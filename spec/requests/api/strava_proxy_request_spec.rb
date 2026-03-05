@@ -210,70 +210,70 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect(strava_integration.access_token).to_not eq og_token
         end
 
-        # context "with valid token permissions" do
-        #   let(:token_expires_at) { Time.current + 1.hour }
-        #   let(:target_attributes) do
-        #     {
-        #       strava_id:,
-        #       title: "Extra 10: HIIT Ride with Cody Rigsby",
-        #       description: "Total Output: 94 kJ\n" + "Leaderboard Rank: 6,555 / 32,313",
-        #       distance_meters: 5079.8,
-        #       moving_time_seconds: 600,
-        #       total_elevation_gain_meters: 0.0,
-        #       sport_type: "Ride",
-        #       private: false,
-        #       kudos_count: 2,
-        #       gear_id:,
-        #       photos: {photo_url: "https://dgtzuqphqg23d.cloudfront.net/lDHfSHn0XR7kn5dltGzfOIgJlAdwjgqM4_6HbGt95l4-768x432.jpg", photo_count: 1},
-        #       segment_locations: {},
-        #       activity_type: "Ride",
-        #       timezone: "America/Chicago",
-        #       average_speed: 8.466,
-        #       suffer_score: 2.0,
-        #       strava_data: {
-        #         commute: false,
-        #         trainer: true,
-        #         muted: true,
-        #         pr_count: 0,
-        #         device_name: "Peloton Bike",
-        #         device_watts: true,
-        #         average_speed: 8.466,
-        #         average_watts: 156.0,
-        #         max_heartrate: 149.0,
-        #         average_heartrate: 136.2
-        #       }
-        #     }
-        #   end
-        #   it "updates the activity and runs update_from_strava!" do
-        #     expect(strava_integration.reload.token_expired?).to be_falsey
-        #     og_token = strava_integration.access_token
-        #     expect(strava_activity.reload.enriched?).to be_falsey
+        context "with valid token permissions" do
+          let(:token_expires_at) { Time.current + 1.hour }
+          let(:target_attributes) do
+            {
+              strava_id:,
+              title: "Extra 10: HIIT Ride with Cody Rigsby",
+              description: "Total Output: 94 kJ\n" + "Leaderboard Rank: 6,555 / 32,313",
+              distance_meters: 5079.8,
+              moving_time_seconds: 600,
+              total_elevation_gain_meters: 0.0,
+              sport_type: "Ride",
+              private: false,
+              kudos_count: 2,
+              gear_id:,
+              photos: {photo_url: "https://dgtzuqphqg23d.cloudfront.net/lDHfSHn0XR7kn5dltGzfOIgJlAdwjgqM4_6HbGt95l4-768x432.jpg", photo_count: 1},
+              segment_locations: {},
+              activity_type: "Ride",
+              timezone: "America/Chicago",
+              average_speed: 8.466,
+              suffer_score: 2.0,
+              strava_data: {
+                commute: false,
+                trainer: true,
+                muted: true,
+                pr_count: 0,
+                device_name: "Peloton Bike",
+                device_watts: true,
+                average_speed: 8.466,
+                average_watts: 156.0,
+                max_heartrate: 149.0,
+                average_heartrate: 136.2
+              }
+            }
+          end
+          it "updates the activity and runs update_from_strava!" do
+            expect(strava_integration.reload.token_expired?).to be_falsey
+            og_token = strava_integration.access_token
+            expect(strava_activity.reload.enriched?).to be_falsey
 
-        #     VCR.use_cassette("strava-proxy_update_activity") do
-        #       expect {
-        #         post base_url, params: {
-        #           url: "activities/#{strava_id}", method: "PUT", access_token: token.token, body: {gear_id:}
-        #         }
-        #       }.to change(StravaRequest, :count).by(3)
-        #       # proxy PUT + update_from_strava! GET + enqueued gear fetch
-        #     end
+            VCR.use_cassette("strava-proxy_update_activity") do
+              expect {
+                post base_url, params: {
+                  url: "activities/#{strava_id}", method: "PUT", access_token: token.token, body: {gear_id:}
+                }
+              }.to change(StravaRequest, :count).by(2)
+              # proxy PUT + update_from_strava! GET + enqueued gear fetch
+            end
 
-        #     expect(response.status).to eq 200
-        #     expect(strava_integration.access_token).to eq og_token
+            expect(response.status).to eq 200
+            expect(strava_integration.access_token).to eq og_token
 
-        #     proxy_request = StravaRequest.where(request_type: :proxy).last
-        #     expect(proxy_request.success?).to be_truthy
-        #     expect(proxy_request.parameters).to eq expected_parameters.as_json
+            proxy_request = StravaRequest.where(request_type: :proxy).last
+            expect(proxy_request.success?).to be_truthy
+            expect(proxy_request.parameters).to eq expected_parameters.as_json
 
-        #     fetch_request = StravaRequest.where(request_type: :fetch_activity).last
-        #     expect(fetch_request.success?).to be_truthy
+            fetch_request = StravaRequest.where(request_type: :fetch_activity).last
+            expect(fetch_request.success?).to be_truthy
 
-        #     expect(strava_activity.reload.enriched?).to be_truthy
-        #     expect(strava_activity).to have_attributes target_attributes.as_json
-        #     expect(strava_activity.start_date).to be_within(1).of Time.at(1771267927)
-        #     expect(json_result).to eq strava_activity.proxy_serialized.as_json
-        #   end
-        # end
+            expect(strava_activity.reload.enriched?).to be_truthy
+            expect(strava_activity).to have_attributes target_attributes.as_json
+            expect(strava_activity.start_date).to be_within(1).of Time.at(1771267927)
+            expect(json_result).to eq strava_activity.proxy_serialized.as_json
+          end
+        end
       end
 
       context "strava returns rate limit error" do
