@@ -196,6 +196,7 @@ class BikeSticker < ApplicationRecord
 
       code_number_length = results.maximum(:code_number_length)
       max_digits = (code_number_length || 4) - leading_zeros.length
+      return results if max_digits < 1
 
       results.where("code_integer < ?", ("9" * max_digits).to_i)
         .of_length(calculated_code_numbers(normalized_code_with_zeroes).length)
