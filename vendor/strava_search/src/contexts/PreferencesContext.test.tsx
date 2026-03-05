@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { PreferencesProvider, usePreferences, getDefaultUnits } from './PreferencesContext';
+import { PreferencesProvider, usePreferences } from './PreferencesContext';
+import { getDefaultUnits } from '../utils/units';
 
 vi.mock('./AuthContext', () => ({
   useAuth: vi.fn(() => ({ athlete: mockAthlete })),

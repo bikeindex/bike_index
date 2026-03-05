@@ -8,8 +8,9 @@ import {
   type ReactNode,
 } from 'react';
 import { useAuth } from './AuthContext';
+import { getDefaultUnits, type UnitSystem } from '../utils/units';
 
-export type UnitSystem = 'metric' | 'imperial';
+export type { UnitSystem };
 export type DarkMode = 'light' | 'dark' | 'system';
 
 interface StoredPreferences {
@@ -42,29 +43,6 @@ function getStoredPreferences(): StoredPreferences {
 function storePreferences(prefs: StoredPreferences) {
   const current = getStoredPreferences();
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...current, ...prefs }));
-}
-
-export function getDefaultUnits(measurementPreference?: string, athleteCountry?: string): UnitSystem {
-  // Use Strava athlete's measurement_preference if available
-  if (measurementPreference === 'feet') {
-    return 'imperial';
-  }
-  if (measurementPreference === 'meters') {
-    return 'metric';
-  }
-
-  // Fall back to athlete country
-  if (athleteCountry === 'United States') {
-    return 'imperial';
-  }
-
-  // Also check browser locale as fallback
-  const locale = navigator.language || '';
-  if (locale.startsWith('en-US')) {
-    return 'imperial';
-  }
-
-  return 'metric';
 }
 
 const PreferencesContext = createContext<PreferencesContextType | null>(null);
