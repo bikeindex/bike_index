@@ -11,7 +11,10 @@
         <% if display_dev_info? %>
           <tr>
             <td class="only-dev-visible">ID</td>
-            <td><code><%= @strava_integration.id %></code></td>
+            <td>
+              <code><%= @strava_integration.id %></code>
+              <small class="tw:ml-2 less-strong">Strava Athlete ID: <code><%= @strava_integration.athlete_id %></code></small>
+            </td>
           </tr>
         <% end %>
 
@@ -117,7 +120,7 @@
 
           <td>
             <%= @strava_integration.sync_progress_percent %>%
-            <span class="less-strong tw:ml-2"><%= number_display(@strava_integration.strava_activities.enriched.count) %> / <%= number_display(@strava_integration.athlete_activity_count) %> enriched</span>
+            <span class="less-strong tw:ml-2"><%= number_display(@strava_integration.strava_activities.enriched.count) %> / <%= number_display(@strava_integration.activities_downloaded_count) %> enriched</span>
           </td>
         </tr>
 

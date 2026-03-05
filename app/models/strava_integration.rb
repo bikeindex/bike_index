@@ -95,22 +95,29 @@ class StravaIntegration < ApplicationRecord
   end
 
   def update_from_athlete_and_stats(athlete, stats = nil)
-    activity_count = if stats
-      (stats.dig("all_ride_totals", "count") || 0) +
+    if stats
+      self.athlete_activity_count = (stats.dig("all_ride_totals", "count") || 0) +
         (stats.dig("all_run_totals", "count") || 0) +
         (stats.dig("all_swim_totals", "count") || 0)
     end
-
-    update(
-      strava_data: athlete.except("id"),
-      athlete_id: athlete["id"].to_s,
-      athlete_activity_count: activity_count,
-      status: :syncing
-    )
+    update(strava_data: athlete.except("id"), athlete_id: athlete["id"], status: calculated_status)
 
     bikes = (athlete["bikes"] || []).map { |g| g.merge("gear_type" => "bike") }
     shoes = (athlete["shoes"] || []).map { |g| g.merge("gear_type" => "shoe") }
     (bikes + shoes).each { |gear_data| StravaGear.update_from_strava(self, gear_data) }
+  end
+
+  def update_sync_status(force_update: false)
+    calculated_downloaded = strava_activities.count
+    return if !force_update && activities_downloaded_count == calculated_downloaded
+
+    self.status = calculated_status
+    if synced?
+      enqueue_enrich_activity_requests
+      enqueue_gear_requests
+      strava_gears.find_each(&:update_total_distance!)
+    end
+    update(activities_downloaded_count: calculated_downloaded)
   end
 
   def unknown_gear_ids
@@ -123,22 +130,18 @@ class StravaIntegration < ApplicationRecord
     (unknown_gear_ids + un_enriched_ids).uniq
   end
 
-  def update_sync_status(force_update: false)
-    calculated_downloaded = strava_activities.count
-    return if !force_update && activities_downloaded_count == calculated_downloaded
-
-    pending_lists = StravaRequest.list_activities.pending.where(strava_integration_id: id)
-    if pending_lists.none?
-      enqueue_enrich_activity_requests
-      enqueue_gear_requests
-      strava_gears.find_each(&:update_total_distance!)
-    end
-
-    update(activities_downloaded_count: calculated_downloaded,
-      status: pending_lists.none? ? :synced : :syncing)
-  end
-
   private
+
+  def calculated_status
+    return :error if status == :error
+    return :syncing if StravaRequest.list_activities.count == 0
+
+    if StravaRequest.list_activities.pending.where(strava_integration_id: id).count > 0
+      :syncing
+    else
+      :synced
+    end
+  end
 
   def enqueue_gear_requests
     already_enqueued = StravaRequest.pending

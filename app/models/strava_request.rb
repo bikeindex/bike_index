@@ -51,7 +51,7 @@ class StravaRequest < AnalyticsRecord
     fetch_athlete_stats: 2,
     list_activities: 3,
     fetch_gear: 4,
-    fetch_activity: 5
+    fetch_activity: 10
   }.freeze
   PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000 # Based on timestamp digits
 
