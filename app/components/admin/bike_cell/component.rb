@@ -33,7 +33,9 @@ module Admin::BikeCell
       # bike_link_path can be false to not link
       return nil if @bike_link_path_arg == false
       return @bike_link_path_arg if @bike_link_path_arg.present?
-      return admin_bike_path(@bike_id) if @bike_id.present?
+      if @bike_id.present?
+        return @bike&.version? ? admin_bike_version_path(@bike_id) : admin_bike_path(@bike_id)
+      end
 
       nil
     end
@@ -53,7 +55,10 @@ module Admin::BikeCell
           concat(content_tag(:em, @bike.frame_model_truncated))
         end
         concat(content_tag(:small, " #{@bike.type}")) unless @bike.cycle_type == "bike"
-        if @bike.unregistered_parking_notification?
+        if @bike.version?
+          concat(" ")
+          concat(render(UI::Badge::Component.new(text: "V", title: "Bike Version", color: :purple, size: :sm)))
+        elsif @bike.unregistered_parking_notification?
           concat(content_tag(:em, " unregistered", class: "small text-warning"))
         elsif @bike.creation_description.present?
           concat(", ")
