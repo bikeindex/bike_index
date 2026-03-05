@@ -47,8 +47,7 @@ RSpec.describe StravaActivity, type: :model do
 
     it "cycling scope returns cycling activities" do
       expect(StravaActivity.cycling.pluck(:id).sort).to eq([ride.id, mtb.id, gravel.id, virtual.id, ebike.id, emtb.id].sort)
-      expect(StravaActivity.strava_ordered.pluck(:id)).to eq([gravel.id,virtual.id, ebike.id, run.id, emtb.id, mtb.id, ride.id])
-
+      expect(StravaActivity.strava_ordered.pluck(:id)).to eq([gravel.id, virtual.id, ebike.id, run.id, emtb.id, mtb.id, ride.id])
     end
   end
 

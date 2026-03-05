@@ -119,7 +119,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect(json_result.first["title"]).to eq "Thanks for coming across the bay!"
           expect(json_result).to eq [strava_activity.proxy_serialized.as_json]
 
-          expect(StravaRequest.last).to have_attributes(request_type: "proxy",response_status: "skipped",
+          expect(StravaRequest.last).to have_attributes(request_type: "proxy", response_status: "skipped",
             parameters: {"url" => "athlete/activities?page=1"})
         end
       end
