@@ -63,15 +63,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const state = await getSyncState(auth.athlete.id);
         setSyncState(state || null);
 
-        // Refresh athlete profile in the background if it's missing
-        if (!auth.athlete.profile_medium) {
-          getAthlete().then(async (freshAthlete) => {
-            freshAthlete.id = Number(freshAthlete.id);
-            const updatedAuth = { ...auth, athlete: freshAthlete };
-            await saveAuth(updatedAuth);
-            setAthlete(freshAthlete);
-          }).catch(() => {}); // Silently ignore
-        }
+        // Refresh athlete profile in the background
+        getAthlete().then(async (freshAthlete) => {
+          if (!freshAthlete.profile_medium) return; // Not a valid athlete response
+          freshAthlete.id = Number(freshAthlete.id);
+          const updatedAuth = { ...auth, athlete: freshAthlete };
+          await saveAuth(updatedAuth);
+          setAthlete(freshAthlete);
+        }).catch(() => {}); // Silently ignore
         return;
       }
 
