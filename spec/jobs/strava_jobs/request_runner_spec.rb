@@ -8,7 +8,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
   let(:instance) { described_class.new }
 
   it "is the correct queue" do
-    expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
+    expect(described_class.sidekiq_options["queue"]).to eq "droppable"
   end
 
   describe "perform" do

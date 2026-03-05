@@ -169,6 +169,11 @@ class BikeVersion < ApplicationRecord
     nil
   end
 
+  # Necessary to duplicate bike
+  def current?
+    !deleted? && !user_hidden?
+  end
+
   def current_impound_record
     nil
   end

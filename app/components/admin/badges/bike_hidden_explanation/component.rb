@@ -25,14 +25,16 @@ module Admin::Badges::BikeHiddenExplanation
       content_tag(:small, "user hidden", class: UI::Alert::Component::TEXT_CLASSES[:notice])
     end
 
+    # BikeVersion can't be example
     def example_content
-      return unless @bike.example?
+      return unless @bike.is_a?(Bike) && @bike.example?
 
       content_tag(:small, "test", title: "example (aka test)", class: error_class)
     end
 
+    # BikeVersion can't be likey spam
     def likely_spam_content
-      return unless @bike.likely_spam?
+      return unless @bike.is_a?(Bike) && @bike.likely_spam?
 
       content_tag(:small, "spam", title: "LIKELY spam", class: error_class)
     end
