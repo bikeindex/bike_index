@@ -8,7 +8,7 @@ class ScheduledJobRunner < ScheduledJob
   HISTORY_KEY = "scheduler_history_#{Rails.env}".freeze
 
   def self.frequency
-    5.minutes
+    59
   end
 
   def self.worker_from_string(worker_string)

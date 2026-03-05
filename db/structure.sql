@@ -3561,7 +3561,7 @@ CREATE TABLE public.strava_gears (
     strava_integration_id bigint NOT NULL,
     item_type character varying,
     item_id bigint,
-    strava_gear_id character varying NOT NULL,
+    strava_id character varying NOT NULL,
     name character varying,
     gear_type integer,
     total_distance_kilometers integer,
@@ -3602,7 +3602,7 @@ CREATE TABLE public.strava_integrations (
     refresh_token text NOT NULL,
     token_expires_at timestamp(6) without time zone,
     strava_permissions character varying,
-    athlete_id character varying,
+    strava_id character varying,
     athlete_activity_count integer,
     activities_downloaded_count integer DEFAULT 0 NOT NULL,
     status integer DEFAULT 0 NOT NULL,
@@ -7148,10 +7148,10 @@ CREATE INDEX index_strava_gears_on_strava_integration_id ON public.strava_gears 
 
 
 --
--- Name: index_strava_gears_on_strava_integration_id_and_strava_gear_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_strava_gears_on_strava_integration_id_and_strava_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_strava_gears_on_strava_integration_id_and_strava_gear_id ON public.strava_gears USING btree (strava_integration_id, strava_gear_id);
+CREATE UNIQUE INDEX index_strava_gears_on_strava_integration_id_and_strava_id ON public.strava_gears USING btree (strava_integration_id, strava_id);
 
 
 --
@@ -7436,6 +7436,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260305025122'),
 ('20260304181710'),
 ('20260220053202'),
 ('20260219190342'),

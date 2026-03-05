@@ -15,14 +15,14 @@
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  item_id                     :bigint
-#  strava_gear_id              :string           not null
+#  strava_id                   :string           not null
 #  strava_integration_id       :bigint           not null
 #
 # Indexes
 #
-#  index_strava_gears_on_item_type_and_item_id                     (item_type,item_id) UNIQUE WHERE (item_id IS NOT NULL)
-#  index_strava_gears_on_strava_integration_id                     (strava_integration_id)
-#  index_strava_gears_on_strava_integration_id_and_strava_gear_id  (strava_integration_id,strava_gear_id) UNIQUE
+#  index_strava_gears_on_item_type_and_item_id                (item_type,item_id) UNIQUE WHERE (item_id IS NOT NULL)
+#  index_strava_gears_on_strava_integration_id                (strava_integration_id)
+#  index_strava_gears_on_strava_integration_id_and_strava_id  (strava_integration_id,strava_id) UNIQUE
 #
 class StravaGear < ApplicationRecord
   GEAR_TYPE_ENUM = {bike: 0, shoe: 1}.freeze
@@ -33,7 +33,7 @@ class StravaGear < ApplicationRecord
   belongs_to :item, polymorphic: true, optional: true
 
   validates :strava_integration, presence: true
-  validates :strava_gear_id, presence: true,
+  validates :strava_id, presence: true,
     uniqueness: {scope: :strava_integration_id}
   validates :item_id, uniqueness: {scope: :item_type, message: "already has a Strava gear association"},
     allow_nil: true
@@ -45,7 +45,7 @@ class StravaGear < ApplicationRecord
   scope :with_item, -> { where.not(item_id: nil) }
 
   def self.update_from_strava(strava_integration, gear_data)
-    strava_gear = strava_integration.strava_gears.find_or_initialize_by(strava_gear_id: gear_data["id"])
+    strava_gear = strava_integration.strava_gears.find_or_initialize_by(strava_id: gear_data["id"])
 
     calculated_gear_type = gear_data["gear_type"] || strava_gear.gear_type
     calculated_gear_type ||= gear_data.key?("frame_type") ? :bike : :shoe
@@ -58,7 +58,7 @@ class StravaGear < ApplicationRecord
   end
 
   def strava_gear_display_name
-    name.presence || strava_gear_id
+    name.presence || strava_id
   end
 
   def strava_distance_km
@@ -92,7 +92,7 @@ class StravaGear < ApplicationRecord
   end
 
   def calculated_strava_activities
-    strava_integration.strava_activities.where(gear_id: strava_gear_id)
+    strava_integration.strava_activities.where(gear_id: strava_id)
   end
 
   def update_total_distance!

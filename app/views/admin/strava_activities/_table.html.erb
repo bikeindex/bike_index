@@ -103,7 +103,7 @@
           <td>
             <% if strava_activity.gear_id.present? %>
               <small><%= strava_activity.calculated_gear_name %></small>
-              <% gear_assoc = strava_activity.strava_integration.strava_gears.find { |ga| ga.strava_gear_id == strava_activity.gear_id } %>
+              <% gear_assoc = strava_activity.strava_integration.strava_gears.find { |ga| ga.strava_id == strava_activity.gear_id } %>
               <% if gear_assoc&.item.present? %>
                 <%= link_to "BI", bike_path(gear_assoc.item), class: "small text-success", title: gear_assoc.item.title_string %>
               <% end %>

@@ -13,8 +13,8 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
 
   describe "perform" do
     let(:strava_integration) do
-      FactoryBot.create(:strava_integration, :syncing,
-        athlete_id: ENV["STRAVA_TEST_USER_ID"], athlete_activity_count: 1817)
+      FactoryBot.create(:strava_integration, :syncing, status: :pending,
+        strava_id: ENV["STRAVA_TEST_USER_ID"], athlete_activity_count: 1817)
     end
     let(:strava_request) do
       StravaRequest.create!(user_id: strava_integration.user_id,
@@ -61,6 +61,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         cycling_count = strava_integration.strava_activities.cycling.count
         detail_requests = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
         expect(detail_requests.count).to eq(cycling_count)
+        expect(strava_integration.reload.status).to eq "synced"
       end
       context "with list_activities over pages enabled" do
         let(:strava_request) do
@@ -76,6 +77,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
           end
 
           expect(StravaActivity.count).to eq 0
+          expect(strava_integration.reload.status).to eq "synced"
         end
       end
     end
@@ -121,6 +123,8 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
 
       it "updates activity details and finishes sync when last" do
+        FactoryBot.create(:strava_request, request_type: :list_activities, response_status: :success, strava_integration:)
+
         VCR.use_cassette("strava-get_activity") do
           instance.perform(strava_request.id)
         end
@@ -138,7 +142,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     context "with fetch_gear request" do
       let!(:strava_gear) do
         FactoryBot.create(:strava_gear, strava_integration:,
-          strava_gear_id: "b12345", strava_data: {"resource_state" => 2})
+          strava_id: "b12345", strava_data: {"resource_state" => 2})
       end
       let!(:strava_request) do
         StravaRequest.create!(user_id: strava_integration.user_id,
@@ -260,7 +264,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
       let(:parameters) do
         {object_type: "activity", aspect_type:, updates:,
-         object_id: "17323701543", owner_id: strava_integration.athlete_id}
+         object_id: "17323701543", owner_id: strava_integration.strava_id}
       end
       let(:aspect_type) { "create" }
       let(:updates) { {} }
@@ -347,7 +351,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       context "with incoming_webhook athlete" do
         let(:parameters) do
           {object_type: "athlete", aspect_type: "update",
-           owner_id: strava_integration.athlete_id, updates:}
+           owner_id: strava_integration.strava_id, updates:}
         end
         it "creates a fetch_athlete request" do
           expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(1)

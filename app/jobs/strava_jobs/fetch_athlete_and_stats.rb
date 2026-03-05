@@ -2,7 +2,7 @@
 
 module StravaJobs
   class FetchAthleteAndStats < ApplicationJob
-    sidekiq_options queue: "low_priority", retry: 5
+    sidekiq_options queue: "low_priority", retry: 3
 
     def self.total_pages(activity_count)
       if (activity_count || 0).to_i > 0

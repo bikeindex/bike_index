@@ -167,7 +167,7 @@ RSpec.describe WebhooksController, type: :request do
             object_type: "activity",
             aspect_type: "create",
             object_id: 12345678987654321,
-            owner_id: strava_integration.athlete_id.to_i,
+            owner_id: strava_integration.strava_id.to_i,
             subscription_id: 999
           }, as: :json
         }.to change(StravaRequest, :count).by(1)

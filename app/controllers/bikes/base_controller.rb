@@ -112,7 +112,7 @@ class Bikes::BaseController < ApplicationController
       return
     end
 
-    strava_gear = strava_integration.strava_gears.find_by(strava_gear_id:)
+    strava_gear = strava_integration.strava_gears.find_by(strava_id: strava_gear_id)
     unless strava_gear
       flash[:error] = "Strava gear not found."
       return

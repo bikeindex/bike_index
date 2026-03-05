@@ -16,11 +16,11 @@ RSpec.describe StravaGear, type: :model do
       end
     end
 
-    context "without strava_gear_id" do
+    context "without strava_id" do
       it "is invalid" do
-        strava_gear = FactoryBot.build(:strava_gear, strava_gear_id: nil)
+        strava_gear = FactoryBot.build(:strava_gear, strava_id: nil)
         expect(strava_gear).not_to be_valid
-        expect(strava_gear.errors[:strava_gear_id]).to be_present
+        expect(strava_gear.errors[:strava_id]).to be_present
       end
     end
 
@@ -30,14 +30,14 @@ RSpec.describe StravaGear, type: :model do
       end
     end
 
-    context "with duplicate strava_gear_id for same strava_integration" do
+    context "with duplicate strava_id for same strava_integration" do
       let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
       it "is invalid" do
-        FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b1234")
-        duplicate = FactoryBot.build(:strava_gear, strava_integration:, strava_gear_id: "b1234")
+        FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b1234")
+        duplicate = FactoryBot.build(:strava_gear, strava_integration:, strava_id: "b1234")
         expect(duplicate).not_to be_valid
-        expect(duplicate.errors[:strava_gear_id]).to be_present
+        expect(duplicate.errors[:strava_id]).to be_present
       end
     end
 
@@ -95,7 +95,7 @@ RSpec.describe StravaGear, type: :model do
   end
 
   describe "#strava_gear_display_name" do
-    let(:strava_gear) { FactoryBot.build(:strava_gear, name:, strava_gear_id: "b12345") }
+    let(:strava_gear) { FactoryBot.build(:strava_gear, name:, strava_id: "b12345") }
 
     context "with name present" do
       let(:name) { "My Road Bike" }
@@ -247,7 +247,7 @@ RSpec.describe StravaGear, type: :model do
       end
 
       it "updates attributes from gear detail response" do
-        FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b1234",
+        FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b1234",
           strava_data: {"resource_state" => 2})
         strava_gear = StravaGear.update_from_strava(strava_integration, detail)
         expect(strava_gear).to be_valid
@@ -265,7 +265,7 @@ RSpec.describe StravaGear, type: :model do
       it "creates a new gear record" do
         expect { StravaGear.update_from_strava(strava_integration, gear_data) }
           .to change(StravaGear, :count).by(1)
-        strava_gear = strava_integration.strava_gears.find_by(strava_gear_id: "b9999")
+        strava_gear = strava_integration.strava_gears.find_by(strava_id: "b9999")
         expect(strava_gear.name).to eq("New Bike")
       end
     end
@@ -283,7 +283,7 @@ RSpec.describe StravaGear, type: :model do
       let(:detail) { {"id" => "b1234", "name" => "Bike", "resource_state" => 3, "distance" => 5000.0} }
 
       it "preserves existing gear_type" do
-        FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b1234", gear_type: "bike")
+        FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b1234", gear_type: "bike")
         strava_gear = StravaGear.update_from_strava(strava_integration, detail)
         expect(strava_gear.gear_type).to eq("bike")
       end
@@ -300,7 +300,7 @@ RSpec.describe StravaGear, type: :model do
   end
 
   describe "#update_total_distance!" do
-    let(:strava_gear) { FactoryBot.create(:strava_gear, strava_gear_id: "b1234") }
+    let(:strava_gear) { FactoryBot.create(:strava_gear, strava_id: "b1234") }
     let(:strava_integration) { strava_gear.strava_integration }
 
     context "with matching activities" do

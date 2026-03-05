@@ -11,7 +11,7 @@ RSpec.describe StravaJobs::FetchAthleteAndStats, type: :job do
 
   describe "perform" do
     let(:strava_integration) do
-      FactoryBot.create(:strava_integration, athlete_id: ENV["STRAVA_TEST_USER_ID"])
+      FactoryBot.create(:strava_integration, strava_id: ENV["STRAVA_TEST_USER_ID"])
     end
     let(:target_strava_data) do
       {
@@ -23,7 +23,7 @@ RSpec.describe StravaJobs::FetchAthleteAndStats, type: :job do
         updated_at: "2026-02-02T18:05:52Z", badge_type_id: 1, resource_state: 2
       }
     end
-    let(:target_proxy_response) { target_strava_data.merge(id: strava_integration.athlete_id, bikes:, shoes:) }
+    let(:target_proxy_response) { target_strava_data.merge(id: strava_integration.strava_id, bikes:, shoes:) }
     let(:bikes) { [] }
     let(:shoes) { [] }
 
