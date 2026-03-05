@@ -22,7 +22,6 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
   const [activityCount, setActivityCount] = useState(0);
   const [enrichedCount, setEnrichedCount] = useState(0);
 
-
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -178,13 +177,13 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
           <div>
             <h3 className="font-medium text-red-600 mb-3">Danger Zone</h3>
             <div className="border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <button
-                  onClick={handleClearData}
-                  className="w-full py-2 border border-red-300 dark:border-red-700 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Clear All Local Data
-                </button>
+              <button
+                onClick={handleClearData}
+                className="w-full py-2 border border-red-300 dark:border-red-700 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Clear All Local Data
+              </button>
             </div>
           </div>
         </div>
