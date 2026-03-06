@@ -116,7 +116,7 @@ module StravaJobs
         return :update_activity if params_method.present?
         return :fetch_athlete if url.match?(/\Aathlete(\/\d+)?\z/)
         return :list_activities if url.match?(/\Aathlete\/activities\?.*page=\d/)
-        return :fetch_activity if url.start_with?("activities/") || url.start_with?("athlete/activities")
+        return :fetch_activity if url.start_with?("activities/", "athlete/activities")
         return :fetch_gear if url.start_with?("gear/")
 
         raise ArgumentError, "Unknown proxy request type for: #{url}, #{params_method}"
