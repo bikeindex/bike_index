@@ -162,11 +162,15 @@ class StravaRequest < AnalyticsRecord
   end
 
   def update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: false, raise_on_error: false)
-    self.response_status = status_from_response(response)
-    store_error_response(response) if error?
-    update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
+    if response == :binx_response_rate_limited
+      update!(requested_at: Time.current, response_status: :binx_response_rate_limited)
+    else
+      self.response_status = status_from_response(response)
+      store_error_response(response) if error?
+      update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
+    end
 
-    if rate_limited? || service_unavailable?(response)
+    if binx_response_rate_limited? || rate_limited? || service_unavailable?(response)
       return unless re_enqueue_if_rate_limited_or_unavailable
 
       StravaRequest.create!(user_id:, strava_integration_id:, request_type:, proxy_request:,
@@ -195,7 +199,7 @@ class StravaRequest < AnalyticsRecord
   end
 
   def service_unavailable?(response)
-    response&.status == 503
+    defined?(response.status) && response.status == 503
   end
 
   def store_error_response(response)

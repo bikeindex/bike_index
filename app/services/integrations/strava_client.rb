@@ -16,15 +16,16 @@ class Integrations::StravaClient
   }.freeze
 
   class << self
-    def currently_rate_limited?(request_method = nil)
+    def currently_rate_limited?(request_method = nil, headroom: nil)
+      headroom ||= RATE_LIMIT_HEADROOM
       rate_limit = StravaRequest.estimated_current_rate_limit
 
       if request_method.blank? || request_method.upcase == "GET"
-        (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < RATE_LIMIT_HEADROOM ||
-          (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < RATE_LIMIT_HEADROOM
+        (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < headroom ||
+          (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < headroom
       else
-        (rate_limit[:short_limit] - rate_limit[:short_usage]) < RATE_LIMIT_HEADROOM ||
-          (rate_limit[:long_limit] - rate_limit[:long_usage]) < RATE_LIMIT_HEADROOM
+        (rate_limit[:short_limit] - rate_limit[:short_usage]) < headroom ||
+          (rate_limit[:long_limit] - rate_limit[:long_usage]) < headroom
       end
     end
 

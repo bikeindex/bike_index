@@ -11,10 +11,8 @@ module StravaJobs
         end
 
         if Integrations::StravaClient.currently_rate_limited?(strava_request.request_method)
-          strava_request.update!(response_status: :binx_response_rate_limited, requested_at: Time.current)
-          StravaRequest.create!(user_id: strava_request.user_id, strava_integration_id: strava_request.strava_integration_id,
-            request_type: strava_request.request_type, proxy_request: strava_request.proxy_request,
-            parameters: strava_request.parameters.except("error_response_status"))
+          strava_request.update_from_response(:binx_response_rate_limited,
+            re_enqueue_if_rate_limited_or_unavailable: true)
           return Integrations::StravaClient::RATE_LIMITED_RESPONSE_BODY
         end
 
