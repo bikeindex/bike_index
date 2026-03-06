@@ -36,56 +36,56 @@ This project uses Rspec for tests. All business logic should be tested.
 
 **Good:**
 ```ruby
-  describe "show_bulk_import?" do
-    let(:organization) { FactoryBot.build(:organization, pos_kind:) }
-    let(:pos_kind) { "no_pos" }
+describe "show_bulk_import?" do
+  let(:organization) { FactoryBot.build(:organization, pos_kind:) }
+  let(:pos_kind) { "no_pos" }
 
-    it "is falsey" do
-      expect(organization.show_bulk_import?).to be_falsey
-    end
+  it "is falsey" do
+    expect(organization.show_bulk_import?).to be_falsey
+  end
 
-    context "when ascend" do
-      let(:pos_kind) { "ascend_pos" }
+  context "when ascend" do
+    let(:pos_kind) { "ascend_pos" }
 
-      it "is truthy" do
-        expect(organization.show_bulk_import?).to be_truthy
-      end
-    end
-
-    context "when broken_ascend_pos" do
-      let(:pos_kind) { "broken_ascend_pos" }
-      it "is truthy" do
-        expect(organization.show_bulk_import?).to be_truthy
-      end
-    end
-
-    context "when lightspeed_pos" do
-      let(:pos_kind) { "lightspeed_pos" }
-      it "is truthy" do
-        expect(organization.show_bulk_import?).to be_falsey
-      end
-    end
-
-    context "when feature show_bulk_import_impound" do
-      let(:organization) { FactoryBot.build(:organization_with_organization_features, enabled_feature_slugs: ["show_bulk_import_impound"]) }
-      it "is truthy" do
-        expect(organization.show_bulk_import?).to be_falsey
-      end
+    it "is truthy" do
+      expect(organization.show_bulk_import?).to be_truthy
     end
   end
+
+  context "when broken_ascend_pos" do
+    let(:pos_kind) { "broken_ascend_pos" }
+    it "is truthy" do
+      expect(organization.show_bulk_import?).to be_truthy
+    end
+  end
+
+  context "when lightspeed_pos" do
+    let(:pos_kind) { "lightspeed_pos" }
+    it "is truthy" do
+      expect(organization.show_bulk_import?).to be_falsey
+    end
+  end
+
+  context "when feature show_bulk_import_impound" do
+    let(:organization) { FactoryBot.build(:organization_with_organization_features, enabled_feature_slugs: ["show_bulk_import_impound"]) }
+    it "is truthy" do
+      expect(organization.show_bulk_import?).to be_falsey
+    end
+  end
+end
 ```
 
 **Bad:**
 ```ruby
-  it "returns truthy for show_bulk_import?" do
-    organization = FactoryBot.create(:organization, pos_kind: "ascend_pos")
-    expect(organization.show_bulk_import?).to be_truthy
-  end
-  it "returns truthy when feature is included" do
-    organization = FactoryBot.create(:organization)
-    allow(organization).to receive(:any_enabled?) { true }
-    expect(organization.show_bulk_import?).to be_truthy
-  end
+it "returns truthy for show_bulk_import?" do
+  organization = FactoryBot.create(:organization, pos_kind: "ascend_pos")
+  expect(organization.show_bulk_import?).to be_truthy
+end
+it "returns truthy when feature is included" do
+  organization = FactoryBot.create(:organization)
+  allow(organization).to receive(:any_enabled?) { true }
+  expect(organization.show_bulk_import?).to be_truthy
+end
 ```
 
 ## Frontend Development
