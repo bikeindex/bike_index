@@ -89,7 +89,8 @@ module StravaJobs
       private
 
       def internal_request?(strava_request)
-        strava_request.fetch_athlete? || strava_request.list_activities?
+        strava_request.fetch_athlete? ||
+          (strava_request.list_activities? && strava_request.parameters["url"]&.match?(/page=\d/))
       end
 
       def internal_response!(strava_request)
@@ -116,7 +117,7 @@ module StravaJobs
         return :update_activity if params_method.present?
         return :fetch_athlete if url.match?(/\Aathlete(\/\d+)?\z/)
         return :list_activities if url.match?(/\Aathlete\/activities(\?|\z)/)
-        return :fetch_gear if url.match?(/\Agear\//)
+        return :fetch_gear if url.start_with?("gear/")
 
         :fetch_activity
       end
