@@ -416,16 +416,39 @@ RSpec.describe Organization, type: :model do
 
   describe "show_bulk_import?" do
     # Note: the show_bulk_import? for ascend shops is tested by the ascend_pos test
-    let(:organization) { Organization.new }
+    let(:organization) { FactoryBot.build(:organization, pos_kind:) }
+    let(:pos_kind) { "no_pos" }
+
     it "is falsey" do
       expect(organization.show_bulk_import?).to be_falsey
     end
-    context "enabled" do
-      %w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen].each do |slug|
-        let(:organization) { Organization.new(enabled_feature_slugs: [slug]) }
-        it "is truthy" do
-          expect(organization.show_bulk_import?).to be_truthy
-        end
+
+    context "when ascend" do
+      let(:pos_kind) { "ascend_pos" }
+
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_truthy
+      end
+    end
+
+    context "when broken_ascend_pos" do
+      let(:pos_kind) { "broken_ascend_pos" }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_truthy
+      end
+    end
+
+    context "when lightspeed_pos" do
+      let(:pos_kind) { "lightspeed_pos" }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_falsey
+      end
+    end
+
+    context "when feature show_bulk_import_impound" do
+      let(:organization) { FactoryBot.build(:organization_with_organization_features, enabled_feature_slugs: ["show_bulk_import_impound"]) }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_falsey
       end
     end
   end
