@@ -42,7 +42,8 @@ module StravaJobs
         strava_request = StravaRequest.create!(
           strava_integration:,
           user:,
-          request_type: :proxy,
+          proxy_request: true,
+          request_type: proxy_request_type(url, params_method),
           parameters: {url:, method: params_method, body:}.compact
         )
 
@@ -87,31 +88,17 @@ module StravaJobs
 
       private
 
-      def athlete_request?(strava_request)
-        return false if strava_request.parameters["method"].present? # Not a GET request
-
-        strava_request.parameters["url"]&.match?(/\Aathlete(\/\d+)?\z/)
-      end
-
-      def list_activities_page(strava_request)
-        return false if strava_request.parameters["method"].present? # Not a GET request
-        return false unless strava_request.parameters["url"]&.match?(/\Aathlete\/activities\?.*page=\d/)
-
-        strava_request.parameters["url"][/\Wpage=(\d+)/, 1].to_i
-      end
-
       def internal_request?(strava_request)
-        athlete_request?(strava_request) ||
-          list_activities_page(strava_request).present?
+        strava_request.fetch_athlete? || strava_request.list_activities?
       end
 
       def internal_response!(strava_request)
         strava_request.update(response_status: :binx_response)
 
-        if athlete_request?(strava_request)
+        if strava_request.fetch_athlete?
           strava_request.strava_integration.proxy_serialized
         else
-          page = list_activities_page(strava_request) - 1
+          page = strava_request.parameters["url"][/\Wpage=(\d+)/, 1].to_i - 1
           limit = Integrations::StravaClient::ACTIVITIES_PER_PAGE
 
           strava_activities = StravaActivity.where(strava_integration_id: strava_request.strava_integration_id).strava_ordered
@@ -123,6 +110,16 @@ module StravaJobs
 
       def authorized_app?(token)
         token.application_id == STRAVA_DOORKEEPER_APP_ID
+      end
+
+      def proxy_request_type(url, params_method)
+        return :update_activity if params_method.present?
+        return :fetch_athlete if url.match?(/\Aathlete(\/\d+)?\z/)
+        return :list_activities if url.match?(/\Aathlete\/activities\?.*page=\d/)
+        return :fetch_activity if url.start_with?("activities/", "athlete/activities")
+        return :fetch_gear if url.start_with?("gear/")
+
+        raise ArgumentError, "Unknown proxy request type for: #{url}, #{params_method}"
       end
 
       def validate_url!(url)

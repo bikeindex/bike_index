@@ -88,6 +88,37 @@ RSpec.describe StravaJobs::ProxyRequester do
     end
   end
 
+  describe ".proxy_request_type" do
+    it "returns update_activity for non-GET methods" do
+      expect(described_class.send(:proxy_request_type, "activities/123", "PUT")).to eq :update_activity
+      expect(described_class.send(:proxy_request_type, "activities/123", "POST")).to eq :update_activity
+    end
+
+    it "returns fetch_athlete for athlete URLs" do
+      expect(described_class.send(:proxy_request_type, "athlete", nil)).to eq :fetch_athlete
+      expect(described_class.send(:proxy_request_type, "athlete/2430215", nil)).to eq :fetch_athlete
+    end
+
+    it "returns list_activities for paginated activity list URLs" do
+      expect(described_class.send(:proxy_request_type, "athlete/activities?page=1", nil)).to eq :list_activities
+      expect(described_class.send(:proxy_request_type, "athlete/activities?per_page=30&page=2", nil)).to eq :list_activities
+    end
+
+    it "returns fetch_activity for activity URLs" do
+      expect(described_class.send(:proxy_request_type, "activities/17323701543", nil)).to eq :fetch_activity
+      expect(described_class.send(:proxy_request_type, "athlete/activities", nil)).to eq :fetch_activity
+      expect(described_class.send(:proxy_request_type, "athlete/activities/3333333", nil)).to eq :fetch_activity
+    end
+
+    it "returns fetch_gear for gear URLs" do
+      expect(described_class.send(:proxy_request_type, "gear/b12345", nil)).to eq :fetch_gear
+    end
+
+    it "raises for unknown URLs" do
+      expect { described_class.send(:proxy_request_type, "segments/12345", nil) }.to raise_error(ArgumentError, /Unknown proxy request type/)
+    end
+  end
+
   describe ".create_and_execute" do
     before { FactoryBot.create(:state_california) }
     let(:target_attributes) do
