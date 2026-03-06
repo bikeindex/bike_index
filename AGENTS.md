@@ -27,11 +27,66 @@ Ruby is formatted with the standard gem. Run `bin/lint` to automatically format 
 This project uses Rspec for tests. All business logic should be tested.
 
 - Tests should either: help make the code correct now or prevent bugs in the future. Don't add tests that don't do one of those things.
-- Use `context` and `let` to make the differences between tests clear
 - Use request specs, not controller specs. Everything making the same request should be in a single test
 - Avoid testing private methods
 - Avoid mocking objects
   - If making external requests, use VCR. Don't manually write VCR cassettes, record them by running the tests.
+- Use `context` and `let` to isolate what varies between examples.
+  - Each `it` block should live in a `context` that names the condition, with `let` overrides for only what differs in that case. Avoid repeating setup across sibling `it` blocks.
+
+**Good:**
+```ruby
+describe "show_bulk_import?" do
+  let(:organization) { FactoryBot.build(:organization, pos_kind:) }
+  let(:pos_kind) { "no_pos" }
+
+  it "is falsey" do
+    expect(organization.show_bulk_import?).to be_falsey
+  end
+
+  context "when ascend" do
+    let(:pos_kind) { "ascend_pos" }
+
+    it "is truthy" do
+      expect(organization.show_bulk_import?).to be_truthy
+    end
+  end
+
+  context "when broken_ascend_pos" do
+    let(:pos_kind) { "broken_ascend_pos" }
+    it "is truthy" do
+      expect(organization.show_bulk_import?).to be_truthy
+    end
+  end
+
+  context "when lightspeed_pos" do
+    let(:pos_kind) { "lightspeed_pos" }
+    it "is truthy" do
+      expect(organization.show_bulk_import?).to be_falsey
+    end
+  end
+
+  context "when feature show_bulk_import_impound" do
+    let(:organization) { FactoryBot.build(:organization_with_organization_features, enabled_feature_slugs: ["show_bulk_import_impound"]) }
+    it "is truthy" do
+      expect(organization.show_bulk_import?).to be_falsey
+    end
+  end
+end
+```
+
+**Bad:**
+```ruby
+it "returns truthy for show_bulk_import?" do
+  organization = FactoryBot.create(:organization, pos_kind: "ascend_pos")
+  expect(organization.show_bulk_import?).to be_truthy
+end
+it "returns truthy when feature is included" do
+  organization = FactoryBot.create(:organization)
+  allow(organization).to receive(:any_enabled?) { true }
+  expect(organization.show_bulk_import?).to be_truthy
+end
+```
 
 ## Frontend Development
 
