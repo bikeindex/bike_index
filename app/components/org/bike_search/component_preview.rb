@@ -20,7 +20,6 @@ module Org::BikeSearch
             render(Org::BikeSearchRow::Component.new(
               bike:,
               organization:,
-              sortable_search_params: {},
               additional_registration_fields: bike_search.additional_registration_fields
             ))
           end

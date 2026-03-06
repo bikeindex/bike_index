@@ -117,6 +117,6 @@
   - @bikes.each do |bike|
     %tr
       - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-2") do
-        = render(Org::BikeSearchRow::Component.new(bike:, organization: current_organization, sortable_search_params: {}, additional_registration_fields: bike_search.additional_registration_fields))
+        = render(Org::BikeSearchRow::Component.new(bike:, organization: current_organization, additional_registration_fields: bike_search.additional_registration_fields))
 
 = render partial: "/organized/model_audits/submit_model_attestation"

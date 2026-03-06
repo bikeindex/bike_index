@@ -52,7 +52,7 @@
   <% if @bike.email_visible_for?(@organization) %>
     <%= @bike.owner_email %>
     <small>
-      <%= link_to "\u{1F50E}", url_for(@sortable_search_params.merge(search_email: @bike.owner_email)) %>
+      <%= link_to "\u{1F50E}", organization_bikes_path(organization_id: @organization.to_param, search_email: @bike.owner_email), class: "display-sortable-link" %>
     </small>
   <% else %>
     <em class="less-strong"><%= translation(".email_hidden") %></em>
