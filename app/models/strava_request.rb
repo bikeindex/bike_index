@@ -8,6 +8,7 @@
 #  id                    :bigint           not null, primary key
 #  parameters            :jsonb
 #  priority              :bigint           not null
+#  proxy_request         :boolean          default(FALSE), not null
 #  rate_limit            :jsonb
 #  request_type          :integer          not null
 #  requested_at          :datetime
@@ -30,7 +31,7 @@ class StravaRequest < AnalyticsRecord
     fetch_activity: 3,
     fetch_gear: 4,
     incoming_webhook: 5,
-    proxy: 6
+    update_activity: 7
   }.freeze
   RESPONSE_STATUS_ENUM = {
     pending: 0,
@@ -46,12 +47,12 @@ class StravaRequest < AnalyticsRecord
   PENDING_OR_SUCCESS = %i[success pending].freeze
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
   PRIORITY_MAP = {
-    proxy: 0,
     incoming_webhook: 1,
     fetch_athlete: 2,
     fetch_athlete_stats: 2,
     list_activities: 3,
     fetch_gear: 4,
+    update_activity: 5,
     fetch_activity: 10
   }.freeze
   PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000 # Based on timestamp digits
@@ -98,7 +99,7 @@ class StravaRequest < AnalyticsRecord
     end
 
     def most_recent_proxy_at(strava_integration_id)
-      where(strava_integration_id:, request_type: :proxy)
+      where(strava_integration_id:, proxy_request: true)
         .where.not(response_status: :pending).maximum(:updated_at)
     end
 
@@ -162,7 +163,7 @@ class StravaRequest < AnalyticsRecord
     if rate_limited? || service_unavailable?(response)
       return unless re_enqueue_if_rate_limited_or_unavailable
 
-      StravaRequest.create!(user_id:, strava_integration_id:, request_type:,
+      StravaRequest.create!(user_id:, strava_integration_id:, request_type:, proxy_request:,
         parameters: parameters.except("error_response_status"))
     elsif error? && raise_on_error
       raise "Strava API error #{response.status}: #{response.body}"
@@ -201,7 +202,11 @@ class StravaRequest < AnalyticsRecord
   end
 
   def calculated_priority
-    level = PRIORITY_MAP[request_type.to_sym] * PRIORITY_LEVEL_MULTIPLIER
+    level = if proxy_request?
+      0
+    else
+      PRIORITY_MAP[request_type.to_sym] * PRIORITY_LEVEL_MULTIPLIER
+    end
 
     if fetch_activity? && parameters["strava_id"].present?
       level += (parameters["strava_id"].to_i / 1000)

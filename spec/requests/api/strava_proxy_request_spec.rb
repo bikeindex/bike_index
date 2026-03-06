@@ -119,8 +119,8 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect(json_result.first["title"]).to eq "Thanks for coming across the bay!"
           expect(json_result).to eq [strava_activity.proxy_serialized.as_json]
 
-          expect(StravaRequest.last).to have_attributes(request_type: "proxy", response_status: "binx_response",
-            parameters: {"url" => "athlete/activities?page=1"})
+          expect(StravaRequest.last).to have_attributes(proxy_request: true, request_type: "list_activities",
+            response_status: "binx_response", parameters: {"url" => "athlete/activities?page=1"})
         end
       end
 
@@ -132,8 +132,8 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect(response.status).to eq 200
           expect(json_result).to eq strava_integration.proxy_serialized.as_json
 
-          expect(StravaRequest.last).to have_attributes(request_type: "proxy", response_status: "binx_response",
-            parameters: {"url" => "athlete/2430215"})
+          expect(StravaRequest.last).to have_attributes(proxy_request: true, request_type: "fetch_athlete",
+            response_status: "binx_response", parameters: {"url" => "athlete/2430215"})
         end
       end
 
@@ -202,7 +202,8 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect(json_result["errors"]).to be_present
 
           strava_request = StravaRequest.last
-          expect(strava_request.proxy?).to be_truthy
+          expect(strava_request.proxy_request?).to be_truthy
+          expect(strava_request.update_activity?).to be_truthy
           expect(strava_request.response_status).to eq "insufficient_token_privileges"
           expect(strava_request.parameters).to eq expected_parameters.as_json
 
@@ -261,9 +262,9 @@ RSpec.describe "Strava Proxy API", type: :request do
             expect(response.status).to eq 200
             expect(strava_integration.access_token).to eq og_token
 
-            proxy_request = StravaRequest.where(request_type: :proxy).last
-            expect(proxy_request.success?).to be_truthy
-            expect(proxy_request.parameters).to eq expected_parameters.as_json
+            strava_proxy_request = StravaRequest.where(proxy_request: true, request_type: :update_activity).last
+            expect(strava_proxy_request.success?).to be_truthy
+            expect(strava_proxy_request.parameters).to eq expected_parameters.as_json
 
             fetch_request = StravaRequest.where(request_type: :fetch_activity).last
             expect(fetch_request.success?).to be_truthy
@@ -301,7 +302,7 @@ RSpec.describe "Strava Proxy API", type: :request do
             expect(json_result).to eq expected_response_body.as_json
 
             strava_request = StravaRequest.last
-            expect(strava_request.proxy?).to be_truthy
+            expect(strava_request.proxy_request?).to be_truthy
             expect(strava_request.success?).to be_falsey
             expect(strava_request.response_status).to eq "error"
           end

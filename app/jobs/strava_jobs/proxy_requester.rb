@@ -42,7 +42,8 @@ module StravaJobs
         strava_request = StravaRequest.create!(
           strava_integration:,
           user:,
-          request_type: :proxy,
+          proxy_request: true,
+          request_type: proxy_request_type(url, params_method),
           parameters: {url:, method: params_method, body:}.compact
         )
 
@@ -123,6 +124,15 @@ module StravaJobs
 
       def authorized_app?(token)
         token.application_id == STRAVA_DOORKEEPER_APP_ID
+      end
+
+      def proxy_request_type(url, params_method)
+        return :update_activity if params_method.present?
+        return :fetch_athlete if url.match?(/\Aathlete(\/\d+)?\z/)
+        return :list_activities if url.match?(/\Aathlete\/activities\b/)
+        return :fetch_gear if url.match?(/\Agear\//)
+
+        :fetch_activity
       end
 
       def validate_url!(url)
