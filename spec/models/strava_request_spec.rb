@@ -243,7 +243,7 @@ RSpec.describe StravaRequest, type: :model do
       end
       let(:target) do
         # long usage only resets if boundary - 2.minutes also crossed midnight UTC
-        long_usage = Time.current.utc.beginning_of_day > boundary - 2.minutes ? 0 : 200
+        long_usage = (Time.current.utc.beginning_of_day > boundary - 2.minutes) ? 0 : 200
         {short_limit: 100, short_usage: 0, long_limit: 1000, long_usage:,
          read_short_limit: 100, read_short_usage: 0, read_long_limit: 1000, read_long_usage: long_usage}
       end
