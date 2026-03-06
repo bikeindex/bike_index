@@ -203,10 +203,11 @@ RSpec.describe StravaJobs::ProxyRequester do
           requested_at: boundary + 1.second, rate_limit:)
       end
 
-      it "sets binx_response_rate_limited without calling Strava" do
+      it "sets binx_response_rate_limited and returns mocked 429 response" do
         result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
         expect(result[:strava_request].binx_response_rate_limited?).to be true
-        expect(result[:response]).to be_nil
+        expect(result[:response].status).to eq 429
+        expect(result[:response].body["message"]).to eq "Rate Limit Exceeded"
         expect(result[:serialized]).to be_nil
         expect(StravaActivity.count).to eq 0
       end

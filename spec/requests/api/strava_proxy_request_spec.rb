@@ -291,6 +291,28 @@ RSpec.describe "Strava Proxy API", type: :request do
         end
       end
 
+      context "pre-emptively rate limited (binx_response_rate_limited)" do
+        let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 198, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0}
+        end
+        let!(:rate_limit_request) do
+          FactoryBot.create(:strava_request, :processed, strava_integration:,
+            requested_at: boundary + 1.second, rate_limit:)
+        end
+
+        it "returns 429 with rate limit message without calling Strava" do
+          expect do
+            post base_url, params: {url: "activities/17323701543", method: "GET", access_token: token.token}
+          end.to change(StravaRequest, :count).by 1
+          expect(response.status).to eq 429
+          expect(json_result["message"]).to eq "Rate Limit Exceeded"
+          expect(json_result["errors"]).to be_present
+          expect(StravaRequest.last.binx_response_rate_limited?).to be_truthy
+        end
+      end
+
       context "strava returns not found" do
         let(:expected_response_body) { {message: "Record Not Found", errors: [{resource: "resource", field: "path", code: "invalid"}]} }
         it "returns strava error status" do

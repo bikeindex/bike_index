@@ -24,6 +24,11 @@ class Integrations::StravaClient
       end
     end
 
+    def mocked_rate_limited_response
+      OpenStruct.new(status: 429, body: {"message" => "Rate Limit Exceeded",
+                                         "errors" => [{"resource" => "Application", "field" => "rate limit", "code" => "exceeded"}]})
+    end
+
     def exchange_token(code)
       conn = oauth_connection
       resp = conn.post("oauth/token") do |req|

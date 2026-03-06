@@ -16,7 +16,7 @@ module StravaJobs
           StravaRequest.create!(user_id: strava_request.user_id, strava_integration_id: strava_request.strava_integration_id,
             request_type: strava_request.request_type, proxy_request: strava_request.proxy_request,
             parameters: strava_request.parameters.except("error_response_status"))
-          return
+          return Integrations::StravaClient.mocked_rate_limited_response.body
         end
 
         response = make_request(strava_integration, strava_request.request_type, strava_request.parameters)
