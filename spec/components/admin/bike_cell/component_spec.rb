@@ -72,6 +72,16 @@ RSpec.describe Admin::BikeCell::Component, type: :component do
     end
   end
 
+  context "with a bike_version" do
+    let(:bike) { FactoryBot.create(:bike_version) }
+
+    it "renders colors, manufacturer, and model" do
+      expect(component.css("strong").text).to eq bike.mnfg_name
+      expect(component.text).to include(bike.frame_colors.to_sentence)
+      expect(component.to_html).to match(/bike version/i) # it's in the title of UI::Badge
+    end
+  end
+
   context "with missing bike" do
     let(:bike_id) { 99999999 }
 

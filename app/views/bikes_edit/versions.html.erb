@@ -110,10 +110,10 @@
 
                     <% strava_integration.strava_gears.bikes.each do |gear| %>
                       <option
-                        value="<%= gear.strava_gear_id %>"
-                        <%= "selected" if bike_gear&.strava_gear_id == gear.strava_gear_id %>
+                        value="<%= gear.strava_id %>"
+                        <%= "selected" if bike_gear&.strava_id == gear.strava_id %>
                       >
-                        <%= gear.strava_gear_name %>
+                        <%= gear.name %>
 
                         <% if gear.total_distance_miles.present? %>
                           (

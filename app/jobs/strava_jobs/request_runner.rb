@@ -2,7 +2,7 @@
 
 module StravaJobs
   class RequestRunner < ApplicationJob
-    sidekiq_options queue: "low_priority", retry: 1
+    sidekiq_options queue: "droppable", retry: 1
 
     class << self
       def make_request_and_update(strava_integration, strava_request)
@@ -11,7 +11,8 @@ module StravaJobs
         end
 
         response = make_request(strava_integration, strava_request.request_type, strava_request.parameters)
-        strava_request.update_from_response(response, re_enqueue_if_rate_limited: true)
+        strava_request.update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: true,
+          raise_on_error: true)
 
         if strava_request&.success?
           handle_response(strava_request, strava_integration, response&.body)
@@ -27,6 +28,8 @@ module StravaJobs
           Integrations::StravaClient.list_activities(strava_integration, **parameters.symbolize_keys)
         when "fetch_activity"
           Integrations::StravaClient.fetch_activity(strava_integration, parameters["strava_id"])
+        when "fetch_athlete"
+          Integrations::StravaClient.fetch_athlete(strava_integration)
         when "fetch_gear"
           Integrations::StravaClient.fetch_gear(strava_integration, parameters["strava_gear_id"])
         else
@@ -48,6 +51,8 @@ module StravaJobs
           end
         elsif strava_request.fetch_activity?
           StravaActivity.create_or_update_from_strava_response(strava_integration, response)
+        elsif strava_request.fetch_athlete?
+          strava_integration.update_from_athlete_and_stats(response)
         elsif strava_request.fetch_gear?
           StravaGear.update_from_strava(strava_integration, response)
         end
@@ -60,10 +65,17 @@ module StravaJobs
           if strava_params["aspect_type"] == "delete"
             strava_integration.strava_activities.find_by(strava_id: strava_params["object_id"].to_s)&.destroy
           else
-            StravaActivity.create_or_update_from_strava_response(strava_integration, {"id" => strava_params["object_id"].to_s})
+            strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration,
+              {"id" => strava_params["object_id"].to_s}.merge(strava_params["updates"] || {}))
+            strava_activity.update_from_strava!
           end
-        elsif strava_params["object_type"] == "athlete" && strava_params.dig("updates", "authorized") == "false"
-          strava_integration.destroy
+        elsif strava_params["object_type"] == "athlete"
+          if strava_params.dig("updates", "authorized") == "false"
+            strava_integration.destroy
+          else
+            StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
+              request_type: :fetch_athlete)
+          end
         end
         strava_request.update!(response_status: :success)
 
@@ -90,7 +102,7 @@ module StravaJobs
 
     def mark_sibling_requests_skipped(strava_request)
       strava_request.update(response_status: :skipped)
-      StravaRequest.unprocessed
+      StravaRequest.pending
         .where(strava_integration_id: strava_request.strava_integration_id, request_type: :fetch_activity)
         .where("parameters->>'strava_id' = ?", strava_request.parameters["strava_id"])
         .where.not(id: strava_request.id)

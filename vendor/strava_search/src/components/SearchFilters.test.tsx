@@ -22,6 +22,7 @@ const defaultFilters: SearchFiltersType = {
   filtersExpanded: true,
   activityTypesExpanded: false,
   equipmentExpanded: false,
+  updatePanelExpanded: false,
   mutedFilter: 'all',
   photoFilter: 'all',
   privateFilter: 'all',
@@ -91,7 +92,7 @@ describe('SearchFilters', () => {
       expect(citySelect.options[0].text).toBe('Loading...');
     });
 
-    it('shows disabled location selects with N/A when no location data exists', () => {
+    it('shows disabled location selects with "No locations loaded" when no location data exists', () => {
       const activitiesWithoutLocations = mockActivities.map((a) => ({
         ...a,
         segment_locations: undefined,
@@ -111,9 +112,9 @@ describe('SearchFilters', () => {
       expect(regionSelect.disabled).toBe(true);
       expect(citySelect.disabled).toBe(true);
 
-      expect(countrySelect.options[0].text).toBe('N/A');
-      expect(regionSelect.options[0].text).toBe('N/A');
-      expect(citySelect.options[0].text).toBe('N/A');
+      expect(countrySelect.options[0].text).toBe('No locations loaded');
+      expect(regionSelect.options[0].text).toBe('No locations loaded');
+      expect(citySelect.options[0].text).toBe('No locations loaded');
     });
 
     it('lists countries with full name and abbreviation', () => {

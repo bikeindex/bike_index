@@ -15,7 +15,7 @@ class ProcessImpoundUpdatesJob < ApplicationJob
           updator: impound_record_update.user)
 
       elsif %w[removed_from_bike_index expired].include?(impound_record_update.kind)
-        impound_record.bike.destroy
+        impound_record.bike&.destroy
       elsif impound_record_update.kind == "retrieved_by_owner" &&
           impound_record.impound_claims.approved.any?
         impound_record_update.impound_claim = impound_record.impound_claims.approved.first

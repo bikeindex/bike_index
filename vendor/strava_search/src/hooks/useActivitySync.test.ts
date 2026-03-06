@@ -13,11 +13,11 @@ vi.mock('../contexts/AuthContext', () => ({
 }));
 
 vi.mock('../services/strava', () => ({
-  getAthleteGear: vi.fn(() => Promise.resolve([])),
-  getAthleteStats: vi.fn(() => Promise.resolve(100)),
+  getAthlete: vi.fn(() => Promise.resolve({ id: 12345, bikes: [], shoes: [] })),
   getAllActivities: vi.fn(() => Promise.resolve([])),
   getActivity: vi.fn(() => Promise.resolve({ id: 1, name: 'Test', muted: false })),
   fetchEnrichedSince: vi.fn(() => Promise.resolve([])),
+  fetchSyncStatus: vi.fn(() => Promise.resolve({ status: 'synced', activities_downloaded_count: 100, athlete_activity_count: 100, progress_percent: 100, rate_limited: false })),
 }));
 
 vi.mock('../services/database', () => ({
@@ -34,10 +34,34 @@ describe('useActivitySync', () => {
     vi.clearAllMocks();
   });
 
+  describe('syncAll', () => {
+    it('passes activities_downloaded_count as estimatedTotal to getAllActivities', async () => {
+      const { getAllActivities, fetchSyncStatus } = await import('../services/strava');
+      vi.mocked(fetchSyncStatus).mockResolvedValueOnce({
+        status: 'synced',
+        activities_downloaded_count: 520,
+        athlete_activity_count: 500,
+        progress_percent: 100,
+        rate_limited: false,
+      });
+
+      const { result } = renderHook(() => useActivitySync());
+
+      await act(async () => {
+        await result.current.syncAll();
+      });
+
+      // Should use activities_downloaded_count (520), not athlete_activity_count (500)
+      expect(getAllActivities).toHaveBeenCalledWith(
+        expect.objectContaining({ estimatedTotal: 520 })
+      );
+    });
+  });
+
   describe('error handling', () => {
     it('clears error when clearError is called', async () => {
-      const { getAthleteGear } = await import('../services/strava');
-      vi.mocked(getAthleteGear).mockRejectedValueOnce(new Error('API Error'));
+      const { getAthlete } = await import('../services/strava');
+      vi.mocked(getAthlete).mockRejectedValueOnce(new Error('API Error'));
 
       const { result } = renderHook(() => useActivitySync());
 
@@ -57,10 +81,10 @@ describe('useActivitySync', () => {
     });
 
     it('clears previous error when starting a new sync', async () => {
-      const { getAthleteGear } = await import('../services/strava');
+      const { getAthlete } = await import('../services/strava');
 
       // First call fails
-      vi.mocked(getAthleteGear).mockRejectedValueOnce(new Error('First error'));
+      vi.mocked(getAthlete).mockRejectedValueOnce(new Error('First error'));
 
       const { result } = renderHook(() => useActivitySync());
 
@@ -72,7 +96,7 @@ describe('useActivitySync', () => {
       expect(result.current.error).toBe('First error');
 
       // Second call succeeds
-      vi.mocked(getAthleteGear).mockResolvedValueOnce([]);
+      vi.mocked(getAthlete).mockResolvedValueOnce({ id: 12345, bikes: [], shoes: [] } as never);
 
       // Start another sync - error should be cleared immediately
       act(() => {
@@ -88,8 +112,8 @@ describe('useActivitySync', () => {
 
   describe('syncRecent error handling', () => {
     it('sets error when syncRecent fails', async () => {
-      const { getAthleteGear } = await import('../services/strava');
-      vi.mocked(getAthleteGear).mockRejectedValueOnce(new Error('Network error'));
+      const { getAthlete } = await import('../services/strava');
+      vi.mocked(getAthlete).mockRejectedValueOnce(new Error('Network error'));
 
       const { result } = renderHook(() => useActivitySync());
 

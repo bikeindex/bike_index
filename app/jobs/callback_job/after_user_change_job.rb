@@ -88,7 +88,7 @@ class CallbackJob::AfterUserChangeJob < ApplicationJob
     return false if user.phone.blank?
     return false if UserPhone.unscoped.where(user_id: user.id, phone: user.phone).present?
 
-    user_phone = user.user_phones.create!(phone: user.phone)
+    user_phone = user.user_phones.create(phone: user.phone)
     # Run this in the same process, rather than a different job, so we update the user alerts
     UserPhoneConfirmationJob.new.perform(user_phone.id, true)
 

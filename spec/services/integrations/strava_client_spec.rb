@@ -7,7 +7,7 @@ RSpec.describe Integrations::StravaClient, type: :service do
     FactoryBot.create(:strava_integration,
       token_expires_at: Time.current + 6.hours,
       status:,
-      athlete_id: ENV["STRAVA_TEST_USER_ID"])
+      strava_id: ENV["STRAVA_TEST_USER_ID"])
   end
   let(:status) { :pending }
 

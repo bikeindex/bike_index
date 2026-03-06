@@ -8,6 +8,9 @@ export interface StravaAthlete {
   country: string;
   profile: string;
   profile_medium: string;
+  measurement_preference?: string;
+  bikes?: StravaGear[];
+  shoes?: StravaGear[];
 }
 
 export interface StravaGear {
@@ -165,6 +168,7 @@ export interface SearchFilters {
   filtersExpanded: boolean;
   activityTypesExpanded: boolean;
   equipmentExpanded: boolean;
+  updatePanelExpanded: boolean;
   mutedFilter: MutedFilter;
   photoFilter: PhotoFilter;
   privateFilter: PrivateFilter;

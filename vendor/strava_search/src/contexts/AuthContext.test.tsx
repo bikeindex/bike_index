@@ -105,6 +105,50 @@ describe('AuthContext', () => {
     expect(mockExchangeSessionForToken).toHaveBeenCalled();
   });
 
+  it('does not clear data when stored athlete ID is a string matching config number', async () => {
+    const storedAuth = {
+      id: 12345,
+      accessToken: 'stored-token',
+      refreshToken: '',
+      expiresAt: Date.now() + 3600000,
+      athlete: { id: '12345', firstname: 'Test', lastname: 'User', username: '', city: '', state: '', country: '', profile: '', profile_medium: 'http://example.com/avatar.jpg' },
+    };
+
+    mockGetAuth.mockResolvedValue(storedAuth);
+    mockGetConfig.mockReturnValue({ athleteId: '12345', tokenEndpoint: '', proxyEndpoint: '', hasActivityWrite: false, authUrl: '' });
+
+    renderWithProvider();
+
+    await waitFor(() => {
+      expect(screen.getByText('authenticated: 12345')).toBeInTheDocument();
+    });
+
+    expect(mockClearAllData).not.toHaveBeenCalled();
+  });
+
+  it('normalizes athlete ID to number after fetching fresh profile', async () => {
+    const { getAthlete } = await import('../services/strava');
+
+    mockGetAuth.mockResolvedValue(undefined);
+    mockGetConfig.mockReturnValue({ athleteId: '99999', tokenEndpoint: '', proxyEndpoint: '', hasActivityWrite: false, authUrl: '' });
+    mockExchangeSessionForToken.mockResolvedValue(validToken);
+    // Simulate proxy returning string ID (strava_id is varchar in DB)
+    vi.mocked(getAthlete).mockResolvedValueOnce({ id: '99999', firstname: 'Test', lastname: 'User', username: '', city: '', state: '', country: '', profile: '', profile_medium: 'http://example.com/avatar.jpg' } as never);
+
+    renderWithProvider();
+
+    await waitFor(() => {
+      expect(screen.getByText('authenticated: 99999')).toBeInTheDocument();
+    });
+
+    // saveAuth should have been called with a numeric ID (not string)
+    await waitFor(() => {
+      const lastSaveCall = mockSaveAuth.mock.calls[mockSaveAuth.mock.calls.length - 1][0];
+      expect(lastSaveCall.athlete.id).toBe(99999);
+      expect(typeof lastSaveCall.athlete.id).toBe('number');
+    });
+  });
+
   it('exchanges session for token when no stored auth exists', async () => {
     mockGetAuth.mockResolvedValue(undefined);
     mockGetConfig.mockReturnValue({ athleteId: '99999', tokenEndpoint: '', proxyEndpoint: '', hasActivityWrite: false, authUrl: '' });

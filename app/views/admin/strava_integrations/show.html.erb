@@ -11,7 +11,14 @@
         <% if display_dev_info? %>
           <tr>
             <td class="only-dev-visible">ID</td>
-            <td><code><%= @strava_integration.id %></code></td>
+
+            <td>
+              <code><%= @strava_integration.id %></code>
+
+              <small class="less-strong tw:ml-2">
+                Strava ID: <code><%= @strava_integration.strava_id %></code>
+              </small>
+            </td>
           </tr>
         <% end %>
 
@@ -24,8 +31,8 @@
         </tr>
 
         <tr>
-          <td>Athlete ID</td>
-          <td><%= @strava_integration.athlete_id %></td>
+          <td>Strava ID</td>
+          <td><%= @strava_integration.strava_id %></td>
         </tr>
 
         <tr>
@@ -117,7 +124,7 @@
 
           <td>
             <%= @strava_integration.sync_progress_percent %>%
-            <span class="less-strong tw:ml-2"><%= number_display(@strava_integration.strava_activities.enriched.count) %> / <%= number_display(@strava_integration.athlete_activity_count) %> enriched</span>
+            <span class="less-strong tw:ml-2"><%= number_display(@strava_integration.strava_activities.enriched.count) %> / <%= number_display(@strava_integration.activities_downloaded_count) %> enriched</span>
           </td>
         </tr>
 
@@ -126,6 +133,7 @@
 
           <td>
             <% most_recent_proxy_at = StravaRequest.most_recent_proxy_at(@strava_integration.id) %>
+
             <% if most_recent_proxy_at.present? %>
               <span class="localizeTime preciseTime">
                 <%= l most_recent_proxy_at, format: :convert_time %>
@@ -133,10 +141,11 @@
             <% else %>
               <small class="less-strong">no proxy requests</small>
             <% end %>
-            priority multiplier:
-            <code>
-              <%= StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id) %>
-            </code>
+
+            <small class="tw:ml-1">
+              priority multiplier:
+              <code><%= StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id) %></code>
+            </small>
           </td>
         </tr>
 

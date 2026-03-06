@@ -50,6 +50,9 @@ function filtersToParams(filters: SearchFilters): URLSearchParams {
   } else if (!filters.equipmentExpanded && (filters.gearIds.length > 0 || filters.noEquipment)) {
     params.set('gearPanel', 'closed');
   }
+  if (filters.updatePanelExpanded) {
+    params.set('updatePanel', 'open');
+  }
   if (filters.mutedFilter && filters.mutedFilter !== 'all') {
     params.set('muted', filters.mutedFilter);
   }
@@ -143,6 +146,7 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
     filtersExpanded: params.get('propertiesPanel') !== 'closed' && (hasProps || params.get('propertiesPanel') === 'open'),
     activityTypesExpanded: params.get('typesPanel') !== 'closed' && (hasTypes || params.get('typesPanel') === 'open'),
     equipmentExpanded: params.get('gearPanel') !== 'closed' && (hasGear || params.get('gearPanel') === 'open'),
+    updatePanelExpanded: params.get('updatePanel') === 'open',
     mutedFilter: (params.get('muted') as MutedFilter) || 'all',
     photoFilter: (params.get('photo') as PhotoFilter) || 'all',
     privateFilter: (params.get('private') as PrivateFilter) || 'all',

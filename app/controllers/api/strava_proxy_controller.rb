@@ -36,7 +36,9 @@ module API
         url: permitted_params[:url], method: permitted_params[:method], body: permitted_params[:body]&.to_h
       )
 
-      if result[:strava_request].success?
+      if result.key?(:internal_response) # Internal data. Can't use present because it can be an empty array
+        render json: result[:internal_response].to_json
+      elsif result[:strava_request].success?
         render json: result[:serialized].to_json, status: result[:response].status
       else
         render json: sanitize_response_body(result[:response]&.body), status: result[:response]&.status || 502

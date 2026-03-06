@@ -18,8 +18,9 @@ module UI::Badge
       # Special badge classes:
       cyan: "tw:bg-cyan-400 tw:text-cyan-900 tw:dark:bg-cyan-800 tw:dark:text-cyan-200",
       gray: "tw:bg-gray-300 tw:text-gray-900 tw:dark:bg-gray-700 tw:dark:text-gray-200",
-      purple: "tw:bg-purple-300 tw:text-purple-900 tw:dark:bg-purple-800 tw:dark:text-purple-200"
-
+      purple: "tw:bg-purple-300 tw:text-purple-900 tw:dark:bg-purple-800 tw:dark:text-purple-200",
+      rose: "tw:bg-rose-400 tw:text-rose-950 tw:dark:bg-rose-800 tw:dark:text-rose-300",
+      orange: "tw:bg-orange-400 tw:text-orange-950 tw:dark:bg-orange-800 tw:dark:text-orange-300"
     }.freeze
 
     def initialize(text:, title: nil, color: :gray, size: :md)

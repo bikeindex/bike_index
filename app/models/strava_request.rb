@@ -40,7 +40,8 @@ class StravaRequest < AnalyticsRecord
     token_refresh_failed: 4,
     integration_deleted: 5,
     skipped: 6,
-    insufficient_token_privileges: 7
+    insufficient_token_privileges: 7,
+    binx_response: 8
   }.freeze
   PENDING_OR_SUCCESS = %i[success pending].freeze
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
@@ -51,7 +52,7 @@ class StravaRequest < AnalyticsRecord
     fetch_athlete_stats: 2,
     list_activities: 3,
     fetch_gear: 4,
-    fetch_activity: 5
+    fetch_activity: 10
   }.freeze
   PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000 # Based on timestamp digits
 
@@ -67,12 +68,11 @@ class StravaRequest < AnalyticsRecord
 
   scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
   scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
-  scope :unprocessed, -> { where(requested_at: nil).where.not(response_status: :integration_deleted).order(:id) }
   scope :priority_ordered, -> { reorder(:priority) }
 
   class << self
     def next_pending(limit = 1)
-      unprocessed.priority_ordered.limit(limit)
+      pending.priority_ordered.limit(limit)
     end
 
     def parse_rate_limit(headers)
@@ -99,7 +99,7 @@ class StravaRequest < AnalyticsRecord
 
     def most_recent_proxy_at(strava_integration_id)
       where(strava_integration_id:, request_type: :proxy)
-        .where.not(requested_at: nil).maximum(:requested_at)
+        .where.not(response_status: :pending).maximum(:updated_at)
     end
 
     private
@@ -154,13 +154,16 @@ class StravaRequest < AnalyticsRecord
     page >= expected_pages
   end
 
-  def update_from_response(response, re_enqueue_if_rate_limited: false, raise_on_error: true)
-    update!(requested_at: Time.current,
-      response_status: status_from_response(response),
-      rate_limit: self.class.parse_rate_limit(response&.headers))
+  def update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: false, raise_on_error: false)
+    self.response_status = status_from_response(response)
+    store_error_response(response) if error?
+    update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
 
-    if re_enqueue_if_rate_limited && rate_limited?
-      StravaRequest.create!(user_id:, strava_integration_id:, request_type:, parameters:)
+    if rate_limited? || service_unavailable?(response)
+      return unless re_enqueue_if_rate_limited_or_unavailable
+
+      StravaRequest.create!(user_id:, strava_integration_id:, request_type:,
+        parameters: parameters.except("error_response_status"))
     elsif error? && raise_on_error
       raise "Strava API error #{response.status}: #{response.body}"
     end
@@ -182,6 +185,14 @@ class StravaRequest < AnalyticsRecord
     else
       :error
     end
+  end
+
+  def service_unavailable?(response)
+    response&.status == 503
+  end
+
+  def store_error_response(response)
+    self.parameters = (parameters || {}).merge(error_response_status: response.status)
   end
 
   def set_calculated_attributes

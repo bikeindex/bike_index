@@ -14,6 +14,12 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     expect(described_class.frequency).to eq(50.minutes)
   end
 
+  describe "min_updated_priority" do
+    it "is 4" do
+      expect(described_class.min_updated_priority).to eq 5_000_000_000
+    end
+  end
+
   describe "perform with no args" do
     let!(:strava_integration) { FactoryBot.create(:strava_integration) }
 
@@ -41,7 +47,12 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     let!(:request) { FactoryBot.create(:strava_request, :fetch_activity, strava_integration:) }
     let(:proxy_requested_at) { nil }
     let!(:strava_request_proxy) do
-      proxy_requested_at && FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: proxy_requested_at)
+      if proxy_requested_at
+        srp = FactoryBot.create(:strava_request, :proxy, response_status: :binx_response,
+          strava_integration:)
+        srp.update_column :updated_at, proxy_requested_at
+        srp
+      end
     end
 
     context "with no proxy requests" do
@@ -58,7 +69,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
       it "divides priority by 4" do
         original_priority = request.priority
         instance.perform(strava_integration.id)
-        expect(request.reload.priority).to eq((original_priority * 0.25).to_i)
+        expect(request.reload.priority).to eq((original_priority * 0.75).to_i)
       end
     end
 
@@ -68,7 +79,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
       it "divides priority by 2" do
         original_priority = request.priority
         instance.perform(strava_integration.id)
-        expect(request.reload.priority).to eq((original_priority * 0.5).to_i)
+        expect(request.reload.priority).to eq((original_priority * 0.9).to_i)
       end
     end
 

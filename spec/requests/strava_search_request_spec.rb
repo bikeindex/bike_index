@@ -23,7 +23,7 @@ RSpec.describe StravaSearchController, type: :request do
 
       context "with strava integration" do
         let(:strava_permissions) { nil }
-        let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "12345", strava_permissions:) }
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, strava_id: "12345", strava_permissions:) }
 
         it "renders with config and valid assets" do
           get strava_search_path
@@ -73,7 +73,7 @@ RSpec.describe StravaSearchController, type: :request do
       end
 
       context "with strava integration" do
-        let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "12345") }
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, strava_id: "12345") }
 
         it "returns existing valid token" do
           existing_token = Doorkeeper::AccessToken.create!(

@@ -3,8 +3,8 @@
 FactoryBot.define do
   factory :strava_gear do
     strava_integration
-    strava_gear_id { "b12345" }
-    strava_gear_name { "My Road Bike" }
+    strava_id { "b12345" }
+    name { "My Road Bike" }
     gear_type { "bike" }
 
     trait :with_bike do
@@ -12,8 +12,8 @@ FactoryBot.define do
     end
 
     trait :shoe do
-      strava_gear_id { "g12345" }
-      strava_gear_name { "Running Shoes" }
+      strava_id { "g12345" }
+      name { "Running Shoes" }
       gear_type { "shoe" }
     end
   end

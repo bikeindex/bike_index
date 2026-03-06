@@ -9,7 +9,7 @@ FactoryBot.define do
     status { :pending }
 
     trait :with_athlete do
-      athlete_id { "12345678" }
+      strava_id { "12345678" }
       athlete_activity_count { 150 }
     end
 
@@ -17,7 +17,7 @@ FactoryBot.define do
       with_athlete
       after(:create) do |strava_integration|
         FactoryBot.create(:strava_gear, strava_integration:,
-          strava_gear_id: "b1234", strava_gear_name: "My Road Bike", gear_type: "bike",
+          strava_id: "b1234", name: "My Road Bike", gear_type: "bike",
           strava_data: {"id" => "b1234", "name" => "My Road Bike", "primary" => true, "distance" => 50000.0, "resource_state" => 2})
       end
     end
@@ -25,7 +25,7 @@ FactoryBot.define do
     trait :env_tokens do
       access_token { ENV.fetch("STRAVA_TEST_ACCESS_TOKEN", "TEST-TOKEN") }
       refresh_token { ENV.fetch("STRAVA_TEST_REFRESH_TOKEN", "TEST-REFRESH-TOKEN") }
-      athlete_id { ENV.fetch("STRAVA_TEST_USER_ID", "6969") }
+      strava_id { ENV.fetch("STRAVA_TEST_USER_ID", "6969") }
     end
 
     trait :syncing do

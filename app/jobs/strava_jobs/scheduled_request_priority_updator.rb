@@ -13,15 +13,20 @@ module StravaJobs
         50.minutes
       end
 
+      def min_updated_priority
+        (StravaRequest::PRIORITY_MAP.except(:fetch_activity).values.max + 1) *
+          StravaRequest::PRIORITY_LEVEL_MULTIPLIER
+      end
+
       def priority_multiplier(strava_integration_id)
         most_recent_proxy_at = StravaRequest.most_recent_proxy_at(strava_integration_id)
         return 1 unless most_recent_proxy_at
 
         elapsed = Time.current - most_recent_proxy_at
         if elapsed < 1.hour
-          0.25 # divide by 4
+          0.75
         elsif elapsed < 24.hours
-          0.5 # divide by 2
+          0.9
         elsif elapsed > 1.week
           4 # multiply by 4
         else
@@ -34,7 +39,7 @@ module StravaJobs
       if strava_integration_id.present?
         update_priorities_for_integration(strava_integration_id)
       else
-        StravaRequest.unprocessed
+        StravaRequest.pending.fetch_activity
           .reorder(nil)
           .distinct
           .pluck(:strava_integration_id)
@@ -48,8 +53,11 @@ module StravaJobs
       multiplier = self.class.priority_multiplier(integration_id)
       return if multiplier == 1
 
-      StravaRequest.unprocessed.where(strava_integration_id: integration_id).find_each do |request|
-        request.update(priority: (request.priority * multiplier).to_i.clamp(0, MAX_PRIORITY))
+      StravaRequest.pending.where(strava_integration_id: integration_id).find_each do |request|
+        new_priority = (request.priority * multiplier).to_i.clamp(0, MAX_PRIORITY)
+        next if new_priority < self.class.min_updated_priority
+
+        request.update(priority: new_priority)
       end
     end
   end

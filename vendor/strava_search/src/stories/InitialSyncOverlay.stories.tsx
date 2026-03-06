@@ -20,35 +20,3 @@ export const StartingSyncNoTotal: Story = {
     status: 'Checking sync status...',
   },
 };
-
-export const SyncingWithProgress: Story = {
-  args: {
-    loaded: 50,
-    total: 150,
-    status: '50 of ~150 activities synced',
-  },
-};
-
-export const SyncingWithoutTotal: Story = {
-  args: {
-    loaded: 23,
-    total: null,
-    status: '23 activities synced',
-  },
-};
-
-export const NearlyComplete: Story = {
-  args: {
-    loaded: 142,
-    total: 150,
-    status: '142 of ~150 activities synced',
-  },
-};
-
-export const LoadingActivities: Story = {
-  args: {
-    loaded: 0,
-    total: null,
-    status: 'Loading activities...',
-  },
-};
