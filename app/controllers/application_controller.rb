@@ -6,11 +6,6 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
 
-  helper_method :sort_column, :sort_direction
-
-  def sort_column = "id"
-  def sort_direction = "desc"
-
   around_action :set_locale
   rescue_from Money::Bank::UnknownRate, with: :localization_failure
   rescue_from Pagy::RangeError, with: :redirect_to_last_page
