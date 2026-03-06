@@ -11,6 +11,63 @@ RSpec.describe Integrations::StravaClient, type: :service do
   end
   let(:status) { :pending }
 
+  describe ".currently_rate_limited?" do
+    let(:default_rate_limit) do
+      {"short_limit" => 200, "short_usage" => 0, "long_limit" => 2000, "long_usage" => 0,
+       "read_short_limit" => 200, "read_short_usage" => 0, "read_long_limit" => 2000, "read_long_usage" => 0}
+    end
+
+    context "GET request" do
+      it "returns false when read limits have headroom" do
+        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(default_rate_limit)
+        expect(described_class.currently_rate_limited?).to be false
+        expect(described_class.currently_rate_limited?("GET")).to be false
+      end
+
+      it "returns true when read short limit is exhausted" do
+        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(
+          default_rate_limit.merge("read_short_usage" => 198)
+        )
+        expect(described_class.currently_rate_limited?("GET")).to be true
+      end
+
+      it "returns true when read long limit is exhausted" do
+        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(
+          default_rate_limit.merge("read_long_usage" => 1997)
+        )
+        expect(described_class.currently_rate_limited?("GET")).to be true
+      end
+    end
+
+    context "PUT request" do
+      it "returns false when overall limits have headroom" do
+        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(default_rate_limit)
+        expect(described_class.currently_rate_limited?("PUT")).to be false
+      end
+
+      it "returns true when overall short limit is exhausted" do
+        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(
+          default_rate_limit.merge("short_usage" => 198)
+        )
+        expect(described_class.currently_rate_limited?("PUT")).to be true
+      end
+
+      it "returns true when overall long limit is exhausted" do
+        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(
+          default_rate_limit.merge("long_usage" => 1997)
+        )
+        expect(described_class.currently_rate_limited?("PUT")).to be true
+      end
+
+      it "does not check read limits" do
+        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(
+          default_rate_limit.merge("read_short_usage" => 198)
+        )
+        expect(described_class.currently_rate_limited?("PUT")).to be false
+      end
+    end
+  end
+
   describe ".authorization_url" do
     it "builds the correct authorization URL with state" do
       url = described_class.authorization_url(state: "test_state")

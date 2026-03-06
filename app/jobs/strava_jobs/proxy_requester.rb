@@ -51,6 +51,12 @@ module StravaJobs
           return {internal_response: internal_response!(strava_request)}
         end
 
+        request_method = params_method || "GET"
+        if Integrations::StravaClient.currently_rate_limited?(request_method)
+          strava_request.update!(response_status: :binx_response_rate_limited, requested_at: Time.current)
+          return {strava_request:, response: nil, serialized: nil}
+        end
+
         response = Integrations::StravaClient.proxy_request(strava_integration,
           strava_request.parameters["url"], method: strava_request.parameters["method"],
           body: strava_request.parameters["body"])

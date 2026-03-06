@@ -42,7 +42,8 @@ class StravaRequest < AnalyticsRecord
     integration_deleted: 5,
     skipped: 6,
     insufficient_token_privileges: 7,
-    binx_response: 8
+    binx_response: 8,
+    binx_response_rate_limited: 9
   }.freeze
   PENDING_OR_SUCCESS = %i[success pending].freeze
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze

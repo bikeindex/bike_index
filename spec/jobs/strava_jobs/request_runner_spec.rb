@@ -164,6 +164,24 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
     end
 
+    context "when currently_rate_limited?" do
+      it "sets binx_response_rate_limited and creates a retry request without calling Strava" do
+        allow(Integrations::StravaClient).to receive(:currently_rate_limited?).with("GET").and_return(true)
+        strava_request_id = strava_request.id
+
+        expect { instance.perform(strava_request_id) }.to change(StravaRequest, :count).by(1)
+
+        strava_request.reload
+        expect(strava_request.response_status).to eq("binx_response_rate_limited")
+        expect(strava_request.requested_at).to be_present
+
+        retry_request = StravaRequest.last
+        expect(retry_request.request_type).to eq(strava_request.request_type)
+        expect(retry_request.requested_at).to be_nil
+        expect(retry_request.response_status).to eq("pending")
+      end
+    end
+
     context "with rate limited response" do
       it "sets response_status to rate_limited and creates a retry request" do
         strava_request_id = strava_request.id

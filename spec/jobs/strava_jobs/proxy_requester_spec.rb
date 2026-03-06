@@ -192,6 +192,25 @@ RSpec.describe StravaJobs::ProxyRequester do
       end
     end
 
+    context "when currently_rate_limited?" do
+      it "sets binx_response_rate_limited without calling Strava" do
+        allow(Integrations::StravaClient).to receive(:currently_rate_limited?).with("GET").and_return(true)
+
+        result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
+        expect(result[:strava_request].binx_response_rate_limited?).to be true
+        expect(result[:response]).to be_nil
+        expect(result[:serialized]).to be_nil
+        expect(StravaActivity.count).to eq 0
+      end
+
+      it "checks PUT method for update_activity requests" do
+        allow(Integrations::StravaClient).to receive(:currently_rate_limited?).with("PUT").and_return(true)
+
+        result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "PUT")
+        expect(result[:strava_request].binx_response_rate_limited?).to be true
+      end
+    end
+
     context "rate limited response" do
       it "marks request as rate_limited" do
         VCR.use_cassette("strava-proxy_rate_limited") do
