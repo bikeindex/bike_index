@@ -210,13 +210,13 @@ RSpec.describe StravaRequest, type: :model do
       {"short_limit" => 100, "short_usage" => 10, "long_limit" => 1000, "long_usage" => 200,
        "read_short_limit" => 100, "read_short_usage" => 10, "read_long_limit" => 1000, "read_long_usage" => 200}
     end
+    let(:target) do
+      {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+       read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
+    end
 
     it "returns defaults when no requests have rate_limit" do
-      result = StravaRequest.estimated_current_rate_limit
-      expect(result[:short_limit]).to eq 200
-      expect(result[:short_usage]).to eq 0
-      expect(result[:long_limit]).to eq 2000
-      expect(result[:long_usage]).to eq 0
+      expect(StravaRequest.estimated_current_rate_limit).to eq target
     end
 
     context "with a recent request in the same short period" do
@@ -225,15 +225,13 @@ RSpec.describe StravaRequest, type: :model do
         FactoryBot.create(:strava_request, :processed, strava_integration:,
           requested_at: boundary + 1.second, rate_limit:)
       end
+      let(:target) do
+        {short_limit: 100, short_usage: 10, long_limit: 1000, long_usage: 200,
+         read_short_limit: 100, read_short_usage: 10, read_long_limit: 1000, read_long_usage: 200}
+      end
 
       it "returns the usage from the latest rate_limit" do
-        result = StravaRequest.estimated_current_rate_limit
-        expect(result[:short_limit]).to eq 100
-        expect(result[:short_usage]).to eq 10
-        expect(result[:long_limit]).to eq 1000
-        expect(result[:long_usage]).to eq 200
-        expect(result[:read_short_usage]).to eq 10
-        expect(result[:read_long_usage]).to eq 200
+        expect(StravaRequest.estimated_current_rate_limit).to eq target
       end
     end
 
@@ -243,17 +241,15 @@ RSpec.describe StravaRequest, type: :model do
         FactoryBot.create(:strava_request, :processed, strava_integration:,
           requested_at: boundary - 2.minutes, rate_limit:)
       end
+      let(:target) do
+        # long usage only resets if boundary - 2.minutes also crossed midnight UTC
+        long_usage = Time.current.utc.beginning_of_day > boundary - 2.minutes ? 0 : 200
+        {short_limit: 100, short_usage: 0, long_limit: 1000, long_usage:,
+         read_short_limit: 100, read_short_usage: 0, read_long_limit: 1000, read_long_usage: long_usage}
+      end
 
       it "resets short usage to 0" do
-        result = StravaRequest.estimated_current_rate_limit
-        expect(result[:short_limit]).to eq 100
-        expect(result[:short_usage]).to eq 0
-        expect(result[:read_short_usage]).to eq 0
-        # Skip long usage check if boundary - 2.minutes crossed midnight UTC
-        unless Time.current.utc.beginning_of_day > boundary - 2.minutes
-          expect(result[:long_usage]).to eq 200
-          expect(result[:read_long_usage]).to eq 200
-        end
+        expect(StravaRequest.estimated_current_rate_limit).to eq target
       end
     end
 
@@ -263,13 +259,13 @@ RSpec.describe StravaRequest, type: :model do
         FactoryBot.create(:strava_request, :processed, strava_integration:,
           requested_at: daily_boundary - 1.hour, rate_limit:)
       end
+      let(:target) do
+        {short_limit: 100, short_usage: 0, long_limit: 1000, long_usage: 0,
+         read_short_limit: 100, read_short_usage: 0, read_long_limit: 1000, read_long_usage: 0}
+      end
 
       it "resets both short and long usage to 0" do
-        result = StravaRequest.estimated_current_rate_limit
-        expect(result[:short_usage]).to eq 0
-        expect(result[:long_usage]).to eq 0
-        expect(result[:read_short_usage]).to eq 0
-        expect(result[:read_long_usage]).to eq 0
+        expect(StravaRequest.estimated_current_rate_limit).to eq target
       end
     end
   end
