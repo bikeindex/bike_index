@@ -1,7 +1,7 @@
 <div class="tw:mt-4 tw:flex tw:flex-col tw:gap-4 tw:md:flex-row">
   <div class="tw:min-w-0 tw:flex-1">
     <h4>By response status</h4>
-    <%= render(UI::Chart::Component.new(series: status_series, time_range: @time_range, stacked: true)) %>
+    <%= render(UI::Chart::Component.new(series: status_series, time_range: @time_range, stacked: true, colors: status_bar_colors)) %>
   </div>
 
   <div class="tw:min-w-0 tw:flex-1">
