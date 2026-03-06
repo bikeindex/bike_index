@@ -16,11 +16,11 @@ class Integrations::StravaClient
     def currently_rate_limited?(method = "GET")
       rate_limit = StravaRequest.estimated_current_rate_limit
       if method.to_s.upcase == "GET"
-        (rate_limit["read_short_limit"].to_i - rate_limit["read_short_usage"].to_i) < RATE_LIMIT_HEADROOM ||
-          (rate_limit["read_long_limit"].to_i - rate_limit["read_long_usage"].to_i) < RATE_LIMIT_HEADROOM
+        (rate_limit[:read_short_limit].to_i - rate_limit[:read_short_usage].to_i) < RATE_LIMIT_HEADROOM ||
+          (rate_limit[:read_long_limit].to_i - rate_limit[:read_long_usage].to_i) < RATE_LIMIT_HEADROOM
       else
-        (rate_limit["short_limit"].to_i - rate_limit["short_usage"].to_i) < RATE_LIMIT_HEADROOM ||
-          (rate_limit["long_limit"].to_i - rate_limit["long_usage"].to_i) < RATE_LIMIT_HEADROOM
+        (rate_limit[:short_limit].to_i - rate_limit[:short_usage].to_i) < RATE_LIMIT_HEADROOM ||
+          (rate_limit[:long_limit].to_i - rate_limit[:long_usage].to_i) < RATE_LIMIT_HEADROOM
       end
     end
 

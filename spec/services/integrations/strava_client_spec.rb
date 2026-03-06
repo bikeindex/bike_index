@@ -12,58 +12,81 @@ RSpec.describe Integrations::StravaClient, type: :service do
   let(:status) { :pending }
 
   describe ".currently_rate_limited?" do
-    let(:default_rate_limit) do
-      {"short_limit" => 200, "short_usage" => 0, "long_limit" => 2000, "long_usage" => 0,
-       "read_short_limit" => 200, "read_short_usage" => 0, "read_long_limit" => 2000, "read_long_usage" => 0}
+    before { StravaRequest.destroy_all }
+    let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+    let(:rate_limit) do
+      {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+       read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
+    end
+    let!(:rate_limit_request) do
+      FactoryBot.create(:strava_request, :processed, strava_integration:,
+        requested_at: boundary + 1.second, rate_limit:)
     end
 
     context "GET request" do
-      it "returns false when read limits have headroom" do
-        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(default_rate_limit)
-        expect(described_class.currently_rate_limited?).to be false
-        expect(described_class.currently_rate_limited?("GET")).to be false
+      context "when read limits have headroom" do
+        it "returns false" do
+          expect(described_class.currently_rate_limited?).to be false
+          expect(described_class.currently_rate_limited?("GET")).to be false
+        end
       end
 
-      it "returns true when read short limit is exhausted" do
-        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(
-          default_rate_limit.merge("read_short_usage" => 198)
-        )
-        expect(described_class.currently_rate_limited?("GET")).to be true
+      context "when read short limit is exhausted" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0}
+        end
+        it "returns true" do
+          expect(described_class.currently_rate_limited?("GET")).to be true
+        end
       end
 
-      it "returns true when read long limit is exhausted" do
-        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(
-          default_rate_limit.merge("read_long_usage" => 1997)
-        )
-        expect(described_class.currently_rate_limited?("GET")).to be true
+      context "when read long limit is exhausted" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1997}
+        end
+        it "returns true" do
+          expect(described_class.currently_rate_limited?("GET")).to be true
+        end
       end
     end
 
     context "PUT request" do
-      it "returns false when overall limits have headroom" do
-        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(default_rate_limit)
-        expect(described_class.currently_rate_limited?("PUT")).to be false
+      context "when overall limits have headroom" do
+        it "returns false" do
+          expect(described_class.currently_rate_limited?("PUT")).to be false
+        end
       end
 
-      it "returns true when overall short limit is exhausted" do
-        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(
-          default_rate_limit.merge("short_usage" => 198)
-        )
-        expect(described_class.currently_rate_limited?("PUT")).to be true
+      context "when overall short limit is exhausted" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 198, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
+        end
+        it "returns true" do
+          expect(described_class.currently_rate_limited?("PUT")).to be true
+        end
       end
 
-      it "returns true when overall long limit is exhausted" do
-        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(
-          default_rate_limit.merge("long_usage" => 1997)
-        )
-        expect(described_class.currently_rate_limited?("PUT")).to be true
+      context "when overall long limit is exhausted" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 1997,
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
+        end
+        it "returns true" do
+          expect(described_class.currently_rate_limited?("PUT")).to be true
+        end
       end
 
-      it "does not check read limits" do
-        allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(
-          default_rate_limit.merge("read_short_usage" => 198)
-        )
-        expect(described_class.currently_rate_limited?("PUT")).to be false
+      context "when only read limits are exhausted" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0}
+        end
+        it "returns false" do
+          expect(described_class.currently_rate_limited?("PUT")).to be false
+        end
       end
     end
   end

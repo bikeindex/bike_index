@@ -115,7 +115,7 @@ class StravaRequest < AnalyticsRecord
        read_short_limit: 200,
        read_short_usage: 0,
        read_long_limit: 2000,
-       read_long_usage: 0}.freeze.as_json
+       read_long_usage: 0}.freeze
     end
 
     def rate_limit_from(latest_rate_limit, latest_requested_at)
@@ -134,7 +134,7 @@ class StravaRequest < AnalyticsRecord
         read_short_usage: limit_for_rate(latest_rate_limit[:read_short_usage], short_reset),
         read_long_limit: latest_rate_limit[:read_long_limit],
         read_long_usage: limit_for_rate(latest_rate_limit[:read_long_usage], daily_reset)
-      }.as_json.compact
+      }.compact
     end
 
     def limit_for_rate(limit, was_reset)

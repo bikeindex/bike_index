@@ -213,10 +213,10 @@ RSpec.describe StravaRequest, type: :model do
 
     it "returns defaults when no requests have rate_limit" do
       result = StravaRequest.estimated_current_rate_limit
-      expect(result["short_limit"]).to eq 200
-      expect(result["short_usage"]).to eq 0
-      expect(result["long_limit"]).to eq 2000
-      expect(result["long_usage"]).to eq 0
+      expect(result[:short_limit]).to eq 200
+      expect(result[:short_usage]).to eq 0
+      expect(result[:long_limit]).to eq 2000
+      expect(result[:long_usage]).to eq 0
     end
 
     context "with a recent request in the same short period" do
@@ -228,12 +228,12 @@ RSpec.describe StravaRequest, type: :model do
 
       it "returns the usage from the latest rate_limit" do
         result = StravaRequest.estimated_current_rate_limit
-        expect(result["short_limit"]).to eq 100
-        expect(result["short_usage"]).to eq 10
-        expect(result["long_limit"]).to eq 1000
-        expect(result["long_usage"]).to eq 200
-        expect(result["read_short_usage"]).to eq 10
-        expect(result["read_long_usage"]).to eq 200
+        expect(result[:short_limit]).to eq 100
+        expect(result[:short_usage]).to eq 10
+        expect(result[:long_limit]).to eq 1000
+        expect(result[:long_usage]).to eq 200
+        expect(result[:read_short_usage]).to eq 10
+        expect(result[:read_long_usage]).to eq 200
       end
     end
 
@@ -246,13 +246,13 @@ RSpec.describe StravaRequest, type: :model do
 
       it "resets short usage to 0" do
         result = StravaRequest.estimated_current_rate_limit
-        expect(result["short_limit"]).to eq 100
-        expect(result["short_usage"]).to eq 0
-        expect(result["read_short_usage"]).to eq 0
+        expect(result[:short_limit]).to eq 100
+        expect(result[:short_usage]).to eq 0
+        expect(result[:read_short_usage]).to eq 0
         # Skip long usage check if boundary - 2.minutes crossed midnight UTC
         unless Time.current.utc.beginning_of_day > boundary - 2.minutes
-          expect(result["long_usage"]).to eq 200
-          expect(result["read_long_usage"]).to eq 200
+          expect(result[:long_usage]).to eq 200
+          expect(result[:read_long_usage]).to eq 200
         end
       end
     end
@@ -266,10 +266,10 @@ RSpec.describe StravaRequest, type: :model do
 
       it "resets both short and long usage to 0" do
         result = StravaRequest.estimated_current_rate_limit
-        expect(result["short_usage"]).to eq 0
-        expect(result["long_usage"]).to eq 0
-        expect(result["read_short_usage"]).to eq 0
-        expect(result["read_long_usage"]).to eq 0
+        expect(result[:short_usage]).to eq 0
+        expect(result[:long_usage]).to eq 0
+        expect(result[:read_short_usage]).to eq 0
+        expect(result[:read_long_usage]).to eq 0
       end
     end
   end

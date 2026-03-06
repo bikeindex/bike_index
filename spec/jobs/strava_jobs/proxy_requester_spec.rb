@@ -193,9 +193,17 @@ RSpec.describe StravaJobs::ProxyRequester do
     end
 
     context "when currently_rate_limited?" do
-      it "sets binx_response_rate_limited without calling Strava" do
-        allow(Integrations::StravaClient).to receive(:currently_rate_limited?).with("GET").and_return(true)
+      let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+      let(:rate_limit) do
+        {short_limit: 200, short_usage: 198, long_limit: 2000, long_usage: 0,
+         read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0}
+      end
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second, rate_limit:)
+      end
 
+      it "sets binx_response_rate_limited without calling Strava" do
         result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
         expect(result[:strava_request].binx_response_rate_limited?).to be true
         expect(result[:response]).to be_nil
@@ -204,8 +212,6 @@ RSpec.describe StravaJobs::ProxyRequester do
       end
 
       it "checks PUT method for update_activity requests" do
-        allow(Integrations::StravaClient).to receive(:currently_rate_limited?).with("PUT").and_return(true)
-
         result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "PUT")
         expect(result[:strava_request].binx_response_rate_limited?).to be true
       end

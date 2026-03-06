@@ -165,8 +165,15 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     end
 
     context "when currently_rate_limited?" do
+      let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second,
+          rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                       read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0})
+      end
+
       it "sets binx_response_rate_limited and creates a retry request without calling Strava" do
-        allow(Integrations::StravaClient).to receive(:currently_rate_limited?).with("GET").and_return(true)
         strava_request_id = strava_request.id
 
         expect { instance.perform(strava_request_id) }.to change(StravaRequest, :count).by(1)
