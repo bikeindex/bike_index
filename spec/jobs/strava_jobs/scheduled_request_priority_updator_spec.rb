@@ -15,8 +15,8 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
   end
 
   describe "min_updated_priority" do
-    it "is 4" do
-      expect(described_class.min_updated_priority).to eq 5_000_000_000
+    it "is above the max non-fetch_activity priority" do
+      expect(described_class.min_updated_priority).to eq 6_000_000_000
     end
   end
 
@@ -56,10 +56,10 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     end
 
     context "with no proxy requests" do
-      it "doesn't change priority" do
+      it "multiplies priority by 4" do
         original_priority = request.priority
         instance.perform(strava_integration.id)
-        expect(request.reload.priority).to eq original_priority
+        expect(request.reload.priority).to eq((original_priority * 4).to_i.clamp(0, described_class::MAX_PRIORITY))
       end
     end
 
@@ -96,10 +96,10 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     context "with proxy request between 1 day and 1 week ago" do
       let(:proxy_requested_at) { 3.days.ago }
 
-      it "does not change priorities" do
+      it "multiplies priority by 2" do
         original_priority = request.priority
         instance.perform(strava_integration.id)
-        expect(request.reload.priority).to eq(original_priority)
+        expect(request.reload.priority).to eq((original_priority * 2).to_i.clamp(0, described_class::MAX_PRIORITY))
       end
     end
   end

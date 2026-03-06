@@ -20,7 +20,7 @@ module StravaJobs
 
       def priority_multiplier(strava_integration_id)
         most_recent_proxy_at = StravaRequest.most_recent_proxy_at(strava_integration_id)
-        return 1 unless most_recent_proxy_at
+        return 4 unless most_recent_proxy_at
 
         elapsed = Time.current - most_recent_proxy_at
         if elapsed < 1.hour
@@ -30,7 +30,7 @@ module StravaJobs
         elsif elapsed > 1.week
           4 # multiply by 4
         else
-          1
+          2
         end
       end
     end
