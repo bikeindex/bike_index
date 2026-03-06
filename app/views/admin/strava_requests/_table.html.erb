@@ -69,6 +69,7 @@
 
           <td>
             <small><%= strava_request.request_type&.humanize %></small>
+
             <% if strava_request.proxy_request? %>
               <%= render UI::Badge::Component.new(
                 text: "Proxy",
