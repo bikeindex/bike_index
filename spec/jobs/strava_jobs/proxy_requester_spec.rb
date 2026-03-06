@@ -106,8 +106,7 @@ RSpec.describe StravaJobs::ProxyRequester do
 
     it "returns fetch_activity for activity URLs" do
       expect(described_class.send(:proxy_request_type, "activities/17323701543", nil)).to eq :fetch_activity
-      expect(described_class.send(:proxy_request_type, "athlete/activities", nil)).to eq :fetch_activity
-      expect(described_class.send(:proxy_request_type, "athlete/activities/3333333", nil)).to eq :fetch_activity
+      expect(described_class.send(:proxy_request_type, "activities/3333333", nil)).to eq :fetch_activity
     end
 
     it "returns fetch_gear for gear URLs" do
@@ -116,6 +115,20 @@ RSpec.describe StravaJobs::ProxyRequester do
 
     it "raises for unknown URLs" do
       expect { described_class.send(:proxy_request_type, "segments/12345", nil) }.to raise_error(ArgumentError, /Unknown proxy request type/)
+    end
+  end
+
+  describe "validate_url!" do
+    ["javascript://evil.com", "../etc/passwd", "/foo/../../etc", "//strava"].each do |invalid_url|
+      it "raises" do
+        puts invalid_url
+        expect { described_class.send(:validate_url!, invalid_url) }.to raise_error("Invalid proxy path")
+      end
+    end
+    it "is valid" do
+      expect(described_class.send(:validate_url!, "athlete/123")).to be_nil
+      expect(described_class.send(:validate_url!, "athlete/activities")).to be_nil
+      expect(described_class.send(:validate_url!, "activities/123")).to be_nil
     end
   end
 

@@ -7,7 +7,7 @@ RSpec.describe "Strava Proxy API", type: :request do
 
   let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
   let(:user) { FactoryBot.create(:user_confirmed) }
-  let(:token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
+  let(:doorkeeper_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
 
   context "no token" do
     it "returns 401" do
@@ -21,7 +21,7 @@ RSpec.describe "Strava Proxy API", type: :request do
   context "token from wrong app" do
     it "returns 403" do
       stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", 99999)
-      post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+      post base_url, params: {url: "athlete/activities", method: "GET", access_token: doorkeeper_token.token}
       expect(response.status).to eq 403
       expect(json_result[:error]).to eq "Unauthorized application"
       expect(StravaRequest.count).to eq 0
@@ -33,7 +33,7 @@ RSpec.describe "Strava Proxy API", type: :request do
 
     context "no strava integration" do
       it "returns 404" do
-        post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+        post base_url, params: {url: "athlete/activities", method: "GET", access_token: doorkeeper_token.token}
         expect(response.status).to eq 404
         expect(json_result[:error]).to eq "No Strava integration"
         expect(StravaRequest.count).to eq 0
@@ -45,7 +45,7 @@ RSpec.describe "Strava Proxy API", type: :request do
 
       it "returns 401 with reauth message and does not create a proxy request" do
         expect {
-          post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+          post base_url, params: {url: "athlete/activities", method: "GET", access_token: doorkeeper_token.token}
         }.to_not change(StravaRequest, :count)
         expect(response.status).to eq 401
         expect(json_result[:error]).to eq "Strava authorization failed. Please re-authenticate with Strava."
@@ -57,7 +57,7 @@ RSpec.describe "Strava Proxy API", type: :request do
       let!(:strava_integration) { FactoryBot.create(:strava_integration, :syncing, user:) }
 
       it "returns sync_status instead of proxying" do
-        post base_url, params: {sync_status: true, access_token: token.token}
+        post base_url, params: {sync_status: true, access_token: doorkeeper_token.token}
         expect(response.status).to eq 200
         expect(json_result[:sync_status][:status]).to eq "syncing"
         expect(json_result[:sync_status][:activities_downloaded_count]).to eq 50
@@ -71,7 +71,7 @@ RSpec.describe "Strava Proxy API", type: :request do
       let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :env_tokens, user:) }
 
       it "returns synced status without proxying to Strava" do
-        post base_url, params: {sync_status: true, access_token: token.token}
+        post base_url, params: {sync_status: true, access_token: doorkeeper_token.token}
         expect(response.status).to eq 200
         expect(json_result[:sync_status][:status]).to eq "synced"
         expect(StravaRequest.count).to eq 0
@@ -112,22 +112,24 @@ RSpec.describe "Strava Proxy API", type: :request do
           strava_activity.update!(target_attributes)
 
           expect {
-            post base_url, params: {url: "athlete/activities?page=1", method: "GET", access_token: token.token}
+            post base_url, params: {url: "athlete/activities?page=1", method: "GET", access_token: doorkeeper_token.token}
           }.to change(StravaRequest, :count).by(1)
           expect(response.status).to eq 200
           expect(json_result).to be_a(Array)
           expect(json_result.first["title"]).to eq "Thanks for coming across the bay!"
           expect(json_result).to eq [strava_activity.proxy_serialized.as_json]
 
-          expect(StravaRequest.last).to have_attributes(proxy_request: true, request_type: "list_activities",
+          strava_request = StravaRequest.last
+          expect(strava_request).to have_attributes(proxy_request: true, request_type: "list_activities",
             response_status: "binx_response", parameters: {"url" => "athlete/activities?page=1"})
+          expect(strava_request.requested_at).to be_within(1).of Time.current
         end
       end
 
       context "get_athlete request" do
         it "returns proxy_serialized without creating a strava_request" do
           expect {
-            post base_url, params: {url: "athlete/2430215", method: " get ", access_token: token.token}
+            post base_url, params: {url: "athlete/2430215", method: " get ", access_token: doorkeeper_token.token}
           }.to change(StravaRequest, :count).by(1)
           expect(response.status).to eq 200
           expect(json_result).to eq strava_integration.proxy_serialized.as_json
@@ -136,6 +138,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect(strava_request).to have_attributes(proxy_request: true, request_type: "fetch_athlete",
             response_status: "binx_response", parameters: {"url" => "athlete/2430215"})
           expect(strava_request.request_method).to eq "GET"
+          expect(strava_request.requested_at).to be_within(1).of Time.current
         end
       end
 
@@ -164,7 +167,7 @@ RSpec.describe "Strava Proxy API", type: :request do
         it "enriches from detail" do
           VCR.use_cassette("strava-get_activity") do
             expect {
-              post base_url, params: {url: "activities/17323701543", method: "GET", access_token: token.token}
+              post base_url, params: {url: "activities/17323701543", method: "GET", access_token: doorkeeper_token.token}
             }.to change(StravaActivity, :count).by(1)
             expect(response.status).to eq 200
             expect(json_result["title"]).to eq "Thanks for coming across the bay!"
@@ -194,7 +197,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           VCR.use_cassette("strava-proxy_update_activity-insufficient") do
             expect {
               post base_url, params: {
-                url: "activities/#{strava_id}", method: "PUT", access_token: token.token, body: {gear_id:}
+                url: "activities/#{strava_id}", method: "PUT", access_token: doorkeeper_token.token, body: {gear_id:}
               }
             }.to change(StravaRequest, :count).by(1)
           end
@@ -256,7 +259,7 @@ RSpec.describe "Strava Proxy API", type: :request do
             VCR.use_cassette("strava-proxy_update_activity") do
               expect {
                 post base_url, params: {
-                  url: "activities/#{strava_id}", method: "PUT", access_token: token.token, body: {gear_id:}
+                  url: "activities/#{strava_id}", method: "PUT", access_token: doorkeeper_token.token, body: {gear_id:}
                 }
               }.to change(StravaRequest, :count).by(2)
               # proxy PUT + update_from_strava! GET + enqueued gear fetch
@@ -284,12 +287,16 @@ RSpec.describe "Strava Proxy API", type: :request do
         it "returns strava error status" do
           VCR.use_cassette("strava-proxy_rate_limited") do
             expect do
-              post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+              post base_url, params: {url: "activities/6969", method: "GET", access_token: doorkeeper_token.token}
             end.to change(StravaRequest, :count).by 1
             expect(response.status).to eq 429
             expect(json_result["message"]).to eq "Rate Limit Exceeded"
             expect(json_result["errors"]).to be_present
-            expect(StravaRequest.last.rate_limited?).to be_truthy
+
+            strava_request = StravaRequest.last
+            expect(strava_request).to have_attributes(proxy_request: true, request_type: "fetch_activity",
+              response_status: "rate_limited", parameters: {"url" => "activities/6969"})
+            expect(strava_request.requested_at).to be_within(1).of Time.current
           end
         end
       end
@@ -307,7 +314,7 @@ RSpec.describe "Strava Proxy API", type: :request do
 
         it "returns 429 with rate limit message without calling Strava" do
           expect do
-            post base_url, params: {url: "activities/17323701543", method: "GET", access_token: token.token}
+            post base_url, params: {url: "activities/17323701543", method: "GET", access_token: doorkeeper_token.token}
           end.to change(StravaRequest, :count).by 1
           expect(response.status).to eq 429
           expect(json_result["message"]).to eq "Rate Limit Exceeded"
@@ -321,15 +328,15 @@ RSpec.describe "Strava Proxy API", type: :request do
         it "returns strava error status" do
           VCR.use_cassette("strava-proxy_not_found") do
             expect do
-              post base_url, params: {url: "athlete/activities/3333333", method: "GET", access_token: token.token}
+              post base_url, params: {url: "activities/3333/dddd", method: "GET", access_token: doorkeeper_token.token}
             end.to change(StravaRequest, :count).by 1
             expect(response.status).to eq 404
             expect(json_result).to eq expected_response_body.as_json
 
             strava_request = StravaRequest.last
-            expect(strava_request.proxy_request?).to be_truthy
-            expect(strava_request.success?).to be_falsey
-            expect(strava_request.response_status).to eq "error"
+            expect(strava_request).to have_attributes(proxy_request: true, request_type: "fetch_activity",
+              response_status: "error", parameters: {"url" => "activities/3333/dddd", "error_response_status" => 404})
+            expect(strava_request.requested_at).to be_within(1).of Time.current
           end
         end
       end
@@ -338,11 +345,15 @@ RSpec.describe "Strava Proxy API", type: :request do
         it "returns strava error status without raising" do
           VCR.use_cassette("strava-proxy_server_error") do
             expect do
-              post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+              post base_url, params: {url: "activities/6969", method: "GET", access_token: doorkeeper_token.token}
             end.to change(StravaRequest, :count).by 1
             expect(response.status).to eq 500
             expect(json_result["message"]).to eq "Internal Server Error"
-            expect(StravaRequest.last.error?).to be_truthy
+
+            strava_request = StravaRequest.last
+            expect(strava_request).to have_attributes(response_status: "error", request_type: "fetch_activity",
+              proxy_request: true, parameters: {"url" => "activities/6969", "error_response_status" => 500})
+            expect(strava_request.requested_at).to be_within(1).of Time.current
           end
         end
       end
@@ -364,7 +375,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect {
             post base_url, params: {
               url: "athlete/activities?enriched_since=#{enriched_since_timestamp}",
-              method: "GET", access_token: token.token
+              method: "GET", access_token: doorkeeper_token.token
             }
           }.to_not change(StravaRequest, :count)
 
@@ -379,21 +390,21 @@ RSpec.describe "Strava Proxy API", type: :request do
       context "invalid proxy path" do
         it "rejects absolute URLs" do
           expect do
-            post base_url, params: {url: "https://evil.com/steal", method: "GET", access_token: token.token}
+            post base_url, params: {url: "https://evil.com/steal", method: "GET", access_token: doorkeeper_token.token}
           end.to_not change(StravaRequest, :count)
           expect(response.status).to eq 400
         end
 
         it "rejects protocol-relative URLs" do
           expect do
-            post base_url, params: {url: "//evil.com/steal", method: "GET", access_token: token.token}
+            post base_url, params: {url: "//evil.com/steal", method: "GET", access_token: doorkeeper_token.token}
           end.to_not change(StravaRequest, :count)
           expect(response.status).to eq 400
         end
 
         it "rejects path traversal" do
           expect do
-            post base_url, params: {url: "../../oauth/token", method: "GET", access_token: token.token}
+            post base_url, params: {url: "../../oauth/token", method: "GET", access_token: doorkeeper_token.token}
           end.to_not change(StravaRequest, :count)
           expect(response.status).to eq 400
         end

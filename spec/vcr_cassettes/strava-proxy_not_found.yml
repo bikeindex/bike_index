@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://www.strava.com/api/v3/athlete/activities/3333333
+    uri: https://www.strava.com/api/v3/activities/3333/dddd
     body:
       encoding: US-ASCII
       string: ''
@@ -25,9 +25,9 @@ http_interactions:
       Connection:
       - keep-alive
       Date:
-      - Fri, 20 Feb 2026 00:16:11 GMT
+      - Fri, 06 Mar 2026 22:25:23 GMT
       X-Envoy-Upstream-Service-Time:
-      - '15'
+      - '16'
       Server:
       - istio-envoy
       Status:
@@ -45,7 +45,7 @@ http_interactions:
       X-Xss-Protection:
       - 1; mode=block
       X-Request-Id:
-      - 48051e6f-1d50-42ee-b56b-7a32caf08b0c
+      - 73521402-3bfc-4895-9604-145674ce2a3a
       X-Download-Options:
       - noopen
       X-Frame-Options:
@@ -57,13 +57,13 @@ http_interactions:
       X-Cache:
       - Error from cloudfront
       Via:
-      - 1.1 744bd06c47c689d0ef4608fa37cf1bcc.cloudfront.net (CloudFront)
+      - 1.1 2eb8075fa15e83705194c1e1d87e9376.cloudfront.net (CloudFront)
       X-Amz-Cf-Pop:
       - SFO53-P8
       X-Amz-Cf-Id:
-      - xS-3hodaerqjx40LsWcVCzTNc0bqrGDlTP-ZjKnLi0b4YQex6EP5pw==
+      - Q2TN8YIQkhntF9pvdWyCAapV_pSyO-ndlccFyYcRrTl6phnq0PfhAQ==
     body:
       encoding: ASCII-8BIT
       string: '{"message":"Record Not Found","errors":[{"resource":"resource","field":"path","code":"invalid"}]}'
-  recorded_at: Fri, 20 Feb 2026 00:16:11 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Fri, 06 Mar 2026 22:25:23 GMT
+recorded_with: VCR 6.4.0

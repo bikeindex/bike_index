@@ -28,7 +28,7 @@ class Integrations::StravaClient
       end
     end
 
-    def rate_limited_response_body
+    def mocked_rate_limited_response
       OpenStruct.new(status: 429, body: RATE_LIMITED_RESPONSE_BODY)
     end
 
