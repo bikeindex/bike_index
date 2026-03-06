@@ -17,6 +17,8 @@ RSpec.describe Org::BikeSearch::Component, :js, type: :system do
 
   it "toggles settings panel visibility" do
     settings_selector = "[data-org--bike-search-target='settings']"
+    # Close settings if initially open (can happen on CI due to timing)
+    click_link "settings" if page.has_css?(settings_selector, visible: true, wait: 1)
     expect(page).not_to have_css(settings_selector, visible: true, wait: 2)
 
     click_link "settings"
