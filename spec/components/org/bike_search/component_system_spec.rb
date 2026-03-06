@@ -10,7 +10,8 @@ RSpec.describe Org::BikeSearch::Component, :js, type: :system do
   before do
     visit(preview_path)
     page.execute_script("localStorage.removeItem('orgBikeColumns'); localStorage.removeItem('orgBikeSettingsOpen')")
-    page.refresh
+    visit("about:blank")
+    visit(preview_path)
     expect(page).to have_css("[data-controller='org--bike-search']", wait: 5)
   end
 
