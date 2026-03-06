@@ -16,7 +16,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
 
   describe "min_updated_priority" do
     it "is above the max non-fetch_activity priority" do
-      expect(described_class.min_updated_priority).to eq 6_000_000_000
+      expect(described_class.min_updated_priority).to eq 5_000_000_000
     end
   end
 
