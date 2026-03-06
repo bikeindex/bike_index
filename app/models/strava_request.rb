@@ -126,15 +126,15 @@ class StravaRequest < AnalyticsRecord
       daily_reset = daily_boundary > latest_requested_at
 
       {
-        short_limit: latest_rate_limit[:short_limit],
-        short_usage: limit_for_rate(latest_rate_limit[:short_usage], short_reset),
-        long_limit: latest_rate_limit[:long_limit],
-        long_usage: limit_for_rate(latest_rate_limit[:long_usage], daily_reset),
-        read_short_limit: latest_rate_limit[:read_short_limit],
-        read_short_usage: limit_for_rate(latest_rate_limit[:read_short_usage], short_reset),
-        read_long_limit: latest_rate_limit[:read_long_limit],
-        read_long_usage: limit_for_rate(latest_rate_limit[:read_long_usage], daily_reset)
-      }.compact
+        short_limit: latest_rate_limit[:short_limit].to_i,
+        short_usage: limit_for_rate(latest_rate_limit[:short_usage].to_i, short_reset),
+        long_limit: latest_rate_limit[:long_limit].to_i,
+        long_usage: limit_for_rate(latest_rate_limit[:long_usage].to_i, daily_reset),
+        read_short_limit: latest_rate_limit[:read_short_limit].to_i,
+        read_short_usage: limit_for_rate(latest_rate_limit[:read_short_usage].to_i, short_reset),
+        read_long_limit: latest_rate_limit[:read_long_limit].to_i,
+        read_long_usage: limit_for_rate(latest_rate_limit[:read_long_usage].to_i, daily_reset)
+      }
     end
 
     def limit_for_rate(limit, was_reset)
