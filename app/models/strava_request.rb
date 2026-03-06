@@ -199,7 +199,7 @@ class StravaRequest < AnalyticsRecord
   end
 
   def service_unavailable?(response)
-    defined?(response.status) && response.status == 503
+    response.respond_to?(:status) && response.status == 503
   end
 
   def store_error_response(response)

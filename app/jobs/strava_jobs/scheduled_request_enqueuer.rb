@@ -14,10 +14,7 @@ module StravaJobs
       end
 
       def rate_limit_allows_batch?
-        rate_limit = StravaRequest.estimated_current_rate_limit
-        min_headroom = 2 * BATCH_SIZE
-        (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) >= min_headroom &&
-          (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) >= min_headroom
+        !Integrations::StravaClient.currently_rate_limited?(headroom: 2 * BATCH_SIZE)
       end
     end
 

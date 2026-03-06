@@ -48,6 +48,17 @@ RSpec.describe Integrations::StravaClient, type: :service do
         end
         it "returns true" do
           expect(described_class.currently_rate_limited?("GET")).to be true
+          expect(described_class.currently_rate_limited?(headroom: 1)).to be false
+        end
+      end
+      context "when read long is negative" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 3000, read_long_usage: 3150}
+        end
+        it "returns true" do
+          expect(described_class.currently_rate_limited?).to be true
+          expect(described_class.currently_rate_limited?("get", headroom: 0)).to be true
         end
       end
     end
@@ -66,6 +77,7 @@ RSpec.describe Integrations::StravaClient, type: :service do
         end
         it "returns true" do
           expect(described_class.currently_rate_limited?("PUT")).to be true
+          expect(described_class.currently_rate_limited?("PUT", headroom: 1)).to be false
         end
       end
 

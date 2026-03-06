@@ -29,10 +29,6 @@ class Integrations::StravaClient
       end
     end
 
-    def mocked_rate_limited_response
-      OpenStruct.new(status: 429, body: RATE_LIMITED_RESPONSE_BODY)
-    end
-
     def exchange_token(code)
       conn = oauth_connection
       resp = conn.post("oauth/token") do |req|
