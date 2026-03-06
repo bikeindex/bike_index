@@ -38,20 +38,6 @@ module Org::BikeSearch
 
     private
 
-    # Ensure sort_column/sort_direction (from SortableTable concern) and @period
-    # (from set_period) are available. These are set by the controller in normal
-    # usage, but not in component previews.
-    def before_render
-      vc = view_context
-      controller = vc.controller
-      controller.instance_variable_set(:@period, "all") unless controller.instance_variable_defined?(:@period)
-      vc.instance_variable_set(:@period, controller.instance_variable_get(:@period))
-      unless vc.respond_to?(:sort_column)
-        vc.define_singleton_method(:sort_column) { "id" }
-        vc.define_singleton_method(:sort_direction) { "desc" }
-      end
-    end
-
     # Mark _html translations as html_safe (matching Rails' t() helper behavior)
     def translation(key, **)
       result = super
