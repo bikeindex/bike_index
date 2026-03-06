@@ -10,8 +10,7 @@ module StravaJobs
           return handle_incoming_webhook(strava_request, strava_integration)
         end
 
-        request_method = strava_request.update_activity? ? "PUT" : "GET"
-        if Integrations::StravaClient.currently_rate_limited?(request_method)
+        if Integrations::StravaClient.currently_rate_limited?(strava_request.request_method)
           strava_request.update!(response_status: :binx_response_rate_limited, requested_at: Time.current)
           StravaRequest.create!(user_id: strava_request.user_id, strava_integration_id: strava_request.strava_integration_id,
             request_type: strava_request.request_type, proxy_request: strava_request.proxy_request,

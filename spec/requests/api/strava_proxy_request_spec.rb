@@ -132,8 +132,10 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect(response.status).to eq 200
           expect(json_result).to eq strava_integration.proxy_serialized.as_json
 
-          expect(StravaRequest.last).to have_attributes(proxy_request: true, request_type: "fetch_athlete",
+          strava_request = StravaRequest.last
+          expect(strava_request).to have_attributes(proxy_request: true, request_type: "fetch_athlete",
             response_status: "binx_response", parameters: {"url" => "athlete/2430215"})
+          expect(strava_request.request_method).to eq "GET"
         end
       end
 
@@ -206,6 +208,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect(strava_request.update_activity?).to be_truthy
           expect(strava_request.response_status).to eq "insufficient_token_privileges"
           expect(strava_request.parameters).to eq expected_parameters.as_json
+          expect(strava_request.request_method).to eq "PUT"
 
           expect(strava_integration.reload.token_expired?).to be_falsey
           expect(strava_integration.access_token).to_not eq og_token

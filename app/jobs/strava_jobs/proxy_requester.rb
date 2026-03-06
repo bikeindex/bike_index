@@ -47,12 +47,11 @@ module StravaJobs
           parameters: {url:, method: params_method, body:}.compact
         )
 
-        if internal_request?(strava_request)
+        if internal_response?(strava_request)
           return {internal_response: internal_response!(strava_request)}
         end
 
-        request_method = params_method || "GET"
-        if Integrations::StravaClient.currently_rate_limited?(request_method)
+        if Integrations::StravaClient.currently_rate_limited?(params_method)
           strava_request.update!(response_status: :binx_response_rate_limited, requested_at: Time.current)
           response = Integrations::StravaClient.mocked_rate_limited_response
           return {strava_request:, response:, serialized: nil}
@@ -95,7 +94,7 @@ module StravaJobs
 
       private
 
-      def internal_request?(strava_request)
+      def internal_response?(strava_request)
         strava_request.fetch_athlete? || strava_request.list_activities?
       end
 

@@ -142,6 +142,10 @@ class StravaRequest < AnalyticsRecord
     end
   end
 
+  def request_method
+    parameters&.dig("method")&.upcase || "GET"
+  end
+
   def skip_request?
     return false unless fetch_activity?
 
