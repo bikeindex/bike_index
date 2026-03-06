@@ -67,6 +67,7 @@ class StravaRequest < AnalyticsRecord
 
   before_validation :set_calculated_attributes, on: :create
 
+  scope :proxy_request, -> { where(proxy_request: true) }
   scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
   scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
   scope :priority_ordered, -> { reorder(:priority) }
