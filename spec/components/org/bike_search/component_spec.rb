@@ -5,10 +5,8 @@ require "rails_helper"
 RSpec.describe Org::BikeSearch::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) do
-    with_controller_class(ComponentPreviewController) do
-      with_request_url("/o/#{organization.to_param}/bikes") do
-        render_inline(instance) { "<tr><td>bike row</td></tr>".html_safe }
-      end
+    with_request_url("/o/#{organization.to_param}/bikes") do
+      render_inline(instance) { "<tr><td>bike row</td></tr>".html_safe }
     end
   end
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }

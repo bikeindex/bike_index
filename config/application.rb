@@ -85,7 +85,6 @@ module Bikeindex
     # Enable instrumentation for ViewComponents (used by rack-mini-profiler)
     config.view_component.instrumentation_enabled = true
     config.view_component.default_preview_layout = "component_preview"
-    config.view_component.preview_controller = "ComponentPreviewController"
     # This is ugly but necessary, see github.com/ViewComponent/view_component/issues/1064
     initializer "app_assets", after: "importmap.assets" do
       Rails.application.config.assets.paths << Rails.root.join("app")
