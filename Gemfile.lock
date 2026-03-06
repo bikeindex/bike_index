@@ -416,7 +416,7 @@ GEM
     jmespath (1.6.2)
     json (2.18.1)
     jwt (2.5.0)
-    knapsack_pro (8.0.1)
+    knapsack_pro (9.2.2)
       rake
     kramdown (2.5.1)
       rexml (>= 3.3.9)
