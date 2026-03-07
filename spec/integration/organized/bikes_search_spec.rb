@@ -55,7 +55,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect(page).not_to have_css("th.avery_cell")
 
       # Open settings and check avery — triggers page reload with param
-      click_link "settings"
+      click_button "settings"
       check "avery_cell"
       expect(page).to have_current_path(/search_avery_export=true/, wait: 10)
       # Avery column should be visible with check mark for exportable bike
