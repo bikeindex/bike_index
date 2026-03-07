@@ -3,9 +3,9 @@ require "rails_helper"
 RSpec.describe WheelSize, type: :model do
   describe "popularity" do
     it "returns the popularities word of the wheel size" do
-      wheel_size = WheelSize.new(priority: 1)
+      wheel_size = WheelSize.new(priority: :standard)
       expect(wheel_size.popularity).to eq("Standard")
-      wheel_size.priority = 4
+      wheel_size.priority = :rare
       expect(wheel_size.popularity).to eq("Rare")
     end
   end
