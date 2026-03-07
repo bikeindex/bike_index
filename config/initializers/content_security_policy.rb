@@ -12,11 +12,15 @@ Rails.application.configure do
       "https://uploads.bikeindex.org",
       "https://bikebook.s3.amazonaws.com",
       "https://www.facebook.com",
+      "https://connect.facebook.net",
       "https://www.googletagmanager.com",
       "https://pbs.twimg.com",
       "https://syndication.twitter.com",
       "https://maps.googleapis.com",
-      "https://maps.gstatic.com", :data
+      "https://maps.gstatic.com",
+      # Google Translate injects images when users translate the page in Chrome
+      "https://fonts.gstatic.com",
+      "https://translate.google.com", :data
     policy.object_src :none
     # unsafe_eval is required for application_revised.js jQuery - remove it when possible!
     policy.script_src :self, :unsafe_inline, :unsafe_eval,
@@ -32,10 +36,12 @@ Rails.application.configure do
       "https://widget.bikeindex.org"
     policy.style_src :self, :unsafe_inline,
       "https://fonts.googleapis.com",
+      "https://www.gstatic.com", # Google Translate styles
       "https://api.mapbox.com",
       "https://cdn.jsdelivr.net"
     policy.connect_src :self,
       "https://www.google-analytics.com",
+      "https://*.google-analytics.com",
       "https://www.googletagmanager.com",
       "https://www.facebook.com",
       "https://maps.googleapis.com",
@@ -43,7 +49,8 @@ Rails.application.configure do
       "https://events.mapbox.com",
       "https://*.tiles.mapbox.com",
       "https://cdn.jsdelivr.net",
-      "https://api.honeybadger.io"
+      "https://api.honeybadger.io",
+      "https://translate.googleapis.com" # Google Translate API
     policy.worker_src :self, :blob
     policy.frame_src :self,
       "https://js.stripe.com",
