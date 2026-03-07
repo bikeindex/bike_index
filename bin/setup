@@ -5,6 +5,8 @@ include FileUtils
 # path to your application root.
 APP_ROOT = File.expand_path("..", __dir__)
 
+without_seeds = ARGV.include?("--without_seeds")
+
 def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
@@ -67,17 +69,19 @@ chdir APP_ROOT do
   system "bin/rake import_manufacturers_csv"
   system "bin/rake import_primary_activities_csv"
 
-  puts "\n== Seeding database =="
-  system "bin/rake db:seed"
+  unless without_seeds
+    puts "\n== Seeding database =="
+    system "bin/rake db:seed"
 
-  puts "\n== Preparing test database (including parallelism) =="
-  system "bin/rake parallel:prepare"
+    puts "\n== Preparing test database (including parallelism) =="
+    system "bin/rake parallel:prepare"
+
+    puts "\n Running update to prepare typeahead"
+    system "bin/rake reset_autocomplete"
+  end
 
   puts "\n== Removing old logs and tempfiles =="
   system! "bin/rails log:clear tmp:clear"
-
-  puts "\n Running update to prepare typeahead"
-  system "bin/rake reset_autocomplete"
 
   puts "\n== Restarting application server =="
   system! "bin/rails restart"
