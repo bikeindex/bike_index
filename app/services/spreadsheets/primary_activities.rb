@@ -25,7 +25,6 @@ module Spreadsheets::PrimaryActivities
   #
   # private below here
   #
-  conceal :names_and_families, :update_or_create_for!
 
   def names_and_families(primary_activities)
     flavors_families = {}
@@ -58,4 +57,6 @@ module Spreadsheets::PrimaryActivities
     end
   end
 
+
+  conceal :names_and_families, :update_or_create_for!
 end

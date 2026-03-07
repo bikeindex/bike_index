@@ -35,7 +35,6 @@ module Slugifyer
   #
   # private below here
   #
-  conceal :remove_parens, :transliterate
 
   def remove_parens(string)
     string&.to_s&.gsub(/\([^)]*\)/i, "")
@@ -44,4 +43,6 @@ module Slugifyer
   def transliterate(string)
     I18n.transliterate(string.to_s.downcase).strip
   end
+
+  conceal :remove_parens, :transliterate
 end

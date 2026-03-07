@@ -56,7 +56,6 @@ module BikeServices::OwnershipTransferer
   #
   # private below here
   #
-  conceal :updated_bike_attrs, :update_impound_and_parking_notifications
 
   def updated_bike_attrs(owner_email, updator)
     BikeServices::Updator.updator_attrs(updator).merge(
@@ -83,4 +82,6 @@ module BikeServices::OwnershipTransferer
     end
   end
 
+
+  conceal :updated_bike_attrs, :update_impound_and_parking_notifications
 end

@@ -56,11 +56,12 @@ module LogSearcher::Reader
   #
   # private below here
   #
-  conceal :time_rgrep
 
   def time_rgrep(time)
     return "" if time.blank?
 
     " | rg '\\AI,\\s\\[#{time.utc.strftime("%Y-%m-%dT%H")}'"
   end
+
+  conceal :time_rgrep
 end

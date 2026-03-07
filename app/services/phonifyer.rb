@@ -31,7 +31,6 @@ module Phonifyer
   #
   # private below here
   #
-  conceal :strip_ignored_parts, :split_with_country_code, :split_with_extension
 
   def strip_ignored_parts(number)
     return nil unless number.present?
@@ -66,4 +65,6 @@ module Phonifyer
     [number.strip, "x#{extension.strip}"]
   end
 
+
+  conceal :strip_ignored_parts, :split_with_country_code, :split_with_extension
 end

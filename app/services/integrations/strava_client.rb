@@ -119,7 +119,6 @@ module Integrations::StravaClient
   #
   # private below here
   #
-  conceal :refresh_token!, :execute_proxy_request, :get, :api_connection, :oauth_connection
 
   def refresh_token!(strava_integration)
     conn = oauth_connection
@@ -197,4 +196,6 @@ module Integrations::StravaClient
     end
   end
 
+
+  conceal :refresh_token!, :execute_proxy_request, :get, :api_connection, :oauth_connection
 end

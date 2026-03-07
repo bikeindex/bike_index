@@ -70,7 +70,6 @@ module Binxtils
     #
     # private below here
     #
-    conceal :time_in_zone
 
     def time_in_zone(time, time_zone_str:, time_str: nil, time_zone: nil)
       time_zone ||= if time_zone_str.present?
@@ -82,5 +81,7 @@ module Binxtils
 
       time.in_time_zone(time_zone || ActiveSupport::TimeZone["UTC"])
     end
+
+    conceal :time_in_zone
   end
 end

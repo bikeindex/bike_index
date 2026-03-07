@@ -40,7 +40,6 @@ module Binxtils
     #
     # private below here
     #
-    conceal :time_string_has_zone_info?, :prioritized_zones_matching_offset, :prioritize_zones
 
     # TODO: This might be overly complicated garbage
     def time_string_has_zone_info?(time_str)
@@ -105,5 +104,7 @@ module Binxtils
       end
     end
 
+
+    conceal :time_string_has_zone_info?, :prioritized_zones_matching_offset, :prioritize_zones
   end
 end

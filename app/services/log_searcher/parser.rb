@@ -70,7 +70,6 @@ module LogSearcher::Parser
   #
   # private below here
   #
-  conceal :includes_query?, :parse_endpoint, :organization_from_params, :parse_request_time, :stolenness_for
 
   def includes_query?(query_items)
     query_items.except(*NON_QUERY_ITEMS).present?
@@ -127,4 +126,6 @@ module LogSearcher::Parser
     end
   end
 
+
+  conceal :includes_query?, :parse_endpoint, :organization_from_params, :parse_request_time, :stolenness_for
 end
