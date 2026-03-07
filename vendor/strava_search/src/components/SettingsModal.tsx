@@ -21,6 +21,7 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
   const { isSyncing, progress, syncRecent } = useActivitySync();
   const [activityCount, setActivityCount] = useState(0);
   const [enrichedCount, setEnrichedCount] = useState(0);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {

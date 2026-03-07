@@ -2,12 +2,18 @@
 
 module StravaJobs
   class RequestRunner < ApplicationJob
-    sidekiq_options queue: "low_priority", retry: 1
+    sidekiq_options queue: "droppable", retry: 1
 
     class << self
       def make_request_and_update(strava_integration, strava_request)
         if strava_request.request_type == "incoming_webhook"
           return handle_incoming_webhook(strava_request, strava_integration)
+        end
+
+        if Integrations::StravaClient.currently_rate_limited?(strava_request.request_method)
+          strava_request.update_from_response(:binx_response_rate_limited,
+            re_enqueue_if_rate_limited_or_unavailable: true)
+          return Integrations::StravaClient::RATE_LIMITED_RESPONSE_BODY
         end
 
         response = make_request(strava_integration, strava_request.request_type, strava_request.parameters)

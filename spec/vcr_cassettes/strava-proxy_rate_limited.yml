@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://www.strava.com/api/v3/athlete/activities
+    uri: https://www.strava.com/api/v3/activities/6969
     body:
       encoding: US-ASCII
       string: ''
@@ -21,15 +21,142 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       X-RateLimit-Limit:
-      - "100,1000"
+      - '100,1000'
       X-RateLimit-Usage:
-      - "101,350"
+      - '101,350'
       X-ReadRateLimit-Limit:
-      - "100,1000"
+      - '100,1000'
       X-ReadRateLimit-Usage:
-      - "101,350"
+      - '101,350'
     body:
       encoding: UTF-8
-      string: '{"message":"Rate Limit Exceeded","errors":[{"resource":"Application","field":"rate limit","code":"exceeded"}]}'
+      string: '{"message":"Rate Limit Exceeded","errors":[{"resource":"Application","field":"rate
+        limit","code":"exceeded"}]}'
   recorded_at: Sun, 08 Feb 2026 22:46:00 GMT
-recorded_with: VCR 6.3.1
+- request:
+    method: get
+    uri: https://www.strava.com/api/v3/activities/12345
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 06 Mar 2026 22:46:19 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '14'
+      Server:
+      - istio-envoy
+      Status:
+      - 401 Unauthorized
+      Cache-Control:
+      - no-cache
+      Vary:
+      - Accept, Origin
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - a2610162-4ded-4094-97ff-537ec4c78ce1
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - DENY
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 f38dffa5f68963b42a7e9d52afc9ea08.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P8
+      X-Amz-Cf-Id:
+      - uXfAGfVo2lZ1nNrQ8BF6HcTMvaMjrSrnCEWVrt3rbdO3-xL9wxwH0A==
+    body:
+      encoding: UTF-8
+      string: '{"message":"Authorization Error","errors":[{"resource":"Application","field":"","code":"invalid"}]}'
+  recorded_at: Fri, 06 Mar 2026 22:46:19 GMT
+- request:
+    method: post
+    uri: https://www.strava.com/oauth/token
+    body:
+      encoding: UTF-8
+      string: client_id=<STRAVA_KEY>&client_secret=<STRAVA_SECRET>&grant_type=refresh_token&refresh_token=strava_test_refresh_token_456
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 06 Mar 2026 22:46:19 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '19'
+      Server:
+      - istio-envoy
+      Status:
+      - 400 Bad Request
+      Cache-Control:
+      - no-cache
+      Vary:
+      - Accept, Origin
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - 113573d0-b4fe-4f3c-9492-aa02e3c6acca
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - DENY
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 8d75c94c9670950752a0ef9e5d4a66d0.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P8
+      X-Amz-Cf-Id:
+      - hih0kErrUAwYzJCp4Mimvnp3C5vPzi3aD2NavZrffl8DMkFawhNPNA==
+    body:
+      encoding: UTF-8
+      string: '{"message":"Bad Request","errors":[{"resource":"RefreshToken","field":"refresh_token","code":"invalid"}]}'
+  recorded_at: Fri, 06 Mar 2026 22:46:19 GMT
+recorded_with: VCR 6.4.0

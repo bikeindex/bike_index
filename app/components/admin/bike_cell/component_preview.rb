@@ -31,6 +31,11 @@ module Admin::BikeCell
       ))
     end
 
+    def bike_version
+      render(Admin::BikeCell::Component.new(bike: BikeVersion.find(1)))
+    end
+    # @endgroup
+
     private
 
     def bike

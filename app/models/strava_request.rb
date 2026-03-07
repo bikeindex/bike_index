@@ -8,6 +8,7 @@
 #  id                    :bigint           not null, primary key
 #  parameters            :jsonb
 #  priority              :bigint           not null
+#  proxy_request         :boolean          default(FALSE), not null
 #  rate_limit            :jsonb
 #  request_type          :integer          not null
 #  requested_at          :datetime
@@ -30,7 +31,7 @@ class StravaRequest < AnalyticsRecord
     fetch_activity: 3,
     fetch_gear: 4,
     incoming_webhook: 5,
-    proxy: 6
+    update_activity: 7
   }.freeze
   RESPONSE_STATUS_ENUM = {
     pending: 0,
@@ -41,17 +42,18 @@ class StravaRequest < AnalyticsRecord
     integration_deleted: 5,
     skipped: 6,
     insufficient_token_privileges: 7,
-    binx_response: 8
+    binx_response: 8,
+    binx_response_rate_limited: 9
   }.freeze
   PENDING_OR_SUCCESS = %i[success pending].freeze
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
   PRIORITY_MAP = {
-    proxy: 0,
     incoming_webhook: 1,
     fetch_athlete: 2,
     fetch_athlete_stats: 2,
     list_activities: 3,
     fetch_gear: 4,
+    update_activity: 5,
     fetch_activity: 10
   }.freeze
   PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000 # Based on timestamp digits
@@ -66,6 +68,7 @@ class StravaRequest < AnalyticsRecord
 
   before_validation :set_calculated_attributes, on: :create
 
+  scope :proxy_request, -> { where(proxy_request: true) }
   scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
   scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
   scope :priority_ordered, -> { reorder(:priority) }
@@ -98,8 +101,8 @@ class StravaRequest < AnalyticsRecord
     end
 
     def most_recent_proxy_at(strava_integration_id)
-      where(strava_integration_id:, request_type: :proxy)
-        .where.not(requested_at: nil).maximum(:requested_at)
+      where(strava_integration_id:, proxy_request: true)
+        .where.not(response_status: :pending).maximum(:updated_at)
     end
 
     private
@@ -112,7 +115,7 @@ class StravaRequest < AnalyticsRecord
        read_short_limit: 200,
        read_short_usage: 0,
        read_long_limit: 2000,
-       read_long_usage: 0}.freeze.as_json
+       read_long_usage: 0}.freeze
     end
 
     def rate_limit_from(latest_rate_limit, latest_requested_at)
@@ -123,20 +126,24 @@ class StravaRequest < AnalyticsRecord
       daily_reset = daily_boundary > latest_requested_at
 
       {
-        short_limit: latest_rate_limit[:short_limit],
-        short_usage: limit_for_rate(latest_rate_limit[:short_usage], short_reset),
-        long_limit: latest_rate_limit[:long_limit],
-        long_usage: limit_for_rate(latest_rate_limit[:long_usage], daily_reset),
-        read_short_limit: latest_rate_limit[:read_short_limit],
-        read_short_usage: limit_for_rate(latest_rate_limit[:read_short_usage], short_reset),
-        read_long_limit: latest_rate_limit[:read_long_limit],
-        read_long_usage: limit_for_rate(latest_rate_limit[:read_long_usage], daily_reset)
-      }.as_json.compact
+        short_limit: latest_rate_limit[:short_limit].to_i,
+        short_usage: limit_for_rate(latest_rate_limit[:short_usage].to_i, short_reset),
+        long_limit: latest_rate_limit[:long_limit].to_i,
+        long_usage: limit_for_rate(latest_rate_limit[:long_usage].to_i, daily_reset),
+        read_short_limit: latest_rate_limit[:read_short_limit].to_i,
+        read_short_usage: limit_for_rate(latest_rate_limit[:read_short_usage].to_i, short_reset),
+        read_long_limit: latest_rate_limit[:read_long_limit].to_i,
+        read_long_usage: limit_for_rate(latest_rate_limit[:read_long_usage].to_i, daily_reset)
+      }
     end
 
     def limit_for_rate(limit, was_reset)
       was_reset ? 0 : limit
     end
+  end
+
+  def request_method
+    parameters&.dig("method")&.upcase || "GET"
   end
 
   def skip_request?
@@ -155,14 +162,18 @@ class StravaRequest < AnalyticsRecord
   end
 
   def update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: false, raise_on_error: false)
-    self.response_status = status_from_response(response)
-    store_error_response(response) if error?
-    update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
+    if response == :binx_response_rate_limited
+      update!(requested_at: Time.current, response_status: :binx_response_rate_limited)
+    else
+      self.response_status = status_from_response(response)
+      store_error_response(response) if error?
+      update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
+    end
 
-    if rate_limited? || service_unavailable?(response)
+    if binx_response_rate_limited? || rate_limited? || service_unavailable?(response)
       return unless re_enqueue_if_rate_limited_or_unavailable
 
-      StravaRequest.create!(user_id:, strava_integration_id:, request_type:,
+      StravaRequest.create!(user_id:, strava_integration_id:, request_type:, proxy_request:,
         parameters: parameters.except("error_response_status"))
     elsif error? && raise_on_error
       raise "Strava API error #{response.status}: #{response.body}"
@@ -188,7 +199,7 @@ class StravaRequest < AnalyticsRecord
   end
 
   def service_unavailable?(response)
-    response&.status == 503
+    response.respond_to?(:status) && response.status == 503
   end
 
   def store_error_response(response)
@@ -201,7 +212,11 @@ class StravaRequest < AnalyticsRecord
   end
 
   def calculated_priority
-    level = PRIORITY_MAP[request_type.to_sym] * PRIORITY_LEVEL_MULTIPLIER
+    level = if proxy_request?
+      0
+    else
+      PRIORITY_MAP[request_type.to_sym] * PRIORITY_LEVEL_MULTIPLIER
+    end
 
     if fetch_activity? && parameters["strava_id"].present?
       level += (parameters["strava_id"].to_i / 1000)

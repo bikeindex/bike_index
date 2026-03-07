@@ -206,29 +206,6 @@
       "note": "System-generated Doorkeeper OAuth application secret displayed in API documentation code example"
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "60c3c168d66540de4cdf77d8af1ca9d7957215e4362fb9c6f2263112cbe3c0a7",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/strava_request.rb",
-      "line": 41,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"ARRAY_POSITION(ARRAY#{[5, 2, 4, 3, 0, 1]}, request_type), id\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "StravaRequest",
-        "method": null
-      },
-      "user_input": "[5, 2, 4, 3, 0, 1]",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": "Hardcoded integer array literal, no user input in the SQL string"
-    },
-    {
       "warning_type": "HTTP Verb Confusion",
       "warning_code": 118,
       "fingerprint": "992e5025f5eb88bbef9ff329f74cdfe005323559a9144475e76f98dea6c02fb8",
@@ -798,18 +775,18 @@
     {
       "warning_type": "Command Injection",
       "warning_code": 14,
-      "fingerprint": "6c4e3c99c184d4d5ef1765d2f9811032cba30ba2d9fcd6e9f6669d81f9ea04cf",
+      "fingerprint": "d8da8ee7a70773f264d1ee33b44fd664227586cbd3b7ca689811909da303a313",
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/services/log_searcher/reader.rb",
-      "line": 35,
+      "line": 36,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`#{rgrep_command_str(time, :log_path => log_path)} | wc -l`",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "LogSearcher::Reader",
-        "method": "self.rgrep_log_lines_count"
+        "method": "rgrep_log_lines_count"
       },
       "user_input": "rgrep_command_str(time, :log_path => log_path)",
       "confidence": "Medium",

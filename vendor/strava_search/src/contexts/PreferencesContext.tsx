@@ -8,8 +8,9 @@ import {
   type ReactNode,
 } from 'react';
 import { useAuth } from './AuthContext';
+import { getDefaultUnits, type UnitSystem } from '../utils/units';
 
-export type UnitSystem = 'metric' | 'imperial';
+export type { UnitSystem };
 export type DarkMode = 'light' | 'dark' | 'system';
 
 interface StoredPreferences {
@@ -42,21 +43,6 @@ function getStoredPreferences(): StoredPreferences {
 function storePreferences(prefs: StoredPreferences) {
   const current = getStoredPreferences();
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...current, ...prefs }));
-}
-
-function getDefaultUnits(athleteCountry?: string): UnitSystem {
-  // Default to imperial for US users
-  if (athleteCountry === 'United States') {
-    return 'imperial';
-  }
-
-  // Also check browser locale as fallback
-  const locale = navigator.language || '';
-  if (locale.startsWith('en-US')) {
-    return 'imperial';
-  }
-
-  return 'metric';
 }
 
 const PreferencesContext = createContext<PreferencesContextType | null>(null);
@@ -113,8 +99,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     if (userSetUnits) {
       return userSetUnits;
     }
-    return getDefaultUnits(athlete?.country);
-  }, [userSetUnits, athlete?.country]);
+    return getDefaultUnits(athlete?.measurement_preference, athlete?.country);
+  }, [userSetUnits, athlete?.measurement_preference, athlete?.country]);
 
   const setUnits = useCallback((newUnits: UnitSystem) => {
     setUserSetUnits(newUnits);

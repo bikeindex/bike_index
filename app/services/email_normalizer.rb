@@ -1,11 +1,13 @@
-class EmailNormalizer
-  def self.normalize(email = nil)
+module EmailNormalizer
+  extend Functionable
+
+  def normalize(email = nil)
     return nil unless email.present?
 
     (email || "").strip.downcase
   end
 
-  def self.obfuscate(email = nil)
+  def obfuscate(email = nil)
     return nil unless email.present?
 
     email.sub(/\A(..?)(.*)?@(.)(.*)(..)\z/) {

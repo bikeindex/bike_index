@@ -105,7 +105,10 @@ function Dashboard() {
       const interval = setInterval(() => {
         refreshActivities(true); // Silent refresh to avoid page blink
       }, 2000); // Refresh every 2 seconds during sync/fetch
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        refreshActivities(true); // Final refresh when sync/fetch completes
+      };
     }
   }, [isSyncing, isFetchingFullData, refreshActivities]);
 
@@ -191,12 +194,12 @@ function Dashboard() {
       <SettingsModal isOpen={showSettings} onClose={handleCloseSettings} />
 
       {/* Initial sync overlay - shown before any activities have loaded */}
-      {isSyncing && !syncState?.isInitialSyncComplete && progress && (
+      {!syncState?.isInitialSyncComplete && activities.length === 0 && (
         <InitialSyncOverlay
-          loaded={progress.loaded}
-          total={progress.total}
-          status={progress.status}
-          rateLimited={progress.rateLimited}
+          loaded={progress?.loaded ?? 0}
+          total={progress?.total ?? null}
+          status={progress?.status ?? 'Checking sync status...'}
+          rateLimited={progress?.rateLimited}
         />
       )}
 

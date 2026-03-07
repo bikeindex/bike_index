@@ -1,5 +1,7 @@
 # Pin npm packages by running ./bin/importmap
 
+# REMEMBER TO ADD to content_security_policy.rb if using a CDN version
+
 pin "application"
 pin "@hotwired/turbo-rails", to: "turbo.min.js", preload: true
 pin "@hotwired/stimulus", to: "stimulus.min.js"

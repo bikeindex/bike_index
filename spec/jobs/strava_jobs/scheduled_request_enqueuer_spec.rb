@@ -65,15 +65,15 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
       end
 
       context "when rate limited" do
-        let(:strava_request) do
-          StravaRequest.create!(user_id: strava_integration.user_id,
-            strava_integration_id: strava_integration.id, request_type: :list_activities)
+        let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+        let(:rate_limit) do
+          {short_limit: 100, short_usage: 0, long_limit: 1000, long_usage: 200,
+           read_short_limit: 100, read_short_usage: 95, read_long_limit: 1000, read_long_usage: 200}
         end
-        let(:limit_hash) do
-          {"read_short_limit" => 100, "read_short_usage" => 95, "read_long_limit" => 1000, "read_long_usage" => 200}
+        let!(:rate_limit_request) do
+          FactoryBot.create(:strava_request, :processed, strava_integration:,
+            requested_at: boundary + 1.second, rate_limit:)
         end
-
-        before { allow(StravaRequest).to receive(:estimated_current_rate_limit).and_return(limit_hash) }
 
         it "skips enqueue when read short rate limit headroom is insufficient" do
           instance.perform
@@ -82,8 +82,9 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
         end
 
         context "long read limit" do
-          let(:limit_hash) do
-            {"read_short_limit" => 200, "read_short_usage" => 0, "read_long_limit" => 1000, "read_long_usage" => 995}
+          let(:rate_limit) do
+            {short_limit: 200, short_usage: 0, long_limit: 1000, long_usage: 0,
+             read_short_limit: 200, read_short_usage: 0, read_long_limit: 1000, read_long_usage: 995}
           end
           it "skips enqueue when read long rate limit headroom is insufficient" do
             instance.perform

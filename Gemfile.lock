@@ -305,6 +305,7 @@ GEM
     formatador (1.2.3)
       reline
     forwardable (1.4.0)
+    functionable (0.1.0)
     geocoder (1.8.5)
       base64 (>= 0.1.0)
       csv (>= 3.0.0)
@@ -351,8 +352,8 @@ GEM
       thor
       tilt
     hashdiff (1.1.2)
-    herb (0.8.8-arm64-darwin)
-    herb (0.8.8-x86_64-linux-gnu)
+    herb (0.8.10-arm64-darwin)
+    herb (0.8.10-x86_64-linux-gnu)
     highline (3.1.2)
       reline
     honeybadger (5.27.0)
@@ -414,9 +415,9 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (2.18.1)
+    json (2.19.0)
     jwt (2.5.0)
-    knapsack_pro (8.0.1)
+    knapsack_pro (9.2.2)
       rake
     kramdown (2.5.1)
       rexml (>= 3.3.9)
@@ -840,9 +841,9 @@ GEM
     uri (1.1.1)
     useragent (0.16.11)
     vcr (6.4.0)
-    view_component (4.1.1)
-      actionview (>= 7.1.0, < 8.2)
-      activesupport (>= 7.1.0, < 8.2)
+    view_component (4.5.0)
+      actionview (>= 7.1.0)
+      activesupport (>= 7.1.0)
       concurrent-ruby (~> 1)
     webmock (3.24.0)
       addressable (>= 2.8.0)
@@ -901,6 +902,7 @@ DEPENDENCIES
   flipper-ui
   fog-aws
   foreman
+  functionable
   geocoder
   grape
   grape_logging

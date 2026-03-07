@@ -88,6 +88,49 @@ RSpec.describe StravaJobs::ProxyRequester do
     end
   end
 
+  describe ".proxy_request_type" do
+    it "returns update_activity for non-GET methods" do
+      expect(described_class.send(:proxy_request_type, "activities/123", "PUT")).to eq :update_activity
+      expect(described_class.send(:proxy_request_type, "activities/123", "POST")).to eq :update_activity
+    end
+
+    it "returns fetch_athlete for athlete URLs" do
+      expect(described_class.send(:proxy_request_type, "athlete", nil)).to eq :fetch_athlete
+      expect(described_class.send(:proxy_request_type, "athlete/2430215", nil)).to eq :fetch_athlete
+    end
+
+    it "returns list_activities for paginated activity list URLs" do
+      expect(described_class.send(:proxy_request_type, "athlete/activities?page=1", nil)).to eq :list_activities
+      expect(described_class.send(:proxy_request_type, "athlete/activities?per_page=30&page=2", nil)).to eq :list_activities
+    end
+
+    it "returns fetch_activity for activity URLs" do
+      expect(described_class.send(:proxy_request_type, "activities/17323701543", nil)).to eq :fetch_activity
+      expect(described_class.send(:proxy_request_type, "activities/3333333", nil)).to eq :fetch_activity
+    end
+
+    it "returns fetch_gear for gear URLs" do
+      expect(described_class.send(:proxy_request_type, "gear/b12345", nil)).to eq :fetch_gear
+    end
+
+    it "raises for unknown URLs" do
+      expect { described_class.send(:proxy_request_type, "segments/12345", nil) }.to raise_error(ArgumentError, /Unknown proxy request type/)
+    end
+  end
+
+  describe "validate_url!" do
+    ["javascript://evil.com", "../etc/passwd", "/foo/../../etc", "//strava"].each do |invalid_url|
+      it "raises" do
+        expect { described_class.send(:validate_url!, invalid_url) }.to raise_error("Invalid proxy path")
+      end
+    end
+    it "is valid" do
+      expect(described_class.send(:validate_url!, "athlete/123")).to be_nil
+      expect(described_class.send(:validate_url!, "athlete/activities")).to be_nil
+      expect(described_class.send(:validate_url!, "activities/123")).to be_nil
+    end
+  end
+
   describe ".create_and_execute" do
     before { FactoryBot.create(:state_california) }
     let(:target_attributes) do
@@ -142,16 +185,18 @@ RSpec.describe StravaJobs::ProxyRequester do
         VCR.use_cassette("strava-get_activity") do
           expect {
             result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
-            expect(result[:strava_request].success?).to be_truthy
-            expect(result[:response].status).to eq 200
+            expect(result[:status]).to eq 200
           }.to change(StravaActivity, :count).by(1)
         end
+
+        strava_request = StravaRequest.last
+        expect(strava_request.success?).to be_truthy
 
         strava_activity = StravaActivity.last
         expect(strava_activity.enriched?).to be_truthy
         expect(strava_activity.enriched_at).to be_within(2.seconds).of(Time.current)
         expect(strava_activity).to have_attributes detail_target_attributes
-        expect(result[:serialized]).to eq strava_activity.proxy_serialized
+        expect(result[:json]).to eq strava_activity.proxy_serialized
 
         VCR.use_cassette("strava-get_activity") do
           expect {
@@ -161,12 +206,51 @@ RSpec.describe StravaJobs::ProxyRequester do
       end
     end
 
+    context "when currently_rate_limited?" do
+      let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+      let(:rate_limit) do
+        {short_limit: 200, short_usage: 198, long_limit: 2000, long_usage: 0,
+         read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0}
+      end
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second, rate_limit:)
+      end
+
+      it "sets binx_response_rate_limited and returns mocked 429 response" do
+        expect do
+          result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
+          expect(result[:status]).to eq 429
+          expect(result[:json]["message"]).to eq "Rate Limit Exceeded"
+        end.to change(StravaRequest, :count).by 1
+
+        strava_request = StravaRequest.last
+        expect(strava_request).to have_attributes(response_status: "binx_response_rate_limited", proxy_request: true,
+          request_type: "fetch_activity")
+        expect(strava_request.requested_at).to be_within(1).of Time.current
+
+        expect(StravaActivity.count).to eq 0
+      end
+
+      it "checks PUT method for update_activity requests" do
+        expect do
+          described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "PUT")
+        end.to change(StravaRequest, :count).by 1
+
+        strava_request = StravaRequest.last
+        expect(strava_request).to have_attributes(response_status: "binx_response_rate_limited", proxy_request: true,
+          request_type: "update_activity")
+        expect(strava_request.requested_at).to be_within(1).of Time.current
+      end
+    end
+
     context "rate limited response" do
       it "marks request as rate_limited" do
         VCR.use_cassette("strava-proxy_rate_limited") do
-          result = described_class.create_and_execute(strava_integration:, user:, url: "athlete/activities", method: "GET")
-          expect(result[:strava_request].rate_limited?).to be_truthy
-          expect(result[:response].status).to eq 429
+          result = described_class.create_and_execute(strava_integration:, user:, url: "activities/6969", method: "GET")
+          strava_request = StravaRequest.last
+          expect(strava_request.rate_limited?).to be_truthy
+          expect(result[:status]).to eq 429
         end
         expect(StravaActivity.count).to eq 0
       end
@@ -175,9 +259,10 @@ RSpec.describe StravaJobs::ProxyRequester do
     context "server error response" do
       it "marks request as error without raising" do
         VCR.use_cassette("strava-proxy_server_error") do
-          result = described_class.create_and_execute(strava_integration:, user:, url: "athlete/activities", method: "GET")
-          expect(result[:strava_request].error?).to be_truthy
-          expect(result[:response].status).to eq 500
+          result = described_class.create_and_execute(strava_integration:, user:, url: "activities/6969", method: "GET")
+          strava_request = StravaRequest.last
+          expect(strava_request.error?).to be_truthy
+          expect(result[:status]).to eq 500
         end
         expect(StravaActivity.count).to eq 0
       end
