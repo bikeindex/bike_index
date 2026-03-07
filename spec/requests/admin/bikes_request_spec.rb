@@ -265,7 +265,7 @@ RSpec.describe Admin::BikesController, type: :request do
         bike1 = FactoryBot.create(:bike)
         bike2 = FactoryBot.create(:bike, example: true)
         bike3 = FactoryBot.create(:bike)
-        expect(Bike.pluck(:id)).to eq([bike1.id, bike3.id])
+        expect(Bike.pluck(:id)).to match_array([bike1.id, bike3.id])
         get "#{base_url}/multi_delete/get_destroy", params: {
           id: "multi_destroy",
           bikes_selected: {bike1.id => bike1.id, bike2.id => bike2.id}
