@@ -44,6 +44,11 @@ RSpec.describe "Organized bikes search", :js, type: :system do
 
   context "with avery_export enabled" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[bike_search avery_export]) }
+    let!(:avery_bike) do
+      bike = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: organization)
+      bike.current_ownership.update!(owner_name: "Test Owner")
+      bike
+    end
 
     it "toggles avery export column via checkbox" do
       visit bikes_path
@@ -54,8 +59,9 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       click_link "settings"
       check "avery_cell"
       expect(page).to have_current_path(/search_avery_export=true/, wait: 10)
-      # Avery column should be visible (not just in the DOM)
+      # Avery column should be visible with check mark for exportable bike
       expect(page).to have_css("th.avery_cell", visible: true)
+      expect(page).to have_css("td.avery_cell", text: "✓")
 
       # Settings panel is already open (persisted via localStorage)
       # Uncheck avery — triggers page reload without param
