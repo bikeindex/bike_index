@@ -37,7 +37,7 @@ FileUtils.chdir APP_ROOT do
       elsif file.end_with?(".js", ".ts", ".jsx", ".tsx")
         system!("npm run js:lint -- #{file}")
       elsif file.end_with?(".erb", ".html")
-        system!("npm run html:format -- #{file}")
+        system!("npx herb-format #{file}")
       else
         raise "Unknown file type: #{file}"
       end
