@@ -41,4 +41,7 @@ Rails.application.configure do
       "https://api.honeybadger.io/v1/browser/csp?api_key=#{ENV["HONEYBADGER_FRONTEND_API_KEY"]}&report_only=true&env=#{Rails.env}&context[user_id]=#{current_user&.id if respond_to?(:current_user)}"
     end
   end
+
+  # Report violations without enforcing the policy.
+  config.content_security_policy_report_only = true
 end
