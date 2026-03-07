@@ -111,6 +111,9 @@ module Images::StolenProcessor
     config = TEMPLATE_CONFIG[template]
     raise "Unknown template (#{template})!" unless config.present?
 
+    # URI.open returns StringIO for small files, which Vips can't process directly
+    image = to_tempfile(image) if image.is_a?(StringIO)
+
     bike_image = ImageProcessing::Vips.source(image)
       .resize_to_limit(*bike_image_dimensions_for(config))
       .call(save: false)
@@ -214,7 +217,15 @@ module Images::StolenProcessor
       .gsub("'", "\\'")
   end
 
+  def to_tempfile(string_io)
+    tempfile = Tempfile.new(["stolen_image", ".jpeg"])
+    tempfile.binmode
+    tempfile.write(string_io.read)
+    tempfile.rewind
+    tempfile
+  end
+
   conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :generate_alert,
     :template_path, :topbar_path, :bike_image_dimensions_for, :bike_image_offset,
-    :caption_overlay, :font, :stolen_record_location
+    :caption_overlay, :font, :stolen_record_location, :to_tempfile
 end
