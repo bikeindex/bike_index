@@ -1,4 +1,7 @@
-<div class="tw:inline-block tw:leading-tight" title="<%= @rate_limit_json.symbolize_keys %>">
+<div
+  class="tw:inline-block tw:leading-tight"
+  title="<%= @rate_limit_json.symbolize_keys %>"
+>
   <small>
     <%= number_display(short_available) %>/<%= number_display(short_limit) %>
     short
