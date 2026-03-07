@@ -9,9 +9,6 @@ en:
         bike: registration
         color: Color
         create_export_of_vehicles: Create export of searched %{cycle_type}
-        impounded: Impounded
-        link: Link
-        manufacturer: Manufacturer
         filter_impounded_html: only <strong>impounded</strong>
         filter_no_address_html: only <strong>no</strong> address
         filter_no_sticker_html: only <strong>no</strong> sticker
@@ -20,6 +17,9 @@ en:
         filter_stolen_html: only stolen
         filter_with_address_html: only <strong>with</strong> address
         filter_with_stickers_html: only <strong>with</strong> stickers
+        impounded: Impounded
+        link: Link
+        manufacturer: Manufacturer
         matching_bikes_html: "%{count} %{cycle_type} matching"
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         model: Model
