@@ -222,6 +222,14 @@ RSpec.describe Images::StolenProcessor do
       it "creates an image matching target" do
         expect_images_to_match(generated_image, target_image)
       end
+
+      context "when image is a StringIO" do
+        let(:image) { StringIO.new(File.binread(Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg"))) }
+
+        it "creates an image matching target" do
+          expect_images_to_match(generated_image, target_image)
+        end
+      end
     end
 
     # These tests take a substantial amount of resources and are largely the same
