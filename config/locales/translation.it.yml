@@ -4630,7 +4630,6 @@ it:
         no_matched:
         search_for_containing:
         search_for_similar:
-        no_matched_marketplace:
       serials_containing:
         no_matched:
         with_serials_containing:
@@ -4645,6 +4644,11 @@ it:
       everything_combobox:
         query_items_description:
         search_descriptions:
+        made_by:
+        only_for:
+        search_for:
+        search_only_for:
+        that_are:
       form:
         doesnt_look_like_serial:
         search_for_serial_number:

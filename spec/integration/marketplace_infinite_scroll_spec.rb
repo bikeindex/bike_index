@@ -79,7 +79,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     find(".select2-container").click
     find(".select2-search__field").set("Yuba")
     # Wait for select2 to load
-    expect(page).to have_content("Items made by Yuba", wait: 5)
+    expect(page).to have_content("Listings made by Yuba", wait: 5)
     find(".select2-search__field").send_keys(:enter)
     page.send_keys :return
     # Should load new results
