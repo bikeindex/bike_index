@@ -4,7 +4,7 @@ module Org::BikeSearch
   class ComponentPreview < ApplicationComponentPreview
     # @display legacy_stylesheet true
     def default
-      organization = Organization.first
+      organization = lookbook_organization
       bikes = organization&.bikes&.limit(5) || Bike.none
       pagy = Pagy::Offset.new(count: bikes.count, page: 1, limit: 10)
       bike_search = Org::BikeSearch::Component.new(

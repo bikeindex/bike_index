@@ -17,6 +17,10 @@ class ApplicationComponentPreview < ViewComponent::Preview
     @lookbook_user ||= User.find(ENV.fetch("LOOKBOOK_USER_ID", 1))
   end
 
+  def lookbook_organization
+    @lookbook_organization ||= Organization.find_by(name: "Hogwarts") || Organization.first
+  end
+
   private
 
   def template
