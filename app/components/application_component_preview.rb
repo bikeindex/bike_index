@@ -18,7 +18,7 @@ class ApplicationComponentPreview < ViewComponent::Preview
   end
 
   def lookbook_organization
-    @lookbook_organization ||= Organization.find_by(name: "Hogwarts") || Organization.first
+    @lookbook_organization ||= Organization.friendly_find("hogwarts") || Organization.first
   end
 
   private
