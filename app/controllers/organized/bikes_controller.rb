@@ -12,10 +12,21 @@ module Organized
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
 
       if current_organization.enabled?("bike_search")
+        @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @per_page = permitted_per_page(default: 10)
-        search_organization_bikes
 
-        create_export_and_redirect if create_export?
+        if @render_results
+          search_organization_bikes
+          create_export_and_redirect if create_export?
+        else
+          @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+          @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+        end
+
+        respond_to do |format|
+          format.html
+          format.turbo_stream
+        end
       else
         @per_page = permitted_per_page(default: 50)
         @available_bikes = if current_organization.enabled?("claimed_ownerships")
