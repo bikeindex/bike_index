@@ -30,7 +30,8 @@ Rails.application.configure do
       "https://maps.googleapis.com",
       "https://api.mapbox.com",
       "https://*.tiles.mapbox.com",
-      "https://cdn.jsdelivr.net"
+      "https://cdn.jsdelivr.net",
+      "https://api.honeybadger.io"
     policy.frame_src :self,
       "https://js.stripe.com",
       "https://www.facebook.com",
