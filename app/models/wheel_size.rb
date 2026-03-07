@@ -12,7 +12,9 @@
 #  updated_at  :datetime         not null
 #
 class WheelSize < ApplicationRecord
-  enum :priority, {standard: 1, common: 2, uncommon: 3, rare: 4}
+  PRIORITY_ENUM = {standard: 1, common: 2, uncommon: 3, rare: 4}.freeze
+
+  enum :priority, PRIORITY_ENUM
   has_many :bikes
 
   validates_presence_of :name, :priority, :description, :iso_bsd
