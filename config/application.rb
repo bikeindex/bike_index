@@ -1,13 +1,17 @@
+dev_port = ENV.fetch("DEV_PORT", 3042).to_i
 # Assign REDIS_URL before loading action cable
 if ENV.fetch("REDIS_URL", "").empty?
   # NOTE: DEV_PORT is set in bin/dev
-  redis_db = (ENV.fetch("DEV_PORT", 3042).to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
+  redis_db = (dev_port - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
   ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_db}"
 end
 
 require_relative "boot"
 
 require "rails"
+
+# Assign BASE_URL if it isn't assigned, using the dev_port
+ENV["BASE_URL"] ||= "http://localhost:#{dev_port}" unless Rails.env.production?
 
 # Pick the frameworks you want:
 require "active_model/railtie"
