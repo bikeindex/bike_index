@@ -2,6 +2,9 @@
   class="tw:w-full"
   data-controller="search--everything-combobox"
   data-search--everything-combobox-api-url-value="<%= API_URL %>"
+  <% if @search_obj_name %>
+    data-search--everything-combobox-search-obj-name-value="<%= @search_obj_name %>"
+  <% end %>
 >
   <link
     rel="stylesheet"

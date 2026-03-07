@@ -4,9 +4,10 @@ module Search::EverythingCombobox
   class Component < ApplicationComponent
     API_URL = "/api/autocomplete"
 
-    def initialize(selected_query_items_options:, query:)
+    def initialize(selected_query_items_options:, query:, search_obj_name: nil)
       @opt_vals = opt_vals_for(selected_query_items_options)
       @query = query
+      @search_obj_name = search_obj_name
     end
 
     private
