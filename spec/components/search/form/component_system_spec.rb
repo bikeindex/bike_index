@@ -67,7 +67,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
       find(".select2-container").click
       # Wait for select2 to load
-      expect(page).to have_content("Bikes that are Black", wait: 5)
+      expect(page).to have_content("Registrations that are Black", wait: 5)
 
       page.send_keys :arrow_down
       page.send_keys :arrow_down
@@ -113,13 +113,13 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       expect(find("#query_items", visible: false).value).to be_blank
       find(".select2-container").click
 
-      expect(page).to have_content("Bikes that are Black", wait: 5)
+      expect(page).to have_content("Registrations that are Black", wait: 5)
       # Scroll down, verify it loads more
       page.execute_script(<<-JS)
         const container = document.querySelector('.select2-results__options');
         const interval = setInterval(() => {
           container.scrollTop += 100;
-          const element = Array.from(container.querySelectorAll('li')).find(el => el.textContent.includes('Bikes made by All City'));
+          const element = Array.from(container.querySelectorAll('li')).find(el => el.textContent.includes('Registrations made by All City'));
           if (element && element.getBoundingClientRect().top >= 0 && element.getBoundingClientRect().bottom <= window.innerHeight) {
             clearInterval(interval);
           }
@@ -144,7 +144,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
         find(".select2-container").click
         # Wait for select2 to load
-        expect(page).to have_content("Bikes that are Black", wait: 5)
+        expect(page).to have_content("Registrations that are Black", wait: 5)
 
         page.send_keys :arrow_down
         page.send_keys :arrow_down
