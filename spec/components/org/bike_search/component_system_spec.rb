@@ -20,6 +20,7 @@ RSpec.describe Org::BikeSearch::Component, :js, type: :system do
 
     click_link "settings"
     expect(page).to have_css(settings_selector, visible: true, wait: 5)
+    sleep 0.3 # wait for show animation to complete before toggling again
 
     click_link "settings"
     expect(page).not_to have_css(settings_selector, visible: true, wait: 5)
