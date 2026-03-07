@@ -31,6 +31,10 @@ module Search::Form
       @interpreted_params.slice(:location, :distance).merge(kind_scope:)
     end
 
+    def search_item_name
+      "Listings" if is_marketplace?
+    end
+
     def query
       @interpreted_params[:query] # might be more complicated someday
     end
