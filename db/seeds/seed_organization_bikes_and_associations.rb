@@ -177,3 +177,24 @@ puts "Creating 5 impound records in San Francisco for Hogwarts..."
 end
 
 puts "Impound records seeded successfully!"
+
+# --- Non-bike cycle types registered to Hogwarts ---
+puts "Seeding non-cycle types and e-vehicles"
+non_bike_types = [
+  {cycle_type: "e-scooter", propulsion_type: "foot-pedal"},
+  {cycle_type: "e-scooter", propulsion_type: "foot-pedal"},
+  {cycle_type: "e-scooter", propulsion_type: "foot-pedal"},
+  {cycle_type: "personal-mobility", propulsion_type: "foot-pedal"},
+  {cycle_type: "cargo", propulsion_type: "pedal-assist"},
+  {cycle_type: "cargo-rear", propulsion_type: "pedal-assist"},
+  {cycle_type: "cargo-trike", propulsion_type: "pedal-assist-and-throttle"}
+].each do |type, i|
+  b_param = BParam.create!(
+    creator: user,
+    params: {bike: org_bike_params(owner_email: owner_emails.sample)
+      .merge(cycle_type: type[:cycle_type], propulsion_type: type[:propulsion_type])}
+  )
+  b_param.origin = "organization_form"
+  bike = creator.create_bike(b_param)
+  raise "#{type[:cycle_type]} creation failed: #{b_param.bike_errors}" if bike.errors.any?
+end
