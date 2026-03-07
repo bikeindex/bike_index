@@ -42,7 +42,8 @@ class StravaRequest < AnalyticsRecord
     integration_deleted: 5,
     skipped: 6,
     insufficient_token_privileges: 7,
-    binx_response: 8
+    binx_response: 8,
+    binx_response_rate_limited: 9
   }.freeze
   PENDING_OR_SUCCESS = %i[success pending].freeze
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
@@ -114,7 +115,7 @@ class StravaRequest < AnalyticsRecord
        read_short_limit: 200,
        read_short_usage: 0,
        read_long_limit: 2000,
-       read_long_usage: 0}.freeze.as_json
+       read_long_usage: 0}.freeze
     end
 
     def rate_limit_from(latest_rate_limit, latest_requested_at)
@@ -125,20 +126,24 @@ class StravaRequest < AnalyticsRecord
       daily_reset = daily_boundary > latest_requested_at
 
       {
-        short_limit: latest_rate_limit[:short_limit],
-        short_usage: limit_for_rate(latest_rate_limit[:short_usage], short_reset),
-        long_limit: latest_rate_limit[:long_limit],
-        long_usage: limit_for_rate(latest_rate_limit[:long_usage], daily_reset),
-        read_short_limit: latest_rate_limit[:read_short_limit],
-        read_short_usage: limit_for_rate(latest_rate_limit[:read_short_usage], short_reset),
-        read_long_limit: latest_rate_limit[:read_long_limit],
-        read_long_usage: limit_for_rate(latest_rate_limit[:read_long_usage], daily_reset)
-      }.as_json.compact
+        short_limit: latest_rate_limit[:short_limit].to_i,
+        short_usage: limit_for_rate(latest_rate_limit[:short_usage].to_i, short_reset),
+        long_limit: latest_rate_limit[:long_limit].to_i,
+        long_usage: limit_for_rate(latest_rate_limit[:long_usage].to_i, daily_reset),
+        read_short_limit: latest_rate_limit[:read_short_limit].to_i,
+        read_short_usage: limit_for_rate(latest_rate_limit[:read_short_usage].to_i, short_reset),
+        read_long_limit: latest_rate_limit[:read_long_limit].to_i,
+        read_long_usage: limit_for_rate(latest_rate_limit[:read_long_usage].to_i, daily_reset)
+      }
     end
 
     def limit_for_rate(limit, was_reset)
       was_reset ? 0 : limit
     end
+  end
+
+  def request_method
+    parameters&.dig("method")&.upcase || "GET"
   end
 
   def skip_request?
@@ -157,11 +162,15 @@ class StravaRequest < AnalyticsRecord
   end
 
   def update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: false, raise_on_error: false)
-    self.response_status = status_from_response(response)
-    store_error_response(response) if error?
-    update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
+    if response == :binx_response_rate_limited
+      update!(requested_at: Time.current, response_status: :binx_response_rate_limited)
+    else
+      self.response_status = status_from_response(response)
+      store_error_response(response) if error?
+      update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
+    end
 
-    if rate_limited? || service_unavailable?(response)
+    if binx_response_rate_limited? || rate_limited? || service_unavailable?(response)
       return unless re_enqueue_if_rate_limited_or_unavailable
 
       StravaRequest.create!(user_id:, strava_integration_id:, request_type:, proxy_request:,
@@ -190,7 +199,7 @@ class StravaRequest < AnalyticsRecord
   end
 
   def service_unavailable?(response)
-    response&.status == 503
+    response.respond_to?(:status) && response.status == 503
   end
 
   def store_error_response(response)

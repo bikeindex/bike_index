@@ -4,6 +4,7 @@
 module StravaJobs
   class ProxyRequester
     STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3).to_i
+    SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
 
     class << self
       # returns {user:, strava_integration:} if valid
@@ -36,31 +37,31 @@ module StravaJobs
 
       def create_and_execute(strava_integration:, user:, url:, method: nil, body: nil)
         validate_url!(url)
-        params_method = method&.strip&.upcase
-        params_method = nil if params_method == "GET"
+        request_method = method&.strip&.upcase
+        request_method = nil if request_method == "GET"
 
         strava_request = StravaRequest.create!(
           strava_integration:,
           user:,
           proxy_request: true,
-          request_type: proxy_request_type(url, params_method),
-          parameters: {url:, method: params_method, body:}.compact
+          request_type: proxy_request_type(url, request_method),
+          parameters: {url:, method: request_method, body:}.compact
         )
 
-        if internal_request?(strava_request)
-          return {internal_response: internal_response!(strava_request)}
-        end
+        return internal_response!(strava_request) if internal_response?(strava_request)
 
         response = Integrations::StravaClient.proxy_request(strava_integration,
           strava_request.parameters["url"], method: strava_request.parameters["method"],
           body: strava_request.parameters["body"])
         strava_request.update_from_response(response)
 
-        serialized = if strava_request.success?
-          handle_proxy_response(strava_integration, response.body, method: strava_request.parameters["method"])
+        json = if strava_request.success?
+          serialize_proxy_response(strava_integration, response.body, method: strava_request.request_method)
+        else
+          sanitize_response_body(response.body)
         end
 
-        {strava_request:, response:, serialized:}
+        {json:, status: response&.status}
       end
 
       # Returns an existing valid token, or revokes the most recent expired one
@@ -88,17 +89,29 @@ module StravaJobs
 
       private
 
-      def internal_request?(strava_request)
-        strava_request.fetch_athlete? || strava_request.list_activities?
+      def internal_response?(strava_request)
+        strava_request.fetch_athlete? || strava_request.list_activities? ||
+          binx_response_rate_limited?(strava_request)
+      end
+
+      # We want a little more headroom on proxy requests -
+      # to reserve some requests for initial fetch athlete and list_activities
+      def binx_response_rate_limited?(strava_request)
+        Integrations::StravaClient.currently_rate_limited?(strava_request.request_method, headroom: 20)
       end
 
       def internal_response!(strava_request)
-        strava_request.update(response_status: :binx_response)
+        if binx_response_rate_limited?(strava_request)
+          strava_request.update_from_response(:binx_response_rate_limited)
+          return {json: Integrations::StravaClient::RATE_LIMITED_RESPONSE_BODY, status: 429}
+        end
 
-        if strava_request.fetch_athlete?
+        strava_request.update(response_status: :binx_response, requested_at: Time.current)
+
+        json = if strava_request.fetch_athlete?
           strava_request.strava_integration.proxy_serialized
         else
-          page = strava_request.parameters["url"][/\Wpage=(\d+)/, 1].to_i - 1
+          page = (strava_request.parameters["url"][/\Wpage=(\d+)/, 1] || 1).to_i - 1
           limit = Integrations::StravaClient::ACTIVITIES_PER_PAGE
 
           strava_activities = StravaActivity.where(strava_integration_id: strava_request.strava_integration_id).strava_ordered
@@ -106,27 +119,31 @@ module StravaJobs
 
           strava_activities.offset(page * limit).limit(limit).map(&:proxy_serialized)
         end
+        {json:, status: 200}
       end
 
       def authorized_app?(token)
         token.application_id == STRAVA_DOORKEEPER_APP_ID
       end
 
-      def proxy_request_type(url, params_method)
-        return :update_activity if params_method.present?
-        return :fetch_athlete if url.match?(/\Aathlete(\/\d+)?\z/)
-        return :list_activities if url.match?(/\Aathlete\/activities\?.*page=\d/)
-        return :fetch_activity if url.start_with?("activities/", "athlete/activities")
-        return :fetch_gear if url.start_with?("gear/")
+      def proxy_request_type(url, request_method)
+        return :update_activity if %w[PUT POST].include?(request_method&.upcase)
 
-        raise ArgumentError, "Unknown proxy request type for: #{url}, #{params_method}"
+        case url
+        when /\Aathlete(\/\d+)?\z/ then :fetch_athlete
+        when /\Aathlete\/activities/ then :list_activities
+        when /\Aactivities\/\d+/ then :fetch_activity
+        when /\Agear\// then :fetch_gear
+        else
+          raise ArgumentError, "Unknown proxy request type for: #{url}, method: #{request_method}"
+        end
       end
 
       def validate_url!(url)
         raise ArgumentError, "Invalid proxy path" if url.blank? || url.match?(%r{://|\A//|(\A|/)\.\.(/|\z)})
       end
 
-      def handle_proxy_response(strava_integration, body, method: nil)
+      def serialize_proxy_response(strava_integration, body, method: nil)
         if body.is_a?(Array)
           body.map { |summary| StravaActivity.create_or_update_from_strava_response(strava_integration, summary).proxy_serialized }
         elsif body.is_a?(Hash) && body["sport_type"].present?
@@ -141,6 +158,12 @@ module StravaJobs
         else
           body
         end
+      end
+
+      def sanitize_response_body(body)
+        return {error: "unknown error"} unless body.is_a?(Hash)
+
+        body.except(*SENSITIVE_KEYS)
       end
     end
   end

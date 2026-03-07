@@ -9,8 +9,26 @@ class Integrations::StravaClient
   STRAVA_SECRET = ENV["STRAVA_SECRET"]
   STRAVA_WEBHOOK_TOKEN = ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"]
   ACTIVITIES_PER_PAGE = 200
+  RATE_LIMIT_HEADROOM = 5
+  RATE_LIMITED_RESPONSE_BODY = {
+    "message" => "Rate Limit Exceeded",
+    "errors" => [{"resource" => "Application", "field" => "rate limit", "code" => "exceeded"}]
+  }.freeze
 
   class << self
+    def currently_rate_limited?(request_method = nil, headroom: nil)
+      headroom ||= RATE_LIMIT_HEADROOM
+      rate_limit = StravaRequest.estimated_current_rate_limit
+
+      if request_method.blank? || request_method.upcase == "GET"
+        (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < headroom ||
+          (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < headroom
+      else
+        (rate_limit[:short_limit] - rate_limit[:short_usage]) < headroom ||
+          (rate_limit[:long_limit] - rate_limit[:long_usage]) < headroom
+      end
+    end
+
     def exchange_token(code)
       conn = oauth_connection
       resp = conn.post("oauth/token") do |req|

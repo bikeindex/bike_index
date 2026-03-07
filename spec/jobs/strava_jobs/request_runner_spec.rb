@@ -157,10 +157,41 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         end
 
         strava_request.reload
-        expect(strava_request.response_status).to eq("success")
+        expect(strava_request).to have_attributes(proxy_request: false, response_status: "success",
+          parameters: {"strava_gear_id" => "b12345"})
+        expect(strava_request.requested_at).to be_within(1).of Time.current
+
         strava_gear.reload
         expect(strava_gear.enriched?).to be true
         expect(strava_gear.last_updated_from_strava_at).to be_present
+      end
+    end
+
+    context "when currently_rate_limited?" do
+      let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second,
+          rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                       read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0})
+      end
+
+      it "sets binx_response_rate_limited and creates a retry request without calling Strava" do
+        strava_request_id = strava_request.id
+
+        expect { instance.perform(strava_request_id) }.to change(StravaRequest, :count).by(1)
+
+        strava_request.reload
+        expect(strava_request.response_status).to eq("binx_response_rate_limited")
+        expect(strava_request.requested_at).to be_present
+        expect(strava_request).to have_attributes(proxy_request: false,
+          response_status: "binx_response_rate_limited")
+        expect(strava_request.requested_at).to be_within(1).of Time.current
+
+        retry_request = StravaRequest.last
+        expect(retry_request.request_type).to eq(strava_request.request_type)
+        expect(retry_request.requested_at).to be_nil
+        expect(retry_request.response_status).to eq("pending")
       end
     end
 
