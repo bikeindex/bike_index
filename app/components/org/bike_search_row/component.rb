@@ -8,6 +8,5 @@ module Org::BikeSearchRow
       @bike_sticker = bike_sticker
       @additional_registration_fields = additional_registration_fields
     end
-
   end
 end

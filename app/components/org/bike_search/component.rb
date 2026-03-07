@@ -145,7 +145,7 @@ module Org::BikeSearch
     def settings_button
       content_tag(:a,
         href: "#",
-        class: "btn btn-sm btn-outline-primary uncap #{settings_default_open? ? "active" : ""}",
+        class: "btn btn-sm btn-outline-primary uncap #{"active" if settings_default_open?}",
         data: {action: "click->org--bike-search#toggleSettings", org__bike_search_target: "settingsButton"}) do
         translation(".settings") +
           helpers.inline_svg_tag("icons/settings_slider.svg", class: "tw:inline", alt: "settings icon")
