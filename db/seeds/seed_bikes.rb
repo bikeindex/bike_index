@@ -9,7 +9,7 @@ ca_state = State.find_by_abbreviation("CA")
 
 creator = BikeServices::Creator.new
 
-def bike_params(owner_email:, manufacturer_id: nil, **extra)
+def bike_params(owner_email:, manufacturer_id: nil)
   manufacturer_id ||= Manufacturer.frame_makers.pluck(:id)
   {
     cycle_type: "bike",
@@ -21,8 +21,7 @@ def bike_params(owner_email:, manufacturer_id: nil, **extra)
     rear_wheel_size_id: wheel_size_id,
     front_wheel_size_id: wheel_size_id,
     handlebar_type: HandlebarType.slugs.first,
-    owner_email:,
-    **extra
+    owner_email:
   }
 end
 
@@ -65,11 +64,8 @@ stolen_locations.each_with_index do |loc, i|
   bike = seed_bike(
     creator:, user:, label: "Stolen bike",
     params: {
-      bike: bike_params(
-        owner_email: "testuser+#{i + 50}@bikeindex.org",
-        status: "status_stolen",
-        date_stolen: (Time.current - rand(1..30).days).to_s
-      ),
+      bike: bike_params(owner_email: "testuser+#{i + 50}@bikeindex.org")
+        .merge(status: "status_stolen", date_stolen: (Time.current - rand(1..30).days).to_s),
       stolen_record: {
         latitude: loc[:latitude].to_s,
         longitude: loc[:longitude].to_s,
@@ -103,10 +99,8 @@ found_locations.each_with_index do |loc, i|
   bike = seed_bike(
     creator:, user:, label: "Found bike",
     params: {
-      bike: bike_params(
-        owner_email: "testuser+#{i + 60}@bikeindex.org",
-        status: "status_impounded"
-      ),
+      bike: bike_params(owner_email: "testuser+#{i + 60}@bikeindex.org")
+        .merge(status: "status_impounded"),
       impound_record: {
         address_record_attributes: {
           street: loc[:street],
@@ -138,9 +132,8 @@ puts "Creating 3 Cannondale bikes registered to Cannondale org..."
     creator:, user:, origin: "organization_form", label: "Cannondale bike",
     params: {bike: bike_params(
       owner_email: "testuser+cannondale#{i}@bikeindex.org",
-      manufacturer_id: cannondale_manufacturer.id,
-      creation_organization_id: cannondale_org.id.to_s
-    )}
+      manufacturer_id: cannondale_manufacturer.id
+    ).merge(creation_organization_id: cannondale_org.id.to_s)}
   )
   puts "  Created Cannondale bike ##{i + 1}: #{bike.manufacturer.name}" unless bike.errors.any?
 end
