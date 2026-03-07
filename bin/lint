@@ -4,7 +4,9 @@
 # NOTE: CI doesn't actually use bin/lint, it manually calls each of the commands for better output
 #
 cli_args = ARGV
-lint_test = ENV["LINT_TEST"] == "true" || cli_args.include?('--no-fix')
+lint_test = ENV["LINT_TEST"] == "true" || cli_args.include?("--no-fix")
+
+# You can pass a file name to lint just that file
 file_args = cli_args.reject { |arg| arg.start_with?("-") }
 
 require "fileutils"
@@ -18,6 +20,7 @@ def system!(*args)
 end
 
 chdir APP_ROOT do
+  # lint_test checking doesn't accept file name
   if lint_test
     puts "Testing lint (will not autofix)"
 
@@ -28,13 +31,16 @@ chdir APP_ROOT do
 
   if file_args.any?
     file_args.each do |file|
-      if file.end_with?(".rb")
+      # Assume bin/ files are ruby, since they mostly are
+      if file.end_with?(".rb") || file.end_with?(".rake") || file.start_with?("bin/")
         system!("bundle exec standardrb --fix #{file}")
         system!("bundle exec rubocop -c .rubocop_custom.yml -A #{file}")
       elsif file.end_with?(".js", ".ts", ".jsx", ".tsx")
-        system!("npx eslint --fix #{file}")
+        system!("npm run js:lint -- #{file}")
+      elsif file.end_with?(".erb", ".html")
+        system!("npm run html:format -- #{file}")
       else
-        puts "Unknown file type: #{file}"
+        raise "Unknown file type: #{file}"
       end
     end
   else
