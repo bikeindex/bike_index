@@ -3,6 +3,13 @@
 require "rails_helper"
 
 RSpec.describe Org::BikeSearch::Component, type: :component do
+  before do
+    # sort_column/sort_direction are normally provided by SortableTable concern
+    vc_test_controller.class.helper_method :sort_column, :sort_direction
+    vc_test_controller.define_singleton_method(:sort_column) { "id" }
+    vc_test_controller.define_singleton_method(:sort_direction) { "desc" }
+  end
+
   let(:instance) { described_class.new(**options) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/bikes") do

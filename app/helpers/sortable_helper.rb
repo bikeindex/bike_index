@@ -8,9 +8,6 @@ module SortableHelper
     :serial, :stolenness, :location, :distance, :primary_activity, query_items: [] # Bike searching params
   ].freeze
 
-  def sort_column = "id"
-  def sort_direction = "desc"
-
   def sortable(column, title = nil, html_options = {}, &block)
     if title.is_a?(Hash) # If title is a hash, it wasn't passed
       html_options = title
