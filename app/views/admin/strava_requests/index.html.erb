@@ -1,11 +1,15 @@
 <% index_title = capture do %>
   Manage Strava Requests
-  <span class="tw:inline-flex tw:items-center tw:gap-x-2 tw:text-base">current rate limit: <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: StravaRequest.estimated_current_rate_limit) %></span>
+  <span class="tw:inline-flex tw:items-center tw:gap-x-2 tw:text-base">current rate limit: <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: StravaRequest.estimated_current_rate_limit.as_json) %></span>
   
   <small class="tw:text-xs!">batch: <%= number_display(StravaJobs::ScheduledRequestEnqueuer::BATCH_SIZE) %></small>
 <% end %>
 
 <% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "Proxy requests", url_for(sortable_search_params.merge(search_proxy_requests: !@proxy_request)), class: "nav-link #{@proxy_request ? 'active' : ''}" %>
+  </li>
+
   <li class="nav-item dropdown">
     <a
       class="nav-link dropdown-toggle <%= params[:search_request_type].present? ? "active" : "" %>"

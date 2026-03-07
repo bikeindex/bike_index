@@ -30,8 +30,13 @@ FactoryBot.define do
     end
 
     trait :proxy do
-      request_type { :proxy }
+      proxy_request { true }
+      request_type { :fetch_activity }
       parameters { {url: "/athlete"} }
+    end
+
+    trait :update_activity do
+      request_type { :update_activity }
     end
 
     trait :processed do

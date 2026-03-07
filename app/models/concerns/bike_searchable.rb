@@ -75,10 +75,14 @@ module BikeSearchable
     private
 
     def searchable_query_items_query(query_params)
-      return {query: query_params[:query]} if query_params[:query].present?
+      return {query: sanitize_query(query_params[:query])} if query_params[:query].present?
 
       query = query_params[:query_items]&.select { |i| !(/\A[cmvp]_/ =~ i) }&.join(" ")
-      query.present? ? {query: query} : {}
+      query.present? ? {query: sanitize_query(query)} : {}
+    end
+
+    def sanitize_query(query)
+      ActionController::Base.helpers.sanitize(query, tags: [])
     end
 
     def searchable_query_items_manufacturer(query_params)

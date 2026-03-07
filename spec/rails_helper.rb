@@ -20,6 +20,10 @@ ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
 ENV["PARALLEL_TEST_FIRST_IS_1"] = "true" # number parallel databases correctly
 require "spec_helper"
+# Load functionable patch before Rails boot so all Functionable modules get permissive test hooks
+require File.expand_path("../../config/boot", __FILE__)
+require "functionable"
+require_relative "support/functionable"
 require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 

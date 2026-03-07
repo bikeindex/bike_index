@@ -1163,5 +1163,23 @@ describe('useActivities', () => {
 
       expect(result.current.error).toBeNull();
     });
+
+    it('retries loading when initial load returns empty', async () => {
+      // Initial load returns empty (simulating IndexedDB timing issue)
+      const { getActivitiesForAthlete } = await import('../services/database');
+      vi.mocked(getActivitiesForAthlete).mockResolvedValueOnce([]);
+
+      const { result } = renderHook(() => useActivities());
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      expect(result.current.activities).toHaveLength(0);
+
+      // Now data is available for the retry
+      mockActivities.push(createActivity({ id: 1, title: 'Delayed Activity' }));
+
+      // Wait for the 500ms retry to fire and load activities
+      await waitFor(() => expect(result.current.activities).toHaveLength(1), { timeout: 2000 });
+      expect(result.current.activities[0].title).toBe('Delayed Activity');
+    });
   });
 });

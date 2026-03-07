@@ -46,6 +46,11 @@ class Admin::StravaRequestsController < Admin::BaseController
       end
     end
 
+    @proxy_request = Binxtils::InputNormalizer.boolean(params[:search_proxy_requests])
+    if @proxy_request
+      strava_requests = strava_requests.proxy_request
+    end
+
     if params[:search_strava_integration_id].present?
       strava_requests = strava_requests.where(strava_integration_id: params[:search_strava_integration_id])
     end

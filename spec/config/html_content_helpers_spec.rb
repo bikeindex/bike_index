@@ -26,7 +26,7 @@ html_content = <<-HTML
   <body class='' id='bikes_show'>
     <nav class='primary-header-nav'>
       <div class='container'>
-        <a class='primary-logo' href='http://localhost:3042/admin'>
+        <a class='primary-logo' href="http://localhost:#{ENV.fetch("DEV_PORT", 3042)}/admin">
           <img class="primary-nav" alt="Bike Index home" src="/assets/revised/logo-4743be32095c95ab594556faadf9f2497c4a49bd8a9f77a5aeadd4050c78dff9.svg" />
         </a>
         <a class="nonprofit-subtitle" href="/news/bike-index--now-a-nonprofit">the non-profit bike registry

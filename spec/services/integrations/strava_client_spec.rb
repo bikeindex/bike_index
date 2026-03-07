@@ -11,6 +11,98 @@ RSpec.describe Integrations::StravaClient, type: :service do
   end
   let(:status) { :pending }
 
+  describe ".currently_rate_limited?" do
+    before { StravaRequest.destroy_all }
+    let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+    let(:rate_limit) do
+      {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+       read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
+    end
+    let!(:rate_limit_request) do
+      FactoryBot.create(:strava_request, :processed, strava_integration:,
+        requested_at: boundary + 1.second, rate_limit:)
+    end
+
+    context "GET request" do
+      context "when read limits have headroom" do
+        it "returns false" do
+          expect(described_class.currently_rate_limited?).to be false
+          expect(described_class.currently_rate_limited?("GET")).to be false
+        end
+      end
+
+      context "when read short limit is exhausted" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0}
+        end
+        it "returns true" do
+          expect(described_class.currently_rate_limited?("GET")).to be true
+        end
+      end
+
+      context "when read long limit is exhausted" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1997}
+        end
+        it "returns true" do
+          expect(described_class.currently_rate_limited?("GET")).to be true
+          expect(described_class.currently_rate_limited?(headroom: 1)).to be false
+        end
+      end
+      context "when read long is negative" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 3000, read_long_usage: 3150}
+        end
+        it "returns true" do
+          expect(described_class.currently_rate_limited?).to be true
+          expect(described_class.currently_rate_limited?("get", headroom: 0)).to be true
+        end
+      end
+    end
+
+    context "PUT request" do
+      context "when overall limits have headroom" do
+        it "returns false" do
+          expect(described_class.currently_rate_limited?("PUT")).to be false
+        end
+      end
+
+      context "when overall short limit is exhausted" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 198, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
+        end
+        it "returns true" do
+          expect(described_class.currently_rate_limited?("PUT")).to be true
+          expect(described_class.currently_rate_limited?("PUT", headroom: 1)).to be false
+        end
+      end
+
+      context "when overall long limit is exhausted" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 1997,
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
+        end
+        it "returns true" do
+          expect(described_class.currently_rate_limited?("PUT")).to be true
+        end
+      end
+
+      context "when only read limits are exhausted" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0}
+        end
+        it "returns false" do
+          expect(described_class.currently_rate_limited?("PUT")).to be false
+        end
+      end
+    end
+  end
+
   describe ".authorization_url" do
     it "builds the correct authorization URL with state" do
       url = described_class.authorization_url(state: "test_state")

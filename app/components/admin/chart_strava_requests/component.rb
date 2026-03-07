@@ -58,6 +58,10 @@ module Admin::ChartStravaRequests
       opts
     end
 
+    def status_bar_colors
+      status_series.map { |s| RESPONSE_STATUS_HEX_COLORS[s[:name].parameterize(separator: "_").to_sym] }
+    end
+
     def status_pie_counts
       @status_pie_counts ||= build_pie_counts(StravaRequest::RESPONSE_STATUS_ENUM, :response_status)
     end

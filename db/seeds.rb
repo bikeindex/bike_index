@@ -1,5 +1,4 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+system "bin/rake setup:import_manufacturers_csv setup:import_primary_activities_csv"
 
 # NOTE: this does not seed manufacturers or primary_activities, those are pulled via rake task
 require File.expand_path("db/seeds/seed_wheel_sizes", Rails.root)
