@@ -305,6 +305,7 @@ GEM
     formatador (1.2.3)
       reline
     forwardable (1.4.0)
+    functionable (0.1.0)
     geocoder (1.8.5)
       base64 (>= 0.1.0)
       csv (>= 3.0.0)
@@ -901,6 +902,7 @@ DEPENDENCIES
   flipper-ui
   fog-aws
   foreman
+  functionable
   geocoder
   grape
   grape_logging

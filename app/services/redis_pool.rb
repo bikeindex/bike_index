@@ -1,18 +1,22 @@
-class RedisPool
-  class << self
-    def conn
-      # Basically, crib what is done in sidekiq
-      raise ArgumentError, "requires a block" unless block_given?
+module RedisPool
+  extend Functionable
 
-      pool.with { |conn| yield conn }
-    end
+  def conn
+    # Basically, crib what is done in sidekiq
+    raise ArgumentError, "requires a block" unless block_given?
 
-    private
+    pool.with { |conn| yield conn }
+  end
 
-    def pool
-      @pool ||= ConnectionPool.new(timeout: 1, size: 2) do
-        Redis.new(url: Bikeindex::Application.config.redis_default_url)
-      end
+  #
+  # private below here
+  #
+
+  def pool
+    @pool ||= ConnectionPool.new(timeout: 1, size: 2) do
+      Redis.new(url: Bikeindex::Application.config.redis_default_url)
     end
   end
+
+  conceal :pool
 end
