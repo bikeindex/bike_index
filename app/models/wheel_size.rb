@@ -12,6 +12,7 @@
 #  updated_at  :datetime         not null
 #
 class WheelSize < ApplicationRecord
+  enum :priority, {standard: 1, common: 2, uncommon: 3, rare: 4}
   has_many :bikes
 
   validates_presence_of :name, :priority, :description, :iso_bsd
@@ -27,7 +28,7 @@ class WheelSize < ApplicationRecord
   end
 
   def self.popularities
-    %w[Standard Common Uncommon Rare]
+    priorities.keys.map(&:titleize)
   end
 
   def select_value
@@ -35,6 +36,6 @@ class WheelSize < ApplicationRecord
   end
 
   def popularity
-    WheelSize.popularities[priority - 1]
+    priority.titleize
   end
 end
