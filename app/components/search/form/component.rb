@@ -2,8 +2,17 @@
 
 module Search::Form
   class Component < ApplicationComponent
-    def initialize(target_search_path:, target_frame:, interpreted_params:, marketplace_scope: nil,
-      currency: nil, price_min_amount: nil, price_max_amount: nil, result_view: nil)
+    def initialize(
+      target_search_path:,
+      target_frame:,
+      interpreted_params:,
+      marketplace_scope: nil,
+      currency: nil,
+      price_min_amount: nil,
+      price_max_amount: nil,
+      result_view: nil,
+      search_obj_name: "Registrations"
+    )
       @marketplace_scope = marketplace_scope
       @target_search_path = target_search_path
       @target_frame = target_frame
@@ -13,6 +22,7 @@ module Search::Form
       @price_min_amount = price_min_amount
       @price_max_amount = price_max_amount
       @result_view = SearchResults::Container::Component.permitted_result_view(result_view)
+      @search_obj_name = search_obj_name
     end
 
     private
@@ -32,7 +42,7 @@ module Search::Form
     end
 
     def search_obj_name
-      "Listings" if is_marketplace?
+      @search_obj_name
     end
 
     def query

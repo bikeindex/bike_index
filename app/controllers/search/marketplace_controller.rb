@@ -81,6 +81,7 @@ class Search::MarketplaceController < ApplicationController
 
     @page = permitted_page(max: MAX_INDEX_PAGE)
     @search_kind = :marketplace
+    @search_obj_name = "Items"
     @result_view = SearchResults::Container::Component
       .permitted_result_view(params[:search_result_view], default: :thumbnail)
   end
