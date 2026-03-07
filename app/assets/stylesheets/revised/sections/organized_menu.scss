@@ -8,7 +8,6 @@ $organized-menu-bg: $gray-lighter;
   }
 
   header {
-    margin-top: -2 * $vertical-height;
     padding: 0 $vertical-height;
 
     // if the dashboard menu item is there, it moves up to be closer to the menu
@@ -44,12 +43,12 @@ $organized-menu-bg: $gray-lighter;
 }
 
 @media (min-width: $grid-breakpoint-md) {
-  .organized-body {
+  .organized-body .primary-footer {
     position: relative;
+  }
 
-    .primary-footer {
-      position: relative;
-    }
+  .organized-content-wrapper {
+    position: relative;
 
     // To make it go over the menu
     .organized-left-menu {
