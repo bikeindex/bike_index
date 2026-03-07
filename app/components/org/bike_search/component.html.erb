@@ -134,7 +134,12 @@
         <%= settings_button %>
       </div>
     <% else %>
-      <div class="tw:flex tw:items-baseline tw:justify-between tw:mt-4">
+      <% if active_search_filter_descriptions.any? %>
+        <p class="tw:mt-4 tw:mb-0">
+          <%= safe_join(active_search_filter_descriptions, " · ") %>
+        </p>
+      <% end %>
+      <div class="tw:flex tw:items-baseline tw:justify-between <%= active_search_filter_descriptions.any? ? '' : 'tw:mt-4' %>">
         <p class="tw:mb-0">
           <% if show_search_query_summary? %>
             <%= translation(".matching_bikes_html",

@@ -110,6 +110,25 @@ module Org::BikeSearch
       @search_params ||= (@sortable_search_params || {}).merge((@interpreted_params || {}).merge(organization_id: @organization.to_param))
     end
 
+    def active_search_filter_descriptions
+      @active_search_filter_descriptions ||= [].tap do |descriptions|
+        case @search_stickers
+        when "with" then descriptions << translation(".only_with_stickers_html")
+        when "none" then descriptions << translation(".only_no_sticker_html")
+        end
+        case @search_address
+        when "with_street" then descriptions << translation(".only_with_address_html")
+        when "without_street" then descriptions << translation(".only_no_address_html")
+        end
+        case @search_status
+        when "not_impounded" then descriptions << translation(".only_not_impounded_html")
+        when "impounded" then descriptions << translation(".only_impounded_vehicles_html")
+        when "with_owner" then descriptions << translation(".only_with_owner_html")
+        when "stolen" then descriptions << translation(".only_stolen_html")
+        end
+      end
+    end
+
     def show_search_query_summary?
       @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
     end
