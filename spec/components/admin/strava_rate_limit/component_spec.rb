@@ -31,6 +31,7 @@ RSpec.describe Admin::StravaRateLimit::Component, type: :component do
       # daily: read has 500 available vs main 5997 → shows 500/3,000
       expect(component.text).to include("500")
       expect(component.text).to include("daily")
+      expect(component.css("div").first["title"]).to eq rate_limit_json.symbolize_keys
     end
   end
 
