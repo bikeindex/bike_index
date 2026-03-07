@@ -8,8 +8,17 @@ Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
     policy.font_src :self, "https://fonts.gstatic.com", :data
-    policy.img_src :self, "https://files.bikeindex.org", "https://uploads.bikeindex.org", "https://bikebook.s3.amazonaws.com", "https://www.facebook.com", "https://www.googletagmanager.com", "https://pbs.twimg.com", "https://syndication.twitter.com", "https://maps.googleapis.com", "https://maps.gstatic.com", :data
+    policy.img_src :self, "https://files.bikeindex.org",
+      "https://uploads.bikeindex.org",
+      "https://bikebook.s3.amazonaws.com",
+      "https://www.facebook.com",
+      "https://www.googletagmanager.com",
+      "https://pbs.twimg.com",
+      "https://syndication.twitter.com",
+      "https://maps.googleapis.com",
+      "https://maps.gstatic.com", :data
     policy.object_src :none
+    # unsafe_eval is required for application_revised.js jQuery - remove it when possible!
     policy.script_src :self, :unsafe_inline, :unsafe_eval,
       "https://www.googletagmanager.com",
       "https://www.google-analytics.com",
