@@ -1,7 +1,6 @@
 # Seed 25 bikes for user@bikeindex.org on the first organization,
 # plus stolen bikes in SF/Oakland and found bikes
 user = User.find_by_email("user@bikeindex.org")
-org = Organization.friendly_find "Hogwarts"
 raise "No manufacturers imported - run `bin/rake setup:import_manufacturers_csv` first" if Manufacturer.frame_makers.none?
 
 us = Country.united_states

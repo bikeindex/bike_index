@@ -178,7 +178,7 @@ puts "Impound records seeded successfully!"
 
 # --- Non-bike cycle types registered to Hogwarts ---
 puts "Seeding non-cycle types and e-vehicles"
-non_bike_types = [
+[
   {cycle_type: "e-scooter", propulsion_type: "foot-pedal"},
   {cycle_type: "e-scooter", propulsion_type: "foot-pedal"},
   {cycle_type: "e-scooter", propulsion_type: "foot-pedal"},
