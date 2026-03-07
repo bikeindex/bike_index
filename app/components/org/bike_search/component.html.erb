@@ -12,7 +12,6 @@
     <hr style="opacity: .3;">
   <% end %>
 
-  <div>
     <div
       class="settings-list <%= 'tw:hidden!' unless settings_default_open? %>"
       data-org--bike-search-target="settings"
@@ -119,19 +118,19 @@
     </div>
 
     <% settings_button = capture do %>
-      <a
+      <button
+        type="button"
         class="btn btn-sm btn-outline-primary uncap <%= 'active' if settings_default_open? %>"
-        href="#"
         data-action="click->org--bike-search#toggleSettings"
         data-org--bike-search-target="settingsButton"
       >
         <%= translation(".settings") %>
         <%= helpers.inline_svg_tag "icons/settings_slider.svg", class: "tw:inline", alt: "settings icon" %>
-      </a>
+      </button>
     <% end %>
 
     <% if @skip_search_form %>
-      <div class="tw:flex tw:justify-end"><%= settings_button %></div>
+      <div class="tw:my-4 tw:flex tw:justify-end"><%= settings_button %></div>
     <% else %>
       <div class="tw:mt-4 tw:flex tw:items-baseline tw:justify-between">
         <p class="tw:mb-0">
@@ -170,7 +169,6 @@
         </p>
       <% end %>
     <% end %>
-  </div>
 
   <div class="full-screen-table pl-lg-1">
     <table
