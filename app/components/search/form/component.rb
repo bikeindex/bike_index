@@ -32,7 +32,7 @@ module Search::Form
     end
 
     def search_item_name
-      "Listings" if is_marketplace?
+      "Items" if is_marketplace?
     end
 
     def query

@@ -117,7 +117,7 @@ export default class extends Controller {
 
     const getPrefix = () => {
       if (item.category === 'colors') {
-        const p = "<span class='sch_'>" + searchItemName + " that are </span>"
+        const p = "<span class='sch_'>" + searchItemName + ' that are </span>'
         if (item.display) {
           return p + "<span class='sclr' style='background: " + item.display + ";'></span>"
         } else {
@@ -126,7 +126,7 @@ export default class extends Controller {
       } else if (item.category === 'cycle_type') {
         return "<span class='sch_'>only for</span>"
       } else if (item.category === 'cmp_mnfg' || item.category === 'frame_mnfg') {
-        return "<span class='sch_'>" + searchItemName + " made by</span>"
+        return "<span class='sch_'>" + searchItemName + ' made by</span>'
       } else {
         return 'Search for'
       }
