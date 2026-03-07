@@ -110,5 +110,4 @@ module FileCacheMaintainer
     uploader.remove!
     RedisPool.conn { |r| r.hdel(info_id, file_info_hash["path"]) }
   end
-
 end
