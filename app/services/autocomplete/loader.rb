@@ -76,6 +76,13 @@ module Autocomplete::Loader
     end.count
   end
 
+  #
+  # private below here
+  #
+  conceal :store_items, :store_item, :base_key, :prefixes_for_phrase, :combinatored_category_array,
+    :store_category_combos, :items_hash, :clean_hash, :clear_cache, :delete_categories_and_item_data,
+    :fetch_category_keys, :fetch_cache_keys, :delete_data
+
   def store_items(items)
     i = 0
     items = items.map { |i| clean_hash(i) }
@@ -221,7 +228,4 @@ module Autocomplete::Loader
     # everything will work itself out as soon as the cache expires again.
   end
 
-  conceal :store_items, :store_item, :base_key, :prefixes_for_phrase, :combinatored_category_array,
-    :store_category_combos, :items_hash, :clean_hash, :clear_cache, :delete_categories_and_item_data,
-    :fetch_category_keys, :fetch_cache_keys, :delete_data
 end

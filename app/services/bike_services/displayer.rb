@@ -127,6 +127,11 @@ module BikeServices::Displayer
     end
   end
 
+  #
+  # private below here
+  #
+  conceal :user_edit_bike_address?, :single_image_hash
+
   def user_edit_bike_address?(bike, user = nil)
     return false if user.blank?
 
@@ -147,5 +152,4 @@ module BikeServices::Displayer
     {square: image_url, twitter: image_url, facebook: image_url}
   end
 
-  conceal :user_edit_bike_address?, :single_image_hash
 end

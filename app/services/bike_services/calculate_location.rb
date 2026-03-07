@@ -49,6 +49,11 @@ module BikeServices::CalculateLocation
     end
   end
 
+  #
+  # private below here
+  #
+  conceal :location_record_coordinates
+
   # Select the source from which to derive location data, in the following order
   # of precedence:
   #
@@ -71,5 +76,4 @@ module BikeServices::CalculateLocation
     l_hash.slice("latitude", "longitude", "address_record_id")
   end
 
-  conceal :location_record_coordinates
 end

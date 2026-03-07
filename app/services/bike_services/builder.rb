@@ -66,6 +66,12 @@ module BikeServices::Builder
     bike
   end
 
+  #
+  # private below here
+  #
+  conceal :check_organization, :check_example, :default_parking_notification_attrs,
+    :org_address_record, :build_new_impound_record
+
   # previously BikeServices::CreatorOrganizer
   def check_organization(b_param, bike)
     organization_id = b_param.params.dig("creation_organization_id").presence ||
@@ -131,6 +137,4 @@ module BikeServices::Builder
     impound_record
   end
 
-  conceal :check_organization, :check_example, :default_parking_notification_attrs,
-    :org_address_record, :build_new_impound_record
 end

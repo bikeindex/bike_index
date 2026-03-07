@@ -40,6 +40,13 @@ module Autocomplete::Matcher
     )
   end
 
+  #
+  # private below here
+  #
+  conceal :not_in_cache?, :query_array, :categories_array, :total_categories_count,
+    :categories_string, :category_key_from_opts, :cache_key_from_opts, :interkeys_from_opts,
+    :store_search_in_cache, :matching_hashes
+
   def not_in_cache?(cache_key)
     cached_result = RedisPool.conn { |r| r.exists(cache_key) }
     cached_result.blank? || cached_result == 0
@@ -107,7 +114,4 @@ module Autocomplete::Matcher
       .reject(&:blank?).map { |r| JSON.parse(r) }
   end
 
-  conceal :not_in_cache?, :query_array, :categories_array, :total_categories_count,
-    :categories_string, :category_key_from_opts, :cache_key_from_opts, :interkeys_from_opts,
-    :store_search_in_cache, :matching_hashes
 end

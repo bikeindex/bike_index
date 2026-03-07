@@ -56,6 +56,12 @@ module GeocodeHelper
     address_hash.except(:formatted_address)
   end
 
+  #
+  # private below here
+  #
+  conceal :geocoder_lookup_string, :ignored_coordinates?, :address_hash_from_reverse_geocode,
+    :address_hash_from_geocoder_result, :hash_for_geocoder_response, :coordinates_from_google_response
+
   # Google isn't a fan of bare zipcodes anymore. But we search using bare US zipcodes a lot - so make it work
   def geocoder_lookup_string(addy)
     address = addy.to_s.strip
@@ -137,6 +143,4 @@ module GeocodeHelper
     {latitude: coord_hash["lat"], longitude: coord_hash["lng"]}
   end
 
-  conceal :geocoder_lookup_string, :ignored_coordinates?, :address_hash_from_reverse_geocode,
-    :address_hash_from_geocoder_result, :hash_for_geocoder_response, :coordinates_from_google_response
 end

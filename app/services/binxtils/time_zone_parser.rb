@@ -37,6 +37,11 @@ module Binxtils
       ActiveSupport::TimeZone::MAPPING.key(time_zone.tzinfo.name) || time_zone.name
     end
 
+    #
+    # private below here
+    #
+    conceal :time_string_has_zone_info?, :prioritized_zones_matching_offset, :prioritize_zones
+
     # TODO: This might be overly complicated garbage
     def time_string_has_zone_info?(time_str)
       return false if Binxtils::TimeParser.looks_like_timestamp?(time_str)
@@ -100,6 +105,5 @@ module Binxtils
       end
     end
 
-    conceal :time_string_has_zone_info?, :prioritized_zones_matching_offset, :prioritize_zones
   end
 end

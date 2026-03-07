@@ -23,6 +23,11 @@ module Spreadsheets::Manufacturers
     end
   end
 
+  #
+  # private below here
+  #
+  conceal :update_or_create_for!, :row_for, :export_column_methods
+
   def update_or_create_for!(row)
     manufacturer = Manufacturer.friendly_find(row[:name])
     manufacturer ||= Manufacturer.friendly_find(row[:alternate_name]) if row[:alternate_name].present?
@@ -68,5 +73,4 @@ module Spreadsheets::Manufacturers
     end
   end
 
-  conceal :update_or_create_for!, :row_for, :export_column_methods
 end

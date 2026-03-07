@@ -50,6 +50,13 @@ module Images::StolenProcessor
     stolen_record
   end
 
+  #
+  # private below here
+  #
+  conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :generate_alert,
+    :template_path, :topbar_path, :bike_image_dimensions_for, :bike_image_offset,
+    :caption_overlay, :font, :stolen_record_location
+
   def image_and_id(stolen_record, public_image_id)
     if public_image_id.present?
       public_image = PublicImage.unscoped.find_by_id(public_image_id)
@@ -210,7 +217,4 @@ module Images::StolenProcessor
       .gsub("'", "\\'")
   end
 
-  conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :generate_alert,
-    :template_path, :topbar_path, :bike_image_dimensions_for, :bike_image_offset,
-    :caption_overlay, :font, :stolen_record_location
 end

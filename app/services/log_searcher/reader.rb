@@ -53,11 +53,14 @@ module LogSearcher::Reader
     RedisPool.conn { |r| r.llen(KEY) }
   end
 
+  #
+  # private below here
+  #
+  conceal :time_rgrep
+
   def time_rgrep(time)
     return "" if time.blank?
 
     " | rg '\\AI,\\s\\[#{time.utc.strftime("%Y-%m-%dT%H")}'"
   end
-
-  conceal :time_rgrep
 end

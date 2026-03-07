@@ -8,11 +8,14 @@ module RedisPool
     pool.with { |conn| yield conn }
   end
 
+  #
+  # private below here
+  #
+  conceal :pool
+
   def pool
     @pool ||= ConnectionPool.new(timeout: 1, size: 2) do
       Redis.new(url: Bikeindex::Application.config.redis_default_url)
     end
   end
-
-  conceal :pool
 end

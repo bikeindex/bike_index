@@ -19,6 +19,11 @@ module BlobUrl
     end
   end
 
+  #
+  # private below here
+  #
+  conceal :local_storage?, :storage_host_for
+
   def local_storage?(blob)
     LOCAL_STORAGE && blob.service&.name == SERVICE
   end
@@ -28,6 +33,4 @@ module BlobUrl
 
     STORAGE_HOST_DEV
   end
-
-  conceal :local_storage?, :storage_host_for
 end
