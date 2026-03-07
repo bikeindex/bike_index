@@ -12,8 +12,6 @@ end
 
 us = Country.united_states
 ca_state = State.find_by_abbreviation("CA")
-manufacturer_ids = Manufacturer.frame_makers.pluck(:id)
-color_ids = Color.pluck(:id)
 
 # San Francisco locations (lat/lng pairs with street addresses)
 sf_locations = [
@@ -43,29 +41,28 @@ owner_emails = %w[
 
 creator = BikeServices::Creator.new
 
-# Helper to create a bike via BikeServices::Creator
-create_bike = lambda {
-  b_param = BParam.create!(
-    creator: user,
-    params: {
-      bike: {
-        cycle_type: "bike",
-        propulsion_type: "foot-pedal",
-        serial_number: (0...10).map { rand(65..90).chr }.join,
-        manufacturer_id: manufacturer_ids.sample.to_s,
-        primary_frame_color_id: color_ids.sample.to_s,
-        rear_tire_narrow: "true",
-        handlebar_type: HandlebarType.slugs.first,
-        owner_email: owner_emails.sample,
-        creation_organization_id: hogwarts.id.to_s
-      }
-    }
-  )
+def org_bike_params(owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id, manufacturer_id: nil)
+  manufacturer_id ||= Manufacturer.frame_makers.pluck(:id).sample
+  {
+    cycle_type: "bike",
+    propulsion_type: "foot-pedal",
+    serial_number: (0...10).map { rand(65..90).chr }.join,
+    manufacturer_id:,
+    primary_frame_color_id: Color.pluck(:id).sample,
+    rear_tire_narrow: "true",
+    handlebar_type: HandlebarType.slugs.first,
+    owner_email:,
+    creation_organization_id: creation_organization_id.to_s
+  }
+end
+
+def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id)
+  b_param = BParam.create!(creator: user, params: {bike: org_bike_params(owner_email:, creation_organization_id:)})
   b_param.origin = "organization_form"
   bike = creator.create_bike(b_param)
   raise "Bike creation failed: #{b_param.bike_errors}" if bike.errors.any?
   bike
-}
+end
 
 puts "Creating parking notifications in San Francisco..."
 
@@ -73,7 +70,7 @@ puts "Creating parking notifications in San Francisco..."
 initial_notifications = []
 10.times do |i|
   loc = sf_locations[i]
-  bike = create_bike.call
+  bike = seed_org_bike(creator:, user:, owner_email: owner_emails.sample)
   pn = ParkingNotification.create!(
     bike:,
     user: member,
@@ -123,17 +120,8 @@ loc = sf_locations[10]
 unreg_b_param = BParam.create!(
   creator: member,
   params: {
-    bike: {
-      cycle_type: "bike",
-      propulsion_type: "foot-pedal",
-      serial_number: "unknown",
-      manufacturer_id: manufacturer_ids.sample.to_s,
-      primary_frame_color_id: color_ids.sample.to_s,
-      rear_tire_narrow: "true",
-      handlebar_type: HandlebarType.slugs.first,
-      owner_email: member.email,
-      creation_organization_id: hogwarts.id.to_s
-    },
+    bike: org_bike_params(owner_email: member.email)
+      .merge(serial_number: "unknown"),
     parking_notification: {
       kind: "parked_incorrectly_notification",
       street: loc[:street],
@@ -161,18 +149,8 @@ puts "Creating 5 impound records in San Francisco for Hogwarts..."
   b_param = BParam.create!(
     creator: member,
     params: {
-      bike: {
-        cycle_type: "bike",
-        propulsion_type: "foot-pedal",
-        serial_number: (0...10).map { rand(65..90).chr }.join,
-        manufacturer_id: manufacturer_ids.sample.to_s,
-        primary_frame_color_id: color_ids.sample.to_s,
-        rear_tire_narrow: "true",
-        handlebar_type: HandlebarType.slugs.first,
-        owner_email: owner_emails.sample,
-        creation_organization_id: hogwarts.id.to_s,
-        status: "status_impounded"
-      },
+      bike: org_bike_params(owner_email: owner_emails.sample)
+        .merge(status: "status_impounded"),
       impound_record: {
         address_record_attributes: {
           street: loc[:street],
@@ -197,3 +175,24 @@ puts "Creating 5 impound records in San Francisco for Hogwarts..."
 end
 
 puts "Impound records seeded successfully!"
+
+# --- Non-bike cycle types registered to Hogwarts ---
+puts "Seeding non-cycle types and e-vehicles"
+[
+  {cycle_type: "e-scooter", propulsion_type: "foot-pedal"},
+  {cycle_type: "e-scooter", propulsion_type: "foot-pedal"},
+  {cycle_type: "e-scooter", propulsion_type: "foot-pedal"},
+  {cycle_type: "personal-mobility", propulsion_type: "foot-pedal"},
+  {cycle_type: "cargo", propulsion_type: "pedal-assist"},
+  {cycle_type: "cargo-rear", propulsion_type: "pedal-assist"},
+  {cycle_type: "cargo-trike", propulsion_type: "pedal-assist-and-throttle"}
+].each do |type, i|
+  b_param = BParam.create!(
+    creator: user,
+    params: {bike: org_bike_params(owner_email: owner_emails.sample)
+      .merge(cycle_type: type[:cycle_type], propulsion_type: type[:propulsion_type])}
+  )
+  b_param.origin = "organization_form"
+  bike = creator.create_bike(b_param)
+  raise "#{type[:cycle_type]} creation failed: #{b_param.bike_errors}" if bike.errors.any?
+end
