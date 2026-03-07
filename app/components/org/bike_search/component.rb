@@ -38,12 +38,6 @@ module Org::BikeSearch
 
     private
 
-    # Mark _html translations as html_safe (matching Rails' t() helper behavior)
-    def translation(key, **)
-      result = super
-      key.to_s.end_with?("_html") ? result.html_safe : result
-    end
-
     # TODO: Now that we have translations, we need to localize this.
     # I believe the easiest way to do so would be to pull the text from the header cell and use that.
     def column_renames
