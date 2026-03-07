@@ -104,7 +104,6 @@ module Binxtils
       end
     end
 
-
     conceal :time_string_has_zone_info?, :prioritized_zones_matching_offset, :prioritize_zones
   end
 end

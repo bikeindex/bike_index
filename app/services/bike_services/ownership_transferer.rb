@@ -82,6 +82,5 @@ module BikeServices::OwnershipTransferer
     end
   end
 
-
   conceal :updated_bike_attrs, :update_impound_and_parking_notifications
 end

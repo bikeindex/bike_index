@@ -65,6 +65,5 @@ module Phonifyer
     [number.strip, "x#{extension.strip}"]
   end
 
-
   conceal :strip_ignored_parts, :split_with_country_code, :split_with_extension
 end

@@ -196,6 +196,5 @@ module Integrations::StravaClient
     end
   end
 
-
   conceal :refresh_token!, :execute_proxy_request, :get, :api_connection, :oauth_connection
 end

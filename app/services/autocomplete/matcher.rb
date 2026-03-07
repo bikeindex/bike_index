@@ -111,7 +111,6 @@ module Autocomplete::Matcher
       .reject(&:blank?).map { |r| JSON.parse(r) }
   end
 
-
   conceal :not_in_cache?, :query_array, :categories_array, :total_categories_count,
     :categories_string, :category_key_from_opts, :cache_key_from_opts, :interkeys_from_opts,
     :store_search_in_cache, :matching_hashes

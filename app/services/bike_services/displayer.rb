@@ -151,6 +151,5 @@ module BikeServices::Displayer
     {square: image_url, twitter: image_url, facebook: image_url}
   end
 
-
   conceal :user_edit_bike_address?, :single_image_hash
 end

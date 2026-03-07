@@ -75,6 +75,5 @@ module BikeServices::CalculateLocation
     l_hash.slice("latitude", "longitude", "address_record_id")
   end
 
-
   conceal :location_record_coordinates
 end

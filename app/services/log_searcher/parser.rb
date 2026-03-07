@@ -126,6 +126,5 @@ module LogSearcher::Parser
     end
   end
 
-
   conceal :includes_query?, :parse_endpoint, :organization_from_params, :parse_request_time, :stolenness_for
 end

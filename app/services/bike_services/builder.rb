@@ -135,7 +135,6 @@ module BikeServices::Builder
     impound_record
   end
 
-
   conceal :check_organization, :check_example, :default_parking_notification_attrs,
     :org_address_record, :build_new_impound_record
 end

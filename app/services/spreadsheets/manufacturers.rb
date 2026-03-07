@@ -72,6 +72,5 @@ module Spreadsheets::Manufacturers
     end
   end
 
-
   conceal :update_or_create_for!, :row_for, :export_column_methods
 end
