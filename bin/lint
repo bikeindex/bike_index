@@ -10,7 +10,6 @@ lint_test = ENV["LINT_TEST"] == "true" || cli_args.include?("--no-fix")
 file_args = cli_args.reject { |arg| arg.start_with?("-") }
 
 require "fileutils"
-include FileUtils
 
 # path to your application root.
 APP_ROOT = File.expand_path("..", __dir__)
@@ -19,7 +18,7 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
-chdir APP_ROOT do
+FileUtils.chdir APP_ROOT do
   # lint_test checking doesn't accept file name
   if lint_test
     puts "Testing lint (will not autofix)"
