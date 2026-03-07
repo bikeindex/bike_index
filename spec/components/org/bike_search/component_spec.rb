@@ -12,6 +12,10 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
   let(:enabled_feature_slugs) { %w[bike_search] }
   let(:pagy) { Pagy::Offset.new(count: 25, page: 1, limit: 10) }
+  let(:search_stickers) { nil }
+  let(:search_address) { nil }
+  let(:search_status) { "all" }
+  let(:skip_search_form) { false }
   let(:options) do
     {
       organization:,
@@ -20,7 +24,10 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
       params: {},
       interpreted_params: {},
       sortable_search_params: {},
-      search_status: "all",
+      search_stickers:,
+      search_address:,
+      search_status:,
+      skip_search_form:,
       stolenness: "all",
       time_range: 1.year.ago..Time.current
     }
@@ -42,7 +49,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   end
 
   context "with skip_search_form" do
-    let(:options) { super().merge(skip_search_form: true) }
+    let(:skip_search_form) { true }
 
     it "renders table without search form" do
       expect(component).to have_css("table.table")
@@ -70,7 +77,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
 
   context "with search_stickers filter active" do
     let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
-    let(:options) { super().merge(search_stickers: "with") }
+    let(:search_stickers) { "with" }
 
     it "displays active filter description" do
       expect(component).to have_text("with stickers")
@@ -78,7 +85,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   end
 
   context "with search_address filter active" do
-    let(:options) { super().merge(search_address: "without_street") }
+    let(:search_address) { "without_street" }
 
     it "displays active filter description" do
       expect(component).to have_text("no address")
@@ -86,7 +93,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   end
 
   context "with search_status filter active" do
-    let(:options) { super().merge(search_status: "stolen") }
+    let(:search_status) { "stolen" }
 
     it "displays active filter description" do
       expect(component).to have_text("only stolen")
