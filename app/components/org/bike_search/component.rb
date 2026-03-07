@@ -6,7 +6,7 @@ module Org::BikeSearch
       interpreted_params: {}, sortable_search_params: {},
       search_stickers: nil, search_address: nil, search_status: "all",
       search_query_present: false, time_range: nil, stolenness: "all",
-      bike_sticker: nil, model_audit: nil, only_show_bikes: false, skip_avery: false)
+      bike_sticker: nil, model_audit: nil, skip_search_form: false, skip_avery: false)
       @organization = organization
       @pagy = pagy
       @interpreted_params = interpreted_params
@@ -21,7 +21,7 @@ module Org::BikeSearch
       @stolenness = stolenness
       @bike_sticker = bike_sticker
       @model_audit = model_audit
-      @only_show_bikes = only_show_bikes
+      @skip_search_form = skip_search_form
       @skip_avery = skip_avery
     end
 
@@ -128,7 +128,7 @@ module Org::BikeSearch
     end
 
     def show_pagination?
-      !@only_show_bikes && @pagy.pages > 1
+      !@skip_search_form && @pagy.pages > 1
     end
   end
 end

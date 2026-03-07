@@ -2,7 +2,7 @@
   data-controller="org--bike-search"
   data-org--bike-search-default-columns-value="<%= initially_checked_columns.to_json %>"
 >
-  <% unless @only_show_bikes %>
+  <% unless @skip_search_form %>
     <div class="mb-4">
       <%= render(Search::FormOrganized::Component.new(
         target_search_path: organization_bikes_path(organization_id: @organization.to_param),
@@ -108,7 +108,7 @@
         <% end %>
       </p>
 
-      <% if @organization.enabled?("csv_exports") && !@only_show_bikes %>
+      <% if @organization.enabled?("csv_exports") && !@skip_search_form %>
         <p class="search-sort-btns text-right">
           <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
             organization_bikes_path(search_params.merge(create_export: true)),
@@ -129,7 +129,7 @@
       </a>
     <% end %>
 
-    <% if @only_show_bikes %>
+    <% if @skip_search_form %>
       <div class="tw:flex tw:justify-end"><%= settings_button %></div>
     <% else %>
       <div class="tw:mt-4 tw:flex tw:items-baseline tw:justify-between">

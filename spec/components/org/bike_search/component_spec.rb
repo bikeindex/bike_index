@@ -48,8 +48,8 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     expect(component).to have_css("select#per_page_select")
   end
 
-  context "with only_show_bikes" do
-    let(:options) { super().merge(only_show_bikes: true) }
+  context "with skip_search_form" do
+    let(:options) { super().merge(skip_search_form: true) }
 
     it "renders table without search form" do
       expect(component).to have_css("table.table")
