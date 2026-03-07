@@ -49,12 +49,12 @@
 
           <%= link_to organization_bikes_path(search_params.merge(search_stickers: "with")),
             class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do %>
-            <%= translation(".only_with_stickers_html") %>
+            <%= translation(".filter_with_stickers_html") %>
           <% end %>
 
           <%= link_to organization_bikes_path(search_params.merge(search_stickers: "none")),
             class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do %>
-            <%= translation(".only_no_sticker_html") %>
+            <%= translation(".filter_no_sticker_html") %>
           <% end %>
         </p>
       <% end %>
@@ -69,12 +69,12 @@
 
           <%= link_to organization_bikes_path(search_params.merge(search_address: "with_street")),
             class: "btn btn-secondary #{@search_address == 'with_street' ? 'active' : ''}" do %>
-            <%= translation(".only_with_address_html") %>
+            <%= translation(".filter_with_address_html") %>
           <% end %>
 
           <%= link_to organization_bikes_path(search_params.merge(search_address: "without_street")),
             class: "btn btn-secondary #{@search_address == 'without_street' ? 'active' : ''}" do %>
-            <%= translation(".only_no_address_html") %>
+            <%= translation(".filter_no_address_html") %>
           <% end %>
         </p>
       <% end %>
@@ -89,22 +89,22 @@
         <% if @organization.enabled?("impound_bikes") %>
           <%= link_to organization_bikes_path(search_params.merge(search_status: "not_impounded")),
             class: "btn btn-secondary #{@search_status == 'not_impounded' ? 'active' : ''}" do %>
-            <%= translation(".only_not_impounded_html") %>
+            <%= translation(".filter_not_impounded_html") %>
           <% end %>
           <%= link_to organization_bikes_path(search_params.merge(search_status: "impounded")),
             class: "btn btn-secondary #{@search_status == 'impounded' ? 'active' : ''}" do %>
-            <%= translation(".only_impounded_vehicles_html") %>
+            <%= translation(".filter_impounded_html") %>
           <% end %>
         <% end %>
 
         <%= link_to organization_bikes_path(search_params.merge(search_status: "with_owner")),
           class: "btn btn-secondary #{@search_status == 'with_owner' ? 'active' : ''}" do %>
-          <%= translation(".only_with_owner_html") %>
+          <%= translation(".filter_not_stolen_or_impounded_html") %>
         <% end %>
 
         <%= link_to organization_bikes_path(search_params.merge(search_status: "stolen")),
           class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}" do %>
-          <%= translation(".only_stolen_html") %>
+          <%= translation(".filter_stolen_html") %>
         <% end %>
       </p>
 
@@ -134,20 +134,20 @@
         <%= settings_button %>
       </div>
     <% else %>
-      <% if active_search_filter_descriptions.any? %>
-        <p class="tw:mt-4 tw:mb-0">
-          <%= safe_join(active_search_filter_descriptions, " · ") %>
-        </p>
-      <% end %>
-      <div class="tw:flex tw:items-baseline tw:justify-between <%= active_search_filter_descriptions.any? ? '' : 'tw:mt-4' %>">
+      <div class="tw:flex tw:items-baseline tw:justify-between tw:mt-4">
         <p class="tw:mb-0">
+          <% bikes_count = helpers.number_display(@pagy.count) %>
           <% if show_search_query_summary? %>
             <%= translation(".matching_bikes_html",
-              bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type)) %>
+              count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count)) %><% if active_search_filter_descriptions.any? %>:<% end %>
           <% else %>
             <%= translation(".registered_bikes_html",
-              bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type),
-              org_name: @organization.short_name) %>
+              count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count),
+              org_name: @organization.short_name) %><% if active_search_filter_descriptions.any? %>:<% end %>
+          <% end %>
+
+          <% if active_search_filter_descriptions.any? %>
+            <em><%= safe_join(active_search_filter_descriptions, " · ") %></em>
           <% end %>
 
           <em><%= helpers.humanized_time_range(@time_range) %></em>

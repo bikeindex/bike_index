@@ -89,7 +89,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     let(:options) { super().merge(search_status: "stolen") }
 
     it "displays active filter description" do
-      expect(component).to have_text("Only stolen")
+      expect(component).to have_text("only stolen")
     end
   end
 
