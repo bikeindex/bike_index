@@ -5930,7 +5930,7 @@ nl:
       index:
         loading_results: Resultaten laden...
       results:
-        no_matched: Er zijn geen %{search_obj_name} die exact overeenkomen met uw zoekopdracht
+        no_matched: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
         search_for_containing: Zoeken naar series die uw zoekopdracht bevatten...
         search_for_similar: Zoeken naar soortgelijke series...
       serials_containing:
@@ -5947,6 +5947,11 @@ nl:
       everything_combobox:
         query_items_description: Zoekbeschrijvingen combobox
         search_descriptions: Zoek beschrijvingen
+        made_by: gemaakt door
+        only_for: alleen voor
+        search_for: Zoeken naar
+        search_only_for: Zoek alleen naar
+        that_are: die zijn
       form:
         doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet
           op een serienummer en wordt dus niet gebruikt om te zoeken.

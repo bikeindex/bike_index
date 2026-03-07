@@ -5773,7 +5773,7 @@ nb:
       index:
         loading_results: Laster inn resultater...
       results:
-        no_matched: Ingen %{search_obj_name} samsvarte nøyaktig med søket ditt
+        no_matched: Ingen registreringer samsvarte nøyaktig med søket ditt
         search_for_containing: Søker etter serier som inneholder søket ditt...
         search_for_similar: Søker etter lignende serier...
       serials_containing:
@@ -5790,6 +5790,11 @@ nb:
       everything_combobox:
         query_items_description: Søkebeskrivelser kombinasjonsboksen
         search_descriptions: Søk i beskrivelser
+        made_by: laget av
+        only_for: bare for
+        search_for: Søk etter
+        search_only_for: Søk bare etter
+        that_are: som er
       form:
         doesnt_look_like_serial: Serienummeret du skrev inn ser ikke ut som et serienummer,
           så det brukes ikke til å søke.
