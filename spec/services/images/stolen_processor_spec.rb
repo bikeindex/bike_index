@@ -159,6 +159,28 @@ RSpec.describe Images::StolenProcessor do
       end
     end
 
+    context "when image is not a valid format" do
+      let(:image) {
+        Tempfile.new(["invalid", ".jpeg"]).tap { |f|
+          f.write("not a real image")
+          f.rewind
+        }
+      }
+      let!(:public_image) { nil }
+
+      it "does not raise" do
+        bike.update!(stock_photo_url: "https://example.com/photo.jpg")
+        allow(URI).to receive(:parse).and_call_original
+        allow(URI).to receive(:parse).with(bike.stock_photo_url).and_return(
+          instance_double(URI::HTTPS, open: image)
+        )
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to_not change(ActiveStorage::Blob, :count)
+        expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
+      end
+    end
+
     context "with stock photo" do
       let(:bike) { FactoryBot.create(:bike, stock_photo_url:) }
       let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/13095/csm_INFINITO_CV_SUPER_RECORD_EPS_Compact_2a2c680c1b.jpg" }

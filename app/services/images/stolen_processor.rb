@@ -34,10 +34,15 @@ module Images::StolenProcessor
       return if !force_regenerate && stolen_record.images_attached_id == image_id
 
       # Prevent touching the stolen record, which kicks off a job
-      ActiveRecord::Base.no_touching do
-        attach_images(stolen_record, image, stolen_record_location(stolen_record))
-        stolen_record.image_four_by_five.blob.metadata["image_id"] = image_id
-        stolen_record.image_four_by_five.blob.save
+      begin
+        ActiveRecord::Base.no_touching do
+          attach_images(stolen_record, image, stolen_record_location(stolen_record))
+          stolen_record.image_four_by_five.blob.metadata["image_id"] = image_id
+          stolen_record.image_four_by_five.blob.save
+        end
+      rescue Vips::Error => e
+        Rails.logger.info("StolenProcessor: skipping invalid image for stolen_record #{stolen_record.id}: #{e.message}")
+        return
       end
     elsif (existing_blob = stolen_record.image_four_by_five&.blob)
       existing_blob.metadata["removed"] = true
