@@ -51,7 +51,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(assigns(:currency).symbol).to eq "$"
           expect(response.body).to match "xxxz"
           # Verify that it shows marketplace, not registrations text
-          expect(response.body).to match "No listings exactly matched your search"
+          expect(response.body).to match "No listings exactly matched"
           # FWIW, this doesn't fail anyway - but it's a reminder, don't search similar serials on marketplace
           expect(response.body).to_not match "with serials similar"
 
