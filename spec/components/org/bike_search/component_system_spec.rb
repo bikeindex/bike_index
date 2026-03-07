@@ -18,10 +18,10 @@ RSpec.describe Org::BikeSearch::Component, :js, type: :system do
     settings_selector = "[data-org--bike-search-target='settings']"
     expect(page).not_to have_css(settings_selector, visible: true, wait: 2)
 
-    click_link "settings"
+    click_button "settings"
     expect(page).to have_css(settings_selector, visible: true, wait: 5)
 
-    click_link "settings"
+    click_button "settings"
     expect(page).not_to have_css(settings_selector, visible: true, wait: 5)
   end
 
@@ -40,7 +40,7 @@ RSpec.describe Org::BikeSearch::Component, :js, type: :system do
     expect(page).to have_css("th.url_cell", visible: :hidden)
 
     # Open settings and check the URL column
-    click_link "settings"
+    click_button "settings"
     check "url_cell"
 
     expect(page).to have_css("th.url_cell", visible: true)
@@ -52,7 +52,7 @@ RSpec.describe Org::BikeSearch::Component, :js, type: :system do
 
   it "persists column selection in localStorage" do
     # Open settings and check URL column
-    click_link "settings"
+    click_button "settings"
     check "url_cell"
 
     stored = page.evaluate_script("localStorage.getItem('orgBikeColumns')")
