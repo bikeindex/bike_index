@@ -16,29 +16,6 @@ task read_logged_searches: :environment do
   LogSearcher::Reader.write_log_lines(Time.current - 1.hour)
 end
 
-desc "Reset Autocomplete"
-task reset_autocomplete: :environment do
-  AutocompleteLoaderJob.new.perform(nil, true)
-end
-
-desc "import manufacturers from GitHub"
-task import_manufacturers_csv: :environment do
-  url = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/manufacturers.csv"
-  file_path = Rails.root.join("tmp/manufacturers.csv")
-  system("wget -q #{url} -O #{file_path}", exception: true)
-  Spreadsheets::Manufacturers.import(file_path)
-end
-
-desc "import primary activities from GitHub"
-# NOTE: This doesn't actually do a good job updating existing primary activities.
-# If that is required, probably do it manually via console
-task import_primary_activities_csv: :environment do
-  url = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/primary_activities.csv"
-  file_path = Rails.root.join("tmp/primary_activities.csv")
-  system("wget -q #{url} -O #{file_path}", exception: true)
-  Spreadsheets::PrimaryActivities.import(file_path)
-end
-
 # TODO: Remove :processed attribute when processing finishes
 desc "Enqueue Logged Search Processing"
 task process_logged_searches: :environment do
@@ -47,11 +24,6 @@ task process_logged_searches: :environment do
 
   LoggedSearch.unprocessed.limit(enqueue_limit).pluck(:id)
     .each { |i| ProcessLoggedSearchJob.perform_async(i) }
-end
-
-desc "Load counts" # This is a rake task so it can be loaded from bin/update
-task load_counts: :environment do
-  UpdateCountsJob.new.perform
 end
 
 desc "Prepare translations for committing to main"
@@ -69,6 +41,33 @@ task exchange_rates_update: :environment do
   print "\nUpdating exchange rates..."
   is_success = ExchangeRateUpdator.update
   print is_success ? "done.\n" : "failed.\n"
+end
+
+desc "Notify Honeybadger of a deploy - both Rails and JS"
+task trigger_honeybadger_deploy: :environment do
+  raise "Missing HONEYBADGER_API_KEY" if ENV["HONEYBADGER_API_KEY"].blank?
+
+  revision = `git rev-parse HEAD`.strip
+  environment = Rails.env
+  repository = "git@github.com:bikeindex/bike_index.git"
+  local_username = `whoami`.strip
+  Honeybadger.track_deployment(environment:, revision:, local_username:, repository:)
+
+  raise "Missing HONEYBADGER_FRONTEND_API_KEY" if ENV["HONEYBADGER_FRONTEND_API_KEY"].blank?
+  require "net/http"
+  require "uri"
+
+  uri = URI("https://api.honeybadger.io/v1/deploys")
+  uri.query = URI.encode_www_form(
+    "deploy[environment]" => environment,
+    "deploy[local_username]" => local_username,
+    "deploy[revision]" => revision,
+    "deploy[repository]" => repository,
+    "api_key" => ENV["HONEYBADGER_FRONTEND_API_KEY"]
+  )
+  response = Net::HTTP.get_response(uri)
+  raise "Honeybadger deploy failed: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+  response
 end
 
 task database_size: :environment do
@@ -99,16 +98,6 @@ task database_size: :environment do
 
   # Print DB size
   puts "\n#{"Total size".ljust(name_col_length)} | #{ActiveRecord::Base.connection.execute(sql)[0]["pg_size_pretty"]}"
-end
-
-desc "Notify Honeybadger of a deploy"
-task trigger_honeybadger_deploy: :environment do
-  Honeybadger.track_deployment(
-    environment: Rails.env,
-    revision: `git rev-parse HEAD`.strip,
-    local_username: `whoami`.strip,
-    repository: "git@github.com:bikeindex/bike_index.git"
-  )
 end
 
 desc "Provide DB vacuum for production environment"
