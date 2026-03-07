@@ -118,18 +118,6 @@
       <% end %>
     </div>
 
-    <% settings_button = capture do %>
-      <a
-        class="btn btn-sm btn-outline-primary uncap <%= 'active' if settings_default_open? %>"
-        href="#"
-        data-action="click->org--bike-search#toggleSettings"
-        data-org--bike-search-target="settingsButton"
-      >
-        <%= translation(".settings") %>
-        <%= helpers.inline_svg_tag "icons/settings_slider.svg", class: "tw:inline", alt: "settings icon" %>
-      </a>
-    <% end %>
-
     <% if @skip_search_form %>
       <div class="tw:flex tw:justify-end"><%= settings_button %></div>
     <% else %>
@@ -184,11 +172,11 @@
           <th class="hiddenColumn url_cell">URL</th>
 
           <th class="hiddenColumn created_at_cell">
-            <%= helpers.sortable"id", translation(".registered") %>
+            <%= sortable("id", translation(".registered")) %>
           </th>
 
           <th class="hiddenColumn updated_at_cell hidden-xs-down">
-            <%= helpers.sortable"updated_by_user_at", translation(".updated") %>
+            <%= sortable("updated_by_user_at", translation(".updated")) %>
           </th>
 
           <th class="hiddenColumn hidden-xs-down stolen_cell">
@@ -196,19 +184,19 @@
           </th>
 
           <th class="hiddenColumn hidden-xs-down propulsion_type_cell">
-            <%= helpers.sortable"propulsion_type", translation(".propulsion_type") %>
+            <%= sortable("propulsion_type", translation(".propulsion_type")) %>
           </th>
 
           <th class="hiddenColumn hidden-xs-down cycle_type_cell">
-            <%= helpers.sortable"cycle_type", translation(".vehicle_type") %>
+            <%= sortable("cycle_type", translation(".vehicle_type")) %>
           </th>
 
           <th class="hiddenColumn hidden-xs-down manufacturer_cell">
-            <%= helpers.sortable"mnfg_name", translation(".manufacturer") %>
+            <%= sortable("mnfg_name", translation(".manufacturer")) %>
           </th>
 
           <th class="hiddenColumn hidden-xs-down model_cell">
-            <%= helpers.sortable"frame_model", translation(".model") %>
+            <%= sortable("frame_model", translation(".model")) %>
           </th>
 
           <th class="hiddenColumn hidden-xs-down color_cell">
@@ -221,7 +209,7 @@
               <br>
             </small>
 
-            <%= helpers.sortable"owner_email", translation(".sent_to") %>
+            <%= sortable("owner_email", translation(".sent_to")) %>
           </th>
 
           <th class="hiddenColumn creation_description_cell">Source</th>

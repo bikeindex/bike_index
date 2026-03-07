@@ -2,6 +2,8 @@
 
 module Org::BikeSearch
   class Component < ApplicationComponent
+    include SortableHelper
+
     def initialize(
       organization:,
       pagy:,
@@ -108,7 +110,7 @@ module Org::BikeSearch
 
     def cycle_type
       @cycle_type ||= begin
-        merged = @params.respond_to?(:to_unsafe_h) ? @params.to_unsafe_h.merge(@interpreted_params) : @params.merge(@interpreted_params)
+        merged = @params.merge(@interpreted_params)
         BikeServices::Displayer.vehicle_search?(merged) ? translation(".vehicle") : translation(".bike")
       end
     end
@@ -138,6 +140,16 @@ module Org::BikeSearch
 
     def show_search_query_summary?
       @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
+    end
+
+    def settings_button
+      content_tag(:a,
+        href: "#",
+        class: "btn btn-sm btn-outline-primary uncap #{settings_default_open? ? "active" : ""}",
+        data: {action: "click->org--bike-search#toggleSettings", org__bike_search_target: "settingsButton"}) do
+        translation(".settings") +
+          helpers.inline_svg_tag("icons/settings_slider.svg", class: "tw:inline", alt: "settings icon")
+      end
     end
 
     def show_pagination?
