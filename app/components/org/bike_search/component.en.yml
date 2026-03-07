@@ -4,11 +4,14 @@ en:
     org:
       bike_search:
         address: 'Address:'
+        affiliation: Affiliation
         all: All
         avery: Avery?
+        avery_exportable: Avery Exportable
         bike: registration
         color: Color
         create_export_of_vehicles: Create export of searched %{cycle_type}
+        e_vehicle_propulsion: E-vehicle (propulsion)
         filter_impounded_html: only <strong>impounded</strong>
         filter_no_address_html: only <strong>no</strong> address
         filter_no_sticker_html: only <strong>no</strong> sticker
@@ -24,17 +27,23 @@ en:
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         model: Model
         owner_name: Owner name
+        phone: Phone
         propulsion_type: Propulsion
+        reg_address: Address
         registered: Registered
         registered_bikes_html: "%{count} %{cycle_type} matching for %{org_name}"
+        secondary_number: "Secondary#"
         sent_to: Sent to
         settings: settings
+        source: Source
         status: 'Status:'
         status_cell: Status
         sticker: Sticker
         stickers: 'Stickers:'
         stolen: Stolen
+        student_id: Student ID
         updated: Updated
+        url: URL
         vehicle: registration
         vehicle_type: Vehicle type
         visible_columns: Visible columns

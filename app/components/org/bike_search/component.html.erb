@@ -32,7 +32,7 @@
                     data: { action: "change->org--bike-search#columnToggled" } %>
                 <% end %>
 
-                <%= column_renames[cell_name] %>
+                <%= column_renames[cell_name.to_sym] %>
               </label>
             </div>
           </div>
@@ -238,7 +238,7 @@
             <% next if reg_field == "extra_registration_number" %>
 
             <th class="hiddenColumn hidden-xs-down <%= "#{reg_field}_cell" %>">
-              <%= column_renames["#{reg_field}_cell"] %>
+              <%= column_renames[:"#{reg_field}_cell"] %>
             </th>
           <% end %>
 
