@@ -8,7 +8,6 @@ $organized-menu-bg: $gray-lighter;
   }
 
   header {
-    margin-top: -2 * $vertical-height;
     padding: 0 $vertical-height;
 
     // if the dashboard menu item is there, it moves up to be closer to the menu
@@ -58,7 +57,9 @@ $organized-menu-bg: $gray-lighter;
       height: 100%;
       position: absolute;
       top: 0;
+      padding-top: 75px; // padding for shorter top menu
       display: block;
+
 
       ul {
         @include list-unstyled;
@@ -133,5 +134,11 @@ $organized-menu-bg: $gray-lighter;
       width: 100%;
       padding-left: 15%;
     }
+  }
+}
+
+@media (min-width: $grid-breakpoint-lg) {
+  .organized-body .organized-left-menu {
+    padding-top: 104px;
   }
 }
