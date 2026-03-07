@@ -29,7 +29,8 @@ Rails.application.configure do
       "https://www.facebook.com",
       "https://maps.googleapis.com",
       "https://api.mapbox.com",
-      "https://*.tiles.mapbox.com"
+      "https://*.tiles.mapbox.com",
+      "https://cdn.jsdelivr.net"
     policy.frame_src :self,
       "https://js.stripe.com",
       "https://www.facebook.com",
