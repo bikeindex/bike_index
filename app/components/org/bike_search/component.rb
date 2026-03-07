@@ -142,16 +142,6 @@ module Org::BikeSearch
       @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
     end
 
-    def settings_button
-      content_tag(:a,
-        href: "#",
-        class: "btn btn-sm btn-outline-primary uncap #{"active" if settings_default_open?}",
-        data: {action: "click->org--bike-search#toggleSettings", org__bike_search_target: "settingsButton"}) do
-        translation(".settings") +
-          helpers.inline_svg_tag("icons/settings_slider.svg", class: "tw:inline", alt: "settings icon")
-      end
-    end
-
     def show_pagination?
       !@skip_search_form && @pagy.pages > 1
     end

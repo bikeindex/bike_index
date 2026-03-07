@@ -71,7 +71,7 @@
   <%= render(bike_search) do %>
     <% @bikes.each do |bike| %>
       <tr>
-        <% cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{@bike_sticker}-2") do %>
+        <% cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{@bike_sticker}") do %>
           <%= render(Org::BikeSearchRow::Component.new(
             bike:,
             organization: current_organization,
