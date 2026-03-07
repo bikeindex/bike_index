@@ -130,20 +130,23 @@
     <% end %>
 
     <% if @only_show_bikes %>
-      <div class="tw:flex tw:justify-end">
-        <%= settings_button %>
-      </div>
+      <div class="tw:flex tw:justify-end"><%= settings_button %></div>
     <% else %>
-      <div class="tw:flex tw:items-baseline tw:justify-between tw:mt-4">
+      <div class="tw:mt-4 tw:flex tw:items-baseline tw:justify-between">
         <p class="tw:mb-0">
           <% bikes_count = helpers.number_display(@pagy.count) %>
+
+          <% suffix = active_search_filter_descriptions.any? ? ":" : "" %>
+
           <% if show_search_query_summary? %>
             <%= translation(".matching_bikes_html",
-              count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count)) %><% if active_search_filter_descriptions.any? %>:<% end %>
+              count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count)) %>
+            <%= suffix %>
           <% else %>
             <%= translation(".registered_bikes_html",
               count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count),
-              org_name: @organization.short_name) %><% if active_search_filter_descriptions.any? %>:<% end %>
+              org_name: @organization.short_name) %>
+            <%= suffix %>
           <% end %>
 
           <% if active_search_filter_descriptions.any? %>
@@ -152,6 +155,7 @@
 
           <em><%= helpers.humanized_time_range(@time_range) %></em>
         </p>
+
         <%= settings_button %>
       </div>
       <% if @model_audit.present? %>
