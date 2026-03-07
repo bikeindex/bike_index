@@ -3772,46 +3772,6 @@ it:
         recovery:
         render_chart:
         show_only_organization_recoveries:
-      search:
-        address:
-        all:
-        avery:
-        bike:
-        color:
-        create_export_of_vehicles:
-        email_hidden:
-        impounded:
-        link:
-        manufacturer:
-        matching_bikes_html:
-        mfg_model_color_html:
-        model:
-        only_impounded_vehicles_html:
-        only_no_address_html:
-        only_no_sticker_html:
-        only_not_impounded_html:
-        only_stolen_html:
-        only_with_address_html:
-        only_with_owner_html:
-        only_with_stickers_html:
-        owner_name:
-        propulsion_type:
-        registered:
-        registered_bikes_html:
-        sent_to:
-        settings:
-        status:
-        status_cell:
-        sticker:
-        stickers:
-        stolen:
-        stolen_vehicles_html:
-        updated:
-        vehicle:
-        vehicle_type:
-        view_all_vehicles:
-        view_just_stolen_vehicles:
-        visible_columns:
     bulk_imports:
       error_type:
         file:
@@ -4904,3 +4864,43 @@ it:
         status_records:
         update_impound_record:
         update_multiple_records:
+      bike_search:
+        address:
+        all: Tutti
+        avery:
+        bike:
+        color: Colore
+        create_export_of_vehicles:
+        filter_impounded_html:
+        filter_no_address_html:
+        filter_no_sticker_html:
+        filter_not_impounded_html:
+        filter_not_stolen_or_impounded_html:
+        filter_stolen_html:
+        filter_with_address_html:
+        filter_with_stickers_html:
+        impounded:
+        link: Collegamento
+        manufacturer: Produttore
+        matching_bikes_html:
+        mfg_model_color_html:
+        model: Modello
+        owner_name:
+        propulsion_type:
+        registered: Registrato
+        registered_bikes_html:
+        sent_to:
+        settings:
+        status:
+        status_cell: Stato
+        sticker:
+        stickers:
+        stolen: Rubata
+        updated:
+        vehicle:
+        vehicle_type:
+        visible_columns:
+      bike_search_row:
+        email_hidden:
+        link: Collegamento
+        mfg_model_color_html:
