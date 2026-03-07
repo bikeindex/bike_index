@@ -5,3 +5,8 @@ en:
       everything_combobox:
         query_items_description: Search descriptions combobox
         search_descriptions: Search descriptions
+        search_for: Search for
+        search_only_for: Search only for
+        that_are: that are
+        made_by: made by
+        only_for: only for
