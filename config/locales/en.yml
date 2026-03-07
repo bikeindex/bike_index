@@ -4532,46 +4532,6 @@ en:
         recovery: recovery
         render_chart: Show chart
         show_only_organization_recoveries: Show only %{org_short_name} bikes
-      search:
-        address: 'Address:'
-        all: All
-        avery: Avery?
-        bike: bike
-        color: Color
-        create_export_of_vehicles: Create export of searched %{cycle_type}
-        email_hidden: email hidden
-        impounded: Impounded
-        link: Link
-        manufacturer: Manufacturer
-        matching_bikes_html: "<strong>%{bikes}</strong> matching"
-        mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
-        model: Model
-        only_impounded_vehicles_html: Only <strong>impounded</strong>
-        only_no_address_html: Only <strong>no</strong> address
-        only_no_sticker_html: Only <strong>no</strong> sticker
-        only_not_impounded_html: Only <strong>not</strong> impounded
-        only_stolen_html: Only stolen
-        only_with_address_html: Only <strong>with</strong> address
-        only_with_owner_html: Not stolen or impounded
-        only_with_stickers_html: Only <strong>with</strong> stickers
-        owner_name: Owner name
-        propulsion_type: Propulsion
-        registered: Registered
-        registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
-        sent_to: Sent to
-        settings: settings
-        status: 'Status:'
-        status_cell: Status
-        sticker: Sticker
-        stickers: 'Stickers:'
-        stolen: Stolen
-        stolen_vehicles_html: "<em>stolen</em> %{cycle_type}"
-        updated: Updated
-        vehicle: vehicle
-        vehicle_type: Vehicle type
-        view_all_vehicles: view all %{cycle_type}
-        view_just_stolen_vehicles: view just stolen %{cycle_type}
-        visible_columns: Visible columns
     bulk_imports:
       error_type:
         file: File
@@ -4992,8 +4952,7 @@ en:
       index:
         loading_results: Loading results...
       results:
-        no_matched: No registrations exactly matched your search
-        no_matched_marketplace: No listings exactly matched your search
+        no_matched: No %{search_obj_name} exactly matched your search
         search_for_containing: Searching for serials containing your search...
         search_for_similar: Searching for similar serials...
       serials_containing:

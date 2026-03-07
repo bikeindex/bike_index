@@ -7,7 +7,15 @@ import 'select2'
 // Connects to data-controller='search--everything-combobox'
 export default class extends Controller {
   static targets = ['input', 'nonjsfields']
-  static values = { apiUrl: String }
+  static values = {
+    apiUrl: String,
+    searchObjName: { type: String, default: 'Registrations' },
+    searchFor: { type: String, default: 'Search for' },
+    searchOnlyFor: { type: String, default: 'Search only for' },
+    thatAre: { type: String, default: 'that are' },
+    madeBy: { type: String, default: 'made by' },
+    onlyFor: { type: String, default: 'only for' }
+  }
 
   connect () {
     // remove the query field that is for users that don't have JS
@@ -26,7 +34,15 @@ export default class extends Controller {
     const searchFormSelector = '#Search_Form'
 
     const processedResults = this.processedResults // Custom data processor
-    const formatSearchText = this.formatSearchText // Custom formatter
+    const translations = {
+      searchObjName: this.searchObjNameValue,
+      searchFor: this.searchForValue,
+      searchOnlyFor: this.searchOnlyForValue,
+      thatAre: this.thatAreValue,
+      madeBy: this.madeByValue,
+      onlyFor: this.onlyForValue
+    }
+    const formatSearchText = (item) => this.formatSearchText(item, translations) // Custom formatter
 
     const $descSearch = $queryField.select2({
       allowClear: true,
@@ -109,25 +125,25 @@ export default class extends Controller {
     })
   }
 
-  formatSearchText (item) {
+  formatSearchText (item, translations) {
     if (item.loading) return item.text
-    if (item.category === 'propulsion') return '<span>Search for <strong>' + item.text + '</strong> only</span>'
-    if (item.category === 'cycle_type') return '<span>Search only for <strong>' + item.text + '</strong></span>'
+    if (item.category === 'propulsion') return '<span>' + translations.searchFor + ' <strong>' + item.text + '</strong> only</span>'
+    if (item.category === 'cycle_type') return '<span>' + translations.searchOnlyFor + ' <strong>' + item.text + '</strong></span>'
 
     const getPrefix = () => {
       if (item.category === 'colors') {
-        const p = "<span class='sch_'>Bikes that are </span>"
+        const p = "<span class='sch_'>" + translations.searchObjName + ' ' + translations.thatAre + ' </span>'
         if (item.display) {
           return p + "<span class='sclr' style='background: " + item.display + ";'></span>"
         } else {
           return p + "<span class='sclr'>stckrs</span>"
         }
       } else if (item.category === 'cycle_type') {
-        return "<span class='sch_'>only for</span>"
+        return "<span class='sch_'>" + translations.onlyFor + '</span>'
       } else if (item.category === 'cmp_mnfg' || item.category === 'frame_mnfg') {
-        return "<span class='sch_'>Bikes made by</span>"
+        return "<span class='sch_'>" + translations.searchObjName + ' ' + translations.madeBy + '</span>'
       } else {
-        return 'Search for'
+        return translations.searchFor
       }
     }
 

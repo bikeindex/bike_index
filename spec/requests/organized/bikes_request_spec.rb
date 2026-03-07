@@ -163,6 +163,35 @@ RSpec.describe Organized::BikesController, type: :request do
       end
     end
 
+    context "with caching" do
+      around do |example|
+        ActionController::Base.perform_caching = true
+        ActionController::Base.cache_store = ActiveSupport::Cache::MemoryStore.new
+        example.run
+      ensure
+        ActionController::Base.perform_caching = false
+        ActionController::Base.cache_store = :null_store
+      end
+
+      it "caches bike rows and busts cache when updated_at changes" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response.body).to include(bike.mnfg_name)
+
+        bike.update_column(:frame_model, "ZZZ-CachedModel")
+
+        # Same updated_at, so cached content should be served
+        get base_url
+        expect(response.body).not_to include("ZZZ-CachedModel")
+
+        # Touch updated_at to bust cache
+        bike.update_column(:updated_at, 1.second.from_now)
+
+        get base_url
+        expect(response.body).to include("ZZZ-CachedModel")
+      end
+    end
+
     context "unpaid organization" do
       let(:current_organization) { FactoryBot.create(:organization) }
 

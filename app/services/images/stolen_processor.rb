@@ -196,20 +196,27 @@ module Images::StolenProcessor
   # The font to use in the caption. Set fallbacks since different environments
   # have different fonts available.
   def font
-    if system("mogrify -list font | grep --silent 'Font: Helvetica-Oblique$'")
-      "Helvetica-Oblique"
-    elsif system("mogrify -list font | grep --silent 'Font: ArialI$'")
-      "ArialI"
-    elsif system("mogrify -list font | grep --silent 'Font: Lato-Italic$'")
-      "Lato-Italic"
-    elsif system("mogrify -list font | grep --silent 'Font: DejaVu-Sans$'")
-      "DejaVu-Sans"
+    if fc_list_has?("Helvetica", "Oblique")
+      "Helvetica Oblique"
+    elsif fc_list_has?("Arial", "Italic")
+      "Arial Italic"
+    elsif fc_list_has?("Lato", "Italic")
+      "Lato Italic"
+    elsif fc_list_has?("DejaVu Sans")
+      "DejaVu Sans"
     end
   end
 
+  def fc_list_output
+    @fc_list_output ||= `fc-list`.to_s
+  end
+
+  def fc_list_has?(*terms)
+    terms.all? { |term| fc_list_output.match?(/#{Regexp.escape(term)}/i) }
+  end
+
   # The stolen location to be displayed on the promoted alert image
-  # Escape single-quotes: location is passed to Imagemagick CLI inside
-  # single-quotes
+  # Escape single-quotes in the location text
   def stolen_record_location(stolen_record)
     return nil unless stolen_record.to_coordinates.any?
 
@@ -227,5 +234,5 @@ module Images::StolenProcessor
 
   conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :generate_alert,
     :template_path, :topbar_path, :bike_image_dimensions_for, :bike_image_offset,
-    :caption_overlay, :font, :stolen_record_location, :to_tempfile
+    :caption_overlay, :font, :fc_list_output, :fc_list_has?, :stolen_record_location, :to_tempfile
 end

@@ -43,7 +43,7 @@ task exchange_rates_update: :environment do
   print is_success ? "done.\n" : "failed.\n"
 end
 
-desc "Notify Honeybadger of a deploy - both Rails and JS"
+desc "Notify Honeybadger of a deploy - Rails, frontend and CSP"
 task trigger_honeybadger_deploy: :environment do
   raise "Missing HONEYBADGER_API_KEY" if ENV["HONEYBADGER_API_KEY"].blank?
 
@@ -54,20 +54,22 @@ task trigger_honeybadger_deploy: :environment do
   Honeybadger.track_deployment(environment:, revision:, local_username:, repository:)
 
   raise "Missing HONEYBADGER_FRONTEND_API_KEY" if ENV["HONEYBADGER_FRONTEND_API_KEY"].blank?
+  raise "Missing HONEYBADGER_CSP_API_KEY" if ENV["HONEYBADGER_CSP_API_KEY"].blank?
+
   require "net/http"
   require "uri"
-
-  uri = URI("https://api.honeybadger.io/v1/deploys")
-  uri.query = URI.encode_www_form(
-    "deploy[environment]" => environment,
-    "deploy[local_username]" => local_username,
-    "deploy[revision]" => revision,
-    "deploy[repository]" => repository,
-    "api_key" => ENV["HONEYBADGER_FRONTEND_API_KEY"]
-  )
-  response = Net::HTTP.get_response(uri)
-  raise "Honeybadger deploy failed: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
-  response
+  [ENV["HONEYBADGER_CSP_API_KEY"], ENV["HONEYBADGER_FRONTEND_API_KEY"]].each do |api_key|
+    uri = URI("https://api.honeybadger.io/v1/deploys")
+    uri.query = URI.encode_www_form(
+      "deploy[environment]" => environment,
+      "deploy[local_username]" => local_username,
+      "deploy[revision]" => revision,
+      "deploy[repository]" => repository,
+      "api_key" => api_key
+    )
+    response = Net::HTTP.get_response(uri)
+    raise "Honeybadger deploy failed: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+  end
 end
 
 task database_size: :environment do

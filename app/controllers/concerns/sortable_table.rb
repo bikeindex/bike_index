@@ -15,12 +15,8 @@ module SortableTable
     %w[asc desc].include?(params[:direction]) ? params[:direction] : default_direction
   end
 
-  # So it can be overridden
-  def default_direction
-    "desc"
-  end
+  # So they can be overridden
+  def default_direction = "desc"
 
-  def default_column
-    sortable_columns.first
-  end
+  def default_column = sortable_columns.first
 end

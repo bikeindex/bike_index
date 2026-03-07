@@ -112,6 +112,11 @@
     %small
       first #{@per_page} shown, #{link_to "see all", organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)}
 
-= render partial: "/organized/bikes/search", locals: {only_show_bikes: true}
+- bike_search = Org::BikeSearch::Component.new(organization: current_organization, pagy: @pagy, per_page: @per_page, params: params, model_audit: @model_audit, skip_search_form: true)
+= render(bike_search) do
+  - @bikes.each do |bike|
+    %tr
+      - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
+        = render(Org::BikeSearchRow::Component.new(bike:, organization: current_organization, additional_registration_fields: bike_search.additional_registration_fields))
 
 = render partial: "/organized/model_audits/submit_model_attestation"

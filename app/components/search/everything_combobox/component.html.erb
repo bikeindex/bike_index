@@ -2,6 +2,14 @@
   class="tw:w-full"
   data-controller="search--everything-combobox"
   data-search--everything-combobox-api-url-value="<%= API_URL %>"
+  <% if @search_obj_name %>
+    data-search--everything-combobox-search-obj-name-value="<%= @search_obj_name %>"
+  <% end %>
+  data-search--everything-combobox-search-for-value="<%= translation(".search_for") %>"
+  data-search--everything-combobox-search-only-for-value="<%= translation(".search_only_for") %>"
+  data-search--everything-combobox-that-are-value="<%= translation(".that_are") %>"
+  data-search--everything-combobox-made-by-value="<%= translation(".made_by") %>"
+  data-search--everything-combobox-only-for-value="<%= translation(".only_for") %>"
 >
   <link
     rel="stylesheet"
