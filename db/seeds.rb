@@ -1,5 +1,4 @@
-system "bin/rake import_manufacturers_csv"
-system "bin/rake import_primary_activities_csv"
+system "bin/rake setup:import_manufacturers_csv setup:import_primary_activities_csv"
 
 # NOTE: this does not seed manufacturers or primary_activities, those are pulled via rake task
 require File.expand_path("db/seeds/seed_wheel_sizes", Rails.root)
