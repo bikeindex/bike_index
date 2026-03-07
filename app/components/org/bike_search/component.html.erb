@@ -12,7 +12,7 @@
     <hr style="opacity: .3;">
   <% end %>
 
-  <div class="clearfix">
+  <div>
     <div
       class="settings-list <%= 'tw:hidden!' unless settings_default_open? %>"
       data-org--bike-search-target="settings"
@@ -119,10 +119,10 @@
 
     <% settings_button = capture do %>
       <a
-        class="float-right btn btn-sm btn-outline-primary uncap"
+        class="btn btn-sm btn-outline-primary uncap <%= 'active' if settings_default_open? %>"
         href="#"
         data-action="click->org--bike-search#toggleSettings"
-        style="margin-top: 0.1em;"
+        data-org--bike-search-target="settingsButton"
       >
         <%= translation(".settings") %>
         <%= helpers.inline_svg_tag "icons/settings_slider.svg", class: "tw:inline", alt: "settings icon" %>
@@ -130,21 +130,25 @@
     <% end %>
 
     <% if @only_show_bikes %>
-      <%= settings_button %>
-    <% else %>
-      <p class="mt-4">
-        <% if show_search_query_summary? %>
-          <%= translation(".matching_bikes_html",
-            bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type)) %>
-        <% else %>
-          <%= translation(".registered_bikes_html",
-            bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type),
-            org_name: @organization.short_name) %>
-        <% end %>
-
-        <em><%= helpers.humanized_time_range(@time_range) %></em>
+      <div class="tw:flex tw:justify-end">
         <%= settings_button %>
-      </p>
+      </div>
+    <% else %>
+      <div class="tw:flex tw:items-baseline tw:justify-between tw:mt-4">
+        <p class="tw:mb-0">
+          <% if show_search_query_summary? %>
+            <%= translation(".matching_bikes_html",
+              bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type)) %>
+          <% else %>
+            <%= translation(".registered_bikes_html",
+              bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type),
+              org_name: @organization.short_name) %>
+          <% end %>
+
+          <em><%= helpers.humanized_time_range(@time_range) %></em>
+        </p>
+        <%= settings_button %>
+      </div>
       <% if @model_audit.present? %>
         <p class="mt-0">
           E-Vehicles for audit:

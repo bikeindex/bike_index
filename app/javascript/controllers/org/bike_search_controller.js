@@ -4,13 +4,14 @@ import { collapse } from 'utils/collapse_utils'
 /* global localStorage */
 
 export default class extends Controller {
-  static targets = ['settings', 'perPage']
+  static targets = ['settings', 'settingsButton', 'perPage']
   static values = { defaultColumns: Array }
 
   connect () {
     this.selectStoredVisibleColumns()
     if (localStorage.getItem('orgBikeSettingsOpen') === 'true') {
       collapse('show', this.settingsTarget, 0)
+      if (this.hasSettingsButtonTarget) this.settingsButtonTarget.classList.add('active')
     }
   }
 
@@ -19,6 +20,7 @@ export default class extends Controller {
       this.settingsTarget.classList.contains('tw:hidden')
     collapse('toggle', this.settingsTarget)
     localStorage.setItem('orgBikeSettingsOpen', wasHidden ? 'true' : 'false')
+    if (this.hasSettingsButtonTarget) this.settingsButtonTarget.classList.toggle('active', wasHidden)
   }
 
   columnToggled () {
