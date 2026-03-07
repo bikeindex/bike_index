@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePreferences } from '../contexts/PreferencesContext';
 import {
@@ -94,6 +94,16 @@ export function useActivities(): UseActivitiesResult {
       setIsLoading(false);
     }
   }, [isAuthenticated, athlete, loadActivities]);
+
+  // Retry once if initial load returned empty (handles IndexedDB timing issues)
+  const initialLoadRetried = useRef(false);
+  useEffect(() => {
+    if (!initialLoadRetried.current && !isLoading && activities.length === 0 && isAuthenticated && athlete) {
+      initialLoadRetried.current = true;
+      const timer = setTimeout(() => loadActivities(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, activities.length, isAuthenticated, athlete, loadActivities]);
 
   // Get unique activity types from the data (using sport_type for more specific types)
   const activityTypes = useMemo(() => {
