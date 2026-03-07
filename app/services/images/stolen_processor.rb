@@ -207,11 +207,12 @@ module Images::StolenProcessor
     end
   end
 
+  def fc_list_output
+    @fc_list_output ||= `fc-list`.to_s
+  end
+
   def fc_list_has?(*terms)
-    cmd = "fc-list"
-    terms[0..-2].each { |term| cmd += " | grep -i '#{term}'" }
-    cmd += " | grep -qi '#{terms.last}'"
-    system(cmd)
+    terms.all? { |term| fc_list_output.match?(/#{Regexp.escape(term)}/i) }
   end
 
   # The stolen location to be displayed on the promoted alert image
@@ -233,5 +234,5 @@ module Images::StolenProcessor
 
   conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :generate_alert,
     :template_path, :topbar_path, :bike_image_dimensions_for, :bike_image_offset,
-    :caption_overlay, :font, :fc_list_has?, :stolen_record_location, :to_tempfile
+    :caption_overlay, :font, :fc_list_output, :fc_list_has?, :stolen_record_location, :to_tempfile
 end
