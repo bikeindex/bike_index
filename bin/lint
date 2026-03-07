@@ -5,6 +5,7 @@
 #
 cli_args = ARGV
 lint_test = ENV["LINT_TEST"] == "true" || cli_args.include?('--no-fix')
+file_args = cli_args.reject { |arg| arg.start_with?("-") }
 
 require "fileutils"
 include FileUtils
@@ -22,7 +23,20 @@ chdir APP_ROOT do
 
     system!("bundle exec standardrb --no-fix")
     system!("bundle exec rubocop -c .rubocop_custom.yml")
-    system!("npm run lint_check")
+    return system!("npm run lint_check")
+  end
+
+  if file_args.any?
+    file_args.each do |file|
+      if file.end_with?(".rb")
+        system!("bundle exec standardrb --fix #{file}")
+        system!("bundle exec rubocop -c .rubocop_custom.yml -A #{file}")
+      elsif file.end_with?(".js", ".ts", ".jsx", ".tsx")
+        system!("npx eslint --fix #{file}")
+      else
+        puts "Unknown file type: #{file}"
+      end
+    end
   else
     system!("bundle exec standardrb --fix")
     system!("bundle exec rubocop -c .rubocop_custom.yml -A")
