@@ -10,7 +10,7 @@ ca_state = State.find_by_abbreviation("CA")
 creator = BikeServices::Creator.new
 
 def bike_params(owner_email:, manufacturer_id: nil)
-  manufacturer_id ||= Manufacturer.frame_makers.pluck(:id)
+  manufacturer_id ||= Manufacturer.frame_makers.pluck(:id).sample
   {
     cycle_type: "bike",
     propulsion_type: "foot-pedal",
@@ -18,8 +18,6 @@ def bike_params(owner_email:, manufacturer_id: nil)
     manufacturer_id:,
     primary_frame_color_id: Color.pluck(:id).sample,
     rear_tire_narrow: "true",
-    rear_wheel_size_id: wheel_size_id,
-    front_wheel_size_id: wheel_size_id,
     handlebar_type: HandlebarType.slugs.first,
     owner_email:
   }

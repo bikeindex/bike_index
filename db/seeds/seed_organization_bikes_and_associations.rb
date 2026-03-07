@@ -42,7 +42,7 @@ owner_emails = %w[
 creator = BikeServices::Creator.new
 
 def org_bike_params(owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id, manufacturer_id: nil)
-  manufacturer_id ||= Manufacturer.frame_makers.pluck(:id)
+  manufacturer_id ||= Manufacturer.frame_makers.pluck(:id).sample
   {
     cycle_type: "bike",
     propulsion_type: "foot-pedal",
@@ -50,8 +50,6 @@ def org_bike_params(owner_email:, creation_organization_id: Organization.find_by
     manufacturer_id:,
     primary_frame_color_id: Color.pluck(:id).sample,
     rear_tire_narrow: "true",
-    rear_wheel_size_id: WheelSize.pluck(:id).sample,
-    front_wheel_size_id: WheelSize.pluck(:id).sample,
     handlebar_type: HandlebarType.slugs.first,
     owner_email:,
     creation_organization_id: creation_organization_id.to_s
