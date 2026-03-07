@@ -111,5 +111,5 @@ module FileCacheMaintainer
     RedisPool.conn { |r| r.hdel(info_id, file_info_hash["path"]) }
   end
 
-  conceal :normalized, :info_id, :blocklist_id, :base_id, :redis, :uploader_from_filename
+  conceal :normalized, :info_id, :blocklist_id, :base_id, :uploader_from_filename
 end
