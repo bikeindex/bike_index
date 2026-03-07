@@ -4,6 +4,7 @@ unless String::trim then String::trim = -> @replace /^\s+|\s+$/g, ""
 # All the classes inherit from this
 class window.BikeIndex
   loadFancySelects: ->
+    return unless $.fn.selectize
     $(".unfancy.fancy-select.no-restore-on-backspace select").selectize
       create: false
       selectOnTab: true
