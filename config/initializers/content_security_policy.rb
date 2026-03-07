@@ -36,6 +36,8 @@ Rails.application.configure do
       "https://www.googletagmanager.com",
       "https://www.youtube.com",
       "https://platform.twitter.com"
-    policy.report_uri -> { "https://api.honeybadger.io/v1/browser/csp?api_key=#{ENV["HONEYBADGER_FRONTEND_API_KEY"]}&report_only=true&env=#{Rails.env}&context[user_id]=#{current_user&.id if respond_to?(:current_user)}" }
+    policy.report_uri -> do
+      "https://api.honeybadger.io/v1/browser/csp?api_key=#{ENV["HONEYBADGER_FRONTEND_API_KEY"]}&report_only=true&env=#{Rails.env}&context[user_id]=#{current_user&.id if respond_to?(:current_user)}"
+    end
   end
 end
