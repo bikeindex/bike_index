@@ -103,6 +103,38 @@ RSpec.describe BikeSearchable do
         end
       end
     end
+    context "with XSS in query param" do
+      context "script tag" do
+        let(:query_params) { {query: '<script>alert("xss")</script>stolen bike'} }
+        it "strips script tags" do
+          expect(interpreted_params[:query]).to eq 'alert("xss")stolen bike'
+        end
+      end
+
+      context "img onerror" do
+        let(:query_params) { {query: '<img src=x onerror="document.location=\'http://evil.com\'">'} }
+        it "strips img tag" do
+          expect(interpreted_params[:query]).to eq ""
+        end
+      end
+
+      context "event handler in anchor tag" do
+        let(:query_params) { {query: '<a href="javascript:alert(1)">click</a> red bike'} }
+        it "strips anchor tag" do
+          expect(interpreted_params[:query]).to eq "click red bike"
+        end
+      end
+    end
+
+    context "with XSS in query_items" do
+      let(:query_params) { {query_items: ['<svg onload="fetch(\'http://evil.com\')">bike</svg> red', "mountain"]} }
+      it "strips svg tag" do
+        expect(interpreted_params[:query]).not_to include("<svg")
+        expect(interpreted_params[:query]).not_to include("onload")
+        expect(interpreted_params[:query]).to eq " red mountain"
+      end
+    end
+
     context "no query in query_items" do
       let(:query_params) { {query_items: [""], stolenness: "stolen"} }
       let(:target) { {stolenness: "stolen"} }
