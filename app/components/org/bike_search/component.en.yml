@@ -6,7 +6,7 @@ en:
         address: 'Address:'
         all: All
         avery: Avery?
-        bike: bike
+        bike: registration
         color: Color
         create_export_of_vehicles: Create export of searched %{cycle_type}
         impounded: Impounded
@@ -35,6 +35,6 @@ en:
         stickers: 'Stickers:'
         stolen: Stolen
         updated: Updated
-        vehicle: vehicle
+        vehicle: registration
         vehicle_type: Vehicle type
         visible_columns: Visible columns
