@@ -1,0 +1,141 @@
+<td class="hiddenColumn url_cell">
+  <code class="small p0" style="word-break: normal"><%= @bike.html_url %></code>
+</td>
+
+<td class="hiddenColumn created_at_cell">
+  <a
+    class="convertTime"
+    href="<%= bike_path(@bike, organization_id: @organization.to_param) %>"
+  >
+    <%= l @bike.created_at, format: :convert_time %>
+  </a>
+</td>
+
+<td class="hiddenColumn updated_at_cell hidden-xs-down">
+  <small class="convertTime">
+    <%= l @bike.updated_by_user_fallback, format: :convert_time %>
+  </small>
+</td>
+
+<td class="hiddenColumn hidden-xs-down table-cell-check stolen_cell">
+  <%= check_mark if @bike.status_stolen? %>
+</td>
+
+<td class="hiddenColumn hidden-xs-down propulsion_type_cell">
+  <span class="<%= 'less-strong' if @bike.propulsion_type == 'foot-pedal' %>">
+    <%= @bike.propulsion_titleize %>
+  </span>
+</td>
+
+<td class="hiddenColumn hidden-xs-down cycle_type_cell">
+  <span class="<%= 'less-strong' if @bike.cycle_type == 'bike' %>">
+    <%= @bike.type_titleize %>
+  </span>
+</td>
+
+<td class="hiddenColumn hidden-xs-down manufacturer_cell">
+  <%= @bike.mnfg_name %>
+</td>
+
+<td class="hiddenColumn hidden-xs-down model_cell"><%= @bike.frame_model %></td>
+
+<td class="hiddenColumn hidden-xs-down color_cell">
+  <span class="less-strong"><%= @bike.frame_colors.join(", ") %></span>
+</td>
+
+<td class="hiddenColumn owner_email_cell">
+  <small class="hidden-sm-up">
+    <%= helpers.organized_bike_text(@bike) %>
+    <br>
+  </small>
+
+  <% if @bike.email_visible_for?(@organization) %>
+    <%= @bike.owner_email %>
+    <small>
+      <%= link_to "\u{1F50E}", organization_bikes_path(organization_id: @organization.to_param, search_email: @bike.owner_email), class: "display-sortable-link" %>
+    </small>
+  <% else %>
+    <em class="less-strong"><%= translation(".email_hidden") %></em>
+  <% end %>
+</td>
+
+<td class="hiddenColumn creation_description_cell">
+  <% if @bike.creation_description %>
+    <small class="less-strong">
+      <%= helpers.origin_display(@bike.creation_description) %>
+    </small>
+  <% end %>
+</td>
+
+<td class="hiddenColumn owner_name_cell hidden-xs-down">
+  <% if @bike.owner_name.present? %>
+    <em><%= @bike.owner_name %></em>
+  <% end %>
+</td>
+
+<td class="hiddenColumn status_cell small">
+  <%= helpers.status_display(@bike.status_humanized_no_with_owner) %>
+</td>
+
+<% @additional_registration_fields.each do |reg_field| %>
+  <% next if reg_field == "extra_registration_number" %>
+
+  <td class="hiddenColumn hidden-xs-down <%= "#{reg_field}_cell" %>">
+    <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
+
+    <% if bike_attr == "address" %>
+      <% if @bike.valid_mailing_address? %>
+        <small>
+          <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(@bike), visible_attribute: :street) %>
+        </small>
+      <% end %>
+    <% elsif bike_attr == "organization_affiliation" %>
+      <%= @bike.organization_affiliation(@organization)&.humanize %>
+    <% elsif bike_attr == "student_id" %>
+      <%= @bike.student_id(@organization)&.humanize %>
+    <% else %>
+      <%= @bike.send(bike_attr) %>
+    <% end %>
+  </td>
+<% end %>
+
+<%# All organizations can see additional serial# %>
+<td class="hiddenColumn hidden-xs-down extra_registration_number_cell">
+  <%= @bike.extra_registration_number %>
+</td>
+
+<% if @organization.enabled?("bike_stickers") %>
+  <td class="hidden-xs-down sticker_cell">
+    <% if @bike_sticker.present? %>
+      <small>
+        <%= link_to translation(".link"),
+          bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: @bike.id),
+          method: "PUT" %>
+      </small>
+    <% else %>
+      <% @bike.bike_stickers.each_with_index do |bike_sticker, index| %>
+        <% if bike_sticker.organization.present? && bike_sticker.organization_id == @organization.id %>
+          <%= link_to bike_sticker.pretty_code,
+            edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param),
+            class: "small" %>
+        <% else %>
+          <small><%= bike_sticker.pretty_code %></small>
+        <% end %>
+
+        <% if index > 0 %>
+          <br>
+        <% end %>
+      <% end %>
+    <% end %>
+  </td>
+<% end %>
+
+<% if @organization.enabled?("impound_bikes") %>
+  <td class="hiddenColumn hidden-xs-down impounded_cell">
+    <% if @bike.status_impounded? && @bike.current_impound_record&.created_at&.present? %>
+      <small class="convertTime">
+        <%= l @bike.current_impound_record.created_at, format: :convert_time %>
+      </small>
+    <% end %>
+  </td>
+<% end %>

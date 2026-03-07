@@ -63,7 +63,7 @@ module GraphingHelper
   end
 
   def humanized_time_range(time_range)
-    return nil if @period == "all"
+    return nil if @period.blank? || @period == "all"
 
     unless @period == "custom"
       period_display = @period.match?("next_") ? @period.tr("_", " ") : "past #{@period}"

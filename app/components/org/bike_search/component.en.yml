@@ -1,0 +1,40 @@
+---
+en:
+  components:
+    org:
+      bike_search:
+        address: 'Address:'
+        all: All
+        avery: Avery?
+        bike: registration
+        color: Color
+        create_export_of_vehicles: Create export of searched %{cycle_type}
+        filter_impounded_html: only <strong>impounded</strong>
+        filter_no_address_html: only <strong>no</strong> address
+        filter_no_sticker_html: only <strong>no</strong> sticker
+        filter_not_impounded_html: only <strong>not</strong> impounded
+        filter_not_stolen_or_impounded_html: not stolen or impounded
+        filter_stolen_html: only stolen
+        filter_with_address_html: only <strong>with</strong> address
+        filter_with_stickers_html: only <strong>with</strong> stickers
+        impounded: Impounded
+        link: Link
+        manufacturer: Manufacturer
+        matching_bikes_html: "%{count} %{cycle_type} matching"
+        mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
+        model: Model
+        owner_name: Owner name
+        propulsion_type: Propulsion
+        registered: Registered
+        registered_bikes_html: "%{count} %{cycle_type} matching for %{org_name}"
+        sent_to: Sent to
+        settings: settings
+        status: 'Status:'
+        status_cell: Status
+        sticker: Sticker
+        stickers: 'Stickers:'
+        stolen: Stolen
+        updated: Updated
+        vehicle: registration
+        vehicle_type: Vehicle type
+        visible_columns: Visible columns
