@@ -4020,7 +4020,8 @@ CREATE TABLE public.user_registration_organizations (
     registration_info jsonb,
     deleted_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    notes text
 );
 
 
@@ -7438,6 +7439,7 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260305025122'),
 ('20260304181710'),
+('20260302170256'),
 ('20260220053202'),
 ('20260219190342'),
 ('20260218010402'),

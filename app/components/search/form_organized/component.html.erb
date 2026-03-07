@@ -31,6 +31,16 @@
             placeholder: translation(".search_for_serial_number"),
             class: "twinput tw:flex-1 fieldResetsCounts" %>
         <% end %>
+
+        <% if render_notes_field? %>
+          <%= label_tag :search_notes,
+            translation(".search_notes"),
+            class: "twlabel tw:sr-only" %>
+          <%= text_field_tag :search_notes,
+            @interpreted_params[:search_notes],
+            placeholder: translation(".search_notes"),
+            class: "twinput tw:flex-1 fieldResetsCounts" %>
+        <% end %>
       </div>
     </div>
 

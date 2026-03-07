@@ -91,6 +91,20 @@ module Organized
     def multi_serial_search
     end
 
+    def update
+      bike = Bike.unscoped.find(params[:id])
+      user_registration_organization = bike.user&.user_registration_organizations
+        &.where(organization_id: current_organization.id)&.first
+
+      unless user_registration_organization.present? && current_organization.enabled?("reg_notes")
+        redirect_to(bike_path(bike)) && return
+      end
+
+      user_registration_organization.update(notes: params[:notes])
+
+      redirect_to bike_path(bike)
+    end
+
     def create
       @b_param = find_or_new_b_param
       iframe_redirect_params = {organization_id: current_organization.to_param}
@@ -195,6 +209,7 @@ module Organized
       if org.present?
         bikes = org.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_and_name_search(params[:search_email]) if params[:search_email].present?
+        bikes = bikes.organized_notes_search(params[:search_notes], org) if params[:search_notes].present?
       else
         bikes = Bike.search(@interpreted_params)
       end
@@ -277,7 +292,7 @@ module Organized
     def no_org_search_params?
       return false if params[:search_stickers].present? && params[:search_stickers] != "all"
 
-      params.slice(:search_address, :search_email, :search_model_audit_id, :search_status)
+      params.slice(:search_address, :search_email, :search_model_audit_id, :search_notes, :search_status)
         .values.reject(&:blank?).none?
     end
 
