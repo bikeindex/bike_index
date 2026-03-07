@@ -1,7 +1,9 @@
-class BadWordCleaner
+module BadWordCleaner
+  extend self
+
   BAD_WORDS = %w[ass bastard bitch chink cock cum cunt damn fuck nigger shit spic]
 
-  def self.clean(str)
+  def clean(str)
     return nil unless str.present?
 
     duped_str = str.dup

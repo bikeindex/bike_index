@@ -1,5 +1,7 @@
-class BikeServices::Geojsoner
-  def self.feature(bike, extended_properties = false)
+module BikeServices::Geojsoner
+  extend self
+
+  def feature(bike, extended_properties = false)
     return nil unless bike.status_stolen?
 
     date_stolen = bike.occurred_at || Time.current
@@ -22,7 +24,7 @@ class BikeServices::Geojsoner
     }
   end
 
-  def self.feature_from_plucked(id, occurred_at, latitude, longitude)
+  def feature_from_plucked(id, occurred_at, latitude, longitude)
     {
       type: "Feature",
       properties: {id: id, at: occurred_at.to_date.to_s},

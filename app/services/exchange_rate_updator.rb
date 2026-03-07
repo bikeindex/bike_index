@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-class ExchangeRateUpdator
-  def self.update
+module ExchangeRateUpdator
+  extend self
+
+  def update
     payload = Integrations::ExchangeRateAPIClient.new.latest
     rates = payload.fetch(:rates)
     base_iso = payload.fetch(:base)
