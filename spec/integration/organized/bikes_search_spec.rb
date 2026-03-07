@@ -29,9 +29,8 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 1)
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
-  end
 
-  it "submits when enter is pressed twice" do
+    # submits when enter is pressed twice
     visit bikes_path
     expect(page).to have_css("table.table", wait: 10)
 
