@@ -10,7 +10,7 @@ Rails.application.configure do
     policy.font_src :self, "https://fonts.gstatic.com", :data
     policy.img_src :self, "https://files.bikeindex.org", "https://uploads.bikeindex.org", "https://bikebook.s3.amazonaws.com", "https://www.facebook.com", "https://www.googletagmanager.com", "https://pbs.twimg.com", "https://syndication.twitter.com", "https://maps.googleapis.com", "https://maps.gstatic.com", :data
     policy.object_src :none
-    policy.script_src :self, :unsafe_inline,
+    policy.script_src :self, :unsafe_inline, :unsafe_eval,
       "https://www.googletagmanager.com",
       "https://www.google-analytics.com",
       "https://www.googleadservices.com",
@@ -40,7 +40,9 @@ Rails.application.configure do
       "https://js.stripe.com",
       "https://www.facebook.com",
       "https://web.facebook.com",
+      "https://m.facebook.com",
       "https://www.google.com",
+      "https://www.recaptcha.net",
       "https://googleads.g.doubleclick.net",
       "https://www.googletagmanager.com",
       "https://www.youtube.com",
