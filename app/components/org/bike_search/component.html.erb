@@ -181,7 +181,7 @@
     >
       <thead class="small-header sortable">
         <tr>
-          <th class="hiddenColumn url_cell">URL</th>
+          <th class="hiddenColumn url_cell"><%= translation(".url") %></th>
 
           <th class="hiddenColumn created_at_cell">
             <%= sortable("id", translation(".registered")) %>
@@ -224,7 +224,7 @@
             <%= sortable("owner_email", translation(".sent_to")) %>
           </th>
 
-          <th class="hiddenColumn creation_description_cell">Source</th>
+          <th class="hiddenColumn creation_description_cell"><%= translation(".source") %></th>
 
           <th class="hiddenColumn owner_name_cell hidden-xs-down">
             <small><%= translation(".owner_name") %></small>
@@ -244,7 +244,7 @@
 
           <%# All organizations can see additional serial# %>
           <th class="hiddenColumn hidden-xs-down extra_registration_number_cell">
-            Secondary#
+            <%= translation(".secondary_number") %>
           </th>
 
           <% if @organization.enabled?("bike_stickers") %>

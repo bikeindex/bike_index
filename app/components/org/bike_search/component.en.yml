@@ -32,7 +32,7 @@ en:
         reg_address: Address
         registered: Registered
         registered_bikes_html: "%{count} %{cycle_type} matching for %{org_name}"
-        secondary_number: "Secondary#"
+        secondary_number: Secondary#
         sent_to: Sent to
         settings: settings
         source: Source
