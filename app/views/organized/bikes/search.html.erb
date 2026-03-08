@@ -1,4 +1,8 @@
-<%= render "organized/bikes/header" %>
+<%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
+
+<%= render partial: "/shared/period_select" %>
+
+<div class="mb-4"></div>
 
 <% bike_search = Org::BikeSearch::Component.new(
   organization: current_organization,

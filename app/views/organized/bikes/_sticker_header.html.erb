@@ -1,0 +1,49 @@
+<% if @bike_sticker.claimed? %>
+  <h2>
+    <a
+      href="<%= edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_sticker.code) %>"
+    >
+      <%= @bike_sticker.kind %>
+      <%= @bike_sticker.pretty_code %>
+    </a>
+
+    <%= t("organized.bikes.index.is_currently_linked") %>
+  </h2>
+  <p>
+    <% bike_link = link_to(@bike_sticker.bike&.title_string, bike_path(@bike_sticker.bike_id)) %>
+    <%= t("organized.bikes.index.connected_to_bike_html", bike_link:) %>
+  </p>
+<% else %>
+  <h2>
+    <a
+      href="<%= edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_sticker.code) %>"
+    >
+      <%= @bike_sticker.kind %>
+      <strong><%= @bike_sticker.pretty_code %></strong>
+    </a>
+
+    <%= t("organized.bikes.index.isnt_linked_to_a_bike") %>
+  </h2>
+<% end %>
+
+<p>
+  <%= t("organized.bikes.index.enter_url_of_the_bike_html", bike_sticker_kind: @bike_sticker.kind) %>
+</p>
+
+<%= form_tag bike_sticker_path(id: @bike_sticker.code, organization_id: current_organization.to_param), method: "PUT", class: "row" do %>
+  <div class="col-sm-8 col-lg-10">
+    <div class="form-group">
+      <%= text_field_tag :bike_id, "", placeholder: "https://bikeindex.org/bikes/1234", class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="col-sm-4 col-lg-2">
+    <%= submit_tag t("organized.bikes.index.update"), class: "btn btn-success" %>
+  </div>
+<% end %>
+
+<p class="less-strong">
+  <%= t("organized.bikes.index.search_org_bikes_html", org_name: current_organization.short_name, bike_sticker_kind: @bike_sticker.kind) %>
+</p>
+
+<hr class="mt-4 mb-4 less-strong">
