@@ -6082,6 +6082,15 @@ nb:
         vehicle: registrering
         vehicle_type: Bil type
         visible_columns: Synlige kolonner
+        affiliation: Tilknytning
+        avery_exportable: Avery eksporterbar
+        e_vehicle_propulsion: Elbil (fremdrift)
+        phone: Telefon
+        reg_address: Adresse
+        secondary_number: Sekundærnr.
+        source: Kilde
+        student_id: Student ID
+        url: URL-adresse
       bike_search_row:
         email_hidden: e-post skjult
         link: Link

@@ -4818,6 +4818,15 @@ es:
         vehicle:
         vehicle_type:
         visible_columns:
+        affiliation:
+        avery_exportable:
+        e_vehicle_propulsion:
+        phone:
+        reg_address:
+        secondary_number:
+        source:
+        student_id:
+        url:
       bike_search_row:
         email_hidden:
         link:

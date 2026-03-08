@@ -6242,6 +6242,15 @@ nl:
         vehicle: Registratie
         vehicle_type: 'Voertuigtype:'
         visible_columns: Zichtbare kolommen
+        affiliation: Aansluiting
+        avery_exportable: Avery Exporteerbaar
+        e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
+        phone: Telefoon
+        reg_address: Adres
+        secondary_number: Secundair#
+        source: Bron
+        student_id: Student-ID
+        url: URL
       bike_search_row:
         email_hidden: email verborgen
         link: Link
