@@ -36,12 +36,14 @@ export default class extends Controller {
     } else {
       url.searchParams.delete('search_avery_export')
     }
+    url.searchParams.set('search_no_js', 'true')
     window.location = url.toString()
   }
 
   perPageChanged () {
     const url = new URL(window.location)
     url.searchParams.set('per_page', this.perPageTarget.value)
+    url.searchParams.set('search_no_js', 'true')
     window.location = url.toString()
   }
 
