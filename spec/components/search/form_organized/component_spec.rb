@@ -66,6 +66,18 @@ RSpec.describe Search::FormOrganized::Component, type: :component do
     end
   end
 
+  context "with target_frame" do
+    let(:options) { {target_search_path:, interpreted_params:, target_frame: :organized_bikes_results_frame} }
+
+    it "renders turbo form with search--form controller" do
+      expect(component).to have_css("[data-controller='search--form']")
+      expect(component).to have_css("form#Search_Form[data-turbo='true']")
+      expect(component).to have_css("form#Search_Form[data-turbo-frame='organized_bikes_results_frame']")
+      expect(component).to have_css("form#Search_Form[data-turbo-action='advance']")
+      expect(component).to have_css("input[name='search_no_js']", visible: :hidden)
+    end
+  end
+
   context "with location search" do
     let(:component) do
       render_inline(instance) do

@@ -4,41 +4,24 @@
 
 <div class="mb-4"></div>
 
-<% bike_search = Org::BikeSearch::Component.new(
-  organization: current_organization,
-  pagy: @pagy,
-  interpreted_params: @interpreted_params,
-  sortable_search_params:,
-  per_page: @per_page,
-  params:,
-  search_stickers: @search_stickers,
-  search_address: @search_address,
-  search_status: @search_status,
-  search_query_present: @search_query_present,
-  time_range: @time_range,
-  stolenness: @stolenness,
-  bike_sticker: @bike_sticker,
-  model_audit: @model_audit,
-  include_avery: true
-) %>
+<div class="mb-4">
+  <%= render(Search::FormOrganized::Component.new(
+    target_search_path: organization_bikes_path(organization_id: current_organization.to_param),
+    target_frame: :organized_bikes_results_frame,
+    interpreted_params: @interpreted_params
+  )) %>
+</div>
 
-<%= render(bike_search) do %>
-  <% @bikes.each do |bike| %>
-    <tr>
-      <% cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{@bike_sticker}") do %>
-        <%= render(Org::BikeSearchRow::Component.new(
-          bike:,
-          organization: current_organization,
-          bike_sticker: @bike_sticker,
-          additional_registration_fields: bike_search.additional_registration_fields
-        )) %>
-      <% end %>
+<hr style="opacity: .3;">
 
-      <% if bike_search.show_avery_export? %>
-        <td class="hiddenColumn hidden-xs-down avery_cell">
-          <%= check_mark if bike.avery_exportable? %>
-        </td>
-      <% end %>
-    </tr>
+<%= turbo_frame_tag :organized_bikes_results_frame do %>
+  <% if @render_results %>
+    <%= render partial: "results" %>
+  <% else %>
+    <span id="loadedWithoutResults" class="tw:hidden"></span>
   <% end %>
 <% end %>
+
+<div id="hiddenLoadingSpinner" class="tw:hidden">
+  <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
+</div>

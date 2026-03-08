@@ -97,7 +97,7 @@ RSpec.describe Org::BikeSearchRow::Component, type: :component do
 
       it "renders impound date" do
         expect(bike.reload.status_impounded?).to be_truthy
-        expect(html).to include("convertTime")
+        expect(html).to include("localizeTime")
         expect(html).to include("impounded_cell")
       end
     end
