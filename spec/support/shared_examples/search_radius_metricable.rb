@@ -15,7 +15,7 @@ RSpec.shared_examples "search_radius_metricable" do
 
   describe "search_radius_metric_units?" do
     context "us organization" do
-      let(:organization) { FactoryBot.create(:organization, :in_nyc) }
+      let(:organization) { FactoryBot.create(:organization, :in_nyc_legacy) }
       it "is false, but you can still set kilometers" do
         expect(instance.search_radius_metric_units?).to be_falsey
         instance.update(search_radius_kilometers: 10)
@@ -25,7 +25,7 @@ RSpec.shared_examples "search_radius_metricable" do
       end
     end
     context "not US organization" do
-      let(:organization) { FactoryBot.create(:organization, :in_edmonton) }
+      let(:organization) { FactoryBot.create(:organization, :in_edmonton_legacy) }
       it "is truthy" do
         expect(location.address_record.country).to eq Country.canada
         expect(location.address_record.region_string).to be_present
