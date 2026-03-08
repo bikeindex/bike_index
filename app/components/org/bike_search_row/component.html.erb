@@ -4,7 +4,7 @@
 
 <td class="hiddenColumn created_at_cell">
   <a
-    class="convertTime"
+    class="localizeTime"
     href="<%= bike_path(@bike, organization_id: @organization.to_param) %>"
   >
     <%= l @bike.created_at, format: :convert_time %>
@@ -12,7 +12,7 @@
 </td>
 
 <td class="hiddenColumn updated_at_cell hidden-xs-down">
-  <small class="convertTime">
+  <small class="localizeTime">
     <%= l @bike.updated_by_user_fallback, format: :convert_time %>
   </small>
 </td>
@@ -133,7 +133,7 @@
 <% if @organization.enabled?("impound_bikes") %>
   <td class="hiddenColumn hidden-xs-down impounded_cell">
     <% if @bike.status_impounded? && @bike.current_impound_record&.created_at&.present? %>
-      <small class="convertTime">
+      <small class="localizeTime">
         <%= l @bike.current_impound_record.created_at, format: :convert_time %>
       </small>
     <% end %>
