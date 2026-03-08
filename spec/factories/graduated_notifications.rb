@@ -2,7 +2,8 @@ FactoryBot.define do
   factory :graduated_notification do
     transient do
       graduated_notification_interval { organization&.graduated_notification_interval.presence || 1.year.to_i }
-      bike_created_at { Time.current - 26.hours - graduated_notification_interval }
+      # Use 25.hours instead of 1.day to survive DST spring-forward (where 1.day is only 23 hours)
+      bike_created_at { Time.current - 25.hours - graduated_notification_interval }
     end
 
     created_at { bike.created_at + graduated_notification_interval } # use the actual bike created_at, in case bike was passed in
@@ -33,7 +34,7 @@ FactoryBot.define do
 
     factory :graduated_notification_bike_graduated do
       transient do
-        bike_created_at { Time.current - 26.hours - graduated_notification_interval }
+        bike_created_at { Time.current - 25.hours - graduated_notification_interval }
       end
       after(:create) do |graduated_notification, _evaluator|
         graduated_notification.process_notification
