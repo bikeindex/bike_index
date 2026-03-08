@@ -49,7 +49,6 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
 
-
     visit bikes_path
     expect(page).to have_css("table.table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 10)
