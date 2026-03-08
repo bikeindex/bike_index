@@ -4272,7 +4272,7 @@ nl:
         re_send: opnieuw versturen
         motorized: e-voertuig?
         vehicle_type: Type
-      index:
+      sticker_header:
         connected_to_bike_html: Het is hiermee verbonden %{bike_link}.
         enter_url_of_the_bike_html: 'U kunt de URL invoeren van de fiets waaraan u
           deze wilt koppelen %{bike_sticker_kind} aan:'

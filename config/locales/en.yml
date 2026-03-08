@@ -4501,7 +4501,7 @@ en:
         sent: Sent
         through_org: through %{org_name}
         vehicle_type: Type
-      index:
+      sticker_header:
         connected_to_bike_html: It is connected to this %{bike_link}.
         enter_url_of_the_bike_html: >-
           You can enter the URL of the bike you would like to link this %{bike_sticker_kind}

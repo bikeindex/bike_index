@@ -3745,7 +3745,7 @@ it:
         sent:
         through_org:
         vehicle_type:
-      index:
+      sticker_header:
         connected_to_bike_html:
         enter_url_of_the_bike_html:
         is_currently_linked:
