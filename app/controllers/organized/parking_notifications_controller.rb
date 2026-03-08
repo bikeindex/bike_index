@@ -106,7 +106,7 @@ module Organized
       end
       if bike_search_params_present?
         bikes = notifications.bikes.search(@interpreted_params)
-        bikes = bikes.organized_email_and_name_search(params[:search_email]) if params[:search_email].present?
+        bikes = BikeServices::OrgSearch.email_and_name(bikes, params[:search_email]) if params[:search_email].present?
         notifications = notifications.where(bike_id: bikes.pluck(:id))
       end
       if @search_bounding_box.present?

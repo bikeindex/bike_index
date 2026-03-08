@@ -144,40 +144,6 @@ RSpec.describe Bike, type: :model do
       end
     end
 
-    describe "organized_email_and_name_search" do
-      let!(:bike1) { FactoryBot.create(:bike, owner_email: "something@stuff.edu") }
-      let(:user) { FactoryBot.create(:user_confirmed, name: "George Jones", email: "something2@stuff.edu") }
-      let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, owner_email: user.email, user: user) }
-      let!(:bike3) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: {user_name: "Sally Jones"}, owner_email: "something@stuff.com") }
-      it "finds the things" do
-        expect(bike2.reload.owner_name).to eq "George Jones"
-        expect(bike3.reload.owner_name).to eq "Sally Jones"
-        expect(Bike.organized_email_and_name_search("something").pluck(:id)).to match_array([bike1.id, bike2.id, bike3.id])
-        expect(Bike.organized_email_and_name_search(" stuff ").pluck(:id)).to match_array([bike1.id, bike2.id, bike3.id])
-        expect(Bike.organized_email_and_name_search("\nstuff.EDU  ").pluck(:id)).to match_array([bike1.id, bike2.id])
-        expect(Bike.organized_email_and_name_search("jones").pluck(:id)).to match_array([bike2.id, bike3.id])
-        expect(Bike.organized_email_and_name_search("  sally").pluck(:id)).to match_array([bike3.id])
-        expect(Bike.claimed.pluck(:id)).to eq([bike2.id])
-      end
-    end
-
-    describe "organized_notes_search" do
-      let(:organization) { FactoryBot.create(:organization) }
-      let(:user1) { FactoryBot.create(:user_confirmed) }
-      let(:user2) { FactoryBot.create(:user_confirmed) }
-      let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user1, creation_organization: organization) }
-      let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user2, creation_organization: organization) }
-      let!(:user_registration_organization1) { FactoryBot.create(:user_registration_organization, user: user1, organization:, notes: "has a red lock") }
-      let!(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, user: user2, organization:, notes: "parked on campus") }
-      it "searches notes" do
-        expect(Bike.organized_notes_search("red lock", organization).pluck(:id)).to eq([bike1.id])
-        expect(Bike.organized_notes_search("campus", organization).pluck(:id)).to eq([bike2.id])
-        expect(Bike.organized_notes_search("parked", organization).pluck(:id)).to eq([bike2.id])
-        expect(Bike.organized_notes_search("nonexistent", organization).pluck(:id)).to eq([])
-        expect(Bike.organized_notes_search("", organization).pluck(:id)).to match_array([bike1.id, bike2.id])
-      end
-    end
-
     describe ".possibly_found_with_match" do
       let(:bike1) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }
       let(:bike1b) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }
