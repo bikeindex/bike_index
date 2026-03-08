@@ -4900,6 +4900,15 @@ it:
         vehicle:
         vehicle_type:
         visible_columns:
+        affiliation:
+        avery_exportable:
+        e_vehicle_propulsion:
+        phone: Telefono
+        reg_address: Indirizzo
+        secondary_number:
+        source:
+        student_id:
+        url:
       bike_search_row:
         email_hidden:
         link: Collegamento
