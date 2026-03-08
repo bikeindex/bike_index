@@ -612,6 +612,16 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(user_registration_organization.reload.notes).to eq "test notes"
         end
       end
+
+      context "bike not in organization" do
+        let(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user) }
+        it "redirects without updating notes" do
+          user_registration_organization.reload
+          patch "#{base_url}/#{other_bike.id}", params: {notes: "test notes"}
+          expect(response).to redirect_to(bike_path(other_bike))
+          expect(user_registration_organization.reload.notes).to be_nil
+        end
+      end
     end
   end
 

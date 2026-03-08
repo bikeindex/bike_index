@@ -93,6 +93,10 @@ module Organized
 
     def update
       bike = Bike.unscoped.find(params[:id])
+      unless bike.bike_organizations.exists?(organization_id: current_organization.id)
+        redirect_to(bike_path(bike)) && return
+      end
+
       user_registration_organization = bike.user&.user_registration_organizations
         &.where(organization_id: current_organization.id)&.first
 
