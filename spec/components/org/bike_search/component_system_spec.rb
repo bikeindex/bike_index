@@ -56,6 +56,9 @@ RSpec.describe Org::BikeSearch::Component, :js, type: :system do
     click_button "settings"
     check "url_cell"
 
+    # Wait for the JS change handler to update the column visibility before reading localStorage
+    expect(page).to have_css("th.url_cell", visible: true, wait: 5)
+
     stored = page.evaluate_script("localStorage.getItem('orgBikeColumns')")
     columns = JSON.parse(stored)
     expect(columns).to include("url_cell")
