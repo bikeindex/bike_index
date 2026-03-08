@@ -16,6 +16,7 @@ module Organized
         search_organization_bikes
 
         create_export_and_redirect if create_export?
+        render :search unless performed?
       else
         @per_page = permitted_per_page(default: 50)
         @available_bikes = if current_organization.enabled?("claimed_ownerships")
