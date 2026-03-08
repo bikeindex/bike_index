@@ -41,6 +41,34 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 1)
   end
 
+  it "paginates results via turbo" do
+    # Create enough bikes to trigger pagination (default per_page is 10)
+    FactoryBot.create_list(:bike_organized, 10, creation_organization: organization)
+
+    visit bikes_path
+    expect(page).to have_css("table.table", wait: 10)
+    expect(page).to have_css("tbody tr", minimum: 10)
+
+    # Pagination should be visible with multiple pages
+    expect(page).to have_css(".paginate-container a", minimum: 1)
+
+    # Click page 2 — turbo frame updates without full reload
+    click_link "2"
+    expect(page).to have_current_path(/page=2/, wait: 10)
+    expect(page).to have_css("table.table", wait: 10)
+    expect(page).to have_css("tbody tr", minimum: 1)
+  end
+
+  it "loads results via turbo frame on initial visit" do
+    visit bikes_path
+    # Results load via turbo auto-submit (search--form controller)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table.table", wait: 10)
+    expect(page).to have_css("tbody tr", minimum: 2)
+
+    # search_no_js should NOT be in the URL (removed by JS controller)
+    expect(page).not_to have_current_path(/search_no_js/)
+  end
+
   context "with avery_export enabled" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[bike_search avery_export]) }
     let!(:avery_bike) do
