@@ -633,11 +633,11 @@ RSpec.describe Organized::BikesController, type: :request do
     let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: bike_user, organization: current_organization, notes: "important note") }
 
     it "filters by notes" do
-      get base_url, params: {search_notes: "important"}
+      get base_url, params: {search_no_js: true, search_notes: "important"}
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
 
-      get base_url, params: {search_notes: "nonexistent"}
+      get base_url, params: {search_no_js: true, search_notes: "nonexistent"}
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([])
     end
