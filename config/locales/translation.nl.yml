@@ -4272,15 +4272,6 @@ nl:
         re_send: opnieuw versturen
         motorized: e-voertuig?
         vehicle_type: Type
-      index:
-        connected_to_bike_html: Het is hiermee verbonden %{bike_link}.
-        enter_url_of_the_bike_html: 'U kunt de URL invoeren van de fiets waaraan u
-          deze wilt koppelen %{bike_sticker_kind} aan:'
-        is_currently_linked: is momenteel gekoppeld.
-        isnt_linked_to_a_bike: is niet gekoppeld aan een fiets.
-        search_org_bikes_html: Of zoek de fietsen van %{org_name}, bekijk de fiets
-          en klik <em>erop</em> om <em>hem</em> te verbinden met deze %{bike_sticker_kind}
-        update: Bijwerken
       list:
         added: Toegevoegd
         bike: Fiets
@@ -4301,6 +4292,15 @@ nl:
         recovered_at: Datum hersteld
         show_only_organization_recoveries: Toon alleen %{org_short_name} fietsen
         render_chart: Toon grafiek
+      index:
+        connected_to_bike_html: Het is hiermee verbonden %{bike_link}.
+        enter_url_of_the_bike_html: 'U kunt de URL invoeren van de fiets waaraan u
+          deze wilt koppelen %{bike_sticker_kind} aan:'
+        is_currently_linked: is momenteel gekoppeld.
+        isnt_linked_to_a_bike: is niet gekoppeld aan een fiets.
+        search_org_bikes_html: Of zoek de fietsen van %{org_name}, bekijk de fiets
+          en klik <em>erop</em> om <em>hem</em> te verbinden met deze %{bike_sticker_kind}
+        update: Bijwerken
     bulk_imports:
       index:
         added: Toegevoegd

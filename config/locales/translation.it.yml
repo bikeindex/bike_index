@@ -3745,13 +3745,6 @@ it:
         sent:
         through_org:
         vehicle_type:
-      index:
-        connected_to_bike_html:
-        enter_url_of_the_bike_html:
-        is_currently_linked:
-        isnt_linked_to_a_bike:
-        search_org_bikes_html:
-        update:
       list:
         added:
         bike:
@@ -3772,6 +3765,13 @@ it:
         recovery:
         render_chart:
         show_only_organization_recoveries:
+      index:
+        connected_to_bike_html:
+        enter_url_of_the_bike_html:
+        is_currently_linked:
+        isnt_linked_to_a_bike: non è collegato a una bicicletta.
+        search_org_bikes_html:
+        update: Aggiorna
     bulk_imports:
       error_type:
         file:

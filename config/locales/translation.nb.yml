@@ -4776,15 +4776,6 @@ nb:
         through_org: gjennom %{org_name}
         motorized: e-kjøretøy?
         vehicle_type: Type
-      index:
-        connected_to_bike_html: Den er koblet til denne %{bike_link}.
-        enter_url_of_the_bike_html: 'Du kan skrive inn URL-en til sykkelen du vil
-          knytte denne %{bike_sticker_kind} til:'
-        is_currently_linked: er for øyeblikket koblet.
-        isnt_linked_to_a_bike: er ikke knyttet til en sykkel.
-        search_org_bikes_html: Eller søk på %{org_name} sine sykler, se på sykkelen
-          og klikk på <em>linken</em> for å koble den til denne %{bike_sticker_kind}
-        update: Oppdater
       list:
         added: La til
         bike: sykkel
@@ -4805,6 +4796,15 @@ nb:
         recovery: gjenoppretting
         render_chart: Vis diagram
         show_only_organization_recoveries: Vis kun %{org_short_name} sykler
+      index:
+        connected_to_bike_html: Den er koblet til denne %{bike_link}.
+        enter_url_of_the_bike_html: 'Du kan skrive inn URL-en til sykkelen du vil
+          knytte denne %{bike_sticker_kind} til:'
+        is_currently_linked: er for øyeblikket koblet.
+        isnt_linked_to_a_bike: er ikke knyttet til en sykkel.
+        search_org_bikes_html: Eller søk på %{org_name} sine sykler, se på sykkelen
+          og klikk på <em>linken</em> for å koble den til denne %{bike_sticker_kind}
+        update: Oppdater
     bulk_imports:
       error_type:
         file: Fil
