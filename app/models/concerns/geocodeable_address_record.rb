@@ -8,12 +8,6 @@ module GeocodeableAddressRecord
     belongs_to :region_record, class_name: "State"
     belongs_to :country
 
-    # Aliases for backward compatibility with shared code/factories that use Geocodeable-style names
-    alias_attribute :state_id, :region_record_id
-    alias_attribute :zipcode, :postal_code
-    alias_method :state, :region_record
-    alias_method :state=, :region_record=
-
     geocoded_by :address
     before_validation :clean_region_and_street_data
     after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process

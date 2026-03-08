@@ -255,7 +255,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
       context "manual address and repeat" do
         let(:state) { FactoryBot.create(:state_california) }
-        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state, kind: "parked_incorrectly_notification") }
+        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, region_record: state, kind: "parked_incorrectly_notification") }
         let(:parking_notification_params) do
           {
             kind: "impound_notification",
