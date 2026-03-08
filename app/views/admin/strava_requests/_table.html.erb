@@ -70,6 +70,7 @@
           <td>
             <span class="tw:inline-flex tw:items-center tw:gap-1 tw:whitespace-nowrap">
               <small><%= strava_request.request_type&.humanize %></small>
+
               <% if strava_request.proxy_request? %>
                 <%= render UI::Badge::Component.new(
                   text: "p",
@@ -86,6 +87,7 @@
             else
               strava_request.response_status.humanize
             end %>
+
             <%= render UI::Badge::Component.new(
               text: status_text,
               title: strava_request.response_status.humanize,
