@@ -583,14 +583,14 @@ RSpec.describe Organized::BikesController, type: :request do
   describe "update" do
     let(:bike_user) { FactoryBot.create(:user_confirmed) }
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user, creation_organization: current_organization) }
-    let(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: bike_user, organization: current_organization) }
+    let(:bike_organization) { bike.bike_organizations.find_by(organization_id: current_organization.id) }
 
     context "without reg_notes feature" do
       it "redirects" do
-        user_registration_organization.reload
+        bike_organization.reload
         patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
         expect(response).to redirect_to(bike_path(bike))
-        expect(user_registration_organization.reload.notes).to be_nil
+        expect(bike_organization.reload.notes).to be_nil
       end
     end
 
@@ -598,29 +598,29 @@ RSpec.describe Organized::BikesController, type: :request do
       let(:enabled_feature_slugs) { %w[bike_search reg_notes] }
 
       it "updates notes" do
-        user_registration_organization.reload
+        bike_organization.reload
         patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
         expect(response).to redirect_to(bike_path(bike))
-        expect(user_registration_organization.reload.notes).to eq "test notes"
+        expect(bike_organization.reload.notes).to eq "test notes"
       end
 
       context "turbo_stream request" do
         it "updates notes" do
-          user_registration_organization.reload
+          bike_organization.reload
           patch "#{base_url}/#{bike.id}", params: {notes: "test notes"},
             headers: {"Accept" => "text/vnd.turbo-stream.html"}
           expect(response).to redirect_to(bike_path(bike))
-          expect(user_registration_organization.reload.notes).to eq "test notes"
+          expect(bike_organization.reload.notes).to eq "test notes"
         end
       end
 
       context "bike not in organization" do
         let(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user) }
         it "redirects without updating notes" do
-          user_registration_organization.reload
+          bike_organization.reload
           patch "#{base_url}/#{other_bike.id}", params: {notes: "test notes"}
           expect(response).to redirect_to(bike_path(other_bike))
-          expect(user_registration_organization.reload.notes).to be_nil
+          expect(bike_organization.reload.notes).to be_nil
         end
       end
     end
@@ -628,9 +628,11 @@ RSpec.describe Organized::BikesController, type: :request do
 
   describe "index with search_notes" do
     let(:enabled_feature_slugs) { %w[bike_search reg_notes] }
-    let(:bike_user) { FactoryBot.create(:user_confirmed) }
-    let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user, creation_organization: current_organization) }
-    let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: bike_user, organization: current_organization, notes: "important note") }
+    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+
+    before do
+      bike.bike_organizations.find_by(organization_id: current_organization.id).update!(notes: "important note")
+    end
 
     it "filters by notes" do
       get base_url, params: {search_no_js: true, search_notes: "important"}

@@ -76,9 +76,8 @@ module PageBlock::OrgBikeAccessPanel
       organization_registered? && @organization.enabled?("reg_notes")
     end
 
-    def user_registration_organization
-      @user_registration_organization ||= @bike.user&.user_registration_organizations
-        &.where(organization_id: @organization.id)&.first
+    def bike_organization
+      @bike_organization ||= @bike.bike_organizations.find_by(organization_id: @organization.id)
     end
 
     def notes_update_url

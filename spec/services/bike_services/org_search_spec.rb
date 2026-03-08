@@ -22,12 +22,14 @@ RSpec.describe BikeServices::OrgSearch, type: :service do
 
   describe ".notes" do
     let(:organization) { FactoryBot.create(:organization) }
-    let(:user1) { FactoryBot.create(:user_confirmed) }
-    let(:user2) { FactoryBot.create(:user_confirmed) }
-    let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user1, creation_organization: organization) }
-    let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user2, creation_organization: organization) }
-    let!(:user_registration_organization1) { FactoryBot.create(:user_registration_organization, user: user1, organization:, notes: "has a red lock") }
-    let!(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, user: user2, organization:, notes: "parked on campus") }
+    let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+
+    before do
+      bike1.bike_organizations.find_by(organization_id: organization.id).update!(notes: "has a red lock")
+      bike2.bike_organizations.find_by(organization_id: organization.id).update!(notes: "parked on campus")
+    end
+
     it "searches notes" do
       expect(described_class.notes(Bike.all, "red lock", organization).pluck(:id)).to eq([bike1.id])
       expect(described_class.notes(Bike.all, "campus", organization).pluck(:id)).to eq([bike2.id])

@@ -7,7 +7,6 @@
 #  all_bikes            :boolean          default(FALSE)
 #  can_not_edit_claimed :boolean          default(FALSE)
 #  deleted_at           :datetime
-#  notes                :text
 #  registration_info    :jsonb
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null

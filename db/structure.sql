@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -384,7 +385,8 @@ CREATE TABLE public.bike_organizations (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone,
-    can_not_edit_claimed boolean DEFAULT false NOT NULL
+    can_not_edit_claimed boolean DEFAULT false NOT NULL,
+    notes text
 );
 
 
@@ -4020,8 +4022,7 @@ CREATE TABLE public.user_registration_organizations (
     registration_info jsonb,
     deleted_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    notes text
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -7437,9 +7438,9 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260308055322'),
 ('20260305025122'),
 ('20260304181710'),
-('20260302170256'),
 ('20260220053202'),
 ('20260219190342'),
 ('20260218010402'),
