@@ -10,6 +10,7 @@ RSpec.describe Organized::BikesController, type: :request do
     # NOTE: Additional index tests in controller spec because of session
     let(:query_params) do
       {
+        search_no_js: true,
         query: "1",
         manufacturer: "2",
         colors: %w[3 4],
@@ -35,7 +36,7 @@ RSpec.describe Organized::BikesController, type: :request do
       }.to_not change(Export, :count)
       # Search without_street to verify that scope works
 
-      get base_url, params: {search_address: "without_street"}
+      get base_url, params: {search_no_js: true, search_address: "without_street"}
       expect(response.status).to eq(200)
       expect(assigns(:search_query_present)).to be_falsey
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
@@ -63,7 +64,7 @@ RSpec.describe Organized::BikesController, type: :request do
       let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: current_organization, manufacturer: bike.manufacturer) }
       it "creates export" do
         expect {
-          get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
+          get base_url, params: {search_no_js: true, manufacturer: bike.manufacturer.id, create_export: true}
         }.to change(Export, :count).by 0
         expect(flash).to be_blank
         redirected_to = response.redirect_url
@@ -72,14 +73,14 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(custom_bike_ids).to match_array([bike.id, bike2.id].map(&:to_s))
 
         expect {
-          get base_url, params: {stolenness: "impounded", create_export: true}
+          get base_url, params: {search_no_js: true, stolenness: "impounded", create_export: true}
         }.to change(Export, :count).by 0
         expect(flash[:error]).to match(/no match/)
         expect(response).to redirect_to(new_organization_export_url(organization_id: current_organization.id, only_custom_bike_ids: true, custom_bike_ids: ""))
 
         reset! # Clear stale flash from session cookie
         expect {
-          get base_url, params: {search_stickers: "none", create_export: true}
+          get base_url, params: {search_no_js: true, search_stickers: "none", create_export: true}
         }.to change(Export, :count).by 0
         expect(flash).to be_blank
         redirected_to = response.redirect_url
@@ -99,13 +100,13 @@ RSpec.describe Organized::BikesController, type: :request do
         end
         it "redirects to export new" do
           expect {
-            get base_url, params: params_blank.merge(search_stickers: "all")
+            get base_url, params: params_blank.merge(search_no_js: true, search_stickers: "all")
           }.to change(Export, :count).by 0
           expect(flash[:error]).to match(/no bikes selected/i)
           expect(response).to redirect_to new_organization_export_url(organization_id: current_organization.id)
 
           expect {
-            get base_url, params: params_blank.merge(period: "year")
+            get base_url, params: params_blank.merge(search_no_js: true, period: "year")
           }.to change(Export, :count).by 0
           expect(flash[:error]).to match(/no bikes selected/i)
 
@@ -124,7 +125,7 @@ RSpec.describe Organized::BikesController, type: :request do
         it "directly creates" do
           Sidekiq::Job.clear_all
           expect {
-            get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true, directly_create_export: 1}
+            get base_url, params: {search_no_js: true, manufacturer: bike.manufacturer.id, create_export: true, directly_create_export: 1}
           }.to change(Export, :count).by 1
           expect(flash[:info]).to be_present
           export = Export.last
@@ -145,7 +146,7 @@ RSpec.describe Organized::BikesController, type: :request do
       it "searches for bikes with stickers" do
         expect(bike_with_sticker.reload.bike_sticker?).to be_truthy
         expect(current_organization.reload.paid?).to be_truthy
-        get base_url, params: {search_stickers: "none"}
+        get base_url, params: {search_no_js: true, search_stickers: "none"}
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:search_stickers)).to eq "none"
@@ -153,7 +154,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(session[:passive_organization_id]).to eq current_organization.id
 
         # And searching without params returns expected result
-        get base_url
+        get base_url, params: {search_no_js: true}
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id])
         expect(assigns(:search_query_present)).to be_falsey
@@ -174,20 +175,20 @@ RSpec.describe Organized::BikesController, type: :request do
       end
 
       it "caches bike rows and busts cache when updated_at changes" do
-        get base_url
+        get base_url, params: {search_no_js: true}
         expect(response.status).to eq(200)
         expect(response.body).to include(bike.mnfg_name)
 
         bike.update_column(:frame_model, "ZZZ-CachedModel")
 
         # Same updated_at, so cached content should be served
-        get base_url
+        get base_url, params: {search_no_js: true}
         expect(response.body).not_to include("ZZZ-CachedModel")
 
         # Touch updated_at to bust cache
         bike.update_column(:updated_at, 1.second.from_now)
 
-        get base_url
+        get base_url, params: {search_no_js: true}
         expect(response.body).to include("ZZZ-CachedModel")
       end
     end

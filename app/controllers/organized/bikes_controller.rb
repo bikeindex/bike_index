@@ -12,19 +12,34 @@ module Organized
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
 
       if current_organization.enabled?("bike_search")
+        @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @per_page = permitted_per_page(default: 10)
-        search_organization_bikes
 
-        create_export_and_redirect if create_export?
-      else
-        @per_page = permitted_per_page(default: 50)
-        @available_bikes = if current_organization.enabled?("claimed_ownerships")
-          claimed_ownerships_search
+        if @render_results
+          search_organization_bikes
+          if create_export?
+            create_export_and_redirect
+          else
+            respond_to do |format|
+              format.html { render :search }
+              format.turbo_stream
+            end
+          end
         else
-          organization_bikes.where(created_at: @time_range)
+          @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+          @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+          render :search
         end
-        @pagy, @bikes = pagy(:countish, @available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
+        return
       end
+
+      @per_page = permitted_per_page(default: 50)
+      @available_bikes = if current_organization.enabled?("claimed_ownerships")
+        claimed_ownerships_search
+      else
+        organization_bikes.where(created_at: @time_range)
+      end
+      @pagy, @bikes = pagy(:countish, @available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
     end
 
     def recoveries
@@ -194,7 +209,7 @@ module Organized
       org = current_organization || passive_organization
       if org.present?
         bikes = org.bikes.search(@interpreted_params)
-        bikes = bikes.organized_email_and_name_search(params[:search_email]) if params[:search_email].present?
+        bikes = BikeServices::OrgSearch.email_and_name(bikes, params[:search_email])
       else
         bikes = Bike.search(@interpreted_params)
       end
