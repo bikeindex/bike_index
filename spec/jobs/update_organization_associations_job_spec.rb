@@ -20,8 +20,8 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
   end
 
   context "regional organization" do
-    let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
-    let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, updated_at: Time.current - 1.hour) }
+    let!(:regional_child) { FactoryBot.create(:organization, :in_nyc_legacy) }
+    let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc_legacy, updated_at: Time.current - 1.hour) }
     it "updates the regional parent too" do
       regional_child.update_column :updated_at, Time.current - 1.hour
       regional_parent.update_column :updated_at, Time.current - 1.hour
@@ -42,7 +42,7 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
   end
 
   context "organization without location set" do
-    let!(:organization) { FactoryBot.create(:organization, :in_nyc) }
+    let!(:organization) { FactoryBot.create(:organization, :in_nyc_legacy) }
     it "updates the regional parent too" do
       expect(organization.locations.count).to eq 1
       organization.update_columns(updated_at: Time.current - 1.hour, location_longitude: nil, location_latitude: nil)
@@ -122,7 +122,7 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
   end
 
   describe "organization_stolen_message" do
-    let(:organization) { FactoryBot.create(:organization, :in_nyc) }
+    let(:organization) { FactoryBot.create(:organization, :in_nyc_legacy) }
     # Have to do this whole dance because factories inline sidekiq processing of this job
     let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: ["organization_stolen_message"]) }
     let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization, subscription_start_at: Time.current - 6.months) }

@@ -508,7 +508,7 @@ RSpec.describe StolenRecord, type: :model do
   describe "#address" do
     context "given include_all" do
       it "returns all available location components" do
-        stolen_record = FactoryBot.create(:stolen_record, :in_nyc)
+        stolen_record = FactoryBot.create(:stolen_record, :in_nyc_legacy)
         expect(stolen_record.address).to eq("New York, NY 10007, US")
         expect(stolen_record.address(country: [:skip_default])).to eq("New York, NY 10007")
         stolen_record.street = ""
@@ -597,7 +597,7 @@ RSpec.describe StolenRecord, type: :model do
   describe "promoted alert recovery notification" do
     context "if marked as recovered while a promoted alert is active" do
       it "sends an admin notification" do
-        stolen_record = FactoryBot.create(:stolen_record, :in_chicago)
+        stolen_record = FactoryBot.create(:stolen_record, :in_chicago_legacy)
         theft_alert = FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
         stolen_record.reload
         expect(stolen_record.theft_alert_missing_photo?).to be_truthy

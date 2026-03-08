@@ -5,7 +5,7 @@ RSpec.describe SocialAccount, type: :model do
 
   describe "geocoding" do
     it "geocodes default location correctly without hitting API" do
-      social_account = FactoryBot.build(:social_account, :in_nyc)
+      social_account = FactoryBot.build(:social_account, :in_nyc_legacy)
       social_account.bike_index_geocode
       expect(social_account.latitude).to eq(40.7143528)
       expect(social_account.longitude).to eq(-74.0059731)
@@ -17,7 +17,7 @@ RSpec.describe SocialAccount, type: :model do
     it "should geocode and then reverse geocode on save" do
       social_account = FactoryBot.build(
         :social_account,
-        :in_chicago,
+        :in_chicago_legacy,
         skip_geocoding: false,
         state: nil
       )
@@ -95,7 +95,7 @@ RSpec.describe SocialAccount, type: :model do
   describe :default_account_for_country do
     it "finds national account" do
       _default_national = FactoryBot.create(:social_account_1, :active, :national, :default)
-      national = FactoryBot.create(:social_account_2, :active, :national, :in_vancouver)
+      national = FactoryBot.create(:social_account_2, :active, :national, :in_vancouver_legacy)
 
       australia = FactoryBot.create(:country_australia)
       national.update_attribute(:country, australia)
@@ -105,7 +105,7 @@ RSpec.describe SocialAccount, type: :model do
 
     it "finds default account if no national exists for the country" do
       default = FactoryBot.create(:social_account_1, :national, :active, :default)
-      national = FactoryBot.create(:social_account_2, :national, :active, :in_vancouver)
+      national = FactoryBot.create(:social_account_2, :national, :active, :in_vancouver_legacy)
 
       australia = FactoryBot.create(:country_australia)
       national.update_attribute(:country, australia)
