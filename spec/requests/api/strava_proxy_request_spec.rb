@@ -124,6 +124,16 @@ RSpec.describe "Strava Proxy API", type: :request do
             response_status: "binx_response", parameters: {"url" => "athlete/activities?page=1"})
           expect(strava_request.requested_at).to be_within(1).of Time.current
         end
+
+        context "page beyond available activities" do
+          it "returns empty array" do
+            expect {
+              post base_url, params: {url: "athlete/activities?page=999", method: "GET", access_token: doorkeeper_token.token}
+            }.to change(StravaRequest, :count).by(1)
+            expect(response.status).to eq 200
+            expect(json_result).to eq []
+          end
+        end
       end
 
       context "get_athlete request" do
