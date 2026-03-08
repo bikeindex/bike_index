@@ -177,7 +177,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([bike1.id, bike2.id])
         expect(GraduatedNotification.count).to eq 0
         graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
-        graduated_notification2.update(created_at: Time.current - 1.day)
+        graduated_notification2.update(created_at: Time.current - 25.hours)
         expect(GraduatedNotification.count).to eq 1
         expect(graduated_notification2.primary_notification?).to be_falsey
         expect(graduated_notification2.user_id).to eq user.id
@@ -188,7 +188,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.processable?).to be_falsey
         expect(graduated_notification2.in_pending_period?).to be_falsey
         graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-        graduated_notification1.update(created_at: Time.current - 1.day)
+        graduated_notification1.update(created_at: Time.current - 25.hours)
         expect(GraduatedNotification.count).to eq 2
         graduated_notification1.reload
         expect(graduated_notification1.primary_notification?).to be_truthy
@@ -282,7 +282,7 @@ RSpec.describe GraduatedNotification, type: :model do
         Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-        graduated_notification1.update(created_at: Time.current - 25.hours)
+        graduated_notification1.update(created_at: Time.current - 25.hours) # Use 25.hours instead of 1.day to survive DST
         expect(graduated_notification1.in_pending_period?).to be_falsey
         expect(graduated_notification1.processable?).to be_falsey
         expect(graduated_notification1.process_notification).to be_falsey
@@ -338,7 +338,7 @@ RSpec.describe GraduatedNotification, type: :model do
     it "it is still primary notification" do
       expect(bike1.user&.id).to eq user.id
       graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-      graduated_notification1.update(created_at: Time.current - 1.day)
+      graduated_notification1.update(created_at: Time.current - 25.hours) # Use 25.hours instead of 1.day to survive DST
       expect(graduated_notification1.primary_notification?).to be_truthy
       expect(graduated_notification1.processable?).to be_truthy
       graduated_notification1.process_notification
