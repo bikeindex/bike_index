@@ -72,9 +72,9 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
           user: user, bike: bike, organization: organization,
           kind: "impound_notification", initial_record: initial,
           latitude: 37.7749, longitude: -122.4194,
-          street: "1 Market St", city: "San Francisco", zipcode: "94105",
+          street: "1 Market St", city: "San Francisco", postal_code: "94105",
           use_entered_address: "1",
-          state_id: State.find_or_create_by(name: "California", abbreviation: "CA", country: Country.united_states).id,
+          region_record_id: State.find_or_create_by(name: "California", abbreviation: "CA", country: Country.united_states).id,
           country_id: Country.united_states.id)
       end
       it "creates impound_record with impounded_from_address_record from parking notification location" do

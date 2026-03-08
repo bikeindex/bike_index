@@ -362,8 +362,8 @@ RSpec.describe BikeServices::Creator do
             use_entered_address: "1",
             street: "278 Broadway",
             city: "New York",
-            zipcode: "10007",
-            state_id: state.id.to_s,
+            postal_code: "10007",
+            region_record_id: state.id.to_s,
             country_id: Country.united_states.id
           }
         end
