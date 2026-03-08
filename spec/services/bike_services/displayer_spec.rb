@@ -145,9 +145,9 @@ RSpec.describe BikeServices::Displayer do
       expect(BikeServices::Displayer.display_sticker_edit?(bike, FactoryBot.create(:superuser))).to be_truthy
     end
     context "organization is a bike_sticker child" do
-      let!(:organization_regional_child) { FactoryBot.create(:organization, :in_nyc) }
+      let!(:organization_regional_child) { FactoryBot.create(:organization, :in_nyc_legacy) }
       let(:enabled_feature_slugs) { %w[regional_bike_counts bike_stickers] }
-      let!(:organization_regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
+      let!(:organization_regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc_legacy, enabled_feature_slugs: enabled_feature_slugs) }
       let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization_regional_child, can_edit_claimed: false) }
       let(:owner) { bike.owner }
       let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner) }

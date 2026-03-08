@@ -14,17 +14,21 @@ module Organized
       if current_organization.enabled?("bike_search")
         @per_page = permitted_per_page(default: 10)
         search_organization_bikes
-
-        create_export_and_redirect if create_export?
-      else
-        @per_page = permitted_per_page(default: 50)
-        @available_bikes = if current_organization.enabled?("claimed_ownerships")
-          claimed_ownerships_search
+        if create_export?
+          create_export_and_redirect
         else
-          organization_bikes.where(created_at: @time_range)
+          render :search
         end
-        @pagy, @bikes = pagy(:countish, @available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
+        return
       end
+
+      @per_page = permitted_per_page(default: 50)
+      @available_bikes = if current_organization.enabled?("claimed_ownerships")
+        claimed_ownerships_search
+      else
+        organization_bikes.where(created_at: @time_range)
+      end
+      @pagy, @bikes = pagy(:countish, @available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
     end
 
     def recoveries
@@ -212,7 +216,7 @@ module Organized
       org = current_organization || passive_organization
       if org.present?
         bikes = org.bikes.search(@interpreted_params)
-        bikes = BikeServices::OrgSearch.email_and_name(bikes, params[:search_email]) if params[:search_email].present?
+        bikes = BikeServices::OrgSearch.email_and_name(bikes, params[:search_email])
         bikes = BikeServices::OrgSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present?
       else
         bikes = Bike.search(@interpreted_params)

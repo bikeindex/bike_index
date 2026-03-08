@@ -179,7 +179,7 @@ RSpec.describe BikeServices::Builder do
       end
 
       context "with organization with reg_address" do
-        let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago_legacy, enabled_feature_slugs: ["reg_address"]) }
         let(:org_address) { organization.default_address_record }
         let(:target_attributes) do
           {id: nil, kind: "ownership", city: "Chicago", region_record_id: org_address.region_record_id,
@@ -245,7 +245,7 @@ RSpec.describe BikeServices::Builder do
     context "with enabled features" do
       let(:labels) { {reg_phone: "You have to put this in, jerk"}.as_json }
       let(:feature_slugs) { %w[reg_address reg_phone] }
-      let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago_legacy, enabled_feature_slugs: ["reg_address"]) }
       let(:user) { FactoryBot.create(:user_confirmed) }
       let(:user_with_registration_organization) { FactoryBot.create(:user_registration_organization, organization:).user }
       let(:user_with_address) { FactoryBot.create(:user_confirmed, :with_address_record, address_in: :edmonton, address_set_manually: false) }

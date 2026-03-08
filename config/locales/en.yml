@@ -4501,17 +4501,6 @@ en:
         sent: Sent
         through_org: through %{org_name}
         vehicle_type: Type
-      index:
-        connected_to_bike_html: It is connected to this %{bike_link}.
-        enter_url_of_the_bike_html: >-
-          You can enter the URL of the bike you would like to link this %{bike_sticker_kind}
-          to:
-        is_currently_linked: is currently linked.
-        isnt_linked_to_a_bike: isn't linked to a bike.
-        search_org_bikes_html: >-
-          Or, search %{org_name}'s bikes, view the bike and click <em>link it</em>
-          to connect it to this %{bike_sticker_kind}
-        update: Update
       list:
         added: Added
         bike: bike
@@ -4532,6 +4521,17 @@ en:
         recovery: recovery
         render_chart: Show chart
         show_only_organization_recoveries: Show only %{org_short_name} bikes
+      sticker_header:
+        connected_to_bike_html: It is connected to this %{bike_link}.
+        enter_url_of_the_bike_html: >-
+          You can enter the URL of the bike you would like to link this %{bike_sticker_kind}
+          to:
+        is_currently_linked: is currently linked.
+        isnt_linked_to_a_bike: isn't linked to a bike.
+        search_org_bikes_html: >-
+          Or, search %{org_name}'s bikes, view the bike and click <em>link it</em>
+          to connect it to this %{bike_sticker_kind}
+        update: Update
     bulk_imports:
       error_type:
         file: File

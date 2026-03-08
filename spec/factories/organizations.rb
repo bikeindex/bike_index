@@ -8,25 +8,25 @@ FactoryBot.define do
     api_access_approved { false }
     sequence(:website) { |n| "http://organization#{n}.com" }
 
-    trait :in_nyc do
+    trait :in_nyc_legacy do
       after(:create) do |org|
         FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: org)
       end
     end
 
-    trait :in_chicago do
+    trait :in_chicago_legacy do
       after(:create) do |org|
         FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization: org)
       end
     end
 
-    trait :in_los_angeles do
+    trait :in_los_angeles_legacy do
       after(:create) do |org|
         FactoryBot.create(:location, :with_address_record, address_in: :los_angeles, organization: org)
       end
     end
 
-    trait :in_edmonton do
+    trait :in_edmonton_legacy do
       after(:create) do |org|
         FactoryBot.create(:location, :with_address_record, address_in: :edmonton, organization: org)
       end

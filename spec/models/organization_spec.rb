@@ -26,8 +26,8 @@ RSpec.describe Organization, type: :model do
       nyc_bike_ids = FactoryBot.create_list(:bike, 2, :with_address_record, address_in: :new_york).map(&:id)
       stolen_nyc_bike = FactoryBot.create(:stolen_bike_in_nyc)
 
-      chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
-      nyc_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
+      chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago_legacy)
+      nyc_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc_legacy)
 
       expect(chi_org.nearby_bikes.pluck(:id)).to be_empty
       expect(nyc_org.nearby_bikes.pluck(:id)).to match_array([*nyc_bike_ids, stolen_nyc_bike.id])
@@ -37,17 +37,17 @@ RSpec.describe Organization, type: :model do
   describe "bikes in/not nearby organizations, nearby recoveries" do
     it "returns bikes associated with nearby organizations" do
       # an nyc-org bike in chicago
-      nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
+      nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc_legacy)
       chi_bike1 = FactoryBot.create(:bike_organized, :with_address_record, address_in: :chicago, creation_organization: nyc_org1)
 
       # a chicago-org bike in nyc
-      chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
+      chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago_legacy)
       nyc_bike1 = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: chi_org)
 
-      nyc_org2 = FactoryBot.create(:organization, :in_nyc)
+      nyc_org2 = FactoryBot.create(:organization, :in_nyc_legacy)
       nyc_bike2 = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: nyc_org2)
 
-      nyc_org3 = FactoryBot.create(:organization, :in_nyc)
+      nyc_org3 = FactoryBot.create(:organization, :in_nyc_legacy)
       nyc_bike3 = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: nyc_org3)
 
       nonorg_bikes = FactoryBot.create_list(:bike, 2, :with_address_record, address_in: :new_york)
@@ -57,7 +57,7 @@ RSpec.describe Organization, type: :model do
 
       # stolen record doesn't automatically set latitude on bike,
       # because of testing skip - so use an existing bike with location set
-      nonorg_stolen_record = FactoryBot.create(:stolen_record, :in_nyc, bike: nonorg_bikes.last)
+      nonorg_stolen_record = FactoryBot.create(:stolen_record, :in_nyc_legacy, bike: nonorg_bikes.last)
       nonorg_stolen_record.add_recovery_information
 
       expect(nyc_org1.nearby_bikes.pluck(:id))
@@ -282,10 +282,10 @@ RSpec.describe Organization, type: :model do
 
     context "given other organizations in the search radius" do
       it "returns the corresponding regional sub-orgs" do
-        nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
-        nyc_org2 = FactoryBot.create(:organization, :in_nyc)
-        nyc_org3 = FactoryBot.create(:organization, :in_nyc)
-        FactoryBot.create(:organization, :in_chicago)
+        nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc_legacy)
+        nyc_org2 = FactoryBot.create(:organization, :in_nyc_legacy)
+        nyc_org3 = FactoryBot.create(:organization, :in_nyc_legacy)
+        FactoryBot.create(:organization, :in_chicago_legacy)
 
         nyc_org1.reload
         expect(nyc_org1.nearby_organizations).to match_array([nyc_org2, nyc_org3])
@@ -392,8 +392,8 @@ RSpec.describe Organization, type: :model do
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
     context "regional bike_stickers" do
-      let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
-      let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }
+      let!(:regional_child) { FactoryBot.create(:organization, :in_nyc_legacy) }
+      let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc_legacy, enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: regional_child) }
       it "sets on the regional organization, applies to bikes" do
         regional_child.reload

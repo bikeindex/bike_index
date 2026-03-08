@@ -350,7 +350,7 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
         end
       end
       context "impounded" do
-        let(:parking_notification) { FactoryBot.create(:parking_notification_organized, :in_edmonton, bike: bike, use_entered_address: true) }
+        let(:parking_notification) { FactoryBot.create(:parking_notification_organized, :in_edmonton_legacy, bike: bike, use_entered_address: true) }
         let(:organization) { parking_notification.organization }
         let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, address_in: :edmonton, bike: bike, parking_notification: parking_notification, organization: organization) }
         let(:title_extended) { "Impounded #{title}" }

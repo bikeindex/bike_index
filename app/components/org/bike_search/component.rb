@@ -53,31 +53,29 @@ module Org::BikeSearch
 
     private
 
-    # TODO: Now that we have translations, we need to localize this.
-    # I believe the easiest way to do so would be to pull the text from the header cell and use that.
     def column_renames
       @column_renames ||= {
-        "created_at_cell" => "Registered",
-        "updated_at_cell" => "Updated",
-        "stolen_cell" => "Stolen",
-        "manufacturer_cell" => "Manufacturer",
-        "model_cell" => "Model",
-        "color_cell" => "Color",
-        "owner_email_cell" => "Sent to",
-        "creation_description_cell" => "Source",
-        "owner_name_cell" => "Owner name",
-        "reg_organization_affiliation_cell" => "Affiliation",
-        "reg_extra_registration_number_cell" => "Secondary#",
-        "reg_phone_cell" => "Phone",
-        "reg_address_cell" => "Address",
-        "reg_student_id_cell" => "Student ID",
-        "sticker_cell" => "Sticker",
-        "impounded_cell" => "Impounded",
-        "avery_cell" => "Avery Exportable",
-        "cycle_type_cell" => "Vehicle type",
-        "propulsion_type_cell" => "E-vehicle (propulsion)",
-        "status_cell" => "Status",
-        "url_cell" => "URL"
+        created_at_cell: translation(".registered"),
+        updated_at_cell: translation(".updated"),
+        stolen_cell: translation(".stolen"),
+        manufacturer_cell: translation(".manufacturer"),
+        model_cell: translation(".model"),
+        color_cell: translation(".color"),
+        owner_email_cell: translation(".sent_to"),
+        creation_description_cell: translation(".source"),
+        owner_name_cell: translation(".owner_name"),
+        reg_organization_affiliation_cell: translation(".affiliation"),
+        reg_extra_registration_number_cell: translation(".secondary_number"),
+        reg_phone_cell: translation(".phone"),
+        reg_address_cell: translation(".reg_address"),
+        reg_student_id_cell: translation(".student_id"),
+        sticker_cell: translation(".sticker"),
+        impounded_cell: translation(".impounded"),
+        avery_cell: translation(".avery_exportable"),
+        cycle_type_cell: translation(".vehicle_type"),
+        propulsion_type_cell: translation(".e_vehicle_propulsion"),
+        status_cell: translation(".status_cell"),
+        url_cell: translation(".url")
       }
     end
 
@@ -99,7 +97,7 @@ module Org::BikeSearch
         cols += additional_registration_fields.map { |f| "#{f}_cell" }
         cols += ["impounded_cell"] if @organization.enabled?("impound_bikes")
         cols += ["avery_cell"] if @include_avery && @organization.enabled?("avery_export")
-        cols.uniq.sort { |a, b| column_renames[a] <=> column_renames[b] }
+        cols.uniq.sort { |a, b| column_renames[a.to_sym] <=> column_renames[b.to_sym] }
       end
     end
 
