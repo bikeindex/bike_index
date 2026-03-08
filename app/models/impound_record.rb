@@ -355,9 +355,8 @@ class ImpoundRecord < ApplicationRecord
   def set_address_record_from_parking_notification
     return if address_record.present? && address_record.changed?
 
-    # Create address_record from parking_notification's legacy fields
     self.address_record = AddressRecord.new(
-      AddressRecord.attrs_from_legacy(parking_notification)
+      AddressRecord.attrs_to_duplicate(parking_notification)
         .merge(kind: :impounded_from, organization_id:, bike_id:)
     )
   end

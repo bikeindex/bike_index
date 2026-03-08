@@ -579,7 +579,7 @@ class BParam < ApplicationRecord
 
     attrs = params["parking_notification"].with_indifferent_access
       .slice(:latitude, :longitude, :kind, :internal_notes, :message, :accuracy,
-        :use_entered_address, :street, :city, :zipcode, :state_id, :country_id, :skip_geocoding)
+        :use_entered_address, :street, :city, :postal_code, :region_record_id, :country_id, :skip_geocoding)
     attrs.merge(organization_id: creation_organization_id,
       user_id: creator_id,
       bike_id: created_bike_id,

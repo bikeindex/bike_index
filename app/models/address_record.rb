@@ -68,11 +68,34 @@ class AddressRecord < ApplicationRecord
         obj.internal_address_attrs.merge(skip_geocoding: obj.latitude.present?, skip_callback_job: true)
       elsif defined?(obj.address_record) && obj.address_record.present?
         attrs_to_duplicate(obj.address_record)
+      elsif defined?(obj.region_record_id)
+        attrs_from_address_record_style(obj)
       elsif defined?(obj.street)
         attrs_from_legacy(obj)
       else
         {}
       end
+    end
+
+    def attrs_from_address_record_style(obj)
+      user_attrs = if !obj.is_a?(User) && obj.respond_to?(:user_id)
+        {user_id: obj.user_id}
+      else
+        {}
+      end
+
+      {
+        skip_geocoding: obj.latitude.present?,
+        skip_callback_job: true,
+        street: obj.street,
+        city: obj.city,
+        region_record_id: obj.region_record_id,
+        region_string: (obj.region_string if obj.respond_to?(:region_string)),
+        postal_code: obj.postal_code,
+        country_id: obj.country_id,
+        latitude: obj.latitude,
+        longitude: obj.longitude
+      }.merge(user_attrs)
     end
 
     def attrs_from_legacy(obj)

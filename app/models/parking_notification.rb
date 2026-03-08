@@ -19,6 +19,8 @@
 #  longitude             :float
 #  message               :text
 #  neighborhood          :string
+#  postal_code           :string
+#  region_string         :string
 #  repeat_number         :integer
 #  resolved_at           :datetime
 #  retrieval_link_token  :text
@@ -26,7 +28,6 @@
 #  status                :integer          default("current")
 #  street                :string
 #  unregistered_bike     :boolean          default(FALSE)
-#  zipcode               :string
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  bike_id               :integer
@@ -34,8 +35,8 @@
 #  impound_record_id     :integer
 #  initial_record_id     :integer
 #  organization_id       :integer
+#  region_record_id      :bigint
 #  retrieved_by_id       :bigint
-#  state_id              :bigint
 #  user_id               :integer
 #
 # Indexes
@@ -45,24 +46,23 @@
 #  index_parking_notifications_on_impound_record_id  (impound_record_id)
 #  index_parking_notifications_on_initial_record_id  (initial_record_id)
 #  index_parking_notifications_on_organization_id    (organization_id)
+#  index_parking_notifications_on_region_record_id   (region_record_id)
 #  index_parking_notifications_on_retrieved_by_id    (retrieved_by_id)
-#  index_parking_notifications_on_state_id           (state_id)
 #  index_parking_notifications_on_user_id            (user_id)
 #
 class ParkingNotification < ActiveRecord::Base
-  include Geocodeable
+  include GeocodeableAddressRecord
 
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other_parking_notification: 3}.freeze
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
   MAX_PER_PAGE = 250
-
-  mount_uploader :image, ImageUploaderBackgrounded
-  process_in_background :image
-
   enum :kind, KIND_ENUM
   enum :status, STATUS_ENUM
   enum :retrieved_kind, RETRIEVED_KIND_ENUM
+
+  mount_uploader :image, ImageUploaderBackgrounded
+  process_in_background :image
 
   belongs_to :bike
   belongs_to :user
@@ -276,7 +276,7 @@ class ParkingNotification < ActiveRecord::Base
 
   # force_show_address, just like stolen_record - but this has a hide_address attr, so by default we show addresses
   def address(force_show_address: false, country: [:iso, :optional, :skip_default])
-    Geocodeable.address(
+    GeocodeableAddressRecord.address(
       self,
       street: force_show_address || show_address,
       country: country
@@ -287,8 +287,8 @@ class ParkingNotification < ActiveRecord::Base
     org_address = organization&.default_address_record
     self.country_id = org_address&.country_id
     self.city = org_address&.city
-    self.zipcode = org_address&.postal_code
-    self.state_id = org_address&.region_record_id
+    self.postal_code = org_address&.postal_code
+    self.region_record_id = org_address&.region_record_id
   end
 
   def set_calculated_attributes
@@ -305,12 +305,13 @@ class ParkingNotification < ActiveRecord::Base
     return true if id.present? && street.present? && latitude.present? && longitude.present?
 
     if !use_entered_address && latitude.present? && longitude.present?
-      self.attributes = GeocodeHelper.assignable_address_hash_for(latitude: latitude, longitude: longitude)
+      self.attributes = GeocodeHelper.assignable_address_hash_for(latitude: latitude, longitude: longitude, new_attrs: true)
     else
       coordinates = GeocodeHelper.coordinates_for(address)
       self.attributes = coordinates if coordinates.present?
       self.location_from_address = true
     end
+    assign_region_record
   end
 
   def subject

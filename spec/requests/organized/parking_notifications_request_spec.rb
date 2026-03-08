@@ -269,8 +269,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             is_repeat: "true",
             street: "300 Lakeside Dr",
             city: "Oakland",
-            zipcode: "94612",
-            state_id: state.id,
+            postal_code: "94612",
+            region_record_id: state.id,
             country_id: Country.united_states.id
           }
         end
