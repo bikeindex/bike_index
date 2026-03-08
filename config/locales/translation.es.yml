@@ -3706,13 +3706,6 @@ es:
         through_org:
         motorized:
         vehicle_type:
-      sticker_header:
-        connected_to_bike_html:
-        enter_url_of_the_bike_html:
-        is_currently_linked:
-        isnt_linked_to_a_bike:
-        search_org_bikes_html:
-        update:
       list:
         added:
         bike:
@@ -3733,6 +3726,13 @@ es:
         recovery:
         render_chart:
         show_only_organization_recoveries:
+      sticker_header:
+        connected_to_bike_html:
+        enter_url_of_the_bike_html:
+        is_currently_linked:
+        isnt_linked_to_a_bike:
+        search_org_bikes_html:
+        update:
     bulk_imports:
       error_type:
         file:
