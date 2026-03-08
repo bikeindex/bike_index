@@ -1,0 +1,27 @@
+<%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
+
+<%= render partial: "/shared/period_select" %>
+
+<div class="mb-4"></div>
+
+<div class="mb-4">
+  <%= render(Search::FormOrganized::Component.new(
+    target_search_path: organization_bikes_path(organization_id: current_organization.to_param),
+    target_frame: :organized_bikes_results_frame,
+    interpreted_params: @interpreted_params
+  )) %>
+</div>
+
+<hr style="opacity: .3;">
+
+<%= turbo_frame_tag :organized_bikes_results_frame do %>
+  <% if @render_results %>
+    <%= render partial: "results" %>
+  <% else %>
+    <span id="loadedWithoutResults" class="tw:hidden"></span>
+  <% end %>
+<% end %>
+
+<div id="hiddenLoadingSpinner" class="tw:hidden">
+  <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
+</div>

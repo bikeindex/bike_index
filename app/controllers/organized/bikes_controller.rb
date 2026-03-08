@@ -17,25 +17,29 @@ module Organized
 
         if @render_results
           search_organization_bikes
-          create_export_and_redirect if create_export?
+          if create_export?
+            create_export_and_redirect
+          else
+            respond_to do |format|
+              format.html { render :search }
+              format.turbo_stream
+            end
+          end
         else
           @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
           @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+          render :search
         end
-
-        respond_to do |format|
-          format.html
-          format.turbo_stream
-        end
-      else
-        @per_page = permitted_per_page(default: 50)
-        @available_bikes = if current_organization.enabled?("claimed_ownerships")
-          claimed_ownerships_search
-        else
-          organization_bikes.where(created_at: @time_range)
-        end
-        @pagy, @bikes = pagy(:countish, @available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
+        return
       end
+
+      @per_page = permitted_per_page(default: 50)
+      @available_bikes = if current_organization.enabled?("claimed_ownerships")
+        claimed_ownerships_search
+      else
+        organization_bikes.where(created_at: @time_range)
+      end
+      @pagy, @bikes = pagy(:countish, @available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
     end
 
     def recoveries
