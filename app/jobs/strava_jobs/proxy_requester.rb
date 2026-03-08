@@ -115,7 +115,7 @@ module StravaJobs
           limit = Integrations::StravaClient::ACTIVITIES_PER_PAGE
 
           strava_activities = StravaActivity.where(strava_integration_id: strava_request.strava_integration_id).strava_ordered
-          return [] if strava_activities.count < page * limit
+          return {json: [], status: 200} if strava_activities.count < page * limit
 
           strava_activities.offset(page * limit).limit(limit).map(&:proxy_serialized)
         end
