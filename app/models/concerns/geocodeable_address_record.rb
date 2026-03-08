@@ -2,7 +2,44 @@
 # (postal_code, region_record_id, region_string instead of zipcode, state_id)
 # Expects `latitude` and `longitude` columns to be defined.
 module GeocodeableAddressRecord
+  # Shared address attribute methods, also included by AddressRecord
+  module Core
+    extend ActiveSupport::Concern
+
+    def address_changed?
+      %i[street city region_record_id region_string postal_code country_id]
+        .any? { |col| public_send(:"#{col}_changed?") }
+    end
+
+    def address_present?
+      [street, city, postal_code].any?(&:present?)
+    end
+
+    def region_abbreviation
+      region_record&.abbreviation || region_string
+    end
+
+    def region_name
+      region_record&.name || region_string
+    end
+
+    def country_abbr
+      country&.iso
+    end
+
+    private
+
+    def assign_region_record
+      self.region_string = nil if region_string.blank? || region_record.present?
+      if region_string.present?
+        self.region_record_id = State.friendly_find(region_string, country_id:)&.id
+        self.region_string = nil if region_record_id.present?
+      end
+    end
+  end
+
   extend ActiveSupport::Concern
+  include Core
 
   included do
     belongs_to :region_record, class_name: "State"
@@ -119,15 +156,6 @@ module GeocodeableAddressRecord
     address_changed?
   end
 
-  def address_changed?
-    %i[street city region_record_id region_string postal_code country_id]
-      .any? { |col| public_send(:"#{col}_changed?") }
-  end
-
-  def address_present?
-    [street, city, postal_code].any?(&:present?)
-  end
-
   def clean_region_and_street_data
     # remove region_record if it's not for the same country
     if country_id.present? && region_record_id.present?
@@ -156,14 +184,6 @@ module GeocodeableAddressRecord
       .with_indifferent_access
   end
 
-  def region_abbreviation
-    region_record&.abbreviation || region_string
-  end
-
-  def region_name
-    region_record&.name || region_string
-  end
-
   # Override assignment to enable friendly finding region_record and country
   def region_record=(val)
     if val.is_a?(String)
@@ -181,23 +201,11 @@ module GeocodeableAddressRecord
     end
   end
 
-  def country_abbr
-    country&.iso
-  end
-
   def metric_units?
     country.blank? || !country.united_states?
   end
 
   private
-
-  def assign_region_record
-    self.region_string = nil if region_string.blank? || region_record.present?
-    if region_string.present?
-      self.region_record_id = State.friendly_find(region_string, country_id:)&.id
-      self.region_string = nil if region_record_id.present?
-    end
-  end
 
   # remove ", CA" for things like "Sacramento, CA"
   # Assign region_record if not assigned.

@@ -31,6 +31,8 @@
 #  index_address_records_on_user_id           (user_id) WHERE (user_id IS NOT NULL)
 #
 class AddressRecord < ApplicationRecord
+  include GeocodeableAddressRecord::Core
+
   KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3, organization: 4, impounded_from: 5}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
@@ -171,10 +173,6 @@ class AddressRecord < ApplicationRecord
     l_hash.with_indifferent_access
   end
 
-  def address_present?
-    [street, postal_code, city].any?(&:present?)
-  end
-
   def include_country?(render_country: nil, current_country_id: nil, current_country_iso: nil)
     render_country = render_country&.to_s
     return render_country == "true" if %w[true false].include?(render_country)
@@ -206,11 +204,7 @@ class AddressRecord < ApplicationRecord
   end
 
   def region(full_region: false)
-    if full_region
-      region_record.present? ? region_record.name : region_string
-    else
-      region_record.present? ? region_record.abbreviation : region_string
-    end
+    full_region ? region_name : region_abbreviation
   end
 
   # This is used when rendering something with an address that is not the user
@@ -257,22 +251,6 @@ class AddressRecord < ApplicationRecord
     assign_region_record
   end
 
-  def assign_region_record
-    self.region_string = nil if region_string.blank?
-
-    # Only remove region_string if region_record.present
-    self.region_string = nil if region_record.present?
-
-    if region_string.present?
-      self.region_record_id = State.friendly_find(region_string, country_id:)&.id
-      self.region_string = nil if region_record_id.present?
-    end
-  end
-
-  def address_changed?
-    %i[street city region_string region_record_id postal_code country_id]
-      .any? { |col| public_send(:"#{col}_changed?") }
-  end
 
   def address_record_geocode
     # Only geocode if there is specific location information
