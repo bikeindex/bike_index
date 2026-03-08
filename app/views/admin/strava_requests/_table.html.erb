@@ -68,20 +68,27 @@
           <% end %>
 
           <td>
-            <small><%= strava_request.request_type&.humanize %></small>
-
-            <% if strava_request.proxy_request? %>
-              <%= render UI::Badge::Component.new(
-                text: "Proxy",
-                title: "Proxy request",
-                color: :gray,
-                size: :sm) %>
-            <% end %>
+            <span class="tw:inline-flex tw:items-center tw:gap-1 tw:whitespace-nowrap">
+              <small><%= strava_request.request_type&.humanize %></small>
+              <% if strava_request.proxy_request? %>
+                <%= render UI::Badge::Component.new(
+                  text: "p",
+                  title: "Proxy request",
+                  color: :gray,
+                  size: :sm) %>
+              <% end %>
+            </span>
           </td>
 
           <td>
+            <% status_text = if strava_request.response_status.start_with?("binx_response")
+              strava_request.response_status == "binx_response" ? "binx" : "binx limited"
+            else
+              strava_request.response_status.humanize
+            end %>
             <%= render UI::Badge::Component.new(
-              text: strava_request.response_status.humanize,
+              text: status_text,
+              title: strava_request.response_status.humanize,
               color: Admin::ChartStravaRequests::Component::RESPONSE_STATUS_BADGE_COLORS[strava_request.response_status.to_sym],
               size: :sm
             ) %>
