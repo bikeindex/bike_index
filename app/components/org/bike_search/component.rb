@@ -141,7 +141,7 @@ module Org::BikeSearch
     end
 
     def show_pagination?
-      !@skip_search_form && @pagy.pages > 1
+      @pagy.pages > 1
     end
   end
 end
