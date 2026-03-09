@@ -51,6 +51,8 @@
 #  index_parking_notifications_on_user_id            (user_id)
 #
 class ParkingNotification < ActiveRecord::Base
+  include GeocodeableParkingNotification
+
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other_parking_notification: 3}.freeze
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
@@ -68,19 +70,14 @@ class ParkingNotification < ActiveRecord::Base
   belongs_to :impound_record
   belongs_to :initial_record, class_name: "ParkingNotification"
   belongs_to :retrieved_by, class_name: "User"
-  belongs_to :region_record, class_name: "State"
-  belongs_to :country
 
   has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
-
-  geocoded_by :address
 
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
 
-  attr_accessor :is_repeat, :use_entered_address, :image_cache, :skip_update, :skip_geocoding
+  attr_accessor :is_repeat, :use_entered_address, :image_cache, :skip_update
 
-  before_validation :clean_region_and_street_data
   before_validation :set_calculated_attributes
   after_commit :process_notification
 
@@ -95,9 +92,6 @@ class ParkingNotification < ActiveRecord::Base
   scope :not_unregistered_bike, -> { where(unregistered_bike: false) }
   scope :first_notification, -> { where(repeat_number: 0) }
   scope :not_replaced, -> { where.not(status: "replaced") }
-  scope :with_location, -> { where.not(latitude: nil) }
-  scope :with_street, -> { with_location.where.not(street: nil) }
-  scope :without_street, -> { where(street: ["", nil]) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -135,28 +129,6 @@ class ParkingNotification < ActiveRecord::Base
   # Passing in an already formed bounding_box - added method to explicitly document required args
   def self.search_bounding_box(sw_lat, sw_lng, ne_lat, ne_lng)
     within_bounding_box(sw_lat, sw_lng, ne_lat, ne_lng)
-  end
-
-  def self.format_address(obj, street: true, city: true, region: true, postal_code: true, country: [:iso])
-    return "" if obj.blank?
-
-    include_country = country && !(obj.country&.default? && country.include?(:skip_default))
-
-    country_name =
-      if include_country
-        country_format = country.find { |e| e.in? %i[iso name] } || :iso
-        country_name = obj.country&.public_send(country_format)
-        return "" if !country.include?(:optional) && country_name.blank?
-
-        country_name
-      end
-
-    [
-      street && obj.street,
-      city && obj.city,
-      [region && obj.region_abbreviation, postal_code && obj.postal_code].reject(&:blank?).join(" "),
-      country_name
-    ].reject(&:blank?).join(", ")
   end
 
   # geocoding is managed by set_calculated_attributes
@@ -302,88 +274,6 @@ class ParkingNotification < ActiveRecord::Base
     self
   end
 
-  def skip_geocoding?
-    skip_geocoding.present?
-  end
-
-  def without_location?
-    latitude.blank?
-  end
-
-  def with_location?
-    !without_location?
-  end
-
-  def latitude_public
-    return nil if latitude.blank?
-
-    show_address ? latitude : latitude.round(Bike::PUBLIC_COORD_LENGTH)
-  end
-
-  def longitude_public
-    return nil if longitude.blank?
-
-    show_address ? longitude : longitude.round(Bike::PUBLIC_COORD_LENGTH)
-  end
-
-  def address_changed?
-    %i[street city region_record_id region_string postal_code country_id]
-      .any? { |col| public_send(:"#{col}_changed?") }
-  end
-
-  def address_present?
-    [street, city, postal_code].any?(&:present?)
-  end
-
-  def region_abbreviation
-    region_record&.abbreviation || region_string
-  end
-
-  def region_name
-    region_record&.name || region_string
-  end
-
-  def country_abbr
-    country&.iso
-  end
-
-  def metric_units?
-    country.blank? || !country.united_states?
-  end
-
-  def address_hash
-    %w[street city postal_code latitude longitude]
-      .index_with { |attr| attributes[attr].presence }
-      .merge("region" => region_abbreviation, "country" => country_abbr)
-      .with_indifferent_access
-  end
-
-  # Override assignment to enable friendly finding region_record and country
-  def region_record=(val)
-    if val.is_a?(String)
-      self.region_record = State.friendly_find(val)
-    else
-      super
-    end
-  end
-
-  def country=(val)
-    if val.is_a?(String)
-      self.country = Country.friendly_find(val)
-    else
-      super
-    end
-  end
-
-  # force_show_address, just like stolen_record - but this has a hide_address attr, so by default we show addresses
-  def address(force_show_address: false, country: [:iso, :optional, :skip_default])
-    self.class.format_address(
-      self,
-      street: force_show_address || show_address,
-      country: country
-    ).presence
-  end
-
   def set_location_from_organization
     org_address = organization&.default_address_record
     self.country_id = org_address&.country_id
@@ -502,40 +392,4 @@ class ParkingNotification < ActiveRecord::Base
     end
   end
 
-  def clean_region_and_street_data
-    if country_id.present? && region_record_id.present?
-      self.region_record_id = nil unless region_record&.country_id == country_id
-    end
-    self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
-    self.city = city.blank? ? nil : clean_city(city)
-    self.postal_code = postal_code.blank? ? nil : GeocodeHelper.format_postal_code(postal_code, country_id)
-    assign_region_record
-  end
-
-  def assign_region_record
-    self.region_string = nil if region_string.blank? || region_record.present?
-    if region_string.present?
-      self.region_record_id = State.friendly_find(region_string, country_id:)&.id
-      self.region_string = nil if region_record_id.present?
-    end
-  end
-
-  def clean_city(str)
-    if str.match?(/(,|\.)\s*\w\w\s*\z/) && country_id == Country.united_states_id
-      str_region_abbr = str[/(,|\.)\s*\w\w\s*\z/].gsub(/,|\./, "").strip.downcase
-      str_no_region = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
-      if region_record_id.present?
-        if region_record.abbreviation.downcase == str_region_abbr
-          str = str_no_region
-        end
-      else
-        citys_region = State.fuzzy_abbr_find(str_region_abbr)
-        if citys_region.present?
-          self.region_record_id = citys_region.id
-          str = str_no_region
-        end
-      end
-    end
-    str.strip.gsub(/\s*,\z/, "")
-  end
 end
