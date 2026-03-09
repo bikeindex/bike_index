@@ -31,7 +31,7 @@
 #  index_mail_snippets_on_state_id           (state_id)
 #
 class MailSnippet < ApplicationRecord
-  include Geocodeable
+  include GeocodeableLegacy
 
   KIND_ENUM = {
     custom: 0,
