@@ -1,19 +1,33 @@
 name: Strava Search CI
 
 on:
-  push:
-    paths:
-      - 'vendor/strava_search/**'
-      - 'public/strava_search/**'
-      - '.github/workflows/strava_search_ci.yml'
+  pull_request:
 
 defaults:
   run:
     working-directory: vendor/strava_search
 
 jobs:
+  changes:
+    name: Check for strava_search changes, trigger run of strava_search CI if there are
+    runs-on: ubuntu-latest
+    outputs:
+      strava_search: ${{ steps.filter.outputs.strava_search }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            strava_search:
+              - 'vendor/strava_search/**'
+              - 'public/strava_search/**'
+              - '.github/workflows/strava_search_ci.yml'
+
   lint:
     name: Lint
+    needs: [changes]
+    if: needs.changes.outputs.strava_search == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,6 +51,8 @@ jobs:
 
   typecheck:
     name: Type Check
+    needs: [changes]
+    if: needs.changes.outputs.strava_search == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -57,6 +73,8 @@ jobs:
 
   test:
     name: Test
+    needs: [changes]
+    if: needs.changes.outputs.strava_search == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -78,7 +96,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, test]
+    needs: [changes, lint, typecheck, test]
+    if: needs.changes.outputs.strava_search == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
