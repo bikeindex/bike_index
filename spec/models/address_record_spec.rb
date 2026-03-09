@@ -191,7 +191,7 @@ RSpec.describe AddressRecord, type: :model do
       end
       it "updates with force update" do
         expect(address_record).to be_valid
-        # postal_code is formatted by GeocodeableLegacy.format_postal_code
+        # postal_code is formatted by GeocodeHelper.format_postal_code
         expect(address_record.reload).to have_attributes({postal_code: "T4N 4E4", region_string: nil, city: nil})
 
         VCR.use_cassette("address-record-assignment_geocode-canada") do

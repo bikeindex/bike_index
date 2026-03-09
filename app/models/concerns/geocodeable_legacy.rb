@@ -77,10 +77,7 @@ module GeocodeableLegacy
     end
 
     def format_postal_code(str, country_id = nil)
-      str = str.strip.upcase.gsub(/\s*,\z/, "")
-      return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
-
-      str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
+      GeocodeHelper.format_postal_code(str, country_id)
     end
 
     def new_address_hash(address_hash)
@@ -150,7 +147,7 @@ module GeocodeableLegacy
     end
     self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
     self.city = city.blank? ? nil : clean_city(city)
-    self.zipcode = zipcode.blank? ? nil : GeocodeableLegacy.format_postal_code(zipcode, country_id)
+    self.zipcode = zipcode.blank? ? nil : GeocodeHelper.format_postal_code(zipcode, country_id)
   end
 
   def bike_index_geocode
