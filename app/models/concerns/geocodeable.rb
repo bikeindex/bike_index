@@ -39,6 +39,9 @@ module Geocodeable
 
   included do
     before_validation :clean_location_attributes
+
+    belongs_to :country
+    belongs_to :region_record, class_name: "State"
   end
 
   def metric_units?
@@ -79,11 +82,9 @@ module Geocodeable
   end
 
   def region(full_region: false)
-    if full_region
-      region_record.present? ? region_record.name : region_string
-    else
-      region_record.present? ? region_record.abbreviation : region_string
-    end
+    return region_string unless region_record.present?
+
+    full_region ? region_record.name : region_record.abbreviation
   end
 
   def address_hash(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
@@ -107,7 +108,6 @@ module Geocodeable
     l_hash[:address_record_id] = id if address_record_id
     l_hash.with_indifferent_access
   end
-
 
   def formatted_address_string(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
     f_hash = address_hash(visible_attribute:, render_country:, current_country_id:, current_country_iso:)

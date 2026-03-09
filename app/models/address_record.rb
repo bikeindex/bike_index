@@ -42,8 +42,6 @@ class AddressRecord < ApplicationRecord
   belongs_to :user
   belongs_to :bike
   belongs_to :organization
-  belongs_to :country
-  belongs_to :region_record, class_name: "State"
 
   has_many :marketplace_listings
 
@@ -54,14 +52,9 @@ class AddressRecord < ApplicationRecord
   after_commit :update_associations
 
   class << self
-    # TODO: I believe this be removed:
-    # def location_attrs
-    #   permitted_params + %i[latitude longitude]
-    # end
-
     def permitted_params
       # user_id and kind should be set manually!
-      ADDRESS_ATTRS
+      Geocodeable::ADDRESS_ATTRS
     end
 
     def default_visibility_for(kind)

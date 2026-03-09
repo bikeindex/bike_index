@@ -21,6 +21,7 @@ RSpec.describe AddressRecord, type: :model do
       it "is valid" do
         expect(address_record).to be_valid
         expect(address_record.region).to eq "North Holland"
+        expect(address_record.region(full_region: true)).to eq "North Holland"
         expect(address_record.formatted_address_string(render_country: true)).to eq "Amsterdam, North Holland 1012, Netherlands"
         expect(address_record.formatted_address_string).to eq "Amsterdam, North Holland 1012, Netherlands"
         expect(address_record.formatted_address_string(current_country_iso: "NL")).to eq "Amsterdam, North Holland 1012"
@@ -36,6 +37,7 @@ RSpec.describe AddressRecord, type: :model do
       it "is valid" do
         expect(address_record).to be_valid
         expect(address_record.region).to eq "CA"
+        expect(address_record.region(full_region: true)).to eq "California"
         expect(address_record.formatted_address_string(render_country: true)).to eq "San Francisco, CA 94103, United States"
         expect(address_record.formatted_address_string).to eq "San Francisco, CA 94103"
         expect(address_record.formatted_address_string(visible_attribute: "street"))
@@ -43,8 +45,6 @@ RSpec.describe AddressRecord, type: :model do
       end
     end
   end
-
-
 
   describe "assignment" do
     let(:address_record) do
