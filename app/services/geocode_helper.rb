@@ -56,6 +56,13 @@ module GeocodeHelper
     address_hash.except(:formatted_address)
   end
 
+  def format_postal_code(str, country_id = nil)
+    str = str.strip.upcase.gsub(/\s*,\z/, "")
+    return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
+
+    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
+  end
+
   #
   # private below here
   #
@@ -139,13 +146,6 @@ module GeocodeHelper
 
   def coordinates_from_google_response(coord_hash)
     {latitude: coord_hash["lat"], longitude: coord_hash["lng"]}
-  end
-
-  def format_postal_code(str, country_id = nil)
-    str = str.strip.upcase.gsub(/\s*,\z/, "")
-    return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
-
-    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
   end
 
   conceal :geocoder_lookup_string, :ignored_coordinates?, :address_hash_from_reverse_geocode,

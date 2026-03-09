@@ -76,10 +76,6 @@ module GeocodeableLegacy
       ].reject(&:blank?).join(", ")
     end
 
-    def format_postal_code(str, country_id = nil)
-      GeocodeHelper.format_postal_code(str, country_id)
-    end
-
     def new_address_hash(address_hash)
       new_hash = address_hash.dup.symbolize_keys
       new_hash[:postal_code] = new_hash.delete(:zipcode)
