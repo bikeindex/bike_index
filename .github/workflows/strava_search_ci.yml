@@ -1,13 +1,7 @@
 name: Strava Search CI
 
 on:
-  push:
-    paths:
-      - 'vendor/strava_search/**'
-      - 'public/strava_search/**'
-      - '.github/workflows/strava_search_ci.yml'
   pull_request:
-    types: [opened, synchronize, reopened]
 
 defaults:
   run:
