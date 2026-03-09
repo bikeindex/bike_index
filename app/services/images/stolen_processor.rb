@@ -220,7 +220,7 @@ module Images::StolenProcessor
   def stolen_record_location(stolen_record)
     return nil unless stolen_record.to_coordinates.any?
 
-    Geocodeable.address(stolen_record, street: false, zipcode: false, country: [:skip_default, :name])
+    GeocodeableLegacy.address(stolen_record, street: false, zipcode: false, country: [:skip_default, :name])
       .gsub("'", "\\'")
   end
 

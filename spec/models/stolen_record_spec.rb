@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe StolenRecord, type: :model do
-  it_behaves_like "geocodeable"
+  it_behaves_like "geocodeable_legacy"
   it_behaves_like "default_currencyable"
 
   describe "factories" do

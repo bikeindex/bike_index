@@ -229,7 +229,7 @@ class AddressRecord < ApplicationRecord
     self.postal_code = Binxtils::InputNormalizer.string(postal_code)
     self.city = Binxtils::InputNormalizer.string(city)
     self.neighborhood = Binxtils::InputNormalizer.string(neighborhood)
-    self.postal_code = Geocodeable.format_postal_code(postal_code, country_id) if postal_code.present?
+    self.postal_code = GeocodeableLegacy.format_postal_code(postal_code, country_id) if postal_code.present?
 
     assign_region_record
   end

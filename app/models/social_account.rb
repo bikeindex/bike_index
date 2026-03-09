@@ -37,7 +37,7 @@
 #  index_social_accounts_on_state_id                (state_id)
 #
 class SocialAccount < ApplicationRecord
-  include Geocodeable
+  include GeocodeableLegacy
 
   has_many :social_posts, dependent: :destroy
 

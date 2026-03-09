@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ParkingNotification, type: :model do
-  it_behaves_like "geocodeable"
+  it_behaves_like "geocodeable_legacy"
 
   describe "factory" do
     let(:parking_notification) { FactoryBot.create(:parking_notification, kind: "appears_abandoned_notification") }

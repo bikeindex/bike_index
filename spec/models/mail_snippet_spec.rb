@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe MailSnippet, type: :model do
-  it_behaves_like "geocodeable"
+  it_behaves_like "geocodeable_legacy"
 
   describe "disable_if_blank" do
     it "sets unenabled if body is blank" do
