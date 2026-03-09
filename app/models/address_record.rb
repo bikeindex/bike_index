@@ -31,8 +31,6 @@
 #  index_address_records_on_user_id           (user_id) WHERE (user_id IS NOT NULL)
 #
 class AddressRecord < ApplicationRecord
-  include Geocodeable::Core
-
   KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3, organization: 4, impounded_from: 5}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
@@ -203,6 +201,18 @@ class AddressRecord < ApplicationRecord
     (arr << f_hash[:country]).reject(&:blank?).join(", ")
   end
 
+  def address_present?
+    [street, city, postal_code].any?(&:present?)
+  end
+
+  def region_abbreviation
+    region_record&.abbreviation || region_string
+  end
+
+  def region_name
+    region_record&.name || region_string
+  end
+
   def region(full_region: false)
     full_region ? region_name : region_abbreviation
   end
@@ -249,6 +259,19 @@ class AddressRecord < ApplicationRecord
     self.postal_code = GeocodeHelper.format_postal_code(postal_code, country_id) if postal_code.present?
 
     assign_region_record
+  end
+
+  def address_changed?
+    %i[street city region_record_id region_string postal_code country_id]
+      .any? { |col| public_send(:"#{col}_changed?") }
+  end
+
+  def assign_region_record
+    self.region_string = nil if region_string.blank? || region_record.present?
+    if region_string.present?
+      self.region_record_id = State.friendly_find(region_string, country_id:)&.id
+      self.region_string = nil if region_record_id.present?
+    end
   end
 
   def address_record_geocode
