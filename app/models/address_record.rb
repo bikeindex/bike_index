@@ -251,7 +251,6 @@ class AddressRecord < ApplicationRecord
     assign_region_record
   end
 
-
   def address_record_geocode
     # Only geocode if there is specific location information
     unless address_present?
