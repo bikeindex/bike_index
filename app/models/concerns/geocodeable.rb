@@ -1,7 +1,7 @@
 # Add to a model that can be geolocated, using AddressRecord-style attributes
 # (postal_code, region_record_id, region_string instead of zipcode, state_id)
 # Expects `latitude` and `longitude` columns to be defined.
-module GeocodeableAddressRecord
+module Geocodeable
   # Shared address attribute methods, also included by AddressRecord
   module Core
     extend ActiveSupport::Concern
@@ -112,12 +112,12 @@ module GeocodeableAddressRecord
     end
 
     def format_postal_code(str, country_id = nil)
-      Geocodeable.format_postal_code(str, country_id)
+      GeocodeHelper.format_postal_code(str, country_id)
     end
   end
 
   def address(**kwargs)
-    GeocodeableAddressRecord.address(self, **kwargs)
+    Geocodeable.address(self, **kwargs)
   end
 
   def without_location?
@@ -163,7 +163,7 @@ module GeocodeableAddressRecord
     end
     self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
     self.city = city.blank? ? nil : clean_city(city)
-    self.postal_code = postal_code.blank? ? nil : GeocodeableAddressRecord.format_postal_code(postal_code, country_id)
+    self.postal_code = postal_code.blank? ? nil : Geocodeable.format_postal_code(postal_code, country_id)
     assign_region_record
   end
 
@@ -177,7 +177,7 @@ module GeocodeableAddressRecord
   end
 
   def address_hash
-    address_attrs = GeocodeableAddressRecord.location_attrs - %w[country_id country region_record_id region_string neighborhood]
+    address_attrs = Geocodeable.location_attrs - %w[country_id country region_record_id region_string neighborhood]
     attributes.slice(*address_attrs)
       .merge(region: region_abbreviation, country: country_abbr)
       .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil

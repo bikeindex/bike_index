@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.shared_examples "geocodeable_address_record" do
+RSpec.shared_examples "geocodeable" do
   let(:model_sym) { subject.class.name.underscore.to_sym }
   let(:instance) { FactoryBot.create model_sym }
 
@@ -37,15 +37,15 @@ RSpec.shared_examples "geocodeable_address_record" do
     end
     context "given booleans for address components" do
       it "toggles component inclusion in the address string" do
-        addr = GeocodeableAddressRecord.address(object)
+        addr = Geocodeable.address(object)
         expect(addr).to eq("1 Park Ave., New York, NY 10016, US")
-        addr = GeocodeableAddressRecord.address(object, street: false)
+        addr = Geocodeable.address(object, street: false)
         expect(addr).to eq("New York, NY 10016, US")
-        addr = GeocodeableAddressRecord.address(object, city: false)
+        addr = Geocodeable.address(object, city: false)
         expect(addr).to eq("1 Park Ave., NY 10016, US")
-        addr = GeocodeableAddressRecord.address(object, postal_code: false)
+        addr = Geocodeable.address(object, postal_code: false)
         expect(addr).to eq("1 Park Ave., New York, NY, US")
-        addr = GeocodeableAddressRecord.address(object, country: false)
+        addr = Geocodeable.address(object, country: false)
         expect(addr).to eq("1 Park Ave., New York, NY 10016")
         expect(object.address_present?).to be_truthy
       end
@@ -53,9 +53,9 @@ RSpec.shared_examples "geocodeable_address_record" do
 
     context "given a format option for country" do
       it "toggles country format" do
-        addr = GeocodeableAddressRecord.address(object, country: [:iso])
+        addr = Geocodeable.address(object, country: [:iso])
         expect(addr).to eq("1 Park Ave., New York, NY 10016, US")
-        addr = GeocodeableAddressRecord.address(object, country: [:name])
+        addr = Geocodeable.address(object, country: [:name])
         expect(addr).to eq("1 Park Ave., New York, NY 10016, United States")
       end
     end
@@ -63,14 +63,14 @@ RSpec.shared_examples "geocodeable_address_record" do
     context "given no country data" do
       it "returns nothing by default since country is required" do
         object.country = nil
-        addr = GeocodeableAddressRecord.address(object)
+        addr = Geocodeable.address(object)
         expect(addr).to eq("")
         expect(object.address_present?).to be_truthy
       end
 
       it "returns an address with no country if country is optional" do
         object.country = nil
-        addr = GeocodeableAddressRecord.address(object, country: [:optional])
+        addr = Geocodeable.address(object, country: [:optional])
         expect(addr).to eq("1 Park Ave., New York, NY 10016")
         expect(object.address_present?).to be_truthy
         expect(object.metric_units?).to be_truthy # Default to metric, because it's better
@@ -81,15 +81,15 @@ RSpec.shared_examples "geocodeable_address_record" do
       it "omits the country if the US, else includes it" do
         expect(object.country).to be_default
 
-        addr = GeocodeableAddressRecord.address(object, country: [:iso, :skip_default])
+        addr = Geocodeable.address(object, country: [:iso, :skip_default])
         expect(addr).to eq("1 Park Ave., New York, NY 10016")
 
         object.country = Country.canada
 
-        addr = GeocodeableAddressRecord.address(object, country: [:skip_default])
+        addr = Geocodeable.address(object, country: [:skip_default])
         expect(addr).to eq("1 Park Ave., New York, NY 10016, CA")
 
-        addr = GeocodeableAddressRecord.address(object, country: [:name, :skip_default])
+        addr = Geocodeable.address(object, country: [:name, :skip_default])
         expect(addr).to eq("1 Park Ave., New York, NY 10016, Canada")
         expect(object.address_present?).to be_truthy
       end

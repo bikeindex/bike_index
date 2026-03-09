@@ -51,7 +51,7 @@
 #  index_parking_notifications_on_user_id            (user_id)
 #
 class ParkingNotification < ActiveRecord::Base
-  include GeocodeableAddressRecord
+  include Geocodeable
 
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other_parking_notification: 3}.freeze
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
@@ -276,7 +276,7 @@ class ParkingNotification < ActiveRecord::Base
 
   # force_show_address, just like stolen_record - but this has a hide_address attr, so by default we show addresses
   def address(force_show_address: false, country: [:iso, :optional, :skip_default])
-    GeocodeableAddressRecord.address(
+    Geocodeable.address(
       self,
       street: force_show_address || show_address,
       country: country

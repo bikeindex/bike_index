@@ -31,7 +31,7 @@
 #  index_address_records_on_user_id           (user_id) WHERE (user_id IS NOT NULL)
 #
 class AddressRecord < ApplicationRecord
-  include GeocodeableAddressRecord::Core
+  include Geocodeable::Core
 
   KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3, organization: 4, impounded_from: 5}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
