@@ -82,6 +82,23 @@ RSpec.describe SessionsController, type: :request do
         expect(response).to redirect_to please_confirm_email_users_path
       end
     end
+    describe "secure_headers" do
+      it "does not join Set-Cookie headers with newlines" do
+        # SecureHeaders::Middleware#flag_cookies! joins cookies with "\n"
+        # which Puma 7 rejects as illegal header values.
+        # config.cookies = SecureHeaders::OPT_OUT prevents this.
+        post "/session", params: {session: {email: user.email, password: password}}
+        set_cookie = response.headers["Set-Cookie"]
+        expect(set_cookie).to be_present
+        expect(set_cookie).not_to include("\n")
+      end
+
+      it "includes expected headers" do
+        post "/session", params: {session: {email: user.email, password: password}}
+        expect(response.headers["X-Frame-Options"]).to eq("SAMEORIGIN")
+        expect(response.headers["X-Content-Type-Options"]).to eq("nosniff")
+      end
+    end
     context "banned" do
       let(:banned) { true }
       it "renders" do
