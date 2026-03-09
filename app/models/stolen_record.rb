@@ -57,7 +57,7 @@
 #
 class StolenRecord < ApplicationRecord
   include ActiveModel::Dirty
-  include Geocodeable
+  include GeocodeableLegacy
   include DefaultCurrencyable
 
   RECOVERY_DISPLAY_STATUS_ENUM = {
@@ -263,7 +263,7 @@ class StolenRecord < ApplicationRecord
   end
 
   def address(force_show_address: false, country: [:iso, :optional])
-    Geocodeable.address(
+    GeocodeableLegacy.address(
       self,
       street: force_show_address || show_address,
       country: country

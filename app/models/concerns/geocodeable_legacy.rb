@@ -1,6 +1,6 @@
 # Add to a model that can be geolocated
 # Expects `latitude` and `longitude` columns to be defined.
-module Geocodeable
+module GeocodeableLegacy
   extend ActiveSupport::Concern
 
   included do
@@ -76,13 +76,6 @@ module Geocodeable
       ].reject(&:blank?).join(", ")
     end
 
-    def format_postal_code(str, country_id = nil)
-      str = str.strip.upcase.gsub(/\s*,\z/, "")
-      return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
-
-      str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
-    end
-
     def new_address_hash(address_hash)
       new_hash = address_hash.dup.symbolize_keys
       new_hash[:postal_code] = new_hash.delete(:zipcode)
@@ -93,7 +86,7 @@ module Geocodeable
   end
 
   def address(**kwargs)
-    Geocodeable.address(self, **kwargs)
+    GeocodeableLegacy.address(self, **kwargs)
   end
 
   def without_location?
@@ -150,7 +143,7 @@ module Geocodeable
     end
     self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
     self.city = city.blank? ? nil : clean_city(city)
-    self.zipcode = zipcode.blank? ? nil : Geocodeable.format_postal_code(zipcode, country_id)
+    self.zipcode = zipcode.blank? ? nil : GeocodeHelper.format_postal_code(zipcode, country_id)
   end
 
   def bike_index_geocode
@@ -164,7 +157,7 @@ module Geocodeable
 
   # default address hash. Probably could be used more often/better
   def address_hash
-    address_attrs = Geocodeable.location_attrs - %w[country_id country state_id state neighborhood]
+    address_attrs = GeocodeableLegacy.location_attrs - %w[country_id country state_id state neighborhood]
     attributes.slice(*address_attrs)
       .merge(state: state_abbr, country: country_abbr)
       .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil
@@ -172,7 +165,7 @@ module Geocodeable
   end
 
   def address_hash_new_attrs
-    Geocodeable.new_address_hash(address_hash)
+    GeocodeableLegacy.new_address_hash(address_hash)
   end
 
   # Override assignment to enable friendly finding state and country
