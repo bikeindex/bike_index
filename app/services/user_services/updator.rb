@@ -7,7 +7,7 @@ class UserServices::Updator
 
       address_record = user.address_record || AddressRecord.new
       address_record.update(
-        AddressRecord.attrs_to_duplicate(address_bike).merge(user_id: user.id, kind: :user)
+        Geocodeable.attrs_to_duplicate(address_bike).merge(user_id: user.id, kind: :user)
       )
       if address_bike.address_record? && address_bike.address_record.user_id.blank?
         address_bike.address_record.update(user_id: user.id)

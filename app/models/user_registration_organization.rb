@@ -47,8 +47,8 @@ class UserRegistrationOrganization < ApplicationRecord
     ignored_own_keys = %w[bike_sticker]
     merging_own_keys = (own_reg_info.keys - uro_reg_info.keys - ignored_own_keys)
     # Then, remove location keys
-    unless (uro_reg_info.keys & LOCATION_KEYS).count == LOCATION_KEYS.count
-      merging_own_keys += LOCATION_KEYS
+    unless (uro_reg_info.keys & Geocodeable::GEO_ATTRS).count == Geocodeable::GEO_ATTRS.count
+      merging_own_keys += Geocodeable::GEO_ATTRS
     end
     new_reg_info = uro_reg_info.merge(own_reg_info.slice(*merging_own_keys))
     new_reg_info["phone"] = user.phone if user.phone.present? # Assign phone from user if possible

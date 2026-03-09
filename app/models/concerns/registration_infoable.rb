@@ -3,17 +3,6 @@
 module RegistrationInfoable
   extend ActiveSupport::Concern
 
-  LOCATION_KEYS = %w[
-    city
-    country
-    postal_code
-    region_string
-    street
-    street_2
-    latitude
-    longitude
-  ].freeze
-
   # Currently not used, keeping it around for reference
   # REGISTRATION_INFO_KEYS = %w[
   #   organization_affiliation
