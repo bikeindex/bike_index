@@ -136,6 +136,7 @@ module Geocodeable
     self.city = Binxtils::InputNormalizer.string(city)
     self.neighborhood = Binxtils::InputNormalizer.string(neighborhood)
     self.postal_code = Geocodeable.format_postal_code(postal_code, country_id) if postal_code.present?
+    self.city = clean_city(city) if city.present?
 
     assign_region_record
   end
@@ -153,6 +154,25 @@ module Geocodeable
       # default to US if no current country is passed
       country_id != (current_country_id || Country.united_states_id)
     end
+  end
+
+  # Remove ", CA" from city like "Sacramento, CA" and assign region if not assigned.
+  # Only works for USA because states only work in US
+  def clean_city(str)
+    if str.match?(/(,|\.)\s*\w\w\s*\z/) && country_id == Country.united_states_id
+      state_abbr = str[/(,|\.)\s*\w\w\s*\z/].gsub(/,|\./, "").strip.downcase
+      city_without_state = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
+      if region_record_id.present?
+        str = city_without_state if region_record.abbreviation.downcase == state_abbr
+      else
+        matched_state = State.fuzzy_abbr_find(state_abbr)
+        if matched_state.present?
+          self.region_record_id = matched_state.id
+          str = city_without_state
+        end
+      end
+    end
+    str.strip.gsub(/\s*,\z/, "")
   end
 
   def assign_region_record
