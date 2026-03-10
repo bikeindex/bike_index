@@ -395,16 +395,11 @@ en:
         name: Name
         slug: Slug
       mail_snippet:
-        address: Address
         body: Body
         is_enabled: Is enabled
-        is_location_triggered: Is location triggered
         kind: Kind
-        latitude: Latitude
-        longitude: Longitude
         name: Name
         organization: :activerecord.models.organization
-        proximity_radius: Proximity radius
         public_images: Public images
       manufacturer:
         bikes: Bikes

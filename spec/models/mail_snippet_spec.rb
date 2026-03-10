@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe MailSnippet, type: :model do
-  it_behaves_like "geocodeable_legacy"
-
   describe "disable_if_blank" do
     it "sets unenabled if body is blank" do
       mail_snippet = MailSnippet.new(is_enabled: true, body: nil, kind: "welcome")
@@ -17,12 +15,6 @@ RSpec.describe MailSnippet, type: :model do
     it "includes all the ParkingNotification kinds" do
       expect(MailSnippet.kinds.count).to eq MailSnippet::KIND_ENUM.values.uniq.count
       expect((MailSnippet.kinds & ParkingNotification.kinds).count).to eq(ParkingNotification.kinds.count)
-    end
-  end
-
-  describe "location triggered" do
-    it "includes the location triggered" do
-      expect(MailSnippet.location_triggered_kinds).to eq([]) # None rn ;)
     end
   end
 
