@@ -357,7 +357,7 @@ class ImpoundRecord < ApplicationRecord
 
     # Create address_record from parking_notification's legacy fields
     self.address_record = AddressRecord.new(
-      AddressRecord.attrs_from_legacy(parking_notification)
+      Geocodeable.attrs_to_duplicate(parking_notification)
         .merge(kind: :impounded_from, organization_id:, bike_id:)
     )
   end

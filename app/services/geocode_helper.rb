@@ -56,13 +56,6 @@ module GeocodeHelper
     address_hash.except(:formatted_address)
   end
 
-  def format_postal_code(str, country_id = nil)
-    str = str.strip.upcase.gsub(/\s*,\z/, "")
-    return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
-
-    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
-  end
-
   #
   # private below here
   #
