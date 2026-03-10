@@ -21,8 +21,6 @@
 class UserRegistrationOrganization < ApplicationRecord
   include RegistrationInfoable
 
-  GEO_ATTRS_S = Geocodeable::GEO_ATTRS.map(&:to_s).freeze
-
   acts_as_paranoid
 
   belongs_to :user
@@ -42,8 +40,8 @@ class UserRegistrationOrganization < ApplicationRecord
       ignored_own_keys = %w[bike_sticker]
       merging_own_keys = (own_reg_info.keys - uro_reg_info.keys - ignored_own_keys)
       # Then, remove location keys
-      unless (uro_reg_info.keys & GEO_ATTRS_S).count == GEO_ATTRS_S.count
-        merging_own_keys += GEO_ATTRS_S
+      unless (uro_reg_info.keys & Geocodeable::GEO_ATTRS_S).count == Geocodeable::GEO_ATTRS_S.count
+        merging_own_keys += Geocodeable::GEO_ATTRS_S
       end
       new_reg_info = uro_reg_info.merge(own_reg_info.slice(*merging_own_keys))
       new_reg_info["phone"] = user.phone if user.phone.present? # Assign phone from user if possible

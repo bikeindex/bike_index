@@ -397,7 +397,7 @@ class Ownership < ApplicationRecord
   end
 
   def reg_info_location_hash
-    reg_info_location = registration_info.slice(*Geocodeable::GEO_ATTRS).reject { |_k, v| v.blank? }
+    reg_info_location = registration_info.slice(*Geocodeable::GEO_ATTRS_S).reject { |_k, v| v.blank? }
     return unless reg_info_location.present?
 
     reg_info_location["country"] ||= "US"
