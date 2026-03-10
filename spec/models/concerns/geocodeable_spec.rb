@@ -8,6 +8,7 @@ RSpec.describe Geocodeable do
     let(:target_attrs) do
       {
         street: "278 Broadway",
+        street_2: nil,
         city: "New York",
         postal_code: "10007",
         latitude: 40.7143528,

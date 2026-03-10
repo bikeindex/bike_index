@@ -361,7 +361,7 @@ class ParkingNotification < ActiveRecord::Base
     # in case geocoder is failing (which happens sometimes), permit if either is present
     return true if latitude.present? && longitude.present? || formatted_address_string.present?
 
-    errors.add(:address, :address_required)
+    errors.add(:base, "address is required")
   end
 
   def process_notification

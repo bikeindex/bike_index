@@ -179,6 +179,11 @@ module Geocodeable
   def assign_region_record
     self.region_string = nil if region_string.blank?
 
+    # Remove region_record if it doesn't match the country
+    if country_id.present? && region_record_id.present?
+      self.region_record_id = nil unless region_record&.country_id == country_id
+    end
+
     # Only remove region_string if region_record.present
     self.region_string = nil if region_record.present?
 
