@@ -69,7 +69,7 @@ module API
     end
 
     def cors_preflight_check
-      if request.method == :options
+      if request.method == "OPTIONS"
         headers["Access-Control-Allow-Origin"] = cors_allowed_origin
         headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
         headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Authorization"
