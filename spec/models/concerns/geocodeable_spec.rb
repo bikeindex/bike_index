@@ -12,8 +12,8 @@ RSpec.describe Geocodeable do
         postal_code: "10007",
         latitude: 40.7143528,
         longitude: -74.0059731,
-        region_record_id: nil,
-        region_string: nil,
+        region_record_id: obj.region_record_id,
+        region_string: obj.region_string,
         country_id: Country.united_states_id,
         skip_geocoding: true,
         skip_callback_job: true
