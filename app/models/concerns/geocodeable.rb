@@ -6,7 +6,6 @@ module Geocodeable
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
   ADDRESS_ATTRS = %i[city country_id postal_code region_record_id region_string street street_2].freeze
   GEO_ATTRS = (ADDRESS_ATTRS + %i[latitude longitude]).freeze
-  GEO_ATTRS_S = (GEO_ATTRS.map(&:to_s) + ["country"]).freeze
 
   class << self
     def attrs_to_duplicate(obj)

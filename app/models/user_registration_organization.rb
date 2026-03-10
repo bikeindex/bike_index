@@ -39,9 +39,10 @@ class UserRegistrationOrganization < ApplicationRecord
       own_reg_info = user.ownerships.reorder(:updated_at).pluck(:registration_info).reduce({}, :merge)
       ignored_own_keys = %w[bike_sticker]
       merging_own_keys = (own_reg_info.keys - uro_reg_info.keys - ignored_own_keys)
+      location_keys = RegistrationInfoable::LOCATION_KEYS
       # Then, remove location keys
-      unless (uro_reg_info.keys & Geocodeable::GEO_ATTRS_S).count == Geocodeable::GEO_ATTRS_S.count
-        merging_own_keys += Geocodeable::GEO_ATTRS_S
+      unless (uro_reg_info.keys & location_keys).count == location_keys.count
+        merging_own_keys += location_keys
       end
       new_reg_info = uro_reg_info.merge(own_reg_info.slice(*merging_own_keys))
       new_reg_info["phone"] = user.phone if user.phone.present? # Assign phone from user if possible
