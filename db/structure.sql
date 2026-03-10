@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -2905,7 +2906,6 @@ CREATE TABLE public.parking_notifications (
     zipcode character varying,
     city character varying,
     neighborhood character varying,
-    hide_address boolean DEFAULT false,
     country_id bigint,
     state_id bigint,
     message text,
@@ -7437,6 +7437,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260310031750'),
 ('20260310022701'),
 ('20260305025122'),
 ('20260304181710'),

@@ -9,7 +9,6 @@
 #  accuracy                   :float
 #  city                       :string
 #  delivery_status            :string
-#  hide_address               :boolean          default(FALSE)
 #  image                      :text
 #  image_processing           :boolean          default(FALSE), not null
 #  internal_notes             :text
