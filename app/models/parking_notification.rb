@@ -9,7 +9,6 @@
 #  accuracy              :float
 #  city                  :string
 #  delivery_status       :string
-#  hide_address          :boolean          default(FALSE)
 #  image                 :text
 #  image_processing      :boolean          default(FALSE), not null
 #  internal_notes        :text
@@ -131,6 +130,10 @@ class ParkingNotification < ActiveRecord::Base
     within_bounding_box(sw_lat, sw_lng, ne_lat, ne_lng)
   end
 
+  def self.permitted_visible_attribute(_, default: nil)
+    :street
+  end
+
   # geocoding is managed by set_calculated_attributes
   def should_be_geocoded?
     false
@@ -173,9 +176,9 @@ class ParkingNotification < ActiveRecord::Base
     owner_known?
   end
 
-  def show_address
-    !hide_address
-  end
+  def publicly_visible_attribute = :street
+
+  def show_address = true
 
   def kind_humanized
     self.class.kinds_humanized[kind.to_sym]
@@ -274,7 +277,7 @@ class ParkingNotification < ActiveRecord::Base
     self
   end
 
-  # force_show_address, just like stolen_record - but this has a hide_address attr, so by default we show addresses
+  # force_show_address, just like stolen_record - by default we show addresses
   def address(force_show_address: false, country: [:iso, :optional, :skip_default])
     GeocodeableLegacy.address(
       self,
