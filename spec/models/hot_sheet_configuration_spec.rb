@@ -49,8 +49,7 @@ RSpec.describe HotSheetConfiguration, type: :model do
       end
       # On days when there is a transition between DST, the time gap is an hour. This hacks that
       def dst_transition?
-        time_now = Time.current.in_time_zone(ActiveSupport::TimeZone["Atlantic Time (Canada)"])
-        time_now.dst? != time_now.yesterday.dst?
+        Time.current.dst? != Time.current.yesterday.dst?
       end
       let(:within_time) { dst_transition? ? 3602 : 2 }
       it "is falsey" do
