@@ -4,14 +4,13 @@ require "rails_helper"
 
 RSpec.describe Backfills::ParkingNotificationPubliclyVisibleJob, type: :job do
   describe "perform" do
-    let!(:parking_notification_hidden) { FactoryBot.create(:parking_notification, hide_address: true) }
-    let!(:parking_notification_shown) { FactoryBot.create(:parking_notification, hide_address: false) }
+    let!(:parking_notification_hidden) { FactoryBot.create(:parking_notification) }
+    let!(:parking_notification_shown) { FactoryBot.create(:parking_notification) }
 
     before do
-      # Reset publicly_visible_attribute to nil to simulate pre-backfill state
-      ParkingNotification.update_all(publicly_visible_attribute: nil)
-      parking_notification_hidden.reload
-      parking_notification_shown.reload
+      # Simulate pre-backfill state: set hide_address and clear publicly_visible_attribute
+      parking_notification_hidden.update_columns(hide_address: true, publicly_visible_attribute: nil)
+      parking_notification_shown.update_columns(hide_address: false, publicly_visible_attribute: nil)
     end
 
     it "sets publicly_visible_attribute based on hide_address" do

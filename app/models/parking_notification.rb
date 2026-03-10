@@ -177,11 +177,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def show_address
-    if publicly_visible_attribute.present?
-      publicly_visible_attribute == "street"
-    else
-      !hide_address
-    end
+    publicly_visible_attribute.nil? || publicly_visible_attribute == "street"
   end
 
   def kind_humanized
@@ -281,7 +277,7 @@ class ParkingNotification < ActiveRecord::Base
     self
   end
 
-  # force_show_address, just like stolen_record - but this has a hide_address attr, so by default we show addresses
+  # force_show_address, just like stolen_record - by default we show addresses
   def address(force_show_address: false, country: [:iso, :optional, :skip_default])
     GeocodeableLegacy.address(
       self,
@@ -299,7 +295,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def set_calculated_attributes
-    self.publicly_visible_attribute ||= hide_address ? :postal_code : :street
+    self.publicly_visible_attribute ||= :street
     self.initial_record_id ||= potential_initial_record&.id if is_repeat
     self.repeat_number ||= calculated_repeat_number
     self.resolved_at ||= calculated_resolved_at # Used by by calculated_status, so must come first
