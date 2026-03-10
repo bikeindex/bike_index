@@ -30,6 +30,6 @@
           = link_to "update your contact preferences", edit_my_account_url, class: "gray-link"
           - if @user.present?
             or
-            = link_to "unsubscribe", unsubscribe_user_url(@user.username), class: "gray-link"
+            = link_to "unsubscribe", unsubscribe_user_url(@user.signed_id(purpose: :unsubscribe, expires_in: 30.days)), class: "gray-link"
 
 
