@@ -2919,8 +2919,7 @@ CREATE TABLE public.parking_notifications (
     retrieved_by_id bigint,
     image text,
     image_processing boolean DEFAULT false NOT NULL,
-    repeat_number integer,
-    publicly_visible_attribute integer
+    repeat_number integer
 );
 
 
@@ -7438,7 +7437,6 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260310031750'),
-('20260310022701'),
 ('20260305025122'),
 ('20260304181710'),
 ('20260220053202'),

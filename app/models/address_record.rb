@@ -34,8 +34,10 @@ class AddressRecord < ApplicationRecord
   include Geocodeable
 
   KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3, organization: 4, impounded_from: 5}.freeze
+  PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
 
   enum :kind, KIND_ENUM
+  enum :publicly_visible_attribute, PUBLICLY_VISIBLE_ATTRIBUTE_ENUM
 
   belongs_to :user
   belongs_to :bike
@@ -53,6 +55,15 @@ class AddressRecord < ApplicationRecord
     def permitted_params
       # user_id and kind should be set manually!
       Geocodeable::ADDRESS_ATTRS
+    end
+
+    def permitted_visible_attribute(string_or_sym, default: nil)
+      if string_or_sym.present?
+        target_attr = string_or_sym&.to_sym
+        return target_attr if PUBLICLY_VISIBLE_ATTRIBUTE_ENUM.key?(target_attr)
+      end
+
+      (default.presence || :postal_code).to_sym
     end
 
     def default_visibility_for(kind)

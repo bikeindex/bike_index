@@ -271,12 +271,11 @@ RSpec.describe ParkingNotification, type: :model do
 
   describe "subject" do
     let(:bike) { FactoryBot.create(:bike, cycle_type: "pedi-cab") }
-    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, publicly_visible_attribute: nil) }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike) }
     let(:organization) { parking_notification.organization }
     it "is default with snippet" do
       expect(parking_notification.reload.mail_snippet).to be_blank
       expect(parking_notification.subject).to eq "Your pedi cab is parked incorrectly"
-      expect(parking_notification.publicly_visible_attribute).to eq "street"
     end
     context "with mail_snippet" do
       let!(:mail_snippet) do
@@ -300,22 +299,16 @@ RSpec.describe ParkingNotification, type: :model do
     it "creates an address" do
       parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
         city: "Chicago",
-        publicly_visible_attribute: :postal_code,
         state_id: state.id,
         zipcode: "60647",
         country_id: country.id)
-      expect(parking_notification.address).to eq("Chicago, XXX 60647, NEVVVV")
-      expect(parking_notification.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
-      parking_notification.publicly_visible_attribute = :street
+      expect(parking_notification.show_address).to be_truthy
       expect(parking_notification.address).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
     end
     it "is ok with missing information" do
       parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
         zipcode: "60647",
-        publicly_visible_attribute: :postal_code,
         country_id: country.id)
-      expect(parking_notification.address).to eq("60647, NEVVVV")
-      parking_notification.publicly_visible_attribute = :street
       expect(parking_notification.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
     end
     it "returns even if no country" do
