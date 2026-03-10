@@ -110,9 +110,8 @@
 </div>
 
 <% if @render_chart %>
-  <div class="col-12 mt-2 mb-4">
-    <%= column_chart time_range_counts(collection: Bike.unscoped.where(id: available_bikes), column: "bikes.created_at"), stacked: true, thousands: "," %>
-  </div>
+  <% series = [{name: "Bikes", data: UI::Chart::Component.time_range_counts(collection: Bike.unscoped.where(id: available_bikes), time_range: @time_range, column: "bikes.created_at")}] %>
+  <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
 <% end %>
 
 <%= render partial: "/shared/period_select" %>
