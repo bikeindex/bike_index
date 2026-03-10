@@ -18,7 +18,7 @@ RSpec.describe Admin::BikesController, type: :request do
       let!(:bike) { FactoryBot.create(:bike, :with_ownership, :with_ownership_claimed, user:) }
       let(:user) { FactoryBot.create(:user_confirmed, email: "somethingcool@bikeindex.org") }
       it "renders the chart" do
-        get base_url, params: {render_chart: true, search_email: "somethingcool@b", period: "year"}
+        get base_url, params: {render_chart: true, search_email: "somethingcool@bikeindex.org", period: "year"}
         expect(response.code).to eq("200")
         expect(response.body).to include("chart-1")
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
