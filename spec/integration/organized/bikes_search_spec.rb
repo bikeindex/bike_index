@@ -63,6 +63,26 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_css("tbody tr", minimum: 1)
   end
 
+  it "preserves turbo-frame after search submissions" do
+    visit bikes_path
+    # Initial auto-submit loads results via turbo_stream
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table.table", wait: 10)
+    # turbo-frame element must still exist after turbo_stream.update
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
+
+    # Search again — this fails if the frame was removed by turbo_stream.replace
+    fill_in "search_email", with: "alice@example.com"
+    find("#search-button").click
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame", wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+
+    # Third submission to confirm frame is still intact
+    fill_in "search_email", with: ""
+    find("#search-button").click
+    expect(page).to have_css("tbody tr", count: 2, wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
+  end
+
   context "with avery_export enabled" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[bike_search avery_export]) }
     let!(:avery_bike) do
