@@ -143,7 +143,7 @@ module GeocodeableLegacy
     end
     self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
     self.city = city.blank? ? nil : clean_city(city)
-    self.zipcode = zipcode.blank? ? nil : GeocodeHelper.format_postal_code(zipcode, country_id)
+    self.zipcode = zipcode.blank? ? nil : Geocodeable.format_postal_code(zipcode, country_id)
   end
 
   def bike_index_geocode

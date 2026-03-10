@@ -60,4 +60,32 @@ RSpec.describe Geocodeable do
       end
     end
   end
+
+  describe "format_postal_code" do
+    it "strips and upcases" do
+      expect(described_class.format_postal_code("  90210 , ")).to eq "90210"
+    end
+
+    context "canadian postal code" do
+      let(:canada_id) { Country.canada_id }
+
+      it "formats 6-character code with space" do
+        expect(described_class.format_postal_code("t4n4e4", canada_id)).to eq "T4N 4E4"
+      end
+
+      it "preserves already-spaced code" do
+        expect(described_class.format_postal_code("T4N 4E4", canada_id)).to eq "T4N 4E4"
+      end
+
+      it "does not format non-6-character codes" do
+        expect(described_class.format_postal_code("T4N", canada_id)).to eq "T4N"
+      end
+    end
+
+    context "non-canadian country" do
+      it "does not add space" do
+        expect(described_class.format_postal_code("t4n4e4", nil)).to eq "T4N4E4"
+      end
+    end
+  end
 end
