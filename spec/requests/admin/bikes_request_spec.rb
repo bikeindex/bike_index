@@ -13,6 +13,16 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(flash).to_not be_present
       expect(assigns(:page_id)).to eq "admin_bikes_index"
     end
+
+    context "with render_chart and search_email" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "found@example.com") }
+      it "renders the chart" do
+        get base_url, params: {render_chart: true, search_email: "found@example.com", period: "year"}
+        expect(response.code).to eq("200")
+        expect(response.body).to_not include("Can't graph")
+        expect(assigns(:search_email)).to eq "found@example.com"
+      end
+    end
   end
 
   describe "duplicates" do
