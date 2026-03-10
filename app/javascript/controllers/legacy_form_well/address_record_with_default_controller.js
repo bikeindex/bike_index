@@ -6,7 +6,9 @@ export default class extends Controller {
   static targets = ['useAccountCheckbox', 'staticFields', 'nonStaticFields']
 
   connect () {
-    this.toggleUseAccount()
+    if (this.hasUseAccountCheckboxTarget) {
+      this.toggleUseAccount()
+    }
   }
 
   toggleUseAccount () {
