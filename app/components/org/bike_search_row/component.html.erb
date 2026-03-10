@@ -6,7 +6,8 @@
   <a
     class="localizeTime"
     href="<%= bike_path(@bike, organization_id: @organization.to_param) %>"
-    data-turbo="false"
+    data-turbo-frame="_top"
+    aria-label="View bike"
   >
     <%= l @bike.created_at, format: :convert_time %>
   </a>
@@ -53,7 +54,7 @@
   <% if @bike.email_visible_for?(@organization) %>
     <%= @bike.owner_email %>
     <small>
-      <%= link_to "\u{1F50E}", organization_bikes_path(organization_id: @organization.to_param, search_email: @bike.owner_email), class: "display-sortable-link", data: {turbo: false} %>
+      <%= link_to "\u{1F50E}", organization_bikes_path(organization_id: @organization.to_param, search_email: @bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
     </small>
   <% else %>
     <em class="less-strong"><%= translation(".email_hidden") %></em>
@@ -111,14 +112,14 @@
       <small>
         <%= link_to translation(".link"),
           bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: @bike.id),
-          method: "PUT", data: {turbo: false} %>
+          method: "PUT", data: {turbo_frame: "_top"} %>
       </small>
     <% else %>
       <% @bike.bike_stickers.each_with_index do |bike_sticker, index| %>
         <% if bike_sticker.organization.present? && bike_sticker.organization_id == @organization.id %>
           <%= link_to bike_sticker.pretty_code,
             edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param),
-            class: "small", data: {turbo: false} %>
+            class: "small", data: {turbo_frame: "_top"} %>
         <% else %>
           <small><%= bike_sticker.pretty_code %></small>
         <% end %>
