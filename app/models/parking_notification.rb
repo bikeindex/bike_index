@@ -145,6 +145,9 @@ class ParkingNotification < ActiveRecord::Base
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
   end
 
+  def street_2
+  end
+
   def active?
     resolved_at.blank?
   end

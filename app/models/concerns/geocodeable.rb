@@ -131,7 +131,7 @@ module Geocodeable
 
   def clean_location_attributes
     self.street = Binxtils::InputNormalizer.string(street)
-    self.street_2 = Binxtils::InputNormalizer.string(street_2)
+    self.street_2 = Binxtils::InputNormalizer.string(street_2) if has_attribute?(:street_2)
     self.postal_code = Binxtils::InputNormalizer.string(postal_code)
     self.city = Binxtils::InputNormalizer.string(city)
     self.neighborhood = Binxtils::InputNormalizer.string(neighborhood)
