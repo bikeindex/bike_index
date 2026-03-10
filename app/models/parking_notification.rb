@@ -136,6 +136,22 @@ class ParkingNotification < ActiveRecord::Base
     false
   end
 
+  def skip_geocoding?
+    skip_geocoding.present?
+  end
+
+  def latitude_public
+    return nil if latitude.blank?
+
+    show_address ? latitude : latitude.round(Bike::PUBLIC_COORD_LENGTH)
+  end
+
+  def longitude_public
+    return nil if longitude.blank?
+
+    show_address ? longitude : longitude.round(Bike::PUBLIC_COORD_LENGTH)
+  end
+
   def sent_at
     email_success? ? created_at : nil
   end
