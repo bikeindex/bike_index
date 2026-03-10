@@ -391,5 +391,4 @@ class ParkingNotification < ActiveRecord::Base
       "current"
     end
   end
-
 end
