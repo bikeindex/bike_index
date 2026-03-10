@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe AddressRecord, type: :model do
+  it_behaves_like "geocodeable"
+
   describe "factory" do
     let(:address_record) { FactoryBot.create(:address_record) }
     it "is valid" do
@@ -145,8 +147,6 @@ RSpec.describe AddressRecord, type: :model do
       end
     end
   end
-
-  it_behaves_like "geocodeable"
 
   describe "formatted_address_string" do
     let(:address_record) { FactoryBot.build(:address_record, :vancouver, publicly_visible_attribute:) }
