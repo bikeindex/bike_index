@@ -61,10 +61,8 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_current_path(/page=2/, wait: 10)
     expect(page).to have_css("table.table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 1)
-  end
 
-  it "preserves turbo-frame after search submissions" do
-    visit bikes_path
+    # Verify that it preserves turbo-frame after search submissions
     # Initial auto-submit loads results via turbo_stream
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table.table", wait: 10)
     # turbo-frame element must still exist after turbo_stream.update
