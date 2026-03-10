@@ -146,9 +146,7 @@ RSpec.describe AddressRecord, type: :model do
     end
   end
 
-  describe "clean_city" do
-    it_behaves_like "geocodeable#clean_city"
-  end
+  it_behaves_like "geocodeable"
 
   describe "formatted_address_string" do
     let(:address_record) { FactoryBot.build(:address_record, :vancouver, publicly_visible_attribute:) }
