@@ -110,7 +110,7 @@ module Organized
       bike = Bike.unscoped.find(params[:id])
       bike_organization = bike.bike_organizations.find_by(organization_id: current_organization.id)
 
-      unless bike_organization.present? && current_organization.enabled?("reg_notes")
+      unless bike_organization.present? && current_organization.enabled?("registration_notes")
         redirect_to(bike_path(bike)) && return
       end
 

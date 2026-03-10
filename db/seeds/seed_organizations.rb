@@ -46,7 +46,7 @@ feature_name_and_slugs = [
   {name: "Bike Stickers: Sticker order", feature_slugs: []},
   {name: "Registration field: Address - REQUIRED", feature_slugs: ["reg_address", "require_reg_address"]},
   {name: "Registration field: True/False question", feature_slugs: []},
-  {name: "Registration field: Notes", feature_slugs: ["reg_notes"]}
+  {name: "Registration Notes", feature_slugs: ["registration_notes"]}
 ]
 
 feature_ids = []

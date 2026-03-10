@@ -596,7 +596,7 @@ RSpec.describe Organized::BikesController, type: :request do
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user, creation_organization: current_organization) }
     let(:bike_organization) { bike.bike_organizations.find_by(organization_id: current_organization.id) }
 
-    context "without reg_notes feature" do
+    context "without registration_notes feature" do
       it "redirects" do
         bike_organization.reload
         patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
@@ -605,8 +605,8 @@ RSpec.describe Organized::BikesController, type: :request do
       end
     end
 
-    context "with reg_notes feature" do
-      let(:enabled_feature_slugs) { %w[bike_search reg_notes] }
+    context "with registration_notes feature" do
+      let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
 
       it "updates notes" do
         bike_organization.reload
@@ -638,7 +638,7 @@ RSpec.describe Organized::BikesController, type: :request do
   end
 
   describe "index with search_notes" do
-    let(:enabled_feature_slugs) { %w[bike_search reg_notes] }
+    let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
     let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
 
     before do

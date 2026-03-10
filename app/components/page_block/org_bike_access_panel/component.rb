@@ -73,7 +73,7 @@ module PageBlock::OrgBikeAccessPanel
     end
 
     def show_notes?
-      organization_registered? && @organization.enabled?("reg_notes")
+      organization_registered? && @organization.enabled?("registration_notes")
     end
 
     def bike_organization
