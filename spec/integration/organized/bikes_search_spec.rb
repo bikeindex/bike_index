@@ -3,7 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "Organized bikes search", :js, type: :system do
-  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[bike_search]) }
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
+  let(:enabled_feature_slugs) { %w[bike_search] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bikes_path) { "/o/#{organization.to_param}/bikes" }
 
@@ -11,6 +12,9 @@ RSpec.describe "Organized bikes search", :js, type: :system do
   let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "bob@example.com") }
 
   before do
+    # Ensure gear types exist so bike show page doesn't write during readonly mode
+    RearGearType.fixed
+    FrontGearType.fixed
     visit new_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
@@ -79,10 +83,18 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     find("#search-button").click
     expect(page).to have_css("tbody tr", count: 10, wait: 10)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
+
+    # clicking a bike navigates to the bike show page with organized panel
+    first("a[aria-label='View bike']").click
+
+    expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
+
+    expect(page).to have_css(".organized-access-panel")
+    expect(page).to have_content(/#{organization.name}\s+Access Panel/i)
   end
 
   context "with avery_export enabled" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[bike_search avery_export]) }
+    let(:enabled_feature_slugs) { %w[bike_search avery_export] }
     let!(:avery_bike) do
       bike = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: organization)
       bike.current_ownership.update!(owner_name: "Test Owner")
