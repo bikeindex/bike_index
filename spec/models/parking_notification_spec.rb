@@ -271,11 +271,12 @@ RSpec.describe ParkingNotification, type: :model do
 
   describe "subject" do
     let(:bike) { FactoryBot.create(:bike, cycle_type: "pedi-cab") }
-    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike) }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, publicly_visible_attribute: nil) }
     let(:organization) { parking_notification.organization }
     it "is default with snippet" do
-      expect(parking_notification.mail_snippet).to be_blank
+      expect(parking_notification.reload.mail_snippet).to be_blank
       expect(parking_notification.subject).to eq "Your pedi cab is parked incorrectly"
+      expect(parking_notification.publicly_visible_attribute).to eq "street"
     end
     context "with mail_snippet" do
       let!(:mail_snippet) do
