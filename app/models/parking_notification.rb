@@ -50,7 +50,9 @@
 #  index_parking_notifications_on_user_id            (user_id)
 #
 class ParkingNotification < ActiveRecord::Base
-  include GeocodeableParkingNotification
+  include Geocodeable
+
+  geocoded_by :formatted_address_string
 
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other_parking_notification: 3}.freeze
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
@@ -59,26 +61,26 @@ class ParkingNotification < ActiveRecord::Base
   enum :kind, KIND_ENUM
   enum :status, STATUS_ENUM
   enum :retrieved_kind, RETRIEVED_KIND_ENUM
-
-  mount_uploader :image, ImageUploaderBackgrounded
-  process_in_background :image
-
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
   belongs_to :impound_record
   belongs_to :initial_record, class_name: "ParkingNotification"
   belongs_to :retrieved_by, class_name: "User"
-
   has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
-
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
+  attr_accessor :skip_geocoding, :is_repeat, :use_entered_address, :image_cache, :skip_update
 
-  attr_accessor :is_repeat, :use_entered_address, :image_cache, :skip_update
+  mount_uploader :image, ImageUploaderBackgrounded
+  process_in_background :image
 
   before_validation :set_calculated_attributes
   after_commit :process_notification
+
+  scope :with_location, -> { where.not(latitude: nil) }
+  scope :with_street, -> { with_location.where.not(street: nil) }
+  scope :without_street, -> { where(street: ["", nil]) }
 
   scope :active, -> { where(resolved_at: nil) }
   scope :resolved, -> { where.not(resolved_at: nil) }
