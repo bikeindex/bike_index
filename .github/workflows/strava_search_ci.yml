@@ -9,7 +9,7 @@ defaults:
 
 jobs:
   changes:
-    name: Check for strava_search changes, trigger run of strava_search CI if there are
+    name: Check for changes, trigger strava_search CI if there are
     runs-on: ubuntu-latest
     outputs:
       strava_search: ${{ steps.filter.outputs.strava_search }}
