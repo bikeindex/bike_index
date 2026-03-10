@@ -2,167 +2,67 @@ require "rails_helper"
 
 RSpec.shared_examples "geocodeable" do
   let(:model_sym) { subject.class.name.underscore.to_sym }
-  let(:instance) { FactoryBot.create model_sym }
 
-  describe "friendly assigning state and country" do
-    let(:country) { Country.united_states }
-    let!(:state) { State.create(name: "Wyoming", abbreviation: "WY", country_id: country.id) }
-    let(:obj_with_strings) { subject.class.new(state: "wy", country: "USA") }
-    let(:obj_with_objects) { subject.class.new(state: state, country_id: country.id) }
-    it "assigns by strings and by object, doesn't explode when not found" do
-      expect(obj_with_strings.country).to eq country
-      expect(obj_with_strings.state).to eq state
-      obj_with_strings.state = "wyoming"
-      expect(obj_with_strings.state).to eq state
-      expect(obj_with_strings.metric_units?).to be_falsey # Because US
+  describe "clean_city" do
+    let(:record) { described_class.new(city:, country_id: Country.united_states_id, region_record_id:, skip_geocoding: true) }
+    let(:region_record_id) { nil }
 
-      expect(obj_with_objects.country).to eq country
-      expect(obj_with_objects.state).to eq state
-      # Doesn't explode when not found
-      obj_with_objects.state = "Other state"
-      expect(obj_with_objects.state).to be_blank
-    end
-  end
+    context "with city containing state abbreviation" do
+      let(:city) { "Sacramento, CA" }
 
-  describe ".address" do
-    let(:object) do
-      FactoryBot.build_stubbed(
-        model_sym,
-        street: "1 Park Ave.",
-        city: "New York",
-        state: FactoryBot.build_stubbed(:state_new_york),
-        zipcode: "10016",
-        country: FactoryBot.build_stubbed(:country_united_states)
-      )
-    end
-    context "given booleans for address components" do
-      it "toggles component inclusion in the address string" do
-        addr = Geocodeable.address(object)
-        expect(addr).to eq("1 Park Ave., New York, NY 10016, US")
-        addr = Geocodeable.address(object, street: false)
-        expect(addr).to eq("New York, NY 10016, US")
-        addr = Geocodeable.address(object, city: false)
-        expect(addr).to eq("1 Park Ave., NY 10016, US")
-        addr = Geocodeable.address(object, zipcode: false)
-        expect(addr).to eq("1 Park Ave., New York, NY, US")
-        addr = Geocodeable.address(object, country: false)
-        expect(addr).to eq("1 Park Ave., New York, NY 10016")
-        expect(object.address_present?).to be_truthy
+      it "removes state abbreviation and assigns region" do
+        california = FactoryBot.create(:state_california)
+        record.valid?
+        expect(record.city).to eq "Sacramento"
+        expect(record.region_record_id).to eq california.id
       end
     end
 
-    context "given a format option for country" do
-      it "toggles country format" do
-        addr = Geocodeable.address(object, country: [:iso])
-        expect(addr).to eq("1 Park Ave., New York, NY 10016, US")
-        addr = Geocodeable.address(object, country: [:name])
-        expect(addr).to eq("1 Park Ave., New York, NY 10016, United States")
+    context "with city containing state abbreviation and region already assigned" do
+      let(:city) { "Sacramento, CA" }
+      let(:region_record_id) { FactoryBot.create(:state_california).id }
+
+      it "removes state abbreviation when matching" do
+        record.valid?
+        expect(record.city).to eq "Sacramento"
       end
     end
 
-    context "given no country data" do
-      it "returns nothing by default since country is required" do
-        object.country = nil
-        addr = Geocodeable.address(object)
-        expect(addr).to eq("")
-        expect(object.address_present?).to be_truthy
-      end
+    context "with city containing non-matching state abbreviation" do
+      let(:city) { "Sacramento, NY" }
+      let(:region_record_id) { FactoryBot.create(:state_california).id }
 
-      it "returns an address with no country if country is optional" do
-        object.country = nil
-        addr = Geocodeable.address(object, country: [:optional])
-        expect(addr).to eq("1 Park Ave., New York, NY 10016")
-        expect(object.address_present?).to be_truthy
-        expect(object.metric_units?).to be_truthy # Default to metric, because it's better
+      it "does not remove the abbreviation" do
+        record.valid?
+        expect(record.city).to eq "Sacramento, NY"
       end
     end
 
-    context "given the :skip_default option for country" do
-      it "omits the country if the US, else includes it" do
-        expect(object.country).to be_default
+    context "with period separator" do
+      let(:city) { "Sacramento. CA" }
 
-        addr = Geocodeable.address(object, country: [:iso, :skip_default])
-        expect(addr).to eq("1 Park Ave., New York, NY 10016")
-
-        object.country = Country.canada
-
-        addr = Geocodeable.address(object, country: [:skip_default])
-        expect(addr).to eq("1 Park Ave., New York, NY 10016, CA")
-
-        addr = Geocodeable.address(object, country: [:name, :skip_default])
-        expect(addr).to eq("1 Park Ave., New York, NY 10016, Canada")
-        expect(object.address_present?).to be_truthy
+      it "removes state abbreviation" do
+        FactoryBot.create(:state_california)
+        record.valid?
+        expect(record.city).to eq "Sacramento"
       end
     end
-  end
 
-  describe ".address_present" do
-    context "country and state" do
-      let(:state) { FactoryBot.create(:state_new_york) }
-      let(:object) { subject.class.new(country: Country.united_states, state: state) }
-      it "is falsey" do
-        expect(object.address_present?).to be_falsey
-      end
-    end
-    context "zipcode" do
-      let(:object) { subject.class.new(zipcode: "94608") }
-      it "is truthy" do
-        expect(object.address_present?).to be_truthy
-      end
-    end
-    context "city" do
-      let(:object) { subject.class.new(city: "Oakland") }
-      it "is truthy" do
-        expect(object.address_present?).to be_truthy
-      end
-    end
-    context "zipcode" do
-      let(:object) { subject.class.new(street: "123 Main St") }
-      it "is truthy" do
-        expect(object.address_present?).to be_truthy
-      end
-    end
-  end
+    context "with non-US country" do
+      let(:record) { described_class.new(city: "Amsterdam, NH", country_id: Country.netherlands.id, skip_geocoding: true) }
 
-  describe ".clean_state_and_street_data" do
-    let!(:state) { nil }
-    let(:object) { subject.class.new(street: " ", city: "\n", zipcode: "   ") }
-    before { object.clean_state_and_street_data }
-    it "removes blanks" do
-      expect(object.street).to eq nil
-      expect(object.city).to eq nil
-      expect(object.zipcode).to eq nil
+      it "does not modify city" do
+        record.valid?
+        expect(record.city).to eq "Amsterdam, NH"
+      end
     end
-    describe "city name with state" do
-      let!(:state) { FactoryBot.create(:state_new_york) }
-      let(:object) { subject.class.new(country: Country.united_states, state: state, city: "New York, NY") }
-      it "removes state" do
-        expect(object.city).to eq "New York"
-        expect(object.state_id).to eq state.id
-      end
-      context "state not set" do
-        let(:object) { subject.class.new(country: Country.united_states, city: "New York,NY", state_id: nil) }
-        it "sets state" do
-          expect(object.city).to eq "New York"
-          expect(object.state_id).to eq state.id
-        end
-      end
-      context "larkspur" do
-        let!(:state) { FactoryBot.create(:state, :find_or_create, name: "Colorado", abbreviation: "CO") }
-        let(:object) { subject.class.new(country: Country.united_states, state: state, city: " larkspur . co\n") }
-        it "removes co" do
-          expect(object.city).to eq "larkspur"
-          expect(object.state_id).to eq state.id
-        end
-      end
-      context "Alberta" do
-        let(:object) { subject.class.new(country: Country.canada, state: nil, city: " Edmonton, AB\n") }
-        # Currently, not handling states except US :(
-        # TODO: fix this!!!
-        it "does not remove ab" do
-          expect(object.city).to eq "Edmonton, AB"
-          expect(object.state_id).to be_blank
-        end
+
+    context "with plain city name" do
+      let(:city) { "Sacramento" }
+
+      it "leaves city unchanged" do
+        record.valid?
+        expect(record.city).to eq "Sacramento"
       end
     end
   end

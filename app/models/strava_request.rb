@@ -47,6 +47,8 @@ class StravaRequest < AnalyticsRecord
   }.freeze
   PENDING_OR_SUCCESS = %i[success pending].freeze
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
+  BINX_RESPONSE = %i[binx_response binx_response_rate_limited].freeze
+  NOT_BINX_RESPONSE = (RESPONSE_STATUS_ENUM.keys - BINX_RESPONSE).freeze
   PRIORITY_MAP = {
     incoming_webhook: 1,
     fetch_athlete: 2,

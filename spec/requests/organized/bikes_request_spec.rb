@@ -138,6 +138,17 @@ RSpec.describe Organized::BikesController, type: :request do
         end
       end
     end
+    context "turbo_stream" do
+      it "renders with update action" do
+        get base_url, as: :turbo_stream
+        expect(response.media_type).to eq Mime[:turbo_stream].to_s
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include("<turbo-stream action=\"update\" target=\"organized_bikes_results_frame\">")
+        expect(response).to render_template(:index)
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+      end
+    end
+
     context "with search_stickers" do
       let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: bike_with_sticker) }

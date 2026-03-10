@@ -7,7 +7,7 @@
 Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
-    policy.font_src :self, "https://fonts.gstatic.com", :data
+    policy.font_src :self, "https://fonts.gstatic.com", "http://fonts.gstatic.com", :data
     policy.img_src :self, "https://files.bikeindex.org",
       "https://uploads.bikeindex.org",
       "https://bikebook.s3.amazonaws.com",
@@ -20,7 +20,7 @@ Rails.application.configure do
       "https://www.facebook.com",
       "https://connect.facebook.net",
       "https://pbs.twimg.com",
-      "https://syndication.twitter.com", :data
+      "https://syndication.twitter.com", :data, :blob
     policy.object_src :none
     # unsafe_eval is required for application_revised.js jQuery - remove it when possible!
     policy.script_src :self, :unsafe_inline, :unsafe_eval,
@@ -55,6 +55,19 @@ Rails.application.configure do
     policy.worker_src :self, :blob
     policy.frame_src :self,
       "https://www.google.com",
+      # Google Ads conversion tracking iframes use country-specific Google domains
+      "https://www.google.ca",
+      "https://www.google.co.uk",
+      "https://www.google.com.au",
+      "https://www.google.com.br",
+      "https://www.google.de",
+      "https://www.google.es",
+      "https://www.google.fr",
+      "https://www.google.it",
+      "https://www.google.nl",
+      "https://www.google.co.in",
+      "https://www.google.co.jp",
+      "https://www.google.com.mx",
       "https://www.recaptcha.net",
       "https://googleads.g.doubleclick.net",
       "https://www.googletagmanager.com",

@@ -2905,7 +2905,6 @@ CREATE TABLE public.parking_notifications (
     zipcode character varying,
     city character varying,
     neighborhood character varying,
-    hide_address boolean DEFAULT false,
     country_id bigint,
     state_id bigint,
     message text,
@@ -7436,6 +7435,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260310031750'),
 ('20260305025122'),
 ('20260304181710'),
 ('20260220053202'),

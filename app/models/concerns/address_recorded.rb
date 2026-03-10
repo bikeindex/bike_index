@@ -20,8 +20,8 @@ module AddressRecorded
     # To ease migration, use the existing attrs. Handle if they've been dropped
     return {} unless defined?(street)
 
-    # Copies Geocodeable#address_hash
-    address_attrs = Geocodeable.location_attrs - %w[country_id country state_id state neighborhood]
+    # Copies GeocodeableLegacy#address_hash
+    address_attrs = GeocodeableLegacy.location_attrs - %w[country_id country state_id state neighborhood]
     attributes.slice(*address_attrs)
       .merge(state: legacy_state_abbr, country: legacy_country_iso)
       .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil

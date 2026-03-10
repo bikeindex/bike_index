@@ -13,6 +13,23 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(flash).to_not be_present
       expect(assigns(:page_id)).to eq "admin_bikes_index"
     end
+
+    context "with render_chart and search_email" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership, :with_ownership_claimed, user:) }
+      let(:user) { FactoryBot.create(:user_confirmed, email: "somethingcool@bikeindex.org") }
+      it "renders the chart" do
+        get base_url, params: {render_chart: true, search_email: "somethingcool@bikeindex.org", period: "year"}
+        expect(response.code).to eq("200")
+        expect(response.body).to include("chart-1")
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        # Also works with user.id
+        get base_url, params: {render_chart: true, user_id: user.id, period: "year"}
+        expect(response.code).to eq("200")
+        expect(response.body).to include("chart-1")
+        expect(assigns(:user_subject)).to eq user
+      end
+    end
   end
 
   describe "duplicates" do
