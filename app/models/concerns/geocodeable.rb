@@ -9,7 +9,7 @@ module Geocodeable
 
   class << self
     def attrs_to_duplicate(obj)
-      if obj.is_a?(AddressRecord)
+      if obj.class.ancestors.include?(Geocodeable)
         obj.internal_address_attrs.merge(skip_geocoding: obj.latitude.present?, skip_callback_job: true)
       elsif defined?(obj.address_record) && obj.address_record.present?
         attrs_to_duplicate(obj.address_record)
