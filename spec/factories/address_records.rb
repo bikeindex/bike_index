@@ -61,7 +61,10 @@ FactoryBot.define do
       street { "278 W Broadway" }
       postal_code { "V5Y 1P5" }
       city { "Vancouver" }
-      region_record { FactoryBot.create(:state_british_columbia) }
+      # TODO: Add region records for Canada
+      # region_record { FactoryBot.create(:state_british_columbia) }
+      region_record { nil }
+      region_string { "BC" }
       country { Country.canada }
     end
 
@@ -73,6 +76,7 @@ FactoryBot.define do
       city { "Edmonton" }
       region_string { "AB" }
       region_record { nil }
+      # TODO: Add region records for Canada
       # region_record { FactoryBot.create(:state_alberta) }
       country { Country.canada }
     end

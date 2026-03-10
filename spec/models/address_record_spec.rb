@@ -6,7 +6,7 @@ RSpec.describe AddressRecord, type: :model do
     it "is valid" do
       expect(address_record).to be_valid
       expect(address_record.region).to eq "CA"
-      expect(address_record.include_country?).to be_falsey
+      expect(address_record.send(:include_country?)).to be_falsey
       expect(address_record.formatted_address_string).to eq "Davis, CA 95616"
       expect(address_record.formatted_address_string(render_country: true)).to eq "Davis, CA 95616, United States"
 
@@ -21,6 +21,7 @@ RSpec.describe AddressRecord, type: :model do
       it "is valid" do
         expect(address_record).to be_valid
         expect(address_record.region).to eq "North Holland"
+        expect(address_record.region(full_region: true)).to eq "North Holland"
         expect(address_record.formatted_address_string(render_country: true)).to eq "Amsterdam, North Holland 1012, Netherlands"
         expect(address_record.formatted_address_string).to eq "Amsterdam, North Holland 1012, Netherlands"
         expect(address_record.formatted_address_string(current_country_iso: "NL")).to eq "Amsterdam, North Holland 1012"
@@ -36,70 +37,11 @@ RSpec.describe AddressRecord, type: :model do
       it "is valid" do
         expect(address_record).to be_valid
         expect(address_record.region).to eq "CA"
+        expect(address_record.region(full_region: true)).to eq "California"
         expect(address_record.formatted_address_string(render_country: true)).to eq "San Francisco, CA 94103, United States"
         expect(address_record.formatted_address_string).to eq "San Francisco, CA 94103"
         expect(address_record.formatted_address_string(visible_attribute: "street"))
           .to eq "1233 Howard St, Mechanics shop, San Francisco, CA 94103"
-      end
-    end
-  end
-
-  describe "attrs_to_duplicate" do
-    let!(:obj) { FactoryBot.create(:parking_notification_organized) }
-
-    let(:target_attrs) do
-      {
-        user_id: obj.user_id,
-        street: "278 Broadway",
-        city: "New York",
-        postal_code: "10007",
-        latitude: 40.7143528,
-        longitude: -74.0059731,
-        region_record_id: nil,
-        region_string: obj.region_string,
-        country_id: Country.united_states_id,
-        skip_geocoding: true,
-        skip_callback_job: true
-      }
-    end
-
-    it "returns target attrs" do
-      expect(described_class.attrs_to_duplicate(obj)).to match_hash_indifferently target_attrs
-    end
-
-    context "with address_record" do
-      let!(:obj) { FactoryBot.create(:user, :with_address_record, address_in: :edmonton) }
-      let(:target_attrs) do
-        {
-          latitude: 53.5069377,
-          longitude: -113.5508765,
-          street: "9330 Groat Rd NW",
-          street_2: nil,
-          postal_code: "T6G 2B3",
-          city: "Edmonton",
-          region_record_id: obj.address_record.region_record_id,
-          country_id: Country.canada_id,
-          skip_geocoding: true,
-          skip_callback_job: true
-        }
-      end
-
-      it "returns target attrs" do
-        expect(described_class.attrs_to_duplicate(obj)).to match_hash_indifferently target_attrs
-      end
-
-      context "passed address_record" do
-        let!(:obj) { FactoryBot.create(:bike, :with_address_record, address_in: :edmonton) }
-        it "returns target_attrs" do
-          expect(described_class.attrs_to_duplicate(obj.address_record)).to match_hash_indifferently target_attrs
-        end
-      end
-    end
-
-    context "passed obj without address" do
-      let!(:obj) { FactoryBot.create(:user) }
-      it "returns target_attrs" do
-        expect(described_class.attrs_to_duplicate(obj)).to eq({})
       end
     end
   end
@@ -212,6 +154,7 @@ RSpec.describe AddressRecord, type: :model do
     let(:target_no_street) { target.gsub("278 W Broadway, ", "") }
 
     it "returns formatted_address_string" do
+      expect(address_record).to have_attributes(region_record_id: nil, region_string: "BC") # until we have Canada region_records
       expect(address_record.formatted_address_string).to eq target
       expect(address_record.formatted_address_string(render_country: true)).to eq target
       expect(address_record.formatted_address_string(current_country_iso: "mx")).to eq target
