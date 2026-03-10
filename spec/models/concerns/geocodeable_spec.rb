@@ -13,6 +13,7 @@ RSpec.describe Geocodeable do
         latitude: 40.7143528,
         longitude: -74.0059731,
         region_record_id: nil,
+        region_string: nil,
         country_id: Country.united_states_id,
         skip_geocoding: true,
         skip_callback_job: true

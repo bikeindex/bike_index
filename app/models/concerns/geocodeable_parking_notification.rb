@@ -58,6 +58,11 @@ module GeocodeableParkingNotification
     end
   end
 
+  # ParkingNotification doesn't have street_2; exclude from GEO_ATTRS
+  def internal_address_attrs
+    slice(*(Geocodeable::GEO_ATTRS - %i[street_2]))
+  end
+
   def address(force_show_address: false, country: [:iso, :optional, :skip_default])
     self.class.format_address(
       self,
@@ -66,7 +71,7 @@ module GeocodeableParkingNotification
     ).presence
   end
 
-  class << self
+  module ClassMethods
     def format_address(obj, street: true, city: true, region: true, postal_code: true, country: [:iso])
       return "" if obj.blank?
 
