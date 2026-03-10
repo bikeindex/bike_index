@@ -5,38 +5,39 @@
 # Table name: parking_notifications
 # Database name: primary
 #
-#  id                    :integer          not null, primary key
-#  accuracy              :float
-#  city                  :string
-#  delivery_status       :string
-#  hide_address          :boolean          default(FALSE)
-#  image                 :text
-#  image_processing      :boolean          default(FALSE), not null
-#  internal_notes        :text
-#  kind                  :integer          default("appears_abandoned_notification")
-#  latitude              :float
-#  location_from_address :boolean          default(FALSE)
-#  longitude             :float
-#  message               :text
-#  neighborhood          :string
-#  repeat_number         :integer
-#  resolved_at           :datetime
-#  retrieval_link_token  :text
-#  retrieved_kind        :integer
-#  status                :integer          default("current")
-#  street                :string
-#  unregistered_bike     :boolean          default(FALSE)
-#  zipcode               :string
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
-#  bike_id               :integer
-#  country_id            :bigint
-#  impound_record_id     :integer
-#  initial_record_id     :integer
-#  organization_id       :integer
-#  retrieved_by_id       :bigint
-#  state_id              :bigint
-#  user_id               :integer
+#  id                         :integer          not null, primary key
+#  accuracy                   :float
+#  city                       :string
+#  delivery_status            :string
+#  hide_address               :boolean          default(FALSE)
+#  image                      :text
+#  image_processing           :boolean          default(FALSE), not null
+#  internal_notes             :text
+#  kind                       :integer          default("appears_abandoned_notification")
+#  latitude                   :float
+#  location_from_address      :boolean          default(FALSE)
+#  longitude                  :float
+#  message                    :text
+#  neighborhood               :string
+#  publicly_visible_attribute :integer
+#  repeat_number              :integer
+#  resolved_at                :datetime
+#  retrieval_link_token       :text
+#  retrieved_kind             :integer
+#  status                     :integer          default("current")
+#  street                     :string
+#  unregistered_bike          :boolean          default(FALSE)
+#  zipcode                    :string
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  bike_id                    :integer
+#  country_id                 :bigint
+#  impound_record_id          :integer
+#  initial_record_id          :integer
+#  organization_id            :integer
+#  retrieved_by_id            :bigint
+#  state_id                   :bigint
+#  user_id                    :integer
 #
 # Indexes
 #
@@ -55,6 +56,7 @@ class ParkingNotification < ActiveRecord::Base
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other_parking_notification: 3}.freeze
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
+  PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = AddressRecord::PUBLICLY_VISIBLE_ATTRIBUTE_ENUM
   MAX_PER_PAGE = 250
 
   mount_uploader :image, ImageUploaderBackgrounded
@@ -63,6 +65,7 @@ class ParkingNotification < ActiveRecord::Base
   enum :kind, KIND_ENUM
   enum :status, STATUS_ENUM
   enum :retrieved_kind, RETRIEVED_KIND_ENUM
+  enum :publicly_visible_attribute, PUBLICLY_VISIBLE_ATTRIBUTE_ENUM
 
   belongs_to :bike
   belongs_to :user
@@ -174,7 +177,11 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def show_address
-    !hide_address
+    if publicly_visible_attribute.present?
+      publicly_visible_attribute == "street"
+    else
+      !hide_address
+    end
   end
 
   def kind_humanized
@@ -292,6 +299,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def set_calculated_attributes
+    self.publicly_visible_attribute ||= hide_address ? :postal_code : :street
     self.initial_record_id ||= potential_initial_record&.id if is_repeat
     self.repeat_number ||= calculated_repeat_number
     self.resolved_at ||= calculated_resolved_at # Used by by calculated_status, so must come first
