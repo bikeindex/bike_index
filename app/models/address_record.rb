@@ -57,10 +57,6 @@ class AddressRecord < ApplicationRecord
       Geocodeable::ADDRESS_ATTRS
     end
 
-    def default_visibility_for(kind)
-      (kind == "organization") ? :street : :postal_code
-    end
-
     def permitted_visible_attribute(string_or_sym, default: nil)
       if string_or_sym.present?
         target_attr = string_or_sym&.to_sym
@@ -68,6 +64,10 @@ class AddressRecord < ApplicationRecord
       end
 
       (default.presence || :postal_code).to_sym
+    end
+
+    def default_visibility_for(kind)
+      (kind == "organization") ? :street : :postal_code
     end
   end
 

@@ -257,7 +257,7 @@ class StolenRecord < ApplicationRecord
     street.blank?
   end
 
-  # Used to be an attribute, removed in
+  # Used to be an attribute, removed in PR#1959
   def show_address
     false
   end

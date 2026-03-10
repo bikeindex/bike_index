@@ -272,7 +272,7 @@ RSpec.describe ParkingNotification, type: :model do
     let(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike) }
     let(:organization) { parking_notification.organization }
     it "is default with snippet" do
-      expect(parking_notification.mail_snippet).to be_blank
+      expect(parking_notification.reload.mail_snippet).to be_blank
       expect(parking_notification.subject).to eq "Your pedi cab is parked incorrectly"
     end
     context "with mail_snippet" do
@@ -297,22 +297,16 @@ RSpec.describe ParkingNotification, type: :model do
     it "creates an address" do
       parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
         city: "Chicago",
-        hide_address: true,
         region_record_id: state.id,
         postal_code: "60647",
         country_id: country.id)
-      expect(parking_notification.address).to eq("Chicago, XXX 60647, NEVVVV")
-      expect(parking_notification.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
-      parking_notification.hide_address = false
+      expect(parking_notification.show_address).to be_truthy
       expect(parking_notification.address).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
     end
     it "is ok with missing information" do
       parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
         postal_code: "60647",
-        hide_address: true,
         country_id: country.id)
-      expect(parking_notification.address).to eq("60647, NEVVVV")
-      parking_notification.hide_address = false
       expect(parking_notification.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
     end
     it "returns even if no country" do
