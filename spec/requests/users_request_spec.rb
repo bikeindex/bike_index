@@ -462,7 +462,7 @@ RSpec.describe UsersController, type: :request do
 
   describe "unsubscribe" do
     let!(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
-    let(:signed_id) { user.signed_id(purpose: :unsubscribe, expires_in: 30.days) }
+    let(:signed_id) { user.signed_id(purpose: :unsubscribe, expires_in: 365.days) }
 
     it "renders" do
       expect(user.notification_newsletters).to be_truthy
@@ -521,7 +521,7 @@ RSpec.describe UsersController, type: :request do
 
   describe "unsubscribe_update" do
     let!(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
-    let(:signed_id) { user.signed_id(purpose: :unsubscribe, expires_in: 30.days) }
+    let(:signed_id) { user.signed_id(purpose: :unsubscribe, expires_in: 365.days) }
 
     it "unsubscribes" do
       expect(user.notification_newsletters).to be_truthy
