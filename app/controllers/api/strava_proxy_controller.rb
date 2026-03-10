@@ -59,5 +59,30 @@ module API
     def render_bad_request(exception)
       render json: {error: exception.message}, status: 400
     end
+
+    def cors_set_access_control_headers
+      set_cors_headers
+    end
+
+    def cors_preflight_check
+      return unless request.method == "OPTIONS"
+      set_cors_headers
+      render plain: ""
+    end
+
+    def set_cors_headers
+      headers["Access-Control-Allow-Origin"] = cors_allowed_origin
+      headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+      headers["Access-Control-Request-Method"] = "*"
+      headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+      headers["Access-Control-Max-Age"] = "1728000"
+    end
+
+    def cors_allowed_origin
+      origin = request.headers["Origin"]
+      allowed = ["https://bikeindex.org", "https://www.bikeindex.org"]
+      allowed << origin if Rails.env.development?
+      allowed.include?(origin) ? origin : allowed.first
+    end
   end
 end

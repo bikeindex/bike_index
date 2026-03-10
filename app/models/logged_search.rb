@@ -38,7 +38,7 @@
 #  index_logged_searches_on_user_id          (user_id)
 #
 class LoggedSearch < AnalyticsRecord
-  include Geocodeable
+  include GeocodeableLegacy
 
   ENDPOINT_ENUM = {
     web_bikes: 0,

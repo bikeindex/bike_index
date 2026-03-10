@@ -68,7 +68,7 @@ RSpec.describe HotSheetConfiguration, type: :model do
         it "is truthy - until it's been created" do
           expect(hot_sheet_configuration.send_today_at.to_i).to be_within(within_time).of Time.current.to_i - 60
           expect(hot_sheet_configuration.hot_sheets.count).to eq 0
-          # This fails when transitioning between DST, so ignore it
+          # This fails when transitioning out of DST, so ignore it
           unless dst_transition?
             expect(hot_sheet_configuration.send_today_now?).to be_truthy
           end

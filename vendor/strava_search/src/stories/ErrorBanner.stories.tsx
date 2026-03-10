@@ -14,7 +14,7 @@ const meta = {
   decorators: [
     (Story) => (
       <div className="relative min-h-[400px] bg-gray-50 dark:bg-gray-900">
-        <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-2">
+        <div className="fixed bottom-8 right-8 z-[1050] flex flex-col gap-2">
           <Story />
         </div>
       </div>
@@ -56,7 +56,7 @@ export const MultipleErrors: Story = {
   decorators: [
     () => (
       <div className="relative min-h-[400px] bg-gray-50 dark:bg-gray-900">
-        <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-2">
+        <div className="fixed bottom-8 right-8 z-[1050] flex flex-col gap-2">
           <ErrorBanner message="Sync failed. Please check your internet connection and try again." onDismiss={() => {}} />
           <ErrorBanner
             message="Updated 0/2 activities.\nActivity 17419209324: Session expired. Please log in again.\nActivity 13329733465: Rate limit exceeded."

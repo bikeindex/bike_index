@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe SocialAccount, type: :model do
-  it_behaves_like "geocodeable"
+  it_behaves_like "geocodeable_legacy"
 
   describe "geocoding" do
     it "geocodes default location correctly without hitting API" do
