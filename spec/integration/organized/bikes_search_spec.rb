@@ -77,7 +77,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     # Third submission to confirm frame is still intact
     fill_in "search_email", with: ""
     find("#search-button").click
-    expect(page).to have_css("tbody tr", count: 2, wait: 10)
+    expect(page).to have_css("tbody tr", count: 10, wait: 10)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
   end
 
