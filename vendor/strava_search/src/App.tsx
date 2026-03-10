@@ -155,7 +155,7 @@ function Dashboard() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header onOpenSettings={() => setShowSettings(true)} isFetchingFullData={isFetchingFullData} fetchProgress={progress} />
       {(syncError || error) && (
-        <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-2">
+        <div className="fixed bottom-8 right-8 z-[1050] flex flex-col gap-2">
           {syncError && <ErrorBanner message={syncError} onDismiss={clearSyncError} loginUrl={config.authUrl} />}
           {error && <ErrorBanner message={error} onDismiss={clearError} loginUrl={config.authUrl} />}
         </div>

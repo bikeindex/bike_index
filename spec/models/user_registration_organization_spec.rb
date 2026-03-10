@@ -65,7 +65,7 @@ RSpec.describe UserRegistrationOrganization, type: :model do
       expect(ownership1.registration_info.keys).to match_array ownership_registration_info.as_json.keys
       expect(user_registration_organization.reload.all_bikes).to be_truthy
       expect(user_registration_organization.registration_info).to eq({latitude: 23, longitude: 44, phone: "3334445555"}.as_json)
-      expect(UserRegistrationOrganization.org_ids_with_uniq_info(user)).to eq([])
+      expect(UserRegistrationOrganization.send(:org_ids_with_uniq_info, user)).to eq([])
       expect(UserRegistrationOrganization.universal_registration_info_for(user.reload)).to eq target_universal_info
       ownership1.update(updated_at: Time.current)
       expect(ownership1.reload.registration_info).to eq target_universal_info.merge("bike_sticker" => "9998888")
@@ -105,7 +105,7 @@ RSpec.describe UserRegistrationOrganization, type: :model do
         expect(user_registration_organization2.all_bikes).to be_falsey
         expect(user_registration_organization2.bikes.pluck(:id)).to eq([bike2.id])
         user.reload
-        expect(UserRegistrationOrganization.org_ids_with_uniq_info(user)).to eq([organization2.id])
+        expect(UserRegistrationOrganization.send(:org_ids_with_uniq_info, user)).to eq([organization2.id])
         expect(UserRegistrationOrganization.universal_registration_info_for(user.reload)).to eq target_universal_info
 
         ownership1.update(updated_at: Time.current)
@@ -139,7 +139,7 @@ RSpec.describe UserRegistrationOrganization, type: :model do
         expect(user_registration_organization.all_bikes).to be_truthy
         expect(user_registration_organization2.all_bikes).to be_falsey
         user.reload
-        expect(UserRegistrationOrganization.org_ids_with_uniq_info(user)).to eq([organization2.id])
+        expect(UserRegistrationOrganization.send(:org_ids_with_uniq_info, user)).to eq([organization2.id])
         expect(UserRegistrationOrganization.universal_registration_info_for(user.reload)).to eq target_universal_info
         expect(ownership2.overridden_by_user_registration?).to be_truthy
         ownership2.update(updated_at: Time.current)

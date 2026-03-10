@@ -124,6 +124,16 @@ RSpec.describe "Strava Proxy API", type: :request do
             response_status: "binx_response", parameters: {"url" => "athlete/activities?page=1"})
           expect(strava_request.requested_at).to be_within(1).of Time.current
         end
+
+        context "page beyond available activities" do
+          it "returns empty array" do
+            expect {
+              post base_url, params: {url: "athlete/activities?page=999", method: "GET", access_token: doorkeeper_token.token}
+            }.to change(StravaRequest, :count).by(1)
+            expect(response.status).to eq 200
+            expect(json_result).to eq []
+          end
+        end
       end
 
       context "get_athlete request" do
@@ -408,6 +418,34 @@ RSpec.describe "Strava Proxy API", type: :request do
           end.to_not change(StravaRequest, :count)
           expect(response.status).to eq 400
         end
+      end
+    end
+  end
+
+  describe "CORS headers" do
+    context "with allowed origin" do
+      it "sets CORS headers" do
+        post base_url, params: {url: "athlete/activities", method: "GET"},
+          headers: {"Origin" => "https://bikeindex.org"}
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq "https://bikeindex.org"
+        expect(response.headers["Access-Control-Allow-Methods"]).to eq "POST, OPTIONS"
+        expect(response.headers["Access-Control-Allow-Headers"]).to include "Authorization"
+      end
+    end
+
+    context "with www subdomain origin" do
+      it "sets CORS headers" do
+        post base_url, params: {url: "athlete/activities", method: "GET"},
+          headers: {"Origin" => "https://www.bikeindex.org"}
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq "https://www.bikeindex.org"
+      end
+    end
+
+    context "with disallowed origin" do
+      it "defaults to first allowed origin" do
+        post base_url, params: {url: "athlete/activities", method: "GET"},
+          headers: {"Origin" => "https://evil.com"}
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq "https://bikeindex.org"
       end
     end
   end

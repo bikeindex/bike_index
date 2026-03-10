@@ -110,14 +110,8 @@
 </div>
 
 <% if @render_chart %>
-  <div class="col-12 mt-2 mb-4">
-    <% if @user_subject || @search_email %>
-      <hr>
-      <h2 class="mt-4 text-warning">Can't graph with user search</h2>
-    <% else %>
-      <%= column_chart time_range_counts(collection: available_bikes, column: "bikes.created_at"), stacked: true, thousands: "," %>
-    <% end %>
-  </div>
+  <% series = [{name: "Bikes", data: UI::Chart::Component.time_range_counts(collection: available_bikes.reorder(nil), time_range: @time_range, column: "bikes.created_at")}] %>
+  <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
 <% end %>
 
 <%= render partial: "/shared/period_select" %>
