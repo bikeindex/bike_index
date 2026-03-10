@@ -111,12 +111,7 @@
 
 <% if @render_chart %>
   <div class="col-12 mt-2 mb-4">
-    <% if @user_subject %>
-      <hr>
-      <h2 class="mt-4 text-warning">Can't graph with user search</h2>
-    <% else %>
-      <%= column_chart time_range_counts(collection: Bike.unscoped.where(id: available_bikes), column: "bikes.created_at"), stacked: true, thousands: "," %>
-    <% end %>
+    <%= column_chart time_range_counts(collection: Bike.unscoped.where(id: available_bikes), column: "bikes.created_at"), stacked: true, thousands: "," %>
   </div>
 <% end %>
 
