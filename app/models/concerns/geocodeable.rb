@@ -3,6 +3,7 @@
 module Geocodeable
   extend ActiveSupport::Concern
 
+  PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
   ADDRESS_ATTRS = %i[city country_id postal_code region_record_id region_string street street_2].freeze
   GEO_ATTRS = (ADDRESS_ATTRS + %i[latitude longitude]).freeze
@@ -27,6 +28,15 @@ module Geocodeable
       str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
     end
 
+    def permitted_visible_attribute(string_or_sym, default: nil)
+      if string_or_sym.present?
+        target_attr = string_or_sym&.to_sym
+        return target_attr if PUBLICLY_VISIBLE_ATTRIBUTE_ENUM.key?(target_attr)
+      end
+
+      (default.presence || :postal_code).to_sym
+    end
+
     private
 
     def attrs_from_legacy(obj)
@@ -45,6 +55,8 @@ module Geocodeable
   end
 
   included do
+    enum :publicly_visible_attribute, PUBLICLY_VISIBLE_ATTRIBUTE_ENUM
+
     before_validation :clean_location_attributes
 
     belongs_to :country
@@ -97,7 +109,7 @@ module Geocodeable
   def address_hash(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
     include_country = include_country?(render_country:, current_country_id:, current_country_iso:)
     country_hash = (include_country && country&.name.present?) ? {country: country.name} : {}
-    visible_attr = self.class.permitted_visible_attribute(visible_attribute, default: publicly_visible_attribute)
+    visible_attr = Geocodeable.permitted_visible_attribute(visible_attribute, default: publicly_visible_attribute)
     {
       street: %i[street].include?(visible_attr) ? street : nil,
       street_2: %i[street].include?(visible_attr) ? street_2 : nil,
@@ -133,7 +145,7 @@ module Geocodeable
     self.street = Binxtils::InputNormalizer.string(street)
     self.street_2 = Binxtils::InputNormalizer.string(street_2)
     self.postal_code = Binxtils::InputNormalizer.string(postal_code)
-    self.city = Binxtils::InputNormalizer.string(city)
+    self.city = clean_city(city)
     self.neighborhood = Binxtils::InputNormalizer.string(neighborhood)
     self.postal_code = Geocodeable.format_postal_code(postal_code, country_id) if postal_code.present?
 
@@ -153,6 +165,27 @@ module Geocodeable
       # default to US if no current country is passed
       country_id != (current_country_id || Country.united_states_id)
     end
+  end
+
+  # Remove ", CA" from city like "Sacramento, CA" and assign region if not assigned.
+  # Only works for USA because states only work in US
+  def clean_city(str)
+    unless country_id == Country.united_states_id && str&.match?(/(,|\.)\s*\w\w\s*\z/)
+      return Binxtils::InputNormalizer.string(str)
+    end
+
+    state_abbr = str[/(,|\.)\s*\w\w\s*\z/].gsub(/,|\./, "").strip.downcase
+    city_without_state = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
+    if region_record_id.present?
+      str = city_without_state if region_record.abbreviation.downcase == state_abbr
+    else
+      matched_state = State.fuzzy_abbr_find(state_abbr)
+      if matched_state.present?
+        self.region_record_id = matched_state.id
+        str = city_without_state
+      end
+    end
+    str.strip.gsub(/\s*,\z/, "")
   end
 
   def assign_region_record
