@@ -148,6 +148,25 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
       end
     end
+    context "turbo frame request" do
+      it "responds with organized_bikes_results_frame" do
+        get base_url, headers: {"Turbo-Frame" => "organized_bikes_results_frame"}
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include("organized_bikes_results_frame")
+        expect(assigns(:render_results)).to be_truthy
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+      end
+
+      context "turbo_stream format with Turbo-Frame header" do
+        it "responds with turbo-frame, not turbo-stream update" do
+          get base_url, as: :turbo_stream, headers: {"Turbo-Frame" => "organized_bikes_results_frame"}
+          expect(response).to have_http_status(:success)
+          # Must contain the turbo-frame element so Turbo can extract it
+          expect(response.body).to include("organized_bikes_results_frame")
+          expect(response.body).not_to include("<turbo-stream")
+        end
+      end
+    end
 
     context "with search_stickers" do
       let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }

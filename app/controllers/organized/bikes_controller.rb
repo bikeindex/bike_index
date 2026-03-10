@@ -22,7 +22,7 @@ module Organized
           else
             respond_to do |format|
               format.html { render :search }
-              format.turbo_stream
+              format.turbo_stream { turbo_frame_request? ? render(:search, formats: [:html]) : render(:index) }
             end
           end
         else
