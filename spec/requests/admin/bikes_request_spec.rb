@@ -15,22 +15,18 @@ RSpec.describe Admin::BikesController, type: :request do
     end
 
     context "with render_chart and search_email" do
-      let!(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "found@example.com") }
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership, :with_ownership_claimed, user:) }
+      let(:user) { FactoryBot.create(:user_confirmed, email: "somethingcool@bikeindex.org") }
       it "renders the chart" do
-        get base_url, params: {render_chart: true, search_email: "found@example.com", period: "year"}
+        get base_url, params: {render_chart: true, search_email: "somethingcool@b", period: "year"}
         expect(response.code).to eq("200")
-        expect(response.body).to_not include("Can't graph")
-        expect(assigns(:search_email)).to eq "found@example.com"
-      end
-    end
+        expect(response.body).to include("chart-1")
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
 
-    context "with render_chart and user_id" do
-      let(:user) { FactoryBot.create(:user_confirmed) }
-      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
-      it "renders the chart" do
+        # Also works with user.id
         get base_url, params: {render_chart: true, user_id: user.id, period: "year"}
         expect(response.code).to eq("200")
-        expect(response.body).to_not include("Can't graph")
+        expect(response.body).to include("chart-1")
         expect(assigns(:user_subject)).to eq user
       end
     end
