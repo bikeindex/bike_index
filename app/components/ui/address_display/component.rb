@@ -7,7 +7,7 @@ module UI::AddressDisplay
       @kind = KINDS.include?(kind) ? kind : KINDS.first
       @address_record = address_record.is_a?(AddressRecord) ? address_record : nil
       @address_hash = address_hash&.with_indifferent_access
-      @visible_attribute = AddressRecord.permitted_visible_attribute(visible_attribute)
+      @visible_attribute = Geocodeable.permitted_visible_attribute(visible_attribute)
       @render_country = render_country
     end
 
