@@ -359,7 +359,7 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
           "Impounded: #{Time.current.strftime("%Y-%m-%d")}, in: Edmonton, AB T6G 2B3, Canada"
         end
         it "returns expected things" do
-          expect(parking_notification.reload.address).to eq "9330 Groat Rd NW, Edmonton, AB T6G 2B3, CA"
+          expect(parking_notification.reload.formatted_address_string).to eq "9330 Groat Rd NW, Edmonton, AB T6G 2B3, Canada"
           impound_record.reload
           expect(bike.reload.current_impound_record.formatted_address_string).to eq "Edmonton, AB T6G 2B3, Canada"
           expect(bike.status_humanized).to eq "impounded"

@@ -320,7 +320,7 @@ class ParkingNotification < ActiveRecord::Base
     if !use_entered_address && latitude.present? && longitude.present?
       self.attributes = GeocodeHelper.assignable_address_hash_for(latitude: latitude, longitude: longitude, new_attrs: true)
     else
-      coordinates = GeocodeHelper.coordinates_for(address)
+      coordinates = GeocodeHelper.coordinates_for(formatted_address_string)
       self.attributes = coordinates if coordinates.present?
       self.location_from_address = true
     end
@@ -359,7 +359,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def location_present
     # in case geocoder is failing (which happens sometimes), permit if either is present
-    return true if latitude.present? && longitude.present? || address.present?
+    return true if latitude.present? && longitude.present? || formatted_address_string.present?
 
     errors.add(:address, :address_required)
   end

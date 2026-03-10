@@ -201,7 +201,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification).to have_attributes parking_notification_params.except(:use_entered_address)
         expect(parking_notification.user).to eq current_user
         expect(parking_notification.organization).to eq current_organization
-        expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+        expect(parking_notification.formatted_address_string).to eq default_location[:formatted_address_no_country]
         expect(parking_notification.location_from_address).to be_falsey
         expect(ProcessParkingNotificationJob.jobs.count).to eq 1
 
@@ -242,7 +242,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification).to have_attributes parking_notification_params.except(:use_entered_address)
           expect(parking_notification.user).to eq current_user
           expect(parking_notification.organization).to eq current_organization
-          expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+          expect(parking_notification.formatted_address_string).to eq default_location[:formatted_address_no_country]
           expect(parking_notification.location_from_address).to be_falsey
 
           bike.reload

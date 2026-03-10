@@ -1,59 +1,19 @@
 # Geocoding and address handling for ParkingNotification.
-# Includes Geocodeable and adds ParkingNotification-specific address behavior:
-# - geocoded_by :address (for bounding box search)
+# Includes Geocodeable and adds ParkingNotification-specific behavior:
+# - geocoded_by :formatted_address_string (for bounding box search)
 # - skip_geocoding support
-# - latitude_public/longitude_public (respects show_address)
-# - simplified address/address_hash (no visibility levels or street_2)
+# - latitude_public/longitude_public
 module GeocodeableParkingNotification
   extend ActiveSupport::Concern
   include Geocodeable
 
   included do
-    geocoded_by :address
+    geocoded_by :formatted_address_string
 
     attr_accessor :skip_geocoding
 
     scope :with_location, -> { where.not(latitude: nil) }
     scope :with_street, -> { with_location.where.not(street: nil) }
     scope :without_street, -> { where(street: ["", nil]) }
-  end
-
-  def address_hash
-    %w[street city postal_code latitude longitude]
-      .index_with { |attr| attributes[attr].presence }
-      .merge("region" => region, "country" => country_iso)
-      .with_indifferent_access
-  end
-
-  def address(force_show_address: false, country: [:iso, :optional, :skip_default])
-    self.class.format_address(
-      self,
-      street: force_show_address || show_address,
-      country: country
-    ).presence
-  end
-
-  module ClassMethods
-    def format_address(obj, street: true, city: true, region: true, postal_code: true, country: [:iso])
-      return "" if obj.blank?
-
-      include_country = country && !(obj.country&.default? && country.include?(:skip_default))
-
-      country_name =
-        if include_country
-          country_format = country.find { |e| e.in? %i[iso name] } || :iso
-          country_name = obj.country&.public_send(country_format)
-          return "" if !country.include?(:optional) && country_name.blank?
-
-          country_name
-        end
-
-      [
-        street && obj.street,
-        city && obj.city,
-        [region && obj.region, postal_code && obj.postal_code].reject(&:blank?).join(" "),
-        country_name
-      ].reject(&:blank?).join(", ")
-    end
   end
 end
