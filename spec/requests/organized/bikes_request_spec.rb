@@ -217,6 +217,19 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
       end
     end
+
+    context "without impound_bikes feature" do
+      let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers] }
+      let!(:impounded_bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization, status: "status_impounded") }
+
+      it "includes impounded bikes in results" do
+        expect(current_organization.enabled?("impound_bikes")).to be_falsey
+        get base_url, params: {search_no_js: true}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_status)).to eq "all"
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
+      end
+    end
   end
 
   describe "new" do
