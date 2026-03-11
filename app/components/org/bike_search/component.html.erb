@@ -131,21 +131,17 @@
     <p class="tw:mb-0">
       <% bikes_count = helpers.number_display(@pagy.count) %>
 
-      <% suffix = active_search_filter_descriptions.any? ? ":" : "" %>
-
       <% if show_search_query_summary? %>
         <%= translation(".matching_bikes_html",
             count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count)) %>
-        <%= suffix %>
       <% else %>
         <%= translation(".registered_bikes_html",
             count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count),
             org_name: @organization.short_name) %>
-        <%= suffix %>
       <% end %>
 
       <% if active_search_filter_descriptions.any? %>
-        <em><%= safe_join(active_search_filter_descriptions, " · ") %></em>
+        <em>— <%= safe_join(active_search_filter_descriptions, " · ") %></em>
       <% end %>
 
       <em><%= helpers.humanized_time_range(@time_range) %></em>
