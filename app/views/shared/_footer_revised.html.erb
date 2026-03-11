@@ -1,3 +1,5 @@
+<%# locals: (skip_facebook:) %>
+
 <footer class="primary-footer">
   <div class="primary-footer-nav">
     <div class="container">
@@ -174,7 +176,8 @@
   </nav>
 </footer>
 
-<% unless controller_namespace == "organized" %>
+<% skip_facebook ||= controller_namespace == "organized" %>
+<% unless skip_facebook %>
   <%# Facebook pixel %>
   <script>
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?

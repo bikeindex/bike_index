@@ -50,7 +50,7 @@
       <%= yield %>
     </div>
 
-    <%= render 'shared/footer_revised' %>
+    <%= render 'shared/footer_revised', locals: {skip_facebook: true} %>
     <%= render "/shared/analytics" %>
   </body>
 </html>
