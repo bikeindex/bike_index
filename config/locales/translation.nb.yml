@@ -599,15 +599,10 @@ nb:
         name: Navn
         slug: Mordersnegle
       mail_snippet:
-        address: Adresse
         body: Kropp
         is_enabled: Er på
-        is_location_triggered: Er plassering utløst
         kind: Snill
-        latitude: Breddegrad
-        longitude: Lengdegrad
         name: Navn
-        proximity_radius: Nærhetsradius
         public_images: Offentlige bilder
       manufacturer:
         bikes: Sykler

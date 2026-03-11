@@ -597,15 +597,10 @@ it:
         name: Nome
         slug:
       mail_snippet:
-        address: Indirizzo
         body: Corpo
         is_enabled: È abilitato
-        is_location_triggered:
         kind: Tipo
-        latitude: Latitudine
-        longitude: Longitudine
         name: Nome
-        proximity_radius: Raggio di prossimità
         public_images: Immagini pubbliche
       manufacturer:
         bikes: Biciclette

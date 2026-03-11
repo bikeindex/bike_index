@@ -588,15 +588,10 @@ nl:
         name: Naam
         slug: Naaktslak
       mail_snippet:
-        address: Adres
         body: Lichaam
         is_enabled: Is ingeschakeld
-        is_location_triggered: Wordt de locatie geactiveerd
         kind: Soort
-        latitude: Breedte
-        longitude: Lengte
         name: Naam
-        proximity_radius: Nabijheid straal
         public_images: Publieke afbeeldingen
       manufacturer:
         bikes: Bikes
