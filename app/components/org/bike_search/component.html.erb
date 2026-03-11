@@ -129,7 +129,7 @@
 
   <div class="tw:mt-4 tw:flex tw:items-baseline tw:justify-between">
     <p class="tw:mb-0">
-      <% bikes_count = helpers.number_display(@pagy.count) %>
+      <% bikes_count = number_display(@pagy.count) %>
 
       <% if show_search_query_summary? %>
         <%= translation(".matching_bikes_html",
