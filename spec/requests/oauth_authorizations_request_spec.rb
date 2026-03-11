@@ -54,6 +54,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         expect(response.body).to match(/authorize/i)
         expect(response.body).to match(/form action=.\/oauth\/authorize/)
         expect(response.body).to_not include("fbevents.js")
+        expect(response.body).to include("googletagmanager")
         expect(response.body).to_not include("GTM-K88RMWC")
       end
       context "no scope" do
