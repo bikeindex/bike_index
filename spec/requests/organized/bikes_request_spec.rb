@@ -151,25 +151,27 @@ RSpec.describe Organized::BikesController, type: :request do
       end
     end
 
-    context "with search_stickers" do
+    context "with search_stickers, no impounded feature" do
+      let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers] }
       let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: bike_with_sticker) }
       let!(:bike_sticker_2) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: non_organization_bike) }
 
       it "searches for bikes with stickers" do
+        expect(impounded_bike.reload.status).to eq "status_impounded"
         expect(bike_with_sticker.reload.bike_sticker?).to be_truthy
         expect(current_organization.reload.paid?).to be_truthy
         get base_url, params: {search_no_js: true, search_stickers: "none"}
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:search_stickers)).to eq "none"
-        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
         expect(session[:passive_organization_id]).to eq current_organization.id
 
         # And searching without params returns expected result
         get base_url, params: {search_no_js: true}
         expect(response.status).to eq(200)
-        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id])
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
         expect(assigns(:search_query_present)).to be_falsey
         expect(assigns(:search_stickers)).to eq false
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
