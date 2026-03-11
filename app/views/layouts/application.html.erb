@@ -36,7 +36,7 @@
       <script>window.timeParserSingleFormat = true</script>
     <% end %>
 
-    <%= render partial: "/shared/analytics" unless controller_namespace == "organized" %>
+    <%= render partial: "/shared/analytics" %>
 
     <%# Use with content_for(:header) -- see news/show for an example of content yielded to a named `yield`. %>
     <%# https://guides.rubyonrails.org/layouts_and_rendering.html#using-the-content-for-method %>
