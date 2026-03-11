@@ -588,15 +588,10 @@ es:
         name: Nombre
         slug:
       mail_snippet:
-        address:
         body:
         is_enabled:
-        is_location_triggered:
         kind:
-        latitude:
-        longitude:
         name: Nombre
-        proximity_radius:
         public_images:
       manufacturer:
         bikes:

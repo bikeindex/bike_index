@@ -71,11 +71,7 @@ class Admin::MailSnippetsController < Admin::BaseController
       :organization_id,
       :body,
       :is_enabled,
-      :latitude,
-      :longitude,
-      :proximity_radius,
-      :doorkeeper_app_id,
-      :is_location_triggered)
+      :doorkeeper_app_id)
   end
 
   def find_snippet

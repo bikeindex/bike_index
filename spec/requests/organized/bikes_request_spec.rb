@@ -23,9 +23,11 @@ RSpec.describe Organized::BikesController, type: :request do
     end
     let!(:non_organization_bike) { FactoryBot.create(:bike) }
     let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+    let(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: current_organization) }
     it "sends all the params and renders search template to organization_bikes" do
       get base_url, params: query_params
       expect(response.status).to eq(200)
+      expect(response.body).to_not include("fbevents.js")
       expect(assigns(:current_organization)).to eq current_organization
       expect(assigns(:search_query_present)).to be_truthy
       expect(assigns(:bikes).pluck(:id)).to eq([])
@@ -152,8 +154,8 @@ RSpec.describe Organized::BikesController, type: :request do
     context "with search_stickers" do
       let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: bike_with_sticker) }
-      let!(:non_organization_bike) { FactoryBot.create(:bike) }
       let!(:bike_sticker_2) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: non_organization_bike) }
+
       it "searches for bikes with stickers" do
         expect(bike_with_sticker.reload.bike_sticker?).to be_truthy
         expect(current_organization.reload.paid?).to be_truthy
@@ -208,13 +210,14 @@ RSpec.describe Organized::BikesController, type: :request do
       let(:current_organization) { FactoryBot.create(:organization) }
 
       it "renders without search" do
+        expect(impounded_bike.reload.status).to eq "status_impounded"
         expect(current_organization.reload.paid?).to be_falsey
         expect(Bike).to_not receive(:search)
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq current_organization
-        expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
       end
     end
   end
