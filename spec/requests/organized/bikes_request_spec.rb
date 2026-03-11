@@ -27,7 +27,7 @@ RSpec.describe Organized::BikesController, type: :request do
       get base_url, params: query_params
       expect(response.status).to eq(200)
       expect(response.body).to_not include("fbevents.js")
-      expect(response.body).to_not include("googletagmanager")
+      expect(response.body).to_not include("GTM-K88RMWC")
       expect(assigns(:current_organization)).to eq current_organization
       expect(assigns(:search_query_present)).to be_truthy
       expect(assigns(:bikes).pluck(:id)).to eq([])
