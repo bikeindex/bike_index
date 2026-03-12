@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Organized bikes search", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search] }
+  let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bikes_path) { "/o/#{organization.to_param}/bikes" }
 
@@ -91,6 +91,16 @@ RSpec.describe "Organized bikes search", :js, type: :system do
 
     expect(page).to have_css(".organized-access-panel")
     expect(page).to have_content(/#{organization.name}\s+Access Panel/i)
+
+    # Go back
+    page.go_back
+    # Open settings inside the results frame to reveal the export link
+    within("turbo-frame#organized_bikes_results_frame") do
+      click_button "settings"
+      click_link "Create export of searched registrations"
+    end
+
+    expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
   end
 
   context "with avery_export enabled" do

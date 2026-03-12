@@ -15,15 +15,14 @@ module Organized
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @per_page = permitted_per_page(default: 10)
 
-        if @render_results
+        if create_export?
           search_organization_bikes
-          if create_export?
-            create_export_and_redirect
-          else
-            respond_to do |format|
-              format.html { render :search }
-              format.turbo_stream
-            end
+          create_export_and_redirect
+        elsif @render_results
+          search_organization_bikes
+          respond_to do |format|
+            format.html { render :search }
+            format.turbo_stream
           end
         else
           @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
