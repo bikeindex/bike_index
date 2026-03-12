@@ -71,5 +71,17 @@ module PageBlock::OrgBikeAccessPanel
     def duplicate_bikes
       @duplicate_bikes ||= @bike.duplicate_bikes.reorder(id: :desc).limit(25)
     end
+
+    def show_notes?
+      organization_registered? && @organization.enabled?("registration_notes")
+    end
+
+    def bike_organization
+      @bike_organization ||= @bike.bike_organizations.find_by(organization_id: @organization.id)
+    end
+
+    def notes_update_url
+      helpers.organization_bike_path(@bike, organization_id: @organization.to_param)
+    end
   end
 end

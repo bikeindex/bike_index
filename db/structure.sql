@@ -384,7 +384,8 @@ CREATE TABLE public.bike_organizations (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone,
-    can_not_edit_claimed boolean DEFAULT false NOT NULL
+    can_not_edit_claimed boolean DEFAULT false NOT NULL,
+    notes text
 );
 
 
@@ -7413,6 +7414,7 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260310045539'),
 ('20260310031750'),
+('20260308055322'),
 ('20260305025122'),
 ('20260304181710'),
 ('20260220053202'),
