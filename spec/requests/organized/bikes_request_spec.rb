@@ -123,6 +123,15 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(end_at.to_i).to be_within(5).of(Time.current.to_i)
         end
       end
+      context "without search_no_js" do
+        it "redirects to export new" do
+          expect {
+            get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
+          }.to change(Export, :count).by 0
+          expect(flash).to be_blank
+          expect(response.redirect_url).to include("exports/new")
+        end
+      end
       context "directly create export", :flaky do
         it "directly creates" do
           Sidekiq::Job.clear_all
