@@ -22,9 +22,10 @@ RSpec.describe "Bike search", :js, type: :system do
   end
 
   def click_first_bike_and_go_back
-    # bike links use absolute html_url (BASE_URL), so extract the path and visit it
-    bike_path = first(".bike-box-item .title-link a")[:href].sub(%r{https?://[^/]+}, "")
-    visit bike_path
+    link = first(".bike-box-item .title-link a")
+    # Rewrite absolute html_url (http://test.host/bikes/123) to relative so Capybara can navigate
+    page.execute_script("arguments[0].href = arguments[0].pathname", link.native)
+    link.click
     expect(page).to have_css("h1.bike-title", wait: 10)
     page.go_back
     expect(page).to have_css(".bike-box-item", wait: 10)
