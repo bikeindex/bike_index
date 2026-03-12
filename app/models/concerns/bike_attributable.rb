@@ -94,9 +94,8 @@ module BikeAttributable
 
   def propulsion_titleize
     return "" unless propulsion_type.present?
-    return "Pedal" if propulsion_type == "foot-pedal"
 
-    propulsion_type.split(/(\s|-)/).map(&:capitalize).join("")
+    propulsion_type_name
   end
 
   def frame_model_truncated
@@ -153,7 +152,7 @@ module BikeAttributable
   end
 
   def propulsion_type_name
-    PropulsionType.new(propulsion_type).name
+    PropulsionType.new(propulsion_type)&.name
   end
 
   def drivetrain_attributes

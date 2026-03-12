@@ -1,9 +1,4 @@
-<div
-  <% unless @skip_settings %>
-    data-controller="org--bike-search"
-    data-org--bike-search-default-columns-value="<%= initially_checked_columns.to_json %>"
-  <% end %>
->
+<%= tag.div(data: wrapper_data_attributes) do %>
   <% unless @skip_search_form %>
     <div class="mb-4">
       <%= render(Search::FormOrganized::Component.new(
@@ -182,4 +177,4 @@
       </div>
     </div>
   <% end %>
-</div>
+<% end %>

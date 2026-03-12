@@ -26,6 +26,8 @@ module Org::BikeSearchSettings
       url_cell
     ].freeze
 
+    ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell].freeze
+
     FILTER_DESCRIPTION_KEYS = {
       search_stickers: {with: ".filter_with_stickers_html", none: ".filter_no_sticker_html"},
       search_address: {with_street: ".filter_with_address_html", without_street: ".filter_no_address_html"},
@@ -55,6 +57,8 @@ module Org::BikeSearchSettings
       @bike_sticker = bike_sticker
     end
 
+    # This isn't used in this component, it's called by Org::BikeSearch
+    # included here because the translations are in this component
     def active_search_filter_descriptions
       values = {search_stickers: @search_stickers, search_address: @search_address, search_status: @search_status}
 
@@ -84,7 +88,11 @@ module Org::BikeSearchSettings
     end
 
     def column_renames
-      @column_renames ||= COLUMN_RENAME_KEYS.map { |key| [key, translation(".#{key}")] }.to_h
+      @column_renames ||= COLUMN_RENAME_KEYS.map { |key|
+        name = translation(".#{key}")
+        name = "#{@organization.short_name} #{name}" if ORG_PREFIXED_COLUMNS.include?(key)
+        [key, name]
+      }.to_h
     end
 
     private

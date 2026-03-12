@@ -92,6 +92,12 @@ module Org::BikeSearch
       @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
     end
 
+    def wrapper_data_attributes
+      return {} if @skip_settings
+      {controller: "org--bike-search",
+       "org--bike-search-default-columns-value": initially_checked_columns.to_json}
+    end
+
     def show_pagination?
       @pagy.pages > 1
     end

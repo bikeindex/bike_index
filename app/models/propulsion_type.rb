@@ -12,7 +12,7 @@ class PropulsionType
   }.freeze # NOTE: 10 is reserved for "motorized"
 
   NAMES = {
-    "foot-pedal": "Foot Pedal",
+    "foot-pedal": "Pedal",
     "pedal-assist": "Pedal Assist",
     throttle: "Electric Throttle",
     "pedal-assist-and-throttle": "Pedal Assist and Throttle",
