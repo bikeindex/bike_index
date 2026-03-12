@@ -15,17 +15,7 @@
   <% end %>
 
   <% unless @skip_settings %>
-    <%= render(Org::BikeSearchSettings::Component.new(
-      organization: @organization,
-      interpreted_params: @interpreted_params,
-      sortable_search_params: @sortable_search_params,
-      params: @params,
-      search_stickers: @search_stickers,
-      search_address: @search_address,
-      search_status: @search_status,
-      include_avery: @include_avery,
-      bike_sticker: @bike_sticker
-    )) %>
+    <%= render(settings_component) %>
   <% end %>
 
   <div class="tw:mt-4 tw:flex tw:items-baseline tw:justify-between">

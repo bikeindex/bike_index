@@ -88,14 +88,21 @@ module Org::BikeSearch
     end
 
     def initially_checked_columns
-      return @initially_checked_columns if defined?(@initially_checked_columns)
+      settings_component.initially_checked_columns
+    end
 
-      @initially_checked_columns = %w[created_at_cell stolen_cell manufacturer_cell model_cell
-        color_cell owner_email_cell owner_name_cell creation_description_cell]
-      @initially_checked_columns += ["sticker_cell"] if @organization.enabled?("bike_stickers")
-      @initially_checked_columns += ["avery_cell"] if show_avery_export?
-      @initially_checked_columns += ["impounded_cell"] if @params[:search_impoundedness] == "impounded"
-      @initially_checked_columns
+    def settings_component
+      @settings_component ||= Org::BikeSearchSettings::Component.new(
+        organization: @organization,
+        interpreted_params: @interpreted_params,
+        sortable_search_params: @sortable_search_params,
+        params: @params,
+        search_stickers: @search_stickers,
+        search_address: @search_address,
+        search_status: @search_status,
+        include_avery: @include_avery,
+        bike_sticker: @bike_sticker
+      )
     end
 
     def cycle_type
