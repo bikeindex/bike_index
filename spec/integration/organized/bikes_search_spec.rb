@@ -101,6 +101,40 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
   end
 
+  it "filters by status buttons" do
+    visit bikes_path
+    expect(page).to have_css("table.table", wait: 10)
+    expect(page).to have_css("tbody tr", minimum: 2, wait: 10)
+
+    # Open settings to reveal status buttons
+    click_button "settings"
+    expect(page).to have_css(".search-sort-btns", text: /Status/, visible: :all)
+
+    # Click "only stolen" — full page visit via data-turbo-frame="_top"
+    find("a", text: "only stolen", visible: :all).click
+    expect(page).to have_current_path(/search_status=stolen/, wait: 10)
+    expect(page).to have_css("table.table", wait: 10)
+    # No stolen bikes exist, so no rows
+    expect(page).to have_text("0 registrations matching")
+    # Active filter description shown in count area
+    expect(page).to have_text("only stolen")
+    # "only stolen" button should be active (settings panel may be hidden)
+    expect(page).to have_css("a.active", text: /only\s+stolen/, visible: :all)
+
+    # Navigate to with_owner status directly
+    visit "#{bikes_path}?search_status=with_owner"
+    expect(page).to have_current_path(/search_status=with_owner/, wait: 10)
+    expect(page).to have_css("table.table", wait: 10)
+    expect(page).to have_css("tbody tr", minimum: 2)
+    expect(page).to have_text("not stolen or impounded")
+    expect(page).to have_css("a.active", text: /not stolen or impounded/, visible: :all)
+
+    # Navigate to all status
+    visit bikes_path
+    expect(page).to have_css("table.table", wait: 10)
+    expect(page).to have_css("tbody tr", minimum: 2, wait: 10)
+  end
+
   context "with avery_export enabled" do
     let(:enabled_feature_slugs) { %w[bike_search avery_export] }
     let!(:avery_bike) do

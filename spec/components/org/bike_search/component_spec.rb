@@ -15,7 +15,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   let(:search_stickers) { nil }
   let(:search_address) { nil }
   let(:search_status) { "all" }
-  let(:skip_search_form) { false }
+  let(:skip_search_and_filters) { false }
   let(:options) do
     {
       organization:,
@@ -27,7 +27,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
       search_stickers:,
       search_address:,
       search_status:,
-      skip_search_form:,
+      skip_search_and_filters:,
       stolenness: "all",
       time_range: 1.year.ago..Time.current
     }
@@ -48,8 +48,8 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     expect(component).to have_css("select#per_page_select")
   end
 
-  context "with skip_search_form" do
-    let(:skip_search_form) { true }
+  context "with skip_search_and_filters" do
+    let(:skip_search_and_filters) { true }
 
     it "renders table without search form" do
       expect(component).to have_css("table.table")

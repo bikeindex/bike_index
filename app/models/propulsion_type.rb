@@ -14,7 +14,7 @@ class PropulsionType
   NAMES = {
     "foot-pedal": "Pedal",
     "pedal-assist": "Pedal Assist",
-    throttle: "Electric Throttle",
+    throttle: "Throttle",
     "pedal-assist-and-throttle": "Pedal Assist and Throttle",
     "hand-pedal": "Hand Cycle (hand pedal)",
     "human-not-pedal": "Human powered (not by pedals)"

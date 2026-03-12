@@ -1,5 +1,5 @@
 <%= tag.div(data: wrapper_data_attributes) do %>
-  <% unless @skip_search_form %>
+  <% unless @skip_search_and_filters %>
     <div class="mb-4">
       <%= render(Search::FormOrganized::Component.new(
         target_search_path: organization_bikes_path(organization_id: @organization.to_param),
@@ -34,13 +34,13 @@
     </p>
   </div>
 
-  <% unless @skip_search_form %>
+  <% unless @skip_search_and_filters %>
     <% if @model_audit.present? %>
       <p class="mt-0">
-        E-Vehicles for audit:
+        <%= translation(".e_vehicles_for_audit") %>
         <a class="gray-link" href="<%= organization_model_audit_path(@model_audit.to_param, organization_id: @organization.to_param) %>"><%= model_audit_display(@model_audit) %></a>
         &nbsp;
-        <%= link_to "view matching any audit",
+        <%= link_to translation(".view_matching_any_audit"),
             url_for(@sortable_search_params.merge(search_model_audit_id: nil)),
             class: "gray-link small" %>
       </p>

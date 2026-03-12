@@ -44,7 +44,8 @@ module Org::BikeSearchSettings
       search_address: nil,
       search_status: "all",
       include_avery: false,
-      bike_sticker: nil
+      bike_sticker: nil,
+      skip_search_and_filters: false
     )
       @organization = organization
       @interpreted_params = interpreted_params
@@ -55,6 +56,7 @@ module Org::BikeSearchSettings
       @search_status = search_status
       @include_avery = include_avery
       @bike_sticker = bike_sticker
+      @skip_search_and_filters = skip_search_and_filters
     end
 
     # This isn't used in this component, it's called by Org::BikeSearch

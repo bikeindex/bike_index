@@ -19,7 +19,7 @@ module Org::BikeSearch
       stolenness: "all",
       bike_sticker: nil,
       model_audit: nil,
-      skip_search_form: false,
+      skip_search_and_filters: false,
       skip_settings: false,
       include_avery: false
     )
@@ -37,7 +37,7 @@ module Org::BikeSearch
       @stolenness = stolenness
       @bike_sticker = bike_sticker
       @model_audit = model_audit
-      @skip_search_form = skip_search_form
+      @skip_search_and_filters = skip_search_and_filters
       @skip_settings = skip_settings
       @include_avery = include_avery
     end
@@ -73,7 +73,8 @@ module Org::BikeSearch
         search_address: @search_address,
         search_status: @search_status,
         include_avery: @include_avery,
-        bike_sticker: @bike_sticker
+        bike_sticker: @bike_sticker,
+        skip_search_and_filters: @skip_search_and_filters
       )
     end
 

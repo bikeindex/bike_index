@@ -107,7 +107,7 @@
 </td>
 
 <% if @organization.enabled?("bike_stickers") %>
-  <td class="hidden-xs-down sticker_cell">
+  <td class="hiddenColumn hidden-xs-down sticker_cell">
     <% if @bike_sticker.present? %>
       <small>
         <%= link_to translation(".link"),
