@@ -6,6 +6,7 @@
 #  id                   :integer          not null, primary key
 #  can_not_edit_claimed :boolean          default(FALSE), not null
 #  deleted_at           :datetime
+#  notes                :text
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  bike_id              :integer
