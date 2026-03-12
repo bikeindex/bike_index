@@ -98,31 +98,11 @@ module Org::BikeSearch
       @initially_checked_columns
     end
 
-    def enabled_columns
-      @enabled_columns ||= begin
-        cols = initially_checked_columns.dup
-        cols += %w[url_cell updated_at_cell cycle_type_cell propulsion_type_cell status_cell]
-        cols += additional_registration_fields.map { |f| "#{f}_cell" }
-        cols += ["impounded_cell"] if @organization.enabled?("impound_bikes")
-        cols += ["avery_cell"] if @include_avery && @organization.enabled?("avery_export")
-        cols.uniq.sort { |a, b| column_renames[a.to_sym] <=> column_renames[b.to_sym] }
-      end
-    end
-
-    def settings_default_open?
-      @search_stickers.present? || @search_address.present? ||
-        @params[:search_impoundedness].present? || Binxtils::InputNormalizer.boolean(@params[:search_open])
-    end
-
     def cycle_type
       @cycle_type ||= begin
         merged = @params.merge(@interpreted_params)
         BikeServices::Displayer.vehicle_search?(merged) ? translation(".vehicle") : translation(".bike")
       end
-    end
-
-    def search_params
-      @search_params ||= (@sortable_search_params || {}).merge((@interpreted_params || {}).merge(organization_id: @organization.to_param))
     end
 
     def active_search_filter_descriptions
