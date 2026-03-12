@@ -57,6 +57,7 @@
         <% end %>
       </p>
     <% end %>
+
     <% if @organization.enabled?("reg_address") %>
       <p class="search-sort-btns">
         <span class="sort-group-label"><%= translation(".address") %></span>
@@ -76,6 +77,7 @@
         <% end %>
       </p>
     <% end %>
+
     <p class="search-sort-btns">
       <span class="sort-group-label"><%= translation(".status") %></span>
 
@@ -104,6 +106,7 @@
         <%= translation(".filter_stolen_html") %>
       <% end %>
     </p>
+
     <% if @organization.enabled?("csv_exports") %>
       <p class="search-sort-btns text-right">
         <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
