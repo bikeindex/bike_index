@@ -66,7 +66,7 @@ RSpec.describe Organized::BikesController, type: :request do
       let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: current_organization, manufacturer: bike.manufacturer) }
       it "creates export" do
         expect {
-          get base_url, params: {search_no_js: true, manufacturer: bike.manufacturer.id, create_export: true}
+          get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
         }.to change(Export, :count).by 0
         expect(flash).to be_blank
         redirected_to = response.redirect_url
@@ -75,14 +75,14 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(custom_bike_ids).to match_array([bike.id, bike2.id].map(&:to_s))
 
         expect {
-          get base_url, params: {search_no_js: true, stolenness: "impounded", create_export: true}
+          get base_url, params: {stolenness: "impounded", create_export: true}
         }.to change(Export, :count).by 0
         expect(flash[:error]).to match(/no match/)
         expect(response).to redirect_to(new_organization_export_url(organization_id: current_organization.id, only_custom_bike_ids: true, custom_bike_ids: ""))
 
         reset! # Clear stale flash from session cookie
         expect {
-          get base_url, params: {search_no_js: true, search_stickers: "none", create_export: true}
+          get base_url, params: {search_stickers: "none", create_export: true}
         }.to change(Export, :count).by 0
         expect(flash).to be_blank
         redirected_to = response.redirect_url
@@ -102,13 +102,13 @@ RSpec.describe Organized::BikesController, type: :request do
         end
         it "redirects to export new" do
           expect {
-            get base_url, params: params_blank.merge(search_no_js: true, search_stickers: "all")
+            get base_url, params: params_blank.merge(search_stickers: "all")
           }.to change(Export, :count).by 0
           expect(flash[:error]).to match(/no bikes selected/i)
           expect(response).to redirect_to new_organization_export_url(organization_id: current_organization.id)
 
           expect {
-            get base_url, params: params_blank.merge(search_no_js: true, period: "year")
+            get base_url, params: params_blank.merge(period: "year")
           }.to change(Export, :count).by 0
           expect(flash[:error]).to match(/no bikes selected/i)
 
@@ -123,20 +123,11 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(end_at.to_i).to be_within(5).of(Time.current.to_i)
         end
       end
-      context "without search_no_js" do
-        it "redirects to export new" do
-          expect {
-            get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
-          }.to change(Export, :count).by 0
-          expect(flash).to be_blank
-          expect(response.redirect_url).to include("exports/new")
-        end
-      end
       context "directly create export", :flaky do
         it "directly creates" do
           Sidekiq::Job.clear_all
           expect {
-            get base_url, params: {search_no_js: true, manufacturer: bike.manufacturer.id, create_export: true, directly_create_export: 1}
+            get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true, directly_create_export: 1}
           }.to change(Export, :count).by 1
           expect(flash[:info]).to be_present
           export = Export.last

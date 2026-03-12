@@ -92,6 +92,8 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_css(".organized-access-panel")
     expect(page).to have_content(/#{organization.name}\s+Access Panel/i)
 
+    # Go back
+    page.go_back
     # Open settings inside the results frame to reveal the export link
     within("turbo-frame#organized_bikes_results_frame") do
       click_button "settings"
