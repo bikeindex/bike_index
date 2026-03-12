@@ -94,11 +94,9 @@ RSpec.describe "Organized bikes search", :js, type: :system do
 
     # Go back
     page.go_back
-    # Open settings inside the results frame to reveal the export link
-    within("turbo-frame#organized_bikes_results_frame") do
-      click_button "settings"
-      click_link "Create export of searched registrations"
-    end
+    # Open settings (outside the turbo frame) to reveal the export link
+    click_button "settings"
+    click_link "Create export of searched registrations"
 
     expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
   end
