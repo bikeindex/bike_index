@@ -14,7 +14,21 @@ RSpec.describe "Bike search", :js, type: :system do
   let!(:blue_stolen_bike_la) { FactoryBot.create(:stolen_bike_in_los_angeles, primary_frame_color: blue) }
   let!(:red_non_stolen_bike) { FactoryBot.create(:bike, primary_frame_color: red) }
 
-  before { Autocomplete::Loader.load_all(%w[Color]) }
+  before do
+    Autocomplete::Loader.load_all(%w[Color])
+    # Ensure gear types exist so bike show page doesn't write during readonly mode
+    RearGearType.fixed
+    FrontGearType.fixed
+  end
+
+  def click_first_bike_and_go_back
+    # bike links use absolute html_url (BASE_URL), so extract the path and visit it
+    bike_path = first(".bike-box-item .title-link a")[:href].sub(%r{https?://[^/]+}, "")
+    visit bike_path
+    expect(page).to have_css("h1.bike-title", wait: 10)
+    page.go_back
+    expect(page).to have_css(".bike-box-item", wait: 10)
+  end
 
   it "filters by color and location" do
     visit "/search/registrations"
@@ -35,6 +49,8 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_content("Blue")
     expect(page).not_to have_content("Red")
 
+    click_first_bike_and_go_back
+
     # Switch to proximity search for NYC
     find("label[for='stolenness_proximity']").click
     find("#distance").set("200")
@@ -45,11 +61,15 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", count: 1, wait: 10)
     expect(page).to have_content("Blue")
 
+    click_first_bike_and_go_back
+
     # Remove the color filter by clearing the Select2, then search again
     find(".select2-selection__choice__remove").click
     find("#search-button").click
 
     # Now both NYC stolen bikes appear
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+
+    click_first_bike_and_go_back
   end
 end
