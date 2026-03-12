@@ -3,6 +3,7 @@ import { collapse } from 'utils/collapse_utils'
 
 /* global localStorage */
 
+// Connects to data-controller='org--bike-search'
 export default class extends Controller {
   static targets = ['settings', 'settingsButton', 'perPage']
   static values = { defaultColumns: Array }
