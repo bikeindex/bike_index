@@ -3,6 +3,7 @@ en:
   components:
     org:
       bike_search_settings:
+        address: 'Address:'
         affiliation: Affiliation
         all: All
         avery_exportable: Avery Exportable
@@ -18,7 +19,6 @@ en:
         filter_stolen_html: only stolen
         filter_with_address_html: only <strong>with</strong> address
         filter_with_stickers_html: only <strong>with</strong> stickers
-        address: 'Address:'
         impounded: Impounded
         manufacturer: Manufacturer
         model: Model
