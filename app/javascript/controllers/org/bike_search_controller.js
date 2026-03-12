@@ -13,6 +13,16 @@ export default class extends Controller {
       collapse('show', this.settingsTarget, 0)
       if (this.hasSettingsButtonTarget) this.settingsButtonTarget.classList.add('active')
     }
+    // Re-apply column visibility when turbo frame updates with new table content
+    document.addEventListener('turbo:frame-render', this.handleFrameRender)
+  }
+
+  disconnect () {
+    document.removeEventListener('turbo:frame-render', this.handleFrameRender)
+  }
+
+  handleFrameRender = () => {
+    this.updateVisibleColumns()
   }
 
   toggleSettings () {
