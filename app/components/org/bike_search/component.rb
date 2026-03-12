@@ -4,34 +4,6 @@ module Org::BikeSearch
   class Component < ApplicationComponent
     include SortableHelper
 
-    COLUMN_RENAME_KEYS = {
-      created_at_cell: ".registered",
-      updated_at_cell: ".updated",
-      stolen_cell: ".stolen",
-      manufacturer_cell: ".manufacturer",
-      model_cell: ".model",
-      color_cell: ".color",
-      owner_email_cell: ".sent_to",
-      creation_description_cell: ".source",
-      owner_name_cell: ".owner_name",
-      reg_organization_affiliation_cell: ".affiliation",
-      reg_extra_registration_number_cell: ".secondary_number",
-      reg_phone_cell: ".phone",
-      reg_address_cell: ".reg_address",
-      reg_student_id_cell: ".student_id",
-      sticker_cell: ".sticker",
-      impounded_cell: ".impounded",
-      avery_cell: ".avery_exportable",
-      cycle_type_cell: ".vehicle_type",
-      propulsion_type_cell: ".e_vehicle_propulsion",
-      status_cell: ".status_cell",
-      url_cell: ".url"
-    }.freeze
-
-    def self.column_renames
-      COLUMN_RENAME_KEYS.transform_values { |key| I18n.t("components.org.bike_search#{key}") }
-    end
-
     def initialize(
       organization:,
       pagy:,
@@ -84,7 +56,7 @@ module Org::BikeSearch
     private
 
     def column_renames
-      self.class.column_renames
+      settings_component.column_renames
     end
 
     def initially_checked_columns

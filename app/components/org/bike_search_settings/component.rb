@@ -2,6 +2,30 @@
 
 module Org::BikeSearchSettings
   class Component < ApplicationComponent
+    COLUMN_RENAME_KEYS = {
+      created_at_cell: ".registered",
+      updated_at_cell: ".updated",
+      stolen_cell: ".stolen",
+      manufacturer_cell: ".manufacturer",
+      model_cell: ".model",
+      color_cell: ".color",
+      owner_email_cell: ".sent_to",
+      creation_description_cell: ".source",
+      owner_name_cell: ".owner_name",
+      reg_organization_affiliation_cell: ".affiliation",
+      reg_extra_registration_number_cell: ".secondary_number",
+      reg_phone_cell: ".phone",
+      reg_address_cell: ".reg_address",
+      reg_student_id_cell: ".student_id",
+      sticker_cell: ".sticker",
+      impounded_cell: ".impounded",
+      avery_cell: ".avery_exportable",
+      cycle_type_cell: ".vehicle_type",
+      propulsion_type_cell: ".e_vehicle_propulsion",
+      status_cell: ".status_cell",
+      url_cell: ".url"
+    }.freeze
+
     FILTER_DESCRIPTION_KEYS = {
       search_stickers: {with: ".filter_with_stickers_html", none: ".filter_no_sticker_html"},
       search_address: {with_street: ".filter_with_address_html", without_street: ".filter_no_address_html"},
@@ -32,8 +56,11 @@ module Org::BikeSearchSettings
     end
 
     def active_search_filter_descriptions
-      @active_search_filter_descriptions ||= FILTER_DESCRIPTION_KEYS.filter_map do |param, mapping|
-        key = mapping[instance_variable_get(:"@#{param}")&.to_sym]
+      values = {search_stickers: @search_stickers, search_address: @search_address, search_status: @search_status}
+
+      FILTER_DESCRIPTION_KEYS.filter_map do |param, mapping|
+        value = values[param]
+        key = mapping[value.to_sym] if value.is_a?(String)
         translation(key) if key
       end
     end
@@ -56,11 +83,11 @@ module Org::BikeSearchSettings
         Binxtils::InputNormalizer.boolean(@params[:search_avery_export])
     end
 
-    private
-
     def column_renames
-      Org::BikeSearch::Component.column_renames
+      @column_renames ||= COLUMN_RENAME_KEYS.transform_values { |key| translation(key) }
     end
+
+    private
 
     def additional_registration_fields
       @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
