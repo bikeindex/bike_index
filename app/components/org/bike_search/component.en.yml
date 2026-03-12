@@ -9,14 +9,6 @@ en:
         bike: registration
         color: Color
         e_vehicle_propulsion: E-vehicle (propulsion)
-        filter_impounded_html: only <strong>impounded</strong>
-        filter_no_address_html: only <strong>no</strong> address
-        filter_no_sticker_html: only <strong>no</strong> sticker
-        filter_not_impounded_html: only <strong>not</strong> impounded
-        filter_not_stolen_or_impounded_html: not stolen or impounded
-        filter_stolen_html: only stolen
-        filter_with_address_html: only <strong>with</strong> address
-        filter_with_stickers_html: only <strong>with</strong> stickers
         impounded: Impounded
         link: Link
         manufacturer: Manufacturer

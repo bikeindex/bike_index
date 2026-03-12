@@ -2,6 +2,13 @@
 
 module Org::BikeSearchSettings
   class Component < ApplicationComponent
+    FILTER_DESCRIPTION_KEYS = {
+      search_stickers: {with: ".filter_with_stickers_html", none: ".filter_no_sticker_html"},
+      search_address: {with_street: ".filter_with_address_html", without_street: ".filter_no_address_html"},
+      search_status: {not_impounded: ".filter_not_impounded_html", impounded: ".filter_impounded_html",
+                      with_owner: ".filter_not_stolen_or_impounded_html", stolen: ".filter_stolen_html"}
+    }.freeze
+
     def initialize(
       organization:,
       interpreted_params: {},
@@ -22,6 +29,13 @@ module Org::BikeSearchSettings
       @search_status = search_status
       @include_avery = include_avery
       @bike_sticker = bike_sticker
+    end
+
+    def active_search_filter_descriptions
+      @active_search_filter_descriptions ||= FILTER_DESCRIPTION_KEYS.filter_map do |param, mapping|
+        key = mapping[instance_variable_get(:"@#{param}")&.to_sym]
+        translation(key) if key
+      end
     end
 
     def initially_checked_columns

@@ -113,24 +113,7 @@ module Org::BikeSearch
     end
 
     def active_search_filter_descriptions
-      @active_search_filter_descriptions ||= [].tap do |descriptions|
-        case @search_stickers
-        when "with" then descriptions << translation(".filter_with_stickers_html")
-        when "none" then descriptions << translation(".filter_no_sticker_html")
-        end
-        case @search_address
-        when "with_street" then descriptions << translation(".filter_with_address_html")
-        when "without_street" then descriptions << translation(".filter_no_address_html")
-        end
-        if @params[:search_status].present?
-          case @search_status
-          when "not_impounded" then descriptions << translation(".filter_not_impounded_html")
-          when "impounded" then descriptions << translation(".filter_impounded_html")
-          when "with_owner" then descriptions << translation(".filter_not_stolen_or_impounded_html")
-          when "stolen" then descriptions << translation(".filter_stolen_html")
-          end
-        end
-      end
+      settings_component.active_search_filter_descriptions
     end
 
     def show_search_query_summary?
