@@ -45,29 +45,7 @@ module Org::BikeSearchSettings
     private
 
     def column_renames
-      @column_renames ||= {
-        created_at_cell: translation(".registered"),
-        updated_at_cell: translation(".updated"),
-        stolen_cell: translation(".stolen"),
-        manufacturer_cell: translation(".manufacturer"),
-        model_cell: translation(".model"),
-        color_cell: translation(".color"),
-        owner_email_cell: translation(".sent_to"),
-        creation_description_cell: translation(".source"),
-        owner_name_cell: translation(".owner_name"),
-        reg_organization_affiliation_cell: translation(".affiliation"),
-        reg_extra_registration_number_cell: translation(".secondary_number"),
-        reg_phone_cell: translation(".phone"),
-        reg_address_cell: translation(".reg_address"),
-        reg_student_id_cell: translation(".student_id"),
-        sticker_cell: translation(".sticker"),
-        impounded_cell: translation(".impounded"),
-        avery_cell: translation(".avery_exportable"),
-        cycle_type_cell: translation(".vehicle_type"),
-        propulsion_type_cell: translation(".e_vehicle_propulsion"),
-        status_cell: translation(".status_cell"),
-        url_cell: translation(".url")
-      }
+      Org::BikeSearch::Component.column_renames
     end
 
     def additional_registration_fields
