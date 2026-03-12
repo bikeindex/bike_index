@@ -1,49 +1,38 @@
 # frozen_string_literal: true
 
-module Org::BikeSearch
+module Org::BikeSearchSettings
   class Component < ApplicationComponent
-    include SortableHelper
-
     def initialize(
       organization:,
-      pagy:,
-      per_page:,
-      params:,
       interpreted_params: {},
       sortable_search_params: {},
+      params: {},
       search_stickers: nil,
       search_address: nil,
       search_status: "all",
-      search_query_present: false,
-      time_range: nil,
-      stolenness: "all",
-      bike_sticker: nil,
-      model_audit: nil,
-      skip_search_form: false,
-      skip_settings: false,
-      include_avery: false
+      include_avery: false,
+      bike_sticker: nil
     )
       @organization = organization
-      @pagy = pagy
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
-      @per_page = per_page
       @params = params
       @search_stickers = search_stickers
       @search_address = search_address
       @search_status = search_status
-      @search_query_present = search_query_present
-      @time_range = time_range
-      @stolenness = stolenness
-      @bike_sticker = bike_sticker
-      @model_audit = model_audit
-      @skip_search_form = skip_search_form
-      @skip_settings = skip_settings
       @include_avery = include_avery
+      @bike_sticker = bike_sticker
     end
 
-    def additional_registration_fields
-      @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
+    def initially_checked_columns
+      @initially_checked_columns ||= begin
+        cols = %w[created_at_cell stolen_cell manufacturer_cell model_cell
+          color_cell owner_email_cell owner_name_cell creation_description_cell]
+        cols += ["sticker_cell"] if @organization.enabled?("bike_stickers")
+        cols += ["avery_cell"] if show_avery_export?
+        cols += ["impounded_cell"] if @params[:search_impoundedness] == "impounded"
+        cols
+      end
     end
 
     def show_avery_export?
@@ -81,15 +70,8 @@ module Org::BikeSearch
       }
     end
 
-    def initially_checked_columns
-      return @initially_checked_columns if defined?(@initially_checked_columns)
-
-      @initially_checked_columns = %w[created_at_cell stolen_cell manufacturer_cell model_cell
-        color_cell owner_email_cell owner_name_cell creation_description_cell]
-      @initially_checked_columns += ["sticker_cell"] if @organization.enabled?("bike_stickers")
-      @initially_checked_columns += ["avery_cell"] if show_avery_export?
-      @initially_checked_columns += ["impounded_cell"] if @params[:search_impoundedness] == "impounded"
-      @initially_checked_columns
+    def additional_registration_fields
+      @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
     end
 
     def enabled_columns
@@ -117,35 +99,6 @@ module Org::BikeSearch
 
     def search_params
       @search_params ||= (@sortable_search_params || {}).merge((@interpreted_params || {}).merge(organization_id: @organization.to_param))
-    end
-
-    def active_search_filter_descriptions
-      @active_search_filter_descriptions ||= [].tap do |descriptions|
-        case @search_stickers
-        when "with" then descriptions << translation(".filter_with_stickers_html")
-        when "none" then descriptions << translation(".filter_no_sticker_html")
-        end
-        case @search_address
-        when "with_street" then descriptions << translation(".filter_with_address_html")
-        when "without_street" then descriptions << translation(".filter_no_address_html")
-        end
-        if @params[:search_status].present?
-          case @search_status
-          when "not_impounded" then descriptions << translation(".filter_not_impounded_html")
-          when "impounded" then descriptions << translation(".filter_impounded_html")
-          when "with_owner" then descriptions << translation(".filter_not_stolen_or_impounded_html")
-          when "stolen" then descriptions << translation(".filter_stolen_html")
-          end
-        end
-      end
-    end
-
-    def show_search_query_summary?
-      @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
-    end
-
-    def show_pagination?
-      @pagy.pages > 1
     end
   end
 end

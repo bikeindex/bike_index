@@ -14,13 +14,32 @@
 
 <hr style="opacity: .3;">
 
-<%= turbo_frame_tag :organized_bikes_results_frame do %>
-  <% if @render_results %>
-    <%= render partial: "results" %>
-  <% else %>
-    <span id="loadedWithoutResults" class="tw:hidden"></span>
+<% bike_search_settings = Org::BikeSearchSettings::Component.new(
+  organization: current_organization,
+  interpreted_params: @interpreted_params,
+  sortable_search_params:,
+  params:,
+  search_stickers: @search_stickers,
+  search_address: @search_address,
+  search_status: @search_status,
+  include_avery: true,
+  bike_sticker: @bike_sticker
+) %>
+
+<div
+  data-controller="org--bike-search"
+  data-org--bike-search-default-columns-value="<%= bike_search_settings.initially_checked_columns.to_json %>"
+>
+  <%= render(bike_search_settings) %>
+
+  <%= turbo_frame_tag :organized_bikes_results_frame do %>
+    <% if @render_results %>
+      <%= render partial: "results" %>
+    <% else %>
+      <span id="loadedWithoutResults" class="tw:hidden"></span>
+    <% end %>
   <% end %>
-<% end %>
+</div>
 
 <div id="hiddenLoadingSpinner" class="tw:hidden">
   <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
