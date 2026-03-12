@@ -2,29 +2,29 @@
 
 module Org::BikeSearchSettings
   class Component < ApplicationComponent
-    COLUMN_RENAME_KEYS = {
-      created_at_cell: ".registered",
-      updated_at_cell: ".updated",
-      stolen_cell: ".stolen",
-      manufacturer_cell: ".manufacturer",
-      model_cell: ".model",
-      color_cell: ".color",
-      owner_email_cell: ".sent_to",
-      creation_description_cell: ".source",
-      owner_name_cell: ".owner_name",
-      reg_organization_affiliation_cell: ".affiliation",
-      reg_extra_registration_number_cell: ".secondary_number",
-      reg_phone_cell: ".phone",
-      reg_address_cell: ".reg_address",
-      reg_student_id_cell: ".student_id",
-      sticker_cell: ".sticker",
-      impounded_cell: ".impounded",
-      avery_cell: ".avery_exportable",
-      cycle_type_cell: ".vehicle_type",
-      propulsion_type_cell: ".e_vehicle_propulsion",
-      status_cell: ".status_cell",
-      url_cell: ".url"
-    }.freeze
+    COLUMN_RENAME_KEYS = %i[
+      created_at_cell
+      updated_at_cell
+      stolen_cell
+      manufacturer_cell
+      model_cell
+      color_cell
+      owner_email_cell
+      creation_description_cell
+      owner_name_cell
+      reg_organization_affiliation_cell
+      reg_extra_registration_number_cell
+      reg_phone_cell
+      reg_address_cell
+      reg_student_id_cell
+      sticker_cell
+      impounded_cell
+      avery_cell
+      cycle_type_cell
+      propulsion_type_cell
+      status_cell
+      url_cell
+    ].freeze
 
     FILTER_DESCRIPTION_KEYS = {
       search_stickers: {with: ".filter_with_stickers_html", none: ".filter_no_sticker_html"},
@@ -84,7 +84,7 @@ module Org::BikeSearchSettings
     end
 
     def column_renames
-      @column_renames ||= COLUMN_RENAME_KEYS.transform_values { |key| translation(key) }
+      @column_renames ||= COLUMN_RENAME_KEYS.map { |key| [key, translation(".#{key}")] }.to_h
     end
 
     private
