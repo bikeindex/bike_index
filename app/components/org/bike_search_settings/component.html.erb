@@ -4,23 +4,22 @@
 >
   <h3 class="header-font-alt"><%= translation(".visible_columns") %></h3>
 
-  <div class="row pb-3">
+  <% column_rows = (enabled_columns.size / 3.0).ceil %>
+  <div class="tw:grid tw:grid-flow-col tw:grid-cols-2 tw:md:grid-cols-3 tw:gap-x-6 tw:gap-y-1 tw:pb-6"
+    style="grid-template-rows: repeat(<%= column_rows %>, auto)"
+  >
     <% enabled_columns.each do |cell_name| %>
-      <div class="col-xs-6 col-md-4">
-        <div class="form-group">
-          <label>
-            <% if cell_name == "avery_cell" %>
-              <%= check_box_tag cell_name, cell_name, show_avery_export?,
-                  data: { action: "change->org--bike-search#averyToggled" } %>
-            <% else %>
-              <%= check_box_tag cell_name, cell_name, false,
-                  data: { action: "change->org--bike-search#columnToggled" } %>
-            <% end %>
+      <label class="tw:flex tw:items-center tw:gap-1">
+        <% if cell_name == "avery_cell" %>
+          <%= check_box_tag cell_name, cell_name, show_avery_export?,
+              data: { action: "change->org--bike-search#averyToggled" } %>
+        <% else %>
+          <%= check_box_tag cell_name, cell_name, false,
+              data: { action: "change->org--bike-search#columnToggled" } %>
+        <% end %>
 
-            <%= column_renames[cell_name.to_sym] %>
-          </label>
-        </div>
-      </div>
+        <%= column_renames[cell_name.to_sym] %>
+      </label>
     <% end %>
   </div>
 

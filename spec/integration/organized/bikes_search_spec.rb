@@ -22,12 +22,12 @@ RSpec.describe "Organized bikes search", :js, type: :system do
   end
 
   def expect_settings_open
-    expect(find('.settings-list', visible: :all)['class']).not_to include('tw:hidden!')
+    expect(find(".settings-list", visible: :all)["class"]).not_to include("tw:hidden!")
   end
 
   def open_settings_if_not
     # if settings
-    if find('.settings-list', visible: :all)['class'].include?('tw:hidden!')
+    if find(".settings-list", visible: :all)["class"].include?("tw:hidden!")
       click_button "settings"
     end
   end
