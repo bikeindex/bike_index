@@ -452,9 +452,11 @@
 
                 .row.countrystatezip
                   .col-sm-4.fancy-select.unfancy.no-restore-on-backspace.hidden-other{class: (@parking_notification.country_id == Country.united_states_id ? "unhidden" : "")}
-                    = f.collection_select(:state_id, State.united_states, :id, :name, {include_blank: true, prompt: translation(".state")}, {class: "form-control"})
+                    = f.collection_select(:region_record_id, State.united_states, :id, :name, {include_blank: true, prompt: translation(".state")}, {class: "form-control"})
+                  .col-sm-4.shown-other{class: (@parking_notification.country_id == Country.united_states_id ? "" : "unhidden")}
+                    = f.text_field :region_string, placeholder: translation(".region"), class: "form-control"
                   .col-sm-4
-                    = f.text_field :zipcode, placeholder: translation(".zipcode"), class: "form-control"
+                    = f.text_field :postal_code, placeholder: translation(".zipcode"), class: "form-control"
                   .col-sm-4.fancy-select.unfancy.no-restore-on-backspace.ifManualRequired#us_id_data{data: {usid: Country.united_states_id}}
                     = f.select(:country_id, Country.select_options,
                       {prompt: translation(".choose_country")},

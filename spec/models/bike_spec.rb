@@ -1356,7 +1356,7 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "valid_mailing_address?" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago_legacy, enabled_feature_slugs: ["reg_address"]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 
     it "is falsey without registration address" do

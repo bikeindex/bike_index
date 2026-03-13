@@ -452,7 +452,7 @@ RSpec.describe MyAccountsController, type: :request do
     end
 
     context "organization with hotsheet" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: ["hot_sheet"]) }
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
       let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
       let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:organization_role) { current_user.organization_roles.first }

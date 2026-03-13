@@ -12,7 +12,7 @@ RSpec.describe Organized::EmailsController, type: :request do
 
   context "logged_in_as_organization_user" do
     include_context :request_spec_logged_in_as_organization_user
-    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: enabled_feature_slugs) }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
     describe "index" do
       it "redirects to the organization root path" do
         get base_url
@@ -51,7 +51,7 @@ RSpec.describe Organized::EmailsController, type: :request do
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
-    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: enabled_feature_slugs) }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
     describe "index" do
       it "renders" do
         get base_url
@@ -267,7 +267,7 @@ RSpec.describe Organized::EmailsController, type: :request do
 
   context "logged_in_as_superuser" do
     include_context :request_spec_logged_in_as_superuser
-    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: enabled_feature_slugs, kind: "bike_shop") }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs, kind: "bike_shop") }
     # Also defined in controller
     let(:viewable_kinds) { ParkingNotification.kinds + %w[finished_registration partial_registration graduated_notification impound_claim_approved impound_claim_denied organization_stolen_message] }
     describe "edit" do

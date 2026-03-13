@@ -174,7 +174,7 @@ module ApplicationHelper
 
   # TODO: location refactor - do something more sophisticated
   def address_formatted(obj)
-    obj.address
+    obj.formatted_address_string
   end
 
   def show_sharing_links(user)
