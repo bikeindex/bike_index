@@ -5,7 +5,12 @@
   <h3 class="header-font-alt"><%= translation(".visible_columns") %></h3>
 
   <% column_rows = (enabled_columns.size / 3.0).ceil %>
-  <div class="tw:grid tw:grid-flow-col tw:grid-cols-2 tw:md:grid-cols-3 tw:gap-x-6 tw:gap-y-1 tw:pb-6"
+
+  <div
+    class="
+      tw:grid tw:grid-flow-col tw:grid-cols-2 tw:gap-x-6 tw:gap-y-1 tw:pb-6
+      tw:md:grid-cols-3
+    "
     style="grid-template-rows: repeat(<%= column_rows %>, auto)"
   >
     <% enabled_columns.each do |cell_name| %>
