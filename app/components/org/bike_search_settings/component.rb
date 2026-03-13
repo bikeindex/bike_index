@@ -6,6 +6,7 @@ module Org::BikeSearchSettings
       created_at_cell
       updated_at_cell
       stolen_cell
+      serial_number_cell
       manufacturer_cell
       model_cell
       color_cell
@@ -112,7 +113,7 @@ module Org::BikeSearchSettings
     def enabled_columns
       @enabled_columns ||= begin
         cols = initially_checked_columns.dup
-        cols += %w[url_cell updated_at_cell cycle_type_cell propulsion_type_cell status_cell]
+        cols += %w[url_cell updated_at_cell serial_number_cell cycle_type_cell propulsion_type_cell status_cell]
         cols += additional_registration_fields.map { |f| "#{f}_cell" }
         cols += ["impounded_cell"] if @organization.enabled?("impound_bikes")
         cols += ["avery_cell"] if @include_avery && @organization.enabled?("avery_export")

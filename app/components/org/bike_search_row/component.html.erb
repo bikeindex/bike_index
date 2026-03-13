@@ -23,6 +23,10 @@
   <%= check_mark if @bike.status_stolen? %>
 </td>
 
+<td class="hiddenColumn hidden-xs-down serial_number_cell">
+  <small><%= @bike.serial_number %></small>
+</td>
+
 <td class="hiddenColumn hidden-xs-down propulsion_type_cell">
   <span class="<%= 'less-strong' if @bike.propulsion_type == 'foot-pedal' %>">
     <%= @bike.propulsion_titleize %>

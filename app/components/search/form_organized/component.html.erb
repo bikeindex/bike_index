@@ -66,6 +66,7 @@
     <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search", skip_organization: true} %>
     <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>
     <%= hidden_field_tag :search_address, @interpreted_params[:search_address] %>
+    <%= hidden_field_tag :search_status, @interpreted_params[:search_status] %>
     <%= hidden_field_tag :search_secondary, @interpreted_params[:search_secondary] %>
     <%= hidden_field_tag :search_model_audit_id, @interpreted_params[:search_model_audit_id] %>
   <% end %>

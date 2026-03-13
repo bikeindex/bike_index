@@ -45,7 +45,6 @@ module Org::BikeSearch
       @include_avery = include_avery
     end
 
-
     private
 
     def settings_component

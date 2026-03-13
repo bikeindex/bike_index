@@ -102,7 +102,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
   end
 
   context "with stolen and impounded bikes" do
-    let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes] }
+    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
     let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization) }
     let!(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization) }
 

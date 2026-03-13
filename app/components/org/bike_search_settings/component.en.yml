@@ -31,6 +31,7 @@ en:
         reg_organization_affiliation_cell: Affiliation
         reg_phone_cell: Phone
         reg_student_id_cell: Student ID
+        serial_number_cell: Serial
         settings: settings
         status: 'Status:'
         status_cell: Status
