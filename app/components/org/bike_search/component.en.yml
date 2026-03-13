@@ -9,7 +9,7 @@ en:
         bike: registration
         color: Color
         e_vehicle_propulsion: E-vehicle (propulsion)
-        e_vehicles_for_audit: "E-Vehicles for audit:"
+        e_vehicles_for_audit: 'E-Vehicles for audit:'
         impounded: Impounded
         link: Link
         manufacturer: Manufacturer
