@@ -26,7 +26,7 @@
 
   <% unless @skip_search_and_filters %>
     <% if @organization.enabled?("bike_stickers") %>
-      <p class="search-sort-btns">
+      <p class="search-sort-btns sortButtonsSticker">
         <span class="sort-group-label"><%= translation(".stickers") %></span>
 
         <%= link_to translation(".all"),
@@ -45,7 +45,7 @@
       </p>
     <% end %>
     <% if @organization.enabled?("reg_address") %>
-      <p class="search-sort-btns">
+      <p class="search-sort-btns sortButtonsAddress">
         <span class="sort-group-label"><%= translation(".address") %></span>
 
         <%= link_to translation(".all"),
@@ -63,7 +63,7 @@
         <% end %>
       </p>
     <% end %>
-    <p class="search-sort-btns">
+    <p class="search-sort-btns sortButtonsStatus">
       <span class="sort-group-label"><%= translation(".status") %></span>
 
       <%= link_to translation(".all"),

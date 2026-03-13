@@ -21,10 +21,10 @@ en:
         propulsion_type: Propulsion
         reg_address: Address
         registered: Registered
-        serial: Serial
         registered_bikes_html: "%{count} %{cycle_type} matching for %{org_name}"
         secondary_number: Secondary#
         sent_to: Sent to
+        serial: Serial
         source: Source
         status_cell: Status
         sticker: Sticker
