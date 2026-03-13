@@ -50,7 +50,7 @@ RSpec.shared_examples "bike_attributable" do
       it "returns expected" do
         expect(obj.type).to eq "e-scooter"
         expect(obj.type_titleize).to eq "e-Scooter"
-        expect(obj.propulsion_titleize).to eq "Electric Throttle"
+        expect(obj.propulsion_titleize).to eq "Throttle"
       end
     end
     context "pedal-assist" do
@@ -74,7 +74,7 @@ RSpec.shared_examples "bike_attributable" do
         expect(obj.cycle_type_name).to eq "e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)"
         expect(obj.type).to eq "e-personal mobility"
         expect(obj.type_titleize).to eq "e-Personal Mobility"
-        expect(obj.propulsion_titleize).to eq "Electric Throttle"
+        expect(obj.propulsion_titleize).to eq "Throttle"
       end
     end
   end

@@ -59,8 +59,7 @@ module Org::BikeSearchSettings
       @skip_search_and_filters = skip_search_and_filters
     end
 
-    # This isn't used in this component, it's called by Org::BikeSearch
-    # included here because the translations are in this component
+    # Called via delegation from Org::BikeSearch
     def active_search_filter_descriptions
       values = {search_stickers: @search_stickers, search_address: @search_address, search_status: @search_status}
 
@@ -97,11 +96,18 @@ module Org::BikeSearchSettings
       }.to_h
     end
 
-    private
-
     def additional_registration_fields
       @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
     end
+
+    def cycle_type
+      @cycle_type ||= begin
+        merged = @params.merge(@interpreted_params)
+        BikeServices::Displayer.vehicle_search?(merged) ? translation(".vehicle") : translation(".bike")
+      end
+    end
+
+    private
 
     def enabled_columns
       @enabled_columns ||= begin
@@ -117,13 +123,6 @@ module Org::BikeSearchSettings
     def settings_default_open?
       @search_stickers.present? || @search_address.present? ||
         @params[:search_impoundedness].present? || Binxtils::InputNormalizer.boolean(@params[:search_open])
-    end
-
-    def cycle_type
-      @cycle_type ||= begin
-        merged = @params.merge(@interpreted_params)
-        BikeServices::Displayer.vehicle_search?(merged) ? translation(".vehicle") : translation(".bike")
-      end
     end
 
     def search_params

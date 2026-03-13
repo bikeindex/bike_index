@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Organized bikes search", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+  let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bikes_path) { "/o/#{organization.to_param}/bikes" }
 

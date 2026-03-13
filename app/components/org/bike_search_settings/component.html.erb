@@ -95,7 +95,7 @@
       <p class="search-sort-btns text-right">
         <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
             organization_bikes_path(search_params.merge(create_export: true)),
-            class: "gray-link" %>
+            class: "gray-link", data: {turbo_frame: "_top"} %>
       </p>
     <% end %>
   <% end %>

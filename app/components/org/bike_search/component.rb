@@ -4,6 +4,9 @@ module Org::BikeSearch
   class Component < ApplicationComponent
     include SortableHelper
 
+    delegate :additional_registration_fields, :show_avery_export?, :column_renames,
+      :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
+      to: :settings_component
     def initialize(
       organization:,
       pagy:,
@@ -42,26 +45,8 @@ module Org::BikeSearch
       @include_avery = include_avery
     end
 
-    def additional_registration_fields
-      @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
-    end
-
-    def show_avery_export?
-      return @show_avery_export if defined?(@show_avery_export)
-
-      @show_avery_export = @include_avery && @organization.enabled?("avery_export") &&
-        Binxtils::InputNormalizer.boolean(@params[:search_avery_export])
-    end
 
     private
-
-    def column_renames
-      settings_component.column_renames
-    end
-
-    def initially_checked_columns
-      settings_component.initially_checked_columns
-    end
 
     def settings_component
       @settings_component ||= Org::BikeSearchSettings::Component.new(
@@ -76,17 +61,6 @@ module Org::BikeSearch
         bike_sticker: @bike_sticker,
         skip_search_and_filters: @skip_search_and_filters
       )
-    end
-
-    def cycle_type
-      @cycle_type ||= begin
-        merged = @params.merge(@interpreted_params)
-        BikeServices::Displayer.vehicle_search?(merged) ? translation(".vehicle") : translation(".bike")
-      end
-    end
-
-    def active_search_filter_descriptions
-      settings_component.active_search_filter_descriptions
     end
 
     def show_search_query_summary?

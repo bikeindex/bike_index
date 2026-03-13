@@ -252,7 +252,11 @@ module Organized
 
     # Set filter params for settings component on initial (non-turbo) page load
     def set_search_filter_params
-      @search_stickers = params[:search_stickers].present? ? ((params[:search_stickers] == "none") ? "none" : "with") : false
+      @search_stickers = if params[:search_stickers].present?
+        (params[:search_stickers] == "none") ? "none" : "with"
+      else
+        false
+      end
       @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
       search_status
     end
