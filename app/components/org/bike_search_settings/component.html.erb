@@ -31,18 +31,15 @@
 
         <%= link_to translation(".all"),
             organization_bikes_path(search_params.merge(search_stickers: nil)),
-            class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}",
-            data: {turbo_frame: "_top"} %>
+            class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}" %>
 
         <%= link_to organization_bikes_path(search_params.merge(search_stickers: "with")),
-            class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}",
-            data: {turbo_frame: "_top"} do %>
+            class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do %>
           <%= translation(".filter_with_stickers_html") %>
         <% end %>
 
         <%= link_to organization_bikes_path(search_params.merge(search_stickers: "none")),
-            class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}",
-            data: {turbo_frame: "_top"} do %>
+            class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do %>
           <%= translation(".filter_no_sticker_html") %>
         <% end %>
       </p>
@@ -53,18 +50,15 @@
 
         <%= link_to translation(".all"),
             organization_bikes_path(search_params.merge(search_address: nil)),
-            class: "btn btn-secondary #{@search_address.blank? ? 'active' : ''}",
-            data: {turbo_frame: "_top"} %>
+            class: "btn btn-secondary #{@search_address.blank? ? 'active' : ''}" %>
 
         <%= link_to organization_bikes_path(search_params.merge(search_address: "with_street")),
-            class: "btn btn-secondary #{@search_address == 'with_street' ? 'active' : ''}",
-            data: {turbo_frame: "_top"} do %>
+            class: "btn btn-secondary #{@search_address == 'with_street' ? 'active' : ''}" do %>
           <%= translation(".filter_with_address_html") %>
         <% end %>
 
         <%= link_to organization_bikes_path(search_params.merge(search_address: "without_street")),
-            class: "btn btn-secondary #{@search_address == 'without_street' ? 'active' : ''}",
-            data: {turbo_frame: "_top"} do %>
+            class: "btn btn-secondary #{@search_address == 'without_street' ? 'active' : ''}" do %>
           <%= translation(".filter_no_address_html") %>
         <% end %>
       </p>
@@ -74,31 +68,26 @@
 
       <%= link_to translation(".all"),
           organization_bikes_path(search_params.merge(search_status: "all")),
-          class: "btn btn-secondary #{@search_status == 'all' ? 'active' : ''}",
-          data: {turbo_frame: "_top"} %>
+          class: "btn btn-secondary #{@search_status == 'all' ? 'active' : ''}" %>
 
       <% if @organization.enabled?("impound_bikes") %>
         <%= link_to organization_bikes_path(search_params.merge(search_status: "not_impounded")),
-            class: "btn btn-secondary #{@search_status == 'not_impounded' ? 'active' : ''}",
-            data: {turbo_frame: "_top"} do %>
+            class: "btn btn-secondary #{@search_status == 'not_impounded' ? 'active' : ''}" do %>
           <%= translation(".filter_not_impounded_html") %>
         <% end %>
         <%= link_to organization_bikes_path(search_params.merge(search_status: "impounded")),
-            class: "btn btn-secondary #{@search_status == 'impounded' ? 'active' : ''}",
-            data: {turbo_frame: "_top"} do %>
+            class: "btn btn-secondary #{@search_status == 'impounded' ? 'active' : ''}" do %>
           <%= translation(".filter_impounded_html") %>
         <% end %>
       <% end %>
 
       <%= link_to organization_bikes_path(search_params.merge(search_status: "with_owner")),
-          class: "btn btn-secondary #{@search_status == 'with_owner' ? 'active' : ''}",
-          data: {turbo_frame: "_top"} do %>
+          class: "btn btn-secondary #{@search_status == 'with_owner' ? 'active' : ''}" do %>
         <%= translation(".filter_not_stolen_or_impounded_html") %>
       <% end %>
 
       <%= link_to organization_bikes_path(search_params.merge(search_status: "stolen")),
-          class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}",
-          data: {turbo_frame: "_top"} do %>
+          class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}" do %>
         <%= translation(".filter_stolen_html") %>
       <% end %>
     </p>
@@ -106,7 +95,7 @@
       <p class="search-sort-btns text-right">
         <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
             organization_bikes_path(search_params.merge(create_export: true)),
-            class: "gray-link", data: {turbo_frame: "_top"} %>
+            class: "gray-link" %>
       </p>
     <% end %>
   <% end %>
