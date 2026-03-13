@@ -11,9 +11,16 @@ module Organized
       @per_page = permitted_per_page
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+      @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
 
-      @pagy, @impound_records = pagy(:countish, available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
-        .includes(:user, :bike, :location), limit: @per_page, page: permitted_page)
+      if @render_results
+        @pagy, @impound_records = pagy(:countish, available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
+          .includes(:user, :bike, :location), limit: @per_page, page: permitted_page)
+        respond_to do |format|
+          format.html
+          format.turbo_stream
+        end
+      end
     end
 
     def show
