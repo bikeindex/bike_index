@@ -82,5 +82,13 @@ module Search::Form
         selected: @interpreted_params[:primary_activity]
       )
     end
+
+    def clean_url_defaults
+      if is_marketplace?
+        {distance: Search::MarketplaceController::DEFAULT_DISTANCE.to_s}
+      else
+        {stolenness: "stolen", distance: GeocodeHelper::DEFAULT_DISTANCE.to_s}
+      end
+    end
   end
 end

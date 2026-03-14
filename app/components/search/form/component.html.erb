@@ -1,4 +1,5 @@
-<div data-controller="search--form">
+<div data-controller="search--form"
+  data-search--form-clean-url-defaults-value="<%= clean_url_defaults.to_json %>">
   <%= form_with(url: @target_search_path,
       builder: BikeIndexFormBuilder,
       method: :get,
