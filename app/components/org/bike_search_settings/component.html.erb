@@ -30,77 +30,48 @@
 
   <% unless @skip_search_and_filters %>
     <% if @organization.enabled?("bike_stickers") %>
-      <p class="search-sort-btns sortButtonsSticker">
+      <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-center tw:gap-1">
         <span class="sort-group-label"><%= translation(".stickers") %></span>
 
-        <%= link_to translation(".all"),
-            organization_bikes_path(search_params.merge(search_stickers: nil)),
-            class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}" %>
-
-        <%= link_to organization_bikes_path(search_params.merge(search_stickers: "with")),
-            class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do %>
-          <%= translation(".filter_with_stickers_html") %>
-        <% end %>
-
-        <%= link_to organization_bikes_path(search_params.merge(search_stickers: "none")),
-            class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do %>
-          <%= translation(".filter_no_sticker_html") %>
-        <% end %>
-      </p>
+        <div class="tw:flex tw:flex-wrap">
+          <%= filter_radio_tag :search_stickers, "", translation(".all"), @search_stickers.blank?, first: true %>
+          <%= filter_radio_tag :search_stickers, "with", translation(".filter_with_stickers_html"), @search_stickers == "with" %>
+          <%= filter_radio_tag :search_stickers, "none", translation(".filter_no_sticker_html"), @search_stickers == "none", last: true %>
+        </div>
+      </div>
     <% end %>
     <% if @organization.enabled?("reg_address") %>
-      <p class="search-sort-btns sortButtonsAddress">
+      <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-center tw:gap-1">
         <span class="sort-group-label"><%= translation(".address") %></span>
 
-        <%= link_to translation(".all"),
-            organization_bikes_path(search_params.merge(search_address: nil)),
-            class: "btn btn-secondary #{@search_address.blank? ? 'active' : ''}" %>
-
-        <%= link_to organization_bikes_path(search_params.merge(search_address: "with_street")),
-            class: "btn btn-secondary #{@search_address == 'with_street' ? 'active' : ''}" do %>
-          <%= translation(".filter_with_address_html") %>
-        <% end %>
-
-        <%= link_to organization_bikes_path(search_params.merge(search_address: "without_street")),
-            class: "btn btn-secondary #{@search_address == 'without_street' ? 'active' : ''}" do %>
-          <%= translation(".filter_no_address_html") %>
-        <% end %>
-      </p>
+        <div class="tw:flex tw:flex-wrap">
+          <%= filter_radio_tag :search_address, "", translation(".all"), @search_address.blank?, first: true %>
+          <%= filter_radio_tag :search_address, "with_street", translation(".filter_with_address_html"), @search_address == "with_street" %>
+          <%= filter_radio_tag :search_address, "without_street", translation(".filter_no_address_html"), @search_address == "without_street", last: true %>
+        </div>
+      </div>
     <% end %>
-    <p class="search-sort-btns sortButtonsStatus">
+    <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-center tw:gap-1">
       <span class="sort-group-label"><%= translation(".status") %></span>
 
-      <%= link_to translation(".all"),
-          organization_bikes_path(search_params.merge(search_status: "all")),
-          class: "btn btn-secondary #{@search_status == 'all' ? 'active' : ''}" %>
+      <div class="tw:flex tw:flex-wrap">
+        <%= filter_radio_tag :search_status, "all", translation(".all"), @search_status == "all", first: true %>
 
-      <% if @organization.enabled?("impound_bikes") %>
-        <%= link_to organization_bikes_path(search_params.merge(search_status: "not_impounded")),
-            class: "btn btn-secondary #{@search_status == 'not_impounded' ? 'active' : ''}" do %>
-          <%= translation(".filter_not_impounded_html") %>
+        <% if @organization.enabled?("impound_bikes") %>
+          <%= filter_radio_tag :search_status, "not_impounded", translation(".filter_not_impounded_html"), @search_status == "not_impounded" %>
+          <%= filter_radio_tag :search_status, "impounded", translation(".filter_impounded_html"), @search_status == "impounded" %>
         <% end %>
-        <%= link_to organization_bikes_path(search_params.merge(search_status: "impounded")),
-            class: "btn btn-secondary #{@search_status == 'impounded' ? 'active' : ''}" do %>
-          <%= translation(".filter_impounded_html") %>
-        <% end %>
-      <% end %>
 
-      <%= link_to organization_bikes_path(search_params.merge(search_status: "with_owner")),
-          class: "btn btn-secondary #{@search_status == 'with_owner' ? 'active' : ''}" do %>
-        <%= translation(".filter_not_stolen_or_impounded_html") %>
-      <% end %>
-
-      <%= link_to organization_bikes_path(search_params.merge(search_status: "stolen")),
-          class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}" do %>
-        <%= translation(".filter_stolen_html") %>
-      <% end %>
-    </p>
+        <%= filter_radio_tag :search_status, "with_owner", translation(".filter_not_stolen_or_impounded_html"), @search_status == "with_owner" %>
+        <%= filter_radio_tag :search_status, "stolen", translation(".filter_stolen_html"), @search_status == "stolen", last: true %>
+      </div>
+    </div>
     <% if @organization.enabled?("csv_exports") %>
-      <p class="search-sort-btns text-right">
+      <div class="tw:mb-3 tw:text-right">
         <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
             organization_bikes_path(search_params.merge(create_export: true)),
             class: "gray-link", data: {turbo_frame: "_top"} %>
-      </p>
+      </div>
     <% end %>
   <% end %>
 </div>

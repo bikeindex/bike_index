@@ -51,6 +51,13 @@ export default class extends Controller {
     window.location = url.toString()
   }
 
+  filterChanged () {
+    const form = document.getElementById('Search_Form')
+    if (form) {
+      form.requestSubmit()
+    }
+  }
+
   perPageChanged () {
     const url = new URL(window.location)
     url.searchParams.set('per_page', this.perPageTarget.value)
