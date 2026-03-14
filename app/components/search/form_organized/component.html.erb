@@ -71,3 +71,8 @@
     <%= hidden_field_tag :search_model_audit_id, @interpreted_params[:search_model_audit_id] %>
   <% end %>
 </div>
+
+<% if @settings_component %>
+  <hr style="opacity: .3;">
+  <%= render(@settings_component) %>
+<% end %>
