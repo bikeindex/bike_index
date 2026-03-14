@@ -6,10 +6,7 @@ import TimeLocalizer from 'utils/time_localizer'
 // Connects to data-controller='search--form'
 export default class extends Controller {
   static targets = ['form', 'button']
-  static values = {
-    spinnerId: { type: String, default: 'hiddenLoadingSpinner' },
-    cleanUrlDefaults: { type: Object, default: {} }
-  }
+  static values = { spinnerId: { type: String, default: 'hiddenLoadingSpinner' } }
 
   get frameElement () {
     const turboFrameId = this.formTarget.getAttribute('data-turbo-frame')
@@ -37,7 +34,6 @@ export default class extends Controller {
       this.formTarget.setAttribute('data-turbo-action', 'advance')
     }
 
-    this.formTarget.addEventListener('turbo:submit-end', this.cleanUrlParams.bind(this))
     this.setupFormFieldListeners()
 
     // Add timeLocalizer and watch for turbo-frame renders
@@ -74,34 +70,6 @@ export default class extends Controller {
 
   resetButton () {
     if (this.hasButtonTarget) { this.buttonTarget.disabled = false }
-  }
-
-  cleanUrlParams () {
-    const url = new URL(window.location)
-    const params = url.searchParams
-    let changed = false
-
-    // Remove empty params
-    for (const [key, value] of [...params.entries()]) {
-      if (!value || value.trim() === '') {
-        params.delete(key)
-        changed = true
-      }
-    }
-
-    // Remove params that match their default values
-    const defaults = this.cleanUrlDefaultsValue
-    for (const [key, defaultValue] of Object.entries(defaults)) {
-      if (params.get(key) === String(defaultValue)) {
-        params.delete(key)
-        changed = true
-      }
-    }
-
-    if (changed) {
-      const newUrl = params.toString() ? `${url.pathname}?${params.toString()}` : url.pathname
-      window.history.replaceState(window.history.state, '', newUrl)
-    }
   }
 
   handleFrameRender = () => {
