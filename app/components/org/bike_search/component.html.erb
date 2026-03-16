@@ -1,10 +1,12 @@
 <%= tag.div(data: wrapper_data_attributes) do %>
-  <% unless @skip_search_and_filters %>
+  <% if @skip_search_and_filters %>
+    <%= render(settings_component) unless @skip_settings %>
+  <% else %>
     <div class="mb-4">
       <%= render(Search::FormOrganized::Component.new(
         target_search_path: organization_bikes_path(organization_id: @organization.to_param),
         interpreted_params: @interpreted_params,
-        settings_component: settings_component
+        settings_component: @skip_settings ? nil : settings_component
       )) %>
     </div>
   <% end %>

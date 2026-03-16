@@ -23,7 +23,8 @@ module Org::BikeSearch
       bike_sticker: nil,
       model_audit: nil,
       skip_search_and_filters: false,
-      include_avery: false
+      include_avery: false,
+      skip_settings: false
     )
       @organization = organization
       @pagy = pagy
@@ -41,6 +42,7 @@ module Org::BikeSearch
       @model_audit = model_audit
       @skip_search_and_filters = skip_search_and_filters
       @include_avery = include_avery
+      @skip_settings = skip_settings
     end
 
     private
@@ -65,7 +67,7 @@ module Org::BikeSearch
     end
 
     def wrapper_data_attributes
-      return {} if @skip_search_and_filters
+      return {} if @skip_settings
       {controller: "org--bike-search",
        "org--bike-search-default-columns-value": initially_checked_columns.to_json}
     end
