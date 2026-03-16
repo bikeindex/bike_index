@@ -31,12 +31,13 @@ RSpec.describe "Bike search", :js, type: :system do
   it "filters by color and location" do
     visit "/search/registrations"
 
-    # Initial load should use replaceState, not adding default params to URL
     expect(page).to have_css(".bike-box-item", wait: 10)
-    url = current_url
-    expect(url).not_to include("serial=")
-    expect(url).not_to include("distance=")
-    expect(url).not_to include("stolenness=stolen")
+
+    # Initial load uses replaceState, so back button goes to the previous page (not a duplicate search entry)
+    page.go_back
+    expect(page).not_to have_current_path("/search/registrations")
+    page.go_forward
+    expect(page).to have_css(".bike-box-item", wait: 10)
 
     # Select "All registrations" stolenness
     find("label[for='stolenness_all']").click
