@@ -28,6 +28,11 @@ export default class extends Controller {
 
     // if the frame was loaded without results, submit the form
     if (this.frameElement?.querySelector('#loadedWithoutResults')) {
+      // Use replace for the initial auto-submit so it doesn't add a duplicate history entry
+      this.formTarget.setAttribute('data-turbo-action', 'replace')
+      this.frameElement.addEventListener('turbo:frame-render', () => {
+        this.formTarget.setAttribute('data-turbo-action', 'advance')
+      }, { once: true })
       this.formTarget.requestSubmit()
     }
 

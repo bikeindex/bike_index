@@ -588,15 +588,10 @@ nl:
         name: Naam
         slug: Naaktslak
       mail_snippet:
-        address: Adres
         body: Lichaam
         is_enabled: Is ingeschakeld
-        is_location_triggered: Wordt de locatie geactiveerd
         kind: Soort
-        latitude: Breedte
-        longitude: Lengte
         name: Naam
-        proximity_radius: Nabijheid straal
         public_images: Publieke afbeeldingen
       manufacturer:
         bikes: Bikes
@@ -6207,20 +6202,9 @@ nl:
         update_impound_record: Update het inbeslagnameregister
         update_multiple_records: Meerdere records bijwerken
       bike_search:
-        address: 'Adres:'
-        all: Alle
         avery: Avery?
         bike: Registratie
         color: Kleur
-        create_export_of_vehicles: Export maken van gezochte %{cycle_type}
-        filter_impounded_html: alleen <strong>in beslag genomen</strong>
-        filter_no_address_html: alleen <strong>geen</strong> adres
-        filter_no_sticker_html: alleen <strong>geen</strong> sticker
-        filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
-        filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
-        filter_stolen_html: alleen gestolen
-        filter_with_address_html: alleen <strong>met</strong> adres
-        filter_with_stickers_html: alleen <strong>met</strong> stickers
         impounded: In beslag genomen bij
         link: Link
         manufacturer: Fabrikant
@@ -6232,16 +6216,12 @@ nl:
         registered: Geregistreerd
         registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
         sent_to: Verzonden naar
-        settings: Instellingen
-        status: 'Toestand:'
         status_cell: Toestand
         sticker: Sticker
-        stickers: 'stickers:'
         stolen: Gestolen
         updated: Bijgewerkt
         vehicle: Registratie
         vehicle_type: 'Voertuigtype:'
-        visible_columns: Zichtbare kolommen
         affiliation: Aansluiting
         avery_exportable: Avery Exporteerbaar
         e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
@@ -6251,7 +6231,50 @@ nl:
         source: Bron
         student_id: Student-ID
         url: URL
+        e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
+        serial: Serie
+        view_matching_any_audit: weergave die overeenkomt met elke audit
       bike_search_row:
         email_hidden: email verborgen
         link: Link
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
+      bike_search_settings:
+        address: 'Adres:'
+        all: Alle
+        avery_cell: Avery Exporteerbaar
+        bike: Registratie
+        color_cell: Kleur
+        create_export_of_vehicles: Export maken van gezochte %{cycle_type}
+        created_at_cell: Geregistreerd
+        creation_description_cell: Bron
+        cycle_type_cell: 'Voertuigtype:'
+        filter_impounded_html: alleen <strong>in beslag genomen</strong>
+        filter_no_address_html: alleen <strong>geen</strong> adres
+        filter_no_sticker_html: alleen <strong>geen</strong> sticker
+        filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
+        filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
+        filter_stolen_html: alleen gestolen
+        filter_with_address_html: alleen <strong>met</strong> adres
+        filter_with_stickers_html: alleen <strong>met</strong> stickers
+        impounded_cell: In beslag genomen bij
+        manufacturer_cell: Fabrikant
+        model_cell: Model
+        owner_email_cell: Verzonden naar
+        owner_name_cell: Eigenaar naam
+        propulsion_type_cell: Elektrisch voertuig (aandrijving)
+        reg_address_cell: Adres
+        reg_extra_registration_number_cell: Secundair#
+        reg_organization_affiliation_cell: Aansluiting
+        reg_phone_cell: Telefoon
+        reg_student_id_cell: Student-ID
+        serial_number_cell: Serie
+        settings: Instellingen
+        status: 'Toestand:'
+        status_cell: Toestand
+        sticker_cell: Sticker
+        stickers: 'stickers:'
+        stolen_cell: Gestolen
+        updated_at_cell: Bijgewerkt
+        url_cell: URL
+        vehicle: Registratie
+        visible_columns: Zichtbare kolommen
