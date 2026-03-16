@@ -53,6 +53,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         expect(response).to render_template(:new)
         expect(response.body).to match(/authorize/i)
         expect(response.body).to match(/form action=.\/oauth\/authorize/)
+        expect(response.body).to_not include("fbevents.js")
       end
       context "no scope" do
         let(:scope_param) { "" }

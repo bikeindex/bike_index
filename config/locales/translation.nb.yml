@@ -599,15 +599,10 @@ nb:
         name: Navn
         slug: Mordersnegle
       mail_snippet:
-        address: Adresse
         body: Kropp
         is_enabled: Er på
-        is_location_triggered: Er plassering utløst
         kind: Snill
-        latitude: Breddegrad
-        longitude: Lengdegrad
         name: Navn
-        proximity_radius: Nærhetsradius
         public_images: Offentlige bilder
       manufacturer:
         bikes: Sykler
@@ -6047,20 +6042,9 @@ nb:
         update_impound_record: Oppdater beslagsregister
         update_multiple_records: Oppdater flere poster
       bike_search:
-        address: 'Adresse:'
-        all: Alle
         avery: Avery?
         bike: registrering
         color: Farge
-        create_export_of_vehicles: Opprett eksport av søkte %{cycle_type}
-        filter_impounded_html: bare <strong>beslaglagt</strong>
-        filter_no_address_html: bare <strong>ingen</strong> adresse
-        filter_no_sticker_html: bare <strong>uten</strong> klistremerke
-        filter_not_impounded_html: bare <strong>ikke</strong> beslaglagt
-        filter_not_stolen_or_impounded_html: ikke stjålet eller beslaglagt
-        filter_stolen_html: bare stjålet
-        filter_with_address_html: bare <strong>med</strong> adresse
-        filter_with_stickers_html: bare <strong>med</strong> klistremerker
         impounded: Beslaglagt
         link: Link
         manufacturer: Produsent
@@ -6072,16 +6056,12 @@ nb:
         registered: Registrert
         registered_bikes_html: "%{count} %{cycle_type} samsvarer med %{org_name}"
         sent_to: Sendt til
-        settings: innstillinger
-        status: 'Status:'
         status_cell: Status
         sticker: Klistremerke
-        stickers: 'Klistremerker:'
         stolen: Stjålet
         updated: Oppdatert
         vehicle: registrering
         vehicle_type: Bil type
-        visible_columns: Synlige kolonner
         affiliation: Tilknytning
         avery_exportable: Avery eksporterbar
         e_vehicle_propulsion: Elbil (fremdrift)
@@ -6091,7 +6071,50 @@ nb:
         source: Kilde
         student_id: Student ID
         url: URL-adresse
+        e_vehicles_for_audit: 'Elbiler for revisjon:'
+        serial: Serienummer
+        view_matching_any_audit: visning som samsvarer med enhver revisjon
       bike_search_row:
         email_hidden: e-post skjult
         link: Link
         mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
+      bike_search_settings:
+        address: 'Adresse:'
+        all: Alle
+        avery_cell: Avery eksporterbar
+        bike: registrering
+        color_cell: Farge
+        create_export_of_vehicles: Opprett eksport av søkte %{cycle_type}
+        created_at_cell: Registrert
+        creation_description_cell: Kilde
+        cycle_type_cell: Bil type
+        filter_impounded_html: bare <strong>beslaglagt</strong>
+        filter_no_address_html: bare <strong>ingen</strong> adresse
+        filter_no_sticker_html: bare <strong>uten</strong> klistremerke
+        filter_not_impounded_html: bare <strong>ikke</strong> beslaglagt
+        filter_not_stolen_or_impounded_html: ikke stjålet eller beslaglagt
+        filter_stolen_html: bare stjålet
+        filter_with_address_html: bare <strong>med</strong> adresse
+        filter_with_stickers_html: bare <strong>med</strong> klistremerker
+        impounded_cell: Beslaglagt
+        manufacturer_cell: Produsent
+        model_cell: Modell
+        owner_email_cell: Sendt til
+        owner_name_cell: Eiers navn
+        propulsion_type_cell: Elbil (fremdrift)
+        reg_address_cell: Adresse
+        reg_extra_registration_number_cell: Sekundærnr.
+        reg_organization_affiliation_cell: Tilknytning
+        reg_phone_cell: Telefon
+        reg_student_id_cell: Student ID
+        serial_number_cell: Serienummer
+        settings: innstillinger
+        status: 'Status:'
+        status_cell: Status
+        sticker_cell: Klistremerke
+        stickers: 'Klistremerker:'
+        stolen_cell: Stjålet
+        updated_at_cell: Oppdatert
+        url_cell: URL-adresse
+        vehicle: registrering
+        visible_columns: Synlige kolonner

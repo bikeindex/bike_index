@@ -98,7 +98,7 @@ export default class extends Controller {
 
       if (window.bike_search_submit) {
         $descSearch.select2('close') // Because form is submitted, hide select box
-        $(searchFormSelector).submit()
+        document.querySelector(searchFormSelector).requestSubmit()
       } else {
         window.bike_search_submit = true
       }
