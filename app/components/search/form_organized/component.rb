@@ -35,8 +35,7 @@ module Search::FormOrganized
     end
 
     def render_notes_field?
-      helpers.respond_to?(:current_organization) &&
-        helpers.current_organization&.enabled?("registration_notes")
+      @settings_component&.organization&.enabled?("registration_notes")
     end
   end
 end

@@ -80,8 +80,5 @@ module PageBlock::OrgBikeAccessPanel
       @bike_organization ||= @bike.bike_organizations.find_by(organization_id: @organization.id)
     end
 
-    def notes_update_url
-      helpers.organization_bike_path(@bike, organization_id: @organization.to_param)
-    end
   end
 end

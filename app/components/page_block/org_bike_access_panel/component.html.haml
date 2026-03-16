@@ -197,7 +197,7 @@
                   %tr
                     %td= translation(".notes")
                     %td
-                      = form_with(url: notes_update_url, method: :patch) do |f|
+                      = form_with(url: organization_bike_path(@bike, organization_id: @organization.to_param), method: :patch) do |f|
                         = f.text_area :notes, value: bike_organization&.notes, class: "twinput tw:w-full", rows: 3, name: "notes"
                         .tw:mt-1
                           = f.submit translation(".save_notes"), class: "btn btn-success btn-sm"
