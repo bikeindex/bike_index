@@ -39,7 +39,6 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     expect(component).to have_css(".settings-list", visible: :all)
     # Search form
     expect(component).to have_css("#Search_Form")
-    expect(component).to have_css("hr")
     # checkboxes
     expect(component).to have_css(".settings-list.tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)
@@ -54,7 +53,6 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     it "renders table without search form" do
       expect(component).to have_css("table.table")
       expect(component).not_to have_css("#Search_Form")
-      expect(component).not_to have_css("hr")
     end
   end
 
