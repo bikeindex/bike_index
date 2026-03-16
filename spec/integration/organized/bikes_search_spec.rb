@@ -32,6 +32,11 @@ RSpec.describe "Organized bikes search", :js, type: :system do
 
     # search_no_js should NOT be in the URL (removed by JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
+
+    # Initial load uses replaceState, so back button goes to the previous page (not a duplicate search entry)
+    page.go_back
+    expect(page).not_to have_current_path(/bikes/)
+    page.go_forward
     expect(page).to have_css("table.table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
 
