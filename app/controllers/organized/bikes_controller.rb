@@ -15,19 +15,19 @@ module Organized
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @per_page = permitted_per_page(default: 10)
 
-        if @render_results
+        if create_export?
           search_organization_bikes
-          if create_export?
-            create_export_and_redirect
-          else
-            respond_to do |format|
-              format.html { render :search }
-              format.turbo_stream
-            end
+          create_export_and_redirect
+        elsif @render_results
+          search_organization_bikes
+          respond_to do |format|
+            format.html { render :search }
+            format.turbo_stream
           end
         else
           @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
           @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+          set_search_filter_params
           render :search
         end
         return
@@ -262,6 +262,17 @@ module Organized
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+    end
+
+    # Set filter params for settings component on initial (non-turbo) page load
+    def set_search_filter_params
+      @search_stickers = if params[:search_stickers].present?
+        (params[:search_stickers] == "none") ? "none" : "with"
+      else
+        false
+      end
+      @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
+      search_status
     end
 
     def search_status
