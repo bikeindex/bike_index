@@ -30,10 +30,6 @@ export default class extends Controller {
     if (this.frameElement?.querySelector('#loadedWithoutResults')) {
       // Use replace instead of advance for initial load to avoid adding to history
       this.formTarget.setAttribute('data-turbo-action', 'replace')
-      // Clean up empty/default params from the URL after the initial submit
-      this.formTarget.addEventListener('turbo:submit-end', () => {
-        this.cleanInitialUrlParams()
-      }, { once: true })
       this.formTarget.requestSubmit()
       this.formTarget.setAttribute('data-turbo-action', 'advance')
     }
@@ -74,35 +70,6 @@ export default class extends Controller {
 
   resetButton () {
     if (this.hasButtonTarget) { this.buttonTarget.disabled = false }
-  }
-
-  cleanInitialUrlParams () {
-    const url = new URL(window.location)
-    const params = url.searchParams
-    let changed = false
-
-    for (const [key, value] of [...params.entries()]) {
-      if (!value || value.trim() === '') {
-        params.delete(key)
-        changed = true
-      }
-    }
-
-    // Remove default stolenness and distance
-    if (params.get('stolenness') === 'stolen') { params.delete('stolenness'); changed = true }
-    if (params.get('distance') === '100' || params.get('distance') === '50') { params.delete('distance'); changed = true }
-
-    // Remove placeholder locations
-    const location = params.get('location')
-    if (location && ['you', 'anywhere'].includes(location.toLowerCase().trim())) {
-      params.delete('location')
-      changed = true
-    }
-
-    if (changed) {
-      const newUrl = params.toString() ? `${url.pathname}?${params.toString()}` : url.pathname
-      window.history.replaceState(window.history.state, '', newUrl)
-    }
   }
 
   handleFrameRender = () => {
