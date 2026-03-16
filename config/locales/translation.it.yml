@@ -4889,9 +4889,23 @@ it:
         source:
         student_id:
         url:
+        e_vehicles_for_audit:
+        serial: Seriale
+        view_matching_any_audit:
+      bike_search_row:
+        email_hidden:
+        link: Collegamento
+        mfg_model_color_html:
+      bike_search_settings:
         address:
         all: Tutti
+        avery_cell:
+        bike:
+        color_cell: Colore
         create_export_of_vehicles:
+        created_at_cell: Registrato
+        creation_description_cell:
+        cycle_type_cell:
         filter_impounded_html:
         filter_no_address_html:
         filter_no_sticker_html:
@@ -4900,11 +4914,25 @@ it:
         filter_stolen_html:
         filter_with_address_html:
         filter_with_stickers_html:
+        impounded_cell:
+        manufacturer_cell: Produttore
+        model_cell: Modello
+        owner_email_cell:
+        owner_name_cell:
+        propulsion_type_cell:
+        reg_address_cell: Indirizzo
+        reg_extra_registration_number_cell:
+        reg_organization_affiliation_cell:
+        reg_phone_cell: Telefono
+        reg_student_id_cell:
+        serial_number_cell: Seriale
         settings:
         status:
+        status_cell: Stato
+        sticker_cell:
         stickers:
+        stolen_cell: Rubata
+        updated_at_cell:
+        url_cell:
+        vehicle:
         visible_columns:
-      bike_search_row:
-        email_hidden:
-        link: Collegamento
-        mfg_model_color_html:

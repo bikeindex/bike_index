@@ -6071,9 +6071,23 @@ nb:
         source: Kilde
         student_id: Student ID
         url: URL-adresse
+        e_vehicles_for_audit: 'Elbiler for revisjon:'
+        serial: Serienummer
+        view_matching_any_audit: visning som samsvarer med enhver revisjon
+      bike_search_row:
+        email_hidden: e-post skjult
+        link: Link
+        mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
+      bike_search_settings:
         address: 'Adresse:'
         all: Alle
+        avery_cell: Avery eksporterbar
+        bike: registrering
+        color_cell: Farge
         create_export_of_vehicles: Opprett eksport av søkte %{cycle_type}
+        created_at_cell: Registrert
+        creation_description_cell: Kilde
+        cycle_type_cell: Bil type
         filter_impounded_html: bare <strong>beslaglagt</strong>
         filter_no_address_html: bare <strong>ingen</strong> adresse
         filter_no_sticker_html: bare <strong>uten</strong> klistremerke
@@ -6082,11 +6096,25 @@ nb:
         filter_stolen_html: bare stjålet
         filter_with_address_html: bare <strong>med</strong> adresse
         filter_with_stickers_html: bare <strong>med</strong> klistremerker
+        impounded_cell: Beslaglagt
+        manufacturer_cell: Produsent
+        model_cell: Modell
+        owner_email_cell: Sendt til
+        owner_name_cell: Eiers navn
+        propulsion_type_cell: Elbil (fremdrift)
+        reg_address_cell: Adresse
+        reg_extra_registration_number_cell: Sekundærnr.
+        reg_organization_affiliation_cell: Tilknytning
+        reg_phone_cell: Telefon
+        reg_student_id_cell: Student ID
+        serial_number_cell: Serienummer
         settings: innstillinger
         status: 'Status:'
+        status_cell: Status
+        sticker_cell: Klistremerke
         stickers: 'Klistremerker:'
+        stolen_cell: Stjålet
+        updated_at_cell: Oppdatert
+        url_cell: URL-adresse
+        vehicle: registrering
         visible_columns: Synlige kolonner
-      bike_search_row:
-        email_hidden: e-post skjult
-        link: Link
-        mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>

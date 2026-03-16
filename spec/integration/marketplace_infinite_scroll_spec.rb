@@ -74,8 +74,9 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # Should load more results
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 14)
 
-    # And then search "Yuba"
+    # And then search "Yuba" without price filter
     # Which will return 8 bikes - so the page won't have the ability to scroll. Verify that it works correctly
+    fill_in "price_max_amount", with: ""
     find(".select2-container").click
     find(".select2-search__field").set("Yuba")
     # Wait for select2 to load

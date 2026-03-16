@@ -4807,9 +4807,23 @@ es:
         source:
         student_id:
         url:
+        e_vehicles_for_audit:
+        serial:
+        view_matching_any_audit:
+      bike_search_row:
+        email_hidden:
+        link:
+        mfg_model_color_html:
+      bike_search_settings:
         address:
         all:
+        avery_cell:
+        bike:
+        color_cell:
         create_export_of_vehicles:
+        created_at_cell:
+        creation_description_cell:
+        cycle_type_cell:
         filter_impounded_html:
         filter_no_address_html:
         filter_no_sticker_html:
@@ -4818,11 +4832,25 @@ es:
         filter_stolen_html:
         filter_with_address_html:
         filter_with_stickers_html:
+        impounded_cell:
+        manufacturer_cell:
+        model_cell:
+        owner_email_cell:
+        owner_name_cell:
+        propulsion_type_cell:
+        reg_address_cell:
+        reg_extra_registration_number_cell:
+        reg_organization_affiliation_cell:
+        reg_phone_cell:
+        reg_student_id_cell:
+        serial_number_cell:
         settings:
         status:
+        status_cell:
+        sticker_cell:
         stickers:
+        stolen_cell:
+        updated_at_cell:
+        url_cell:
+        vehicle:
         visible_columns:
-      bike_search_row:
-        email_hidden:
-        link:
-        mfg_model_color_html:
