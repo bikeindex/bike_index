@@ -6,11 +6,14 @@ export default class extends Controller {
   connect () {
     this.checkOverflow()
     this.resizeHandler = () => this.checkOverflow()
+    this.frameRenderHandler = () => this.checkOverflow()
     window.addEventListener('resize', this.resizeHandler)
+    document.addEventListener('turbo:frame-render', this.frameRenderHandler)
   }
 
   disconnect () {
     window.removeEventListener('resize', this.resizeHandler)
+    document.removeEventListener('turbo:frame-render', this.frameRenderHandler)
   }
 
   checkOverflow () {
