@@ -27,6 +27,7 @@ module Organized
         else
           @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
           @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+          set_search_filter_params
           render :search
         end
         return
@@ -247,6 +248,17 @@ module Organized
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+    end
+
+    # Set filter params for settings component on initial (non-turbo) page load
+    def set_search_filter_params
+      @search_stickers = if params[:search_stickers].present?
+        (params[:search_stickers] == "none") ? "none" : "with"
+      else
+        false
+      end
+      @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
+      search_status
     end
 
     def search_status
