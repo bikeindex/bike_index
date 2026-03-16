@@ -15,7 +15,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   let(:search_stickers) { nil }
   let(:search_address) { nil }
   let(:search_status) { "all" }
-  let(:skip_search_form) { false }
+  let(:skip_search_and_filters) { false }
   let(:options) do
     {
       organization:,
@@ -27,7 +27,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
       search_stickers:,
       search_address:,
       search_status:,
-      skip_search_form:,
+      skip_search_and_filters:,
       stolenness: "all",
       time_range: 1.year.ago..Time.current
     }
@@ -39,7 +39,6 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     expect(component).to have_css(".settings-list", visible: :all)
     # Search form
     expect(component).to have_css("#Search_Form")
-    expect(component).to have_css("hr")
     # checkboxes
     expect(component).to have_css(".settings-list.tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)
@@ -48,30 +47,30 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     expect(component).to have_css("select#per_page_select")
   end
 
-  context "with skip_search_form" do
-    let(:skip_search_form) { true }
+  context "with skip_search_and_filters" do
+    let(:skip_search_and_filters) { true }
 
     it "renders table without search form" do
       expect(component).to have_css("table.table")
       expect(component).not_to have_css("#Search_Form")
-      expect(component).not_to have_css("hr")
     end
   end
 
   context "with bike_stickers enabled" do
     let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
 
-    it "renders sticker filter buttons" do
-      expect(component).to have_css(".search-sort-btns", text: /Stickers/, visible: :all)
+    it "renders sticker filter radios" do
+      expect(component).to have_text("Stickers")
+      expect(component).to have_css("input[type='radio'][name='search_stickers']", visible: :all)
     end
   end
 
   context "with impound_bikes enabled" do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
 
-    it "renders impound status filter buttons" do
-      expect(component).to have_css(".search-sort-btns", text: /Status/, visible: :all)
-      expect(component).to have_css(".search-sort-btns a", text: /not/, visible: :all)
+    it "renders impound status filter radios" do
+      expect(component).to have_text("Status")
+      expect(component).to have_css("input[type='radio'][name='search_status'][value='not_impounded']", visible: :all)
     end
   end
 

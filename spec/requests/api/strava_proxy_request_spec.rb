@@ -421,4 +421,32 @@ RSpec.describe "Strava Proxy API", type: :request do
       end
     end
   end
+
+  describe "CORS headers" do
+    context "with allowed origin" do
+      it "sets CORS headers" do
+        post base_url, params: {url: "athlete/activities", method: "GET"},
+          headers: {"Origin" => "https://bikeindex.org"}
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq "https://bikeindex.org"
+        expect(response.headers["Access-Control-Allow-Methods"]).to eq "POST, OPTIONS"
+        expect(response.headers["Access-Control-Allow-Headers"]).to include "Authorization"
+      end
+    end
+
+    context "with www subdomain origin" do
+      it "sets CORS headers" do
+        post base_url, params: {url: "athlete/activities", method: "GET"},
+          headers: {"Origin" => "https://www.bikeindex.org"}
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq "https://www.bikeindex.org"
+      end
+    end
+
+    context "with disallowed origin" do
+      it "defaults to first allowed origin" do
+        post base_url, params: {url: "athlete/activities", method: "GET"},
+          headers: {"Origin" => "https://evil.com"}
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq "https://bikeindex.org"
+      end
+    end
+  end
 end

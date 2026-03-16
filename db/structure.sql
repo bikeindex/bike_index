@@ -1999,22 +1999,12 @@ ALTER SEQUENCE public.locks_id_seq OWNED BY public.locks.id;
 CREATE TABLE public.mail_snippets (
     id integer NOT NULL,
     is_enabled boolean DEFAULT false NOT NULL,
-    is_location_triggered boolean DEFAULT false NOT NULL,
     body text,
-    latitude double precision,
-    longitude double precision,
-    proximity_radius integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     organization_id integer,
     kind integer DEFAULT 0,
-    street character varying,
-    city character varying,
-    zipcode character varying,
-    state_id bigint,
-    country_id bigint,
     subject text,
-    neighborhood character varying,
     doorkeeper_app_id bigint
 );
 
@@ -6476,13 +6466,6 @@ CREATE INDEX index_locks_on_user_id ON public.locks USING btree (user_id);
 
 
 --
--- Name: index_mail_snippets_on_country_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_mail_snippets_on_country_id ON public.mail_snippets USING btree (country_id);
-
-
---
 -- Name: index_mail_snippets_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6494,13 +6477,6 @@ CREATE INDEX index_mail_snippets_on_doorkeeper_app_id ON public.mail_snippets US
 --
 
 CREATE INDEX index_mail_snippets_on_organization_id ON public.mail_snippets USING btree (organization_id);
-
-
---
--- Name: index_mail_snippets_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_mail_snippets_on_state_id ON public.mail_snippets USING btree (state_id);
 
 
 --
@@ -7436,6 +7412,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260310045539'),
 ('20260310031750'),
 ('20260308002919'),
 ('20260305025122'),

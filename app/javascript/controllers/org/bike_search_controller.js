@@ -3,8 +3,9 @@ import { collapse } from 'utils/collapse_utils'
 
 /* global localStorage */
 
+// Connects to data-controller='org--bike-search'
 export default class extends Controller {
-  static targets = ['settings', 'settingsButton', 'perPage']
+  static targets = ['settings', 'settingsButton', 'perPage', 'exportLink']
   static values = { defaultColumns: Array }
 
   connect () {
@@ -13,6 +14,17 @@ export default class extends Controller {
       collapse('show', this.settingsTarget, 0)
       if (this.hasSettingsButtonTarget) this.settingsButtonTarget.classList.add('active')
     }
+    // Re-apply column visibility when turbo frame updates with new table content
+    document.addEventListener('turbo:frame-render', this.handleFrameRender)
+  }
+
+  disconnect () {
+    document.removeEventListener('turbo:frame-render', this.handleFrameRender)
+  }
+
+  handleFrameRender = () => {
+    this.updateVisibleColumns()
+    this.updateExportLink()
   }
 
   toggleSettings () {
@@ -40,11 +52,25 @@ export default class extends Controller {
     window.location = url.toString()
   }
 
+  filterChanged () {
+    const form = document.getElementById('Search_Form')
+    if (form) {
+      form.requestSubmit()
+    }
+  }
+
   perPageChanged () {
     const url = new URL(window.location)
     url.searchParams.set('per_page', this.perPageTarget.value)
     url.searchParams.set('search_no_js', 'true')
     window.location = url.toString()
+  }
+
+  updateExportLink () {
+    if (!this.hasExportLinkTarget) return
+    const url = new URL(window.location)
+    url.searchParams.set('create_export', 'true')
+    this.exportLinkTarget.href = url.toString()
   }
 
   selectStoredVisibleColumns () {

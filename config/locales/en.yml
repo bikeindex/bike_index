@@ -395,16 +395,11 @@ en:
         name: Name
         slug: Slug
       mail_snippet:
-        address: Address
         body: Body
         is_enabled: Is enabled
-        is_location_triggered: Is location triggered
         kind: Kind
-        latitude: Latitude
-        longitude: Longitude
         name: Name
         organization: :activerecord.models.organization
-        proximity_radius: Proximity radius
         public_images: Public images
       manufacturer:
         bikes: Bikes
@@ -758,12 +753,12 @@ en:
           poor: needs service
           salvage: not working/unrideable
       propulsion_type:
-        foot_pedal: Foot Pedal
+        foot_pedal: Pedal
         hand_pedal: Hand Cycle (hand pedal)
         human_not_pedal: Human powered (not by pedals)
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedal Assist and Throttle
-        throttle: Electric Throttle
+        throttle: Throttle
     errors:
       messages:
         access_denied: The resource owner or authorization server denied the request.

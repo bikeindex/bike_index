@@ -4,6 +4,9 @@ module Org::BikeSearch
   class Component < ApplicationComponent
     include SortableHelper
 
+    delegate :additional_registration_fields, :show_avery_export?, :column_renames,
+      :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
+      to: :settings_component
     def initialize(
       organization:,
       pagy:,
@@ -19,8 +22,9 @@ module Org::BikeSearch
       stolenness: "all",
       bike_sticker: nil,
       model_audit: nil,
-      skip_search_form: false,
-      include_avery: false
+      skip_search_and_filters: false,
+      include_avery: false,
+      skip_settings: false
     )
       @organization = organization
       @pagy = pagy
@@ -36,108 +40,36 @@ module Org::BikeSearch
       @stolenness = stolenness
       @bike_sticker = bike_sticker
       @model_audit = model_audit
-      @skip_search_form = skip_search_form
+      @skip_search_and_filters = skip_search_and_filters
       @include_avery = include_avery
-    end
-
-    def additional_registration_fields
-      @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
-    end
-
-    def show_avery_export?
-      return @show_avery_export if defined?(@show_avery_export)
-
-      @show_avery_export = @include_avery && @organization.enabled?("avery_export") &&
-        Binxtils::InputNormalizer.boolean(@params[:search_avery_export])
+      @skip_settings = skip_settings
     end
 
     private
 
-    def column_renames
-      @column_renames ||= {
-        created_at_cell: translation(".registered"),
-        updated_at_cell: translation(".updated"),
-        stolen_cell: translation(".stolen"),
-        manufacturer_cell: translation(".manufacturer"),
-        model_cell: translation(".model"),
-        color_cell: translation(".color"),
-        owner_email_cell: translation(".sent_to"),
-        creation_description_cell: translation(".source"),
-        owner_name_cell: translation(".owner_name"),
-        reg_organization_affiliation_cell: translation(".affiliation"),
-        reg_extra_registration_number_cell: translation(".secondary_number"),
-        reg_phone_cell: translation(".phone"),
-        reg_address_cell: translation(".reg_address"),
-        reg_student_id_cell: translation(".student_id"),
-        sticker_cell: translation(".sticker"),
-        impounded_cell: translation(".impounded"),
-        avery_cell: translation(".avery_exportable"),
-        cycle_type_cell: translation(".vehicle_type"),
-        propulsion_type_cell: translation(".e_vehicle_propulsion"),
-        status_cell: translation(".status_cell"),
-        url_cell: translation(".url")
-      }
-    end
-
-    def initially_checked_columns
-      return @initially_checked_columns if defined?(@initially_checked_columns)
-
-      @initially_checked_columns = %w[created_at_cell stolen_cell manufacturer_cell model_cell
-        color_cell owner_email_cell owner_name_cell creation_description_cell]
-      @initially_checked_columns += ["sticker_cell"] if @organization.enabled?("bike_stickers")
-      @initially_checked_columns += ["avery_cell"] if show_avery_export?
-      @initially_checked_columns += ["impounded_cell"] if @params[:search_impoundedness] == "impounded"
-      @initially_checked_columns
-    end
-
-    def enabled_columns
-      @enabled_columns ||= begin
-        cols = initially_checked_columns.dup
-        cols += %w[url_cell updated_at_cell cycle_type_cell propulsion_type_cell status_cell]
-        cols += additional_registration_fields.map { |f| "#{f}_cell" }
-        cols += ["impounded_cell"] if @organization.enabled?("impound_bikes")
-        cols += ["avery_cell"] if @include_avery && @organization.enabled?("avery_export")
-        cols.uniq.sort { |a, b| column_renames[a.to_sym] <=> column_renames[b.to_sym] }
-      end
-    end
-
-    def settings_default_open?
-      @search_stickers.present? || @search_address.present? ||
-        @params[:search_impoundedness].present? || Binxtils::InputNormalizer.boolean(@params[:search_open])
-    end
-
-    def cycle_type
-      @cycle_type ||= begin
-        merged = @params.merge(@interpreted_params)
-        BikeServices::Displayer.vehicle_search?(merged) ? translation(".vehicle") : translation(".bike")
-      end
-    end
-
-    def search_params
-      @search_params ||= (@sortable_search_params || {}).merge((@interpreted_params || {}).merge(organization_id: @organization.to_param))
-    end
-
-    def active_search_filter_descriptions
-      @active_search_filter_descriptions ||= [].tap do |descriptions|
-        case @search_stickers
-        when "with" then descriptions << translation(".filter_with_stickers_html")
-        when "none" then descriptions << translation(".filter_no_sticker_html")
-        end
-        case @search_address
-        when "with_street" then descriptions << translation(".filter_with_address_html")
-        when "without_street" then descriptions << translation(".filter_no_address_html")
-        end
-        case @search_status
-        when "not_impounded" then descriptions << translation(".filter_not_impounded_html")
-        when "impounded" then descriptions << translation(".filter_impounded_html")
-        when "with_owner" then descriptions << translation(".filter_not_stolen_or_impounded_html")
-        when "stolen" then descriptions << translation(".filter_stolen_html")
-        end
-      end
+    def settings_component
+      @settings_component ||= Org::BikeSearchSettings::Component.new(
+        organization: @organization,
+        interpreted_params: @interpreted_params,
+        sortable_search_params: @sortable_search_params,
+        params: @params,
+        search_stickers: @search_stickers,
+        search_address: @search_address,
+        search_status: @search_status,
+        include_avery: @include_avery,
+        bike_sticker: @bike_sticker,
+        skip_search_and_filters: @skip_search_and_filters
+      )
     end
 
     def show_search_query_summary?
       @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
+    end
+
+    def wrapper_data_attributes
+      return {} if @skip_settings
+      {controller: "org--bike-search",
+       "org--bike-search-default-columns-value": initially_checked_columns.to_json}
     end
 
     def show_pagination?
