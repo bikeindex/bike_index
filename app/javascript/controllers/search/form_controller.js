@@ -28,10 +28,17 @@ export default class extends Controller {
 
     // if the frame was loaded without results, submit the form
     if (this.frameElement?.querySelector('#loadedWithoutResults')) {
-      // Use replace instead of advance for initial load to avoid adding to history
-      this.formTarget.setAttribute('data-turbo-action', 'replace')
+      // Temporarily replace pushState with replaceState so the initial auto-submit
+      // doesn't add a duplicate history entry
+      const originalPushState = window.history.pushState.bind(window.history)
+      window.history.pushState = function (...args) {
+        window.history.replaceState(...args)
+      }
+      this.frameElement.addEventListener('turbo:frame-render', () => {
+        // Delay restoration to ensure Turbo has finished its URL update
+        setTimeout(() => { window.history.pushState = originalPushState }, 0)
+      }, { once: true })
       this.formTarget.requestSubmit()
-      this.formTarget.setAttribute('data-turbo-action', 'advance')
     }
 
     this.setupFormFieldListeners()
