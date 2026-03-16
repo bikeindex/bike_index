@@ -25,6 +25,8 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     # Create enough bikes to trigger pagination (default per_page is 10)
     FactoryBot.create_list(:bike_organized, 10, creation_organization: organization)
 
+    # Visit a different page first to establish history, then navigate to bikes
+    visit "/"
     visit bikes_path
     # Results load via turbo auto-submit (search--form controller)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table.table", wait: 10)
@@ -33,9 +35,9 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     # search_no_js should NOT be in the URL (removed by JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
 
-    # Initial load uses replaceState, so back button goes to the previous page (not a duplicate search entry)
+    # Initial load uses replaceState, so back button returns to the previous page (not a duplicate search entry)
     page.go_back
-    expect(page).not_to have_current_path(/bikes/)
+    expect(page).to have_current_path("/", wait: 5)
     page.go_forward
     expect(page).to have_css("table.table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
