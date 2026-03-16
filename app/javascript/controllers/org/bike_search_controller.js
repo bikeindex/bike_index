@@ -5,7 +5,7 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='org--bike-search'
 export default class extends Controller {
-  static targets = ['settings', 'settingsButton', 'perPage']
+  static targets = ['settings', 'settingsButton', 'perPage', 'exportLink']
   static values = { defaultColumns: Array }
 
   connect () {
@@ -24,6 +24,7 @@ export default class extends Controller {
 
   handleFrameRender = () => {
     this.updateVisibleColumns()
+    this.updateExportLink()
   }
 
   toggleSettings () {
@@ -63,6 +64,13 @@ export default class extends Controller {
     url.searchParams.set('per_page', this.perPageTarget.value)
     url.searchParams.set('search_no_js', 'true')
     window.location = url.toString()
+  }
+
+  updateExportLink () {
+    if (!this.hasExportLinkTarget) return
+    const url = new URL(window.location)
+    url.searchParams.set('create_export', 'true')
+    this.exportLinkTarget.href = url.toString()
   }
 
   selectStoredVisibleColumns () {

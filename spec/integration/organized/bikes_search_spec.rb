@@ -105,11 +105,15 @@ RSpec.describe "Organized bikes search", :js, type: :system do
 
     # Go back
     page.go_back
+    expect(page).to have_css("tbody tr", count: 10, wait: 10)
     # Open settings to reveal the export link
     open_settings_if_not
     click_link "Create export of searched registrations"
 
     expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
+    all_bike_ids = organization.bikes.pluck(:id).sort
+    export_ids = find("#export_custom_bike_ids", visible: :all).value.split(", ").map(&:to_i).sort
+    expect(export_ids).to eq(all_bike_ids)
   end
 
   context "with stolen and impounded bikes" do
@@ -138,6 +142,10 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
 
+      # Doesn't have export, because no csv_export feature
+      expect_settings_open
+      expect(page).to_not have_text "Create export of searched registrations"
+
       # Choose "not stolen or impounded"
       choose("search_status_with_owner", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=with_owner/, wait: 10)
@@ -154,7 +162,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
   end
 
   context "with avery_export enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search avery_export reg_address bike_stickers] }
+    let(:enabled_feature_slugs) { %w[bike_search avery_export reg_address bike_stickers csv_exports] }
     let!(:avery_bike) do
       bike = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: organization)
       bike.current_ownership.update!(owner_name: "Test Owner")
@@ -190,6 +198,14 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect(page).to have_css("tbody tr", count: 1)
       expect(page).to have_text("1 registration matching")
       expect(page).to have_text("only with address")
+
+      expect_settings_open
+      click_link "Create export of searched registrations"
+      expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
+      export_ids = find("#export_custom_bike_ids", visible: :all).value.split(", ").map(&:to_i).sort
+      expect(export_ids).to eq([avery_bike.id])
+      page.go_back
+      expect(page).to have_css("tbody tr", count: 1, wait: 10)
 
       expect_settings_open
       choose("search_stickers_with", allow_label_click: true, visible: :all)
