@@ -160,17 +160,18 @@ RSpec.describe Org::BikeSearchSettings::Component, type: :component do
     context "with bike_stickers enabled" do
       let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
 
-      it "renders sticker filter buttons" do
-        expect(component).to have_css(".search-sort-btns", text: /Stickers/, visible: :all)
+      it "renders sticker filter radios" do
+        expect(component).to have_text("Stickers")
+        expect(component).to have_css("input[type='radio'][name='search_stickers']", visible: :all)
       end
     end
 
     context "with impound_bikes enabled" do
       let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
 
-      it "renders impound status filter buttons" do
-        expect(component).to have_css(".search-sort-btns", text: /Status/, visible: :all)
-        expect(component).to have_css(".search-sort-btns a", text: /not/, visible: :all)
+      it "renders impound status filter radios" do
+        expect(component).to have_text("Status")
+        expect(component).to have_css("input[type='radio'][name='search_status'][value='not_impounded']", visible: :all)
       end
     end
 

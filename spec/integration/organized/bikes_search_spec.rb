@@ -117,43 +117,36 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization) }
     let!(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization) }
 
-    it "filters by status buttons" do
+    it "filters by status radios" do
       visit "#{bikes_path}?search_status=all"
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", minimum: 4, wait: 10)
 
-      # Open settings and click "only stolen"
+      # Open settings and choose "only stolen"
       open_settings_if_not
-      expect(page).to have_css(".search-sort-btns", visible: :all, wait: 5)
-      find("a", text: "only stolen", visible: :all).click
+      choose("search_status_stolen", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=stolen/, wait: 10)
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
       expect(page).to have_text("1 registration matching")
       expect(page).to have_text("only stolen")
-      expect(page).to have_css("a.active", text: /only\s+stolen/, visible: :all)
 
-      # Settings persisted open via localStorage; click "only impounded"
+      # Settings persisted open via localStorage; choose "only impounded"
       expect_settings_open
-      expect(page).to have_css(".search-sort-btns", visible: :all, wait: 5)
-      find("a", text: /\bonly impounded\b/, visible: :all).click
+      choose("search_status_impounded", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=impounded/, wait: 10)
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
-      expect(page).to have_css("a.active", text: /\bonly impounded\b/, visible: :all)
 
-      # Click "not stolen or impounded"
-      expect(page).to have_css(".search-sort-btns", visible: :all, wait: 5)
-      find("a", text: "not stolen or impounded", visible: :all).click
+      # Choose "not stolen or impounded"
+      choose("search_status_with_owner", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=with_owner/, wait: 10)
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", count: 2)
       expect(page).to have_text("not stolen or impounded")
-      expect(page).to have_css("a.active", text: /not stolen or impounded/, visible: :all)
 
-      # Click "All" to show everything
-      expect(page).to have_css(".search-sort-btns", visible: :all, wait: 5)
-      find(".sortButtonsStatus a", text: "All", visible: :all).click
+      # Choose "All" to show everything
+      choose("search_status_all", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=all/, wait: 10)
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", minimum: 4, wait: 10)
@@ -190,9 +183,8 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect(page).not_to have_current_path(/search_avery_export/, wait: 10)
       expect(page).not_to have_css("th.avery_cell")
 
-      # Open settings and click "only with address"
-      expect(page).to have_css(".search-sort-btns", visible: :all, wait: 5)
-      find("a", text: "only with address", visible: :all).click
+      # Open settings and choose "only with address"
+      choose("search_address_with_street", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_address=with_street/, wait: 10)
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
@@ -200,8 +192,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect(page).to have_text("only with address")
 
       expect_settings_open
-      expect(page).to have_css(".search-sort-btns", visible: :all, wait: 5)
-      find("a", text: "only with stickers", visible: :all).click
+      choose("search_stickers_with", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_stickers=with/, wait: 10)
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", count: 0)
@@ -209,7 +200,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect(page).to have_text("only with address")
       expect(page).to have_text("only with stickers")
 
-      find(".sortButtonsAddress a", text: "All", visible: :all).click
+      choose("search_address_", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_stickers=with/, wait: 10)
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
