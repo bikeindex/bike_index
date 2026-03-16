@@ -4778,20 +4778,9 @@ es:
         update_impound_record:
         update_multiple_records:
       bike_search:
-        address:
-        all:
         avery:
         bike:
         color:
-        create_export_of_vehicles:
-        filter_impounded_html:
-        filter_no_address_html:
-        filter_no_sticker_html:
-        filter_not_impounded_html:
-        filter_not_stolen_or_impounded_html:
-        filter_stolen_html:
-        filter_with_address_html:
-        filter_with_stickers_html:
         impounded:
         link:
         manufacturer:
@@ -4803,16 +4792,12 @@ es:
         registered:
         registered_bikes_html:
         sent_to:
-        settings:
-        status:
         status_cell:
         sticker:
-        stickers:
         stolen:
         updated:
         vehicle:
         vehicle_type:
-        visible_columns:
         affiliation:
         avery_exportable:
         e_vehicle_propulsion:
@@ -4822,6 +4807,21 @@ es:
         source:
         student_id:
         url:
+        address:
+        all:
+        create_export_of_vehicles:
+        filter_impounded_html:
+        filter_no_address_html:
+        filter_no_sticker_html:
+        filter_not_impounded_html:
+        filter_not_stolen_or_impounded_html:
+        filter_stolen_html:
+        filter_with_address_html:
+        filter_with_stickers_html:
+        settings:
+        status:
+        stickers:
+        visible_columns:
       bike_search_row:
         email_hidden:
         link:

@@ -4,16 +4,15 @@ import { Controller } from '@hotwired/stimulus'
 // Adds 'full-screen-table-overflown' class when a child table is wider than the viewport
 export default class extends Controller {
   connect () {
+    this.checkOverflow = this.checkOverflow.bind(this)
     this.checkOverflow()
-    this.resizeHandler = () => this.checkOverflow()
-    this.frameRenderHandler = () => this.checkOverflow()
-    window.addEventListener('resize', this.resizeHandler)
-    document.addEventListener('turbo:frame-render', this.frameRenderHandler)
+    window.addEventListener('resize', this.checkOverflow)
+    document.addEventListener('turbo:frame-render', this.checkOverflow)
   }
 
   disconnect () {
-    window.removeEventListener('resize', this.resizeHandler)
-    document.removeEventListener('turbo:frame-render', this.frameRenderHandler)
+    window.removeEventListener('resize', this.checkOverflow)
+    document.removeEventListener('turbo:frame-render', this.checkOverflow)
   }
 
   checkOverflow () {

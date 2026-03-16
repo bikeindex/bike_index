@@ -4860,20 +4860,9 @@ it:
         update_impound_record:
         update_multiple_records:
       bike_search:
-        address:
-        all: Tutti
         avery:
         bike:
         color: Colore
-        create_export_of_vehicles:
-        filter_impounded_html:
-        filter_no_address_html:
-        filter_no_sticker_html:
-        filter_not_impounded_html:
-        filter_not_stolen_or_impounded_html:
-        filter_stolen_html:
-        filter_with_address_html:
-        filter_with_stickers_html:
         impounded:
         link: Collegamento
         manufacturer: Produttore
@@ -4885,16 +4874,12 @@ it:
         registered: Registrato
         registered_bikes_html:
         sent_to:
-        settings:
-        status:
         status_cell: Stato
         sticker:
-        stickers:
         stolen: Rubata
         updated:
         vehicle:
         vehicle_type:
-        visible_columns:
         affiliation:
         avery_exportable:
         e_vehicle_propulsion:
@@ -4904,6 +4889,21 @@ it:
         source:
         student_id:
         url:
+        address:
+        all: Tutti
+        create_export_of_vehicles:
+        filter_impounded_html:
+        filter_no_address_html:
+        filter_no_sticker_html:
+        filter_not_impounded_html:
+        filter_not_stolen_or_impounded_html:
+        filter_stolen_html:
+        filter_with_address_html:
+        filter_with_stickers_html:
+        settings:
+        status:
+        stickers:
+        visible_columns:
       bike_search_row:
         email_hidden:
         link: Collegamento
