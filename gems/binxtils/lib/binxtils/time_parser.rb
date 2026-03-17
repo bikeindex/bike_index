@@ -4,9 +4,12 @@ module Binxtils
   module TimeParser
     extend Functionable
 
-    DEFAULT_TIME_ZONE = ActiveSupport::TimeZone[Rails.application.class.config.time_zone].freeze
     EARLIEST_YEAR = 1900
     LATEST_YEAR = Time.current.year + 100
+
+    def default_time_zone
+      @default_time_zone ||= ActiveSupport::TimeZone[Rails.application.class.config.time_zone].freeze
+    end
 
     def parse(time_str = nil, time_zone_str = nil, in_time_zone: false)
       return nil unless time_str.present?
@@ -21,7 +24,7 @@ module Binxtils
         time_zone = Binxtils::TimeZoneParser.parse(time_zone_str)
         Time.zone = time_zone
         time = Time.zone.parse(time_str.to_s) # Assign in time zone
-        Time.zone = DEFAULT_TIME_ZONE
+        Time.zone = default_time_zone
       end
       # Return in time_zone or not
       in_time_zone ? time_in_zone(time, time_str:, time_zone:, time_zone_str:) : time

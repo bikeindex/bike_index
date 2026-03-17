@@ -222,8 +222,8 @@ module Organized
       org = current_organization || passive_organization
       if org.present?
         bikes = org.bikes.search(@interpreted_params)
-        bikes = BikeServices::OrgSearch.email_and_name(bikes, params[:search_email])
-        bikes = BikeServices::OrgSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present?
+        bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
+        bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present?
       else
         bikes = Bike.search(@interpreted_params)
       end

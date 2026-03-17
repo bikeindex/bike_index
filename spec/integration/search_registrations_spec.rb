@@ -29,7 +29,17 @@ RSpec.describe "Bike search", :js, type: :system do
   end
 
   it "filters by color and location" do
+    # Visit a different page first to establish history, then navigate to search
+    visit "/"
     visit "/search/registrations"
+
+    expect(page).to have_css(".bike-box-item", wait: 10)
+
+    # Initial load doesn't add a duplicate history entry, so back button returns to previous page
+    page.go_back
+    expect(page).to have_current_path("/", wait: 5)
+    page.go_forward
+    expect(page).to have_css(".bike-box-item", wait: 10)
 
     # Select "All registrations" stolenness
     find("label[for='stolenness_all']").click

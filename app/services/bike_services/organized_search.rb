@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module BikeServices::OrgSearch
+module BikeServices::OrganizedSearch
   extend Functionable
 
   def email_and_name(bikes, query)
