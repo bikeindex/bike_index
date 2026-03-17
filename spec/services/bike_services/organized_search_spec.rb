@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe BikeServices::OrgSearch, type: :service do
+RSpec.describe BikeServices::OrganizedSearch, type: :service do
   describe ".email_and_name" do
     let!(:bike1) { FactoryBot.create(:bike, owner_email: "something@stuff.edu") }
     let(:user) { FactoryBot.create(:user_confirmed, name: "George Jones", email: "something2@stuff.edu") }

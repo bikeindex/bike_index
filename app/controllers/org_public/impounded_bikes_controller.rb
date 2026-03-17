@@ -46,7 +46,7 @@ module OrgPublic
 
       if bike_search_params_present?
         bikes = a_impound_records.bikes.search(@interpreted_params)
-        bikes = BikeServices::OrgSearch.email_and_name(bikes, params[:search_email])
+        bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
         a_impound_records = a_impound_records.where(bike_id: bikes.pluck(:id))
       elsif params[:search_bike_id].present?
         a_impound_records = a_impound_records.where(bike_id: params[:search_bike_id])
