@@ -542,9 +542,8 @@ GEM
     parser (3.3.10.2)
       ast (~> 2.4.1)
       racc
-    pg (1.6.2)
-    pg (1.6.2-arm64-darwin)
-    pg (1.6.2-x86_64-linux)
+    pg (1.6.3-arm64-darwin)
+    pg (1.6.3-x86_64-linux)
     pg_search (2.3.7)
       activerecord (>= 6.1)
       activesupport (>= 6.1)
@@ -876,7 +875,6 @@ GEM
 
 PLATFORMS
   arm64-darwin
-  x86_64-linux
   x86_64-linux-gnu
 
 DEPENDENCIES
