@@ -5,9 +5,9 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-ruby "3.4.9"
+ruby "4.0.2"
 
-# Gems that are no longer in standard library as Ruby 3.4
+# Gems that are no longer in standard library as of Ruby 3.4
 gem "csv"
 gem "observer"
 gem "prime"
