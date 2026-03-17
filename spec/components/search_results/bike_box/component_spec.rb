@@ -129,7 +129,7 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
       expect(bike.reload.status).to eq "status_with_owner"
       expect(component).to have_content bike.mnfg_name
       expect(component).to_not have_content "for sale"
-      expect(component).to_not have_content "777"
+      expect(component).to_not have_content "$777"
       expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
 
       expect_serial_is_visible(component, bike.serial_number)
@@ -145,7 +145,7 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
         expect(component).to have_content "for sale"
         expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
         expect(component).to have_content(l(marketplace_listing.published_at, format: :convert_time))
-        expect(component).to have_content "777"
+        expect(component).to have_content "$777"
 
         expect_serial_is_visible(component, bike.serial_number)
       end
@@ -159,7 +159,7 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
           expect(component).to have_content "stolen"
           expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
           expect(component).to have_content(l(stolen_record.date_stolen, format: :convert_time))
-          expect(component).to_not have_content "777"
+          expect(component).to_not have_content "$777"
 
           expect_serial_is_visible(component, bike.serial_number)
         end
@@ -174,9 +174,9 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
         expect(bike.reload.status).to eq "status_with_owner"
         expect(component).to have_content bike.mnfg_name
         expect(component).to_not have_content "for sale"
-        expect(component).to have_content "777"
+        expect(component).to have_content "$777"
         expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
-        expect(component).to have_content "777"
+        expect(component).to have_content "$777"
 
         expect_serial_is_visible(component, bike.serial_number)
       end
@@ -202,7 +202,7 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
             expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
             expect(component).to have_content(l(bike.deleted_at, format: :convert_time))
             expect(component).to have_content(l(marketplace_listing.published_at, format: :convert_time))
-            expect(component).to have_content "777"
+            expect(component).to have_content "$777"
 
             expect_serial_is_visible(component, bike.serial_number)
           end
@@ -218,7 +218,7 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
           expect(bike.current_event_record&.id).to be_nil
           expect(component).to have_content bike.mnfg_name
           expect(component).to_not have_content "for sale"
-          expect(component).to have_content "777"
+          expect(component).to have_content "$777"
           expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
 
           expect_serial_is_visible(component, bike.serial_number)
@@ -237,7 +237,7 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
             expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
             expect(component).to have_content(l(marketplace_listing.published_at, format: :convert_time))
             expect(component).to have_content(l(marketplace_listing.end_at, format: :convert_time))
-            expect(component).to have_content "777"
+            expect(component).to have_content "$777"
 
             expect_serial_is_visible(component, bike.serial_number)
           end
