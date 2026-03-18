@@ -116,6 +116,12 @@
             <small><%= translation(".status_cell") %></small>
           </th>
 
+          <% if @organization.enabled?("registration_notes") %>
+            <th class="hiddenColumn hidden-xs-down notes_cell">
+              <%= translation(".notes") %>
+            </th>
+          <% end %>
+
           <% additional_registration_fields.each do |reg_field| %>
             <% next if reg_field == "extra_registration_number" %>
 

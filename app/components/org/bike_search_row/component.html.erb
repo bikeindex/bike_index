@@ -83,6 +83,12 @@
   <%= helpers.status_display(@bike.status_humanized_no_with_owner) %>
 </td>
 
+<% if @organization.enabled?("registration_notes") %>
+  <td class="hiddenColumn hidden-xs-down notes_cell">
+    <small><%= bike_organization&.notes %></small>
+  </td>
+<% end %>
+
 <% @additional_registration_fields.each do |reg_field| %>
   <% next if reg_field == "extra_registration_number" %>
 
