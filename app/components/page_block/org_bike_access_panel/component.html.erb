@@ -45,15 +45,7 @@
     </div>
 
     <div class="card-body">
-      <%# Mobile: message, table, notes stacked. Desktop: table left (7/12), message+notes right (5/12). %>
-      <div class="
-        tw:grid tw:gap-4
-        tw:grid-cols-1
-        tw:md:grid-cols-[7fr_5fr]
-        <%= "tw:[grid-template-areas:'message'_'table'_'notes'] tw:md:[grid-template-areas:'table_message'_'table_notes']" if display_unstolen_notification_form? && show_notes? %>
-        <%= "tw:[grid-template-areas:'message'_'table'] tw:md:[grid-template-areas:'table_message']" if display_unstolen_notification_form? && !show_notes? %>
-        <%= "tw:[grid-template-areas:'table'_'notes'] tw:md:[grid-template-areas:'table_notes']" if !display_unstolen_notification_form? && show_notes? %>
-      ">
+      <div class="<%= card_body_grid_classes %>">
         <% if @organization.ambassador? && @bike.current_stolen_record.present? %>
           <div class="tw:mb-2 tw:text-right less-strong">
             <%= translation(".as_a_bikeindex_ambassador_html").html_safe %>
