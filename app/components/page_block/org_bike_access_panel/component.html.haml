@@ -31,15 +31,30 @@
               %span.hidden-lg-up
                 = translation(".is_not_registered_html", org_name: @organization.short_name).html_safe
     .card-body
-      .row
+      -# Desktop: 2-col grid with right column for message+notes. Mobile: message, table, notes stacked.
+      - has_right_col = display_unstolen_notification_form? || show_notes?
+      - mobile_areas = [("message" if display_unstolen_notification_form?), "table", ("notes" if show_notes?)].compact
+      - desktop_areas = [("'table message'" if display_unstolen_notification_form?), ("'table notes'" if show_notes?)].compact
+      - desktop_areas = ["'table table'"] if desktop_areas.empty?
+      %style
+        :plain
+          .access-panel-grid {
+            grid-template-areas: #{mobile_areas.map { |a| "'#{a}'" }.join(" ")};
+          }
+          @media (min-width: 768px) {
+            .access-panel-grid {
+              grid-template-columns: 7fr 5fr;
+              grid-template-areas: #{desktop_areas.join(" ")};
+            }
+          }
+      %div{class: "tw:grid tw:gap-4 access-panel-grid"}
         - if @organization.ambassador? && @bike.current_stolen_record.present?
-          .col-xs-12.mb-2
-            .text-right.less-strong
-              = translation(".as_a_bikeindex_ambassador_html").html_safe
+          %div{class: "tw:mb-2 tw:text-right less-strong"}
+            = translation(".as_a_bikeindex_ambassador_html").html_safe
 
-              = link_to translation(".mark_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token), class: "btn btn-success btn-sm"
+            = link_to translation(".mark_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token), class: "btn btn-success btn-sm"
 
-        .mb-2{class: display_unstolen_notification_form? ? "col-md-7" : "col-sm-12"}
+        %div{class: "tw:mb-2", style: "grid-area: table"}
           %table.table-list
             %tbody
               %tr
@@ -193,21 +208,12 @@
                       - else
                         %span.less-strong= translation(".not_audited")
 
-                - if show_notes?
-                  %tr
-                    %td= translation(".notes")
-                    %td
-                      = form_with(url: organization_bike_path(@bike, organization_id: @organization.to_param), method: :patch) do |f|
-                        = f.text_area :notes, value: bike_organization&.notes, class: "twinput tw:w-full", rows: 3, name: "notes"
-                        .tw:mt-1
-                          = f.submit translation(".save_notes"), class: "btn btn-success btn-sm"
-
           - if !organization_registered? # Apologize, bike isn't organizations
             %p.less-strong.mt-4
               %em
                 = translation(".unable_to_display_additional_information", bike_type: @bike.type, org_name: @organization.name)
         - if display_unstolen_notification_form?
-          .col-md-5.unstolen-notification-box
+          %div{class: "unstolen-notification-box", style: "grid-area: message"}
             %p.mb-2
               %em= translation(".bike_not_marked_stolen", bike_type: @bike.type_titleize)
               %strong= translation(".believe_it_is_anyway")
@@ -241,6 +247,14 @@
               %p
                 = support_link = link_to(translation(".support_email"), "mailto:#{translation('.support_email')}")
                 = translation(".email_to_deal_with_this_html", support_link: support_link).html_safe
+        - if show_notes?
+          %div{class: "tw:self-start tw:rounded tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-3", style: "grid-area: notes"}
+            %label{class: "tw:mb-1 tw:block tw:text-sm tw:font-medium tw:text-gray-600"}
+              = translation(".notes")
+            = form_with(url: organization_bike_path(@bike, organization_id: @organization.to_param), method: :patch) do |f|
+              = f.text_area :notes, value: bike_organization&.notes, class: "twinput tw:w-full", rows: 3, name: "notes"
+              %div{class: "tw:mt-2 tw:flex tw:justify-end"}
+                = f.submit translation(".save_notes"), class: "btn btn-success btn-sm"
 
       -# Additional law enforcement information
       - if @organization.enabled?("additional_registrations_information")
