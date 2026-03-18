@@ -74,17 +74,17 @@ module Org::BikeAccessPanel
 
     # CSS grid template areas for the card body layout
     # Mobile: message (if applicable), table — stacked
-    # Desktop: table on left (7fr), message on right (5fr)
+    # Desktop: table on left (7fr), message+empty on right (5fr)
     #
     # Tailwind safelist (must be literal strings for JIT to detect):
     # tw:[grid-template-areas:'message'_'table'] tw:md:[grid-template-areas:'table_message']
-    # tw:[grid-template-areas:'table']
+    # tw:[grid-template-areas:'table'] tw:md:[grid-template-areas:'table_.']
     def card_body_grid_classes
-      base = "tw:grid tw:gap-4 tw:grid-cols-1"
+      base = "tw:grid tw:gap-4 tw:grid-cols-1 tw:md:grid-cols-[7fr_5fr]"
       if display_unstolen_notification_form?
-        "#{base} tw:md:grid-cols-[7fr_5fr] tw:[grid-template-areas:'message'_'table'] tw:md:[grid-template-areas:'table_message']"
+        "#{base} tw:[grid-template-areas:'message'_'table'] tw:md:[grid-template-areas:'table_message']"
       else
-        base
+        "#{base} tw:[grid-template-areas:'table'] tw:md:[grid-template-areas:'table_.']"
       end
     end
   end
