@@ -36,6 +36,8 @@ module Org::BikeSearchSettings
                       with_owner: ".filter_not_stolen_or_impounded_html", stolen: ".filter_stolen_html"}
     }.freeze
 
+    attr_reader :organization
+
     def initialize(
       organization:,
       interpreted_params: {},

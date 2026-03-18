@@ -79,6 +79,5 @@ module PageBlock::OrgBikeAccessPanel
     def bike_organization
       @bike_organization ||= @bike.bike_organizations.find_by(organization_id: @organization.id)
     end
-
   end
 end
