@@ -47,6 +47,7 @@ en:
         missing_owner_name: missing user name
         model_audit: E-Vehicle audit
         not_audited: Not audited
+        note_by: "by %{user}"
         notes: Notes
         or_call_owner_html: "<em>Or call</em> <strong>Owner's phone number:</strong>"
         org_can_edit_bike: "%{org_name} can edit this %{bike_type}"

@@ -114,7 +114,13 @@ module Organized
         redirect_to(bike_path(bike)) && return
       end
 
-      bike_organization.update(notes: params[:notes])
+      note_body = params[:notes].to_s.strip
+      if note_body.present?
+        note = bike_organization.bike_organization_note || bike_organization.build_bike_organization_note
+        note.update!(body: note_body, user: current_user)
+      elsif bike_organization.bike_organization_note.present?
+        bike_organization.bike_organization_note.destroy!
+      end
 
       redirect_to bike_path(bike)
     end

@@ -22,12 +22,15 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
 
   describe ".notes" do
     let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization) }
     let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 
     before do
-      bike1.bike_organizations.find_by(organization_id: organization.id).update!(notes: "has a red lock")
-      bike2.bike_organizations.find_by(organization_id: organization.id).update!(notes: "parked on campus")
+      bike_org1 = bike1.bike_organizations.find_by(organization_id: organization.id)
+      bike_org2 = bike2.bike_organizations.find_by(organization_id: organization.id)
+      BikeOrganizationNote.create!(bike_organization: bike_org1, body: "has a red lock", user:)
+      BikeOrganizationNote.create!(bike_organization: bike_org2, body: "parked on campus", user:)
     end
 
     it "searches notes" do

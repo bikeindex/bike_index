@@ -6,7 +6,6 @@
 #  id                   :integer          not null, primary key
 #  can_not_edit_claimed :boolean          default(FALSE), not null
 #  deleted_at           :datetime
-#  notes                :text
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  bike_id              :integer
@@ -23,6 +22,7 @@ class BikeOrganization < ApplicationRecord
 
   belongs_to :bike
   belongs_to :organization
+  has_one :bike_organization_note, dependent: :destroy
 
   validates_presence_of :bike_id, :organization_id
   validates_uniqueness_of :organization_id, scope: [:bike_id], allow_nil: false

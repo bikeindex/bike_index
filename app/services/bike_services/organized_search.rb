@@ -16,8 +16,8 @@ module BikeServices::OrganizedSearch
     return bikes unless query.present?
 
     query_string = "%#{query.strip}%"
-    bikes.joins(:bike_organizations)
+    bikes.joins(bike_organizations: :bike_organization_note)
       .where(bike_organizations: {organization_id: organization.id})
-      .where("bike_organizations.notes ILIKE ?", query_string)
+      .where("bike_organization_notes.body ILIKE ?", query_string)
   end
 end

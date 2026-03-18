@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -374,6 +375,39 @@ ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 
 --
+-- Name: bike_organization_notes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_organization_notes (
+    id bigint NOT NULL,
+    bike_organization_id bigint NOT NULL,
+    body text,
+    user_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: bike_organization_notes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_organization_notes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_organization_notes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_organization_notes_id_seq OWNED BY public.bike_organization_notes.id;
+
+
+--
 -- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -384,8 +418,7 @@ CREATE TABLE public.bike_organizations (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone,
-    can_not_edit_claimed boolean DEFAULT false NOT NULL,
-    notes text
+    can_not_edit_claimed boolean DEFAULT false NOT NULL
 );
 
 
@@ -4207,6 +4240,13 @@ ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_p
 
 
 --
+-- Name: bike_organization_notes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_organization_notes ALTER COLUMN id SET DEFAULT nextval('public.bike_organization_notes_id_seq'::regclass);
+
+
+--
 -- Name: bike_organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4935,6 +4975,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_organization_notes bike_organization_notes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_organization_notes
+    ADD CONSTRAINT bike_organization_notes_pkey PRIMARY KEY (id);
 
 
 --
@@ -5777,6 +5825,20 @@ CREATE INDEX index_b_params_on_created_bike_id ON public.b_params USING btree (c
 --
 
 CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (organization_id);
+
+
+--
+-- Name: index_bike_organization_notes_on_bike_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_bike_organization_notes_on_bike_organization_id ON public.bike_organization_notes USING btree (bike_organization_id);
+
+
+--
+-- Name: index_bike_organization_notes_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_organization_notes_on_user_id ON public.bike_organization_notes USING btree (user_id);
 
 
 --
@@ -7412,6 +7474,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260318211639'),
+('20260318211638'),
 ('20260310045539'),
 ('20260310031750'),
 ('20260308055322'),

@@ -80,6 +80,10 @@ module Org::BikeAccessPanel
       @bike_organization ||= @bike.bike_organizations.find_by(organization_id: @organization.id)
     end
 
+    def bike_organization_note
+      @bike_organization_note ||= bike_organization&.bike_organization_note
+    end
+
     # CSS grid template areas for the card body layout
     # Mobile: message (if applicable), table, notes (if applicable) — stacked
     # Desktop: table on left (7fr), message+notes on right (5fr)

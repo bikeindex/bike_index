@@ -417,9 +417,21 @@
             </label>
 
             <%= form_with(url: organization_bike_path(@bike, organization_id: @organization.to_param), method: :patch) do |f| %>
-              <%= f.text_area :notes, value: bike_organization&.notes, class: "twinput tw:w-full", rows: 3, name: "notes" %>
+              <%= f.text_area :notes, value: bike_organization_note&.body, class: "twinput tw:w-full", rows: 3, name: "notes" %>
 
-              <div class="tw:mt-2 tw:flex tw:justify-end">
+              <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">
+                <% if bike_organization_note.present? %>
+                  <small class="tw:text-gray-500">
+                    <%= translation(".note_by", user: bike_organization_note.user.display_name) %>
+
+                    <span class="localizeTime withPreposition">
+                      <%= l bike_organization_note.updated_at, format: :convert_time %>
+                    </span>
+                  </small>
+                <% else %>
+                  <span></span>
+                <% end %>
+
                 <%= f.submit translation(".save_notes"), class: "btn btn-success btn-sm" %>
               </div>
             <% end %>

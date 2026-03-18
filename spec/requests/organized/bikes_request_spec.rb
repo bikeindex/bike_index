@@ -606,7 +606,7 @@ RSpec.describe Organized::BikesController, type: :request do
         bike_organization.reload
         patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
         expect(response).to redirect_to(bike_path(bike))
-        expect(bike_organization.reload.notes).to be_nil
+        expect(bike_organization.reload.bike_organization_note).to be_nil
       end
     end
 
@@ -617,7 +617,9 @@ RSpec.describe Organized::BikesController, type: :request do
         bike_organization.reload
         patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
         expect(response).to redirect_to(bike_path(bike))
-        expect(bike_organization.reload.notes).to eq "test notes"
+        note = bike_organization.reload.bike_organization_note
+        expect(note.body).to eq "test notes"
+        expect(note.user).to eq current_user
       end
 
       context "turbo_stream request" do
@@ -626,7 +628,7 @@ RSpec.describe Organized::BikesController, type: :request do
           patch "#{base_url}/#{bike.id}", params: {notes: "test notes"},
             headers: {"Accept" => "text/vnd.turbo-stream.html"}
           expect(response).to redirect_to(bike_path(bike))
-          expect(bike_organization.reload.notes).to eq "test notes"
+          expect(bike_organization.reload.bike_organization_note.body).to eq "test notes"
         end
       end
 
@@ -636,7 +638,7 @@ RSpec.describe Organized::BikesController, type: :request do
           bike_organization.reload
           patch "#{base_url}/#{other_bike.id}", params: {notes: "test notes"}
           expect(response).to redirect_to(bike_path(other_bike))
-          expect(bike_organization.reload.notes).to be_nil
+          expect(bike_organization.reload.bike_organization_note).to be_nil
         end
       end
     end
@@ -647,7 +649,8 @@ RSpec.describe Organized::BikesController, type: :request do
     let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
 
     before do
-      bike.bike_organizations.find_by(organization_id: current_organization.id).update!(notes: "important note")
+      bike_org = bike.bike_organizations.find_by(organization_id: current_organization.id)
+      BikeOrganizationNote.create!(bike_organization: bike_org, body: "important note", user: current_user)
     end
 
     it "filters by notes" do
