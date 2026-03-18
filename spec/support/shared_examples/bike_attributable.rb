@@ -176,12 +176,6 @@ RSpec.shared_examples "bike_attributable" do
     end
   end
 
-  describe "serial_display" do
-    it "returns the serial uppercased" do
-      expect(instance.serial_display).to eq instance.serial_number.upcase
-    end
-  end
-
   describe "status_humanized" do
     let(:obj) { FactoryBot.build(model_sym) }
     it "returns" do

@@ -1215,6 +1215,9 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "serial_display" do
+    it "returns the serial" do
+      expect(Bike.new(serial_number: "AAbbCC").serial_display).to eq "AABBCC"
+    end
     context "abandoned" do
       it "only returns the serial if we should show people the serial" do
         # We're hiding serial numbers for abandoned bikes to provide a method of verifying ownership
@@ -1232,6 +1235,19 @@ RSpec.describe Bike, type: :model do
         bike = Bike.new(serial_number: "something", status: "status_impounded")
         expect(bike.serial_hidden?).to be_truthy
         expect(bike.serial_display).to eq "Hidden"
+      end
+    end
+    context "unknown" do
+      it "returns unknown" do
+        bike = Bike.new(serial_number: "unknown")
+        expect(bike.serial_display).to eq("Unknown")
+      end
+    end
+    context "Made without serial" do
+      it "returns made_without_serial" do
+        bike = Bike.new(made_without_serial: true)
+        bike.send(:normalize_serial_number)
+        expect(bike.serial_display).to eq("Made without serial")
       end
     end
     context "impound_record" do
