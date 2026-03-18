@@ -499,9 +499,7 @@ class Bike < ApplicationRecord
       # show the serial to the user, even if authorization_requires_impound_organization?
       return "Hidden" unless can_see_hidden_serial?(u)
     end
-    return serial_number.humanize if no_serial?
-
-    serial_number&.upcase
+    super
   end
 
   # Prevent returning ip address, rather than the TLD URL

@@ -71,6 +71,12 @@ module BikeAttributable
     made_without_serial? || serial_unknown?
   end
 
+  def serial_display(_user = nil)
+    return serial_number.humanize if no_serial?
+
+    serial_number&.upcase
+  end
+
   def motorized?
     PropulsionType.motorized?(propulsion_type)
   end
