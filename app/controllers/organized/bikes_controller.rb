@@ -106,6 +106,21 @@ module Organized
     def multi_serial_search
     end
 
+    def update
+      bike = Bike.unscoped.find(params[:id])
+      bike_organization = bike.bike_organizations.find_by(organization_id: current_organization.id)
+
+      unless bike_organization.present? && current_organization.enabled?("registration_notes")
+        flash[:error] = "Not authorized to update notes"
+        redirect_to(bike_path(bike)) && return
+      end
+
+      BikeOrganizationNote.upsert_or_delete(bike_organization:, body: params[:notes], user: current_user)
+
+      flash[:success] = "Note saved"
+      redirect_to bike_path(bike)
+    end
+
     def create
       @b_param = find_or_new_b_param
       iframe_redirect_params = {organization_id: current_organization.to_param}
@@ -210,6 +225,7 @@ module Organized
       if org.present?
         bikes = org.bikes.search(@interpreted_params)
         bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
+        bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present?
       else
         bikes = Bike.search(@interpreted_params)
       end
@@ -303,7 +319,7 @@ module Organized
     def no_org_search_params?
       return false if params[:search_stickers].present? && params[:search_stickers] != "all"
 
-      params.slice(:search_address, :search_email, :search_model_audit_id, :search_status)
+      params.slice(:search_address, :search_email, :search_model_audit_id, :search_notes, :search_status)
         .values.reject(&:blank?).none?
     end
 

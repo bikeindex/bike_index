@@ -72,6 +72,17 @@
         tw:justify-between tw:gap-2
       "
     >
+      <% if @organization.enabled?("registration_notes") %>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary uncap"
+          data-action="click->org--bike-search#toggleNotesSearch"
+          data-org--bike-search-target="notesButton"
+        >
+          <%= translation(".show_notes_search") %>
+        </button>
+      <% end %>
+
       <% if @organization.enabled?("csv_exports") %>
         <div class="tw:ml-auto tw:text-right">
           <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),

@@ -5937,6 +5937,7 @@ nl:
         search_for_serial_number: Zoek naar framenummer
         search_owner_email: Zoek eigenaar e-mail
         submit: Voorleggen
+        search_notes: Zoeknotities
     legacy_form_well:
       address_record:
         address: Adres
@@ -6161,6 +6162,7 @@ nl:
         e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
         serial: Serie
         view_matching_any_audit: weergave die overeenkomt met elke audit
+        notes: Notes
       bike_search_row:
         email_hidden: email verborgen
         link: Link
@@ -6205,6 +6207,8 @@ nl:
         url_cell: URL
         vehicle: Registratie
         visible_columns: Zichtbare kolommen
+        notes_cell: Notes
+        show_notes_search: notities weergeven zoeken
       bike_access_panel:
         access_panel: Toegangspaneel
         added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd
@@ -6278,3 +6282,6 @@ nl:
           op in het onderstaande veld
         write_a_message: Schrijf een bericht
         zipcode: Postcode
+        note_by: door %{user}
+        notes: Notes
+        save_notes: Bewaar notitie

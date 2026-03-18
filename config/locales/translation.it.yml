@@ -4633,6 +4633,7 @@ it:
         search_for_serial_number:
         search_owner_email:
         submit:
+        search_notes:
     legacy_form_well:
       address_record:
         address:
@@ -4832,6 +4833,7 @@ it:
         e_vehicles_for_audit:
         serial: Seriale
         view_matching_any_audit:
+        notes: Note
       bike_search_row:
         email_hidden:
         link: Collegamento
@@ -4876,6 +4878,8 @@ it:
         url_cell:
         vehicle:
         visible_columns:
+        notes_cell: Note
+        show_notes_search:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:
@@ -4936,3 +4940,6 @@ it:
         where_did_you_see_this_bike:
         write_a_message:
         zipcode: Codice postale
+        note_by:
+        notes: Note
+        save_notes:

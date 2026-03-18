@@ -5781,6 +5781,7 @@ nb:
         search_for_serial_number: Søk etter serienummer
         search_owner_email: Søk etter eierens e-postadresse
         submit: sende inn
+        search_notes: Søk i notater
     legacy_form_well:
       address_record:
         address: gateadresse
@@ -6002,6 +6003,7 @@ nb:
         e_vehicles_for_audit: 'Elbiler for revisjon:'
         serial: Serienummer
         view_matching_any_audit: visning som samsvarer med enhver revisjon
+        notes: Notater
       bike_search_row:
         email_hidden: e-post skjult
         link: Link
@@ -6046,6 +6048,8 @@ nb:
         url_cell: URL-adresse
         vehicle: registrering
         visible_columns: Synlige kolonner
+        notes_cell: Notater
+        show_notes_search: vis notatsøk
       bike_access_panel:
         access_panel: Tilgangspanel
         added_to_track_parking_notification: Denne %{bike_type} er ikke registrert
@@ -6118,3 +6122,6 @@ nb:
           om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
         write_a_message: Skrive en melding
         zipcode: Postnummer
+        note_by: av %{user}
+        notes: Notater
+        save_notes: Lagre notat

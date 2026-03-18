@@ -141,6 +141,20 @@ puts "  Created unregistered parking notification at #{loc[:street]}"
 
 puts "Parking notifications seeded successfully!"
 
+# --- Add notes to some bike_organizations ---
+puts "Adding notes to bike organizations..."
+sample_notes = [
+  "Always parks near the library",
+  "Has a red lock and basket",
+  "Student employee - building access",
+  "Frequent visitor, registered at orientation",
+  "Needs new sticker - old one damaged"
+]
+hogwarts.bike_organizations.limit(5).each_with_index do |bike_organization, index|
+  BikeOrganizationNote.create!(bike_organization:, body: sample_notes[index], user: member)
+  puts "  Added note to bike organization ##{bike_organization.id}"
+end
+
 # --- 5 impound records via BikeServices::Creator with status_impounded ---
 puts "Creating 5 impound records in San Francisco for Hogwarts..."
 

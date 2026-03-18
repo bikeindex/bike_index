@@ -4551,6 +4551,7 @@ es:
         search_for_serial_number:
         search_owner_email:
         submit:
+        search_notes:
     legacy_form_well:
       address_record:
         address:
@@ -4750,6 +4751,7 @@ es:
         e_vehicles_for_audit:
         serial:
         view_matching_any_audit:
+        notes:
       bike_search_row:
         email_hidden:
         link:
@@ -4794,6 +4796,8 @@ es:
         url_cell:
         vehicle:
         visible_columns:
+        notes_cell:
+        show_notes_search:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:
@@ -4854,3 +4858,6 @@ es:
         where_did_you_see_this_bike:
         write_a_message:
         zipcode:
+        note_by:
+        notes:
+        save_notes:

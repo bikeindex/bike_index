@@ -403,6 +403,40 @@
             <% end %>
           </div>
         <% end %>
+
+        <% if show_notes? %>
+          <div
+            class="
+              tw:self-start tw:rounded tw:border tw:border-gray-200
+              tw:bg-gray-50 tw:p-3 tw:[grid-area:notes]
+            "
+          >
+            <label class="tw:mb-1 tw:block tw:text-sm tw:font-medium tw:text-gray-600">
+              <%= @organization.short_name %>
+              <%= translation(".notes") %>
+            </label>
+
+            <%= form_with(url: organization_bike_path(@bike, organization_id: @organization.to_param), method: :patch) do |f| %>
+              <%= f.text_area :notes, value: bike_organization_note&.body, class: "twinput tw:w-full", rows: 3, name: "notes" %>
+
+              <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">
+                <% if bike_organization_note.present? %>
+                  <small class="tw:text-gray-500">
+                    <%= translation(".note_by", user: bike_organization_note.user.display_name) %>
+
+                    <span class="localizeTime withPreposition">
+                      <%= l bike_organization_note.updated_at, format: :convert_time %>
+                    </span>
+                  </small>
+                <% else %>
+                  <span></span>
+                <% end %>
+
+                <%= f.submit translation(".save_notes"), class: "btn btn-success btn-sm" %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
       </div>
 
       <%# Additional law enforcement information %>
