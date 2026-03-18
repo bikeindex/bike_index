@@ -151,7 +151,7 @@ sample_notes = [
   "Needs new sticker - old one damaged"
 ]
 hogwarts.bike_organizations.limit(5).each_with_index do |bike_organization, index|
-  bike_organization.update!(notes: sample_notes[index])
+  BikeOrganizationNote.create!(bike_organization:, body: sample_notes[index], user: member)
   puts "  Added note to bike organization ##{bike_organization.id}"
 end
 
