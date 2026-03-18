@@ -80,7 +80,7 @@
 </td>
 
 <% if @organization.enabled?("registration_notes") %>
-  <td class="hiddenColumn notes_cell">
+  <td class="hiddenColumn notes_cell tw:leading-none">
     <small><%= bike_organization&.notes %></small>
   </td>
 <% end %>

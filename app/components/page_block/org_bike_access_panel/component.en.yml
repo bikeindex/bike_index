@@ -60,7 +60,7 @@ en:
           to user</small>"
         permission: Permission
         registered: Registered
-        save_notes: Save notes
+        save_notes: Save note
         send_message: Send message
         state: State
         sticker: Sticker
