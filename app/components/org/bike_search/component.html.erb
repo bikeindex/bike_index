@@ -45,10 +45,8 @@
     <% end %>
   <% end %>
 
-  <div
-    class="stimulus-full-screen-table pl-lg-1"
-    data-controller="fullscreen-table-overflow"
-  >
+  <%# Always make it overflow, better aesthetics %>
+  <div class="stimulus-full-screen-table full-screen-table-overflown tw:md:px-4">
     <table
       class="
         table table-striped table-hover table-bordered table-sm

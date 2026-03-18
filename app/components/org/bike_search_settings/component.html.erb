@@ -8,13 +8,13 @@
 
   <div
     class="
-      tw:grid tw:grid-flow-col tw:grid-cols-2 tw:gap-x-6 tw:gap-y-1 tw:pb-6
-      tw:md:grid-cols-3
+      tw:grid tw:grid-cols-2 tw:gap-x-1 tw:gap-y-3 tw:pb-6
+      tw:md:grid-flow-col tw:md:grid-cols-3
     "
     style="grid-template-rows: repeat(<%= column_rows %>, auto)"
   >
     <% enabled_columns.each do |cell_name| %>
-      <label class="tw:flex tw:items-center tw:gap-1">
+      <label class="tw:flex tw:items-center tw:gap-1 tw:leading-[1.25]!">
         <% if cell_name == "avery_cell" %>
           <%= check_box_tag cell_name, cell_name, show_avery_export?,
               data: { action: "change->org--bike-search#averyToggled" } %>
