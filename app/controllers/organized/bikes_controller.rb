@@ -111,17 +111,13 @@ module Organized
       bike_organization = bike.bike_organizations.find_by(organization_id: current_organization.id)
 
       unless bike_organization.present? && current_organization.enabled?("registration_notes")
+        flash[:error] = "Not authorized to update notes"
         redirect_to(bike_path(bike)) && return
       end
 
-      note_body = params[:notes].to_s.strip
-      if note_body.present?
-        note = bike_organization.bike_organization_note || bike_organization.build_bike_organization_note
-        note.update!(body: note_body, user: current_user)
-      elsif bike_organization.bike_organization_note.present?
-        bike_organization.bike_organization_note.destroy!
-      end
+      BikeOrganizationNote.upsert_or_delete(bike_organization:, body: params[:notes], user: current_user)
 
+      flash[:success] = "Note saved"
       redirect_to bike_path(bike)
     end
 

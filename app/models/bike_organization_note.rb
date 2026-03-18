@@ -22,4 +22,15 @@ class BikeOrganizationNote < ApplicationRecord
   belongs_to :user
 
   validates :body, presence: true
+
+  def self.upsert_or_delete(bike_organization:, body:, user:)
+    body = body.to_s&.strip
+    existing = bike_organization.bike_organization_note
+    if body.present?
+      note = existing || bike_organization.build_bike_organization_note
+      note.update!(body:, user:)
+    elsif existing.present?
+      existing.destroy!
+    end
+  end
 end

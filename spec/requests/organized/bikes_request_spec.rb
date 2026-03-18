@@ -602,10 +602,11 @@ RSpec.describe Organized::BikesController, type: :request do
     let(:bike_organization) { bike.bike_organizations.find_by(organization_id: current_organization.id) }
 
     context "without registration_notes feature" do
-      it "redirects" do
+      it "redirects with flash error" do
         bike_organization.reload
         patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
         expect(response).to redirect_to(bike_path(bike))
+        expect(flash[:error]).to be_present
         expect(bike_organization.reload.bike_organization_note).to be_nil
       end
     end
@@ -617,6 +618,7 @@ RSpec.describe Organized::BikesController, type: :request do
         bike_organization.reload
         patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
         expect(response).to redirect_to(bike_path(bike))
+        expect(flash[:success]).to be_present
         note = bike_organization.reload.bike_organization_note
         expect(note.body).to eq "test notes"
         expect(note.user).to eq current_user
@@ -628,16 +630,29 @@ RSpec.describe Organized::BikesController, type: :request do
           patch "#{base_url}/#{bike.id}", params: {notes: "test notes"},
             headers: {"Accept" => "text/vnd.turbo-stream.html"}
           expect(response).to redirect_to(bike_path(bike))
+          expect(flash[:success]).to be_present
           expect(bike_organization.reload.bike_organization_note.body).to eq "test notes"
+        end
+      end
+
+      context "with blank notes" do
+        it "deletes existing note" do
+          BikeOrganizationNote.create!(bike_organization:, body: "old note", user: current_user)
+          expect(bike_organization.reload.bike_organization_note).to be_present
+          patch "#{base_url}/#{bike.id}", params: {notes: "  "}
+          expect(response).to redirect_to(bike_path(bike))
+          expect(flash[:success]).to be_present
+          expect(bike_organization.reload.bike_organization_note).to be_nil
         end
       end
 
       context "bike not in organization" do
         let(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user) }
-        it "redirects without updating notes" do
+        it "redirects with flash error" do
           bike_organization.reload
           patch "#{base_url}/#{other_bike.id}", params: {notes: "test notes"}
           expect(response).to redirect_to(bike_path(other_bike))
+          expect(flash[:error]).to be_present
           expect(bike_organization.reload.bike_organization_note).to be_nil
         end
       end
