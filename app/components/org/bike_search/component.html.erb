@@ -63,35 +63,35 @@
             <%= sortable("id", translation(".registered")) %>
           </th>
 
-          <th class="hiddenColumn updated_at_cell hidden-xs-down">
+          <th class="hiddenColumn updated_at_cell">
             <%= sortable("updated_by_user_at", translation(".updated")) %>
           </th>
 
-          <th class="hiddenColumn hidden-xs-down stolen_cell">
+          <th class="hiddenColumn stolen_cell">
             <small><%= translation(".stolen") %></small>
           </th>
 
-          <th class="hiddenColumn hidden-xs-down serial_number_cell">
+          <th class="hiddenColumn serial_number_cell">
             <%= translation(".serial") %>
           </th>
 
-          <th class="hiddenColumn hidden-xs-down propulsion_type_cell">
+          <th class="hiddenColumn propulsion_type_cell">
             <%= sortable("propulsion_type", translation(".propulsion_type")) %>
           </th>
 
-          <th class="hiddenColumn hidden-xs-down cycle_type_cell">
+          <th class="hiddenColumn cycle_type_cell">
             <%= sortable("cycle_type", translation(".vehicle_type")) %>
           </th>
 
-          <th class="hiddenColumn hidden-xs-down manufacturer_cell">
+          <th class="hiddenColumn manufacturer_cell">
             <%= sortable("mnfg_name", translation(".manufacturer")) %>
           </th>
 
-          <th class="hiddenColumn hidden-xs-down model_cell">
+          <th class="hiddenColumn model_cell">
             <%= sortable("frame_model", translation(".model")) %>
           </th>
 
-          <th class="hiddenColumn hidden-xs-down color_cell">
+          <th class="hiddenColumn color_cell">
             <%= translation(".color") %>
           </th>
 
@@ -108,16 +108,16 @@
             <%= translation(".source") %>
           </th>
 
-          <th class="hiddenColumn owner_name_cell hidden-xs-down">
+          <th class="hiddenColumn owner_name_cell">
             <small><%= translation(".owner_name") %></small>
           </th>
 
-          <th class="hiddenColumn status_cell hidden-xs-down">
+          <th class="hiddenColumn status_cell">
             <small><%= translation(".status_cell") %></small>
           </th>
 
           <% if @organization.enabled?("registration_notes") %>
-            <th class="hiddenColumn hidden-xs-down notes_cell">
+            <th class="hiddenColumn notes_cell">
               <%= translation(".notes") %>
             </th>
           <% end %>
@@ -125,18 +125,18 @@
           <% additional_registration_fields.each do |reg_field| %>
             <% next if reg_field == "extra_registration_number" %>
 
-            <th class="hiddenColumn hidden-xs-down <%= "#{reg_field}_cell" %>">
+            <th class="hiddenColumn <%= "#{reg_field}_cell" %>">
               <%= column_renames[:"#{reg_field}_cell"] %>
             </th>
           <% end %>
 
           <%# All organizations can see additional serial# %>
-          <th class="hiddenColumn hidden-xs-down extra_registration_number_cell">
+          <th class="hiddenColumn extra_registration_number_cell">
             <%= translation(".secondary_number") %>
           </th>
 
           <% if @organization.enabled?("bike_stickers") %>
-            <th class="hiddenColumn hidden-xs-down sticker_cell">
+            <th class="hiddenColumn sticker_cell">
               <%= translation(".sticker") %>
             </th>
             <% if @bike_sticker.present? %>
@@ -145,13 +145,13 @@
           <% end %>
 
           <% if @organization.enabled?("impound_bikes") %>
-            <th class="hiddenColumn hidden-xs-down impounded_cell">
+            <th class="hiddenColumn impounded_cell">
               <%= translation(".impounded") %>
             </th>
           <% end %>
 
           <% if show_avery_export? %>
-            <th class="hiddenColumn hidden-xs-down avery_cell">
+            <th class="hiddenColumn avery_cell">
               <%= translation(".avery") %>
             </th>
           <% end %>
