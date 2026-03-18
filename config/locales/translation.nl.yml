@@ -5969,7 +5969,7 @@ nl:
         registered_not_stolen: geregistreerd, niet gestolen
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
-    page_block:
+    org:
       marketplace_listing_panel:
         condition: Voorwaarde
         description: Beschrijving
@@ -5978,7 +5978,7 @@ nl:
         price_is_firm_false: prijs is onderhandelbaar
         price_is_firm_true: prijs is vast
         still_for_sale_at: Nog steeds te koop bij
-      org_bike_access_panel:
+      bike_access_panel:
         access_panel: Toegangspaneel
         added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd
           bij een gebruiker. Het is toegevoegd om parkeermeldingen te volgen.
