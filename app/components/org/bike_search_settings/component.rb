@@ -28,7 +28,7 @@ module Org::BikeSearchSettings
       url_cell
     ].freeze
 
-    ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell].freeze
+    ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
 
     FILTER_DESCRIPTION_KEYS = {
       search_stickers: {with: ".filter_with_stickers_html", none: ".filter_no_sticker_html"},
