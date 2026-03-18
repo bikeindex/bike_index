@@ -23,9 +23,7 @@
   <%= check_mark if @bike.status_stolen? %>
 </td>
 
-<td class="hiddenColumn serial_number_cell">
-  <%= @bike.serial_number %>
-</td>
+<td class="hiddenColumn serial_number_cell"><%= @bike.serial_number %></td>
 
 <td class="hiddenColumn propulsion_type_cell">
   <span class="<%= 'less-strong' if @bike.propulsion_type == 'foot-pedal' %>">
@@ -39,9 +37,7 @@
   </span>
 </td>
 
-<td class="hiddenColumn manufacturer_cell">
-  <%= @bike.mnfg_name %>
-</td>
+<td class="hiddenColumn manufacturer_cell"><%= @bike.mnfg_name %></td>
 
 <td class="hiddenColumn model_cell"><%= @bike.frame_model %></td>
 
