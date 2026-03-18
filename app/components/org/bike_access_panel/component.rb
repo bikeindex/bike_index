@@ -100,7 +100,8 @@ module Org::BikeAccessPanel
         # tw:[grid-template-areas:'table'_'notes'] tw:md:[grid-template-areas:'table_notes']
         "#{base} tw:md:grid-cols-[7fr_5fr] tw:[grid-template-areas:'table'_'notes'] tw:md:[grid-template-areas:'table_notes']"
       else
-        base
+        # tw:md:[grid-template-areas:'table_.']
+        "#{base} tw:md:grid-cols-[7fr_5fr] tw:md:[grid-template-areas:'table_.']"
       end
     end
   end
