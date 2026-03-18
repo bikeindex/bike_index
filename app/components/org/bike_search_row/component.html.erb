@@ -13,39 +13,35 @@
   </a>
 </td>
 
-<td class="hiddenColumn updated_at_cell hidden-xs-down">
+<td class="hiddenColumn updated_at_cell">
   <small class="localizeTime">
     <%= l @bike.updated_by_user_fallback, format: :convert_time %>
   </small>
 </td>
 
-<td class="hiddenColumn hidden-xs-down table-cell-check stolen_cell">
+<td class="hiddenColumn table-cell-check stolen_cell">
   <%= check_mark if @bike.status_stolen? %>
 </td>
 
-<td class="hiddenColumn hidden-xs-down serial_number_cell">
-  <%= @bike.serial_number %>
-</td>
+<td class="hiddenColumn serial_number_cell"><%= @bike.serial_number %></td>
 
-<td class="hiddenColumn hidden-xs-down propulsion_type_cell">
+<td class="hiddenColumn propulsion_type_cell">
   <span class="<%= 'less-strong' if @bike.propulsion_type == 'foot-pedal' %>">
     <%= @bike.propulsion_titleize %>
   </span>
 </td>
 
-<td class="hiddenColumn hidden-xs-down cycle_type_cell">
+<td class="hiddenColumn cycle_type_cell">
   <span class="<%= 'less-strong' if @bike.cycle_type == 'bike' %>">
     <%= @bike.type_titleize %>
   </span>
 </td>
 
-<td class="hiddenColumn hidden-xs-down manufacturer_cell">
-  <%= @bike.mnfg_name %>
-</td>
+<td class="hiddenColumn manufacturer_cell"><%= @bike.mnfg_name %></td>
 
-<td class="hiddenColumn hidden-xs-down model_cell"><%= @bike.frame_model %></td>
+<td class="hiddenColumn model_cell"><%= @bike.frame_model %></td>
 
-<td class="hiddenColumn hidden-xs-down color_cell">
+<td class="hiddenColumn color_cell">
   <span class="less-strong"><%= @bike.frame_colors.join(", ") %></span>
 </td>
 
@@ -73,7 +69,7 @@
   <% end %>
 </td>
 
-<td class="hiddenColumn owner_name_cell hidden-xs-down">
+<td class="hiddenColumn owner_name_cell">
   <% if @bike.owner_name.present? %>
     <em><%= @bike.owner_name %></em>
   <% end %>
@@ -86,7 +82,7 @@
 <% @additional_registration_fields.each do |reg_field| %>
   <% next if reg_field == "extra_registration_number" %>
 
-  <td class="hiddenColumn hidden-xs-down <%= "#{reg_field}_cell" %>">
+  <td class="hiddenColumn <%= "#{reg_field}_cell" %>">
     <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
 
     <% if bike_attr == "address" %>
@@ -106,12 +102,12 @@
 <% end %>
 
 <%# All organizations can see additional serial# %>
-<td class="hiddenColumn hidden-xs-down extra_registration_number_cell">
+<td class="hiddenColumn extra_registration_number_cell">
   <%= @bike.extra_registration_number %>
 </td>
 
 <% if @organization.enabled?("bike_stickers") %>
-  <td class="hiddenColumn hidden-xs-down sticker_cell">
+  <td class="hiddenColumn sticker_cell">
     <% if @bike_sticker.present? %>
       <small>
         <%= link_to translation(".link"),
@@ -137,7 +133,7 @@
 <% end %>
 
 <% if @organization.enabled?("impound_bikes") %>
-  <td class="hiddenColumn hidden-xs-down impounded_cell">
+  <td class="hiddenColumn impounded_cell">
     <% if @bike.status_impounded? && @bike.current_impound_record&.created_at&.present? %>
       <small class="localizeTime">
         <%= l @bike.current_impound_record.created_at, format: :convert_time %>

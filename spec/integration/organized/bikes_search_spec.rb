@@ -32,7 +32,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     end
   end
 
-  it "searches by email" do
+  it "searches by email and serial" do
     # Create enough bikes to trigger pagination (default per_page is 10)
     FactoryBot.create_list(:bike_organized, 10, creation_organization: organization)
 
@@ -53,6 +53,15 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_css("table.table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
 
+    # Search by serial number
+    fill_in "serial", with: bike1.serial_number
+    find("#search-button").click
+
+    expect(page).to have_current_path(/serial=/, wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+
+    # Clear serial and search by email
+    fill_in "serial", with: ""
     fill_in "search_email", with: "alice@example.com"
     find("#search-button").click
 
