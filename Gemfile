@@ -5,7 +5,7 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-ruby "3.4.8"
+ruby "3.4.9"
 
 # Gems that are no longer in standard library as Ruby 3.4
 gem "csv"
@@ -67,7 +67,7 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 gem "rqrcode", "3.2.0" # QR Code image generator
 
 # Functionality extensions
-gem "binxtils", path: "gems/binxtils" # Bike Index utilities
+gem "binxtils" # Bike Index utilities
 gem "functionable" # Functional modules
 gem "flipper" # Feature flagging
 gem "flipper-active_record" # Feature flagging

@@ -26,15 +26,6 @@ GIT
       excon (~> 0.76.0)
       json (~> 2.1, >= 2.1.0)
 
-PATH
-  remote: gems/binxtils
-  specs:
-    binxtils (0.1.0)
-      activerecord
-      activesupport
-      functionable
-      rails-html-sanitizer
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -146,6 +137,12 @@ GEM
     bcrypt (3.1.13)
     benchmark (0.5.0)
     bigdecimal (4.0.1)
+    binxtils (0.1.0)
+      activerecord
+      activesupport
+      functionable
+      loofah
+      rails-html-sanitizer
     bootsnap (1.18.6)
       msgpack (~> 1.2)
     brakeman (8.0.4)
@@ -886,7 +883,7 @@ DEPENDENCIES
   axlsx (~> 3.0.0.pre)
   bcrypt
   benchmark
-  binxtils!
+  binxtils
   bootsnap
   brakeman
   bullet
@@ -1003,7 +1000,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-  ruby 3.4.8
+  ruby 3.4.9
 
 BUNDLED WITH
   4.0.0.beta2
