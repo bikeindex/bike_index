@@ -586,6 +586,23 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(response.location).to match(organization_bikes_path(organization_id: current_organization.to_param))
       end
     end
+
+    context "with search_notes" do
+      let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+
+      before { FactoryBot.create(:bike_organization_note, bike:, body: "important note") }
+
+      it "filters by notes" do
+        get base_url, params: {search_no_js: true, search_notes: "important"}
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        get base_url, params: {search_no_js: true, search_notes: "nonexistent"}
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes).pluck(:id)).to eq([])
+      end
+    end
   end
 
   describe "multi_serial_search" do
@@ -637,7 +654,7 @@ RSpec.describe Organized::BikesController, type: :request do
 
       context "with blank notes" do
         it "deletes existing note" do
-          BikeOrganizationNote.create!(bike_organization:, body: "old note", user: current_user)
+          FactoryBot.create(:bike_organization_note, bike_organization:, body: "old note")
           expect(bike_organization.reload.bike_organization_note).to be_present
           patch "#{base_url}/#{bike.id}", params: {notes: "  "}
           expect(response).to redirect_to(bike_path(bike))
@@ -659,23 +676,4 @@ RSpec.describe Organized::BikesController, type: :request do
     end
   end
 
-  describe "index with search_notes" do
-    let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
-    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
-
-    before do
-      bike_org = bike.bike_organizations.find_by(organization_id: current_organization.id)
-      BikeOrganizationNote.create!(bike_organization: bike_org, body: "important note", user: current_user)
-    end
-
-    it "filters by notes" do
-      get base_url, params: {search_no_js: true, search_notes: "important"}
-      expect(response.status).to eq(200)
-      expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-
-      get base_url, params: {search_no_js: true, search_notes: "nonexistent"}
-      expect(response.status).to eq(200)
-      expect(assigns(:bikes).pluck(:id)).to eq([])
-    end
-  end
 end
