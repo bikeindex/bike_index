@@ -675,5 +675,4 @@ RSpec.describe Organized::BikesController, type: :request do
       end
     end
   end
-
 end
