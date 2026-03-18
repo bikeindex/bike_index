@@ -137,7 +137,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_css("table.table", wait: 10)
 
     open_settings_if_not
-    click_button "Show notes search"
+    click_button "show notes search"
     fill_in "search_notes", with: "red lock"
     find("#search-button").click
 

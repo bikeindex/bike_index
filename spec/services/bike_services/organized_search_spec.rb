@@ -35,7 +35,7 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.notes(Bike.all, "campus", organization).pluck(:id)).to eq([bike2.id])
       expect(described_class.notes(Bike.all, "parked", organization).pluck(:id)).to eq([bike2.id])
       expect(described_class.notes(Bike.all, "nonexistent", organization).pluck(:id)).to eq([])
-      expect(described_class.notes(Bike.all, "", organization).pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(described_class.notes(Bike.all, "", organization)).to eq(Bike.all)
     end
   end
 end
