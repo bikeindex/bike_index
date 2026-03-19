@@ -7,7 +7,8 @@
       <% elsif params[:search_item_type].present? %>
         <strong><%= params[:search_item_type] %></strong>
       <% elsif params[:search_item_id].present? %>
-        #<strong><%= params[:search_item_id] %></strong>
+        #
+        <strong><%= params[:search_item_id] %></strong>
       <% end %>
       <%= link_to "view all", admin_paper_trail_versions_path(sortable_search_params.merge(search_item_type: nil, search_item_id: nil)), class: "gray-link tw:text-sm" %>
     </p>
