@@ -631,19 +631,21 @@ RSpec.describe Organized::BikesController, type: :request do
     context "with registration_notes feature" do
       let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
 
-      it "updates notes and creates audit trail" do
-        PaperTrail.enabled = true
-        bike_organization.reload
-        patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
-        expect(response).to redirect_to(bike_path(bike))
-        expect(flash[:success]).to be_present
-        note = bike_organization.reload.bike_organization_note
-        expect(note.body).to eq "test notes"
-        expect(note.user).to eq current_user
-        version = note.versions.last
-        expect(version.event).to eq "create"
-        expect(version.whodunnit).to eq current_user.id.to_s
-        PaperTrail.enabled = false
+      context "with paper_trail" do
+        include_context :with_paper_trail
+
+        it "updates notes and creates audit trail" do
+          bike_organization.reload
+          patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
+          expect(response).to redirect_to(bike_path(bike))
+          expect(flash[:success]).to be_present
+          note = bike_organization.reload.bike_organization_note
+          expect(note.body).to eq "test notes"
+          expect(note.user).to eq current_user
+          version = note.versions.last
+          expect(version.event).to eq "create"
+          expect(version.whodunnit).to eq current_user.id.to_s
+        end
       end
 
       context "turbo_stream request" do

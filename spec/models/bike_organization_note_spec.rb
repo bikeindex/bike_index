@@ -23,8 +23,7 @@ RSpec.describe BikeOrganizationNote, type: :model do
   end
 
   describe "versioning" do
-    before { PaperTrail.enabled = true }
-    after { PaperTrail.enabled = false }
+    include_context :with_paper_trail
 
     let(:bike_organization_note) { FactoryBot.create(:bike_organization_note) }
 

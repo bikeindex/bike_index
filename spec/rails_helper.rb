@@ -60,6 +60,12 @@ end
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
+  config.around do |example|
+    PaperTrail.enabled = false
+    example.run
+  ensure
+    PaperTrail.enabled = false
+  end
   config.render_views
 
   # include translation / localization methods
