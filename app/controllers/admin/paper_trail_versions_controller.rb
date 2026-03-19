@@ -16,7 +16,7 @@ class Admin::PaperTrailVersionsController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at item_type item_id event].freeze
+    %w[created_at item_type event].freeze
   end
 
   def sortable_opts
@@ -36,6 +36,14 @@ class Admin::PaperTrailVersionsController < Admin::BaseController
 
     if params[:search_item_type].present?
       versions = versions.where(item_type: params[:search_item_type])
+    end
+
+    if params[:search_event].present?
+      versions = versions.where(event: params[:search_event])
+    end
+
+    if params[:user_id].present?
+      versions = versions.where(whodunnit: (user_subject&.id || params[:user_id]).to_s)
     end
 
     @time_range_column = "created_at"
