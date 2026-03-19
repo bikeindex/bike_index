@@ -13,7 +13,7 @@ class Admin::StravaActivitiesController < Admin::BaseController
 
   helper_method :matching_strava_activities
 
-  protected
+  private
 
   def sortable_columns
     %w[created_at updated_at start_date activity_type distance_meters strava_integration_id enriched_at]
