@@ -80,6 +80,7 @@ module AdminHelper
       {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Config: Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
       {title: "Config: Primary Activities", path: admin_primary_activities_path, match_controller: true},
+      {title: "Bike Organization Notes", path: admin_bike_organization_notes_path, match_controller: true},
       {title: "Strava Integrations", path: admin_strava_integrations_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
     ] + dev_nav_select_links).sort_by { |a| a[:title] }
