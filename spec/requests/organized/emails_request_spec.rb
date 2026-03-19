@@ -217,6 +217,8 @@ RSpec.describe Organized::EmailsController, type: :request do
     end
 
     describe "update" do
+      include_context :with_paper_trail
+
       it "creates" do
         expect(current_organization.mail_snippets.count).to eq 0
         put "#{base_url}/impound_notification", params: {
@@ -234,7 +236,11 @@ RSpec.describe Organized::EmailsController, type: :request do
         expect(mail_snippet.body).to eq "cool new things"
         expect(mail_snippet.subject).to eq "a fancy custom subject"
         expect(mail_snippet.is_enabled).to be_truthy
+        version = mail_snippet.versions.last
+        expect(version.event).to eq "create"
+        expect(version.whodunnit).to eq current_user.id.to_s
       end
+
       context "existing" do
         let!(:mail_snippet) do
           FactoryBot.create(:mail_snippet,
@@ -260,6 +266,9 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(mail_snippet.body).to eq "cool new things"
           expect(mail_snippet.subject).to eq "a fancy custom subject"
           expect(mail_snippet.is_enabled).to be_falsey
+          version = mail_snippet.versions.last
+          expect(version.event).to eq "update"
+          expect(version.whodunnit).to eq current_user.id.to_s
         end
       end
     end
