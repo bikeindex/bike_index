@@ -100,5 +100,16 @@ RSpec.describe AdminHelper, type: :helper do
         expect(admin_path_for_object(ImpoundRecord.new(id: 11))).to eq admin_impound_record_path("pkey-11")
       end
     end
+    context "bike_organization_note" do
+      it "returns" do
+        expect(admin_path_for_object(BikeOrganizationNote.new(id: 5))).to eq admin_bike_organization_note_path(5)
+      end
+    end
+    context "paper_trail_version" do
+      it "returns path from item_type and item_id" do
+        version = PaperTrail::Version.new(id: 1, item_type: "BikeOrganizationNote", item_id: 5)
+        expect(admin_path_for_object(version)).to eq admin_bike_organization_note_path(5)
+      end
+    end
   end
 end

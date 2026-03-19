@@ -35,13 +35,7 @@
           </td>
 
           <td>
-            <%= version.item_type %>
-            <% admin_path = helpers.admin_path_for_object(version.item) rescue nil %>
-            <% if admin_path %>
-              <%= link_to "##{version.item_id}", admin_path %>
-            <% else %>
-              #<%= version.item_id %>
-            <% end %>
+            <%= link_to "#{version.item_type} ##{version.item_id}", admin_path_for_object(version), class: "tw:mr-1" %>
             <% if render_sortable %>
               <small><%= link_to "🔎", url_for(sortable_search_params.merge(search_item_type: version.item_type, search_item_id: version.item_id)), class: "display-sortable-link" %></small>
             <% end %>
