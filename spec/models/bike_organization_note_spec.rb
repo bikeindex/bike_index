@@ -43,8 +43,8 @@ RSpec.describe BikeOrganizationNote, type: :model do
     context "on destroy" do
       it "creates a version" do
         bike_organization_note.destroy!
-        expect(PaperTrailVersion.last.event).to eq "destroy"
-        expect(PaperTrailVersion.last.item_id).to eq bike_organization_note.id
+        expect(PaperTrail::Version.last.event).to eq "destroy"
+        expect(PaperTrail::Version.last.item_id).to eq bike_organization_note.id
       end
     end
   end

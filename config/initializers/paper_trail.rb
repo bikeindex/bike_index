@@ -1,3 +1,3 @@
-PaperTrail.config.has_paper_trail_defaults = {
-  versions: {class_name: "PaperTrailVersion"}
-}
+Rails.application.config.after_initialize do
+  PaperTrail::Version.establish_connection :analytics
+end
