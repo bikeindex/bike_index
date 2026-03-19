@@ -1,0 +1,68 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <th>
+        <small>
+          <%= sortable "updated_at", render_sortable: render_sortable %>
+        </small>
+      </th>
+
+      <th>
+        <%= sortable "user_id", "User", render_sortable: render_sortable %>
+      </th>
+
+      <th>Bike</th>
+
+      <th>Organization</th>
+
+      <th>Body</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |bike_organization_note| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <%= link_to admin_bike_organization_note_path(bike_organization_note), class: "localizeTime" do %>
+                <%= l bike_organization_note.created_at, format: :convert_time %>
+              <% end %>
+
+              <% if display_dev_info? %>
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= bike_organization_note.id %>
+                </span>
+              <% end %>
+            </div>
+          </td>
+
+          <td>
+            <small class="localizeTime">
+              <%= l bike_organization_note.updated_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: bike_organization_note.user, user_id: bike_organization_note.user_id, render_search: render_sortable) %>
+          </td>
+
+          <td>
+            <%= link_to bike_organization_note.bike_organization.bike_id, admin_bike_path(bike_organization_note.bike_organization.bike_id) %>
+          </td>
+
+          <td>
+            <% organization = bike_organization_note.bike_organization.organization %>
+            <%= link_to organization.short_name, admin_organization_path(organization) %>
+          </td>
+
+          <td>
+            <small><%= truncate(bike_organization_note.body, length: 80) %></small>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
