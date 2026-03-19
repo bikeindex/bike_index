@@ -49,8 +49,10 @@
           </td>
 
           <td>
-            <small title="<%= version.object_changes %>">
-              <%= truncate(version.object_changes.to_s, length: 120) %>
+            <small>
+              <% if version.object_changes.present? %>
+                <%= pretty_print_json(version.object_changes) %>
+              <% end %>
             </small>
           </td>
         </tr>
