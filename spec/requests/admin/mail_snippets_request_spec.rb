@@ -49,5 +49,17 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
       mail_snippet.reload
       expect(mail_snippet).to have_attributes valid_params
     end
+
+    context "with paper_trail" do
+      include_context :with_paper_trail
+
+      it "creates a version on update" do
+        patch "#{base_url}/#{mail_snippet.id}", params: {mail_snippet: valid_params}
+        mail_snippet.reload
+        version = mail_snippet.versions.last
+        expect(version.event).to eq "update"
+        expect(version.whodunnit).to eq current_user.id.to_s
+      end
+    end
   end
 end

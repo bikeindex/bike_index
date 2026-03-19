@@ -235,6 +235,23 @@ RSpec.describe Organized::EmailsController, type: :request do
         expect(mail_snippet.subject).to eq "a fancy custom subject"
         expect(mail_snippet.is_enabled).to be_truthy
       end
+
+      context "with paper_trail" do
+        include_context :with_paper_trail
+
+        it "creates a version on create" do
+          put "#{base_url}/impound_notification", params: {
+            organization_id: current_organization.to_param,
+            id: "impound_notification",
+            mail_snippet: {body: "new snippet", is_enabled: "true"}
+          }
+          mail_snippet = current_organization.mail_snippets.last
+          version = mail_snippet.versions.last
+          expect(version.event).to eq "create"
+          expect(version.whodunnit).to eq current_user.id.to_s
+        end
+      end
+
       context "existing" do
         let!(:mail_snippet) do
           FactoryBot.create(:mail_snippet,
@@ -260,6 +277,22 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(mail_snippet.body).to eq "cool new things"
           expect(mail_snippet.subject).to eq "a fancy custom subject"
           expect(mail_snippet.is_enabled).to be_falsey
+        end
+
+        context "with paper_trail" do
+          include_context :with_paper_trail
+
+          it "creates a version on update" do
+            put "#{base_url}/appears_abandoned_notification", params: {
+              organization_id: current_organization.to_param,
+              id: "appears_abandoned_notification",
+              mail_snippet: {body: "updated body", is_enabled: "0"}
+            }
+            mail_snippet.reload
+            version = mail_snippet.versions.last
+            expect(version.event).to eq "update"
+            expect(version.whodunnit).to eq current_user.id.to_s
+          end
         end
       end
     end

@@ -30,9 +30,6 @@
       %th Subject, Body
       %th
         %small Enabled
-      %th
-        %small Geo
-
       %tbody
         - @mail_snippets.each do |mail_snippet|
           %tr
@@ -56,8 +53,6 @@
                 = truncate(mail_snippet.body, length: 100)
             %td.table-cell-check
               = check_mark if mail_snippet.is_enabled
-            %td.table-cell-check
-              = check_mark if mail_snippet.with_location?
 
 
 
