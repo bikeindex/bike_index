@@ -19,6 +19,8 @@
 #  index_mail_snippets_on_organization_id    (organization_id)
 #
 class MailSnippet < ApplicationRecord
+  has_paper_trail only: %i[body is_enabled kind subject]
+
   KIND_ENUM = {
     custom: 0,
     header: 1,
@@ -145,6 +147,7 @@ class MailSnippet < ApplicationRecord
   def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
     self.kind ||= "custom"
+    self.subject = Binxtils::InputNormalizer.string(subject)
   end
 
   def update_associations
