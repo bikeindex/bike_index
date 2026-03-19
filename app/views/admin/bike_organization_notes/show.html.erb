@@ -77,3 +77,15 @@
     <p><%= @bike_organization_note.body %></p>
   </div>
 </div>
+
+<% versions = PaperTrail::Version.where(item_type: "BikeOrganizationNote", item_id: @bike_organization_note.id).order(created_at: :desc) %>
+
+<% if versions.any? %>
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <h4>Paper Trail Versions</h4>
+
+      <%= render "admin/paper_trail_versions/table", collection: versions, render_sortable: false %>
+    </div>
+  </div>
+<% end %>
