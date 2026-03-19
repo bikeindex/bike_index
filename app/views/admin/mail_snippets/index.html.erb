@@ -48,6 +48,7 @@
       <th><%= sortable "kind" %></th>
       <th>Subject, Body</th>
       <th><small>Enabled</small></th>
+      <th><small>Versions</small></th>
     </thead>
 
     <tbody>
@@ -89,6 +90,10 @@
 
           <td class="table-cell-check">
             <%= check_mark if mail_snippet.is_enabled %>
+          </td>
+
+          <td>
+            <%= link_to "versions", admin_paper_trail_versions_path(search_item_type: "MailSnippet", search_item_id: mail_snippet.id, period: "all") %>
           </td>
         </tr>
       <% end %>

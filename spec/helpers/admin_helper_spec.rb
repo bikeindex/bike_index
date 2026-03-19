@@ -111,5 +111,10 @@ RSpec.describe AdminHelper, type: :helper do
         expect(admin_path_for_object(version)).to eq admin_bike_organization_note_path(5)
       end
     end
+    context "with item_type and item_id keywords" do
+      it "returns" do
+        expect(admin_path_for_object(item_type: "BikeOrganizationNote", item_id: 5)).to eq admin_bike_organization_note_path(5)
+      end
+    end
   end
 end

@@ -145,11 +145,14 @@ module AdminHelper
     end
   end
 
-  def admin_path_for_object(obj = nil)
+  def admin_path_for_object(obj = nil, item_type: nil, item_id: nil)
+    if item_type.present? && item_id.present?
+      return admin_path_for_object(item_type.constantize.find_by(id: item_id))
+    end
     return nil unless obj&.id.present?
 
     if obj.instance_of?(PaperTrail::Version)
-      admin_path_for_object(obj.item) || "/admin/#{obj.item_type.underscore.pluralize}/#{obj.item_id}"
+      admin_path_for_object(item_type: obj.item_type, item_id: obj.item_id)
     elsif obj.instance_of?(StolenRecord)
       admin_stolen_bike_path(obj.id, stolen_record_id: obj.id)
     elsif obj.instance_of?(ImpoundRecord)
