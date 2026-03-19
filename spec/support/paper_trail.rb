@@ -1,4 +1,11 @@
 RSpec.shared_context :with_paper_trail do
-  before { PaperTrail.enabled = true }
-  after { PaperTrail::Version.delete_all }
+  before do
+    PaperTrail.enabled = true
+    Sidekiq::Testing.inline!
+  end
+
+  after do
+    Sidekiq::Testing.fake!
+    PaperTrail::Version.delete_all
+  end
 end
