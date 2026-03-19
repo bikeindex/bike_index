@@ -12,7 +12,7 @@
       </th>
 
       <th>
-        <%= sortable "user_id", "User", render_sortable: render_sortable %>
+        <%= sortable "user_id", render_sortable: render_sortable %>
       </th>
 
       <th>Bike</th>
@@ -59,7 +59,7 @@
           </td>
 
           <td>
-            <small><%= truncate(bike_organization_note.body, length: 80) %></small>
+            <small title="<%= bike_organization_note.body %>"><%= truncate(bike_organization_note.body, length: 80) %></small>
           </td>
         </tr>
       <% end %>

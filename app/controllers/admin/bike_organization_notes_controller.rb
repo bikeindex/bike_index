@@ -17,7 +17,7 @@ class Admin::BikeOrganizationNotesController < Admin::BaseController
 
   helper_method :matching_bike_organization_notes
 
-  protected
+  private
 
   def sortable_columns
     %w[created_at updated_at user_id bike_organization_id].freeze
