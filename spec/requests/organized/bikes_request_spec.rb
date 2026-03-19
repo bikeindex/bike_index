@@ -642,8 +642,6 @@ RSpec.describe Organized::BikesController, type: :request do
           bike_organization_note = bike_organization.reload.bike_organization_note
           expect(bike_organization_note.body).to eq "test notes"
           expect(bike_organization_note.user).to eq current_user
-          expect(CreateVersionJob.jobs.size).to eq 1
-          CreateVersionJob.drain
           version = bike_organization_note.versions.last
           expect(version.event).to eq "create"
           expect(version.whodunnit).to eq current_user.id.to_s
@@ -671,8 +669,6 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(response).to redirect_to(bike_path(bike))
           expect(flash[:success]).to be_present
           expect(bike_organization.reload.bike_organization_note).to be_nil
-          expect(CreateVersionJob.jobs.size).to eq 2
-          CreateVersionJob.drain
           version = PaperTrail::Version.last
           expect(version.event).to eq "destroy"
           expect(version.item_id).to eq bike_organization_note.id
