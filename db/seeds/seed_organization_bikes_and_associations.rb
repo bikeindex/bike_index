@@ -151,7 +151,7 @@ sample_notes = [
   "Needs new sticker - old one damaged"
 ]
 hogwarts.bike_organizations.limit(5).each_with_index do |bike_organization, index|
-  BikeOrganizationNote.create!(bike: bike_organization.bike, organization: bike_organization.organization, body: sample_notes[index], user: member)
+  BikeOrganizationNote.upsert(bike: bike_organization.bike, organization: bike_organization.organization, body: sample_notes[index], user: member)
   puts "  Added note for bike ##{bike_organization.bike_id} in #{bike_organization.organization.short_name}"
 end
 

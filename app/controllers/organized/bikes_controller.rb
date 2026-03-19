@@ -115,12 +115,7 @@ module Organized
         redirect_to(bike_path(bike)) && return
       end
 
-      body = params[:notes].to_s.strip
-      if body.present?
-        BikeOrganizationNote.upsert(bike:, organization: current_organization, body:, user: current_user)
-      else
-        BikeOrganizationNote.where(bike_id: bike.id, organization_id: current_organization.id).destroy_all
-      end
+      BikeOrganizationNote.upsert(bike:, organization: current_organization, body: params[:notes], user: current_user)
 
       flash[:success] = "Note saved"
       redirect_to bike_path(bike)

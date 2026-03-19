@@ -659,15 +659,16 @@ RSpec.describe Organized::BikesController, type: :request do
         include_context :with_paper_trail
         let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization: current_organization, body: "old note") }
 
-        it "deletes existing note" do
-          expect(BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: current_organization.id)).to be_present
+        it "updates note body to nil" do
+          expect(bike_organization_note.body).to eq "old note"
           patch "#{base_url}/#{bike.id}", params: {notes: "  "}
           expect(response).to redirect_to(bike_path(bike))
           expect(flash[:success]).to be_present
-          expect(BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: current_organization.id)).to be_nil
-          version = PaperTrail::Version.last
-          expect(version.event).to eq "destroy"
-          expect(version.item_id).to eq bike_organization_note.id
+          bike_organization_note.reload
+          expect(bike_organization_note.body).to be_nil
+          expect(bike_organization_note.user).to eq current_user
+          version = bike_organization_note.versions.last
+          expect(version.event).to eq "update"
           expect(version.whodunnit).to eq current_user.id.to_s
         end
       end

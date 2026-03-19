@@ -27,10 +27,18 @@ class BikeOrganizationNote < ApplicationRecord
   belongs_to :organization
   belongs_to :user
 
-  validates :body, presence: true
+  validates_presence_of :bike_id, :organization_id, :user_id
+
+  before_save :set_calculated_attributes
 
   def self.upsert(bike:, organization:, body:, user:)
     note = find_or_initialize_by(bike_id: bike.id, organization_id: organization.id)
     note.update!(body:, user:)
+  end
+
+  private
+
+  def set_calculated_attributes
+    self.body = body&.strip.presence
   end
 end
