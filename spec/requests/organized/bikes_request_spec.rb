@@ -639,10 +639,10 @@ RSpec.describe Organized::BikesController, type: :request do
           patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
           expect(response).to redirect_to(bike_path(bike))
           expect(flash[:success]).to be_present
-          note = bike_organization.reload.bike_organization_note
-          expect(note.body).to eq "test notes"
-          expect(note.user).to eq current_user
-          version = note.versions.last
+          bike_organization_note = bike_organization.reload.bike_organization_note
+          expect(bike_organization_note.body).to eq "test notes"
+          expect(bike_organization_note.user).to eq current_user
+          version = bike_organization_note.versions.last
           expect(version.event).to eq "create"
           expect(version.whodunnit).to eq current_user.id.to_s
         end
@@ -660,13 +660,19 @@ RSpec.describe Organized::BikesController, type: :request do
       end
 
       context "with blank notes" do
+        include_context :with_paper_trail
+        let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike_organization:, body: "old note") }
+
         it "deletes existing note" do
-          FactoryBot.create(:bike_organization_note, bike_organization:, body: "old note")
           expect(bike_organization.reload.bike_organization_note).to be_present
           patch "#{base_url}/#{bike.id}", params: {notes: "  "}
           expect(response).to redirect_to(bike_path(bike))
           expect(flash[:success]).to be_present
           expect(bike_organization.reload.bike_organization_note).to be_nil
+          version = PaperTrail::Version.last
+          expect(version.event).to eq "destroy"
+          expect(version.item_id).to eq bike_organization_note.id
+          expect(version.whodunnit).to eq current_user.id.to_s
         end
       end
 

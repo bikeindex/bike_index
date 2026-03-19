@@ -9,6 +9,8 @@ RSpec.describe BikeOrganizationNote, type: :model do
       expect(bike_organization_note.body).to be_present
       expect(bike_organization_note.user).to be_present
       expect(bike_organization_note.bike_organization).to be_present
+      # Verify that we aren't tracking versions by default
+      expect(bike_organization_note.versions.count).to eq 0
     end
 
     context "with bike transient" do
