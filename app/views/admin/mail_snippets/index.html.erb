@@ -93,7 +93,8 @@
           </td>
 
           <td>
-            <%= link_to "versions", admin_paper_trail_versions_path(search_item_type: "MailSnippet", search_item_id: mail_snippet.id, period: "all") %>
+            <% version_count = PaperTrail::Version.where(item_type: "MailSnippet", item_id: mail_snippet.id).count %>
+            <%= link_to number_display(version_count), admin_paper_trail_versions_path(search_item_type: "MailSnippet", search_item_id: mail_snippet.id, period: "all") %>
           </td>
         </tr>
       <% end %>

@@ -24,7 +24,7 @@ class Admin::PaperTrailVersionsController < Admin::BaseController
   end
 
   def earliest_period_date
-    PaperTrail::Version.minimum(:created_at) || Time.current
+    Time.at(1773878400)
   end
 
   def matching_versions

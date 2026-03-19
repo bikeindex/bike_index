@@ -43,7 +43,7 @@
 
           <td>
             <% if version.whodunnit.present? %>
-              <%= render Admin::UserCell::Component.new(user: nil, user_id: version.whodunnit.to_i, render_search: render_sortable) %>
+              <%= render Admin::UserCell::Component.new(user: User.find_by(id: version.whodunnit), user_id: version.whodunnit.to_i, render_search: render_sortable) %>
             <% end %>
           </td>
 
