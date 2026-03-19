@@ -552,13 +552,16 @@ class BParam < ApplicationRecord
     else
       paint = Paint.new(name: paint_entry)
       paint.manufacturer_id = bike["manufacturer_id"] if is_pos
-      paint.save
-      params["bike"]["paint_id"] = paint.id
-      params["bike"]["paint_name"] = paint.name
+      unless paint.save
+        # Handle race condition: paint may have been created concurrently
+        paint = Paint.friendly_find(paint_entry)
+      end
+      params["bike"]["paint_id"] = paint&.id
+      params["bike"]["paint_name"] = paint_entry.downcase.strip
     end
 
     unless bike["primary_frame_color_id"].present?
-      params["bike"]["primary_frame_color_id"] = if paint.color_id.present?
+      params["bike"]["primary_frame_color_id"] = if paint&.color_id.present?
         paint.color.id
       else
         Color.black.id
