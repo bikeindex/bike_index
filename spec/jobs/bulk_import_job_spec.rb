@@ -614,12 +614,9 @@ RSpec.describe BulkImportJob, type: :job do
         def expect_registered_bike(passed_row)
           expect(organization.auto_user).to_not eq bulk_import.user
           expect(Bike.count).to eq 0
-          b_param_hash = instance.send(:row_to_b_param_hash, passed_row)
-          new_bike = instance.send(:register_bike, b_param_hash)
-          if new_bike&.errors&.any?
-            pp "expect_registered_bike errors", new_bike.errors.full_messages,
-              "b_param bike attrs", BParam.last&.bike
-          end
+          new_bike = instance.send(:register_bike, instance.send(:row_to_b_param_hash, passed_row))
+          # This test is being flaky! Add debug printout #2101
+          pp "Error expect_registered_bike", new_bike.errors if new_bike.errors.any?
           expect(Bike.count).to eq 1
           bike = Bike.last
 

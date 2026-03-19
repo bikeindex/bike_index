@@ -858,12 +858,8 @@ class Bike < ApplicationRecord
     return true if Color.friendly_find(paint_name).present?
 
     paint = Paint.friendly_find(paint_name)
-    unless paint.present?
-      paint = Paint.create(name: paint_name)
-      # Handle race condition: paint may have been created concurrently
-      paint = Paint.friendly_find(paint_name) if paint.new_record?
-    end
-    self.paint_id = paint&.id
+    paint = Paint.create(name: paint_name) unless paint.present?
+    self.paint_id = paint.id
   end
 
   def normalize_serial_number
