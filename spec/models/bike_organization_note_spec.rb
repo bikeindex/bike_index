@@ -27,9 +27,11 @@ RSpec.describe BikeOrganizationNote, type: :model do
   describe "versioning" do
     include_context :with_paper_trail
 
-    let(:bike_organization_note) { FactoryBot.create(:bike_organization_note) }
+    let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note) }
 
     it "creates a version on create" do
+      expect(CreateVersionJob.jobs.size).to eq 1
+      CreateVersionJob.drain
       expect(bike_organization_note.versions.count).to eq 1
       expect(bike_organization_note.versions.last.event).to eq "create"
     end
@@ -37,6 +39,8 @@ RSpec.describe BikeOrganizationNote, type: :model do
     context "on update" do
       it "creates a version" do
         bike_organization_note.update!(body: "updated body")
+        expect(CreateVersionJob.jobs.size).to eq 2
+        CreateVersionJob.drain
         expect(bike_organization_note.versions.count).to eq 2
         expect(bike_organization_note.versions.last.event).to eq "update"
       end
@@ -45,6 +49,8 @@ RSpec.describe BikeOrganizationNote, type: :model do
     context "on destroy" do
       it "creates a version" do
         bike_organization_note.destroy!
+        expect(CreateVersionJob.jobs.size).to eq 2
+        CreateVersionJob.drain
         expect(PaperTrail::Version.last.event).to eq "destroy"
         expect(PaperTrail::Version.last.item_id).to eq bike_organization_note.id
       end
