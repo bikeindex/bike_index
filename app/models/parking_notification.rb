@@ -52,8 +52,6 @@
 class ParkingNotification < ActiveRecord::Base
   include Geocodeable
 
-  geocoded_by :formatted_address_string
-
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other_parking_notification: 3}.freeze
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
