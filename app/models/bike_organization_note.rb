@@ -21,7 +21,7 @@
 #  index_bike_organization_notes_on_user_id                      (user_id)
 #
 class BikeOrganizationNote < ApplicationRecord
-  has_paper_trail only: %i[body user_id]
+  has_paper_trail only: %i[bike_id body]
 
   belongs_to :bike
   belongs_to :organization

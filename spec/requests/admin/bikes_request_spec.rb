@@ -201,17 +201,23 @@ RSpec.describe Admin::BikesController, type: :request do
       end
 
       context "removing organization with note" do
+        include_context :with_paper_trail
+
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization) }
         let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization:) }
 
-        it "deletes the bike_organization_note" do
+        it "deletes the bike_organization_note and creates a paper trail version" do
           expect(bike.reload.bike_organization_ids).to eq([organization.id])
           expect(BikeOrganizationNote.where(bike_id: bike.id, organization_id: organization.id).count).to eq 1
+          expect(bike_organization_note.versions.count).to eq 1
 
           put "#{base_url}/#{bike.id}", params: {bike: {bike_organization_ids: [""]}}
           expect(flash[:success]).to be_present
           expect(bike.reload.bike_organization_ids).to eq([])
           expect(BikeOrganizationNote.where(bike_id: bike.id, organization_id: organization.id).count).to eq 0
+
+          version = PaperTrail::Version.where(item_type: "BikeOrganizationNote", item_id: bike_organization_note.id).last
+          expect(version.event).to eq "destroy"
         end
       end
     end
