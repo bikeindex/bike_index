@@ -9,6 +9,7 @@ module Organized
 
     def index
       set_period
+      @search_claimedness = "all"
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
 
       if current_organization.enabled?("bike_search")
