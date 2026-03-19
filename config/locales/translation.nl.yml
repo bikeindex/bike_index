@@ -1212,6 +1212,10 @@ nl:
         unused: tonen ongebruikte vertalingen
         cp: kopieer de sleutels in landinstellingen die overeenkomen met het gegeven
           patroon
+        check_prism: Controleer of Prism-scanner dezelfde (of betere) resultaten oplevert
+          als de standaardparser.
+        check_reserved_interpolations: Controleer of alle vertalingen gereserveerde
+          interpolatievariabelen vermijden.
       encourage:
       - Goed gedaan!
       - Goed gedaan!
@@ -1297,6 +1301,9 @@ nl:
           of translation.watsonx_api_key in config/i18n-tasks.yml. De sleutel is te
           vinden op https://www.ibm.com/products/watsonx-ai.
         no_results: watsonx leverde geen resultaten op.
+    reserved_interpolations:
+      details_title: Gereserveerde interpolatiesleutels
+      none: Geen gereserveerde interpolaties gevonden.
   grape:
     errors:
       format: "%{attributes} %{message}"

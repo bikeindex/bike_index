@@ -1280,6 +1280,10 @@ nb:
         tree_translate: Google Oversett et tre til rotlokaliteter
         unused: vis ubrukte oversettelser
         cp: kopier nøklene i lokalitetsdata som samsvarer med det gitte mønsteret
+        check_prism: bekrefte at Prism-skanneren gir de samme (eller bedre) resultatene
+          som standardparseren
+        check_reserved_interpolations: verifiser at alle oversettelser unngår reserverte
+          interpolasjonsvariabler
       encourage:
       - Godt jobbet!
       - Bra gjort!
@@ -1361,6 +1365,9 @@ nb:
           eller translation.watsonx_api_key i config/i18n-tasks.yml. Hent nøkkelen
           på https://www.ibm.com/products/watsonx-ai.
         no_results: watsonx returnerte ingen resultater.
+    reserved_interpolations:
+      details_title: Reserverte interpolasjonsnøkler
+      none: Ingen reserverte interpolasjoner funnet.
   countries:
     AC: Ascension Island
     AD: Andorra
