@@ -1,0 +1,105 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "new snippet", new_admin_mail_snippet_path, class: "nav-link" %>
+  </li>
+
+  <li class="nav-item">
+    <a
+      class="nav-link dropdown-toggle <%= @search_kind == "all" ? "" : "active" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @search_kind == "all" %>
+        All kinds
+      <% else %>
+        <%= MailSnippet.kind_humanized(@search_kind) %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <% (["all"] + MailSnippet.kinds).each do |kind| %>
+        <% kind_active = @search_kind == kind %>
+        <% kind_link_params = sortable_search_params.merge(search_kind: (kind_active ? nil : kind)) %>
+        <% kind_humanized = kind == "all" ? "All kinds" : MailSnippet.kind_humanized(kind) %>
+
+        <%= link_to kind_humanized, admin_mail_snippets_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}" %>
+
+        <% if kind == "all" %>
+          <div class="dropdown-divider"></div>
+        <% end %>
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<% table_view = capture do %>
+  <table class="table table-striped table-bordered table-sm without-exterior-border">
+    <thead class="small-header hidden-md-down">
+      <th><%= sortable "created_at" %></th>
+      <th><small><%= sortable "updated_at" %></small></th>
+
+      <% unless current_organization.present? %>
+        <th><%= sortable "organization_id" %></th>
+      <% end %>
+
+      <th><%= sortable "kind" %></th>
+      <th>Subject, Body</th>
+      <th><small>Enabled</small></th>
+      <th><small>Versions</small></th>
+    </thead>
+
+    <tbody>
+      <% @mail_snippets.each do |mail_snippet| %>
+        <tr>
+          <td>
+            <a
+              class="convertTime"
+              href="<%= edit_mail_snippet_path_for(mail_snippet) %>"
+            >
+              <%= l mail_snippet.created_at, format: :convert_time %>
+            </a>
+
+            <% if display_dev_info? %>
+              <code class="small only-dev-visible"><%= mail_snippet.id %></code>
+            <% end %>
+          </td>
+
+          <td>
+            <small class="convertTime">
+              <%= l mail_snippet.updated_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <% unless current_organization.present? %>
+            <td>
+              <% if mail_snippet.organization.present? %>
+                <%= link_to mail_snippet.organization&.short_name, admin_mail_snippets_path(sortable_search_params.merge(organization_id: mail_snippet.organization_id)) %>
+              <% end %>
+            </td>
+          <% end %>
+
+          <td><%= mail_snippet.kind_humanized %></td>
+
+          <td>
+            <div class="d-block"><%= mail_snippet.subject %></div>
+            <small><%= truncate(mail_snippet.body, length: 100) %></small>
+          </td>
+
+          <td class="table-cell-check">
+            <%= check_mark if mail_snippet.is_enabled %>
+          </td>
+
+          <td>
+            <% version_count = PaperTrail::Version.where(item_type: "MailSnippet", item_id: mail_snippet.id).count %>
+            <%= link_to number_display(version_count), admin_paper_trail_versions_path(search_item_type: "MailSnippet", search_item_id: mail_snippet.id, period: "all") %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(collection: @mail_snippets, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_mail_snippets)) %>

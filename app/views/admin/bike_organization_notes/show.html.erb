@@ -1,0 +1,91 @@
+<div class="admin-subnav">
+  <div class="col-md-12">
+    <h1>Bike Organization Note</h1>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <% if display_dev_info? %>
+          <tr>
+            <td class="only-dev-visible">ID</td>
+
+            <td>
+              <code><%= @bike_organization_note.id %></code>
+
+              <small class="less-strong tw:ml-2">
+                bike_organization_id:
+                <code><%= @bike_organization_note.bike_organization_id %></code>
+              </small>
+            </td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>User</td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: @bike_organization_note.user, user_id: @bike_organization_note.user_id) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Bike</td>
+
+          <td>
+            <%= link_to @bike_organization_note.bike_organization.bike_id, admin_bike_path(@bike_organization_note.bike_organization.bike_id) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Organization</td>
+
+          <td>
+            <% organization = @bike_organization_note.bike_organization.organization %>
+            <%= link_to organization.short_name, admin_organization_path(organization) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Created</td>
+
+          <td>
+            <span class="localizeTime preciseTime">
+              <%= l @bike_organization_note.created_at, format: :convert_time %>
+            </span>
+          </td>
+        </tr>
+
+        <tr class="small">
+          <td>Updated</td>
+
+          <td>
+            <span class="localizeTime preciseTime">
+              <%= l @bike_organization_note.updated_at, format: :convert_time %>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <h4>Body</h4>
+
+    <p><%= @bike_organization_note.body %></p>
+  </div>
+</div>
+
+<% versions = PaperTrail::Version.where(item_type: "BikeOrganizationNote", item_id: @bike_organization_note.id).order(created_at: :desc) %>
+
+<% if versions.any? %>
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <h4>Paper Trail Versions</h4>
+
+      <%= render "admin/paper_trail_versions/table", collection: versions, render_sortable: false %>
+    </div>
+  </div>
+<% end %>

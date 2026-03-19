@@ -40,6 +40,8 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
   end
 
   describe "update" do
+    include_context :with_paper_trail
+
     let!(:mail_snippet) { FactoryBot.create(:mail_snippet) }
     it "updates" do
       patch "#{base_url}/#{mail_snippet.id}", params: {mail_snippet: valid_params}
@@ -48,6 +50,9 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
       expect(flash[:errors]).to be_blank
       mail_snippet.reload
       expect(mail_snippet).to have_attributes valid_params
+      version = mail_snippet.versions.last
+      expect(version.event).to eq "update"
+      expect(version.whodunnit).to eq current_user.id.to_s
     end
   end
 end

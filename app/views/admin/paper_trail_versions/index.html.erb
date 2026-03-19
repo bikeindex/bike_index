@@ -1,0 +1,21 @@
+<% admin_search_form = capture do %>
+  <% if params[:search_item_type].present? || params[:search_item_id].present? %>
+    <p class="pagination-number">
+      Versions for
+      <% if params[:search_item_type].present? && params[:search_item_id].present? %>
+        <%= link_to "#{params[:search_item_type]} ##{params[:search_item_id]}", admin_path_for_object(item_type: params[:search_item_type], item_id: params[:search_item_id]), class: "twlink" %>
+      <% elsif params[:search_item_type].present? %>
+        <strong><%= params[:search_item_type] %></strong>
+      <% elsif params[:search_item_id].present? %>
+        #
+        <strong><%= params[:search_item_id] %></strong>
+      <% end %>
+      <%= link_to "view all", admin_paper_trail_versions_path(sortable_search_params.merge(search_item_type: nil, search_item_id: nil)), class: "gray-link tw:text-sm" %>
+    </p>
+  <% end %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  chart_collection: @render_chart && matching_versions,
+  admin_search_form:
+)) %>

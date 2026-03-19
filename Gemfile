@@ -20,6 +20,7 @@ gem "puma" # App server
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg" # Postgres
+gem "paper_trail" # audit logging
 gem "paranoia" # soft delete
 gem "pg_search"
 gem "lograge" # Structure log data, put it in single lines to improve the functionality

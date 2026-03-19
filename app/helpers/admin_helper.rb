@@ -23,7 +23,8 @@ module AdminHelper
       {title: "Dev: IP Location", path: admin_ip_location_path, match_controller: false},
       {title: "Dev: Strava Requests", path: admin_strava_requests_path, match_controller: true},
       {title: "Dev: Strava Activities", path: admin_strava_activities_path, match_controller: true},
-      {title: "Dev: Strava Gear", path: admin_strava_gears_path, match_controller: true}
+      {title: "Dev: Strava Gear", path: admin_strava_gears_path, match_controller: true},
+      {title: "Dev: Paper Trail Versions", path: admin_paper_trail_versions_path, match_controller: true}
     ]
   end
 
@@ -80,6 +81,7 @@ module AdminHelper
       {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Config: Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
       {title: "Config: Primary Activities", path: admin_primary_activities_path, match_controller: true},
+      {title: "Bike Organization Notes", path: admin_bike_organization_notes_path, match_controller: true},
       {title: "Strava Integrations", path: admin_strava_integrations_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
     ] + dev_nav_select_links).sort_by { |a| a[:title] }
@@ -143,10 +145,15 @@ module AdminHelper
     end
   end
 
-  def admin_path_for_object(obj = nil)
+  def admin_path_for_object(obj = nil, item_type: nil, item_id: nil)
+    if item_type.present? && item_id.present?
+      return admin_path_for_object(item_type.constantize.find_by(id: item_id))
+    end
     return nil unless obj&.id.present?
 
-    if obj.instance_of?(StolenRecord)
+    if obj.instance_of?(PaperTrail::Version)
+      admin_path_for_object(item_type: obj.item_type, item_id: obj.item_id)
+    elsif obj.instance_of?(StolenRecord)
       admin_stolen_bike_path(obj.id, stolen_record_id: obj.id)
     elsif obj.instance_of?(ImpoundRecord)
       admin_impound_record_path("pkey-#{obj.id}")

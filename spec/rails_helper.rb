@@ -26,6 +26,7 @@ require "functionable"
 require_relative "support/functionable"
 require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
+require "paper_trail/frameworks/rspec"
 
 # Include capybara for view component system specs
 require "capybara/rails"

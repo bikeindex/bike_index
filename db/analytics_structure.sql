@@ -162,6 +162,41 @@ ALTER SEQUENCE public.strava_requests_id_seq OWNED BY public.strava_requests.id;
 
 
 --
+-- Name: versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.versions (
+    id bigint NOT NULL,
+    item_type character varying NOT NULL,
+    item_id bigint NOT NULL,
+    event character varying NOT NULL,
+    whodunnit character varying,
+    object jsonb,
+    object_changes jsonb,
+    created_at timestamp without time zone
+);
+
+
+--
+-- Name: versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.versions_id_seq OWNED BY public.versions.id;
+
+
+--
 -- Name: logged_searches id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -180,6 +215,13 @@ ALTER TABLE ONLY public.organization_statuses ALTER COLUMN id SET DEFAULT nextva
 --
 
 ALTER TABLE ONLY public.strava_requests ALTER COLUMN id SET DEFAULT nextval('public.strava_requests_id_seq'::regclass);
+
+
+--
+-- Name: versions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.versions ALTER COLUMN id SET DEFAULT nextval('public.versions_id_seq'::regclass);
 
 
 --
@@ -220,6 +262,14 @@ ALTER TABLE ONLY public.schema_migrations
 
 ALTER TABLE ONLY public.strava_requests
     ADD CONSTRAINT strava_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: versions versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.versions
+    ADD CONSTRAINT versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -279,12 +329,20 @@ CREATE INDEX index_strava_requests_on_user_id ON public.strava_requests USING bt
 
 
 --
+-- Name: index_versions_on_item_type_and_item_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_versions_on_item_type_and_item_id ON public.versions USING btree (item_type, item_id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260318174948'),
 ('20260306001002'),
 ('20260303050228'),
 ('20260227165150'),
