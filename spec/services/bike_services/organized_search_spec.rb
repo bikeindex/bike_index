@@ -19,4 +19,23 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(Bike.claimed.pluck(:id)).to eq([bike2.id])
     end
   end
+
+  describe ".notes" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+
+    before do
+      FactoryBot.create(:bike_organization_note, bike: bike1, body: "has a red lock")
+      FactoryBot.create(:bike_organization_note, bike: bike2, body: "parked on campus")
+    end
+
+    it "searches notes" do
+      expect(described_class.notes(Bike.all, "red lock", organization).pluck(:id)).to eq([bike1.id])
+      expect(described_class.notes(Bike.all, "campus", organization).pluck(:id)).to eq([bike2.id])
+      expect(described_class.notes(Bike.all, "parked", organization).pluck(:id)).to eq([bike2.id])
+      expect(described_class.notes(Bike.all, "nonexistent", organization).pluck(:id)).to eq([])
+      expect(described_class.notes(Bike.all, "", organization)).to eq(Bike.all)
+    end
+  end
 end

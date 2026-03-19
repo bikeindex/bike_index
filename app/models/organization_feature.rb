@@ -64,6 +64,7 @@ class OrganizationFeature < ApplicationRecord
     organization_stolen_message
     passwordless_users
     regional_bike_counts
+    registration_notes
     require_reg_address
     require_reg_student_id
     show_bulk_import

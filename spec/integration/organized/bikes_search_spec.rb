@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Organized bikes search", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes] }
+  let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bikes_path) { "/o/#{organization.to_param}/bikes" }
 
@@ -32,7 +32,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     end
   end
 
-  it "searches by email" do
+  it "searches by email and serial" do
     # Create enough bikes to trigger pagination (default per_page is 10)
     FactoryBot.create_list(:bike_organized, 10, creation_organization: organization)
 
@@ -53,6 +53,15 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_css("table.table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
 
+    # Search by serial number
+    fill_in "serial", with: bike1.serial_number
+    find("#search-button").click
+
+    expect(page).to have_current_path(/serial=/, wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+
+    # Clear serial and search by email
+    fill_in "serial", with: ""
     fill_in "search_email", with: "alice@example.com"
     find("#search-button").click
 
@@ -121,6 +130,20 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     all_bike_ids = organization.bikes.pluck(:id).sort
     export_ids = find("#export_custom_bike_ids", visible: :all).value.split(", ").map(&:to_i).sort
     expect(export_ids).to eq(all_bike_ids)
+
+    # Search by notes
+    FactoryBot.create(:bike_organization_note, bike: bike1, body: "red lock on rack")
+    page.go_back
+    expect(page).to have_css("table.table", wait: 10)
+
+    open_settings_if_not
+    click_button "show notes search"
+    fill_in "search_notes", with: "red lock"
+    find("#search-button").click
+
+    expect(page).to have_current_path(/search_notes=red/, wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_content("alice@example.com")
   end
 
   context "with stolen and impounded bikes" do
