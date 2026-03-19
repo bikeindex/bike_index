@@ -1,0 +1,44 @@
+# frozen_string_literal: true
+
+class Admin::PaperTrailVersionsController < Admin::BaseController
+  include SortableTable
+
+  def index
+    @per_page = permitted_per_page(default: 50)
+    @pagy, @collection = pagy(:countish,
+      matching_versions.reorder(sortable_opts),
+      limit: @per_page,
+      page: permitted_page)
+  end
+
+  helper_method :matching_versions
+
+  private
+
+  def sortable_columns
+    %w[created_at item_type item_id event].freeze
+  end
+
+  def sortable_opts
+    "versions.#{sort_column} #{sort_direction}"
+  end
+
+  def earliest_period_date
+    PaperTrail::Version.minimum(:created_at) || Time.current
+  end
+
+  def matching_versions
+    versions = PaperTrail::Version.all
+
+    if params[:search_item_id].present?
+      versions = versions.where(item_id: params[:search_item_id])
+    end
+
+    if params[:search_item_type].present?
+      versions = versions.where(item_type: params[:search_item_type])
+    end
+
+    @time_range_column = "created_at"
+    versions.where(created_at: @time_range)
+  end
+end

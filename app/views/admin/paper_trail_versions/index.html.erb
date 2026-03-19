@@ -1,0 +1,24 @@
+<% admin_search_form = capture do %>
+  <%= form_tag admin_paper_trail_versions_path, method: :get do %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+
+    <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
+      <div class="mt-2 mr-2">
+        <%= text_field_tag :search_item_type, params[:search_item_type], placeholder: "Item type", class: "form-control" %>
+      </div>
+
+      <div class="mt-2 mr-2">
+        <%= text_field_tag :search_item_id, params[:search_item_id], placeholder: "Item ID", class: "form-control" %>
+      </div>
+
+      <div class="mt-2 mr-2">
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  chart_collection: @render_chart && matching_versions,
+  admin_search_form:
+)) %>

@@ -1,0 +1,60 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+      <th><%= sortable "event", render_sortable: render_sortable %></th>
+      <th><%= sortable "item_type", render_sortable: render_sortable %></th>
+      <th><%= sortable "item_id", render_sortable: render_sortable %></th>
+      <th>Whodunnit</th>
+      <th>Changes</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |version| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <span class="localizeTime">
+                <%= l version.created_at, format: :convert_time %>
+              </span>
+
+              <% if display_dev_info? %>
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= version.id %>
+                </span>
+              <% end %>
+            </div>
+          </td>
+
+          <td><%= version.event %></td>
+
+          <td><%= version.item_type %></td>
+
+          <td>
+            <% admin_path = helpers.admin_path_for_object(version.item) rescue nil %>
+
+            <% if admin_path %>
+              <%= link_to version.item_id, admin_path %>
+            <% else %>
+              <%= version.item_id %>
+            <% end %>
+          </td>
+
+          <td>
+            <% if version.whodunnit.present? %>
+              <%= render Admin::UserCell::Component.new(user: nil, user_id: version.whodunnit.to_i, render_search: render_sortable) %>
+            <% end %>
+          </td>
+
+          <td>
+            <small title="<%= version.object_changes %>">
+              <%= truncate(version.object_changes.to_s, length: 120) %>
+            </small>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
