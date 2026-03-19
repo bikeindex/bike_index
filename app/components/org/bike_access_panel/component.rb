@@ -76,12 +76,8 @@ module Org::BikeAccessPanel
       organization_registered? && @organization.enabled?("registration_notes")
     end
 
-    def bike_organization
-      @bike_organization ||= @bike.bike_organizations.find_by(organization_id: @organization.id)
-    end
-
     def bike_organization_note
-      @bike_organization_note ||= bike_organization&.bike_organization_note
+      @bike_organization_note ||= BikeOrganizationNote.find_by(bike_id: @bike.id, organization_id: @organization.id)
     end
 
     # CSS grid template areas for the card body layout

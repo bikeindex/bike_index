@@ -128,6 +128,7 @@ class Bike < ApplicationRecord
   belongs_to :model_audit
 
   has_many :bike_organizations
+  has_many :bike_organization_notes
   has_many :organizations, through: :bike_organizations
   has_many :can_edit_claimed_bike_organizations, -> { can_edit_claimed }, class_name: "BikeOrganization"
   has_many :can_edit_claimed_organizations, through: :can_edit_claimed_bike_organizations, source: :organization

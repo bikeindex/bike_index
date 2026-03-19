@@ -12,14 +12,7 @@
           <tr>
             <td class="only-dev-visible">ID</td>
 
-            <td>
-              <code><%= @bike_organization_note.id %></code>
-
-              <small class="less-strong tw:ml-2">
-                bike_organization_id:
-                <code><%= @bike_organization_note.bike_organization_id %></code>
-              </small>
-            </td>
+            <td><code><%= @bike_organization_note.id %></code></td>
           </tr>
         <% end %>
 
@@ -35,7 +28,7 @@
           <td>Bike</td>
 
           <td>
-            <%= link_to @bike_organization_note.bike_organization.bike_id, admin_bike_path(@bike_organization_note.bike_organization.bike_id) %>
+            <%= link_to @bike_organization_note.bike_id, admin_bike_path(@bike_organization_note.bike_id) %>
           </td>
         </tr>
 
@@ -43,8 +36,7 @@
           <td>Organization</td>
 
           <td>
-            <% organization = @bike_organization_note.bike_organization.organization %>
-            <%= link_to organization.short_name, admin_organization_path(organization) %>
+            <%= link_to @bike_organization_note.organization.short_name, admin_organization_path(@bike_organization_note.organization) %>
           </td>
         </tr>
 
