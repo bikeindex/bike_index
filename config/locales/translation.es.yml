@@ -1252,6 +1252,8 @@ es:
         tree_translate:
         unused:
         cp:
+        check_prism:
+        check_reserved_interpolations:
       encourage:
       -
       -
@@ -1319,6 +1321,9 @@ es:
         no_api_key:
         no_project_id:
         no_results:
+    reserved_interpolations:
+      details_title:
+      none:
   countries:
     AC:
     AD:
