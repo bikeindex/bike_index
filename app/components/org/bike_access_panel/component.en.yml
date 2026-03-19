@@ -1,8 +1,8 @@
 ---
 en:
   components:
-    page_block:
-      org_bike_access_panel:
+    org:
+      bike_access_panel:
         access_panel: Access Panel
         added_to_track_parking_notification: >-
           This %{bike_type} is not registered to a user. It was added to track parking
@@ -47,6 +47,8 @@ en:
         missing_owner_name: missing user name
         model_audit: E-Vehicle audit
         not_audited: Not audited
+        note_by: by %{user}
+        notes: Notes
         or_call_owner_html: "<em>Or call</em> <strong>Owner's phone number:</strong>"
         org_can_edit_bike: "%{org_name} can edit this %{bike_type}"
         org_cannot_edit: "%{org_name} can not edit"
@@ -60,6 +62,7 @@ en:
         permission: Permission
         region: Region
         registered: Registered
+        save_notes: Save note
         send_message: Send message
         state: State
         sticker: Sticker

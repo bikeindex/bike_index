@@ -33,5 +33,9 @@ module Search::FormOrganized
     def serial_looks_like_not_a_serial?
       @interpreted_params[:raw_serial].present? && @interpreted_params[:serial].blank?
     end
+
+    def render_notes_field?
+      @settings_component&.organization&.enabled?("registration_notes")
+    end
   end
 end

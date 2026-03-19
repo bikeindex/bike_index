@@ -18,6 +18,7 @@ module Org::BikeSearchSettings
       reg_phone_cell
       reg_address_cell
       reg_student_id_cell
+      notes_cell
       sticker_cell
       impounded_cell
       avery_cell
@@ -27,7 +28,7 @@ module Org::BikeSearchSettings
       url_cell
     ].freeze
 
-    ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell].freeze
+    ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
 
     FILTER_DESCRIPTION_KEYS = {
       search_stickers: {with: ".filter_with_stickers_html", none: ".filter_no_sticker_html"},
@@ -35,6 +36,8 @@ module Org::BikeSearchSettings
       search_status: {not_impounded: ".filter_not_impounded_html", impounded: ".filter_impounded_html",
                       with_owner: ".filter_not_stolen_or_impounded_html", stolen: ".filter_stolen_html"}
     }.freeze
+
+    attr_reader :organization
 
     def initialize(
       organization:,
@@ -140,6 +143,7 @@ module Org::BikeSearchSettings
         cols = initially_checked_columns.dup
         cols += %w[url_cell updated_at_cell serial_number_cell cycle_type_cell propulsion_type_cell status_cell]
         cols += additional_registration_fields.map { |f| "#{f}_cell" }
+        cols += ["notes_cell"] if @organization.enabled?("registration_notes")
         cols += ["impounded_cell"] if @organization.enabled?("impound_bikes")
         cols += ["avery_cell"] if @include_avery && @organization.enabled?("avery_export")
         cols.uniq.sort { |a, b| column_renames[a.to_sym] <=> column_renames[b.to_sym] }

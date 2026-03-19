@@ -8,5 +8,11 @@ module Org::BikeSearchRow
       @bike_sticker = bike_sticker
       @additional_registration_fields = additional_registration_fields
     end
+
+    private
+
+    def bike_organization
+      @bike_organization ||= @bike.bike_organizations.find_by(organization_id: @organization.id)
+    end
   end
 end

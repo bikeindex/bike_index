@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PageBlock::OrgBikeAccessPanel
+module Org::BikeAccessPanel
   class Component < ApplicationComponent
     include OrganizedHelper
     include VehicleHelper
@@ -70,6 +70,39 @@ module PageBlock::OrgBikeAccessPanel
 
     def duplicate_bikes
       @duplicate_bikes ||= @bike.duplicate_bikes.reorder(id: :desc).limit(25)
+    end
+
+    def show_notes?
+      organization_registered? && @organization.enabled?("registration_notes")
+    end
+
+    def bike_organization
+      @bike_organization ||= @bike.bike_organizations.find_by(organization_id: @organization.id)
+    end
+
+    def bike_organization_note
+      @bike_organization_note ||= bike_organization&.bike_organization_note
+    end
+
+    # CSS grid template areas for the card body layout
+    # Mobile: message (if applicable), table, notes (if applicable) — stacked
+    # Desktop: table on left (7fr), message+notes on right (5fr)
+    # NOTE: classes are written as full literals so Tailwind JIT can detect them
+    def card_body_grid_classes
+      base = "tw:grid tw:gap-4 tw:grid-cols-1"
+      if display_unstolen_notification_form? && show_notes?
+        # tw:[grid-template-areas:'message'_'table'_'notes'] tw:md:[grid-template-areas:'table_message'_'table_notes']
+        "#{base} tw:md:grid-cols-[7fr_5fr] tw:[grid-template-areas:'message'_'table'_'notes'] tw:md:[grid-template-areas:'table_message'_'table_notes']"
+      elsif display_unstolen_notification_form?
+        # tw:[grid-template-areas:'message'_'table'] tw:md:[grid-template-areas:'table_message']
+        "#{base} tw:md:grid-cols-[7fr_5fr] tw:[grid-template-areas:'message'_'table'] tw:md:[grid-template-areas:'table_message']"
+      elsif show_notes?
+        # tw:[grid-template-areas:'table'_'notes'] tw:md:[grid-template-areas:'table_notes']
+        "#{base} tw:md:grid-cols-[7fr_5fr] tw:[grid-template-areas:'table'_'notes'] tw:md:[grid-template-areas:'table_notes']"
+      else
+        # tw:md:[grid-template-areas:'table_.']
+        "#{base} tw:md:grid-cols-[7fr_5fr] tw:md:[grid-template-areas:'table_.']"
+      end
     end
   end
 end

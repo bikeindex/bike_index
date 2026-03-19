@@ -17,7 +17,7 @@
         ),
       ) %>
 
-        <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2 tw:md:flex-nowrap">
+        <div class="tw:mt-2 tw:flex tw:flex-col tw:gap-2 tw:lg:flex-row">
           <%= label_tag :search_email,
           translation(".search_owner_email"),
           class: "twlabel tw:sr-only" %>
@@ -35,6 +35,22 @@
             @interpreted_params[:raw_serial],
             placeholder: translation(".search_for_serial_number"),
             class: "twinput tw:flex-1 fieldResetsCounts" %>
+          <% end %>
+
+          <% if render_notes_field? %>
+            <div
+              class="tw:hidden tw:flex-1"
+              data-org--bike-search-target="notesField"
+            >
+              <%= label_tag :search_notes,
+                translation(".search_notes"),
+                class: "twlabel tw:sr-only" %>
+
+              <%= text_field_tag :search_notes,
+                @interpreted_params[:search_notes],
+                placeholder: translation(".search_notes"),
+                class: "twinput tw:w-full fieldResetsCounts" %>
+            </div>
           <% end %>
         </div>
       </div>

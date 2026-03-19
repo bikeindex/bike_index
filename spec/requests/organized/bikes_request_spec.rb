@@ -586,6 +586,23 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(response.location).to match(organization_bikes_path(organization_id: current_organization.to_param))
       end
     end
+
+    context "with search_notes" do
+      let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+
+      before { FactoryBot.create(:bike_organization_note, bike:, body: "important note") }
+
+      it "filters by notes" do
+        get base_url, params: {search_no_js: true, search_notes: "important"}
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        get base_url, params: {search_no_js: true, search_notes: "nonexistent"}
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes).pluck(:id)).to eq([])
+      end
+    end
   end
 
   describe "multi_serial_search" do
@@ -593,6 +610,69 @@ RSpec.describe Organized::BikesController, type: :request do
       get "#{base_url}/multi_serial_search"
       expect(response.status).to eq(200)
       expect(response).to render_template :multi_serial_search
+    end
+  end
+
+  describe "update" do
+    let(:bike_user) { FactoryBot.create(:user_confirmed) }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user, creation_organization: current_organization) }
+    let(:bike_organization) { bike.bike_organizations.find_by(organization_id: current_organization.id) }
+
+    context "without registration_notes feature" do
+      it "redirects with flash error" do
+        bike_organization.reload
+        patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
+        expect(response).to redirect_to(bike_path(bike))
+        expect(flash[:error]).to be_present
+        expect(bike_organization.reload.bike_organization_note).to be_nil
+      end
+    end
+
+    context "with registration_notes feature" do
+      let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
+
+      it "updates notes" do
+        bike_organization.reload
+        patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
+        expect(response).to redirect_to(bike_path(bike))
+        expect(flash[:success]).to be_present
+        note = bike_organization.reload.bike_organization_note
+        expect(note.body).to eq "test notes"
+        expect(note.user).to eq current_user
+      end
+
+      context "turbo_stream request" do
+        it "updates notes" do
+          bike_organization.reload
+          patch "#{base_url}/#{bike.id}", params: {notes: "test notes"},
+            headers: {"Accept" => "text/vnd.turbo-stream.html"}
+          expect(response).to redirect_to(bike_path(bike))
+          expect(flash[:success]).to be_present
+          expect(bike_organization.reload.bike_organization_note.body).to eq "test notes"
+        end
+      end
+
+      context "with blank notes" do
+        it "deletes existing note" do
+          FactoryBot.create(:bike_organization_note, bike_organization:, body: "old note")
+          expect(bike_organization.reload.bike_organization_note).to be_present
+          patch "#{base_url}/#{bike.id}", params: {notes: "  "}
+          expect(response).to redirect_to(bike_path(bike))
+          expect(flash[:success]).to be_present
+          expect(bike_organization.reload.bike_organization_note).to be_nil
+        end
+      end
+
+      context "bike not in organization" do
+        let(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user) }
+        it "redirects with flash error" do
+          bike_organization.reload
+          patch "#{base_url}/#{other_bike.id}", params: {notes: "test notes"}
+          expect(response).to redirect_to(bike_path(other_bike))
+          expect(flash[:error]).to be_present
+          expect(bike_organization.reload.bike_organization_note).to be_nil
+        end
+      end
     end
   end
 end
