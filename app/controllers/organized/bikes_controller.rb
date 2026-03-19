@@ -196,8 +196,6 @@ module Organized
         else
           bikes.joins(:ownerships).where.not(ownerships: {previous_ownership_id: nil})
         end
-      else
-        @search_claimedness = "all"
       end
       bikes.where(created_at: @time_range)
     end
