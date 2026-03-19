@@ -199,6 +199,21 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(stolen_record.city).to eq "Chicago"
         expect(bike.bike_organization_ids).to eq([organization.id])
       end
+
+      context "removing organization with note" do
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization) }
+        let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization:) }
+
+        it "deletes the bike_organization_note" do
+          expect(bike.reload.bike_organization_ids).to eq([organization.id])
+          expect(BikeOrganizationNote.where(bike_id: bike.id, organization_id: organization.id).count).to eq 1
+
+          put "#{base_url}/#{bike.id}", params: {bike: {bike_organization_ids: [""]}}
+          expect(flash[:success]).to be_present
+          expect(bike.reload.bike_organization_ids).to eq([])
+          expect(BikeOrganizationNote.where(bike_id: bike.id, organization_id: organization.id).count).to eq 0
+        end
+      end
     end
   end
 
