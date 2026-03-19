@@ -18,6 +18,8 @@
 #  index_bike_organization_notes_on_user_id               (user_id)
 #
 class BikeOrganizationNote < ApplicationRecord
+  has_paper_trail only: %i[body user_id]
+
   belongs_to :bike_organization
   belongs_to :user
 
