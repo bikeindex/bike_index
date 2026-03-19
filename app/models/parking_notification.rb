@@ -50,6 +50,7 @@
 #  index_parking_notifications_on_user_id            (user_id)
 #
 class ParkingNotification < ActiveRecord::Base
+  include AddressRecordedWithinBoundingBox
   include Geocodeable
 
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other_parking_notification: 3}.freeze
