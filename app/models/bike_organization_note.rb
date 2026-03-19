@@ -29,14 +29,8 @@ class BikeOrganizationNote < ApplicationRecord
 
   validates :body, presence: true
 
-  def self.upsert_or_delete(bike:, organization:, body:, user:)
-    body = body.to_s&.strip
-    existing = find_by(bike_id: bike.id, organization_id: organization.id)
-    if body.present?
-      note = existing || new(bike:, organization:)
-      note.update!(body:, user:)
-    elsif existing.present?
-      existing.destroy!
-    end
+  def self.upsert(bike:, organization:, body:, user:)
+    note = find_or_initialize_by(bike_id: bike.id, organization_id: organization.id)
+    note.update!(body:, user:)
   end
 end
