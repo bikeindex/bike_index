@@ -6,7 +6,7 @@ class Admin::BikeOrganizationNotesController < Admin::BaseController
   def index
     @per_page = permitted_per_page(default: 50)
     @pagy, @collection = pagy(:countish,
-      matching_bike_organization_notes.includes(:user, bike_organization: [:bike, :organization]).reorder(sortable_opts),
+      matching_bike_organization_notes.includes(:user, :bike, :organization).reorder(sortable_opts),
       limit: @per_page,
       page: permitted_page)
   end
@@ -20,7 +20,7 @@ class Admin::BikeOrganizationNotesController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at updated_at user_id bike_organization_id].freeze
+    %w[created_at updated_at user_id bike_id organization_id].freeze
   end
 
   def sortable_opts
@@ -39,15 +39,11 @@ class Admin::BikeOrganizationNotesController < Admin::BaseController
     end
 
     if params[:search_organization_id].present?
-      bike_organization_notes = bike_organization_notes
-        .joins(:bike_organization)
-        .where(bike_organizations: {organization_id: params[:search_organization_id]})
+      bike_organization_notes = bike_organization_notes.where(organization_id: params[:search_organization_id])
     end
 
     if params[:search_bike_id].present?
-      bike_organization_notes = bike_organization_notes
-        .joins(:bike_organization)
-        .where(bike_organizations: {bike_id: params[:search_bike_id]})
+      bike_organization_notes = bike_organization_notes.where(bike_id: params[:search_bike_id])
     end
 
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)

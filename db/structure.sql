@@ -379,11 +379,12 @@ ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 CREATE TABLE public.bike_organization_notes (
     id bigint NOT NULL,
-    bike_organization_id bigint NOT NULL,
     body text,
     user_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    bike_id bigint NOT NULL,
+    organization_id bigint NOT NULL
 );
 
 
@@ -5827,10 +5828,24 @@ CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (o
 
 
 --
--- Name: index_bike_organization_notes_on_bike_organization_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_bike_organization_notes_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_bike_organization_notes_on_bike_organization_id ON public.bike_organization_notes USING btree (bike_organization_id);
+CREATE INDEX index_bike_organization_notes_on_bike_id ON public.bike_organization_notes USING btree (bike_id);
+
+
+--
+-- Name: index_bike_organization_notes_on_bike_id_and_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_bike_organization_notes_on_bike_id_and_organization_id ON public.bike_organization_notes USING btree (bike_id, organization_id);
+
+
+--
+-- Name: index_bike_organization_notes_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_organization_notes_on_organization_id ON public.bike_organization_notes USING btree (organization_id);
 
 
 --
@@ -7473,6 +7488,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260319153927'),
 ('20260318211639'),
 ('20260318211638'),
 ('20260310045539'),
