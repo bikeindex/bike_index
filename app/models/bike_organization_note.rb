@@ -18,7 +18,7 @@
 #  index_bike_organization_notes_on_user_id               (user_id)
 #
 class BikeOrganizationNote < ApplicationRecord
-  has_paper_trail only: [:user_id, :body], versions: {class_name: "PaperTrailVersion"}
+  has_paper_trail only: [:user_id, :body]
 
   belongs_to :bike_organization
   belongs_to :user
