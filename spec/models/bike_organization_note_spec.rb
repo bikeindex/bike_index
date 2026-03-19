@@ -21,4 +21,32 @@ RSpec.describe BikeOrganizationNote, type: :model do
       end
     end
   end
+
+  describe "versioning" do
+    before { PaperTrail.enabled = true }
+    after { PaperTrail.enabled = false }
+
+    let(:bike_organization_note) { FactoryBot.create(:bike_organization_note) }
+
+    it "creates a version on create" do
+      expect(bike_organization_note.versions.count).to eq 1
+      expect(bike_organization_note.versions.last.event).to eq "create"
+    end
+
+    context "on update" do
+      it "creates a version" do
+        bike_organization_note.update!(body: "updated body")
+        expect(bike_organization_note.versions.count).to eq 2
+        expect(bike_organization_note.versions.last.event).to eq "update"
+      end
+    end
+
+    context "on destroy" do
+      it "creates a version" do
+        bike_organization_note.destroy!
+        expect(PaperTrailVersion.last.event).to eq "destroy"
+        expect(PaperTrailVersion.last.item_id).to eq bike_organization_note.id
+      end
+    end
+  end
 end
