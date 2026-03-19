@@ -1,9 +1,4 @@
 RSpec.shared_context :with_paper_trail do
-  around do |example|
-    PaperTrail.enabled = true
-    example.run
-  ensure
-    PaperTrail.enabled = false
-    PaperTrailVersion.delete_all
-  end
+  before { PaperTrail.enabled = true }
+  after { PaperTrailVersion.delete_all }
 end
