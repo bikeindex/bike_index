@@ -4541,7 +4541,7 @@ en:
         new_import: New import
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
-        impounded: Impounded
+        impounded: impound import
         progress: Progress
         registrations: Registrations
       new:
