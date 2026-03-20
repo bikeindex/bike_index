@@ -43,6 +43,7 @@ Rails.application.configure do
       "https://bikebook.herokuapp.com",
       "https://www.google-analytics.com",
       "https://*.google-analytics.com",
+      "https://region1.google-analytics.com",
       "https://www.googletagmanager.com",
       "https://maps.googleapis.com",
       "https://translate.googleapis.com", # Google Translate API
