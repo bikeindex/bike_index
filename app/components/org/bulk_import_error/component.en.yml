@@ -1,0 +1,5 @@
+---
+en:
+  components:
+    org:
+      bulk_import_error: {}

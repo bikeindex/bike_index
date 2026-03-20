@@ -49,7 +49,7 @@
     - @bulk_imports.each do |bulk_import|
       %tr
         %td
-          %a.convertTime{ href: organization_bulk_import_path(bulk_import, organization_id: current_organization.to_param) }
+          %a.localizeTime{ href: organization_bulk_import_path(bulk_import, organization_id: current_organization.to_param) }
             = l bulk_import.created_at, format: :convert_time
         - if @show_kind
           %td
@@ -62,7 +62,7 @@
           = bulk_import.user.display_name if bulk_import.user_id.present?
         %td
           = number_display(bulk_import.ownerships.count)
-          - if bulk_import.impounded? && current_organization.enabled?("show_bulk_import_impound")
+          - if bulk_import.impounded?
             %em.small.text-muted= t(".impounded")
 
 .pb-4.pt-4
