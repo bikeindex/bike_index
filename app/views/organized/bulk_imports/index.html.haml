@@ -44,8 +44,6 @@
     %th= t(".errors")
     %th
       = sortable "user_id", t(".creator")
-    - if current_organization.enabled?("show_bulk_import_impound")
-      %th= t(".impounded")
     %th= t(".registrations")
   %tbody
     - @bulk_imports.each do |bulk_import|
@@ -62,11 +60,10 @@
           = render partial: "/organized/bulk_imports/error_type", locals: {bulk_import: bulk_import}
         %td
           = bulk_import.user.display_name if bulk_import.user_id.present?
-        - if current_organization.enabled?("show_bulk_import_impound")
-          %td
-            = check_mark if bulk_import.impounded?
         %td
-          = number_display(bulk_import.ownerships.count) # Don't need to do bikes through ownerships
+          = number_display(bulk_import.ownerships.count)
+          - if bulk_import.impounded? && current_organization.enabled?("show_bulk_import_impound")
+            %em.small.text-muted= t(".impounded")
 
 .pb-4.pt-4
   = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
