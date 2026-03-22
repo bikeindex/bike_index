@@ -56,9 +56,4 @@
   - if @bulk_import.import_errors.present?
     = render partial: "/organized/bulk_imports/error_display", locals: {bulk_import: @bulk_import}
 
-- bike_search = Org::BikeSearch::Component.new(organization: current_organization, pagy: @pagy, per_page: @per_page, params: params, skip_search_and_filters: true)
-= render(bike_search) do
-  - @bikes.each do |bike|
-    %tr
-      - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-2") do
-        = render(Org::BikeSearchRow::Component.new(bike:, organization: current_organization, additional_registration_fields: bike_search.additional_registration_fields))
+= render partial: "/organized/bikes/search_bike_table", locals: {bike_search: Org::BikeSearch::Component.new(organization: current_organization, pagy: @pagy, per_page: @per_page, params: params, skip_search_and_filters: true)}

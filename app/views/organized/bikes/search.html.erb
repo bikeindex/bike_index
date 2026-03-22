@@ -37,7 +37,7 @@
 
   <%= turbo_frame_tag :organized_bikes_results_frame do %>
     <% if @render_results %>
-      <%= render partial: "results" %>
+      <%= render partial: "search_bike_table" %>
     <% else %>
       <span id="loadedWithoutResults" class="tw:hidden"></span>
     <% end %>

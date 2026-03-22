@@ -1,4 +1,4 @@
-<% bike_search = Org::BikeSearch::Component.new(
+<% bike_search ||= Org::BikeSearch::Component.new(
   organization: current_organization,
   pagy: @pagy,
   interpreted_params: @interpreted_params,
@@ -17,9 +17,10 @@
   include_avery: true,
   skip_settings: true
 ) %>
+<% bikes = @bikes %>
 
 <%= render(bike_search) do %>
-  <% @bikes.each do |bike| %>
+  <% bikes.each do |bike| %>
     <tr>
       <% cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{@bike_sticker}-2") do %>
         <%= render(Org::BikeSearchRow::Component.new(
