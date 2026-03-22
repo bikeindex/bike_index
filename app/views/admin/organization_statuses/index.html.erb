@@ -119,7 +119,7 @@
         <% @organization_statuses.each do |organization_status| %>
           <tr>
             <td>
-              <span class="convertTime preciseTime">
+              <span class="localizeTime preciseTime">
                 <%= l organization_status.start_at, format: :convert_time %>
               </span>
 
@@ -132,7 +132,7 @@
 
             <% if show_created_at %>
               <td class="small">
-                <span class="convertTime">
+                <span class="localizeTime">
                   <%= l organization_status.created_at, format: :convert_time %>
                 </span>
               </td>
@@ -140,7 +140,7 @@
 
             <td>
               <% if organization_status.end_at.present? %>
-                <span class="convertTime preciseTime">
+                <span class="localizeTime preciseTime">
                   <%= l organization_status.end_at, format: :convert_time %>
                 </span>
               <% end %>
@@ -171,7 +171,7 @@
 
             <td>
               <% if organization_status.organization_deleted_at.present? %>
-                <span class="convertTime preciseTime text-danger">
+                <span class="localizeTime preciseTime text-danger">
                   <%= l organization_status.organization_deleted_at, format: :convert_time %>
                 </span>
               <% end %>

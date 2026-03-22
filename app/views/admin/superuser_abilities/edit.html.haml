@@ -8,17 +8,17 @@
         %tr
           %td Created
           %td
-            %span.convertTime
+            %span.localizeTime
               = l(@superuser_ability.created_at, format: :convert_time)
         %tr
           %td Updated
-          %td.small.convertTime
+          %td.small.localizeTime
             = l(@superuser_ability.updated_at, format: :convert_time)
         %tr
           %td Deleted
           %td
             - if @superuser_ability.deleted_at.present?
-              %strong.convertTime.text-danger
+              %strong.localizeTime.text-danger
                 = l(@superuser_ability.deleted_at, format: :convert_time)
         %tr
           %td User

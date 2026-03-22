@@ -56,7 +56,7 @@
         <tr>
           <td>
             <a
-              class="convertTime"
+              class="localizeTime"
               href="<%= edit_mail_snippet_path_for(mail_snippet) %>"
             >
               <%= l mail_snippet.created_at, format: :convert_time %>
@@ -68,7 +68,7 @@
           </td>
 
           <td>
-            <small class="convertTime">
+            <small class="localizeTime">
               <%= l mail_snippet.updated_at, format: :convert_time %>
             </small>
           </td>

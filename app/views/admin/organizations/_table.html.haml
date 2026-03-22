@@ -41,7 +41,7 @@
             %td.table-cell-check
               = check_mark if organization.approved
             %td
-              %span.convertTime
+              %span.localizeTime
                 = l organization.created_at, format: :convert_time
             %td
               = number_display(organization.bikes.count)

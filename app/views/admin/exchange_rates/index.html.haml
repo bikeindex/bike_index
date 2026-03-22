@@ -37,4 +37,4 @@
           %td= xrate.from
           %td= xrate.to
           %td= link_to xrate.rate.truncate(2), edit_admin_exchange_rate_path(xrate)
-          %td.convertTime= l(xrate.updated_at, format: :convert_time)
+          %td.localizeTime= l(xrate.updated_at, format: :convert_time)

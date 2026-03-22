@@ -59,7 +59,7 @@
               .form-group
                 %span.less-strong
                   Publish Date:
-                %span.convertTime
+                %span.localizeTime
                   = l @blog.published_at, format: :convert_time
             .col-sm-6{ class: blogOnlyClass }
               .form-check.form-check-inline

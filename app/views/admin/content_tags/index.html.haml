@@ -23,12 +23,12 @@
       - @content_tags.each do |content_tag|
         %tr
           %td
-            %span.convertTime
+            %span.localizeTime
               = l content_tag.created_at, format: :convert_time
             - if display_dev_info?
               %code.only-dev-visible= content_tag.id
           %td
-            %small.convertTime
+            %small.localizeTime
               = l content_tag.updated_at, format: :convert_time
           %td
             = link_to content_tag.name, edit_admin_content_tag_url(content_tag)

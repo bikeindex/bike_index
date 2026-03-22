@@ -28,13 +28,13 @@
       %tr
         %td Created
         %td
-          %span.convertTime.preciseTime
+          %span.localizeTime.preciseTime
             = l payment.created_at, format: :convert_time
       %tr
         %td Paid
         %td
           - if payment.paid?
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l payment.paid_at, format: :convert_time
           - else
             %span.text-danger Incomplete!

@@ -92,10 +92,10 @@
         %td
           = safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.kind_humanized, admin_feedback_path(f), class: "small") }, ", ")
         %td
-          %span.convertTime
+          %span.localizeTime
             = l(mailchimp_datum.created_at, format: :convert_time)
         %td
-          %small.convertTime
+          %small.localizeTime
             = l(mailchimp_datum.updated_at, format: :convert_time)
         %td
           = mailchimp_datum.lists.join(", ")
@@ -106,7 +106,7 @@
             %small= mailchimp_datum.status&.humanize
         %td
           - if mailchimp_datum.mailchimp_updated_at.present?
-            %span.convertTime
+            %span.localizeTime
               = l(mailchimp_datum.mailchimp_updated_at, format: :convert_time)
         %td.collapse.data-cell.data-cell-collapsed.small
           = pretty_print_json(mailchimp_datum.data)

@@ -61,10 +61,10 @@
         - cache(model_audit) do
           %tr
             %td
-              %span.convertTime= l model_audit.created_at, format: :convert_time
+              %span.localizeTime= l model_audit.created_at, format: :convert_time
               %code.small.only-dev-visible= model_audit.id
             %td.small
-              %span.convertTime= l model_audit.updated_at, format: :convert_time
+              %span.localizeTime= l model_audit.updated_at, format: :convert_time
             %td
               = model_audit.mnfg_name
               - unless skip_manufacturer_search

@@ -29,7 +29,7 @@
       - @social_accounts.each do |social_account|
         %tr
           %td
-            %a.convertTime{ href: admin_social_account_path(social_account) }
+            %a.localizeTime{ href: admin_social_account_path(social_account) }
               = l(social_account.created_at, format: :convert_time)
           %td
             = social_account.screen_name

@@ -60,11 +60,11 @@
         - @paints.each do |paint|
           %tr
             %td
-              %a.convertTime{ href: admin_paint_url(paint) }
+              %a.localizeTime{ href: admin_paint_url(paint) }
                 = l paint.created_at, format: :convert_time
 
             %td
-              %small.convertTime
+              %small.localizeTime
                 = l paint.updated_at, format: :convert_time
 
             %td

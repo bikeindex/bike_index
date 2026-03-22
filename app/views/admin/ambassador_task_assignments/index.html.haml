@@ -47,7 +47,7 @@
     %tbody
       - @ambassador_task_assignments.each do |assignment|
         %tr
-          %td.convertTime= l(assignment.completed_at, format: :convert_time)
+          %td.localizeTime= l(assignment.completed_at, format: :convert_time)
           %td
             - if assignment.organization.present?
               = link_to assignment.organization_name, |

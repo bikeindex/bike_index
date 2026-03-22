@@ -25,7 +25,7 @@
         %tr
           %td
             .less-strong-hold
-              %a.convertTime{href: edit_admin_primary_activity_path(primary_activity.id)}
+              %a.localizeTime{href: edit_admin_primary_activity_path(primary_activity.id)}
                 = l primary_activity.created_at, format: :convert_time
               - if display_dev_info?
                 %span.less-strong-right.d-none.d-md-block
