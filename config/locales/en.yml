@@ -4528,9 +4528,6 @@ en:
           to connect it to this %{bike_sticker_kind}
         update: Update
     bulk_imports:
-      error_type:
-        file: File
-        line: Line
       index:
         added: Added
         creator: Creator
