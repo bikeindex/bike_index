@@ -4528,21 +4528,22 @@ en:
           to connect it to this %{bike_sticker_kind}
         update: Update
     bulk_imports:
-      error_type:
-        file: File
-        line: Line
       index:
         added: Added
         creator: Creator
         errors: Errors
-        exclude_empty_imports: Exclude Empty imports
-        include_empty_imports: Include Empty imports
+        impounded: impound import
         kind: Kind
         new_import: New import
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
         progress: Progress
         registrations: Registrations
+        search_filter_all: All imports
+        search_filter_only_empty: Only empty imports
+        search_filter_with_errors: Only imports with errors
+        search_filter_without_empty: Only NOT empty imports
+        search_filter_without_errors: Only imports without errors
       new:
         choose_file: Choose file...
         correct_actual_image_url_html: '<span class="text-success">Correct</span>:
