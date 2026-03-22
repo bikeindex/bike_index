@@ -53,7 +53,6 @@
 
 - if @bulk_import.import_errors?
   %h2.mt-2.mb-2= t(".errors")
-  - if @bulk_import.import_errors.present?
-    = render partial: "/organized/bulk_imports/error_display", locals: {bulk_import: @bulk_import}
+  = render(Org::BulkImportError::Component.new(bulk_import: @bulk_import))
 
 = render partial: "/organized/bikes/search_bike_table", locals: {skip_search_and_filters: true}

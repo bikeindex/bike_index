@@ -1,0 +1,26 @@
+---
+en:
+  components:
+    org:
+      bulk_import_error:
+        ascend: Ascend
+        ascend_unprocessable_html: >-
+          Bulk Import <span class="text-danger">failed to process</span> because no
+          organization was found with the ascend name of <strong>%{ascend_name}</strong>
+        contact_to_resolve_html: Reach out to %{email_link} to get this resolved
+        edit_org_add_ascend_name_html: Edit the organization and add the ascend name
+          <code>%{ascend_name}</code>
+        file: File
+        file_errors: 'File errors:'
+        find_org: Find the organization this bulk import should have been assigned
+          to
+        fix_this_by: 'Fix this by:'
+        go_to_organizations_html: Go to %{link}
+        line: Line
+        line_error: Line error
+        line_errors: 'Line errors:'
+        line_label: 'Line:'
+        organizations: organizations
+        reprocess_instruction: Return here and click the "reprocess import" button
+          below
+        unknown_ascend_name: Unknown Ascend name

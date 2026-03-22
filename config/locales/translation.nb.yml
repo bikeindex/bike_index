@@ -4808,21 +4808,22 @@ nb:
           og klikk på <em>linken</em> for å koble den til denne %{bike_sticker_kind}
         update: Oppdater
     bulk_imports:
-      error_type:
-        file: Fil
-        line: Linje
       index:
         added: La til
         creator: Skaper
         errors: Feil
-        exclude_empty_imports: Ekskluder tom import
-        include_empty_imports: Inkluder tom import
         kind: Snill
         new_import: Ny import
         org_ascend_imports_html: "<em>%{org_name}</em> Stigende import"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulkimport"
         progress: Framgang
         registrations: Registreringer
+        impounded: beslaglegge import
+        search_filter_all: All import
+        search_filter_only_empty: Bare tomme importer
+        search_filter_with_errors: Kun import med feil
+        search_filter_without_empty: Kun IKKE tomme importer
+        search_filter_without_errors: Kun import uten feil
       new:
         choose_file: Velg Fil...
         correct_actual_image_url_html: '<span class="text-success">Riktig</span> :
@@ -6132,3 +6133,23 @@ nb:
         note_by: av %{user}
         notes: Notater
         save_notes: Lagre notat
+      bulk_import_error:
+        ascend: Stige
+        ascend_unprocessable_html: Masseimport <span class="text-danger">mislyktes</span>
+          fordi ingen organisasjon ble funnet med ascend-navnet <strong>%{ascend_name}</strong>
+        contact_to_resolve_html: Kontakt %{email_link} for å få dette løst
+        edit_org_add_ascend_name_html: Rediger organisasjonen og legg til ascend-navnet
+          <code>%{ascend_name}</code>
+        file: Fil
+        file_errors: 'Filfeil:'
+        find_org: Finn organisasjonen denne masseimporten skulle ha blitt tilordnet
+        fix_this_by: 'Fiks dette ved å:'
+        go_to_organizations_html: Gå til %{link}
+        line: Linje
+        line_error: Linjefeil
+        line_errors: 'Linjefeil:'
+        line_label: 'Linje:'
+        organizations: organisasjoner
+        reprocess_instruction: Gå tilbake hit og klikk på knappen «behandle importen
+          på nytt» nedenfor
+        unknown_ascend_name: Ukjent Ascend-navn
