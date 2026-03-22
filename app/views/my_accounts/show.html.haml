@@ -96,7 +96,7 @@
                             = link_to marketplace_translation, edit_bike_path(bike, edit_template: "marketplace"), class: "less-strong"
                           - if bike.strava_gear.present?
                             %li
-                              = link_to strava_search_path(gear: bike.strava_gear.strava_gear_id), class: "less-strong" do
+                              = link_to strava_search_path(gear: bike.strava_gear.strava_id), class: "less-strong" do
                                 = inline_svg_tag("logos/strava.svg", style: "vertical-align: baseline; display: inline-block; height: 12px; width: auto;")
                                 %span.less-strong= bike.strava_gear.strava_gear_display_name
                           %li
