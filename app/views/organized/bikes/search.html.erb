@@ -2,7 +2,16 @@
 
 <%= render partial: "/shared/period_select" %>
 
-<div class="mb-4"></div>
+<% if @render_chart && @available_bikes.present? %>
+  <%= column_chart time_range_counts(collection: @available_bikes, column: "bikes.created_at"), stacked: true, thousands: "," %>
+<% end %>
+
+<div class="tw:text-right tw:mb-2">
+  <a class="btn btn-sm btn-outline-secondary <%= "active" if @render_chart %>"
+     href="<%= url_for(sortable_search_params.merge(render_chart: !@render_chart)) %>">
+    Render chart
+  </a>
+</div>
 
 <% bike_search_settings = Org::BikeSearchSettings::Component.new(
   organization: current_organization,
