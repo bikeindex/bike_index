@@ -56,4 +56,4 @@
   - if @bulk_import.import_errors.present?
     = render partial: "/organized/bulk_imports/error_display", locals: {bulk_import: @bulk_import}
 
-= render partial: "/organized/bikes/search_bike_table", locals: {bike_search: Org::BikeSearch::Component.new(organization: current_organization, pagy: @pagy, per_page: @per_page, params: params, skip_search_and_filters: true)}
+= render partial: "/organized/bikes/search_bike_table", locals: {skip_search_and_filters: true}

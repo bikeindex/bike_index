@@ -1,27 +1,25 @@
-<% bike_search ||= Org::BikeSearch::Component.new(
+<% bike_search = Org::BikeSearch::Component.new(
   organization: current_organization,
   pagy: @pagy,
-  interpreted_params: @interpreted_params,
-  sortable_search_params:,
   per_page: @per_page,
   params:,
-  search_stickers: @search_stickers,
-  search_address: @search_address,
-  search_status: @search_status,
-  search_query_present: @search_query_present,
-  time_range: @time_range,
-  stolenness: @stolenness,
-  bike_sticker: @bike_sticker,
-  model_audit: @model_audit,
-  skip_search_and_filters: true,
-  include_avery: true,
-  skip_settings: true
+  interpreted_params: local_assigns.fetch(:interpreted_params, @interpreted_params || {}),
+  sortable_search_params: local_assigns.fetch(:sortable_search_params, sortable_search_params),
+  search_stickers: local_assigns.fetch(:search_stickers, @search_stickers),
+  search_address: local_assigns.fetch(:search_address, @search_address),
+  search_status: local_assigns.fetch(:search_status, @search_status || "all"),
+  search_query_present: local_assigns.fetch(:search_query_present, @search_query_present || false),
+  time_range: local_assigns.fetch(:time_range, @time_range),
+  stolenness: local_assigns.fetch(:stolenness, @stolenness || "all"),
+  bike_sticker: local_assigns.fetch(:bike_sticker, @bike_sticker),
+  model_audit: local_assigns.fetch(:model_audit, @model_audit),
+  skip_search_and_filters: local_assigns.fetch(:skip_search_and_filters, false),
+  include_avery: local_assigns.fetch(:include_avery, false),
+  skip_settings: local_assigns.fetch(:skip_settings, false)
 ) %>
 
-<% bikes = @bikes %>
-
 <%= render(bike_search) do %>
-  <% bikes.each do |bike| %>
+  <% @bikes.each do |bike| %>
     <tr>
       <% cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{@bike_sticker}-2") do %>
         <%= render(Org::BikeSearchRow::Component.new(

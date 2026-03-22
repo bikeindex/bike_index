@@ -1,3 +1,3 @@
 <%= turbo_stream.update :organized_bikes_results_frame do %>
-  <%= render partial: "search_bike_table" %>
+  <%= render partial: "search_bike_table", locals: {skip_search_and_filters: true, include_avery: true, skip_settings: true} %>
 <% end %>
