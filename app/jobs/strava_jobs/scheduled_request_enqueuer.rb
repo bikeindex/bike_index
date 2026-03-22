@@ -18,36 +18,31 @@ module StravaJobs
       end
 
       def duplicate_request_ids(limit: 5_000)
-        fetch_activity = StravaRequest.request_types[:fetch_activity]
-        fetch_gear = StravaRequest.request_types[:fetch_gear]
-        pending = StravaRequest.response_statuses[:pending]
+        pending = StravaRequest.pending.priority_ordered.limit(limit)
 
-        StravaRequest.find_by_sql([<<~SQL.squish, {pending:, fetch_activity:, fetch_gear:}]).map(&:id)
-          SELECT id FROM (
-            SELECT id, ROW_NUMBER() OVER (
-              PARTITION BY strava_integration_id,
-                CASE request_type
-                  WHEN :fetch_activity THEN parameters->>'strava_id'
-                  WHEN :fetch_gear THEN parameters->>'strava_gear_id'
-                END
-              ORDER BY priority
-            ) AS rn
-            FROM strava_requests
-            WHERE response_status = :pending
-              AND request_type IN (:fetch_activity, :fetch_gear)
-            ORDER BY priority
-            LIMIT #{limit}
-          ) ranked
-          WHERE rn > 1
-        SQL
+        duplicate_ids_for(pending.fetch_activity, "parameters->>'strava_id'") +
+          duplicate_ids_for(pending.fetch_gear, "parameters->>'strava_gear_id'")
+      end
+
+      private
+
+      def duplicate_ids_for(scope, key_sql)
+        grouped = scope.reorder(nil).group(:strava_integration_id, Arel.sql(key_sql))
+          .having("COUNT(*) > 1")
+          .pluck(:strava_integration_id, Arel.sql(key_sql))
+
+        grouped.flat_map do |integration_id, key_value|
+          scope.where(strava_integration_id: integration_id)
+            .where("#{key_sql} = ?", key_value)
+            .order(:priority).pluck(:id).drop(1)
+        end
       end
     end
 
     def perform(skip_perform_in = false)
       return unless self.class.rate_limit_allows_batch?
 
-      # skip_duplicate_requests before enqueuing
-      skip_duplicate_requests
+      skip_duplicate_requests # skip_duplicate_requests before enqueuing
       StravaRequest.next_pending(BATCH_SIZE).pluck(:id).each do |strava_request_id|
         RequestRunner.perform_async(strava_request_id)
       end

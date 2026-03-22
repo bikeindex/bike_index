@@ -206,29 +206,6 @@
       "note": "System-generated Doorkeeper OAuth application secret displayed in API documentation code example"
     },
     {
-      "warning_type": "HTTP Verb Confusion",
-      "warning_code": 118,
-      "fingerprint": "992e5025f5eb88bbef9ff329f74cdfe005323559a9144475e76f98dea6c02fb8",
-      "check_name": "VerbConfusion",
-      "message": "Potential HTTP verb confusion. `HEAD` is routed like `GET` but `request.get?` will return `false`",
-      "file": "app/controllers/webhooks_controller.rb",
-      "line": 10,
-      "link": "https://brakemanscanner.org/docs/warning_types/http_verb_confusion/",
-      "code": "request.get? ? (strava_verify_subscription) : (strava_receive_event)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "WebhooksController",
-        "method": "strava"
-      },
-      "user_input": "request.get?",
-      "confidence": "Weak",
-      "cwe_id": [
-        352
-      ],
-      "note": "HEAD requests falling through to strava_receive_event is harmless - it will just return 200 OK"
-    },
-    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
       "fingerprint": "256abbf7d9c0f9ab5f2d308097945c944bccc3c428f6e769bff43d767a43d057",
@@ -399,6 +376,29 @@
       "note": "export_progress_class() returns only hardcoded CSS class names (text-danger/text-success/text-warning)"
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "307302495adc5aac1ba54527adfa69aa6664d308d5b21a80c0c160170e7afb2f",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/jobs/strava_jobs/scheduled_request_enqueuer.rb",
+      "line": 42,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "scope.where(:strava_integration_id => integration_id).where(\"#{key_sql} = ?\", key_value)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "StravaJobs::ScheduledRequestEnqueuer",
+        "method": "self.duplicate_ids_for"
+      },
+      "user_input": "key_sql",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Redirect",
       "warning_code": 18,
       "fingerprint": "38cbf9d0ba136acb8502affdc8f703e52fc0c068b5eda8c048b1b21d21cbc772",
@@ -428,7 +428,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/stolen_record.rb",
-      "line": 123,
+      "line": 125,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "where(\"tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'\")",
       "render_path": null,
@@ -565,7 +565,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/concerns/registration_infoable.rb",
-      "line": 35,
+      "line": 37,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "where(\"(registration_info -> 'organization_affiliation') is not null OR (registration_info -> 'organization_affiliation_#{org_id_for_org(org)}') is not null\")",
       "render_path": null,
@@ -771,29 +771,6 @@
         79
       ],
       "note": "Admin-only view. stripe_admin_url is a computed URL from stored Stripe ID, not user input"
-    },
-    {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "d8da8ee7a70773f264d1ee33b44fd664227586cbd3b7ca689811909da303a313",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "app/services/log_searcher/reader.rb",
-      "line": 36,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`#{rgrep_command_str(time, :log_path => log_path)} | wc -l`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "LogSearcher::Reader",
-        "method": "rgrep_log_lines_count"
-      },
-      "user_input": "rgrep_command_str(time, :log_path => log_path)",
-      "confidence": "Medium",
-      "cwe_id": [
-        77
-      ],
-      "note": "Command built from hardcoded regex pattern and strftime-formatted time, no user input in command string"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1011,6 +988,29 @@
       "note": "RecoveryDisplay.quote is sanitized via Binxtils::InputNormalizer.string() before storage"
     },
     {
+      "warning_type": "HTTP Verb Confusion",
+      "warning_code": 118,
+      "fingerprint": "992e5025f5eb88bbef9ff329f74cdfe005323559a9144475e76f98dea6c02fb8",
+      "check_name": "VerbConfusion",
+      "message": "Potential HTTP verb confusion. `HEAD` is routed like `GET` but `request.get?` will return `false`",
+      "file": "app/controllers/webhooks_controller.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/http_verb_confusion/",
+      "code": "request.get? ? (strava_verify_subscription) : (strava_receive_event)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "WebhooksController",
+        "method": "strava"
+      },
+      "user_input": "request.get?",
+      "confidence": "Weak",
+      "cwe_id": [
+        352
+      ],
+      "note": "HEAD requests falling through to strava_receive_event is harmless - it will just return 200 OK"
+    },
+    {
       "warning_type": "Remote Code Execution",
       "warning_code": 110,
       "fingerprint": "9ae68e59cfee3e5256c0540dadfeb74e6b72c91997fdb60411063a6e8518144a",
@@ -1037,7 +1037,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/concerns/registration_infoable.rb",
-      "line": 31,
+      "line": 33,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "where(\"(registration_info -> 'student_id') is not null OR (registration_info -> 'student_id_#{org_id_for_org(org)}') is not null\")",
       "render_path": null,
@@ -1138,7 +1138,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/organized/impound_records_controller.rb",
-      "line": 74,
+      "line": 77,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "impound_records.public_send((params[:search_status] or available_statuses.first))",
       "render_path": null,
@@ -1309,7 +1309,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/models/export.rb",
-      "line": 272,
+      "line": 273,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`wc -l \"#{tmp_file.path}\"`",
       "render_path": null,
@@ -1454,7 +1454,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/organization_statuses_controller.rb",
-      "line": 64,
+      "line": 74,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "OrganizationStatus.all.where(:organization_id => current_organization.id).current.ended.deleted.public_send(params[:search_pos_kind])",
       "render_path": null,
@@ -1627,6 +1627,29 @@
         79
       ],
       "note": "Admin-only view. theft_alert_status_class() returns hardcoded CSS class names"
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "d8da8ee7a70773f264d1ee33b44fd664227586cbd3b7ca689811909da303a313",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/log_searcher/reader.rb",
+      "line": 36,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{rgrep_command_str(time, :log_path => log_path)} | wc -l`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "LogSearcher::Reader",
+        "method": "rgrep_log_lines_count"
+      },
+      "user_input": "rgrep_command_str(time, :log_path => log_path)",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "Command built from hardcoded regex pattern and strftime-formatted time, no user input in command string"
     },
     {
       "warning_type": "Mass Assignment",
@@ -1953,7 +1976,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/organization_statuses_controller.rb",
-      "line": 71,
+      "line": 81,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "OrganizationStatus.all.where(:organization_id => current_organization.id).current.ended.deleted.public_send(params[:search_pos_kind]).public_send(params[:search_kind])",
       "render_path": null,
@@ -1993,5 +2016,5 @@
       "note": "File path uses only model timestamps via strftime(), no user-controlled path components"
     }
   ],
-  "brakeman_version": "8.0.2"
+  "brakeman_version": "8.0.4"
 }
