@@ -26,14 +26,14 @@ module StravaJobs
 
       private
 
-      def duplicate_ids_for(scope, key_sql)
-        grouped = scope.reorder(nil).group(:strava_integration_id, Arel.sql(key_sql))
+      def duplicate_ids_for(scope, strava_parameters)
+        grouped = scope.reorder(nil).group(:strava_integration_id, Arel.sql(strava_parameters))
           .having("COUNT(*) > 1")
-          .pluck(:strava_integration_id, Arel.sql(key_sql))
+          .pluck(:strava_integration_id, Arel.sql(strava_parameters))
 
         grouped.flat_map do |integration_id, key_value|
           scope.where(strava_integration_id: integration_id)
-            .where("#{key_sql} = ?", key_value)
+            .where("#{strava_parameters} = ?", key_value)
             .order(:priority).pluck(:id).drop(1)
         end
       end

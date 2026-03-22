@@ -239,6 +239,29 @@
       "note": "RecoveryDisplay.link is sanitized via Binxtils::InputNormalizer.string() before storage"
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "26004c8f7886aa2cea850e0b27a5d81c4ed5631f18efe1fdb6bbc5b02955e1ff",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/jobs/strava_jobs/scheduled_request_enqueuer.rb",
+      "line": 36,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "scope.where(:strava_integration_id => integration_id).where(\"#{strava_parameters} = ?\", key_value)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "StravaJobs::ScheduledRequestEnqueuer",
+        "method": "self.duplicate_ids_for"
+      },
+      "user_input": "strava_parameters",
+      "confidence": "Weak",
+      "cwe_id": [
+        89
+      ],
+      "note": "strava_parameters is a hardcoded string literal passed internally, not user input"
+    },
+    {
       "warning_type": "Redirect",
       "warning_code": 18,
       "fingerprint": "2843118e7bef96258449dfb2f745e07476f8a3193835936f63af1254bdf24a9c",
@@ -374,29 +397,6 @@
         79
       ],
       "note": "export_progress_class() returns only hardcoded CSS class names (text-danger/text-success/text-warning)"
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "307302495adc5aac1ba54527adfa69aa6664d308d5b21a80c0c160170e7afb2f",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/jobs/strava_jobs/scheduled_request_enqueuer.rb",
-      "line": 42,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "scope.where(:strava_integration_id => integration_id).where(\"#{key_sql} = ?\", key_value)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "StravaJobs::ScheduledRequestEnqueuer",
-        "method": "self.duplicate_ids_for"
-      },
-      "user_input": "key_sql",
-      "confidence": "Weak",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
     },
     {
       "warning_type": "Redirect",
