@@ -134,9 +134,11 @@ class StravaIntegration < ApplicationRecord
 
   def calculated_status
     return :error if status == :error
-    return :syncing if StravaRequest.list_activities.count == 0
 
-    if StravaRequest.list_activities.pending.where(strava_integration_id: id).count > 0
+    non_proxy = StravaRequest.list_activities.where(proxy_request: [false, nil], strava_integration_id: id)
+    return :syncing if non_proxy.count == 0
+
+    if non_proxy.pending.count > 0
       :syncing
     else
       :synced
