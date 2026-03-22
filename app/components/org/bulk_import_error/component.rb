@@ -30,7 +30,7 @@ module Org::BulkImportError
 
     def short_line_text
       count = @bulk_import.line_errors.length
-      "#{count} #{translation(".line")} #{(count == 1) ? translation(".error") : translation(".errors")}"
+      helpers.pluralize(helpers.number_with_delimiter(count), translation(".line_error"))
     end
 
     def other_errors

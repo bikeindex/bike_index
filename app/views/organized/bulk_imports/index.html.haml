@@ -57,7 +57,7 @@
         %td
           = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: bulk_import}
         %td
-          = render(Org::BulkImportError::Component.new(bulk_import:, short_view: true))
+          = render(Org::BulkImportError::Component.new(bulk_import:, short_display: true))
         %td
           = bulk_import.user.display_name if bulk_import.user_id.present?
         %td
