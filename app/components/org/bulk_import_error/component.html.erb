@@ -34,16 +34,16 @@
           <span class="text-danger"><%= translation(".line_errors") %></span>
         </strong>
         <ul class="tw:ml-4 tw:list-disc">
-          <% @bulk_import.line_errors.each do |le| %>
+          <% @bulk_import.line_errors.each do |line_error| %>
             <li>
-              <% if le.is_a?(Array) && le.first.is_a?(Integer) %>
+              <% if line_error.is_a?(Array) && line_error.first.is_a?(Integer) %>
                 <span class="d-block">
                   <%= translation(".line_label") %>
-                  <strong><%= le.first %></strong>
+                  <strong><%= line_error.first %></strong>
                 </span>
-                <code><%= le[1..].join(", ") %></code>
+                <code><%= line_error[1..].join(", ") %></code>
               <% else %>
-                <%= le %>
+                <%= line_error %>
               <% end %>
             </li>
           <% end %>
@@ -55,11 +55,11 @@
           <span class="text-danger"><%= translation(".file_errors") %></span>
         </strong>
         <ul class="tw:ml-4 tw:list-disc">
-          <% @bulk_import.file_errors.each_with_index do |ie, ind| %>
+          <% @bulk_import.file_errors.each_with_index do |file_error, ind| %>
             <% file_line_error = @bulk_import.file_import_error_lines[ind] %>
 
             <li>
-              <%= ie %>
+              <%= file_error %>
 
               <% if file_line_error.present? %>
                 (line:
