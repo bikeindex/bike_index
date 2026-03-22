@@ -20,6 +20,7 @@ en:
         filter_stolen_html: only stolen
         filter_with_address_html: only <strong>with</strong> address
         filter_with_stickers_html: only <strong>with</strong> stickers
+        impound_id_cell: Impound ID
         impounded_cell: Impounded
         manufacturer_cell: Manufacturer
         model_cell: Model

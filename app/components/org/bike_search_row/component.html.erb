@@ -139,6 +139,11 @@
 <% end %>
 
 <% if @organization.enabled?("impound_bikes") %>
+  <td class="hiddenColumn impound_id_cell">
+    <% if @bike.status_impounded? && @bike.current_impound_record.present? %>
+      <%= number_display(@bike.current_impound_record.id) %>
+    <% end %>
+  </td>
   <td class="hiddenColumn impounded_cell">
     <% if @bike.status_impounded? && @bike.current_impound_record&.created_at&.present? %>
       <small class="localizeTime">
