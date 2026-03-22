@@ -98,7 +98,7 @@
                 %em.small import failed to process
                 %small.only-dev-visible still pending
             %td
-              = render partial: "/organized/bulk_imports/error_type", locals: {bulk_import: bulk_import}
+              = render(Org::BulkImportError::Component.new(bulk_import:, short_view: true, in_admin: true))
             %td
               - if bulk_import.user_id.present?
                 = bulk_import.user.display_name

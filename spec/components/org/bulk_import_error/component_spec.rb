@@ -3,8 +3,11 @@
 require "rails_helper"
 
 RSpec.describe Org::BulkImportError::Component, type: :component do
-  let(:instance) { described_class.new(bulk_import:) }
+  let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
+  let(:options) { {bulk_import:, short_display:, in_admin:} }
+  let(:in_admin) { false }
+  let(:short_display) { false }
   let(:bulk_import) { FactoryBot.build(:bulk_import, import_errors:) }
   let(:import_errors) { {} }
 
