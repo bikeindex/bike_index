@@ -40,7 +40,7 @@
           %td Most recent
           %td
             - if @organization_model_audit&.last_bike_created_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@organization_model_audit&.last_bike_created_at, format: :convert_time)
 
         %tr
@@ -85,7 +85,7 @@
       - @model_attestations.each do |model_attestation|
         %tr
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l(model_attestation.created_at, format: :convert_time)
             - if display_dev_info?
               %code.only-dev-visible= model_attestation.id

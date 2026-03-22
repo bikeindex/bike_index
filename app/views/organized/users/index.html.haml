@@ -60,7 +60,7 @@
       - @organization_roles.each do |organization_role|
         %tr
           %td
-            %a.convertTime{ href: edit_organization_user_path(organization_role.id, organization_id: current_organization.to_param) }
+            %a.localizeTime{ href: edit_organization_user_path(organization_role.id, organization_id: current_organization.to_param) }
               = l(organization_role.created_at, format: :convert_time)
           %td
             = organization_role.invited_display_name
@@ -68,7 +68,7 @@
               = organization_role.invited_email
           %td
             - if organization_role.claimed_at.present?
-              %span.convertTime
+              %span.localizeTime
                 = l(organization_role.created_at, format: :convert_time)
           %td
             - if organization_role.admin?

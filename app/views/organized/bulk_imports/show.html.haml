@@ -13,7 +13,7 @@
       %td
         = t(".created")
       %td
-        %span.convertTime
+        %span.localizeTime
           = l @bulk_import.created_at, format: :convert_time
 
     %tr
@@ -81,7 +81,7 @@
     - @bikes.each do |bike|
       %tr
         %td
-          = link_to l(bike.created_at, format: :convert_time), bike_path(bike), class: "convertTime"
+          = link_to l(bike.created_at, format: :convert_time), bike_path(bike), class: "localizeTime"
         %td
           = bike.mnfg_name
         %td
@@ -99,6 +99,6 @@
           - impound_record = bike.impound_records.first
           %td
             - if impound_record.present?
-              = link_to l(impound_record.impounded_at, format: :convert_time), organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id), class: "convertTime"
+              = link_to l(impound_record.impounded_at, format: :convert_time), organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id), class: "localizeTime"
           - if show_impounded_id
             %td= impound_record.display_id

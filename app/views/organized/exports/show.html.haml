@@ -15,7 +15,7 @@
       %tr
         %td= t(".created")
         %td
-          %span.convertTime.preciseTime
+          %span.localizeTime.preciseTime
             = l(@export.created_at, format: :convert_time)
       %tr
         %td= t(".by")
@@ -66,7 +66,7 @@
             = t(".bikes_registered_after")
           %td
             - if @export.start_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@export.start_at, format: :convert_time)
             - else
               %small.less-strong
@@ -76,7 +76,7 @@
             = t(".bikes_registered_before")
           %td
             - if @export.end_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@export.end_at, format: :convert_time)
             - else
               %small.less-strong

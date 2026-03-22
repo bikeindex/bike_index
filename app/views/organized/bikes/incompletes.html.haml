@@ -34,7 +34,7 @@
     %th
       = sortable "id" do
         = t(".sent")
-        %small.convertTimezone
+        %small.localizeTimezone
     %th= t(".bike")
     %th= sortable "cycle_type", t(".vehicle_type")
     %th= sortable "motorized", t(".motorized")
@@ -43,7 +43,7 @@
     - @b_params.each do |b_param|
       %tr
         %td
-          %span.convertTime
+          %span.localizeTime
             = l b_param.created_at, format: :convert_time
           - if display_dev_info?
             %small.only-dev-visible= b_param.id
@@ -69,7 +69,7 @@
           .less-strong-hold{style: "min-width:2rem;"}
             - resend_notifications.each do |resend|
               %span.d-block{style: "line-height:1.2;"}
-                %small.convertTime
+                %small.localizeTime
                   = l resend[0], format: :convert_time
                 = notification_delivery_display(resend[1])
             -# Hacky restriction on the number of resends you can do

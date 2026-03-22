@@ -18,7 +18,7 @@
               = parking_notification.kind_humanized
               notification
           created
-          %span.convertTime.preciseTime
+          %span.localizeTime.preciseTime
             = l(parking_notification.created_at, format: :convert_time)
           %span.less-strong
             for the
@@ -31,12 +31,12 @@
             - if parking_notification.retrieved?
               was retrieved
               - if parking_notification.resolved_at.present?
-                %span.convertTime.preciseTime
+                %span.localizeTime.preciseTime
                   = l(parking_notification.resolved_at, format: :convert_time)
             - elsif parking_notification.impounded?
               was impounded
               - if parking_notification.resolved_at.present?
-                %span.convertTime.preciseTime
+                %span.localizeTime.preciseTime
                   = l(parking_notification.resolved_at, format: :convert_time)
 
 
