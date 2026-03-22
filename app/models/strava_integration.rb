@@ -112,12 +112,13 @@ class StravaIntegration < ApplicationRecord
     return if !force_update && activities_downloaded_count == calculated_downloaded && synced?
 
     self.status = calculated_status
-    if synced?
-      enqueue_enrich_activity_requests
-      enqueue_gear_requests
-      strava_gears.find_each(&:update_total_distance!)
-    end
-    update(activities_downloaded_count: calculated_downloaded)
+    # Update before enqueueing the enrich requests, to make double enqueueing less likely
+    update!(activities_downloaded_count: calculated_downloaded)
+    return unless synced?
+
+    enqueue_enrich_activity_requests
+    enqueue_gear_requests
+    strava_gears.find_each(&:update_total_distance!)
   end
 
   def unknown_gear_ids
