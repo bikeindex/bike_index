@@ -35,10 +35,10 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
       it "enqueues BATCH_SIZE requests" do
         stub_const("StravaJobs::ScheduledRequestEnqueuer::BATCH_SIZE", 5)
 
-        5.times.map do
+        5.times.map do |i|
           StravaRequest.create!(user_id: strava_integration.user_id,
             strava_integration_id: strava_integration.id, request_type: :fetch_activity,
-            parameters: {strava_id: "12300000000"})
+            parameters: {strava_id: "1230000000#{i}"})
         end
         fetch_activity = StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id, request_type: :fetch_activity,
@@ -62,6 +62,58 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
 
         # Extra verification
         expect { instance.perform(true) }.to change(described_class.jobs, :count).by 0
+      end
+
+      describe "skip_duplicate_requests" do
+        it "skips duplicate fetch_activity requests" do
+          request1 = StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id, request_type: :fetch_activity,
+            parameters: {strava_id: "111"})
+          request2 = StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id, request_type: :fetch_activity,
+            parameters: {strava_id: "111"})
+          request3 = StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id, request_type: :fetch_activity,
+            parameters: {strava_id: "222"})
+
+          instance.perform
+
+          expect(request1.reload.response_status).to eq("pending")
+          expect(request2.reload.response_status).to eq("skipped")
+          expect(request3.reload.response_status).to eq("pending")
+        end
+
+        it "skips duplicate fetch_gear requests" do
+          request1 = StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id, request_type: :fetch_gear,
+            parameters: {strava_gear_id: "b123"})
+          request2 = StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id, request_type: :fetch_gear,
+            parameters: {strava_gear_id: "b123"})
+
+          instance.perform
+
+          expect(request1.reload.response_status).to eq("pending")
+          expect(request2.reload.response_status).to eq("skipped")
+        end
+
+        context "with different integrations" do
+          let(:strava_integration2) { FactoryBot.create(:strava_integration) }
+
+          it "does not skip requests from different integrations" do
+            request1 = StravaRequest.create!(user_id: strava_integration.user_id,
+              strava_integration_id: strava_integration.id, request_type: :fetch_activity,
+              parameters: {strava_id: "111"})
+            request2 = StravaRequest.create!(user_id: strava_integration2.user_id,
+              strava_integration_id: strava_integration2.id, request_type: :fetch_activity,
+              parameters: {strava_id: "111"})
+
+            instance.perform
+
+            expect(request1.reload.response_status).to eq("pending")
+            expect(request2.reload.response_status).to eq("pending")
+          end
+        end
       end
 
       context "when rate limited" do

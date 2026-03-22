@@ -226,7 +226,7 @@ RSpec.describe StravaIntegration, type: :model do
     let(:enriched_at) { nil }
 
     it "sets status to syncing" do
-      expect(strava_integration.update_sync_status).to be_truthy
+      strava_integration.update_sync_status
       expect(strava_integration.reload.status).to eq "syncing"
     end
 
@@ -236,17 +236,17 @@ RSpec.describe StravaIntegration, type: :model do
 
       it "sets status to syncing" do
         expect(strava_integration.reload.send(:calculated_status)).to eq :syncing
-        expect(strava_integration.update_sync_status).to be_truthy
+        strava_integration.update_sync_status
         expect(strava_integration.reload.status).to eq("syncing")
         expect(strava_integration.activities_downloaded_count).to eq(1)
       end
 
       context "with no pending list_activities" do
         let(:list_activities_status) { :success }
-        it "sets status to syncing" do
+        it "sets status to synced" do
           expect(strava_integration.reload.send(:calculated_status)).to eq :synced
           expect do
-            expect(strava_integration.update_sync_status).to be_truthy
+            strava_integration.update_sync_status
           end.to change(StravaRequest, :count).by 1
           expect(strava_integration.reload.status).to eq("synced")
           expect(strava_integration.activities_downloaded_count).to eq(1)
@@ -254,11 +254,20 @@ RSpec.describe StravaIntegration, type: :model do
           expect(StravaRequest.last.request_type).to eq "fetch_activity"
 
           expect do
-            # Running it again returns nil because it noops - since download count matches
+            # Running it again noops - since download count matches
             expect(strava_integration.update_sync_status).to be_nil
-            # Running it again with force_update returns true, because it
-            expect(strava_integration.update_sync_status(force_update: true)).to be_truthy
+            strava_integration.update_sync_status(force_update: true)
           end.to change(StravaRequest, :count).by 0
+        end
+
+        context "when activities_downloaded_count already matches" do
+          before { strava_integration.update(activities_downloaded_count: 1) }
+
+          it "still transitions to synced" do
+            expect(strava_integration.reload.status).to eq "pending"
+            strava_integration.update_sync_status
+            expect(strava_integration.reload.status).to eq "synced"
+          end
         end
 
         context "with strava_gear" do
@@ -280,7 +289,7 @@ RSpec.describe StravaIntegration, type: :model do
             expect(strava_integration.gear_ids_to_request).to eq([strava_gear2.strava_id])
 
             expect do
-              expect(strava_integration.reload.update_sync_status).to be_truthy
+              strava_integration.reload.update_sync_status
             end.to change(StravaRequest, :count).by 1
             expect(StravaRequest.last.request_type).to eq "fetch_gear"
 
@@ -291,7 +300,7 @@ RSpec.describe StravaIntegration, type: :model do
 
             # Running it again doesn't add updates
             expect do
-              expect(strava_integration.update_sync_status(force_update: true)).to be_truthy
+              strava_integration.update_sync_status(force_update: true)
             end.to change(StravaRequest, :count).by 0
           end
         end
