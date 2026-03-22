@@ -48,10 +48,10 @@
                         = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                         %li.less-strong
                           %strong.attr-title #{t(".registered")}:
-                          %span.convertTime= l bike.created_at, format: :convert_time
+                          %span.localizeTime= l bike.created_at, format: :convert_time
                         %li.less-strong
                           %strong.attr-title #{t(".updated")}:
-                          %span.convertTime= l bike.updated_by_user_fallback, format: :convert_time
+                          %span.localizeTime= l bike.updated_by_user_fallback, format: :convert_time
 
                       %ul.attr-list
                         - if bike.bike_stickers.any?
@@ -69,7 +69,7 @@
                         - if bike.occurred_at.present?
                           %li
                             %strong.attr-title #{bike.status_humanized.titleize}:
-                            %span.convertTime= l bike.occurred_at, format: :convert_time
+                            %span.localizeTime= l bike.occurred_at, format: :convert_time
 
                         -# marketplace_listing handles address differently. TODO: Reconcile that!
                         - if bike.current_event_record.present? && !bike.is_for_sale
@@ -132,7 +132,7 @@
                 - @locks.each do |lock|
                   %tr
                     %td
-                      %span.convertTime.mr-2= l lock.created_at, format: :convert_time
+                      %span.localizeTime.mr-2= l lock.created_at, format: :convert_time
                       %small= link_to(t(".edit"), edit_lock_path(lock))
                     %td
                       = lock.lock_type&.name
@@ -140,7 +140,7 @@
                     %td= lock.key_serial
                     %td= lock.combination
                     %td
-                      %small.convertTime= l lock.updated_at, format: :convert_time
+                      %small.localizeTime= l lock.updated_at, format: :convert_time
           - else
             %h2= t(".you_have_no_registered_locks")
     .col-md-4

@@ -64,10 +64,10 @@
       - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?
         %p
           %strong= @bike.status_humanized_translated.titleize
-          %span.convertTime.preciseTime
+          %span.localizeTime.preciseTime
             - time = @stolen_record.present? ? @stolen_record.date_stolen : @bike.current_impound_record.impounded_at
             = l time, format: :convert_time
-          %small.convertTimezone
+          %small.localizeTimezone
           - if @stolen_record&.address.present? || @bike.current_impound_record&.address_present?
             %strong
               = @bike.status_found? ? t(".in") : t(".from")
