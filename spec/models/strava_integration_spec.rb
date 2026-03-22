@@ -243,7 +243,7 @@ RSpec.describe StravaIntegration, type: :model do
 
       context "with no pending list_activities" do
         let(:list_activities_status) { :success }
-        it "sets status to syncing" do
+        it "sets status to synced" do
           expect(strava_integration.reload.send(:calculated_status)).to eq :synced
           expect do
             expect(strava_integration.update_sync_status).to be_truthy
@@ -259,6 +259,16 @@ RSpec.describe StravaIntegration, type: :model do
             # Running it again with force_update returns true, because it
             expect(strava_integration.update_sync_status(force_update: true)).to be_truthy
           end.to change(StravaRequest, :count).by 0
+        end
+
+        context "when activities_downloaded_count already matches" do
+          before { strava_integration.update(activities_downloaded_count: 1) }
+
+          it "still transitions to synced" do
+            expect(strava_integration.reload.status).to eq "pending"
+            expect(strava_integration.update_sync_status).to be_truthy
+            expect(strava_integration.reload.status).to eq "synced"
+          end
         end
 
         context "with strava_gear" do
