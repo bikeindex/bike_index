@@ -3773,21 +3773,22 @@ it:
         search_org_bikes_html:
         update: Aggiorna
     bulk_imports:
-      error_type:
-        file:
-        line:
       index:
         added:
         creator:
         errors:
-        exclude_empty_imports:
-        include_empty_imports:
         kind:
         new_import:
         org_ascend_imports_html:
         org_bulk_imports_html:
         progress:
         registrations:
+        impounded:
+        search_filter_all:
+        search_filter_only_empty:
+        search_filter_with_errors:
+        search_filter_without_empty:
+        search_filter_without_errors:
       new:
         choose_file:
         correct_actual_image_url_html:
@@ -4948,3 +4949,20 @@ it:
         note_by:
         notes: Note
         save_notes:
+      bulk_import_error:
+        ascend:
+        ascend_unprocessable_html:
+        contact_to_resolve_html:
+        edit_org_add_ascend_name_html:
+        file: File
+        file_errors:
+        find_org:
+        fix_this_by:
+        go_to_organizations_html:
+        line:
+        line_error:
+        line_errors:
+        line_label:
+        organizations:
+        reprocess_instruction:
+        unknown_ascend_name:
