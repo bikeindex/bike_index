@@ -1,48 +1,45 @@
-<% if @short_view %>
+<% if @short_display %>
+  <small><%= short_text %></small>
 <% else %>
   <%= render(UI::Card::Component.new) do %>
     <%# use non-standard height so that it doesn't clip at a line break %>
     <div class="tw:max-h-[402px] tw:overflow-y-auto">
       <% if @bulk_import.ascend_unprocessable? %>
         <p class="mt-2">
-          Bulk Import <span class="text-danger">failed to process</span> because
-          no organization was found with the ascend name of
-          <strong><%= @bulk_import.ascend_name %></strong>
+          <%= translation(".ascend_unprocessable_html", ascend_name: @bulk_import.ascend_name) %>
         </p>
         <% if @in_admin %>
-          <p>Fix this by:</p>
+          <p><%= translation(".fix_this_by") %></p>
           <ol class="tw:ml-4 tw:list-decimal">
             <li>
-              Go to
-              <%= link_to "organizations", admin_organizations_path %>
+              <%= translation(".go_to_organizations_html", link: link_to(translation(".organizations"), admin_organizations_path)) %>
             </li>
+
+            <li><%= translation(".find_org") %></li>
 
             <li>
-              Find the organization this bulk import should have been assigned to
+              <%= translation(".edit_org_add_ascend_name_html", ascend_name: @bulk_import.ascend_name) %>
             </li>
 
-            <li>
-              Edit the organization and add the ascend name
-              <code><%= @bulk_import.ascend_name %></code>
-            </li>
-
-            <li>Return here and click the "reprocess import" button below</li>
+            <li><%= translation(".reprocess_instruction") %></li>
           </ol>
         <% else %>
-          Reach out to <%= link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org" %> to get this resolved
+          <%= translation(".contact_to_resolve_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org")) %>
         <% end %>
-
         <hr>
       <% end %>
 
       <% if @bulk_import.line_errors.present? %>
-        <strong><span class="text-danger">Line errors:</span></strong>
+        <strong>
+          <span class="text-danger"><%= translation(".line_errors") %></span>
+        </strong>
         <ul class="tw:ml-4 tw:list-disc">
           <% @bulk_import.line_errors.each do |le| %>
             <li>
               <% if le.is_a?(Array) && le.first.is_a?(Integer) %>
                 <span class="d-block">
-                  Line: <strong><%= le.first %></strong>
+                  <%= translation(".line_label") %>
+                  <strong><%= le.first %></strong>
                 </span>
                 <code><%= le[1..].join(", ") %></code>
               <% else %>
@@ -54,7 +51,9 @@
       <% end %>
 
       <% if @bulk_import.file_errors.present? %>
-        <strong><span class="text-danger">File errors:</span></strong>
+        <strong>
+          <span class="text-danger"><%= translation(".file_errors") %></span>
+        </strong>
         <ul class="tw:ml-4 tw:list-disc">
           <% @bulk_import.file_errors.each_with_index do |ie, ind| %>
             <% file_line_error = @bulk_import.file_import_error_lines[ind] %>

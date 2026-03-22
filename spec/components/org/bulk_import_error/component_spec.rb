@@ -35,4 +35,54 @@ RSpec.describe Org::BulkImportError::Component, type: :component do
       expect(component).to have_content("Invalid CSV encoding")
     end
   end
+
+  describe "short_text" do
+    let(:short_display) { true }
+    let(:component_text) { whitespace_normalized_body_text(component.to_html) }
+
+    context "when line_errors" do
+      let(:import_errors) { {"line" => lines} }
+      let(:lines) { [[2, ["Association error 62049780564 is out of range for ActiveModel::Type::Integer with limit 4 bytes"]]] }
+
+      it "renders Line" do
+        expect(component_text).to eq("1 Line error")
+      end
+
+      context "with multiple line errors" do
+        let(:lines) do
+          [[2, ["Owner email invalid format"]],
+            [3, ["Owner email invalid format"]],
+            [4, ["Owner email invalid format"]],
+            [5, ["Owner email invalid format"]]]
+        end
+        it "renders Line" do
+          expect(component_text).to eq("4 Line errors")
+        end
+      end
+    end
+
+    context "when file_errors" do
+      let(:import_errors) { {"file" => file_error, "file_lines" => [""]} }
+      let(:file_error) { ["\"\\xE2\" from ASCII-8BIT to UTF-8"] }
+
+      it "renders File" do
+        expect(component_text).to eq("File")
+      end
+
+      context "invalid file extension" do
+        let(:file_error) { ["Invalid file extension, must be .csv or .tsv"] }
+        it "renders File" do
+          expect(component_text).to eq(file_error.first)
+        end
+      end
+    end
+
+    context "when ascend_errors" do
+      let(:import_errors) { {"ascend" => ["Unable to find an Organization with ascend_name = XXX_yyy"]} }
+
+      it "renders Ascend" do
+        expect(component_text).to eq("Unknown Ascend name")
+      end
+    end
+  end
 end
