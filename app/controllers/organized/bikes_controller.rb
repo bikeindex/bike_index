@@ -256,7 +256,8 @@ module Organized
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
-      @available_bikes = bikes.where(created_at: @time_range)
+      @chart_column = (sort_column == "updated_by_user_at") ? "bikes.updated_by_user_at" : "bikes.created_at"
+      @available_bikes = bikes.where(@chart_column => @time_range)
       @pagy, @bikes = pagy(:countish, @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
