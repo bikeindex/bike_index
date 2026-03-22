@@ -37,7 +37,7 @@
 
   <%= turbo_frame_tag :organized_bikes_results_frame do %>
     <% if @render_results %>
-      <%= render partial: "search_bike_table", locals: {interpreted_params: @interpreted_params, sortable_search_params:, search_stickers: @search_stickers, search_address: @search_address, search_status: @search_status, search_query_present: @search_query_present, time_range: @time_range, stolenness: @stolenness, bike_sticker: @bike_sticker, model_audit: @model_audit, skip_search_and_filters: true, include_avery: true, skip_settings: true} %>
+      <%= render partial: "search_bike_table", locals: {sortable_search_params:, search_stickers: @search_stickers, search_address: @search_address, search_status: @search_status, search_query_present: @search_query_present, time_range: @time_range, stolenness: @stolenness, bike_sticker: @bike_sticker, model_audit: @model_audit, skip_search_and_filters: true, include_avery: true, skip_settings: true} %>
     <% else %>
       <span id="loadedWithoutResults" class="tw:hidden"></span>
     <% end %>

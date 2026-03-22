@@ -1,11 +1,11 @@
-<%# locals: (interpreted_params: {}, sortable_search_params: {}, search_stickers: nil, search_address: nil, search_status: "all", search_query_present: false, time_range: nil, stolenness: "all", bike_sticker: nil, model_audit: nil, skip_search_and_filters: false, include_avery: false, skip_settings: false) %>
+<%# locals: (sortable_search_params: {}, search_stickers: nil, search_address: nil, search_status: "all", search_query_present: false, time_range: nil, stolenness: "all", bike_sticker: nil, model_audit: nil, skip_search_and_filters: false, include_avery: false, skip_settings: false) %>
 
 <% bike_search = Org::BikeSearch::Component.new(
   organization: current_organization,
   pagy: @pagy,
   per_page: @per_page,
   params:,
-  interpreted_params:,
+  interpreted_params: @interpreted_params || {},
   sortable_search_params:,
   search_stickers:,
   search_address:,
