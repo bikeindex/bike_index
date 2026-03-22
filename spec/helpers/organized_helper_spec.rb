@@ -128,6 +128,24 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(organized_container).to eq "container-fluid"
       end
     end
+    context "bulk_imports index" do
+      let(:controller_name) { "bulk_imports" }
+      it "is container-fluid" do
+        expect(organized_container).to eq "container"
+      end
+      context "action_name: show" do
+        let(:action_name) { "show" }
+        it "is container-fluid" do
+          expect(organized_container).to eq "container-fluid"
+        end
+      end
+    end
+    context "exports index" do
+      let(:controller_name) { "exports" }
+      it "is container-fluid" do
+        expect(organized_container).to eq "container"
+      end
+    end
     context "parking_notifications" do
       let(:controller_name) { "parking_notifications" }
       it "is container-fluid" do
