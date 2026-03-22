@@ -42,6 +42,12 @@ RSpec.describe Organized::BikesController, type: :request do
       expect(response.status).to eq(200)
       expect(assigns(:search_query_present)).to be_falsey
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+      expect(assigns(:render_chart)).to be_falsey
+
+      get base_url, params: {search_no_js: true, render_chart: true, period: "year"}
+      expect(response.status).to eq(200)
+      expect(assigns(:render_chart)).to be_truthy
+      expect(assigns(:available_bikes).pluck(:id)).to eq([bike.id])
     end
     context "member_no_bike_edit" do
       let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization, role: "member_no_bike_edit") }
