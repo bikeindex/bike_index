@@ -3,7 +3,9 @@
 <%= render partial: "/shared/period_select" %>
 
 <% if @render_chart && @available_bikes.present? %>
-  <%= column_chart time_range_counts(collection: @available_bikes.reorder(nil), column: "bikes.created_at"), stacked: true, thousands: "," %>
+  <% chart_column = sort_column == "updated_by_user_at" ? "bikes.updated_by_user_at" : "bikes.created_at" %>
+  <% series = [{name: "Bikes", data: UI::Chart::Component.time_range_counts(collection: @available_bikes.reorder(nil), time_range: @time_range, column: chart_column)}] %>
+  <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
 <% end %>
 
 <div class="tw:mb-2 tw:text-right">
