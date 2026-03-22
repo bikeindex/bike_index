@@ -4308,14 +4308,18 @@ nl:
         added: Toegevoegd
         creator: Schepper
         errors: fouten
-        exclude_empty_imports: Lege invoer uitsluiten
-        include_empty_imports: Inclusief lege invoer
         new_import: Nieuwe import
         org_ascend_imports_html: "<em>%{org_name}</em> Importeren <em>ascenderen</em>"
         org_bulk_imports_html: "<em>%{org_name} Bulkimport</em>"
         progress: Vooruitgang
         kind: Soort
         registrations: Registraties
+        impounded: inbeslagname import
+        search_filter_all: Alle importen
+        search_filter_only_empty: Alleen lege imports
+        search_filter_with_errors: Alleen importen met fouten
+        search_filter_without_empty: Alleen NIET-lege imports
+        search_filter_without_errors: Alleen importen zonder fouten
       new:
         choose_file: Kies bestand...
         correct_actual_image_url_html: '<span class="text-success">Juist</span> :
@@ -4379,9 +4383,6 @@ nl:
         impounded_at: In beslag genomen bij
         impounded_id: In beslag genomen identiteitsbewijs
         registrations: Registraties
-      error_type:
-        file: file
-        line: Lijn
     exports:
       index:
         bikes_in_export: Fietsen in export
@@ -6292,3 +6293,25 @@ nl:
         note_by: door %{user}
         notes: Notes
         save_notes: Bewaar notitie
+      bulk_import_error:
+        ascend: Stijg op
+        ascend_unprocessable_html: Het bulkimportproces <span class="text-danger">is
+          mislukt</span> omdat er geen organisatie is gevonden met de oplopende naam
+          <strong>%{ascend_name}.</strong>
+        contact_to_resolve_html: Neem contact op met %{email_link} om dit op te lossen.
+        edit_org_add_ascend_name_html: Bewerk de organisatie en voeg de oplopende
+          naam toe <code>%{ascend_name}</code>
+        file: file
+        file_errors: 'Bestandsfouten:'
+        find_org: Zoek de organisatie op waaraan deze bulkimport had moeten worden
+          toegewezen.
+        fix_this_by: 'Los dit op door:'
+        go_to_organizations_html: Ga naar %{link}
+        line: Lijn
+        line_error: Regelfout
+        line_errors: 'Regelfouten:'
+        line_label: 'Lijn:'
+        organizations: organisaties
+        reprocess_instruction: Ga terug naar deze pagina en klik op de knop 'import
+          opnieuw verwerken' hieronder.
+        unknown_ascend_name: Onbekende Ascend-naam
