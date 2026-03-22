@@ -16,17 +16,43 @@ module StravaJobs
       def rate_limit_allows_batch?
         !Integrations::StravaClient.currently_rate_limited?(headroom: 2 * BATCH_SIZE)
       end
+
+      def duplicate_request_ids(limit: 5_000)
+        fetch_activity = StravaRequest.request_types[:fetch_activity]
+        fetch_gear = StravaRequest.request_types[:fetch_gear]
+        pending = StravaRequest.response_statuses[:pending]
+
+        StravaRequest.find_by_sql([<<~SQL.squish, {pending:, fetch_activity:, fetch_gear:}]).map(&:id)
+          SELECT id FROM (
+            SELECT id, ROW_NUMBER() OVER (
+              PARTITION BY strava_integration_id,
+                CASE request_type
+                  WHEN :fetch_activity THEN parameters->>'strava_id'
+                  WHEN :fetch_gear THEN parameters->>'strava_gear_id'
+                END
+              ORDER BY priority
+            ) AS rn
+            FROM strava_requests
+            WHERE response_status = :pending
+              AND request_type IN (:fetch_activity, :fetch_gear)
+            ORDER BY priority
+            LIMIT #{limit}
+          ) ranked
+          WHERE rn > 1
+        SQL
+      end
     end
 
     def perform(skip_perform_in = false)
       return unless self.class.rate_limit_allows_batch?
 
+      # skip_duplicate_requests before enqueuing
+      skip_duplicate_requests
       StravaRequest.next_pending(BATCH_SIZE).pluck(:id).each do |strava_request_id|
         RequestRunner.perform_async(strava_request_id)
       end
       return if skip_perform_in
 
-      skip_duplicate_requests
       self.class.perform_in(15, true)
       self.class.perform_in(30, true)
       self.class.perform_in(45, true)
@@ -35,29 +61,8 @@ module StravaJobs
     private
 
     def skip_duplicate_requests
-      pending = StravaRequest.next_pending(1000)
-      seen_activities = Set.new
-      seen_gears = Set.new
-
-      pending.each do |request|
-        key = duplicate_key(request)
-        next if key.nil?
-
-        seen = request.fetch_gear? ? seen_gears : seen_activities
-        if seen.include?(key)
-          request.update!(response_status: :skipped)
-        else
-          seen.add(key)
-        end
-      end
-    end
-
-    def duplicate_key(request)
-      if request.fetch_activity?
-        [request.strava_integration_id, request.parameters&.dig("strava_id")]
-      elsif request.fetch_gear?
-        [request.strava_integration_id, request.parameters&.dig("strava_gear_id")]
-      end
+      StravaRequest.where(id: self.class.duplicate_request_ids)
+        .find_each { |r| r.update!(response_status: :skipped) }
     end
   end
 end
