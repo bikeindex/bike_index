@@ -20,7 +20,7 @@
             %td Created
             %td
               - if created_at.present?
-                %span.convertTime.preciseTime
+                %span.localizeTime.preciseTime
                   = l(created_at, format: :convert_time)
               - else
                 %span.less-strong not created
@@ -28,7 +28,7 @@
             %td Last updated
             %td
               - if created_at.present?
-                %span.convertTime.preciseTime
+                %span.localizeTime.preciseTime
                   = l(@object.updated_at, format: :convert_time)
     .col-md-6
       %table.table-list

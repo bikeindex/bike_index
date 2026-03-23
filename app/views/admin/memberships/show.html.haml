@@ -21,13 +21,13 @@
           %td
             Created
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l @membership.created_at, format: :convert_time
         %tr.small
           %td
             Updated
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l @membership.updated_at, format: :convert_time
         %tr
           %td
@@ -59,14 +59,14 @@
             Start
           %td
             - if @membership.start_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l @membership.start_at, format: :convert_time
         %tr
           %td
             End
           %td
             - if @membership.end_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l @membership.end_at, format: :convert_time
         %tr
           - if @membership.admin_managed?

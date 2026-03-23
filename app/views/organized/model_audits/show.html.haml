@@ -40,7 +40,7 @@
           %td Most recent
           %td
             - if @organization_model_audit&.last_bike_created_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@organization_model_audit&.last_bike_created_at, format: :convert_time)
 
         %tr
@@ -85,7 +85,7 @@
       - @model_attestations.each do |model_attestation|
         %tr
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l(model_attestation.created_at, format: :convert_time)
             - if display_dev_info?
               %code.only-dev-visible= model_attestation.id
@@ -112,11 +112,9 @@
     %small
       first #{@per_page} shown, #{link_to "see all", organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)}
 
-- bike_search = Org::BikeSearch::Component.new(organization: current_organization, pagy: @pagy, per_page: @per_page, params: params, model_audit: @model_audit, skip_search_form: true)
+- bike_search = Org::BikeSearch::Component.new(organization: current_organization, pagy: @pagy, per_page: @per_page, params: params, model_audit: @model_audit, skip_search_and_filters: true)
 = render(bike_search) do
   - @bikes.each do |bike|
-    %tr
-      - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
-        = render(Org::BikeSearchRow::Component.new(bike:, organization: current_organization, additional_registration_fields: bike_search.additional_registration_fields))
+    = render partial: "/organized/bikes/cached_bike_table_row", locals: {bike:, bike_search:}
 
 = render partial: "/organized/model_audits/submit_model_attestation"

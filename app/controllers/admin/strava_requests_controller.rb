@@ -13,7 +13,7 @@ class Admin::StravaRequestsController < Admin::BaseController
 
   helper_method :matching_strava_requests
 
-  protected
+  private
 
   def sortable_columns
     %w[updated_at created_at requested_at request_type response_status strava_integration_id priority]

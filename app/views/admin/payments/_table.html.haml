@@ -32,12 +32,12 @@
       - payments.each do |payment|
         %tr
           %td
-            %a.convertTime{href: edit_admin_payment_path(payment)}
+            %a.localizeTime{href: edit_admin_payment_path(payment)}
               = l payment.created_at, format: :convert_time
           - unless skip_paid_at
             %td
               - if payment.paid_at.present?
-                %small.convertTime
+                %small.localizeTime
                   = l payment.paid_at, format: :convert_time
           - unless skip_user
             %td

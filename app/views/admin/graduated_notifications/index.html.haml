@@ -55,16 +55,16 @@
     - @graduated_notifications.each do |graduated_notification|
       %tr
         %td
-          %a.convertTime.preciseTime{ href: organization_graduated_notification_path(graduated_notification.id, organization_id: graduated_notification.organization_id) }
+          %a.localizeTime.preciseTime{ href: organization_graduated_notification_path(graduated_notification.id, organization_id: graduated_notification.organization_id) }
             = l(graduated_notification.created_at, format: :convert_time)
         %td
           - if graduated_notification.processed_at
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l(graduated_notification.processed_at, format: :convert_time)
           - else
             %small.less-strong
               @
-              %span.convertTime
+              %span.localizeTime
                 = l(graduated_notification.pending_period_ends_at, format: :convert_time)
         %td
           = check_mark if graduated_notification.primary_notification?
@@ -84,5 +84,5 @@
             = graduated_notification.email
         %td
           - if graduated_notification.marked_remaining_at.present?
-            %span.convertTime
+            %span.localizeTime
               = l(graduated_notification.marked_remaining_at, format: :convert_time)

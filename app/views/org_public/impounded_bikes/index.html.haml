@@ -35,7 +35,7 @@
             %td
               = impound_record.display_id
             %td
-              %a.convertTime.preciseTime
+              %a.localizeTime.preciseTime
                 = l(impound_record.created_at, format: :convert_time)
             %td
               - if impound_record.bike.present?

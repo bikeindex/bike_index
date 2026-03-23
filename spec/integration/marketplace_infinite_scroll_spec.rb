@@ -25,6 +25,13 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     stub_const("Search::EverythingCombobox::Component::API_URL", "https://bikeindex.org/api/autocomplete")
   end
 
+  def click_last_bike_and_go_back
+    all("[data-test-id^='vehicle-thumbnail-linkspan-'] a").last.click
+    expect(page).to have_css("h1.bike-title", wait: 10)
+    page.go_back
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10)
+  end
+
   def scroll_to_lazy_load
     # Scroll the lazy-loading frame into view
     page.execute_script(<<~JS)
@@ -74,8 +81,9 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # Should load more results
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 14)
 
-    # And then search "Yuba"
+    # And then search "Yuba" without price filter
     # Which will return 8 bikes - so the page won't have the ability to scroll. Verify that it works correctly
+    fill_in "price_max_amount", with: ""
     find(".select2-container").click
     find(".select2-search__field").set("Yuba")
     # Wait for select2 to load

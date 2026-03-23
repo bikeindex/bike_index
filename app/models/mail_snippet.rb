@@ -3,35 +3,23 @@
 # Table name: mail_snippets
 # Database name: primary
 #
-#  id                    :integer          not null, primary key
-#  body                  :text
-#  city                  :string
-#  is_enabled            :boolean          default(FALSE), not null
-#  is_location_triggered :boolean          default(FALSE), not null
-#  kind                  :integer          default("custom")
-#  latitude              :float
-#  longitude             :float
-#  neighborhood          :string
-#  proximity_radius      :integer
-#  street                :string
-#  subject               :text
-#  zipcode               :string
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
-#  country_id            :bigint
-#  doorkeeper_app_id     :bigint
-#  organization_id       :integer
-#  state_id              :bigint
+#  id                :integer          not null, primary key
+#  body              :text
+#  is_enabled        :boolean          default(FALSE), not null
+#  kind              :integer          default("custom")
+#  subject           :text
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  doorkeeper_app_id :bigint
+#  organization_id   :integer
 #
 # Indexes
 #
-#  index_mail_snippets_on_country_id         (country_id)
 #  index_mail_snippets_on_doorkeeper_app_id  (doorkeeper_app_id)
 #  index_mail_snippets_on_organization_id    (organization_id)
-#  index_mail_snippets_on_state_id           (state_id)
 #
 class MailSnippet < ApplicationRecord
-  include GeocodeableLegacy
+  has_paper_trail only: %i[body is_enabled kind subject]
 
   KIND_ENUM = {
     custom: 0,
@@ -125,10 +113,6 @@ class MailSnippet < ApplicationRecord
     def organization_message_kinds
       ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved]
     end
-
-    def location_triggered_kinds
-      []
-    end
   end
 
   def which_organization_email
@@ -152,10 +136,6 @@ class MailSnippet < ApplicationRecord
     organization_message?
   end
 
-  def location_triggered?
-    self.class.location_triggered_kinds.include?(kind)
-  end
-
   def kind_humanized
     self.class.kind_humanized(kind)
   end
@@ -167,6 +147,7 @@ class MailSnippet < ApplicationRecord
   def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
     self.kind ||= "custom"
+    self.subject = Binxtils::InputNormalizer.string(subject)
   end
 
   def update_associations
@@ -175,11 +156,5 @@ class MailSnippet < ApplicationRecord
     # Because we need to update the organization and make sure mail snippet calculations are included
     # Manually update to ensure that it runs the before save stuff
     organization&.update(updated_at: Time.current)
-  end
-
-  private
-
-  def should_be_geocoded?
-    false # Currently the only location_triggered variety is set from the organization location
   end
 end

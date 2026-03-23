@@ -26,6 +26,7 @@ require "functionable"
 require_relative "support/functionable"
 require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
+require "paper_trail/frameworks/rspec"
 
 # Include capybara for view component system specs
 require "capybara/rails"
@@ -237,6 +238,17 @@ end
 CarrierWave.configure do |config|
   config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
   config.enable_processing = false
+end
+
+# Set BASE_URL to match Capybara's server for JS specs so html_url links work
+RSpec.configure do |config|
+  config.around(:each, :js) do |example|
+    original_base_url = ENV["BASE_URL"]
+    ENV["BASE_URL"] = "http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"
+    example.run
+  ensure
+    ENV["BASE_URL"] = original_base_url
+  end
 end
 
 # Override capybara methods to support tailwind selectors

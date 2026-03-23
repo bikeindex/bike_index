@@ -27,12 +27,12 @@
       - collection.each do |superuser_ability|
         %tr
           %td
-            %a.convertTime{href: edit_admin_superuser_ability_path(superuser_ability.to_param)}
+            %a.localizeTime{href: edit_admin_superuser_ability_path(superuser_ability.to_param)}
               = l(superuser_ability.created_at, format: :convert_time)
             - if display_dev_info?
               %code.small.only-dev-visible= superuser_ability.id
           %td
-            %small.convertTime
+            %small.localizeTime
               = l(superuser_ability.updated_at, format: :convert_time)
           - unless skip_user
             %td
@@ -49,5 +49,5 @@
           - if render_deleted
             %td
               - if superuser_ability.deleted_at.present?
-                %span.convertTime.preciseTime.text-danger
+                %span.localizeTime.preciseTime.text-danger
                   = l(superuser_ability.deleted_at, format: :convert_time)

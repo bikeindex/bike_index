@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
 
+  before_action :set_paper_trail_whodunnit
   around_action :set_locale
   rescue_from Money::Bank::UnknownRate, with: :localization_failure
   rescue_from Pagy::RangeError, with: :redirect_to_last_page
@@ -45,6 +46,10 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def user_for_paper_trail
+    current_user&.id
+  end
 
   def permitted_org_bike_search_params
     @stolenness ||= params["stolenness"].present? ? params["stolenness"] : "all"
@@ -101,7 +106,7 @@ class ApplicationController < ActionController::Base
 
     I18n.with_locale(requested_locale, &action)
   ensure # Make sure we reset default timezone
-    Time.zone = Binxtils::TimeParser::DEFAULT_TIME_ZONE
+    Time.zone = Binxtils::TimeParser.default_time_zone
   end
 
   # Handle localization / currency conversion exceptions by redirecting to the

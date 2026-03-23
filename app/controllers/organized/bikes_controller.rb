@@ -9,25 +9,27 @@ module Organized
 
     def index
       set_period
+      @search_claimedness = "all"
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
 
       if current_organization.enabled?("bike_search")
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
+        @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
+        @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+        @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
         @per_page = permitted_per_page(default: 10)
 
-        if @render_results
+        if create_export?
           search_organization_bikes
-          if create_export?
-            create_export_and_redirect
-          else
-            respond_to do |format|
-              format.html { render :search }
-              format.turbo_stream
-            end
+          create_export_and_redirect
+        elsif @render_results
+          search_organization_bikes
+          respond_to do |format|
+            format.html { render :search }
+            format.turbo_stream
           end
         else
-          @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-          @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+          set_search_filter_params
           render :search
         end
         return
@@ -104,6 +106,20 @@ module Organized
     end
 
     def multi_serial_search
+    end
+
+    def update
+      bike = Bike.unscoped.find(params[:id])
+
+      unless bike.organized?(current_organization) && current_organization.enabled?("registration_notes")
+        flash[:error] = "Not authorized to update notes"
+        redirect_to(bike_path(bike)) && return
+      end
+
+      BikeOrganizationNote.upsert(bike:, organization: current_organization, body: params[:notes], user: current_user)
+
+      flash[:success] = "Note saved"
+      redirect_to bike_path(bike)
     end
 
     def create
@@ -195,21 +211,17 @@ module Organized
         else
           bikes.joins(:ownerships).where.not(ownerships: {previous_ownership_id: nil})
         end
-      else
-        @search_claimedness = "all"
       end
       bikes.where(created_at: @time_range)
     end
 
     # NOTE: Make sure to add any custom search params to no_org_search_params?
     def search_organization_bikes
-      @permitted_org_bike_search_params = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?)
-      @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
-      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       org = current_organization || passive_organization
       if org.present?
         bikes = org.bikes.search(@interpreted_params)
-        bikes = BikeServices::OrgSearch.email_and_name(bikes, params[:search_email])
+        bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
+        bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present?
       else
         bikes = Bike.search(@interpreted_params)
       end
@@ -247,7 +259,17 @@ module Organized
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end
-      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+    end
+
+    # Set filter params for settings component on initial (non-turbo) page load
+    def set_search_filter_params
+      @search_stickers = if params[:search_stickers].present?
+        (params[:search_stickers] == "none") ? "none" : "with"
+      else
+        false
+      end
+      @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
+      search_status
     end
 
     def search_status
@@ -292,7 +314,7 @@ module Organized
     def no_org_search_params?
       return false if params[:search_stickers].present? && params[:search_stickers] != "all"
 
-      params.slice(:search_address, :search_email, :search_model_audit_id, :search_status)
+      params.slice(:search_address, :search_email, :search_model_audit_id, :search_notes, :search_status)
         .values.reject(&:blank?).none?
     end
 

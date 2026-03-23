@@ -374,6 +374,40 @@ ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 
 --
+-- Name: bike_organization_notes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_organization_notes (
+    id bigint NOT NULL,
+    body text,
+    user_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    bike_id bigint NOT NULL,
+    organization_id bigint NOT NULL
+);
+
+
+--
+-- Name: bike_organization_notes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_organization_notes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_organization_notes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_organization_notes_id_seq OWNED BY public.bike_organization_notes.id;
+
+
+--
 -- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1999,22 +2033,12 @@ ALTER SEQUENCE public.locks_id_seq OWNED BY public.locks.id;
 CREATE TABLE public.mail_snippets (
     id integer NOT NULL,
     is_enabled boolean DEFAULT false NOT NULL,
-    is_location_triggered boolean DEFAULT false NOT NULL,
     body text,
-    latitude double precision,
-    longitude double precision,
-    proximity_radius integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     organization_id integer,
     kind integer DEFAULT 0,
-    street character varying,
-    city character varying,
-    zipcode character varying,
-    state_id bigint,
-    country_id bigint,
     subject text,
-    neighborhood character varying,
     doorkeeper_app_id bigint
 );
 
@@ -4216,6 +4240,13 @@ ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_p
 
 
 --
+-- Name: bike_organization_notes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_organization_notes ALTER COLUMN id SET DEFAULT nextval('public.bike_organization_notes_id_seq'::regclass);
+
+
+--
 -- Name: bike_organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4944,6 +4975,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_organization_notes bike_organization_notes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_organization_notes
+    ADD CONSTRAINT bike_organization_notes_pkey PRIMARY KEY (id);
 
 
 --
@@ -5789,6 +5828,34 @@ CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (o
 
 
 --
+-- Name: index_bike_organization_notes_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_organization_notes_on_bike_id ON public.bike_organization_notes USING btree (bike_id);
+
+
+--
+-- Name: index_bike_organization_notes_on_bike_id_and_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_bike_organization_notes_on_bike_id_and_organization_id ON public.bike_organization_notes USING btree (bike_id, organization_id);
+
+
+--
+-- Name: index_bike_organization_notes_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_organization_notes_on_organization_id ON public.bike_organization_notes USING btree (organization_id);
+
+
+--
+-- Name: index_bike_organization_notes_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_organization_notes_on_user_id ON public.bike_organization_notes USING btree (user_id);
+
+
+--
 -- Name: index_bike_organizations_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6475,13 +6542,6 @@ CREATE INDEX index_locks_on_user_id ON public.locks USING btree (user_id);
 
 
 --
--- Name: index_mail_snippets_on_country_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_mail_snippets_on_country_id ON public.mail_snippets USING btree (country_id);
-
-
---
 -- Name: index_mail_snippets_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6493,13 +6553,6 @@ CREATE INDEX index_mail_snippets_on_doorkeeper_app_id ON public.mail_snippets US
 --
 
 CREATE INDEX index_mail_snippets_on_organization_id ON public.mail_snippets USING btree (organization_id);
-
-
---
--- Name: index_mail_snippets_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_mail_snippets_on_state_id ON public.mail_snippets USING btree (state_id);
 
 
 --
@@ -7435,7 +7488,12 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260319153927'),
+('20260318211639'),
+('20260318211638'),
+('20260310045539'),
 ('20260310031750'),
+('20260308055322'),
 ('20260305025122'),
 ('20260304181710'),
 ('20260220053202'),

@@ -105,15 +105,15 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
-    addressable (2.8.8)
+    addressable (2.8.9)
       public_suffix (>= 2.0.2, < 8.0)
     annotaterb (4.21.0)
       activerecord (>= 6.0.0)
       activesupport (>= 6.0.0)
     api-pagination (7.0.0)
     ast (2.4.3)
-    aws-eventstream (1.3.1)
-    aws-partitions (1.1060.0)
+    aws-eventstream (1.4.0)
+    aws-partitions (1.1223.0)
     aws-sdk-core (3.211.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
@@ -122,11 +122,11 @@ GEM
     aws-sdk-kms (1.96.0)
       aws-sdk-core (~> 3, >= 3.210.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.170.0)
+    aws-sdk-s3 (1.177.0)
       aws-sdk-core (~> 3, >= 3.210.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
-    aws-sigv4 (1.11.0)
+    aws-sigv4 (1.12.1)
       aws-eventstream (~> 1, >= 1.0.2)
     axlsx (3.0.0.pre)
       htmlentities (~> 4.3, >= 4.3.4)
@@ -137,6 +137,12 @@ GEM
     bcrypt (3.1.13)
     benchmark (0.5.0)
     bigdecimal (4.0.1)
+    binxtils (0.1.0)
+      activerecord
+      activesupport
+      functionable
+      loofah
+      rails-html-sanitizer
     bootsnap (1.18.6)
       msgpack (~> 1.2)
     brakeman (8.0.4)
@@ -185,7 +191,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
-    css_parser (1.21.1)
+    css_parser (2.0.0)
       addressable
     csv (3.3.5)
     dartsass-rails (0.5.1)
@@ -265,7 +271,7 @@ GEM
     faraday-net_http_persistent (1.2.0)
     faraday-patron (1.0.0)
     faraday-rack (1.0.0)
-    faraday-retry (1.0.3)
+    faraday-retry (1.0.4)
     faraday_middleware (1.2.1)
       faraday (~> 1.0)
     fast_blank (1.0.1)
@@ -315,12 +321,12 @@ GEM
       text (>= 1.3.0)
     globalid (1.3.0)
       activesupport (>= 6.1)
-    google-protobuf (4.29.3-arm64-darwin)
+    google-protobuf (4.34.0-arm64-darwin)
       bigdecimal
-      rake (>= 13)
-    google-protobuf (4.29.3-x86_64-linux)
+      rake (~> 13.3)
+    google-protobuf (4.34.0-x86_64-linux-gnu)
       bigdecimal
-      rake (>= 13)
+      rake (~> 13.3)
     grape (3.0.1)
       activesupport (>= 7.0)
       dry-configurable
@@ -384,13 +390,14 @@ GEM
       railties (>= 5.0)
     i18n-js (3.5.0)
       i18n (>= 0.6.6)
-    i18n-tasks (1.0.15)
+    i18n-tasks (1.1.2)
       activesupport (>= 4.0.2)
       ast (>= 2.1.0)
       erubi
-      highline (>= 2.0.0)
+      highline (>= 3.0.0)
       i18n
       parser (>= 3.2.2.1)
+      prism
       rails-i18n
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.8, >= 1.8.1)
@@ -416,7 +423,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (2.19.0)
+    json (2.19.1)
     jwt (2.5.0)
     knapsack_pro (9.2.2)
       rake
@@ -498,7 +505,7 @@ GEM
       mustermann (>= 1.0.0)
     naught (1.1.0)
     nenv (0.3.0)
-    net-imap (0.6.2)
+    net-imap (0.6.3)
       date
       net-protocol
     net-pop (0.1.2)
@@ -524,6 +531,9 @@ GEM
     pagy (43.2.1)
       json
       yaml
+    paper_trail (17.0.0)
+      activerecord (>= 7.1)
+      request_store (~> 1.4)
     parallel (1.27.0)
     parallel_tests (4.10.1)
       parallel
@@ -532,8 +542,8 @@ GEM
     parser (3.3.10.2)
       ast (~> 2.4.1)
       racc
-    pg (1.6.2-arm64-darwin)
-    pg (1.6.2-x86_64-linux)
+    pg (1.6.3-arm64-darwin)
+    pg (1.6.3-x86_64-linux)
     pg_search (2.3.7)
       activerecord (>= 6.1)
       activesupport (>= 6.1)
@@ -546,12 +556,13 @@ GEM
       postmark (>= 1.21.3, < 2.0)
     pp (0.6.3)
       prettyprint
-    premailer (1.27.0)
+    premailer (1.29.0)
       addressable
       css_parser (>= 1.19.0)
       htmlentities (>= 4.0.0)
-    premailer-rails (1.10.3)
+    premailer-rails (1.12.0)
       actionmailer (>= 3)
+      net-smtp
       premailer (~> 1.7, >= 1.7.9)
     prettyprint (0.2.0)
     prime (0.1.4)
@@ -570,12 +581,12 @@ GEM
     psych (5.3.1)
       date
       stringio
-    public_suffix (7.0.0)
+    public_suffix (7.0.5)
     puma (7.1.0)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.2.5)
-    rack-mini-profiler (3.3.1)
+    rack-mini-profiler (4.0.1)
       rack (>= 1.2.0)
     rack-protection (4.1.1)
       base64 (>= 0.1.0)
@@ -648,9 +659,9 @@ GEM
     redcarpet (3.6.1)
     redis (5.4.1)
       redis-client (>= 0.22.0)
-    redis-client (0.26.2)
+    redis-client (0.27.0)
       connection_pool
-    redlock (2.0.6)
+    redlock (2.1.0)
       redis-client (>= 0.14.1, < 1.0.0)
     regexp_parser (2.11.3)
     reline (0.6.3)
@@ -721,7 +732,7 @@ GEM
       prism (>= 1.2, < 2.0)
       rbs (>= 3, < 5)
     ruby-progressbar (1.13.0)
-    ruby-vips (2.2.5)
+    ruby-vips (2.3.0)
       ffi (~> 1.12)
       logger
     ruby2_keywords (0.0.5)
@@ -805,7 +816,7 @@ GEM
     thor (1.5.0)
     thread_safe (0.3.6)
     tilt (2.7.0)
-    timeout (0.6.0)
+    timeout (0.6.1)
     translation (1.26)
       gettext (~> 3.2, >= 3.2.5, <= 3.3.7)
     tsort (0.2.0)
@@ -864,7 +875,7 @@ GEM
 
 PLATFORMS
   arm64-darwin
-  x86_64-linux
+  x86_64-linux-gnu
 
 DEPENDENCIES
   MailchimpMarketing!
@@ -872,10 +883,11 @@ DEPENDENCIES
   annotaterb
   api-pagination
   aws-sdk-core (= 3.211)
-  aws-sdk-s3 (= 1.170)
+  aws-sdk-s3 (= 1.177.0)
   axlsx (~> 3.0.0.pre)
   bcrypt
   benchmark
+  binxtils
   bootsnap
   brakeman
   bullet
@@ -936,6 +948,7 @@ DEPENDENCIES
   oj
   openssl
   pagy
+  paper_trail
   paranoia
   pg
   pg_search
@@ -992,7 +1005,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-  ruby 3.4.8
+  ruby 4.0.2
 
 BUNDLED WITH
   4.0.0.beta2

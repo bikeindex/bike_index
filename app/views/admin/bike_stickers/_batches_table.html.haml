@@ -29,10 +29,10 @@
           %td
             #{link_to "##{bike_sticker_batch.id}", admin_bike_stickers_path(search_bike_sticker_batch_id: bike_sticker_batch.id)}
           %td
-            %span.convertTime
+            %span.localizeTime
               = l bike_sticker_batch.created_at, format: :convert_time
           %td
-            %small.convertTime
+            %small.localizeTime
               = l bike_sticker_batch.updated_at, format: :convert_time
           %td
             %small

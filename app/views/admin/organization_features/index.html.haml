@@ -24,7 +24,7 @@
       - @organization_features.each do |organization_feature|
         %tr
           %td
-            %small.convertTime
+            %small.localizeTime
               = l organization_feature.created_at, format: :convert_time
           %td
             = link_to organization_feature.name, edit_admin_organization_feature_url(organization_feature)

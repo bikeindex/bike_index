@@ -19,7 +19,7 @@
           <td>
             <div class="less-strong-hold">
               <a
-                class="convertTime mr-2"
+                class="localizeTime mr-2"
                 href="<%= edit_admin_recovery_display_url(recovery_display) %>"
               >
                 <%= l recovery_display.recovered_at, format: :convert_time %>
@@ -32,13 +32,13 @@
           </td>
 
           <td>
-            <small class="convertTime">
+            <small class="localizeTime">
               <%= l recovery_display.created_at, format: :convert_time %>
             </small>
           </td>
 
           <td>
-            <small class="convertTime less-strong">
+            <small class="localizeTime less-strong">
               <%= l recovery_display.updated_at, format: :convert_time %>
             </small>
           </td>

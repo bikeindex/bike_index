@@ -24,7 +24,9 @@ class BikeOrganization < ApplicationRecord
   belongs_to :organization
 
   validates_presence_of :bike_id, :organization_id
+
   validates_uniqueness_of :organization_id, scope: [:bike_id], allow_nil: false
+  after_commit :delete_bike_organization_note, on: :destroy
 
   scope :can_edit_claimed, -> { where(can_not_edit_claimed: false) }
 
@@ -44,5 +46,11 @@ class BikeOrganization < ApplicationRecord
 
   def can_edit_claimed=(val)
     self.can_not_edit_claimed = !val
+  end
+
+  private
+
+  def delete_bike_organization_note
+    BikeOrganizationNote.where(bike_id:, organization_id:).destroy_all
   end
 end

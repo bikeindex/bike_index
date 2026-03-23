@@ -5,9 +5,9 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-ruby "3.4.8"
+ruby "4.0.2"
 
-# Gems that are no longer in standard library as Ruby 3.4
+# Gems that are no longer in standard library as of Ruby 3.4
 gem "csv"
 gem "observer"
 gem "prime"
@@ -20,6 +20,7 @@ gem "puma" # App server
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg" # Postgres
+gem "paper_trail" # audit logging
 gem "paranoia" # soft delete
 gem "pg_search"
 gem "lograge" # Structure log data, put it in single lines to improve the functionality
@@ -67,6 +68,7 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 gem "rqrcode", "3.2.0" # QR Code image generator
 
 # Functionality extensions
+gem "binxtils" # Bike Index utilities
 gem "functionable" # Functional modules
 gem "flipper" # Feature flagging
 gem "flipper-active_record" # Feature flagging
@@ -80,7 +82,7 @@ gem "twitter" # Twitter. For rendering tweets
 gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
-gem "aws-sdk-s3", "1.170", require: false # Used by ActiveStorage for Cloudflare R2
+gem "aws-sdk-s3", "1.177.0", require: false # Used by ActiveStorage for Cloudflare R2
 gem "aws-sdk-core", "3.211" # Required for S3 compatibility, see github.com/rails/rails/issues/54374
 gem "postmark-rails" # Transactional email
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails

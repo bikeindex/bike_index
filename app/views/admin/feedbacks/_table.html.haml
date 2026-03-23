@@ -20,7 +20,7 @@
       - feedbacks.each do |feedback|
         %tr
           %td
-            %a.convertTime{ href: admin_feedback_url(feedback) }
+            %a.localizeTime{ href: admin_feedback_url(feedback) }
               = l feedback.created_at, format: :convert_time
           - unless skip_user
             %td

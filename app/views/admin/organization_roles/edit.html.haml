@@ -3,7 +3,7 @@
 - if @organization_role.deleted?
   %h2.text-danger.mb-4
     Organization Role deleted
-    %span.convertTime.preciseTime
+    %span.localizeTime.preciseTime
       = l @organization_role.deleted_at, format: :convert_time
 
 
@@ -29,27 +29,27 @@
           %td
             Created
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l @organization_role.created_at, format: :convert_time
         %tr
           %td
             Updated
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l @organization_role.updated_at, format: :convert_time
         %tr
           %td
             Claimed
           %td
             - if @organization_role.claimed_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l @organization_role.claimed_at, format: :convert_time
         %tr
           %td
             Emailed
           %td
             - if @organization_role.email_invitation_sent_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l @organization_role.email_invitation_sent_at, format: :convert_time
 
   .col-md-4

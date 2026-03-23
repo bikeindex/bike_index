@@ -7,7 +7,7 @@
         <div class="alert alert-danger mb-4">
           <h4 class="text-danger">User deleted</h4>
           Deleted:
-          <span class="convertTime preciseTime">
+          <span class="localizeTime preciseTime">
             <%= l @user.deleted_at, format: :convert_time %>
           </span>
         </div>
@@ -24,7 +24,7 @@
             <tr>
               <td>Banned at</td>
 
-              <td class="convertTime preciseTime">
+              <td class="localizeTime preciseTime">
                 <% time = user_ban&.created_at || @user.updated_at %>
                 <%= l time, format: :convert_time %>
               </td>
@@ -120,7 +120,7 @@
         <tr>
           <td>Created</td>
 
-          <td class="convertTime preciseTime">
+          <td class="localizeTime preciseTime">
             <%= l @user.created_at, format: :convert_time %>
           </td>
         </tr>
@@ -128,7 +128,7 @@
         <tr>
           <td>Updated</td>
 
-          <td class="convertTime preciseTime">
+          <td class="localizeTime preciseTime">
             <%= l @user.updated_at, format: :convert_time %>
           </td>
         </tr>
@@ -138,7 +138,7 @@
 
           <td>
             <% if @user.last_login_at.present? %>
-              <span class="convertTime preciseTime">
+              <span class="localizeTime preciseTime">
                 <%= l @user.last_login_at, format: :convert_time %>
               </span>
             <% end %>
@@ -179,7 +179,7 @@
               <% if superuser_ability.present? %>
                 <small class="less-strong">
                   since
-                  <span class="convertTime preciseTime"><%= l superuser_ability.created_at, format: :convert_time %></span>
+                  <span class="localizeTime preciseTime"><%= l superuser_ability.created_at, format: :convert_time %></span>
                 </small>
               <% end %>
             <% elsif superuser_abilities.any? %>
@@ -337,7 +337,7 @@
                     <%= user_phone.confirmed? ? "confirmed" : "unconfirmed" %>
                   </small>
 
-                  <small class="less-strong convertTime withPreposition">
+                  <small class="less-strong localizeTime withPreposition">
                     <%= l user_phone.created_at, format: :convert_time %>
                   </small>
 
@@ -384,7 +384,7 @@
 
         <td>
           <% if @user.when_vendor_terms_of_service.present? %>
-            <span class="convertTime preciseTime">
+            <span class="localizeTime preciseTime">
               <%= l @user.when_vendor_terms_of_service, format: :convert_time %>
             </span>
           <% end %>
@@ -413,7 +413,7 @@
 
           <td>
             <% if task.completed_at %>
-              <span class="convertTime">
+              <span class="localizeTime">
                 <%= l task.completed_at, format: :convert_time %>
               </span>
             <% end %>
@@ -513,7 +513,7 @@
 <div class="full-screen-table">
   <table class="table table-striped table-bordered table-sm">
     <thead>
-      <th>Created&nbsp;<small class="convertTimezone"></small></th>
+      <th>Created&nbsp;<small class="localizeTimezone"></small></th>
       <th></th>
       <th>Confirmed</th>
       <th>Primary</th>
@@ -529,7 +529,7 @@
                 <%= user_email.id %>
               </span>
 
-              <span class="convertTime">
+              <span class="localizeTime">
                 <%= l user_email.created_at, format: :convert_time %>
               </span>
             </div>
@@ -608,7 +608,7 @@
 
             <td>
               <% if mailchimp_datum.mailchimp_updated_at.present? %>
-                <span class="convertTime">
+                <span class="localizeTime">
                   <%= l(mailchimp_datum.mailchimp_updated_at, format: :convert_time) %>
                 </span>
               <% end %>

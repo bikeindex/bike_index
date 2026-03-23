@@ -109,15 +109,16 @@ class StravaIntegration < ApplicationRecord
 
   def update_sync_status(force_update: false)
     calculated_downloaded = strava_activities.count
-    return if !force_update && activities_downloaded_count == calculated_downloaded
+    return if !force_update && activities_downloaded_count == calculated_downloaded && synced?
 
     self.status = calculated_status
-    if synced?
-      enqueue_enrich_activity_requests
-      enqueue_gear_requests
-      strava_gears.find_each(&:update_total_distance!)
-    end
-    update(activities_downloaded_count: calculated_downloaded)
+    # Update before enqueueing the enrich requests, to make double enqueueing less likely
+    update!(activities_downloaded_count: calculated_downloaded)
+    return unless synced?
+
+    enqueue_enrich_activity_requests
+    enqueue_gear_requests
+    strava_gears.find_each(&:update_total_distance!)
   end
 
   def unknown_gear_ids
@@ -134,9 +135,9 @@ class StravaIntegration < ApplicationRecord
 
   def calculated_status
     return :error if status == :error
-    return :syncing if StravaRequest.list_activities.count == 0
+    return :syncing if strava_requests.list_activities.count == 0
 
-    if StravaRequest.list_activities.pending.where(strava_integration_id: id).count > 0
+    if strava_requests.list_activities.pending.count > 0
       :syncing
     else
       :synced

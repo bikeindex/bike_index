@@ -14,7 +14,7 @@
     - impound_record_updates.each do |impound_record_update|
       %tr
         %td
-          %span.convertTime.preciseTime
+          %span.localizeTime.preciseTime
             = l(impound_record_update.created_at, format: :convert_time)
         %td
           = impound_record_update.user&.display_name

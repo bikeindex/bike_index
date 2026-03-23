@@ -1,4 +1,4 @@
-#organized_bikes_index, #organized_model_audits_show {
+.org-bikes-search-component {
   .organized-bikes-settings-toggle {
     color: $gray-light;
   }
@@ -9,35 +9,13 @@
     padding: 2 * $vertical-height $vertical-height $vertical-height;
     background: $gray-lighter;
     border: solid 1px rgba($gray-light, 0.7);
-    &.in {
-      margin: $vertical-height 0;
-    }
+    margin: 24px 0;
     label {
       cursor: pointer;
       margin-bottom: 0;
     }
     .form-group {
       margin-bottom: 0;
-    }
-
-    .search-sort-btns {
-      margin: 0;
-      padding-top: 1 * $vertical-height;
-      margin-bottom: 0.5 * $vertical-height;
-      border-top: solid 1px rgba($gray-light, 0.25);
-      .sort-group-label, .btn {
-        margin-bottom: 0.5 * $vertical-height;
-        font-size: $body-font-size;
-        line-height: 1;
-        display: inline-block;
-      }
-      .btn {
-        margin-left: 0.25rem;
-      }
-      .btn.active {
-        cursor: default;
-        text-decoration: none;
-      }
     }
   }
 }

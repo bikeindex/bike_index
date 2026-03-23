@@ -597,15 +597,10 @@ it:
         name: Nome
         slug:
       mail_snippet:
-        address: Indirizzo
         body: Corpo
         is_enabled: È abilitato
-        is_location_triggered:
         kind: Tipo
-        latitude: Latitudine
-        longitude: Longitudine
         name: Nome
-        proximity_radius: Raggio di prossimità
         public_images: Immagini pubbliche
       manufacturer:
         bikes: Biciclette
@@ -1272,6 +1267,8 @@ it:
         tree_translate:
         unused:
         cp:
+        check_prism:
+        check_reserved_interpolations:
       encourage:
       -
       -
@@ -1339,6 +1336,9 @@ it:
         no_api_key:
         no_project_id:
         no_results:
+    reserved_interpolations:
+      details_title:
+      none:
   countries:
     AC:
     AD:
@@ -3773,21 +3773,22 @@ it:
         search_org_bikes_html:
         update: Aggiorna
     bulk_imports:
-      error_type:
-        file:
-        line:
       index:
         added:
         creator:
         errors:
-        exclude_empty_imports:
-        include_empty_imports:
         kind:
         new_import:
         org_ascend_imports_html:
         org_bulk_imports_html:
         progress:
         registrations:
+        impounded:
+        search_filter_all:
+        search_filter_only_empty:
+        search_filter_with_errors:
+        search_filter_without_empty:
+        search_filter_without_errors:
       new:
         choose_file:
         correct_actual_image_url_html:
@@ -3815,21 +3816,13 @@ it:
         ascend_import:
         bulk_import:
         bulk_import_impounded:
-        color:
         created:
         creator:
         errors:
         file:
         file_removed:
         file_removed_explanation:
-        impounded_at:
-        impounded_id:
-        manufacturer:
-        model:
         progress:
-        sent_to:
-        sent_to_a_new_owner:
-        registrations:
     exports:
       index:
         bikes_in_export:
@@ -4638,6 +4631,7 @@ it:
         search_for_serial_number:
         search_owner_email:
         submit:
+        search_notes:
     legacy_form_well:
       address_record:
         address:
@@ -4679,66 +4673,6 @@ it:
         price_is_firm_false:
         price_is_firm_true:
         still_for_sale_at:
-      org_bike_access_panel:
-        access_panel:
-        added_to_track_parking_notification:
-        additional_registrations_information:
-        additional_registrations_information_visible_because:
-        additional_registrations_potential_duplicates:
-        additional_registrations_registered_at:
-        additional_registrations_this_bike:
-        address:
-        address_or_intersection:
-        as_a_bikeindex_ambassador_html:
-        assign_sticker:
-        avery_exportable:
-        believe_it_is_anyway:
-        bike_is_not_registered_html:
-        bike_is_registered:
-        bike_not_marked_stolen:
-        choose_country:
-        city: Città
-        claimed: Rivendicato
-        contact_the_owner_it_is_stolen:
-        creation_source:
-        creator:
-        edit: Modifica
-        email_to_deal_with_this_html:
-        initial_registration:
-        is_false:
-        is_not_registered_html:
-        is_registered:
-        is_true:
-        link_sticker:
-        link_url_for_online_sighting:
-        mark_bike_recovered:
-        missing_address:
-        missing_owner_name:
-        model_audit:
-        not_audited:
-        or_call_owner_html:
-        org_can_edit_bike:
-        org_cannot_edit:
-        organization_can_edit_after_claimed:
-        organization_child:
-        organization_registered: Organizzazione
-        owner_email: Email del proprietario
-        owner_name:
-        parking_notification_notes_html:
-        permission:
-        registered:
-        send_message:
-        state: Stato
-        sticker:
-        sticker_code:
-        support_email:
-        unable_to_display_additional_information:
-        unregistered_parking_notification:
-        user_revoked_permission_html:
-        waiting_on_device_location:
-        where_did_you_see_this_bike:
-        write_a_message:
-        zipcode: Codice postale
       homepage_for_buttons:
         bike_shops: Bicicletta
         cities: Città
@@ -4865,20 +4799,9 @@ it:
         update_impound_record:
         update_multiple_records:
       bike_search:
-        address:
-        all: Tutti
         avery:
         bike:
         color: Colore
-        create_export_of_vehicles:
-        filter_impounded_html:
-        filter_no_address_html:
-        filter_no_sticker_html:
-        filter_not_impounded_html:
-        filter_not_stolen_or_impounded_html:
-        filter_stolen_html:
-        filter_with_address_html:
-        filter_with_stickers_html:
         impounded:
         link: Collegamento
         manufacturer: Produttore
@@ -4890,16 +4813,12 @@ it:
         registered: Registrato
         registered_bikes_html:
         sent_to:
-        settings:
-        status:
         status_cell: Stato
         sticker:
-        stickers:
         stolen: Rubata
         updated:
         vehicle:
         vehicle_type:
-        visible_columns:
         affiliation:
         avery_exportable:
         e_vehicle_propulsion:
@@ -4909,7 +4828,135 @@ it:
         source:
         student_id:
         url:
+        e_vehicles_for_audit:
+        serial: Seriale
+        view_matching_any_audit:
+        notes: Note
+        impound_id:
       bike_search_row:
         email_hidden:
         link: Collegamento
         mfg_model_color_html:
+      bike_search_settings:
+        address:
+        all: Tutti
+        avery_cell:
+        bike:
+        color_cell: Colore
+        create_export_of_vehicles:
+        created_at_cell: Registrato
+        creation_description_cell:
+        cycle_type_cell:
+        filter_impounded_html:
+        filter_no_address_html:
+        filter_no_sticker_html:
+        filter_not_impounded_html:
+        filter_not_stolen_or_impounded_html:
+        filter_stolen_html:
+        filter_with_address_html:
+        filter_with_stickers_html:
+        impounded_cell:
+        manufacturer_cell: Produttore
+        model_cell: Modello
+        owner_email_cell:
+        owner_name_cell:
+        propulsion_type_cell:
+        reg_address_cell: Indirizzo
+        reg_extra_registration_number_cell:
+        reg_organization_affiliation_cell:
+        reg_phone_cell: Telefono
+        reg_student_id_cell:
+        serial_number_cell: Seriale
+        settings:
+        status:
+        status_cell: Stato
+        sticker_cell:
+        stickers:
+        stolen_cell: Rubata
+        updated_at_cell:
+        url_cell:
+        vehicle:
+        visible_columns:
+        notes_cell: Note
+        show_notes_search:
+        impound_id_cell:
+      bike_access_panel:
+        access_panel:
+        added_to_track_parking_notification:
+        additional_registrations_information:
+        additional_registrations_information_visible_because:
+        additional_registrations_potential_duplicates:
+        additional_registrations_registered_at:
+        additional_registrations_this_bike:
+        address:
+        address_or_intersection:
+        as_a_bikeindex_ambassador_html:
+        assign_sticker:
+        avery_exportable:
+        believe_it_is_anyway:
+        bike_is_not_registered_html:
+        bike_is_registered:
+        bike_not_marked_stolen:
+        choose_country:
+        city: Città
+        claimed: Rivendicato
+        contact_the_owner_it_is_stolen:
+        creation_source:
+        creator: Creatore
+        edit: Modifica
+        email_to_deal_with_this_html:
+        initial_registration:
+        is_false:
+        is_not_registered_html:
+        is_registered:
+        is_true:
+        link_sticker:
+        link_url_for_online_sighting:
+        mark_bike_recovered:
+        missing_address:
+        missing_owner_name:
+        model_audit:
+        not_audited:
+        or_call_owner_html:
+        org_can_edit_bike:
+        org_cannot_edit:
+        organization_can_edit_after_claimed:
+        organization_child:
+        organization_registered: Organizzazione
+        owner_email: Email del proprietario
+        owner_name:
+        parking_notification_notes_html:
+        permission:
+        registered: Registrato
+        send_message: Invia il messaggio
+        state: Stato
+        sticker:
+        sticker_code:
+        support_email:
+        unable_to_display_additional_information:
+        unregistered_parking_notification:
+        user_revoked_permission_html:
+        waiting_on_device_location:
+        where_did_you_see_this_bike:
+        write_a_message:
+        zipcode: Codice postale
+        note_by:
+        notes: Note
+        save_notes:
+      bulk_import_error:
+        ascend:
+        ascend_unprocessable_html:
+        contact_to_resolve_html:
+        edit_org_add_ascend_name_html:
+        file: File
+        file_errors:
+        find_org:
+        fix_this_by:
+        go_to_organizations_html:
+        line:
+        line_error:
+        line_errors:
+        line_label:
+        organizations:
+        reprocess_instruction:
+        unknown_ascend_name:
