@@ -26,6 +26,13 @@ RSpec.describe BikeHelper, type: :helper do
         expect(render_serial_display(bike, superuser, skip_explanation: true)).to eq "<code class=\"bike-serial\">FFF333</code>"
       end
     end
+    context "with bike_version" do
+      let(:bike) { FactoryBot.create(:bike, serial_number: serial_number) }
+      let(:bike_version) { FactoryBot.create(:bike_version, bike:) }
+      it "renders without error" do
+        expect(render_serial_display(bike_version)).to eq("<code class=\"bike-serial\">FFF333</code>")
+      end
+    end
   end
 
   describe "bike_thumb_image" do
