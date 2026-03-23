@@ -301,6 +301,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       let(:updates) { {} }
       context "with incoming_webhook activity create" do
         it "creates or updates a StravaActivity" do
+          expect(strava_integration.last_updated_activities_at).to be_nil
           expect { instance.perform(strava_request.id) }.to change(StravaActivity, :count).by(1)
             .and change(StravaRequest, :count).by 1
 
@@ -309,6 +310,9 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
 
           activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
           expect(activity).to be_present
+
+          strava_integration.reload
+          expect(strava_integration.last_updated_activities_at).to be_within(2).of(Time.current)
         end
       end
 
