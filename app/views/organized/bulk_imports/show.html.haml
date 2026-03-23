@@ -55,49 +55,7 @@
   %h2.mt-2.mb-2= t(".errors")
   = render(Org::BulkImportError::Component.new(bulk_import: @bulk_import))
 
-.tw:flex.tw:flex-wrap.tw:justify-between.tw:mt-8.tw:mb-4
-  %h2.uncap.mt-0.mb-0
-    = t(".registrations")
-    %small
-      = number_display @pagy.count
-  %div= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
-
-- show_impounded_id = @bulk_import.impounded? && @bulk_import.headers.present? && @bulk_import.headers.include?("impounded_id")
-
-%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
-  %thead.small-header
-    %tr
-      %th= t(".created")
-      %th= t(".manufacturer")
-      %th= t(".model")
-      %th= t(".color")
-      %th= t(".sent_to")
-      - if @bulk_import.impounded?
-        %th= t(".impounded_at")
-        - if show_impounded_id
-          %th= t(".impounded_id")
-  %tbody
-    - @bikes.each do |bike|
-      %tr
-        %td
-          = link_to l(bike.created_at, format: :convert_time), bike_path(bike), class: "convertTime"
-        %td
-          = bike.mnfg_name
-        %td
-          = bike.frame_model
-        %td
-          = bike.frame_colors.to_sentence
-        %td
-          = bike.first_owner_email
-          %small.less-strong
-            - if bike.creation_description
-              = origin_display(bike.creation_description)
-            - unless bike.owner_email == bike.first_owner_email
-              = t(".sent_to_a_new_owner")
-        - if @bulk_import.impounded?
-          - impound_record = bike.impound_records.first
-          %td
-            - if impound_record.present?
-              = link_to l(impound_record.impounded_at, format: :convert_time), organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id), class: "convertTime"
-          - if show_impounded_id
-            %td= impound_record.display_id
+- bike_search = Org::BikeSearch::Component.new(organization: current_organization, pagy: @pagy, per_page: @per_page, params: params, skip_search_and_filters: true)
+= render(bike_search) do
+  - @bikes.each do |bike|
+    = render partial: "/organized/bikes/cached_bike_table_row", locals: {bike:, bike_search:}
