@@ -84,6 +84,7 @@ module StravaJobs
           end
         end
         strava_request.update!(response_status: :success)
+        strava_integration.update(last_updated_activities_at: Time.current)
 
         strava_params
       end
