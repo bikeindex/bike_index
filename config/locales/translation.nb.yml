@@ -285,13 +285,13 @@ nb:
       ad:
         body: Innhold
         image: Bilde
-        live: Bo
+        live: Aktiv
         target_url: Målnettadresse
         title: Tittel
       ambassador:
         ambassador_task_assignments: Ambassadøroppgavetildelinger
         ambassador_tasks: Ambassadøroppgaver
-        auth_token: Auth token
+        auth_token: Autentiseringsnøkkel
         avatar: Avatar
         banned: Utestengt
         can_send_many_stolen_notifications: Kan sende mange tyverivarsler
@@ -299,7 +299,7 @@ nb:
         confirmation_token: Bekreftelseskode
         confirmed: Bekreftet
         created_bikes: Opprettede sykler
-        created_ownerships: Opprettet eierskap
+        created_ownerships: Opprettede eierskap
         creation_states: Opprettelsestilstander
         current_ownerships: Nåværende eierskap
         currently_owned_bikes: Sykler som eies i dag
@@ -355,9 +355,9 @@ nb:
         description: Beskrivelse
         title: Tittel
       ambassador_task_assignment:
-        completed_at: Fullført kl
+        completed_at: Fullført
       b_param:
-        bike_errors: Sykkel feil
+        bike_errors: Sykkelens feil
         bike_title: Sykkeltittel
         email: E-post
         id_token: ID-token
@@ -382,7 +382,7 @@ nb:
         coaster_brake: Coaster brems
         components: Komponenter
         creation_states: Skapelsen sier
-        cycle_type: Syklustype
+        cycle_type: Sykkeltype
         description: Beskrivelse
         duplicate_bike_groups: Dupliserte sykkelgrupper
         example: Eksempel
@@ -3028,7 +3028,7 @@ nb:
         number</em> " på slutten av salgsseddelen i Lightspeed,</strong> og klistremerket
         vil lenke til sykkelen og legge til sykkelen i ditt lokale register.'
       security_link_text: Vanlige spørsmål om POS-integrering
-      sign_your_shop_up: Meld deg på butikken din
+      sign_your_shop_up: Registrer butikken din
       the_bicycles_owner_will_receive_an_email: Sykkelens eier vil motta en e-post
         med all informasjon han eller hun trenger for å logge inn og vedlikeholde
         kontoen samt en PDF-kopi av registreringsinformasjonen.
@@ -3976,7 +3976,7 @@ nb:
       free: Gratis
       package_title: "%{name}-pakken"
       questions_want_to_get_started: Spørsmål? Vil du komme i gang?
-      sign_up: Melde deg på
+      sign_up: Registrer deg
       sign_up_now: Registrer deg nå
       simply_the_best_bike_registry: Rett og slett det beste sykkelregisteret
       try_for_free: Prøv gratis
@@ -3995,7 +3995,7 @@ nb:
       free: Gratis
       package_title: "%{name}-pakken"
       questions_want_to_get_started: Spørsmål? Vil du komme i gang?
-      sign_up: Melde deg på
+      sign_up: Registrer deg
       sign_up_now: Registrer deg nå
       try_for_free: Prøv gratis
       year: år
@@ -4014,7 +4014,7 @@ nb:
         de ønsker
       package_title: "%{name}-pakken"
       questions_want_to_get_started: Spørsmål? Vil du komme i gang?
-      sign_up: Melde deg på
+      sign_up: Registrer deg
       sign_up_now: Registrer deg nå
       try_for_free: Prøv gratis
       year: år
@@ -4237,7 +4237,7 @@ nb:
       log_in: Logg Inn
       logout: Logg ut
       register_a_new_bike: Registrer en ny sykkel
-      sign_up: Melde deg på
+      sign_up: Registrer deg
       stolen_bike: Stjålet sykkel?
       the_nonprofit_bike_registry: det ideelle sykkelregisteret
       user_settings: "%{user_email}-innstillinger"
@@ -6005,9 +6005,9 @@ nb:
         view_matching_any_audit: visning som samsvarer med enhver revisjon
         notes: Notater
         impound_id: Beslags-ID
+        assign_bike_sticker: Link
       bike_search_row:
         email_hidden: e-post skjult
-        link: Link
         mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
       bike_search_settings:
         address: 'Adresse:'
