@@ -13,6 +13,7 @@ module Organized
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
 
       if current_organization.enabled?("bike_search")
+        @render_chart = Binxtils::InputNormalizer.boolean(params[:render_chart])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
         @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
@@ -29,6 +30,7 @@ module Organized
             format.turbo_stream
           end
         else
+          search_organization_bikes if @render_chart
           set_search_filter_params
           render :search
         end
