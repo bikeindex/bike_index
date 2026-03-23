@@ -1,7 +1,7 @@
 <%# locals: (bike:, bike_search:, bike_sticker: nil) %>
 
 <tr>
-  <% cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{bike_sticker}-2") do %>
+  <% cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{bike_sticker}-3") do %>
     <%= render(Org::BikeSearchRow::Component.new(
       bike:,
       organization: current_organization,
