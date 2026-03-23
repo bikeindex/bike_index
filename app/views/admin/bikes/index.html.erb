@@ -125,7 +125,7 @@
   <p>
     <%= number_with_delimiter(Bike.count) %> publicly registered,
     <em>(<%= Bike.where("created_at >= ?", Time.current.beginning_of_day).count %> today)</em>
-
+    
     <%= number_with_delimiter(Ownership.where(current: true).where(claimed: true).count) %>
     are claimed
   </p>

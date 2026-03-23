@@ -223,9 +223,7 @@
 
                   <tr>
                     <% if bike_attr == "address" %>
-
                       <td><%= translation(".address") %></td>
-
                       <td>
                         <% address = @bike.registration_address %>
 
@@ -259,13 +257,10 @@
                           </small>
                         <% end %>
                       </td>
-
                     <% else %>
-
                       <td>
                         <%= (bike_attr || reg_field)&.humanize(keep_id_suffix: true) %>
                       </td>
-
                       <td>
                         <% if bike_attr == "organization_affiliation" %>
                           <%= @bike.organization_affiliation(@organization)&.humanize %>
@@ -275,7 +270,6 @@
                           <%= @bike.send(bike_attr) %>
                         <% end %>
                       </td>
-
                     <% end %>
                   </tr>
                 <% end %>
@@ -409,9 +403,9 @@
         <% if show_notes? %>
           <div
             class="
-          tw:self-start tw:rounded tw:border tw:border-gray-200
-          tw:bg-gray-50 tw:p-3 tw:[grid-area:notes]
-          "
+              tw:self-start tw:rounded tw:border tw:border-gray-200
+              tw:bg-gray-50 tw:p-3 tw:[grid-area:notes]
+            "
           >
             <label class="tw:mb-1 tw:block tw:text-sm tw:font-medium tw:text-gray-600">
               <%= @organization.short_name %>
@@ -455,9 +449,9 @@
 
             <table
               class="
-            table table-striped table-bordered table-sm
-            without-exterior-border
-            "
+                table table-striped table-bordered table-sm
+                without-exterior-border
+              "
             >
               <tbody>
                 <thead>
@@ -515,9 +509,9 @@
             </p>
             <table
               class="
-            table table-striped table-bordered table-sm
-            without-exterior-border
-            "
+                table table-striped table-bordered table-sm
+                without-exterior-border
+              "
             >
               <tbody>
                 <% duplicate_bikes.each do |duplicate_bike| %>
@@ -599,8 +593,7 @@
             <%= link_to organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all") do %>
               view map
               <div class="d-none d-md-inline">
-                of
-                <%= "notifications".pluralize(parking_notifications.count) %>
+                of <%= "notifications".pluralize(parking_notifications.count) %>
               </div>
             <% end %>
           </em>
@@ -612,8 +605,7 @@
       <% impound_record = @bike.current_impound_record&.organization_id == @organization.id ? @bike.current_impound_record : nil %>
       <h3 class="uncap mt-2">
         <span class="text-danger">
-          <%= @bike.type_titleize %>
-          is
+          <%= @bike.type_titleize %> is
           <% if @bike.current_impound_record&.organization&.id == @organization.id %>
             impounded!
           <% else %>
@@ -645,8 +637,7 @@
       <%# Gotta include the current impound notification if it's present %>
       <% current_count = parking_notifications.current.count %>
       <% current_count += 1 if current_impound_notification.present? %>
-      <%= pluralize(number_with_delimiter(current_count), "current notification") %>
-      ,
+      <%= pluralize(number_with_delimiter(current_count), "current notification") %>,
       <% if resolved_notifications.count > 0 %>
         -
         <a
@@ -660,8 +651,7 @@
       <% else %>
         <span class="less-strong">0 resolved notifications</span>
       <% end %>
-      for
-      <%= @bike.type %>
+      for <%= @bike.type %>
     </p>
 
     <% if parking_notifications.current.any? %>
@@ -719,7 +709,7 @@
                   <%= f.radio_button :is_repeat, false %> First notice
                 </label>
 
-                <label class="btn btn-secondary <%= "active" if @parking_notification.is_repeat %>" <%= "disabled" unless @parking_notification.can_be_repeat? %>>
+                <label class="btn btn-secondary <%= "active" if @parking_notification.is_repeat %>" <%= "disabled" unless @parking_notification.can_be_repeat? %>> <%# herb:disable erb-no-output-in-attribute-position %>
                   <%= f.radio_button :is_repeat, true %>
                   <%# We have to add 1 on the repeat because this hasn't been created yet %>
                   Repeat
@@ -776,9 +766,9 @@
             <div class="col-md-6" id="choseLocationMethod">
               <span
                 class="
-              less-strong waitingOnLocationText hideOnLocationFind
-              collapse in
-              "
+                  less-strong waitingOnLocationText hideOnLocationFind
+                  collapse in
+                "
               >
                 <%= translation(".waiting_on_device_location") %>
               </span>
@@ -819,9 +809,9 @@
 
                   <div
                     class="
-                  col-sm-4 fancy-select unfancy no-restore-on-backspace
-                  ifManualRequired
-                  "
+                      col-sm-4 fancy-select unfancy no-restore-on-backspace
+                      ifManualRequired
+                    "
                     id="us_id_data"
                     data-usid="<%= Country.united_states_id %>"
                   >

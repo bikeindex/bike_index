@@ -10,8 +10,8 @@
 >
 
 <script>
-  mapboxgl.accessToken = "<%= ENV['MAPBOX_MAPPING'] %>";
-  var stolenBikeLngLat = [<%= mapping_record.longitude_public %>, <%= mapping_record.latitude_public %>];
+  mapboxgl.accessToken = <%= ENV['MAPBOX_MAPPING'].to_json %>;
+  var stolenBikeLngLat = [<%= mapping_record.longitude_public.to_json %>, <%= mapping_record.latitude_public.to_json %>];
 
   var map = new mapboxgl.Map({
     container: "map_canvas",
@@ -46,7 +46,7 @@
             [5, 5],
             [16, 240]
           ],
-          base: <%= mapping_record.show_address ? 2 : 1.15 %>
+          base: <%= (mapping_record.show_address ? 2 : 1.15).to_json %>
         },
         "circle-color": "red",
         "circle-opacity": 0.4

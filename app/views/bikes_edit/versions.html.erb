@@ -104,12 +104,12 @@
 
                 <div class="form-well-input">
                   <select class="form-control" name="strava_gear_id">
-                    <option value="" <%= "selected" if bike_gear.blank? %>>
+                    <option value="" <%= "selected" if bike_gear.blank? %>> <%# herb:disable erb-no-output-in-attribute-position %>
                       <%= t("bikes_edit.strava_gear.none_selected") %>
                     </option>
 
                     <% strava_integration.strava_gears.bikes.each do |gear| %>
-                      <option
+                      <option <%# herb:disable erb-no-output-in-attribute-position %>
                         value="<%= gear.strava_id %>"
                         <%= "selected" if bike_gear&.strava_id == gear.strava_id %>
                       >
