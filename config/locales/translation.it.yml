@@ -4832,6 +4832,7 @@ it:
         serial: Seriale
         view_matching_any_audit:
         notes: Note
+        impound_id:
       bike_search_row:
         email_hidden:
         link: Collegamento
@@ -4878,6 +4879,7 @@ it:
         visible_columns:
         notes_cell: Note
         show_notes_search:
+        impound_id_cell:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:
