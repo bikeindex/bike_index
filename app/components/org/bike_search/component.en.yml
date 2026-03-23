@@ -16,7 +16,7 @@ en:
         matching_bikes_html: "%{count} %{cycle_type} matching"
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         model: Model
-        notes: Notes
+        notes: Registration Notes
         owner_name: Owner name
         phone: Phone
         propulsion_type: Propulsion
