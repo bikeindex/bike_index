@@ -10,7 +10,7 @@
         %tr
           %td= t(".created")
           %td
-            %span.convertTime
+            %span.localizeTime
               = l(@parking_notification.created_at, format: :convert_time)
         %tr
           %td= t(".by")
@@ -52,7 +52,7 @@
                     %small
                       %em
                         created
-                        %span.convertTime.preciseTime
+                        %span.localizeTime.preciseTime
                           = l(impound_notification.created_at, format: :convert_time)
                       by #{impound_notification.user.display_name}
                   - if @parking_notification.impound_record_id.present?
@@ -69,7 +69,7 @@
                 - retrieved_notification = @parking_notification.associated_retrieved_notification
                 - if retrieved_notification.present?
                   Marked retrieved
-                  %span.convertTime.preciseTime
+                  %span.localizeTime.preciseTime
                     = l(retrieved_notification.created_at, format: :convert_time)
                   by
                   - if retrieved_notification.organization_recovery?
@@ -132,7 +132,7 @@
                 = @parking_notification.notification_number
               %em.small.less-strong.ml-1
                 first notification sent
-                %a.convertTime.preciseTime{ href: organization_parking_notification_path(@parking_notification.initial_record_id, organization_id: current_organization.to_param) }
+                %a.localizeTime.preciseTime{ href: organization_parking_notification_path(@parking_notification.initial_record_id, organization_id: current_organization.to_param) }
                   - if @parking_notification.initial_record.present?
                     = l(@parking_notification.initial_record.created_at, format: :convert_time)
                   - else
@@ -149,7 +149,7 @@
                 - else
                   Resolved
               - if @parking_notification.resolved_at.present?
-                %span.convertTime
+                %span.localizeTime
                   = l(@parking_notification.resolved_at, format: :convert_time)
         %tr
           %td= t(".message")

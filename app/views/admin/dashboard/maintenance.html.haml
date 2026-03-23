@@ -26,7 +26,7 @@
       - @bikes_other_handlebar_type.each do |bike|
         %tr
           %td
-            %span.convertTime
+            %span.localizeTime
               = l bike.created_at, format: :convert_time
 
           %td

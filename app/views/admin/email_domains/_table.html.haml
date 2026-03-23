@@ -24,16 +24,16 @@
       - collection.each do |email_domain|
         %tr
           %td
-            %a.convertTime{href: admin_email_domain_path(email_domain)}
+            %a.localizeTime{href: admin_email_domain_path(email_domain)}
               = l(email_domain.created_at, format: :convert_time)
             - if display_dev_info?
               %code.small.only-dev-visible= email_domain.id
           %td
-            %small.convertTime
+            %small.localizeTime
               = l(email_domain.updated_at, format: :convert_time)
           %td
             - if email_domain.status_changed_after_create?
-              %small.convertTime
+              %small.localizeTime
                 = l(email_domain.updated_at, format: :convert_time)
           %td= email_domain.domain
           %td

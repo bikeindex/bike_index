@@ -30,7 +30,7 @@
       - @exports.each do |export|
         %tr
           %td
-            %a.convertTime{ href: organization_export_path(export, organization_id: export.organization.to_param) }
+            %a.localizeTime{ href: organization_export_path(export, organization_id: export.organization.to_param) }
               = l export.created_at, format: :convert_time
           %td
             %span{ class: export_progress_class(export) }

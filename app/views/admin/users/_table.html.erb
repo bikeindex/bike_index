@@ -58,20 +58,20 @@
         <% cache(user) do %>
           <tr>
             <td>
-              <span class="convertTime">
+              <span class="localizeTime">
                 <%= l user.created_at, format: :convert_time %>
               </span>
             </td>
 
             <td class="only-dev-visible">
-              <small class="convertTime">
+              <small class="localizeTime">
                 <%= l user.updated_at, format: :convert_time %>
               </small>
             </td>
 
             <td class="deleted-cell">
               <% if user.deleted_at.present? %>
-                <span class="convertTime text-danger">
+                <span class="localizeTime text-danger">
                   <%= l user.deleted_at, format: :convert_time %>
                 </span>
               <% end %>

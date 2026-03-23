@@ -32,11 +32,11 @@
               = period_in_words((last_started + klass.frequency) - Time.current)
           %td
             - if klass.last_finished.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l Time.parse(klass.last_finished), format: :convert_time
           %td
             - if last_started.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l last_started, format: :convert_time
           %td
             - if klass.last_finished.present? && last_started.present?

@@ -36,10 +36,10 @@
       - @stolen_notifications.each do |stolen_notification|
         %tr
           %td
-            %a.convertTime{ href: admin_stolen_notification_url(stolen_notification) }
+            %a.localizeTime{ href: admin_stolen_notification_url(stolen_notification) }
               = l stolen_notification.created_at, format: :convert_time
           %td
-            %small.convertTime
+            %small.localizeTime
               = l stolen_notification.created_at, format: :convert_time
           %td
             - if stolen_notification.bike

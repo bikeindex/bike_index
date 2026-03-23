@@ -42,7 +42,7 @@
             .mt-2.small.less-strong
               = t(".organization_sent_this_message", org_name: @matching_notification.organization.name)
               - if @matching_notification.sent_at.present?
-                %span.convertTime.preciseTime.withPreposition
+                %span.localizeTime.preciseTime.withPreposition
                   = l @matching_notification.sent_at, format: :convert_time
 
             - organization_email = @matching_notification.organization.auto_user&.email

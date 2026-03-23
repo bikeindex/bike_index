@@ -30,7 +30,7 @@
         %tr
           %td Created
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l(@impound_record.created_at, format: :convert_time)
         %tr
           %td Impounded by
@@ -39,7 +39,7 @@
           %tr
             %td Resolved
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@impound_record.resolved_at, format: :convert_time)
           %tr
             %td By
@@ -74,7 +74,7 @@
           %tr
             %td Updated
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@impound_record.updated_at, format: :convert_time)
         %tr
           %td last update by
@@ -84,7 +84,7 @@
             %td Resolved
             %td
               - if @impound_record.resolved_at.present?
-                %span.convertTime.preciseTime
+                %span.localizeTime.preciseTime
                   = l(@impound_record.resolved_at, format: :convert_time)
         %tr
           %td Impounded from

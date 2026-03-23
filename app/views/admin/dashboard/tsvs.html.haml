@@ -22,7 +22,7 @@
         - @tsvs.sort_by { |a| a[:updated_at] }.each do |tsv_info|
           %tr
             %td
-              %span.convertTime
+              %span.localizeTime
                 = tsv_info[:updated_at].to_i
             %td
               %a{href: tsv_info[:path] }

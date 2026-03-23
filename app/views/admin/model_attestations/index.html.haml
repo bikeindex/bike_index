@@ -55,11 +55,11 @@
         - model_audit = model_attestation.model_audit
         %tr
           %td
-            %span.convertTime= l model_attestation.created_at, format: :convert_time
+            %span.localizeTime= l model_attestation.created_at, format: :convert_time
             %code.small.d-inline-block.only-dev-visible= model_attestation.id
           - if sort_column == "updated_at"
             %td.small
-              %span.convertTime= l model_attestation.updated_at, format: :convert_time
+              %span.localizeTime= l model_attestation.updated_at, format: :convert_time
           %td{style: "min-width: 200px"}
             %strong= model_audit.mnfg_name
             = model_audit_frame_model_display(model_audit, truncate: true)

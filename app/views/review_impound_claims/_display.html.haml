@@ -13,7 +13,7 @@
         %tr
           %td Claim Created
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l(@impound_claim.created_at, format: :convert_time)
         %tr
           %td Status
@@ -21,12 +21,12 @@
             %strong
               = status_display(@impound_claim.status_humanized)
             - if @impound_claim.resolved?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@impound_claim.resolved_at, format: :convert_time)
             - elsif @impound_claim.submitted_at.present?
               %small.less-strong
                 submitted:
-                %span.convertTime.preciseTime
+                %span.localizeTime.preciseTime
                   = l(@impound_claim.submitted_at, format: :convert_time)
         %tr
           %td Claimant
@@ -47,7 +47,7 @@
           %td Bike registered
           %td
             - if @bike_submitting.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@bike_submitting.created_at, format: :convert_time)
         %tr
           %td Photos with bike
@@ -138,7 +138,7 @@
           %tr
             %td Created
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@impound_record.created_at, format: :convert_time)
 
         - unless @impound_record.current?

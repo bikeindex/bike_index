@@ -25,10 +25,10 @@
           %td
             .less-strong-hold
               - if stripe_subscription.membership_id.present?
-                %a.convertTime{href: admin_membership_path(stripe_subscription.membership_id)}
+                %a.localizeTime{href: admin_membership_path(stripe_subscription.membership_id)}
                   = l stripe_subscription.created_at, format: :convert_time
               - else
-                %span.convertTime
+                %span.localizeTime
                   = l stripe_subscription.created_at, format: :convert_time
               %span.less-strong-right.d-none.d-md-block
                 = stripe_subscription.id
@@ -41,11 +41,11 @@
                 %small= stripe_price.currency_name
           %td
             - if stripe_subscription.start_at.present?
-              %span.convertTime
+              %span.localizeTime
                 = l stripe_subscription.start_at, format: :convert_time
           %td
             - if stripe_subscription.end_at.present?
-              %span.convertTime
+              %span.localizeTime
                 = l stripe_subscription.end_at, format: :convert_time
           %td
             - if stripe_subscription.user_id.present?
