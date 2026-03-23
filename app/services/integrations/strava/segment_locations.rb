@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# NOTE: This is not actually a job - it's in the StravaJobs namespace to keep everything together
-module StravaJobs
+module Integrations::Strava
   class SegmentLocations
     class << self
       def locations_for(segments)

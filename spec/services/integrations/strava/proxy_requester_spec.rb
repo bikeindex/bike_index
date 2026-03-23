@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe StravaJobs::ProxyRequester do
+RSpec.describe Integrations::Strava::ProxyRequester do
   before { StravaRequest.destroy_all }
 
   let(:strava_integration) { FactoryBot.create(:strava_integration) }
@@ -11,7 +11,7 @@ RSpec.describe StravaJobs::ProxyRequester do
   describe ".authorize_user_and_strava_integration" do
     let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
     let(:access_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
-    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
+    before { stub_const("Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
 
     it "returns user and strava_integration when valid" do
       result = described_class.authorize_user_and_strava_integration(access_token)
@@ -44,7 +44,7 @@ RSpec.describe StravaJobs::ProxyRequester do
 
   describe ".find_or_create_access_token" do
     let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
-    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
+    before { stub_const("Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
 
     it "returns existing valid token" do
       existing_token = Doorkeeper::AccessToken.create!(

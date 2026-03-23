@@ -63,7 +63,7 @@ RSpec.describe StravaIntegration, type: :model do
   end
 
   describe "permissions scopes and methods" do
-    let(:default_scope) { Integrations::StravaClient::DEFAULT_SCOPE }
+    let(:default_scope) { Integrations::Strava::Client::DEFAULT_SCOPE }
     let!(:integration_default) { FactoryBot.create(:strava_integration, strava_permissions: default_scope) }
     let!(:integration_less) { FactoryBot.create(:strava_integration, strava_permissions: "read") }
     let!(:integration_more) { FactoryBot.create(:strava_integration, strava_permissions: "read,activity:read_all,profile:read_all,activity:write") }

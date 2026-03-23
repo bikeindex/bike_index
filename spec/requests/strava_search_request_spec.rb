@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe StravaSearchController, type: :request do
   let(:strava_app) { FactoryBot.create(:doorkeeper_app, is_internal: true) }
 
-  before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", strava_app.id) }
+  before { stub_const("Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", strava_app.id) }
 
   describe "GET /strava_search" do
     it "redirects to login when not signed in" do
@@ -44,7 +44,7 @@ RSpec.describe StravaSearchController, type: :request do
         end
 
         context "with activity:write permission" do
-          let(:strava_permissions) { Integrations::StravaClient::STRAVA_SEARCH_SCOPE }
+          let(:strava_permissions) { Integrations::Strava::Client::STRAVA_SEARCH_SCOPE }
 
           it "renders with hasActivityWrite true" do
             get strava_search_path

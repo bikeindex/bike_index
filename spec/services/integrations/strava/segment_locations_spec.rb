@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe StravaJobs::SegmentLocations do
+RSpec.describe Integrations::Strava::SegmentLocations do
   let(:segment_effort_json) do
     '{"id":3098415184501105490,"resource_state":2,"name":"South Park - steep section","activity":{"id":9166353937,"visibility":"everyone","resource_state":1},"athlete":{"id":2430215,"resource_state":1},"elapsed_time":246,"moving_time":246,"start_date":"2023-05-29T22:22:08Z","start_date_local":"2023-05-29T15:22:08Z","distance":667.88,"start_index":8468,"end_index":8712,"device_watts":false,"average_heartrate":132.4,"max_heartrate":154.0,"segment":{"id":1287957,"resource_state":2,"name":"South Park - steep section","activity_type":"Ride","distance":667.88,"average_grade":8.6,"maximum_grade":21.3,"elevation_high":360.0,"elevation_low":302.8,"start_latlng":[37.89035322144628,-122.2365182172507],"end_latlng":[37.88604165427387,-122.2314907517284],"elevation_profile":null,"elevation_profiles":null,"climb_category":0,"city":"Orinda","state":"CA","country":"United States","private":false,"hazardous":false,"starred":false},"pr_rank":null,"achievements":[],"visibility":"everyone","kom_rank":null,"hidden":false}'
   end

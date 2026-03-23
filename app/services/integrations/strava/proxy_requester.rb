@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# NOTE: This is not actually a job - it's in the StravaJobs namespace to keep everything together
-module StravaJobs
+module Integrations::Strava
   class ProxyRequester
     STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3).to_i
     SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
@@ -30,7 +29,7 @@ module StravaJobs
             activities_downloaded_count: strava_integration.activities_downloaded_count,
             athlete_activity_count: strava_integration.athlete_activity_count,
             progress_percent: strava_integration.sync_progress_percent,
-            rate_limited: !ScheduledRequestEnqueuer.rate_limit_allows_batch?
+            rate_limited: !StravaJobs::ScheduledRequestEnqueuer.rate_limit_allows_batch?
           }
         }
       end
@@ -50,7 +49,7 @@ module StravaJobs
 
         return internal_response!(strava_request) if internal_response?(strava_request)
 
-        response = Integrations::StravaClient.proxy_request(strava_integration,
+        response = Integrations::Strava::Client.proxy_request(strava_integration,
           strava_request.parameters["url"], method: strava_request.parameters["method"],
           body: strava_request.parameters["body"])
         strava_request.update_from_response(response)
@@ -97,13 +96,13 @@ module StravaJobs
       # We want a little more headroom on proxy requests -
       # to reserve some requests for initial fetch athlete and list_activities
       def binx_response_rate_limited?(strava_request)
-        Integrations::StravaClient.currently_rate_limited?(strava_request.request_method, headroom: 20)
+        Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method, headroom: 20)
       end
 
       def internal_response!(strava_request)
         if binx_response_rate_limited?(strava_request)
           strava_request.update_from_response(:binx_response_rate_limited)
-          return {json: Integrations::StravaClient::RATE_LIMITED_RESPONSE_BODY, status: 429}
+          return {json: Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY, status: 429}
         end
 
         strava_request.update(response_status: :binx_response, requested_at: Time.current)
@@ -112,7 +111,7 @@ module StravaJobs
           strava_request.strava_integration.proxy_serialized
         else
           page = (strava_request.parameters["url"][/\Wpage=(\d+)/, 1] || 1).to_i - 1
-          limit = Integrations::StravaClient::ACTIVITIES_PER_PAGE
+          limit = Integrations::Strava::Client::ACTIVITIES_PER_PAGE
 
           strava_activities = StravaActivity.where(strava_integration_id: strava_request.strava_integration_id).strava_ordered
           return {json: [], status: 200} if strava_activities.count < page * limit

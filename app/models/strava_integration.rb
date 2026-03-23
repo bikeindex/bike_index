@@ -28,7 +28,7 @@
 #
 class StravaIntegration < ApplicationRecord
   STATUS_ENUM = {pending: 0, syncing: 1, synced: 2, error: 3}.freeze
-  DEFAULT_SCOPE_COUNT = Integrations::StravaClient::DEFAULT_SCOPE.count(",")
+  DEFAULT_SCOPE_COUNT = Integrations::Strava::Client::DEFAULT_SCOPE.count(",")
 
   acts_as_paranoid
 
@@ -46,7 +46,7 @@ class StravaIntegration < ApplicationRecord
   before_destroy :mark_disconnected
 
   scope :token_expired, -> { where("token_expires_at IS NULL OR token_expires_at < ?", Time.current) }
-  scope :permissions_default, -> { where(strava_permissions: Integrations::StravaClient::DEFAULT_SCOPE) }
+  scope :permissions_default, -> { where(strava_permissions: Integrations::Strava::Client::DEFAULT_SCOPE) }
   scope :permissions_less, -> {
     where("strava_permissions IS NULL OR LENGTH(strava_permissions) - LENGTH(REPLACE(strava_permissions, ',', '')) < ?", DEFAULT_SCOPE_COUNT)
   }
@@ -59,21 +59,21 @@ class StravaIntegration < ApplicationRecord
   end
 
   def permissions_default?
-    strava_permissions == Integrations::StravaClient::DEFAULT_SCOPE
+    strava_permissions == Integrations::Strava::Client::DEFAULT_SCOPE
   end
 
   def permissions_strava_search_default?
-    strava_permissions == Integrations::StravaClient::STRAVA_SEARCH_SCOPE
+    strava_permissions == Integrations::Strava::Client::STRAVA_SEARCH_SCOPE
   end
 
   def permissions_less?
     return true if strava_permissions.blank?
 
-    strava_permissions.split(",").length < Integrations::StravaClient::DEFAULT_SCOPE.split(",").length
+    strava_permissions.split(",").length < Integrations::Strava::Client::DEFAULT_SCOPE.split(",").length
   end
 
   def permissions_more?
-    strava_permissions.present? && strava_permissions.split(",").length > Integrations::StravaClient::DEFAULT_SCOPE.split(",").length
+    strava_permissions.present? && strava_permissions.split(",").length > Integrations::Strava::Client::DEFAULT_SCOPE.split(",").length
   end
 
   def has_activity_write?

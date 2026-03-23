@@ -20,7 +20,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
         location = response.location
         expect(location).to include("state=")
         scope_param = CGI.parse(URI.parse(location).query)["scope"].first
-        expect(scope_param).to eq Integrations::StravaClient::DEFAULT_SCOPE
+        expect(scope_param).to eq Integrations::Strava::Client::DEFAULT_SCOPE
       end
 
       context "with strava_search scope" do
@@ -30,7 +30,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
           location = response.location
           expect(location).to include("state=")
           scope_param = CGI.parse(URI.parse(location).query)["scope"].first
-          expect(scope_param).to eq Integrations::StravaClient::STRAVA_SEARCH_SCOPE
+          expect(scope_param).to eq Integrations::Strava::Client::STRAVA_SEARCH_SCOPE
         end
       end
     end
@@ -97,7 +97,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
             expect(strava_integration.refresh_token).to be_present
             expect(strava_integration.strava_id).to eq("2430215")
             expect(strava_integration.status).to eq("pending")
-            expect(strava_integration.strava_permissions).to eq Integrations::StravaClient::DEFAULT_SCOPE
+            expect(strava_integration.strava_permissions).to eq Integrations::Strava::Client::DEFAULT_SCOPE
           end
         end
 
@@ -106,10 +106,10 @@ RSpec.describe StravaIntegrationsController, type: :request do
             oauth_state = initiate_oauth_flow
             VCR.use_cassette("strava-exchange_token") do
               get "/strava_integration/callback",
-                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::STRAVA_SEARCH_SCOPE}
               expect(response).to redirect_to(strava_search_path)
               expect(flash[:success]).to match(/connected/i)
-              expect(current_user.reload.strava_integration.strava_permissions).to eq Integrations::StravaClient::STRAVA_SEARCH_SCOPE
+              expect(current_user.reload.strava_integration.strava_permissions).to eq Integrations::Strava::Client::STRAVA_SEARCH_SCOPE
             end
           end
         end
@@ -120,7 +120,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
             oauth_state = initiate_oauth_flow(scope: "strava_search", return_to:)
             VCR.use_cassette("strava-exchange_token") do
               get "/strava_integration/callback",
-                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::STRAVA_SEARCH_SCOPE}
               expect(response).to redirect_to(return_to)
             end
           end
@@ -129,7 +129,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
             oauth_state = initiate_oauth_flow(scope: "strava_search", return_to: "https://evil.com")
             VCR.use_cassette("strava-exchange_token") do
               get "/strava_integration/callback",
-                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::STRAVA_SEARCH_SCOPE}
               expect(response).to redirect_to(strava_search_path)
             end
           end
@@ -143,7 +143,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
             VCR.use_cassette("strava-exchange_token") do
               expect {
                 get "/strava_integration/callback",
-                  params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::DEFAULT_SCOPE}
+                  params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::DEFAULT_SCOPE}
               }.to change(StravaIntegration, :count).by(0)
                 .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(0)
 
@@ -153,7 +153,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
               strava_integration = current_user.reload.strava_integration
               expect(strava_integration.id).to eq existing.id
               expect(strava_integration.access_token).to be_present
-              expect(strava_integration.strava_permissions).to eq Integrations::StravaClient::DEFAULT_SCOPE
+              expect(strava_integration.strava_permissions).to eq Integrations::Strava::Client::DEFAULT_SCOPE
             end
           end
         end
