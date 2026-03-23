@@ -1,0 +1,85 @@
+<% if @short_display %>
+  <small><%= short_text %></small>
+<% else %>
+  <%= render(UI::Card::Component.new) do %>
+    <%# use non-standard height so that it doesn't clip at a line break %>
+    <div class="tw:max-h-[402px] tw:overflow-y-auto">
+      <% if @bulk_import.ascend_unprocessable? %>
+        <p class="mt-2">
+          <%= translation(".ascend_unprocessable_html", ascend_name: @bulk_import.ascend_name) %>
+        </p>
+        <% if @in_admin %>
+          <p><%= translation(".fix_this_by") %></p>
+          <ol class="tw:ml-4 tw:list-decimal">
+            <li>
+              <%= translation(".go_to_organizations_html", link: link_to(translation(".organizations"), admin_organizations_path)) %>
+            </li>
+
+            <li><%= translation(".find_org") %></li>
+
+            <li>
+              <%= translation(".edit_org_add_ascend_name_html", ascend_name: @bulk_import.ascend_name) %>
+            </li>
+
+            <li><%= translation(".reprocess_instruction") %></li>
+          </ol>
+        <% else %>
+          <%= translation(".contact_to_resolve_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org")) %>
+        <% end %>
+        <hr>
+      <% end %>
+
+      <% if @bulk_import.line_errors.present? %>
+        <strong>
+          <span class="text-danger"><%= translation(".line_errors") %></span>
+        </strong>
+        <ul class="tw:ml-4 tw:list-disc">
+          <% @bulk_import.line_errors.each do |line_error| %>
+            <li>
+              <% if line_error.is_a?(Array) && line_error.first.is_a?(Integer) %>
+                <span class="d-block">
+                  <%= translation(".line_label") %>
+                  <strong><%= line_error.first %></strong>
+                </span>
+                <code><%= line_error[1..].join(", ") %></code>
+              <% else %>
+                <%= line_error %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if @bulk_import.file_errors.present? %>
+        <strong>
+          <span class="text-danger"><%= translation(".file_errors") %></span>
+        </strong>
+        <ul class="tw:ml-4 tw:list-disc">
+          <% @bulk_import.file_errors.each_with_index do |file_error, ind| %>
+            <% file_line_error = @bulk_import.file_import_error_lines[ind] %>
+
+            <li>
+              <%= file_error %>
+
+              <% if file_line_error.present? %>
+                (line:
+                <%= file_line_error %>
+                )
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if other_errors.present? %>
+        <%= helpers.pretty_print_json(other_errors) %>
+      <% end %>
+
+      <% if helpers.display_dev_info? %>
+        <code class="small d-block only-dev-visible p-1">
+          <%= @bulk_import.import_errors %>
+        </code>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

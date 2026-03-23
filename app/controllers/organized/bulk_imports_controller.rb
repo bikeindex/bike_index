@@ -63,10 +63,20 @@ module Organized
     end
 
     def available_bulk_imports
+      @search_filter = %w[all without_errors without_empty only_empty with_errors].include?(params[:search_filter]) ? params[:search_filter] : "all"
       a_bulk_imports = bulk_imports.where(created_at: @time_range, kind: permitted_kinds)
-      @show_empty = !Binxtils::InputNormalizer.boolean(params[:without_empty])
-      a_bulk_imports = a_bulk_imports.with_bikes unless @show_empty
-      a_bulk_imports
+      case @search_filter
+      when "without_errors"
+        a_bulk_imports.no_import_errors
+      when "without_empty"
+        a_bulk_imports.with_bikes
+      when "only_empty"
+        a_bulk_imports.no_bikes.no_import_errors
+      when "with_errors"
+        a_bulk_imports.import_errors
+      else
+        a_bulk_imports
+      end
     end
 
     def ensure_can_create_import!
