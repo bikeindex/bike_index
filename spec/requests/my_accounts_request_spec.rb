@@ -73,6 +73,17 @@ RSpec.describe MyAccountsController, type: :request do
             expect(assigns(:bikes).pluck(:id)).to eq([bike2.id])
             expect(assigns(:locks).pluck(:id)).to eq([lock.id])
           end
+
+          context "with strava_gear" do
+            let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user) }
+            let!(:strava_gear) { FactoryBot.create(:strava_gear, strava_integration:, item: bike1) }
+
+            it "renders" do
+              get base_url
+              expect(response.status).to eq(200)
+              expect(response).to render_template("show")
+            end
+          end
         end
         context "with lock with deleted manufacturer" do
           let(:lock) { FactoryBot.create(:lock, user: current_user) }

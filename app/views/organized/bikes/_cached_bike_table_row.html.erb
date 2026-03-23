@@ -1,0 +1,18 @@
+<%# locals: (bike:, bike_search:, bike_sticker: nil) %>
+
+<tr>
+  <% cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{bike_sticker}-2") do %>
+    <%= render(Org::BikeSearchRow::Component.new(
+      bike:,
+      organization: current_organization,
+      bike_sticker:,
+      additional_registration_fields: bike_search.additional_registration_fields
+    )) %>
+  <% end %>
+
+  <% if bike_search.show_avery_export? %>
+    <td class="hiddenColumn hidden-xs-down avery_cell">
+      <%= check_mark if bike.avery_exportable? %>
+    </td>
+  <% end %>
+</tr>
