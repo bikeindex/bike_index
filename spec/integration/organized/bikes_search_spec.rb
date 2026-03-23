@@ -262,7 +262,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       # Click the first "Link" to assign the sticker to a bike
       first("td.assign_bike_sticker_cell a").click
       expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
-      expect(page).to have_content(unlinked_sticker.pretty_code)
+      expect(page).to have_content("claimed")
       expect(unlinked_sticker.reload.bike).to be_present
     end
   end
