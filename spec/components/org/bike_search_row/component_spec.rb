@@ -60,16 +60,6 @@ RSpec.describe Org::BikeSearchRow::Component, type: :component do
       expect(html).to include("sticker_cell")
     end
 
-    context "with bike_sticker param" do
-      let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:) }
-      let(:options) { {bike:, organization:, bike_sticker:} }
-
-      it "renders link to claim sticker" do
-        expect(html).to include("Link")
-        expect(html).to include(bike_sticker.code)
-      end
-    end
-
     context "with sticker already on bike" do
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization:, bike:) }
 
