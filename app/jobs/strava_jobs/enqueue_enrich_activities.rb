@@ -2,15 +2,29 @@
 
 module StravaJobs
   class EnqueueEnrichActivities < ApplicationJob
+    REDLOCK_PREFIX = "StravaEnrichLock-#{Rails.env.slice(0, 3)}"
+
     sidekiq_options queue: "low_priority", retry: 3
+
+    def self.redlock_key(strava_integration_id)
+      "#{REDLOCK_PREFIX}-#{strava_integration_id}"
+    end
 
     def perform(strava_integration_id)
       strava_integration = StravaIntegration.find_by(id: strava_integration_id)
       return unless strava_integration
 
-      enqueue_enrich_activity_requests(strava_integration)
-      enqueue_gear_requests(strava_integration)
-      strava_integration.strava_gears.find_each(&:update_total_distance!)
+      lock_manager = Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
+      redlock = lock_manager.lock(self.class.redlock_key(strava_integration_id), 5.minutes.in_milliseconds.to_i)
+      return unless redlock
+
+      begin
+        enqueue_enrich_activity_requests(strava_integration)
+        enqueue_gear_requests(strava_integration)
+        strava_integration.strava_gears.find_each(&:update_total_distance!)
+      ensure
+        lock_manager.unlock(redlock)
+      end
     end
 
     private
