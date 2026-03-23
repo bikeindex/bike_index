@@ -54,10 +54,10 @@
       - @user_registration_organizations.each do |user_registration_organization|
         %tr
           %td
-            %span.convertTime
+            %span.localizeTime
               = l user_registration_organization.created_at, format: :convert_time
           %td
-            %small.convertTime
+            %small.localizeTime
               = l user_registration_organization.updated_at, format: :convert_time
           %td
             - if user_registration_organization.user_id.present?

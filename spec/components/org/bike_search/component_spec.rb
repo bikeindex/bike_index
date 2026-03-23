@@ -68,9 +68,11 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   context "with impound_bikes enabled" do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
 
-    it "renders impound status filter radios" do
+    it "renders impound status filter radios and impound columns" do
       expect(component).to have_text("Status")
       expect(component).to have_css("input[type='radio'][name='search_status'][value='not_impounded']", visible: :all)
+      expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
+      expect(component).to have_css("th.impounded_cell", visible: :all, text: "Impounded")
     end
   end
 

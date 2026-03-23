@@ -62,11 +62,11 @@
       - @bike_stickers.each do |bike_sticker|
         %tr
           %td
-            %a.convertTime{ href: edit_organization_sticker_path(organization_id: current_organization.to_param, id: bike_sticker.code) }
+            %a.localizeTime{ href: edit_organization_sticker_path(organization_id: current_organization.to_param, id: bike_sticker.code) }
               = l(bike_sticker.created_at, format: :convert_time)
           %td
             - if bike_sticker.claimed? && bike_sticker.claimed_at.present?
-              %span.convertTime
+              %span.localizeTime
                 = l(bike_sticker.claimed_at, format: :convert_time)
           %td
             - if bike_sticker.claimed?

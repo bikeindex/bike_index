@@ -24,7 +24,7 @@
       - @ads.each do |ad|
         %tr
           %td.w-25
-            %a.convertTime{href: edit_admin_ad_url(ad)}
+            %a.localizeTime{href: edit_admin_ad_url(ad)}
               = l ad.created_at, format: :convert_time
           %td.w-25
             = ad.organization.name if ad.organization.present?

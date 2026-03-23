@@ -17,7 +17,7 @@ class Admin::StravaIntegrationsController < Admin::BaseController
 
   helper_method :matching_strava_integrations, :permission_levels
 
-  protected
+  private
 
   def sortable_columns
     %w[created_at updated_at deleted_at last_updated_activities_at user_id status activities_downloaded_count].freeze

@@ -95,11 +95,11 @@
         <td>Created</td>
 
         <td>
-          <span class="convertTime preciseTime">
+          <span class="localizeTime preciseTime">
             <%= l @organization.created_at, format: :convert_time %>
           </span>
 
-          <small class="convertTimezone"></small>
+          <small class="localizeTimezone"></small>
         </td>
       </tr>
 
@@ -107,7 +107,7 @@
         <td>Updated</td>
 
         <td>
-          <span class="convertTime preciseTime">
+          <span class="localizeTime preciseTime">
             <%= l @organization.updated_at, format: :convert_time %>
           </span>
         </td>

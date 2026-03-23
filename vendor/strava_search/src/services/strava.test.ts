@@ -229,6 +229,17 @@ describe('strava service', () => {
       expect(body.url).not.toContain('per_page');
     });
 
+    it('returns empty array when response is not an array', async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ sync_status: { status: 'syncing' } }),
+      });
+
+      const result = await getActivities(1);
+
+      expect(result).toEqual([]);
+    });
+
     it('includes page parameter in the request URL', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,

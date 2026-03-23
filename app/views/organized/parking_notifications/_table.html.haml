@@ -20,7 +20,7 @@
         = sortable "created_at"
       - else
         = t(".created")
-      %small.convertTimezone
+      %small.localizeTimezone
     - unless skip_bike
       %th=t(".bike")
     - if render_address
@@ -65,7 +65,7 @@
         - unless skip_map_cell
           %td
         %td
-          %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) }
+          %a.localizeTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) }
             = l(parking_notification.created_at, format: :convert_time)
           %span.extended-col-info.small
             \- <em>#{parking_notification.kind_humanized}</em> - by #{parking_notification.user&.display_name}
@@ -86,7 +86,7 @@
                 Retrieved:
               - else
                 Resolved:
-              %small.convertTime
+              %small.localizeTime
                 = l(parking_notification.resolved_at, format: :convert_time)
           - if message_notes_cell.present?
             %small.extended-col-info.d-block
@@ -124,13 +124,13 @@
           %td.hidden-sm-cells.status-cell
             - resolved_at = parking_notification.resolved_at
             - if parking_notification.impound_record_id.present?
-              %a.small{ href: organization_impound_record_path("pkey-#{parking_notification.impound_record_id}", organization_id: parking_notification.organization_id), class: (resolved_at.present? ? "convertTime" : "") }
+              %a.small{ href: organization_impound_record_path("pkey-#{parking_notification.impound_record_id}", organization_id: parking_notification.organization_id), class: (resolved_at.present? ? "localizeTime" : "") }
                 - if resolved_at.present?
                   = l(resolved_at, format: :convert_time)
                 - else
                   impounded
             - elsif resolved_at.present?
-              %small.convertTime
+              %small.localizeTime
                 = l(resolved_at, format: :convert_time)
 
         - unless skip_multiselect

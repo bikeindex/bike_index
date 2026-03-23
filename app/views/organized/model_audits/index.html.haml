@@ -51,7 +51,7 @@
           - if display_dev_info?
             %small.only-dev-visible= organization_model_audit.id
         %td
-          %span.convertTime.preciseTime
+          %span.localizeTime.preciseTime
             - if organization_model_audit.last_bike_created_at
               = l(organization_model_audit.last_bike_created_at, format: :convert_time)
             - else

@@ -13,7 +13,7 @@ class Admin::StravaGearsController < Admin::BaseController
 
   helper_method :matching_strava_gears
 
-  protected
+  private
 
   def sortable_columns
     %w[created_at updated_at gear_type strava_integration_id total_distance_kilometers]

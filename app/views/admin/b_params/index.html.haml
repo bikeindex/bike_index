@@ -70,10 +70,10 @@
       - @b_params.each do |b_param|
         %tr
           %td
-            %a.convertTime.preciseTime{ href: admin_b_param_url(b_param.id) }
+            %a.localizeTime.preciseTime{ href: admin_b_param_url(b_param.id) }
               = l b_param.created_at, format: :convert_time
           %td
-            %small.convertTime.preciseTime
+            %small.localizeTime.preciseTime
               = l b_param.updated_at, format: :convert_time
           %td
             = b_param.email

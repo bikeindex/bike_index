@@ -56,8 +56,8 @@ def org_bike_params(owner_email:, creation_organization_id: Organization.find_by
   }
 end
 
-def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id)
-  b_param = BParam.create!(creator: user, params: {bike: org_bike_params(owner_email:, creation_organization_id:)})
+def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id, **bike_attrs)
+  b_param = BParam.create!(creator: user, params: {bike: org_bike_params(owner_email:, creation_organization_id:).merge(bike_attrs)})
   b_param.origin = "organization_form"
   bike = creator.create_bike(b_param)
   raise "Bike creation failed: #{b_param.bike_errors}" if bike.errors.any?
@@ -151,8 +151,8 @@ sample_notes = [
   "Needs new sticker - old one damaged"
 ]
 hogwarts.bike_organizations.limit(5).each_with_index do |bike_organization, index|
-  BikeOrganizationNote.create!(bike_organization:, body: sample_notes[index], user: member)
-  puts "  Added note to bike organization ##{bike_organization.id}"
+  BikeOrganizationNote.upsert(bike: bike_organization.bike, organization: bike_organization.organization, body: sample_notes[index], user: member)
+  puts "  Added note for bike ##{bike_organization.bike_id} in #{bike_organization.organization.short_name}"
 end
 
 # --- 5 impound records via BikeServices::Creator with status_impounded ---
@@ -200,13 +200,7 @@ puts "Seeding non-cycle types and e-vehicles"
   {cycle_type: "cargo", propulsion_type: "pedal-assist"},
   {cycle_type: "cargo-rear", propulsion_type: "pedal-assist"},
   {cycle_type: "cargo-trike", propulsion_type: "pedal-assist-and-throttle"}
-].each do |type, i|
-  b_param = BParam.create!(
-    creator: user,
-    params: {bike: org_bike_params(owner_email: owner_emails.sample)
-      .merge(cycle_type: type[:cycle_type], propulsion_type: type[:propulsion_type])}
-  )
-  b_param.origin = "organization_form"
-  bike = creator.create_bike(b_param)
-  raise "#{type[:cycle_type]} creation failed: #{b_param.bike_errors}" if bike.errors.any?
+].each do |type|
+  bike = seed_org_bike(creator:, user:, owner_email: owner_emails.sample, cycle_type: type[:cycle_type], propulsion_type: type[:propulsion_type])
+  FindOrCreateModelAuditJob.new.perform(bike.id)
 end

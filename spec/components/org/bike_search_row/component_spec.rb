@@ -90,15 +90,18 @@ RSpec.describe Org::BikeSearchRow::Component, type: :component do
 
     it "renders impounded cell" do
       expect(html).to include("impounded_cell")
+      expect(html).to include("impound_id_cell")
     end
 
     context "with impounded bike" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike:, organization:) }
 
-      it "renders impound date" do
+      it "renders impound date and impound id" do
         expect(bike.reload.status_impounded?).to be_truthy
         expect(html).to include("localizeTime")
         expect(html).to include("impounded_cell")
+        expect(html).to include("impound_id_cell")
+        expect(html).to include(impound_record.id.to_s)
       end
     end
   end

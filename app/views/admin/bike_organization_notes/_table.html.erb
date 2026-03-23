@@ -48,12 +48,11 @@
           </td>
 
           <td>
-            <%= link_to bike_organization_note.bike_organization.bike_id, admin_bike_path(bike_organization_note.bike_organization.bike_id) %>
+            <%= link_to bike_organization_note.bike_id, admin_bike_path(bike_organization_note.bike_id) %>
           </td>
 
           <td>
-            <% organization = bike_organization_note.bike_organization.organization %>
-            <%= link_to organization.short_name, admin_organization_path(organization) %>
+            <%= link_to bike_organization_note.organization.short_name, admin_organization_path(bike_organization_note.organization) %>
           </td>
 
           <td>

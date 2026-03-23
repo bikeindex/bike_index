@@ -96,7 +96,7 @@
             %td
               = link_to organization.name, organization_dashboard_index_path(organization_id: organization.to_param)
             %td
-              %small.convertTime= l(organization.created_at, format: :convert_time)
+              %small.localizeTime= l(organization.created_at, format: :convert_time)
             %td
               = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
             - if render_regional_nearby
@@ -120,7 +120,7 @@
               %td
                 = organization.name
               %td
-                %small.convertTime= l(organization.created_at, format: :convert_time)
+                %small.localizeTime= l(organization.created_at, format: :convert_time)
               %td
                 = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
 

@@ -11,8 +11,8 @@ module Org::BikeSearchRow
 
     private
 
-    def bike_organization
-      @bike_organization ||= @bike.bike_organizations.find_by(organization_id: @organization.id)
+    def bike_organization_note
+      @bike_organization_note ||= BikeOrganizationNote.find_by(bike_id: @bike.id, organization_id: @organization.id)
     end
   end
 end

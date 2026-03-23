@@ -17,20 +17,20 @@
           %td
             Created
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l @email_domain.created_at, format: :convert_time
         %tr.small
           %td
             Updated
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l @email_domain.updated_at, format: :convert_time
         %tr.small
           %td
             Changed status at
           %td
             - if @email_domain.status_changed_after_create?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l @email_domain.status_changed_at, format: :convert_time
         %tr
           %td TLD

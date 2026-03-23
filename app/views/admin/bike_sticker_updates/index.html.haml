@@ -161,7 +161,7 @@
         - bike_sticker = bike_sticker_update.bike_sticker
         %tr
           %td
-            %a.convertTime{href: "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}"}
+            %a.localizeTime{href: "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}"}
               = l bike_sticker_update.created_at, format: :convert_time
             - if display_dev_info?
               %small.only-dev-visible= bike_sticker_update.id

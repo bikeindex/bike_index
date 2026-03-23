@@ -30,14 +30,14 @@
     - impound_records.each do |impound_record|
       %tr
         %td
-          %a.convertTime.preciseTime{href: admin_impound_record_path("pkey-#{impound_record.id}")}
+          %a.localizeTime.preciseTime{href: admin_impound_record_path("pkey-#{impound_record.id}")}
             = l(impound_record.created_at, format: :convert_time)
         %td
-          %small.convertTime.preciseTime
+          %small.localizeTime.preciseTime
             = l(impound_record.updated_at, format: :convert_time)
         %td
           - if impound_record.impounded_at.present?
-            %small.convertTime.preciseTime
+            %small.localizeTime.preciseTime
               = l(impound_record.impounded_at, format: :convert_time)
         - unless skip_organization
           %td
@@ -57,7 +57,7 @@
         - unless skip_status
           %td
             - if impound_record.resolved_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(impound_record.resolved_at, format: :convert_time)
         - unless skip_claims
           %td

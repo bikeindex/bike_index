@@ -15,14 +15,14 @@
       %td
         = t(".invited")
       %td
-        %span.convertTime.preciseTime
+        %span.localizeTime.preciseTime
           = l(@organization_role.created_at, format: :convert_time)
     %tr
       %td
         = t(".signed_up")
       %td
         - if @organization_role.claimed?
-          %span.convertTime.preciseTime= l(@organization_role.claimed_at, format: :convert_time)
+          %span.localizeTime.preciseTime= l(@organization_role.claimed_at, format: :convert_time)
         - else
           = t(".has_not_signed_up_html", name: @organization_role.invited_display_name)
     %tr
@@ -30,7 +30,7 @@
         = t(".last_login")
       %td
         - if @organization_role&.user&.last_login_at&.present?
-          %span.convertTime.preciseTime= l(@organization_role.user.last_login_at, format: :convert_time)
+          %span.localizeTime.preciseTime= l(@organization_role.user.last_login_at, format: :convert_time)
     %tr
       %td
         = t(".last_login_ip")

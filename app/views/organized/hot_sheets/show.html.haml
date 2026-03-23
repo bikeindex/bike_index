@@ -88,7 +88,7 @@
                       %td
                         %span.text-success Recovered
                       %td
-                        %span.convertTime.preciseTime
+                        %span.localizeTime.preciseTime
                           = l stolen_record.recovered_at, format: :convert_time
 
                   - else
@@ -96,7 +96,7 @@
                       %td
                         %span.stolen-color Stolen at
                       %td
-                        %span.convertTime.preciseTime
+                        %span.localizeTime.preciseTime
                           = l stolen_record.date_stolen, format: :convert_time
 
                     %tr

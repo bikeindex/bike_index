@@ -3734,21 +3734,22 @@ es:
         search_org_bikes_html:
         update:
     bulk_imports:
-      error_type:
-        file:
-        line:
       index:
         added:
         creator:
         errors:
-        exclude_empty_imports:
-        include_empty_imports:
         kind:
         new_import:
         org_ascend_imports_html:
         org_bulk_imports_html:
         progress:
         registrations:
+        impounded:
+        search_filter_all:
+        search_filter_only_empty:
+        search_filter_with_errors:
+        search_filter_without_empty:
+        search_filter_without_errors:
       new:
         choose_file:
         correct_actual_image_url_html:
@@ -3776,21 +3777,13 @@ es:
         ascend_import:
         bulk_import:
         bulk_import_impounded:
-        color:
         created:
         creator:
         errors:
         file:
         file_removed:
         file_removed_explanation:
-        impounded_at:
-        impounded_id:
-        manufacturer:
-        model:
         progress:
-        sent_to:
-        sent_to_a_new_owner:
-        registrations:
     exports:
       index:
         bikes_in_export:
@@ -4757,6 +4750,7 @@ es:
         serial:
         view_matching_any_audit:
         notes:
+        impound_id:
       bike_search_row:
         email_hidden:
         link:
@@ -4803,6 +4797,7 @@ es:
         visible_columns:
         notes_cell:
         show_notes_search:
+        impound_id_cell:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:
@@ -4866,3 +4861,20 @@ es:
         note_by:
         notes:
         save_notes:
+      bulk_import_error:
+        ascend:
+        ascend_unprocessable_html:
+        contact_to_resolve_html:
+        edit_org_add_ascend_name_html:
+        file:
+        file_errors:
+        find_org:
+        fix_this_by:
+        go_to_organizations_html:
+        line:
+        line_error:
+        line_errors:
+        line_label:
+        organizations:
+        reprocess_instruction:
+        unknown_ascend_name:

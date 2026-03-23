@@ -60,7 +60,7 @@
               <li>
                 <%= link_to "#{payment.amount_formatted}", admin_payment_path(payment) %>
 
-                <span class="convertTime withPreposition">
+                <span class="localizeTime withPreposition">
                   <%= l payment.created_at, format: :convert_time %>
                 </span>
               </li>
@@ -124,7 +124,7 @@
             <span class="text-warning">Endless</span>
             (invoice never ends)
           <% elsif @invoice.subscription_end_at.present? %>
-            <span class="convertTime preciseTimeSeconds">
+            <span class="localizeTime preciseTimeSeconds">
               <%= l @invoice.subscription_end_at, format: :convert_time %>
             </span>
           <% end %>
