@@ -257,8 +257,13 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       visit "#{bikes_path}?bike_sticker=#{unlinked_sticker.code}"
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("th.assign_bike_sticker_cell")
-      expect(page).to have_css("td.assign_bike_sticker_cell", minimum: 1)
-      expect(page).to have_css("td.assign_bike_sticker_cell a", text: "Link")
+      expect(page).to have_css("td.assign_bike_sticker_cell a", text: "Link", minimum: 1)
+
+      # Click the first "Link" to assign the sticker to a bike
+      first("td.assign_bike_sticker_cell a").click
+      expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
+      expect(page).to have_content(unlinked_sticker.pretty_code)
+      expect(unlinked_sticker.reload.bike).to be_present
     end
   end
 end
