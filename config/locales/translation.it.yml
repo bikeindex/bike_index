@@ -3816,21 +3816,13 @@ it:
         ascend_import:
         bulk_import:
         bulk_import_impounded:
-        color:
         created:
         creator:
         errors:
         file:
         file_removed:
         file_removed_explanation:
-        impounded_at:
-        impounded_id:
-        manufacturer:
-        model:
         progress:
-        sent_to:
-        sent_to_a_new_owner:
-        registrations:
     exports:
       index:
         bikes_in_export:

@@ -4366,23 +4366,15 @@ nl:
       show:
         ascend_import: Ascending importeren
         bulk_import: Bulk import
-        color: Kleur
         created: Gemaakt
         creator: Schepper
         errors: fouten
         file: file
-        manufacturer: Fabrikant
-        model: Model
         progress: Vooruitgang
-        sent_to: Verzonden naar
-        sent_to_a_new_owner: "(verzonden naar een nieuwe eigenaar)"
         file_removed: Bestand verwijderd
         file_removed_explanation: na een paar dagen verwijderen we het geüploade bestand
           om ruimte te besparen
         bulk_import_impounded: In beslag genomen bulkimport
-        impounded_at: In beslag genomen bij
-        impounded_id: In beslag genomen identiteitsbewijs
-        registrations: Registraties
     exports:
       index:
         bikes_in_export: Fietsen in export

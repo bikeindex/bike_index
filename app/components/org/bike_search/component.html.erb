@@ -1,4 +1,4 @@
-<%= tag.div(data: wrapper_data_attributes) do %>
+<%= tag.div(class: "org-bikes-search-component", data: wrapper_data_attributes) do %>
   <% if @skip_search_and_filters %>
     <%= render(settings_component) unless @skip_settings %>
   <% else %>

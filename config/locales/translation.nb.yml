@@ -4867,7 +4867,6 @@ nb:
         ascend_import: Ascend import
         bulk_import: Masseimport
         bulk_import_impounded: Beslaglagt bulkimport
-        color: Farge
         created: Opprettet
         creator: Skaper
         errors: Feil
@@ -4875,14 +4874,7 @@ nb:
         file_removed: fil fjernet
         file_removed_explanation: etter noen dager sletter vi den opplastede filen
           for å spare plass
-        impounded_at: Beslaglagt kl
-        impounded_id: Beslaglagt ID
-        manufacturer: Produsent
-        model: Modell
         progress: Framgang
-        sent_to: Sendt til
-        sent_to_a_new_owner: "(sendt til ny eier)"
-        registrations: Registreringer
     exports:
       index:
         bikes_in_export: Sykler på eksport
