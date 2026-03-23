@@ -141,6 +141,9 @@
           <% end %>
 
           <% if @organization.enabled?("impound_bikes") %>
+            <th class="hiddenColumn impound_id_cell">
+              <%= translation(".impound_id") %>
+            </th>
             <th class="hiddenColumn impounded_cell">
               <%= translation(".impounded") %>
             </th>

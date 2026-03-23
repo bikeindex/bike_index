@@ -10,6 +10,7 @@ en:
         color: Color
         e_vehicle_propulsion: E-vehicle (propulsion)
         e_vehicles_for_audit: 'E-Vehicles for audit:'
+        impound_id: Impound ID
         impounded: Impounded
         link: Link
         manufacturer: Manufacturer
