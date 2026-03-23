@@ -201,5 +201,6 @@ puts "Seeding non-cycle types and e-vehicles"
   {cycle_type: "cargo-rear", propulsion_type: "pedal-assist"},
   {cycle_type: "cargo-trike", propulsion_type: "pedal-assist-and-throttle"}
 ].each do |type|
-  seed_org_bike(creator:, user:, owner_email: owner_emails.sample, cycle_type: type[:cycle_type], propulsion_type: type[:propulsion_type])
+  bike = seed_org_bike(creator:, user:, owner_email: owner_emails.sample, cycle_type: type[:cycle_type], propulsion_type: type[:propulsion_type])
+  FindOrCreateModelAuditJob.new.perform(bike.id)
 end
