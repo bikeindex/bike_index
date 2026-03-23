@@ -38,10 +38,23 @@ linter:
   #   - 'app/views/admin/**/*'
 
   rules:
+    #
+    # Rules I don't want to enable ever:
+    #
     html-head-only-elements:
       enabled: false
-  #   erb-no-extra-newline:
-  #     enabled: false
+    # .html_safe and .raw are always hacks and I know they're hacks and are avoided
+    erb-no-unsafe-raw:
+      enabled: false
+
+    #
+    # Rules I'd like to enable but we have legacy things that make it hard
+    #
+    erb-no-instance-variables-in-partials:
+      enabled: false
+    # Legacy bootstrap code uses this - new code does not. Just let it be for now
+    html-anchor-require-href:
+      enabled: false
   #
   #   # Rules can have 'include', 'only', and 'exclude' patterns
   #   some-rule:
