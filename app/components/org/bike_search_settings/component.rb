@@ -22,7 +22,6 @@ module Org::BikeSearchSettings
       sticker_cell
       impound_id_cell
       impounded_cell
-      assign_bike_sticker_cell
       avery_cell
       cycle_type_cell
       propulsion_type_cell
@@ -81,7 +80,6 @@ module Org::BikeSearchSettings
         cols = %w[created_at_cell stolen_cell manufacturer_cell model_cell
           color_cell owner_email_cell owner_name_cell creation_description_cell]
         cols += ["sticker_cell"] if @organization.enabled?("bike_stickers")
-        cols += ["assign_bike_sticker_cell"] if @bike_sticker.present?
         cols += ["avery_cell"] if show_avery_export?
         cols += ["impounded_cell"] if @params[:search_impoundedness] == "impounded"
         cols
@@ -148,7 +146,6 @@ module Org::BikeSearchSettings
         cols += additional_registration_fields.map { |f| "#{f}_cell" }
         cols += ["notes_cell"] if @organization.enabled?("registration_notes")
         cols += %w[impound_id_cell impounded_cell] if @organization.enabled?("impound_bikes")
-        cols += ["assign_bike_sticker_cell"] if @bike_sticker.present?
         cols += ["avery_cell"] if @include_avery && @organization.enabled?("avery_export")
         cols.uniq.sort { |a, b| column_renames[a.to_sym] <=> column_renames[b.to_sym] }
       end

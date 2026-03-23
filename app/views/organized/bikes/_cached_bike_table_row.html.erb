@@ -10,7 +10,7 @@
   <% end %>
 
   <% if bike_sticker.present? %>
-    <td class="hiddenColumn assign_bike_sticker_cell">
+    <td class="assign_bike_sticker_cell">
       <small>
         <%= link_to t("components.org.bike_search.assign_bike_sticker"),
           bike_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization_id, bike_id: bike.id),
