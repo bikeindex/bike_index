@@ -3,14 +3,16 @@
   <%= @stolen_notification.bike.type %>!
 </h2>
 
-<% if @stolen_notification.unstolen_blocked? %>
-  <p>
+<p>
+  <% if @stolen_notification.unstolen_blocked? %>
+
     They shouldn't have been able to send this notification to an unstolen
     bike. <strong>Please contact seth</strong>!
-  </p>
-<% else %>
-  <p>They have sent more stolen notifications than they are allowed.</p>
-<% end %>
+
+  <% else %>
+    They have sent more stolen notifications than they are allowed.
+  <% end %>
+</p>
 
 <p><%= @stolen_notification.message %></p>
 

@@ -221,8 +221,9 @@
                 <% (@organization.additional_registration_fields - ["reg_bike_sticker"]).each do |reg_field| %>
                   <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
 
-                  <% if bike_attr == "address" %>
-                    <tr>
+                  <tr>
+                    <% if bike_attr == "address" %>
+
                       <td><%= translation(".address") %></td>
 
                       <td>
@@ -258,9 +259,9 @@
                           </small>
                         <% end %>
                       </td>
-                    </tr>
-                  <% else %>
-                    <tr>
+
+                    <% else %>
+
                       <td>
                         <%= (bike_attr || reg_field)&.humanize(keep_id_suffix: true) %>
                       </td>
@@ -274,8 +275,9 @@
                           <%= @bike.send(bike_attr) %>
                         <% end %>
                       </td>
-                    </tr>
-                  <% end %>
+
+                    <% end %>
+                  </tr>
                 <% end %>
                 <% if @organization.enabled?("avery_export") %>
                   <tr>
@@ -407,9 +409,9 @@
         <% if show_notes? %>
           <div
             class="
-              tw:self-start tw:rounded tw:border tw:border-gray-200
-              tw:bg-gray-50 tw:p-3 tw:[grid-area:notes]
-            "
+          tw:self-start tw:rounded tw:border tw:border-gray-200
+          tw:bg-gray-50 tw:p-3 tw:[grid-area:notes]
+          "
           >
             <label class="tw:mb-1 tw:block tw:text-sm tw:font-medium tw:text-gray-600">
               <%= @organization.short_name %>
@@ -453,9 +455,9 @@
 
             <table
               class="
-                table table-striped table-bordered table-sm
-                without-exterior-border
-              "
+            table table-striped table-bordered table-sm
+            without-exterior-border
+            "
             >
               <tbody>
                 <thead>
@@ -513,9 +515,9 @@
             </p>
             <table
               class="
-                table table-striped table-bordered table-sm
-                without-exterior-border
-              "
+            table table-striped table-bordered table-sm
+            without-exterior-border
+            "
             >
               <tbody>
                 <% duplicate_bikes.each do |duplicate_bike| %>
@@ -774,9 +776,9 @@
             <div class="col-md-6" id="choseLocationMethod">
               <span
                 class="
-                  less-strong waitingOnLocationText hideOnLocationFind
-                  collapse in
-                "
+              less-strong waitingOnLocationText hideOnLocationFind
+              collapse in
+              "
               >
                 <%= translation(".waiting_on_device_location") %>
               </span>
@@ -817,9 +819,9 @@
 
                   <div
                     class="
-                      col-sm-4 fancy-select unfancy no-restore-on-backspace
-                      ifManualRequired
-                    "
+                  col-sm-4 fancy-select unfancy no-restore-on-backspace
+                  ifManualRequired
+                  "
                     id="us_id_data"
                     data-usid="<%= Country.united_states_id %>"
                   >
