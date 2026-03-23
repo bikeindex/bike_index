@@ -212,21 +212,19 @@ RSpec.describe StravaIntegration, type: :model do
         let(:list_activities_status) { :success }
         it "sets status to synced" do
           expect(strava_integration.reload.send(:calculated_status)).to eq :synced
-          Sidekiq::Testing.inline! do
-            expect do
-              strava_integration.update_sync_status
-            end.to change(StravaRequest, :count).by 1
-            expect(strava_integration.reload.status).to eq("synced")
-            expect(strava_integration.activities_downloaded_count).to eq(1)
-            # it enqueues fetch_activity for the un-enriched activity
-            expect(StravaRequest.last.request_type).to eq "fetch_activity"
+          strava_integration.update_sync_status
+          StravaJobs::EnqueueEnrichActivities.drain
+          expect(StravaRequest.count).to eq 2 # 1 list_activities + 1 fetch_activity
+          expect(strava_integration.reload.status).to eq("synced")
+          expect(strava_integration.activities_downloaded_count).to eq(1)
+          # it enqueues fetch_activity for the un-enriched activity
+          expect(StravaRequest.last.request_type).to eq "fetch_activity"
 
-            expect do
-              # Running it again noops - since download count matches
-              expect(strava_integration.update_sync_status).to be_nil
-              strava_integration.update_sync_status(force_update: true)
-            end.to change(StravaRequest, :count).by 0
-          end
+          # Running it again noops - since download count matches
+          expect(strava_integration.update_sync_status).to be_nil
+          strava_integration.update_sync_status(force_update: true)
+          StravaJobs::EnqueueEnrichActivities.drain
+          expect(StravaRequest.count).to eq 2
         end
 
         context "when activities_downloaded_count already matches" do
@@ -257,22 +255,19 @@ RSpec.describe StravaIntegration, type: :model do
             expect(strava_activity.reload.enriched?).to be_truthy
             expect(strava_integration.gear_ids_to_request).to eq([strava_gear2.strava_id])
 
-            Sidekiq::Testing.inline! do
-              expect do
-                strava_integration.reload.update_sync_status
-              end.to change(StravaRequest, :count).by 1
-              expect(StravaRequest.last.request_type).to eq "fetch_gear"
+            strava_integration.reload.update_sync_status
+            StravaJobs::EnqueueEnrichActivities.drain
+            expect(StravaRequest.last.request_type).to eq "fetch_gear"
 
-              expect(strava_gear.reload.total_distance_kilometers).to eq(25)
-              # Un-enriched gear gets a fetch_gear request
-              expect(StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_gear).count).to eq(1)
-              expect(strava_integration.reload.status).to eq("synced")
+            expect(strava_gear.reload.total_distance_kilometers).to eq(25)
+            # Un-enriched gear gets a fetch_gear request
+            expect(StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_gear).count).to eq(1)
+            expect(strava_integration.reload.status).to eq("synced")
 
-              # Running it again doesn't add updates
-              expect do
-                strava_integration.update_sync_status(force_update: true)
-              end.to change(StravaRequest, :count).by 0
-            end
+            # Running it again doesn't add updates
+            strava_integration.update_sync_status(force_update: true)
+            StravaJobs::EnqueueEnrichActivities.drain
+            expect(StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_gear).count).to eq(1)
           end
         end
       end
