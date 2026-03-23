@@ -210,3 +210,39 @@ puts "Seeding non-cycle types and e-vehicles"
   bike = creator.create_bike(b_param)
   raise "#{type[:cycle_type]} creation failed: #{b_param.bike_errors}" if bike.errors.any?
 end
+
+# --- Model Audits for Hogwarts e-vehicles ---
+puts "Seeding model audits for Hogwarts..."
+
+e_vehicle_models = [
+  {frame_model: "SuperSoco CPx", cycle_type: "e-scooter", propulsion_type: "throttle", count: 3},
+  {frame_model: "RadRunner Plus", cycle_type: "bike", propulsion_type: "pedal-assist", count: 4},
+  {frame_model: "Tern GSD S10", cycle_type: "cargo-rear", propulsion_type: "pedal-assist", count: 2},
+  {frame_model: "Urban Arrow Family", cycle_type: "cargo", propulsion_type: "pedal-assist-and-throttle", count: 3},
+  {frame_model: nil, cycle_type: "e-scooter", propulsion_type: "throttle", count: 2}
+]
+
+e_vehicle_manufacturer_names = %w[Trek Specialized Cannondale Giant Electra]
+
+e_vehicle_models.each do |model_info|
+  manufacturer = Manufacturer.where(name: e_vehicle_manufacturer_names).order("RANDOM()").first ||
+    Manufacturer.frame_makers.order("RANDOM()").first
+  model_info[:count].times do
+    b_param = BParam.create!(
+      creator: user,
+      params: {bike: org_bike_params(owner_email: owner_emails.sample, manufacturer_id: manufacturer.id)
+        .merge(
+          cycle_type: model_info[:cycle_type],
+          propulsion_type: model_info[:propulsion_type],
+          frame_model: model_info[:frame_model]
+        )}
+    )
+    b_param.origin = "organization_form"
+    bike = creator.create_bike(b_param)
+    raise "Model audit bike creation failed: #{b_param.bike_errors}" if bike.errors.any?
+    FindOrCreateModelAuditJob.new.perform(bike.id)
+  end
+  puts "  Created #{model_info[:count]} bikes for model: #{model_info[:frame_model] || "(unknown)"}"
+end
+
+puts "Model audits seeded: #{ModelAudit.count} model audits, #{OrganizationModelAudit.count} organization model audits"
