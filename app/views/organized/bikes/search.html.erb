@@ -1,8 +1,7 @@
 <%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
 
-<% if @render_chart && @available_bikes.present? %>
-  <% series = [{name: "Bikes", data: UI::Chart::Component.time_range_counts(collection: @available_bikes.reorder(nil), time_range: @time_range, column: @chart_column)}] %>
-  <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
+<%= turbo_frame_tag :organized_bikes_chart_frame do %>
+  <%= render partial: "chart" %>
 <% end %>
 
 <div class="tw:my-4 tw:text-right">
@@ -46,7 +45,8 @@
       target_search_path: organization_bikes_path(organization_id: current_organization.to_param),
       target_frame: :organized_bikes_results_frame,
       interpreted_params: form_interpreted_params,
-      settings_component: bike_search_settings
+      settings_component: bike_search_settings,
+      turbo_stream: true
     )) %>
   </div>
 

@@ -30,7 +30,6 @@ module Organized
             format.turbo_stream
           end
         else
-          search_organization_bikes if @render_chart
           set_search_filter_params
           render :search
         end

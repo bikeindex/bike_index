@@ -1,0 +1,4 @@
+<% if @render_chart && @available_bikes.present? %>
+  <% series = [{name: "Bikes", data: UI::Chart::Component.time_range_counts(collection: @available_bikes.reorder(nil), time_range: @time_range, column: @chart_column)}] %>
+  <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
+<% end %>

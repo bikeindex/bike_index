@@ -2,12 +2,13 @@
 
 module Search::FormOrganized
   class Component < ApplicationComponent
-    def initialize(target_search_path:, interpreted_params:, target_frame: nil, skip_serial_field: false, settings_component: nil)
+    def initialize(target_search_path:, interpreted_params:, target_frame: nil, skip_serial_field: false, settings_component: nil, turbo_stream: false)
       @target_search_path = target_search_path
       @interpreted_params = interpreted_params
       @target_frame = target_frame
       @skip_serial_field = skip_serial_field
       @settings_component = settings_component
+      @turbo_stream = turbo_stream
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
     end
 
@@ -19,8 +20,11 @@ module Search::FormOrganized
 
     def form_data
       if turbo?
-        {:turbo_frame => @target_frame, :turbo_action => "advance",
-         :turbo => true, "search--form-target" => "form"}
+        data = {:turbo_action => "advance",
+                :turbo => true, "search--form-target" => "form"}
+        data[:turbo_frame] = @target_frame unless @turbo_stream
+        data[:turbo_stream] = true if @turbo_stream
+        data
       else
         {turbo: false}
       end
