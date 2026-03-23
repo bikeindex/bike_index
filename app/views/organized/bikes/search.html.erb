@@ -1,7 +1,5 @@
 <%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
 
-<%= render partial: "/shared/period_select" %>
-
 <% if @render_chart && @available_bikes.present? %>
   <% series = [{name: "Bikes", data: UI::Chart::Component.time_range_counts(collection: @available_bikes.reorder(nil), time_range: @time_range, column: @chart_column)}] %>
   <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
@@ -15,6 +13,8 @@
     Render chart
   </a>
 </div>
+
+<div class="tw:mt-2 tw:mb-8"><%= render partial: "/shared/period_select" %></div>
 
 <% bike_search_settings = Org::BikeSearchSettings::Component.new(
   organization: current_organization,
