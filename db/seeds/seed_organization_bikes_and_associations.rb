@@ -56,8 +56,8 @@ def org_bike_params(owner_email:, creation_organization_id: Organization.find_by
   }
 end
 
-def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id)
-  b_param = BParam.create!(creator: user, params: {bike: org_bike_params(owner_email:, creation_organization_id:)})
+def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id, **bike_attrs)
+  b_param = BParam.create!(creator: user, params: {bike: org_bike_params(owner_email:, creation_organization_id:).merge(bike_attrs)})
   b_param.origin = "organization_form"
   bike = creator.create_bike(b_param)
   raise "Bike creation failed: #{b_param.bike_errors}" if bike.errors.any?
@@ -200,13 +200,7 @@ puts "Seeding non-cycle types and e-vehicles"
   {cycle_type: "cargo", propulsion_type: "pedal-assist"},
   {cycle_type: "cargo-rear", propulsion_type: "pedal-assist"},
   {cycle_type: "cargo-trike", propulsion_type: "pedal-assist-and-throttle"}
-].each do |type, i|
-  b_param = BParam.create!(
-    creator: user,
-    params: {bike: org_bike_params(owner_email: owner_emails.sample)
-      .merge(cycle_type: type[:cycle_type], propulsion_type: type[:propulsion_type])}
-  )
-  b_param.origin = "organization_form"
-  bike = creator.create_bike(b_param)
-  raise "#{type[:cycle_type]} creation failed: #{b_param.bike_errors}" if bike.errors.any?
+].each do |type|
+  bike = seed_org_bike(creator:, user:, owner_email: owner_emails.sample, cycle_type: type[:cycle_type], propulsion_type: type[:propulsion_type])
+  FindOrCreateModelAuditJob.new.perform(bike.id)
 end
