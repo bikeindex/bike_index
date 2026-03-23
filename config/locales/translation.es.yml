@@ -4750,6 +4750,7 @@ es:
         serial:
         view_matching_any_audit:
         notes:
+        impound_id:
       bike_search_row:
         email_hidden:
         link:
@@ -4796,6 +4797,7 @@ es:
         visible_columns:
         notes_cell:
         show_notes_search:
+        impound_id_cell:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:

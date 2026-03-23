@@ -6004,6 +6004,7 @@ nb:
         serial: Serienummer
         view_matching_any_audit: visning som samsvarer med enhver revisjon
         notes: Notater
+        impound_id: Beslags-ID
       bike_search_row:
         email_hidden: e-post skjult
         link: Link
@@ -6050,6 +6051,7 @@ nb:
         visible_columns: Synlige kolonner
         notes_cell: Notater
         show_notes_search: vis notatsøk
+        impound_id_cell: Beslags-ID
       bike_access_panel:
         access_panel: Tilgangspanel
         added_to_track_parking_notification: Denne %{bike_type} er ikke registrert
