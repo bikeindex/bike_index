@@ -135,9 +135,12 @@
             <th class="hiddenColumn sticker_cell">
               <%= translation(".sticker") %>
             </th>
-            <% if @bike_sticker.present? %>
-              <th><%= translation(".link") %></th>
-            <% end %>
+          <% end %>
+
+          <% if @bike_sticker.present? %>
+            <th class="hiddenColumn assign_bike_sticker_cell">
+              <%= translation(".assign_bike_sticker") %>
+            </th>
           <% end %>
 
           <% if @organization.enabled?("impound_bikes") %>

@@ -199,11 +199,13 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       bike
     end
     let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization:, bike: bike1) }
+    let!(:unlinked_sticker) { FactoryBot.create(:bike_sticker, organization:) }
 
     it "toggles avery export column via checkbox" do
       visit bikes_path
       expect(page).to have_css("table.table", wait: 10)
       expect(page).not_to have_css("th.avery_cell")
+      expect(page).not_to have_css("th.assign_bike_sticker_cell")
 
       # Open settings and check avery — triggers page reload with param
       open_settings_if_not
@@ -250,6 +252,13 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect(page).to have_current_path(/search_stickers=with/, wait: 10)
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
+
+      # Visit with bike_sticker param to test assign_bike_sticker column
+      visit "#{bikes_path}?bike_sticker=#{unlinked_sticker.code}"
+      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("th.assign_bike_sticker_cell")
+      expect(page).to have_css("td.assign_bike_sticker_cell", minimum: 1)
+      expect(page).to have_css("td.assign_bike_sticker_cell a", text: "Link")
     end
   end
 end

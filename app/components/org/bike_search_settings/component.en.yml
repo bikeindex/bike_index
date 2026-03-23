@@ -5,6 +5,7 @@ en:
       bike_search_settings:
         address: 'Address:'
         all: All
+        assign_bike_sticker_cell: Assign Sticker
         avery_cell: Avery Exportable
         bike: registration
         color_cell: Color

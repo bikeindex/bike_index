@@ -12,6 +12,7 @@ en:
         e_vehicles_for_audit: 'E-Vehicles for audit:'
         impound_id: Impound ID
         impounded: Impounded
+        assign_bike_sticker: Link
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "%{count} %{cycle_type} matching"
