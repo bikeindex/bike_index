@@ -21,9 +21,9 @@
           <!-- ignore this select in dirty forms -->
           <select class="dirtyignore">
             <% @edit_templates.each do |template, description| %>
-              <option <%# herb:disable erb-no-output-in-attribute-position %>
+              <option
                 value="<%= template_url(template) %>"
-                <%= 'selected' if @edit_template == template %>
+                <%= 'selected' if @edit_template == template %> <%# herb:disable erb-no-output-in-attribute-position %>
               >
                 <%= description %>
               </option>

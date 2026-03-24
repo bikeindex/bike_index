@@ -109,9 +109,9 @@
                     </option>
 
                     <% strava_integration.strava_gears.bikes.each do |gear| %>
-                      <option <%# herb:disable erb-no-output-in-attribute-position %>
+                      <option
                         value="<%= gear.strava_id %>"
-                        <%= "selected" if bike_gear&.strava_id == gear.strava_id %>
+                        <%= "selected" if bike_gear&.strava_id == gear.strava_id %> <%# herb:disable erb-no-output-in-attribute-position %>
                       >
                         <%= gear.name %>
 
