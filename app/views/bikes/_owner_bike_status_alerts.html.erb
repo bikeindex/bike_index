@@ -5,6 +5,7 @@
     Impounded
     <em class="localizeTime"><%= l @bike.current_impound_record.impounded_at, format: :convert_time %></em>
 
+
     <em class="small localizeTimezone"></em>
     by <strong><%= @bike.current_impound_record.organization&.name %></strong>
     <% if @bike.current_impound_record.parking_notification.present? %>
@@ -58,7 +59,7 @@
               <span class="extended-col-info small">
                 - <em><%= parking_notification.kind_humanized %></em> - by
                 <strong><%= parking_notification.organization.short_name %></strong>
-
+                
                 <small class="less-strong">(<%= parking_notification.user&.display_name %>)</small>
               </span>
 
