@@ -163,7 +163,7 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
         context "when skipping in perform" do
           let(:read_long_usage) { 1001 }
 
-          it "skips fetch_activity requests but enqueues other request types" do
+          it "excludes fetch_activity requests from batch but leaves them pending" do
             fetch_activity = StravaRequest.create!(user_id: strava_integration.user_id,
               strava_integration_id: strava_integration.id, request_type: :fetch_activity,
               parameters: {strava_id: "123"})
@@ -173,7 +173,7 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
 
             instance.perform
 
-            expect(fetch_activity.reload.response_status).to eq("skipped")
+            expect(fetch_activity.reload.response_status).to eq("pending")
             expect(list_activities.reload.response_status).to eq("pending")
             expect(StravaJobs::RequestRunner.jobs.size).to eq(1)
             expect(StravaJobs::RequestRunner.jobs.first["args"]).to eq([list_activities.id])

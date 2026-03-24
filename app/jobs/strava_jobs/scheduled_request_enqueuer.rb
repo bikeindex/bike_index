@@ -51,8 +51,9 @@ module StravaJobs
       return unless self.class.rate_limit_allows_batch?
 
       skip_duplicate_requests # skip_duplicate_requests before enqueuing
-      skip_fetch_activity_requests # skip fetch_activity requests if rate limited
-      StravaRequest.next_pending(BATCH_SIZE).pluck(:id).each do |strava_request_id|
+      pending = StravaRequest.pending.priority_ordered.limit(BATCH_SIZE)
+      pending = pending.where.not(request_type: :fetch_activity) if self.class.skip_enqueueing_fetch_activity_requests?
+      pending.pluck(:id).each do |strava_request_id|
         RequestRunner.perform_async(strava_request_id)
       end
       return if skip_perform_in
@@ -66,13 +67,6 @@ module StravaJobs
 
     def skip_duplicate_requests
       StravaRequest.where(id: self.class.duplicate_request_ids)
-        .find_each { |r| r.update!(response_status: :skipped) }
-    end
-
-    def skip_fetch_activity_requests
-      return unless self.class.skip_enqueueing_fetch_activity_requests?
-
-      StravaRequest.pending.fetch_activity
         .find_each { |r| r.update!(response_status: :skipped) }
     end
   end
