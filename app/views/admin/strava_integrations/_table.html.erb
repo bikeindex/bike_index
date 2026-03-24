@@ -85,7 +85,7 @@
             <% end %>
           </td>
 
-          <td><small><%= strava_integration.strava_id %></small></td>
+          <td><small><%= number_display(strava_integration.strava_id) %></small></td>
 
           <td>
             <%= link_to strava_integration.activities_downloaded_count, admin_strava_activities_path(search_strava_integration_id: strava_integration.id) %>
