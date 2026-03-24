@@ -30,8 +30,6 @@ module StravaJobs
     private
 
     def enqueue_enrich_activity_requests(strava_integration)
-      return if StravaJobs::RequestRunner.enrich_requests_rate_limited?
-
       already_enqueued = StravaRequest.pending
         .where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
         .pluck(Arel.sql("parameters->>'strava_id'"))
