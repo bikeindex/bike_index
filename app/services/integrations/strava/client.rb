@@ -19,21 +19,20 @@ module Integrations::Strava::Client
     "errors" => [{"resource" => "Application", "field" => "rate limit", "code" => "exceeded"}]
   }.freeze
 
-  def fetch_activity_requests_rate_limited?
+  def currently_rate_limited?(request_method = nil, headroom: nil, request_type: nil)
     rate_limit = StravaRequest.estimated_current_rate_limit
 
-    (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < FETCH_ACTIVITY_SHORT_HEADROOM ||
-      (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < FETCH_ACTIVITY_LONG_HEADROOM
-  end
-
-  def currently_rate_limited?(request_method = nil, headroom: nil)
-    headroom ||= RATE_LIMIT_HEADROOM
-    rate_limit = StravaRequest.estimated_current_rate_limit
-
-    if request_method.blank? || request_method.upcase == "GET"
+    if request_type&.to_sym == :fetch_activity
+      short_headroom = headroom || FETCH_ACTIVITY_SHORT_HEADROOM
+      long_headroom = headroom || FETCH_ACTIVITY_LONG_HEADROOM
+      (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < short_headroom ||
+        (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < long_headroom
+    elsif request_method.blank? || request_method.upcase == "GET"
+      headroom ||= RATE_LIMIT_HEADROOM
       (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < headroom ||
         (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < headroom
     else
+      headroom ||= RATE_LIMIT_HEADROOM
       (rate_limit[:short_limit] - rate_limit[:short_usage]) < headroom ||
         (rate_limit[:long_limit] - rate_limit[:long_usage]) < headroom
     end

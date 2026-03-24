@@ -18,7 +18,7 @@ module StravaJobs
       end
 
       def skip_enqueueing_fetch_activity_requests?
-        return true if Integrations::Strava::Client.fetch_activity_requests_rate_limited?
+        return true if Integrations::Strava::Client.currently_rate_limited?(request_type: :fetch_activity)
 
         rate_limit = StravaRequest.estimated_current_rate_limit
         (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < Integrations::Strava::Client::FETCH_ACTIVITY_LONG_HEADROOM * 2
