@@ -7,7 +7,7 @@ module Integrations::Strava::ProxyRequester
   SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
   # We want a little more headroom on proxy requests -
   # to reserve some requests for initial fetch athlete and list_activities
-  RATE_LIMIT_HEADROOM = ENV.fetch("STRAVA_PROXY_HEADROOM", Client::RATE_LIMIT_HEADROOM * 2).to_i
+  RATE_LIMIT_HEADROOM = ENV.fetch("STRAVA_PROXY_HEADROOM", Integrations::Strava::Client::RATE_LIMIT_HEADROOM * 2).to_i
 
   # returns {user:, strava_integration:} if valid
   # otherwise {error: message, status: status_code}
