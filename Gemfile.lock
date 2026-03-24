@@ -523,7 +523,7 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     observer (0.1.2)
-    oj (3.16.15)
+    oj (3.16.16)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
     openssl (4.0.0)
