@@ -11,7 +11,7 @@ module Integrations::Strava::Client
   STRAVA_SECRET = ENV["STRAVA_SECRET"]
   STRAVA_WEBHOOK_TOKEN = ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"]
   ACTIVITIES_PER_PAGE = 200
-  RATE_LIMIT_HEADROOM = ENV.fetch("STRAVA_CLIENT_RATE_LIMIT_HEADROOM", 10).to_i
+  RATE_LIMIT_HEADROOM = ENV.fetch("STRAVA_CLIENT_HEADROOM", 10).to_i
   FETCH_ACTIVITY_SHORT_HEADROOM = ENV.fetch("STRAVA_CLIENT_FETCH_ACTIVITY_SHORT_HEADROOM", 100).to_i
   FETCH_ACTIVITY_LONG_HEADROOM = ENV.fetch("STRAVA_CLIENT_FETCH_ACTIVITY_LONG_HEADROOM", 500).to_i
   RATE_LIMITED_RESPONSE_BODY = {
@@ -21,6 +21,7 @@ module Integrations::Strava::Client
 
   def fetch_activity_requests_rate_limited?
     rate_limit = StravaRequest.estimated_current_rate_limit
+
     (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < FETCH_ACTIVITY_SHORT_HEADROOM ||
       (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < FETCH_ACTIVITY_LONG_HEADROOM
   end
