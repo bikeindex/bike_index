@@ -10,7 +10,8 @@ module StravaJobs
           return handle_incoming_webhook(strava_request, strava_integration)
         end
 
-        if Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method)
+        headroom = strava_request.list_activities? ? 40 : nil
+        if Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method, headroom:)
           strava_request.update_from_response(:binx_response_rate_limited,
             re_enqueue_if_rate_limited_or_unavailable: true)
           return Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY

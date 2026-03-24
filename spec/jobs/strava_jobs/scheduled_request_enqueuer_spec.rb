@@ -97,6 +97,24 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
           expect(request2.reload.response_status).to eq("skipped")
         end
 
+        it "skips duplicate list_activities requests" do
+          request1 = StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id, request_type: :list_activities,
+            parameters: {page: 1})
+          request2 = StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id, request_type: :list_activities,
+            parameters: {page: 1})
+          request3 = StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id, request_type: :list_activities,
+            parameters: {page: 2})
+
+          instance.perform
+
+          expect(request1.reload.response_status).to eq("pending")
+          expect(request2.reload.response_status).to eq("skipped")
+          expect(request3.reload.response_status).to eq("pending")
+        end
+
         context "with different integrations" do
           let(:strava_integration2) { FactoryBot.create(:strava_integration) }
 
