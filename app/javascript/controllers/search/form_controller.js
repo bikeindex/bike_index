@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import TimeLocalizer from 'utils/time_localizer'
+import TimeLocalizer from '@bikeindex/time-localizer'
 
 /* global window  */
 
