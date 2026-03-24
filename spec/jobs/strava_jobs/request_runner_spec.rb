@@ -174,7 +174,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         FactoryBot.create(:strava_request, :processed, strava_integration:,
           requested_at: boundary + 1.second,
           rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
-                       read_short_limit: 200, read_short_usage: 185, read_long_limit: 2000, read_long_usage: 0})
+                       read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0})
       end
 
       it "sets binx_response_rate_limited and creates a retry request without calling Strava" do
