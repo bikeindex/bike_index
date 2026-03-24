@@ -1,73 +1,75 @@
 # frozen_string_literal: true
 
-module Integrations::Strava
-  class SegmentLocations
-    class << self
-      def locations_for(segments)
-        return {} if segments.blank?
+module Integrations::Strava::SegmentLocations
+  extend Functionable
 
-        region_cache = {}
-        country_cache = {}
+  def locations_for(segments)
+    return {} if segments.blank?
 
-        locations = segments.filter_map do |segment|
-          next if segment["segment"].blank?
+    region_cache = {}
+    country_cache = {}
 
-          region = segment.dig("segment", "state").presence
-          region_cache[region] ||= find_region_abbreviation(region)
+    locations = segments.filter_map do |segment|
+      next if segment["segment"].blank?
 
-          country = segment.dig("segment", "country").presence
-          country_cache[country] ||= find_country_abbreviation(country)
+      region = segment.dig("segment", "state").presence
+      region_cache[region] ||= find_region_abbreviation(region)
 
-          segment_location(segment["segment"], region_cache.dig(region, :abbreviation),
-            country_cache.dig(country, :abbreviation))
-        end.compact.uniq
+      country = segment.dig("segment", "country").presence
+      country_cache[country] ||= find_country_abbreviation(country)
 
-        regions = region_cache.values.compact.reject { |v| v[:name] == v[:abbreviation] }
-          .to_h { |v| [v[:name], v[:abbreviation]] }
-        countries = country_cache.values.compact.reject { |v| v[:name] == v[:abbreviation] }
-          .to_h { |v| [v[:name], v[:abbreviation]] }
+      segment_location(segment["segment"], region_cache.dig(region, :abbreviation),
+        country_cache.dig(country, :abbreviation))
+    end.compact.uniq
 
-        {locations:, regions: regions.presence, countries: countries.presence}.compact
-      end
+    regions = region_cache.values.compact.reject { |v| v[:name] == v[:abbreviation] }
+      .to_h { |v| [v[:name], v[:abbreviation]] }
+    countries = country_cache.values.compact.reject { |v| v[:name] == v[:abbreviation] }
+      .to_h { |v| [v[:name], v[:abbreviation]] }
 
-      private
+    {locations:, regions: regions.presence, countries: countries.presence}.compact
+  end
 
-      def segment_location(segment, region, country)
-        city = segment["city"].presence&.strip
+  #
+  # private below here
+  #
 
-        # Remove country from the end of the city
-        city = city&.gsub(/, #{country}\z/i, "")
-        city = city&.gsub(/, usa\z/i, "") if country == "US"
-        # Remove region from the end of the city
-        city = city&.gsub(/, #{region}\z/i, "")
+  def segment_location(segment, region, country)
+    city = segment["city"].presence&.strip
 
-        {city:, region:, country:}.compact.presence
-      end
+    # Remove country from the end of the city
+    city = city&.gsub(/, #{country}\z/i, "")
+    city = city&.gsub(/, usa\z/i, "") if country == "US"
+    # Remove region from the end of the city
+    city = city&.gsub(/, #{region}\z/i, "")
 
-      def find_region_abbreviation(raw_value)
-        return if raw_value.blank?
+    {city:, region:, country:}.compact.presence
+  end
 
-        state = State.friendly_find(raw_value)
-        if state
-          {name: state.name, abbreviation: state.abbreviation}
-        else
-          {name: raw_value, abbreviation: raw_value}
-        end
-      end
+  def find_region_abbreviation(raw_value)
+    return if raw_value.blank?
 
-      def find_country_abbreviation(raw_value)
-        return if raw_value.blank?
-
-        country = Country.friendly_find(raw_value)
-        return {name: country.name, abbreviation: country.abbreviation} if country
-
-        sac_hash = StatesAndCountries.countries.detect { |sac| sac[:self_name] == raw_value }
-        if sac_hash.present?
-          {name: sac_hash[:name], abbreviation: sac_hash[:iso]}
-        else
-          {name: raw_value, abbreviation: raw_value}
-        end
-      end
+    state = State.friendly_find(raw_value)
+    if state
+      {name: state.name, abbreviation: state.abbreviation}
+    else
+      {name: raw_value, abbreviation: raw_value}
     end
   end
+
+  def find_country_abbreviation(raw_value)
+    return if raw_value.blank?
+
+    country = Country.friendly_find(raw_value)
+    return {name: country.name, abbreviation: country.abbreviation} if country
+
+    sac_hash = StatesAndCountries.countries.detect { |sac| sac[:self_name] == raw_value }
+    if sac_hash.present?
+      {name: sac_hash[:name], abbreviation: sac_hash[:iso]}
+    else
+      {name: raw_value, abbreviation: raw_value}
+    end
+  end
+
+  conceal :segment_location, :find_region_abbreviation, :find_country_abbreviation
 end
