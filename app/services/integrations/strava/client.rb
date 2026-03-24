@@ -23,8 +23,7 @@ module Integrations::Strava::Client
     rate_limit = StravaRequest.estimated_current_rate_limit
 
     if request_type&.to_sym == :fetch_activity
-      short_headroom = headroom || FETCH_ACTIVITY_SHORT_HEADROOM
-      (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < short_headroom ||
+      (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < FETCH_ACTIVITY_SHORT_HEADROOM ||
         (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < FETCH_ACTIVITY_LONG_HEADROOM
     elsif request_method.blank? || request_method.upcase == "GET"
       headroom ||= RATE_LIMIT_HEADROOM
