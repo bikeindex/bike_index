@@ -34,7 +34,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
       context "when read short limit is exhausted" do
         let(:rate_limit) do
           {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
-           read_short_limit: 200, read_short_usage: 185, read_long_limit: 2000, read_long_usage: 0}
+           read_short_limit: 200, read_short_usage: 191, read_long_limit: 2000, read_long_usage: 0}
         end
         it "returns true" do
           expect(described_class.currently_rate_limited?("GET")).to be true
@@ -44,7 +44,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
       context "when read long limit is exhausted" do
         let(:rate_limit) do
           {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
-           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1985}
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1991}
         end
         it "returns true" do
           expect(described_class.currently_rate_limited?("GET")).to be true
@@ -72,7 +72,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
 
       context "when overall short limit is exhausted" do
         let(:rate_limit) do
-          {short_limit: 200, short_usage: 185, long_limit: 2000, long_usage: 0,
+          {short_limit: 200, short_usage: 191, long_limit: 2000, long_usage: 0,
            read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
         end
         it "returns true" do
@@ -83,7 +83,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
 
       context "when overall long limit is exhausted" do
         let(:rate_limit) do
-          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 1985,
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 1991,
            read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
         end
         it "returns true" do

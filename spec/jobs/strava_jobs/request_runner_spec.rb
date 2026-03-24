@@ -169,11 +169,11 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     end
 
     context "when fetch_activity_requests_rate_limited? for fetch_activity" do
-      let(:strava_request) do
+      let!(:strava_request) do
         StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id,
           request_type: :fetch_activity,
-          parameters: {strava_id: "12345"})
+          parameters: {strava_id: "17323701543"})
       end
       let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
 
@@ -210,6 +210,9 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
 
       context "when rate limits have sufficient remaining" do
+        let!(:strava_activity) do
+          FactoryBot.create(:strava_activity, strava_integration:, strava_id: "17323701543")
+        end
         let!(:rate_limit_request) do
           FactoryBot.create(:strava_request, :processed, strava_integration:,
             requested_at: boundary + 1.second,
