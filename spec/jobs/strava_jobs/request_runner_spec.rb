@@ -177,6 +177,29 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
       let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
 
+      context "with list_activities request" do
+        let!(:strava_request) do
+          StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id,
+            request_type: :list_activities)
+        end
+        let!(:rate_limit_request) do
+          FactoryBot.create(:strava_request, :processed, strava_integration:,
+            requested_at: boundary + 1.second,
+            rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                         read_short_limit: 200, read_short_usage: 110, read_long_limit: 2000, read_long_usage: 0})
+        end
+
+        it "proceeds despite fetch_activity rate limiting" do
+          VCR.use_cassette("strava-list_activities") do
+            instance.perform(strava_request.id)
+          end
+
+          strava_request.reload
+          expect(strava_request.response_status).to eq("success")
+        end
+      end
+
       context "when short rate limit remaining is below threshold" do
         let!(:rate_limit_request) do
           FactoryBot.create(:strava_request, :processed, strava_integration:,
