@@ -387,6 +387,54 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
     end
 
+    context "when re-enqueued request has skippable sibling" do
+      let!(:strava_activity) do
+        FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345",
+          enriched_at: 30.minutes.ago)
+      end
+      let!(:original_request) { FactoryBot.create(:strava_request, :fetch_activity, strava_integration:) }
+      let!(:re_enqueued_request) { FactoryBot.create(:strava_request, :fetch_activity, strava_integration:) }
+
+      it "skips the original request and siblings, not the re-enqueued request" do
+        # Process the original (older) request first — it's skippable
+        instance.perform(original_request.id)
+
+        expect(original_request.reload.response_status).to eq("skipped")
+        expect(re_enqueued_request.reload.response_status).to eq("skipped")
+
+        # Create a new re-enqueued request (simulating what update_from_response does)
+        new_request = StravaRequest.create!(user_id: strava_integration.user_id,
+          strava_integration_id: strava_integration.id,
+          request_type: :fetch_activity, parameters: {strava_id: "12345"})
+
+        # The re-enqueued request is not skipped because siblings were already cleared
+        expect(new_request.reload.response_status).to eq("pending")
+      end
+    end
+
+    context "with proxy request that is rate limited" do
+      let!(:strava_request) do
+        StravaRequest.create!(user_id: strava_integration.user_id,
+          strava_integration_id: strava_integration.id,
+          request_type: :fetch_activity, proxy_request: true,
+          parameters: {url: "activities/12345"})
+      end
+      let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second,
+          rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                       read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0})
+      end
+
+      it "does not re-enqueue proxy requests" do
+        strava_request.update_from_response(:binx_response_rate_limited)
+
+        expect(strava_request.reload.response_status).to eq("binx_response_rate_limited")
+        expect(StravaRequest.pending.where(proxy_request: true).count).to eq(0)
+      end
+    end
+
     context "with already processed request" do
       let!(:strava_request) do
         StravaRequest.create!(user_id: strava_integration.user_id,
