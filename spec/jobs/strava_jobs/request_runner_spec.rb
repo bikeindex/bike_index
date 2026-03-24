@@ -11,6 +11,57 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     expect(described_class.sidekiq_options["queue"]).to eq "droppable"
   end
 
+  describe "enrich_requests_rate_limited?" do
+    before { StravaRequest.destroy_all }
+    let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+    let(:strava_integration) { FactoryBot.create(:strava_integration) }
+
+    context "when no rate limit data" do
+      it "is falsey" do
+        expect(described_class.enrich_requests_rate_limited?).to be_falsey
+      end
+    end
+
+    context "when short remaining below ENRICH_SHORT_RATE_LIMIT_MINIMUM" do
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second,
+          rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                       read_short_limit: 200, read_short_usage: 101, read_long_limit: 2000, read_long_usage: 0})
+      end
+
+      it "is truthy" do
+        expect(described_class.enrich_requests_rate_limited?).to be_truthy
+      end
+    end
+
+    context "when long remaining below ENRICH_LONG_RATE_LIMIT_MINIMUM" do
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second,
+          rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                       read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1501})
+      end
+
+      it "is truthy" do
+        expect(described_class.enrich_requests_rate_limited?).to be_truthy
+      end
+    end
+
+    context "when both limits have sufficient remaining" do
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second,
+          rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                       read_short_limit: 200, read_short_usage: 50, read_long_limit: 2000, read_long_usage: 1000})
+      end
+
+      it "is falsey" do
+        expect(described_class.enrich_requests_rate_limited?).to be_falsey
+      end
+    end
+  end
+
   describe "perform" do
     let(:strava_integration) do
       FactoryBot.create(:strava_integration, :syncing, status: :pending,
@@ -165,6 +216,66 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         strava_gear.reload
         expect(strava_gear.enriched?).to be true
         expect(strava_gear.last_updated_from_strava_at).to be_present
+      end
+    end
+
+    context "when enrich_requests_rate_limited? for fetch_activity" do
+      let(:strava_request) do
+        StravaRequest.create!(user_id: strava_integration.user_id,
+          strava_integration_id: strava_integration.id,
+          request_type: :fetch_activity,
+          parameters: {strava_id: "12345"})
+      end
+      let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+
+      context "when short rate limit remaining is below threshold" do
+        let!(:rate_limit_request) do
+          FactoryBot.create(:strava_request, :processed, strava_integration:,
+            requested_at: boundary + 1.second,
+            rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                         read_short_limit: 200, read_short_usage: 110, read_long_limit: 2000, read_long_usage: 0})
+        end
+
+        it "sets binx_response_rate_limited without calling Strava" do
+          expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(1)
+
+          strava_request.reload
+          expect(strava_request.response_status).to eq("binx_response_rate_limited")
+        end
+      end
+
+      context "when long rate limit remaining is below threshold" do
+        let!(:rate_limit_request) do
+          FactoryBot.create(:strava_request, :processed, strava_integration:,
+            requested_at: boundary + 1.second,
+            rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                         read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1600})
+        end
+
+        it "sets binx_response_rate_limited without calling Strava" do
+          expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(1)
+
+          strava_request.reload
+          expect(strava_request.response_status).to eq("binx_response_rate_limited")
+        end
+      end
+
+      context "when rate limits have sufficient remaining" do
+        let!(:rate_limit_request) do
+          FactoryBot.create(:strava_request, :processed, strava_integration:,
+            requested_at: boundary + 1.second,
+            rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                         read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0})
+        end
+
+        it "proceeds with the request" do
+          VCR.use_cassette("strava-get_activity") do
+            instance.perform(strava_request.id)
+          end
+
+          strava_request.reload
+          expect(strava_request.response_status).to eq("success")
+        end
       end
     end
 

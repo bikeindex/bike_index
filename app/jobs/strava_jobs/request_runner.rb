@@ -2,15 +2,30 @@
 
 module StravaJobs
   class RequestRunner < ApplicationJob
+    ENRICH_SHORT_RATE_LIMIT_MINIMUM = 100
+    ENRICH_LONG_RATE_LIMIT_MINIMUM = 500
+
     sidekiq_options queue: "droppable", retry: 1
 
     class << self
+      def enrich_requests_rate_limited?
+        rate_limit = StravaRequest.estimated_current_rate_limit
+        (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < ENRICH_SHORT_RATE_LIMIT_MINIMUM ||
+          (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < ENRICH_LONG_RATE_LIMIT_MINIMUM
+      end
+
       def make_request_and_update(strava_integration, strava_request)
         if strava_request.request_type == "incoming_webhook"
           return handle_incoming_webhook(strava_request, strava_integration)
         end
 
         if Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method)
+          strava_request.update_from_response(:binx_response_rate_limited,
+            re_enqueue_if_rate_limited_or_unavailable: true)
+          return Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY
+        end
+
+        if strava_request.fetch_activity? && enrich_requests_rate_limited?
           strava_request.update_from_response(:binx_response_rate_limited,
             re_enqueue_if_rate_limited_or_unavailable: true)
           return Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY

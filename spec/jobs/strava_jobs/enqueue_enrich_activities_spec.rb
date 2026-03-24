@@ -3,6 +3,23 @@
 require "rails_helper"
 
 RSpec.describe StravaJobs::EnqueueEnrichActivities, type: :job do
+  describe "enqueue_enrich_activity_requests" do
+    let(:strava_integration) { FactoryBot.create(:strava_integration) }
+    before { StravaRequest.destroy_all }
+
+    context "when enrich_requests_rate_limited?" do
+      it "does not create fetch_activity requests" do
+        FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345")
+        allow(StravaJobs::RequestRunner).to receive(:enrich_requests_rate_limited?).and_return(true)
+
+        described_class.new.perform(strava_integration.id)
+
+        activity_requests = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
+        expect(activity_requests.count).to eq(0)
+      end
+    end
+  end
+
   describe "enqueue_gear_requests" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
     before { StravaRequest.destroy_all }
