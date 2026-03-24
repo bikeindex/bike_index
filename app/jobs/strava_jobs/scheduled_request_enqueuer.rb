@@ -21,7 +21,8 @@ module StravaJobs
         pending = StravaRequest.pending.priority_ordered.limit(limit)
 
         duplicate_ids_for(pending.fetch_activity, "parameters->>'strava_id'") +
-          duplicate_ids_for(pending.fetch_gear, "parameters->>'strava_gear_id'")
+          duplicate_ids_for(pending.fetch_gear, "parameters->>'strava_gear_id'") +
+          duplicate_ids_for(pending.list_activities, "parameters->>'page'")
       end
 
       private
