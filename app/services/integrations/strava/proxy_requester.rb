@@ -100,7 +100,7 @@ module Integrations::Strava::ProxyRequester
 
   def binx_response_rate_limited?(strava_request)
     Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method,
-      headroom: RATE_LIMIT_HEADROOM)
+      headroom: RATE_LIMIT_HEADROOM, request_type: strava_request.request_type)
   end
 
   def internal_response!(strava_request)
