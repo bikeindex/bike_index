@@ -11,7 +11,9 @@ module Integrations::Strava::Client
   STRAVA_SECRET = ENV["STRAVA_SECRET"]
   STRAVA_WEBHOOK_TOKEN = ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"]
   ACTIVITIES_PER_PAGE = 200
-  RATE_LIMIT_HEADROOM = 20
+  RATE_LIMIT_HEADROOM = (ENV["STRAVA_RATE_LIMIT_HEADROOM"] || 10).to_i
+  ENRICH_SHORT_RATE_LIMIT_MINIMUM = (ENV["STRAVA_ENRICH_SHORT_RATE_LIMIT_MINIMUM"] || 100).to_i
+  ENRICH_LONG_RATE_LIMIT_MINIMUM = (ENV["STRAVA_ENRICH_LONG_RATE_LIMIT_MINIMUM"] || 500).to_i
   RATE_LIMITED_RESPONSE_BODY = {
     "message" => "Rate Limit Exceeded",
     "errors" => [{"resource" => "Application", "field" => "rate limit", "code" => "exceeded"}]

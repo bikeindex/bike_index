@@ -2,16 +2,13 @@
 
 module StravaJobs
   class RequestRunner < ApplicationJob
-    ENRICH_SHORT_RATE_LIMIT_MINIMUM = 100
-    ENRICH_LONG_RATE_LIMIT_MINIMUM = 500
-
     sidekiq_options queue: "droppable", retry: 1
 
     class << self
       def enrich_requests_rate_limited?
         rate_limit = StravaRequest.estimated_current_rate_limit
-        (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < ENRICH_SHORT_RATE_LIMIT_MINIMUM ||
-          (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < ENRICH_LONG_RATE_LIMIT_MINIMUM
+        (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < Integrations::Strava::Client::ENRICH_SHORT_RATE_LIMIT_MINIMUM ||
+          (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < Integrations::Strava::Client::ENRICH_LONG_RATE_LIMIT_MINIMUM
       end
 
       def make_request_and_update(strava_integration, strava_request)
