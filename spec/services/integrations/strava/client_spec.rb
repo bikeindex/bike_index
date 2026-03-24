@@ -103,6 +103,56 @@ RSpec.describe Integrations::Strava::Client, type: :service do
     end
   end
 
+  describe ".enrich_requests_rate_limited?" do
+    before { StravaRequest.destroy_all }
+    let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+
+    context "when no rate limit data" do
+      it "is falsey" do
+        expect(described_class.enrich_requests_rate_limited?).to be_falsey
+      end
+    end
+
+    context "when short remaining below ENRICH_SHORT_HEADROOM" do
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second,
+          rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                       read_short_limit: 200, read_short_usage: 101, read_long_limit: 2000, read_long_usage: 0})
+      end
+
+      it "is truthy" do
+        expect(described_class.enrich_requests_rate_limited?).to be_truthy
+      end
+    end
+
+    context "when long remaining below ENRICH_LONG_HEADROOM" do
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second,
+          rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                       read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1501})
+      end
+
+      it "is truthy" do
+        expect(described_class.enrich_requests_rate_limited?).to be_truthy
+      end
+    end
+
+    context "when both limits have sufficient remaining" do
+      let!(:rate_limit_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second,
+          rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                       read_short_limit: 200, read_short_usage: 50, read_long_limit: 2000, read_long_usage: 1000})
+      end
+
+      it "is falsey" do
+        expect(described_class.enrich_requests_rate_limited?).to be_falsey
+      end
+    end
+  end
+
   describe ".authorization_url" do
     it "builds the correct authorization URL with state" do
       url = described_class.authorization_url(state: "test_state")
