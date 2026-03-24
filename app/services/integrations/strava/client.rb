@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Integrations::StravaClient
+module Integrations::Strava::Client
   extend Functionable
 
   BASE_URL = "https://www.strava.com"

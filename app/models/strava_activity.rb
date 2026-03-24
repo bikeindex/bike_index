@@ -113,7 +113,7 @@ class StravaActivity < ApplicationRecord
         average_speed: detail["average_speed"],
         suffer_score: detail["suffer_score"],
         photos:,
-        segment_locations: StravaJobs::SegmentLocations.locations_for(detail["segment_efforts"]),
+        segment_locations: Integrations::Strava::SegmentLocations.locations_for(detail["segment_efforts"]),
         kudos_count: detail["kudos_count"],
         enriched_at: Time.current,
         strava_data: strava_data_from(detail)
