@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Integrations::StravaClient, type: :service do
+RSpec.describe Integrations::Strava::Client, type: :service do
   let(:strava_integration) do
     FactoryBot.create(:strava_integration,
       token_expires_at: Time.current + 6.hours,
@@ -217,7 +217,7 @@ RSpec.describe Integrations::StravaClient, type: :service do
   end
 
   describe ".create_webhook_subscription" do
-    before { stub_const("Integrations::StravaClient::STRAVA_WEBHOOK_TOKEN", "test_verify_token") }
+    before { stub_const("Integrations::Strava::Client::STRAVA_WEBHOOK_TOKEN", "test_verify_token") }
 
     it "creates a webhook subscription" do
       VCR.use_cassette("strava-create_webhook_subscription") do

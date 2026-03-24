@@ -25,8 +25,9 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     context "with list_activities request" do
       it "creates activities and enqueues detail requests for cycling activities" do
         VCR.use_cassette("strava-list_activities") do
-          expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by 3
+          instance.perform(strava_request.id)
         end
+        StravaJobs::EnqueueEnrichActivities.drain
 
         strava_request.reload
         expect(strava_request.response_status).to eq("success")
