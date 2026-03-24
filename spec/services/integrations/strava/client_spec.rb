@@ -103,17 +103,17 @@ RSpec.describe Integrations::Strava::Client, type: :service do
     end
   end
 
-  describe ".enrich_requests_rate_limited?" do
+  describe ".fetch_activity_requests_rate_limited?" do
     before { StravaRequest.destroy_all }
     let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
 
     context "when no rate limit data" do
       it "is falsey" do
-        expect(described_class.enrich_requests_rate_limited?).to be_falsey
+        expect(described_class.fetch_activity_requests_rate_limited?).to be_falsey
       end
     end
 
-    context "when short remaining below ENRICH_SHORT_HEADROOM" do
+    context "when short remaining below FETCH_ACTIVITY_SHORT_HEADROOM" do
       let!(:rate_limit_request) do
         FactoryBot.create(:strava_request, :processed, strava_integration:,
           requested_at: boundary + 1.second,
@@ -122,11 +122,11 @@ RSpec.describe Integrations::Strava::Client, type: :service do
       end
 
       it "is truthy" do
-        expect(described_class.enrich_requests_rate_limited?).to be_truthy
+        expect(described_class.fetch_activity_requests_rate_limited?).to be_truthy
       end
     end
 
-    context "when long remaining below ENRICH_LONG_HEADROOM" do
+    context "when long remaining below FETCH_ACTIVITY_LONG_HEADROOM" do
       let!(:rate_limit_request) do
         FactoryBot.create(:strava_request, :processed, strava_integration:,
           requested_at: boundary + 1.second,
@@ -135,7 +135,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
       end
 
       it "is truthy" do
-        expect(described_class.enrich_requests_rate_limited?).to be_truthy
+        expect(described_class.fetch_activity_requests_rate_limited?).to be_truthy
       end
     end
 
@@ -148,7 +148,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
       end
 
       it "is falsey" do
-        expect(described_class.enrich_requests_rate_limited?).to be_falsey
+        expect(described_class.fetch_activity_requests_rate_limited?).to be_falsey
       end
     end
   end

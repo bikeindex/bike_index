@@ -168,7 +168,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
     end
 
-    context "when enrich_requests_rate_limited? for fetch_activity" do
+    context "when fetch_activity_requests_rate_limited? for fetch_activity" do
       let(:strava_request) do
         StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id,

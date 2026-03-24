@@ -134,6 +134,55 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
         end
       end
 
+      describe "skip_enqueueing_fetch_activity_requests?" do
+        let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+
+        context "when no rate limit data" do
+          it "is falsey" do
+            expect(described_class.skip_enqueueing_fetch_activity_requests?).to be_falsey
+          end
+        end
+
+        context "when fetch_activity_requests_rate_limited?" do
+          let!(:rate_limit_request) do
+            FactoryBot.create(:strava_request, :processed, strava_integration:,
+              requested_at: boundary + 1.second,
+              rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                           read_short_limit: 200, read_short_usage: 101, read_long_limit: 2000, read_long_usage: 0})
+          end
+
+          it "is truthy" do
+            expect(described_class.skip_enqueueing_fetch_activity_requests?).to be_truthy
+          end
+        end
+
+        context "when long remaining is below 2x FETCH_ACTIVITY_LONG_HEADROOM" do
+          let!(:rate_limit_request) do
+            FactoryBot.create(:strava_request, :processed, strava_integration:,
+              requested_at: boundary + 1.second,
+              rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1001})
+          end
+
+          it "is truthy" do
+            expect(described_class.skip_enqueueing_fetch_activity_requests?).to be_truthy
+          end
+        end
+
+        context "when long remaining is above 2x FETCH_ACTIVITY_LONG_HEADROOM" do
+          let!(:rate_limit_request) do
+            FactoryBot.create(:strava_request, :processed, strava_integration:,
+              requested_at: boundary + 1.second,
+              rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 999})
+          end
+
+          it "is falsey" do
+            expect(described_class.skip_enqueueing_fetch_activity_requests?).to be_falsey
+          end
+        end
+      end
+
       context "when rate limited" do
         let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
         let(:rate_limit) do
