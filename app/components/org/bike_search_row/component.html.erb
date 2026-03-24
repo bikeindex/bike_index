@@ -114,25 +114,17 @@
 
 <% if @organization.enabled?("bike_stickers") %>
   <td class="hiddenColumn sticker_cell">
-    <% if @bike_sticker.present? %>
-      <small>
-        <%= link_to translation(".link"),
-          bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: @bike.id),
-          method: "PUT", data: {turbo_frame: "_top"} %>
-      </small>
-    <% else %>
-      <% @bike.bike_stickers.each_with_index do |bike_sticker, index| %>
-        <% if bike_sticker.organization.present? && bike_sticker.organization_id == @organization.id %>
-          <%= link_to bike_sticker.pretty_code,
-            edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param),
-            class: "small", data: {turbo_frame: "_top"} %>
-        <% else %>
-          <small><%= bike_sticker.pretty_code %></small>
-        <% end %>
+    <% @bike.bike_stickers.each_with_index do |bike_sticker, index| %>
+      <% if bike_sticker.organization.present? && bike_sticker.organization_id == @organization.id %>
+        <%= link_to bike_sticker.pretty_code,
+          edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param),
+          class: "small", data: {turbo_frame: "_top"} %>
+      <% else %>
+        <small><%= bike_sticker.pretty_code %></small>
+      <% end %>
 
-        <% if index > 0 %>
-          <br>
-        <% end %>
+      <% if index > 0 %>
+        <br>
       <% end %>
     <% end %>
   </td>

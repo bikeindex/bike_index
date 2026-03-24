@@ -39,7 +39,7 @@ class StravaSearchController < ApplicationController
     strava_integration = current_user.strava_integration
     return render json: {error: "No Strava integration"}, status: 404 unless strava_integration
 
-    access_token = StravaJobs::ProxyRequester.find_or_create_access_token(current_user.id)
+    access_token = Integrations::Strava::ProxyRequester.find_or_create_access_token(current_user.id)
 
     render json: {
       access_token: access_token.token,

@@ -10,10 +10,10 @@ module StravaJobs
           return handle_incoming_webhook(strava_request, strava_integration)
         end
 
-        if Integrations::StravaClient.currently_rate_limited?(strava_request.request_method)
+        if Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method)
           strava_request.update_from_response(:binx_response_rate_limited,
             re_enqueue_if_rate_limited_or_unavailable: true)
-          return Integrations::StravaClient::RATE_LIMITED_RESPONSE_BODY
+          return Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY
         end
 
         response = make_request(strava_integration, strava_request.request_type, strava_request.parameters)
@@ -31,13 +31,13 @@ module StravaJobs
       def make_request(strava_integration, strava_request_type, parameters)
         case strava_request_type
         when "list_activities"
-          Integrations::StravaClient.list_activities(strava_integration, **parameters.symbolize_keys)
+          Integrations::Strava::Client.list_activities(strava_integration, **parameters.symbolize_keys)
         when "fetch_activity"
-          Integrations::StravaClient.fetch_activity(strava_integration, parameters["strava_id"])
+          Integrations::Strava::Client.fetch_activity(strava_integration, parameters["strava_id"])
         when "fetch_athlete"
-          Integrations::StravaClient.fetch_athlete(strava_integration)
+          Integrations::Strava::Client.fetch_athlete(strava_integration)
         when "fetch_gear"
-          Integrations::StravaClient.fetch_gear(strava_integration, parameters["strava_gear_id"])
+          Integrations::Strava::Client.fetch_gear(strava_integration, parameters["strava_gear_id"])
         else
           raise "Unknown Request type"
         end
@@ -51,7 +51,7 @@ module StravaJobs
           if strava_request.parameters["page"] == 1
             strava_integration.update(last_updated_activities_at: Time.current)
           end
-          if strava_request.looks_like_last_page? && response.size == Integrations::StravaClient::ACTIVITIES_PER_PAGE
+          if strava_request.looks_like_last_page? && response.size == Integrations::Strava::Client::ACTIVITIES_PER_PAGE
             StravaRequest.create!(user_id: strava_request.user_id, strava_integration_id: strava_integration.id,
               request_type: :list_activities, parameters: {page: strava_request.parameters["page"] + 1})
           end
@@ -84,6 +84,7 @@ module StravaJobs
           end
         end
         strava_request.update!(response_status: :success)
+        strava_integration.update(last_updated_activities_at: Time.current)
 
         strava_params
       end

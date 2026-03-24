@@ -14,14 +14,15 @@ module StravaJobs
       end
 
       def rate_limit_allows_batch?
-        !Integrations::StravaClient.currently_rate_limited?(headroom: 2 * BATCH_SIZE)
+        !Integrations::Strava::Client.currently_rate_limited?(headroom: 2 * BATCH_SIZE)
       end
 
       def duplicate_request_ids(limit: 5_000)
         pending = StravaRequest.pending.priority_ordered.limit(limit)
 
         duplicate_ids_for(pending.fetch_activity, "parameters->>'strava_id'") +
-          duplicate_ids_for(pending.fetch_gear, "parameters->>'strava_gear_id'")
+          duplicate_ids_for(pending.fetch_gear, "parameters->>'strava_gear_id'") +
+          duplicate_ids_for(pending.list_activities, "parameters->>'page'")
       end
 
       private

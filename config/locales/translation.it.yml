@@ -4833,9 +4833,9 @@ it:
         view_matching_any_audit:
         notes: Note
         impound_id:
+        assign_bike_sticker: Collegamento
       bike_search_row:
         email_hidden:
-        link: Collegamento
         mfg_model_color_html:
       bike_search_settings:
         address:

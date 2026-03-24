@@ -4,6 +4,7 @@ en:
     org:
       bike_search:
         affiliation: Affiliation
+        assign_bike_sticker: Link
         avery: Avery?
         avery_exportable: Avery Exportable
         bike: registration

@@ -6,7 +6,7 @@ import { Application } from '@hotwired/stimulus'
 // Lazy load all controllers
 import { lazyLoadControllersFrom } from '@hotwired/stimulus-loading'
 
-import TimeLocalizer from 'utils/time_localizer'
+import TimeLocalizer from '@bikeindex/time-localizer'
 
 /* global Turbo Honeybadger */
 // Disable Turbo by default, only enable on case-by-case

@@ -23,6 +23,7 @@
 ).compact %>
 
 <div
+  class="org-bikes-search-component"
   data-controller="org--bike-search"
   data-org--bike-search-default-columns-value="<%= bike_search_settings.initially_checked_columns.to_json %>"
 >
@@ -32,7 +33,11 @@
       target_frame: :organized_bikes_results_frame,
       interpreted_params: form_interpreted_params,
       settings_component: bike_search_settings
-    )) %>
+    )) do %>
+      <% if @bike_sticker.present? %>
+        <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
+      <% end %>
+    <% end %>
   </div>
 
   <%= turbo_frame_tag :organized_bikes_results_frame do %>
