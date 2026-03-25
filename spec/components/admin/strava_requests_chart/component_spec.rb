@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Admin::ChartStravaRequests::Component, type: :component do
+RSpec.describe Admin::StravaRequestsChart::Component, type: :component do
   let(:time_range) { 1.week.ago..Time.current }
   let(:time_range_column) { "created_at" }
   let(:instance) { described_class.new(collection:, time_range:, time_range_column:) }
