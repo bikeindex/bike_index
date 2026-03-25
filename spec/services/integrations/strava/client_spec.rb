@@ -67,6 +67,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
       context "when overall limits have headroom" do
         it "returns false" do
           expect(described_class.currently_rate_limited?("PUT")).to be false
+          expect(described_class.currently_rate_limited?).to be false
         end
       end
 
@@ -84,20 +85,22 @@ RSpec.describe Integrations::Strava::Client, type: :service do
       context "when overall long limit is exhausted" do
         let(:rate_limit) do
           {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 1991,
-           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1991}
         end
         it "returns true" do
           expect(described_class.currently_rate_limited?("PUT")).to be true
+          expect(described_class.currently_rate_limited?).to be true
         end
       end
 
       context "when only read limits are exhausted" do
         let(:rate_limit) do
           {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
-           read_short_limit: 200, read_short_usage: 185, read_long_limit: 2000, read_long_usage: 0}
+           read_short_limit: 200, read_short_usage: 191, read_long_limit: 2000, read_long_usage: 0}
         end
         it "returns false" do
           expect(described_class.currently_rate_limited?("PUT")).to be false
+          expect(described_class.currently_rate_limited?).to be true
         end
       end
     end
@@ -134,6 +137,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
 
         it "returns false" do
           expect(described_class.currently_rate_limited?(request_type: :fetch_activity)).to be false
+          expect(described_class.currently_rate_limited?).to be false
         end
       end
     end
