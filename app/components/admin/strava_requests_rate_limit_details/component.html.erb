@@ -1,10 +1,15 @@
-<div class="tw:flex tw:flex-wrap tw:gap-x-6 tw:gap-y-2 tw:items-start tw:py-2">
+<div class="tw:flex tw:flex-wrap tw:items-start tw:gap-x-6 tw:gap-y-2 tw:py-2">
   <div class="tw:flex tw:items-center tw:gap-x-2">
     <span class="tw:font-medium tw:text-gray-500">Rate limit</span>
     <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: @rate_limit_json) %>
-    <div class="tw:text-xs tw:text-gray-400 tw:leading-tight">
+
+    <div class="tw:text-xs tw:leading-tight tw:text-gray-400">
       <div>short resets: <%= short_resets_display %></div>
-      <div>long resets: <span class="localizeTime preciseTimeSeconds"><%= helpers.l(long_resets_at, format: :convert_time) %></span></div>
+
+      <div>
+        long resets:
+        <span class="localizeTime preciseTimeSeconds"><%= helpers.l(long_resets_at, format: :convert_time) %></span>
+      </div>
     </div>
   </div>
 
