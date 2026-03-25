@@ -43,7 +43,7 @@ class Admin::StravaRequestsController < Admin::BaseController
       when "pending_or_success" then strava_requests.where(response_status: StravaRequest::PENDING_OR_SUCCESS)
       when "not_successful" then strava_requests.where(response_status: StravaRequest::NOT_SUCCESSFUL)
       when "only_binx_response" then strava_requests.where(response_status: StravaRequest::BINX_RESPONSE)
-      when "not_binx_response" then strava_requests.where(response_status: StravaRequest::NOT_BINX_RESPONSE)
+      when "only_strava_response" then strava_requests.strava_response
       else strava_requests.where(response_status: params[:search_response_status])
       end
     end

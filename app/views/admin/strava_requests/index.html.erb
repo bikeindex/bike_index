@@ -1,7 +1,7 @@
 <% index_title = capture do %>
   Manage Strava Requests
   <span class="tw:inline-flex tw:items-center tw:gap-x-2 tw:text-base">current rate limit: <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: StravaRequest.estimated_current_rate_limit.as_json) %></span>
-  
+  <br>
   <small class="tw:text-xs!">batch: <%= number_display(StravaJobs::ScheduledRequestEnqueuer::BATCH_SIZE) %></small>
 <% end %>
 
@@ -57,8 +57,8 @@
       <%= link_to "All statuses", url_for(sortable_search_params.merge(search_response_status: nil)), class: "dropdown-item #{params[:search_response_status].present? ? '' : 'active'}" %>
       <%= link_to "Pending or successful", url_for(sortable_search_params.merge(search_response_status: "pending_or_success")), class: "dropdown-item #{params[:search_response_status] == 'pending_or_success' ? 'active' : ''}" %>
       <%= link_to "Not successful", url_for(sortable_search_params.merge(search_response_status: "not_successful")), class: "dropdown-item #{params[:search_response_status] == 'not_successful' ? 'active' : ''}" %>
-      <%= link_to "Only binx response", url_for(sortable_search_params.merge(search_response_status: "only_binx_response")), class: "dropdown-item #{params[:search_response_status] == 'only_binx_response' ? 'active' : ''}" %>
-      <%= link_to "Only NOT binx response", url_for(sortable_search_params.merge(search_response_status: "not_binx_response")), class: "dropdown-item #{params[:search_response_status] == 'not_binx_response' ? 'active' : ''}" %>
+      <%= link_to "Only Binx response", url_for(sortable_search_params.merge(search_response_status: "only_binx_response")), class: "dropdown-item #{params[:search_response_status] == 'only_binx_response' ? 'active' : ''}" %>
+      <%= link_to "Only Strava Response (NOT Binx response)", url_for(sortable_search_params.merge(search_response_status: "only_strava_response")), class: "dropdown-item #{params[:search_response_status] == 'only_strava_response' ? 'active' : ''}" %>
 
       <div class="dropdown-divider"></div>
 
