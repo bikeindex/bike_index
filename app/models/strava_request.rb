@@ -98,7 +98,7 @@ class StravaRequest < AnalyticsRecord
     end
 
     def estimated_current_rate_limit
-      latest = where.not(rate_limit: nil).order(requested_at: :desc).first
+      latest = where.not(rate_limit: nil).where.not(response_status: BINX_RESPONSE).order(requested_at: :desc).first
       latest.nil? ? default_rate_limit : rate_limit_from(latest.rate_limit.symbolize_keys, latest.requested_at)
     end
 

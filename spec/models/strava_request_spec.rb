@@ -253,6 +253,41 @@ RSpec.describe StravaRequest, type: :model do
       end
     end
 
+    context "when only binx_response requests exist" do
+      let!(:binx_request) do
+        FactoryBot.create(:strava_request, strava_integration:,
+          requested_at: Time.current, response_status: :binx_response,
+          rate_limit: {"short_limit" => 100, "short_usage" => 99, "long_limit" => 1000, "long_usage" => 999,
+                       "read_short_limit" => 100, "read_short_usage" => 99, "read_long_limit" => 1000, "read_long_usage" => 999})
+      end
+
+      it "returns defaults" do
+        expect(StravaRequest.estimated_current_rate_limit).to eq target
+      end
+    end
+
+    context "when the most recent request is a binx_response" do
+      let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+      let!(:strava_request) do
+        FactoryBot.create(:strava_request, :processed, strava_integration:,
+          requested_at: boundary + 1.second, rate_limit:)
+      end
+      let!(:binx_request) do
+        FactoryBot.create(:strava_request, strava_integration:,
+          requested_at: boundary + 2.seconds, response_status: :binx_response,
+          rate_limit: {"short_limit" => 100, "short_usage" => 99, "long_limit" => 1000, "long_usage" => 999,
+                       "read_short_limit" => 100, "read_short_usage" => 99, "read_long_limit" => 1000, "read_long_usage" => 999})
+      end
+      let(:target) do
+        {short_limit: 100, short_usage: 10, long_limit: 1000, long_usage: 200,
+         read_short_limit: 100, read_short_usage: 10, read_long_limit: 1000, read_long_usage: 200}
+      end
+
+      it "ignores binx_response and uses the strava response" do
+        expect(StravaRequest.estimated_current_rate_limit).to eq target
+      end
+    end
+
     context "when the daily boundary has been crossed" do
       let(:daily_boundary) { Time.current.utc.beginning_of_day }
       let!(:base_request) do
