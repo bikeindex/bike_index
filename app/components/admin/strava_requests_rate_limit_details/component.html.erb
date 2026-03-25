@@ -1,4 +1,4 @@
-<div class="tw:flex tw:flex-wrap tw:items-start tw:gap-x-6 tw:gap-y-2 tw:py-2">
+<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-6 tw:gap-y-2">
   <div class="tw:flex tw:items-center tw:gap-x-2">
     <span class="tw:font-medium tw:text-gray-500">Rate limit</span>
     <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: @rate_limit_json) %>
@@ -8,13 +8,17 @@
 
       <div>
         long resets:
-        <span class="localizeTime preciseTimeSeconds"><%= helpers.l(long_resets_at, format: :convert_time) %></span>
+        <span class="localizeTime preciseTimeSeconds"><%= l(long_resets_at, format: :convert_time) %></span>
       </div>
     </div>
   </div>
 
   <div class="tw:text-xs tw:text-gray-500">
-    <div>batch: <%= helpers.number_display(@batch_size) %></div>
-    <div>headroom: <%= helpers.number_display(@headroom) %></div>
+    <div>headroom: <%= number_display(@headroom) %></div>
+    <div>fetch_activity headroom: <%= number_display(@fetch_activity_short_headroom) %> short, <%= number_display(@fetch_activity_long_headroom) %> long</div>
+  </div>
+
+  <div class="tw:text-xs tw:text-gray-500">
+    <div>batch: <%= number_display(@batch_size) %></div>
   </div>
 </div>
