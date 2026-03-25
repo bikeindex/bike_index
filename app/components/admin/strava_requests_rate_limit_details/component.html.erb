@@ -1,14 +1,20 @@
 <span class="tw:inline-flex tw:items-center tw:gap-x-2">
   Strava Requests
-  <span class="tw:inline-flex tw:items-center tw:gap-x-1 tw:text-sm tw:font-normal tw:text-gray-500">
-    Rate limit
-    <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: @rate_limit_json) %>
-  </span>
+  <span class="
+    tw:inline-flex tw:items-center tw:gap-x-1 tw:text-sm tw:font-normal
+    tw:text-gray-500
+  ">Rate limit <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: @rate_limit_json) %></span>
 </span>
 
-<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-6 tw:gap-y-1 tw:mt-2 tw:mb-2 tw:text-xs tw:font-normal tw:text-gray-500">
+<div
+  class="
+    tw:mt-2 tw:mb-2 tw:flex tw:flex-wrap tw:items-center tw:gap-x-6
+    tw:gap-y-1 tw:text-xs tw:font-normal tw:text-gray-500
+  "
+>
   <div class="tw:leading-tight">
     <div>short resets: <%= short_resets_display %></div>
+
     <div>
       long resets:
       <span class="localizeTime preciseTimeSeconds"><%= l(long_resets_at, format: :convert_time) %></span>
@@ -17,6 +23,7 @@
 
   <div class="tw:leading-tight">
     <div>headroom: <%= number_display(@headroom) %></div>
+
     <div>
       fetch_activity headroom:
       <%= number_display(@fetch_activity_short_headroom) %> short,
@@ -24,5 +31,7 @@
     </div>
   </div>
 
-  <div>batch: <%= number_display(@batch_size) %></div>
+  <div class="sm:tw:basis-auto tw:basis-full">
+    batch: <%= number_display(@batch_size) %>
+  </div>
 </div>
