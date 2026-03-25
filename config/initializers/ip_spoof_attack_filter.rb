@@ -14,3 +14,5 @@ class IpSpoofAttackFilter
     FORBIDDEN_RESPONSE
   end
 end
+
+Rails.application.config.middleware.insert_after ActionDispatch::RemoteIp, IpSpoofAttackFilter
