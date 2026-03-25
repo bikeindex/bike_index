@@ -1,8 +1,9 @@
 <% index_title = capture do %>
   Manage Strava Requests
-  <span class="tw:inline-flex tw:items-center tw:gap-x-2 tw:text-base">current rate limit: <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: StravaRequest.estimated_current_rate_limit.as_json) %></span>
-  <br>
-  <small class="tw:text-xs!">batch: <%= number_display(StravaJobs::ScheduledRequestEnqueuer::BATCH_SIZE) %></small>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <%= render Admin::StravaRequestsRateLimitDetails::Component.new %>
 <% end %>
 
 <% nav_header_list_items = capture do %>
@@ -75,7 +76,7 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(index_title:, nav_header_list_items:, rendered_chart:)) %>
+<%= render(Admin::IndexSkeleton::Component.new(index_title:, nav_header_list_items:, admin_search_form:, rendered_chart:)) %>
 
 <style>
   .full-screen-table pre { margin-bottom: 0; }

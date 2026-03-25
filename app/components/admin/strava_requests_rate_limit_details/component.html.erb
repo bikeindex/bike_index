@@ -1,0 +1,8 @@
+<div>
+  <span class="tw:inline-flex tw:items-center tw:gap-x-2 tw:text-base">current rate limit: <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: @rate_limit_json) %></span>
+  <br>
+  <small class="tw:text-xs!">batch: <%= helpers.number_display(@batch_size) %>
+    &nbsp;|&nbsp; short resets: <%= short_resets_display %>
+    &nbsp;|&nbsp; long resets: <span class="localizeTime preciseTimeSeconds"><%= helpers.l(long_resets_at, format: :convert_time) %></span>
+  </small>
+</div>
