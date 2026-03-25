@@ -1,8 +1,4 @@
 <% index_title = capture do %>
-  Manage Strava Requests
-<% end %>
-
-<% admin_search_form = capture do %>
   <%= render Admin::StravaRequestsRateLimitDetails::Component.new %>
 <% end %>
 
@@ -76,7 +72,7 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(index_title:, nav_header_list_items:, admin_search_form:, rendered_chart:)) %>
+<%= render(Admin::IndexSkeleton::Component.new(index_title:, nav_header_list_items:, rendered_chart:)) %>
 
 <style>
   .full-screen-table pre { margin-bottom: 0; }
