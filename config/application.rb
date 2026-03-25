@@ -22,6 +22,7 @@ require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
 require "rack/throttle"
+require_relative "../lib/ip_spoof_attack_filter"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -66,7 +67,6 @@ module Bikeindex
     config.i18n.available_locales = %i[en es it nl nb]
     config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
 
-    require_relative "../lib/ip_spoof_attack_filter"
     config.middleware.insert_after ActionDispatch::RemoteIp, IpSpoofAttackFilter
     config.middleware.use Rack::Deflater
     config.middleware.insert 0, Rack::UTF8Sanitizer
