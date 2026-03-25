@@ -4254,7 +4254,6 @@ es:
       resources: Recursos
       schools_and_universities: Escuelas y universidades
       security: Seguridad
-      stolen_bike_map: Mapa de bicicletas robadas
       stolen_bike_recoveries: Recuperación de bicicletas robadas
       store: Tienda
       support_us: Apóyanos
@@ -4262,6 +4261,7 @@ es:
       vendor_terms: condiciones de venta
       where_we_are: Dónde estamos
       who_we_serve: A quién servimos
+      strava_search:
     form_well_footer_save:
       save_changes:
     header_nav:
