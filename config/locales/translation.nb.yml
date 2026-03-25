@@ -5434,7 +5434,6 @@ nb:
       resources: Ressurser
       schools_and_universities: Skoler og universiteter
       security: Sikkerhet
-      stolen_bike_map: Stjålet sykkelkart
       stolen_bike_recoveries: Gjenvinning av stjålne sykkel
       store: butikk
       support_us: Støtt oss
@@ -5442,6 +5441,7 @@ nb:
       vendor_terms: leverandørens vilkår
       where_we_are: Hvor vi er
       who_we_serve: Hvem vi tjener
+      strava_search: Strava-søk og -oppdatering
     form_well_footer_save:
       save_changes: Lagre endringer
     header_nav:
