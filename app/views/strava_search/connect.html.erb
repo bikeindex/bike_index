@@ -1,12 +1,21 @@
-<div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:min-h-[60vh] tw:text-center tw:px-4">
-  <h1 class="tw:text-3xl tw:font-bold tw:mb-4">Strava Search</h1>
-  <p class="tw:text-lg tw:text-gray-600 tw:mb-2 tw:max-w-lg">
-    Associate your Strava gear with your Bike Index registrations.
-    Search, filter, and bulk-update your activities to assign gear to rides that are missing it.
+<div
+  class="
+    tw:flex tw:min-h-[60vh] tw:flex-col tw:items-center tw:justify-center
+    tw:px-4 tw:text-center
+  "
+>
+  <h1 class="tw:mb-4 tw:text-3xl tw:font-bold">Strava Search</h1>
+
+  <p class="tw:mb-2 tw:max-w-lg tw:text-lg tw:text-gray-600">
+    Associate your Strava gear with your Bike Index registrations. Search,
+    filter, and bulk-update your activities to assign gear to rides that are
+    missing it.
   </p>
-  <p class="tw:text-gray-500 tw:mb-8 tw:max-w-lg">
+
+  <p class="tw:mb-8 tw:max-w-lg tw:text-gray-500">
     Connect your Strava account to get started.
   </p>
+
   <%= link_to @connect_url do %>
     <%= image_tag("logos/btn_strava_connect.svg", alt: "Connect with Strava", style: "height: 48px; width: auto;") %>
   <% end %>
