@@ -6,8 +6,7 @@
 <p>
   <% if @stolen_notification.unstolen_blocked? %>
     They shouldn't have been able to send this notification to an unstolen bike.
-    <strong>Please contact seth</strong>
-    !
+    <strong>Please contact seth!</strong>
   <% else %>
     They have sent more stolen notifications than they are allowed.
   <% end %>
