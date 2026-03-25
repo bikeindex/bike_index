@@ -34,7 +34,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
       context "when read short limit is exhausted" do
         let(:rate_limit) do
           {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
-           read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0}
+           read_short_limit: 200, read_short_usage: 191, read_long_limit: 2000, read_long_usage: 0}
         end
         it "returns true" do
           expect(described_class.currently_rate_limited?("GET")).to be true
@@ -44,7 +44,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
       context "when read long limit is exhausted" do
         let(:rate_limit) do
           {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
-           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1997}
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1991}
         end
         it "returns true" do
           expect(described_class.currently_rate_limited?("GET")).to be true
@@ -67,12 +67,13 @@ RSpec.describe Integrations::Strava::Client, type: :service do
       context "when overall limits have headroom" do
         it "returns false" do
           expect(described_class.currently_rate_limited?("PUT")).to be false
+          expect(described_class.currently_rate_limited?).to be false
         end
       end
 
       context "when overall short limit is exhausted" do
         let(:rate_limit) do
-          {short_limit: 200, short_usage: 198, long_limit: 2000, long_usage: 0,
+          {short_limit: 200, short_usage: 191, long_limit: 2000, long_usage: 0,
            read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
         end
         it "returns true" do
@@ -83,21 +84,60 @@ RSpec.describe Integrations::Strava::Client, type: :service do
 
       context "when overall long limit is exhausted" do
         let(:rate_limit) do
-          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 1997,
-           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 0}
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 1991,
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1991}
         end
         it "returns true" do
           expect(described_class.currently_rate_limited?("PUT")).to be true
+          expect(described_class.currently_rate_limited?).to be true
         end
       end
 
       context "when only read limits are exhausted" do
         let(:rate_limit) do
           {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
-           read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0}
+           read_short_limit: 200, read_short_usage: 191, read_long_limit: 2000, read_long_usage: 0}
         end
         it "returns false" do
           expect(described_class.currently_rate_limited?("PUT")).to be false
+          expect(described_class.currently_rate_limited?).to be true
+        end
+      end
+    end
+    context "with request_type: :fetch_activity" do
+      context "when short remaining below FETCH_ACTIVITY_SHORT_HEADROOM" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 101, read_long_limit: 2000, read_long_usage: 0}
+        end
+
+        it "returns true" do
+          expect(described_class.currently_rate_limited?(request_type: :fetch_activity)).to be true
+          expect(described_class.currently_rate_limited?("GET")).to be false
+        end
+      end
+
+      context "when long remaining below FETCH_ACTIVITY_LONG_HEADROOM" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage: 1501}
+        end
+
+        it "returns true" do
+          expect(described_class.currently_rate_limited?(request_type: :fetch_activity)).to be true
+          expect(described_class.currently_rate_limited?("GET")).to be false
+        end
+      end
+
+      context "when both limits have sufficient remaining" do
+        let(:rate_limit) do
+          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+           read_short_limit: 200, read_short_usage: 50, read_long_limit: 2000, read_long_usage: 1000}
+        end
+
+        it "returns false" do
+          expect(described_class.currently_rate_limited?(request_type: :fetch_activity)).to be false
+          expect(described_class.currently_rate_limited?).to be false
         end
       end
     end

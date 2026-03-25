@@ -73,6 +73,7 @@ class StravaRequest < AnalyticsRecord
   scope :proxy_request, -> { where(proxy_request: true) }
   scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
   scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
+  scope :strava_response, -> { where(response_status: NOT_BINX_RESPONSE) }
   scope :priority_ordered, -> { reorder(:priority) }
 
   class << self
@@ -98,7 +99,7 @@ class StravaRequest < AnalyticsRecord
     end
 
     def estimated_current_rate_limit
-      latest = where.not(rate_limit: nil).order(requested_at: :desc).first
+      latest = strava_response.where.not(rate_limit: nil).order(requested_at: :desc).first
       latest.nil? ? default_rate_limit : rate_limit_from(latest.rate_limit.symbolize_keys, latest.requested_at)
     end
 

@@ -4806,7 +4806,6 @@ nl:
       privacy_policy: Privacybeleid
       resources: Middelen
       schools_and_universities: Scholen en universiteiten
-      stolen_bike_map: Gestolen fietskaart
       stolen_bike_recoveries: Gestolen fietsherstel
       store: Winkel
       support_us: Steun ons
@@ -4819,6 +4818,7 @@ nl:
       protect_your_bike: Bescherm je fiets
       how_to_get_your_stolen_bike_back: Haal je gestolen fiets terug
       press_inquiries: Persvragen
+      strava_search: Zoeken en bijwerken op Strava
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:

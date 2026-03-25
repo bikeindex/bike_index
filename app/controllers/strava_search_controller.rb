@@ -2,11 +2,11 @@
 
 class StravaSearchController < ApplicationController
   content_security_policy false, only: [:index]
-  before_action :store_return_and_authenticate_user, only: [:index]
 
   def index
-    unless current_user.strava_integration
-      return redirect_to new_strava_integration_path(scope: :strava_search)
+    unless current_user&.strava_integration
+      @connect_url = new_strava_integration_path(scope: :strava_search)
+      return render :connect
     end
 
     strava_integration = current_user.strava_integration

@@ -17,11 +17,19 @@ module StravaJobs
         !Integrations::Strava::Client.currently_rate_limited?(headroom: 2 * BATCH_SIZE)
       end
 
+      def skip_enqueueing_fetch_activity_requests?
+        return true if Integrations::Strava::Client.currently_rate_limited?(request_type: :fetch_activity)
+
+        rate_limit = StravaRequest.estimated_current_rate_limit
+        (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < Integrations::Strava::Client::FETCH_ACTIVITY_LONG_HEADROOM * 2
+      end
+
       def duplicate_request_ids(limit: 5_000)
         pending = StravaRequest.pending.priority_ordered.limit(limit)
 
         duplicate_ids_for(pending.fetch_activity, "parameters->>'strava_id'") +
-          duplicate_ids_for(pending.fetch_gear, "parameters->>'strava_gear_id'")
+          duplicate_ids_for(pending.fetch_gear, "parameters->>'strava_gear_id'") +
+          duplicate_ids_for(pending.list_activities, "parameters->>'page'")
       end
 
       private
@@ -43,7 +51,9 @@ module StravaJobs
       return unless self.class.rate_limit_allows_batch?
 
       skip_duplicate_requests # skip_duplicate_requests before enqueuing
-      StravaRequest.next_pending(BATCH_SIZE).pluck(:id).each do |strava_request_id|
+      pending = StravaRequest.pending.priority_ordered
+      pending = pending.where.not(request_type: :fetch_activity) if self.class.skip_enqueueing_fetch_activity_requests?
+      pending.limit(BATCH_SIZE).pluck(:id).each do |strava_request_id|
         RequestRunner.perform_async(strava_request_id)
       end
       return if skip_perform_in
