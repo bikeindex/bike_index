@@ -11,20 +11,26 @@ module Integrations::Strava::Client
   STRAVA_SECRET = ENV["STRAVA_SECRET"]
   STRAVA_WEBHOOK_TOKEN = ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"]
   ACTIVITIES_PER_PAGE = 200
-  RATE_LIMIT_HEADROOM = 20
+  RATE_LIMIT_HEADROOM = ENV.fetch("STRAVA_CLIENT_HEADROOM", 10).to_i
+  FETCH_ACTIVITY_SHORT_HEADROOM = ENV.fetch("STRAVA_CLIENT_FETCH_ACTIVITY_SHORT_HEADROOM", 100).to_i
+  FETCH_ACTIVITY_LONG_HEADROOM = ENV.fetch("STRAVA_CLIENT_FETCH_ACTIVITY_LONG_HEADROOM", 500).to_i
   RATE_LIMITED_RESPONSE_BODY = {
     "message" => "Rate Limit Exceeded",
     "errors" => [{"resource" => "Application", "field" => "rate limit", "code" => "exceeded"}]
   }.freeze
 
-  def currently_rate_limited?(request_method = nil, headroom: nil)
-    headroom ||= RATE_LIMIT_HEADROOM
+  def currently_rate_limited?(request_method = nil, headroom: nil, request_type: nil)
     rate_limit = StravaRequest.estimated_current_rate_limit
 
-    if request_method.blank? || request_method.upcase == "GET"
+    if request_type&.to_sym == :fetch_activity
+      (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < FETCH_ACTIVITY_SHORT_HEADROOM ||
+        (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < FETCH_ACTIVITY_LONG_HEADROOM
+    elsif request_method.blank? || request_method.upcase == "GET"
+      headroom ||= RATE_LIMIT_HEADROOM
       (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < headroom ||
         (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < headroom
     else
+      headroom ||= RATE_LIMIT_HEADROOM
       (rate_limit[:short_limit] - rate_limit[:short_usage]) < headroom ||
         (rate_limit[:long_limit] - rate_limit[:long_usage]) < headroom
     end

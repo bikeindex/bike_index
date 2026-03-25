@@ -5,6 +5,9 @@ module Integrations::Strava::ProxyRequester
 
   STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3).to_i
   SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
+  # We want a little more headroom on proxy requests -
+  # to reserve some requests for initial fetch athlete and list_activities
+  PROXY_RATE_LIMIT_HEADROOM = ENV.fetch("STRAVA_PROXY_HEADROOM", Integrations::Strava::Client::RATE_LIMIT_HEADROOM * 2).to_i
 
   # returns {user:, strava_integration:} if valid
   # otherwise {error: message, status: status_code}
@@ -95,10 +98,9 @@ module Integrations::Strava::ProxyRequester
       binx_response_rate_limited?(strava_request)
   end
 
-  # We want a little more headroom on proxy requests -
-  # to reserve some requests for initial fetch athlete and list_activities
   def binx_response_rate_limited?(strava_request)
-    Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method, headroom: 20)
+    Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method,
+      headroom: PROXY_RATE_LIMIT_HEADROOM, request_type: strava_request.request_type)
   end
 
   def internal_response!(strava_request)
