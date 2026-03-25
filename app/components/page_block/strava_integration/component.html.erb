@@ -1,5 +1,5 @@
 <div class="tw:mt-1 tw:space-y-0.5 tw:leading-snug tw:[&_p]:mb-2!">
-  <% if connected? %>
+  <% if connected? %> <%# herb:disable erb-no-duplicate-branch-elements %>
     <p><%= strava_icon %> <strong>Integration</strong></p>
     <% if syncing? || pending? %>
       <% if pending? %>
