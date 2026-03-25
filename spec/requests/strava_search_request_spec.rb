@@ -16,9 +16,11 @@ RSpec.describe StravaSearchController, type: :request do
     context "signed in" do
       include_context :request_spec_logged_in_as_user
 
-      it "redirects to strava integration setup when user has no integration" do
+      it "renders connect page when user has no integration" do
         get strava_search_path
-        expect(response).to redirect_to(new_strava_integration_path(scope: :strava_search))
+        expect(response.status).to eq 200
+        expect(response.body).to include("Connect with Strava")
+        expect(response.body).to include("btn_strava_connect")
       end
 
       context "with strava integration" do

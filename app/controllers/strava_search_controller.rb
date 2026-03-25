@@ -6,7 +6,8 @@ class StravaSearchController < ApplicationController
 
   def index
     unless current_user.strava_integration
-      return redirect_to new_strava_integration_path(scope: :strava_search)
+      @connect_url = new_strava_integration_path(scope: :strava_search)
+      return render :connect
     end
 
     strava_integration = current_user.strava_integration

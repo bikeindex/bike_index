@@ -1,0 +1,13 @@
+<div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:min-h-[60vh] tw:text-center tw:px-4">
+  <h1 class="tw:text-3xl tw:font-bold tw:mb-4">Strava Search</h1>
+  <p class="tw:text-lg tw:text-gray-600 tw:mb-2 tw:max-w-lg">
+    Search, filter, and bulk-update your Strava activities.
+    Add missing bikes, fix activity names, and keep your ride history organized.
+  </p>
+  <p class="tw:text-gray-500 tw:mb-8 tw:max-w-lg">
+    Connect your Strava account to get started.
+  </p>
+  <%= link_to @connect_url do %>
+    <%= image_tag("logos/btn_strava_connect.svg", alt: "Connect with Strava", style: "height: 48px; width: auto;") %>
+  <% end %>
+</div>
