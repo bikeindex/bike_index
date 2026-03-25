@@ -55,6 +55,9 @@ linter:
     # Legacy bootstrap code uses this - new code does not. Just let it be for now
     html-anchor-require-href:
       enabled: false
+    # Disabled: herb-format adds indentation to blank lines, conflicting with this rule
+    erb-no-trailing-whitespace:
+      enabled: false
   #
   #   # Rules can have 'include', 'only', and 'exclude' patterns
   #   some-rule:
