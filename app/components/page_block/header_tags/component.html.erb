@@ -52,18 +52,18 @@
 <meta name="twitter:site" content="@bikeindex">
 <meta name="twitter:image:alt" content="<%= @page_description %>">
 
-<script type="application/ld+json">
+<script type="application/ld+json"> <%# herb:disable html-allowed-script-type %>
   {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "Bike Index",
-    "description": "<%= default_description %>",
+    "description": <%= default_description.to_json %>,
     "url": "https://bikeindex.org",
     "image": "https://bikeindex.org/opengraph.png"
   }
 </script>
 
-<script type="application/ld+json">
+<script type="application/ld+json"> <%# herb:disable html-allowed-script-type %>
   {
     "@context": "https://schema.org",
     "@type": "WebSite",

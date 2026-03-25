@@ -7,9 +7,7 @@
         <div class="alert alert-danger mb-4">
           <h4 class="text-danger">User deleted</h4>
           Deleted:
-          <span class="localizeTime preciseTime">
-            <%= l @user.deleted_at, format: :convert_time %>
-          </span>
+          <span class="localizeTime preciseTime"><%= l @user.deleted_at, format: :convert_time %></span>
         </div>
       </div>
     <% end %>

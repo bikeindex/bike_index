@@ -252,9 +252,7 @@
     <% if @organization.parent_organization.present? %>
       <p>
         Parent
-        <strong class="em">
-          <%= @organization.parent_organization.short_name %>
-        </strong>
+        <strong class="em"><%= @organization.parent_organization.short_name %></strong>
         has
         <%= link_to admin_organization_invoices_path(organization_id: @organization.parent_organization.to_param) do %>
           <%= pluralize(@organization.parent_organization.invoices.count, "invoice") %>
@@ -600,7 +598,7 @@
             <small class="less-strong">
               <%= link_to admin_organization_path(@organization, deleted_organization_roles: false), class: "gray-link" do %>
                 <%= number_with_delimiter(@organization.organization_roles.count) %>
-                 <strong>NOT</strong> deleted organization role
+                <strong>NOT</strong> deleted organization role
               <% end %>
             </small>
           <% end %>

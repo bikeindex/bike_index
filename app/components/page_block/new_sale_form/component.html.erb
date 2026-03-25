@@ -13,7 +13,7 @@
       <%= f.submit translation(:record_sale), class: "twbtn-blue twbtn-lg tw:mr-2" %>
 
       <span class="tw:text-sm tw:italic">
-        <% buyer_html = content_tag(:strong, buyer_name) %>
+        <% buyer_html = content_tag(:strong, buyer_name) %> <%# herb:disable actionview-no-silent-helper %>
         <%= translation(:transfer_to_html, buyer_html:).html_safe %>
       </span>
     </div>

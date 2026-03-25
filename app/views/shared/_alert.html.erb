@@ -9,11 +9,11 @@
   seconds ||= 0
 
   title ||= false
-  body ||= ''
+  body ||= '' %>
 
-  unless body.include? '<' # Ensure we make it html
-    body = content_tag(:p, body)
-  end %>
+<% unless body.include? '<' %>
+  <% body = content_tag(:p, body) %>
+<% end %>
 
 <div class="alert in <%= class_names %>" data-seconds="<%= seconds %>">
   <button

@@ -87,10 +87,10 @@
           <% bike_search_active = controller_namespace == "search" && controller_name == "registrations" && action_name == "index" %>
           <% marketplace_search_active = controller_namespace == "search" && controller_name == "marketplace" && action_name == "index" %>
 
-          <a id="menu-opened-backdrop" aria-hidden="true"></a> <%# herb:disable html-anchor-require-href %>
+          <a id="menu-opened-backdrop" aria-hidden="true"></a>
 
           <div class="hamburgler" aria-hidden="true">
-            <a id="primary_nav_hamburgler"></a> <%# herb:disable html-anchor-require-href %>
+            <a id="primary_nav_hamburgler"></a>
           </div>
 
           <ul class="primary-main-menu">
@@ -261,8 +261,8 @@
     <% end %>
 
     <script>
-  I18n.defaultLocale = "<%= I18n.default_locale %>"
-  I18n.locale = "<%= I18n.locale %>"
+  I18n.defaultLocale = <%= I18n.default_locale.to_json %>
+  I18n.locale = <%= I18n.locale.to_json %>
 </script>
   </body>
 </html>
