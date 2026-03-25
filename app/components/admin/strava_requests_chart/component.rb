@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Admin::ChartStravaRequests
+module Admin::StravaRequestsChart
   class Component < ApplicationComponent
     RESPONSE_STATUS_BADGE_COLORS = {
       pending: :cyan,

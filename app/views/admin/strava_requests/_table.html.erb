@@ -91,7 +91,7 @@
             <%= render UI::Badge::Component.new(
               text: status_text,
               title: strava_request.response_status.humanize,
-              color: Admin::ChartStravaRequests::Component::RESPONSE_STATUS_BADGE_COLORS[strava_request.response_status.to_sym],
+              color: Admin::StravaRequestsChart::Component::RESPONSE_STATUS_BADGE_COLORS[strava_request.response_status.to_sym],
               size: :sm
             ) %>
           </td>
