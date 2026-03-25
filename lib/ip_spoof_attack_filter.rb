@@ -1,6 +1,4 @@
 class IpSpoofAttackFilter
-  FORBIDDEN_RESPONSE = [403, {"content-type" => "text/plain"}, ["Forbidden"]].freeze
-
   def initialize(app)
     @app = app
   end
@@ -8,9 +6,15 @@ class IpSpoofAttackFilter
   def call(env)
     @app.call(env)
   rescue ActionDispatch::RemoteIp::IpSpoofAttackError
-    FORBIDDEN_RESPONSE
+    forbidden_response
   rescue ActionView::Template::Error => e
     raise unless e.cause.is_a?(ActionDispatch::RemoteIp::IpSpoofAttackError)
-    FORBIDDEN_RESPONSE
+    forbidden_response
+  end
+
+  private
+
+  def forbidden_response
+    [403, {"content-type" => "text/plain"}, ["Forbidden"]]
   end
 end
