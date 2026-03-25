@@ -58,6 +58,9 @@ linter:
     # Disabled: herb-format adds indentation to blank lines, conflicting with this rule
     erb-no-trailing-whitespace:
       enabled: false
+    # Disabled: branches often have structurally different content, making extraction impractical
+    erb-no-duplicate-branch-elements:
+      enabled: false
   #
   #   # Rules can have 'include', 'only', and 'exclude' patterns
   #   some-rule:
