@@ -8,9 +8,11 @@ RSpec.describe StravaSearchController, type: :request do
   before { stub_const("Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", strava_app.id) }
 
   describe "GET /strava_search" do
-    it "redirects to login when not signed in" do
+    it "renders connect page when not signed in" do
       get strava_search_path
-      expect(response).to redirect_to(new_session_path)
+      expect(response.status).to eq 200
+      expect(response.body).to include("Connect with Strava")
+      expect(response.body).to include("btn_strava_connect")
     end
 
     context "signed in" do
