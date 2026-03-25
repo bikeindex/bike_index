@@ -73,7 +73,7 @@ class StravaRequest < AnalyticsRecord
   scope :proxy_request, -> { where(proxy_request: true) }
   scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
   scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
-  scope :strava_response, -> { where(response_status: NOT_BINX_RESPONSE) }
+  scope :strava_response, -> { where(response_status: NOT_BINX_RESPONSE).where.not(requested_at: nil) }
   scope :priority_ordered, -> { reorder(:priority) }
 
   class << self

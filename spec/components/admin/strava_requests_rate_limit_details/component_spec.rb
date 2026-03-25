@@ -7,12 +7,14 @@ RSpec.describe Admin::StravaRequestsRateLimitDetails::Component, type: :componen
   let(:component) { render_inline(instance) }
   let(:now) { Time.current.utc }
 
-  it "renders batch size" do
+  it "renders rate limit, batch, and headroom" do
+    expect(component.text).to include("Rate limit")
     expect(component.text).to include("batch:")
+    expect(component.text).to include("headroom:")
   end
 
-  it "renders current rate limit" do
-    expect(component.text).to include("current rate limit:")
+  it "renders headroom value" do
+    expect(component.text).to include(Integrations::Strava::Client::RATE_LIMIT_HEADROOM.to_s)
   end
 
   context "when more than a minute until short reset" do

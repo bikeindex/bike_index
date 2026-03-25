@@ -6,6 +6,7 @@ module Admin::StravaRequestsRateLimitDetails
       @now = now
       @rate_limit_json = StravaRequest.estimated_current_rate_limit.as_json
       @batch_size = StravaJobs::ScheduledRequestEnqueuer::BATCH_SIZE
+      @headroom = Integrations::Strava::Client::RATE_LIMIT_HEADROOM
     end
 
     private
