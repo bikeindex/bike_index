@@ -222,7 +222,7 @@
                   <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
 
                   <tr>
-                    <% if bike_attr == "address" %> <%# herb:disable erb-no-duplicate-branch-elements %>
+                    <% if bike_attr == "address" %>
                       <td><%= translation(".address") %></td>
                       <td>
                         <% address = @bike.registration_address %>
