@@ -30,11 +30,11 @@ module UI
       private
 
       def current_sort
-        @sort || (helpers.respond_to?(:sort_column) ? helpers.sort_column : nil)
+        @sort || sort_column
       end
 
       def current_direction
-        @sort_direction || (helpers.respond_to?(:sort_direction) ? helpers.sort_direction : "desc")
+        @sort_direction || sort_direction
       end
 
       def render_sortable(column)

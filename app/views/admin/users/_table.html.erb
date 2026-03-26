@@ -14,20 +14,20 @@
 <%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users", bordered: true)) do |table| %>
   <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |user| %>
     <span class="localizeTime">
-      <%= helpers.l user.created_at, format: :convert_time %>
+      <%= l user.created_at, format: :convert_time %>
     </span>
   <% end %>
 
   <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "only-dev-visible tw:text-xs") do |user| %>
     <small class="localizeTime">
-      <%= helpers.l user.updated_at, format: :convert_time %>
+      <%= l user.updated_at, format: :convert_time %>
     </small>
   <% end %>
 
   <% table.column(sortable: render_sortable ? "deleted_at" : nil, label: "Deleted", classes: "deleted-cell tw:text-xs") do |user| %>
     <% if user.deleted_at.present? %>
       <span class="localizeTime tw:text-red-600">
-        <%= helpers.l user.deleted_at, format: :convert_time %>
+        <%= l user.deleted_at, format: :convert_time %>
       </span>
     <% end %>
   <% end %>
@@ -64,7 +64,7 @@
           <small class="tw:text-gray-400">|</small>
         <% end %>
 
-        <%= helpers.link_to organization_role.organization.name.gsub(" ", "\u00a0"), helpers.admin_users_path(organization_id: organization_role.organization_id), class: "small" %>
+        <%= link_to organization_role.organization.name.gsub(" ", "\u00a0"), admin_users_path(organization_id: organization_role.organization_id), class: "small" %>
       <% end %>
     <% end %>
   <% end %>
