@@ -5,7 +5,7 @@ module UI
     class Component < ApplicationComponent
       include SortableHelper
 
-      Column = Data.define(:label, :sortable, :block)
+      Column = Data.define(:label, :sortable, :block, :classes)
 
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
       def initialize(records:, cache_key: nil, classes: nil, sort: nil, sort_direction: nil)
@@ -17,8 +17,8 @@ module UI
         @columns = []
       end
 
-      def with_column(label: nil, sortable: nil, &block)
-        @columns << Column.new(label:, sortable:, block:)
+      def with_column(label: nil, sortable: nil, classes: nil, &block)
+        @columns << Column.new(label:, sortable:, block:, classes:)
         nil
       end
 
@@ -61,7 +61,7 @@ module UI
 
       def table_classes
         [
-          "tw:min-w-full tw:text-sm tw:text-left tw:text-gray-500 dark:tw:text-gray-400",
+          "tw:min-w-full tw:text-left tw:text-gray-500 dark:tw:text-gray-400",
           @classes
         ].compact.join(" ")
       end

@@ -1,22 +1,26 @@
 <%# locals: (collection: nil, render_sortable: false, render_deleted: false) %>
 <% collection ||= @users %>
 
+<% unless render_deleted %>
+  <style>.deleted-cell {display: none !important;}</style>
+<% end %>
+
+<% unless display_dev_info? %>
+  <style>.only-dev-visible {display: none !important;}</style>
+<% end %>
+
 <%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users")) do |table| %>
   <% table.with_column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |user| %>
     <span class="localizeTime"><%= helpers.l user.created_at, format: :convert_time %></span>
   <% end %>
 
-  <% if display_dev_info? %>
-    <% table.with_column(sortable: render_sortable ? "updated_at" : nil, label: "Updated") do |user| %>
-      <small class="localizeTime"><%= helpers.l user.updated_at, format: :convert_time %></small>
-    <% end %>
+  <% table.with_column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "only-dev-visible tw:text-xs") do |user| %>
+    <small class="localizeTime"><%= helpers.l user.updated_at, format: :convert_time %></small>
   <% end %>
 
-  <% if render_deleted %>
-    <% table.with_column(sortable: render_sortable ? "deleted_at" : nil, label: "Deleted") do |user| %>
-      <% if user.deleted_at.present? %>
-        <span class="localizeTime tw:text-red-600"><%= helpers.l user.deleted_at, format: :convert_time %></span>
-      <% end %>
+  <% table.with_column(sortable: render_sortable ? "deleted_at" : nil, label: "Deleted", classes: "deleted-cell tw:text-xs") do |user| %>
+    <% if user.deleted_at.present? %>
+      <span class="localizeTime tw:text-red-600"><%= helpers.l user.deleted_at, format: :convert_time %></span>
     <% end %>
   <% end %>
 
@@ -47,7 +51,7 @@
     <% end %>
   <% end %>
 
-  <% table.with_column(label: "Ambassador tasks") do |user| %>
+  <% table.with_column(label: "Ambassador tasks", classes: "tw:text-xs") do |user| %>
     <% if user.ambassador? %>
       <%= number_display(Ambassador.find(user.id).progress_count) %>
     <% end %>
@@ -63,7 +67,7 @@
     </small>
   <% end %>
 
-  <% table.with_column(label: "Confirmed") do |user| %>
+  <% table.with_column(label: "Confirmed", classes: "tw:text-xs") do |user| %>
     <%= check_mark if user.confirmed %>
   <% end %>
 <% end %>
