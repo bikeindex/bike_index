@@ -18,7 +18,7 @@ RSpec.describe HotSheet, type: :model do
 
   describe "fetch_stolen_records" do
     let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc_legacy) }
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: ["hot_sheet"]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
     let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
     let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization) }
     context "with two records" do
@@ -55,7 +55,7 @@ RSpec.describe HotSheet, type: :model do
   end
 
   describe "fetch_recipients" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: ["hot_sheet"]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
     let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: organization, hot_sheet_notification: "notification_daily") }
     let!(:organization_role2) { FactoryBot.create(:organization_role_claimed, organization: organization, hot_sheet_notification: "notification_never") }
     let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization) }

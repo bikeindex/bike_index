@@ -339,7 +339,7 @@ RSpec.describe BikeServices::Creator do
           # Sanity check
           expect(parking_notification.longitude.to_s).to eq attrs.dig(:params, :parking_notification, :longitude)
           expect(parking_notification.street).to eq "278 Broadway"
-          expect(parking_notification.address).to eq "278 Broadway, New York, NY 10007"
+          expect(parking_notification.formatted_address_string).to eq "278 Broadway, New York, NY 10007"
           expect(parking_notification.kind).to eq "parked_incorrectly_notification"
           expect(parking_notification.message).to eq "Some message to the user"
           expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"
@@ -362,8 +362,8 @@ RSpec.describe BikeServices::Creator do
             use_entered_address: "1",
             street: "278 Broadway",
             city: "New York",
-            zipcode: "10007",
-            state_id: state.id.to_s,
+            postal_code: "10007",
+            region_record_id: state.id.to_s,
             country_id: Country.united_states.id
           }
         end
@@ -399,7 +399,7 @@ RSpec.describe BikeServices::Creator do
             expect(parking_notification.owner_known?).to be_falsey
             expect(parking_notification.latitude).to eq bike.latitude
             expect(parking_notification.longitude).to eq bike.longitude
-            expect(parking_notification.address).to eq "278 Broadway, New York, NY 10007"
+            expect(parking_notification.formatted_address_string).to eq "278 Broadway, New York, NY 10007"
             expect(parking_notification.kind).to eq "appears_abandoned_notification"
             expect(parking_notification.message).to eq "another note"
             expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"

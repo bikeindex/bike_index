@@ -300,8 +300,8 @@ RSpec.describe Organized::BikesController, type: :request do
           street: "",
           city: "",
           accuracy: "14.2",
-          zipcode: "10007",
-          state_id: state.id.to_s,
+          postal_code: "10007",
+          region_record_id: state.id.to_s,
           country_id: Country.united_states.id
         }
       end
@@ -402,7 +402,7 @@ RSpec.describe Organized::BikesController, type: :request do
             street: "10544 82 Ave NW",
             city: "Edmonton",
             country_id: Country.canada.id,
-            zipcode: "T6E 2A4",
+            postal_code: "T6E 2A4",
             internal_notes: "Impounded it!")
         end
         include_context :geocoder_real
@@ -410,7 +410,7 @@ RSpec.describe Organized::BikesController, type: :request do
           current_organization.reload
           expect(current_organization.auto_user).to eq auto_user
           expect(current_organization.public_impound_bikes?).to be_truthy
-          expect(parking_notification_abandoned[:state_id]).to be_present # Test that we're blanking the state
+          expect(parking_notification_abandoned[:region_record_id]).to be_present # Test that we're blanking the region
           VCR.use_cassette("organized_bikes_controller-create-impound-record-edmonton", match_requests_on: [:path]) do
             Sidekiq::Testing.inline! do
               ActionMailer::Base.deliveries = []
@@ -465,8 +465,8 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(parking_notification.location_from_address).to be_truthy
           expect(parking_notification.street).to eq "10544 82 Ave NW"
           expect(parking_notification.city).to eq "Edmonton"
-          expect(parking_notification.state_id).to be_blank
-          expect(parking_notification.zipcode).to eq "T6E 2A4"
+          expect(parking_notification.region_record_id).to be_blank
+          expect(parking_notification.postal_code).to eq "T6E 2A4"
           expect(parking_notification.latitude).to eq 53.5183943
           expect(parking_notification.longitude).to eq(-113.5023587)
 

@@ -177,13 +177,19 @@ initializeStateHiding = ->
   united_states_id = $("#us_id_data").attr("data-usid")
   $target = $("#us_id_data select")
   $other_field = $("#state-select")
+  $region_field = $("#region-string-field")
   $target.change (e) ->
     if $target.val() == united_states_id
       $other_field.slideDown "fast", ->
         $other_field.addClass("unhidden").removeClass("currently-hidden")
+      $region_field.slideUp "fast", ->
+        $region_field.addClass("currently-hidden")
+        $region_field.find("input").val("")
     else
       $other_field.slideUp "fast", ->
         $other_field.removeClass("unhidden initially-unhidden").addClass("currently-hidden")
+      $region_field.slideDown "fast", ->
+        $region_field.removeClass("currently-hidden")
 
 updateSubmitButtonDisabled = (is_disabled) ->
   $(".submit-registration input").attr("disabled", is_disabled)
