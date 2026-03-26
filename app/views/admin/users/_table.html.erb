@@ -6,7 +6,9 @@
 <% end %>
 
 <% unless display_dev_info? %>
-  <style>.only-dev-visible {display: none !important;}</style>
+  <style>
+    .only-dev-visible {display: none !important;}
+  </style>
 <% end %>
 
 <%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users", bordered: true)) do |table| %>
@@ -31,8 +33,13 @@
   <% end %>
 
   <% table.with_column(sortable: render_sortable ? "email" : nil, label: "Email") do |user| %>
-    <%= render Admin::UserCell::Component.new(email: user.email, user:, render_search: false) %>
-    <small class="tw:text-gray-400">&nbsp;<%= user.id %></small>
+    <div class="tw:relative tw:min-h-5">
+      <%= render Admin::UserCell::Component.new(email: user.email, user:, render_search: false) %>
+
+      <small class="tw:absolute tw:-right-0.5 tw:-bottom-1 tw:text-xs tw:text-gray-400">
+        &nbsp;<%= user.id %>
+      </small>
+    </div>
   <% end %>
 
   <% table.with_column(label: "Secondary Emails") do |user| %>

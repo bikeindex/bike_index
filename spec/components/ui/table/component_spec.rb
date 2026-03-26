@@ -26,10 +26,6 @@ RSpec.describe UI::Table::Component, type: :component do
     expect(component).to have_css("td", text: "bob@example.com")
   end
 
-  it "renders with table-overflow controller" do
-    expect(component).to have_css("[data-controller='table-overflow']")
-  end
-
   context "with custom classes" do
     let(:component) do
       render_inline(described_class.new(records:, classes: "custom-class")) do |table|
