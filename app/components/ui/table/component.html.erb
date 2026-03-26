@@ -1,0 +1,41 @@
+<div class="tw:-mx-4 tw:mb-4 tw:overflow-x-scroll tw:px-4 tw:md:mx-0 tw:md:px-0">
+  <table class="<%= table_classes %>">
+    <thead
+      class="
+        dark:tw:bg-gray-700 dark:tw:text-gray-400 tw:bg-gray-50 tw:text-sm
+        tw:text-gray-700
+      "
+    >
+      <tr>
+        <% @columns.each do |col| %>
+          <th class="tw:px-1 tw:py-2 <%= "tw:border tw:border-gray-200 dark:tw:border-gray-700" if @bordered %> <%= col.classes %>">
+            <% if col.sortable.present? %>
+              <%= render_sortable(col.sortable) %>
+            <% else %>
+              <%= col.label %>
+            <% end %>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+
+    <tbody class="dark:tw:divide-gray-700 tw:divide-y tw:divide-gray-200">
+      <% @records.each do |record| %>
+        <% cache_if(@cache_key, [@cache_key, record]) do %>
+          <tr
+            class="
+              even:tw:bg-gray-50 odd:tw:bg-white dark:even:tw:bg-gray-800
+              dark:odd:tw:bg-gray-900
+            "
+          >
+            <% @columns.each do |col| %>
+              <td class="tw:px-1 tw:py-1 <%= "tw:border tw:border-gray-200 dark:tw:border-gray-700" if @bordered %> <%= col.classes %>">
+                <%= capture { instance_exec(record, &col.block) } %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
