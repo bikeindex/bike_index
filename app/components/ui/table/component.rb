@@ -18,7 +18,7 @@ module UI
         @columns = []
       end
 
-      def with_column(label: nil, sortable: nil, classes: nil, &block)
+      def column(label: nil, sortable: nil, classes: nil, &block)
         @columns << Column.new(label:, sortable:, block:, classes:)
         nil
       end

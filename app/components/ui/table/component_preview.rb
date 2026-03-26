@@ -18,12 +18,12 @@ module UI
         enthusiasm_colors = {"Extreme" => :error, "High" => :warning, "Medium" => :orange, "Low" => :gray, "None" => :gray}
 
         render(UI::Table::Component.new(records:)) do |table|
-          table.with_column(label: "Cryptid") { |r| r.name }
-          table.with_column(label: "Region") { |r| r.region }
-          table.with_column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
-          table.with_column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: enthusiasm_colors[r.enthusiasm], size: :sm)) }
-          table.with_column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
-          table.with_column(label: "First Seen") { |r| render(UI::Time::Component.new(time: r.first_seen, format: :date)) }
+          table.column(label: "Cryptid") { |r| r.name }
+          table.column(label: "Region") { |r| r.region }
+          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
+          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: enthusiasm_colors[r.enthusiasm], size: :sm)) }
+          table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
+          table.column(label: "First Seen") { |r| render(UI::Time::Component.new(time: r.first_seen, format: :date)) }
         end
       end
 
@@ -35,10 +35,10 @@ module UI
         ]
 
         render(UI::Table::Component.new(records:, sort: "name", sort_direction: "desc")) do |table|
-          table.with_column(sortable: "name") { |r| r.name }
-          table.with_column(sortable: "email") { |r| r.email }
-          table.with_column(label: "Role") { |r| render(UI::Badge::Component.new(text: r.role, color: (r.role == "admin") ? :purple : :gray, size: :sm)) }
-          table.with_column(sortable: "created_at") { |r| render(UI::Time::Component.new(time: r.created_at)) }
+          table.column(sortable: "name") { |r| r.name }
+          table.column(sortable: "email") { |r| r.email }
+          table.column(label: "Role") { |r| render(UI::Badge::Component.new(text: r.role, color: (r.role == "admin") ? :purple : :gray, size: :sm)) }
+          table.column(sortable: "created_at") { |r| render(UI::Time::Component.new(time: r.created_at)) }
         end
       end
     end

@@ -13,8 +13,8 @@ RSpec.describe UI::Table::Component, type: :component do
 
   let(:component) do
     render_inline(described_class.new(records:)) do |table|
-      table.with_column(label: "Name") { |r| r.name }
-      table.with_column(label: "Email") { |r| r.email }
+      table.column(label: "Name") { |r| r.name }
+      table.column(label: "Email") { |r| r.email }
     end
   end
 
@@ -29,7 +29,7 @@ RSpec.describe UI::Table::Component, type: :component do
   context "with custom classes" do
     let(:component) do
       render_inline(described_class.new(records:, classes: "custom-class")) do |table|
-        table.with_column(label: "Name") { |r| r.name }
+        table.column(label: "Name") { |r| r.name }
       end
     end
 
@@ -42,8 +42,8 @@ RSpec.describe UI::Table::Component, type: :component do
 
   it "renders components inside column blocks" do
     result = render_inline(described_class.new(records:)) do |table|
-      table.with_column(label: "Name") { |r| r.name }
-      table.with_column(label: "Role") { |r| render(UI::Badge::Component.new(text: "admin", color: :purple, size: :sm)) }
+      table.column(label: "Name") { |r| r.name }
+      table.column(label: "Role") { |r| render(UI::Badge::Component.new(text: "admin", color: :purple, size: :sm)) }
     end
 
     expect(result).to have_css("th", text: "Name")
@@ -59,8 +59,8 @@ RSpec.describe UI::Table::Component, type: :component do
 
     it "renders sortable headers with link class and active state" do
       result = render_inline(described_class.new(records:, sort: "name", sort_direction: "desc")) do |table|
-        table.with_column(sortable: "name") { |r| r.name }
-        table.with_column(sortable: "email") { |r| r.email }
+        table.column(sortable: "name") { |r| r.name }
+        table.column(sortable: "email") { |r| r.email }
       end
 
       expect(result).to have_css("th a.link.sortable-link.link-active", text: /Name/)
@@ -72,7 +72,7 @@ RSpec.describe UI::Table::Component, type: :component do
   context "with bordered" do
     it "adds border classes to th and td" do
       result = render_inline(described_class.new(records:, bordered: true)) do |table|
-        table.with_column(label: "Name") { |r| r.name }
+        table.column(label: "Name") { |r| r.name }
       end
 
       expect(result.to_html).to include("tw:border")
@@ -91,8 +91,8 @@ RSpec.describe UI::Table::Component, type: :component do
 
       with_controller_class(ApplicationController) do
         result = render_inline(described_class.new(records: users, cache_key: "test")) do |table|
-          table.with_column(label: "Name") { |u| u.name }
-          table.with_column(label: "Email") { |u| u.email }
+          table.column(label: "Name") { |u| u.name }
+          table.column(label: "Email") { |u| u.email }
         end
 
         expect(result).to have_css("td", text: users.first.name)
@@ -105,11 +105,11 @@ RSpec.describe UI::Table::Component, type: :component do
 
       with_controller_class(ApplicationController) do
         render_inline(described_class.new(records: users, cache_key: "view-a")) do |table|
-          table.with_column(label: "Name") { |u| u.name }
+          table.column(label: "Name") { |u| u.name }
         end
 
         render_inline(described_class.new(records: users, cache_key: "view-b")) do |table|
-          table.with_column(label: "Name") { |u| u.name }
+          table.column(label: "Name") { |u| u.name }
         end
       end
     end
@@ -120,7 +120,7 @@ RSpec.describe UI::Table::Component, type: :component do
 
     let(:component) do
       render_inline(described_class.new(records:)) do |table|
-        table.with_column(label: "Name") { |r| r.name }
+        table.column(label: "Name") { |r| r.name }
       end
     end
 
