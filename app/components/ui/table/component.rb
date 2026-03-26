@@ -3,6 +3,8 @@
 module UI
   module Table
     class Component < ApplicationComponent
+      include SortableHelper
+
       Column = Data.define(:label, :sortable, :block)
 
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
@@ -45,17 +47,21 @@ module UI
           arrow_class = "sortable-direction"
         else
           arrow = (direction == "desc") ? "\u2193" : "\u2191"
-          arrow_class = "sortable-direction opacity-0 group-hover:opacity-50 transition-opacity"
+          arrow_class = "sortable-direction tw:opacity-0 group-hover:tw:opacity-50 tw:transition-opacity"
         end
 
-        helpers.link_to(helpers.sortable_url(column, direction), class: "#{css} group") do
-          helpers.safe_join([title, "\u00A0", helpers.content_tag(:span, arrow, class: arrow_class)])
+        link_to(sortable_url(column, direction), class: "#{css} tw:group") do
+          safe_join([title, "\u00A0", content_tag(:span, arrow, class: arrow_class)])
         end
+      end
+
+      def sortable_url(sort, direction)
+        url_for(sortable_search_params.merge(sort:, direction:))
       end
 
       def table_classes
         [
-          "min-w-full text-sm text-left text-gray-500 dark:text-gray-400",
+          "tw:min-w-full tw:text-sm tw:text-left tw:text-gray-500 dark:tw:text-gray-400",
           @classes
         ].compact.join(" ")
       end

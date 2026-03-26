@@ -1,9 +1,9 @@
-<div class="mb-4" data-controller="table-overflow">
+<div class="tw:mb-4" data-controller="table-overflow">
   <table class="<%= table_classes %>">
-    <thead class="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <thead class="tw:text-xs tw:text-gray-700 tw:bg-gray-50 dark:tw:bg-gray-700 dark:tw:text-gray-400">
       <tr>
         <% @columns.each do |col| %>
-          <th class="px-4 py-3">
+          <th class="tw:px-4 tw:py-3">
             <% if col.sortable.present? %>
               <%= render_sortable(col.sortable) %>
             <% else %>
@@ -16,10 +16,10 @@
     <tbody>
       <% @records.each do |record| %>
         <% cache_if(@cache_key, [@cache_key, record]) do %>
-          <tr class="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <tr class="tw:bg-white tw:border-b tw:border-gray-200 dark:tw:bg-gray-800 dark:tw:border-gray-700">
             <% @columns.each do |col| %>
-              <td class="px-4 py-3">
-                <%= instance_exec(record, &col.block) %>
+              <td class="tw:px-4 tw:py-3">
+                <%= capture { instance_exec(record, &col.block) } %>
               </td>
             <% end %>
           </tr>
