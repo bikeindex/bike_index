@@ -9,7 +9,7 @@
   <style>.only-dev-visible {display: none !important;}</style>
 <% end %>
 
-<%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users")) do |table| %>
+<%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users", bordered: true)) do |table| %>
   <% table.with_column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |user| %>
     <span class="localizeTime"><%= helpers.l user.created_at, format: :convert_time %></span>
   <% end %>

@@ -8,10 +8,11 @@ module UI
       Column = Data.define(:label, :sortable, :block, :classes)
 
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
-      def initialize(records:, cache_key: nil, classes: nil, sort: nil, sort_direction: nil)
+      def initialize(records:, cache_key: nil, classes: nil, bordered: false, sort: nil, sort_direction: nil)
         @records = records
         @cache_key = cache_key
         @classes = classes
+        @bordered = bordered
         @sort = sort
         @sort_direction = sort_direction || "desc"
         @columns = []
@@ -61,7 +62,7 @@ module UI
 
       def table_classes
         [
-          "tw:min-w-full tw:text-left tw:text-gray-500 dark:tw:text-gray-400",
+          "tw:min-w-full tw:text-left",
           @classes
         ].compact.join(" ")
       end

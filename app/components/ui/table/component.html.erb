@@ -1,9 +1,9 @@
-<div class="tw:mb-4" data-controller="table-overflow">
+<div class="tw:mb-4 tw:overflow-hidden tw:rounded-sm" data-controller="table-overflow">
   <table class="<%= table_classes %>">
     <thead class="tw:text-sm tw:text-gray-700 tw:bg-gray-50 dark:tw:bg-gray-700 dark:tw:text-gray-400">
       <tr>
         <% @columns.each do |col| %>
-          <th class="tw:px-4 tw:py-3 <%= col.classes %>">
+          <th class="tw:px-1 tw:py-2 <%= "tw:border tw:border-gray-200 dark:tw:border-gray-700" if @bordered %> <%= col.classes %>">
             <% if col.sortable.present? %>
               <%= render_sortable(col.sortable) %>
             <% else %>
@@ -16,9 +16,9 @@
     <tbody class="tw:divide-y tw:divide-gray-200 dark:tw:divide-gray-700">
       <% @records.each do |record| %>
         <% cache_if(@cache_key, [@cache_key, record]) do %>
-          <tr class="tw:bg-white dark:tw:bg-gray-800">
+          <tr class="even:tw:bg-gray-50 odd:tw:bg-white dark:even:tw:bg-gray-800 dark:odd:tw:bg-gray-900">
             <% @columns.each do |col| %>
-              <td class="tw:px-1 tw:py-1 <%= col.classes %>">
+              <td class="tw:px-1 tw:py-1 <%= "tw:border tw:border-gray-200 dark:tw:border-gray-700" if @bordered %> <%= col.classes %>">
                 <%= capture { instance_exec(record, &col.block) } %>
               </td>
             <% end %>
