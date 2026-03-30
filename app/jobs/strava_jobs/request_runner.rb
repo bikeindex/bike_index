@@ -112,6 +112,7 @@ module StravaJobs
       end
     end
 
+    # keyword args are just for calling inline
     def perform(strava_request_id, strava_request: nil, no_skip: false)
       strava_request ||= StravaRequest.find_by(id: strava_request_id)
       return if strava_request.blank? || !strava_request.pending?
