@@ -55,9 +55,13 @@ chdir APP_ROOT do
   puts "== Checking Ruby version =="
   required_ruby = File.read(".tool-versions")[/ruby (\S+)/, 1]
   if required_ruby && RUBY_VERSION != required_ruby
+    if ENV["SETUP_RUBY_INSTALLED"]
+      abort "Failed to activate Ruby #{required_ruby} via mise after installing"
+    end
+    abort "mise is required but not found. See https://mise.jdx.dev/" unless system("which mise > /dev/null 2>&1")
     puts "Ruby #{required_ruby} required (current: #{RUBY_VERSION}), installing via mise..."
-    system!({"MISE_RUBY_COMPILE" => "0"}, "mise install ruby@#{required_ruby}")
-    exec "mise", "exec", "--", "ruby", __FILE__, *ARGV
+    system!("mise install ruby@#{required_ruby}")
+    exec({"SETUP_RUBY_INSTALLED" => "1"}, "mise", "exec", "--", "ruby", __FILE__, *ARGV)
   end
 
   puts "== Installing dependencies =="
