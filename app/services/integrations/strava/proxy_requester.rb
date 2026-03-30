@@ -52,10 +52,10 @@ module Integrations::Strava::ProxyRequester
 
     return internal_response!(strava_request) if internal_response?(strava_request)
 
-    response = Integrations::Strava::Client.proxy_request(strava_integration,
-      strava_request.parameters["url"], method: strava_request.parameters["method"],
-      body: strava_request.parameters["body"])
-    strava_request.update_from_response(response)
+    response = StravaJobs::RequestRunner.new.perform(strava_request.id, strava_request:, no_skip: true)
+    strava_request.reload
+
+    return {json: Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY, status: 429} unless response
 
     json = if strava_request.success?
       serialize_proxy_response(strava_integration, response.body, method: strava_request.request_method)
@@ -63,7 +63,7 @@ module Integrations::Strava::ProxyRequester
       sanitize_response_body(response.body)
     end
 
-    {json:, status: response&.status}
+    {json:, status: response.status}
   end
 
   # Returns an existing valid token, or revokes the most recent expired one
