@@ -28,8 +28,9 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
 
       it "no-ops when redlock cannot be acquired" do
-        lock_manager = described_class.new_lock_manager
-        redlock = lock_manager.lock(described_class.redlock_key(strava_request.id), 30_000)
+        lock_manager = Redlockable.new_lock_manager
+        redlock_key = described_class.redlock_key(strava_request.id)
+        redlock = lock_manager.lock(redlock_key, 30_000)
 
         begin
           instance.perform(strava_request.id)

@@ -14,16 +14,10 @@ module StravaJobs
       strava_integration = StravaIntegration.find_by(id: strava_integration_id)
       return unless strava_integration
 
-      lock_manager = Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
-      redlock = lock_manager.lock(self.class.redlock_key(strava_integration_id), 5.minutes.in_milliseconds.to_i)
-      return unless redlock
-
-      begin
+      Redlockable.with_redlock(self.class.redlock_key(strava_integration_id)) do
         enqueue_enrich_activity_requests(strava_integration)
         enqueue_gear_requests(strava_integration)
         strava_integration.strava_gears.find_each(&:update_total_distance!)
-      ensure
-        lock_manager.unlock(redlock)
       end
     end
 
