@@ -2,7 +2,7 @@
 
 module StravaJobs
   class RequestRunner < ApplicationJob
-    REDLOCK_PREFIX = "StravaRequestLock-#{Rails.env.slice(0, 3)}"
+    REDLOCK_PREFIX = "StravaRequestRunnerLock-#{Rails.env.slice(0, 3)}"
 
     sidekiq_options queue: "droppable", retry: 1
 

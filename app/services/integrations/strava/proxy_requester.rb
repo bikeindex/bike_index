@@ -5,9 +5,6 @@ module Integrations::Strava::ProxyRequester
 
   STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3).to_i
   SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
-  # We want a little more headroom on proxy requests -
-  # to reserve some requests for initial fetch athlete and list_activities
-  PROXY_RATE_LIMIT_HEADROOM = ENV.fetch("STRAVA_PROXY_HEADROOM", Integrations::Strava::Client::RATE_LIMIT_HEADROOM * 2).to_i
 
   # returns {user:, strava_integration:} if valid
   # otherwise {error: message, status: status_code}
@@ -94,21 +91,10 @@ module Integrations::Strava::ProxyRequester
   #
 
   def internal_response?(strava_request)
-    strava_request.fetch_athlete? || strava_request.list_activities? ||
-      binx_response_rate_limited?(strava_request)
-  end
-
-  def binx_response_rate_limited?(strava_request)
-    Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method,
-      headroom: PROXY_RATE_LIMIT_HEADROOM, request_type: strava_request.request_type)
+    strava_request.fetch_athlete? || strava_request.list_activities?
   end
 
   def internal_response!(strava_request)
-    if binx_response_rate_limited?(strava_request)
-      strava_request.update_from_response(:binx_response_rate_limited)
-      return {json: Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY, status: 429}
-    end
-
     strava_request.update(response_status: :binx_response, requested_at: Time.current)
 
     json = if strava_request.fetch_athlete?
@@ -169,7 +155,7 @@ module Integrations::Strava::ProxyRequester
     body.except(*SENSITIVE_KEYS)
   end
 
-  conceal :internal_response?, :binx_response_rate_limited?, :internal_response!,
+  conceal :internal_response?, :internal_response!,
     :authorized_app?, :proxy_request_type, :validate_url!,
     :serialize_proxy_response, :sanitize_response_body
 end

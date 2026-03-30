@@ -213,62 +213,6 @@ RSpec.describe Integrations::Strava::ProxyRequester do
       end
     end
 
-    context "when currently_rate_limited?" do
-      let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
-      let(:rate_limit) do
-        {short_limit: 200, short_usage: 198, long_limit: 2000, long_usage: 0,
-         read_short_limit: 200, read_short_usage: 198, read_long_limit: 2000, read_long_usage: 0}
-      end
-      let!(:rate_limit_request) do
-        FactoryBot.create(:strava_request, :processed, strava_integration:,
-          requested_at: boundary + 1.second, rate_limit:)
-      end
-
-      it "sets binx_response_rate_limited and returns mocked 429 response" do
-        expect do
-          result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
-          expect(result[:status]).to eq 429
-          expect(result[:json]["message"]).to eq "Rate Limit Exceeded"
-        end.to change(StravaRequest, :count).by 1
-
-        strava_request = StravaRequest.last
-        expect(strava_request).to have_attributes(response_status: "binx_response_rate_limited", proxy_request: true,
-          request_type: "fetch_activity")
-        expect(strava_request.requested_at).to be_within(1).of Time.current
-
-        expect(StravaActivity.count).to eq 0
-      end
-
-      context "when fetch_activity is rate limited but general is not" do
-        let(:rate_limit) do
-          {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
-           read_short_limit: 200, read_short_usage: 101, read_long_limit: 2000, read_long_usage: 0}
-        end
-
-        it "rate limits fetch_activity proxy requests using fetch_activity headroom" do
-          expect do
-            result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
-            expect(result[:status]).to eq 429
-          end.to change(StravaRequest, :count).by 1
-
-          strava_request = StravaRequest.last
-          expect(strava_request).to have_attributes(response_status: "binx_response_rate_limited",
-            request_type: "fetch_activity")
-        end
-      end
-
-      it "checks PUT method for update_activity requests" do
-        expect do
-          described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "PUT")
-        end.to change(StravaRequest, :count).by 1
-
-        strava_request = StravaRequest.last
-        expect(strava_request).to have_attributes(response_status: "binx_response_rate_limited", proxy_request: true,
-          request_type: "update_activity")
-        expect(strava_request.requested_at).to be_within(1).of Time.current
-      end
-    end
-
     context "rate limited response" do
       it "marks request as rate_limited" do
         VCR.use_cassette("strava-proxy_rate_limited") do
