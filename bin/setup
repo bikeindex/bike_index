@@ -55,11 +55,16 @@ chdir APP_ROOT do
   puts "== Checking Ruby version =="
   required_ruby = File.read(".tool-versions")[/ruby (\S+)/, 1]
   if required_ruby && RUBY_VERSION != required_ruby
-    puts "Ruby #{required_ruby} required (current: #{RUBY_VERSION}), installing via rbenv..."
+    puts "Ruby #{required_ruby} required (current: #{RUBY_VERSION}), installing via mise..."
     custom_definitions = File.expand_path(".ruby-build", APP_ROOT)
-    env = File.directory?(custom_definitions) ? {"RUBY_BUILD_DEFINITIONS" => custom_definitions} : {}
-    system!(env, "rbenv install #{required_ruby} --skip-existing")
-    exec "rbenv exec ruby", __FILE__, *ARGV
+    env = {}
+    env["RUBY_BUILD_DEFINITIONS"] = custom_definitions if File.directory?(custom_definitions)
+    env["MISE_RUBY_BUILD_REPO"] = ENV["MISE_RUBY_BUILD_REPO"] if ENV["MISE_RUBY_BUILD_REPO"]
+    # Use granular install targets to avoid downloading bundled gems, which
+    # fails in network-restricted environments (e.g. egress proxy containers).
+    env["MAKE_INSTALL_TARGET"] = "install-arch install-lib install-bin install-ext"
+    system!(env, "mise install ruby@#{required_ruby}")
+    exec "mise", "exec", "--", "ruby", __FILE__, *ARGV
   end
 
   puts "== Installing dependencies =="
