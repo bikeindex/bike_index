@@ -84,7 +84,7 @@ RSpec.describe UpdateModelAuditJob, type: :job do
     end
     context "redlock" do
       before do
-        @lock_manager = described_class.new_lock_manager
+        @lock_manager = Redlockable.new_lock_manager
         @redlock = @lock_manager.lock(described_class.redlock_key(model_audit.id), 5000)
       end
       after { @lock_manager.unlock(@redlock) }
