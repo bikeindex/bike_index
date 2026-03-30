@@ -8,11 +8,6 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
   include_examples :scheduled_job_tests
 
   let(:instance) { described_class.new }
-  let(:sidekiq_queue) { instance_double(Sidekiq::Queue, count: 0) }
-
-  before do
-    allow(Sidekiq::Queue).to receive(:new).and_return(sidekiq_queue)
-  end
 
   it "is the correct queue and frequency" do
     expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
@@ -187,11 +182,10 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
       end
 
       context "when more than 10 requests enqueued" do
-        let(:sidekiq_queue) { instance_double(Sidekiq::Queue, count: 11) }
-
         it "skips enqueue" do
           StravaRequest.create!(user_id: strava_integration.user_id,
             strava_integration_id: strava_integration.id, request_type: :list_activities)
+          allow(instance).to receive(:enqueued_runner_count).and_return(11)
 
           instance.perform
           expect(StravaJobs::RequestRunner.jobs.size).to eq(0)

@@ -67,7 +67,8 @@ module StravaJobs
     private
 
     def enqueued_runner_count
-      Sidekiq::Queue.new(RequestRunner.sidekiq_options["queue"]).count
+      Sidekiq::Queue.new(RequestRunner.sidekiq_options["queue"])
+        .count { |job| job.klass == "StravaJobs::RequestRunner" }
     end
 
     def skip_duplicate_requests

@@ -15,9 +15,7 @@ module StravaJobs
         Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
       end
 
-      def locked?(strava_request_id)
-        new_lock_manager.locked?(redlock_key(strava_request_id))
-      end
+      private
 
       def make_request_and_update(strava_integration, strava_request)
         if strava_request.incoming_webhook?
@@ -27,7 +25,7 @@ module StravaJobs
         if Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method, request_type: strava_request.request_type)
           strava_request.update_from_response(:binx_response_rate_limited,
             re_enqueue_if_rate_limited_or_unavailable: !strava_request.proxy_request?)
-          return
+          return :rate_limited
         end
 
         response = make_request(strava_integration, strava_request)
@@ -40,8 +38,6 @@ module StravaJobs
         end
         response
       end
-
-      private
 
       def make_request(strava_integration, strava_request)
         if strava_request.proxy_request?
@@ -66,9 +62,7 @@ module StravaJobs
       end
 
       def handle_response(strava_request, strava_integration, response)
-        if strava_request.incoming_webhook?
-          handle_incoming_webhook(strava_request, strava_integration, response)
-        elsif strava_request.list_activities?
+        if strava_request.list_activities?
           response.each { |summary| StravaActivity.create_or_update_from_strava_response(strava_integration, summary) }
           if strava_request.parameters["page"] == 1
             strava_integration.update(last_updated_activities_at: Time.current)
@@ -129,7 +123,7 @@ module StravaJobs
           return mark_sibling_requests_skipped(strava_request)
         end
 
-        self.class.make_request_and_update(strava_integration, strava_request)
+        self.class.send(:make_request_and_update, strava_integration, strava_request)
       ensure
         lock_manager.unlock(redlock)
       end

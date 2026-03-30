@@ -7,13 +7,6 @@ RSpec.describe Integrations::Strava::ProxyRequester do
 
   let(:strava_integration) { FactoryBot.create(:strava_integration) }
   let(:user) { strava_integration.user }
-  let(:lock_manager) { instance_double(Redlock::Client) }
-
-  before do
-    allow(Redlock::Client).to receive(:new).and_return(lock_manager)
-    allow(lock_manager).to receive(:lock).and_return("locked")
-    allow(lock_manager).to receive(:unlock).and_return(true)
-  end
 
   describe ".authorize_user_and_strava_integration" do
     let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
@@ -213,7 +206,7 @@ RSpec.describe Integrations::Strava::ProxyRequester do
       end
     end
 
-    context "when currently_rate_limited?" do
+    context "when RequestRunner is rate limited" do
       let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
       let!(:rate_limit_request) do
         FactoryBot.create(:strava_request, :processed, strava_integration:,

@@ -52,7 +52,7 @@ module Integrations::Strava::ProxyRequester
     response = StravaJobs::RequestRunner.new.perform(strava_request.id, strava_request:, no_skip: true)
     strava_request.reload
 
-    return {json: Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY, status: 429} unless response
+    return {json: Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY, status: 429} if response == :rate_limited
 
     json = if strava_request.success?
       serialize_proxy_response(strava_integration, response.body, method: strava_request.request_method)
