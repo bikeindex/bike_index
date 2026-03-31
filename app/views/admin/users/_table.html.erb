@@ -18,23 +18,17 @@
 
 <%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users")) do |table| %>
   <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |user| %>
-    <span class="localizeTime">
-      <%= l user.created_at, format: :convert_time %>
-    </span>
+    <%= render UI::Time::Component.new(time: user.created_at) %>
   <% end %>
 
   <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "only-dev-visible tw:text-xs") do |user| %>
-    <small class="localizeTime">
-      <%= l user.updated_at, format: :convert_time %>
-    </small>
+    <small><%= render UI::Time::Component.new(time: user.updated_at) %></small>
   <% end %>
 
   <% table.column(sortable: render_sortable ? "deleted_at" : nil, label: "Deleted", classes: "deleted-cell tw:text-xs") do |user| %>
-    <% if user.deleted_at.present? %>
-      <span class="localizeTime tw:text-red-600">
-        <%= l user.deleted_at, format: :convert_time %>
-      </span>
-    <% end %>
+    <span class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
+      <%= render UI::Time::Component.new(time: user.deleted_at) %>
+    </span>
   <% end %>
 
   <% table.column(sortable: render_sortable ? "email" : nil, label: "Email") do |user| %>

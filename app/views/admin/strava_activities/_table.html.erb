@@ -1,128 +1,82 @@
 <%# locals: (collection:, render_sortable: false, searched_activity_type: nil) %>
 
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered table-sm">
-    <thead class="thead-light">
-      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+<%= render(UI::Table::Component.new(records: collection)) do |table| %>
+  <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |strava_activity| %>
+    <%= render UI::Time::Component.new(time: strava_activity.created_at) %>
 
-      <th class="small">
-        <%= sortable "updated_at", render_sortable: render_sortable %>
-      </th>
+    <% if helpers.display_dev_info? %>
+      <span class="less-strong-right d-none d-md-block only-dev-visible">
+        <%= strava_activity.id %>
+      </span>
+    <% end %>
+  <% end %>
 
-      <th><%= sortable "start_date", render_sortable: render_sortable %></th>
+  <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "tw:text-xs") do |strava_activity| %>
+    <small>
+      <%= render UI::Time::Component.new(time: strava_activity.updated_at) %>
+    </small>
+  <% end %>
 
-      <th>Title</th>
+  <% table.column(sortable: render_sortable ? "start_date" : nil, label: "Start date") do |strava_activity| %>
+    <%= render UI::Time::Component.new(time: strava_activity.start_date) %>
+  <% end %>
 
-      <th>
-        <%= sortable "activity_type", "Type", render_sortable: render_sortable %>
-      </th>
+  <% table.column(label: "Title") do |strava_activity| %>
+    <% if strava_activity.photos&.dig("photo_url").present? %>
+      📷
+    <% end %>
 
-      <th>
-        <small>
-          <%= sortable "distance_meters", "Distance (miles)", render_sortable: render_sortable %>
-        </small>
-      </th>
+    <span class="tw:mr-1"><%= strava_activity.title %></span>
 
-      <th>Gear</th>
+    <%= link_to link_emoji, "https://www.strava.com/activities/#{strava_activity.strava_id}", title: "View on Strava" %>
 
-      <th>User</th>
+    <% if strava_activity.description.present? %>
+      <span
+        class="small less-strong tw:block"
+        title="<%= strava_activity.description %>"
+      >
+        <%= strava_activity.description&.truncate(120) %>
+      </span>
+    <% end %>
+  <% end %>
 
-      <% if display_dev_info? %>
-        <th class="small only-dev-visible">
-          <%= sortable "enriched_at", render_sortable: render_sortable %>
-        </th>
+  <% table.column(sortable: render_sortable ? "activity_type" : nil, label: "Type") do |strava_activity| %>
+    <% if strava_activity.cycling? %>
+      <span class="<%= UI::Alert::Component::TEXT_CLASSES[:success] %>">
+        <%= strava_activity.activity_type %>
+      </span>
+    <% else %>
+      <small><%= strava_activity.activity_type %></small>
+    <% end %>
+
+    <% unless searched_activity_type.present? %>
+      <%= link_to search_emoji, url_for(sortable_search_params.merge(search_activity_type: strava_activity.activity_type)), class: "display-sortable-link small" %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: render_sortable ? "distance_meters" : nil, label: "Distance (miles)", classes: "tw:text-xs") do |strava_activity| %>
+    <%= number_display(strava_activity.distance_miles.round) %>
+  <% end %>
+
+  <% table.column(label: "Gear") do |strava_activity| %>
+    <% if strava_activity.gear_id.present? %>
+      <small><%= strava_activity.calculated_gear_name %></small>
+      <% gear_assoc = strava_activity.strava_integration.strava_gears.find { |ga| ga.strava_id == strava_activity.gear_id } %>
+      <% if gear_assoc&.item.present? %>
+        <%= link_to "BI", bike_path(gear_assoc.item), class: "small #{UI::Alert::Component::TEXT_CLASSES[:success]}", title: gear_assoc.item.title_string %>
       <% end %>
-    </thead>
+    <% end %>
+  <% end %>
 
-    <tbody>
-      <% collection.each do |strava_activity| %>
-        <tr>
-          <td>
-            <div class="less-strong-hold">
-              <span class="localizeTime">
-                <%= l strava_activity.created_at, format: :convert_time %>
-              </span>
+  <% table.column(label: "User") do |strava_activity| %>
+    <%= render Admin::UserCell::Component.new(user: strava_activity.strava_integration.user, user_id: strava_activity.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_activity.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_activity.strava_integration_id))) %>
+  <% end %>
 
-              <% if display_dev_info? %>
-                <span class="less-strong-right d-none d-md-block only-dev-visible">
-                  <%= strava_activity.id %>
-                </span>
-              <% end %>
-            </div>
-          </td>
-
-          <td>
-            <small class="localizeTime">
-              <%= l strava_activity.updated_at, format: :convert_time %>
-            </small>
-          </td>
-
-          <td>
-            <% if strava_activity.start_date.present? %>
-              <span class="localizeTime">
-                <%= l strava_activity.start_date, format: :convert_time %>
-              </span>
-            <% end %>
-          </td>
-
-          <td>
-            <% if strava_activity.photos&.dig("photo_url").present? %>
-              📷
-            <% end %>
-
-            <span class="tw:mr-1"><%= strava_activity.title %></span>
-
-            <%= link_to link_emoji, "https://www.strava.com/activities/#{strava_activity.strava_id}", title: "View on Strava" %>
-
-            <% if strava_activity.description.present? %>
-              <span
-                class="small less-strong tw:block"
-                title="<%= strava_activity.description %>"
-              >
-                <%= strava_activity.description&.truncate(120) %>
-              </span>
-            <% end %>
-          </td>
-
-          <td>
-            <% if strava_activity.cycling? %>
-              <span class="text-success">
-                <%= strava_activity.activity_type %>
-              </span>
-            <% else %>
-              <small><%= strava_activity.activity_type %></small>
-            <% end %>
-
-            <% unless searched_activity_type.present? %>
-              <%= link_to search_emoji, url_for(sortable_search_params.merge(search_activity_type: strava_activity.activity_type)), class: "display-sortable-link small" %>
-            <% end %>
-          </td>
-
-          <td><%= number_display(strava_activity.distance_miles.round) %></td>
-
-          <td>
-            <% if strava_activity.gear_id.present? %>
-              <small><%= strava_activity.calculated_gear_name %></small>
-              <% gear_assoc = strava_activity.strava_integration.strava_gears.find { |ga| ga.strava_id == strava_activity.gear_id } %>
-              <% if gear_assoc&.item.present? %>
-                <%= link_to "BI", bike_path(gear_assoc.item), class: "small text-success", title: gear_assoc.item.title_string %>
-              <% end %>
-            <% end %>
-          </td>
-
-          <td>
-            <%= render Admin::UserCell::Component.new(user: strava_activity.strava_integration.user, user_id: strava_activity.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_activity.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_activity.strava_integration_id))) %>
-          </td>
-
-          <td>
-            <% if strava_activity.enriched_at.present? %>
-              <small class="localizeTime">
-                <%= l strava_activity.enriched_at, format: :convert_time %>
-              </small>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% if display_dev_info? %>
+    <% table.column(sortable: render_sortable ? "enriched_at" : nil, label: "Enriched", classes: "only-dev-visible tw:text-xs") do |strava_activity| %>
+      <small>
+        <%= render UI::Time::Component.new(time: strava_activity.enriched_at) %>
+      </small>
+    <% end %>
+  <% end %>
+<% end %>
