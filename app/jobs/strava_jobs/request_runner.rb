@@ -15,8 +15,6 @@ module StravaJobs
         Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
       end
 
-      private
-
       def make_request_and_update(strava_integration, strava_request)
         if strava_request.incoming_webhook?
           return handle_incoming_webhook(strava_request, strava_integration)
@@ -39,15 +37,12 @@ module StravaJobs
         response
       end
 
-      def make_request(strava_integration, strava_request)
-        if strava_request.proxy_request?
-          return Integrations::Strava::Client.proxy_request(strava_integration,
-            strava_request.parameters["url"],
-            method: strava_request.parameters["method"],
-            body: strava_request.parameters["body"])
-        end
+      private
 
+      def make_request(strava_integration, strava_request)
         case strava_request.request_type
+        when strava_request.proxy_request? # not a request type...
+          Integrations::Strava::Client.proxy_request(strava_integration, strava_request.parameters["url"], method: strava_request.parameters["method"], body: strava_request.parameters["body"])
         when "list_activities"
           Integrations::Strava::Client.list_activities(strava_integration, **strava_request.parameters.symbolize_keys)
         when "fetch_activity"
@@ -123,7 +118,7 @@ module StravaJobs
           return mark_sibling_requests_skipped(strava_request)
         end
 
-        self.class.send(:make_request_and_update, strava_integration, strava_request)
+        self.class.make_request_and_update(strava_integration, strava_request)
       ensure
         lock_manager.unlock(redlock)
       end
