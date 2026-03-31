@@ -33,9 +33,13 @@
 
   <% table.column(sortable: render_sortable ? "status" : nil, label: "Status") do |strava_integration| %>
     <% if strava_integration.synced? %>
-      <span class="<%= UI::Alert::Component::TEXT_CLASSES[:success] %>"><%= strava_integration.status %></span>
+      <span class="<%= UI::Alert::Component::TEXT_CLASSES[:success] %>">
+        <%= strava_integration.status %>
+      </span>
     <% elsif strava_integration.error? %>
-      <span class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>"><%= strava_integration.status %></span>
+      <span class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
+        <%= strava_integration.status %>
+      </span>
     <% else %>
       <small><%= strava_integration.status %></small>
     <% end %>
