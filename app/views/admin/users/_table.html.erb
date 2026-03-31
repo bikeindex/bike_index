@@ -7,7 +7,7 @@
 
 <% unless display_dev_info? %>
   <style>
-    .only-dev-visible {display: none !important;}
+    .only-dev-visible, .dev-visible-cell {display: none !important;}
   </style>
 <% end %>
 
@@ -18,7 +18,7 @@
     </span>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "only-dev-visible tw:text-xs") do |user| %>
+  <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "dev-visible-cell tw:text-xs") do |user| %>
     <small class="localizeTime">
       <%= l user.updated_at, format: :convert_time %>
     </small>
