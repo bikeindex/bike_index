@@ -137,9 +137,12 @@ class BikeSticker < ApplicationRecord
   end
 
   def self.next_unclaimed_code(after_id = nil)
-    after_id ||= claimed.order(:id).last&.id || 1 # So we can pass in the id to iterate from.
-    # If there aren't any claimed stickers, we need to include a number or this returns nil
-    unclaimed.reorder(:id).where("id > ?", after_id || 1).first
+    if after_id.present?
+      unclaimed.reorder(:id).where("id > ?", after_id).first
+    else
+      after_code_integer = claimed.maximum(:code_integer) || 0
+      unclaimed.reorder(:code_integer, :id).where("code_integer > ?", after_code_integer).first
+    end
   end
 
   def self.user_can_claim_sticker?(user, bike_sticker = nil)
@@ -223,7 +226,8 @@ class BikeSticker < ApplicationRecord
   end
 
   def next_unclaimed_code
-    BikeSticker.where(organization_id: organization_id).next_unclaimed_code(id)
+    organization&.bike_stickers&.next_unclaimed_code(id) ||
+      BikeSticker.where(organization_id: organization_id).next_unclaimed_code(id)
   end
 
   def pretty_code
