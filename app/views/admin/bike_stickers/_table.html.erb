@@ -30,9 +30,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id") do |bike_sticker| %>
-    <% if bike_sticker.organization.present? %>
-      <%= link_to bike_sticker.organization.name, admin_bike_stickers_path(sortable_search_params.merge(organization_id: bike_sticker.organization_id)) %>
-    <% end %>
+    <%= render Admin::OrganizationCell::Component.new(organization: bike_sticker.organization, render_search: true) %>
   <% end %>
 
   <% table.column(sortable: "bike_sticker_batch_id", label: "Batch") do |bike_sticker| %>
