@@ -87,6 +87,7 @@ module StravaJobs
           else
             strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration,
               {"id" => strava_params["object_id"].to_s}.merge(strava_params["updates"] || {}))
+            # update_from_strava!(run_inline: false) creates a request (but doesn't make the request)
             strava_activity.update_from_strava!
           end
         elsif strava_params["object_type"] == "athlete"
