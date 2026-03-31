@@ -24,6 +24,7 @@ RSpec.describe UI::Table::Component, type: :component do
     expect(component).to have_css("th", text: "Email")
     expect(component).to have_css("td", text: "Alice")
     expect(component).to have_css("td", text: "bob@example.com")
+    expect(component).to have_css("tbody.twtable-striped")
   end
 
   context "with custom classes" do
@@ -58,7 +59,7 @@ RSpec.describe UI::Table::Component, type: :component do
     end
 
     it "renders sortable headers with link class and active state" do
-      result = render_inline(described_class.new(records:, sort: "name", sort_direction: "desc")) do |table|
+      result = render_inline(described_class.new(records:, render_sortable: true, sort: "name", sort_direction: "desc")) do |table|
         table.column(sortable: "name") { |r| r.name }
         table.column(sortable: "email") { |r| r.email }
       end
@@ -66,6 +67,55 @@ RSpec.describe UI::Table::Component, type: :component do
       expect(result).to have_css("th a.twlink.active", text: /Name/)
       expect(result).to have_css("th a.twlink", text: /Email/)
       expect(result).not_to have_css("th a.active", text: /Email/)
+    end
+
+    context "with custom label" do
+      it "uses label instead of derived title" do
+        result = render_inline(described_class.new(records:, render_sortable: true, sort: "bike_sticker_batch_id")) do |table|
+          table.column(sortable: "bike_sticker_batch_id", label: "Batch") { |r| r.name }
+          table.column(sortable: "code_integer", label: "Code #") { |r| r.email }
+        end
+
+        expect(result).to have_css("th a.twlink.active", text: /Batch/)
+        expect(result).not_to have_css("th a", text: /Bike Sticker Batch/)
+        expect(result).to have_css("th a.twlink", text: /Code #/)
+        expect(result).not_to have_css("th a", text: /Code Integer/)
+      end
+    end
+
+    context "with render_sortable false" do
+      it "renders column labels without sort links" do
+        result = render_inline(described_class.new(records:)) do |table|
+          table.column(sortable: "created_at") { |r| r.name }
+          table.column(sortable: "email") { |r| r.email }
+        end
+
+        expect(result).to have_css("th", text: "Created")
+        expect(result).not_to have_css("th a")
+      end
+    end
+
+    context "without explicit sort" do
+      it "defaults to first sortable column as active" do
+        result = render_inline(described_class.new(records:, render_sortable: true)) do |table|
+          table.column(sortable: "created_at") { |r| r.name }
+          table.column(sortable: "email") { |r| r.email }
+        end
+
+        expect(result).to have_css("th a.twlink.active", text: /Created/)
+        expect(result).not_to have_css("th a.active", text: /Email/)
+      end
+    end
+  end
+
+  context "with lower_right" do
+    it "renders lower_right content in the cell" do
+      result = render_inline(described_class.new(records:)) do |table|
+        table.column(label: "Email", lower_right: ->(r) { r.name }) { |r| r.email }
+      end
+
+      expect(result).to have_css("td div", text: /alice@example.com/)
+      expect(result).to have_css("td div small", text: "Alice")
     end
   end
 

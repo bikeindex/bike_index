@@ -4,30 +4,19 @@
       <tr>
         <% @columns.each_with_index do |col, i| %>
           <th class="<%= th_classes(col, i) %>">
-            <% if col.sortable.present? %>
-              <%= render_sortable(col.sortable) %>
-            <% else %>
-              <%= col.label %>
-            <% end %>
+            <%= render_header(col) %>
           </th>
         <% end %>
       </tr>
     </thead>
 
-    <tbody>
+    <tbody class="twtable-striped">
       <% @records.each_with_index do |record, row_index| %>
         <% cache_if(@cache_key, [@cache_key, record]) do %>
-          <% last_row = row_index == @records.length - 1 %>
-
-          <tr
-            class="
-              tw:odd:bg-white tw:even:bg-gray-100 tw:dark:odd:bg-gray-900
-              tw:dark:even:bg-gray-800
-            "
-          >
+          <tr>
             <% @columns.each_with_index do |col, i| %>
-              <td class="<%= td_classes(col, i, last_row:) %>">
-                <%= capture { instance_exec(record, &col.block) } %>
+              <td class="<%= td_classes(col, i, last_row: last_row?(row_index)) %>">
+                <%= render_cell(col, record) %>
               </td>
             <% end %>
           </tr>

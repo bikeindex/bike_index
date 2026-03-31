@@ -141,6 +141,8 @@ RSpec.describe Organized::ExportsController, type: :request do
         let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
         it "removes the stickers before destroying" do
           export.update(options: export.options.merge(bike_codes_assigned: ["a1111"]))
+          export_options = export.reload.options
+          export_id = export.id
           bike_sticker.reload
           export.reload
           expect(bike_sticker.claimed?).to be_truthy
@@ -159,6 +161,12 @@ RSpec.describe Organized::ExportsController, type: :request do
           bike_sticker_update = bike_sticker.bike_sticker_updates.last
           expect(bike_sticker_update.creator_kind).to eq "creator_export"
           expect(bike_sticker_update.kind).to eq "un_claim"
+
+          # Soft deleted
+          export = Export.unscoped.find(export_id)
+          expect(export.deleted_at).to be_present
+          # Verify that the bike stickers haven't been removed from the options
+          expect(Export.unscoped.find(export.id).options).to eq export_options
         end
       end
     end

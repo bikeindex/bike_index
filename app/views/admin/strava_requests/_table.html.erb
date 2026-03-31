@@ -1,31 +1,25 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection)) do |table| %>
-  <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |strava_request| %>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |strava_request| %>
     <%= render UI::Time::Component.new(time: strava_request.created_at) %>
-
-    <% if helpers.display_dev_info? %>
-      <span class="less-strong-right d-none d-md-block only-dev-visible">
-        <%= strava_request.id %>
-      </span>
-    <% end %>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "tw:text-xs") do |strava_request| %>
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |strava_request| %>
     <small>
       <%= render UI::Time::Component.new(time: strava_request.updated_at) %>
     </small>
   <% end %>
 
   <% if display_dev_info? %>
-    <% table.column(sortable: render_sortable ? "priority" : nil, label: "Priority", classes: "only-dev-visible tw:text-xs") do |strava_request| %>
+    <% table.column(sortable: "priority", classes: "only-dev-visible tw:text-xs") do |strava_request| %>
       <small title="<%= number_with_delimiter(strava_request.priority) %>">
         <%= (strava_request.priority / 100_000_000.0).round(1) %>
       </small>
     <% end %>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "request_type" : nil, label: "Type") do |strava_request| %>
+  <% table.column(sortable: "request_type", label: "Type") do |strava_request| %>
     <span class="tw:inline-flex tw:items-center tw:gap-1 tw:whitespace-nowrap">
       <small><%= strava_request.request_type&.humanize %></small>
 
@@ -39,7 +33,7 @@
     </span>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "response_status" : nil, label: "Status") do |strava_request| %>
+  <% table.column(sortable: "response_status", label: "Status") do |strava_request| %>
     <% status_text = if strava_request.response_status.start_with?("binx_response")
       strava_request.response_status == "binx_response" ? "binx" : "binx limited"
     else
@@ -64,7 +58,7 @@
     <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: strava_request.rate_limit) %>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "requested_at" : nil, label: "Requested") do |strava_request| %>
+  <% table.column(sortable: "requested_at") do |strava_request| %>
     <small>
       <%= render UI::Time::Component.new(time: strava_request.requested_at) %>
     </small>

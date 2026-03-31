@@ -1245,7 +1245,8 @@ CREATE TABLE public.exports (
     rows integer,
     options jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone
 );
 
 
@@ -7488,6 +7489,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260331160943'),
 ('20260319153927'),
 ('20260318211638'),
 ('20260310045539'),

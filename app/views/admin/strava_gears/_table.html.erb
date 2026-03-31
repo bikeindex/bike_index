@@ -1,17 +1,11 @@
 <%# locals: (collection:, render_sortable: false, skip_strava_integration: false) %>
 
-<%= render(UI::Table::Component.new(records: collection)) do |table| %>
-  <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |strava_gear| %>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |strava_gear| %>
     <%= render UI::Time::Component.new(time: strava_gear.created_at) %>
-
-    <% if helpers.display_dev_info? %>
-      <span class="less-strong-right d-none d-md-block only-dev-visible">
-        <%= strava_gear.id %>
-      </span>
-    <% end %>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "tw:text-xs") do |strava_gear| %>
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |strava_gear| %>
     <small>
       <%= render UI::Time::Component.new(time: strava_gear.updated_at) %>
     </small>
@@ -21,7 +15,7 @@
     <%= strava_gear.strava_gear_display_name %>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "gear_type" : nil, label: "Type") do |strava_gear| %>
+  <% table.column(sortable: "gear_type", label: "Type") do |strava_gear| %>
     <%= strava_gear.gear_type %>
   <% end %>
 
@@ -29,7 +23,7 @@
     <code><%= strava_gear.strava_id %></code>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "total_distance_kilometers" : nil, label: "Distance (mi)") do |strava_gear| %>
+  <% table.column(sortable: "total_distance_kilometers", label: "Distance (mi)") do |strava_gear| %>
     <%= number_display(strava_gear.total_distance_miles) %>
   <% end %>
 

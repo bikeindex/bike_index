@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id              :integer          not null, primary key
+#  deleted_at      :datetime
 #  file            :text
 #  file_format     :integer          default("csv")
 #  kind            :integer          default("organization")
@@ -56,6 +57,8 @@ class Export < ApplicationRecord
   FEATURE_HEADERS = %w[partial_registration is_impounded impounded_at].freeze
   HEADERS_FOR_AVERY_EXPORT = %w[address owner_name].freeze
 
+  acts_as_paranoid
+
   mount_uploader :file, ExportUploader
 
   enum :progress, PROGRESS_ENUM
@@ -72,6 +75,20 @@ class Export < ApplicationRecord
   before_validation :set_progress
 
   scope :avery, -> { where("(options -> 'avery_export') IS NOT NULL") }
+  scope :with_stickers, -> { where("(options -> 'bike_code_start') IS NOT NULL OR (options -> 'assign_bike_codes') IS NOT NULL") }
+  scope :specific, -> { where("(options -> 'only_custom_bike_ids')::text = 'true'") }
+  scope :not_specific, -> { where("(options -> 'only_custom_bike_ids') IS NULL OR (options -> 'only_custom_bike_ids')::text != 'true'") }
+  scope :incompletes, -> { where("(options -> 'partial_registrations')::text = '\"only\"'") }
+  scope :registrations, -> {
+    not_specific.where("(options -> 'partial_registrations') IS NULL OR (options -> 'partial_registrations')::text = 'false' OR ((options -> 'partial_registrations') IS NOT NULL AND (options -> 'partial_registrations')::text != '\"only\"')")
+  }
+  scope :with_dates, -> {
+    where("((options -> 'start_at') IS NOT NULL AND (options -> 'start_at')::text != 'null') OR ((options -> 'end_at') IS NOT NULL AND (options -> 'end_at')::text != 'null')")
+  }
+  scope :incompletes_and_registrations, -> {
+    not_specific.where("(options -> 'partial_registrations') IS NOT NULL")
+      .where.not("(options -> 'partial_registrations')::text IN ('false', '\"only\"')")
+  }
 
   class << self
     def default_headers

@@ -34,4 +34,8 @@
   <div class="sm:tw:basis-auto tw:basis-full">
     batch: <%= number_display(@batch_size) %>
   </div>
+
+  <% if StravaJobs::RequestRunner.new.skip_job? %>
+    <%= render(UI::Alert::Component.new(text: "StravaJobs::RequestRunner is skipped", kind: :error)) %>
+  <% end %>
 </div>
