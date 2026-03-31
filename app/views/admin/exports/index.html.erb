@@ -82,7 +82,7 @@
 <% end %>
 
 <% table_view = capture do %>
-  <%= render(UI::Table::Component.new(records: @collection)) do |table| %>
+  <%= render(UI::Table::Component.new(records: @collection, render_sortable: true)) do |table| %>
     <% table.column(sortable: "created_at", label: "Date") do |export| %>
       <%= link_to organization_export_path(export, organization_id: export.organization.to_param) do %>
         <%= render UI::Time::Component.new(time: export.created_at) %>

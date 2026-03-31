@@ -24,6 +24,7 @@ RSpec.describe UI::Table::Component, type: :component do
     expect(component).to have_css("th", text: "Email")
     expect(component).to have_css("td", text: "Alice")
     expect(component).to have_css("td", text: "bob@example.com")
+    expect(component).to have_css("tbody.twtable-striped")
   end
 
   context "with custom classes" do
@@ -58,7 +59,7 @@ RSpec.describe UI::Table::Component, type: :component do
     end
 
     it "renders sortable headers with link class and active state" do
-      result = render_inline(described_class.new(records:, sort: "name", sort_direction: "desc")) do |table|
+      result = render_inline(described_class.new(records:, render_sortable: true, sort: "name", sort_direction: "desc")) do |table|
         table.column(sortable: "name") { |r| r.name }
         table.column(sortable: "email") { |r| r.email }
       end
@@ -70,7 +71,7 @@ RSpec.describe UI::Table::Component, type: :component do
 
     context "with custom label" do
       it "uses label instead of derived title" do
-        result = render_inline(described_class.new(records:, sort: "bike_sticker_batch_id")) do |table|
+        result = render_inline(described_class.new(records:, render_sortable: true, sort: "bike_sticker_batch_id")) do |table|
           table.column(sortable: "bike_sticker_batch_id", label: "Batch") { |r| r.name }
           table.column(sortable: "code_integer", label: "Code #") { |r| r.email }
         end
@@ -82,9 +83,21 @@ RSpec.describe UI::Table::Component, type: :component do
       end
     end
 
+    context "with render_sortable false" do
+      it "renders column labels without sort links" do
+        result = render_inline(described_class.new(records:)) do |table|
+          table.column(sortable: "created_at") { |r| r.name }
+          table.column(sortable: "email") { |r| r.email }
+        end
+
+        expect(result).to have_css("th", text: "Created")
+        expect(result).not_to have_css("th a")
+      end
+    end
+
     context "without explicit sort" do
       it "defaults to first sortable column as active" do
-        result = render_inline(described_class.new(records:)) do |table|
+        result = render_inline(described_class.new(records:, render_sortable: true)) do |table|
           table.column(sortable: "created_at") { |r| r.name }
           table.column(sortable: "email") { |r| r.email }
         end

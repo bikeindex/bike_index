@@ -69,6 +69,13 @@
   .twhr {
     @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
   }
+
+  .twtable-striped tr:nth-child(odd) {
+    @apply tw:bg-white tw:dark:bg-gray-900;
+  }
+  .twtable-striped tr:nth-child(even) {
+    @apply tw:bg-gray-100 tw:dark:bg-gray-800;
+  }
 }
 
 @utility base-font {

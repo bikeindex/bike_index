@@ -12,13 +12,14 @@ module UI
       Column = Data.define(:label, :sortable, :block, :classes, :lower_right)
 
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
-      def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil)
+      def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil, render_sortable: false)
         @records = records
         @cache_key = cache_key
         @classes = classes
         @bordered = !unbordered
         @sort = sort
         @sort_direction = sort ? (sort_direction || "desc") : sort_direction
+        @render_sortable = render_sortable
         @columns = []
       end
 
@@ -78,7 +79,7 @@ module UI
       end
 
       def render_header(col)
-        col.sortable.present? ? render_sortable(col.sortable, col.label) : col.label
+        (col.sortable.present? && @render_sortable) ? render_sortable(col.sortable, col.label) : (col.label || col.sortable&.gsub(/_(id|at)\z/, "")&.titleize)
       end
 
       def render_cell(col, record)

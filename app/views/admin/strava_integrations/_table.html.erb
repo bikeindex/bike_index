@@ -1,13 +1,13 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection)) do |table| %>
-  <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created", lower_right: display_dev_info? ? ->(r) { r.id } : nil) do |strava_integration| %>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: display_dev_info? ? ->(r) { r.id } : nil) do |strava_integration| %>
     <%= link_to admin_strava_integration_path(strava_integration) do %>
       <%= render UI::Time::Component.new(time: strava_integration.created_at) %>
     <% end %>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "deleted_at" : nil, label: "Deleted") do |strava_integration| %>
+  <% table.column(sortable: "deleted_at") do |strava_integration| %>
     <% if strava_integration.deleted_at.present? %>
       <small class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
         <%= render UI::Time::Component.new(time: strava_integration.deleted_at) %>
@@ -15,17 +15,17 @@
     <% end %>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "tw:text-xs") do |strava_integration| %>
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |strava_integration| %>
     <small>
       <%= render UI::Time::Component.new(time: strava_integration.updated_at) %>
     </small>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "user_id" : nil, label: "User") do |strava_integration| %>
+  <% table.column(sortable: "user_id") do |strava_integration| %>
     <%= render Admin::UserCell::Component.new(user: strava_integration.user, user_id: strava_integration.user_id, render_search: render_sortable) %>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "status" : nil, label: "Status") do |strava_integration| %>
+  <% table.column(sortable: "status") do |strava_integration| %>
     <% if strava_integration.synced? %>
       <span class="<%= UI::Alert::Component::TEXT_CLASSES[:success] %>">
         <%= strava_integration.status %>
@@ -51,7 +51,7 @@
     <small><%= number_display(strava_integration.strava_id) %></small>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "activities_downloaded_count" : nil, label: "Activities") do |strava_integration| %>
+  <% table.column(sortable: "activities_downloaded_count", label: "Activities") do |strava_integration| %>
     <%= link_to strava_integration.activities_downloaded_count, admin_strava_activities_path(search_strava_integration_id: strava_integration.id) %>
 
     <% if !strava_integration.synced? && strava_integration.athlete_activity_count.present? %>
@@ -67,7 +67,7 @@
     </small>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "last_updated_activities_at" : nil, label: "Activities updated") do |strava_integration| %>
+  <% table.column(sortable: "last_updated_activities_at", label: "Activities updated") do |strava_integration| %>
     <small>
       <%= render UI::Time::Component.new(time: strava_integration.last_updated_activities_at) %>
     </small>

@@ -16,22 +16,22 @@
   tbody td.only-dev-visible {border-top: 0px;}
 </style>
 
-<%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users")) do |table| %>
-  <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |user| %>
+<%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users", render_sortable:)) do |table| %>
+  <% table.column(sortable: "created_at") do |user| %>
     <%= render UI::Time::Component.new(time: user.created_at) %>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "only-dev-visible tw:text-xs") do |user| %>
+  <% table.column(sortable: "updated_at", classes: "only-dev-visible tw:text-xs") do |user| %>
     <small><%= render UI::Time::Component.new(time: user.updated_at) %></small>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "deleted_at" : nil, label: "Deleted", classes: "deleted-cell tw:text-xs") do |user| %>
+  <% table.column(sortable: "deleted_at", classes: "deleted-cell tw:text-xs") do |user| %>
     <span class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
       <%= render UI::Time::Component.new(time: user.deleted_at) %>
     </span>
   <% end %>
 
-  <% table.column(sortable: render_sortable ? "email" : nil, label: "Email", lower_right: ->(user) { user.id }) do |user| %>
+  <% table.column(sortable: "email", lower_right: ->(user) { user.id }) do |user| %>
     <%= render Admin::UserCell::Component.new(email: user.email, user:, render_search: false) %>
   <% end %>
 
