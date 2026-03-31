@@ -40,9 +40,12 @@ module StravaJobs
       private
 
       def make_request(strava_integration, strava_request)
+        if strava_request.proxy_request?
+          return Integrations::Strava::Client.proxy_request(strava_integration, strava_request.parameters["url"],
+            method: strava_request.parameters["method"], body: strava_request.parameters["body"])
+        end
+
         case strava_request.request_type
-        when strava_request.proxy_request? # not a request type...
-          Integrations::Strava::Client.proxy_request(strava_integration, strava_request.parameters["url"], method: strava_request.parameters["method"], body: strava_request.parameters["body"])
         when "list_activities"
           Integrations::Strava::Client.list_activities(strava_integration, **strava_request.parameters.symbolize_keys)
         when "fetch_activity"
