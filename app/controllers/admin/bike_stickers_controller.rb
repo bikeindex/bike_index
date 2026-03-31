@@ -7,7 +7,7 @@ class Admin::BikeStickersController < Admin::BaseController
     @bike_sticker_batches = if @bike_sticker_batch.present?
       [@bike_sticker_batch]
     elsif @matching_batches
-      BikeStickerBatch.where(id: @bike_stickers.reorder(:bike_sticker_batch_id).distinct.pluck(:bike_sticker_batch_id))
+      BikeStickerBatch.where(id: matching_bike_stickers.reorder(:bike_sticker_batch_id).distinct.pluck(:bike_sticker_batch_id))
         .reorder(id: :desc)
         .includes(:organization)
     else

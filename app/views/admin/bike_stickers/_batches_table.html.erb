@@ -1,0 +1,54 @@
+<%# locals: (bike_sticker_batches:, render_sortable: false, matching_count: false) %>
+
+<%= render(UI::Table::Component.new(records: bike_sticker_batches, render_sortable:)) do |table| %>
+  <% table.column(sortable: "id", label: "Batch") do |batch| %>
+    <%= link_to "##{batch.id}", admin_bike_stickers_path(search_bike_sticker_batch_id: batch.id) %>
+  <% end %>
+
+  <% table.column(sortable: "created_at") do |batch| %>
+    <%= render UI::Time::Component.new(time: batch.created_at) %>
+  <% end %>
+
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |batch| %>
+    <small><%= render UI::Time::Component.new(time: batch.updated_at) %></small>
+  <% end %>
+
+  <% table.column(sortable: "creator_id", label: "Creator") do |batch| %>
+    <small><%= batch.user&.display_name %></small>
+  <% end %>
+
+  <% table.column(sortable: "organization_id") do |batch| %>
+    <%= render Admin::OrganizationCell::Component.new(organization: batch.organization, render_search: true) %>
+  <% end %>
+
+  <% if matching_count %>
+    <% all_matching = matching_bike_stickers %>
+    <% table.column(label: "Matching count") do |batch| %>
+      <%= number_display(all_matching.where(bike_sticker_batch_id: batch.id).count) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Count") do |batch| %>
+    <small><%= number_display(batch.bike_stickers.count) %></small>
+  <% end %>
+
+  <% table.column(label: "Claimed") do |batch| %>
+    <small><%= number_display(batch.bike_stickers.claimed.count) %></small>
+  <% end %>
+
+  <% table.column(label: "Prefix") do |batch| %>
+    <small><%= batch.prefix %></small>
+  <% end %>
+
+  <% table.column(label: "Min") do |batch| %>
+    <small><%= number_display(batch.min_code_integer) %></small>
+  <% end %>
+
+  <% table.column(label: "Max") do |batch| %>
+    <small><%= number_display(batch.max_code_integer) %></small>
+  <% end %>
+
+  <% table.column(label: "Notes") do |batch| %>
+    <small><%= batch.notes %></small>
+  <% end %>
+<% end %>

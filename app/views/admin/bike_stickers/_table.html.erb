@@ -50,7 +50,7 @@
 
   <% table.column(label: "Bike") do |bike_sticker| %>
     <% if bike_sticker.claimed? %>
-      <%= organized_bike_text(bike_sticker.bike) %>
+      <%= helpers.organized_bike_text(bike_sticker.bike) %>
     <% elsif bike_sticker.bike_id.present? %>
       <%= link_to bike_sticker.bike_id, admin_bike_path(bike_sticker.bike_id), class: "small" %>
       <small class="text-danger">Deleted?</small>
