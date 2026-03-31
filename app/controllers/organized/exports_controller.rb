@@ -23,6 +23,7 @@ module Organized
       else
         @export = Export.new(permitted_parameters)
         @export.options[:partial_registrations] = partial_registration_params
+        @export.options[:impounded_bikes] = Binxtils::InputNormalizer.boolean(params[:include_impounded_bikes])
       end
       if flash[:error].blank? && @export.update(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
         OrganizationExportJob.perform_async(@export.id)

@@ -89,6 +89,7 @@ class Export < ApplicationRecord
     not_specific.where("(options -> 'partial_registrations') IS NOT NULL")
       .where.not("(options -> 'partial_registrations')::text IN ('false', '\"only\"')")
   }
+  scope :impounded, -> { where("(options -> 'impounded_bikes')::text = 'true'") }
 
   class << self
     def default_headers
@@ -185,6 +186,10 @@ class Export < ApplicationRecord
 
   def partial_registrations
     options["partial_registrations"].blank? ? false : options["partial_registrations"]
+  end
+
+  def impounded_bikes
+    Binxtils::InputNormalizer.boolean(options["impounded_bikes"])
   end
 
   # NOTE: Only does the first 100 bikes, in case there is a huge export

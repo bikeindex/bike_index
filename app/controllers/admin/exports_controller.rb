@@ -34,6 +34,8 @@ class Admin::ExportsController < Admin::BaseController
     exports = exports.with_stickers if @stickers
     @with_dates = Binxtils::InputNormalizer.boolean(params[:search_with_dates])
     exports = exports.with_dates if @with_dates
+    @impounded = Binxtils::InputNormalizer.boolean(params[:search_impounded])
+    exports = exports.impounded if @impounded
     if params[:search_kind] == "avery"
       exports = exports.avery
     elsif params[:search_kind].present?

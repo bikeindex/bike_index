@@ -143,6 +143,18 @@
             </div>
           <% end %>
 
+          <% if current_organization.enabled?("impound_bikes") %>
+            <div
+              class="col-xs-4 mb-0 hiddenOnAveryExport"
+              style="line-height: 1.25;"
+            >
+              <label class="checkbox">
+                <%= check_box_tag :include_impounded_bikes, true, @export.impounded_bikes %>
+                Impounded bikes
+              </label>
+            </div>
+          <% end %>
+
           <div class="col-xs-4 mb-0">
             <a id="addSpecificBikes" class="field-expander" href="#">
               Add specific bikes to export
