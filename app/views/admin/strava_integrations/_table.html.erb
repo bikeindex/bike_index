@@ -1,15 +1,9 @@
 <%# locals: (collection:, render_sortable: false) %>
 
 <%= render(UI::Table::Component.new(records: collection)) do |table| %>
-  <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |strava_integration| %>
-    <%= link_to admin_strava_integration_path(strava_integration), class: "localizeTime" do %>
-      <%= l strava_integration.created_at, format: :convert_time %>
-    <% end %>
-
-    <% if helpers.display_dev_info? %>
-      <span class="less-strong-right d-none d-md-block only-dev-visible">
-        <%= strava_integration.id %>
-      </span>
+  <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created", lower_right: display_dev_info? ? ->(r) { r.id } : nil) do |strava_integration| %>
+    <%= link_to admin_strava_integration_path(strava_integration) do %>
+      <%= render UI::Time::Component.new(time: strava_integration.created_at) %>
     <% end %>
   <% end %>
 

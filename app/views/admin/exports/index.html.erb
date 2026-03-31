@@ -2,19 +2,159 @@
   <% if current_organization.present? %>
     <li class="nav-item">
       <span class="nav-link">
-        <%= link_to current_organization.name, admin_organization_path(current_organization) %> Exports
-        <small>
-          <%= link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "less-strong" %>
-        </small>
+        <%= link_to current_organization.name, admin_organization_path(current_organization) %>
+        Exports
+        <small><%= link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "less-strong" %></small>
       </span>
     </li>
   <% end %>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= params[:search_kind].present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if params[:search_kind].blank? %>
+        All kinds
+      <% else %>
+        <%= params[:search_kind].humanize %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{params[:search_kind].present? ? '' : 'active'}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% Export::VALID_KINDS.each_key do |kind| %>
+        <%= link_to kind.to_s.humanize, url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{params[:search_kind] == kind.to_s ? 'active' : ''}" %>
+      <% end %>
+
+      <div class="dropdown-divider"></div>
+
+      <%= link_to "Avery", url_for(sortable_search_params.merge(search_kind: "avery")), class: "dropdown-item #{params[:search_kind] == 'avery' ? 'active' : ''}" %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Dates", url_for(sortable_search_params.merge(search_with_dates: !@with_dates)), class: "nav-link #{@with_dates ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= params[:search_registrations].present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if params[:search_registrations].blank? %>
+        All registrations
+      <% else %>
+        <%= params[:search_registrations].humanize %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All registrations", url_for(sortable_search_params.merge(search_registrations: nil)), class: "dropdown-item #{params[:search_registrations].present? ? '' : 'active'}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <%= link_to "Registered", url_for(sortable_search_params.merge(search_registrations: "registered")), class: "dropdown-item #{params[:search_registrations] == 'registered' ? 'active' : ''}" %>
+      <%= link_to "Incomplete", url_for(sortable_search_params.merge(search_registrations: "incomplete")), class: "dropdown-item #{params[:search_registrations] == 'incomplete' ? 'active' : ''}" %>
+      <%= link_to "Incompletes & registrations", url_for(sortable_search_params.merge(search_registrations: "incompletes_and_registrations")), class: "dropdown-item #{params[:search_registrations] == 'incompletes_and_registrations' ? 'active' : ''}" %>
+      <%= link_to "Specific", url_for(sortable_search_params.merge(search_registrations: "specific")), class: "dropdown-item #{params[:search_registrations] == 'specific' ? 'active' : ''}" %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Stickers", url_for(sortable_search_params.merge(search_stickers: !@stickers)), class: "nav-link #{@stickers ? 'active' : ''}" %>
+  </li>
+
   <li class="nav-item">
     <%= link_to "Deleted", url_for(sortable_search_params.merge(search_deleted: !@deleted)), class: "nav-link #{@deleted ? 'active' : ''}" %>
   </li>
 <% end %>
 
-<% table_view = render(partial: "table", locals: {collection: @collection, render_sortable: true}) %>
+<% table_view = capture do %>
+  <%= render(UI::Table::Component.new(records: @collection)) do |table| %>
+    <% table.column(sortable: "created_at", label: "Date") do |export| %>
+      <%= link_to organization_export_path(export, organization_id: export.organization.to_param) do %>
+        <%= render UI::Time::Component.new(time: export.created_at) %>
+      <% end %>
+    <% end %>
+
+    <% table.column(label: "Progress") do |export| %>
+      <% progress = export.calculated_progress %>
+
+      <% color = case progress
+        when "errored" then :red
+        when "finished" then :green
+        else :yellow
+      end %>
+
+      <%= render UI::Badge::Component.new(text: progress, color:, size: :sm) %>
+    <% end %>
+
+    <% table.column(label: "Creator") do |export| %>
+      <% if export.user_id.present? %>
+        <%= export.user.display_name %>
+      <% end %>
+    <% end %>
+
+    <% table.column(label: "Organization") do |export| %>
+      <%= render Admin::OrganizationCell::Component.new(organization: export.organization, render_search: true) %>
+    <% end %>
+
+    <% table.column(label: "File") do |export| %>
+      <% if export.file.url.present? %>
+        <small title="<%= export.file.url %>">
+          <%= truncate(export.file.url, length: 50) %>
+        </small>
+      <% end %>
+    <% end %>
+
+    <% table.column(label: "Kind") do |export| %>
+      <% display_kind = export.avery_export? ? "avery" : export.kind %>
+      <%= link_to display_kind, url_for(sortable_search_params.merge(search_kind: display_kind)) %>
+
+      <% if export.assign_bike_codes? %>
+        <%= link_to url_for(sortable_search_params.merge(search_stickers: true)) do %>
+          <%= render UI::Badge::Component.new(text: "sticker", title: "Assigned stickers", color: :cyan, size: :sm) %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% table.column(label: "Rows") do |export| %>
+      <% if export.finished? %>
+        <%= number_display(export.rows) %>
+      <% end %>
+    <% end %>
+
+    <% table.column(label: "Registrations") do |export| %>
+      <% if export.only_custom_bike_ids %>
+        <%= render UI::Badge::Component.new(text: "specific", title: "Only specified registrations", color: :purple, size: :sm) %>
+      <% elsif export.partial_registrations == "only" %>
+        incomplete
+      <% elsif export.partial_registrations.present? %>
+        incompletes & registrations
+      <% else %>
+        registered
+      <% end %>
+
+      <% if export.start_at.present? || export.end_at.present? %>
+        <%= link_to url_for(sortable_search_params.merge(search_with_dates: true)) do %>
+          <%= render UI::Badge::Component.new(text: "dates", color: :yellow, size: :sm) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
   viewing: "Exports",

@@ -1,14 +1,8 @@
 <%# locals: (collection:, render_sortable: false) %>
 
 <%= render(UI::Table::Component.new(records: collection)) do |table| %>
-  <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |strava_request| %>
+  <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created", lower_right: display_dev_info? ? ->(r) { r.id } : nil) do |strava_request| %>
     <%= render UI::Time::Component.new(time: strava_request.created_at) %>
-
-    <% if helpers.display_dev_info? %>
-      <span class="less-strong-right d-none d-md-block only-dev-visible">
-        <%= strava_request.id %>
-      </span>
-    <% end %>
   <% end %>
 
   <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "tw:text-xs") do |strava_request| %>

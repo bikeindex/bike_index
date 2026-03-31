@@ -67,6 +67,43 @@ RSpec.describe UI::Table::Component, type: :component do
       expect(result).to have_css("th a.twlink", text: /Email/)
       expect(result).not_to have_css("th a.active", text: /Email/)
     end
+
+    context "with custom label" do
+      it "uses label instead of derived title" do
+        result = render_inline(described_class.new(records:, sort: "bike_sticker_batch_id")) do |table|
+          table.column(sortable: "bike_sticker_batch_id", label: "Batch") { |r| r.name }
+          table.column(sortable: "code_integer", label: "Code #") { |r| r.email }
+        end
+
+        expect(result).to have_css("th a.twlink.active", text: /Batch/)
+        expect(result).not_to have_css("th a", text: /Bike Sticker Batch/)
+        expect(result).to have_css("th a.twlink", text: /Code #/)
+        expect(result).not_to have_css("th a", text: /Code Integer/)
+      end
+    end
+
+    context "without explicit sort" do
+      it "defaults to first sortable column as active" do
+        result = render_inline(described_class.new(records:)) do |table|
+          table.column(sortable: "created_at") { |r| r.name }
+          table.column(sortable: "email") { |r| r.email }
+        end
+
+        expect(result).to have_css("th a.twlink.active", text: /Created/)
+        expect(result).not_to have_css("th a.active", text: /Email/)
+      end
+    end
+  end
+
+  context "with lower_right" do
+    it "renders lower_right content in the cell" do
+      result = render_inline(described_class.new(records:)) do |table|
+        table.column(label: "Email", lower_right: ->(r) { r.name }) { |r| r.email }
+      end
+
+      expect(result).to have_css("td div", text: /alice@example.com/)
+      expect(result).to have_css("td div small", text: "Alice")
+    end
   end
 
   context "with unbordered" do

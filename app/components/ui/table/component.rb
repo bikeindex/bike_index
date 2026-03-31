@@ -9,7 +9,7 @@ module UI
       ARROW_DOWN = "\u2193"
       NBSP = "\u00A0"
 
-      Column = Data.define(:label, :sortable, :block, :classes)
+      Column = Data.define(:label, :sortable, :block, :classes, :lower_right)
 
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
       def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil)
@@ -22,8 +22,8 @@ module UI
         @columns = []
       end
 
-      def column(label: nil, sortable: nil, classes: nil, &block)
-        @columns << Column.new(label:, sortable:, block:, classes:)
+      def column(label: nil, sortable: nil, classes: nil, lower_right: nil, &block)
+        @columns << Column.new(label:, sortable:, block:, classes:, lower_right:)
         nil
       end
 
@@ -34,15 +34,29 @@ module UI
       private
 
       def current_sort
-        @sort || (helpers.respond_to?(:sort_column) ? helpers.sort_column : nil)
+        @current_sort ||= @sort || helper_sort_column || default_sort_column
       end
 
       def current_direction
-        @sort_direction || (helpers.respond_to?(:sort_direction) ? helpers.sort_direction : nil)
+        @sort_direction || (helpers.respond_to?(:sort_direction) ? helpers.sort_direction : nil) || "desc"
       end
 
-      def render_sortable(column)
-        title = column.gsub(/_(id|at)\z/, "").titleize
+      def helper_sort_column
+        return unless helpers.respond_to?(:sort_column)
+        col = helpers.sort_column
+        sortable_columns.include?(col) ? col : nil
+      end
+
+      def default_sort_column
+        @columns.find { |c| c.sortable }&.sortable
+      end
+
+      def sortable_columns
+        @columns.filter_map(&:sortable)
+      end
+
+      def render_sortable(column, label = nil)
+        title = label || column.gsub(/_(id|at)\z/, "").titleize
         direction = (column == current_sort && current_direction == "desc") ? "asc" : "desc"
         css = "twlink"
 
@@ -63,10 +77,29 @@ module UI
         end
       end
 
+      def render_header(col)
+        col.sortable.present? ? render_sortable(col.sortable, col.label) : col.label
+      end
+
+      def render_cell(col, record)
+        cell_content = capture { instance_exec(record, &col.block) }
+        return cell_content unless col.lower_right
+
+        lower_right_content = instance_exec(record, &col.lower_right)
+        content_tag(:div, class: "tw:relative tw:min-h-5") do
+          safe_join([
+            cell_content,
+            content_tag(:small, safe_join([NBSP.html_safe, lower_right_content]),
+              class: "tw:absolute tw:-right-0.5 tw:-bottom-1 tw:text-xs tw:text-gray-400")
+          ])
+        end
+      end
+
       def arrow_for(direction)
         (direction == "desc") ? ARROW_DOWN : ARROW_UP
       end
 
+      def last_row?(row_index) = row_index == @records.length - 1
       def first_col?(index) = index == 0
       def last_col?(index) = index == @columns.length - 1
 

@@ -12,6 +12,10 @@ class Admin::ExportsController < Admin::BaseController
 
   private
 
+  def earliest_period_date
+    Time.at(1535760000) # 2018-09-01
+  end
+
   def matching_exports
     exports = if params[:organization_id].present?
       Export.where(organization_id: current_organization.id)
@@ -20,6 +24,21 @@ class Admin::ExportsController < Admin::BaseController
     end
     @deleted = Binxtils::InputNormalizer.boolean(params[:search_deleted])
     exports = exports.deleted if @deleted
+    case params[:search_registrations]
+    when "specific" then exports = exports.specific
+    when "incomplete" then exports = exports.incompletes
+    when "incompletes_and_registrations" then exports = exports.incompletes_and_registrations
+    when "registered" then exports = exports.registrations
+    end
+    @stickers = Binxtils::InputNormalizer.boolean(params[:search_stickers])
+    exports = exports.with_stickers if @stickers
+    @with_dates = Binxtils::InputNormalizer.boolean(params[:search_with_dates])
+    exports = exports.with_dates if @with_dates
+    if params[:search_kind] == "avery"
+      exports = exports.avery
+    elsif params[:search_kind].present?
+      exports = exports.where(kind: params[:search_kind])
+    end
     exports.where(created_at: @time_range)
   end
 end
