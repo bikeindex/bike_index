@@ -15,6 +15,7 @@
 <style>
   tbody td.only-dev-visible {border-top: 0px;}
 </style>
+
 <%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users")) do |table| %>
   <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |user| %>
     <span class="localizeTime">
