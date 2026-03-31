@@ -63,21 +63,20 @@ RSpec.describe UI::Table::Component, type: :component do
         table.column(sortable: "email") { |r| r.email }
       end
 
-      expect(result).to have_css("th a.link.sortable-link.link-active", text: /Name/)
-      expect(result).to have_css("th a.link.sortable-link", text: /Email/)
-      expect(result).not_to have_css("th a.link-active", text: /Email/)
+      expect(result).to have_css("th a.twlink.active", text: /Name/)
+      expect(result).to have_css("th a.twlink", text: /Email/)
+      expect(result).not_to have_css("th a.active", text: /Email/)
     end
   end
 
-  context "with bordered" do
-    it "adds border classes to th and td" do
-      result = render_inline(described_class.new(records:, bordered: true)) do |table|
+  context "with unbordered" do
+    it "removes border-r and border-t classes from th and td" do
+      result = render_inline(described_class.new(records:, unbordered: true)) do |table|
         table.column(label: "Name") { |r| r.name }
       end
 
-      expect(result.to_html).to include("tw:border")
-      expect(result).to have_css("th.tw\\:border")
-      expect(result).to have_css("td.tw\\:border")
+      expect(result).not_to have_css("th.tw:border-r.tw:border-t")
+      expect(result).not_to have_css("td.tw:border-r")
     end
   end
 
