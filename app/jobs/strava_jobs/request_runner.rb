@@ -6,11 +6,15 @@ module StravaJobs
 
     sidekiq_options queue: "droppable", retry: 1
 
-    def self.redlock_key(strava_request_id)
-      "#{REDLOCK_PREFIX}-#{strava_request_id}"
-    end
-
     class << self
+      def redlock_key(strava_request_id)
+        "#{REDLOCK_PREFIX}-#{strava_request_id}"
+      end
+
+      def new_lock_manager
+        Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
+      end
+
       private
 
       def make_request_and_update(strava_integration, strava_request)
@@ -107,7 +111,11 @@ module StravaJobs
       strava_request ||= StravaRequest.find_by(id: strava_request_id)
       return if strava_request.blank? || !strava_request.pending?
 
-      Redlockable.with_redlock(self.class.redlock_key(strava_request_id)) do
+      lock_manager = self.class.new_lock_manager
+      redlock = lock_manager.lock(self.class.redlock_key(strava_request_id), 5.minutes.in_milliseconds.to_i)
+      return unless redlock
+
+      begin
         strava_integration = StravaIntegration.find_by(id: strava_request.strava_integration_id)
         if strava_integration.blank?
           return mark_requests_deleted(strava_request)
@@ -116,6 +124,8 @@ module StravaJobs
         end
 
         self.class.send(:make_request_and_update, strava_integration, strava_request)
+      ensure
+        lock_manager.unlock(redlock)
       end
     end
 
