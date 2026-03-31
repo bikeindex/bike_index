@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id              :integer          not null, primary key
+#  deleted_at      :datetime
 #  file            :text
 #  file_format     :integer          default("csv")
 #  kind            :integer          default("organization")
@@ -55,6 +56,8 @@ class Export < ApplicationRecord
   PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).sort.freeze
   FEATURE_HEADERS = %w[partial_registration is_impounded impounded_at].freeze
   HEADERS_FOR_AVERY_EXPORT = %w[address owner_name].freeze
+
+  acts_as_paranoid
 
   mount_uploader :file, ExportUploader
 
