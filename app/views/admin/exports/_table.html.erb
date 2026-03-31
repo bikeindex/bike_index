@@ -1,0 +1,40 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<%= render(UI::Table::Component.new(records: collection)) do |table| %>
+  <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Date") do |export| %>
+    <%= render UI::Time::Component.new(time: export.created_at) %>
+  <% end %>
+
+  <% table.column(label: "Progress") do |export| %>
+    <% progress = export.calculated_progress %>
+    <% color = case progress
+      when "errored" then :red
+      when "finished" then :green
+      else :yellow
+    end %>
+    <%= render UI::Badge::Component.new(text: progress, color:, size: :sm) %>
+  <% end %>
+
+  <% table.column(label: "Creator") do |export| %>
+    <% if export.user_id.present? %>
+      <%= export.user.display_name %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Organization") do |export| %>
+    <% if export.organization.present? %>
+      <%= link_to export.organization.name, admin_exports_url(organization_id: export.organization.to_param) %>
+    <% else %>
+      <%= link_to "none", admin_exports_url(organization_id: "none"), class: "tw:text-gray-300" %>
+    <% end %>
+    <% if export.file.url.present? %>
+      <br><small><%= export.file.url %></small>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Rows") do |export| %>
+    <% if export.finished? %>
+      <%= number_display(export.rows) %>
+    <% end %>
+  <% end %>
+<% end %>
