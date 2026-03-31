@@ -5,10 +5,9 @@ require "rails_helper"
 RSpec.describe UI::Time::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
-  let(:options) { {time:, format:, timezone_if_different:} }
+  let(:options) { {time:, format:} }
   let(:time) { Time.utc(2024, 1, 15, 14, 30, 0) }
   let(:format) { nil }
-  let(:timezone_if_different) { false }
 
   describe "#render?" do
     context "when time is present" do

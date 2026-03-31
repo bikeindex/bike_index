@@ -48,6 +48,7 @@ module StravaJobs
     end
 
     def perform(skip_perform_in = false)
+      return if skip_job?
       return unless self.class.rate_limit_allows_batch?
       return if enqueued_runner_count > 10
 
