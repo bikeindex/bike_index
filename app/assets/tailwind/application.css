@@ -1,3 +1,5 @@
+/* Declare the layers here, including legacy, so that legacy is first to be overridden */
+@layer legacy, theme, base, components, utilities;
 @import "tailwindcss" prefix(tw);
 @config "../../../config/tailwind.config.js";
 
@@ -9,7 +11,12 @@
 
 @layer components {
   .twlink {
-    @apply tw:text-blue-500 tw:underline;
+    @apply tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition-colors tw:underline;
+  }
+
+  .twlink.active,
+  .twlink:active {
+    @apply tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold;
   }
 
   .twless-strong {
