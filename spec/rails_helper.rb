@@ -258,8 +258,9 @@ end
 #
 module Capybara
   module RSpecMatchers
-    def have_selector(expr, **, &)
-      Matchers::HaveSelector.new(escape_colon_classes(expr), **, &)
+    def have_selector(*args, **, &)
+      args = args.map { |a| a.is_a?(String) ? escape_colon_classes(a) : a }
+      Matchers::HaveSelector.new(*args, **, &)
     end
 
     def have_css(expr, **, &)
@@ -268,13 +269,11 @@ module Capybara
 
     private
 
-    # Automatically escape colons in tailwind classes
+    # Automatically escape colons in tailwind class selectors (e.g. .tw\:p-6)
+    # Only escapes colons that appear within class selectors, preserving
+    # pseudo-selectors like :hover, :focus, :disabled, :not(), etc.
     def escape_colon_classes(expr)
-      # Don't change anything unless it looks like a colon class
-      return expr unless expr.match?(/\.\w+[^\\]:/)
-
-      # remove colon, unless it's for :disabled
-      expr.gsub(":", '\:').gsub('\:disabled', ":disabled").gsub('\:not(', ":not(")
+      expr.gsub(/(\.\w+):/) { "#{$1}\\:" }
     end
   end
 end
