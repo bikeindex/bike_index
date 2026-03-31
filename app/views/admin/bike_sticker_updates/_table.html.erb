@@ -1,9 +1,7 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<% dev_id = ->(r) { content_tag(:span, r.id, class: "only-dev-visible") } %>
-
 <%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
-  <% table.column(sortable: "created_at", lower_right: dev_id) do |update| %>
+  <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |update| %>
     <% bike_sticker = update.bike_sticker %>
 
     <%= link_to "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}" do %>
@@ -21,8 +19,7 @@
     <% bike_sticker = update.bike_sticker %>
 
     <strong>
-      <%= link_to bike_sticker.pretty_code,
-      admin_bike_sticker_updates_path(sortable_search_params.merge(search_query: bike_sticker.code)) %>
+      <%= link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sortable_search_params.merge(search_query: bike_sticker.code)) %>
     </strong>
 
     <% unless bike_sticker.sticker? %>
@@ -77,14 +74,10 @@
         <%= update.creator_kind_humanized %>
       </small>
       <% if update.export_id.present? %>
-        <%= link_to "##{update.export_id}",
-          organization_export_path(update.export_id, organization_id: update.organization_id),
-          class: "small" %>
+        <%= link_to "##{update.export_id}", organization_export_path(update.export_id, organization_id: update.organization_id), class: "small" %>
       <% end %>
       <% if update.bulk_import_id.present? %>
-        <%= link_to "##{update.bulk_import_id}",
-          organization_bulk_import_path(update.bulk_import_id, organization_id: update.organization_id),
-          class: "small" %>
+        <%= link_to "##{update.bulk_import_id}", organization_bulk_import_path(update.bulk_import_id, organization_id: update.organization_id), class: "small" %>
       <% end %>
     <% end %>
   <% end %>

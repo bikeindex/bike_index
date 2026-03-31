@@ -2,10 +2,8 @@
 
 <% bike_code_batch_organizations = BikeStickerBatch.all.map { |b| [b.id.to_s, b.organization&.short_name] }.to_h %>
 
-<% dev_id = ->(r) { content_tag(:span, r.id, class: "only-dev-visible") } %>
-
 <%= render(UI::Table::Component.new(records: bike_stickers, render_sortable:)) do |table| %>
-  <% table.column(sortable: "created_at", lower_right: dev_id) do |bike_sticker| %>
+  <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |bike_sticker| %>
     <% if bike_sticker.organization.present? %>
       <% bike_sticker_url = edit_organization_sticker_path(organization_id: bike_sticker.organization_id, id: bike_sticker.code) %>
     <% else %>

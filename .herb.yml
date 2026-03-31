@@ -61,9 +61,6 @@ linter:
     # Disabled: branches often have structurally different content, making extraction impractical
     erb-no-duplicate-branch-elements:
       enabled: false
-    # Disabled: UI::Table column blocks run via instance_exec, so helpers need helpers. prefix
-    actionview-no-silent-helper:
-      enabled: false
   #
   #   # Rules can have 'include', 'only', and 'exclude' patterns
   #   some-rule:
