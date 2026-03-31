@@ -15,15 +15,15 @@
 
   <% table.column(sortable: render_sortable ? "deleted_at" : nil, label: "Deleted") do |strava_integration| %>
     <% if strava_integration.deleted_at.present? %>
-      <small class="localizeTime <%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
-        <%= l strava_integration.deleted_at, format: :convert_time %>
+      <small class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
+        <%= render UI::Time::Component.new(time: strava_integration.deleted_at) %>
       </small>
     <% end %>
   <% end %>
 
   <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "tw:text-xs") do |strava_integration| %>
-    <small class="localizeTime">
-      <%= l strava_integration.updated_at, format: :convert_time %>
+    <small>
+      <%= render UI::Time::Component.new(time: strava_integration.updated_at) %>
     </small>
   <% end %>
 
@@ -74,10 +74,8 @@
   <% end %>
 
   <% table.column(sortable: render_sortable ? "last_updated_activities_at" : nil, label: "Activities updated") do |strava_integration| %>
-    <% if strava_integration.last_updated_activities_at.present? %>
-      <small class="localizeTime">
-        <%= l strava_integration.last_updated_activities_at, format: :convert_time %>
-      </small>
-    <% end %>
+    <small>
+      <%= render UI::Time::Component.new(time: strava_integration.last_updated_activities_at) %>
+    </small>
   <% end %>
 <% end %>

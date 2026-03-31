@@ -2,9 +2,7 @@
 
 <%= render(UI::Table::Component.new(records: collection)) do |table| %>
   <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |strava_activity| %>
-    <span class="localizeTime">
-      <%= l strava_activity.created_at, format: :convert_time %>
-    </span>
+    <%= render UI::Time::Component.new(time: strava_activity.created_at) %>
 
     <% if helpers.display_dev_info? %>
       <span class="less-strong-right d-none d-md-block only-dev-visible">
@@ -14,17 +12,13 @@
   <% end %>
 
   <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "tw:text-xs") do |strava_activity| %>
-    <small class="localizeTime">
-      <%= l strava_activity.updated_at, format: :convert_time %>
+    <small>
+      <%= render UI::Time::Component.new(time: strava_activity.updated_at) %>
     </small>
   <% end %>
 
   <% table.column(sortable: render_sortable ? "start_date" : nil, label: "Start date") do |strava_activity| %>
-    <% if strava_activity.start_date.present? %>
-      <span class="localizeTime">
-        <%= l strava_activity.start_date, format: :convert_time %>
-      </span>
-    <% end %>
+    <%= render UI::Time::Component.new(time: strava_activity.start_date) %>
   <% end %>
 
   <% table.column(label: "Title") do |strava_activity| %>
@@ -80,11 +74,9 @@
 
   <% if display_dev_info? %>
     <% table.column(sortable: render_sortable ? "enriched_at" : nil, label: "Enriched", classes: "only-dev-visible tw:text-xs") do |strava_activity| %>
-      <% if strava_activity.enriched_at.present? %>
-        <small class="localizeTime">
-          <%= l strava_activity.enriched_at, format: :convert_time %>
-        </small>
-      <% end %>
+      <small>
+        <%= render UI::Time::Component.new(time: strava_activity.enriched_at) %>
+      </small>
     <% end %>
   <% end %>
 <% end %>

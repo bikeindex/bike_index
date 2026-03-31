@@ -2,9 +2,7 @@
 
 <%= render(UI::Table::Component.new(records: collection)) do |table| %>
   <% table.column(sortable: render_sortable ? "created_at" : nil, label: "Created") do |strava_request| %>
-    <span class="localizeTime">
-      <%= l strava_request.created_at, format: :convert_time %>
-    </span>
+    <%= render UI::Time::Component.new(time: strava_request.created_at) %>
 
     <% if helpers.display_dev_info? %>
       <span class="less-strong-right d-none d-md-block only-dev-visible">
@@ -14,8 +12,8 @@
   <% end %>
 
   <% table.column(sortable: render_sortable ? "updated_at" : nil, label: "Updated", classes: "tw:text-xs") do |strava_request| %>
-    <small class="localizeTime">
-      <%= l strava_request.updated_at, format: :convert_time %>
+    <small>
+      <%= render UI::Time::Component.new(time: strava_request.updated_at) %>
     </small>
   <% end %>
 
@@ -67,11 +65,9 @@
   <% end %>
 
   <% table.column(sortable: render_sortable ? "requested_at" : nil, label: "Requested") do |strava_request| %>
-    <% if strava_request.requested_at.present? %>
-      <small class="localizeTime">
-        <%= l strava_request.requested_at, format: :convert_time %>
-      </small>
-    <% end %>
+    <small>
+      <%= render UI::Time::Component.new(time: strava_request.requested_at) %>
+    </small>
   <% end %>
 
   <% table.column(label: "User") do |strava_request| %>
