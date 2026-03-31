@@ -73,8 +73,8 @@ module UI
       def th_classes(col, index)
         classes = ["tw:border-0 tw:bg-gray-200 tw:px-1 tw:py-2 tw:dark:bg-gray-700"]
         if @bordered
-          classes << "tw:border-b tw:border-l tw:border-t tw:border-gray-300 tw:dark:border-gray-600"
-          classes << "tw:border-r" if last_col?(index)
+          classes << "tw:border-b tw:border-r tw:border-t tw:border-gray-300 tw:dark:border-gray-600"
+          classes << "tw:border-l" if first_col?(index)
         end
         classes << "tw:rounded-tl-sm" if first_col?(index)
         classes << "tw:rounded-tr-sm" if last_col?(index)
@@ -85,8 +85,8 @@ module UI
       def td_classes(col, index, last_row:)
         classes = ["tw:border-0 tw:px-1 tw:py-1"]
         if @bordered
-          classes << "tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700"
-          classes << "tw:border-r" if last_col?(index)
+          classes << "tw:border-b tw:border-r tw:border-gray-200 tw:dark:border-gray-700"
+          classes << "tw:border-l" if first_col?(index)
         else
           classes << "tw:border-b tw:border-gray-100 tw:dark:border-gray-700"
         end

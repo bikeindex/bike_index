@@ -75,8 +75,8 @@ RSpec.describe UI::Table::Component, type: :component do
         table.column(label: "Name") { |r| r.name }
       end
 
-      expect(result).not_to have_css("th.tw:border-l.tw:border-t")
-      expect(result).not_to have_css("td.tw:border-l")
+      expect(result).not_to have_css("th.tw:border-r.tw:border-t")
+      expect(result).not_to have_css("td.tw:border-r")
     end
   end
 
