@@ -1,3 +1,5 @@
+/* Declare the layers here, including legacy, so that legacy is first to be overridden */
+@layer legacy, theme, base, components, utilities;
 @import "tailwindcss" prefix(tw);
 @config "../../../config/tailwind.config.js";
 
