@@ -1,7 +1,7 @@
 <%# locals: (collection:, render_sortable: false, skip_strava_integration: false) %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
-  <% table.column(sortable: "created_at", lower_right: display_dev_info? ? ->(r) { r.id } : nil) do |strava_gear| %>
+  <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |strava_gear| %>
     <%= render UI::Time::Component.new(time: strava_gear.created_at) %>
   <% end %>
 

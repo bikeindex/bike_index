@@ -90,7 +90,8 @@ module UI
         content_tag(:div, class: "tw:relative tw:min-h-5") do
           safe_join([
             cell_content,
-            content_tag(:small, safe_join([NBSP.html_safe, lower_right_content]),
+            NBSP.html_safe,
+            content_tag(:small, lower_right_content,
               class: "tw:absolute tw:-right-0.5 tw:-bottom-1 tw:text-xs tw:text-gray-400")
           ])
         end
