@@ -14,7 +14,7 @@ module UI
         @classes = classes
         @bordered = bordered
         @sort = sort
-        @sort_direction = sort_direction || "desc"
+        @sort_direction = sort ? (sort_direction || "desc") : sort_direction
         @columns = []
       end
 
@@ -30,28 +30,28 @@ module UI
       private
 
       def current_sort
-        @sort || sort_column
+        @sort || (helpers.respond_to?(:sort_column) ? helpers.sort_column : nil)
       end
 
       def current_direction
-        @sort_direction || sort_direction
+        @sort_direction || (helpers.respond_to?(:sort_direction) ? helpers.sort_direction : nil)
       end
 
       def render_sortable(column)
         title = column.gsub(/_(id|at)\z/, "").titleize
         direction = (column == current_sort && current_direction == "desc") ? "asc" : "desc"
-        css = "link sortable-link"
+        css_classes = "twlink"
 
         if column == current_sort
-          css += " link-active"
+          css_classes += " active"
           arrow = (current_direction == "desc") ? "\u2193" : "\u2191"
-          arrow_class = "sortable-direction"
+          arrow_class = nil
         else
           arrow = (direction == "desc") ? "\u2193" : "\u2191"
-          arrow_class = "sortable-direction tw:opacity-0 group-hover:tw:opacity-50 tw:transition-opacity"
+          arrow_class = "tw:opacity-0 tw:group-hover/sort:opacity-50 tw:transition-opacity"
         end
 
-        link_to(sortable_url(column, direction), class: "#{css} tw:group") do
+        link_to(sortable_url(column, direction), class: "#{css_classes} tw:group/sort") do
           safe_join([title, "\u00A0", content_tag(:span, arrow, class: arrow_class)])
         end
       end
@@ -62,7 +62,7 @@ module UI
 
       def table_classes
         [
-          "tw:min-w-full tw:text-left tw:border-separate tw:border-spacing-0",
+          "tw:min-w-full tw:text-left tw:border-separate! tw:border-spacing-0",
           @classes
         ].compact.join(" ")
       end

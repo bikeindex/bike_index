@@ -15,7 +15,7 @@ module UI
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
           table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
           table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
-          table.column(label: "First Seen") { |r| render(UI::Time::Component.new(time: r.first_seen, format: :date)) }
+          table.column(label: "First Seen") { |r| content_tag(:span, l(r.first_seen, format: :convert_time), class: "localizeTime") }
         end
       end
 
@@ -27,7 +27,7 @@ module UI
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
           table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
           table.column(sortable: "sightings") { |r| number_with_delimiter(r.sightings) }
-          table.column(label: "First Seen") { |r| render(UI::Time::Component.new(time: r.first_seen, format: :date)) }
+          table.column(label: "First Seen") { |r| content_tag(:span, l(r.first_seen, format: :convert_time), class: "localizeTime") }
         end
       end
 
@@ -39,7 +39,7 @@ module UI
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
           table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
           table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
-          table.column(label: "First Seen") { |r| render(UI::Time::Component.new(time: r.first_seen, format: :date)) }
+          table.column(label: "First Seen") { |r| content_tag(:span, l(r.first_seen, format: :convert_time), class: "localizeTime") }
         end
       end
 

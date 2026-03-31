@@ -1,14 +1,9 @@
 <div class="tw:-mx-4 tw:mb-4 tw:overflow-x-scroll tw:px-4 tw:pb-3">
   <table class="<%= table_classes %>">
-    <thead
-      class="
-        dark:tw:bg-gray-700 dark:tw:text-gray-400 tw:bg-gray-50 tw:text-sm
-        tw:text-gray-700
-      "
-    >
+    <thead class="tw:text-sm tw:text-gray-700 tw:dark:text-gray-400">
       <tr>
         <% @columns.each_with_index do |col, i| %>
-          <th class="tw:px-1 tw:py-2 <%= "tw:border-b tw:border-r tw:border-t tw:border-gray-200 dark:tw:border-gray-700" if @bordered %> <%= "tw:border-l" if @bordered && i == 0 %> <%= "tw:rounded-tl-sm" if i == 0 %> <%= "tw:rounded-tr-sm" if i == @columns.length - 1 %> <%= col.classes %>">
+          <th class="tw:border-0 tw:bg-gray-200 tw:px-1 tw:py-2 tw:dark:bg-gray-700 <%= "tw:border-b tw:border-l tw:border-t tw:border-gray-300 tw:dark:border-gray-600" if @bordered %> <%= "tw:border-r" if @bordered && i == @columns.length - 1 %> <%= "tw:rounded-tl-sm" if i == 0 %> <%= "tw:rounded-tr-sm" if i == @columns.length - 1 %> <%= col.classes %>">
             <% if col.sortable.present? %>
               <%= render_sortable(col.sortable) %>
             <% else %>
@@ -19,18 +14,19 @@
       </tr>
     </thead>
 
-    <tbody class="<%= "dark:tw:divide-gray-700 tw:divide-y tw:divide-gray-200" unless @bordered %>">
+    <tbody>
       <% @records.each_with_index do |record, row_index| %>
         <% cache_if(@cache_key, [@cache_key, record]) do %>
           <% last_row = row_index == @records.length - 1 %>
+
           <tr
             class="
-              even:tw:bg-gray-50 odd:tw:bg-white dark:even:tw:bg-gray-800
-              dark:odd:tw:bg-gray-900
+              tw:odd:bg-white tw:even:bg-gray-100 tw:dark:odd:bg-gray-900
+              tw:dark:even:bg-gray-800
             "
           >
             <% @columns.each_with_index do |col, i| %>
-              <td class="tw:px-1 tw:py-1 <%= "tw:border-b tw:border-r tw:border-gray-200 dark:tw:border-gray-700" if @bordered %> <%= "tw:border-l" if @bordered && i == 0 %> <%= "tw:rounded-bl-sm" if last_row && i == 0 %> <%= "tw:rounded-br-sm" if last_row && i == @columns.length - 1 %> <%= col.classes %>">
+              <td class="tw:border-0 tw:px-1 tw:py-1 <%= "tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700" if @bordered %> <%= "tw:border-r" if @bordered && i == @columns.length - 1 %> <%= "tw:border-b tw:border-gray-100 tw:dark:border-gray-700" unless @bordered %> <%= "tw:rounded-bl-sm" if last_row && i == 0 %> <%= "tw:rounded-br-sm" if last_row && i == @columns.length - 1 %> <%= col.classes %>">
                 <%= capture { instance_exec(record, &col.block) } %>
               </td>
             <% end %>
