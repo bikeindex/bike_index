@@ -3,7 +3,7 @@
     <thead class="tw:text-sm tw:text-gray-700 tw:dark:text-gray-400">
       <tr>
         <% @columns.each_with_index do |col, i| %>
-          <th class="tw:border-0 tw:bg-gray-200 tw:px-1 tw:py-2 tw:dark:bg-gray-700 <%= "tw:border-b tw:border-l tw:border-t tw:border-gray-300 tw:dark:border-gray-600" if @bordered %> <%= "tw:border-r" if @bordered && i == @columns.length - 1 %> <%= "tw:rounded-tl-sm" if i == 0 %> <%= "tw:rounded-tr-sm" if i == @columns.length - 1 %> <%= col.classes %>">
+          <th class="<%= th_classes(col, i) %>">
             <% if col.sortable.present? %>
               <%= render_sortable(col.sortable) %>
             <% else %>
@@ -26,7 +26,7 @@
             "
           >
             <% @columns.each_with_index do |col, i| %>
-              <td class="tw:border-0 tw:px-1 tw:py-1 <%= "tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700" if @bordered %> <%= "tw:border-r" if @bordered && i == @columns.length - 1 %> <%= "tw:border-b tw:border-gray-100 tw:dark:border-gray-700" unless @bordered %> <%= "tw:rounded-bl-sm" if last_row && i == 0 %> <%= "tw:rounded-br-sm" if last_row && i == @columns.length - 1 %> <%= col.classes %>">
+              <td class="<%= td_classes(col, i, last_row:) %>">
                 <%= capture { instance_exec(record, &col.block) } %>
               </td>
             <% end %>

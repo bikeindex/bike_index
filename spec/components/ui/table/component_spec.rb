@@ -69,14 +69,14 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  context "with bordered" do
-    it "adds border classes to th and td" do
-      result = render_inline(described_class.new(records:, bordered: true)) do |table|
+  context "with unbordered" do
+    it "removes border-r and border-t classes from th and td" do
+      result = render_inline(described_class.new(records:, unbordered: true)) do |table|
         table.column(label: "Name") { |r| r.name }
       end
 
-      expect(result).to have_css("th.tw:border-b.tw:border-l.tw:border-t")
-      expect(result).to have_css("td.tw:border-b.tw:border-l")
+      expect(result).not_to have_css("th.tw:border-l.tw:border-t")
+      expect(result).not_to have_css("td.tw:border-l")
     end
   end
 

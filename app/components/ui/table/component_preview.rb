@@ -31,9 +31,9 @@ module UI
         end
       end
 
-      def bordered
+      def unbordered
         colors = enthusiasm_colors
-        render(UI::Table::Component.new(records: sample_records, bordered: true)) do |table|
+        render(UI::Table::Component.new(records: sample_records, unbordered: true)) do |table|
           table.column(label: "Cryptid") { |r| r.name }
           table.column(label: "Region") { |r| r.region }
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
