@@ -1,0 +1,6 @@
+// These CSS layers are set up so that legacy is overridden by tailwind utility classes
+@layer legacy, theme, base, components, utilities;
+
+@layer legacy {
+  @import 'legacy_includes/admin_unvendored';
+}
