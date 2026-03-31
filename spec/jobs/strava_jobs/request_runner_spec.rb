@@ -11,6 +11,36 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     expect(described_class.sidekiq_options["queue"]).to eq "droppable"
   end
 
+  describe "redlock" do
+    it "has correct key format" do
+      expect(described_class.redlock_key(123)).to match(/StravaRequestRunnerLock-.*-123/)
+    end
+
+    context "when locked" do
+      let(:strava_integration) do
+        FactoryBot.create(:strava_integration, :syncing, status: :pending,
+          strava_id: ENV["STRAVA_TEST_USER_ID"], athlete_activity_count: 1817)
+      end
+      let(:strava_request) do
+        StravaRequest.create!(user_id: strava_integration.user_id,
+          strava_integration_id: strava_integration.id,
+          request_type: :list_activities)
+      end
+
+      it "no-ops when redlock cannot be acquired" do
+        lock_manager = described_class.new_lock_manager
+        redlock = lock_manager.lock(described_class.redlock_key(strava_request.id), 30_000)
+
+        begin
+          instance.perform(strava_request.id)
+          expect(strava_request.reload.response_status).to eq("pending")
+        ensure
+          lock_manager.unlock(redlock)
+        end
+      end
+    end
+  end
+
   describe "perform" do
     let(:strava_integration) do
       FactoryBot.create(:strava_integration, :syncing, status: :pending,

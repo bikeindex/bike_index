@@ -181,6 +181,17 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
         end
       end
 
+      context "when more than 10 requests enqueued" do
+        it "skips enqueue" do
+          StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id, request_type: :list_activities)
+          allow(instance).to receive(:enqueued_runner_count).and_return(11)
+
+          instance.perform
+          expect(StravaJobs::RequestRunner.jobs.size).to eq(0)
+        end
+      end
+
       context "when rate limited" do
         let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
         let(:rate_limit) do

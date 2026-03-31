@@ -49,6 +49,7 @@ module StravaJobs
 
     def perform(skip_perform_in = false)
       return unless self.class.rate_limit_allows_batch?
+      return if enqueued_runner_count > 10
 
       skip_duplicate_requests # skip_duplicate_requests before enqueuing
       pending = StravaRequest.pending.priority_ordered
@@ -64,6 +65,11 @@ module StravaJobs
     end
 
     private
+
+    def enqueued_runner_count
+      Sidekiq::Queue.new(RequestRunner.sidekiq_options["queue"])
+        .count { |job| job.klass == "StravaJobs::RequestRunner" }
+    end
 
     def skip_duplicate_requests
       StravaRequest.where(id: self.class.duplicate_request_ids)
