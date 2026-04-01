@@ -94,7 +94,7 @@
 
         - if render_address
           %td.hidden-sm-cells
-            %small= address_formatted(parking_notification)
+            %small= parking_notification.formatted_address_string
         - unless skip_bike
           %td.hidden-sm-cells
             - if parking_notification.bike.present?
