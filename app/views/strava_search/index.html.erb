@@ -2,7 +2,7 @@
   <% @strava_search_assets.each do |asset| %>
     <% if asset[:type] == :react_refresh %>
       <script type="module">
-        import RefreshRuntime from <%= asset[:src].to_json %>
+        import RefreshRuntime from <%== asset[:src].to_json %>
         RefreshRuntime.injectIntoGlobalHook(window)
         window.$RefreshReg$ = () => {}
         window.$RefreshSig$ = () => (type) => type

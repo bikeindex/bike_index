@@ -2,7 +2,7 @@
 
 <% if time_zone.present? %>
   <script>
-    window.localTimezone = <%= time_zone.to_json %>;
+    window.localTimezone = <%== time_zone.to_json %>;
   </script>
 <% end %>
 
