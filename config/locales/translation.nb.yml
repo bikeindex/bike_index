@@ -6127,6 +6127,7 @@ nb:
         note_by: av %{user}
         notes: Notater
         save_notes: Lagre notat
+        region: Region
       bulk_import_error:
         ascend: Stige
         ascend_unprocessable_html: Masseimport <span class="text-danger">mislyktes</span>

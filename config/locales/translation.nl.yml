@@ -6287,6 +6287,7 @@ nl:
         note_by: door %{user}
         notes: Notes
         save_notes: Bewaar notitie
+        region: Regio
       bulk_import_error:
         ascend: Stijg op
         ascend_unprocessable_html: Het bulkimportproces <span class="text-danger">is
