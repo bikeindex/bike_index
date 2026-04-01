@@ -157,7 +157,6 @@ module Integrations::Strava::Client
     when "PUT" then conn.put(path) { |req| req.body = body if body }
     else conn.get(path)
     end
-    refresh_token!(strava_integration) if response.status == 401
     response
   end
 
@@ -166,7 +165,6 @@ module Integrations::Strava::Client
     response = api_connection(strava_integration).get(path) do |req|
       req.params = params
     end
-    refresh_token!(strava_integration) if response.status == 401
     response
   end
 
