@@ -105,16 +105,16 @@
               chartkick_library_props = {
                 animation: { duration: 5000, easing: "easeOutQuart" },
                 scales: {
-                  yAxes: [{
-                    gridLines: { color: "rgba(172, 172, 172, 0)" },
-                    ticks: { fontColor: scale_color }
-                  }],
-                  xAxes: [{
+                  y: {
+                    grid: { color: "rgba(172, 172, 172, 0)" },
+                    ticks: { color: scale_color }
+                  },
+                  x: {
                     weight: 5,
-                    borderColor: "rgba(0,0,0,0)",
-                    gridLines: { color: "rgba(172, 172, 172, 0)" },
-                    ticks: { fontColor: scale_color }
-                  }]
+                    border: { color: "rgba(0,0,0,0)" },
+                    grid: { color: "rgba(172, 172, 172, 0)" },
+                    ticks: { color: scale_color }
+                  }
                 }
               } %>
 

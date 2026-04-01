@@ -1,5 +1,4 @@
 import '@hotwired/turbo-rails'
-import '@honeybadger-io/js'
 
 // Import stimulus controllers
 import { Application } from '@hotwired/stimulus'
@@ -8,7 +7,7 @@ import { lazyLoadControllersFrom } from '@hotwired/stimulus-loading'
 
 import TimeLocalizer from '@bikeindex/time-localizer'
 
-/* global Turbo Honeybadger */
+/* global Turbo */
 // Disable Turbo by default, only enable on case-by-case
 // You must include data-turbo="true" on the elements you want to enable turbo on
 Turbo.session.drive = false
@@ -24,12 +23,17 @@ function localizeTime () {
   window.timeLocalizer.localize()
 }
 
+// Load honeybadger dynamically so ad blockers don't break the entire app
 const honeybadgerApiKey = document.querySelector('meta[name="honeybadger-api-key"]')?.content
 if (honeybadgerApiKey) {
-  Honeybadger.configure({
-    apiKey: honeybadgerApiKey,
-    environment: document.querySelector('meta[name="honeybadger-environment"]')?.content
-  })
+  import('@honeybadger-io/js')
+    .then(({ default: Honeybadger }) => {
+      Honeybadger.configure({
+        apiKey: honeybadgerApiKey,
+        environment: document.querySelector('meta[name="honeybadger-environment"]')?.content
+      })
+    })
+    .catch(() => {})
 }
 
 document.addEventListener('DOMContentLoaded', localizeTime)
