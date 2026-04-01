@@ -137,7 +137,7 @@ RSpec.describe BikeServices::CalculateLocation do
     end
 
     context "given no current_stolen_record" do
-      let(:organization) { FactoryBot.create(:organization, :in_nyc_legacy) }
+      let(:organization) { FactoryBot.create(:organization, :in_nyc) }
       let(:bike) { FactoryBot.create(:bike, creation_organization: organization) }
 
       it "takes location from the creation org" do

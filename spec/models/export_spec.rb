@@ -284,8 +284,8 @@ RSpec.describe Export, type: :model do
       end
     end
     context "with bike_stickers from regional organization" do
-      let!(:organization_in_region) { FactoryBot.create(:organization, :in_nyc_legacy) }
-      let!(:organization_regional) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: %w[bike_stickers regional_bike_counts]) }
+      let!(:organization_in_region) { FactoryBot.create(:organization, :in_nyc) }
+      let!(:organization_regional) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: %w[bike_stickers regional_bike_counts]) }
       it "returns with reg_bike_sticker" do
         organization_regional.reload
         expect(organization_regional.regional?).to be_truthy

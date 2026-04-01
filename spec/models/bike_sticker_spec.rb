@@ -389,8 +389,8 @@ RSpec.describe BikeSticker, type: :model do
     end
     context "organization varieties" do
       let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization) }
-      let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton_legacy) }
-      let(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton_legacy, regional_ids: [organization_regional.id]) }
+      let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton) }
+      let(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton, regional_ids: [organization_regional.id]) }
       let(:organization_child) { FactoryBot.create(:organization_child, parent_organization: organization) }
       let(:organization_other) { FactoryBot.create(:organization) }
       let(:organization_ambassador) { FactoryBot.create(:organization_ambassador) }
@@ -499,8 +499,8 @@ RSpec.describe BikeSticker, type: :model do
       let(:bike_sticker1) { FactoryBot.create(:bike_sticker, organization: organization) }
       let(:bike_sticker2) { FactoryBot.create(:bike_sticker, organization: organization) }
       let(:bike_sticker3) { FactoryBot.create(:bike_sticker, organization: organization) }
-      let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton_legacy) }
-      let(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton_legacy, regional_ids: [organization_regional.id]) }
+      let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton) }
+      let(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton, regional_ids: [organization_regional.id]) }
       let(:organization_other) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:organization_user, organization: organization_regional) }
       before { FactoryBot.create(:organization_role_claimed, user: user, organization: organization_other) }
@@ -727,8 +727,8 @@ RSpec.describe BikeSticker, type: :model do
       end
     end
     describe "assigning organization tests" do
-      let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton_legacy) }
-      let!(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton_legacy, regional_ids: [organization_regional.id]) }
+      let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton) }
+      let!(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton, regional_ids: [organization_regional.id]) }
       let!(:bike_sticker1) { FactoryBot.create(:bike_sticker, organization: organization) }
       let(:bike_sticker2) { FactoryBot.create(:bike_sticker, organization: organization) }
       let(:bike) { FactoryBot.create(:bike, creator: user) }

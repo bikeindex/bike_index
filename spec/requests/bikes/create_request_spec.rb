@@ -299,7 +299,7 @@ RSpec.describe "BikesController#create", type: :request do
     end
   end
   context "no existing b_param, reg_address, top_level_propulsion_type" do
-    let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_los_angeles_legacy, :with_auto_user, enabled_feature_slugs: %w[reg_address reg_organization_affiliation]) }
+    let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_los_angeles, :with_auto_user, enabled_feature_slugs: %w[reg_address reg_organization_affiliation]) }
     let(:bike_params) do
       {
         b_param_id_token: "",
