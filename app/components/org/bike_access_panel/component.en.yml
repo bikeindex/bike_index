@@ -60,6 +60,7 @@ en:
         parking_notification_notes_html: "%{org_name} internal notes <small>not shown
           to user</small>"
         permission: Permission
+        region: Region
         registered: Registered
         save_notes: Save note
         send_message: Send message

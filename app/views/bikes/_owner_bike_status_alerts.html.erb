@@ -10,7 +10,7 @@
     by <strong><%= @bike.current_impound_record.organization&.name %></strong>
     <% if @bike.current_impound_record.parking_notification.present? %>
       from
-      <%= @bike.current_impound_record.parking_notification.address %>
+      <%= @bike.current_impound_record.parking_notification.formatted_address_string %>
     <% end %>
   </div>
 <% end %>
@@ -71,7 +71,9 @@
             </td>
 
             <td class="hidden-sm-cells">
-              <small><%= address_formatted(parking_notification) %></small>
+              <small>
+                <%= parking_notification.formatted_address_string %>
+              </small>
             </td>
 
             <td class="hidden-sm-cells">

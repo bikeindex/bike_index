@@ -172,11 +172,6 @@ module ApplicationHelper
     end
   end
 
-  # TODO: location refactor - do something more sophisticated
-  def address_formatted(obj)
-    obj.address
-  end
-
   def show_sharing_links(user)
     [twitterable(user), instagramable(user), websiteable(user)].compact.to_sentence.html_safe
   end

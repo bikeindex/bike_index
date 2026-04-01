@@ -63,7 +63,7 @@ module BikeServices::CalculateLocation
   def location_record_coordinates(bike)
     l_hashes = [
       bike.current_impound_record&.address_hash_legacy,
-      bike.current_parking_notification&.address_hash,
+      bike.current_parking_notification&.address_hash_legacy,
       bike.registration_address(true, address_record_id: true), # temporary cludge?
       bike.creation_organization&.default_location&.address_hash_legacy
     ].compact

@@ -14,11 +14,18 @@ class BikeIndex.ToggleHiddenOther extends BikeIndex
   toggleOtherDisplay: (e, other_val) ->
     $target = $(e.target)
     return true unless $target.hasClass 'form-control'
-    $other_field = $target.parents('.related-fields').find('.hidden-other')
+    $related = $target.parents('.related-fields')
+    $other_field = $related.find('.hidden-other')
+    $shown_field = $related.find('.shown-other')
     if "#{$target.val()}" == "#{other_val}"
       $other_field.slideDown 'fast', ->
         $other_field.addClass('unhidden').removeClass('currently-hidden')
+      $shown_field.slideUp 'fast', ->
+        $shown_field.removeClass('unhidden').addClass('currently-hidden')
+        $shown_field.find('.form-control').val('')
     else
       $other_field.slideUp 'fast', ->
         $other_field.removeClass('unhidden').addClass('currently-hidden')
         $other_field.find('.form-control').val('')
+      $shown_field.slideDown 'fast', ->
+        $shown_field.addClass('unhidden').removeClass('currently-hidden')

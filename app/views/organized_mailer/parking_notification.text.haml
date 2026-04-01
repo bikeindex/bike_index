@@ -14,9 +14,9 @@ This is for your #{@bike.title_string}.
     = render UI::AddressDisplay::Component.new(address_record: impound_record.location.address_record, visible_attribute: :street, kind: :multiline)
 
 - if @parking_notification.impound_notification?
-  It was located at: #{@parking_notification.address}
+  It was located at: #{@parking_notification.formatted_address_string}
 - else
-  It is located at: #{@parking_notification.address}
+  It is located at: #{@parking_notification.formatted_address_string}
 
 \---
 
