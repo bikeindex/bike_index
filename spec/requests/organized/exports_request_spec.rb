@@ -66,6 +66,32 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
       end
+      context "with impounded_bikes only" do
+        let(:export) { FactoryBot.create(:export_organization, organization: current_organization, options: Export.default_options("organization").merge("impounded_bikes" => true, "partial_registrations" => "none")) }
+        it "shows Impounded" do
+          expect(export.matching_kinds).to eq([:impounded])
+          get "#{base_url}/#{export.id}"
+          expect(response.code).to eq("200")
+          expect(response.body).to include("Impounded")
+        end
+      end
+      context "deleted export" do
+        let(:export) { FactoryBot.create(:export_organization, organization: current_organization, deleted_at: Time.current) }
+        it "404s" do
+          get "#{base_url}/#{export.id}"
+          expect(response.status).to eq 404
+        end
+
+        context "as superuser" do
+          let(:current_user) { FactoryBot.create(:superuser) }
+          it "renders with deleted alert" do
+            get "#{base_url}/#{export.id}"
+            expect(response.code).to eq("200")
+            expect(response).to render_template(:show)
+            expect(response.body).to include("deleted")
+          end
+        end
+      end
       context "not organization export" do
         let(:export) { FactoryBot.create(:export_organization) }
         it "404s" do
@@ -141,6 +167,8 @@ RSpec.describe Organized::ExportsController, type: :request do
         let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
         it "removes the stickers before destroying" do
           export.update(options: export.options.merge(bike_codes_assigned: ["a1111"]))
+          export_options = export.reload.options
+          export_id = export.id
           bike_sticker.reload
           export.reload
           expect(bike_sticker.claimed?).to be_truthy
@@ -159,6 +187,12 @@ RSpec.describe Organized::ExportsController, type: :request do
           bike_sticker_update = bike_sticker.bike_sticker_updates.last
           expect(bike_sticker_update.creator_kind).to eq "creator_export"
           expect(bike_sticker_update.kind).to eq "un_claim"
+
+          # Soft deleted
+          export = Export.unscoped.find(export_id)
+          expect(export.deleted_at).to be_present
+          # Verify that the bike stickers haven't been removed from the options
+          expect(Export.unscoped.find(export.id).options).to eq export_options
         end
       end
     end
@@ -260,6 +294,21 @@ RSpec.describe Organized::ExportsController, type: :request do
           end
         end
       end
+      context "with impounded_bikes" do
+        let(:enabled_feature_slugs) { %w[csv_exports impound_bikes] }
+        it "creates with impounded_bikes" do
+          expect {
+            post base_url, params: {
+              export: valid_attrs,
+              include_impounded_bikes: "true"
+            }
+          }.to change(Export, :count).by 1
+          export = Export.last
+          expect(export.impounded_bikes).to be_truthy
+          expect(export.options["impounded_bikes"]).to be_truthy
+        end
+      end
+
       context "avery export without feature" do
         it "fails" do
           expect {

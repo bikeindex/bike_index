@@ -2,9 +2,9 @@
   <% unless @skip_total %>
     <div class="col-md-5">
       <p class="pagination-number mb-0">
-        <strong><%= number_with_delimiter(count) %></strong>
-        Matching
+        <strong><%= number_with_delimiter(count) %></strong> Matching
         <%= viewing.pluralize(count) %>
+
 
         <% if show_time_range? %>
           <em>

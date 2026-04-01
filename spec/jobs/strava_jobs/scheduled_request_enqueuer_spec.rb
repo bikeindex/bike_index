@@ -134,6 +134,64 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
         end
       end
 
+      describe "skip_enqueueing_fetch_activity_requests?" do
+        let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+        let(:read_long_usage) { 0 }
+        let!(:rate_limit_request) do
+          FactoryBot.create(:strava_request, :processed, strava_integration:,
+            requested_at: boundary + 1.second,
+            rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
+                         read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage:})
+        end
+
+        context "when long remaining is below 2x FETCH_ACTIVITY_LONG_HEADROOM" do
+          let(:read_long_usage) { 1001 }
+
+          it "is truthy" do
+            expect(described_class.skip_enqueueing_fetch_activity_requests?).to be_truthy
+          end
+        end
+
+        context "when long remaining is above 2x FETCH_ACTIVITY_LONG_HEADROOM" do
+          let(:read_long_usage) { 999 }
+
+          it "is falsey" do
+            expect(described_class.skip_enqueueing_fetch_activity_requests?).to be_falsey
+          end
+        end
+
+        context "when skipping in perform" do
+          let(:read_long_usage) { 1001 }
+
+          it "excludes fetch_activity requests from batch but leaves them pending" do
+            fetch_activity = StravaRequest.create!(user_id: strava_integration.user_id,
+              strava_integration_id: strava_integration.id, request_type: :fetch_activity,
+              parameters: {strava_id: "123"})
+            list_activities = StravaRequest.create!(user_id: strava_integration.user_id,
+              strava_integration_id: strava_integration.id, request_type: :list_activities,
+              parameters: {page: 1})
+
+            instance.perform
+
+            expect(fetch_activity.reload.response_status).to eq("pending")
+            expect(list_activities.reload.response_status).to eq("pending")
+            expect(StravaJobs::RequestRunner.jobs.size).to eq(1)
+            expect(StravaJobs::RequestRunner.jobs.first["args"]).to eq([list_activities.id])
+          end
+        end
+      end
+
+      context "when more than 10 requests enqueued" do
+        it "skips enqueue" do
+          StravaRequest.create!(user_id: strava_integration.user_id,
+            strava_integration_id: strava_integration.id, request_type: :list_activities)
+          allow(instance).to receive(:enqueued_runner_count).and_return(11)
+
+          instance.perform
+          expect(StravaJobs::RequestRunner.jobs.size).to eq(0)
+        end
+      end
+
       context "when rate limited" do
         let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
         let(:rate_limit) do

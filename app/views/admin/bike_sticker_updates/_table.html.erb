@@ -1,0 +1,84 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |update| %>
+    <% bike_sticker = update.bike_sticker %>
+
+    <%= link_to "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}" do %>
+      <%= render UI::Time::Component.new(time: update.created_at) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "user_id") do |update| %>
+    <% if update.user_id.present? %>
+      <%= render Admin::UserCell::Component.new(user: update.user, render_search: true) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "bike_sticker_id", label: "Sticker") do |update| %>
+    <% bike_sticker = update.bike_sticker %>
+
+    <strong>
+      <%= link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sortable_search_params.merge(search_query: bike_sticker.code)) %>
+    </strong>
+
+    <% unless bike_sticker.sticker? %>
+      <em class="small text-warning"><%= bike_sticker.kind %></em>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Sticker org") do |update| %>
+    <% if update.bike_sticker.organization.present? %>
+      <small><%= update.bike_sticker.organization.short_name %></small>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "update_number", label: "Repeat#") do |update| %>
+    <% unless update.update_number == 1 %>
+      <small><%= update.update_number %></small>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "bike_id") do |update| %>
+    <% if update.bike.present? %>
+      <small>
+        <%= link_to helpers.organized_bike_text(update.bike), edit_admin_bike_path(update.bike_id) %>
+      </small>
+    <% elsif update.bike_id.present? %>
+      <%= link_to update.bike_sticker.bike_id, admin_bike_path(update.bike_sticker.bike_id), class: "small" %>
+      <small class="text-danger">Deleted?</small>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "organization_id", label: "Update org") do |update| %>
+    <%= render Admin::OrganizationCell::Component.new(organization: update.organization, render_search: true) %>
+  <% end %>
+
+  <% table.column(sortable: "organization_kind", label: "Org kind") do |update| %>
+    <% unless update.no_organization? %>
+      <small>
+        <%= update.organization_kind.gsub("_organization", "").humanize %>
+      </small>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "kind") do |update| %>
+    <small><%= update.kind.gsub("_claim", "").humanize %></small>
+  <% end %>
+
+  <% table.column(sortable: "creator_kind") do |update| %>
+    <% unless update.creator_user? %>
+      <small
+        title="bulk_import_id: '<%= update.bulk_import_id %>' export_id: '<%= update.export_id %>'"
+      >
+        <%= update.creator_kind_humanized %>
+      </small>
+      <% if update.export_id.present? %>
+        <%= link_to "##{update.export_id}", organization_export_path(update.export_id, organization_id: update.organization_id), class: "small" %>
+      <% end %>
+      <% if update.bulk_import_id.present? %>
+        <%= link_to "##{update.bulk_import_id}", organization_bulk_import_path(update.bulk_import_id, organization_id: update.organization_id), class: "small" %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

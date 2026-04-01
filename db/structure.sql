@@ -1245,7 +1245,8 @@ CREATE TABLE public.exports (
     rows integer,
     options jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone
 );
 
 
@@ -2926,11 +2927,11 @@ CREATE TABLE public.parking_notifications (
     accuracy double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    postal_code character varying,
+    zipcode character varying,
     city character varying,
     neighborhood character varying,
     country_id bigint,
-    region_record_id bigint,
+    state_id bigint,
     message text,
     location_from_address boolean DEFAULT false,
     delivery_status character varying,
@@ -2942,8 +2943,7 @@ CREATE TABLE public.parking_notifications (
     retrieved_by_id bigint,
     image text,
     image_processing boolean DEFAULT false NOT NULL,
-    repeat_number integer,
-    region_string character varying
+    repeat_number integer
 );
 
 
@@ -6942,17 +6942,17 @@ CREATE INDEX index_parking_notifications_on_organization_id ON public.parking_no
 
 
 --
--- Name: index_parking_notifications_on_region_record_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_parking_notifications_on_region_record_id ON public.parking_notifications USING btree (region_record_id);
-
-
---
 -- Name: index_parking_notifications_on_retrieved_by_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_parking_notifications_on_retrieved_by_id ON public.parking_notifications USING btree (retrieved_by_id);
+
+
+--
+-- Name: index_parking_notifications_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parking_notifications_on_state_id ON public.parking_notifications USING btree (state_id);
 
 
 --
@@ -7489,13 +7489,11 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260331160943'),
 ('20260319153927'),
-('20260318211639'),
 ('20260318211638'),
 ('20260310045539'),
 ('20260310031750'),
-('20260308055322'),
-('20260308002919'),
 ('20260305025122'),
 ('20260304181710'),
 ('20260220053202'),

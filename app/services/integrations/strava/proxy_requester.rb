@@ -49,10 +49,10 @@ module Integrations::Strava::ProxyRequester
 
     return internal_response!(strava_request) if internal_response?(strava_request)
 
-    response = Integrations::Strava::Client.proxy_request(strava_integration,
-      strava_request.parameters["url"], method: strava_request.parameters["method"],
-      body: strava_request.parameters["body"])
-    strava_request.update_from_response(response)
+    response = StravaJobs::RequestRunner.new.perform(strava_request.id, strava_request:, no_skip: true)
+    strava_request.reload
+
+    return {json: Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY, status: 429} if response == :rate_limited
 
     json = if strava_request.success?
       serialize_proxy_response(strava_integration, response.body, method: strava_request.request_method)
@@ -60,7 +60,7 @@ module Integrations::Strava::ProxyRequester
       sanitize_response_body(response.body)
     end
 
-    {json:, status: response&.status}
+    {json:, status: response.status}
   end
 
   # Returns an existing valid token, or revokes the most recent expired one
@@ -91,22 +91,10 @@ module Integrations::Strava::ProxyRequester
   #
 
   def internal_response?(strava_request)
-    strava_request.fetch_athlete? || strava_request.list_activities? ||
-      binx_response_rate_limited?(strava_request)
-  end
-
-  # We want a little more headroom on proxy requests -
-  # to reserve some requests for initial fetch athlete and list_activities
-  def binx_response_rate_limited?(strava_request)
-    Integrations::Strava::Client.currently_rate_limited?(strava_request.request_method, headroom: 20)
+    strava_request.fetch_athlete? || strava_request.list_activities?
   end
 
   def internal_response!(strava_request)
-    if binx_response_rate_limited?(strava_request)
-      strava_request.update_from_response(:binx_response_rate_limited)
-      return {json: Integrations::Strava::Client::RATE_LIMITED_RESPONSE_BODY, status: 429}
-    end
-
     strava_request.update(response_status: :binx_response, requested_at: Time.current)
 
     json = if strava_request.fetch_athlete?
@@ -167,7 +155,7 @@ module Integrations::Strava::ProxyRequester
     body.except(*SENSITIVE_KEYS)
   end
 
-  conceal :internal_response?, :binx_response_rate_limited?, :internal_response!,
+  conceal :internal_response?, :internal_response!,
     :authorized_app?, :proxy_request_type, :validate_url!,
     :serialize_proxy_response, :sanitize_response_body
 end

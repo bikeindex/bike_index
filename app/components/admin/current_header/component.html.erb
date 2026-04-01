@@ -43,7 +43,7 @@
         <em>
           Marketplace Listing
           <%= render(Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing_subject.status, status_humanized: marketplace_listing_subject.status_humanized, kind: :marketplace_listing)) %>
-           <%= "##{marketplace_listing_subject.id}," %>
+          <%= "##{marketplace_listing_subject.id}," %>
         </em>
         <%= render Admin::BikeCell::Component.new(bike: marketplace_listing_subject.item, bike_id: marketplace_listing_subject.item_id) %>
       <% else %>
@@ -59,8 +59,7 @@
 
   <% if show_organization? %>
     <p>
-      <%= viewing.pluralize %>
-      for
+      <%= viewing.pluralize %> for
       <% if organization_subject.present? %>
         <em>
           <%= link_to organization_subject.short_name, admin_organization_path(organization_subject), class: "twlink" %>
@@ -91,8 +90,7 @@
 
   <% if show_strava_integration? %>
     <p>
-      <%= viewing.pluralize %>
-      for
+      <%= viewing.pluralize %> for
       <%= link_to "Strava Integration #{strava_integration_id}", admin_strava_integration_path(strava_integration_id), class: "twlink" %>
       <% if strava_integration.present? %>
         <small>
@@ -114,8 +112,7 @@
 
   <% if show_primary_activity? %>
     <p>
-      <%= viewing.pluralize %>
-      for
+      <%= viewing.pluralize %> for
       <% if primary_activity_subject.present? %>
         <%= link_to primary_activity_subject.name, admin_primary_activity_path(primary_activity_subject), class: "twlink" %>
       <% else %>

@@ -1,0 +1,27 @@
+<div class="tw:-mx-4 tw:mb-4 tw:overflow-x-scroll tw:px-4 tw:pb-3">
+  <table class="<%= table_classes %>">
+    <thead class="tw:text-sm">
+      <tr>
+        <% @columns.each_with_index do |col, i| %>
+          <th class="<%= col.th_classes(i, total: @columns.length, bordered: @bordered) %>">
+            <%= col.render_header(render_sortable: @render_sortable, current_sort:, current_direction:, sortable_url: method(:sortable_url)) %>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+
+    <tbody class="twtable-striped">
+      <% @records.each_with_index do |record, row_index| %>
+        <% cache_if(@cache_key, [@cache_key, record]) do %>
+          <tr>
+            <% @columns.each_with_index do |col, i| %>
+              <td class="<%= col.td_classes(i, total: @columns.length, bordered: @bordered, last_row: last_row?(row_index)) %>">
+                <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

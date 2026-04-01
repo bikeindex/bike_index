@@ -36,8 +36,7 @@
 
 <% if @bike&.manufacturer.present? %>
   <p class="mt-4">
-    <%= @bike.type_titleize %>
-    manufacturer
+    <%= @bike.type_titleize %> manufacturer
     <%= link_to @bike.mnfg_name, admin_manufacturer_path(@bike.manufacturer), target: "_blank" %>
     - Twitter:
     <% if @bike.manufacturer.blank? || @bike.manufacturer.other? %>

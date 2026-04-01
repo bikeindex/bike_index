@@ -4290,7 +4290,6 @@ it:
       resources:
       schools_and_universities:
       security:
-      stolen_bike_map:
       stolen_bike_recoveries:
       store:
       support_us:
@@ -4298,6 +4297,7 @@ it:
       vendor_terms:
       where_we_are:
       who_we_serve:
+      strava_search:
     form_well_footer_save:
       save_changes:
     header_nav:

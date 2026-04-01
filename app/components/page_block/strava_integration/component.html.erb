@@ -36,7 +36,7 @@
         <p>
           <strong><%= number_display(@strava_integration.strava_gears.bikes.with_item.count) %></strong>
           / <%= number_display(@strava_integration.strava_gears.bikes.count) %>
-           <%= translation(:strava_bikes_connected) %>
+          <%= translation(:strava_bikes_connected) %>
         </p>
       <% end %>
     <% elsif error? %>

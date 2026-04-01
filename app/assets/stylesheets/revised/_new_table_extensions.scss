@@ -11,7 +11,7 @@
   @include full-screen-table-overflown;
 }
 
-.full-screen-table, .stimulus-full-screen-table {
+.full-screen-table {
   @include media-breakpoint-down(sm) {
     @include full-screen-table-overflown;
   }

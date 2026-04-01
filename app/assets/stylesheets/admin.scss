@@ -1,0 +1,30 @@
+/* Declare CSS layers so that legacy is overridden by tailwind utility classes */
+@layer theme, base, legacy, components, utilities;
+
+// If this whole stylesheet is put into layer legacy, it breaks
+// ... so just pull in specific things to override
+@import 'legacy_includes/admin_unvendored';
+
+@layer legacy {
+  a {
+    color: #007bff;
+    text-decoration: none;
+    background-color: transparent
+  }
+
+  a:hover {
+    color: #0056b3;
+    text-decoration: underline
+  }
+
+  a:not([href]):not([tabindex]),
+  a:not([href]):not([tabindex]):focus,
+  a:not([href]):not([tabindex]):hover {
+    color: inherit;
+    text-decoration: none
+  }
+
+  a:not([href]):not([tabindex]):focus {
+    outline: 0
+  }
+}
