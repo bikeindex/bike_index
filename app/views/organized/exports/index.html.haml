@@ -21,7 +21,7 @@
           %small.localizeTimezone
         %th= t(".creator")
         %th= t(".progress")
-        %th Includes
+        %th Matching registrations
         - if show_assigned_bike_codes
           %td.small.text-center
             - if current_organization.enabled?("avery_export")
@@ -52,6 +52,9 @@
                 = check_mark if (export.avery_export? || export.assign_bike_codes?)
             %td
               = number_display(export.rows) if export.finished?
+              - if export.assign_bike_codes?
+                &nbsp;
+                = render UI::Badge::Component.new(text: "stickers", title: "Assigned stickers", color: :cyan, size: :sm)
             %td
               = link_to(t(".download"), export.file.url) if export.file.url.present?
             %td
