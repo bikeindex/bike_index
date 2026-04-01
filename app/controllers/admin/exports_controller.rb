@@ -29,6 +29,7 @@ class Admin::ExportsController < Admin::BaseController
     when "incomplete" then exports = exports.incompletes
     when "incompletes_and_registrations" then exports = exports.incompletes_and_registrations
     when "registered" then exports = exports.registrations
+    when "impounded" then exports = exports.impounded
     end
     @stickers = Binxtils::InputNormalizer.boolean(params[:search_stickers])
     exports = exports.with_stickers if @stickers

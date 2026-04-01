@@ -192,6 +192,14 @@ class Export < ApplicationRecord
     Binxtils::InputNormalizer.boolean(options["impounded_bikes"])
   end
 
+  def matching_kinds
+    kinds = []
+    kinds << :registered if partial_registrations != "only"
+    kinds << :incomplete if partial_registrations.present? && partial_registrations != false
+    kinds << :impounded if impounded_bikes
+    kinds
+  end
+
   # NOTE: Only does the first 100 bikes, in case there is a huge export
   def exported_bike_ids
     options["exported_bike_ids"]

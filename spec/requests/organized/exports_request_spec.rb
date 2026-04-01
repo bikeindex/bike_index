@@ -66,6 +66,14 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
       end
+      context "with impounded_bikes only" do
+        let(:export) { FactoryBot.create(:export_organization, organization: current_organization, options: Export.default_options("organization").merge("impounded_bikes" => true)) }
+        it "shows Registered & impounded" do
+          get "#{base_url}/#{export.id}"
+          expect(response.code).to eq("200")
+          expect(response.body).to include("Registered &amp; impounded")
+        end
+      end
       context "not organization export" do
         let(:export) { FactoryBot.create(:export_organization) }
         it "404s" do
@@ -268,6 +276,21 @@ RSpec.describe Organized::ExportsController, type: :request do
           end
         end
       end
+      context "with impounded_bikes" do
+        let(:enabled_feature_slugs) { %w[csv_exports impound_bikes] }
+        it "creates with impounded_bikes" do
+          expect {
+            post base_url, params: {
+              export: valid_attrs,
+              include_impounded_bikes: "true"
+            }
+          }.to change(Export, :count).by 1
+          export = Export.last
+          expect(export.impounded_bikes).to be_truthy
+          expect(export.options["impounded_bikes"]).to be_truthy
+        end
+      end
+
       context "avery export without feature" do
         it "fails" do
           expect {
