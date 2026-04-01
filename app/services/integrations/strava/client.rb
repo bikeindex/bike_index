@@ -136,13 +136,6 @@ module Integrations::Strava::Client
         refresh_token: strava_integration.refresh_token
       }
     end
-    StravaRequest.create!(
-      strava_integration_id: strava_integration.id,
-      request_type: :token_refresh,
-      requested_at: Time.current,
-      response_status: resp.success? ? :success : :token_refresh_failed,
-      rate_limit: StravaRequest.parse_rate_limit(resp.headers)
-    )
     if resp.success?
       data = resp.body
       strava_integration.update(

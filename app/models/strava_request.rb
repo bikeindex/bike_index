@@ -31,9 +31,7 @@ class StravaRequest < AnalyticsRecord
     fetch_activity: 3,
     fetch_gear: 4,
     incoming_webhook: 5,
-    update_activity: 7,
-    token_refresh: 8,
-    token_exchange: 9
+    update_activity: 7
   }.freeze
   RESPONSE_STATUS_ENUM = {
     pending: 0,
@@ -58,8 +56,6 @@ class StravaRequest < AnalyticsRecord
     list_activities: 3,
     fetch_gear: 4,
     update_activity: 5,
-    token_refresh: 1,
-    token_exchange: 1,
     fetch_activity: 10
   }.freeze
   PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000 # Based on timestamp digits
