@@ -332,7 +332,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     end
 
     context "with unauthorized response" do
-      it "sets response_status to token_refresh_failed and re-enqueues" do
+      it "sets response_status to token_expired and re-enqueues" do
         strava_request_id = strava_request.id
         VCR.use_cassette("strava-unauthorized") do
           expect { instance.perform(strava_request_id) }.to change(StravaRequest, :count).by(1)
@@ -340,7 +340,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
 
         strava_request.reload
         expect(strava_request.requested_at).to be_present
-        expect(strava_request.response_status).to eq("token_refresh_failed")
+        expect(strava_request.response_status).to eq("token_expired")
 
         retry_request = StravaRequest.last
         expect(retry_request.request_type).to eq(strava_request.request_type)

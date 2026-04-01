@@ -43,7 +43,8 @@ class StravaRequest < AnalyticsRecord
     skipped: 6,
     insufficient_token_privileges: 7,
     binx_response: 8,
-    binx_response_rate_limited: 9
+    binx_response_rate_limited: 9,
+    token_expired: 10
   }.freeze
   PENDING_OR_SUCCESS = %i[success pending].freeze
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
@@ -173,7 +174,7 @@ class StravaRequest < AnalyticsRecord
       update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
     end
 
-    if token_refresh_failed?
+    if token_expired?
       StravaRequest.create!(user_id:, strava_integration_id:, request_type:, proxy_request:,
         parameters: parameters.except("error_response_status"))
     elsif binx_response_rate_limited? || rate_limited? || service_unavailable?(response)
@@ -196,7 +197,7 @@ class StravaRequest < AnalyticsRecord
     elsif response.status == 429
       :rate_limited
     elsif response.status == 401
-      :token_refresh_failed
+      :token_expired
     elsif insufficient_token_privileges_response?(response)
       :insufficient_token_privileges
     else
