@@ -156,36 +156,32 @@ module Integrations::Strava::Client
     end
   end
 
-  def execute_proxy_request(strava_integration, path, method: "GET", body: nil)
+  def execute_proxy_request(strava_integration, path, method: "GET", body: nil, retried: false)
     conn = api_connection(strava_integration)
     response = case method.to_s.upcase
     when "POST" then conn.post(path) { |req| req.body = body if body }
     when "PUT" then conn.put(path) { |req| req.body = body if body }
     else conn.get(path)
     end
-    return response unless response.status == 401
+    return response unless response.status == 401 && !retried
 
     if refresh_token!(strava_integration)
-      # Try the request again!
-      execute_proxy_request(strava_integration, path, method:, body:)
+      execute_proxy_request(strava_integration, path, method:, body:, retried: true)
     else
-      # Strava Integration failed to refresh the token, so return the original response
       response
     end
   end
 
-  def get(strava_integration, path, params = {})
+  def get(strava_integration, path, retried: false, **params)
     ensure_valid_token!(strava_integration)
     response = api_connection(strava_integration).get(path) do |req|
       req.params = params
     end
-    return response unless response.status == 401
+    return response unless response.status == 401 && !retried
 
     if refresh_token!(strava_integration)
-      # Try the request again!
-      get(strava_integration, path, params)
+      get(strava_integration, path, retried: true, **params)
     else
-      # Strava Integration failed to refresh the token, so return the original response
       response
     end
   end
