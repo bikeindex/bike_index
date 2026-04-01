@@ -140,40 +140,6 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "168c44fb84e413aede1c1ae3f1683b7d996697f8f4ee65a2eb72ddec2c945505",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/organized/exports/show.html.haml",
-      "line": 34,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, export_progress_class((Export.unscoped.where(:organization_id => current_organization.id) or exports).find(params[:id])))",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::ExportsController",
-          "method": "show",
-          "line": 14,
-          "file": "app/controllers/organized/exports_controller.rb",
-          "rendered": {
-            "name": "organized/exports/show",
-            "file": "app/views/organized/exports/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/exports/show"
-      },
-      "user_input": "Export.unscoped.where(:organization_id => current_organization.id)",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "export_progress_class() returns only hardcoded CSS class names (text-danger/text-success/text-warning)"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
       "fingerprint": "19b9ab344f9415ecf19709e9ee5b955e59227e5a0c9a89a935b00fed02ed9f2f",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped parameter value",
@@ -1176,40 +1142,6 @@
         79
       ],
       "note": "URL from stored model data in organized view, not user-controlled HTML"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "b5e33fb006d88b5f88d7a7d68446612e31d1fc40efe3ef82f79c0b6d4e3c5ced",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/organized/exports/show.html.haml",
-      "line": 33,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, (Export.unscoped.where(:organization_id => current_organization.id) or exports).find(params[:id]).progress)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::ExportsController",
-          "method": "show",
-          "line": 14,
-          "file": "app/controllers/organized/exports_controller.rb",
-          "rendered": {
-            "name": "organized/exports/show",
-            "file": "app/views/organized/exports/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/exports/show"
-      },
-      "user_input": "Export.unscoped.where(:organization_id => current_organization.id)",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "export.progress is an enum value used as a CSS class — only returns hardcoded values (pending/ongoing/finished/errored)"
     },
     {
       "warning_type": "Cross-Site Scripting",
