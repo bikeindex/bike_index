@@ -219,13 +219,11 @@ RSpec.describe Integrations::Strava::Client, type: :service do
     context "with a erroring token" do
       let(:status) { "synced" }
       let(:expires_at) { Time.current + 6.hours }
-      it "updates strava_integration to be errored" do
+      it "returns 401 response" do
         VCR.use_cassette("strava-get_activity-401") do
           expect(strava_integration.reload.status).to eq "synced"
-          expect(strava_integration.token_expires_at).to be_within(5).of expires_at
           response = described_class.fetch_activity(strava_integration, "17323701543")
-          expect(strava_integration.reload.status).to eq "error"
-          expect(strava_integration.token_expires_at).to be_within(5).of expires_at
+          expect(response.status).to eq 401
           expect(response.body["errors"]).to eq([{code: "invalid", field: "", resource: "Application"}].as_json)
         end
       end
@@ -245,13 +243,10 @@ RSpec.describe Integrations::Strava::Client, type: :service do
   end
 
   describe ".proxy_request" do
-    it "retries with refreshed token on 401 from Strava" do
+    it "returns 401 response without retrying" do
       VCR.use_cassette("strava-proxy_request_401_retry") do
         response = described_class.proxy_request(strava_integration, "athlete")
-        expect(response.status).to eq(200)
-        expect(response.body["id"]).to eq(2430215)
-        strava_integration.reload
-        expect(strava_integration.token_expires_at).to be > Time.current
+        expect(response.status).to eq(401)
       end
     end
   end

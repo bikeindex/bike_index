@@ -18,6 +18,7 @@ RSpec.describe StravaRequest, type: :model do
   end
 
   describe ".next_pending" do
+    before { StravaRequest.destroy_all }
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
     it "returns oldest pending request" do
@@ -205,6 +206,7 @@ RSpec.describe StravaRequest, type: :model do
   end
 
   describe ".estimated_current_rate_limit" do
+    before { StravaRequest.destroy_all }
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
     let(:rate_limit) do
       {"short_limit" => 100, "short_usage" => 10, "long_limit" => 1000, "long_usage" => 200,
