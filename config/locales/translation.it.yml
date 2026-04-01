@@ -4943,6 +4943,7 @@ it:
         note_by:
         notes: Note
         save_notes:
+        region:
       bulk_import_error:
         ascend:
         ascend_unprocessable_html:
