@@ -663,8 +663,13 @@ class Bike < ApplicationRecord
 
   def build_new_stolen_record(new_attrs = {})
     new_country_id = address_record&.country_id || creator&.address_record&.country_id || Country.united_states&.id
+    # Translate legacy API param names and filter to permitted attributes
+    new_attrs = new_attrs.to_h.with_indifferent_access
+    new_attrs[:postal_code] ||= new_attrs.delete(:zipcode) if new_attrs[:zipcode].present?
+    new_attrs[:street] ||= new_attrs.delete(:address) if new_attrs[:address].present?
+    permitted = BikeServices::StolenRecordUpdator.old_attr_accessible
     new_stolen_record = stolen_records
-      .build({country_id: new_country_id, phone: phone, current: true}.merge(new_attrs))
+      .build({country_id: new_country_id, phone: phone, current: true}.merge(new_attrs.slice(*permitted)))
     new_stolen_record.date_stolen ||= Time.current # in case a blank value was passed in new_attrs
     if created_at.blank? || created_at > Time.current - 1.day
       new_stolen_record.creation_organization_id = creation_organization_id
