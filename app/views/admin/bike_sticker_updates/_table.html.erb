@@ -27,7 +27,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Sticker org") do |update| %>
+  <% table.column(label: "Sticker org", header_classes: "tw:font-normal") do |update| %>
     <% if update.bike_sticker.organization.present? %>
       <small><%= update.bike_sticker.organization.short_name %></small>
     <% end %>

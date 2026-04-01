@@ -17,8 +17,8 @@ module UI
         @columns = []
       end
 
-      def column(label: nil, sortable: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
-        @columns << UI::TableColumn::Component.new(label:, sortable:, classes:, header_classes:, lower_right:, &block)
+      def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
+        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, lower_right:, &block)
         nil
       end
 
@@ -51,10 +51,6 @@ module UI
       end
 
       def last_row?(row_index) = row_index == @records.length - 1
-
-      def sortable_url(sort, direction)
-        url_for(sortable_search_params.merge(sort:, direction:))
-      end
 
       def table_classes
         [
