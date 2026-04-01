@@ -21,6 +21,7 @@
           %small.localizeTimezone
         %th= t(".creator")
         %th= t(".progress")
+        %th Includes
         - if show_assigned_bike_codes
           %td.small.text-center
             - if current_organization.enabled?("avery_export")
@@ -41,6 +42,11 @@
             %td
               %span{ class: export_progress_class(export) }
                 = export.calculated_progress
+            %td
+              - if export.only_custom_bike_ids
+                %em only specified
+              - else
+                = export.matching_kinds.map(&:to_s).join(", ")
             - if show_assigned_bike_codes
               %td.text-center
                 = check_mark if (export.avery_export? || export.assign_bike_codes?)

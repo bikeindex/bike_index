@@ -12,7 +12,8 @@
 
   - if @export.deleted_at.present?
     .mb-4
-      = render partial: "shared/alert", locals: { body: "This export was deleted #{render(UI::Time::Component.new(time: @export.deleted_at))}".html_safe, type: "danger" }
+      - deleted_time = content_tag(:span, l(@export.deleted_at, format: :convert_time), class: "localizeTime preciseTime withPreposition")
+      = render partial: "shared/alert", locals: { body: "This export was deleted #{deleted_time}".html_safe, type: "danger" }
 
   %table.table-list
     %tbody
