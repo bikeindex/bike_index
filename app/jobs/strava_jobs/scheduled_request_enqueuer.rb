@@ -55,7 +55,9 @@ module StravaJobs
       skip_duplicate_requests # skip_duplicate_requests before enqueuing
       pending = StravaRequest.pending.priority_ordered
       pending = pending.where.not(request_type: :fetch_activity) if self.class.skip_enqueueing_fetch_activity_requests?
-      pending.limit(BATCH_SIZE).pluck(:id).each do |strava_request_id|
+      batch = pending.limit(BATCH_SIZE)
+      ensure_valid_tokens_for_batch(batch)
+      batch.pluck(:id).each do |strava_request_id|
         RequestRunner.perform_async(strava_request_id)
       end
       return if skip_perform_in
@@ -66,6 +68,13 @@ module StravaJobs
     end
 
     private
+
+    def ensure_valid_tokens_for_batch(batch)
+      integration_ids = batch.pluck(:strava_integration_id).uniq
+      StravaIntegration.where(id: integration_ids).find_each do |strava_integration|
+        Integrations::Strava::Client.ensure_valid_token!(strava_integration)
+      end
+    end
 
     def enqueued_runner_count
       Sidekiq::Queue.new(RequestRunner.sidekiq_options["queue"])
