@@ -149,6 +149,19 @@ RSpec.describe UI::Table::Component, type: :component do
       end
     end
 
+    it "caches rows with lower_right content" do
+      users = FactoryBot.create_list(:user, 2)
+
+      with_controller_class(ApplicationController) do
+        result = render_inline(described_class.new(records: users, cache_key: "lr-test")) do |table|
+          table.column(label: "Email", lower_right: ->(u) { u.id }) { |u| u.email }
+        end
+
+        expect(result).to have_css("td div", text: /#{users.first.email}/)
+        expect(result).to have_css("td div small", text: users.first.id.to_s)
+      end
+    end
+
     it "namespaces cache keys with a string" do
       users = FactoryBot.create_list(:user, 1)
 

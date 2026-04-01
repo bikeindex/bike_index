@@ -3,8 +3,8 @@
     <thead class="tw:text-sm">
       <tr>
         <% @columns.each_with_index do |col, i| %>
-          <th class="<%= th_classes(col, i) %>">
-            <%= render_header(col) %>
+          <th class="<%= col.th_classes(i, total: @columns.length, bordered: @bordered) %>">
+            <%= col.render_header(render_sortable: @render_sortable, current_sort:, current_direction:, sortable_url: method(:sortable_url)) %>
           </th>
         <% end %>
       </tr>
@@ -15,8 +15,8 @@
         <% cache_if(@cache_key, [@cache_key, record]) do %>
           <tr>
             <% @columns.each_with_index do |col, i| %>
-              <td class="<%= td_classes(col, i, last_row: last_row?(row_index)) %>">
-                <%= render_cell(col, record) %>
+              <td class="<%= col.td_classes(i, total: @columns.length, bordered: @bordered, last_row: last_row?(row_index)) %>">
+                <%= render col.for_record(record) %>
               </td>
             <% end %>
           </tr>

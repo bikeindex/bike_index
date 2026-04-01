@@ -10,8 +10,7 @@ module UI
       def default
         colors = enthusiasm_colors
         render(UI::Table::Component.new(records: sample_records)) do |table|
-          table.column(label: "Cryptid") { |r| r.name }
-          table.column(label: "Region") { |r| r.region }
+          table.column(label: "Cryptid", lower_right: ->(r) { r.region }) { |r| r.name }
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
           table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
           table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
@@ -21,7 +20,7 @@ module UI
 
       def with_sortable_columns
         colors = enthusiasm_colors
-        render(UI::Table::Component.new(records: sample_records, sort: "name", sort_direction: "desc")) do |table|
+        render(UI::Table::Component.new(records: sample_records, sort: "name", sort_direction: "desc", render_sortable: true)) do |table|
           table.column(sortable: "name") { |r| r.name }
           table.column(label: "Region") { |r| r.region }
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
