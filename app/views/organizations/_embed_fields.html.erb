@@ -209,14 +209,14 @@
             </div>
 
             <div class="controls extra-field">
-              <%= builder.text_field :zipcode, placeholder: t(".zipcode") %>
+              <%= builder.text_field :postal_code, placeholder: t(".zipcode") %>
             </div>
 
             <div
               id="state-select"
               class="controls extra-field special-select-single"
             >
-              <%= builder.collection_select(:state_id, State.united_states, :id, :name, include_blank: true, prompt: t(".state") ) %>
+              <%= builder.collection_select(:region_record_id, State.united_states, :id, :name, include_blank: true, prompt: t(".state") ) %>
             </div>
           </div>
         </div>

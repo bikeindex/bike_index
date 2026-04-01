@@ -132,7 +132,7 @@
                     %small.text-success= stolen_record.country.iso
               %td
                 %span{ class: stolen_record.city.blank? ? "less-strong" : "" }
-                  = [stolen_record.city, stolen_record.state&.abbreviation, stolen_record.zipcode].reject(&:blank?).first
+                  = [stolen_record.city, stolen_record.region, stolen_record.postal_code].reject(&:blank?).first
               %td.table-cell-check
                 = check_mark if stolen_record.approved
                 = render(Admin::Badges::User::Component.new(user: bike&.user))

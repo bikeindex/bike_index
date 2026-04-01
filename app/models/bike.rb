@@ -713,7 +713,7 @@ class Bike < ApplicationRecord
     creation_organization.default_location.address_hash_legacy != addy
   end
 
-  # NOTE! This will return different hashes - legacy hashes for stolen & impound
+  # NOTE! impound_record still returns legacy hash format
   def address_hash
     current_stolen_record&.address_hash || current_impound_record&.address_hash_legacy ||
       address_record&.address_hash
