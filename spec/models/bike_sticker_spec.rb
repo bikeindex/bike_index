@@ -378,6 +378,45 @@ RSpec.describe BikeSticker, type: :model do
         expect(BikeSticker.where(organization_id: 11).next_unclaimed_code).to eq bike_sticker2
       end
     end
+
+    context "stickers created out of code order across batches" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:bike) { FactoryBot.create(:bike) }
+      let(:batch1) { FactoryBot.create(:bike_sticker_batch, organization:, prefix: "PSU") }
+      let(:batch2) { FactoryBot.create(:bike_sticker_batch, organization:, prefix: "PSU") }
+
+      it "returns next code by code_integer, not by database id" do
+        # Batch1 created first with higher codes (PSU501-PSU504), gets lower database IDs
+        batch1.update!(code_number_length: 4)
+        %w[PSU501 PSU502 PSU503 PSU504].each do |code|
+          FactoryBot.create(:bike_sticker, organization:, bike_sticker_batch: batch1, code:)
+        end
+        # Batch2 created later with lower codes (PSU1-PSU500), gets higher database IDs
+        batch2.update!(code_number_length: 4)
+        %w[PSU1 PSU2 PSU3].each do |code|
+          FactoryBot.create(:bike_sticker, organization:, bike_sticker_batch: batch2, code:)
+        end
+
+        # Claim PSU501-PSU503 via export
+        BikeSticker.find_by(code: "PSU501").update!(bike: bike, claimed_at: Time.current)
+        BikeSticker.find_by(code: "PSU502").update!(bike: bike, claimed_at: Time.current)
+        BikeSticker.find_by(code: "PSU503").update!(bike: bike, claimed_at: Time.current)
+        # Claim PSU1 out-of-order (e.g. user scanned sticker manually)
+        BikeSticker.find_by(code: "PSU1").update!(bike: bike, claimed_at: Time.current)
+
+        # PSU1 (from batch2) has a HIGHER database id than PSU503 (from batch1)
+        psu1 = BikeSticker.find_by(code: "PSU1", organization:)
+        psu503 = BikeSticker.find_by(code: "PSU503", organization:)
+        expect(psu1.id).to be > psu503.id
+
+        # Bug: id-based ordering saw PSU1 as the "last claimed" (highest id),
+        # then looked for unclaimed with id > PSU1's id, returning PSU2.
+        # Correct: code_integer ordering sees PSU503 as highest claimed code,
+        # so next unclaimed should be PSU504
+        org_stickers = organization.bike_stickers
+        expect(org_stickers.next_unclaimed_code&.code).to eq "PSU504"
+      end
+    end
   end
 
   describe "organization_authorized?" do
