@@ -172,6 +172,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         expect(email_domain.reload.calculated_users.count).to eq 2
 
         VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
+          Sidekiq::Job.clear_all
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 2
 
