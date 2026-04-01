@@ -31,7 +31,7 @@ FactoryBot.define do
     zipcode { "1012" }
   end
 
-  trait :in_chicago do
+  trait :in_chicago_legacy do
     latitude { 41.8624488 }
     longitude { -87.6591502 }
     city { "Chicago" }
@@ -41,7 +41,7 @@ FactoryBot.define do
     zipcode { "60608" }
   end
 
-  trait :in_los_angeles do
+  trait :in_los_angeles_legacy do
     latitude { 34.05223 }
     longitude { -118.24368 }
     street { "100 W 1st St" }
@@ -51,7 +51,7 @@ FactoryBot.define do
     country_id { Country.united_states.id }
   end
 
-  trait :in_nyc do
+  trait :in_nyc_legacy do
     latitude { 40.7143528 }
     longitude { -74.0059731 }
     city { "New York" }
@@ -71,7 +71,7 @@ FactoryBot.define do
     country_id { Country.canada.id }
   end
 
-  trait :in_edmonton do
+  trait :in_edmonton_legacy do
     latitude { 53.5069377 }
     longitude { -113.5508765 }
     street { "9330 Groat Rd NW" }

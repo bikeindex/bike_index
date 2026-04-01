@@ -123,7 +123,7 @@ RSpec.describe BikeServices::CalculateLocation do
       context "given a parking notification" do
         it "it still uses the stolen_record" do
           expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
-          parking_notification = FactoryBot.create(:parking_notification, :in_los_angeles, bike: bike)
+          parking_notification = FactoryBot.create(:parking_notification, :in_los_angeles_legacy, bike: bike)
           bike.reload
           expect(bike.current_impound_record).to_not be_present
           expect(bike.current_parking_notification).to eq parking_notification

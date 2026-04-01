@@ -5,7 +5,7 @@ RSpec.describe SocialAccount, type: :model do
 
   describe "geocoding" do
     it "geocodes default location correctly without hitting API" do
-      social_account = FactoryBot.build(:social_account, :in_nyc)
+      social_account = FactoryBot.build(:social_account, :in_nyc_legacy)
       social_account.bike_index_geocode
       expect(social_account.latitude).to eq(40.7143528)
       expect(social_account.longitude).to eq(-74.0059731)
@@ -17,7 +17,7 @@ RSpec.describe SocialAccount, type: :model do
     it "should geocode and then reverse geocode on save" do
       social_account = FactoryBot.build(
         :social_account,
-        :in_chicago,
+        :in_chicago_legacy,
         skip_geocoding: false,
         state: nil
       )

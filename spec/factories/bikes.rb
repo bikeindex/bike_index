@@ -144,19 +144,19 @@ FactoryBot.define do
     end
     factory :stolen_bike_in_los_angeles, traits: [:stolen_trait] do
       after(:create) do |bike|
-        create(:stolen_record, :in_los_angeles, bike: bike)
+        create(:stolen_record, :in_los_angeles_legacy, bike: bike)
         bike.reload
       end
     end
     factory :stolen_bike_in_nyc, traits: [:stolen_trait] do
       after(:create) do |bike|
-        create(:stolen_record, :in_nyc, bike: bike)
+        create(:stolen_record, :in_nyc_legacy, bike: bike)
         bike.reload
       end
     end
     factory :stolen_bike_in_chicago, traits: [:stolen_trait] do
       after(:create) do |bike|
-        create(:stolen_record, :in_chicago, bike: bike)
+        create(:stolen_record, :in_chicago_legacy, bike: bike)
         bike.reload
       end
     end
