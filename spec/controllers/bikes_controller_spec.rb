@@ -464,8 +464,8 @@ RSpec.describe BikesController, type: :controller do
             country_id: country.id,
             street: "2459 W Division St",
             city: "Chicago",
-            zipcode: "60622",
-            state_id: state.id,
+            postal_code: "60622",
+            region_record_id: state.id,
             date_stolen: (Time.current - 1.day).utc,
             timezone: "UTC"
           }

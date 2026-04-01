@@ -35,6 +35,10 @@ class BikeServices::StolenRecordUpdator
   def update_with_params(stolen_record)
     return stolen_record unless @stolen_params.present?
 
+    # Backward compat for API consumers sending old column names
+    @stolen_params["postal_code"] ||= @stolen_params.delete("zipcode") if @stolen_params["zipcode"].present?
+    @stolen_params["street"] ||= @stolen_params.delete("address") if @stolen_params["address"].present?
+
     stolen_record.attributes = permitted_attributes(@stolen_params)
 
     if @stolen_params["date_stolen"].present?

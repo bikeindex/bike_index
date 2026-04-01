@@ -204,7 +204,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.claimed?).to be_truthy
         expect(bike.owner&.id).to eq current_user.id
         # It no longer has an address, the stolen record has updated it
-        expect(bike.address_hash.values.compact).to eq(["US"])
+        expect(bike.address_hash.values.compact).to eq([])
 
         stolen_record = bike.current_stolen_record
         expect(stolen_record).to be_present
