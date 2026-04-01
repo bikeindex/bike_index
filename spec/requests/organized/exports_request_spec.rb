@@ -67,11 +67,12 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(flash).to_not be_present
       end
       context "with impounded_bikes only" do
-        let(:export) { FactoryBot.create(:export_organization, organization: current_organization, options: Export.default_options("organization").merge("impounded_bikes" => true)) }
-        it "shows Registered & impounded" do
+        let(:export) { FactoryBot.create(:export_organization, organization: current_organization, options: Export.default_options("organization").merge("impounded_bikes" => true, "partial_registrations" => "none")) }
+        it "shows Impounded" do
+          expect(export.matching_kinds).to eq([:impounded])
           get "#{base_url}/#{export.id}"
           expect(response.code).to eq("200")
-          expect(response.body).to include("Registered &amp; impounded")
+          expect(response.body).to include("Impounded")
         end
       end
       context "not organization export" do
