@@ -31,7 +31,7 @@ class StravaIntegrationsController < ApplicationController
     end
 
     unless sufficient_strava_permissions?(params[:scope])
-      flash[:error] = "Bike Index needs permission to read your activities and profile. Please reconnect and accept all requested permissions."
+      flash[:error] = "Bike Index needs permission to read your activities and profile."
       redirect_to return_to
       return
     end
