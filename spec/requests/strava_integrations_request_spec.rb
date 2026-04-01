@@ -140,12 +140,12 @@ RSpec.describe StravaIntegrationsController, type: :request do
             end
           end
 
-          it "ignores external return_to URLs" do
+          it "ignores external return_to URLs and falls back to strava_search" do
             oauth_state = initiate_oauth_flow(scope: "strava_search", return_to: "https://evil.com")
             VCR.use_cassette("strava-exchange_token") do
               get "/strava_integration/callback",
                 params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::STRAVA_SEARCH_SCOPE}
-              expect(response).to redirect_to(my_account_path)
+              expect(response).to redirect_to(strava_search_path)
             end
           end
         end
