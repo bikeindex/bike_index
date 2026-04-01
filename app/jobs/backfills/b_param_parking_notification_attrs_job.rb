@@ -4,22 +4,23 @@
 #   zipcode -> postal_code
 #   state_id -> region_record_id
 class Backfills::BParamParkingNotificationAttrsJob < ApplicationJob
-  sidekiq_options queue: "low_priority", retry: false
+  include Sidekiq::IterableJob
+
+  sidekiq_options queue: "low_priority"
 
   LEGACY_RENAMES = {"zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
 
-  class << self
-    def enqueue_all
-      scope.find_each { |b_param| perform_async(b_param.id) }
-    end
-
-    def scope
-      BParam.where("params -> 'parking_notification' ? 'zipcode' OR params -> 'parking_notification' ? 'state_id'")
-    end
+  def self.iterable_scope
+    BParam.where("params -> 'parking_notification' ? 'zipcode' OR params -> 'parking_notification' ? 'state_id'")
   end
 
-  def perform(id)
-    b_param = BParam.find(id)
+  def build_enumerator(cursor:)
+    return if skip_job?
+
+    active_record_records_enumerator(self.class.iterable_scope, cursor:)
+  end
+
+  def each_iteration(b_param)
     parking_attrs = b_param.params["parking_notification"]
     return if parking_attrs.blank?
 

@@ -172,7 +172,6 @@ module ApplicationHelper
     end
   end
 
-
   def show_sharing_links(user)
     [twitterable(user), instagramable(user), websiteable(user)].compact.to_sentence.html_safe
   end

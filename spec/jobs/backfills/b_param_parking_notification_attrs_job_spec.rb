@@ -3,17 +3,17 @@ require "rails_helper"
 RSpec.describe Backfills::BParamParkingNotificationAttrsJob, type: :job do
   let(:instance) { described_class.new }
 
-  describe "scope" do
+  describe "iterable_scope" do
     let!(:b_param_legacy) { FactoryBot.create(:b_param, params: {"parking_notification" => {"zipcode" => "60647", "state_id" => 1}}) }
     let!(:b_param_new) { FactoryBot.create(:b_param, params: {"parking_notification" => {"postal_code" => "60647"}}) }
     let!(:b_param_no_parking) { FactoryBot.create(:b_param) }
 
     it "returns only b_params with legacy parking_notification attrs" do
-      expect(described_class.scope).to eq([b_param_legacy])
+      expect(described_class.iterable_scope).to eq([b_param_legacy])
     end
   end
 
-  describe "perform" do
+  describe "each_iteration" do
     let(:b_param) do
       FactoryBot.create(:b_param, params: {
         "parking_notification" => {
@@ -27,7 +27,7 @@ RSpec.describe Backfills::BParamParkingNotificationAttrsJob, type: :job do
     end
 
     it "renames legacy attributes to new names" do
-      instance.perform(b_param.id)
+      instance.each_iteration(b_param)
       b_param.reload
 
       parking_attrs = b_param.params["parking_notification"]
@@ -46,7 +46,7 @@ RSpec.describe Backfills::BParamParkingNotificationAttrsJob, type: :job do
       let(:b_param) { FactoryBot.create(:b_param, params: {"parking_notification" => {"zipcode" => "90210"}}) }
 
       it "renames only zipcode" do
-        instance.perform(b_param.id)
+        instance.each_iteration(b_param)
 
         parking_attrs = b_param.reload.params["parking_notification"]
         expect(parking_attrs["postal_code"]).to eq("90210")
@@ -58,7 +58,7 @@ RSpec.describe Backfills::BParamParkingNotificationAttrsJob, type: :job do
       let(:b_param) { FactoryBot.create(:b_param, params: {"parking_notification" => {"postal_code" => "60647"}}) }
 
       it "does not update" do
-        expect { instance.perform(b_param.id) }.not_to change { b_param.reload.updated_at }
+        expect { instance.each_iteration(b_param) }.not_to change { b_param.reload.updated_at }
       end
     end
   end
