@@ -70,7 +70,7 @@ module StravaJobs
     private
 
     def ensure_valid_tokens_for_batch(batch)
-      integration_ids = batch.pluck(:strava_integration_id).uniq
+      integration_ids = batch.reorder(nil).distinct.pluck(:strava_integration_id)
       StravaIntegration.where(id: integration_ids).find_each do |strava_integration|
         Integrations::Strava::Client.ensure_valid_token!(strava_integration)
       end
