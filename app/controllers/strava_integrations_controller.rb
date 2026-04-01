@@ -28,6 +28,12 @@ class StravaIntegrationsController < ApplicationController
       return
     end
 
+    unless sufficient_strava_permissions?(params[:scope])
+      flash[:error] = "Bike Index needs permission to read your activities and profile. Please reconnect and accept all requested permissions."
+      redirect_to my_account_path
+      return
+    end
+
     token_data = Integrations::Strava::Client.exchange_token(params[:code])
     if token_data.blank?
       flash[:error] = "Unable to connect to Strava. Please try again."
@@ -96,6 +102,13 @@ class StravaIntegrationsController < ApplicationController
       existing_strava_integration&.destroy
       current_user.create_strava_integration!(attrs)
     end
+  end
+
+  def sufficient_strava_permissions?(scope)
+    return false if scope.blank?
+
+    granted = scope.split(",")
+    Integrations::Strava::Client::DEFAULT_SCOPE.split(",").all? { |s| granted.include?(s) }
   end
 
   def session_state_matches?(session_state)
