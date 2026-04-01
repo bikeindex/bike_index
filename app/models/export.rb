@@ -89,6 +89,7 @@ class Export < ApplicationRecord
     not_specific.where("(options -> 'partial_registrations') IS NOT NULL")
       .where.not("(options -> 'partial_registrations')::text IN ('false', '\"only\"')")
   }
+  scope :impounded, -> { where("(options -> 'impounded_bikes')::text = 'true'") }
 
   class << self
     def default_headers
@@ -185,6 +186,18 @@ class Export < ApplicationRecord
 
   def partial_registrations
     options["partial_registrations"].blank? ? false : options["partial_registrations"]
+  end
+
+  def impounded_bikes
+    Binxtils::InputNormalizer.boolean(options["impounded_bikes"])
+  end
+
+  def matching_kinds
+    kinds = []
+    kinds << :impounded if impounded_bikes
+    kinds << :incomplete if partial_registrations.present? && !partial_registrations.in?([false, "none"])
+    kinds << :registered unless partial_registrations == "only" || partial_registrations == "none"
+    kinds
   end
 
   # NOTE: Only does the first 100 bikes, in case there is a huge export
@@ -305,7 +318,7 @@ class Export < ApplicationRecord
 
   def bikes_scoped
     raise "#{kind} scoping not set up" unless kind == "organization"
-    return Bike.none if partial_registrations == "only"
+    return Bike.none if partial_registrations.in?(["only", "none"])
     return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
     return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
 

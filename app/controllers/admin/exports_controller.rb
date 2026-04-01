@@ -29,11 +29,14 @@ class Admin::ExportsController < Admin::BaseController
     when "incomplete" then exports = exports.incompletes
     when "incompletes_and_registrations" then exports = exports.incompletes_and_registrations
     when "registered" then exports = exports.registrations
+    when "impounded" then exports = exports.impounded
     end
     @stickers = Binxtils::InputNormalizer.boolean(params[:search_stickers])
     exports = exports.with_stickers if @stickers
     @with_dates = Binxtils::InputNormalizer.boolean(params[:search_with_dates])
     exports = exports.with_dates if @with_dates
+    @impounded = Binxtils::InputNormalizer.boolean(params[:search_impounded])
+    exports = exports.impounded if @impounded
     if params[:search_kind] == "avery"
       exports = exports.avery
     elsif params[:search_kind].present?

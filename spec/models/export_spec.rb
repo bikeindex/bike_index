@@ -60,16 +60,18 @@ RSpec.describe Export, type: :model do
     let!(:with_stickers) { FactoryBot.create(:export_organization, options: Export.default_options("organization").merge("assign_bike_codes" => true)) }
     let!(:with_dates) { FactoryBot.create(:export_organization, options: Export.default_options("organization").merge("start_at" => Time.current.to_s)) }
     let!(:avery) { FactoryBot.create(:export_avery) }
+    let!(:with_impounded) { FactoryBot.create(:export_organization, options: Export.default_options("organization").merge("impounded_bikes" => true)) }
 
     it "returns correct records for each scope" do
       expect(Export.specific.pluck(:id)).to match_array([specific.id])
-      expect(Export.not_specific.pluck(:id)).to match_array([basic.id, with_incompletes.id, incompletes_only.id, with_stickers.id, with_dates.id, avery.id])
+      expect(Export.not_specific.pluck(:id)).to match_array([basic.id, with_incompletes.id, incompletes_only.id, with_stickers.id, with_dates.id, avery.id, with_impounded.id])
       expect(Export.incompletes.pluck(:id)).to match_array([incompletes_only.id])
       expect(Export.incompletes_and_registrations.pluck(:id)).to match_array([with_incompletes.id])
-      expect(Export.registrations.pluck(:id)).to match_array([basic.id, with_incompletes.id, with_stickers.id, with_dates.id, avery.id])
+      expect(Export.registrations.pluck(:id)).to match_array([basic.id, with_incompletes.id, with_stickers.id, with_dates.id, avery.id, with_impounded.id])
       expect(Export.with_stickers.pluck(:id)).to match_array([with_stickers.id])
       expect(Export.with_dates.pluck(:id)).to match_array([with_dates.id])
       expect(Export.avery.pluck(:id)).to match_array([avery.id])
+      expect(Export.impounded.pluck(:id)).to match_array([with_impounded.id])
     end
   end
 

@@ -69,11 +69,16 @@
       <%= link_to "Incomplete", url_for(sortable_search_params.merge(search_registrations: "incomplete")), class: "dropdown-item #{params[:search_registrations] == 'incomplete' ? 'active' : ''}" %>
       <%= link_to "Incompletes & registrations", url_for(sortable_search_params.merge(search_registrations: "incompletes_and_registrations")), class: "dropdown-item #{params[:search_registrations] == 'incompletes_and_registrations' ? 'active' : ''}" %>
       <%= link_to "Specific", url_for(sortable_search_params.merge(search_registrations: "specific")), class: "dropdown-item #{params[:search_registrations] == 'specific' ? 'active' : ''}" %>
+      <%= link_to "Impounded", url_for(sortable_search_params.merge(search_registrations: "impounded")), class: "dropdown-item #{params[:search_registrations] == 'impounded' ? 'active' : ''}" %>
     </div>
   </li>
 
   <li class="nav-item">
     <%= link_to "Stickers", url_for(sortable_search_params.merge(search_stickers: !@stickers)), class: "nav-link #{@stickers ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Impounded", url_for(sortable_search_params.merge(search_impounded: !@impounded)), class: "nav-link #{@impounded ? 'active' : ''}" %>
   </li>
 
   <li class="nav-item">
@@ -86,6 +91,12 @@
     <% table.column(sortable: "created_at", label: "Date") do |export| %>
       <%= link_to organization_export_path(export, organization_id: export.organization.to_param) do %>
         <%= render UI::Time::Component.new(time: export.created_at) %>
+      <% end %>
+    <% end %>
+
+    <% if @deleted %>
+      <% table.column(sortable: "deleted_at") do |export| %>
+        <%= render UI::Time::Component.new(time: export.deleted_at) %>
       <% end %>
     <% end %>
 
@@ -139,12 +150,8 @@
     <% table.column(label: "Registrations") do |export| %>
       <% if export.only_custom_bike_ids %>
         <%= render UI::Badge::Component.new(text: "specific", title: "Only specified registrations", color: :purple, size: :sm) %>
-      <% elsif export.partial_registrations == "only" %>
-        incomplete
-      <% elsif export.partial_registrations.present? %>
-        incompletes & registrations
       <% else %>
-        registered
+        <%= export.matching_kinds.map(&:to_s).join(", ") %>
       <% end %>
 
       <% if export.start_at.present? || export.end_at.present? %>

@@ -245,7 +245,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/jobs/strava_jobs/scheduled_request_enqueuer.rb",
-      "line": 36,
+      "line": 44,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "scope.where(:strava_integration_id => integration_id).where(\"#{strava_parameters} = ?\", key_value)",
       "render_path": null,
@@ -329,74 +329,6 @@
         77
       ],
       "note": "Admin-only. params[:search_manager] validated against searchable_managers allowlist before send()"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "2de321859c63d4d1258bcbb5bda620219b4c75953ebb59301d950ed7fad93463",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped parameter value",
-      "file": "app/views/organized/exports/show.html.haml",
-      "line": 28,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, exports.find(params[:id]).progress)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::ExportsController",
-          "method": "show",
-          "line": 14,
-          "file": "app/controllers/organized/exports_controller.rb",
-          "rendered": {
-            "name": "organized/exports/show",
-            "file": "app/views/organized/exports/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/exports/show"
-      },
-      "user_input": "params[:id]",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "Export.progress is a computed model attribute. Used in Haml class attribute, not raw HTML output"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "306aba0b384464c59f8acf27bcc7ebb559e0677255ff7557bd1c5d8a719b2a62",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped parameter value",
-      "file": "app/views/organized/exports/show.html.haml",
-      "line": 29,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, export_progress_class(exports.find(params[:id])))",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::ExportsController",
-          "method": "show",
-          "line": 14,
-          "file": "app/controllers/organized/exports_controller.rb",
-          "rendered": {
-            "name": "organized/exports/show",
-            "file": "app/views/organized/exports/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/exports/show"
-      },
-      "user_input": "params[:id]",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "export_progress_class() returns only hardcoded CSS class names (text-danger/text-success/text-warning)"
     },
     {
       "warning_type": "Redirect",
@@ -655,7 +587,7 @@
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/my_accounts/edit.html.erb",
-      "line": 41,
+      "line": 43,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
       "code": "render(partial => (params[:edit_template] or edit_templates.keys.first), { :locals => ({ :f => f }) })",
       "render_path": [
@@ -1309,7 +1241,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/models/export.rb",
-      "line": 273,
+      "line": 303,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`wc -l \"#{tmp_file.path}\"`",
       "render_path": null,
@@ -1332,7 +1264,7 @@
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/public_images/edit.html.erb",
-      "line": 22,
+      "line": 17,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
       "code": "link_to(image_tag(PublicImage.unscoped.find(params[:id]).image_url(:medium)), PublicImage.unscoped.find(params[:id]).image_url, :target => \"_blank\")",
       "render_path": [
