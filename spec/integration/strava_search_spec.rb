@@ -20,6 +20,7 @@ RSpec.describe "Strava search", :js, type: :system do
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
+    expect(page).to have_content("Logged in")
 
     visit "/strava_search"
 
