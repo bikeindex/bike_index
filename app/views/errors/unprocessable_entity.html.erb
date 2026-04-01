@@ -2,7 +2,7 @@
   <h1 class="error-text">422</h1>
 
   <p class="error-explanation">
-    <% email_link = link_to t(".contact"), "mailto:#{t('.contact_email')}" %>
+    <% email_link = link_to t(".contact"), "mailto:#{t('.contact_email')}" %> <%# herb:disable actionview-no-silent-helper %>
     <%= t(".explanation_html", email_link: email_link) %>
   </p>
 
