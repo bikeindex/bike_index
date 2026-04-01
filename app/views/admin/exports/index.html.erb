@@ -94,6 +94,12 @@
       <% end %>
     <% end %>
 
+    <% if @deleted %>
+      <% table.column(sortable: "deleted_at") do |export| %>
+        <%= render UI::Time::Component.new(time: export.deleted_at) %>
+      <% end %>
+    <% end %>
+
     <% table.column(label: "Progress") do |export| %>
       <% progress = export.calculated_progress %>
 

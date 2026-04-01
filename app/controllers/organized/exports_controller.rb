@@ -97,7 +97,8 @@ module Organized
     end
 
     def find_export
-      @export = exports.find(params[:id])
+      scope = current_user.superuser? ? Export.unscoped.where(organization_id: current_organization.id) : exports
+      @export = scope.find(params[:id])
     end
 
     def exports

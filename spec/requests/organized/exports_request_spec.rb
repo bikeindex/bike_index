@@ -75,6 +75,23 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(response.body).to include("Impounded")
         end
       end
+      context "deleted export" do
+        let(:export) { FactoryBot.create(:export_organization, organization: current_organization, deleted_at: Time.current) }
+        it "404s" do
+          get "#{base_url}/#{export.id}"
+          expect(response.status).to eq 404
+        end
+
+        context "as superuser" do
+          let(:current_user) { FactoryBot.create(:superuser) }
+          it "renders with deleted alert" do
+            get "#{base_url}/#{export.id}"
+            expect(response.code).to eq("200")
+            expect(response).to render_template(:show)
+            expect(response.body).to include("deleted")
+          end
+        end
+      end
       context "not organization export" do
         let(:export) { FactoryBot.create(:export_organization) }
         it "404s" do

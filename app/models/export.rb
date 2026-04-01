@@ -194,9 +194,9 @@ class Export < ApplicationRecord
 
   def matching_kinds
     kinds = []
-    kinds << :registered unless partial_registrations == "only" || partial_registrations == "none"
-    kinds << :incomplete if partial_registrations.present? && !partial_registrations.in?([false, "none"])
     kinds << :impounded if impounded_bikes
+    kinds << :incomplete if partial_registrations.present? && !partial_registrations.in?([false, "none"])
+    kinds << :registered unless partial_registrations == "only" || partial_registrations == "none"
     kinds
   end
 
