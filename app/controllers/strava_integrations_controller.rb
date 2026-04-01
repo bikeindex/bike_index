@@ -16,28 +16,30 @@ class StravaIntegrationsController < ApplicationController
   end
 
   def callback
+    return_to = session.delete(:strava_return_to) || my_account_path
+
     if params[:error].present?
       flash[:error] = "Strava authorization was denied."
-      redirect_to my_account_path
+      redirect_to return_to
       return
     end
 
     unless params[:state].present? && session_state_matches?(session.delete(:strava_oauth_state))
       flash[:error] = "Invalid OAuth state. Please try again."
-      redirect_to my_account_path
+      redirect_to return_to
       return
     end
 
     unless sufficient_strava_permissions?(params[:scope])
       flash[:error] = "Bike Index needs permission to read your activities and profile. Please reconnect and accept all requested permissions."
-      redirect_to my_account_path
+      redirect_to return_to
       return
     end
 
     token_data = Integrations::Strava::Client.exchange_token(params[:code])
     if token_data.blank?
       flash[:error] = "Unable to connect to Strava. Please try again."
-      redirect_to my_account_path
+      redirect_to return_to
       return
     end
 
@@ -49,8 +51,8 @@ class StravaIntegrationsController < ApplicationController
     else
       flash[:success] = "Strava connection updated!"
     end
-    return_to = session.delete(:strava_return_to)
-    redirect_to return_to || (strava_integration.has_activity_write? ? strava_search_path : my_account_path)
+
+    redirect_to return_to
   end
 
   def destroy

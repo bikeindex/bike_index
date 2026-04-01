@@ -117,12 +117,12 @@ RSpec.describe StravaIntegrationsController, type: :request do
         end
 
         context "with strava_search scope" do
-          it "redirects to strava_search" do
+          it "redirects to my_account and stores strava_search permissions" do
             oauth_state = initiate_oauth_flow
             VCR.use_cassette("strava-exchange_token") do
               get "/strava_integration/callback",
                 params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::STRAVA_SEARCH_SCOPE}
-              expect(response).to redirect_to(strava_search_path)
+              expect(response).to redirect_to(my_account_path)
               expect(flash[:success]).to match(/connected/i)
               expect(current_user.reload.strava_integration.strava_permissions).to eq Integrations::Strava::Client::STRAVA_SEARCH_SCOPE
             end
@@ -145,7 +145,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
             VCR.use_cassette("strava-exchange_token") do
               get "/strava_integration/callback",
                 params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::STRAVA_SEARCH_SCOPE}
-              expect(response).to redirect_to(strava_search_path)
+              expect(response).to redirect_to(my_account_path)
             end
           end
         end
