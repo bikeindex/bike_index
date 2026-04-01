@@ -1,6 +1,6 @@
 <div class="tw:-mx-4 tw:mb-4 tw:overflow-x-scroll tw:px-4 tw:pb-3">
   <table class="<%= table_classes %>">
-    <thead class="tw:text-sm">
+    <thead class="tw:bg-gray-50 tw:text-sm tw:dark:bg-gray-700">
       <tr>
         <% @columns.each_with_index do |col, i| %>
           <th class="<%= col.th_classes(i, total: @columns.length, bordered: @bordered) %>">

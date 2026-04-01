@@ -11,9 +11,10 @@ module UI
 
       attr_reader :sortable, :cell_block
 
-      def initialize(label: nil, sortable: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
         @label = label
         @sortable = sortable
+        @sort_indicator = sort_indicator
         @classes = classes
         @header_classes = header_classes
         @lower_right = lower_right
@@ -30,8 +31,7 @@ module UI
         content_tag(:div, class: "tw:relative tw:min-h-5") do
           safe_join([
             cell_content,
-            NBSP.html_safe,
-            content_tag(:small, lower_right_content,
+            content_tag(:small, safe_join([NBSP.html_safe, lower_right_content]),
               class: "tw:absolute tw:-right-0.5 tw:-bottom-1 tw:text-xs tw:text-gray-400")
           ])
         end
@@ -40,15 +40,17 @@ module UI
       def render_header(render_sortable:, current_sort:, current_direction:, sortable_url:)
         if sortable.present? && render_sortable
           render_sort_link(current_sort:, current_direction:, sortable_url:)
+        elsif @sort_indicator.present? && @sort_indicator == current_sort
+          safe_join([header_label, NBSP, arrow_for(current_direction)])
         else
           header_label
         end
       end
 
       def th_classes(index, total:, bordered:)
-        classes = ["tw:border-0 tw:bg-gray-200 tw:px-1 tw:py-2 tw:dark:bg-gray-700"]
+        classes = ["tw:px-1 tw:py-2"]
         if bordered
-          classes << "tw:border-b tw:border-r tw:border-t tw:border-gray-300 tw:dark:border-gray-600"
+          classes << "tw:border-b tw:border-r tw:border-t tw:border-gray-200 tw:dark:border-gray-600"
           classes << "tw:border-l" if index == 0
         end
         classes << "tw:rounded-tl-sm" if index == 0
@@ -59,7 +61,7 @@ module UI
       end
 
       def td_classes(index, total:, bordered:, last_row:)
-        classes = ["tw:border-0 tw:px-1 tw:py-1"]
+        classes = ["tw:px-1 tw:py-1"]
         if bordered
           classes << "tw:border-b tw:border-r tw:border-gray-200 tw:dark:border-gray-700"
           classes << "tw:border-l" if index == 0
@@ -75,27 +77,28 @@ module UI
       private
 
       def header_label
-        @label || @sortable&.gsub(/_(id|at)\z/, "")&.titleize
+        return @label unless @label.nil?
+        @sortable&.gsub(/_(id|at)\z/, "")&.titleize
       end
 
       def render_sort_link(current_sort:, current_direction:, sortable_url:)
-        title = @label || @sortable.gsub(/_(id|at)\z/, "").titleize
+        title = header_label
         direction = (@sortable == current_sort && current_direction == "desc") ? "asc" : "desc"
         css = "twlink"
 
         if @sortable == current_sort
           css += " active"
           arrow_spans = [
-            content_tag(:span, arrow_for(current_direction), class: "tw:group-hover/sort:hidden"),
-            content_tag(:span, arrow_for(direction), class: "tw:hidden tw:group-hover/sort:inline tw:opacity-50")
+            content_tag(:span, arrow_for(current_direction), class: "tw:group-hover:hidden"),
+            content_tag(:span, arrow_for(direction), class: "tw:hidden tw:group-hover:inline tw:opacity-50")
           ]
         else
           arrow_spans = [
-            content_tag(:span, arrow_for(direction), class: "tw:opacity-0 tw:group-hover/sort:opacity-50 tw:transition-opacity")
+            content_tag(:span, arrow_for(direction), class: "tw:opacity-0 tw:group-hover:opacity-50 tw:transition-opacity")
           ]
         end
 
-        link_to(sortable_url.call(@sortable, direction), class: "#{css} tw:group/sort") do
+        link_to(sortable_url.call(@sortable, direction), class: "#{css} tw:group") do
           safe_join([title, NBSP, *arrow_spans])
         end
       end
