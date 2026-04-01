@@ -150,6 +150,7 @@ module Integrations::Strava::Client
         refresh_token: data["refresh_token"],
         token_expires_at: Time.at(data["expires_at"])
       )
+      strava_integration.reload
     else
       strava_integration.update(status: "error")
       false
