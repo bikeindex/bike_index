@@ -325,7 +325,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   describe "send_additional" do
     let!(:parking_notification_initial) do
       FactoryBot.create(:parking_notification,
-        :in_los_angeles_legacy,
+        :in_los_angeles,
         bike: bike,
         organization: current_organization,
         message: "some message to the user",
@@ -405,7 +405,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(bike.status).to eq "status_with_owner"
       end
       context "multiple parking notifications" do
-        let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles_legacy, organization: current_organization, delivery_status: "email_success") }
+        let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization, delivery_status: "email_success") }
         it "marks both retrieved" do
           Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
@@ -454,7 +454,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     context "replaced" do
       let!(:parking_notification2) do
         FactoryBot.create(:parking_notification,
-          :in_chicago_legacy,
+          :in_chicago,
           bike: bike,
           initial_record_id: parking_notification_initial.id,
           organization: current_organization,
@@ -531,7 +531,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
     end
     context "impound_notification - multiple" do
-      let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles_legacy, organization: current_organization) }
+      let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization) }
       it "impounds them both" do
         bike.reload
         expect(bike.status).to eq "status_with_owner"
