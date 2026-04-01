@@ -177,7 +177,10 @@ class StravaRequest < AnalyticsRecord
       update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
     end
 
-    if binx_response_rate_limited? || rate_limited? || service_unavailable?(response)
+    if token_refresh_failed?
+      StravaRequest.create!(user_id:, strava_integration_id:, request_type:, proxy_request:,
+        parameters: parameters.except("error_response_status"))
+    elsif binx_response_rate_limited? || rate_limited? || service_unavailable?(response)
       return unless re_enqueue_if_rate_limited_or_unavailable
 
       StravaRequest.create!(user_id:, strava_integration_id:, request_type:, proxy_request:,

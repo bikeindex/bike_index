@@ -164,13 +164,8 @@ module Integrations::Strava::Client
     when "PUT" then conn.put(path) { |req| req.body = body if body }
     else conn.get(path)
     end
-    return response unless response.status == 401
-
-    if refresh_token!(strava_integration)
-      execute_proxy_request(strava_integration, path, method:, body:)
-    else
-      response
-    end
+    refresh_token!(strava_integration) if response.status == 401
+    response
   end
 
   def get(strava_integration, path, **params)
@@ -178,13 +173,8 @@ module Integrations::Strava::Client
     response = api_connection(strava_integration).get(path) do |req|
       req.params = params
     end
-    return response unless response.status == 401
-
-    if refresh_token!(strava_integration)
-      get(strava_integration, path, **params)
-    else
-      response
-    end
+    refresh_token!(strava_integration) if response.status == 401
+    response
   end
 
   def api_connection(strava_integration)

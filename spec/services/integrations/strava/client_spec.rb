@@ -249,11 +249,10 @@ RSpec.describe Integrations::Strava::Client, type: :service do
   end
 
   describe ".proxy_request" do
-    it "retries with refreshed token on 401 from Strava and creates token_refresh strava_request" do
+    it "refreshes token on 401 and returns 401 response" do
       VCR.use_cassette("strava-proxy_request_401_retry") do
         response = described_class.proxy_request(strava_integration, "athlete")
-        expect(response.status).to eq(200)
-        expect(response.body["id"]).to eq(2430215)
+        expect(response.status).to eq(401)
         strava_integration.reload
         expect(strava_integration.token_expires_at).to be > Time.current
         refresh_request = StravaRequest.token_refresh.last
