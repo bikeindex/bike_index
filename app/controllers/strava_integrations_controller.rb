@@ -36,6 +36,12 @@ class StravaIntegrationsController < ApplicationController
     end
 
     strava_integration = find_or_create_strava_integration(token_data)
+    StravaRequest.create!(
+      strava_integration_id: strava_integration.id,
+      request_type: :token_exchange,
+      requested_at: Time.current,
+      response_status: :success
+    )
 
     if strava_integration.previously_new_record?
       StravaJobs::FetchAthleteAndStats.perform_async(strava_integration.id)

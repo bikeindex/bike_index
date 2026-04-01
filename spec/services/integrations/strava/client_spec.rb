@@ -219,7 +219,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
     context "with a erroring token" do
       let(:status) { "synced" }
       let(:expires_at) { Time.current + 6.hours }
-      it "updates strava_integration to be errored" do
+      it "updates strava_integration to be errored and creates token_refresh strava_request" do
         VCR.use_cassette("strava-get_activity-401") do
           expect(strava_integration.reload.status).to eq "synced"
           expect(strava_integration.token_expires_at).to be_within(5).of expires_at
@@ -227,6 +227,10 @@ RSpec.describe Integrations::Strava::Client, type: :service do
           expect(strava_integration.reload.status).to eq "error"
           expect(strava_integration.token_expires_at).to be_within(5).of expires_at
           expect(response.body["errors"]).to eq([{code: "invalid", field: "", resource: "Application"}].as_json)
+          refresh_request = StravaRequest.token_refresh.last
+          expect(refresh_request.strava_integration_id).to eq strava_integration.id
+          expect(refresh_request.response_status).to eq "token_refresh_failed"
+          expect(refresh_request.requested_at).to be_present
         end
       end
     end
@@ -245,13 +249,16 @@ RSpec.describe Integrations::Strava::Client, type: :service do
   end
 
   describe ".proxy_request" do
-    it "retries with refreshed token on 401 from Strava" do
+    it "retries with refreshed token on 401 from Strava and creates token_refresh strava_request" do
       VCR.use_cassette("strava-proxy_request_401_retry") do
         response = described_class.proxy_request(strava_integration, "athlete")
         expect(response.status).to eq(200)
         expect(response.body["id"]).to eq(2430215)
         strava_integration.reload
         expect(strava_integration.token_expires_at).to be > Time.current
+        refresh_request = StravaRequest.token_refresh.last
+        expect(refresh_request.strava_integration_id).to eq strava_integration.id
+        expect(refresh_request.response_status).to eq "success"
       end
     end
   end
