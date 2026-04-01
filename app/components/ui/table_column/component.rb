@@ -9,7 +9,7 @@ module UI
       ARROW_DOWN = "\u2193"
       NBSP = "\u00A0"
 
-      attr_reader :sortable
+      attr_reader :sortable, :cell_block
 
       def initialize(label: nil, sortable: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
         @label = label
@@ -20,16 +20,13 @@ module UI
         @cell_block = block
       end
 
-      def for_record(record)
-        @record = record
-        self
-      end
-
-      def call
-        cell_content = capture { instance_exec(@record, &@cell_block) }
+      # Renders cell content for a record. The block should yield the captured
+      # cell content (executed in the parent Table component's view context).
+      def render_cell(record)
+        cell_content = yield(record)
         return cell_content unless @lower_right
 
-        lower_right_content = instance_exec(@record, &@lower_right)
+        lower_right_content = @lower_right.call(record)
         content_tag(:div, class: "tw:relative tw:min-h-5") do
           safe_join([
             cell_content,

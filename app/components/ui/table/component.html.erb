@@ -16,7 +16,7 @@
           <tr>
             <% @columns.each_with_index do |col, i| %>
               <td class="<%= col.td_classes(i, total: @columns.length, bordered: @bordered, last_row: last_row?(row_index)) %>">
-                <%= render col.for_record(record) %>
+                <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
               </td>
             <% end %>
           </tr>
