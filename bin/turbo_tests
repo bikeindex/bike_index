@@ -9,10 +9,6 @@ IO.popen(["/bin/bash", "-c", "source bin/env && env"]) do |io|
   end
 end
 
-# Override REDIS_URL with test-specific db offset
-redis_db = (ENV.fetch("DEV_PORT", 3042).to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
-ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_db}"
-
 require "bundler/setup"
 require "digest"
 
