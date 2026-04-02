@@ -1,7 +1,8 @@
-# Assign REDIS_URL before loading action cable
-if ENV.fetch("REDIS_URL", "").empty?
-  redis_db = (ENV.fetch("DEV_PORT", 3042).to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
-  ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_db}"
+# Offset REDIS_URL db number for parallel test processes
+if ENV["TEST_ENV_NUMBER"].to_i > 0 && ENV["REDIS_URL"].present?
+  base_uri = URI.parse(ENV["REDIS_URL"])
+  base_uri.path = "/#{base_uri.path.to_s.delete("/").to_i + ENV["TEST_ENV_NUMBER"].to_i}"
+  ENV["REDIS_URL"] = base_uri.to_s
 end
 
 require_relative "boot"
