@@ -218,7 +218,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def address_string
-    stolen_record&.address(force_show_address: true, render_country: :if_different)
+    stolen_record&.formatted_address_string(visible_attribute: :street, render_country: :if_different).presence
   end
 
   def stolen_record_approved?

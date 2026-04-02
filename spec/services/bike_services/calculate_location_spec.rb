@@ -80,8 +80,8 @@ RSpec.describe BikeServices::CalculateLocation do
       let(:full_address) { "#{street_address}, #{abbr_address}" }
       it "takes location from the current stolen record" do
         expect(stolen_record.street).to eq street_address
-        expect(stolen_record.address(force_show_address: true)).to eq(full_address)
-        expect(stolen_record.address).to eq(abbr_address)
+        expect(stolen_record.formatted_address_string(visible_attribute: :street)).to eq(full_address)
+        expect(stolen_record.formatted_address_string).to eq(abbr_address)
 
         bike.reload
         stolen_record.save
@@ -96,7 +96,7 @@ RSpec.describe BikeServices::CalculateLocation do
         # When displaying searches for stolen bikes, it's critical we honor the stolen record's data
         # ... or else unexpected things happen
         it "blanks the location on the bike" do
-          expect(stolen_record.address(force_show_address: true)).to eq(full_address)
+          expect(stolen_record.formatted_address_string(visible_attribute: :street)).to eq(full_address)
           expect(bike.to_coordinates.compact).to be_present
           bike.reload
           stolen_record.reload
@@ -114,7 +114,7 @@ RSpec.describe BikeServices::CalculateLocation do
           # Doesn't have coordinates, see geocodeable for additional information
           expect(stolen_record.to_coordinates.compact).to eq([])
           expect(stolen_record.address_hash.compact).to eq({region: "IL"})
-          expect(stolen_record.address(force_show_address: true)).to eq "IL"
+          expect(stolen_record.formatted_address_string(visible_attribute: :street)).to eq "IL"
 
           expect(bike.to_coordinates.compact).to eq([])
           expect(described_class.registration_address_source(bike)).to be_blank

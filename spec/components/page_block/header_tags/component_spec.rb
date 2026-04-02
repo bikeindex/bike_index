@@ -313,7 +313,7 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
           "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, United States"
         end
         it "returns expected things" do
-          expect(bike.reload.current_stolen_record.address).to eq "Chicago, IL 60608"
+          expect(bike.reload.current_stolen_record.formatted_address_string).to eq "Chicago, IL 60608"
 
           expect_matching_tags(title:, description:, updated_at: bike.updated_at)
         end

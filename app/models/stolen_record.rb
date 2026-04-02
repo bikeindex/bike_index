@@ -291,16 +291,6 @@ class StolenRecord < ApplicationRecord
     street.blank?
   end
 
-  # Used to be an attribute, removed in PR#1959
-  def show_address
-    false
-  end
-
-  def address(force_show_address: false, render_country: :if_different, country: nil)
-    render_country = country_option_to_render_country(country) if country
-    visible_attribute = (force_show_address || show_address) ? :street : nil
-    formatted_address_string(visible_attribute:, render_country:).presence
-  end
 
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
@@ -433,12 +423,6 @@ class StolenRecord < ApplicationRecord
   private
 
   # Map legacy country: option to render_country: for backward compatibility
-  def country_option_to_render_country(country)
-    return false if country == false
-
-    country = Array(country)
-    country.include?(:skip_default) ? :if_different : true
-  end
 
   # The read replica can't make database changes, but can enqueue the worker - which will make the changes
   def enqueue_worker(location_changed = false)
