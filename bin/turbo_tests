@@ -5,6 +5,14 @@
 redis_db = (ENV.fetch("DEV_PORT", 3042).to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
 ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_db}"
 
+# Source bin/env defaults (DEV_PORT, BASE_URL, etc.)
+IO.popen(["/bin/bash", "-c", "source bin/env && env"]) do |io|
+  io.each_line do |line|
+    key, value = line.strip.split("=", 2)
+    ENV[key] ||= value if key && value
+  end
+end
+
 require "bundler/setup"
 require "digest"
 
