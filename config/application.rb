@@ -1,6 +1,5 @@
 # Assign REDIS_URL before loading action cable
 if ENV.fetch("REDIS_URL", "").empty?
-  # NOTE: DEV_PORT is set in bin/dev
   redis_db = (ENV.fetch("DEV_PORT", 3042).to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
   ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_db}"
 end
