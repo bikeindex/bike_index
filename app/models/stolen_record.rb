@@ -232,17 +232,18 @@ class StolenRecord < ApplicationRecord
   end
 
   def publicly_visible_attribute = :postal_code
+  def show_address = false
 
   def latitude_public
     return nil if latitude.blank?
 
-    show_address ? latitude : latitude.round(Bike::PUBLIC_COORD_LENGTH)
+    latitude.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def longitude_public
     return nil if longitude.blank?
 
-    show_address ? longitude : longitude.round(Bike::PUBLIC_COORD_LENGTH)
+    longitude.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   # Override to add reverse geocoding functionality
@@ -335,7 +336,7 @@ class StolenRecord < ApplicationRecord
     row << tsv_col(b.frame_colors.to_sentence)
     row << tsv_col(b.description)
     row << " #{tsv_col(theft_description)}"
-    row << " Stolen from: #{tsv_col(address)}"
+    row << " Stolen from: #{tsv_col(formatted_address_string)}"
     row << "\t"
     row << "Article\t" if with_article
     row << date_stolen.strftime("%Y-%m-%d")
