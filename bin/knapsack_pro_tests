@@ -1,5 +1,4 @@
 #!/bin/bash
-source bin/env
 
 # Skip running knapsack if on a fork (which doesn't have the secret)
 if [ "$KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC" = "" ]; then
