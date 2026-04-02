@@ -291,7 +291,6 @@ class StolenRecord < ApplicationRecord
     street.blank?
   end
 
-
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
     self.secondary_phone = Phonifyer.phonify(secondary_phone)
