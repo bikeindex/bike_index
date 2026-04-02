@@ -357,12 +357,12 @@ class Bike < ApplicationRecord
         .flat_map { |bike, matches| matches.map { |match| [bike, match] } }
     end
 
-    # Search for currently stolen bikes reported stolen in the given city, state
-    # and/or country. `city`, `state` and `country` are accepted as strings /
+    # Search for currently stolen bikes reported stolen in the given city, region
+    # and/or country. `city`, `region` and `country` are accepted as strings /
     # symbols of the name or abbreviation, and are matched conjointly.
-    def currently_stolen_in(city: nil, state: nil, country: nil)
-      location = {city: city, region_record: state, country: country}.select { |_, v| v.present? }
-      location[:region_record] &&= State.find_by("name = ? OR abbreviation = ?", state, state)
+    def currently_stolen_in(city: nil, region: nil, country: nil)
+      location = {city: city, region_record: region, country: country}.select { |_, v| v.present? }
+      location[:region_record] &&= State.find_by("name = ? OR abbreviation = ?", region, region)
       location[:country] &&= Country.find_by("name = ? OR iso = ?", country, country)
       return none if location.values.any?(&:blank?)
 
@@ -715,9 +715,8 @@ class Bike < ApplicationRecord
     creation_organization.default_location.address_hash_legacy != addy
   end
 
-  # NOTE! impound_record still returns legacy hash format
   def address_hash
-    current_stolen_record&.address_hash || current_impound_record&.address_hash_legacy ||
+    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
       address_record&.address_hash
   end
 

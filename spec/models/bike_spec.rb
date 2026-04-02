@@ -71,7 +71,7 @@ RSpec.describe Bike, type: :model do
           FactoryBot.create(:stolen_bike_in_nyc)
           FactoryBot.create(:stolen_bike_in_los_angeles)
           expect(Bike.currently_stolen_in(country: "New York City")).to be_empty
-          expect(Bike.currently_stolen_in(state: "New York City", country: "Svenborgia")).to be_empty
+          expect(Bike.currently_stolen_in(region: "New York City", country: "Svenborgia")).to be_empty
           expect(Bike.currently_stolen_in(city: "Los Angeles", country: "NL")).to be_empty
         end
       end
@@ -92,10 +92,10 @@ RSpec.describe Bike, type: :model do
           bikes = Bike.currently_stolen_in(city: "Los Angeles")
           expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["Los Angeles"])
 
-          bikes = Bike.currently_stolen_in(state: "NY", country: "US")
+          bikes = Bike.currently_stolen_in(region: "NY", country: "US")
           expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["New York"])
 
-          bikes = Bike.currently_stolen_in(state: "NY", country: "NL")
+          bikes = Bike.currently_stolen_in(region: "NY", country: "NL")
           expect(bikes).to be_empty
         end
       end
