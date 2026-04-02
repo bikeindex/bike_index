@@ -1,10 +1,3 @@
-# Offset REDIS_URL db number for parallel test processes
-if ENV["TEST_ENV_NUMBER"].to_i > 0 && ENV["REDIS_URL"].present?
-  base_uri = URI.parse(ENV["REDIS_URL"])
-  base_uri.path = "/#{base_uri.path.to_s.delete("/").to_i + ENV["TEST_ENV_NUMBER"].to_i}"
-  ENV["REDIS_URL"] = base_uri.to_s
-end
-
 require_relative "boot"
 
 require "rails"
