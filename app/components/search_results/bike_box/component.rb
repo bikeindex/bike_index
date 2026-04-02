@@ -47,11 +47,7 @@ module SearchResults::BikeBox
     end
 
     def address_string
-      if @event_record.is_a?(ImpoundRecord)
-        @event_record.formatted_address_string # It's address_record
-      else
-        @event_record.formatted_address_string
-      end
+      @event_record.formatted_address_string
     end
 
     # copies from application_helper
