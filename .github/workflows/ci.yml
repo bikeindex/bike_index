@@ -111,7 +111,7 @@ jobs:
           bundler-cache: true
       - run: bundle install
       - name: Set up database
-        run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
+        run: source bin/env && bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
       - name: Test bin/setup # Test bin/setup - only run on 1 node, knapsack should balance
         if: matrix.ci_node_index == 0
         run: bin/setup
