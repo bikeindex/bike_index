@@ -12,7 +12,7 @@ touch log/redis.log
 > log/redis.log
 redis-server > log/redis.log &
 
-source bin/env
+eval "$(ruby bin/env --export)"
 
 # Pass --strava to start the strava_search Vite dev server
 FOREMAN_ARGS="-f Procfile.dev"
