@@ -1,3 +1,9 @@
+# Set REDIS_URL before Rails loads (cable.yml uses ENV.fetch)
+if ENV.fetch("REDIS_URL", "").empty?
+  redis_db = ENV.fetch("CONDUCTOR_PORT", ENV.fetch("DEV_PORT", 3042)).to_i % 16
+  ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_db}"
+end
+
 require_relative "boot"
 
 require "rails"
