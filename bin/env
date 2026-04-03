@@ -1,0 +1,6 @@
+#!/bin/bash
+export DEV_PORT=${CONDUCTOR_PORT:-${DEV_PORT:-3042}}
+export BASE_URL=http://localhost:$DEV_PORT
+if [ -z "$REDIS_URL" ]; then
+  export REDIS_URL="redis://localhost:6379/$(( (DEV_PORT - 1) % 16 ))"
+fi

@@ -14,6 +14,12 @@ if ENV["COVERAGE"] == "true"
   Rails.application.eager_load! if defined?(Rails)
 end
 
+# Adjust REDIS_URL for parallel test workers (each gets its own Redis DB)
+if ENV["TEST_ENV_NUMBER"]
+  redis_database = (ENV.fetch("DEV_PORT", 3042).to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
+  ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_database}"
+end
+
 # Assign here because only one .env file
 ENV["BASE_URL"] = "http://test.host"
 ENV["RAILS_ENV"] ||= "test"

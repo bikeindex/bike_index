@@ -1,6 +1,14 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+# Source bin/env defaults (REDIS_URL, DEV_PORT, BASE_URL, etc.)
+IO.popen(["/bin/bash", "-c", "source bin/env && env"]) do |io|
+  io.each_line do |line|
+    key, value = line.strip.split("=", 2)
+    ENV[key] ||= value if key && value
+  end
+end
+
 require "bundler/setup"
 require "digest"
 
