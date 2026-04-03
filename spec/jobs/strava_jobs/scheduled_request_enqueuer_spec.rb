@@ -136,15 +136,21 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
 
       describe "skip_enqueueing_fetch_activity_requests?" do
         let(:boundary) { Time.current.change(min: (Time.current.min / 15) * 15, sec: 0) }
+        let(:read_short_usage) { 0 }
         let(:read_long_usage) { 0 }
         let!(:rate_limit_request) do
           FactoryBot.create(:strava_request, :processed, strava_integration:,
             requested_at: boundary + 1.second,
             rate_limit: {short_limit: 200, short_usage: 0, long_limit: 2000, long_usage: 0,
-                         read_short_limit: 200, read_short_usage: 0, read_long_limit: 2000, read_long_usage:})
+                         read_short_limit: 200, read_short_usage:, read_long_limit: 2000, read_long_usage:})
         end
 
-        context "when long remaining is below 2x FETCH_ACTIVITY_LONG_HEADROOM" do
+        it "has expected constant values" do
+          expect(described_class::ENQUEUER_FETCH_ACTIVITY_SHORT_HEADROOM).to eq(Integrations::Strava::Client::FETCH_ACTIVITY_SHORT_HEADROOM * 2)
+          expect(described_class::ENQUEUER_FETCH_ACTIVITY_LONG_HEADROOM).to eq(Integrations::Strava::Client::FETCH_ACTIVITY_LONG_HEADROOM * 2)
+        end
+
+        context "when long remaining is below ENQUEUER_FETCH_ACTIVITY_LONG_HEADROOM" do
           let(:read_long_usage) { 1001 }
 
           it "is truthy" do
@@ -152,8 +158,24 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
           end
         end
 
-        context "when long remaining is above 2x FETCH_ACTIVITY_LONG_HEADROOM" do
+        context "when long remaining is above ENQUEUER_FETCH_ACTIVITY_LONG_HEADROOM" do
           let(:read_long_usage) { 999 }
+
+          it "is falsey" do
+            expect(described_class.skip_enqueueing_fetch_activity_requests?).to be_falsey
+          end
+        end
+
+        context "when short remaining is below ENQUEUER_FETCH_ACTIVITY_SHORT_HEADROOM" do
+          let(:read_short_usage) { 1 }
+
+          it "is truthy" do
+            expect(described_class.skip_enqueueing_fetch_activity_requests?).to be_truthy
+          end
+        end
+
+        context "when short remaining is above ENQUEUER_FETCH_ACTIVITY_SHORT_HEADROOM" do
+          let(:read_short_usage) { 0 }
 
           it "is falsey" do
             expect(described_class.skip_enqueueing_fetch_activity_requests?).to be_falsey
