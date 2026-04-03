@@ -32,6 +32,16 @@ if (honeybadgerApiKey) {
         apiKey: honeybadgerApiKey,
         environment: document.querySelector('meta[name="honeybadger-environment"]')?.content
       })
+      Honeybadger.beforeNotify((notice) => {
+        // Filter out browser extension errors
+        if (notice.backtrace?.some((frame) => /^(chrome|moz|safari)-extension:\/\//.test(frame.file))) {
+          return false
+        }
+        // Filter out ResizeObserver loop noise (benign browser warning)
+        if (notice.message?.includes('ResizeObserver loop')) {
+          return false
+        }
+      })
     })
     .catch(() => {})
 }
