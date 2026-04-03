@@ -1,13 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Source bin/env defaults (REDIS_URL, DEV_PORT, BASE_URL, etc.)
-IO.popen(["/bin/bash", "-c", "source bin/env && env"]) do |io|
-  io.each_line do |line|
-    key, value = line.strip.split("=", 2)
-    ENV[key] ||= value if key && value
-  end
-end
+load File.expand_path("env", __dir__)
 
 require "bundler/setup"
 require "digest"
@@ -44,6 +38,8 @@ end
 
 # Make sure precompilation is off, because it's just been handled
 ENV['RAILS_ASSETS_PRECOMPILE'] = 'false'
+# dartsass-rails hooks into test:prepare, skip since assets are already compiled
+ENV['SKIP_CSS_BUILD'] = 'true'
 
 # Pass all arguments to turbo_tests
 exec "bundle", "exec", "turbo_tests", *ARGV
