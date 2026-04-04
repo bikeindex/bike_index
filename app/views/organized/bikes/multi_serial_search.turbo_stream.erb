@@ -1,0 +1,5 @@
+<%= turbo_stream.update :multi_serial_results_frame do %>
+  <% if @serial_results.present? %>
+    <%= render partial: "multi_serial_search_results" %>
+  <% end %>
+<% end %>

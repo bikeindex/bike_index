@@ -106,6 +106,36 @@ module Organized
     end
 
     def multi_serial_search
+      @serials_text = params[:serials].to_s.strip
+      return if @serials_text.blank?
+
+      serials = @serials_text.split(/[,\n]/).map(&:strip).reject(&:blank?).uniq
+      normalized_serials = serials.filter_map { |s|
+        normalized = SerialNormalizer.normalized_and_corrected(s)
+        next if normalized.blank?
+        {raw: s, normalized:, no_space: SerialNormalizer.no_space(normalized)}
+      }
+
+      if normalized_serials.any?
+        bikes = current_organization.bikes
+        serial_query = normalized_serials.reduce(Bike.none) { |union, s|
+          union.or(Bike.where("serial_normalized @@ ? OR serial_normalized_no_space = ?", s[:normalized], s[:no_space]))
+        }
+        @available_bikes = bikes.where(id: serial_query)
+        @per_page = permitted_per_page(default: 100)
+        @pagy, @bikes = pagy(:countish, @available_bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
+
+        # Track which serials matched and which didn't
+        @serial_results = normalized_serials.map { |s|
+          matched = @available_bikes.matching_serial(s[:normalized], s[:no_space]).exists?
+          {raw: s[:raw], matched:}
+        }
+      end
+
+      respond_to do |format|
+        format.html
+        format.turbo_stream
+      end
     end
 
     def update

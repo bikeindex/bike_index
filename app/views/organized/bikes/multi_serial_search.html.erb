@@ -1,0 +1,40 @@
+<div
+  data-controller="org--multi-serial-search"
+  class="org-bikes-search-component"
+>
+  <div class="tw:max-w-2xl tw:mx-auto tw:mb-6">
+    <h3 class="tw:text-center tw:mb-4">Multiple Serial Search</h3>
+
+    <%= form_with(
+      url: multi_serial_search_organization_bikes_path(organization_id: current_organization.to_param),
+      method: :get,
+      data: {
+        turbo_frame: "multi_serial_results_frame",
+        turbo_action: "advance",
+        action: "submit->org--multi-serial-search#submit",
+        "org--multi-serial-search-target": "form"
+      }
+    ) do %>
+      <%= text_area_tag :serials, @serials_text,
+        placeholder: "Enter multiple serial numbers, separated by commas or new lines",
+        class: "twinput tw:w-full tw:font-mono tw:h-32 tw:resize-none",
+        data: {"org--multi-serial-search-target": "textarea"} %>
+
+      <div class="tw:flex tw:justify-end tw:mt-2">
+        <button
+          type="submit"
+          class="twbtn-blue tw:disabled:cursor-wait"
+          data-org--multi-serial-search-target="button"
+        >
+          Search serials
+        </button>
+      </div>
+    <% end %>
+  </div>
+
+  <%= turbo_frame_tag :multi_serial_results_frame do %>
+    <% if @serial_results.present? %>
+      <%= render partial: "multi_serial_search_results" %>
+    <% end %>
+  <% end %>
+</div>
