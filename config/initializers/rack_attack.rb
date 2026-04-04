@@ -23,7 +23,7 @@ class Rack::Attack
   cache.store = ActiveSupport::Cache::RedisCacheStore.new(url: redis_url)
 
   # Global rate limit per IP (replaces rack-throttle)
-  throttle("requests/ip", limit: ENV.fetch("MIN_MAX_RATE", 1000).to_i, period: 1.minute) do |request|
+  throttle("requests/ip", limit: ENV.fetch("MIN_MAX_RATE", 500).to_i, period: 1.minute) do |request|
     request.ip
   end
 
