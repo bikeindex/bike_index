@@ -118,7 +118,19 @@ RSpec.describe SessionsController, type: :request do
         end
         post "/session", params: {session: {email: user.email, password:}}
         expect(response).to have_http_status(:too_many_requests)
+        expect(response.headers["retry-after"]).to eq "60"
+        expect(response.body).to eq "Too Many Requests"
       end
+    end
+  end
+
+  describe "create_magic_link with rack_attack" do
+    include_context :rack_attack
+
+    it "returns 429 after exceeding the limit" do
+      5.times { post "/session/create_magic_link" }
+      post "/session/create_magic_link"
+      expect(response).to have_http_status(:too_many_requests)
     end
   end
 end
