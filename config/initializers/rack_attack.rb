@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Rack::Attack
-  SIGN_IN_PATHS = %w[/session].freeze
+  SIGN_IN_PATH = "/session"
 
   SENSITIVE_AUTH_PATHS = %w[
     /session/create_magic_link
@@ -29,7 +29,7 @@ class Rack::Attack
 
   # Sign-in endpoints: 10 per minute per IP
   throttle("sign_in/ip", limit: 10, period: 1.minute) do |request|
-    request.ip if request.post? && SIGN_IN_PATHS.include?(request.path)
+    request.ip if request.post? && request.path == SIGN_IN_PATH
   end
 
   # Sensitive auth endpoints: 5 per minute per IP
