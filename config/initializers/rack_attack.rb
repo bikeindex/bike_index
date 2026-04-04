@@ -47,6 +47,11 @@ class Rack::Attack
     end
   end
 
+  # Account password update: 5 per minute per IP
+  throttle("account_update/ip", limit: 5, period: 1.minute) do |request|
+    request.ip if request.patch? && request.path == "/my_account"
+  end
+
   self.throttled_responder = lambda do |request|
     match_data = request.env["rack.attack.match_data"]
     retry_after = (match_data || {})[:period]

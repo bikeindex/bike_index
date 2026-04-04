@@ -735,4 +735,17 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
   end
+
+  describe "update with rack_attack" do
+    include_context :rack_attack
+
+    it "returns 429 after exceeding the limit" do
+      5.times do
+        patch base_url, params: {user: {password: "newpass123"}}
+        expect(response.status).to_not eq 429
+      end
+      patch base_url, params: {user: {password: "newpass123"}}
+      expect(response).to have_http_status(:too_many_requests)
+    end
+  end
 end
