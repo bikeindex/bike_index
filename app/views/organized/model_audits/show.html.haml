@@ -35,7 +35,7 @@
           %td Total vehicles
           %td
             = number_display @bikes_count
-            %small= link_to "search matching vehicles", organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)
+            %small= link_to "search matching vehicles", organization_search_registrations_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)
         %tr
           %td Most recent
           %td
@@ -110,7 +110,7 @@
   Vehicles
   - if @bikes_count > @per_page
     %small
-      first #{@per_page} shown, #{link_to "see all", organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)}
+      first #{@per_page} shown, #{link_to "see all", organization_search_registrations_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)}
 
 - bike_search = Org::BikeSearch::Component.new(organization: current_organization, pagy: @pagy, per_page: @per_page, params: params, model_audit: @model_audit, skip_search_and_filters: true)
 = render(bike_search) do

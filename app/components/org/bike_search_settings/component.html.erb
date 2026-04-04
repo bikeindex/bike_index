@@ -86,7 +86,7 @@
       <% if @organization.enabled?("csv_exports") %>
         <div class="tw:ml-auto tw:text-right">
           <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
-              organization_bikes_path(search_params.merge(create_export: true)),
+              organization_search_registrations_path(search_params.merge(create_export: true)),
               class: "gray-link", data: {turbo_frame: "_top", "org--bike-search-target": "exportLink"} %>
         </div>
       <% end %>
