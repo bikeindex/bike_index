@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Rack::Attack
-  MAX_REQUESTS_PER_MINUTE = ENV.fetch("RACK_ATTACK_MAX_LIMIT", 500).to_i
+  mattr_accessor :max_requests_per_minute, default: ENV.fetch("RACK_ATTACK_MAX_LIMIT", 500).to_i
 
   SIGN_IN_PATH = "/session"
 
@@ -25,7 +25,8 @@ class Rack::Attack
   cache.store = ActiveSupport::Cache::RedisCacheStore.new(url: REDIS_URL)
 
   # Global rate limit per IP (replaces rack-throttle)
-  throttle("requests/ip", limit: proc { MAX_REQUESTS_PER_MINUTE }, period: 1.minute) do |request|
+  # proc because Rack::Attack bakes limit at config time; this lets tests override it
+  throttle("requests/ip", limit: proc { max_requests_per_minute }, period: 1.minute) do |request|
     request.ip
   end
 
