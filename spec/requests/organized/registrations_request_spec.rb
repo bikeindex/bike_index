@@ -247,4 +247,36 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response).to render_template :multi_serial_search
     end
   end
+
+  context "given an authenticated ambassador" do
+    include_context :request_spec_logged_in_as_ambassador
+    let(:base_url) { "/o/#{current_organization.to_param}/registrations" }
+
+    describe "index" do
+      it "redirects to the organization root path" do
+        get base_url
+        expect(response).to redirect_to(organization_root_path)
+      end
+    end
+
+    describe "multi_serial_search" do
+      it "renders" do
+        get "#{base_url}/multi_serial_search"
+        expect(response.status).to eq(200)
+        expect(response).to render_template :multi_serial_search
+      end
+    end
+  end
+
+  context "not organization member" do
+    include_context :request_spec_logged_in_as_user
+    let!(:current_organization) { FactoryBot.create(:organization) }
+    let(:base_url) { "/o/#{current_organization.to_param}/registrations" }
+
+    it "redirects the user" do
+      get base_url
+      expect(response).to redirect_to my_account_url
+      expect(flash[:error]).to be_present
+    end
+  end
 end
