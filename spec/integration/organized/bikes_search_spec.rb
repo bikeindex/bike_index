@@ -6,7 +6,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
   let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
-  let(:bikes_path) { "/o/#{organization.to_param}/bikes" }
+  let(:bikes_path) { "/o/#{organization.to_param}/registrations" }
 
   let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "alice@example.com") }
   let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "bob@example.com") }

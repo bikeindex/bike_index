@@ -4,7 +4,7 @@
   <% else %>
     <div class="mb-4">
       <%= render(Search::FormOrganized::Component.new(
-        target_search_path: organization_bikes_path(organization_id: @organization.to_param),
+        target_search_path: organization_registrations_path(organization_id: @organization.to_param),
         interpreted_params: @interpreted_params,
         settings_component: @skip_settings ? nil : settings_component
       )) %>
@@ -114,7 +114,7 @@
         <% if bike.email_visible_for?(organization) %>
           <%= bike.owner_email %>
           <small>
-            <%= link_to "\u{1F50E}", organization_bikes_path(organization_id: organization.to_param, search_email: bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
+            <%= link_to "\u{1F50E}", organization_registrations_path(organization_id: organization.to_param, search_email: bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
           </small>
         <% else %>
           <em class="tw:text-gray-400">
