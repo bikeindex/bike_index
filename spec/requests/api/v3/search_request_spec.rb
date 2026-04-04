@@ -179,9 +179,13 @@ RSpec.describe "Search API V3", type: :request do
   describe "rack_attack" do
     include_context :rack_attack
 
-    it "does not throttle search requests under the global limit" do
+    it "throttles after exceeding the global limit" do
+      stub_const("Rack::Attack::MAX_REQUESTS_PER_MINUTE", 3)
       3.times { get "/api/v3/search", params: {stolenness: "non", format: :json} }
       expect(response.status).to_not eq 429
+      get "/api/v3/search", params: {stolenness: "non", format: :json}
+      expect(response).to have_http_status(:too_many_requests)
+      expect(response.body).to eq "Too Many Requests"
     end
   end
 
