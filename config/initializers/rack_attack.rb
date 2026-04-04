@@ -27,9 +27,18 @@ class Rack::Attack
     request.ip
   end
 
-  # Sign-in endpoints: 10 per minute per IP
+  # Sign-in: 10 per minute per IP
   throttle("sign_in/ip", limit: 10, period: 1.minute) do |request|
     request.ip if request.post? && request.path == SIGN_IN_PATH
+  end
+
+  # Sign-in: 5 per 20 seconds per email (protects individual accounts)
+  # Note: a malicious user could intentionally throttle logins for
+  # another user, but this is uncommon in practice.
+  throttle("sign_in/email", limit: 5, period: 20.seconds) do |request|
+    if request.post? && request.path == SIGN_IN_PATH
+      request.params.dig("session", "email").to_s.strip.downcase.presence
+    end
   end
 
   # Sensitive auth endpoints: 5 per minute per IP

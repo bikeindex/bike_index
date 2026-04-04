@@ -112,7 +112,7 @@ RSpec.describe SessionsController, type: :request do
     context "with rack_attack" do
       include_context :rack_attack
 
-      it "returns 429 after exceeding the limit" do
+      it "returns 429 after exceeding IP limit" do
         10.times do
           post "/session", params: {session: {email: user.email, password:}}
         end
@@ -120,6 +120,15 @@ RSpec.describe SessionsController, type: :request do
         expect(response).to have_http_status(:too_many_requests)
         expect(response.headers["retry-after"]).to eq "60"
         expect(response.body).to eq "Too Many Requests"
+      end
+
+      it "returns 429 after exceeding per-email limit" do
+        5.times do
+          post "/session", params: {session: {email: user.email, password:}}
+        end
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(response).to have_http_status(:too_many_requests)
+        expect(response.headers["retry-after"]).to eq "20"
       end
     end
   end
