@@ -26,11 +26,10 @@ module Bikeindex
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
     # Separate Redis database for Rack::Attack to avoid key collisions with app cache.
     # Note: eviction still operates server-wide, not per database.
-    config.redis_rack_attack_url = begin
-      uri = URI.parse(config.redis_cache_url)
-      current_db = uri.path.delete("/").to_i
-      uri.path = "/#{current_db + 1}"
-      uri.to_s
+    config.redis_rack_attack_url = if config.redis_cache_url.match?(%r{/\d+\z})
+      config.redis_cache_url.sub(%r{/(\d+)\z}) { "/#{$1.to_i + 1}" }
+    else
+      "#{config.redis_cache_url}/1"
     end
 
     config.load_defaults 8.0
