@@ -4,6 +4,9 @@ module Organized
 
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
 
+    # index moved to RegistrationsController; remove the SortableTable set_period
+    # callback that targets :index (Rails 7.1 raises on missing callback actions)
+    skip_before_action :set_period
     before_action :allow_x_frame, only: [:new_iframe, :create]
 
     def recoveries
