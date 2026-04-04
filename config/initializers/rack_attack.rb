@@ -19,7 +19,7 @@ class Rack::Attack
 
   # Global rate limit per IP
   throttle("requests/ip", limit: MAX_REQUESTS_PER_TWENTY, period: 20.seconds) do |request|
-    request.ip
+    request.ip unless request.path.start_with?("/assets")
   end
 
   # Sign-in: 10 per minute per IP
