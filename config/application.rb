@@ -16,6 +16,7 @@ require "sprockets/railtie"
 
 require "rack/throttle"
 require_relative "../lib/ip_spoof_attack_filter"
+require_relative "../lib/sign_in_throttle"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -67,6 +68,8 @@ module Bikeindex
       max: ENV["MIN_MAX_RATE"].to_i,
       cache: Redis.new(url: config.redis_cache_url),
       key_prefix: :throttle
+    config.middleware.use SignInThrottle,
+      cache: Redis.new(url: config.redis_cache_url)
 
     # Add middleware to make i18n configuration thread-safe
     config.middleware.use I18n::Middleware
