@@ -8,17 +8,17 @@ RSpec.describe Organized::RegistrationsController, type: :controller do
     let!(:organization) { FactoryBot.create(:organization) }
 
     it "redirects the user, reassigns passive_organization_id" do
-      session[:passive_organization_id] = "0"
+      session[:passive_organization_id] = "0" # Because, who knows! Maybe they don't have org access at some point.
       get :index, params: {organization_id: organization.to_param}
       expect(response.location).to eq my_account_url
       expect(flash[:error]).to be_present
-      expect(session[:passive_organization_id]).to eq "0"
+      expect(session[:passive_organization_id]).to eq "0" # sets it to zero so we don't look it up again
     end
 
     context "admin user" do
       let(:user) { FactoryBot.create(:superuser) }
       it "renders, doesn't reassign passive_organization_id" do
-        session[:passive_organization_id] = organization.to_param
+        session[:passive_organization_id] = organization.to_param # Admin, so user has access
         get :index, params: {organization_id: organization.to_param}
         expect(response.status).to eq(200)
         expect(response).to render_template :index

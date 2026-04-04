@@ -7,6 +7,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
   describe "index" do
+    # NOTE: Additional index tests in controller spec because of session
     let(:query_params) do
       {
         search_no_js: true,
