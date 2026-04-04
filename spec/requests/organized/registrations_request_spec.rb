@@ -211,12 +211,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       let(:current_organization) { FactoryBot.create(:organization) }
 
       it "renders without search" do
+        expect(impounded_bike.reload.status).to eq "status_impounded"
         expect(current_organization.reload.paid?).to be_falsey
         expect(Bike).to_not receive(:search)
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq current_organization
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
       end
     end
 
