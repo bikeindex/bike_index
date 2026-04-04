@@ -11,8 +11,8 @@ class Rack::Attack
     /users/resend_confirmation_email
   ].freeze
 
-  # Use a separate Redis database from the main cache to avoid
-  # throttle keys being evicted or interfering with app cache.
+  # Use a separate Redis database to avoid key collisions with app cache.
+  # Note: eviction still operates server-wide, not per database.
   REDIS_URL = begin
     uri = URI.parse(Bikeindex::Application.config.redis_cache_url)
     current_db = uri.path.delete("/").to_i

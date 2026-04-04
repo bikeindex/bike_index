@@ -23,6 +23,7 @@ Bundler.require(*Rails.groups)
 module Bikeindex
   class Application < Rails::Application
     config.redis_default_url = ENV["REDIS_URL"]
+    # Also used by Rack::Attack (see config/initializers/rack_attack.rb)
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
 
     config.load_defaults 8.0
