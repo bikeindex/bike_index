@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Rack::Attack
-  MAX_REQUESTS_PER_MINUTE = ENV.fetch("RACK_ATTACK_MAX_LIMIT", 100).to_i
+  MAX_REQUESTS_PER_TWENTY = ENV.fetch("RACK_ATTACK_MAX_LIMIT", 30).to_i
 
   SIGN_IN_PATH = "/session"
 
@@ -18,7 +18,7 @@ class Rack::Attack
   )
 
   # Global rate limit per IP
-  throttle("requests/ip", limit: MAX_REQUESTS_PER_MINUTE, period: 20.seconds) do |request|
+  throttle("requests/ip", limit: MAX_REQUESTS_PER_TWENTY, period: 20.seconds) do |request|
     request.ip
   end
 

@@ -180,7 +180,7 @@ RSpec.describe "Search API V3", type: :request do
     include_context :rack_attack
 
     it "throttles after exceeding the global limit" do
-      expect(Rack::Attack::MAX_REQUESTS_PER_MINUTE).to eq 12
+      expect(Rack::Attack::MAX_REQUESTS_PER_TWENTY).to eq 12
       12.times { get "/api/v3/search", params: {stolenness: "non", format: :json} }
       expect(response.status).to_not eq 429
       get "/api/v3/search", params: {stolenness: "non", format: :json}
