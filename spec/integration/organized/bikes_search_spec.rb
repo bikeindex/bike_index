@@ -40,7 +40,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     visit "/"
     visit bikes_path
     # Results load via turbo auto-submit (search--form controller)
-    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table.table", wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
 
     # search_no_js should NOT be in the URL (removed by JS controller)
@@ -50,7 +50,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     page.go_back
     expect(page).to have_current_path("/", wait: 5)
     page.go_forward
-    expect(page).to have_css("table.table", wait: 10)
+    expect(page).to have_css("table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
 
     # Search by serial number
@@ -72,7 +72,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
 
     # submits when enter is pressed twice
     visit bikes_path
-    expect(page).to have_css("table.table", wait: 10)
+    expect(page).to have_css("table", wait: 10)
 
     fill_in "search_email", with: "alice@example.com"
     find("#search_email").send_keys(:return)
@@ -81,7 +81,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 1)
 
     visit bikes_path
-    expect(page).to have_css("table.table", wait: 10)
+    expect(page).to have_css("table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 10)
 
     # Pagination should be visible with multiple pages
@@ -90,12 +90,12 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     # Click page 2 — turbo frame updates without full reload
     click_link "2"
     expect(page).to have_current_path(/page=2/, wait: 10)
-    expect(page).to have_css("table.table", wait: 10)
+    expect(page).to have_css("table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 1)
 
     # Verify that it preserves turbo-frame after search submissions
     # Initial auto-submit loads results via turbo_stream
-    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table.table", wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     # turbo-frame element must still exist after turbo_stream.update
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
 
@@ -134,7 +134,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     # Search by notes
     FactoryBot.create(:bike_organization_note, bike: bike1, body: "red lock on rack")
     page.go_back
-    expect(page).to have_css("table.table", wait: 10)
+    expect(page).to have_css("table", wait: 10)
 
     open_settings_if_not
     click_button "show notes search"
@@ -153,14 +153,14 @@ RSpec.describe "Organized bikes search", :js, type: :system do
 
     it "filters by status radios" do
       visit "#{bikes_path}?search_status=all"
-      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", minimum: 4, wait: 10)
 
       # Open settings and choose "only stolen"
       open_settings_if_not
       choose("search_status_stolen", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=stolen/, wait: 10)
-      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
       expect(page).to have_text("1 registration matching")
       expect(page).to have_text("only stolen")
@@ -169,7 +169,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect_settings_open
       choose("search_status_impounded", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=impounded/, wait: 10)
-      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
 
       # Doesn't have export, because no csv_export feature
@@ -179,14 +179,14 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       # Choose "not stolen or impounded"
       choose("search_status_with_owner", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=with_owner/, wait: 10)
-      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 2)
       expect(page).to have_text("not stolen or impounded")
 
       # Choose "All" to show everything
       choose("search_status_all", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=all/, wait: 10)
-      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", minimum: 4, wait: 10)
     end
   end
@@ -203,7 +203,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
 
     it "toggles avery export column via checkbox" do
       visit bikes_path
-      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("table", wait: 10)
       expect(page).not_to have_css("th.avery_cell")
       expect(page).not_to have_css("th.assign_bike_sticker_cell")
 
@@ -226,7 +226,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       # Open settings and choose "only with address"
       choose("search_address_with_street", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_address=with_street/, wait: 10)
-      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
       expect(page).to have_text("1 registration matching")
       expect(page).to have_text("only with address")
@@ -242,7 +242,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect_settings_open
       choose("search_stickers_with", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_stickers=with/, wait: 10)
-      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 0)
       expect(page).to have_text("0 registrations matching")
       expect(page).to have_text("only with address")
@@ -250,12 +250,12 @@ RSpec.describe "Organized bikes search", :js, type: :system do
 
       choose("search_address_", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_stickers=with/, wait: 10)
-      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
 
       # Visit with bike_sticker param to test assign_bike_sticker column
       visit "#{bikes_path}?bike_sticker=#{unlinked_sticker.code}"
-      expect(page).to have_css("table.table", wait: 10)
+      expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("th.assign_bike_sticker_cell")
       expect(page).to have_css("td.assign_bike_sticker_cell a", text: "Link", minimum: 1)
 
