@@ -18,7 +18,7 @@ module UI
 
       def call
         extra_class = (@format == :localize_time_precise) ? "preciseTime" : nil
-        content_tag(:span, l(@time, format: :localize_time), class: "localizeTime #{extra_class}")
+        content_tag(:span, l(@time, format: :convert_time), class: "localizeTime #{extra_class}")
       end
 
       private
