@@ -176,6 +176,15 @@ RSpec.describe "Search API V3", type: :request do
     end
   end
 
+  describe "rack_attack" do
+    include_context :rack_attack
+
+    it "does not throttle search requests under the global limit" do
+      3.times { get "/api/v3/search", params: {stolenness: "non", format: :json} }
+      expect(response.status).to_not eq 429
+    end
+  end
+
   describe "/count" do
     context "incorrect stolenness value" do
       it "returns an error message" do
