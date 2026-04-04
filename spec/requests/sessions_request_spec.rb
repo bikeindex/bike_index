@@ -113,8 +113,10 @@ RSpec.describe SessionsController, type: :request do
       include_context :rack_attack
 
       it "returns 429 after exceeding IP limit" do
-        10.times do
-          post "/session", params: {session: {email: user.email, password:}}
+        users = Array.new(10) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
+        users.each do |sign_in_user|
+          post "/session", params: {session: {email: sign_in_user.email, password:}}
+          expect(response.status).to_not eq 429
         end
         post "/session", params: {session: {email: user.email, password:}}
         expect(response).to have_http_status(:too_many_requests)
@@ -125,6 +127,7 @@ RSpec.describe SessionsController, type: :request do
       it "returns 429 after exceeding per-email limit" do
         5.times do
           post "/session", params: {session: {email: user.email, password:}}
+          expect(response.status).to_not eq 429
         end
         post "/session", params: {session: {email: user.email, password:}}
         expect(response).to have_http_status(:too_many_requests)
@@ -137,7 +140,10 @@ RSpec.describe SessionsController, type: :request do
     include_context :rack_attack
 
     it "returns 429 after exceeding the limit" do
-      5.times { post "/session/create_magic_link" }
+      5.times do
+        post "/session/create_magic_link"
+        expect(response.status).to_not eq 429
+      end
       post "/session/create_magic_link"
       expect(response).to have_http_status(:too_many_requests)
     end

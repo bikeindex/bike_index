@@ -42,7 +42,10 @@ RSpec.describe UserEmailsController, type: :request do
     include_context :rack_attack
 
     it "returns 429 after exceeding the limit" do
-      5.times { post "#{base_url}/123/resend_confirmation" }
+      5.times do
+        post "#{base_url}/123/resend_confirmation"
+        expect(response.status).to_not eq 429
+      end
       post "#{base_url}/123/resend_confirmation"
       expect(response).to have_http_status(:too_many_requests)
     end
