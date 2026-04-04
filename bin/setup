@@ -77,9 +77,8 @@ chdir APP_ROOT do
 
   puts "\n== Preparing database =="
 
-  # db:prepare is idempotent: creates DB if needed, loads schema if empty, then migrates
-  # NOTE: only preparing primary, because primary_replica is the same db in dev
-  system! "bin/rake db:prepare:primary db:prepare:analytics"
+  # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev
+  system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate"
 
   unless without_seeds
     puts "\n== Seeding database =="
