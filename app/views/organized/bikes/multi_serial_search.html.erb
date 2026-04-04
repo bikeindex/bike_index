@@ -2,8 +2,8 @@
   data-controller="org--multi-serial-search"
   data-org--multi-serial-search-url-value="<%= multi_serial_search_organization_bikes_path(organization_id: current_organization.to_param) %>"
 >
-  <div class="tw:max-w-2xl tw:mx-auto tw:mb-6">
-    <h3 class="tw:text-center tw:mb-4">Multiple Serial Search</h3>
+  <div class="tw:mx-auto tw:mb-6 tw:max-w-2xl">
+    <h3 class="tw:mb-4 tw:text-center">Multiple Serial Search</h3>
 
     <form data-action="submit->org--multi-serial-search#submit">
       <%= text_area_tag :serials, nil,
@@ -11,7 +11,7 @@
         class: "twinput tw:w-full tw:font-mono tw:h-32 tw:resize-none",
         data: {"org--multi-serial-search-target": "textarea"} %>
 
-      <div class="tw:flex tw:justify-end tw:mt-2">
+      <div class="tw:mt-2 tw:flex tw:justify-end">
         <button
           type="submit"
           class="twbtn-blue tw:disabled:cursor-wait"
@@ -25,11 +25,8 @@
 
   <div
     data-org--multi-serial-search-target="serialChips"
-    class="tw:flex tw:flex-wrap tw:gap-1 tw:mb-4"
+    class="tw:mb-4 tw:flex tw:flex-wrap tw:gap-1"
   ></div>
 
-  <div
-    id="multi_serial_results"
-    data-org--multi-serial-search-target="results"
-  ></div>
+  <div id="multi_serial_results" data-org--multi-serial-search-target="results"></div>
 </div>

@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import TimeLocalizer from '@bikeindex/time-localizer'
 
-/* global window */
+/* global window, CSS */
 
 // Connects to data-controller='org--multi-serial-search'
 export default class extends Controller {
