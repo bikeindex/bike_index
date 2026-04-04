@@ -82,7 +82,7 @@ jobs:
       COVERAGE: false # additional configuration is needed for parallelized tests
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
       TRANSLATION_BRANCH: main
-      RACK_ATTACK_MAX_LIMIT: 10
+      RACK_ATTACK_MAX_LIMIT: 12
       RETRY_FLAKY: true
       SKIP_PARALLEL_MIGRATIONS: true
       KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC: ${{ secrets.KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC }}
