@@ -62,7 +62,6 @@ module Bikeindex
     config.middleware.insert_after ActionDispatch::RemoteIp, IpSpoofAttackFilter
     config.middleware.use Rack::Deflater
     config.middleware.insert 0, Rack::UTF8Sanitizer
-    config.middleware.use Rack::Attack
 
     # Add middleware to make i18n configuration thread-safe
     config.middleware.use I18n::Middleware
