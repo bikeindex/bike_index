@@ -13,14 +13,14 @@ class Rack::Attack
 
   # Use a separate Redis database from the main cache to avoid
   # throttle keys being evicted or interfering with app cache.
-  def self.redis_url
+  REDIS_URL = begin
     uri = URI.parse(Bikeindex::Application.config.redis_cache_url)
     current_db = uri.path.delete("/").to_i
     uri.path = "/#{current_db + 1}"
     uri.to_s
   end
 
-  cache.store = ActiveSupport::Cache::RedisCacheStore.new(url: redis_url)
+  cache.store = ActiveSupport::Cache::RedisCacheStore.new(url: REDIS_URL)
 
   # Global rate limit per IP (replaces rack-throttle)
   throttle("requests/ip", limit: ENV.fetch("MIN_MAX_RATE", 500).to_i, period: 1.minute) do |request|
