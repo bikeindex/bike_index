@@ -37,7 +37,7 @@ class Rack::Attack
   # another user, but this is uncommon in practice.
   throttle("sign_in/email", limit: 5, period: 20.seconds) do |request|
     if request.post? && request.path == SIGN_IN_PATH
-      request.params.dig("session", "email").to_s.strip.downcase.presence
+      EmailNormalizer.normalize(request.params.dig("session", "email"))
     end
   end
 
