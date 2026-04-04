@@ -78,17 +78,17 @@ chdir APP_ROOT do
   puts "\n== Preparing database =="
 
   # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev
-  system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate"
+  system! "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate"
 
   unless without_seeds
     puts "\n== Seeding database =="
-    system "bin/rake db:seed"
+    system! "bin/rake db:seed"
 
     puts "\n== Preparing test database (including parallelism) =="
-    system "bin/rake parallel:prepare"
+    system! "bin/rake parallel:prepare"
 
     puts "\n== loading typeahead and bike counts =="
-    system "bin/rake setup:reset_autocomplete setup:load_counts"
+    system! "bin/rake setup:reset_autocomplete setup:load_counts"
   end
 
   puts "\n== Removing old logs and tempfiles =="
