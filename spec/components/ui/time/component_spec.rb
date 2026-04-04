@@ -26,8 +26,8 @@ RSpec.describe UI::Time::Component, type: :component do
   end
 
   describe "rendering content" do
-    context "with convert_time format" do
-      let(:format) { :convert_time }
+    context "with localize_time format" do
+      let(:format) { :localize_time }
 
       it "renders the time content" do
         expect(component).to have_content("2024-01-15T14:30:00+0000")
@@ -36,8 +36,8 @@ RSpec.describe UI::Time::Component, type: :component do
       end
     end
 
-    context "with convert_time_precise format" do
-      let(:format) { :convert_time_precise }
+    context "with localize_time_precise format" do
+      let(:format) { :localize_time_precise }
 
       it "renders the time content" do
         expect(component).to have_content("2024-01-15T14:30:00+0000")
@@ -49,7 +49,7 @@ RSpec.describe UI::Time::Component, type: :component do
     context "with default format (nil)" do
       let(:format) { nil }
 
-      it "defaults to convert_time format" do
+      it "defaults to localize_time format" do
         expect(component).to have_content("2024-01-15T14:30:00+0000")
       end
     end
@@ -57,7 +57,7 @@ RSpec.describe UI::Time::Component, type: :component do
     context "with invalid format" do
       let(:format) { :invalid_format }
 
-      it "defaults to convert_time format" do
+      it "defaults to localize_time format" do
         expect(component).to have_content("2024-01-15T14:30:00+0000")
       end
     end

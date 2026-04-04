@@ -3,7 +3,7 @@
 module UI
   module Time
     class Component < ApplicationComponent
-      PERMITTED_FORMATS = %i[convert_time convert_time_precise].freeze
+      PERMITTED_FORMATS = %i[localize_time localize_time_precise].freeze
 
       def initialize(time: nil, format: nil)
         @time = time
@@ -17,8 +17,8 @@ module UI
       end
 
       def call
-        extra_class = (@format == :convert_time_precise) ? "preciseTime" : nil
-        content_tag(:span, l(@time, format: :convert_time), class: "localizeTime #{extra_class}")
+        extra_class = (@format == :localize_time_precise) ? "preciseTime" : nil
+        content_tag(:span, l(@time, format: :localize_time), class: "localizeTime #{extra_class}")
       end
 
       private

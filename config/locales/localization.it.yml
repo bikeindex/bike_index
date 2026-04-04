@@ -68,6 +68,7 @@ it:
       blog: "%m_%d_%Y"
       convert_time: "%FT%T%z"
       dotted: "%Y.%-m.%-d"
+      localize_time: "%FT%T%z"
       no_day_with_year: "%B %d %Y"
       short_with_hour: "%l%P - %m.%d.%y"
       short_with_year: "%a, %B %d %Y"
