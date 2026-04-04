@@ -15,6 +15,8 @@ class SignInThrottle
   SENSITIVE_SUFFIXES = %w[/resend_confirmation].freeze
   SENSITIVE_MAX = 5
 
+  cattr_accessor :enabled, default: true
+
   def initialize(app, cache: nil)
     @app = app
     @cache = cache || Redis.new
@@ -22,7 +24,7 @@ class SignInThrottle
 
   def call(env)
     request = Rack::Request.new(env)
-    return @app.call(env) unless request.post?
+    return @app.call(env) unless enabled && request.post?
 
     limit = request_limit(request)
     if limit

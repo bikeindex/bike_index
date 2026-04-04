@@ -108,5 +108,17 @@ RSpec.describe SessionsController, type: :request do
         expect(user.last_login_at).to be_blank
       end
     end
+
+    context "with sign_in_throttle" do
+      include_context :sign_in_throttle
+
+      it "returns 429 after exceeding the limit" do
+        SignInThrottle::SIGN_IN_MAX.times do
+          post "/session", params: {session: {email: user.email, password:}}
+        end
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(response).to have_http_status(:too_many_requests)
+      end
+    end
   end
 end

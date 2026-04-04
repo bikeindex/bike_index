@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe SignInThrottle do
+  include_context :sign_in_throttle
+
   let(:app) { ->(env) { [200, {"content-type" => "text/plain"}, ["OK"]] } }
   let(:cache) { Redis.new(url: Rails.application.config.redis_cache_url) }
   let(:middleware) { described_class.new(app, cache:) }
@@ -76,6 +78,21 @@ RSpec.describe SignInThrottle do
     it "does not throttle POST to other paths" do
       15.times { post_request("/bikes") }
       status, _headers, _body = post_request("/bikes")
+      expect(status).to eq 200
+    end
+  end
+
+  context "when disabled" do
+    around do |example|
+      SignInThrottle.enabled = false
+      example.run
+    ensure
+      SignInThrottle.enabled = true
+    end
+
+    it "passes through without throttling" do
+      15.times { post_request("/session") }
+      status, _headers, _body = post_request("/session")
       expect(status).to eq 200
     end
   end
