@@ -66,7 +66,7 @@ class BikesController < Bikes::BaseController
     elsif current_user.present?
       if current_user.member_of?(@bike_sticker.organization)
         set_passive_organization(@bike_sticker.organization)
-        redirect_to(organization_bikes_path(organization_id: passive_organization.to_param, bike_sticker: @bike_sticker.code)) && return
+        redirect_to(organization_registrations_path(organization_id: passive_organization.to_param, bike_sticker: @bike_sticker.code)) && return
       else
         @bikes = current_user.bikes.reorder(created_at: :desc).limit(100)
       end

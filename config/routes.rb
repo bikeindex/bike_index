@@ -388,12 +388,12 @@ Rails.application.routes.draw do
     get "/", to: "dashboard#root", as: :root
     resources :dashboard, only: %i[index]
     get "landing", to: "manages#landing", as: :landing
-    resources :search_registrations, only: %i[index] do
+    resources :registrations, only: %i[index] do
       collection do
         get :multi_serial_search
       end
     end
-    resources :bikes, only: %i[index new create show update] do
+    resources :bikes, only: %i[new create show update] do
       collection do
         get :recoveries
         get :incompletes

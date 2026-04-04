@@ -4,7 +4,7 @@
   <% else %>
     <div class="mb-4">
       <%= render(Search::FormOrganized::Component.new(
-        target_search_path: organization_search_registrations_path(organization_id: @organization.to_param),
+        target_search_path: organization_registrations_path(organization_id: @organization.to_param),
         interpreted_params: @interpreted_params,
         settings_component: @skip_settings ? nil : settings_component
       )) %>

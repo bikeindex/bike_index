@@ -1,7 +1,7 @@
 require "rails_helper"
 
-RSpec.describe Organized::SearchRegistrationsController, type: :request do
-  let(:base_url) { "/o/#{current_organization.to_param}/search_registrations" }
+RSpec.describe Organized::RegistrationsController, type: :request do
+  let(:base_url) { "/o/#{current_organization.to_param}/registrations" }
   include_context :request_spec_logged_in_as_organization_user
   let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
@@ -210,10 +210,13 @@ RSpec.describe Organized::SearchRegistrationsController, type: :request do
     context "unpaid organization" do
       let(:current_organization) { FactoryBot.create(:organization) }
 
-      it "redirects to bikes index" do
+      it "renders without search" do
         expect(current_organization.reload.paid?).to be_falsey
+        expect(Bike).to_not receive(:search)
         get base_url
-        expect(response).to redirect_to(organization_bikes_path(organization_id: current_organization.to_param))
+        expect(response.status).to eq(200)
+        expect(response).to render_template :index
+        expect(assigns(:current_organization)).to eq current_organization
       end
     end
 

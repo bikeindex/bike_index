@@ -6,24 +6,6 @@ module Organized
 
     before_action :allow_x_frame, only: [:new_iframe, :create]
 
-    def index
-      if current_organization.enabled?("bike_search")
-        redirect_to organization_search_registrations_path(organization_id: current_organization.to_param)
-        return
-      end
-
-      set_period
-      @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
-
-      @per_page = permitted_per_page(default: 50)
-      @available_bikes = if current_organization.enabled?("claimed_ownerships")
-        claimed_ownerships_search
-      else
-        organization_bikes.where(created_at: @time_range)
-      end
-      @pagy, @bikes = pagy(:countish, @available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
-    end
-
     def recoveries
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_recoveries")
 
@@ -168,28 +150,7 @@ module Organized
     end
 
     def current_root_path
-      organization_bikes_path(organization_id: current_organization.to_param)
-    end
-
-    def redirect_back_fallback_path
-      if params[:id].present?
-        bike_path(params[:id])
-      else
-        organization_bikes_path
-      end
-    end
-
-    def claimed_ownerships_search
-      bikes = organization_bikes
-      if %w[transferred initial].include?(params[:search_claimedness])
-        @search_claimedness = params[:search_claimedness]
-        bikes = if @search_claimedness == "initial"
-          bikes.joins(:ownerships).where(ownerships: {current: true, previous_ownership_id: nil})
-        else
-          bikes.joins(:ownerships).where.not(ownerships: {previous_ownership_id: nil})
-        end
-      end
-      bikes.where(created_at: @time_range)
+      organization_registrations_path(organization_id: current_organization.to_param)
     end
   end
 end

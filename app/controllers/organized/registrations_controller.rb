@@ -1,5 +1,5 @@
 module Organized
-  class SearchRegistrationsController < Organized::BaseController
+  class RegistrationsController < Organized::BaseController
     include SortableTable
 
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
@@ -7,30 +7,38 @@ module Organized
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index
-      redirect_to(organization_bikes_path(organization_id: current_organization.to_param)) && return unless current_organization.enabled?("bike_search")
-
       set_period
-      @search_claimedness = "all"
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
 
-      @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
-      @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
-      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
-      @per_page = permitted_per_page(default: 10)
+      if current_organization.enabled?("bike_search")
+        @search_claimedness = "all"
+        @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
+        @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
+        @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+        @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+        @per_page = permitted_per_page(default: 10)
 
-      if create_export?
-        search_organization_bikes
-        create_export_and_redirect
-      elsif @render_results
-        search_organization_bikes
-        respond_to do |format|
-          format.html { render :search }
-          format.turbo_stream
+        if create_export?
+          search_organization_bikes
+          create_export_and_redirect
+        elsif @render_results
+          search_organization_bikes
+          respond_to do |format|
+            format.html { render :search }
+            format.turbo_stream
+          end
+        else
+          set_search_filter_params
+          render :search
         end
       else
-        set_search_filter_params
-        render :search
+        @per_page = permitted_per_page(default: 50)
+        @available_bikes = if current_organization.enabled?("claimed_ownerships")
+          claimed_ownerships_search
+        else
+          organization_bikes.where(created_at: @time_range)
+        end
+        @pagy, @bikes = pagy(:countish, @available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
       end
     end
 
@@ -48,7 +56,7 @@ module Organized
     end
 
     def current_root_path
-      organization_search_registrations_path(organization_id: current_organization.to_param)
+      organization_registrations_path(organization_id: current_organization.to_param)
     end
 
     # NOTE: Make sure to add any custom search params to no_org_search_params?
@@ -186,6 +194,19 @@ module Organized
       new_export_params_custom_bike_ids.merge(kind: "organization",
         headers: Export.permitted_headers(current_organization),
         user_id: current_user.id)
+    end
+
+    def claimed_ownerships_search
+      bikes = organization_bikes
+      if %w[transferred initial].include?(params[:search_claimedness])
+        @search_claimedness = params[:search_claimedness]
+        bikes = if @search_claimedness == "initial"
+          bikes.joins(:ownerships).where(ownerships: {current: true, previous_ownership_id: nil})
+        else
+          bikes.joins(:ownerships).where.not(ownerships: {previous_ownership_id: nil})
+        end
+      end
+      bikes.where(created_at: @time_range)
     end
   end
 end

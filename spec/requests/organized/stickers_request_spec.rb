@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Organized::StickersController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/stickers" }
-  let(:root_path) { organization_bikes_path(organization_id: current_organization.to_param) }
+  let(:root_path) { organization_registrations_path(organization_id: current_organization.to_param) }
   let(:stickers_root_path) { organization_stickers_path(organization_id: current_organization.to_param) }
   let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: current_organization, code: "laxee") }
 
@@ -69,7 +69,7 @@ RSpec.describe Organized::StickersController, type: :request do
             expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker_claimed.id])
             # And check that it redirects to the sticker path
             get "/bikes/scanned/#{bike_sticker2.code}"
-            expect(response).to redirect_to(organization_bikes_path(bike_sticker: bike_sticker2.code, organization_id: current_organization.to_param))
+            expect(response).to redirect_to(organization_registrations_path(bike_sticker: bike_sticker2.code, organization_id: current_organization.to_param))
           end
         end
         context "with bike_query" do

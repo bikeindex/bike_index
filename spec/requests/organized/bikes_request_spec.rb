@@ -6,34 +6,6 @@ RSpec.describe Organized::BikesController, type: :request do
   let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
-  describe "index" do
-    let!(:non_organization_bike) { FactoryBot.create(:bike) }
-    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
-
-    context "paid organization with bike_search" do
-      it "redirects to search_registrations" do
-        get base_url
-        expect(response).to redirect_to(organization_search_registrations_path(organization_id: current_organization.to_param))
-      end
-    end
-
-    context "unpaid organization" do
-      let(:current_organization) { FactoryBot.create(:organization) }
-      let(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: current_organization) }
-
-      it "renders without search" do
-        expect(impounded_bike.reload.status).to eq "status_impounded"
-        expect(current_organization.reload.paid?).to be_falsey
-        expect(Bike).to_not receive(:search)
-        get base_url
-        expect(response.status).to eq(200)
-        expect(response).to render_template :index
-        expect(assigns(:current_organization)).to eq current_organization
-        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
-      end
-    end
-  end
-
   describe "new" do
     it "redirects" do
       get "#{base_url}/new"
@@ -325,7 +297,7 @@ RSpec.describe Organized::BikesController, type: :request do
       it "redirects" do
         expect(current_organization.reload.paid?).to be_falsey
         get "#{base_url}/recoveries"
-        expect(response.location).to match(organization_bikes_path(organization_id: current_organization.to_param))
+        expect(response.location).to match(organization_registrations_path(organization_id: current_organization.to_param))
       end
     end
   end
@@ -393,7 +365,7 @@ RSpec.describe Organized::BikesController, type: :request do
       it "redirects" do
         expect(current_organization.reload.paid?).to be_falsey
         get "#{base_url}/incompletes"
-        expect(response.location).to match(organization_bikes_path(organization_id: current_organization.to_param))
+        expect(response.location).to match(organization_registrations_path(organization_id: current_organization.to_param))
       end
     end
   end
