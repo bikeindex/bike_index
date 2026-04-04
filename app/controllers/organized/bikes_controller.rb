@@ -106,31 +106,14 @@ module Organized
     end
 
     def multi_serial_search
-      @serials_text = params[:serials].to_s.strip
-      return if @serials_text.blank?
+      @serial = params[:serial].to_s.strip
+      return unless @serial.present?
 
-      serials = @serials_text.split(/[,\n]/).map(&:strip).reject(&:blank?).uniq
-      normalized_serials = serials.filter_map { |s|
-        normalized = SerialNormalizer.normalized_and_corrected(s)
-        next if normalized.blank?
-        {raw: s, normalized:, no_space: SerialNormalizer.no_space(normalized)}
-      }
-
-      if normalized_serials.any?
-        bikes = current_organization.bikes
-        serial_query = normalized_serials.reduce(Bike.none) { |union, s|
-          union.or(Bike.where("serial_normalized @@ ? OR serial_normalized_no_space = ?", s[:normalized], s[:no_space]))
-        }
-        @available_bikes = bikes.where(id: serial_query)
-        @per_page = permitted_per_page(default: 100)
-        @pagy, @bikes = pagy(:countish, @available_bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
-
-        # Track which serials matched and which didn't
-        @serial_results = normalized_serials.map { |s|
-          matched = @available_bikes.matching_serial(s[:normalized], s[:no_space]).exists?
-          {raw: s[:raw], matched:}
-        }
-      end
+      @interpreted_params = BikeSearchable.searchable_interpreted_params({serial: @serial, stolenness: "all"}, ip: forwarded_ip_address)
+      bikes = current_organization.bikes.search(@interpreted_params)
+      @per_page = permitted_per_page(default: 25)
+      @pagy, @bikes = pagy(:countish, bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
+      @close_serials = current_organization.bikes.search_close_serials(@interpreted_params).limit(25) if @bikes.none?
 
       respond_to do |format|
         format.html

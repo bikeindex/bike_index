@@ -610,21 +610,25 @@ RSpec.describe Organized::BikesController, type: :request do
       get "#{base_url}/multi_serial_search"
       expect(response.status).to eq(200)
       expect(response).to render_template :multi_serial_search
-      expect(assigns(:serial_results)).to be_nil
     end
 
-    context "with serials" do
+    context "with serial turbo request" do
       let!(:bike) { FactoryBot.create(:bike_organized, serial_number: "ABCD1234", creation_organization: current_organization) }
       let!(:other_bike) { FactoryBot.create(:bike, serial_number: "WXYZ9999") }
 
-      it "searches and returns matching bikes" do
-        get "#{base_url}/multi_serial_search", params: {serials: "ABCD1234, NONEXISTENT"}
+      it "searches and returns matching org bikes" do
+        get "#{base_url}/multi_serial_search", params: {serial: "ABCD1234"},
+          headers: {"Accept" => "text/vnd.turbo-stream.html"}
         expect(response.status).to eq(200)
+        expect(response.media_type).to eq("text/vnd.turbo-stream.html")
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-        expect(assigns(:serial_results).length).to eq(2)
-        matched = assigns(:serial_results).select { |r| r[:matched] }
-        expect(matched.length).to eq(1)
-        expect(matched.first[:raw]).to eq("ABCD1234")
+      end
+
+      it "does not return bikes from other orgs" do
+        get "#{base_url}/multi_serial_search", params: {serial: "WXYZ9999"},
+          headers: {"Accept" => "text/vnd.turbo-stream.html"}
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes)).to be_empty
       end
     end
   end
