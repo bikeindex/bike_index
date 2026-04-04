@@ -6,8 +6,6 @@
 Rack::Attack.enabled = false
 
 RSpec.shared_context :rack_attack do
-  before { Rack::Attack.cache.store.clear }
-
   around do |example|
     Rack::Attack.enabled = true
     example.run
