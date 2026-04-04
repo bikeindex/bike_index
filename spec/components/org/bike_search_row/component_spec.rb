@@ -6,7 +6,7 @@ RSpec.describe Org::BikeSearchRow::Component, type: :component do
   # rendered_content preserves raw HTML (including <td> elements that
   # Nokogiri would strip without a <table> wrapper)
   let(:html) do
-    with_request_url("/o/#{organization.to_param}/bikes") do
+    with_request_url("/o/#{organization.to_param}/registrations") do
       render_inline(described_class.new(**options))
     end
     rendered_content

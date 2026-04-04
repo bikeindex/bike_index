@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe Org::BikeSearchSettings::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) do
-    with_request_url("/o/#{organization.to_param}/bikes") do
+    with_request_url("/o/#{organization.to_param}/registrations") do
       render_inline(instance)
     end
   end

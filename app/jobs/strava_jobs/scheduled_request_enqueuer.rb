@@ -5,6 +5,10 @@ module StravaJobs
     prepend ScheduledJobRecorder
 
     BATCH_SIZE = ENV.fetch("STRAVA_BULK_ENQUEUE_SIZE", 40).to_i
+    ENQUEUER_FETCH_ACTIVITY_SHORT_HEADROOM = ENV.fetch("STRAVA_ENQUEUER_FETCH_ACTIVITY_SHORT_HEADROOM",
+      Integrations::Strava::Client::FETCH_ACTIVITY_SHORT_HEADROOM * 2).to_i
+    ENQUEUER_FETCH_ACTIVITY_LONG_HEADROOM = ENV.fetch("STRAVA_ENQUEUER_FETCH_ACTIVITY_LONG_HEADROOM",
+      Integrations::Strava::Client::FETCH_ACTIVITY_LONG_HEADROOM * 2).to_i
 
     sidekiq_options queue: "low_priority"
 
@@ -21,7 +25,8 @@ module StravaJobs
         return true if Integrations::Strava::Client.currently_rate_limited?(request_type: :fetch_activity)
 
         rate_limit = StravaRequest.estimated_current_rate_limit
-        (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < Integrations::Strava::Client::FETCH_ACTIVITY_LONG_HEADROOM * 2
+        (rate_limit[:read_short_limit] - rate_limit[:read_short_usage]) < ENQUEUER_FETCH_ACTIVITY_SHORT_HEADROOM ||
+          (rate_limit[:read_long_limit] - rate_limit[:read_long_usage]) < ENQUEUER_FETCH_ACTIVITY_LONG_HEADROOM
       end
 
       def duplicate_request_ids(limit: 5_000)

@@ -82,13 +82,13 @@ chdir APP_ROOT do
 
   unless without_seeds
     puts "\n== Seeding database =="
-    system "bin/rake db:seed"
+    system! "bin/rake db:seed"
 
     puts "\n== Preparing test database (including parallelism) =="
-    system "bin/rake parallel:prepare"
+    system! "bin/rake parallel:prepare"
 
     puts "\n== loading typeahead and bike counts =="
-    system "bin/rake setup:reset_autocomplete setup:load_counts"
+    system! "bin/rake setup:reset_autocomplete setup:load_counts"
   end
 
   puts "\n== Removing old logs and tempfiles =="
