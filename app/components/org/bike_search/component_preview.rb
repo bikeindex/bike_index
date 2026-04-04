@@ -7,24 +7,14 @@ module Org::BikeSearch
       organization = lookbook_organization
       bikes = organization&.bikes&.limit(5) || Bike.none
       pagy = Pagy::Offset.new(count: bikes.count, page: 1, limit: 10)
-      bike_search = Org::BikeSearch::Component.new(
+      render Org::BikeSearch::Component.new(
         organization:,
         pagy:,
+        bikes:,
         per_page: 10,
         params: {},
         time_range: 1.year.ago..Time.current
       )
-      render(bike_search) do
-        bikes.map { |bike|
-          content_tag(:tr) do
-            render(Org::BikeSearchRow::Component.new(
-              bike:,
-              organization:,
-              additional_registration_fields: bike_search.additional_registration_fields
-            ))
-          end
-        }.join.html_safe
-      end
     end
   end
 end
