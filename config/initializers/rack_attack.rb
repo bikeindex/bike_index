@@ -1,0 +1,49 @@
+# frozen_string_literal: true
+
+Rack::Attack.cache.store = ActiveSupport::Cache::RedisCacheStore.new(
+  url: Rails.application.config.redis_cache_url
+)
+
+# Global rate limit: MAX_REQUESTS_PER_MINUTE per IP (replaces rack-throttle)
+Rack::Attack.throttle("requests/ip",
+  limit: ENV.fetch("MIN_MAX_RATE", 1000).to_i,
+  period: 1.minute) do |request|
+  request.ip
+end
+
+# Sign-in endpoints: 10 per minute per IP
+SIGN_IN_PATHS = %w[/session /oauth/token].freeze
+
+Rack::Attack.throttle("sign_in/ip",
+  limit: 10,
+  period: 1.minute) do |request|
+  request.ip if request.post? && SIGN_IN_PATHS.include?(request.path)
+end
+
+# Sensitive auth endpoints: 5 per minute per IP
+SENSITIVE_AUTH_PATHS = %w[
+  /session/create_magic_link
+  /session/sign_in_with_magic_link
+  /users/send_password_reset_email
+  /users/update_password_with_reset_token
+  /users/resend_confirmation_email
+].freeze
+
+Rack::Attack.throttle("sensitive_auth/ip",
+  limit: 5,
+  period: 1.minute) do |request|
+  if request.post?
+    if SENSITIVE_AUTH_PATHS.include?(request.path)
+      request.ip
+    elsif request.path.start_with?("/user_emails/") && request.path.end_with?("/resend_confirmation")
+      request.ip
+    end
+  end
+end
+
+# Return 429 with Retry-After header
+Rack::Attack.throttled_responder = lambda do |request|
+  match_data = request.env["rack.attack.match_data"]
+  retry_after = (match_data || {})[:period]
+  [429, {"content-type" => "text/plain", "retry-after" => retry_after.to_s}, ["Too Many Requests"]]
+end

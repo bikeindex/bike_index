@@ -109,11 +109,11 @@ RSpec.describe SessionsController, type: :request do
       end
     end
 
-    context "with sign_in_throttle" do
-      include_context :sign_in_throttle
+    context "with rack_attack" do
+      include_context :rack_attack
 
       it "returns 429 after exceeding the limit" do
-        SignInThrottle::SIGN_IN_MAX.times do
+        10.times do
           post "/session", params: {session: {email: user.email, password:}}
         end
         post "/session", params: {session: {email: user.email, password:}}

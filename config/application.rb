@@ -14,9 +14,7 @@ require "action_view/railtie"
 require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
-require "rack/throttle"
 require_relative "../lib/ip_spoof_attack_filter"
-require_relative "../lib/sign_in_throttle"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -64,12 +62,7 @@ module Bikeindex
     config.middleware.insert_after ActionDispatch::RemoteIp, IpSpoofAttackFilter
     config.middleware.use Rack::Deflater
     config.middleware.insert 0, Rack::UTF8Sanitizer
-    config.middleware.use Rack::Throttle::Minute,
-      max: ENV["MIN_MAX_RATE"].to_i,
-      cache: Redis.new(url: config.redis_cache_url),
-      key_prefix: :throttle
-    config.middleware.use SignInThrottle,
-      cache: Redis.new(url: config.redis_cache_url)
+    config.middleware.use Rack::Attack
 
     # Add middleware to make i18n configuration thread-safe
     config.middleware.use I18n::Middleware
