@@ -29,16 +29,16 @@
       <%= number_display(@fetch_activity_short_headroom) %> short,
       <%= number_display(@fetch_activity_long_headroom) %> long
     </div>
+  </div>
+
+  <div class="tw:basis-full sm:tw:order-first tw:flex tw:flex-wrap tw:gap-x-6">
+    <div>batch: <%= number_display(@batch_size) %></div>
 
     <div>
       <i>enqueuer</i> fetch_activity headroom:
       <%= number_display(@enqueuer_fetch_activity_short_headroom) %> short,
       <%= number_display(@enqueuer_fetch_activity_long_headroom) %> long
     </div>
-  </div>
-
-  <div class="sm:tw:basis-auto tw:basis-full">
-    batch: <%= number_display(@batch_size) %>
   </div>
 
   <% if StravaJobs::RequestRunner.new.skip_job? %>
