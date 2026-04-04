@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Rack::Attack
-  SIGN_IN_PATHS = %w[/session /oauth/token].freeze
+  SIGN_IN_PATHS = %w[/session].freeze
 
   SENSITIVE_AUTH_PATHS = %w[
     /session/create_magic_link
