@@ -122,8 +122,8 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(organized_container).to eq "container"
       end
     end
-    context "bikes index" do
-      let(:controller_name) { "bikes" }
+    context "registrations index" do
+      let(:controller_name) { "registrations" }
       it "is container-fluid" do
         expect(organized_container).to eq "container-fluid"
       end
