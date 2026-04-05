@@ -9,7 +9,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
     expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
     expect(page).not_to have_css("[data-dropdown-target='menu']:not(.tw\\:hidden)")
 
-    click_button "actions"
+    click_button "menu"
 
     expect(page).to have_text("Profile")
     expect(page).to have_text("Settings")
