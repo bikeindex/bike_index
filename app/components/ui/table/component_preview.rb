@@ -27,8 +27,8 @@ module UI
           table.column(label: "Credibility", header_classes: "tw:font-normal") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
           table.column(label: "Enthusiasm", header_classes: "tw:font-normal") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
           table.column(sortable: "sightings") { |r| number_with_delimiter(r.sightings) }
-          table.column(label: "Cached at", header_classes: "tw:font-normal") { |_r| tag.small(l(::Time.current, format: :localize_time), class: "localizeTime preciseTimeSeconds") }
-          table.column(label: "Rendered at", uncached: true) { |_r| tag.small(l(::Time.current, format: :localize_time), class: "localizeTime preciseTimeSeconds") }
+          table.column(label: "Cached at", header_classes: "tw:font-normal") { |_r| tag.small(l(::Time.current, format: :convert_time), class: "localizeTime preciseTimeSeconds") }
+          table.column(label: "Rendered at", uncached: true) { |_r| tag.small(l(::Time.current, format: :convert_time), class: "localizeTime preciseTimeSeconds") }
         end
       end
 
