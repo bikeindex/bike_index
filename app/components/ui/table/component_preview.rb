@@ -14,7 +14,7 @@ module UI
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
           table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
           table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
-          table.column(label: safe_join(["First Seen ", tag.span(class: "convertTimezone")]), sort_indicator: "first_seen") { |r| render(UI::Time::Component.new(time: r.first_seen)) }
+          table.column(label: safe_join(["First Seen ", tag.span(class: "localizeTimezone")]), sort_indicator: "first_seen") { |r| render(UI::Time::Component.new(time: r.first_seen)) }
         end
       end
 

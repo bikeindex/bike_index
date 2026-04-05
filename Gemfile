@@ -170,4 +170,5 @@ group :test do
   gem "capybara" # For view components
   gem "selenium-webdriver" # For capybara
   gem "chunky_png" # used to test that generated images match their targets
+  gem "axe-core-rspec" # Accessibility testing
 end
