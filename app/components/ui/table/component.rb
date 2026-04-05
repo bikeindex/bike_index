@@ -56,7 +56,7 @@ module UI
       end
 
       def validate_uncached_columns_are_last!
-        return unless @columns.any?(&:uncached)
+        return if uncached_columns.empty?
         first_uncached = @columns.index(&:uncached)
         return if @columns[first_uncached..].all?(&:uncached)
         raise ArgumentError, "UI::Table uncached columns must be defined after all cached columns. " \
