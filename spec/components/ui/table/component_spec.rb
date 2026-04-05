@@ -195,7 +195,6 @@ RSpec.describe UI::Table::Component, type: :component do
       call_count = 0
 
       with_controller_class(ApplicationController) do
-        # Enable fragment caching for this test
         ActionController::Base.perform_caching = true
 
         # First render: populates cache
@@ -207,10 +206,10 @@ RSpec.describe UI::Table::Component, type: :component do
           }
         end
 
-        # Second render: cached column should be stale, uncached column re-evaluates
         # Update name without changing updated_at so the cache key stays the same
-        user.class.where(id: user.id).update_all(name: "Updated Name")
+        user.update_column(:name, "Updated Name")
         user.reload
+
         result = render_inline(described_class.new(records: [user], cache_key: "uncached-test")) do |table|
           table.column(label: "Name") { |u| u.name }
           table.column(label: "Dynamic", uncached: true) { |_u|
