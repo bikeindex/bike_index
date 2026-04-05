@@ -107,7 +107,7 @@
                   = Country.united_states_id
             .form-group.fancy-select.unfancy.col-6
               = s.label :state, "State"
-              = s.collection_select(:state_id, State.united_states, :id, :name, include_blank: true, prompt: "State")
+              = s.collection_select(:region_record_id, State.united_states, :id, :name, include_blank: true, prompt: "State")
           .form-group
             = label :street, "Intersection or address"
             = s.text_field :street, placeholder: "Intersection or address", class: "form-control"
@@ -116,8 +116,8 @@
               = label :city, "City"
               = s.text_field :city, placeholder: "City", class: "form-control"
             .col-6.form-group
-              = label :zipcode, "Zipcode"
-              = s.text_field :zipcode, placeholder: "Zipcode", class: "form-control"
+              = label :postal_code, "Zipcode"
+              = s.text_field :postal_code, placeholder: "Zipcode", class: "form-control"
 
         .col-md-8
           .form-group

@@ -409,7 +409,7 @@ RSpec.describe API::V1::BikesController, type: :request do
           expect(bike.current_ownership.organization).to eq @organization
           expect(bike.rear_wheel_size.iso_bsd).to eq 559
           csr = bike.fetch_current_stolen_record
-          expect(csr.address).to be_present
+          expect(csr.formatted_address_string).to be_present
           expect(csr.phone).to eq("9999999")
           # No longer support this date format :/
           # expect(csr.date_stolen).to eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))

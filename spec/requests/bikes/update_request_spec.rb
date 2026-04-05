@@ -204,7 +204,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.claimed?).to be_truthy
         expect(bike.owner&.id).to eq current_user.id
         # It no longer has an address, the stolen record has updated it
-        expect(bike.address_hash.values.compact).to eq(["US"])
+        expect(bike.address_hash.values.compact).to eq([])
 
         stolen_record = bike.current_stolen_record
         expect(stolen_record).to be_present
@@ -346,8 +346,8 @@ RSpec.describe "BikesController#update", type: :request do
         country_id: Country.united_states.id,
         street: "278 Broadway",
         city: "New York",
-        zipcode: "10007",
-        state_id: state.id,
+        postal_code: "10007",
+        region_record_id: state.id,
         show_address: "1",
         estimated_value: "2101",
         locking_description: "party",
@@ -403,7 +403,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone).to eq "1111111111"
         expect(stolen_record.secondary_phone).to eq "1231231234"
         expect(stolen_record.country_id).to eq Country.united_states.id
-        expect(stolen_record.state_id).to eq state.id
+        expect(stolen_record.region_record_id).to eq state.id
         expect(stolen_record.show_address).to be_falsey
         expect(stolen_record.estimated_value).to eq 2101
         expect(stolen_record.locking_description).to eq "party"

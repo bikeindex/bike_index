@@ -21,7 +21,7 @@ class StolenRecordV2Serializer < ApplicationSerializer
   end
 
   def location
-    object.address
+    object.formatted_address_string.presence
   end
 
   def latitude
