@@ -24,6 +24,7 @@
           <% end %>
 
           <% cached_columns_count ||= @columns.count - uncached_columns.count %>
+
           <% uncached_columns.each_with_index do |col, i| %>
             <td class="<%= col.td_classes(cached_columns_count + i, total: @columns.length, bordered: @bordered, last_row: last_row?(row_index)) %>">
               <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
