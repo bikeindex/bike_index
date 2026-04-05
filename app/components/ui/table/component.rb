@@ -17,8 +17,8 @@ module UI
         @columns = []
       end
 
-      def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
-        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, lower_right:, &block)
+      def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, uncached: false, &block)
+        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, lower_right:, uncached:, &block)
         nil
       end
 
@@ -48,6 +48,10 @@ module UI
 
       def sortable_columns
         @columns.filter_map(&:sortable)
+      end
+
+      def uncached_columns
+        @uncached_columns ||= @columns.select(&:uncached)
       end
 
       def last_row?(row_index) = row_index == @records.length - 1
