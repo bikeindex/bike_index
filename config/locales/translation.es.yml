@@ -4683,6 +4683,9 @@ es:
         from:
         me:
         to:
+    alerts:
+      object_errors:
+        errors_prevented_this_from_being_saved:
     ui:
       definition_list:
         row:

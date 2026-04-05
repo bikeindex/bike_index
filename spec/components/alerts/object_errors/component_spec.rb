@@ -12,7 +12,7 @@ RSpec.describe Alerts::ObjectErrors::Component, type: :component do
   end
 
   it "renders error messages" do
-    expect(component).to have_text("2 errors prevented this User from being saved:")
+    expect(component).to have_text("2 prevented this User from being saved:")
     expect(component).to have_text("Email can't be blank")
     expect(component).to have_text("Password is too short")
   end
@@ -40,7 +40,7 @@ RSpec.describe Alerts::ObjectErrors::Component, type: :component do
     end
 
     it "uses singular 'error'" do
-      expect(component).to have_text("1 error prevented")
+      expect(component).to have_text("1 prevented")
     end
   end
 end

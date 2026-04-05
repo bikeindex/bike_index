@@ -6095,6 +6095,10 @@ nl:
         from: uit
         me: mij
         to: Naar
+    alerts:
+      object_errors:
+        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+          dit %{object_name} wordt opgeslagen:"
     ui:
       definition_list:
         row:

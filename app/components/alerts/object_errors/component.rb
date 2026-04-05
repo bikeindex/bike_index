@@ -17,8 +17,8 @@ module Alerts
       private
 
       def header_text
-        count = @error_messages.count
-        "#{count} #{"error".pluralize(count)} prevented this #{@name} from being saved:"
+        translation(".errors_prevented_this_from_being_saved", errors_count: @error_messages.count,
+          object_name: @name)
       end
     end
   end
