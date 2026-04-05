@@ -5940,9 +5940,6 @@ nb:
       definition_list:
         row:
           no_value: ingen
-      alert_for_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
-          %{object_name} ble lagret:"
     org:
       location_address_fields:
         address: Adresse

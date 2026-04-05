@@ -1,5 +1,5 @@
 = form_for [:admin, @organization_feature] do |f|
-  = render(UI::AlertForErrors::Component.new(object: @organization_feature))
+  = render(Alerts::ObjectErrors::Component.new(object: @organization_feature))
 
   .row
     .col-md-6.col-xs-12

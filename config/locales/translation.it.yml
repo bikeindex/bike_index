@@ -4769,8 +4769,6 @@ it:
       definition_list:
         row:
           no_value:
-      alert_for_errors:
-        errors_prevented_this_from_being_saved:
     org:
       location_address_fields:
         address: Indirizzo
