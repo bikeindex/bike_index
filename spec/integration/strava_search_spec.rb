@@ -27,5 +27,6 @@ RSpec.describe "Strava search", :js, type: :system do
     # Verify the React app has mounted and rendered content into #root
     expect(page).to have_css("#root *", wait: 10)
     expect(page).to have_title("Strava search")
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
   end
 end

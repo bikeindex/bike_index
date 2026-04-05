@@ -52,6 +52,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
 
     # Wait for the initial results to load
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
     # Get the initial bike IDs visible on page 1
     initial_bikes = page.all("[data-test-id^='vehicle-thumbnail-linkspan-']").map do |el|
       el["data-test-id"].split("-").last

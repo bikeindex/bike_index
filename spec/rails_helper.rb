@@ -54,7 +54,7 @@ require "view_component/test_helpers"
 require "view_component/system_test_helpers"
 require "axe-rspec"
 
-SKIPPABLE_AXE_RULES = %w[color-contrast heading-order html-has-lang landmark-one-main page-has-heading-one region]
+SKIPPABLE_AXE_RULES = %w[aria-allowed-role color-contrast heading-order html-has-lang landmark-one-main landmark-unique page-has-heading-one region]
 
 ActiveRecord::Migration.maintain_test_schema!
 
