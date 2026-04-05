@@ -117,6 +117,7 @@ class User < ApplicationRecord
   has_one :user_ban
 
   validates_uniqueness_of :username
+  validates_with UserNameValidator
   validates :password,
     presence: true,
     length: {within: 12..100},
