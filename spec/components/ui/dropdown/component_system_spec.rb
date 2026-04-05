@@ -13,5 +13,6 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
 
     expect(page).to have_text("Profile")
     expect(page).to have_text("Settings")
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
   end
 end
