@@ -8,7 +8,8 @@ class UserNameValidator < ActiveModel::Validator
     return false if str.blank?
     slugged = Slugifyer.slugify(str).tr("-", "_")
     return false if slugged.length < 2
-    !INVALID_USERNAMES.include?(slugged)
+    return false if INVALID_USERNAMES.include?(slugged)
+    !BadWordCleaner::BAD_WORDS.include?(slugged)
   end
 
   def validate(record)

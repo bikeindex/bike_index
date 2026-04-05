@@ -19,6 +19,11 @@ RSpec.describe UserNameValidator do
       expect(described_class.valid?("")).to be false
     end
 
+    it "is false for bad words" do
+      expect(described_class.valid?("fuck")).to be false
+      expect(described_class.valid?("shit")).to be false
+    end
+
     it "is true for normal usernames" do
       expect(described_class.valid?("coolbiker")).to be true
       expect(described_class.valid?("jane_doe")).to be true
