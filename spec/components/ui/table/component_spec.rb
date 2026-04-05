@@ -201,7 +201,10 @@ RSpec.describe UI::Table::Component, type: :component do
         # First render: populates cache
         render_inline(described_class.new(records: [user], cache_key: "uncached-test")) do |table|
           table.column(label: "Name") { |u| u.name }
-          table.column(label: "Dynamic", uncached: true) { |_u| call_count += 1; "render-#{call_count}" }
+          table.column(label: "Dynamic", uncached: true) { |_u|
+            call_count += 1
+            "render-#{call_count}"
+          }
         end
 
         # Second render: cached column should be stale, uncached column re-evaluates
@@ -210,7 +213,10 @@ RSpec.describe UI::Table::Component, type: :component do
         user.reload
         result = render_inline(described_class.new(records: [user], cache_key: "uncached-test")) do |table|
           table.column(label: "Name") { |u| u.name }
-          table.column(label: "Dynamic", uncached: true) { |_u| call_count += 1; "render-#{call_count}" }
+          table.column(label: "Dynamic", uncached: true) { |_u|
+            call_count += 1
+            "render-#{call_count}"
+          }
         end
 
         # Cached column still shows original name (stale)
@@ -221,6 +227,16 @@ RSpec.describe UI::Table::Component, type: :component do
       ensure
         ActionController::Base.perform_caching = false
       end
+    end
+
+    it "raises when uncached columns are not last" do
+      expect {
+        render_inline(described_class.new(records: records)) do |table|
+          table.column(label: "Name") { |r| r.name }
+          table.column(label: "Action", uncached: true) { |_r| "action" }
+          table.column(label: "Email") { |r| r.email }
+        end
+      }.to raise_error(ArgumentError, /uncached columns must be defined after all cached columns/)
     end
 
     it "namespaces cache keys with a string" do
