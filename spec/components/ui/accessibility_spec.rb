@@ -19,7 +19,7 @@ RSpec.describe "UI component accessibility", :js, type: :system do
     it "#{name} is accessible" do
       visit("#{preview_base}/#{path}")
       # Skip page-level rules that come from the component preview layout, not from the components
-      expect(page).to be_axe_clean.skipping(:"html-has-lang", :"landmark-one-main", :"page-has-heading-one", :"region")
+      expect(page).to be_axe_clean.skipping(:"html-has-lang", :"landmark-one-main", :"page-has-heading-one", :region)
     end
   end
 end
