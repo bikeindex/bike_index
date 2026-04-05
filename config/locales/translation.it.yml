@@ -4765,12 +4765,13 @@ it:
         from: Da
         me:
         to: A
+    alerts:
+      object_errors:
+        errors_prevented_this_from_being_saved:
     ui:
       definition_list:
         row:
           no_value:
-      alert_for_errors:
-        errors_prevented_this_from_being_saved:
     org:
       location_address_fields:
         address: Indirizzo
