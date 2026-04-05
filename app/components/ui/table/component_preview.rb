@@ -30,15 +30,13 @@ module UI
         end
       end
 
+      # Cached columns freeze after first render; the uncached "Rendered at" column updates on each reload.
       def with_uncached_columns
-        colors = enthusiasm_colors
         render(UI::Table::Component.new(records: sample_records, cache_key: "preview-cryptids", sort: "first_seen", sort_direction: "desc")) do |table|
           table.column(label: "Cryptid") { |r| r.name }
           table.column(label: "Region") { |r| r.region }
-          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
-          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
-          table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
-          table.column(label: "Action", uncached: true) { |r| link_to("Investigate #{r.name}", "#", class: "twlink") }
+          table.column(label: "Sightings") { |r| "#{number_with_delimiter(r.sightings)} (cached #{Time.current.strftime("%H:%M:%S")})" }
+          table.column(label: "Rendered at", uncached: true) { |_r| tag.code(Time.current.strftime("%H:%M:%S.%L")) }
         end
       end
 
