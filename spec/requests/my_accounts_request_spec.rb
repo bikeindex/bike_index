@@ -188,6 +188,18 @@ RSpec.describe MyAccountsController, type: :request do
     # force skip_update to be false, like it is in reality (unblocks updating)
     before { current_user.skip_update = false }
 
+    context "reserved username" do
+      it "doesn't update username" do
+        current_user.reload
+        expect(current_user.username).to eq "something"
+        patch base_url, params: {id: current_user.username, user: {username: "confirm"}, edit_template: "sharing"}
+        expect(response).to render_template(:edit)
+        expect(assigns(:page_errors)).to include("Username is reserved")
+        current_user.reload
+        expect(current_user.username).to eq("something")
+      end
+    end
+
     context "nil username" do
       it "doesn't update username" do
         current_user.reload
