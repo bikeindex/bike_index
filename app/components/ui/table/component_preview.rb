@@ -18,25 +18,17 @@ module UI
         end
       end
 
-      def with_sortable_columns
+      # Cached columns freeze after first render; the uncached "Rendered at" column updates on each reload.
+      def sortable_with_cached_and_uncached_columns
         colors = enthusiasm_colors
-        render(UI::Table::Component.new(records: sample_records, sort: "name", sort_direction: "desc", render_sortable: true)) do |table|
+        render(UI::Table::Component.new(records: sample_records, cache_key: "preview-cryptids", sort: "name", sort_direction: "desc", render_sortable: true)) do |table|
           table.column(sortable: "name") { |r| r.name }
           table.column(label: "Region", header_classes: "tw:font-normal") { |r| r.region }
           table.column(label: "Credibility", header_classes: "tw:font-normal") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
           table.column(label: "Enthusiasm", header_classes: "tw:font-normal") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
           table.column(sortable: "sightings") { |r| number_with_delimiter(r.sightings) }
-          table.column(label: "First Seen", header_classes: "tw:font-normal") { |r| render(UI::Time::Component.new(time: r.first_seen)) }
-        end
-      end
-
-      # Cached columns freeze after first render; the uncached "Rendered at" column updates on each reload.
-      def with_uncached_columns
-        render(UI::Table::Component.new(records: sample_records, cache_key: "preview-cryptids", sort: "first_seen", sort_direction: "desc")) do |table|
-          table.column(label: "Cryptid") { |r| r.name }
-          table.column(label: "Region") { |r| r.region }
-          table.column(label: "Sightings") { |r| "#{number_with_delimiter(r.sightings)} (cached #{Time.current.strftime("%H:%M:%S")})" }
-          table.column(label: "Rendered at", uncached: true) { |_r| tag.code(Time.current.strftime("%H:%M:%S.%L")) }
+          table.column(label: "Cached at", header_classes: "tw:font-normal") { |_r| tag.small(l(::Time.current, format: :localize_time), class: "localizeTime preciseTimeSeconds") }
+          table.column(label: "Rendered at", uncached: true) { |_r| tag.small(l(::Time.current, format: :localize_time), class: "localizeTime preciseTimeSeconds") }
         end
       end
 
