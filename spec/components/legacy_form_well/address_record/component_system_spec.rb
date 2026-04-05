@@ -13,6 +13,7 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, :js, type: :system do
     visit(preview_path)
 
     expect(page).to have_content "Street address"
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
     expect(page).to have_select(
       "user[address_record_attributes][country_id]", selected: "United States"
     )
@@ -42,6 +43,7 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, :js, type: :system do
       Country.canada
       visit(preview_path)
 
+      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
       expect(page).to have_select(
         "impound_record[address_record_attributes][country_id]", selected: "United States"
       )

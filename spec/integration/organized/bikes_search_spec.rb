@@ -42,6 +42,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     # Results load via turbo auto-submit (search--form controller)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table.table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
 
     # search_no_js should NOT be in the URL (removed by JS controller)
     expect(page).not_to have_current_path(/search_no_js/)

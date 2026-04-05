@@ -28,6 +28,7 @@ RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, :js, type: :
 
       visit(preview_path)
       expect(page).to have_text("Use account address")
+      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
       expect(page).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
 
       expect(page).to_not have_field("bike[current_marketplace_listing_attributes][address_record_attributes][postal_code]", visible: true)

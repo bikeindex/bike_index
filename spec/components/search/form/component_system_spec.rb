@@ -61,6 +61,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
     it "submits when enter is pressed twice" do
       expect(find("#query_items", visible: false).value).to be_blank
+      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
       expect(page_text(page.text)).to_not match("miles of")
 
       find("label", text: "Stolen in search area").click

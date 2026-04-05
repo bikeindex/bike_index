@@ -12,6 +12,7 @@ RSpec.describe Messages::ThreadShow::Component, :js, type: :system do
     visit(preview_path)
 
     expect(page).to have_content "When are you available"
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
 
     expect(page).to have_content("Me (")
   end
@@ -22,6 +23,7 @@ RSpec.describe Messages::ThreadShow::Component, :js, type: :system do
       visit(preview_path)
 
       expect(page).to have_content "When are you available"
+      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
       expect(page).to have_content("to me")
     end
   end
