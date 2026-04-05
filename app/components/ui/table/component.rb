@@ -50,6 +50,10 @@ module UI
         @columns.filter_map(&:sortable)
       end
 
+      def uncached_columns
+        @uncached_columns ||= @columns.select(&:uncached)
+      end
+
       def last_row?(row_index) = row_index == @records.length - 1
 
       def table_classes
