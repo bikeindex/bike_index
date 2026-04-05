@@ -3,13 +3,10 @@
 require "rails_helper"
 
 RSpec.describe UI::Modal::Component, :js, type: :system do
-  # Skip page-level rules that come from the component preview layout, not from the components
-  let(:axe_skipped_rules) { [:"html-has-lang", :"landmark-one-main", :"page-has-heading-one", :region] }
-
   it "opens and closes modal" do
     visit("/rails/view_components/ui/modal/component/default")
 
-    expect(page).to be_axe_clean.skipping(*axe_skipped_rules)
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
 
     click_button "Open Settings"
 
