@@ -9,6 +9,7 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 # pin "flowbite", to: "https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.turbo.min.js"
 pin "luxon", to: "https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/es6/luxon.js"
 pin "@bikeindex/time-localizer", to: "https://cdn.jsdelivr.net/npm/@bikeindex/time-localizer@0.1.1/index.js"
+pin "@floating-ui/dom", to: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.3/+esm"
 
 # jQuery is required for select2, which is used by search. It should not be used!
 # ideally we transition off it soon!
