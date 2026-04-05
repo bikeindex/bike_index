@@ -192,7 +192,7 @@ RSpec.describe MyAccountsController, type: :request do
       it "doesn't update username" do
         current_user.reload
         expect(current_user.username).to eq "something"
-        patch base_url, params: {id: current_user.username, user: {username: "admin"}, edit_template: "sharing"}
+        patch base_url, params: {id: current_user.username, user: {username: "confirm"}, edit_template: "sharing"}
         expect(response).to render_template(:edit)
         expect(assigns(:page_errors)).to include("Username is reserved")
         current_user.reload
