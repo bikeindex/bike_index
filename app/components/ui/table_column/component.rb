@@ -9,15 +9,16 @@ module UI
       ARROW_DOWN = "\u2193"
       NBSP = "\u00A0"
 
-      attr_reader :sortable, :cell_block
+      attr_reader :sortable, :cell_block, :uncached
 
-      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, uncached: false, &block)
         @label = label
         @sortable = sortable
         @sort_indicator = sort_indicator
         @classes = classes
         @header_classes = header_classes
         @lower_right = lower_right
+        @uncached = uncached
         @cell_block = block
       end
 
