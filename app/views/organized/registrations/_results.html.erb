@@ -1,6 +1,7 @@
-<% bike_search = Org::BikeSearch::Component.new(
+<%= render(Org::BikeSearch::Component.new(
   organization: current_organization,
   pagy: @pagy,
+  bikes: @bikes,
   interpreted_params: @interpreted_params,
   sortable_search_params:,
   per_page: @per_page,
@@ -16,10 +17,4 @@
   skip_search_and_filters: true,
   include_avery: true,
   skip_settings: true
-) %>
-
-<%= render(bike_search) do %>
-  <% @bikes.each do |bike| %>
-    <%= render partial: "cached_bike_table_row", locals: {bike:, bike_search:, bike_sticker: @bike_sticker} %>
-  <% end %>
-<% end %>
+)) %>
