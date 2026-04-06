@@ -157,10 +157,8 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  context "with cache_key" do
-    let(:memory_store) { ActiveSupport::Cache::MemoryStore.new }
-
-    before { allow(ApplicationController).to receive(:cache_store).and_return(memory_store) }
+  context "with cache_key", :caching do
+    include_context :caching_basic
 
     it "caches each row" do
       users = FactoryBot.create_list(:user, 2)
@@ -187,6 +185,51 @@ RSpec.describe UI::Table::Component, type: :component do
         expect(result).to have_css("td div", text: /#{users.first.email}/)
         expect(result).to have_css("td div small", text: users.first.id.to_s)
       end
+    end
+
+    it "renders uncached columns outside the cache block" do
+      user = FactoryBot.create(:user)
+      original_name = user.name
+      call_count = 0
+
+      with_controller_class(ApplicationController) do
+        # First render: populates cache
+        render_inline(described_class.new(records: [user], cache_key: "uncached-test")) do |table|
+          table.column(label: "Name") { |u| u.name }
+          table.column(label: "Dynamic", uncached: true) { |_u|
+            call_count += 1
+            "render-#{call_count}"
+          }
+        end
+
+        # Update name without changing updated_at so the cache key stays the same
+        user.update_column(:name, "Updated Name")
+        user.reload
+
+        result = render_inline(described_class.new(records: [user], cache_key: "uncached-test")) do |table|
+          table.column(label: "Name") { |u| u.name }
+          table.column(label: "Dynamic", uncached: true) { |_u|
+            call_count += 1
+            "render-#{call_count}"
+          }
+        end
+
+        # Cached column still shows original name (stale)
+        expect(result).to have_css("td", text: original_name)
+        expect(result).not_to have_css("td", text: "Updated Name")
+        # Uncached column was re-evaluated
+        expect(result).to have_css("td", text: "render-2")
+      end
+    end
+
+    it "raises when uncached columns are not last" do
+      expect {
+        render_inline(described_class.new(records: records)) do |table|
+          table.column(label: "Name") { |r| r.name }
+          table.column(label: "Action", uncached: true) { |_r| "action" }
+          table.column(label: "Email") { |r| r.email }
+        end
+      }.to raise_error(ArgumentError, /uncached columns must be defined after all cached columns/)
     end
 
     it "namespaces cache keys with a string" do

@@ -6099,9 +6099,6 @@ nl:
       definition_list:
         row:
           no_value: geen
-      alert_for_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
-          dit %{object_name} wordt opgeslagen:"
     org:
       location_address_fields:
         address: Adres
@@ -6310,3 +6307,7 @@ nl:
         reprocess_instruction: Ga terug naar deze pagina en klik op de knop 'import
           opnieuw verwerken' hieronder.
         unknown_ascend_name: Onbekende Ascend-naam
+    alerts:
+      object_errors:
+        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+          dit %{object_name} wordt opgeslagen:"

@@ -27,7 +27,7 @@ gem "lograge" # Structure log data, put it in single lines to improve the functi
 gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 gem "responders" # Rails responders modules
-gem "rack-throttle" # Rate limiting
+gem "rack-attack" # Rate limiting
 gem "secure_headers", "~> 7.2"
 
 # Speed, performance, etc
@@ -170,4 +170,5 @@ group :test do
   gem "capybara" # For view components
   gem "selenium-webdriver" # For capybara
   gem "chunky_png" # used to test that generated images match their targets
+  gem "axe-core-rspec" # Accessibility testing
 end
