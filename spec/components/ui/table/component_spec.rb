@@ -196,6 +196,7 @@ RSpec.describe UI::Table::Component, type: :component do
 
       with_controller_class(ApplicationController) do
         ActionController::Base.perform_caching = true
+        ActionController::Base.cache_store = memory_store
 
         # First render: populates cache
         render_inline(described_class.new(records: [user], cache_key: "uncached-test")) do |table|
@@ -225,6 +226,7 @@ RSpec.describe UI::Table::Component, type: :component do
         expect(result).to have_css("td", text: "render-2")
       ensure
         ActionController::Base.perform_caching = false
+        ActionController::Base.cache_store = :null_store
       end
     end
 
