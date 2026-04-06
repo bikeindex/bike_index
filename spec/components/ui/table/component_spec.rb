@@ -157,10 +157,9 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  context "with cache_key" do
-    let(:memory_store) { ActiveSupport::Cache::MemoryStore.new }
-
-    before { allow(ApplicationController).to receive(:cache_store).and_return(memory_store) }
+  context "with cache_key", :caching do
+    include_context :caching_enabled
+    let(:cache) { ActiveSupport::Cache::MemoryStore.new }
 
     it "caches each row" do
       users = FactoryBot.create_list(:user, 2)
@@ -195,8 +194,6 @@ RSpec.describe UI::Table::Component, type: :component do
       call_count = 0
 
       with_controller_class(ApplicationController) do
-        ActionController::Base.perform_caching = true
-
         # First render: populates cache
         render_inline(described_class.new(records: [user], cache_key: "uncached-test")) do |table|
           table.column(label: "Name") { |u| u.name }
@@ -223,8 +220,6 @@ RSpec.describe UI::Table::Component, type: :component do
         expect(result).not_to have_css("td", text: "Updated Name")
         # Uncached column was re-evaluated
         expect(result).to have_css("td", text: "render-2")
-      ensure
-        ActionController::Base.perform_caching = false
       end
     end
 
