@@ -1,5 +1,5 @@
 <%= render(UI::Alert::Component.new(header: header_text, kind: :error, dismissable: @dismissable)) do %>
-  <ul class="tw:mt-2 tw:mb-0 tw:list-inside tw:list-disc">
+  <ul class="tw:mt-2! tw:mb-0! tw:list-inside tw:list-disc">
     <% @error_messages.each do |message| %>
       <li class="tw:block"><%= message %></li>
     <% end %>
