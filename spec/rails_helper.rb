@@ -26,6 +26,7 @@ ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
 ENV["PARALLEL_TEST_FIRST_IS_1"] = "true" # number parallel databases correctly
 ENV["RACK_ATTACK_MAX_LIMIT"] ||= "12"
+ENV["RACK_ATTACK_API_MAX_LIMIT"] ||= "15"
 require "spec_helper"
 # Load functionable patch before Rails boot so all Functionable modules get permissive test hooks
 require File.expand_path("../../config/boot", __FILE__)
