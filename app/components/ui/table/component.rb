@@ -63,8 +63,6 @@ module UI
           "Move uncached columns to the end of the column list so header and body cells align."
       end
 
-      def last_row?(row_index) = row_index == @records.length - 1
-
       def table_classes
         [
           "tw:min-w-full tw:text-left tw:border-separate! tw:border-spacing-0",

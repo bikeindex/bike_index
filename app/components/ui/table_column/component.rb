@@ -61,7 +61,7 @@ module UI
         classes.join(" ")
       end
 
-      def td_classes(index, total:, bordered:, last_row:)
+      def td_classes(index, bordered:)
         classes = ["tw:px-1 tw:py-1"]
         if bordered
           classes << "tw:border-b tw:border-r tw:border-gray-200 tw:dark:border-gray-700"
@@ -69,8 +69,6 @@ module UI
         else
           classes << "tw:border-b tw:border-gray-100 tw:dark:border-gray-700"
         end
-        classes << "tw:rounded-bl-sm" if last_row && index == 0
-        classes << "tw:rounded-br-sm" if last_row && index == total - 1
         classes << @classes if @classes
         classes.join(" ")
       end
