@@ -2,6 +2,7 @@
 
 class Rack::Attack
   MAX_REQUESTS_PER_TWENTY = ENV.fetch("RACK_ATTACK_MAX_LIMIT", 30).to_i
+  API_MAX_REQUESTS = ENV.fetch("RACK_ATTACK_API_MAX_LIMIT", 150).to_i
 
   SIGN_IN_PATH = "/session"
 
@@ -13,13 +14,21 @@ class Rack::Attack
     /users/resend_confirmation_email
   ].freeze
 
+  API_PATH_PREFIXES = %w[/api /oauth].freeze
+
   cache.store = ActiveSupport::Cache::RedisCacheStore.new(
     url: Bikeindex::Application.config.redis_rack_attack_url
   )
 
-  # Global rate limit per IP
+  # API and OAuth: 150 per 30 seconds per IP
+  throttle("api/ip", limit: API_MAX_REQUESTS, period: 30.seconds) do |request|
+    request.ip if API_PATH_PREFIXES.any? { |prefix| request.path.start_with?(prefix) }
+  end
+
+  # Global rate limit per IP (non-API, non-OAuth)
   throttle("requests/ip", limit: MAX_REQUESTS_PER_TWENTY, period: 20.seconds) do |request|
-    request.ip unless request.path.start_with?("/assets")
+    next if request.path.start_with?("/assets")
+    request.ip unless API_PATH_PREFIXES.any? { |prefix| request.path.start_with?(prefix) }
   end
 
   # Sign-in: 10 per minute per IP
@@ -55,6 +64,16 @@ class Rack::Attack
   self.throttled_responder = lambda do |request|
     match_data = request.env["rack.attack.match_data"]
     retry_after = (match_data || {})[:period]
-    [429, {"content-type" => "text/plain", "retry-after" => retry_after.to_s}, ["Too Many Requests"]]
+    headers = {"retry-after" => retry_after.to_s}
+
+    if request.env["HTTP_ACCEPT"]&.include?("json") || request.path.start_with?("/api")
+      headers["content-type"] = "application/json"
+      body = {error: "Too Many Requests"}.to_json
+    else
+      headers["content-type"] = "text/plain"
+      body = "Too Many Requests"
+    end
+
+    [429, headers, [body]]
   end
 end
