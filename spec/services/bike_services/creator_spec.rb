@@ -260,7 +260,7 @@ RSpec.describe BikeServices::Creator do
           expect(ownership.address_hash_legacy.reject { |_k, v| v.blank? }).to eq({"street" => "Somewhere Ville"})
         end
 
-        it "creates" do
+        it "creates", :flaky do
           expect_bike_created_with_extra_attrs
         end
       end

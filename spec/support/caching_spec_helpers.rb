@@ -6,6 +6,7 @@ RSpec.shared_context :caching_enabled do
       ActionController::Base.perform_caching = true
       ActionController::Base.cache_store = cache
       example.run
+    ensure
       ActionController::Base.perform_caching = false
       ActionController::Base.cache_store = :null_store
     end
