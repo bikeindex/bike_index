@@ -76,6 +76,12 @@
   .twtable-striped tr:nth-child(even) {
     @apply tw:bg-gray-100 tw:dark:bg-gray-800;
   }
+  .twtable-striped tr:last-child td:first-child {
+    @apply tw:rounded-bl-sm;
+  }
+  .twtable-striped tr:last-child td:last-child {
+    @apply tw:rounded-br-sm;
+  }
 }
 
 @utility base-font {
