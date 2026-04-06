@@ -158,8 +158,7 @@ RSpec.describe UI::Table::Component, type: :component do
   end
 
   context "with cache_key", :caching do
-    include_context :caching_enabled
-    let(:cache) { ActiveSupport::Cache::MemoryStore.new }
+    include_context :caching_basic
 
     it "caches each row" do
       users = FactoryBot.create_list(:user, 2)
