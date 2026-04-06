@@ -6095,10 +6095,6 @@ nl:
         from: uit
         me: mij
         to: Naar
-    alerts:
-      object_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
-          dit %{object_name} wordt opgeslagen:"
     ui:
       definition_list:
         row:
@@ -6311,3 +6307,7 @@ nl:
         reprocess_instruction: Ga terug naar deze pagina en klik op de knop 'import
           opnieuw verwerken' hieronder.
         unknown_ascend_name: Onbekende Ascend-naam
+    alerts:
+      object_errors:
+        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+          dit %{object_name} wordt opgeslagen:"

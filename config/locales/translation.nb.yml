@@ -5936,10 +5936,6 @@ nb:
         from: Fra
         me: meg
         to: Til
-    alerts:
-      object_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
-          %{object_name} ble lagret:"
     ui:
       definition_list:
         row:
@@ -6149,3 +6145,7 @@ nb:
         reprocess_instruction: Gå tilbake hit og klikk på knappen «behandle importen
           på nytt» nedenfor
         unknown_ascend_name: Ukjent Ascend-navn
+    alerts:
+      object_errors:
+        errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
+          %{object_name} ble lagret:"
