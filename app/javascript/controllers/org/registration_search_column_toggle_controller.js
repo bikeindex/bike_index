@@ -17,7 +17,8 @@ export default class extends Controller {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
   }
 
-  handleFrameRender = () => {
+  handleFrameRender = (event) => {
+    if (!this.element.contains(event.target)) return
     this.refreshEnabledColumns()
     this.updateVisibleColumns()
   }
@@ -45,6 +46,10 @@ export default class extends Controller {
     window.location = url.toString()
   }
 
+  isAveryCheckbox (cb) {
+    return cb.dataset.action?.includes('averyToggled')
+  }
+
   selectStoredVisibleColumns () {
     const stored = localStorage.getItem('orgRegistrationColumns')
     let columns = this.defaultColumnsValue
@@ -53,7 +58,7 @@ export default class extends Controller {
     }
 
     this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      if (cb.dataset.action && cb.dataset.action.includes('averyToggled')) return
+      if (this.isAveryCheckbox(cb)) return
       cb.checked = columns.includes(cb.name)
     })
     this.updateVisibleColumns()
@@ -63,7 +68,7 @@ export default class extends Controller {
     const checked = []
     const visible = []
     this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      if (cb.dataset.action && cb.dataset.action.includes('averyToggled')) {
+      if (this.isAveryCheckbox(cb)) {
         // Avery state is URL-driven, not stored in localStorage, but still
         // needs to be in the visible list so the column cells are shown
         if (cb.checked) visible.push(cb.name)
@@ -74,7 +79,6 @@ export default class extends Controller {
         visible.push(cb.name)
       }
     })
-    // Store enabled columns so they persist across page loads
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
     this.enabledColumnsValue.forEach(col => {

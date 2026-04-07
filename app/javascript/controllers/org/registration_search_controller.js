@@ -8,7 +8,7 @@ export default class extends Controller {
   static targets = ['settings', 'settingsButton', 'perPage', 'exportLink', 'notesField', 'notesButton']
 
   connect () {
-    if (localStorage.getItem('orgBikeSettingsOpen') === 'true') {
+    if (localStorage.getItem('orgRegistrationSettingsOpen') === 'true') {
       collapse('show', this.settingsTarget, 0)
       if (this.hasSettingsButtonTarget) this.settingsButtonTarget.classList.add('active')
     }
@@ -28,7 +28,7 @@ export default class extends Controller {
     const wasHidden = this.settingsTarget.classList.contains('tw:hidden!') ||
       this.settingsTarget.classList.contains('tw:hidden')
     collapse('toggle', this.settingsTarget)
-    localStorage.setItem('orgBikeSettingsOpen', wasHidden ? 'true' : 'false')
+    localStorage.setItem('orgRegistrationSettingsOpen', wasHidden ? 'true' : 'false')
     if (this.hasSettingsButtonTarget) this.settingsButtonTarget.classList.toggle('active', wasHidden)
   }
 
@@ -36,7 +36,7 @@ export default class extends Controller {
     if (!this.hasNotesFieldTarget) return
     const input = this.notesFieldTarget.querySelector('input')
     const hasValue = input && input.value.length > 0
-    if (hasValue || localStorage.getItem('orgBikeNotesSearchOpen') === 'true') {
+    if (hasValue || localStorage.getItem('orgRegistrationNotesSearchOpen') === 'true') {
       this.showNotesSearch()
     }
   }
@@ -53,13 +53,13 @@ export default class extends Controller {
 
   showNotesSearch () {
     this.notesFieldTarget.classList.remove('tw:hidden')
-    localStorage.setItem('orgBikeNotesSearchOpen', 'true')
+    localStorage.setItem('orgRegistrationNotesSearchOpen', 'true')
     if (this.hasNotesButtonTarget) this.notesButtonTarget.classList.add('active')
   }
 
   hideNotesSearch () {
     this.notesFieldTarget.classList.add('tw:hidden')
-    localStorage.setItem('orgBikeNotesSearchOpen', 'false')
+    localStorage.setItem('orgRegistrationNotesSearchOpen', 'false')
     if (this.hasNotesButtonTarget) this.notesButtonTarget.classList.remove('active')
   }
 
