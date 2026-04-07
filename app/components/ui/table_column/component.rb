@@ -9,15 +9,16 @@ module UI
       ARROW_DOWN = "\u2193"
       NBSP = "\u00A0"
 
-      attr_reader :sortable, :cell_block
+      attr_reader :sortable, :cell_block, :uncached
 
-      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, uncached: false, &block)
         @label = label
         @sortable = sortable
         @sort_indicator = sort_indicator
         @classes = classes
         @header_classes = header_classes
         @lower_right = lower_right
+        @uncached = uncached
         @cell_block = block
       end
 
@@ -60,7 +61,7 @@ module UI
         classes.join(" ")
       end
 
-      def td_classes(index, total:, bordered:, last_row:)
+      def td_classes(index, bordered:)
         classes = ["tw:px-1 tw:py-1"]
         if bordered
           classes << "tw:border-b tw:border-r tw:border-gray-200 tw:dark:border-gray-700"
@@ -68,8 +69,6 @@ module UI
         else
           classes << "tw:border-b tw:border-gray-100 tw:dark:border-gray-700"
         end
-        classes << "tw:rounded-bl-sm" if last_row && index == 0
-        classes << "tw:rounded-br-sm" if last_row && index == total - 1
         classes << @classes if @classes
         classes.join(" ")
       end

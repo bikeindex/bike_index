@@ -3,7 +3,7 @@
     = link_to @social_post.post_link.gsub(/https?..\//, ''), @social_post.post_link, target: '_blank'
 
 = form_for [:admin, @social_post], url: { action: 'update', controller: 'social_posts' } do |f|
-  = render(UI::AlertForErrors::Component.new(object: @social_post))
+  = render(Alerts::ObjectErrors::Component.new(object: @social_post))
 
   .row.mt-4
     .col-md-6

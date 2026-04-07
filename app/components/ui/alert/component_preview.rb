@@ -1,49 +1,35 @@
 # frozen_string_literal: true
 
-module UI::Alert
-  class ComponentPreview < ApplicationComponentPreview
-    # @group Kind Variants
-    # @param kind "The kind of alert"
-    def notice(kind: :notice)
-      render(UI::Alert::Component.new(text: default_text, kind:))
-    end
+module UI
+  module Alert
+    class ComponentPreview < ApplicationComponentPreview
+      # @!group Kind variants
+      def notice
+        render(UI::Alert::Component.new(text: "This is a notice alert", kind: :notice))
+      end
 
-    def error(kind: :error)
-      render(UI::Alert::Component.new(text: default_text, kind:))
-    end
+      def error
+        render(UI::Alert::Component.new(text: "This is an error alert", kind: :error))
+      end
 
-    def warning(kind: :warning)
-      render(UI::Alert::Component.new(text: default_text, kind:))
-    end
+      def warning
+        render(UI::Alert::Component.new(text: "This is a warning alert", kind: :warning))
+      end
 
-    def success(kind: :success)
-      render(UI::Alert::Component.new(text: default_text, kind:))
-    end
-    # @endgroup
+      def success
+        render(UI::Alert::Component.new(text: "This is a success alert", kind: :success))
+      end
+      # @!endgroup
 
-    # @group Dismissable Variants
-    # @param kind "The kind of alert"
-    def dismissable_notice(kind: :notice)
-      render(UI::Alert::Component.new(text: default_text, kind:, dismissable: true))
-    end
+      # @!group Dismissable variants
+      def dismissable_notice
+        render(UI::Alert::Component.new(text: "Dismissable notice", kind: :notice, dismissable: true))
+      end
 
-    def dismissable_error(kind: :error)
-      render(UI::Alert::Component.new(text: default_text, kind:, dismissable: true))
-    end
-
-    def dismissable_warning(kind: :warning)
-      render(UI::Alert::Component.new(text: default_text, kind:, dismissable: true))
-    end
-
-    def dismissable_success(kind: :success)
-      render(UI::Alert::Component.new(text: default_text, kind:, dismissable: true))
-    end
-    # @endgroup
-
-    private
-
-    def default_text
-      "A simple alert with some info in it"
+      def dismissable_error
+        render(UI::Alert::Component.new(text: "Dismissable error", kind: :error, dismissable: true))
+      end
+      # @!endgroup
     end
   end
 end

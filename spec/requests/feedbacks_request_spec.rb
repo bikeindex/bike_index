@@ -55,9 +55,9 @@ RSpec.describe FeedbacksController, type: :request do
                              package_size: "small"
                            }
                          },
-            headers: {"HTTP_REFERER" => "http://localhost:3000/partyyyyy"}
+            headers: {"HTTP_REFERER" => "http://www.example.com/partyyyyy"}
         }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
-        expect(response).to redirect_to "http://localhost:3000/partyyyyy"
+        expect(response).to redirect_to "http://www.example.com/partyyyyy"
         expect(flash[:success]).to be_present
         feedback = Feedback.last
         expect(feedback.title).to eq "New School lead: Cool School"
@@ -77,9 +77,9 @@ RSpec.describe FeedbacksController, type: :request do
                                package_size: ""
                              }
                            },
-              headers: {"HTTP_REFERER" => "http://localhost:3000/cities_packages"}
+              headers: {"HTTP_REFERER" => "http://www.example.com/cities_packages"}
           }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
-          expect(response).to redirect_to "http://localhost:3000/cities_packages"
+          expect(response).to redirect_to "http://www.example.com/cities_packages"
           expect(flash[:success]).to be_present
           feedback = Feedback.last
           expect(feedback.title).to eq "New City lead: Chicago"

@@ -32,7 +32,7 @@ RSpec.describe UI::TableColumn::Component do
     it "includes header_classes on th but not td" do
       col = described_class.new(label: "Name", header_classes: "w-32")
       expect(col.th_classes(0, total: 1, bordered: false)).to include("w-32")
-      expect(col.td_classes(0, total: 1, bordered: false, last_row: false)).not_to include("w-32")
+      expect(col.td_classes(0, bordered: false)).not_to include("w-32")
     end
   end
 
@@ -40,20 +40,14 @@ RSpec.describe UI::TableColumn::Component do
     let(:col) { described_class.new(label: "Name") }
 
     it "includes bordered classes when bordered" do
-      result = col.td_classes(0, total: 3, bordered: true, last_row: false)
-      expect(result).to include("border-b")
-      expect(result).to include("border-l")
+      result = col.td_classes(0, bordered: true)
+      expect(result).to include("tw:border-b tw:border-r")
+      expect(result).to include("tw:border-l")
     end
 
     it "includes unbordered classes when not bordered" do
-      result = col.td_classes(1, total: 3, bordered: false, last_row: false)
-      expect(result).to include("border-b")
-      expect(result).to include("border-gray-100")
-    end
-
-    it "includes corner rounding on last row" do
-      expect(col.td_classes(0, total: 3, bordered: false, last_row: true)).to include("rounded-bl-sm")
-      expect(col.td_classes(2, total: 3, bordered: false, last_row: true)).to include("rounded-br-sm")
+      result = col.td_classes(1, bordered: false)
+      expect(result).to include("tw:border-b tw:border-gray-100")
     end
   end
 
