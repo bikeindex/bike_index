@@ -8,9 +8,7 @@ export default class extends Controller {
   static values = { enabledColumns: Array, defaultColumns: Array }
 
   connect () {
-    this.enabledColumnsValue = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
-      [...th.classList].find(c => c.endsWith('_cell'))
-    ).filter(Boolean)
+    this.refreshEnabledColumns()
     this.selectStoredVisibleColumns()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
@@ -20,7 +18,14 @@ export default class extends Controller {
   }
 
   handleFrameRender = () => {
+    this.refreshEnabledColumns()
     this.updateVisibleColumns()
+  }
+
+  refreshEnabledColumns () {
+    this.enabledColumnsValue = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
+      [...th.classList].find(c => c.endsWith('_cell'))
+    ).filter(Boolean)
   }
 
   columnToggled () {
@@ -72,9 +77,11 @@ export default class extends Controller {
     // Store enabled columns so they persist across page loads
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
-    this.element.querySelectorAll('.hideableColumn').forEach(el => {
-      const isVisible = visible.some(col => el.classList.contains(col))
-      el.classList.toggle('tw:hidden', !isVisible)
+    this.enabledColumnsValue.forEach(col => {
+      const isVisible = visible.includes(col)
+      this.element.querySelectorAll(`.${col}`).forEach(el => {
+        el.classList.toggle('tw:hidden', !isVisible)
+      })
     })
   }
 }
