@@ -118,6 +118,7 @@ class StravaIntegrationsController < ApplicationController
   end
 
   def session_state_matches?(params_state, session_state)
-    ActiveSupport::SecurityUtils.secure_compare(params_state&.to_s, session_state&.to_s)
+    params_state.present? && session_state.present? &&
+      ActiveSupport::SecurityUtils.secure_compare(params_state.to_s, session_state.to_s)
   end
 end

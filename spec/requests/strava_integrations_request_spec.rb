@@ -80,8 +80,10 @@ RSpec.describe StravaIntegrationsController, type: :request do
       end
 
       context "with expired session (no session state)" do
-        it "redirects with error flash without reporting to error tracker" do
-          get "/strava_integration/callback", params: {code: "test_auth_code", state: "stale_state_from_url"}
+        it "redirects with error flash and does not create integration" do
+          expect {
+            get "/strava_integration/callback", params: {code: "test_auth_code", state: "stale_state_from_url"}
+          }.to change(StravaIntegration, :count).by(0)
           expect(response).to redirect_to(my_account_path)
           expect(flash[:error]).to match(/invalid oauth state/i)
         end
