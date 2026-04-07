@@ -66,6 +66,7 @@ Rails.application.configure do
       "https://www.google.fr",
       "https://www.google.it",
       "https://www.google.nl",
+      "https://www.google.co.id",
       "https://www.google.co.in",
       "https://www.google.co.jp",
       "https://www.google.com.mx",
