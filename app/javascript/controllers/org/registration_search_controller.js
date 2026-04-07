@@ -3,19 +3,16 @@ import { collapse } from 'utils/collapse_utils'
 
 /* global localStorage */
 
-// Connects to data-controller='org--bike-search'
+// Connects to data-controller='org--registration-search'
 export default class extends Controller {
   static targets = ['settings', 'settingsButton', 'perPage', 'exportLink', 'notesField', 'notesButton']
-  static values = { defaultColumns: Array }
 
   connect () {
-    this.selectStoredVisibleColumns()
     if (localStorage.getItem('orgBikeSettingsOpen') === 'true') {
       collapse('show', this.settingsTarget, 0)
       if (this.hasSettingsButtonTarget) this.settingsButtonTarget.classList.add('active')
     }
     this.initNotesSearch()
-    // Re-apply column visibility when turbo frame updates with new table content
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
 
@@ -24,7 +21,6 @@ export default class extends Controller {
   }
 
   handleFrameRender = () => {
-    this.updateVisibleColumns()
     this.updateExportLink()
   }
 
@@ -34,23 +30,6 @@ export default class extends Controller {
     collapse('toggle', this.settingsTarget)
     localStorage.setItem('orgBikeSettingsOpen', wasHidden ? 'true' : 'false')
     if (this.hasSettingsButtonTarget) this.settingsButtonTarget.classList.toggle('active', wasHidden)
-  }
-
-  columnToggled () {
-    this.updateVisibleColumns()
-  }
-
-  // Avery export requires a page reload because the server conditionally
-  // renders avery column cells based on the search_avery_export param
-  averyToggled (event) {
-    const url = new URL(window.location)
-    if (event.target.checked) {
-      url.searchParams.set('search_avery_export', 'true')
-    } else {
-      url.searchParams.delete('search_avery_export')
-    }
-    url.searchParams.set('search_no_js', 'true')
-    window.location = url.toString()
   }
 
   initNotesSearch () {
@@ -103,43 +82,5 @@ export default class extends Controller {
     const url = new URL(window.location)
     url.searchParams.set('create_export', 'true')
     this.exportLinkTarget.href = url.toString()
-  }
-
-  selectStoredVisibleColumns () {
-    const stored = localStorage.getItem('orgRegistrationColumns')
-    let columns = this.defaultColumnsValue
-    if (stored) {
-      try { columns = JSON.parse(stored) } catch { localStorage.removeItem('orgRegistrationColumns') }
-    }
-
-    this.settingsTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      if (cb.dataset.action && cb.dataset.action.includes('averyToggled')) return
-      cb.checked = columns.includes(cb.name)
-    })
-    this.updateVisibleColumns()
-  }
-
-  updateVisibleColumns () {
-    const checked = []
-    const visible = []
-    this.settingsTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      if (cb.dataset.action && cb.dataset.action.includes('averyToggled')) {
-        // Avery state is URL-driven, not stored in localStorage, but still
-        // needs to be in the visible list so the column cells are shown
-        if (cb.checked) visible.push(cb.name)
-        return
-      }
-      if (cb.checked) {
-        checked.push(cb.name)
-        visible.push(cb.name)
-      }
-    })
-    // Store enabled columns so they persist across page loads
-    localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
-
-    this.element.querySelectorAll('.hiddenColumn').forEach(el => {
-      const isVisible = visible.some(col => el.classList.contains(col))
-      el.classList.toggle('tw:hidden', !isVisible)
-    })
   }
 }

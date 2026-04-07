@@ -55,43 +55,45 @@
     >
       <thead class="small-header sortable">
         <tr>
-          <th class="hiddenColumn url_cell"><%= translation(".url") %></th>
+          <th class="hideableColumn url_cell"><%= translation(".url") %></th>
 
-          <th class="hiddenColumn created_at_cell">
+          <th class="hideableColumn created_at_cell">
             <%= sortable("id", translation(".registered")) %>
           </th>
 
-          <th class="hiddenColumn updated_at_cell">
+          <th class="hideableColumn updated_at_cell">
             <%= sortable("updated_by_user_at", translation(".updated")) %>
           </th>
 
-          <th class="hiddenColumn stolen_cell">
+          <th class="hideableColumn stolen_cell">
             <small><%= translation(".stolen") %></small>
           </th>
 
-          <th class="hiddenColumn serial_number_cell">
+          <th class="hideableColumn serial_number_cell">
             <%= translation(".serial") %>
           </th>
 
-          <th class="hiddenColumn propulsion_type_cell">
+          <th class="hideableColumn propulsion_type_cell">
             <%= sortable("propulsion_type", translation(".propulsion_type")) %>
           </th>
 
-          <th class="hiddenColumn cycle_type_cell">
+          <th class="hideableColumn cycle_type_cell">
             <%= sortable("cycle_type", translation(".vehicle_type")) %>
           </th>
 
-          <th class="hiddenColumn manufacturer_cell">
+          <th class="hideableColumn manufacturer_cell">
             <%= sortable("mnfg_name", translation(".manufacturer")) %>
           </th>
 
-          <th class="hiddenColumn model_cell">
+          <th class="hideableColumn model_cell">
             <%= sortable("frame_model", translation(".model")) %>
           </th>
 
-          <th class="hiddenColumn color_cell"><%= translation(".color") %></th>
+          <th class="hideableColumn color_cell">
+            <%= translation(".color") %>
+          </th>
 
-          <th class="hiddenColumn owner_email_cell">
+          <th class="hideableColumn owner_email_cell">
             <small class="hidden-sm-up">
               <%= translation(".mfg_model_color_html") %>
               <br>
@@ -100,20 +102,20 @@
             <%= sortable("owner_email", translation(".sent_to")) %>
           </th>
 
-          <th class="hiddenColumn creation_description_cell">
+          <th class="hideableColumn creation_description_cell">
             <%= translation(".source") %>
           </th>
 
-          <th class="hiddenColumn owner_name_cell">
+          <th class="hideableColumn owner_name_cell">
             <small><%= translation(".owner_name") %></small>
           </th>
 
-          <th class="hiddenColumn status_cell">
+          <th class="hideableColumn status_cell">
             <small><%= translation(".status_cell") %></small>
           </th>
 
           <% if @organization.enabled?("registration_notes") %>
-            <th class="hiddenColumn notes_cell">
+            <th class="hideableColumn notes_cell">
               <%= translation(".notes") %>
             </th>
           <% end %>
@@ -121,18 +123,18 @@
           <% additional_registration_fields.each do |reg_field| %>
             <% next if reg_field == "extra_registration_number" %>
 
-            <th class="hiddenColumn <%= "#{reg_field}_cell" %>">
+            <th class="hideableColumn <%= "#{reg_field}_cell" %>">
               <%= column_renames[:"#{reg_field}_cell"] %>
             </th>
           <% end %>
 
           <%# All organizations can see additional serial# %>
-          <th class="hiddenColumn extra_registration_number_cell">
+          <th class="hideableColumn extra_registration_number_cell">
             <%= translation(".secondary_number") %>
           </th>
 
           <% if @organization.enabled?("bike_stickers") %>
-            <th class="hiddenColumn sticker_cell">
+            <th class="hideableColumn sticker_cell">
               <%= translation(".sticker") %>
             </th>
           <% end %>
@@ -144,16 +146,16 @@
           <% end %>
 
           <% if @organization.enabled?("impound_bikes") %>
-            <th class="hiddenColumn impound_id_cell">
+            <th class="hideableColumn impound_id_cell">
               <%= translation(".impound_id") %>
             </th>
-            <th class="hiddenColumn impounded_cell">
+            <th class="hideableColumn impounded_cell">
               <%= translation(".impounded") %>
             </th>
           <% end %>
 
           <% if show_avery_export? %>
-            <th class="hiddenColumn avery_cell">
+            <th class="hideableColumn avery_cell">
               <%= translation(".avery") %>
             </th>
           <% end %>
@@ -185,7 +187,7 @@
           style: "width: 100%; max-width: 15rem; margin-top:15px;",
           data: {
             org__bike_search_target: "perPage",
-            action: "change->org--bike-search#perPageChanged"
+            action: "change->org--registration-search#perPageChanged"
           } %>
       </div>
     </div>

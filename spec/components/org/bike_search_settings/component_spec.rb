@@ -152,7 +152,7 @@ RSpec.describe Org::BikeSearchSettings::Component, type: :component do
 
   describe "rendering" do
     it "renders settings panel with columns and settings button" do
-      expect(component).to have_css(".settings-list", visible: :all)
+      expect(component).to have_css("[data-org--registration-search-target='settings']", visible: :all)
       expect(component).to have_css("input[type='checkbox']", visible: :all)
       expect(component).to have_button("settings", visible: :all)
     end
@@ -188,7 +188,7 @@ RSpec.describe Org::BikeSearchSettings::Component, type: :component do
       let(:search_stickers) { "with" }
 
       it "opens settings by default" do
-        expect(component).to have_css(".settings-list:not(.tw\\:hidden\\!)", visible: :all)
+        expect(component).to have_css("[data-org--registration-search-target='settings']:not(.tw\\:hidden\\!)", visible: :all)
       end
     end
   end
