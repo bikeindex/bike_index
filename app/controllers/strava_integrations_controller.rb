@@ -118,6 +118,7 @@ class StravaIntegrationsController < ApplicationController
   end
 
   def session_state_matches?(session_state)
+    return false if session_state.blank?
     return true if ActiveSupport::SecurityUtils.secure_compare(params[:state].to_s, session_state.to_s)
     Rails.error.report(StandardError.new("Invalid Strava OAuth state"),
       context: {user_id: current_user.id, param_state: params[:state], session_state:})
