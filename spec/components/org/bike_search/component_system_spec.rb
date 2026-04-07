@@ -9,14 +9,14 @@ RSpec.describe Org::BikeSearch::Component, :js, type: :system do
 
   before do
     visit(preview_path)
-    page.execute_script("localStorage.removeItem('orgBikeColumns'); localStorage.setItem('orgBikeSettingsOpen', 'false')")
+    page.execute_script("localStorage.removeItem('orgRegistrationColumns'); localStorage.setItem('orgRegistrationSettingsOpen', 'false')")
     visit(preview_path)
-    expect(page).to have_css("[data-controller='org--bike-search']", wait: 5)
+    expect(page).to have_css("[data-controller~='org--registration-search']", wait: 5)
   end
 
   it "toggles settings panel visibility" do
     expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
-    settings_selector = "[data-org--bike-search-target='settings']"
+    settings_selector = "[data-org--registration-search-target='settings']"
     expect(page).not_to have_css(settings_selector, visible: true, wait: 2)
 
     click_button "settings"
@@ -60,7 +60,7 @@ RSpec.describe Org::BikeSearch::Component, :js, type: :system do
     # Wait for the JS change handler to update the column visibility before reading localStorage
     expect(page).to have_css("th.url_cell", visible: true, wait: 5)
 
-    stored = page.evaluate_script("localStorage.getItem('orgBikeColumns')")
+    stored = page.evaluate_script("localStorage.getItem('orgRegistrationColumns')")
     columns = JSON.parse(stored)
     expect(columns).to include("url_cell")
 

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Organized bikes search", :js, type: :system do
+RSpec.describe "Organized registrations search", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
   let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
@@ -21,13 +21,16 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     click_button "Log in"
   end
 
+  def settings_selector
+    "[data-org--registration-search-target='settings']"
+  end
+
   def expect_settings_open
-    expect(find(".settings-list", visible: :all)["class"]).not_to include("tw:hidden!")
+    expect(find(settings_selector, visible: :all)["class"]).not_to include("tw:hidden!")
   end
 
   def open_settings_if_not
-    # if settings
-    if find(".settings-list", visible: :all)["class"].include?("tw:hidden!")
+    if find(settings_selector, visible: :all)["class"].include?("tw:hidden!")
       click_button "settings"
     end
   end
@@ -157,14 +160,38 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", minimum: 4, wait: 10)
 
-      # Open settings and choose "only stolen"
+      # Default columns are visible
+      expect(page).to have_css("th.manufacturer_cell", visible: :visible)
+      expect(page).to have_css("th.owner_email_cell", visible: :visible)
+      expect(page).to have_css("th.stolen_cell", visible: :visible)
+      # Non-default columns are hidden
+      expect(page).to have_css("th.serial_number_cell", visible: :hidden)
+      expect(page).to have_css("th.url_cell", visible: :hidden)
+      expect(page).to have_css("th.impounded_cell", visible: :hidden)
+      # Uncheck a default column — it hides
       open_settings_if_not
+      uncheck "manufacturer_cell"
+      expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
+      expect(page).to have_css("td.manufacturer_cell", visible: :hidden, minimum: 1)
+      # Check a non-default column — it shows
+      check "serial_number_cell"
+      expect(page).to have_css("th.serial_number_cell", visible: :visible)
+      expect(page).to have_css("td.serial_number_cell", visible: :visible, minimum: 1)
+      # Show impounded column
+      check "impounded_cell"
+      expect(page).to have_css("th.impounded_cell", visible: :visible)
+
+      # Choose "only stolen"
       choose("search_status_stolen", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=stolen/, wait: 10)
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
       expect(page).to have_text("1 registration matching")
       expect(page).to have_text("only stolen")
+      # Column choices persist after the search
+      expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
+      expect(page).to have_css("th.serial_number_cell", visible: :visible)
+      expect(page).to have_css("th.impounded_cell", visible: :visible)
 
       # Settings persisted open via localStorage; choose "only impounded"
       expect_settings_open
@@ -189,6 +216,10 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       expect(page).to have_current_path(/search_status=all/, wait: 10)
       expect(page).to have_css("table.table", wait: 10)
       expect(page).to have_css("tbody tr", minimum: 4, wait: 10)
+      # Column choices still persist
+      expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
+      expect(page).to have_css("th.serial_number_cell", visible: :visible)
+      expect(page).to have_css("th.impounded_cell", visible: :visible)
     end
   end
 

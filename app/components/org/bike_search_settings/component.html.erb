@@ -1,6 +1,6 @@
 <div
-  class="settings-list <%= 'tw:hidden!' unless settings_default_open? %>"
-  data-org--bike-search-target="settings"
+  class="[&_.form-group]:tw:mb-0 tw:my-4 tw:border tw:border-gray-300/70 tw:bg-gray-100 tw:px-3 tw:pt-4 tw:pb-3 <%= 'tw:hidden!' unless settings_default_open? %>"
+  data-org--registration-search-target="settings"
 >
   <h3 class="header-font-alt"><%= translation(".visible_columns") %></h3>
 
@@ -12,15 +12,21 @@
       tw:md:grid-flow-col tw:md:grid-cols-3
     "
     style="grid-template-rows: repeat(<%= column_rows %>, auto)"
+    data-org--registration-search-column-toggle-target="checkboxes"
   >
     <% enabled_columns.each do |cell_name| %>
-      <label class="tw:flex tw:items-center tw:gap-1 tw:leading-[1.25]!">
+      <label
+        class="
+          tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-1
+          tw:leading-[1.25]!
+        "
+      >
         <% if cell_name == "avery_cell" %>
           <%= check_box_tag cell_name, cell_name, show_avery_export?,
-              data: { action: "change->org--bike-search#averyToggled" } %>
+              data: { action: "change->org--registration-search-column-toggle#averyToggled" } %>
         <% else %>
           <%= check_box_tag cell_name, cell_name, false,
-              data: { action: "change->org--bike-search#columnToggled" } %>
+              data: { action: "change->org--registration-search-column-toggle#columnToggled" } %>
         <% end %>
 
         <%= column_renames[cell_name.to_sym] %>
@@ -76,8 +82,8 @@
         <button
           type="button"
           class="btn btn-sm btn-outline-secondary uncap"
-          data-action="click->org--bike-search#toggleNotesSearch"
-          data-org--bike-search-target="notesButton"
+          data-action="click->org--registration-search#toggleNotesSearch"
+          data-org--registration-search-target="notesButton"
         >
           <%= translation(".show_notes_search") %>
         </button>
@@ -87,7 +93,7 @@
         <div class="tw:ml-auto tw:text-right">
           <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
               organization_registrations_path(search_params.merge(create_export: true)),
-              class: "gray-link", data: {turbo_frame: "_top", "org--bike-search-target": "exportLink"} %>
+              class: "gray-link", data: {turbo_frame: "_top", "org--registration-search-target": "exportLink"} %>
         </div>
       <% end %>
     </div>
@@ -98,8 +104,8 @@
   <button
     type="button"
     class="btn btn-sm btn-outline-primary uncap <%= 'active' if settings_default_open? %>"
-    data-action="click->org--bike-search#toggleSettings"
-    data-org--bike-search-target="settingsButton"
+    data-action="click->org--registration-search#toggleSettings"
+    data-org--registration-search-target="settingsButton"
   >
     <%= translation(".settings") %>
     <%= helpers.inline_svg_tag "icons/settings_slider.svg", class: "tw:inline", alt: "settings icon" %>
