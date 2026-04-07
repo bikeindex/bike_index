@@ -41,6 +41,7 @@ Rails.application.configure do
       "https://cdn.jsdelivr.net",
       "https://api.mapbox.com"
     policy.connect_src :self,
+      "https://bikeindex.org",
       "https://bikebook.herokuapp.com",
       "https://www.google-analytics.com",
       "https://*.google-analytics.com",
