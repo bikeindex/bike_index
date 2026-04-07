@@ -70,17 +70,36 @@
     @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
   }
 
-  .twtable-striped tr:nth-child(odd) {
+  .ui-table tr:nth-child(odd) {
     @apply tw:bg-white tw:dark:bg-gray-900;
   }
-  .twtable-striped tr:nth-child(even) {
+  .ui-table tr:nth-child(even) {
     @apply tw:bg-gray-100 tw:dark:bg-gray-800;
   }
-  .twtable-striped tr:last-child td:first-child {
+  .ui-table tr:last-child td:first-child {
     @apply tw:rounded-bl-sm;
   }
-  .twtable-striped tr:last-child td:last-child {
+  .ui-table tr:last-child td:last-child {
     @apply tw:rounded-br-sm;
+  }
+  thead tr th:first-child {
+    @apply tw:rounded-tl-sm;
+  }
+  thead tr th:last-child {
+    @apply tw:rounded-tr-sm;
+  }
+
+  .ui-table-bordered tr td:first-child {
+    @apply tw:border-l tw:border-gray-200 tw:dark:border-gray-700;
+  }
+  .ui-table-bordered tr td:last-child {
+    @apply tw:border-r tw:border-gray-200 tw:dark:border-gray-700;
+  }
+  thead:has(+ .ui-table-bordered) tr th:first-child {
+    @apply tw:border-l tw:border-gray-200 tw:dark:border-gray-600;
+  }
+  thead:has(+ .ui-table-bordered) tr th:last-child {
+    @apply tw:border-r tw:border-gray-200 tw:dark:border-gray-600;
   }
 }
 

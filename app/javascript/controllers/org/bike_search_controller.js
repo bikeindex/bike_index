@@ -106,10 +106,10 @@ export default class extends Controller {
   }
 
   selectStoredVisibleColumns () {
-    const stored = localStorage.getItem('orgBikeColumns')
+    const stored = localStorage.getItem('orgRegistrationColumns')
     let columns = this.defaultColumnsValue
     if (stored) {
-      try { columns = JSON.parse(stored) } catch { localStorage.removeItem('orgBikeColumns') }
+      try { columns = JSON.parse(stored) } catch { localStorage.removeItem('orgRegistrationColumns') }
     }
 
     this.settingsTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
@@ -135,11 +135,11 @@ export default class extends Controller {
       }
     })
     // Store enabled columns so they persist across page loads
-    localStorage.setItem('orgBikeColumns', JSON.stringify(checked))
+    localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
     this.element.querySelectorAll('.hiddenColumn').forEach(el => {
       const isVisible = visible.some(col => el.classList.contains(col))
-      el.style.display = isVisible ? '' : 'none'
+      el.classList.toggle('tw:hidden', !isVisible)
     })
   }
 }
