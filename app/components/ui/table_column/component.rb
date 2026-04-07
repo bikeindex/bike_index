@@ -48,24 +48,20 @@ module UI
         end
       end
 
-      def th_classes(index, total:, bordered:)
+      def th_classes(bordered:)
         classes = ["tw:px-1 tw:py-2"]
         if bordered
-          classes << "tw:border-b tw:border-r tw:border-t tw:border-gray-200 tw:dark:border-gray-600"
-          classes << "tw:border-l" if index == 0
+          classes << "tw:border-b tw:border-l tw:border-t tw:border-gray-200 tw:dark:border-gray-600"
         end
-        classes << "tw:rounded-tl-sm" if index == 0
-        classes << "tw:rounded-tr-sm" if index == total - 1
         classes << @classes if @classes
         classes << @header_classes if @header_classes
         classes.join(" ")
       end
 
-      def td_classes(index, bordered:)
+      def td_classes(bordered:)
         classes = ["tw:px-1 tw:py-1"]
         if bordered
-          classes << "tw:border-b tw:border-r tw:border-gray-200 tw:dark:border-gray-700"
-          classes << "tw:border-l" if index == 0
+          classes << "tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700"
         else
           classes << "tw:border-b tw:border-gray-100 tw:dark:border-gray-700"
         end

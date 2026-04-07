@@ -2,31 +2,29 @@
   <table class="<%= table_classes %>">
     <thead class="tw:bg-gray-50 tw:text-sm tw:dark:bg-gray-700">
       <tr>
-        <% @columns.each_with_index do |col, i| %>
-          <th class="<%= col.th_classes(i, total: @columns.length, bordered: @bordered) %>">
+        <% @columns.each do |col| %>
+          <th class="<%= col.th_classes(bordered: @bordered) %>">
             <%= col.render_header(render_sortable: @render_sortable, current_sort:, current_direction:, sortable_url: method(:sortable_url)) %>
           </th>
         <% end %>
       </tr>
     </thead>
 
-    <tbody class="twtable-striped">
+    <tbody class="ui-table<%= ' ui-table-bordered' if @bordered %>">
       <% @records.each_with_index do |record, row_index| %>
         <tr>
           <% cache_if(@cache_key, [@cache_key, record]) do %>
-            <% @columns.each_with_index do |col, i| %>
+            <% @columns.each do |col| %>
               <% next if col.uncached %>
 
-              <td class="<%= col.td_classes(i, bordered: @bordered) %>">
+              <td class="<%= col.td_classes(bordered: @bordered) %>">
                 <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
               </td>
             <% end %>
           <% end %>
 
-          <% uncached_columns.each_with_index do |col, i| %>
-            <% cached_columns_count ||= @columns.count - uncached_columns.count %>
-
-            <td class="<%= col.td_classes(cached_columns_count + i, bordered: @bordered) %>">
+          <% uncached_columns.each do |col| %>
+            <td class="<%= col.td_classes(bordered: @bordered) %>">
               <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
             </td>
           <% end %>
