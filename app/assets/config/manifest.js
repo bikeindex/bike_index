@@ -7,6 +7,7 @@
 //= link registrations.js
 //= link i18n.js
 //= link redesign_2025.css
+//= link redesign_2026.css
 
 //= link_tree ../../javascript
 //= link_tree ../../components/ .js
