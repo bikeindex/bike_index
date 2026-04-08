@@ -52,7 +52,7 @@
   <% end %>
 
   <% table.column(sortable: "activities_downloaded_count", label: "Activities") do |strava_integration| %>
-    <%= link_to strava_integration.activities_downloaded_count, admin_strava_activities_path(search_strava_integration_id: strava_integration.id) %>
+    <%= link_to number_display(strava_integration.activities_downloaded_count), admin_strava_activities_path(search_strava_integration_id: strava_integration.id) %>
 
     <% if !strava_integration.synced? && strava_integration.athlete_activity_count.present? %>
       <small class="less-strong">
