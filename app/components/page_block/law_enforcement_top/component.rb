@@ -54,10 +54,10 @@ module PageBlock::LawEnforcementTop
 
     def partner_logos
       PARTNER_CITIES.map do |city|
-        {name: city, image: image_url("redesign_2026/lawpartners/#{city}.png")}
+        {name: city, image: image_url("kelsey/lawpartners/#{city}.png")}
       end + [
-        {name: "Boise City", image: image_url("redesign_2026/lawpartners/Boise City.png")},
-        {name: "Los Angeles", image: image_url("redesign_2026/lawpartners/LA.png")}
+        {name: "Boise City", image: image_url("kelsey/lawpartners/Boise City.png")},
+        {name: "Los Angeles", image: image_url("kelsey/lawpartners/LA.png")}
       ]
     end
   end
