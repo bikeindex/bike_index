@@ -45,6 +45,12 @@ module PageBlock::LawEnforcementTop
        author: "Officer Brittany Elenes", org: "LAPD"}
     ].freeze
 
+    def initialize(recoveries_value:, recoveries:, organization_count:)
+      @recoveries_value = recoveries_value
+      @recoveries = recoveries
+      @organization_count = organization_count
+    end
+
     private
 
     def bike_tile_images
