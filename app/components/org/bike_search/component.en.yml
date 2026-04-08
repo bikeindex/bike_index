@@ -11,6 +11,7 @@ en:
         color: Color
         e_vehicle_propulsion: E-vehicle (propulsion)
         e_vehicles_for_audit: 'E-Vehicles for audit:'
+        email_hidden: email hidden
         impound_id: Impound ID
         impounded: Impounded
         link: Link

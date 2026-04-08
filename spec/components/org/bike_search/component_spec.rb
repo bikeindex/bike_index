@@ -6,20 +6,23 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
-      render_inline(instance) { "<tr><td>bike row</td></tr>".html_safe }
+      render_inline(instance)
     end
   end
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
   let(:enabled_feature_slugs) { %w[bike_search] }
+  let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
   let(:pagy) { Pagy::Offset.new(count: 25, page: 1, limit: 10) }
   let(:search_stickers) { nil }
   let(:search_address) { nil }
   let(:search_status) { "all" }
   let(:skip_search_and_filters) { false }
+  let(:bikes) { [bike] }
   let(:options) do
     {
       organization:,
       pagy:,
+      bikes:,
       per_page: 10,
       params: {},
       interpreted_params: {},
@@ -33,8 +36,8 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     }
   end
 
-  it "renders table with form, checkboxes, and content block" do
-    expect(component).to have_css("table.table")
+  it "renders table with form, checkboxes, and bike data" do
+    expect(component).to have_css("table")
     expect(component).to have_css("tbody tr", count: 1)
     expect(component).to have_css("[data-org--registration-search-target='settings']", visible: :all)
     # Search form
@@ -45,13 +48,15 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     # pagination
     expect(component).to have_css(".paginate-container")
     expect(component).to have_css("select#per_page_select")
+    # bike data in cells
+    expect(component).to have_text(bike.mnfg_name)
   end
 
   context "with skip_search_and_filters" do
     let(:skip_search_and_filters) { true }
 
     it "renders table without search form" do
-      expect(component).to have_css("table.table")
+      expect(component).to have_css("table")
       expect(component).not_to have_css("#Search_Form")
     end
   end

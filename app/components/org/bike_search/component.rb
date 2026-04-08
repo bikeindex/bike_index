@@ -12,6 +12,7 @@ module Org::BikeSearch
       pagy:,
       per_page:,
       params:,
+      bikes: [],
       interpreted_params: {},
       sortable_search_params: {},
       search_stickers: nil,
@@ -28,6 +29,7 @@ module Org::BikeSearch
     )
       @organization = organization
       @pagy = pagy
+      @bikes = bikes
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
       @per_page = per_page
