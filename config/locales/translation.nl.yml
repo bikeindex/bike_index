@@ -6162,9 +6162,7 @@ nl:
         notes: Notes
         impound_id: Inbeslagname-ID
         assign_bike_sticker: Link
-      bike_search_row:
         email_hidden: email verborgen
-        mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
       bike_search_settings:
         address: 'Adres:'
         all: Alle
