@@ -70,18 +70,52 @@
     @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
   }
 
-  .twtable-striped tr:nth-child(odd) {
+  /* Style tables with CSS selectors to prevent caching issues */
+  .ui-table tbody tr:nth-child(odd) {
     @apply tw:bg-white tw:dark:bg-gray-900;
   }
-  .twtable-striped tr:nth-child(even) {
+  .ui-table tbody tr:nth-child(even) {
     @apply tw:bg-gray-100 tw:dark:bg-gray-800;
   }
-  .twtable-striped tr:last-child td:first-child {
+  .ui-table tbody tr:last-child td:first-child {
     @apply tw:rounded-bl-sm;
   }
-  .twtable-striped tr:last-child td:last-child {
+  .ui-table tbody tr:last-child td:last-child {
     @apply tw:rounded-br-sm;
   }
+  .ui-table thead tr th:first-child {
+    @apply tw:rounded-tl-sm;
+  }
+  .ui-table thead tr th:last-child {
+    @apply tw:rounded-tr-sm;
+  }
+
+  .ui-table-bordered tbody tr td:first-child {
+    @apply tw:ui-table-bordered-td-first;
+  }
+  .ui-table-bordered tbody tr td:last-child {
+    @apply tw:ui-table-bordered-td-last;
+  }
+  .ui-table-bordered thead tr th:first-child {
+    @apply tw:ui-table-bordered-th-first;
+  }
+  .ui-table-bordered thead tr th:last-child {
+    @apply tw:ui-table-bordered-th-last;
+  }
+}
+
+/* Create utility classes for the sides of the table so that it can be applied in JS when columns are hidden  */
+@utility ui-table-bordered-td-first {
+  @apply tw:border-l tw:border-gray-200 tw:dark:border-gray-700;
+}
+@utility ui-table-bordered-td-last {
+  @apply tw:border-r tw:border-gray-200 tw:dark:border-gray-700;
+}
+@utility ui-table-bordered-th-first {
+  @apply tw:border-l tw:border-gray-200 tw:dark:border-gray-600;
+}
+@utility ui-table-bordered-th-last {
+  @apply tw:border-r tw:border-gray-200 tw:dark:border-gray-600;
 }
 
 @utility base-font {

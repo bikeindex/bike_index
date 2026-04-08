@@ -12,6 +12,7 @@ module Org::BikeSearch
       pagy:,
       per_page:,
       params:,
+      bikes: [],
       interpreted_params: {},
       sortable_search_params: {},
       search_stickers: nil,
@@ -28,6 +29,7 @@ module Org::BikeSearch
     )
       @organization = organization
       @pagy = pagy
+      @bikes = bikes
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
       @per_page = per_page
@@ -68,8 +70,8 @@ module Org::BikeSearch
 
     def wrapper_data_attributes
       return {} if @skip_settings
-      {controller: "org--bike-search",
-       "org--bike-search-default-columns-value": initially_checked_columns.to_json}
+      {controller: "org--registration-search org--registration-search-column-toggle",
+       "org--registration-search-column-toggle-default-columns-value": initially_checked_columns.to_json}
     end
 
     def show_pagination?

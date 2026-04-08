@@ -24,7 +24,7 @@ RSpec.describe UI::Table::Component, type: :component do
     expect(component).to have_css("th", text: "Email")
     expect(component).to have_css("td", text: "Alice")
     expect(component).to have_css("td", text: "bob@example.com")
-    expect(component).to have_css("tbody.twtable-striped")
+    expect(component).to have_css("table.ui-table")
   end
 
   context "with custom classes" do

@@ -9,30 +9,24 @@ RSpec.describe UI::TableColumn::Component do
     let(:col) { described_class.new(label: "Name") }
 
     it "includes base classes" do
-      result = col.th_classes(1, total: 3, bordered: false)
-      expect(result).to include("tw:px-1 tw:py-2")
+      expect(col.th_classes(bordered: false)).to include("tw:px-1 tw:py-2")
     end
 
     it "includes border classes when bordered" do
-      result = col.th_classes(0, total: 3, bordered: true)
+      result = col.th_classes(bordered: true)
       expect(result).to include("border-b")
       expect(result).to include("border-l")
     end
 
-    it "includes corner rounding for first and last" do
-      expect(col.th_classes(0, total: 3, bordered: false)).to include("rounded-tl-sm")
-      expect(col.th_classes(2, total: 3, bordered: false)).to include("rounded-tr-sm")
-    end
-
     it "includes custom classes" do
       col = described_class.new(label: "Name", classes: "text-xs")
-      expect(col.th_classes(0, total: 1, bordered: false)).to include("text-xs")
+      expect(col.th_classes(bordered: false)).to include("text-xs")
     end
 
     it "includes header_classes on th but not td" do
       col = described_class.new(label: "Name", header_classes: "w-32")
-      expect(col.th_classes(0, total: 1, bordered: false)).to include("w-32")
-      expect(col.td_classes(0, bordered: false)).not_to include("w-32")
+      expect(col.th_classes(bordered: false)).to include("w-32")
+      expect(col.td_classes(bordered: false)).not_to include("w-32")
     end
   end
 
@@ -40,14 +34,13 @@ RSpec.describe UI::TableColumn::Component do
     let(:col) { described_class.new(label: "Name") }
 
     it "includes bordered classes when bordered" do
-      result = col.td_classes(0, bordered: true)
-      expect(result).to include("tw:border-b tw:border-r")
+      result = col.td_classes(bordered: true)
+      expect(result).to include("tw:border-b")
       expect(result).to include("tw:border-l")
     end
 
     it "includes unbordered classes when not bordered" do
-      result = col.td_classes(1, bordered: false)
-      expect(result).to include("tw:border-b tw:border-gray-100")
+      expect(col.td_classes(bordered: false)).to include("tw:border-b tw:border-gray-100")
     end
   end
 
