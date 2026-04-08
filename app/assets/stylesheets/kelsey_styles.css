@@ -128,7 +128,7 @@
 }
 
 .kelsey_styles .stat-box:nth-child(1) {
-  background-image: url('kelsey_styles/shield_dark-gray.png');
+  background-image: url('kelsey/shield_dark-gray.png');
   z-index: 1;
   margin-right: -300px;
   width: 350px;
@@ -142,7 +142,7 @@
 }
 
 .kelsey_styles .stat-box:nth-child(2) {
-  background-image: url('kelsey_styles/shield_light-blue.png');
+  background-image: url('kelsey/shield_light-blue.png');
   z-index: 3;
   width: 550px;
   height: 204px;
@@ -162,7 +162,7 @@
 }
 
 .kelsey_styles .stat-box:nth-child(3) {
-  background-image: url('kelsey_styles/shield_purple.png');
+  background-image: url('kelsey/shield_purple.png');
   z-index: 1;
   margin-left: -300px;
   width: 350px;
@@ -331,7 +331,7 @@
 /* Stolen Bikes Section */
 .kelsey_styles .stolen-bikes-section {
   background-color: var(--redesign-blue-800);
-  background-image: url('kelsey_styles/bikes-unique.png');
+  background-image: url('kelsey/bikes-unique.png');
   background-size: cover;
   background-position: center;
   background-blend-mode: overlay;
