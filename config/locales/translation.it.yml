@@ -4832,9 +4832,7 @@ it:
         notes: Note
         impound_id:
         assign_bike_sticker: Collegamento
-      bike_search_row:
         email_hidden:
-        mfg_model_color_html:
       bike_search_settings:
         address:
         all: Tutti
