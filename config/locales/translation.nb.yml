@@ -6003,9 +6003,7 @@ nb:
         notes: Notater
         impound_id: Beslags-ID
         assign_bike_sticker: Link
-      bike_search_row:
         email_hidden: e-post skjult
-        mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
       bike_search_settings:
         address: 'Adresse:'
         all: Alle
