@@ -81,10 +81,21 @@ export default class extends Controller {
     })
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
+    const firstVisible = this.enabledColumnsValue.find(col => visible.includes(col))
+    const lastVisible = [...this.enabledColumnsValue].reverse().find(col => visible.includes(col))
+
+    const borderClasses = {
+      th: { first: 'tw:ui-table-bordered-th-first', last: 'tw:ui-table-bordered-th-last' },
+      td: { first: 'tw:ui-table-bordered-td-first', last: 'tw:ui-table-bordered-td-last' }
+    }
+
     this.enabledColumnsValue.forEach(col => {
       const isVisible = visible.includes(col)
       this.element.querySelectorAll(`.${col}`).forEach(el => {
         el.classList.toggle('tw:hidden', !isVisible)
+        const tag = el.tagName === 'TH' ? 'th' : 'td'
+        el.classList.toggle(borderClasses[tag].first, col === firstVisible)
+        el.classList.toggle(borderClasses[tag].last, col === lastVisible)
       })
     })
   }

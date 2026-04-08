@@ -10,7 +10,7 @@
       </tr>
     </thead>
 
-    <tbody class="ui-table <%= ' ui-table-bordered' if @bordered %>">
+    <tbody>
       <% @records.each_with_index do |record, row_index| %>
         <tr>
           <% cache_if(@cache_key, [@cache_key, record]) do %>

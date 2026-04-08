@@ -54,7 +54,7 @@
   >
     <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-bikes", render_sortable: true)) do |table| %>
       <% table.column(label: t("components.org.bike_search.url"), classes: "hideableColumn url_cell") do |bike| %>
-        <code class="tw:p-0 tw:text-xs" style="word-break: normal">
+        <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
           <%= bike.html_url %>
         </code>
       <% end %>
