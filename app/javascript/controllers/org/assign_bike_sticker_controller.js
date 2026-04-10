@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='assign-bike-sticker'
+// Connects to data-controller='org--assign-bike-sticker'
 // When a bike_sticker param is present, shows the assign column and wires up link hrefs
 export default class extends Controller {
   static values = { stickerPath: String }
