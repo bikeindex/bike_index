@@ -217,7 +217,7 @@
       <% end %>
 
       <% if @include_avery && organization.enabled?("avery_export") %>
-        <% table.column(label: t("components.org.bike_search.avery"), classes: "hideableColumn avery_cell", uncached: true) do |bike| %>
+        <% table.column(label: t("components.org.bike_search.avery"), classes: "hideableColumn avery_cell") do |bike| %>
           <%= check_mark if bike.avery_exportable? %>
         <% end %>
       <% end %>

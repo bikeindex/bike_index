@@ -80,17 +80,10 @@ module Org::BikeSearchSettings
         cols = %w[created_at_cell stolen_cell manufacturer_cell model_cell
           color_cell owner_email_cell owner_name_cell creation_description_cell]
         cols += ["sticker_cell"] if @organization.enabled?("bike_stickers")
-        cols += ["avery_cell"] if show_avery_export?
+        cols += ["avery_cell"] if @include_avery && @organization.enabled?("avery_export")
         cols += ["impounded_cell"] if @params[:search_impoundedness] == "impounded"
         cols
       end
-    end
-
-    def show_avery_export?
-      return @show_avery_export if defined?(@show_avery_export)
-
-      @show_avery_export = @include_avery && @organization.enabled?("avery_export") &&
-        Binxtils::InputNormalizer.boolean(@params[:search_avery_export])
     end
 
     def column_renames

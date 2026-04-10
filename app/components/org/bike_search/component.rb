@@ -4,7 +4,7 @@ module Org::BikeSearch
   class Component < ApplicationComponent
     include SortableHelper
 
-    delegate :additional_registration_fields, :show_avery_export?, :column_renames,
+    delegate :additional_registration_fields, :column_renames,
       :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
       to: :settings_component
     def initialize(
