@@ -78,7 +78,6 @@ module Org::BikeSearchSettings
         cols = %w[created_at_cell stolen_cell manufacturer_cell model_cell
           color_cell owner_email_cell owner_name_cell creation_description_cell]
         cols += ["sticker_cell"] if @organization.enabled?("bike_stickers")
-        cols += ["avery_cell"] if @organization.enabled?("avery_export")
         cols += ["impounded_cell"] if @params[:search_impoundedness] == "impounded"
         cols
       end
