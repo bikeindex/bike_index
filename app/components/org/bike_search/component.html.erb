@@ -49,8 +49,11 @@
   <% bike_sticker = @bike_sticker %>
 
   <div
-    data-controller="update-cached-sortable-links"
+    data-controller="update-cached-sortable-links assign-bike-sticker"
     data-update-cached-sortable-links-base-url-value="<%= url_for(@sortable_search_params.merge(organization_id: organization.to_param)) %>"
+    <% if bike_sticker.present? %>
+      data-assign-bike-sticker-sticker-path-value="<%= bike_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization_id) %>"
+    <% end %>
   >
     <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-bikes", render_sortable: true)) do |table| %>
       <% table.column(label: t("components.org.bike_search.url"), classes: "hideableColumn url_cell") do |bike| %>
@@ -189,14 +192,11 @@
             <% end %>
           <% end %>
         <% end %>
-      <% end %>
-
-      <% if bike_sticker.present? %>
-        <% table.column(label: t("components.org.bike_search.assign_bike_sticker"), classes: "assign_bike_sticker_cell", uncached: true) do |bike| %>
+        <% table.column(label: t("components.org.bike_search.assign_bike_sticker"), classes: "assign_bike_sticker_cell tw:hidden") do |bike| %>
           <small>
-            <%= link_to t("components.org.bike_search.assign_bike_sticker"),
-              bike_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization_id, bike_id: bike.id),
-              method: "PUT", data: {turbo_frame: "_top"} %>
+            <a data-bike-id="<%= bike.id %>">
+              <%= t("components.org.bike_search.assign_bike_sticker") %>
+            </a>
           </small>
         <% end %>
       <% end %>
