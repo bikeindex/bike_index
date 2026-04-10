@@ -48,7 +48,6 @@ module Org::BikeSearchSettings
       search_stickers: nil,
       search_address: nil,
       search_status: "all",
-      include_avery: false,
       bike_sticker: nil,
       skip_search_and_filters: false
     )
@@ -59,7 +58,6 @@ module Org::BikeSearchSettings
       @search_stickers = search_stickers
       @search_address = search_address
       @search_status = search_status
-      @include_avery = include_avery
       @bike_sticker = bike_sticker
       @skip_search_and_filters = skip_search_and_filters
     end
@@ -80,7 +78,7 @@ module Org::BikeSearchSettings
         cols = %w[created_at_cell stolen_cell manufacturer_cell model_cell
           color_cell owner_email_cell owner_name_cell creation_description_cell]
         cols += ["sticker_cell"] if @organization.enabled?("bike_stickers")
-        cols += ["avery_cell"] if @include_avery && @organization.enabled?("avery_export")
+        cols += ["avery_cell"] if @organization.enabled?("avery_export")
         cols += ["impounded_cell"] if @params[:search_impoundedness] == "impounded"
         cols
       end
@@ -139,7 +137,7 @@ module Org::BikeSearchSettings
         cols += additional_registration_fields.map { |f| "#{f}_cell" }
         cols += ["notes_cell"] if @organization.enabled?("registration_notes")
         cols += %w[impound_id_cell impounded_cell] if @organization.enabled?("impound_bikes")
-        cols += ["avery_cell"] if @include_avery && @organization.enabled?("avery_export")
+        cols += ["avery_cell"] if @organization.enabled?("avery_export")
         cols.uniq.sort { |a, b| column_renames[a.to_sym] <=> column_renames[b.to_sym] }
       end
     end

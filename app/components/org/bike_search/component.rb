@@ -24,7 +24,6 @@ module Org::BikeSearch
       bike_sticker: nil,
       model_audit: nil,
       skip_search_and_filters: false,
-      include_avery: false,
       skip_settings: false
     )
       @organization = organization
@@ -43,7 +42,6 @@ module Org::BikeSearch
       @bike_sticker = bike_sticker
       @model_audit = model_audit
       @skip_search_and_filters = skip_search_and_filters
-      @include_avery = include_avery
       @skip_settings = skip_settings
     end
 
@@ -58,7 +56,6 @@ module Org::BikeSearch
         search_stickers: @search_stickers,
         search_address: @search_address,
         search_status: @search_status,
-        include_avery: @include_avery,
         bike_sticker: @bike_sticker,
         skip_search_and_filters: @skip_search_and_filters
       )
