@@ -191,16 +191,6 @@
         <% end %>
       <% end %>
 
-      <% if bike_sticker.present? %>
-        <% table.column(label: t("components.org.bike_search.assign_bike_sticker"), classes: "assign_bike_sticker_cell", uncached: true) do |bike| %>
-          <small>
-            <%= link_to t("components.org.bike_search.assign_bike_sticker"),
-              bike_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization_id, bike_id: bike.id),
-              method: "PUT", data: {turbo_frame: "_top"} %>
-          </small>
-        <% end %>
-      <% end %>
-
       <% if organization.enabled?("impound_bikes") %>
         <% table.column(label: t("components.org.bike_search.impound_id"), classes: "hideableColumn impound_id_cell") do |bike| %>
           <% if bike.status_impounded? && bike.current_impound_record.present? %>
@@ -219,6 +209,16 @@
       <% if @organization.enabled?("avery_export") %>
         <% table.column(label: t("components.org.bike_search.avery"), classes: "hideableColumn avery_cell") do |bike| %>
           <%= check_mark if bike.avery_exportable? %>
+        <% end %>
+      <% end %>
+
+      <% if bike_sticker.present? %>
+        <% table.column(label: t("components.org.bike_search.assign_bike_sticker"), classes: "assign_bike_sticker_cell", uncached: true) do |bike| %>
+          <small>
+            <%= link_to t("components.org.bike_search.assign_bike_sticker"),
+              bike_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization_id, bike_id: bike.id),
+              method: "PUT", data: {turbo_frame: "_top"} %>
+          </small>
         <% end %>
       <% end %>
     <% end %>
