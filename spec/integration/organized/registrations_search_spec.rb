@@ -236,19 +236,19 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     it "toggles avery export column via checkbox" do
       visit bikes_path
       expect(page).to have_css("table", wait: 10)
-      expect(page).not_to have_css("th.avery_cell:not(.tw\\:hidden)")
+      expect(page).not_to have_css("th.avery_cell", visible: :visible)
       expect(page).not_to have_css("th.assign_bike_sticker_cell")
 
       # Open settings and check avery — toggles column visibility client-side
       open_settings_if_not
       check "avery_cell"
       # Avery column should be visible with check mark for exportable bike
-      expect(page).to have_css("th.avery_cell:not(.tw\\:hidden)")
+      expect(page).to have_css("th.avery_cell", visible: :visible)
       expect(page).to have_css("td.avery_cell", text: "✓")
 
       # Uncheck avery — hides column client-side
       uncheck "avery_cell"
-      expect(page).not_to have_css("th.avery_cell:not(.tw\\:hidden)")
+      expect(page).not_to have_css("th.avery_cell", visible: :visible)
 
       # Open settings and choose "only with address"
       choose("search_address_with_street", allow_label_click: true, visible: :all)
