@@ -192,16 +192,12 @@
       <% end %>
 
       <% if organization.enabled?("bike_stickers") %>
-        <% table.column(label: translation(".sticker"), classes: "hideableColumn sticker_cell") do |bike| %>
+        <% table.column(label: translation(".sticker"), classes: "hideableColumn sticker_cell tw:pt-0", header_classes: "tw:pt-1") do |bike| %>
           <% bike.bike_stickers.each_with_index do |bs, index| %>
             <% if bs.organization.present? && bs.organization_id == organization.id %>
-              <%= link_to bs.pretty_code, edit_organization_sticker_path(id: bs.code, organization_id: bs.organization&.to_param), class: "small", data: {turbo_frame: "_top"} %>
+              <%= link_to bs.pretty_code, edit_organization_sticker_path(id: bs.code, organization_id: bs.organization&.to_param), class: "tw:text-xs tw:block tw:mt-1", data: {turbo_frame: "_top"} %>
             <% else %>
-              <small><%= bs.pretty_code %></small>
-            <% end %>
-
-            <% if index > 0 %>
-              <br>
+              <small class="tw:text-xs tw:block tw:mt-1"><%= bs.pretty_code %></small>
             <% end %>
           <% end %>
         <% end %>

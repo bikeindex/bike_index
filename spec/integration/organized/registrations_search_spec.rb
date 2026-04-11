@@ -284,7 +284,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       visit "#{bikes_path}?bike_sticker=#{unlinked_sticker.code}"
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("th.assign_bike_sticker_cell")
-      expect(page).to have_css("td.assign_bike_sticker_cell a", text: "Link", minimum: 1)
+      expect(page).to have_css("td.assign_bike_sticker_cell a", text: "link sticker", minimum: 1)
 
       # Click the first "Link" to assign the sticker to a bike
       first("td.assign_bike_sticker_cell a").click
