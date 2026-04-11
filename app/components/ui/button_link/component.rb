@@ -7,7 +7,7 @@ module UI
         @text = text
         @href = href
         @color = UI::Button::Component::COLORS.key?(color) ? color : :secondary
-        @size = UI::Button::Component::SIZE_TEXT.key?(size) ? size : :md
+        @size = UI::Button::Component::SIZES.key?(size) ? size : :md
         @active = active
         @html_options = html_options
       end
@@ -19,15 +19,7 @@ module UI
       private
 
       def link_classes
-        classes = [
-          UI::Button::Component::BASE_CLASSES,
-          UI::Button::Component::COLORS[@color],
-          UI::Button::Component::SIZE_TEXT[@size],
-          @html_options[:class]
-        ]
-        classes << UI::Button::Component::SIZE_PADDING[@size] unless @color == :link
-        classes << UI::Button::Component::ACTIVE_COLORS[@color] if @active
-        classes.compact.join(" ")
+        UI::Button::Component.build_classes(color: @color, size: @size, active: @active, html_class: @html_options[:class])
       end
     end
   end
