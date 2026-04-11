@@ -12,15 +12,15 @@
 
     <tbody>
       <% @records.each do |record| %>
-        <tr>
-          <% cache_if(@cache_key, [@cache_key, record]) do %>
+        <% cache_if(@cache_key, [@cache_key, record]) do %>
+          <tr>
             <% @columns.each do |col| %>
               <td class="<%= col.td_classes(bordered: @bordered) %>">
                 <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
               </td>
             <% end %>
-          <% end %>
-        </tr>
+          </tr>
+        <% end %>
       <% end %>
     </tbody>
   </table>
