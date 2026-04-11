@@ -33,23 +33,6 @@ export default class extends Controller {
     this.updateVisibleColumns()
   }
 
-  // Avery export requires a page reload because the server conditionally
-  // renders avery column cells based on the search_avery_export param
-  averyToggled (event) {
-    const url = new URL(window.location)
-    if (event.target.checked) {
-      url.searchParams.set('search_avery_export', 'true')
-    } else {
-      url.searchParams.delete('search_avery_export')
-    }
-    url.searchParams.set('search_no_js', 'true')
-    window.location = url.toString()
-  }
-
-  isAveryCheckbox (cb) {
-    return cb.dataset.action?.includes('averyToggled')
-  }
-
   selectStoredVisibleColumns () {
     const stored = localStorage.getItem('orgRegistrationColumns')
     let columns = this.defaultColumnsValue
@@ -58,7 +41,6 @@ export default class extends Controller {
     }
 
     this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      if (this.isAveryCheckbox(cb)) return
       cb.checked = columns.includes(cb.name)
     })
     this.updateVisibleColumns()
@@ -66,23 +48,13 @@ export default class extends Controller {
 
   updateVisibleColumns () {
     const checked = []
-    const visible = []
     this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      if (this.isAveryCheckbox(cb)) {
-        // Avery state is URL-driven, not stored in localStorage, but still
-        // needs to be in the visible list so the column cells are shown
-        if (cb.checked) visible.push(cb.name)
-        return
-      }
-      if (cb.checked) {
-        checked.push(cb.name)
-        visible.push(cb.name)
-      }
+      if (cb.checked) checked.push(cb.name)
     })
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
-    const firstVisible = this.enabledColumnsValue.find(col => visible.includes(col))
-    const lastVisible = [...this.enabledColumnsValue].reverse().find(col => visible.includes(col))
+    const firstVisible = this.enabledColumnsValue.find(col => checked.includes(col))
+    const lastVisible = [...this.enabledColumnsValue].reverse().find(col => checked.includes(col))
 
     const borderClasses = {
       th: { first: 'tw:ui-table-bordered-th-first', last: 'tw:ui-table-bordered-th-last' },
@@ -90,7 +62,7 @@ export default class extends Controller {
     }
 
     this.enabledColumnsValue.forEach(col => {
-      const isVisible = visible.includes(col)
+      const isVisible = checked.includes(col)
       this.element.querySelectorAll(`.${col}`).forEach(el => {
         el.classList.toggle('tw:hidden', !isVisible)
         const tag = el.tagName === 'TH' ? 'th' : 'td'
