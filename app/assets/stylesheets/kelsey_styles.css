@@ -1,3 +1,7 @@
+/*
+ *= require kelsey/for_landing_pages
+ */
+
 :root {
   --redesign-blue-500: #3397dc;
   --redesign-blue-800: #016ec2;
@@ -754,4 +758,3 @@
   }
 }
 
-@import "kelsey/for_landing_pages.css";
