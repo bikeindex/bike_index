@@ -1,12 +1,12 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--assign-bike-sticker'
-// When a bike_sticker param is present, shows the assign column and wires up link hrefs
+// When a bike_sticker param is present, wires up assign link hrefs
 export default class extends Controller {
   static values = { stickerPath: String }
 
   connect () {
-    if (!this.hasStickerPathValue || !this.stickerPathValue) return
+    if (!this.stickerPathValue) return
     this.updateLinks()
   }
 

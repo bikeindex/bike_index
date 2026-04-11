@@ -24,6 +24,9 @@ export default class extends Controller {
   }
 
   refreshEnabledColumns () {
+    // Stimulus Array values return a fresh copy on each read, so mutating
+    // via push won't persist (and assign_bike_sticker_cell is ignored)
+    // build the full array, then assign it once.
     const columns = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
       [...th.classList].find(c => c.endsWith('_cell'))
     ).filter(Boolean)
