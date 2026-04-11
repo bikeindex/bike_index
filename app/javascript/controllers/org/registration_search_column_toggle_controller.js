@@ -24,13 +24,15 @@ export default class extends Controller {
   }
 
   refreshEnabledColumns () {
-    this.enabledColumnsValue = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
+    const columns = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
       [...th.classList].find(c => c.endsWith('_cell'))
     ).filter(Boolean)
 
     if (this.assignBikeStickerValue) {
-      this.enabledColumnsValue.push('assign_bike_sticker_cell')
+      columns.push('assign_bike_sticker_cell')
     }
+
+    this.enabledColumnsValue = columns
   }
 
   columnToggled () {
