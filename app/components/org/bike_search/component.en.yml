@@ -15,6 +15,7 @@ en:
         impound_id: Impound ID
         impounded: Impounded
         link: Link
+        link_sticker: link sticker
         manufacturer: Manufacturer
         matching_bikes_html: "%{count} %{cycle_type} matching"
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
