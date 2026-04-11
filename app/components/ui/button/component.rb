@@ -47,8 +47,6 @@ module UI
         content_tag(:button, @text || content, class: button_classes, type: (@kind == :submit) ? "submit" : "button", data: @data)
       end
 
-      private
-
       def button_classes
         self.class.build_classes(color: @color, size: @size, active: @active, html_class: @html_class)
       end
