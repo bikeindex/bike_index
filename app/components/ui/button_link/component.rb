@@ -7,7 +7,7 @@ module UI
         @text = text
         @href = href
         @color = UI::Button::Component::COLORS.key?(color) ? color : :secondary
-        @size = UI::Button::Component::SIZES.key?(size) ? size : :md
+        @size = UI::Button::Component::SIZE_TEXT.key?(size) ? size : :md
         @active = active
         @html_options = html_options
       end
@@ -22,9 +22,10 @@ module UI
         classes = [
           UI::Button::Component::BASE_CLASSES,
           UI::Button::Component::COLORS[@color],
-          UI::Button::Component::SIZES[@size],
+          UI::Button::Component::SIZE_TEXT[@size],
           @html_options[:class]
         ]
+        classes << UI::Button::Component::SIZE_PADDING[@size] unless @color == :link
         classes << UI::Button::Component::ACTIVE_COLORS[@color] if @active
         classes.compact.join(" ")
       end
