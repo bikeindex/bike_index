@@ -2,8 +2,6 @@
 
 module UI
   module TableColumn
-    # ViewComponent representing a single table column. The table renders this
-    # component once per cell via `render(col.for_record(record))`.
     class Component < ApplicationComponent
       ARROW_UP = "\u2191"
       ARROW_DOWN = "\u2193"
