@@ -7,14 +7,7 @@ export default class extends Controller {
 
   connect () {
     if (!this.hasStickerPathValue || !this.stickerPathValue) return
-    this.showColumn()
     this.updateLinks()
-  }
-
-  showColumn () {
-    this.element.querySelectorAll('.assign_bike_sticker_cell').forEach(el => {
-      el.classList.remove('tw:hidden')
-    })
   }
 
   updateLinks () {

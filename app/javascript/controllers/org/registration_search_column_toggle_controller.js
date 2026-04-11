@@ -5,16 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--registration-search-column-toggle'
 export default class extends Controller {
   static targets = ['checkboxes']
-  static values = { enabledColumns: Array, defaultColumns: Array }
-
-  // Columns whose visibility is managed by other controllers (not checkboxes)
-  get externalColumns () {
-    const columns = []
-    if (this.element.querySelector('[data-org--assign-bike-sticker-sticker-path-value]')) {
-      columns.push('assign_bike_sticker_cell')
-    }
-    return columns
-  }
+  static values = { enabledColumns: Array, defaultColumns: Array, assignBikeSticker: Boolean }
 
   connect () {
     this.refreshEnabledColumns()
@@ -33,11 +24,13 @@ export default class extends Controller {
   }
 
   refreshEnabledColumns () {
-    const columns = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
+    this.enabledColumnsValue = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
       [...th.classList].find(c => c.endsWith('_cell'))
     ).filter(Boolean)
 
-    this.enabledColumnsValue = columns.concat(this.externalColumns)
+    if (this.assignBikeStickerValue) {
+      this.enabledColumnsValue.push('assign_bike_sticker_cell')
+    }
   }
 
   columnToggled () {
@@ -64,12 +57,9 @@ export default class extends Controller {
     })
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
-    // External columns are visible when their th is visible (managed elsewhere)
-    const external = this.externalColumns
-    external.forEach(col => {
-      const th = this.element.querySelector(`th.${col}`)
-      if (th && !th.classList.contains('tw:hidden')) checked.push(col)
-    })
+    if (this.assignBikeStickerValue) {
+      checked.push('assign_bike_sticker_cell')
+    }
 
     const firstVisible = this.enabledColumnsValue.find(col => checked.includes(col))
     // When initially rendering, or if none selected, return early
@@ -84,9 +74,7 @@ export default class extends Controller {
     this.enabledColumnsValue.forEach(col => {
       const isVisible = checked.includes(col)
       this.element.querySelectorAll(`.${col}`).forEach(el => {
-        if (!external.includes(col)) {
-          el.classList.toggle('tw:hidden', !isVisible)
-        }
+        el.classList.toggle('tw:hidden', !isVisible)
         const tag = el.tagName === 'TH' ? 'th' : 'td'
         el.classList.toggle(borderClasses[tag].first, col === firstVisible)
         el.classList.toggle(borderClasses[tag].last, col === lastVisible)
