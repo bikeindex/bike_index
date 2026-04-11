@@ -65,10 +65,21 @@ module Org::BikeSearch
       @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
     end
 
-    def wrapper_data_attributes
+    def component_wrapper_data_attributes
       return {} if @skip_settings
       {controller: "org--registration-search org--registration-search-column-toggle",
        "org--registration-search-column-toggle-default-columns-value": initially_checked_columns.to_json}
+    end
+
+    def table_wrapper_data_attributes
+      attrs = {
+        controller: "update-cached-sortable-links org--assign-bike-sticker",
+        "update-cached-sortable-links-base-url-value": helpers.url_for(@sortable_search_params.merge(organization_id: @organization.to_param))
+      }
+      if @bike_sticker.present?
+        attrs[:"org--assign-bike-sticker-sticker-path-value"] = helpers.bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id)
+      end
+      attrs
     end
 
     def show_pagination?

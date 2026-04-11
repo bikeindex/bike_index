@@ -24,9 +24,16 @@ export default class extends Controller {
   }
 
   refreshEnabledColumns () {
-    this.enabledColumnsValue = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
+    const columns = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
       [...th.classList].find(c => c.endsWith('_cell'))
     ).filter(Boolean)
+
+    const stickerEl = this.element.querySelector('[data-org--assign-bike-sticker-sticker-path-value]')
+    if (stickerEl) {
+      columns.push('assign_bike_sticker_cell')
+    }
+
+    this.enabledColumnsValue = columns
   }
 
   columnToggled () {
@@ -54,7 +61,10 @@ export default class extends Controller {
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
     const firstVisible = this.enabledColumnsValue.find(col => checked.includes(col))
+    // When initially rendering, or if none selected, return early
+    if (!firstVisible) return;
     const lastVisible = [...this.enabledColumnsValue].reverse().find(col => checked.includes(col))
+    console.log(firstVisible)
 
     const borderClasses = {
       th: { first: 'tw:ui-table-bordered-th-first', last: 'tw:ui-table-bordered-th-last' },
