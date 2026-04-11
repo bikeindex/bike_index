@@ -60,9 +60,15 @@ export default class extends Controller {
     })
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
+    // assign_bike_sticker_cell visibility is managed by the assign-bike-sticker controller
+    const stickerTh = this.element.querySelector('th.assign_bike_sticker_cell')
+    if (stickerTh && !stickerTh.classList.contains('tw:hidden')) {
+      checked.push('assign_bike_sticker_cell')
+    }
+
     const firstVisible = this.enabledColumnsValue.find(col => checked.includes(col))
     // When initially rendering, or if none selected, return early
-    if (!firstVisible) return;
+    if (!firstVisible) return
     const lastVisible = [...this.enabledColumnsValue].reverse().find(col => checked.includes(col))
     console.log(firstVisible)
 

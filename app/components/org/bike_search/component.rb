@@ -74,10 +74,10 @@ module Org::BikeSearch
     def table_wrapper_data_attributes
       attrs = {
         controller: "update-cached-sortable-links org--assign-bike-sticker",
-        "update-cached-sortable-links-base-url-value": helpers.url_for(@sortable_search_params.merge(organization_id: @organization.to_param))
+        "update-cached-sortable-links-base-url-value": url_for(@sortable_search_params.merge(organization_id: @organization.to_param))
       }
       if @bike_sticker.present?
-        attrs[:"org--assign-bike-sticker-sticker-path-value"] = helpers.bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id)
+        attrs[:"org--assign-bike-sticker-sticker-path-value"] = bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id)
       end
       attrs
     end
