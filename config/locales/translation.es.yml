@@ -4751,6 +4751,7 @@ es:
         impound_id:
         assign_bike_sticker:
         email_hidden:
+        link_sticker:
       bike_search_settings:
         address:
         all:

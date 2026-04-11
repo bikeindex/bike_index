@@ -7,6 +7,15 @@ export default class extends Controller {
   static targets = ['checkboxes']
   static values = { enabledColumns: Array, defaultColumns: Array }
 
+  // Columns whose visibility is managed by other controllers (not checkboxes)
+  get externalColumns () {
+    const columns = []
+    if (this.element.querySelector('[data-org--assign-bike-sticker-sticker-path-value]')) {
+      columns.push('assign_bike_sticker_cell')
+    }
+    return columns
+  }
+
   connect () {
     this.refreshEnabledColumns()
     this.selectStoredVisibleColumns()
@@ -28,12 +37,7 @@ export default class extends Controller {
       [...th.classList].find(c => c.endsWith('_cell'))
     ).filter(Boolean)
 
-    const stickerEl = this.element.querySelector('[data-org--assign-bike-sticker-sticker-path-value]')
-    if (stickerEl) {
-      columns.push('assign_bike_sticker_cell')
-    }
-
-    this.enabledColumnsValue = columns
+    this.enabledColumnsValue = columns.concat(this.externalColumns)
   }
 
   columnToggled () {
@@ -60,11 +64,12 @@ export default class extends Controller {
     })
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
-    // assign_bike_sticker_cell visibility is managed by the assign-bike-sticker controller
-    const stickerTh = this.element.querySelector('th.assign_bike_sticker_cell')
-    if (stickerTh && !stickerTh.classList.contains('tw:hidden')) {
-      checked.push('assign_bike_sticker_cell')
-    }
+    // External columns are visible when their th is visible (managed elsewhere)
+    const external = this.externalColumns
+    external.forEach(col => {
+      const th = this.element.querySelector(`th.${col}`)
+      if (th && !th.classList.contains('tw:hidden')) checked.push(col)
+    })
 
     const firstVisible = this.enabledColumnsValue.find(col => checked.includes(col))
     // When initially rendering, or if none selected, return early
@@ -79,8 +84,7 @@ export default class extends Controller {
     this.enabledColumnsValue.forEach(col => {
       const isVisible = checked.includes(col)
       this.element.querySelectorAll(`.${col}`).forEach(el => {
-        // assign_bike_sticker_cell visibility is managed by the assign-bike-sticker controller
-        if (col !== 'assign_bike_sticker_cell') {
+        if (!external.includes(col)) {
           el.classList.toggle('tw:hidden', !isVisible)
         }
         const tag = el.tagName === 'TH' ? 'th' : 'td'
