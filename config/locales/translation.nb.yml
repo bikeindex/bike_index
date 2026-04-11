@@ -6004,6 +6004,7 @@ nb:
         impound_id: Beslags-ID
         assign_bike_sticker: Link
         email_hidden: e-post skjult
+        link_sticker: lenkeklistremerke
       bike_search_settings:
         address: 'Adresse:'
         all: Alle

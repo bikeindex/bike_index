@@ -12,7 +12,6 @@
   search_stickers: @search_stickers,
   search_address: @search_address,
   search_status: @search_status,
-  include_avery: true,
   bike_sticker: @bike_sticker
 ) %>
 
@@ -26,6 +25,7 @@
   class="org-bikes-search-component"
   data-controller="org--registration-search org--registration-search-column-toggle"
   data-org--registration-search-column-toggle-default-columns-value="<%= bike_search_settings.initially_checked_columns.to_json %>"
+  data-org--registration-search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
 >
   <div class="mb-4">
     <%= render(Search::FormOrganized::Component.new(

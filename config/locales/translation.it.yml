@@ -4833,6 +4833,7 @@ it:
         impound_id:
         assign_bike_sticker: Collegamento
         email_hidden:
+        link_sticker:
       bike_search_settings:
         address:
         all: Tutti
