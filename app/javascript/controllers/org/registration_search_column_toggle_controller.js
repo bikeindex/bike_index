@@ -70,7 +70,6 @@ export default class extends Controller {
     // When initially rendering, or if none selected, return early
     if (!firstVisible) return
     const lastVisible = [...this.enabledColumnsValue].reverse().find(col => checked.includes(col))
-    console.log(firstVisible)
 
     const borderClasses = {
       th: { first: 'tw:ui-table-bordered-th-first', last: 'tw:ui-table-bordered-th-last' },
@@ -80,7 +79,10 @@ export default class extends Controller {
     this.enabledColumnsValue.forEach(col => {
       const isVisible = checked.includes(col)
       this.element.querySelectorAll(`.${col}`).forEach(el => {
-        el.classList.toggle('tw:hidden', !isVisible)
+        // assign_bike_sticker_cell visibility is managed by the assign-bike-sticker controller
+        if (col !== 'assign_bike_sticker_cell') {
+          el.classList.toggle('tw:hidden', !isVisible)
+        }
         const tag = el.tagName === 'TH' ? 'th' : 'td'
         el.classList.toggle(borderClasses[tag].first, col === firstVisible)
         el.classList.toggle(borderClasses[tag].last, col === lastVisible)
