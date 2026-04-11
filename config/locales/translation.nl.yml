@@ -6163,6 +6163,7 @@ nl:
         impound_id: Inbeslagname-ID
         assign_bike_sticker: Link
         email_hidden: email verborgen
+        link_sticker: link sticker
       bike_search_settings:
         address: 'Adres:'
         all: Alle

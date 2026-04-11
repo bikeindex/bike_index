@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--registration-search-column-toggle'
 export default class extends Controller {
   static targets = ['checkboxes']
-  static values = { enabledColumns: Array, defaultColumns: Array }
+  static values = { enabledColumns: Array, defaultColumns: Array, assignBikeSticker: Boolean }
 
   connect () {
     this.refreshEnabledColumns()
@@ -24,9 +24,18 @@ export default class extends Controller {
   }
 
   refreshEnabledColumns () {
-    this.enabledColumnsValue = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
+    // Stimulus Array values return a fresh copy on each read, so mutating
+    // via push won't persist (and assign_bike_sticker_cell is ignored)
+    // build the full array, then assign it once.
+    const columns = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
       [...th.classList].find(c => c.endsWith('_cell'))
     ).filter(Boolean)
+
+    if (this.assignBikeStickerValue) {
+      columns.push('assign_bike_sticker_cell')
+    }
+
+    this.enabledColumnsValue = columns
   }
 
   columnToggled () {
@@ -53,7 +62,13 @@ export default class extends Controller {
     })
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
+    if (this.assignBikeStickerValue) {
+      checked.push('assign_bike_sticker_cell')
+    }
+
     const firstVisible = this.enabledColumnsValue.find(col => checked.includes(col))
+    // When initially rendering, or if none selected, return early
+    if (!firstVisible) return
     const lastVisible = [...this.enabledColumnsValue].reverse().find(col => checked.includes(col))
 
     const borderClasses = {
