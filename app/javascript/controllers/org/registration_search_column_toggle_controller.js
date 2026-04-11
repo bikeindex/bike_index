@@ -33,6 +33,31 @@ export default class extends Controller {
     this.updateVisibleColumns()
   }
 
+  selectAll () {
+    this.setAllCheckboxes(true)
+  }
+
+  selectNone () {
+    this.setAllCheckboxes(false)
+  }
+
+  selectDefault () {
+    const defaults = this.defaultColumnsValue
+    this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      if (this.isAveryCheckbox(cb)) return
+      cb.checked = defaults.includes(cb.name)
+    })
+    this.updateVisibleColumns()
+  }
+
+  setAllCheckboxes (checked) {
+    this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      if (this.isAveryCheckbox(cb)) return
+      cb.checked = checked
+    })
+    this.updateVisibleColumns()
+  }
+
   // Avery export requires a page reload because the server conditionally
   // renders avery column cells based on the search_avery_export param
   averyToggled (event) {

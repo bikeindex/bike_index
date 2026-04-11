@@ -34,6 +34,17 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with link color" do
+    let(:color) { :link }
+
+    it "renders link styles" do
+      html = component.to_html
+      expect(html).to include("tw:underline")
+      expect(html).to include("tw:text-blue-600")
+      expect(html).not_to include("tw:bg-blue-600")
+    end
+  end
+
   context "with invalid color" do
     let(:color) { :invalid }
 

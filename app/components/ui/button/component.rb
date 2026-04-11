@@ -5,22 +5,30 @@ module UI
     class Component < ApplicationComponent
       BASE_CLASSES = "tw:inline-flex tw:items-center tw:gap-1.5 tw:font-medium tw:rounded-lg tw:cursor-pointer tw:transition-colors tw:focus:outline-none tw:focus:ring-2"
 
-      SIZES = {
-        sm: "tw:px-2.5 tw:py-1 tw:text-xs",
-        md: "tw:px-3 tw:py-1.5 tw:text-sm",
-        lg: "tw:px-4 tw:py-2 tw:text-base"
+      SIZE_PADDING = {
+        sm: "tw:px-2.5 tw:py-1",
+        md: "tw:px-3 tw:py-1.5",
+        lg: "tw:px-4 tw:py-2"
+      }.freeze
+
+      SIZE_TEXT = {
+        sm: "tw:text-xs",
+        md: "tw:text-sm",
+        lg: "tw:text-base"
       }.freeze
 
       COLORS = {
         primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:hover:bg-blue-700 tw:active:bg-blue-800 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:hover:bg-blue-600 tw:dark:active:bg-blue-700",
         secondary: "tw:text-gray-700 tw:bg-white tw:border tw:border-gray-300 tw:hover:bg-gray-50 tw:hover:border-gray-400 tw:active:bg-gray-100 tw:focus:ring-blue-500/40 tw:dark:text-gray-200 tw:dark:bg-gray-800 tw:dark:border-gray-600 tw:dark:hover:bg-gray-700 tw:dark:hover:border-gray-500 tw:dark:active:bg-gray-600",
-        error: "tw:text-white tw:bg-red-600 tw:border tw:border-red-600 tw:hover:bg-red-700 tw:active:bg-red-800 tw:focus:ring-red-500/40 tw:dark:bg-red-500 tw:dark:border-red-500 tw:dark:hover:bg-red-600 tw:dark:active:bg-red-700"
+        error: "tw:text-white tw:bg-red-600 tw:border tw:border-red-600 tw:hover:bg-red-700 tw:active:bg-red-800 tw:focus:ring-red-500/40 tw:dark:bg-red-500 tw:dark:border-red-500 tw:dark:hover:bg-red-600 tw:dark:active:bg-red-700",
+        link: "tw:text-blue-600 tw:underline tw:hover:text-blue-800 tw:active:text-blue-800 tw:focus:ring-blue-500/40 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:dark:active:text-blue-300 tw:border tw:border-transparent"
       }.freeze
 
       ACTIVE_COLORS = {
         primary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-blue-700 tw:dark:bg-blue-600",
         secondary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-gray-100 tw:border-gray-400 tw:dark:bg-gray-700 tw:dark:border-gray-500",
-        error: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-700 tw:dark:bg-red-600"
+        error: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-700 tw:dark:bg-red-600",
+        link: "tw:ring-2 tw:ring-blue-500/40 tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold"
       }.freeze
 
       KINDS = %i[button submit]
@@ -28,7 +36,7 @@ module UI
       def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, data: {})
         @text = text
         @color = COLORS.key?(color) ? color : :secondary
-        @size = SIZES.key?(size) ? size : :md
+        @size = SIZE_TEXT.key?(size) ? size : :md
         @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
         @active = active
         @html_class = html_class
@@ -36,7 +44,9 @@ module UI
       end
 
       def button_classes
-        classes = [BASE_CLASSES, COLORS[@color], SIZES[@size], @html_class]
+        classes = [BASE_CLASSES, COLORS[@color], SIZE_TEXT[@size]]
+        classes << SIZE_PADDING[@size] unless @color == :link
+        classes << @html_class
         classes << ACTIVE_COLORS[@color] if @active
         classes.compact.join(" ")
       end

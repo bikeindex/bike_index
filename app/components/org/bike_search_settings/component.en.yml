@@ -6,6 +6,8 @@ en:
         address: 'Address:'
         all: All
         avery_cell: Avery Exportable
+        default: default
+        none: none
         bike: registration
         color_cell: Color
         create_export_of_vehicles: Create export of searched %{cycle_type}

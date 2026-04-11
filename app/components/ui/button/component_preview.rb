@@ -20,6 +20,10 @@ module UI
         render(UI::Button::Component.new(text: "Delete", color: :error))
       end
 
+      def link
+        render(UI::Button::Component.new(text: "Link style", color: :link))
+      end
+
       def secondary_with_data
         render(UI::Button::Component.new(text: "Secondary with data", color: :secondary, data: {action: "click->modal#open"}))
       end
@@ -36,6 +40,10 @@ module UI
 
       def error_active
         render(UI::Button::Component.new(text: "Error Active", color: :error, active: true))
+      end
+
+      def link_active
+        render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
       end
       # @!endgroup
 
