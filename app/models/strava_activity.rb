@@ -31,7 +31,6 @@
 #
 # Indexes
 #
-#  index_strava_activities_on_strava_integration_id                (strava_integration_id)
 #  index_strava_activities_on_strava_integration_id_and_strava_id  (strava_integration_id,strava_id) UNIQUE
 #
 class StravaActivity < ApplicationRecord
