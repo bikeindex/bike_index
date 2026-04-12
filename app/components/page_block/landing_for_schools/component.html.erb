@@ -24,13 +24,13 @@
 
       <div class="le-hero-stats">
         <div class="le-stat-item">
-          <div class="le-stat-number">$3M</div>
+          <div class="le-stat-number"><%= recoveries_value_display %></div>
           <div class="le-stat-label">Worth of bikes recovered</div>
         </div>
 
         <div class="le-stat-item">
           <div class="le-stat-number">
-            <%= helpers.number_with_delimiter(Counts.recoveries) %>+
+            <%= recoveries_display %>+
           </div>
 
           <div class="le-stat-label">Stolen bikes recovered</div>
@@ -268,7 +268,7 @@
       <h2>Ready to modernize your campus bike program?</h2>
 
       <p class="le-cta-subtitle">
-        Join <%= helpers.number_with_delimiter(Counts.organizations) %>+
+        Join <%= organizations_display %>+
         organizations using the world's most widely used bike registration
         network.
       </p>

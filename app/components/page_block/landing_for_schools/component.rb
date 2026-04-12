@@ -2,7 +2,21 @@
 
 module PageBlock::LandingForSchools
   class Component < ApplicationComponent
+    include MoneyHelper
+
     private
+
+    def recoveries_value_display
+      as_currency(Counts.recoveries_value / 1_000_000) + "M+"
+    end
+
+    def recoveries_display
+      helpers.number_with_delimiter(Counts.recoveries)
+    end
+
+    def organizations_display
+      helpers.number_with_delimiter(Counts.organizations)
+    end
 
     def bike_tile_images
       (0..16).map { it.to_s.rjust(2, "0") }
