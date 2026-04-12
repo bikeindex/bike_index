@@ -76,4 +76,4 @@
             %strong= bike_sticker.pretty_code
 
 .pt-4.pb-4
-  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+  = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
