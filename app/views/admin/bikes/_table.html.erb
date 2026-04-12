@@ -47,11 +47,11 @@
         <%= link_to render(UI::Time::Component.new(time: bike.created_at)), edit_admin_bike_url(bike), class: "tw:text-xs" %>
       <% end %>
 
-      <% table.column(sortable: "updated_by_user_at", label: "Updated", classes: "tw:hidden xl:tw:table-cell tw:text-xs") do |bike| %>
+      <% table.column(sortable: "updated_by_user_at", label: "Updated", classes: "tw:hidden tw:xl:table-cell tw:text-xs") do |bike| %>
         <%= render UI::Time::Component.new(time: bike.updated_by_user_fallback) %>
       <% end %>
 
-      <% table.column(sortable: "owner_email", label: "Sent to", classes: "tw:hidden md:tw:table-cell user-cell") do |bike| %>
+      <% table.column(sortable: "owner_email", label: "Sent to", classes: "tw:hidden tw:md:table-cell user-cell") do |bike| %>
         <div class="tw:relative">
           <%# Pass in search_url because caching breaks with url_for %>
           <% search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email) %>
@@ -81,7 +81,7 @@
         </small>
       <% end %>
 
-      <% table.column(label: "Info", classes: "tw:hidden lg:tw:table-cell") do |bike| %>
+      <% table.column(label: "Info", classes: "tw:hidden tw:lg:table-cell") do |bike| %>
         <div class="tw:relative">
           <%= render Admin::Badges::BikeHiddenExplanation::Component.new(bike:) %>
           <%= [bike.year, bike.frame_model_truncated].join(' ') %>
@@ -138,7 +138,7 @@
         </div>
       <% end %>
 
-      <% table.column(label: "Cred", classes: "tw:hidden md:tw:table-cell tw:text-right tw:text-xs") do |bike| %>
+      <% table.column(label: "Cred", classes: "tw:hidden tw:md:table-cell tw:text-right tw:text-xs") do |bike| %>
         <% if bike.credibility_score.present? %>
           <small
             style="color: <%= helpers.credibility_scorer_color_table(bike.credibility_score) %>;"
