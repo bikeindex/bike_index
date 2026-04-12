@@ -38,9 +38,9 @@
 
 <% rendered_chart = capture do %>
   <% if @render_kind_counts %>
-    <% series = Feedback.kinds.map { |k| {name: Feedback.kind_humanized(k), data: UI::Chart::Component.time_range_counts(collection: available_feedbacks.where(kind: k), time_range: @time_range, column: @time_range_column)} } %>
+    <% series = Feedback.kinds.map { |k| {name: Feedback.kind_humanized(k), data: UI::Chart::Component.time_range_counts(collection: available_feedbacks.where(kind: k), time_range: @time_range, column: @time_range_column.presence || "created_at")} } %>
   <% else %>
-    <% series = [{name: "Feedback", data: UI::Chart::Component.time_range_counts(collection: available_feedbacks, time_range: @time_range, column: @time_range_column)}] %>
+    <% series = [{name: "Feedback", data: UI::Chart::Component.time_range_counts(collection: available_feedbacks, time_range: @time_range, column: @time_range_column.presence || "created_at")}] %>
   <% end %>
 
   <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true, colors:)) %>

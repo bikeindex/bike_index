@@ -1,4 +1,7 @@
 class Admin::CtypesController < Admin::BaseController
+  include SetPeriod
+
+  before_action :set_period, only: %i[index]
   before_action :find_ctypes, only: [:edit, :update, :destroy]
 
   def index
