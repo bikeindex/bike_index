@@ -19,48 +19,22 @@ module UI
         render(UI::Dropdown::Component.new(
           name: "User",
           button_content: avatar_button,
-          button_class: avatar_button_class,
-          header: content_tag(:div, "Last synced: 2 minutes ago", class: "tw:px-4 tw:py-2 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400")
+          button_class: avatar_button_class
         )) do |dropdown|
+          dropdown.with_entry_item { content_tag(:span, "Last synced: 2 minutes ago", class: "tw:block tw:px-4 tw:py-2 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400") }
+          dropdown.with_entry_divider
           dropdown.with_entry_item { icon_link("⚙", "Settings") }
           dropdown.with_entry_item { icon_link("↻", "Sync") }
         end
       end
 
-      # @label bottom_start (button_size: :sm)
-      def bottom_start
-        render_placement(:bottom_start, button_size: :sm)
-      end
-
-      # @label top_end (button_size: :lg)
-      def top_end
-        render_placement(:top_end, button_size: :lg)
-      end
-
-      # @label top_start (button_color: :primary)
-      def top_start
-        render_placement(:top_start, button_color: :primary)
-      end
-
-      # @label right (button_color: :error)
-      def right
-        render_placement(:right, button_color: :error)
-      end
-
-      def left
-        render_placement(:left)
+      def placements
+        {template: "ui/dropdown/component_preview/placements"}
       end
 
       # @!endgroup
 
       private
-
-      def render_placement(direction, button_size: :md, button_color: :secondary)
-        render(UI::Dropdown::Component.new(name: direction.to_s.tr("_", " "), drop_direction: direction, button_size:, button_color:, wrapper_class: "tw:block! tw:w-fit tw:mx-auto")) do |d|
-          d.with_entry_item { content_tag(:a, "Option 1", href: "#") }
-          d.with_entry_item { content_tag(:a, "Option 2", href: "#") }
-        end
-      end
 
       def avatar_button
         avatar = content_tag(:img, nil, src: ActionController::Base.helpers.asset_path("kelsey/illustrations/comic-assets_bike-love-1.png"), class: "tw:rounded-full tw:w-8 tw:h-8 tw:object-cover", alt: "Avatar")
