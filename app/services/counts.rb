@@ -80,6 +80,10 @@ module Counts
     retrieve_for("recoveries_value")
   end
 
+  #
+  # private below here
+  #
+
   # This method isn't called in normal operation
   def calculated_recovery_average_value
     valued = valued_recoveries
