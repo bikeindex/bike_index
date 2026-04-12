@@ -154,7 +154,7 @@ class Admin::OrganizationsController < Admin::BaseController
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
     matching_organizations = matching_organizations.where(approved: (sort_direction == "desc")) if sort_column == "approved"
-    @time_range_column = sort_column if %w[updated_at].include?(sort_column)
+    @time_range_column = sort_column if %w[updated_at deleted_at].include?(sort_column)
     @time_range_column ||= "created_at"
     @matching_organizations = matching_organizations.where(@time_range_column => @time_range)
   end
