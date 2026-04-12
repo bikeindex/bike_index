@@ -75,7 +75,7 @@
   }
 
   .twdropdown li[role="menuitem"] > a {
-    @apply tw:block tw:px-4 tw:py-1 tw:text-gray-700 tw:no-underline
+    @apply tw:block tw:px-4 tw:py-1 tw:text-sm tw:text-gray-700 tw:no-underline
       tw:hover:bg-gray-100 tw:hover:text-gray-900
       tw:dark:text-gray-200 tw:dark:hover:bg-gray-700 tw:dark:hover:text-gray-100;
   }
