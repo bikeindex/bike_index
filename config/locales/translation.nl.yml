@@ -3979,46 +3979,6 @@ nl:
       used_by_law_enforcement_everywhere: Overal gebruikt door wetshandhavers
       with_over_registrations_and_almost: Met meer dan %{registrations} registraties
         en %{stolen_recoveries} gestolen fietsen weten we hoe we kunnen helpen.
-    for_schools:
-      bike_index_for_universities: Fietsindex voor universiteiten
-      bike_index_users_provide: Bike Index-gebruikers verstrekken serienummers, eigendomsbewijzen
-        en identificatiegegevens over hun fietsen. Wanneer een fiets als verloren
-        of gestolen wordt gemeld, kunnen onze partners de fietsindex doorzoeken om
-        deze te identificeren, lokaliseren en volgen vanaf elke computer of smartphone.
-        Ons uitgebreide archief heeft officieren geholpen om fietsen terug te vinden
-        die betrokken zijn in criminele situaties, van eenvoudige diefstal tot chop-shops,
-        drugshuizen - zelfs schermringen en online zwarte markten.
-      features_amp_pricing: Functies en prijzen
-      how_it_works: Hoe het werkt
-      keep_campus_bikes_in_order: Houd campusfietsen op orde
-      make_bike_registration_better: Maak fietsregistratie beter
-      protecting_bikes_on_campus_can_be: Het beschermen van fietsen op de campus kan
-        een fulltime baan zijn. Laat ons helpen.
-      read_about_our_html: Lees meer over onze meer dan %{count} terugvorderingen
-        op onze blog. Voor een volledige lijst met partners van Bike Index bezoekt
-        u onze partners-pagina en neemt u contact met ons op voor informatie over
-        samenwerking met Bike Index.
-      related_articles: 'Gerelateerde artikelen:'
-      trusted_by_top_universities: Vertrouwd door topuniversiteiten
-      weve_designed_a_platform: 'We hebben een platform ontworpen om een fundamentele
-        barrière op te lossen bij het beschermen van fietsen: het ontbreken van een
-        universeel fietsregister. Met onze geconsolideerde universitaire registratiesites
-        is het eenvoudiger voor politie- en transportafdelingen om campusfietsen te
-        zoeken en te recupereren.'
-      your_students_can_register_their_bikes: Uw studenten kunnen hun fietsen registreren,
-        het eigendom verifiëren en de gemeenschap waarschuwen dat ze fietsen missen
-        van overal. Het enige dat ze nodig hebben is elke smartphone of laptop. Je
-        hebt toegang tot de gegevens erachter om te begrijpen hoe je fietsen op je
-        campus het beste kunt beschermen.
-      must_read: Moet lezen -
-      six_best_features_for_schools: De zes beste functies van Bike Index voor fietsbeheer
-        op de campus
-      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
-        op uw website
-      check_out: Bekijk onze
-      schools_deck: universitair partnerdeck
-      bike_index_admin_guide: Bike Index Campus Management Admin-handleiding
-      how_to_use_bike_index_qr_stickers: Hoe gebruik je Bike Index QR-stickers?
     packages_list:
       forever: Voor altijd
       free: GRATIS
@@ -6163,6 +6123,7 @@ nl:
         impound_id: Inbeslagname-ID
         assign_bike_sticker: Link
         email_hidden: email verborgen
+        link_sticker: link sticker
       bike_search_settings:
         address: 'Adres:'
         all: Alle

@@ -3792,17 +3792,17 @@ en:
         job. Let us help.
       read_about_our_html: >-
         Read about our over %{count} recoveries on our blog. For a complete list of
-        Bike Index's partners, visit our partners page, and for information on partnering
+        Bike Index’s partners, visit our partners page, and for information on partnering
         with Bike Index, please contact us.
-      related_articles: 'Related articles:'
+      related_articles: ‘Related articles:’
       schools_deck: university partner deck
       six_best_features_for_schools: Bike Index’s six best features for campus bike
         management
       trusted_by_top_universities: Trusted by top universities
       weve_designed_a_platform: >-
-        We've designed a platform to solve a fundamental barrier in safeguarding bicycles:
+        We’ve designed a platform to solve a fundamental barrier in safeguarding bicycles:
         the lack of a universal bike registry. With our consolidated university registration
-        sites, it's easier for police and transportation departments to search and
+        sites, it’s easier for police and transportation departments to search and
         recover campus bicycles.
       your_students_can_register_their_bikes: >-
         Your students can register their bikes, verify ownership, and alert the community
@@ -4480,7 +4480,7 @@ en:
         is_currently_linked: is currently linked.
         isnt_linked_to_a_bike: isn't linked to a bike.
         search_org_bikes_html: >-
-          Or, search %{org_name}'s bikes, view the bike and click <em>link it</em>
+          Or, search %{org_name}'s bikes, view the bike and click <em>link sticker</em>
           to connect it to this %{bike_sticker_kind}
         update: Update
     bulk_imports:

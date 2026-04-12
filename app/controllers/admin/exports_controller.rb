@@ -22,8 +22,7 @@ class Admin::ExportsController < Admin::BaseController
     else
       Export.all
     end
-    @deleted = Binxtils::InputNormalizer.boolean(params[:search_deleted])
-    exports = exports.deleted if @deleted
+    exports = search_deleted_scope(exports)
     case params[:search_registrations]
     when "specific" then exports = exports.specific
     when "incomplete" then exports = exports.incompletes

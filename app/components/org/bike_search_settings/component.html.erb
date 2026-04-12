@@ -21,13 +21,8 @@
           tw:leading-[1.25]!
         "
       >
-        <% if cell_name == "avery_cell" %>
-          <%= check_box_tag cell_name, cell_name, show_avery_export?,
-              data: { action: "change->org--registration-search-column-toggle#averyToggled" } %>
-        <% else %>
-          <%= check_box_tag cell_name, cell_name, false,
-              data: { action: "change->org--registration-search-column-toggle#columnToggled" } %>
-        <% end %>
+        <%= check_box_tag cell_name, cell_name, false,
+            data: { action: "change->org--registration-search-column-toggle#columnToggled" } %>
 
         <%= column_renames[cell_name.to_sym] %>
       </label>

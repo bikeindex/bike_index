@@ -4,7 +4,7 @@ en:
     org:
       bike_search:
         affiliation: Affiliation
-        assign_bike_sticker: Link
+        assign_bike_sticker: Assign sticker
         avery: Avery?
         avery_exportable: Avery Exportable
         bike: registration
@@ -15,6 +15,7 @@ en:
         impound_id: Impound ID
         impounded: Impounded
         link: Link
+        link_sticker: link sticker
         manufacturer: Manufacturer
         matching_bikes_html: "%{count} %{cycle_type} matching"
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>

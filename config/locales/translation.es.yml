@@ -3228,26 +3228,6 @@ es:
       with_over_registrations_and_almost:
       you_have_the_authority_to_bring_html:
       youre_the_first_one:
-    for_schools:
-      bike_index_for_universities:
-      bike_index_users_provide:
-      check_out:
-      embed_a_bike_index_registration_form:
-      features_amp_pricing:
-      how_it_works:
-      keep_campus_bikes_in_order:
-      make_bike_registration_better:
-      must_read:
-      protecting_bikes_on_campus_can_be:
-      read_about_our_html:
-      related_articles:
-      schools_deck:
-      six_best_features_for_schools:
-      trusted_by_top_universities:
-      weve_designed_a_platform:
-      your_students_can_register_their_bikes:
-      bike_index_admin_guide:
-      how_to_use_bike_index_qr_stickers:
     packages_list:
       forever:
       free:
@@ -4751,6 +4731,7 @@ es:
         impound_id:
         assign_bike_sticker:
         email_hidden:
+        link_sticker:
       bike_search_settings:
         address:
         all:

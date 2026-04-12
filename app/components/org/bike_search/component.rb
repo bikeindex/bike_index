@@ -4,7 +4,7 @@ module Org::BikeSearch
   class Component < ApplicationComponent
     include SortableHelper
 
-    delegate :additional_registration_fields, :show_avery_export?, :column_renames,
+    delegate :additional_registration_fields, :column_renames,
       :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
       to: :settings_component
     def initialize(
@@ -24,7 +24,6 @@ module Org::BikeSearch
       bike_sticker: nil,
       model_audit: nil,
       skip_search_and_filters: false,
-      include_avery: false,
       skip_settings: false
     )
       @organization = organization
@@ -43,7 +42,6 @@ module Org::BikeSearch
       @bike_sticker = bike_sticker
       @model_audit = model_audit
       @skip_search_and_filters = skip_search_and_filters
-      @include_avery = include_avery
       @skip_settings = skip_settings
     end
 
@@ -58,7 +56,6 @@ module Org::BikeSearch
         search_stickers: @search_stickers,
         search_address: @search_address,
         search_status: @search_status,
-        include_avery: @include_avery,
         bike_sticker: @bike_sticker,
         skip_search_and_filters: @skip_search_and_filters
       )
@@ -68,10 +65,21 @@ module Org::BikeSearch
       @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
     end
 
-    def wrapper_data_attributes
+    def component_wrapper_data_attributes
       return {} if @skip_settings
       {controller: "org--registration-search org--registration-search-column-toggle",
        "org--registration-search-column-toggle-default-columns-value": initially_checked_columns.to_json}
+    end
+
+    def table_wrapper_data_attributes
+      attrs = {
+        controller: "update-cached-sortable-links org--assign-bike-sticker",
+        "update-cached-sortable-links-base-url-value": url_for(@sortable_search_params.merge(organization_id: @organization.to_param))
+      }
+      if @bike_sticker.present?
+        attrs[:"org--assign-bike-sticker-sticker-path-value"] = bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id)
+      end
+      attrs
     end
 
     def show_pagination?

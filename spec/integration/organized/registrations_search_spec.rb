@@ -236,24 +236,19 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     it "toggles avery export column via checkbox" do
       visit bikes_path
       expect(page).to have_css("table", wait: 10)
-      expect(page).not_to have_css("th.avery_cell")
+      expect(page).not_to have_css("th.avery_cell", visible: :visible)
       expect(page).not_to have_css("th.assign_bike_sticker_cell")
 
-      # Open settings and check avery — triggers page reload with param
+      # Open settings and check avery — toggles column visibility client-side
       open_settings_if_not
       check "avery_cell"
-      expect(page).to have_current_path(/search_avery_export=true/, wait: 10)
       # Avery column should be visible with check mark for exportable bike
-      expect(page).to have_css("th.avery_cell")
+      expect(page).to have_css("th.avery_cell", visible: :visible)
       expect(page).to have_css("td.avery_cell", text: "✓")
 
-      expect_settings_open
-      # Settings panel is already open (persisted via localStorage)
-      # Uncheck avery — triggers page reload without param
-      expect(page).to have_field("avery_cell", checked: true, wait: 5)
+      # Uncheck avery — hides column client-side
       uncheck "avery_cell"
-      expect(page).not_to have_current_path(/search_avery_export/, wait: 10)
-      expect(page).not_to have_css("th.avery_cell")
+      expect(page).not_to have_css("th.avery_cell", visible: :visible)
 
       # Open settings and choose "only with address"
       choose("search_address_with_street", allow_label_click: true, visible: :all)
@@ -289,7 +284,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       visit "#{bikes_path}?bike_sticker=#{unlinked_sticker.code}"
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("th.assign_bike_sticker_cell")
-      expect(page).to have_css("td.assign_bike_sticker_cell a", text: "Link", minimum: 1)
+      expect(page).to have_css("td.assign_bike_sticker_cell a", text: "link sticker", minimum: 1)
 
       # Click the first "Link" to assign the sticker to a bike
       first("td.assign_bike_sticker_cell a").click
