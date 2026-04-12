@@ -3,7 +3,8 @@
 module UI
   module Button
     class ComponentPreview < ApplicationComponentPreview
-      def default
+      # @label legacy (using twbtn classes)
+      def legacy
         {template: "ui/button/component_preview/default"}
       end
 
