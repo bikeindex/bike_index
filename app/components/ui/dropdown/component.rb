@@ -21,7 +21,7 @@ module UI
         left: "left"
       }.freeze
 
-      def initialize(name:, button_content: nil, drop_direction: :bottom_end, button_class: nil, button_color: :secondary, button_size: :md, header: nil, id: nil)
+      def initialize(name:, button_content: nil, drop_direction: :bottom_end, button_class: nil, button_color: :secondary, button_size: :md, header: nil, id: nil, wrapper_class: nil)
         @name = name
         @button_content = button_content || name
         @button_class = button_class
@@ -30,6 +30,7 @@ module UI
         @header = header
         @button_id = id || @name.parameterize(separator: "-")
         @placement = PLACEMENTS.fetch(drop_direction, PLACEMENTS[:bottom_end])
+        @wrapper_class = wrapper_class
       end
 
       def button_classes

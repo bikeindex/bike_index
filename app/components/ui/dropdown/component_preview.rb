@@ -31,7 +31,7 @@ module UI
       end
 
       def bottom_start
-        render_placement(:bottom_start, wrapper_class: "tw:ml-48")
+        render_placement(:bottom_start, "tw:ml-48")
       end
 
       def top_end
@@ -39,7 +39,7 @@ module UI
       end
 
       def top_start
-        render_placement(:top_start, wrapper_class: "tw:ml-48")
+        render_placement(:top_start, "tw:ml-48")
       end
 
       def right
@@ -47,19 +47,18 @@ module UI
       end
 
       def left
-        render_placement(:left, wrapper_class: "tw:ml-48")
+        render_placement(:left, "tw:ml-48")
       end
 
       # @!endgroup
 
       private
 
-      def render_placement(direction, wrapper_class: nil)
-        dropdown = render(UI::Dropdown::Component.new(name: direction.to_s.tr("_", " "), drop_direction: direction)) do |d|
+      def render_placement(direction, extra_class = nil)
+        render(UI::Dropdown::Component.new(name: direction.to_s.tr("_", " "), drop_direction: direction, wrapper_class: extra_class)) do |d|
           d.with_entry_item { content_tag(:a, "Option 1", href: "#") }
           d.with_entry_item { content_tag(:a, "Option 2", href: "#") }
         end
-        wrapper_class ? content_tag(:div, dropdown, class: wrapper_class) : dropdown
       end
 
       def avatar_button
