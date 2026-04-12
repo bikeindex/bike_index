@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PageBlock::ForSchoolsTop
+module PageBlock::LandingForSchools
   class Component < ApplicationComponent
     private
 
