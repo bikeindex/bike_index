@@ -29,7 +29,11 @@
       aria-labelledby="<%= @button_id %>"
     >
       <% items.each do |item| %>
-        <li><%= item %></li>
+        <% if item.to_s.strip == "---" %>
+          <li role="separator" class="tw:my-1 tw:border-t tw:border-gray-200 tw:dark:border-gray-700"></li>
+        <% else %>
+          <li class="tw:[&>a]:block tw:[&>a]:px-4 tw:[&>a]:py-1 tw:[&>a]:text-gray-700 tw:[&>a]:no-underline tw:[&>a]:hover:bg-gray-100 tw:[&>a]:hover:text-gray-900 tw:dark:[&>a]:text-gray-200 tw:dark:[&>a]:hover:bg-gray-700 tw:dark:[&>a]:hover:text-gray-100"><%= item %></li>
+        <% end %>
       <% end %>
     </ul>
   </div>
