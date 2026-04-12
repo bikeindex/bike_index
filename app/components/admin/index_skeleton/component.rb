@@ -68,8 +68,7 @@ module Admin::IndexSkeleton
         user_subject: @user_subject, bike: @bike,
         marketplace_listing: @marketplace_listing,
         primary_activity: @primary_activity,
-        current_organization: @current_organization,
-        render_deleted: @render_deleted
+        current_organization: @current_organization
       )
     end
 

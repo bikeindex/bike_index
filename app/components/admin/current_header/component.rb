@@ -15,7 +15,7 @@ module Admin::CurrentHeader
       search_strava_integration_id
     ].freeze
 
-    def initialize(params:, viewing: nil, kind_humanized: nil, user_subject: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil, render_deleted: nil)
+    def initialize(params:, viewing: nil, kind_humanized: nil, user_subject: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil)
       @params = params
       @viewing = viewing
       @kind_humanized = kind_humanized
@@ -24,12 +24,11 @@ module Admin::CurrentHeader
       @marketplace_listing = marketplace_listing
       @primary_activity = primary_activity
       @current_organization = current_organization
-      @render_deleted = render_deleted
     end
 
     def render?
       (@params.keys.map(&:to_sym) & HEADER_KEYS).any? || show_user? || show_marketplace_listing? ||
-        show_organization? || show_deleted?
+        show_organization?
     end
 
     private
@@ -102,10 +101,6 @@ module Admin::CurrentHeader
 
     def primary_activity_subject
       @primary_activity_subject ||= @primary_activity || PrimaryActivity.find_by_id(@params[:primary_activity])
-    end
-
-    def show_deleted?
-      @render_deleted
     end
 
     def error_text_class
