@@ -26,7 +26,7 @@
         Locations
     %tbody
       - @organizations.each do |organization|
-        - cache(organization, "v1") do
+        - cache([organization, "v1"]) do
           %tr
             %td
               = link_to organization.name, admin_organization_url(organization)

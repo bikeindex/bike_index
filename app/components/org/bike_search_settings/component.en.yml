@@ -4,7 +4,7 @@ en:
     org:
       bike_search_settings:
         address: 'Address:'
-        all: All
+        all: all
         avery_cell: Avery Exportable
         bike: registration
         color_cell: Color
@@ -12,6 +12,7 @@ en:
         created_at_cell: Registered
         creation_description_cell: Source
         cycle_type_cell: Vehicle type
+        default: default
         filter_impounded_html: only <strong>impounded</strong>
         filter_no_address_html: only <strong>no</strong> address
         filter_no_sticker_html: only <strong>no</strong> sticker
@@ -24,6 +25,7 @@ en:
         impounded_cell: Impounded
         manufacturer_cell: Manufacturer
         model_cell: Model
+        none: none
         notes_cell: Registration Notes
         owner_email_cell: Sent to
         owner_name_cell: Owner name
