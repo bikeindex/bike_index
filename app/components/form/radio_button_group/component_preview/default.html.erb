@@ -1,0 +1,8 @@
+<%= render Form::RadioButtonGroup::Component.new(
+  name: :search_status,
+  options: [
+    {value: "", label: "All"},
+    {value: "active", label: "Active"},
+    {value: "inactive", label: "Inactive"}
+  ]
+) %>
