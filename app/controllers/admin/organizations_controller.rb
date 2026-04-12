@@ -160,7 +160,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def sortable_columns
-    %w[created_at name approved pos_kind bikes].freeze
+    %w[created_at deleted_at name approved pos_kind bikes].freeze
   end
 
   def organization_settings

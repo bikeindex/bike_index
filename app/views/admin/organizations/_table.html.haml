@@ -21,7 +21,7 @@
       %th
         = sortable "pos_kind", "POS", render_sortable: render_sortable
       %th.deleted-col
-        Deleted
+        = sortable "deleted_at", "Deleted", render_sortable: render_sortable
       %th
         Locations
     %tbody
