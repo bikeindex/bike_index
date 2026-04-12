@@ -230,11 +230,17 @@
               class="le-testimonial <%= "active" if index == 0 %>"
               data-landing-pages--testimonials-target="testimonial"
             >
-              <p class="le-testimonial-quote">"<%= testimonial[:quote] %>"</p>
+              <div class="le-testimonial-content">
+                <div class="le-testimonial-text">
+                  <p class="le-testimonial-quote">
+                    "<%= testimonial[:quote] %>"
+                  </p>
 
-              <div class="le-testimonial-author">
-                <strong><%= testimonial[:author] %></strong>
-                <span><%= testimonial[:org] %></span>
+                  <div class="le-testimonial-author">
+                    <strong><%= testimonial[:author] %></strong>
+                    <span><%= testimonial[:org] %></span>
+                  </div>
+                </div>
               </div>
             </div>
           <% end %>
