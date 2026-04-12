@@ -47,18 +47,19 @@ module UI
       end
 
       def left
-        render_placement(:left)
+        render_placement(:left, wrapper_class: "tw:ml-48")
       end
 
       # @!endgroup
 
       private
 
-      def render_placement(direction)
-        render(UI::Dropdown::Component.new(name: direction.to_s.tr("_", " "), drop_direction: direction)) do |dropdown|
-          dropdown.with_entry_item { content_tag(:a, "Option 1", href: "#") }
-          dropdown.with_entry_item { content_tag(:a, "Option 2", href: "#") }
+      def render_placement(direction, wrapper_class: nil)
+        dropdown = render(UI::Dropdown::Component.new(name: direction.to_s.tr("_", " "), drop_direction: direction)) do |d|
+          d.with_entry_item { content_tag(:a, "Option 1", href: "#") }
+          d.with_entry_item { content_tag(:a, "Option 2", href: "#") }
         end
+        wrapper_class ? content_tag(:div, dropdown, class: wrapper_class) : dropdown
       end
 
       def avatar_button
