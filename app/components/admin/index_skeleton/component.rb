@@ -100,6 +100,7 @@ module Admin::IndexSkeleton
     def deleted_dropdown_options
       [
         helpers.link_to("Only not deleted", helpers.url_for(sortable_search_params.merge(search_deleted: nil)), class: "dropdown-link #{@render_deleted == false ? "active" : ""}"),
+        helpers.tag.hr(class: "tw:my-1 tw:border-gray-200"),
         helpers.link_to("Including deleted", helpers.url_for(sortable_search_params.merge(search_deleted: "including")), class: "dropdown-link #{@render_deleted == "including" ? "active" : ""}"),
         helpers.link_to("Only deleted", helpers.url_for(sortable_search_params.merge(search_deleted: "only")), class: "dropdown-link #{@render_deleted == "only" ? "active" : ""}")
       ]
