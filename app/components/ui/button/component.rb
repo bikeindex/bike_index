@@ -25,7 +25,7 @@ module UI
 
       KINDS = %i[button submit]
 
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, data: {}, id: nil, aria: {})
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, data: {})
         @text = text
         @color = COLORS.key?(color) ? color : :secondary
         @size = SIZES.key?(size) ? size : :md
@@ -33,8 +33,6 @@ module UI
         @active = active
         @html_class = html_class
         @data = data
-        @id = id
-        @aria = aria
       end
 
       def button_classes
@@ -44,10 +42,7 @@ module UI
       end
 
       def call
-        options = {class: button_classes, type: (@kind == :submit) ? "submit" : "button", data: @data}
-        options[:id] = @id if @id
-        options[:aria] = @aria if @aria.present?
-        content_tag(:button, @text || content, **options)
+        content_tag(:button, @text || content, class: button_classes, type: (@kind == :submit) ? "submit" : "button", data: @data)
       end
     end
   end

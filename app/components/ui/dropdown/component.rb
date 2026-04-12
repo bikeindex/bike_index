@@ -32,15 +32,8 @@ module UI
         @placement = PLACEMENTS.fetch(drop_direction, PLACEMENTS[:bottom_end])
       end
 
-      def button_component
-        UI::Button::Component.new(
-          color: @button_color,
-          size: @button_size,
-          html_class: @button_class,
-          id: @button_id,
-          aria: {expanded: false},
-          data: {action: "click->dropdown#toggle", dropdown_target: "button"}
-        )
+      def button_classes
+        @button_class || UI::Button::Component.new(color: @button_color, size: @button_size).button_classes
       end
 
       def floating_ui_placement
