@@ -71,7 +71,9 @@
 
       <% table.column(sortable: "manufacturer_id") do |bike| %>
         <% if bike.manufacturer_other.present? %>
-          <span class="<%= UI::Alert::Component::TEXT_CLASSES[:warning] %>"><%= bike.manufacturer_other %></span>
+          <span class="<%= UI::Alert::Component::TEXT_CLASSES[:warning] %>">
+            <%= bike.manufacturer_other %>
+          </span>
         <% else %>
           <%= bike.mnfg_name %>
         <% end %>
