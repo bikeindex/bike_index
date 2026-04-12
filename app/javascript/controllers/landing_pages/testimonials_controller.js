@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='landing-pages--testimonials'
 export default class extends Controller {
-  static targets = ['testimonial', 'dot']
+  static targets = ['testimonial']
 
   // Testimonials carousel functionality
   connect () {
@@ -18,18 +18,21 @@ export default class extends Controller {
   }
 
   createDots () {
-    const dotsContainer = this.element.querySelector('[data-testimonials-dots]')
-    if (!dotsContainer) return
+    this.dotsContainer = this.element.querySelector('[data-testimonials-dots]')
+    if (!this.dotsContainer) return
 
     this.testimonialTargets.forEach((_, index) => {
       const dot = document.createElement('button')
       dot.className = 'le-testimonial-dot'
-      dot.dataset.landingPagesTestimonialsTarget = 'dot'
       dot.dataset.index = index
-      dot.dataset.action = 'click->landing-pages--testimonials#goTo'
+      dot.addEventListener('click', () => this.goTo(index))
       if (index === 0) dot.classList.add('active')
-      dotsContainer.appendChild(dot)
+      this.dotsContainer.appendChild(dot)
     })
+  }
+
+  get dots () {
+    return this.dotsContainer ? this.dotsContainer.querySelectorAll('.le-testimonial-dot') : []
   }
 
   prev () {
@@ -42,18 +45,18 @@ export default class extends Controller {
     this.show()
   }
 
-  goTo (event) {
-    this.currentIndex = parseInt(event.currentTarget.dataset.index)
+  goTo (index) {
+    this.currentIndex = index
     this.show()
   }
 
   show () {
     this.testimonialTargets.forEach(t => t.classList.remove('active'))
-    this.dotTargets.forEach(d => d.classList.remove('active'))
+    this.dots.forEach(d => d.classList.remove('active'))
 
     this.testimonialTargets[this.currentIndex].classList.add('active')
-    if (this.dotTargets[this.currentIndex]) {
-      this.dotTargets[this.currentIndex].classList.add('active')
+    if (this.dots[this.currentIndex]) {
+      this.dots[this.currentIndex].classList.add('active')
     }
   }
 }
