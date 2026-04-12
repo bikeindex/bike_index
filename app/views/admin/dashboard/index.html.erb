@@ -8,8 +8,7 @@
 <% end %>
 
 <h2 class="mb-4 mt-4">
-  Recent
-  <%= link_to "Bikes", admin_bikes_url %>
+  Recent <%= link_to "Bikes", admin_bikes_url %>
 </h2>
 
 <%= render partial: "/admin/bikes/table", locals: { bikes: @bikes } %>
@@ -21,8 +20,7 @@
 <div class="row justify-content-end">
   <div class="col-auto">
     <p>
-      <%= number_with_delimiter(Bike.count) %>
-      bikes total
+      <%= number_with_delimiter(Bike.count) %> bikes total
       <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
     </p>
   </div>
@@ -34,17 +32,19 @@
 
 <% cache(User.maximum(:created_at)) do %>
   <h2 class="mt-4">
-    Recent
-    <%= link_to "Users", admin_users_url %>
+    Recent <%= link_to "Users", admin_users_url %>
   </h2>
+
   <%= render partial: "/admin/users/table" %>
+
   <div class="row justify-content-end">
     <div class="col-auto">
       <p>
-        <%= number_with_delimiter(User.valid_only.count) %>
-        users total
+        <%= number_with_delimiter(User.valid_only.count) %> users total
         <% today = User.valid_only.where("users.created_at >= ?", Time.current.beginning_of_day).count %>
+        
         <% yesterday = (User.valid_only.where("users.created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today %>
+        
         <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
       </p>
     </div>
@@ -54,17 +54,19 @@
 <hr>
 
 <h2 class="mt-4">
-  Recent
-  <%= link_to "Organizations", admin_organizations_url %>
+  Recent <%= link_to "Organizations", admin_organizations_url %>
 </h2>
+
 <%= render partial: "/admin/organizations/table" %>
+
 <div class="row justify-content-end">
   <div class="col-auto">
     <p>
-      <%= number_with_delimiter(Organization.count) %>
-      Organizations total
+      <%= number_with_delimiter(Organization.count) %> Organizations total
       <% today = Organization.where("created_at >= ?", Time.current.beginning_of_day).count %>
+      
       <% yesterday = (Organization.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today %>
+      
       <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
     </p>
   </div>
