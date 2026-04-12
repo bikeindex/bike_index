@@ -34,20 +34,12 @@ module UI
         render_placement(:bottom_start)
       end
 
-      def bottom
-        render_placement(:bottom)
-      end
-
       def top_end
         render_placement(:top_end)
       end
 
       def top_start
         render_placement(:top_start)
-      end
-
-      def top
-        render_placement(:top)
       end
 
       def right

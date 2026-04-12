@@ -15,10 +15,8 @@ module UI
       PLACEMENTS = {
         bottom_end: "bottom-end",
         bottom_start: "bottom-start",
-        bottom: "bottom",
         top_end: "top-end",
         top_start: "top-start",
-        top: "top",
         right: "right",
         left: "left"
       }.freeze
