@@ -106,7 +106,7 @@
   <% if show_deleted? %>
     <p>
       Viewing <em class="<%= error_text_class %>">deleted</em> <%= viewing.pluralize.downcase %>
-      <%= link_to "hide deleted", helpers.url_for(sortable_search_params.merge(search_deleted: nil)), class: "gray-link tw:text-sm" %>
+      <%= link_to "hide deleted", url_for(sortable_search_params.merge(search_deleted: nil)), class: "gray-link tw:text-sm" %>
     </p>
   <% end %>
 
