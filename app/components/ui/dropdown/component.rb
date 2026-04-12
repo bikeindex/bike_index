@@ -38,7 +38,10 @@ module UI
         return @button_class if @button_class
 
         classes = UI::Button::Component.new(color: @button_color, size: @button_size, active: @active).button_classes
-        classes += " tw:px-1" if @button_color == :link
+        if @button_color == :link
+          classes = classes.gsub("tw:underline", "").squeeze(" ").strip + " tw:px-1"
+          @button_content = content_tag(:span, @button_content, class: "tw:underline")
+        end
         classes
       end
 

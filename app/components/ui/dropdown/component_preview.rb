@@ -24,7 +24,7 @@ module UI
           dropdown.with_entry_item { content_tag(:span, "Last synced: 2 minutes ago", class: "tw:block tw:px-4 tw:py-2 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400") }
           dropdown.with_entry_divider
           dropdown.with_entry_item { icon_link("⚙", "Settings") }
-          dropdown.with_entry_item { icon_link("↻", "Sync") }
+          dropdown.with_entry_item { icon_link("↻", "Sync", active: true) }
         end
       end
 
@@ -47,8 +47,8 @@ module UI
         "tw:flex tw:items-center tw:gap-1 tw:rounded-full tw:bg-gray-100 tw:pr-3 tw:pl-1 tw:py-1 tw:text-sm tw:font-medium tw:text-gray-700 tw:hover:bg-gray-200 tw:dark:bg-gray-700 tw:dark:text-gray-200 tw:dark:hover:bg-gray-600"
       end
 
-      def icon_link(icon, label)
-        content_tag(:a, href: "#", class: "tw:flex tw:items-center tw:gap-2") do
+      def icon_link(icon, label, active: false)
+        content_tag(:a, href: "#", class: "tw:flex tw:items-center tw:gap-2 #{"active" if active}".strip) do
           safe_join([content_tag(:span, icon, class: "tw:text-base"), label])
         end
       end

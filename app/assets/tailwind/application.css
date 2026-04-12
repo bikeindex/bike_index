@@ -71,7 +71,15 @@
   }
 
   .twdropdown {
-    @apply tw:flex-col tw:list-none tw:py-1;
+    @apply tw:flex-col tw:list-none tw:py-0;
+  }
+
+  .twdropdown li[role="menuitem"]:first-child > a {
+    @apply tw:pt-2 tw:rounded-t-lg;
+  }
+
+  .twdropdown li[role="menuitem"]:last-child > a {
+    @apply tw:pb-2 tw:rounded-b-lg;
   }
 
   .twdropdown li[role="menuitem"] > a {
@@ -86,7 +94,7 @@
   }
 
   .twdropdown li[role="separator"] {
-    @apply tw:my-1 tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
+    @apply tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
   }
 
   .twhr {
