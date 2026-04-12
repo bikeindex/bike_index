@@ -65,7 +65,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
     end
 
     if Binxtils::InputNormalizer.boolean(params[:search_deleted])
-      @deleted = true
+      @render_deleted = true
       organization_statuses = organization_statuses.deleted
     end
 
