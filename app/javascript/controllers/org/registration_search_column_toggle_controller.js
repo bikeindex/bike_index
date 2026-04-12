@@ -66,24 +66,14 @@ export default class extends Controller {
       checked.push('assign_bike_sticker_cell')
     }
 
-    const firstVisible = this.enabledColumnsValue.find(col => checked.includes(col))
-    // When initially rendering, or if none selected, return early
-    if (!firstVisible) return
-    const lastVisible = [...this.enabledColumnsValue].reverse().find(col => checked.includes(col))
-
-    const borderClasses = {
-      th: { first: 'tw:ui-table-bordered-th-first', last: 'tw:ui-table-bordered-th-last' },
-      td: { first: 'tw:ui-table-bordered-td-first', last: 'tw:ui-table-bordered-td-last' }
-    }
-
     this.enabledColumnsValue.forEach(col => {
       const isVisible = checked.includes(col)
       this.element.querySelectorAll(`.${col}`).forEach(el => {
         el.classList.toggle('tw:hidden', !isVisible)
-        const tag = el.tagName === 'TH' ? 'th' : 'td'
-        el.classList.toggle(borderClasses[tag].first, col === firstVisible)
-        el.classList.toggle(borderClasses[tag].last, col === lastVisible)
       })
     })
+
+    // Re-apply first/last visible column border styles via ui-table controller
+    window.dispatchEvent(new Event('ui-table:refresh'))
   }
 }
