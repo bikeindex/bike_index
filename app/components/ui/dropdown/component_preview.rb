@@ -31,7 +31,7 @@ module UI
       end
 
       def bottom_start
-        render_placement(:bottom_start)
+        render_placement(:bottom_start, wrapper_class: "tw:ml-48")
       end
 
       def top_end
@@ -39,7 +39,7 @@ module UI
       end
 
       def top_start
-        render_placement(:top_start)
+        render_placement(:top_start, wrapper_class: "tw:ml-48")
       end
 
       def right
