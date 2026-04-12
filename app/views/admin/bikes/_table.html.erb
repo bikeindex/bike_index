@@ -59,7 +59,7 @@
 
           <% if bike.claimed? %>
             <span
-              class="tw:absolute tw:top-0 tw:right-0 tw:text-blue-500"
+              class="tw:absolute tw:top-0 tw:right-0 <%= UI::Alert::Component::TEXT_CLASSES[:notice] %>"
               title="<%= bike.type %> is claimed"
               style="cursor: default"
             >
@@ -71,7 +71,7 @@
 
       <% table.column(sortable: "manufacturer_id") do |bike| %>
         <% if bike.manufacturer_other.present? %>
-          <span class="tw:text-yellow-600"><%= bike.manufacturer_other %></span>
+          <span class="<%= UI::Alert::Component::TEXT_CLASSES[:warning] %>"><%= bike.manufacturer_other %></span>
         <% else %>
           <%= bike.mnfg_name %>
         <% end %>
@@ -89,7 +89,7 @@
 
           <% if bike.stolen_recovery? %>
             <small>
-              <%= link_to "recovery!", edit_admin_recovery_url(bike.recovered_records.first.id), class: "tw:text-green-600 tw:underline" %>
+              <%= link_to "recovery!", edit_admin_recovery_url(bike.recovered_records.first.id), class: "#{UI::Alert::Component::TEXT_CLASSES[:success]} tw:underline" %>
             </small>
           <% end %>
 
@@ -108,7 +108,7 @@
           <% end %>
 
           <% if bike.status_stolen? %>
-            <span class="tw:absolute tw:right-0 tw:bottom-0 tw:text-xs tw:text-red-600">
+            <span class="tw:absolute tw:right-0 tw:bottom-0 tw:text-xs <%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
               stolen
             </span>
           <% end %>
