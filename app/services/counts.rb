@@ -5,7 +5,7 @@ module Counts
 
   COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart organizations].freeze
 
-  RECOVERY_AVERAGE_VALUE = 1725 # updated with calculated_recovery_average_value on 2022-2-1
+  RECOVERY_AVERAGE_VALUE = 2103 # updated with calculated_recovery_average_value on 2026-4-11
 
   def assign_for(count_key, value)
     RedisPool.conn { |r| r.hset STORAGE_KEY, count_key, value }
@@ -98,5 +98,5 @@ module Counts
     calculated_recoveries.pluck(:estimated_value).reject(&:blank?)
   end
 
-  conceal :beginning_of_week, :calculated_recoveries, :valued_recoveries
+  conceal :beginning_of_week, :calculated_recovery_average_value, :calculated_recoveries, :valued_recoveries
 end
