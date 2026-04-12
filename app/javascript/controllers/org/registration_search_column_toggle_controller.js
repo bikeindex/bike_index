@@ -5,6 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--registration-search-column-toggle'
 export default class extends Controller {
   static targets = ['checkboxes']
+  static outlets = ['ui-table']
   static values = { enabledColumns: Array, defaultColumns: Array, assignBikeSticker: Boolean }
 
   connect () {
@@ -74,9 +75,6 @@ export default class extends Controller {
     })
 
     // Re-apply first/last visible column border styles via ui-table controller
-    const uiTableEl = this.element.querySelector('[data-controller~="ui-table"]')
-    if (uiTableEl) {
-      this.application.getControllerForElementAndIdentifier(uiTableEl, 'ui-table')?.refresh()
-    }
+    if (this.hasUiTableOutlet) this.uiTableOutlet.refresh()
   }
 }

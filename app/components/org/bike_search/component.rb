@@ -68,7 +68,8 @@ module Org::BikeSearch
     def component_wrapper_data_attributes
       return {} if @skip_settings
       {controller: "org--registration-search org--registration-search-column-toggle",
-       "org--registration-search-column-toggle-default-columns-value": initially_checked_columns.to_json}
+       "org--registration-search-column-toggle-default-columns-value": initially_checked_columns.to_json,
+       "org--registration-search-column-toggle-ui-table-outlet": "[data-controller~='ui-table']"}
     end
 
     def table_wrapper_data_attributes
