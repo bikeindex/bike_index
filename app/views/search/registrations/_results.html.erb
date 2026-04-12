@@ -31,7 +31,7 @@
 
 <%# This is now a view component, so it needs to be outside the bootstrap container for styling %>
 <% if @bikes.present? && @pagy.present? %>
-  <%= render(Pagination::Component.new(pagy: @pagy, page_params: params,
+  <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params,
     size: :lg, data: {turbo_action: "advance"})) %>
 <% end %>
 

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pagination::Component, type: :component do
+RSpec.describe UI::Pagination::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {pagy:, data:, page_params:} }

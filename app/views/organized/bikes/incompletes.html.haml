@@ -78,4 +78,4 @@
                 = link_to t(".re_send"), resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param), method: :post, data: {confirm: t(".only_resend_with_permission")}, class: "gray-link"
 
 .pt-4.pb-4
-  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+  = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

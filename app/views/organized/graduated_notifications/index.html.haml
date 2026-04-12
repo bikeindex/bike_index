@@ -59,4 +59,4 @@
 = render partial: "/organized/graduated_notifications/table", locals: {graduated_notifications: @graduated_notifications, render_sortable: true, render_remaining_at: !skip_remaining, separate_secondary_notifications: separate_secondary_notifications?}
 
 .pt-4.pb-4
-  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+  = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
