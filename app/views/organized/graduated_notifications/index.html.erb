@@ -1,0 +1,46 @@
+<%# TODO: add translations %>
+
+<div class="organized-page-header">
+  <h1>Graduated notifications</h1>
+</div>
+
+<% unless current_organization.deliver_graduated_notifications? %>
+  <div class="row mt-5 mb-5">
+    <div class="col-md-6">
+      <div class="alert alert-info">
+        <h3>Not delivering graduated notifications</h3>
+        <%= current_organization.name %>
+        doesn't have a notification time period set,
+        <span class="text-warning">bikes are not being graduated.</span>
+        <br>
+        Please email
+        <%= link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org" %>
+        to set up graduated notifications.
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%= render partial: "/shared/period_select" %>
+
+<div class="mt-4">
+  <%= render(Search::FormOrganized::Component.new(
+    target_search_path: organization_graduated_notifications_path(organization_id: current_organization.to_param),
+    target_frame: :graduated_notifications_results_frame,
+    interpreted_params: @interpreted_params
+  )) %>
+</div>
+
+<hr style="opacity: .3;">
+
+<%= turbo_frame_tag :graduated_notifications_results_frame do %>
+  <% if @render_results %>
+    <%= render partial: "results" %>
+  <% else %>
+    <span id="loadedWithoutResults" class="tw:hidden"></span>
+  <% end %>
+<% end %>
+
+<div id="hiddenLoadingSpinner" class="tw:hidden">
+  <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
+</div>
