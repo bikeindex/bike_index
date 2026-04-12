@@ -1,5 +1,6 @@
 <%# locals: (bikes: nil, no_show_header: false, show_serial: false, render_sortable: false, skip_user: false, render_multi_check: false) %>
 <% bikes ||= @bikes %>
+<% show_serial = true if params[:show_serial].present? %>
 
 <%# require inline CSS setting because of caching %>
 <% unless display_dev_info? %>
