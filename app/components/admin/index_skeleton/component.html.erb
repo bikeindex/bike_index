@@ -17,32 +17,23 @@
     <%= @nav_header_list_items %>
 
     <% if show_deleted_link? %>
-      <li class="nav-item dropdown dropleft small">
-        <a
-          class="nav-link dropdown-toggle <%= deleted_active? ? "active" : "" %>"
-          href="#"
-          role="button"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          <%= deleted_label %>
-        </a>
-
-        <div class="dropdown-menu">
-          <%= link_to "Only not deleted", helpers.url_for(sortable_search_params.merge(search_deleted: nil)), class: "dropdown-item #{@render_deleted == false ? 'active' : ''}" %>
-
-          <div class="dropdown-divider"></div>
-
-          <%= link_to "Including deleted", helpers.url_for(sortable_search_params.merge(search_deleted: "including")), class: "dropdown-item #{@render_deleted == "including" ? 'active' : ''}" %>
-          <%= link_to "Only deleted", helpers.url_for(sortable_search_params.merge(search_deleted: "only")), class: "dropdown-item #{@render_deleted == "only" ? 'active' : ''}" %>
-        </div>
+      <li class="nav-item tw:text-sm">
+        <%= render(UI::Dropdown::Component.new(
+          name: deleted_label,
+          button_size: :sm,
+          active: deleted_active?
+        )) do |dropdown|
+          dropdown.with_entry_item { link_to "Only not deleted", url_for(sortable_search_params.merge(search_deleted: nil)), class: deleted_item_class(nil) }
+          dropdown.with_entry_divider
+          dropdown.with_entry_item { link_to "Including deleted", url_for(sortable_search_params.merge(search_deleted: "including")), class: deleted_item_class("including") }
+          dropdown.with_entry_item { link_to "Only deleted", url_for(sortable_search_params.merge(search_deleted: "only")), class: deleted_item_class("only") }
+        end %>
       </li>
     <% end %>
 
     <% unless @skip_charting %>
       <li class="nav-item">
-        <%= link_to "graph", helpers.url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? "active" : ""}" %>
+        <%= link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? "active" : ""}" %>
       </li>
     <% end %>
   </ul>

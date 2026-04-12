@@ -6168,6 +6168,8 @@ nl:
         notes_cell: Notes
         show_notes_search: notities weergeven zoeken
         impound_id_cell: Inbeslagname-ID
+        default: standaard
+        none: geen
       bike_access_panel:
         access_panel: Toegangspaneel
         added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd

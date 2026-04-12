@@ -42,6 +42,29 @@ export default class extends Controller {
     this.updateVisibleColumns()
   }
 
+  selectAll () {
+    this.setAllCheckboxes(true)
+  }
+
+  selectNone () {
+    this.setAllCheckboxes(false)
+  }
+
+  selectDefault () {
+    const defaults = this.defaultColumnsValue
+    this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.checked = defaults.includes(cb.name)
+    })
+    this.updateVisibleColumns()
+  }
+
+  setAllCheckboxes (checked) {
+    this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.checked = checked
+    })
+    this.updateVisibleColumns()
+  }
+
   selectStoredVisibleColumns () {
     const stored = localStorage.getItem('orgRegistrationColumns')
     let columns = this.defaultColumnsValue

@@ -217,7 +217,7 @@
   <% if show_pagination? %>
     <div class="paginate-container paginate-container-bottom row">
       <div class="col-md-8 mb-2 mt-4">
-        <%= render(Pagination::Component.new(pagy: @pagy, page_params: @params, size: :lg, data: {turbo_action: "advance"})) %>
+        <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @params, size: :lg, data: {turbo_action: "advance"})) %>
       </div>
 
       <div class="col-md-4 text-right">

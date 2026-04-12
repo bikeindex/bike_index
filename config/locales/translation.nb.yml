@@ -6011,6 +6011,8 @@ nb:
         notes_cell: Notater
         show_notes_search: vis notatsøk
         impound_id_cell: Beslags-ID
+        default: misligholde
+        none: ingen
       bike_access_panel:
         access_panel: Tilgangspanel
         added_to_track_parking_notification: Denne %{bike_type} er ikke registrert
