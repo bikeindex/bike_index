@@ -107,12 +107,16 @@
   </li>
 <% end %>
 
-<% rendered_chart = capture do %>
-  <h4 class="mt-2">Counts</h4>
-  <%= column_chart payments_counts_nozero.map { |c| {name: c[:name], data: c[:data]} }, stacked: true, thousands: "," %>
+<% rendered_chart = nil %>
 
-  <h4 class="mt-2">Amounts</h4>
-  <%= column_chart payments_counts_nozero.reject { |c| c[:count] < 1 }.map { |c| {name: c[:name], data: c[:data_money]} }, stacked: true, thousands: ",", prefix: "$", round: 2 %>
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <h4 class="mt-2">Counts</h4>
+    <%= column_chart payments_counts_nozero.map { |c| {name: c[:name], data: c[:data]} }, stacked: true, thousands: "," %>
+
+    <h4 class="mt-2">Amounts</h4>
+    <%= column_chart payments_counts_nozero.reject { |c| c[:count] < 1 }.map { |c| {name: c[:name], data: c[:data_money]} }, stacked: true, thousands: ",", prefix: "$", round: 2 %>
+  <% end %>
 <% end %>
 
 <% admin_search_form = capture do %>

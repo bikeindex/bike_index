@@ -52,13 +52,17 @@
   </li>
 <% end %>
 
-<% rendered_chart = capture do %>
-  <% if @search_type == "all" %>
-    <% series = registry_types.map { |search_type| {name: ExternalRegistryBike.registry_name(search_type), data: UI::Chart::Component.time_range_counts(collection: @matching_bikes.where(type: "ExternalRegistryBike::#{search_type}"), time_range: @time_range, column: @time_range_column.presence || "created_at")} } %>
-    <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"])) %>
-  <% else %>
-    <% series = [{name: "External Registry Bikes", data: UI::Chart::Component.time_range_counts(collection: @matching_bikes, time_range: @time_range, column: @time_range_column.presence || "created_at")}] %>
-    <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true)) %>
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <% if @search_type == "all" %>
+      <% series = registry_types.map { |search_type| {name: ExternalRegistryBike.registry_name(search_type), data: UI::Chart::Component.time_range_counts(collection: @matching_bikes.where(type: "ExternalRegistryBike::#{search_type}"), time_range: @time_range, column: @time_range_column.presence || "created_at")} } %>
+      <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"])) %>
+    <% else %>
+      <% series = [{name: "External Registry Bikes", data: UI::Chart::Component.time_range_counts(collection: @matching_bikes, time_range: @time_range, column: @time_range_column.presence || "created_at")}] %>
+      <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true)) %>
+    <% end %>
   <% end %>
 <% end %>
 

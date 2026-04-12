@@ -47,13 +47,17 @@
   </li>
 <% end %>
 
-<% rendered_chart = capture do %>
-  <% if @endpoint.present? %>
-    <% endpoints = matching_logged_searches.distinct.pluck(:endpoint).sort %>
-    <% counts_by_endpoint = endpoints.map { |endpoint| {name: endpoint, data: time_range_counts(collection: matching_logged_searches.where(endpoint:), column: @time_range_column)} } %>
-    <%= column_chart counts_by_endpoint, stacked: true, thousands: "," %>
-  <% else %>
-    <%= column_chart time_range_counts(collection: matching_logged_searches, column: @time_range_column), stacked: true, thousands: "," %>
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <% if @endpoint.present? %>
+      <% endpoints = matching_logged_searches.distinct.pluck(:endpoint).sort %>
+      <% counts_by_endpoint = endpoints.map { |endpoint| {name: endpoint, data: time_range_counts(collection: matching_logged_searches.where(endpoint:), column: @time_range_column)} } %>
+      <%= column_chart counts_by_endpoint, stacked: true, thousands: "," %>
+    <% else %>
+      <%= column_chart time_range_counts(collection: matching_logged_searches, column: @time_range_column), stacked: true, thousands: "," %>
+    <% end %>
   <% end %>
 <% end %>
 

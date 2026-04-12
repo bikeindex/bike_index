@@ -55,40 +55,44 @@
   </li>
 <% end %>
 
-<% rendered_chart = capture do %>
-  <%= column_chart time_range_counts(collection: available_recoveries, column: @time_range_column), stacked: true, thousands: "," %>
+<% rendered_chart = nil %>
 
-  <div class="row mt-4 mb-4">
-    <div class="col-sm-6 offset-sm-3">
-      <table class="table-list wide-definition no-italic-definition">
-        <%# duplicates some stuff from counts.rb %>
-        <% valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?) %>
-        <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <%= column_chart time_range_counts(collection: available_recoveries, column: @time_range_column), stacked: true, thousands: "," %>
 
-        <tbody>
-          <tr class="small">
-            <td>With user entered value</td>
-            <td><%= number_display(valued_recoveries.count) %></td>
-          </tr>
+    <div class="row mt-4 mb-4">
+      <div class="col-sm-6 offset-sm-3">
+        <table class="table-list wide-definition no-italic-definition">
+          <%# duplicates some stuff from counts.rb %>
+          <% valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?) %>
+          <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>
 
-          <tr class="small">
-            <td>Total user entered value</td>
-            <td>$<%= number_display(valued_recoveries.sum) %></td>
-          </tr>
+          <tbody>
+            <tr class="small">
+              <td>With user entered value</td>
+              <td><%= number_display(valued_recoveries.count) %></td>
+            </tr>
 
-          <tr class="small">
-            <td>Average stolen value</td>
-            <td>$<%= number_display(Counts.recovery_average_value) %></td>
-          </tr>
+            <tr class="small">
+              <td>Total user entered value</td>
+              <td>$<%= number_display(valued_recoveries.sum) %></td>
+            </tr>
 
-          <tr>
-            <td>Total estimated value</td>
-            <td>$<%= number_display(recovery_amount) %></td>
-          </tr>
-        </tbody>
-      </table>
+            <tr class="small">
+              <td>Average stolen value</td>
+              <td>$<%= number_display(Counts.recovery_average_value) %></td>
+            </tr>
+
+            <tr>
+              <td>Total estimated value</td>
+              <td>$<%= number_display(recovery_amount) %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
+  <% end %>
 <% end %>
 
 <% admin_search_form = capture do %>
