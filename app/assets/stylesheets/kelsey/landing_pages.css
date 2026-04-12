@@ -1,7 +1,7 @@
 .kelsey_landing-page-body .primary-header-nav {
   margin-bottom: 0;
-
 }
+
 /* Landing Page Hero Section */
 .kelsey_styles .le-hero-section {
   background-color: var(--redesign-blue-800);
@@ -10,15 +10,13 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  overflow: hidden;
+  clip-path: inset(-100px 0 0 0);
   padding: 3rem 0;
-  margin-top: -50px;
-  padding-top: calc(50px + 3rem);
 }
 
 .kelsey_styles .le-bike-tiles-grid {
   position: absolute;
-  top: 0;
+  top: -100px;
   left: 0;
   right: 0;
   bottom: 0;
