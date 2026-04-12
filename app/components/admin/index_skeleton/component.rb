@@ -35,6 +35,8 @@ module Admin::IndexSkeleton
       @render_chart = controller.instance_variable_get(:@render_chart)
       @pagy = controller.instance_variable_get(:@pagy)
       @per_page = controller.instance_variable_get(:@per_page)
+      @render_deleted = controller.instance_variable_get(:@render_deleted)
+      @render_deleted_link = !@render_deleted.nil?
       @time_range = controller.instance_variable_get(:@time_range)
       @period = controller.instance_variable_get(:@period)
       @time_range_column = @time_range_column_override || controller.instance_variable_get(:@time_range_column) || "created_at"
