@@ -5,7 +5,7 @@ module UI
     class Component < ApplicationComponent
       renders_many :entries, types: {
         item: lambda { |&block|
-          content_tag(:li, role: "menuitem", &block)
+          content_tag(:li, nil, role: "menuitem", &block)
         },
         divider: lambda {
           content_tag(:li, "", role: "separator")
