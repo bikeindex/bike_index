@@ -28,7 +28,7 @@ module Admin::CurrentHeader
 
     def render?
       (@params.keys.map(&:to_sym) & HEADER_KEYS).any? || show_user? || show_marketplace_listing? ||
-        show_organization?
+        show_organization? || show_deleted?
     end
 
     private
@@ -101,6 +101,10 @@ module Admin::CurrentHeader
 
     def primary_activity_subject
       @primary_activity_subject ||= @primary_activity || PrimaryActivity.find_by_id(@params[:primary_activity])
+    end
+
+    def show_deleted?
+      Binxtils::InputNormalizer.boolean(@params[:search_deleted])
     end
 
     def error_text_class
