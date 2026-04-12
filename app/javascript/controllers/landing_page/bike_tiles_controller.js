@@ -7,6 +7,27 @@ export default class extends Controller {
 
   connect () {
     this.generateTiles()
+    this.ticking = false
+
+    this.handleScroll = () => {
+      if (!this.ticking) {
+        window.requestAnimationFrame(() => {
+          const scrolled = window.pageYOffset
+          const heroSection = this.element.closest('.le-hero-section')
+          if (heroSection && scrolled < window.innerHeight) {
+            this.gridTarget.style.transform = `translateY(${scrolled * 0.3}px)`
+          }
+          this.ticking = false
+        })
+        this.ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', this.handleScroll)
+  }
+
+  disconnect () {
+    window.removeEventListener('scroll', this.handleScroll)
   }
 
   generateTiles () {
