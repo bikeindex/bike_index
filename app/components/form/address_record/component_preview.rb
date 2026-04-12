@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module LegacyFormWell::AddressRecord
+module Form::AddressRecord
   class ComponentPreview < ApplicationComponentPreview
     layout "component_preview_form_wrap"
 
@@ -8,12 +8,12 @@ module LegacyFormWell::AddressRecord
     def default(organization_id: nil)
       organization = Organization.friendly_find(organization_id)
 
-      {template: "legacy_form_well/address_record/component_preview/default",
+      {template: "form/address_record/component_preview/default",
        locals: {organization:}}
     end
 
     def impounded_bike
-      {template: "legacy_form_well/address_record/component_preview/default",
+      {template: "form/address_record/component_preview/default",
        locals: {bike_status: "status_impounded"}}
     end
 

@@ -4612,7 +4612,7 @@ it:
         search_owner_email:
         submit:
         search_notes:
-    legacy_form_well:
+    form:
       address_record:
         address:
         address_school:

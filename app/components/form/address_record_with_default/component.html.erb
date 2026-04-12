@@ -1,9 +1,9 @@
 <div
   class="related-fields"
-  data-controller="legacy-form-well--address-record-with-default"
+  data-controller="form--address-record-with-default"
 >
   <%= render(
-    LegacyFormWell::AddressRecord::Component.new(
+    Form::AddressRecord::Component.new(
       form_builder: @builder,
       not_related_fields: true,
       no_street: true,
@@ -20,8 +20,8 @@
           <%= @builder.check_box :user_account_address,
                              {
                                "data-action" =>
-                                 "change->legacy-form-well--address-record-with-default#toggleUseAccount",
-                               "data-legacy-form-well--address-record-with-default-target" =>
+                                 "change->form--address-record-with-default#toggleUseAccount",
+                               "data-form--address-record-with-default-target" =>
                                  "useAccountCheckbox",
                              } %>
           

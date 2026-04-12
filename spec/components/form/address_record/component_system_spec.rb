@@ -2,8 +2,8 @@
 
 require "rails_helper"
 
-RSpec.describe LegacyFormWell::AddressRecord::Component, :js, type: :system do
-  let(:base_path) { "/rails/view_components/legacy_form_well/address_record/component/" }
+RSpec.describe Form::AddressRecord::Component, :js, type: :system do
+  let(:base_path) { "/rails/view_components/form/address_record/component/" }
   let(:preview_path) { "#{base_path}default" }
 
   it "renders default preview" do

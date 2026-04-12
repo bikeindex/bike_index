@@ -7,7 +7,7 @@
       <% irecord.object.address_record = AddressRecord.new(country: Country.united_states) %>
 
       <%= irecord.fields_for :address_record do |address_form| %>
-        <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, bike_status:  bike_status)) %>
+        <%= render(Form::AddressRecord::Component.new(form_builder: address_form, bike_status:  bike_status)) %>
       <% end %>
     <% end %>
   <% end %>
@@ -18,7 +18,7 @@
   <%= form_for @user, url: my_account_path, method: :patch, multipart: true do |f| %>
     <%= f.fields_for :address_record do |address_form| %>
       <%= render(
-        LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization:)
+        Form::AddressRecord::Component.new(form_builder: address_form, organization:)
       ) %>
     <% end %>
   <% end %>

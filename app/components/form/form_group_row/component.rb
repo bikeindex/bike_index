@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module LegacyFormWell::FormGroupRow
+module Form::FormGroupRow
   class Component < ApplicationComponent
     def initialize(form_builder:, label:, label_translation: nil, row_classes: "form-group row")
       @form_builder = form_builder

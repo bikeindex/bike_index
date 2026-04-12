@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module LegacyFormWell::AddressRecord
+module Form::AddressRecord
   class Component < ApplicationComponent
     STATIC_FIELDS_OPTIONS = %i[shown hidden]
 

@@ -5898,7 +5898,7 @@ nl:
         search_owner_email: Zoek eigenaar e-mail
         submit: Voorleggen
         search_notes: Zoeknotities
-    legacy_form_well:
+    form:
       address_record:
         address: Adres
         address_school: Postadres van de campus

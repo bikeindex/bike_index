@@ -1,7 +1,7 @@
 ---
 en:
   components:
-    legacy_form_well:
+    form:
       address_record:
         address: Street address
         address_no_street: Address

@@ -2,8 +2,8 @@
 
 require "rails_helper"
 
-RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, :js, type: :system do
-  let(:preview_path) { "/rails/view_components/legacy_form_well/address_record_with_default/component/default" }
+RSpec.describe Form::AddressRecordWithDefault::Component, :js, type: :system do
+  let(:preview_path) { "/rails/view_components/form/address_record_with_default/component/default" }
   let(:user) { FactoryBot.create(:user) }
   let(:address_record) {}
   let(:organization) { nil }
