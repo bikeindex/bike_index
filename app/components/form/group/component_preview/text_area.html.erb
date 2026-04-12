@@ -1,0 +1,3 @@
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(Form::Group::Component.new(form_builder: f, attribute: :name, kind: :text_area, html_options: {rows: 4})) %>
+<% end %>
