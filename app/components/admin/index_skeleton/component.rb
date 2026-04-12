@@ -35,6 +35,7 @@ module Admin::IndexSkeleton
       @render_chart = controller.instance_variable_get(:@render_chart)
       @pagy = controller.instance_variable_get(:@pagy)
       @per_page = controller.instance_variable_get(:@per_page)
+      @render_deleted = controller.instance_variable_get(:@render_deleted)
       @time_range = controller.instance_variable_get(:@time_range)
       @period = controller.instance_variable_get(:@period)
       @time_range_column = @time_range_column_override || controller.instance_variable_get(:@time_range_column) || "created_at"
@@ -67,7 +68,8 @@ module Admin::IndexSkeleton
         user_subject: @user_subject, bike: @bike,
         marketplace_listing: @marketplace_listing,
         primary_activity: @primary_activity,
-        current_organization: @current_organization
+        current_organization: @current_organization,
+        render_deleted: @render_deleted
       )
     end
 

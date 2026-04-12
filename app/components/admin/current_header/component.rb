@@ -15,7 +15,7 @@ module Admin::CurrentHeader
       search_strava_integration_id
     ].freeze
 
-    def initialize(params:, viewing: nil, kind_humanized: nil, user_subject: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil)
+    def initialize(params:, viewing: nil, kind_humanized: nil, user_subject: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil, render_deleted: nil)
       @params = params
       @viewing = viewing
       @kind_humanized = kind_humanized
@@ -24,6 +24,7 @@ module Admin::CurrentHeader
       @marketplace_listing = marketplace_listing
       @primary_activity = primary_activity
       @current_organization = current_organization
+      @render_deleted = render_deleted
     end
 
     def render?
@@ -104,7 +105,7 @@ module Admin::CurrentHeader
     end
 
     def show_deleted?
-      Binxtils::InputNormalizer.boolean(@params[:search_deleted])
+      @render_deleted
     end
 
     def error_text_class
