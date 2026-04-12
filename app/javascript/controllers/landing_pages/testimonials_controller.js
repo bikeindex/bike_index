@@ -1,12 +1,15 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='landing-page--testimonials'
+// Connects to data-controller='landing-pages--testimonials'
 export default class extends Controller {
   static targets = ['testimonial', 'dot']
 
+  // Testimonials carousel functionality
   connect () {
     this.currentIndex = 0
+    // Create dots
     this.createDots()
+    // Auto-advance testimonials every 8 seconds
     this.autoAdvanceInterval = setInterval(() => this.next(), 8000)
   }
 
@@ -21,9 +24,9 @@ export default class extends Controller {
     this.testimonialTargets.forEach((_, index) => {
       const dot = document.createElement('button')
       dot.className = 'le-testimonial-dot'
-      dot.dataset.landingPageTestimonialsTarget = 'dot'
+      dot.dataset.landingPagesTestimonialsTarget = 'dot'
       dot.dataset.index = index
-      dot.dataset.action = 'click->landing-page--testimonials#goTo'
+      dot.dataset.action = 'click->landing-pages--testimonials#goTo'
       if (index === 0) dot.classList.add('active')
       dotsContainer.appendChild(dot)
     })

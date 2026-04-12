@@ -1,14 +1,16 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='landing-page--bike-tiles'
+// Connects to data-controller='landing-pages--bike-tiles'
 export default class extends Controller {
   static targets = ['grid']
   static values = { images: Array }
 
   connect () {
+    // Initialize bike tiles grid background
     this.generateTiles()
     this.ticking = false
 
+    // Add subtle parallax effect to hero background on scroll
     this.handleScroll = () => {
       if (!this.ticking) {
         window.requestAnimationFrame(() => {
@@ -31,6 +33,7 @@ export default class extends Controller {
   }
 
   generateTiles () {
+    // Calculate how many tiles we need to fill the screen
     const tilesNeeded = Math.ceil(window.innerWidth / 130) * Math.ceil(window.innerHeight / 130) + 20
     const bikeImagesLength = this.imagesValue.length
 

@@ -3,9 +3,9 @@
   <section class="le-hero-section">
     <div
       class="le-bike-tiles-grid"
-      data-controller="landing-page--bike-tiles"
-      data-landing-page--bike-tiles-target="grid"
-      data-landing-page--bike-tiles-images-value="<%= bike_tile_images.to_json %>"
+      data-controller="landing-pages--bike-tiles"
+      data-landing-pages--bike-tiles-target="grid"
+      data-landing-pages--bike-tiles-images-value="<%= bike_tile_images.to_json %>"
     ></div>
     <div class="le-hero-content">
       <h1>The #1 platform for campus bike management</h1>
@@ -66,27 +66,27 @@
       </div>
 
       <%# Tabbed Widget %>
-      <div class="le-tabbed-widget" data-controller="landing-page--tabs">
+      <div class="le-tabbed-widget" data-controller="landing-pages--tabs">
         <div class="le-tab-buttons">
           <button
             class="le-tab-button active"
             data-tab="database"
-            data-landing-page--tabs-target="button"
-            data-action="click->landing-page--tabs#select"
+            data-landing-pages--tabs-target="button"
+            data-action="click->landing-pages--tabs#select"
           >
             All-in-One Database Management for Operational Efficiency
           </button>
           <button
             class="le-tab-button"
             data-tab="defense"
-            data-landing-page--tabs-target="button"
-            data-action="click->landing-page--tabs#select"
+            data-landing-pages--tabs-target="button"
+            data-action="click->landing-pages--tabs#select"
           >
             First Line of Defense Against Theft for Your Campus Members
           </button>
         </div>
         <div class="le-tab-content">
-          <div class="le-tab-panel active" id="tab-database" data-landing-page--tabs-target="panel">
+          <div class="le-tab-panel active" id="tab-database" data-landing-pages--tabs-target="panel">
             <div class="le-tab-panel-content">
               <div class="le-tab-icon">
                 <%= image_tag "kelsey/unis.gif", alt: "Database Management" %>
@@ -101,7 +101,7 @@
               </div>
             </div>
           </div>
-          <div class="le-tab-panel" id="tab-defense" data-landing-page--tabs-target="panel">
+          <div class="le-tab-panel" id="tab-defense" data-landing-pages--tabs-target="panel">
             <div class="le-tab-panel-content">
               <div class="le-tab-icon">
                 <%= image_tag "kelsey/theft-victims.gif", alt: "First Line of Defense" %>
@@ -140,7 +140,7 @@
   </section>
 
   <%# Testimonials Section %>
-  <section class="le-testimonials-section" data-controller="landing-page--testimonials">
+  <section class="le-testimonials-section" data-controller="landing-pages--testimonials">
     <div class="container">
       <h2>Testimonials</h2>
       <div class="le-testimonials-carousel-wrapper">
@@ -148,7 +148,7 @@
           <% testimonials.each_with_index do |testimonial, index| %>
             <div
               class="le-testimonial <%= 'active' if index == 0 %>"
-              data-landing-page--testimonials-target="testimonial"
+              data-landing-pages--testimonials-target="testimonial"
             >
               <div class="le-testimonial-content">
                 <div class="le-testimonial-text">
@@ -170,12 +170,12 @@
         <div class="le-testimonial-nav">
           <button
             class="le-testimonial-arrow"
-            data-action="click->landing-page--testimonials#prev"
+            data-action="click->landing-pages--testimonials#prev"
           >&lsaquo;</button>
           <div class="le-testimonial-dots" data-testimonials-dots></div>
           <button
             class="le-testimonial-arrow"
-            data-action="click->landing-page--testimonials#next"
+            data-action="click->landing-pages--testimonials#next"
           >&rsaquo;</button>
         </div>
       </div>
