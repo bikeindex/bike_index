@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe PageBlock::ForSchoolsTop::Component, type: :component do
+RSpec.describe PageBlock::LandingForSchools::Component, type: :component do
   let(:component) { render_inline(described_class.new) }
 
   it "renders" do
