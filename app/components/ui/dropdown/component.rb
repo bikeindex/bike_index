@@ -3,6 +3,8 @@
 module UI
   module Dropdown
     class Component < ApplicationComponent
+      attr_reader :entries
+
       def initialize(name:, button_content: nil, drop_direction: :bottom_end, button_class: nil, header: nil, id: nil, placement: nil)
         @name = name
         @entries = []
@@ -20,8 +22,6 @@ module UI
       def with_divider
         @entries << {type: :divider}
       end
-
-      attr_reader :entries
 
       def floating_ui_placement
         @placement
