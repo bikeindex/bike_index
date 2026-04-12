@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Organized registrations search", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[registration_search csv_exports impound_bikes registration_notes] }
+  let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bikes_path) { "/o/#{organization.to_param}/registrations" }
 
@@ -151,7 +151,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   context "with stolen and impounded bikes" do
-    let(:enabled_feature_slugs) { %w[registration_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
     let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization) }
     let!(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization) }
 
@@ -224,7 +224,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   context "with avery_export enabled" do
-    let(:enabled_feature_slugs) { %w[registration_search avery_export reg_address bike_stickers csv_exports] }
+    let(:enabled_feature_slugs) { %w[bike_search avery_export reg_address bike_stickers csv_exports] }
     let!(:avery_bike) do
       bike = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: organization)
       bike.current_ownership.update!(owner_name: "Test Owner")

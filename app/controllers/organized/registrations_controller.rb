@@ -10,7 +10,7 @@ module Organized
       set_period
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
 
-      if current_organization.enabled?("registration_search")
+      if current_organization.enabled?("bike_search")
         @search_claimedness = "all"
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @search_query_present = permitted_org_registration_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
