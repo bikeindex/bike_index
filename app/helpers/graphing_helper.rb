@@ -127,14 +127,15 @@ module GraphingHelper
 
   private
 
-  def collection_grouped(collection:, column: "created_at", time_range: nil, time_zone: nil)
+  def collection_grouped(collection:, column: "created_at", time_range: nil)
     time_range ||= @time_range
     # Note: by specifying the range parameter, we force it to display empty days
     collection.send(
       group_by_method(time_range),
       column,
       range: time_range,
-      format: group_by_format(time_range)
+      format: group_by_format(time_range),
+      time_zone: Time.zone
     )
   end
 

@@ -21,6 +21,12 @@ lazyLoadControllersFrom('controllers', application)
 function localizeTime () {
   if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
   window.timeLocalizer.localize()
+
+  // Set timezone cookie so server-side charts use the correct timezone
+  const timezone = window.localTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone
+  if (timezone && document.cookie.indexOf('timezone=' + timezone) === -1) {
+    document.cookie = 'timezone=' + timezone + ';path=/;max-age=31536000;SameSite=Lax'
+  }
 }
 
 // Load honeybadger dynamically so ad blockers don't break the entire app

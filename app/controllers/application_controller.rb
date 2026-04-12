@@ -97,6 +97,8 @@ class ApplicationController < ActionController::Base
     # Set the timezone on a per request basis if we have a timezone saved
     if session[:timezone].present?
       Time.zone = timezone || Binxtils::TimeZoneParser.parse(session[:timezone])
+    elsif cookies[:timezone].present?
+      Time.zone = Binxtils::TimeZoneParser.parse(cookies[:timezone]) || Binxtils::TimeParser.default_time_zone
     end
 
     # We aren't translating the superadmin section

@@ -106,6 +106,9 @@ module SetPeriod
       Time.zone = @timezone
     end
 
+    if cookies[:timezone].present?
+      @timezone ||= Binxtils::TimeParser.parse_timezone(cookies[:timezone])
+    end
     @timezone ||= Binxtils::TimeParser.default_time_zone
   end
 end
