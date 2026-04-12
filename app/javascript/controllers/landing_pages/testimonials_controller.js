@@ -9,11 +9,23 @@ export default class extends Controller {
     this.currentIndex = 0
     // Create dots
     this.createDots()
-    // Auto-advance testimonials every 8 seconds
-    this.autoAdvanceInterval = setInterval(() => this.next(), 8000)
+    // Auto-advance testimonials every 8 seconds, pause on hover
+    this.startAutoAdvance()
+    const wrapper = this.element.querySelector('.le-testimonials-carousel-wrapper')
+    wrapper.addEventListener('mouseenter', () => this.pauseAutoAdvance())
+    wrapper.addEventListener('mouseleave', () => this.startAutoAdvance())
   }
 
   disconnect () {
+    clearInterval(this.autoAdvanceInterval)
+  }
+
+  startAutoAdvance () {
+    clearInterval(this.autoAdvanceInterval)
+    this.autoAdvanceInterval = setInterval(() => this.next(), 8000)
+  }
+
+  pauseAutoAdvance () {
     clearInterval(this.autoAdvanceInterval)
   }
 
@@ -54,8 +66,7 @@ export default class extends Controller {
   }
 
   resetAutoAdvance () {
-    clearInterval(this.autoAdvanceInterval)
-    this.autoAdvanceInterval = setInterval(() => this.next(), 8000)
+    this.startAutoAdvance()
   }
 
   show () {
