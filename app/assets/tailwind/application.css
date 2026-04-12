@@ -66,6 +66,10 @@
     @apply tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
   }
 
+  [aria-expanded="true"] .twdropdown-chevron {
+    @apply tw:rotate-180;
+  }
+
   .twdropdown {
     @apply tw:flex-col;
   }
