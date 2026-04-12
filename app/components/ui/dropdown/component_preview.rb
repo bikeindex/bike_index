@@ -4,12 +4,11 @@ module UI
   module Dropdown
     class ComponentPreview < ApplicationComponentPreview
       def default
-        options = [
-          '<a href="#" class="dropdown-link">Profile</a>'.html_safe,
-          '<a href="#" class="dropdown-link">Settings</a>'.html_safe,
-          '<a href="#" class="dropdown-link">Logout</a>'.html_safe
-        ]
-        render(UI::Dropdown::Component.new(name: "Menu", options:))
+        render(UI::Dropdown::Component.new(name: "Menu")) do |dropdown|
+          dropdown.with_item { link_to "Profile", "#", class: "dropdown-link" }
+          dropdown.with_item { link_to "Settings", "#", class: "dropdown-link" }
+          dropdown.with_item { link_to "Logout", "#", class: "dropdown-link" }
+        end
       end
     end
   end
