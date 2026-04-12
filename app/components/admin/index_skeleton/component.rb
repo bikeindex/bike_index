@@ -81,6 +81,10 @@ module Admin::IndexSkeleton
       )
     end
 
+    def show_deleted_link?
+      !@render_deleted.nil?
+    end
+
     def default_table_view
       helpers.render(partial: "table", locals: {collection: @collection, render_sortable: @render_sortable})
     end
