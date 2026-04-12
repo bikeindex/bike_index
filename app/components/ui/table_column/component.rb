@@ -2,23 +2,20 @@
 
 module UI
   module TableColumn
-    # ViewComponent representing a single table column. The table renders this
-    # component once per cell via `render(col.for_record(record))`.
     class Component < ApplicationComponent
       ARROW_UP = "\u2191"
       ARROW_DOWN = "\u2193"
       NBSP = "\u00A0"
 
-      attr_reader :sortable, :cell_block, :uncached
+      attr_reader :sortable, :cell_block
 
-      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, uncached: false, &block)
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
         @label = label
         @sortable = sortable
         @sort_indicator = sort_indicator
         @classes = classes
         @header_classes = header_classes
         @lower_right = lower_right
-        @uncached = uncached
         @cell_block = block
       end
 

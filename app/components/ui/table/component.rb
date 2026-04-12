@@ -17,14 +17,13 @@ module UI
         @columns = []
       end
 
-      def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, uncached: false, &block)
-        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, lower_right:, uncached:, &block)
+      def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
+        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, lower_right:, &block)
         nil
       end
 
       def before_render
         content
-        validate_uncached_columns_are_last!
       end
 
       private
@@ -49,18 +48,6 @@ module UI
 
       def sortable_columns
         @columns.filter_map(&:sortable)
-      end
-
-      def uncached_columns
-        @uncached_columns ||= @columns.select(&:uncached)
-      end
-
-      def validate_uncached_columns_are_last!
-        return if uncached_columns.empty?
-        first_uncached = @columns.index(&:uncached)
-        return if @columns[first_uncached..].all?(&:uncached)
-        raise ArgumentError, "UI::Table uncached columns must be defined after all cached columns. " \
-          "Move uncached columns to the end of the column list so header and body cells align."
       end
 
       def table_classes
