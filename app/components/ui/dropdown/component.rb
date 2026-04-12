@@ -12,9 +12,6 @@ module UI
         }
       }
 
-      alias_method :with_item, :with_entry_item
-      alias_method :with_divider, :with_entry_divider
-
       def initialize(name:, button_content: nil, drop_direction: :bottom_end, button_class: nil, header: nil, id: nil, placement: nil)
         @name = name
         @button_content = button_content || "#{name} ▾"
