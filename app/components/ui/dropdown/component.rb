@@ -28,7 +28,6 @@ module UI
         @button_color = button_color
         @button_size = button_size
         @active = active
-        @button_id = @name.parameterize(separator: "-")
         @placement = PLACEMENTS.fetch(drop_direction, PLACEMENTS[:bottom_end])
       end
 
@@ -43,6 +42,10 @@ module UI
           @button_content = content_tag(:span, @button_content, class: "tw:underline")
         end
         classes
+      end
+
+      def button_id
+        @button_id ||= @name.parameterize(separator: "-")
       end
 
       def floating_ui_placement
