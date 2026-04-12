@@ -21,9 +21,7 @@ module UI
         @entries << {type: :divider}
       end
 
-      def entries
-        @entries
-      end
+      attr_reader :entries
 
       def floating_ui_placement
         @placement
