@@ -8,6 +8,12 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   connect () {
     this.applyEdgeStyles()
+    this.boundRefresh = () => this.applyEdgeStyles()
+    window.addEventListener('ui-table:refresh', this.boundRefresh)
+  }
+
+  disconnect () {
+    window.removeEventListener('ui-table:refresh', this.boundRefresh)
   }
 
   refresh () {

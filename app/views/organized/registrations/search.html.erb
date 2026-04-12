@@ -26,7 +26,6 @@
   data-controller="org--registration-search org--registration-search-column-toggle"
   data-org--registration-search-column-toggle-default-columns-value="<%= bike_search_settings.initially_checked_columns.to_json %>"
   data-org--registration-search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
-  data-org--registration-search-column-toggle-ui-table-outlet="[data-controller~='ui-table']"
 >
   <div class="mb-4">
     <%= render(Search::FormOrganized::Component.new(
