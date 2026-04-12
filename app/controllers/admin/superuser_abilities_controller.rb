@@ -43,7 +43,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
 
   def searched_superuser_abilities
     @render_deleted = Binxtils::InputNormalizer.boolean(params[:search_deleted])
-    superuser_abilities = @render_deleted ? SuperuserAbility.unscoped : SuperuserAbility
+    superuser_abilities = @render_deleted ? SuperuserAbility.only_deleted : SuperuserAbility
 
     if SuperuserAbility.kinds.include?(params[:search_kind])
       @kind = params[:search_kind]

@@ -37,7 +37,7 @@ class Admin::StravaIntegrationsController < Admin::BaseController
 
   def matching_strava_integrations
     @render_deleted = Binxtils::InputNormalizer.boolean(params[:search_deleted])
-    strava_integrations = @render_deleted ? StravaIntegration.unscoped : StravaIntegration.all
+    strava_integrations = @render_deleted ? StravaIntegration.only_deleted : StravaIntegration.all
 
     if params[:user_id].present?
       strava_integrations = strava_integrations.where(user_id: user_subject&.id || params[:user_id])
