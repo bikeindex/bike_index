@@ -1,10 +1,16 @@
 import { Controller } from '@hotwired/stimulus'
 
+/* global CSS, getComputedStyle */
+
 // Connects to data-controller='ui-table'
 // Applies first/last visible column styles (rounding, borders) that CSS
-// :first-child can't handle when columns are hidden via display:none.
+// :first-child/:last-child can't handle when columns are hidden.
 export default class extends Controller {
   connect () {
+    this.applyEdgeStyles()
+  }
+
+  refresh () {
     this.applyEdgeStyles()
   }
 
@@ -13,36 +19,49 @@ export default class extends Controller {
     if (!table) return
 
     const bordered = table.classList.contains('ui-table-bordered')
+    const thFirst = bordered ? 'tw:ui-table-bordered-th-first' : 'tw:rounded-tl-sm'
+    const thLast = bordered ? 'tw:ui-table-bordered-th-last' : 'tw:rounded-tr-sm'
+    const tdFirst = bordered ? 'tw:ui-table-bordered-td-first' : 'tw:rounded-bl-sm'
+    const tdLast = bordered ? 'tw:ui-table-bordered-td-last' : 'tw:rounded-br-sm'
+    const allClasses = [thFirst, thLast, tdFirst, tdLast]
+
+    // Clear previous edge styles
+    allClasses.forEach(cls => {
+      table.querySelectorAll(`.${CSS.escape(cls)}`).forEach(el => el.classList.remove(cls))
+    })
 
     // Header row
     const headerRow = table.querySelector('thead tr')
     if (headerRow) {
-      const firstTh = this.firstVisible(headerRow, 'th')
-      if (firstTh) {
-        firstTh.classList.add('tw:rounded-tl-sm')
-        if (bordered) firstTh.classList.add('tw:ui-table-bordered-th-first')
+      const ths = this.visibleCells(headerRow, 'th')
+      if (ths.length) {
+        ths[0].classList.add(thFirst)
+        ths[ths.length - 1].classList.add(thLast)
       }
     }
 
-    // Body rows - first visible td in last row gets bottom-left rounding
+    // Body rows
     const bodyRows = table.querySelectorAll('tbody tr')
-    if (bodyRows.length > 0) {
-      const lastRow = bodyRows[bodyRows.length - 1]
-      const firstTd = this.firstVisible(lastRow, 'td')
-      if (firstTd) firstTd.classList.add('tw:rounded-bl-sm')
-    }
-
-    // Bordered: first visible td in every row
     if (bordered) {
       bodyRows.forEach(row => {
-        const firstTd = this.firstVisible(row, 'td')
-        if (firstTd) firstTd.classList.add('tw:ui-table-bordered-td-first')
+        const tds = this.visibleCells(row, 'td')
+        if (tds.length) {
+          tds[0].classList.add(tdFirst)
+          tds[tds.length - 1].classList.add(tdLast)
+        }
       })
+    } else if (bodyRows.length > 0) {
+      const lastRow = bodyRows[bodyRows.length - 1]
+      const tds = this.visibleCells(lastRow, 'td')
+      if (tds.length) {
+        tds[0].classList.add(tdFirst)
+        tds[tds.length - 1].classList.add(tdLast)
+      }
     }
   }
 
-  firstVisible (row, tag) {
-    return Array.from(row.querySelectorAll(tag)).find(el =>
+  visibleCells (row, tag) {
+    return Array.from(row.querySelectorAll(tag)).filter(el =>
       getComputedStyle(el).display !== 'none'
     )
   }
