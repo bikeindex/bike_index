@@ -15,7 +15,6 @@
 #
 # Indexes
 #
-#  index_bike_organization_notes_on_bike_id                      (bike_id)
 #  index_bike_organization_notes_on_bike_id_and_organization_id  (bike_id,organization_id) UNIQUE
 #  index_bike_organization_notes_on_organization_id              (organization_id)
 #  index_bike_organization_notes_on_user_id                      (user_id)

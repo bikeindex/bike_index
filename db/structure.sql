@@ -5830,13 +5830,6 @@ CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (o
 
 
 --
--- Name: index_bike_organization_notes_on_bike_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_organization_notes_on_bike_id ON public.bike_organization_notes USING btree (bike_id);
-
-
---
 -- Name: index_bike_organization_notes_on_bike_id_and_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7174,13 +7167,6 @@ CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records
 
 
 --
--- Name: index_strava_activities_on_strava_integration_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_strava_activities_on_strava_integration_id ON public.strava_activities USING btree (strava_integration_id);
-
-
---
 -- Name: index_strava_activities_on_strava_integration_id_and_strava_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7192,13 +7178,6 @@ CREATE UNIQUE INDEX index_strava_activities_on_strava_integration_id_and_strava_
 --
 
 CREATE UNIQUE INDEX index_strava_gears_on_item_type_and_item_id ON public.strava_gears USING btree (item_type, item_id) WHERE (item_id IS NOT NULL);
-
-
---
--- Name: index_strava_gears_on_strava_integration_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_strava_gears_on_strava_integration_id ON public.strava_gears USING btree (strava_integration_id);
 
 
 --
@@ -7332,6 +7311,13 @@ CREATE INDEX index_user_bans_on_creator_id ON public.user_bans USING btree (crea
 --
 
 CREATE INDEX index_user_bans_on_user_id ON public.user_bans USING btree (user_id);
+
+
+--
+-- Name: index_user_emails_on_email_confirmed; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_emails_on_email_confirmed ON public.user_emails USING btree (email) WHERE (confirmation_token IS NULL);
 
 
 --
@@ -7490,6 +7476,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260412183446'),
 ('20260401211310'),
 ('20260331160943'),
 ('20260319153927'),

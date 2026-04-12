@@ -4775,6 +4775,8 @@ es:
         notes_cell:
         show_notes_search:
         impound_id_cell:
+        default:
+        none:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:
