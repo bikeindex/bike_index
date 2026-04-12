@@ -83,31 +83,31 @@
 <% if @render_chart %>
   <% rendered_chart = capture do %>
     <% if @search_kind == "all" %>
-    <% series = BikeStickerUpdate.kinds.map { |kind| {name: kind.humanize, data: UI::Chart::Component.time_range_counts(collection: matching_bike_sticker_updates.where(kind: kind), time_range: @time_range)} } %>
-    <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"])) %>
-  <% else %>
-    <% series = [{name: "Sticker updates", data: UI::Chart::Component.time_range_counts(collection: matching_bike_sticker_updates, time_range: @time_range)}] %>
-    <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true)) %>
-  <% end %>
+      <% series = BikeStickerUpdate.kinds.map { |kind| {name: kind.humanize, data: UI::Chart::Component.time_range_counts(collection: matching_bike_sticker_updates.where(kind: kind), time_range: @time_range)} } %>
+      <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"])) %>
+    <% else %>
+      <% series = [{name: "Sticker updates", data: UI::Chart::Component.time_range_counts(collection: matching_bike_sticker_updates, time_range: @time_range)}] %>
+      <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true)) %>
+    <% end %>
 
-  <% unless params[:organization_id].present? %>
-    <% update_kinds = BikeStickerUpdate.kinds %>
-    <div class="full-screen-table mt-2">
-      <table class="table table-striped table-bordered table-sm">
-        <thead class="small-header">
-          <th>Organization</th>
+    <% unless params[:organization_id].present? %>
+      <% update_kinds = BikeStickerUpdate.kinds %>
+      <div class="full-screen-table mt-2">
+        <table class="table table-striped table-bordered table-sm">
+          <thead class="small-header">
+            <th>Organization</th>
 
-          <% if @search_kind == "all" %>
-            <% update_kinds.each do |kind| %>
-              <th class="small"><%= kind.humanize %></th>
+            <% if @search_kind == "all" %>
+              <% update_kinds.each do |kind| %>
+                <th class="small"><%= kind.humanize %></th>
+              <% end %>
             <% end %>
-          <% end %>
 
-          <th>Total</th>
-        </thead>
+            <th>Total</th>
+          </thead>
 
-        <tbody>
-          <% matching_org_ids = matching_bike_sticker_updates.distinct.pluck(:organization_id)
+          <tbody>
+            <% matching_org_ids = matching_bike_sticker_updates.distinct.pluck(:organization_id)
             matching_sticker_per_org_id = matching_org_ids.map do |id|
               if @search_kind == "all"
                 values = update_kinds.map { |kind| [kind, matching_bike_sticker_updates.where(organization_id: id, kind: kind).count] }.to_h
@@ -117,48 +117,48 @@
               end
             end %>
 
-          <% matching_sticker_per_org_id.sort_by { |_id, values| values[:total] }.each do |id, values| %>
-            <% organization = Organization.unscoped.find_by_id(id) if id.present? %>
+            <% matching_sticker_per_org_id.sort_by { |_id, values| values[:total] }.each do |id, values| %>
+              <% organization = Organization.unscoped.find_by_id(id) if id.present? %>
+
+              <tr>
+                <td class="small">
+                  <% if organization.present? %>
+                    <%= link_to organization.short_name, admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "") %>
+                  <% else %>
+                    <%= link_to "no organization", admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: "none")), class: "gray-link" %>
+                  <% end %>
+                </td>
+
+                <% if @search_kind == "all" %>
+                  <% update_kinds.each do |kind| %>
+                    <td><small><%= number_display(values[kind]) %></small></td>
+                  <% end %>
+                <% end %>
+
+                <td><%= number_display(values[:total]) %></td>
+              </tr>
+            <% end %>
 
             <tr>
-              <td class="small">
-                <% if organization.present? %>
-                  <%= link_to organization.short_name, admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "") %>
-                <% else %>
-                  <%= link_to "no organization", admin_bike_sticker_updates_path(sortable_search_params.merge(organization_id: "none")), class: "gray-link" %>
-                <% end %>
-              </td>
+              <td>Total</td>
 
               <% if @search_kind == "all" %>
                 <% update_kinds.each do |kind| %>
-                  <td><small><%= number_display(values[kind]) %></small></td>
+                  <td>
+                    <small>
+                      <%= number_display(matching_sticker_per_org_id.map { |_id, values| values[kind] }.sum) %>
+                    </small>
+                  </td>
                 <% end %>
               <% end %>
 
-              <td><%= number_display(values[:total]) %></td>
+              <td>
+                <%= number_display(matching_sticker_per_org_id.map { |_id, values| values[:total] }.sum) %>
+              </td>
             </tr>
-          <% end %>
-
-          <tr>
-            <td>Total</td>
-
-            <% if @search_kind == "all" %>
-              <% update_kinds.each do |kind| %>
-                <td>
-                  <small>
-                    <%= number_display(matching_sticker_per_org_id.map { |_id, values| values[kind] }.sum) %>
-                  </small>
-                </td>
-              <% end %>
-            <% end %>
-
-            <td>
-              <%= number_display(matching_sticker_per_org_id.map { |_id, values| values[:total] }.sum) %>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+          </tbody>
+        </table>
+      </div>
     <% end %>
   <% end %>
 <% end %>
