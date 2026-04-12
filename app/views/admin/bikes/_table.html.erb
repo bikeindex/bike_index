@@ -129,9 +129,9 @@
           <% if bike.creation_description %>
             <span class="tw:absolute tw:right-0 tw:bottom-0 tw:text-xs tw:text-gray-400">
               <% if bike.bulk_import.present? %>
-                <%= link_to origin_display(bike.creation_description), admin_bulk_import_path(bike.bulk_import), class: "tw:text-gray-400" %>
+                <%= link_to helpers.origin_display(bike.creation_description), admin_bulk_import_path(bike.bulk_import), class: "tw:text-gray-400" %>
               <% else %>
-                <%= origin_display(bike.creation_description) %>
+                <%= helpers.origin_display(bike.creation_description) %>
               <% end %>
             </span>
           <% end %>
@@ -141,7 +141,7 @@
       <% table.column(label: "Cred", classes: "tw:hidden md:tw:table-cell tw:text-right tw:text-xs") do |bike| %>
         <% if bike.credibility_score.present? %>
           <small
-            style="color: <%= credibility_scorer_color_table(bike.credibility_score) %>;"
+            style="color: <%= helpers.credibility_scorer_color_table(bike.credibility_score) %>;"
           >
             <%= bike.credibility_score %>
           </small>
