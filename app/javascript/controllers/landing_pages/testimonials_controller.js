@@ -38,16 +38,24 @@ export default class extends Controller {
   prev () {
     this.currentIndex = (this.currentIndex - 1 + this.testimonialTargets.length) % this.testimonialTargets.length
     this.show()
+    this.resetAutoAdvance()
   }
 
   next () {
     this.currentIndex = (this.currentIndex + 1) % this.testimonialTargets.length
     this.show()
+    this.resetAutoAdvance()
   }
 
   goTo (index) {
     this.currentIndex = index
     this.show()
+    this.resetAutoAdvance()
+  }
+
+  resetAutoAdvance () {
+    clearInterval(this.autoAdvanceInterval)
+    this.autoAdvanceInterval = setInterval(() => this.next(), 8000)
   }
 
   show () {
