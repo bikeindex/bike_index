@@ -66,6 +66,16 @@
     @apply tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
   }
 
+  .twdropdown li[role="menuitem"] > a {
+    @apply tw:block tw:px-4 tw:py-1 tw:text-gray-700 tw:no-underline
+      tw:hover:bg-gray-100 tw:hover:text-gray-900
+      tw:dark:text-gray-200 tw:dark:hover:bg-gray-700 tw:dark:hover:text-gray-100;
+  }
+
+  .twdropdown li[role="separator"] {
+    @apply tw:my-1 tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
+  }
+
   .twhr {
     @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
   }

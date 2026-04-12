@@ -5,10 +5,10 @@ module UI
     class Component < ApplicationComponent
       renders_many :entries, types: {
         item: lambda { |&block|
-          content_tag(:li, role: "menuitem", class: "tw:[&>a]:block tw:[&>a]:px-4 tw:[&>a]:py-1 tw:[&>a]:text-gray-700 tw:[&>a]:no-underline tw:[&>a]:hover:bg-gray-100 tw:[&>a]:hover:text-gray-900 tw:dark:[&>a]:text-gray-200 tw:dark:[&>a]:hover:bg-gray-700 tw:dark:[&>a]:hover:text-gray-100", &block)
+          content_tag(:li, role: "menuitem", &block)
         },
         divider: lambda {
-          content_tag(:li, "", role: "separator", class: "tw:my-1 tw:border-t tw:border-gray-200 tw:dark:border-gray-700")
+          content_tag(:li, "", role: "separator")
         }
       }
 
