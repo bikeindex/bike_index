@@ -1,7 +1,7 @@
-/* ====================================
-   LANDING PAGE STYLES (for_schools, etc.)
-   ==================================== */
+.kelsey_landing-page-body .primary-header-nav {
+  margin-bottom: 0;
 
+}
 /* Landing Page Hero Section */
 .kelsey_styles .le-hero-section {
   background-color: var(--redesign-blue-800);
