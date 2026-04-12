@@ -16,7 +16,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       expect(page).to have_text("Profile")
       expect(page).to have_text("Settings")
       expect(page).to have_text("Logout")
-      expect(page).to have_css('li[role="separator"]')
+      expect(page).to have_css('li[role="menuitem"]:nth-child(2) + li[role="separator"] + li[role="menuitem"]')
       expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
 
       send_keys(:escape)
