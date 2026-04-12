@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Org::BikeSearch::Component, type: :component do
+RSpec.describe Org::RegistrationSearch::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
@@ -10,7 +10,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     end
   end
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search] }
+  let(:enabled_feature_slugs) { %w[registration_search] }
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
   let(:pagy) { Pagy::Offset.new(count: 25, page: 1, limit: 10) }
   let(:search_stickers) { nil }
@@ -62,7 +62,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   end
 
   context "with bike_stickers enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+    let(:enabled_feature_slugs) { %w[registration_search bike_stickers] }
 
     it "renders sticker filter radios" do
       expect(component).to have_text("Stickers")
@@ -71,7 +71,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   end
 
   context "with impound_bikes enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[registration_search impound_bikes] }
 
     it "renders impound status filter radios and impound columns" do
       expect(component).to have_text("Status")
@@ -82,7 +82,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   end
 
   context "with search_stickers filter active" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+    let(:enabled_feature_slugs) { %w[registration_search bike_stickers] }
     let(:search_stickers) { "with" }
 
     it "displays active filter description" do
@@ -107,7 +107,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   end
 
   context "with csv_exports enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+    let(:enabled_feature_slugs) { %w[registration_search csv_exports] }
 
     it "renders export link" do
       expect(component).to have_link(text: /Create export/, visible: :all)

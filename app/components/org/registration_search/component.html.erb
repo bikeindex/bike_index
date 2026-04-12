@@ -1,4 +1,4 @@
-<%= tag.div(class: "org-bikes-search-component", data: component_wrapper_data_attributes) do %>
+<%= tag.div(class: "org-registration-search-component", data: component_wrapper_data_attributes) do %>
   <% if @skip_search_and_filters %>
     <%= render(settings_component) unless @skip_settings %>
   <% else %>
@@ -206,7 +206,7 @@
         <% table.column(label: translation(".assign_bike_sticker"), classes: "assign_bike_sticker_cell tw:hidden") do |bike| %>
           <small>
             <a data-bike-id="<%= bike.id %>">
-              <%= t("components.org.bike_search.link_sticker") %>
+              <%= t("components.org.registration_search.link_sticker") %>
             </a>
           </small>
         <% end %>

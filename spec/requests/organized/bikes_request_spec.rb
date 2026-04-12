@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Organized::BikesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/bikes" }
   include_context :request_spec_logged_in_as_organization_user
-  let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
+  let(:enabled_feature_slugs) { %w[registration_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
   describe "new" do
@@ -384,7 +384,7 @@ RSpec.describe Organized::BikesController, type: :request do
     end
 
     context "with registration_notes feature" do
-      let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
+      let(:enabled_feature_slugs) { %w[registration_search registration_notes] }
 
       context "with paper_trail" do
         include_context :with_paper_trail

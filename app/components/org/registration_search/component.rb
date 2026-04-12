@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Org::BikeSearch
+module Org::RegistrationSearch
   class Component < ApplicationComponent
     include SortableHelper
 
@@ -48,7 +48,7 @@ module Org::BikeSearch
     private
 
     def settings_component
-      @settings_component ||= Org::BikeSearchSettings::Component.new(
+      @settings_component ||= Org::RegistrationSearchSettings::Component.new(
         organization: @organization,
         interpreted_params: @interpreted_params,
         sortable_search_params: @sortable_search_params,

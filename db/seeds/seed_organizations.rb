@@ -33,7 +33,7 @@ feature_name_and_slugs = [
   {name: "Organization Views: Bulk Import stolen", feature_slugs: ["show_bulk_import_stolen"]},
   {name: "Organization Views: Custom emails", feature_slugs: ["customize_emails"]},
   {name: "Organization Views: Partially registered bikes", feature_slugs: ["show_partial_registrations"]},
-  {name: "Organization Views: Search bikes", feature_slugs: ["bike_search"]},
+  {name: "Organization Views: Search bikes", feature_slugs: ["registration_search"]},
   {name: "Parking Notifications", feature_slugs: ["parking_notifications", "impound_bikes"]},
   {name: "Passwordless users", feature_slugs: ["passwordless_users"]},
   {name: "Product review", feature_slugs: []},

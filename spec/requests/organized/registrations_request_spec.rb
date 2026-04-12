@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Organized::RegistrationsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/registrations" }
   include_context :request_spec_logged_in_as_organization_user
-  let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
+  let(:enabled_feature_slugs) { %w[registration_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
   describe "index" do
@@ -55,7 +55,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
     describe "create_export" do
-      let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes csv_exports] }
+      let(:enabled_feature_slugs) { %w[registration_search show_recoveries show_partial_registrations bike_stickers impound_bikes csv_exports] }
       let(:target_params) do
         {
           organization_id: current_organization.id,
@@ -152,7 +152,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "with search_stickers, no impounded feature" do
-      let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers] }
+      let(:enabled_feature_slugs) { %w[registration_search show_recoveries show_partial_registrations bike_stickers] }
       let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: bike_with_sticker) }
       let!(:bike_sticker_2) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: non_organization_bike) }
@@ -224,7 +224,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "with search_notes" do
-      let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
+      let(:enabled_feature_slugs) { %w[registration_search registration_notes] }
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
 
       before { FactoryBot.create(:bike_organization_note, bike:, body: "important note") }

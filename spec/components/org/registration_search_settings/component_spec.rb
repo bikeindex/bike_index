@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Org::BikeSearchSettings::Component, type: :component do
+RSpec.describe Org::RegistrationSearchSettings::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
@@ -10,7 +10,7 @@ RSpec.describe Org::BikeSearchSettings::Component, type: :component do
     end
   end
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search] }
+  let(:enabled_feature_slugs) { %w[registration_search] }
   let(:search_stickers) { nil }
   let(:search_address) { nil }
   let(:search_status) { "all" }
@@ -134,7 +134,7 @@ RSpec.describe Org::BikeSearchSettings::Component, type: :component do
     end
 
     context "with bike_stickers enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+      let(:enabled_feature_slugs) { %w[registration_search bike_stickers] }
 
       it "includes sticker_cell" do
         expect(instance.initially_checked_columns).to include("sticker_cell")
@@ -158,7 +158,7 @@ RSpec.describe Org::BikeSearchSettings::Component, type: :component do
     end
 
     context "with bike_stickers enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+      let(:enabled_feature_slugs) { %w[registration_search bike_stickers] }
 
       it "renders sticker filter radios" do
         expect(component).to have_text("Stickers")
@@ -167,7 +167,7 @@ RSpec.describe Org::BikeSearchSettings::Component, type: :component do
     end
 
     context "with impound_bikes enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+      let(:enabled_feature_slugs) { %w[registration_search impound_bikes] }
 
       it "renders impound status filter radios" do
         expect(component).to have_text("Status")
@@ -176,7 +176,7 @@ RSpec.describe Org::BikeSearchSettings::Component, type: :component do
     end
 
     context "with csv_exports enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+      let(:enabled_feature_slugs) { %w[registration_search csv_exports] }
 
       it "renders export link" do
         expect(component).to have_link(text: /Create export/, visible: :all)
@@ -184,7 +184,7 @@ RSpec.describe Org::BikeSearchSettings::Component, type: :component do
     end
 
     context "with search_stickers active" do
-      let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+      let(:enabled_feature_slugs) { %w[registration_search bike_stickers] }
       let(:search_stickers) { "with" }
 
       it "opens settings by default" do

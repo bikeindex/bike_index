@@ -46,7 +46,7 @@ class OrganizationFeature < ApplicationRecord
   # NOTE: impound_bikes_public is automatically added if the org configures, no need to manually addz
   EXPECTED_SLUGS = (%w[
     avery_export
-    bike_search
+    registration_search
     bike_stickers
     bike_stickers_user_editable
     child_organizations

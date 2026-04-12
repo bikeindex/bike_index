@@ -296,10 +296,10 @@
 
         <% if @organization.paid? %>
           <tr>
-            <td>Bike Search</td>
+            <td>Registration Search</td>
 
             <td>
-              <% if @organization.enabled?("bike_search") %>
+              <% if @organization.enabled?("registration_search") %>
                 Yes
               <% else %>
                 <small class="less-strong">no</small>
