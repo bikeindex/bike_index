@@ -66,8 +66,8 @@
     @apply tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
   }
 
-  .twdropdown li {
-    @apply tw:block;
+  .twdropdown {
+    @apply tw:flex-col;
   }
 
   .twdropdown li[role="menuitem"] > a {
