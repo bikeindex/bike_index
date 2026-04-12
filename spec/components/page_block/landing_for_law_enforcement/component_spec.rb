@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe PageBlock::LawEnforcementTop::Component, type: :component do
+RSpec.describe PageBlock::LandingForLawEnforcement::Component, type: :component do
   let(:instance) { described_class.new(recoveries_value:, recoveries:, organization_count:) }
   let(:component) { render_inline(instance) }
   let(:recoveries_value) { 11_000_000 }

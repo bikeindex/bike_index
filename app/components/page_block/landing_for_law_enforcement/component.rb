@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PageBlock::LawEnforcementTop
+module PageBlock::LandingForLawEnforcement
   class Component < ApplicationComponent
     PARTNER_CITIES = %w[Calgary Edmonton Lethbridge Bend Portland Sunnyvale Davis].freeze
 

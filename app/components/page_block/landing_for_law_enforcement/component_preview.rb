@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PageBlock::LawEnforcementTop
+module PageBlock::LandingForLawEnforcement
   class ComponentPreview < ApplicationComponentPreview
     # @display kelsey_stylesheet true
     def default
