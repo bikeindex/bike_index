@@ -7,13 +7,13 @@
       <%= translation(".visible_columns") %>
     </h3>
 
-    <%= render UI::Button::Component.new(text: translation(".all"), color: :link, size: :sm,
+    <%= render UI::Button::Component.new(text: translation(".all"), color: :link,
           data: { action: "click->org--registration-search-column-toggle#selectAll" }) %>
 
-    <%= render UI::Button::Component.new(text: translation(".none"), color: :link, size: :sm,
+    <%= render UI::Button::Component.new(text: translation(".none"), color: :link,
           data: { action: "click->org--registration-search-column-toggle#selectNone" }) %>
 
-    <%= render UI::Button::Component.new(text: translation(".default"), color: :link, size: :sm,
+    <%= render UI::Button::Component.new(text: translation(".default"), color: :link,
           data: { action: "click->org--registration-search-column-toggle#selectDefault" }) %>
   </div>
 
