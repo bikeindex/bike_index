@@ -89,12 +89,11 @@ module Admin::IndexSkeleton
     end
 
     def deleted_label
-      label = case @render_deleted
+      case @render_deleted
       when "including" then "Including deleted"
       when "only" then "Only deleted"
       else "deleted"
       end
-      "#{label} ▾"
     end
 
     def default_table_view
