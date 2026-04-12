@@ -4183,44 +4183,6 @@ nb:
       youre_the_first_one: Du er den første innbyggerne dine ser på når syklene deres
         blir stjålet. Få tilgang til og søk i vår internasjonale database for å returnere
         fellesskapets sykler til deres rettmessige eiere.
-    for_schools:
-      bike_index_for_universities: Sykkelindeks for universiteter
-      bike_index_users_provide: Bike Index-brukere gir serienummer, bevis på eierskap
-        og identifiserende informasjon om syklene deres. Når en sykkel er rapportert
-        tapt eller stjålet, kan våre partnere søke i Bike Index for å identifisere,
-        finne og spore den fra hvilken som helst datamaskin eller smarttelefon. Vårt
-        omfattende arkiv har hjulpet betjenter med å finne tilbake sykler som er involvert
-        i kriminelle situasjoner, fra enkle tyverier til karbonadebutikker, narkotikahus
-        – til og med fekteringer og svarte markeder på nettet.
-      check_out: Sjekk ut vår
-      embed_a_bike_index_registration_form: Legg inn et sykkelregistreringsskjema
-        på nettstedet ditt
-      features_amp_pricing: Funksjoner og priser
-      how_it_works: Hvordan det fungerer
-      keep_campus_bikes_in_order: Hold campussyklene i orden
-      make_bike_registration_better: Gjør sykkelregistreringen bedre
-      must_read: Må lese -
-      protecting_bikes_on_campus_can_be: Å beskytte sykler på campus kan være en fulltidsjobb.
-        La oss hjelpe.
-      read_about_our_html: Les om våre over %{count} gjenopprettinger på bloggen vår.
-        For en fullstendig liste over Bike Index sine partnere, besøk vår partnerside,
-        og for informasjon om samarbeid med Bike Index, vennligst kontakt oss.
-      related_articles: 'Relaterte artikler:'
-      schools_deck: universitetspartnerdekk
-      six_best_features_for_schools: Bike Indexs seks beste funksjoner for sykkeladministrasjon
-        på campus
-      trusted_by_top_universities: Godkjent av toppuniversiteter
-      weve_designed_a_platform: 'Vi har utviklet en plattform for å løse en grunnleggende
-        barriere for å beskytte sykler: mangelen på et universelt sykkelregister.
-        Med våre konsoliderte universitetsregistreringssider er det lettere for politi
-        og transportavdelinger å søke etter og gjenopprette campussykler.'
-      your_students_can_register_their_bikes: Elevene dine kan registrere syklene
-        sine, bekrefte eierskap og varsle fellesskapet om manglende sykler fra hvor
-        som helst. Alt de trenger er en hvilken som helst smarttelefon eller bærbar
-        datamaskin. Du har tilgang til dataene bak det hele for å forstå hvordan du
-        best kan beskytte sykler på campus.
-      bike_index_admin_guide: Bike Index Campus Management Admin Guide
-      how_to_use_bike_index_qr_stickers: Hvordan bruke Bike Index QR-klistremerker
     packages_list:
       forever: For alltid
       free: Gratis
