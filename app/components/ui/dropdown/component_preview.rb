@@ -26,9 +26,48 @@ module UI
         end
       end
 
+      def bottom_end
+        render_placement(:bottom_end)
+      end
+
+      def bottom_start
+        render_placement(:bottom_start)
+      end
+
+      def bottom
+        render_placement(:bottom)
+      end
+
+      def top_end
+        render_placement(:top_end)
+      end
+
+      def top_start
+        render_placement(:top_start)
+      end
+
+      def top
+        render_placement(:top)
+      end
+
+      def right
+        render_placement(:right)
+      end
+
+      def left
+        render_placement(:left)
+      end
+
       # @!endgroup
 
       private
+
+      def render_placement(direction)
+        render(UI::Dropdown::Component.new(name: direction.to_s.tr("_", " "), drop_direction: direction)) do |dropdown|
+          dropdown.with_entry_item { content_tag(:a, "Option 1", href: "#") }
+          dropdown.with_entry_item { content_tag(:a, "Option 2", href: "#") }
+        end
+      end
 
       def avatar_button
         avatar = content_tag(:img, nil, src: ActionController::Base.helpers.asset_path("kelsey/illustrations/comic-assets_bike-love-1.png"), class: "tw:rounded-full tw:w-8 tw:h-8 tw:object-cover", alt: "Avatar")
