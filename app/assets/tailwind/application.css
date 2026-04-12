@@ -71,7 +71,7 @@
   }
 
   .twdropdown {
-    @apply tw:flex-col;
+    @apply tw:flex-col tw:list-none tw:py-1;
   }
 
   .twdropdown li[role="menuitem"] > a {
