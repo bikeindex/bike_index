@@ -40,11 +40,13 @@ module UI
       def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, data: {})
         @text = text
         @color = COLORS.key?(color) ? color : :secondary
-        @size = SIZES.key?(size) ? size : :md
         @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
         @active = active
         @html_class = html_class
         @data = data
+
+        @size = SIZES.key?(size) ? size : :md
+        raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
       end
 
       def call
