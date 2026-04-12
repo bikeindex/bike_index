@@ -52,7 +52,7 @@
             = render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f}
 
 
-          = render LegacyFormWell::FormGroupRow::Component.new(form_builder: f, label: :condition, label_translation: t(".condition"), row_classes: "unnested-field") do
+          = render Form::LegacyFormWell::FormGroupRow::Component.new(form_builder: f, label: :condition, label_translation: t(".condition"), row_classes: "unnested-field") do
             = f.select :condition, MarketplaceListing.conditions.keys.map { |i| [MarketplaceListing.condition_with_description_humanized(i), i] }, {prompt: t(".choose_condition")}, class: "form-control"
 
           .related-fields
@@ -70,7 +70,7 @@
                   = t(".price_is_negitiable")
 
           = f.fields_for :address_record do |address_form|
-            = render(LegacyFormWell::AddressRecordWithDefault::Component.new(form_builder: address_form, user: @bike.user))
+            = render(Form::LegacyFormWell::AddressRecordWithDefault::Component.new(form_builder: address_form, user: @bike.user))
 
           .form-group.row.unnested-field
             = f.label :description, class: "form-well-label form-well-label-large-input" do
