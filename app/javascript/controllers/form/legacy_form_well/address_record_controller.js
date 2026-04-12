@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 
-// Connects to data-controller='form--address-record'
+// Connects to data-controller='form--legacy-form-well--address-record'
 export default class extends Controller {
   static targets = ['country', 'state', 'region']
   static values = { usId: String }

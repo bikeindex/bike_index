@@ -4613,22 +4613,23 @@ it:
         submit:
         search_notes:
     form:
-      address_record:
-        address:
-        address_school:
-        choose_country:
-        city: Città
-        postal_code: Codice postale
-        region:
-        state: Stato
-        your_full_address_is_required:
-        address_no_street: Indirizzo
-        street_2:
-        address_or_intersection:
-        where_was_it_status:
-      address_record_with_default:
-        edit_my_account_path:
-        use_account_address:
+      legacy_form_well:
+        address_record:
+          address:
+          address_school:
+          choose_country:
+          city: Città
+          postal_code: Codice postale
+          region:
+          state: Stato
+          your_full_address_is_required:
+          address_no_street: Indirizzo
+          street_2:
+          address_or_intersection:
+          where_was_it_status:
+        address_record_with_default:
+          edit_my_account_path:
+          use_account_address:
     search_results:
       bike_box:
         location: Luogo

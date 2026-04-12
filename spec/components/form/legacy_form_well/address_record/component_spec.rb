@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Form::AddressRecord::Component, type: :component do
+RSpec.describe Form::LegacyFormWell::AddressRecord::Component, type: :component do
   let(:user) { FactoryBot.create(:user) }
   let(:address_record) { AddressRecord.new(country: Country.united_states, user:) }
   let(:organization) { nil }
@@ -17,7 +17,7 @@ RSpec.describe Form::AddressRecord::Component, type: :component do
       form_for passed_obj, url: "#", method: :patch, multipart: true do |f|
         f.fields_for(:address_record) do |address_form|
           # Here we provide the form_builder to the component
-          render(Form::AddressRecord::Component.new(
+          render(Form::LegacyFormWell::AddressRecord::Component.new(
             **options.merge(form_builder: address_form)
           ))
         end

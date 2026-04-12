@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Form::AddressRecordWithDefault::Component, type: :component do
+RSpec.describe Form::LegacyFormWell::AddressRecordWithDefault::Component, type: :component do
   let(:user) { FactoryBot.create(:user) }
   let(:address_record) {}
   let(:organization) { nil }
@@ -16,7 +16,7 @@ RSpec.describe Form::AddressRecordWithDefault::Component, type: :component do
         f.fields_for :current_marketplace_listing do |ml|
           ml.fields_for :address_record do |address_form|
             # Here we provide the form_builder to the component
-            render(Form::AddressRecordWithDefault::Component.new(
+            render(Form::LegacyFormWell::AddressRecordWithDefault::Component.new(
               form_builder: address_form,
               user: passed_user
             ))

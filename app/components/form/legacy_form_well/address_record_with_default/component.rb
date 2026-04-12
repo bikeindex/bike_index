@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Form::AddressRecordWithDefault
+module Form::LegacyFormWell::AddressRecordWithDefault
   class Component < ApplicationComponent
     def initialize(form_builder:, user:, no_street: false)
       @builder = form_builder

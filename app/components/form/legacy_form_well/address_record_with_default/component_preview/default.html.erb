@@ -6,7 +6,7 @@
     <%= ml.fields_for :address_record do |address_form| %>
       <%# Here we provide the form_builder to the component %>
       <%= render(
-        Form::AddressRecordWithDefault::Component.new(
+        Form::LegacyFormWell::AddressRecordWithDefault::Component.new(
           form_builder: address_form,
           user: @user,
         )
