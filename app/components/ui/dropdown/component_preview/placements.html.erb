@@ -42,10 +42,12 @@
   end %>
 </div>
 
-<h3 class="tw:mt-8 tw:mb-3 tw:text-center tw:text-sm tw:opacity-60">left</h3>
+<h3 class="tw:mt-8 tw:mb-3 tw:text-center tw:text-sm tw:opacity-60">
+  left (button_color: :link)
+</h3>
 
 <div class="tw:text-center">
-  <%= render(UI::Dropdown::Component.new(name: "left", drop_direction: :left)) do |d|
+  <%= render(UI::Dropdown::Component.new(name: "left", drop_direction: :left, button_color: :link)) do |d|
     d.with_entry_item { content_tag(:a, "Option 1", href: "#") }
     d.with_entry_item { content_tag(:a, "Option 2", href: "#") }
   end %>

@@ -97,7 +97,9 @@ module Admin::IndexSkeleton
     end
 
     def deleted_item_class(value)
-      @render_deleted.to_s == value.to_s ? "active" : nil
+      if value.nil? ? !deleted_active? : @render_deleted == value
+        "active"
+      end
     end
 
     def default_table_view

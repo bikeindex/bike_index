@@ -35,7 +35,11 @@ module UI
       private
 
       def button_classes
-        @button_class || UI::Button::Component.new(color: @button_color, size: @button_size, active: @active).button_classes
+        return @button_class if @button_class
+
+        classes = UI::Button::Component.new(color: @button_color, size: @button_size, active: @active).button_classes
+        classes += " tw:px-1" if @button_color == :link
+        classes
       end
 
       def floating_ui_placement
