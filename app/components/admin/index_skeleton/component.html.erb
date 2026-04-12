@@ -21,12 +21,12 @@
         <%= render(UI::Dropdown::Component.new(
           name: deleted_label,
           button_size: :sm,
-          button_class: deleted_active? ? "active" : nil
+          active: deleted_active?
         )) do |dropdown|
-          dropdown.with_entry_item { link_to "Only not deleted", url_for(sortable_search_params.merge(search_deleted: nil)) }
+          dropdown.with_entry_item { link_to "Only not deleted", url_for(sortable_search_params.merge(search_deleted: nil)), class: deleted_item_class(nil) }
           dropdown.with_entry_divider
-          dropdown.with_entry_item { link_to "Including deleted", url_for(sortable_search_params.merge(search_deleted: "including")) }
-          dropdown.with_entry_item { link_to "Only deleted", url_for(sortable_search_params.merge(search_deleted: "only")) }
+          dropdown.with_entry_item { link_to "Including deleted", url_for(sortable_search_params.merge(search_deleted: "including")), class: deleted_item_class("including") }
+          dropdown.with_entry_item { link_to "Only deleted", url_for(sortable_search_params.merge(search_deleted: "only")), class: deleted_item_class("only") }
         end %>
       </li>
     <% end %>

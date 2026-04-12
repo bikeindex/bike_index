@@ -80,6 +80,11 @@
       tw:dark:text-gray-200 tw:dark:hover:bg-gray-700 tw:dark:hover:text-gray-100;
   }
 
+  .twdropdown li[role="menuitem"] > a.active {
+    @apply tw:bg-gray-100 tw:font-semibold tw:text-gray-900
+      tw:dark:bg-gray-700 tw:dark:text-gray-100;
+  }
+
   .twdropdown li[role="separator"] {
     @apply tw:my-1 tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
   }

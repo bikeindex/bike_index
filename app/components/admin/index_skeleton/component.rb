@@ -96,6 +96,10 @@ module Admin::IndexSkeleton
       end
     end
 
+    def deleted_item_class(value)
+      @render_deleted.to_s == value.to_s ? "active" : nil
+    end
+
     def default_table_view
       helpers.render(partial: "table", locals: {collection: @collection, render_sortable: @render_sortable})
     end

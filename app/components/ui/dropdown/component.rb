@@ -21,12 +21,13 @@ module UI
         left: "left"
       }.freeze
 
-      def initialize(name:, button_content: nil, drop_direction: :bottom_end, button_class: nil, button_color: :secondary, button_size: :md)
+      def initialize(name:, button_content: nil, drop_direction: :bottom_end, button_class: nil, button_color: :secondary, button_size: :md, active: false)
         @name = name
         @button_content = button_content || name
         @button_class = button_class
         @button_color = button_color
         @button_size = button_size
+        @active = active
         @button_id = @name.parameterize(separator: "-")
         @placement = PLACEMENTS.fetch(drop_direction, PLACEMENTS[:bottom_end])
       end
@@ -34,7 +35,7 @@ module UI
       private
 
       def button_classes
-        @button_class || UI::Button::Component.new(color: @button_color, size: @button_size).button_classes
+        @button_class || UI::Button::Component.new(color: @button_color, size: @button_size, active: @active).button_classes
       end
 
       def floating_ui_placement
