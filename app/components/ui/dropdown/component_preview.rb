@@ -24,7 +24,7 @@ module UI
           dropdown.with_entry_item { content_tag(:span, "Last synced: 2 minutes ago", class: "tw:block tw:px-4 tw:py-2 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400") }
           dropdown.with_entry_divider
           dropdown.with_entry_item { icon_link("⚙", "Settings") }
-          dropdown.with_entry_item { icon_link("↻", "Sync", active: true) }
+          dropdown.with_entry_item { icon_link("↻", "Sync (active)", active: true) }
         end
       end
 
