@@ -33,8 +33,20 @@
       %li.nav-item
         - paid_search_params = sortable_search_params.merge(search_paid: !@search_paid)
         = link_to "Paid", admin_organizations_path(paid_search_params), class: @search_paid ? "nav-link active" : "nav-link"
-      %li.nav-item
-        = link_to "Deleted", show_deleted_admin_organizations_path, class: "nav-link"
+      %li.nav-item.dropdown.dropleft.small
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@render_deleted.present? && @render_deleted != false ? "active" : "")}
+          - case @render_deleted
+          - when "including"
+            Including deleted
+          - when "only"
+            Only deleted
+          - else
+            deleted
+        .dropdown-menu
+          = link_to "Only not deleted", admin_organizations_path(sortable_search_params.merge(search_deleted: nil)), class: "dropdown-item #{@render_deleted == false ? 'active' : ''}"
+          .dropdown-divider
+          = link_to "Including deleted", admin_organizations_path(sortable_search_params.merge(search_deleted: "including")), class: "dropdown-item #{@render_deleted == 'including' ? 'active' : ''}"
+          = link_to "Only deleted", admin_organizations_path(sortable_search_params.merge(search_deleted: "only")), class: "dropdown-item #{@render_deleted == 'only' ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
       %li.nav-item

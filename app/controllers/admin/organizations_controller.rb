@@ -23,10 +23,6 @@ class Admin::OrganizationsController < Admin::BaseController
     @pagy, @bikes = pagy(:countish, bikes, limit: 10, page: permitted_page)
   end
 
-  def show_deleted
-    @organizations = Organization.only_deleted.all
-  end
-
   def recover
     @organization = Organization.only_deleted.find(params[:id]).restore(recursive: true)
     redirect_to admin_organizations_url
@@ -127,7 +123,7 @@ class Admin::OrganizationsController < Admin::BaseController
     return @matching_organizations if defined?(@matching_organizations)
 
     @search_paid = Binxtils::InputNormalizer.boolean(params[:search_paid])
-    matching_organizations = Organization.unscoped.where(deleted_at: nil) # We don't want deleted orgs
+    matching_organizations = search_deleted_scope(Organization.all)
     matching_organizations = matching_organizations.paid if @search_paid
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
 

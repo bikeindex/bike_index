@@ -93,7 +93,7 @@ module Admin::IndexSkeleton
       case @render_deleted
       when "including" then "Including deleted"
       when "only" then "Only deleted"
-      else "Not deleted"
+      else "deleted"
       end
     end
 
