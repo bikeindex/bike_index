@@ -12,7 +12,18 @@ module UI
         }
       }
 
-      def initialize(name:, button_content: nil, drop_direction: :bottom_end, button_class: nil, button_color: :secondary, button_size: :md, header: nil, id: nil, placement: nil)
+      PLACEMENTS = {
+        bottom_end: "bottom-end",
+        bottom_start: "bottom-start",
+        bottom: "bottom",
+        top_end: "top-end",
+        top_start: "top-start",
+        top: "top",
+        right: "right",
+        left: "left"
+      }.freeze
+
+      def initialize(name:, button_content: nil, drop_direction: :bottom_end, button_class: nil, button_color: :secondary, button_size: :md, header: nil, id: nil)
         @name = name
         @button_content = button_content || name
         @button_class = button_class
@@ -20,7 +31,7 @@ module UI
         @button_size = button_size
         @header = header
         @button_id = id || @name.parameterize(separator: "-")
-        @placement = placement || placement_for(drop_direction)
+        @placement = PLACEMENTS.fetch(drop_direction, PLACEMENTS[:bottom_end])
       end
 
       def button_component
@@ -39,13 +50,6 @@ module UI
       end
 
       private
-
-      def placement_for(direction)
-        case direction
-        when :bottom_start then "bottom-start"
-        else "bottom-end"
-        end
-      end
     end
   end
 end
