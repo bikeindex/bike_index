@@ -31,6 +31,8 @@ module UI
         @placement = PLACEMENTS.fetch(drop_direction, PLACEMENTS[:bottom_end])
       end
 
+      private
+
       def button_classes
         @button_class || UI::Button::Component.new(color: @button_color, size: @button_size).button_classes
       end
@@ -38,8 +40,6 @@ module UI
       def floating_ui_placement
         @placement
       end
-
-      private
     end
   end
 end
