@@ -25,12 +25,7 @@ class Admin::UserBansController < Admin::BaseController
   end
 
   def matching_user_bans
-    @render_deleted = %w[including only].include?(params[:search_deleted]) ? params[:search_deleted] : false
-    user_bans = case @render_deleted
-    when "only" then UserBan.only_deleted
-    when "including" then UserBan.unscoped
-    else UserBan
-    end
+    user_bans = search_deleted_scope(UserBan.all)
 
     if params[:user_id].present?
       user_bans = user_bans.where(creator_id: user_subject&.id || params[:user_id])

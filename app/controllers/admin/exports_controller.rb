@@ -22,12 +22,7 @@ class Admin::ExportsController < Admin::BaseController
     else
       Export.all
     end
-    @render_deleted = %w[including only].include?(params[:search_deleted]) ? params[:search_deleted] : false
-    exports = case @render_deleted
-    when "only" then exports.deleted
-    when "including" then exports.with_deleted
-    else exports
-    end
+    exports = search_deleted_scope(exports)
     case params[:search_registrations]
     when "specific" then exports = exports.specific
     when "incomplete" then exports = exports.incompletes

@@ -76,17 +76,10 @@ class Admin::OrganizationRolesController < Admin::BaseController
     else
       OrganizationRole.all
     end
-    @render_deleted = if %w[including only].include?(params[:search_deleted])
-      params[:search_deleted]
-    elsif current_organization&.deleted?
-      "including"
-    else
-      false
-    end
-    organization_roles = case @render_deleted
-    when "only" then organization_roles.deleted
-    when "including" then organization_roles.with_deleted
-    else organization_roles
+    organization_roles = search_deleted_scope(organization_roles)
+    if !@render_deleted && current_organization&.deleted?
+      @render_deleted = "including"
+      organization_roles = organization_roles.with_deleted
     end
 
     @time_range_column = sort_column if %w[claimed_at deleted_at].include?(sort_column)

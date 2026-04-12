@@ -42,12 +42,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
   end
 
   def searched_superuser_abilities
-    @render_deleted = %w[including only].include?(params[:search_deleted]) ? params[:search_deleted] : false
-    superuser_abilities = case @render_deleted
-    when "only" then SuperuserAbility.only_deleted
-    when "including" then SuperuserAbility.unscoped
-    else SuperuserAbility
-    end
+    superuser_abilities = search_deleted_scope(SuperuserAbility.all)
 
     if SuperuserAbility.kinds.include?(params[:search_kind])
       @kind = params[:search_kind]
