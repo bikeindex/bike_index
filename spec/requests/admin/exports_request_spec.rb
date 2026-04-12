@@ -26,7 +26,7 @@ RSpec.describe Admin::ExportsController, type: :request do
       get base_url, params: {search_kind: "avery"}
       expect(assigns(:collection).pluck(:id)).to eq([avery_export.id])
 
-      get base_url, params: {search_deleted: true}
+      get base_url, params: {search_deleted: "only"}
       expect(assigns(:collection).pluck(:id)).to eq([deleted_export.id])
 
       get base_url, params: {search_stickers: true}

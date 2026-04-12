@@ -25,8 +25,7 @@ class Admin::UserBansController < Admin::BaseController
   end
 
   def matching_user_bans
-    @viewing_deleted = Binxtils::InputNormalizer.boolean(params[:search_deleted])
-    user_bans = @viewing_deleted ? UserBan.only_deleted : UserBan
+    user_bans = search_deleted_scope(UserBan.all)
 
     if params[:user_id].present?
       user_bans = user_bans.where(creator_id: user_subject&.id || params[:user_id])
