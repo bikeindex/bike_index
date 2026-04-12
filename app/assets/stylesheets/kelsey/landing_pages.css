@@ -272,7 +272,7 @@
 .kelsey_styles .le-tab-button {
   flex: 1;
   padding: 1.5rem 2rem;
-  background-color: transparent;
+  background-color: #f8f8f8;
   border: none;
   font-size: 1.1rem;
   font-weight: 600;
@@ -287,12 +287,13 @@
 
 .kelsey_styles .le-tab-button:hover {
   color: var(--redesign-blue-500);
-  background-color: #f8f8f8;
+  background-color: transparent;
 }
 
 .kelsey_styles .le-tab-button.active {
   color: var(--redesign-blue-500);
   border-bottom-color: var(--redesign-blue-500);
+  background-color: transparent;
 }
 
 .kelsey_styles .le-tab-content {
