@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universities | Bike Index</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo-section">
+                <img src="assets/bike index logo_white-blue.png" alt="Bike Index Logo" class="logo">
+                <span class="logo-divider">|</span>
+                <a href="https://bikeindex.org/news/bike-index--now-a-nonprofit" class="tagline" target="_blank">
+                    <span>the non-profit</span>
+                    <span>bike registry</span>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li class="dropdown">
+                    <a href="about.html">About</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#who-we-are">Who We Are</a></li>
+                        <li><a href="#who-were-for">Who We're For</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="database.html">Search</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="stolen-bike.html">Stolen Bikes</a></li>
+                        <li><a href="#marketplace">Marketplace</a></li>
+                    </ul>
+                </li>
+                <li><a href="#news">News</a></li>
+                <li><a href="stolen-bike.html">Stolen bike?</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li class="menu-divider">|</li>
+                <li><a href="#login" class="login-btn">Login</a></li>
+                <li><a href="#signup" class="signup-btn">Sign up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="le-hero-section">
+            <div class="le-bike-tiles-grid" id="leBikeTilesGrid"></div>
+            <div class="le-hero-content">
+                <h1>The #1 platform for campus bike management</h1>
+                <p class="le-hero-tagline">
+                    Bike Index is a comprehensive database and management tool that gives universities
+                    real-time metrics, streamlined workflows, and a community-powered recovery platform,
+                    so you can keep bikes in students' hands and reduce administrative burden.
+                </p>
+                <div class="le-hero-buttons">
+                    <a href="#schedule-demo" class="le-btn-primary">Schedule a Demo</a>
+                </div>
+                <div class="le-hero-stats">
+                    <div class="le-stat-item">
+                        <div class="le-stat-number">$3M</div>
+                        <div class="le-stat-label">Worth of bikes recovered</div>
+                    </div>
+                    <div class="le-stat-item">
+                        <div class="le-stat-number">17,000+</div>
+                        <div class="le-stat-label">Stolen bikes recovered</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trusted Universities Section -->
+        <section class="le-municipalities-section">
+            <div class="container">
+                <h2>Used proudly on campuses nationwide</h2>
+                <div class="le-partners-carousel-wrapper">
+                    <div class="le-partners-grid" id="partnersCarousel">
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/CU Boulder.png" alt="CU Boulder">
+                            <span>CU Boulder</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/Penn State.png" alt="Penn State">
+                            <span>Penn State</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/Princeton.png" alt="Princeton">
+                            <span>Princeton</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/Stevens Institute of Technology.png" alt="Stevens Institute of Technology">
+                            <span>Stevens Institute</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/UC Davis.png" alt="UC Davis">
+                            <span>UC Davis</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/UC San Diego.png" alt="UC San Diego">
+                            <span>UC San Diego</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/UCLA.png" alt="UCLA">
+                            <span>UCLA</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/University of Maryland.png" alt="University of Maryland">
+                            <span>University of Maryland</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/University of Pittsburgh.png" alt="University of Pittsburgh">
+                            <span>University of Pittsburgh</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/University of Washington.png" alt="University of Washington">
+                            <span>University of Washington</span>
+                        </div>
+                        <!-- Duplicate for seamless loop -->
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/CU Boulder.png" alt="CU Boulder">
+                            <span>CU Boulder</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/Penn State.png" alt="Penn State">
+                            <span>Penn State</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/Princeton.png" alt="Princeton">
+                            <span>Princeton</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/Stevens Institute of Technology.png" alt="Stevens Institute of Technology">
+                            <span>Stevens Institute</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/UC Davis.png" alt="UC Davis">
+                            <span>UC Davis</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/UC San Diego.png" alt="UC San Diego">
+                            <span>UC San Diego</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/UCLA.png" alt="UCLA">
+                            <span>UCLA</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/University of Maryland.png" alt="University of Maryland">
+                            <span>University of Maryland</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/University of Pittsburgh.png" alt="University of Pittsburgh">
+                            <span>University of Pittsburgh</span>
+                        </div>
+                        <div class="le-partner-logo">
+                            <img src="assets/PartnerOrgs/unipartners/University of Washington.png" alt="University of Washington">
+                            <span>University of Washington</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Three Features Section -->
+        <section class="le-features-section">
+            <div class="container">
+                <h2>Bike Index is the #1 open-source platform for universities to manage bikes and keep them in campus members' hands</h2>
+                <div class="le-features-grid">
+                    <div class="le-feature-block">
+                        <div class="le-feature-icon">
+                            <img src="assets/DrawnAssets/partners/assets-uni_1.png" alt="All-in-One Database">
+                        </div>
+                        <h3>All-in-One Database</h3>
+                        <p>
+                            Streamlined registration, tracking, and impound management with clear workflows for lost and stolen bike cases across all campus departments.
+                        </p>
+                    </div>
+                    <div class="le-feature-block">
+                        <div class="le-feature-icon">
+                            <img src="assets/DrawnAssets/partners/assets-uni_2.png" alt="Extensive Tools">
+                        </div>
+                        <h3>Extensive Tools & Workflows</h3>
+                        <p>
+                            QR stickers, searchable catalogs, direct messaging, and legacy transfer tools help you modernize operations and reduce administrative burden.
+                        </p>
+                    </div>
+                    <div class="le-feature-block">
+                        <div class="le-feature-icon">
+                            <img src="assets/DrawnAssets/partners/assets-uni_3.png" alt="EPAMD Management">
+                        </div>
+                        <h3>e-Vehicle & Micromobility Management</h3>
+                        <p>
+                            Manage campus vehicles, including e-personal mobility devices (EPAMDs), by verifying UL certification and centralizing safety documentation.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tabbed Widget -->
+                <div class="le-tabbed-widget">
+                    <div class="le-tab-buttons">
+                        <button class="le-tab-button active" data-tab="database">
+                            All-in-One Database Management for Operational Efficiency
+                        </button>
+                        <button class="le-tab-button" data-tab="defense">
+                            First Line of Defense Against Theft for Your Campus Members
+                        </button>
+                    </div>
+                    <div class="le-tab-content">
+                        <div class="le-tab-panel active" id="tab-database">
+                            <div class="le-tab-panel-content">
+                                <div class="le-tab-icon">
+                                    <img src="assets/unis.gif" alt="Database Management">
+                                </div>
+                                <div class="le-tab-text">
+                                    <p>Easier management, stronger data, smarter campus mobility oversight through:</p>
+                                    <ul>
+                                        <li>Our nationally recognized, trusted platform replaces fragmented or outdated in-house tracking systems</li>
+                                        <li>All-in-One management tool features streamlined reporting and tracking with clear, prescriptive workflows for lost/stolen bike cases</li>
+                                        <li>Reduces administrative burden by improving interdepartmental coordination (campus police, transportation, student services) and aligning your campus with national best practices in bike theft prevention</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="le-tab-panel" id="tab-defense">
+                            <div class="le-tab-panel-content">
+                                <div class="le-tab-icon">
+                                    <img src="assets/theft-victims.gif" alt="First Line of Defense">
+                                </div>
+                                <div class="le-tab-text">
+                                    <p>Greater security, higher recovery potential, and empowered riders:</p>
+                                    <ul>
+                                        <li>Our publicly searchable record of database is the first line of defense against bike theft and makes resale of stolen bikes significantly harder</li>
+                                        <li>Our partnerships with law enforcement, community organizations, and bike shops increase recovery rates</li>
+                                        <li>Secure digital proof of ownership provides peace of mind and creates a proactive step students, faculty, and staff can take to protect their investment</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools Overview Section -->
+        <section class="le-tools-section">
+            <div class="container">
+                <h2>Comprehensive tools for every scenario</h2>
+                <div class="le-tools-grid">
+                    <div class="le-tool-item" data-tool="database">
+                        <img src="assets/DrawnAssets/universities/features_database.png.png" alt="All-in-One Database">
+                        <h4>All-in-One Database</h4>
+                        <div class="le-tool-details">
+                            <p>Staff can access the same information on bikes, locations, and updates, fostering seamless collaboration.</p>
+                        </div>
+                    </div>
+                    <div class="le-tool-item" data-tool="catalog">
+                        <img src="assets/DrawnAssets/universities/features_catalog.png" alt="Searchable Catalog">
+                        <h4>Searchable Catalog</h4>
+                        <div class="le-tool-details">
+                            <p>Quickly find bike details and contact information for cyclists.</p>
+                        </div>
+                    </div>
+                    <div class="le-tool-item" data-tool="messaging">
+                        <img src="assets/DrawnAssets/universities/features_direct-communication.png" alt="Direct Messaging">
+                        <h4>Direct Messaging</h4>
+                        <div class="le-tool-details">
+                            <p>Communicate with students and faculty regarding their bikes and track message history.</p>
+                        </div>
+                    </div>
+                    <div class="le-tool-item" data-tool="updates">
+                        <img src="assets/DrawnAssets/universities/features_updates.png" alt="Timely Updates">
+                        <h4>Alerts & Recovery Network</h4>
+                        <div class="le-tool-details">
+                            <p>Issue alerts about maintenance, theft recovery, and more utilizing our national network.</p>
+                        </div>
+                    </div>
+                    <div class="le-tool-item" data-tool="impound">
+                        <img src="assets/DrawnAssets/universities/features_impound.png" alt="Impound Bikes With Ease">
+                        <h4>Impound Bikes With Ease</h4>
+                        <div class="le-tool-details">
+                            <p>Impound bikes in the field or from your dashboard and create a public searchable database.</p>
+                        </div>
+                    </div>
+                    <div class="le-tool-item" data-tool="legacy">
+                        <img src="assets/DrawnAssets/universities/features_legacy transfer.png" alt="Legacy Transfer">
+                        <h4>Legacy Transfer</h4>
+                        <div class="le-tool-details">
+                            <p>Import existing bike registrations into Bike Index for continuity and ease of use.</p>
+                        </div>
+                    </div>
+                    <div class="le-tool-item" data-tool="graduate">
+                        <img src="assets/DrawnAssets/universities/features_graduate.png" alt="Graduate Bikes">
+                        <h4>Graduate Bikes</h4>
+                        <div class="le-tool-details">
+                            <p>Automatically remove bikes that are no longer on campus from your system.</p>
+                        </div>
+                    </div>
+                    <div class="le-tool-item" data-tool="qr-stickers">
+                        <img src="assets/DrawnAssets/universities/features_qr-stickers.png" alt="QR Code Stickers">
+                        <h4>QR Code Stickers</h4>
+                        <div class="le-tool-details">
+                            <p>Permit, track and message bike owners quickly and easily with scannable stickers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="le-testimonials-section uni-testimonials-section">
+            <div class="container">
+                <h2>Testimonials</h2>
+                <div class="le-testimonials-carousel-wrapper">
+                    <div class="le-testimonials-grid" id="testimonialsCarousel">
+                        <div class="le-testimonial active">
+                            <div class="uni-testimonial-content">
+                                <div class="uni-testimonial-text">
+                                    <p class="le-testimonial-quote">
+                                        "Among other options, Bike Index really stands out for their commitment to creating tailored, accessible solutions, and their nonprofit, advocacy ethos."
+                                    </p>
+                                    <div class="le-testimonial-author">
+                                        <strong>Ted Sweeney</strong>
+                                        <span>former UW Active Transportation Specialist</span>
+                                    </div>
+                                </div>
+                                <div class="uni-testimonial-image">
+                                    <img src="assets/DrawnAssets/illustrations/comic-assets_bike-love-1.png" alt="Bike Love">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="le-testimonial">
+                            <div class="uni-testimonial-content">
+                                <div class="uni-testimonial-text">
+                                    <p class="le-testimonial-quote">
+                                        "We're excited to partner with Bike Index to provide Centre Region cyclists with a more intuitive and effective bike registration and recovery service."
+                                    </p>
+                                    <div class="le-testimonial-author">
+                                        <strong>Cecily Zhu</strong>
+                                        <span>Penn State Alternative Transportation Program Coordinator</span>
+                                    </div>
+                                </div>
+                                <div class="uni-testimonial-image">
+                                    <img src="assets/DrawnAssets/illustrations/comic-assets_bike-love-2.png" alt="Bike Love">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="le-testimonial">
+                            <div class="uni-testimonial-content">
+                                <div class="uni-testimonial-text">
+                                    <p class="le-testimonial-quote">
+                                        "It comes down to efficiency. The Bike Index features allow a university bike program to operate more efficiently and in a more timely manner. That's important when it comes to students' bikes at a large university."
+                                    </p>
+                                    <div class="le-testimonial-author">
+                                        <strong>Thomas Worth</strong>
+                                        <span>University of Maryland Department of Transportation Services</span>
+                                    </div>
+                                </div>
+                                <div class="uni-testimonial-image">
+                                    <img src="assets/DrawnAssets/illustrations/comic-assets_bike-love-3.png" alt="Bike Love">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="le-testimonial-nav">
+                        <button class="le-testimonial-arrow" id="testimonialPrev">‹</button>
+                        <div class="le-testimonial-dots" id="testimonialDots"></div>
+                        <button class="le-testimonial-arrow" id="testimonialNext">›</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA Section -->
+        <section class="le-cta-section">
+            <div class="container">
+                <h2>Ready to modernize your campus bike program?</h2>
+                <p class="le-cta-subtitle">
+                    Join 1,800+ organizations using the world's most widely used bike registration network.
+                </p>
+                <p class="le-nonprofit-message">
+                    We're a 501(c)(3) non-profit. Our mission is bike theft recovery, not profit.
+                    Let's talk about what works for your campus.
+                </p>
+                <div class="le-cta-buttons">
+                    <a href="#schedule-demo" class="le-btn-primary">Schedule a Demo</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="universities.js"></script>
+</body>
+</html>
