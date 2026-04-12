@@ -126,7 +126,7 @@ class StolenRecord < ApplicationRecord
   scope :not_spam, -> { left_joins(:bike).where.not(bikes: {likely_spam: true}) }
 
   scope :recovered, -> { unscoped.where(current: false) }
-  scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
+  scope :recovered_ordered, -> { recovered.order("stolen_records.recovered_at desc") }
   scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}).distinct(true) }
   scope :with_theft_alerts_paid_or_admin, -> { joins(:theft_alerts).merge(TheftAlert.paid_or_admin).distinct(true) }
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
