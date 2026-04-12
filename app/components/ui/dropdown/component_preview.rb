@@ -7,7 +7,7 @@ module UI
         render(UI::Dropdown::Component.new(name: "Menu")) do |dropdown|
           dropdown.with_item { link_to "Profile", "#" }
           dropdown.with_item { link_to "Settings", "#" }
-          dropdown.with_item { "---" }
+          dropdown.with_divider
           dropdown.with_item { link_to "Logout", "#" }
         end
       end

@@ -25,14 +25,15 @@
     <% end %>
 
     <ul
+      role="menu"
       class="dropdown-menu tw:list-none tw:py-1"
       aria-labelledby="<%= @button_id %>"
     >
-      <% items.each do |item| %>
-        <% if item.to_s.strip == "---" %>
+      <% entries.each do |entry| %>
+        <% if entry[:type] == :divider %>
           <li role="separator" class="tw:my-1 tw:border-t tw:border-gray-200 tw:dark:border-gray-700"></li>
         <% else %>
-          <li class="tw:[&>a]:block tw:[&>a]:px-4 tw:[&>a]:py-1 tw:[&>a]:text-gray-700 tw:[&>a]:no-underline tw:[&>a]:hover:bg-gray-100 tw:[&>a]:hover:text-gray-900 tw:dark:[&>a]:text-gray-200 tw:dark:[&>a]:hover:bg-gray-700 tw:dark:[&>a]:hover:text-gray-100"><%= item %></li>
+          <li role="menuitem" class="tw:[&>a]:block tw:[&>a]:px-4 tw:[&>a]:py-1 tw:[&>a]:text-gray-700 tw:[&>a]:no-underline tw:[&>a]:hover:bg-gray-100 tw:[&>a]:hover:text-gray-900 tw:dark:[&>a]:text-gray-200 tw:dark:[&>a]:hover:bg-gray-700 tw:dark:[&>a]:hover:text-gray-100"><%= entry[:content].call %></li>
         <% end %>
       <% end %>
     </ul>
