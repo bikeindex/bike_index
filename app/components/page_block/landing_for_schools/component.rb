@@ -11,11 +11,11 @@ module PageBlock::LandingForSchools
     end
 
     def recoveries_display
-      helpers.number_with_delimiter(Counts.recoveries)
+      number_with_delimiter(Counts.recoveries)
     end
 
     def organizations_display
-      helpers.number_with_delimiter(Counts.organizations)
+      number_with_delimiter(Counts.organizations)
     end
 
     def bike_tile_images
