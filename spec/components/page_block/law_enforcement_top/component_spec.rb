@@ -53,14 +53,14 @@ RSpec.describe PageBlock::LawEnforcementTop::Component, type: :component do
   end
 
   it "renders stimulus controllers" do
-    expect(component).to have_css("[data-controller='law-enforcement--bike-tiles']")
-    expect(component).to have_css("[data-controller='law-enforcement--tabs']")
-    expect(component).to have_css("[data-controller='law-enforcement--testimonials']")
+    expect(component).to have_css("[data-controller='landing-pages--bike-tiles']")
+    expect(component).to have_css("[data-controller='landing-pages--tabs']")
+    expect(component).to have_css("[data-controller='landing-pages--testimonials']")
   end
 
   it "passes bike tile images to stimulus controller" do
-    tiles_div = component.css("[data-controller='law-enforcement--bike-tiles']").first
-    images = JSON.parse(tiles_div["data-law-enforcement--bike-tiles-images-value"])
+    tiles_div = component.css("[data-controller='landing-pages--bike-tiles']").first
+    images = JSON.parse(tiles_div["data-landing-pages--bike-tiles-images-value"])
     expect(images.length).to eq 17
     expect(images.first).to include("bike-entry_0000")
   end

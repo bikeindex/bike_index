@@ -3,9 +3,9 @@
   <section class="le-hero-section">
     <div
       class="le-bike-tiles-grid"
-      data-controller="law-enforcement--bike-tiles"
-      data-law-enforcement--bike-tiles-target="grid"
-      data-law-enforcement--bike-tiles-images-value="<%= bike_tile_images.to_json %>"
+      data-controller="landing-pages--bike-tiles"
+      data-landing-pages--bike-tiles-target="grid"
+      data-landing-pages--bike-tiles-images-value="<%= bike_tile_images.to_json %>"
     ></div>
 
     <div class="le-hero-content">
@@ -87,22 +87,22 @@
       </div>
 
       <%# Tabbed Widget %>
-      <div class="le-tabbed-widget" data-controller="law-enforcement--tabs">
+      <div class="le-tabbed-widget" data-controller="landing-pages--tabs">
         <div class="le-tab-buttons">
           <button
             class="le-tab-button active"
-            data-law-enforcement--tabs-target="button"
-            data-action="click->law-enforcement--tabs#switch"
             data-tab="database"
+            data-landing-pages--tabs-target="button"
+            data-action="click->landing-pages--tabs#select"
           >
             All-in-One Database Management for Operational Efficiency
           </button>
 
           <button
             class="le-tab-button"
-            data-law-enforcement--tabs-target="button"
-            data-action="click->law-enforcement--tabs#switch"
             data-tab="defense"
+            data-landing-pages--tabs-target="button"
+            data-action="click->landing-pages--tabs#select"
           >
             First Line of Defense Against Theft for Your Citizens
           </button>
@@ -111,8 +111,8 @@
         <div class="le-tab-content">
           <div
             class="le-tab-panel active"
-            data-law-enforcement--tabs-target="panel"
-            data-tab="database"
+            id="tab-database"
+            data-landing-pages--tabs-target="panel"
           >
             <div class="le-tab-panel-content">
               <div class="le-tab-icon">
@@ -152,8 +152,8 @@
 
           <div
             class="le-tab-panel"
-            data-law-enforcement--tabs-target="panel"
-            data-tab="defense"
+            id="tab-defense"
+            data-landing-pages--tabs-target="panel"
           >
             <div class="le-tab-panel-content">
               <div class="le-tab-icon">
@@ -216,19 +216,19 @@
   </section>
 
   <%# Testimonials Section %>
-  <section class="le-testimonials-section">
+  <section
+    class="le-testimonials-section"
+    data-controller="landing-pages--testimonials"
+  >
     <div class="container">
       <h2>Testimonials</h2>
 
-      <div
-        class="le-testimonials-carousel-wrapper"
-        data-controller="law-enforcement--testimonials"
-      >
+      <div class="le-testimonials-carousel-wrapper">
         <div class="le-testimonials-grid">
           <% TESTIMONIALS.each_with_index do |testimonial, index| %>
             <div
               class="le-testimonial <%= "active" if index == 0 %>"
-              data-law-enforcement--testimonials-target="testimonial"
+              data-landing-pages--testimonials-target="testimonial"
             >
               <p class="le-testimonial-quote">"<%= testimonial[:quote] %>"</p>
 
@@ -243,19 +243,16 @@
         <div class="le-testimonial-nav">
           <button
             class="le-testimonial-arrow"
-            data-action="click->law-enforcement--testimonials#prev"
+            data-action="click->landing-pages--testimonials#prev"
           >
             &lsaquo;
           </button>
 
-          <div
-            class="le-testimonial-dots"
-            data-law-enforcement--testimonials-target="dots"
-          ></div>
+          <div class="le-testimonial-dots" data-testimonials-dots></div>
 
           <button
             class="le-testimonial-arrow"
-            data-action="click->law-enforcement--testimonials#next"
+            data-action="click->landing-pages--testimonials#next"
           >
             &rsaquo;
           </button>
