@@ -22,8 +22,12 @@ class Admin::ExportsController < Admin::BaseController
     else
       Export.all
     end
-    @render_deleted = Binxtils::InputNormalizer.boolean(params[:search_deleted])
-    exports = exports.deleted if @render_deleted
+    @render_deleted = %w[including only].include?(params[:search_deleted]) ? params[:search_deleted] : false
+    exports = case @render_deleted
+    when "only" then exports.deleted
+    when "including" then exports.with_deleted
+    else exports
+    end
     case params[:search_registrations]
     when "specific" then exports = exports.specific
     when "incomplete" then exports = exports.incompletes

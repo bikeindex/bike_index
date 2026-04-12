@@ -85,6 +85,18 @@ module Admin::IndexSkeleton
       !@render_deleted.nil?
     end
 
+    def deleted_active?
+      @render_deleted.present? && @render_deleted != false
+    end
+
+    def deleted_label
+      case @render_deleted
+      when "including" then "Including deleted"
+      when "only" then "Only deleted"
+      else "Not deleted"
+      end
+    end
+
     def default_table_view
       helpers.render(partial: "table", locals: {collection: @collection, render_sortable: @render_sortable})
     end

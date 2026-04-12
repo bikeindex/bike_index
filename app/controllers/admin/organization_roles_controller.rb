@@ -76,8 +76,18 @@ class Admin::OrganizationRolesController < Admin::BaseController
     else
       OrganizationRole.all
     end
-    @render_deleted = current_organization&.deleted? || Binxtils::InputNormalizer.boolean(params[:search_deleted])
-    organization_roles = organization_roles.deleted if @render_deleted
+    @render_deleted = if %w[including only].include?(params[:search_deleted])
+      params[:search_deleted]
+    elsif current_organization&.deleted?
+      "including"
+    else
+      false
+    end
+    organization_roles = case @render_deleted
+    when "only" then organization_roles.deleted
+    when "including" then organization_roles.with_deleted
+    else organization_roles
+    end
 
     @time_range_column = sort_column if %w[claimed_at deleted_at].include?(sort_column)
     @time_range_column ||= "created_at"

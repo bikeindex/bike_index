@@ -64,8 +64,12 @@ class Admin::OrganizationStatusesController < Admin::BaseController
       organization_statuses = organization_statuses.ended
     end
 
-    @render_deleted = Binxtils::InputNormalizer.boolean(params[:search_deleted])
-    organization_statuses = organization_statuses.deleted if @render_deleted
+    @render_deleted = %w[including only].include?(params[:search_deleted]) ? params[:search_deleted] : false
+    organization_statuses = case @render_deleted
+    when "only" then organization_statuses.deleted
+    when "including" then organization_statuses.with_deleted
+    else organization_statuses
+    end
 
     if permitted_pos_kinds.include?(params[:search_pos_kind])
       @pos_kind = params[:search_pos_kind]
