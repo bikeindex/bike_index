@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe Counts, type: :model do
+RSpec.describe Counts do
   let(:redis) { Redis.new }
-  before { redis.expire(Counts::STOREAGE_KEY, 0) }
+  before { redis.expire(Counts::STORAGE_KEY, 0) }
 
   describe "counts_keys" do
     it "has things" do
@@ -15,7 +15,7 @@ RSpec.describe Counts, type: :model do
   context "total_bikes" do
     it "saves things to redis" do
       Counts.assign_total_bikes
-      expect(redis.hget(Counts::STOREAGE_KEY, "total_bikes")).to eq "0"
+      expect(redis.hget(Counts::STORAGE_KEY, "total_bikes")).to eq "0"
       expect(Counts.total_bikes).to eq 0
     end
   end
