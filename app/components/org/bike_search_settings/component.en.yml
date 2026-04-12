@@ -4,7 +4,7 @@ en:
     org:
       bike_search_settings:
         address: 'Address:'
-        all: All
+        all: all
         avery_cell: Avery Exportable
         bike: registration
         color_cell: Color
