@@ -14,7 +14,7 @@ module UI
 
       def initialize(name:, button_content: nil, drop_direction: :bottom_end, button_class: nil, header: nil, id: nil, placement: nil)
         @name = name
-        @button_content = button_content || "#{name} ▼"
+        @button_content = button_content || "#{name} ▾"
         @button_class = button_class || UI::Button::Component.new(color: :secondary).button_classes
         @header = header
         @button_id = id || @name.parameterize(separator: "-")

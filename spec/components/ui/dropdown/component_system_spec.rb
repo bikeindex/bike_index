@@ -10,7 +10,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       expect(page).to have_css('[aria-expanded="false"]')
       expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
 
-      click_button("Menu ▼")
+      click_button("Menu ▾")
 
       expect(page).to have_css('[aria-expanded="true"]')
       expect(page).to have_text("Profile")
@@ -23,7 +23,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
 
       expect(page).to have_css('[aria-expanded="false"]')
 
-      click_button("Menu ▼")
+      click_button("Menu ▾")
 
       expect(page).to have_css('[aria-expanded="true"]')
 
