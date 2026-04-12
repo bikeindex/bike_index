@@ -66,6 +66,10 @@
     @apply tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
   }
 
+  .twdropdown li {
+    @apply tw:block;
+  }
+
   .twdropdown li[role="menuitem"] > a {
     @apply tw:block tw:px-4 tw:py-1 tw:text-gray-700 tw:no-underline
       tw:hover:bg-gray-100 tw:hover:text-gray-900
