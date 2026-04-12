@@ -1,6 +1,13 @@
 .kelsey_landing-page-body .primary-header-nav {
   margin-bottom: 0;
 }
+.kelsey_landing-page-body .primary-footer {
+  margin-top: 0;
+}
+
+.kelsey_landing-page-body h2 {
+  text-transform: none;
+}
 
 /* Landing Page Hero Section */
 .kelsey_styles .le-hero-section {
@@ -568,6 +575,7 @@
 
 .kelsey_styles .le-cta-subtitle {
   font-size: 1.3rem;
+  color: white;
   margin-bottom: 1.5rem;
 }
 
@@ -578,6 +586,7 @@
   max-width: 700px;
   margin-left: auto;
   margin-right: auto;
+  color: white;
 }
 
 .kelsey_styles .le-cta-buttons {
