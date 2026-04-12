@@ -27,11 +27,7 @@
   </li>
 
   <li class="nav-item">
-    <% if @render_deleted %>
-      <%= link_to "deleted", url_for(sortable_search_params.except(:search_deleted)), class: "nav-link active" %>
-    <% else %>
-      <%= link_to "deleted", url_for(sortable_search_params.merge(search_deleted: true)), class: "nav-link" %>
-    <% end %>
+    <%= link_to "deleted", url_for(sortable_search_params.merge(search_deleted: !@render_deleted)), class: "nav-link #{@render_deleted ? 'active' : ''}" %>
   </li>
 <% end %>
 
