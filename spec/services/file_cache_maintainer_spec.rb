@@ -6,11 +6,14 @@ RSpec.describe FileCacheMaintainer do
       FileCacheMaintainer.update_file_info("1456863086_all_stolen_cache.json", 1456863086)
       t = Time.current.to_i
       FileCacheMaintainer.update_file_info("#{t}_all_stolen_cache.json", t)
-      result = FileCacheMaintainer.cached_all_stolen
-      expect(result["filename"]).to eq("#{t}_all_stolen_cache.json")
-      expect(result["daily"]).to be true
-      expect(result["updated_at"]).to eq(t.to_s)
-      expect(result["path"]).to end_with("#{t}_all_stolen_cache.json")
+      target = {
+        "path" => "#{t}_all_stolen_cache.json",
+        "filename" => "#{t}_all_stolen_cache.json",
+        "daily" => true,
+        "updated_at" => t.to_s,
+        "description" => nil
+      }
+      expect(FileCacheMaintainer.cached_all_stolen).to eq(target)
     end
   end
 
