@@ -15,7 +15,7 @@ module UI
       end
 
       def custom_button
-        avatar = content_tag(:img, nil, src: "https://placekitten.com/40/40", class: "tw:rounded-full tw:w-8 tw:h-8", alt: "Avatar")
+        avatar = content_tag(:img, nil, src: ActionController::Base.helpers.asset_path("kelsey/illustrations/comic-assets_bike-love-1.png"), class: "tw:rounded-full tw:w-8 tw:h-8 tw:object-cover", alt: "Avatar")
         button = content_tag(:span, class: "tw:flex tw:items-center tw:gap-2") do
           safe_join([avatar, content_tag(:span, "seth herr")])
         end
