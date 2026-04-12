@@ -1,0 +1,103 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<table
+  class="table table-striped table-bordered table-sm without-exterior-border"
+  id="recordsTable"
+>
+  <thead class="small-header hidden-md-down">
+    <th><%= sortable "Email", render_sortable: render_sortable %></th>
+    <th><small>Feedbacks</small></th>
+    <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+    <th>
+      <small>
+        <%= sortable "updated_at", render_sortable: render_sortable %>
+      </small>
+    </th>
+
+    <th>Lists</th>
+
+    <th>
+      Groups
+      <% if display_dev_info? %>
+        <small class="only-dev-visible d-none d-xl-inline-block">
+          AKA interests
+        </small>
+      <% end %>
+    </th>
+
+    <th>
+      <small><%= sortable "status", render_sortable: render_sortable %></small>
+    </th>
+
+    <th>
+      <%= sortable "mailchimp_updated_at", render_sortable: render_sortable %>
+    </th>
+
+    <th class="collapse data-cell-collapsed">Data</th>
+  </thead>
+
+  <tbody>
+    <% collection.each do |mailchimp_datum| %>
+      <tr>
+        <td>
+          <% if mailchimp_datum.user_id.present? %>
+            <% if mailchimp_datum.user.present? %>
+              <%= link_to mailchimp_datum.email, admin_user_path(mailchimp_datum.user) %>
+            <% else %>
+              <% user = User.unscoped.find_by_id(mailchimp_datum.user_id) %>
+              <% if user.present? %>
+                <%= link_to user.display_name, admin_user_path(user.to_param) %>
+                <small class="text-danger">user deleted</small>
+              <% else %>
+                <%= mailchimp_datum.email %>
+                <small class="text-danger">
+                  missing user: <%= mailchimp_datum.user_id %>
+                </small>
+              <% end %>
+            <% end %>
+          <% else %>
+            <%= mailchimp_datum.email %>
+          <% end %>
+        </td>
+
+        <td>
+          <%= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.kind_humanized, admin_feedback_path(f), class: "small") }, ", ") %>
+        </td>
+
+        <td>
+          <span class="localizeTime">
+            <%= l(mailchimp_datum.created_at, format: :convert_time) %>
+          </span>
+        </td>
+
+        <td>
+          <small class="localizeTime">
+            <%= l(mailchimp_datum.updated_at, format: :convert_time) %>
+          </small>
+        </td>
+
+        <td><%= mailchimp_datum.lists.join(", ") %></td>
+        <td><%= mailchimp_datum.interests.map(&:humanize).join(", ") %></td>
+
+        <td>
+          <% unless mailchimp_datum.subscribed? %>
+            <small><%= mailchimp_datum.status&.humanize %></small>
+          <% end %>
+        </td>
+
+        <td>
+          <% if mailchimp_datum.mailchimp_updated_at.present? %>
+            <span class="localizeTime">
+              <%= l(mailchimp_datum.mailchimp_updated_at, format: :convert_time) %>
+            </span>
+          <% end %>
+        </td>
+
+        <td class="collapse data-cell data-cell-collapsed small">
+          <%= pretty_print_json(mailchimp_datum.data) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

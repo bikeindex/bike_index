@@ -1,0 +1,40 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <a
+      class="nav-link dropdown-toggle <%= params[:search_organization_id].present? ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if params[:search_organization_id].present? %>
+        <%= Organization.friendly_find(params[:search_organization_id])&.name || "Organization" %>
+      <% else %>
+        Filter by organization
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <% if params[:search_organization_id].present? %>
+        <%= link_to "All organizations", admin_ambassador_task_assignments_path(sortable_search_params.except(:search_organization_id)), class: "dropdown-item" %>
+        <div class="dropdown-divider"></div>
+      <% end %>
+
+      <% Organization.ambassador.each do |org| %>
+        <% org_active = params[:search_organization_id].to_s == org.id.to_s %>
+
+        <%= link_to org.name,
+          admin_ambassador_task_assignments_path(sortable_search_params.merge(search_organization_id: org.id)),
+          class: "dropdown-item #{org_active ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @ambassador_task_assignments,
+  index_title: "Completed Ambassador Activities",
+  nav_header_list_items:,
+  skip_charting: true
+)) %>

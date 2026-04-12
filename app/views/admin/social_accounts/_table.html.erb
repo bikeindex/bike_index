@@ -1,0 +1,82 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table-wrapper">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <th>
+        <%= sortable "screen_name", "Handle", render_sortable: render_sortable %>
+      </th>
+
+      <th>
+        <%= sortable "last_error_at", "Errored?", render_sortable: render_sortable %>
+      </th>
+
+      <th>Active?</th>
+      <th>Default?</th>
+
+      <th>
+        <%= sortable "national", "National?", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "language", render_sortable: render_sortable %></th>
+      <th>Address</th>
+      <th>Neighborhood</th>
+      <th><%= sortable "city", render_sortable: render_sortable %></th>
+      <th>State</th>
+      <th><%= sortable "country", render_sortable: render_sortable %></th>
+      <th>Posts</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |social_account| %>
+        <tr>
+          <td>
+            <a
+              class="localizeTime"
+              href="<%= admin_social_account_path(social_account) %>"
+            >
+              <%= l(social_account.created_at, format: :convert_time) %>
+            </a>
+          </td>
+
+          <td><%= social_account.screen_name %></td>
+          <td><%= cross_mark if social_account.errored? %></td>
+          <td><%= check_mark if social_account.active? %></td>
+          <td><%= check_mark if social_account.default? %></td>
+          <td><%= check_mark if social_account.national? %></td>
+          <td><%= social_account.language %></td>
+
+          <td>
+            <small class="less-strong"><%= social_account.address %></small>
+          </td>
+
+          <td>
+            <small class="less-strong">
+              <%= social_account.neighborhood %>
+            </small>
+          </td>
+
+          <td><small class="less-strong"><%= social_account.city %></small></td>
+
+          <td>
+            <small class="less-strong">
+              <%= social_account.state&.abbreviation %>
+            </small>
+          </td>
+
+          <td>
+            <small class="less-strong">
+              <%= social_account.country&.name %>
+            </small>
+          </td>
+
+          <td>
+            <%= number_with_delimiter(social_account.social_posts.count) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

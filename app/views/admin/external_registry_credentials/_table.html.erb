@@ -1,0 +1,33 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th>Registry</th>
+      <th>Expires in</th>
+      <th></th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |creds| %>
+        <tr>
+          <td>
+            <%= link_to creds.registry_name, edit_admin_external_registry_credential_path(creds) %>
+          </td>
+
+          <td>
+            <%= external_registry_credential_expires_in(creds) %>
+          </td>
+
+          <td>
+            <% if creds.access_token_can_be_reset? %>
+              <%= link_to "set / update access token",
+                reset_admin_external_registry_credential_path(creds),
+                method: :put, class: "btn btn-success btn-sm" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,12 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "New Component type", new_admin_ctype_url, class: "nav-link" %>
+  </li>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @ctypes,
+  viewing: "Component Types",
+  skip_charting: true,
+  nav_header_list_items:
+)) %>

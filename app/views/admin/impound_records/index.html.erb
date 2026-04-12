@@ -1,0 +1,93 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @search_status == available_statuses.first ? '' : 'active' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @search_status != "current" && ImpoundRecord.statuses.include?(@search_status) %>
+        <%= ImpoundRecord.statuses_humanized[@search_status.to_sym] %>
+      <% elsif @search_status == "all" %>
+        All statuses
+      <% else %>
+        <%= @search_status.titleize %>
+        records
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <% available_statuses.each do |status| %>
+        <% if status != "current" && ImpoundRecord.statuses.include?(status) %>
+          <% display_status = ImpoundRecord.statuses_humanized[status.to_sym] %>
+        <% elsif status == "all" %>
+          <% display_status = "All statuses" %>
+        <% else %>
+          <% display_status = "#{status.titleize} records" %>
+        <% end %>
+
+        <% status_active = @search_status == status %>
+        <% status_link_params = sortable_search_params.merge(search_status: (status_active ? nil : status)) %>
+
+        <%= link_to display_status, url_for(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}" %>
+
+        <% if status == "resolved" %>
+          <div class="dropdown-divider"></div>
+        <% end %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "with claims", url_for(sortable_search_params.merge(search_with_claims: !@with_claims)), class: "nav-link #{@with_claims ? 'active' : ''}" %>
+  </li>
+<% end %>
+
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <% data = UI::Chart::Component.time_range_counts(collection: matching_impound_records, time_range: @time_range, column: "created_at") %>
+    <%= render(UI::Chart::Component.new(series: [{name: "Impound Records", data:}], time_range: @time_range, stacked: true)) %>
+
+    <% unless params[:organization_id].present? %>
+      <div class="row mt-4">
+        <div class="col-md-6 offset-md-3">
+          <table class="table-list wide-definition">
+            <tbody>
+              <% matching_impound_records.distinct.pluck(:organization_id).map { |id| [id, matching_impound_records.where(organization_id: id).count] }.sort_by { |_id, number| number }.each do |id, number| %>
+                <% organization = Organization.unscoped.find_by_id(id) if id.present? %>
+
+                <tr>
+                  <td>
+                    <% if organization.present? %>
+                      <%= link_to organization.short_name, url_for(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "") %>
+                    <% else %>
+                      <%= link_to "no organization", url_for(sortable_search_params.merge(organization_id: "none")), class: "gray-link" %>
+                    <% end %>
+                  </td>
+
+                  <td><%= number_with_delimiter(number) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "table", locals: {impound_records: @impound_records, render_sortable: true, skip_organization: current_organization.present?} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @impound_records,
+  viewing: "Impound Records",
+  nav_header_list_items:,
+  rendered_chart:,
+  table_view:
+)) %>

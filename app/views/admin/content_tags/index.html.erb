@@ -1,0 +1,12 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "New tag", new_admin_content_tag_url, class: "nav-link" %>
+  </li>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @content_tags,
+  viewing: "Content Tags",
+  skip_charting: true,
+  nav_header_list_items:
+)) %>

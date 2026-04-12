@@ -1,0 +1,54 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm without-exterior-border">
+    <thead class="small-header">
+      <th><%= sortable "completed_at", render_sortable: render_sortable %></th>
+
+      <th>
+        <%= sortable "organization_name", render_sortable: render_sortable %>
+      </th>
+
+      <th>
+        <%= sortable "ambassador_task_title", "Activity Title", render_sortable: render_sortable %>
+      </th>
+
+      <th>
+        <%= sortable "ambassador_name", render_sortable: render_sortable %>
+      </th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |assignment| %>
+        <tr>
+          <td class="localizeTime">
+            <%= l(assignment.completed_at, format: :convert_time) %>
+          </td>
+
+          <td>
+            <% if assignment.organization.present? %>
+              <%= link_to assignment.organization_name,
+                admin_ambassador_task_assignments_path(sortable_search_params.merge(search_organization_id: assignment.organization.id)) %>
+            <% else %>
+              <small class="text-danger">missing org</small>
+            <% end %>
+          </td>
+
+          <td>
+            <%= link_to assignment.title,
+              admin_ambassador_task_assignments_path(sortable_search_params.merge(search_ambassador_task_id: assignment.ambassador_task_id)) %>
+          </td>
+
+          <td>
+            <% if assignment.ambassador.present? %>
+              <%= link_to assignment.ambassador_name,
+                admin_ambassador_task_assignments_path(sortable_search_params.merge(search_ambassador_id: assignment.user_id)) %>
+            <% else %>
+              <small class="text-danger">missing ambassador</small>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

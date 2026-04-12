@@ -1,0 +1,91 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<table class="table table-striped table-bordered table-sm without-exterior-border">
+  <thead class="small-header hidden-md-down">
+    <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+    <th>
+      <%= sortable "processed_at", "Sent", render_sortable: render_sortable %>
+    </th>
+
+    <th><small>primary?</small></th>
+
+    <% unless current_organization.present? %>
+      <th>Organization</th>
+    <% end %>
+
+    <th>Bike</th>
+    <th>Status</th>
+    <th><%= sortable "email", render_sortable: render_sortable %></th>
+
+    <th>
+      <%= sortable "marked_remaining_at", render_sortable: render_sortable %>
+    </th>
+  </thead>
+
+  <tbody>
+    <% collection.each do |graduated_notification| %>
+      <tr>
+        <td>
+          <a
+            class="localizeTime preciseTime"
+            href="<%= organization_graduated_notification_path(graduated_notification.id, organization_id: graduated_notification.organization_id) %>"
+          >
+            <%= l(graduated_notification.created_at, format: :convert_time) %>
+          </a>
+        </td>
+
+        <td>
+          <% if graduated_notification.processed_at %>
+            <span class="localizeTime preciseTime">
+              <%= l(graduated_notification.processed_at, format: :convert_time) %>
+            </span>
+          <% else %>
+            <small class="less-strong">
+              @
+              <span class="localizeTime"><%= l(graduated_notification.pending_period_ends_at, format: :convert_time) %></span>
+            </small>
+          <% end %>
+        </td>
+
+        <td>
+          <%= check_mark if graduated_notification.primary_notification? %>
+        </td>
+
+        <% unless current_organization.present? %>
+          <td>
+            <%= link_to graduated_notification.organization&.short_name, admin_graduated_notifications_path(sortable_search_params.merge(organization_id: graduated_notification.organization_id)) %>
+          </td>
+        <% end %>
+
+        <td>
+          <% if graduated_notification.bike.present? %>
+            <%= link_to organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: graduated_notification.organization_id) %>
+          <% end %>
+        </td>
+
+        <td>
+          <em>
+            <%= status_display(graduated_notification.status_humanized) %>
+          </em>
+        </td>
+
+        <td>
+          <% if graduated_notification.user_id.present? %>
+            <%= link_to graduated_notification.email, admin_user_path(graduated_notification.user_id) %>
+          <% else %>
+            <%= graduated_notification.email %>
+          <% end %>
+        </td>
+
+        <td>
+          <% if graduated_notification.marked_remaining_at.present? %>
+            <span class="localizeTime">
+              <%= l(graduated_notification.marked_remaining_at, format: :convert_time) %>
+            </span>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

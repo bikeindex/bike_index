@@ -1,0 +1,102 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @list != 'all' ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= @list.titleize %> <%= @list == "all" ? "lists" : "list" %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All lists", url_for(sortable_search_params.merge(search_list: nil)), class: "dropdown-item #{@list == 'all' ? 'active' : ''}" %>
+      <%= link_to "Organization list", url_for(sortable_search_params.merge(search_list: "organization")), class: "dropdown-item #{@list == 'organization' ? 'active' : ''}" %>
+      <%= link_to "Individual list", url_for(sortable_search_params.merge(search_list: "individual")), class: "dropdown-item #{@list == 'individual' ? 'active' : ''}" %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @status != 'all' ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= @status.titleize %> <%= @status == "all" ? "statuses" : "status" %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All statuses", url_for(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@status == 'all' ? 'active' : ''}" %>
+      <%= link_to "Not subscribed status", url_for(sortable_search_params.merge(search_status: "not_subscribed")), class: "dropdown-item #{@status == 'not_subscribed' ? 'active' : ''}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% MailchimpDatum.statuses.each do |status| %>
+        <%= link_to "#{status.humanize} status", url_for(sortable_search_params.merge(search_status: status)), class: "dropdown-item #{@status == status ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @search_users == 'all' ? '' : 'active' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @search_users == "all" %>
+        With and without users
+      <% else %>
+        <%= @search_users.humanize %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "With and without users", url_for(sortable_search_params.merge(search_users: nil)), class: "dropdown-item #{@search_users == 'all' ? 'active' : ''}" %>
+
+      <div class="dropdown-divider"></div>
+      <%= link_to "With user", url_for(sortable_search_params.merge(search_users: "with_user")), class: "dropdown-item #{@search_users == 'with_user' ? 'active' : ''}" %>
+      <%= link_to "No user", url_for(sortable_search_params.merge(search_users: "no_user")), class: "dropdown-item #{@search_users == 'no_user' ? 'active' : ''}" %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      href=".data-cell-collapsed"
+      aria-expanded="false"
+      data-toggle="collapse"
+    >
+      Toggle data
+    </a>
+  </li>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <%= form_tag admin_mailchimp_data_path, method: :get, class: "form-inline" do %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+    <%= hidden_field_tag :search_list, params[:search_list] %>
+    <%= hidden_field_tag :search_users, params[:search_users] %>
+
+    <div class="form-group ml-auto mb-0">
+      <%= text_field_tag :query, params[:query], placeholder: "Search email", class: "form-control ml-auto" %>
+    </div>
+
+    <%= submit_tag "Search", name: "search", class: "btn btn-primary ml-2" %>
+  <% end %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @mailchimp_data,
+  viewing: "Mailchimp Data",
+  nav_header_list_items:,
+  admin_search_form:,
+  chart_collection: @render_chart && matching_mailchimp_data
+)) %>

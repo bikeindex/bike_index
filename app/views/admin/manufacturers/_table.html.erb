@@ -1,0 +1,60 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table mt-4">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="sortable">
+      <th><%= sortable "name", render_sortable: render_sortable %></th>
+
+      <th>
+        <%= sortable "frame_maker", "frame", render_sortable: render_sortable %>
+      </th>
+
+      <th>
+        <%= sortable "motorized_only", "motorized", render_sortable: render_sortable %>
+      </th>
+
+      <th>Website</th>
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <% if display_dev_info? %>
+        <th class="small only-dev-visible">
+          <%= sortable "priority", render_sortable: render_sortable %>
+        </th>
+      <% end %>
+    </thead>
+
+    <tbody>
+      <% collection.each do |manufacturer| %>
+        <tr>
+          <td>
+            <%= link_to manufacturer.name, admin_manufacturer_url(manufacturer) %>
+          </td>
+
+          <td class="table-cell-check">
+            <%= check_mark if manufacturer.frame_maker %>
+          </td>
+
+          <td class="table-cell-check">
+            <%= check_mark if manufacturer.motorized_only %>
+          </td>
+
+          <td>
+            <% if manufacturer.website %>
+              <%= link_to "Company website", manufacturer.website %>
+            <% end %>
+          </td>
+
+          <td>
+            <span class="localizeTime">
+              <%= l manufacturer.created_at, format: :convert_time %>
+            </span>
+          </td>
+
+          <% if display_dev_info? %>
+            <td><%= number_display(manufacturer.priority) %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

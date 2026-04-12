@@ -1,0 +1,76 @@
+<%# locals: (collection:, render_sortable: true) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead>
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <th class="small">
+        <%= sortable "updated_at", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "user_id", render_sortable: render_sortable %></th>
+
+      <th>
+        <%= sortable "organization_id", render_sortable: render_sortable %>
+      </th>
+
+      <th><small>Registration info</small></th>
+      <th class="small">All Bikes</th>
+      <th class="small">Can edit claimed</th>
+      <th>Bikes</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |user_registration_organization| %>
+        <tr>
+          <td>
+            <span class="localizeTime">
+              <%= l user_registration_organization.created_at, format: :convert_time %>
+            </span>
+          </td>
+
+          <td>
+            <small class="localizeTime">
+              <%= l user_registration_organization.updated_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <td>
+            <% if user_registration_organization.user_id.present? %>
+              <%= link_to user_registration_organization.user&.display_name, admin_user_path(user_registration_organization.user_id) %>
+            <% else %>
+              Missing ID: "
+              <%= user_registration_organization.user_id %>
+              "
+            <% end %>
+          </td>
+
+          <td>
+            <% if user_registration_organization.organization.present? %>
+              <%= link_to user_registration_organization.organization.name, admin_organization_path(user_registration_organization.organization_id) %>
+            <% end %>
+          </td>
+
+          <td class="small data-cell only-data">
+            <% if user_registration_organization.registration_info.present? %>
+              <%= pretty_print_json(user_registration_organization.registration_info) %>
+            <% end %>
+          </td>
+
+          <td class="table-cell-check">
+            <%= check_mark if user_registration_organization.all_bikes? %>
+          </td>
+
+          <td class="table-cell-check">
+            <%= check_mark if user_registration_organization.can_edit_claimed %>
+          </td>
+
+          <td>
+            <%= number_display(user_registration_organization.bikes.count) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

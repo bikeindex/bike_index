@@ -1,0 +1,203 @@
+<% index_title = capture do %>
+  <em class="strong"><%= @query.present? ? @query.titleize : "All" %></em>
+  Invoices
+<% end %>
+
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @query.present? ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= @query.present? ? "#{@query.titleize} only" : "All invoices" %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All", admin_invoices_path(sortable_search_params.merge(query: nil)), class: "dropdown-item #{@query.blank? ? 'active' : ''}" %>
+
+      <div class="dropdown-divider"></div>
+      <%= link_to "Active only", admin_invoices_path(sortable_search_params.merge(query: "active")), class: "dropdown-item #{@query == 'active' ? 'active' : ''}" %>
+      <%= link_to "Inactive only", admin_invoices_path(sortable_search_params.merge(query: "inactive")), class: "dropdown-item #{@query == 'inactive' ? 'active' : ''}" %>
+      <%= link_to "First invoices only", admin_invoices_path(sortable_search_params.merge(query: "first_invoice")), class: "dropdown-item #{@query == 'first_invoice' ? 'active' : ''}" %>
+      <%= link_to "Renewal invoices only", admin_invoices_path(sortable_search_params.merge(query: "renewal_invoice")), class: "dropdown-item #{@query == 'renewal_invoice' ? 'active' : ''}" %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @time_range_column == 'created_at' ? '' : 'active' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= humanized_time_range_column(@time_range_column, return_value_for_all: true) %>
+      in timerange
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "Created in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "created_at")), class: "dropdown-item #{@time_range_column == 'created_at' ? 'active' : ''}" %>
+      <%= link_to "Subscription ends in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_end_at")), class: "dropdown-item #{@time_range_column == 'subscription_end_at' ? 'active' : ''}" %>
+      <%= link_to "Subscription starts in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_start_at")), class: "dropdown-item #{@time_range_column == 'subscription_start_at' ? 'active' : ''}" %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @search_endless.present? ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= @search_endless.present? ? @search_endless.humanize : "endless-ness" %>
+    </a>
+
+    <div class="dropdown-menu">
+      <% endless_only_active = @search_endless == "endless_only" %>
+      <%= link_to "Endless only", admin_invoices_path(sortable_search_params.merge(search_endless: endless_only_active ? nil : "endless_only")), class: "dropdown-item #{endless_only_active ? 'active' : ''}" %>
+      <% not_endless_active = @search_endless == "not_endless" %>
+      <%= link_to "Not Endless", admin_invoices_path(sortable_search_params.merge(search_endless: not_endless_active ? nil : "not_endless")), class: "dropdown-item #{not_endless_active ? 'active' : ''}" %>
+    </div>
+  </li>
+<% end %>
+
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <% data = UI::Chart::Component.time_range_counts(collection: matching_invoices, time_range: @time_range, column: @time_range_column) %>
+    <%= render(UI::Chart::Component.new(series: [{name: "Invoices", data:}], time_range: @time_range, stacked: true)) %>
+
+    <% unless params[:query].present? %>
+      <div class="row mb-4 mt-4">
+        <div class="col-sm-8 offset-sm-2">
+          <div class="full-screen-table">
+            <table class="table table-striped table-bordered table-sm text-center">
+              <thead>
+                <tr class="text-left">
+                  <th></th>
+                  <th>count</th>
+                  <th>amount due</th>
+                  <th>amount paid</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr class="text-left">
+                  <% payments = matching_invoices.first_invoice %>
+
+                  <td>First invoice</td>
+                  <td><%= number_display(payments.count) %></td>
+
+                  <td>
+                    <%= MoneyFormatter.money_format(payments.sum(:amount_due_cents)) %>
+                  </td>
+
+                  <td>
+                    <%= MoneyFormatter.money_format(payments.sum(:amount_paid_cents)) %>
+                  </td>
+                </tr>
+
+                <tr class="text-left">
+                  <% payments = matching_invoices.renewal_invoice %>
+
+                  <td>Renewals</td>
+                  <td><%= number_display(payments.count) %></td>
+
+                  <td>
+                    <%= MoneyFormatter.money_format(payments.sum(:amount_due_cents)) %>
+                  </td>
+
+                  <td>
+                    <%= MoneyFormatter.money_format(payments.sum(:amount_paid_cents)) %>
+                  </td>
+                </tr>
+
+                <tr class="text-left">
+                  <% payments = matching_invoices.free %>
+
+                  <td>Free invoices</td>
+                  <td><%= number_display(payments.count) %></td>
+
+                  <td>
+                    <%= MoneyFormatter.money_format(payments.sum(:amount_due_cents)) %>
+                  </td>
+
+                  <td>
+                    <%= MoneyFormatter.money_format(payments.sum(:amount_paid_cents)) %>
+                  </td>
+                </tr>
+
+                <tr class="text-left">
+                  <% payments = matching_invoices.paid %>
+
+                  <td>Not free</td>
+                  <td><%= number_display(payments.count) %></td>
+
+                  <td>
+                    <%= MoneyFormatter.money_format(payments.sum(:amount_due_cents)) %>
+                  </td>
+
+                  <td>
+                    <%= MoneyFormatter.money_format(payments.sum(:amount_paid_cents)) %>
+                  </td>
+                </tr>
+
+                <tr class="text-left">
+                  <td><strong>All</strong></td>
+
+                  <td>
+                    <strong>
+                      <%= number_display(matching_invoices.count) %>
+                    </strong>
+                  </td>
+
+                  <td>
+                    <strong>
+                      <%= MoneyFormatter.money_format(matching_invoices.sum(:amount_due_cents)) %>
+                    </strong>
+                  </td>
+
+                  <td>
+                    <strong>
+                      <%= MoneyFormatter.money_format(matching_invoices.sum(:amount_paid_cents)) %>
+                    </strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <p>
+    Total paid:
+    <strong><%= MoneyFormatter.money_format(matching_invoices.sum(:amount_paid_cents)) %></strong>
+  </p>
+
+  <p class="less-strong">
+    Go to individual organizations to create new invoices
+  </p>
+
+  <%= render partial: "/admin/organizations/invoices/table", locals: {invoices: @invoices, render_sortable: true, display_organization: true} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @invoices,
+  index_title:,
+  nav_header_list_items:,
+  rendered_chart:,
+  table_view:,
+  time_range_column: @time_range_column
+)) %>
