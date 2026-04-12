@@ -8,6 +8,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       visit "/rails/view_components/ui/dropdown/component/default"
 
       expect(page).to have_css('[aria-expanded="false"]')
+      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
 
       click_button("Menu ▼")
 
@@ -15,6 +16,14 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
 
       send_keys(:escape)
+
+      expect(page).to have_css('[aria-expanded="false"]')
+
+      click_button("Menu ▼")
+
+      expect(page).to have_css('[aria-expanded="true"]')
+
+      page.find("body").click
 
       expect(page).to have_css('[aria-expanded="false"]')
     end
