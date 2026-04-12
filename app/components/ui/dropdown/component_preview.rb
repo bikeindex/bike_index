@@ -18,9 +18,9 @@ module UI
       def custom_button
         render(UI::Dropdown::Component.new(
           name: "User",
-          button_content: avatar_button,
           button_class: avatar_button_class
         )) do |dropdown|
+          dropdown.with_button { avatar_button }
           dropdown.with_entry_item { content_tag(:span, "Last synced: 2 minutes ago", class: "tw:block tw:px-4 tw:py-2 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400") }
           dropdown.with_entry_divider
           dropdown.with_entry_item { icon_link("⚙", "Settings") }
