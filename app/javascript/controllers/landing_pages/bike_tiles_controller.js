@@ -10,6 +10,13 @@ export default class extends Controller {
     this.generateTiles()
     this.ticking = false
 
+    // Recalculate tiles on window resize
+    this.handleResize = this.debounce(() => {
+      this.gridTarget.innerHTML = ''
+      this.generateTiles()
+    }, 250)
+    window.addEventListener('resize', this.handleResize)
+
     // Add subtle parallax effect to hero background on scroll
     this.handleScroll = () => {
       if (!this.ticking) {
@@ -30,6 +37,15 @@ export default class extends Controller {
 
   disconnect () {
     window.removeEventListener('scroll', this.handleScroll)
+    window.removeEventListener('resize', this.handleResize)
+  }
+
+  debounce (func, wait) {
+    let timeout
+    return (...args) => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => func(...args), wait)
+    }
   }
 
   generateTiles () {
