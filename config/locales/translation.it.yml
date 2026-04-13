@@ -4759,89 +4759,6 @@ it:
         status_records:
         update_impound_record:
         update_multiple_records:
-      bike_search:
-        avery:
-        bike:
-        color: Colore
-        impounded:
-        link: Collegamento
-        manufacturer: Produttore
-        matching_bikes_html:
-        mfg_model_color_html:
-        model: Modello
-        owner_name:
-        propulsion_type:
-        registered: Registrato
-        registered_bikes_html:
-        sent_to:
-        status_cell: Stato
-        sticker:
-        stolen: Rubata
-        updated:
-        vehicle:
-        vehicle_type:
-        affiliation:
-        avery_exportable:
-        e_vehicle_propulsion:
-        phone: Telefono
-        reg_address: Indirizzo
-        secondary_number:
-        source:
-        student_id:
-        url:
-        e_vehicles_for_audit:
-        serial: Seriale
-        view_matching_any_audit:
-        notes: Note
-        impound_id:
-        assign_bike_sticker: Collegamento
-        email_hidden:
-        link_sticker:
-      bike_search_settings:
-        address:
-        all: Tutti
-        avery_cell:
-        bike:
-        color_cell: Colore
-        create_export_of_vehicles:
-        created_at_cell: Registrato
-        creation_description_cell:
-        cycle_type_cell:
-        filter_impounded_html:
-        filter_no_address_html:
-        filter_no_sticker_html:
-        filter_not_impounded_html:
-        filter_not_stolen_or_impounded_html:
-        filter_stolen_html:
-        filter_with_address_html:
-        filter_with_stickers_html:
-        impounded_cell:
-        manufacturer_cell: Produttore
-        model_cell: Modello
-        owner_email_cell:
-        owner_name_cell:
-        propulsion_type_cell:
-        reg_address_cell: Indirizzo
-        reg_extra_registration_number_cell:
-        reg_organization_affiliation_cell:
-        reg_phone_cell: Telefono
-        reg_student_id_cell:
-        serial_number_cell: Seriale
-        settings:
-        status:
-        status_cell: Stato
-        sticker_cell:
-        stickers:
-        stolen_cell: Rubata
-        updated_at_cell:
-        url_cell:
-        vehicle:
-        visible_columns:
-        notes_cell: Note
-        show_notes_search:
-        impound_id_cell:
-        default:
-        none:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:
@@ -4923,6 +4840,89 @@ it:
         organizations:
         reprocess_instruction:
         unknown_ascend_name:
+      registration_search:
+        affiliation:
+        assign_bike_sticker: Collegamento
+        avery:
+        avery_exportable:
+        bike:
+        color: Colore
+        e_vehicle_propulsion:
+        e_vehicles_for_audit:
+        email_hidden:
+        impound_id:
+        impounded:
+        link: Collegamento
+        link_sticker:
+        manufacturer: Produttore
+        matching_bikes_html:
+        mfg_model_color_html:
+        model: Modello
+        notes: Note
+        owner_name:
+        phone: Telefono
+        propulsion_type:
+        reg_address: Indirizzo
+        registered: Registrato
+        registered_bikes_html:
+        secondary_number:
+        sent_to:
+        serial: Seriale
+        source:
+        status_cell: Stato
+        sticker:
+        stolen: Rubata
+        student_id:
+        updated:
+        url:
+        vehicle:
+        vehicle_type:
+        view_matching_any_audit:
+      registration_search_settings:
+        address:
+        all: Tutti
+        avery_cell:
+        bike:
+        color_cell: Colore
+        create_export_of_vehicles:
+        created_at_cell: Registrato
+        creation_description_cell:
+        cycle_type_cell:
+        default:
+        filter_impounded_html:
+        filter_no_address_html:
+        filter_no_sticker_html:
+        filter_not_impounded_html:
+        filter_not_stolen_or_impounded_html:
+        filter_stolen_html:
+        filter_with_address_html:
+        filter_with_stickers_html:
+        impound_id_cell:
+        impounded_cell:
+        manufacturer_cell: Produttore
+        model_cell: Modello
+        none:
+        notes_cell: Note
+        owner_email_cell:
+        owner_name_cell:
+        propulsion_type_cell:
+        reg_address_cell: Indirizzo
+        reg_extra_registration_number_cell:
+        reg_organization_affiliation_cell:
+        reg_phone_cell: Telefono
+        reg_student_id_cell:
+        serial_number_cell: Seriale
+        settings:
+        show_notes_search:
+        status:
+        status_cell: Stato
+        sticker_cell:
+        stickers:
+        stolen_cell: Rubata
+        updated_at_cell:
+        url_cell:
+        vehicle:
+        visible_columns:
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved:

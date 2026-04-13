@@ -6069,89 +6069,6 @@ nl:
         status_records: "%{status} records"
         update_impound_record: Update het inbeslagnameregister
         update_multiple_records: Meerdere records bijwerken
-      bike_search:
-        avery: Avery?
-        bike: Registratie
-        color: Kleur
-        impounded: In beslag genomen bij
-        link: Link
-        manufacturer: Fabrikant
-        matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
-        mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
-        model: Model
-        owner_name: Eigenaar naam
-        propulsion_type: Voortstuwing
-        registered: Geregistreerd
-        registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
-        sent_to: Verzonden naar
-        status_cell: Toestand
-        sticker: Sticker
-        stolen: Gestolen
-        updated: Bijgewerkt
-        vehicle: Registratie
-        vehicle_type: 'Voertuigtype:'
-        affiliation: Aansluiting
-        avery_exportable: Avery Exporteerbaar
-        e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
-        phone: Telefoon
-        reg_address: Adres
-        secondary_number: Secundair#
-        source: Bron
-        student_id: Student-ID
-        url: URL
-        e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
-        serial: Serie
-        view_matching_any_audit: weergave die overeenkomt met elke audit
-        notes: Notes
-        impound_id: Inbeslagname-ID
-        assign_bike_sticker: Link
-        email_hidden: email verborgen
-        link_sticker: link sticker
-      bike_search_settings:
-        address: 'Adres:'
-        all: Alle
-        avery_cell: Avery Exporteerbaar
-        bike: Registratie
-        color_cell: Kleur
-        create_export_of_vehicles: Export maken van gezochte %{cycle_type}
-        created_at_cell: Geregistreerd
-        creation_description_cell: Bron
-        cycle_type_cell: 'Voertuigtype:'
-        filter_impounded_html: alleen <strong>in beslag genomen</strong>
-        filter_no_address_html: alleen <strong>geen</strong> adres
-        filter_no_sticker_html: alleen <strong>geen</strong> sticker
-        filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
-        filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
-        filter_stolen_html: alleen gestolen
-        filter_with_address_html: alleen <strong>met</strong> adres
-        filter_with_stickers_html: alleen <strong>met</strong> stickers
-        impounded_cell: In beslag genomen bij
-        manufacturer_cell: Fabrikant
-        model_cell: Model
-        owner_email_cell: Verzonden naar
-        owner_name_cell: Eigenaar naam
-        propulsion_type_cell: Elektrisch voertuig (aandrijving)
-        reg_address_cell: Adres
-        reg_extra_registration_number_cell: Secundair#
-        reg_organization_affiliation_cell: Aansluiting
-        reg_phone_cell: Telefoon
-        reg_student_id_cell: Student-ID
-        serial_number_cell: Serie
-        settings: Instellingen
-        status: 'Toestand:'
-        status_cell: Toestand
-        sticker_cell: Sticker
-        stickers: 'stickers:'
-        stolen_cell: Gestolen
-        updated_at_cell: Bijgewerkt
-        url_cell: URL
-        vehicle: Registratie
-        visible_columns: Zichtbare kolommen
-        notes_cell: Notes
-        show_notes_search: notities weergeven zoeken
-        impound_id_cell: Inbeslagname-ID
-        default: standaard
-        none: geen
       bike_access_panel:
         access_panel: Toegangspaneel
         added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd
@@ -6251,6 +6168,89 @@ nl:
         reprocess_instruction: Ga terug naar deze pagina en klik op de knop 'import
           opnieuw verwerken' hieronder.
         unknown_ascend_name: Onbekende Ascend-naam
+      registration_search:
+        affiliation: Aansluiting
+        assign_bike_sticker: Sticker toewijzen
+        avery: Avery?
+        avery_exportable: Avery Exporteerbaar
+        bike: Registratie
+        color: Kleur
+        e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
+        e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
+        email_hidden: email verborgen
+        impound_id: Inbeslagname-ID
+        impounded: In beslag genomen bij
+        link: Link
+        link_sticker: link sticker
+        manufacturer: Fabrikant
+        matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
+        mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
+        model: Model
+        notes: Notes
+        owner_name: Eigenaar naam
+        phone: Telefoon
+        propulsion_type: Voortstuwing
+        reg_address: Adres
+        registered: Geregistreerd
+        registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
+        secondary_number: Secundair#
+        sent_to: Verzonden naar
+        serial: Serie
+        source: Bron
+        status_cell: Toestand
+        sticker: Sticker
+        stolen: Gestolen
+        student_id: Student-ID
+        updated: Bijgewerkt
+        url: URL
+        vehicle: Registratie
+        vehicle_type: 'Voertuigtype:'
+        view_matching_any_audit: weergave die overeenkomt met elke audit
+      registration_search_settings:
+        address: 'Adres:'
+        all: Alle
+        avery_cell: Avery Exporteerbaar
+        bike: Registratie
+        color_cell: Kleur
+        create_export_of_vehicles: Export maken van gezochte %{cycle_type}
+        created_at_cell: Geregistreerd
+        creation_description_cell: Bron
+        cycle_type_cell: 'Voertuigtype:'
+        default: standaard
+        filter_impounded_html: alleen <strong>in beslag genomen</strong>
+        filter_no_address_html: alleen <strong>geen</strong> adres
+        filter_no_sticker_html: alleen <strong>geen</strong> sticker
+        filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
+        filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
+        filter_stolen_html: alleen gestolen
+        filter_with_address_html: alleen <strong>met</strong> adres
+        filter_with_stickers_html: alleen <strong>met</strong> stickers
+        impound_id_cell: Inbeslagname-ID
+        impounded_cell: In beslag genomen bij
+        manufacturer_cell: Fabrikant
+        model_cell: Model
+        none: geen
+        notes_cell: Notes
+        owner_email_cell: Verzonden naar
+        owner_name_cell: Eigenaar naam
+        propulsion_type_cell: Elektrisch voertuig (aandrijving)
+        reg_address_cell: Adres
+        reg_extra_registration_number_cell: Secundair#
+        reg_organization_affiliation_cell: Aansluiting
+        reg_phone_cell: Telefoon
+        reg_student_id_cell: Student-ID
+        serial_number_cell: Serie
+        settings: Instellingen
+        show_notes_search: notities weergeven zoeken
+        status: 'Toestand:'
+        status_cell: Toestand
+        sticker_cell: Sticker
+        stickers: 'stickers:'
+        stolen_cell: Gestolen
+        updated_at_cell: Bijgewerkt
+        url_cell: URL
+        vehicle: Registratie
+        visible_columns: Zichtbare kolommen
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
