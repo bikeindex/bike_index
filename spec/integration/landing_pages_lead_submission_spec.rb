@@ -20,6 +20,11 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
   end
 
   context "for_schools" do
+    let(:target_attributes) do
+      {kind: "lead_for_school", name: "Test University", email: "admin@testuni.edu",
+       phone_number: "5551234567", title: "New School lead: Test University"}
+    end
+
     it "submits a school lead via hero button" do
       visit "/for_schools"
       expect(page).to have_content("campus bike management")
@@ -30,12 +35,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
         expect(page).to have_content("Thank", wait: 5)
       }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
 
-      feedback = Feedback.last
-      expect(feedback.kind).to eq "lead_for_school"
-      expect(feedback.name).to eq "Test University"
-      expect(feedback.email).to eq "admin@testuni.edu"
-      expect(feedback.phone_number).to eq "5551234567"
-      expect(feedback.title).to eq "New School lead: Test University"
+      expect(Feedback.last).to have_attributes(target_attributes)
 
       Email::FeedbackNotificationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -44,6 +44,10 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
 
   context "for_law_enforcement" do
     let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:target_attributes) do
+      {kind: "lead_for_city", name: "Portland", email: user.email,
+       phone_number: "5551234567", title: "New City lead: Portland"}
+    end
 
     it "submits a city lead via CTA button" do
       log_in_via_browser(user)
@@ -56,12 +60,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
         expect(page).to have_content("Thank", wait: 5)
       }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
 
-      feedback = Feedback.last
-      expect(feedback.kind).to eq "lead_for_city"
-      expect(feedback.name).to eq "Portland"
-      expect(feedback.email).to eq user.email
-      expect(feedback.phone_number).to eq "5551234567"
-      expect(feedback.title).to eq "New City lead: Portland"
+      expect(Feedback.last).to have_attributes(target_attributes)
 
       Email::FeedbackNotificationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
