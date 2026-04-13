@@ -80,15 +80,14 @@
     <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
       <span class="sort-group-label"><%= translation(".status") %></span>
 
-      <%
-        status_entries = [{value: "all", label: translation(".all")}]
+      <% status_entries = [{value: "all", label: translation(".all")}]
         if @organization.enabled?("impound_bikes")
           status_entries << {value: "not_impounded", label: translation(".filter_not_impounded_html")}
           status_entries << {value: "impounded", label: translation(".filter_impounded_html")}
         end
         status_entries << {value: "with_owner", label: translation(".filter_not_stolen_or_impounded_html")}
-        status_entries << {value: "stolen", label: translation(".filter_stolen_html")}
-      %>
+        status_entries << {value: "stolen", label: translation(".filter_stolen_html")} %>
+
       <%= render Form::RadioButtonGroup::Component.new(
         name: :search_status,
         selected: @search_status,
