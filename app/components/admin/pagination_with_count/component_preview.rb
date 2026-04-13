@@ -2,7 +2,7 @@
 
 module Admin::PaginationWithCount
   class ComponentPreview < ApplicationComponentPreview
-    # @group PaginationWithCount Variants
+    # @!group PaginationWithCount Variants
     def default
       pagy = Pagy::Offset.new(count: 100, page: 1, limit: 25)
       render(Admin::PaginationWithCount::Component.new(

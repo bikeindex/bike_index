@@ -2,7 +2,7 @@
 
 module PageBlock::StravaIntegration
   class ComponentPreview < ApplicationComponentPreview
-    # @group Status Variants
+    # @!group Status Variants
     # @display legacy_stylesheet true
     def not_connected
       render(Component.new(user: built_user))

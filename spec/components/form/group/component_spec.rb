@@ -43,4 +43,17 @@ RSpec.describe Form::Group::Component, type: :component do
       expect(component).to have_css("textarea")
     end
   end
+
+  context "when radio_button_group" do
+    let(:attribute) { :status }
+    let(:kind) { :radio_button_group }
+    let(:entries) { [{value: "", label: "All"}, {value: "active", label: "Active"}] }
+    let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, label_text:, entries:, selected: "active")) }
+
+    it "renders label and radio button group" do
+      expect(component).to have_css("label", text: "Status")
+      expect(component).to have_css("input[type='radio'][value='']")
+      expect(component).to have_css("input[type='radio'][value='active'][checked]")
+    end
+  end
 end

@@ -2,7 +2,7 @@
 
 module UI::AddressDisplay
   class ComponentPreview < ApplicationComponentPreview
-    # @group Address Variants
+    # @!group Address Variants
 
     def with_address_record
       render(UI::AddressDisplay::Component.new(address_record:, visible_attribute: :street))

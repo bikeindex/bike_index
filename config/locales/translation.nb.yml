@@ -4140,49 +4140,6 @@ nb:
         er en samfunnsdrevet innsats for å gjenopprette tapte og stjålne sykler. Uansett
         type sykkel eller syklist, ønsker vi å holde alle sykler rullende med eierne
         som trenger dem.
-    for_law_enforcement:
-      automated_tweets: automatiserte tweets
-      bend_reduces_bike_theft_by_60_percent: Bend reduserer sykkeltyveri med 60 prosent
-      bike_index_for_law_enforcement: Sykkelindeks for rettshåndhevelse
-      bike_index_organization_impounding: Beslaglegge sykler med Bike Index
-      calgary_doubles: Calgary dobler sykkelgjenvinningsgraden med Bike Index
-      check_out: Sjekk ut vår
-      embed_a_bike_index_registration_form: Legg inn et sykkelregistreringsskjema
-        på nettstedet ditt
-      here: her
-      if_you_want_to_collaborate_html: Hvis du ønsker å samarbeide med andre avdelinger
-        i byen din for å administrere et register, kan du lære mer om sykkelindeks
-        for kommuner %{link}.
-      is_your_department_equipped_to_fight_bike: Er din avdeling utstyrt for å bekjempe
-        sykkeltyveri? Bike Index kan hjelpe deg med å få syklene tilbake i riktige
-        hender.
-      law_enforcement_deck: rettshåndhevende partnerdekk
-      local_ambassadors: lokale ambassadører
-      our_extensive_archive_has_helped_officers: Vårt omfattende arkiv har hjulpet
-        betjenter med å finne tilbake sykler som er involvert i kriminelle situasjoner,
-        fra enkle tyverier til karbonadebutikker, narkotikahus – til og med fekteringer
-        og svarte markeder på nettet.
-      put_a_lock_on_bike_theft: Sett lås på sykkeltyveri
-      recover_your_citizens_bikes: Gjenopprett borgersyklene dine
-      related_articles: 'Relaterte artikler:'
-      sign_up_for_free: Registrer deg gratis
-      trusted_by_law_enforcement_everywhere: Stolt på av rettshåndhevelse overalt
-      used_by_law_enforcement_everywhere: Brukt av rettshåndhevelse overalt
-      with_over_600_partnerships_html: Med %{organization_counts} partnerskap er Bike
-        Index bransjeledende innen sykkelregistrering. Bli med i nettverket vårt gratis
-        %{link}, eller be oss om å sette deg i kontakt med en eksisterende partner
-        innen rettshåndhevelse.
-      with_over_registrations_and_almost: Med over %{registrations}-registreringer
-        og %{stolen_recoveries} stjålne sykkelgjenvinninger, vet vi hvordan vi kan
-        hjelpe.
-      you_have_the_authority_to_bring_html: Du har myndighet til å bringe sykler tilbake
-        - det er ikke et lite ansvar. Det er derfor vi har verktøy – som vår integrasjon
-        med LeadsOnline og %{automated_tweets_link} av stjålne sykler – for å holde
-        samfunnet ditt trygt. Ta kontakt med %{local_ambassadors_link} og spotters
-        for raskt å konfiskere og blokkere salg av stjålne sykler.
-      youre_the_first_one: Du er den første innbyggerne dine ser på når syklene deres
-        blir stjålet. Få tilgang til og søk i vår internasjonale database for å returnere
-        fellesskapets sykler til deres rettmessige eiere.
     packages_list:
       forever: For alltid
       free: Gratis
