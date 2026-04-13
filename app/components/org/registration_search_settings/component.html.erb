@@ -47,38 +47,54 @@
       <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
         <span class="sort-group-label"><%= translation(".stickers") %></span>
 
-        <div class="tw:flex tw:flex-wrap">
-          <%= filter_radio_tag :search_stickers, "", translation(".all"), @search_stickers.blank?, first: true %>
-          <%= filter_radio_tag :search_stickers, "with", translation(".filter_with_stickers_html"), @search_stickers == "with" %>
-          <%= filter_radio_tag :search_stickers, "none", translation(".filter_no_sticker_html"), @search_stickers == "none", last: true %>
-        </div>
+        <%= render Form::RadioButtonGroup::Component.new(
+          name: :search_stickers,
+          selected: @search_stickers.presence || "",
+          entries: [
+            {value: "", label: translation(".all")},
+            {value: "with", label: translation(".filter_with_stickers_html")},
+            {value: "none", label: translation(".filter_no_sticker_html")}
+          ],
+          form: "Search_Form",
+          data: {action: "change->org--registration-search#filterChanged"}
+        ) %>
       </div>
     <% end %>
     <% if @organization.enabled?("reg_address") %>
       <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
         <span class="sort-group-label"><%= translation(".address") %></span>
 
-        <div class="tw:flex tw:flex-wrap">
-          <%= filter_radio_tag :search_address, "", translation(".all"), @search_address.blank?, first: true %>
-          <%= filter_radio_tag :search_address, "with_street", translation(".filter_with_address_html"), @search_address == "with_street" %>
-          <%= filter_radio_tag :search_address, "without_street", translation(".filter_no_address_html"), @search_address == "without_street", last: true %>
-        </div>
+        <%= render Form::RadioButtonGroup::Component.new(
+          name: :search_address,
+          selected: @search_address.presence || "",
+          entries: [
+            {value: "", label: translation(".all")},
+            {value: "with_street", label: translation(".filter_with_address_html")},
+            {value: "without_street", label: translation(".filter_no_address_html")}
+          ],
+          form: "Search_Form",
+          data: {action: "change->org--registration-search#filterChanged"}
+        ) %>
       </div>
     <% end %>
     <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
       <span class="sort-group-label"><%= translation(".status") %></span>
 
-      <div class="tw:flex tw:flex-wrap">
-        <%= filter_radio_tag :search_status, "all", translation(".all"), @search_status == "all", first: true %>
+      <% status_entries = [{value: "all", label: translation(".all")}]
+        if @organization.enabled?("impound_bikes")
+          status_entries << {value: "not_impounded", label: translation(".filter_not_impounded_html")}
+          status_entries << {value: "impounded", label: translation(".filter_impounded_html")}
+        end
+        status_entries << {value: "with_owner", label: translation(".filter_not_stolen_or_impounded_html")}
+        status_entries << {value: "stolen", label: translation(".filter_stolen_html")} %>
 
-        <% if @organization.enabled?("impound_bikes") %>
-          <%= filter_radio_tag :search_status, "not_impounded", translation(".filter_not_impounded_html"), @search_status == "not_impounded" %>
-          <%= filter_radio_tag :search_status, "impounded", translation(".filter_impounded_html"), @search_status == "impounded" %>
-        <% end %>
-
-        <%= filter_radio_tag :search_status, "with_owner", translation(".filter_not_stolen_or_impounded_html"), @search_status == "with_owner" %>
-        <%= filter_radio_tag :search_status, "stolen", translation(".filter_stolen_html"), @search_status == "stolen", last: true %>
-      </div>
+      <%= render Form::RadioButtonGroup::Component.new(
+        name: :search_status,
+        selected: @search_status,
+        entries: status_entries,
+        form: "Search_Form",
+        data: {action: "change->org--registration-search#filterChanged"}
+      ) %>
     </div>
     <div
       class="
