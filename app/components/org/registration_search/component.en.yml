@@ -1,0 +1,42 @@
+---
+en:
+  components:
+    org:
+      registration_search:
+        affiliation: Affiliation
+        assign_bike_sticker: Assign sticker
+        avery: Avery?
+        avery_exportable: Avery Exportable
+        bike: registration
+        color: Color
+        e_vehicle_propulsion: E-vehicle (propulsion)
+        e_vehicles_for_audit: 'E-Vehicles for audit:'
+        email_hidden: email hidden
+        impound_id: Impound ID
+        impounded: Impounded
+        link: Link
+        link_sticker: link sticker
+        manufacturer: Manufacturer
+        matching_bikes_html: "%{count} %{cycle_type} matching"
+        mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
+        model: Model
+        notes: Registration Notes
+        owner_name: Owner name
+        phone: Phone
+        propulsion_type: Propulsion
+        reg_address: Address
+        registered: Registered
+        registered_bikes_html: "%{count} %{cycle_type} matching for %{org_name}"
+        secondary_number: Secondary#
+        sent_to: Sent to
+        serial: Serial
+        source: Source
+        status_cell: Status
+        sticker: Sticker
+        stolen: Stolen
+        student_id: Student ID
+        updated: Updated
+        url: URL
+        vehicle: registration
+        vehicle_type: Vehicle type
+        view_matching_any_audit: view matching any audit

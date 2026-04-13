@@ -1,6 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
 import { computePosition, flip, shift, offset } from '@floating-ui/dom'
 
+let zCounter = 50
+
 // Connects to data-controller="dropdown"
 export default class extends Controller {
   static targets = ['menu', 'button']
@@ -34,6 +36,7 @@ export default class extends Controller {
 
   async open () {
     this.menuTarget.classList.remove('tw:hidden')
+    this.menuTarget.style.zIndex = ++zCounter
     this.buttonTarget.setAttribute('aria-expanded', 'true')
     await this.updatePosition()
     this.addEventListeners()

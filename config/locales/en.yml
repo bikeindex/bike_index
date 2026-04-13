@@ -1613,6 +1613,24 @@ en:
           serial: 'Serial:'
           stolen_at: 'Stolen at:'
           stolen_from: 'Stolen from:'
+    form:
+      legacy_form_well:
+        address_record:
+          address: Street address
+          address_no_street: Address
+          address_or_intersection: Address or intersection
+          address_school: Campus mailing address
+          choose_country: Choose country
+          city: City
+          postal_code: Postal Code
+          region: Region / Province
+          state: State
+          street_2: Street address line 2 (optional)
+          where_was_it_status: Where was it %{bike_status}?
+          your_full_address_is_required: Your full address is required by %{org_name}
+        address_record_with_default:
+          edit_my_account_path: edit on my account
+          use_account_address: Use account address
     org:
       impound_records_index:
         matching_impound_record:
