@@ -13,8 +13,8 @@ module Organized
       if current_organization.enabled?("bike_search")
         @search_claimedness = "all"
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
-        @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
-        @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+        @search_query_present = permitted_org_registration_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
+        @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
         @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
         @per_page = permitted_per_page(default: 10)
 

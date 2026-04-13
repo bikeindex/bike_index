@@ -2,7 +2,7 @@
 en:
   components:
     org:
-      bike_search:
+      registration_search:
         affiliation: Affiliation
         assign_bike_sticker: Assign sticker
         avery: Avery?

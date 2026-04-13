@@ -2,7 +2,7 @@
 en:
   components:
     org:
-      bike_search_settings:
+      registration_search_settings:
         address: 'Address:'
         all: all
         avery_cell: Avery Exportable
