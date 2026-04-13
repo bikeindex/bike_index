@@ -4,8 +4,9 @@ module PageBlock::LandingForSchools
   class Component < ApplicationComponent
     include MoneyHelper
 
-    def initialize(feedback: Feedback.new)
+    def initialize(feedback: Feedback.new, current_user: nil)
       @feedback = feedback
+      @current_user = current_user
     end
 
     private

@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag "kelsey_styles", "data-turbo-track" => "reload" %>
 
 <main class="root-landing-page">
-  <%= render(PageBlock::LandingForLawEnforcement::Component.new(feedback: @feedback)) %>
+  <%= render(PageBlock::LandingForLawEnforcement::Component.new(feedback: @feedback, current_user:)) %>
 </main>

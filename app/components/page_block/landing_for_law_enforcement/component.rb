@@ -47,8 +47,9 @@ module PageBlock::LandingForLawEnforcement
        author: "Officer Brittany Elenes", org: "LAPD"}
     ].freeze
 
-    def initialize(feedback: Feedback.new)
+    def initialize(feedback: Feedback.new, current_user: nil)
       @feedback = feedback
+      @current_user = current_user
     end
 
 

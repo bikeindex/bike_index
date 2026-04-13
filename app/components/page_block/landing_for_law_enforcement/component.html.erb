@@ -301,7 +301,7 @@
 
           <div>
             <%= f.label :email, class: "twlabel" %>
-            <%= f.email_field :email, value: helpers.current_user&.email, required: true, class: "twinput" %>
+            <%= f.email_field :email, value: @current_user&.email, required: true, class: "twinput" %>
           </div>
 
           <div class="tw:hidden">
