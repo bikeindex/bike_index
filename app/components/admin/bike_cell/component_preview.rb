@@ -2,7 +2,7 @@
 
 module Admin::BikeCell
   class ComponentPreview < ApplicationComponentPreview
-    # @group Bike Variants
+    # @!group Bike Variants
     def with_bike
       render(Admin::BikeCell::Component.new(bike:))
     end

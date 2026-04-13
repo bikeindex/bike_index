@@ -2,7 +2,7 @@
 
 module Admin::Badges::User
   class ComponentPreview < ApplicationComponentPreview
-    # @group User Badge Variants
+    # @!group User Badge Variants
     def default
       render(Admin::Badges::User::Component.new(user: lookbook_user))
     end

@@ -3,7 +3,7 @@
 module UI
   module Pagination
     class ComponentPreview < ApplicationComponentPreview
-      # @group Pagination Variants
+      # @!group Pagination Variants
       # @param page "The page of pagination"
       def first_page(page: 1)
         pagy_a = pagy_arg(default_opts.merge(page:))
