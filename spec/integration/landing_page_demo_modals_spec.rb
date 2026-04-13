@@ -4,7 +4,6 @@ require "rails_helper"
 
 RSpec.describe "Landing page demo modals", :js, type: :system do
   def fill_in_and_submit_demo_form(name_label:, name_value:, email:)
-    first("button[data-open-modal]").click
     expect(page).to have_content("Contact us for a free trial", wait: 5)
     fill_in name_label, with: name_value
     fill_in "Phone number", with: "5551234567"
@@ -13,9 +12,10 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
   end
 
   context "for_schools" do
-    it "submits a school lead" do
+    it "submits a school lead via hero button" do
       visit "/for_schools"
       expect(page).to have_content("campus bike management")
+      first("button[data-open-modal]").click
 
       expect {
         fill_in_and_submit_demo_form(name_label: "School", name_value: "Test University", email: "admin@testuni.edu")
@@ -32,9 +32,10 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
   end
 
   context "for_law_enforcement" do
-    it "submits a city lead" do
+    it "submits a city lead via CTA button" do
       visit "/for_law_enforcement"
       expect(page).to have_content("bike theft recovery")
+      find(".le-cta-section button[data-open-modal]").click
 
       expect {
         fill_in_and_submit_demo_form(name_label: "City", name_value: "Portland", email: "officer@portland.gov")
