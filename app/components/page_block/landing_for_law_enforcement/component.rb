@@ -52,7 +52,6 @@ module PageBlock::LandingForLawEnforcement
       @current_user = current_user
     end
 
-
     private
 
     def recoveries_value_display
