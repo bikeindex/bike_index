@@ -5,11 +5,26 @@ module Form
     class ComponentPreview < ApplicationComponentPreview
       # @!group Examples
       def default
-        {template: "form/radio_button_group/component_preview/default"}
+        render(Form::RadioButtonGroup::Component.new(
+          name: :search_status,
+          entries: [
+            {value: "", label: "All"},
+            {value: "active", label: "Active"},
+            {value: "inactive", label: "Inactive"}
+          ]
+        ))
       end
 
       def with_selection
-        {template: "form/radio_button_group/component_preview/with_selection"}
+        render(Form::RadioButtonGroup::Component.new(
+          name: :search_filter,
+          selected: "active",
+          entries: [
+            {value: "", label: "All"},
+            {value: "active", label: "Active"},
+            {value: "inactive", label: "Inactive"}
+          ]
+        ))
       end
       # @!endgroup
     end
