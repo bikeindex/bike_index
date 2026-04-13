@@ -29,16 +29,13 @@
         </div>
 
         <div class="le-stat-item">
-          <div class="le-stat-number">
-            $<%= number_display(@recoveries_value / 1_000_000) %>M
-          </div>
-
+          <div class="le-stat-number"><%= recoveries_value_display %></div>
           <div class="le-stat-label">Worth of bikes recovered</div>
         </div>
 
         <div class="le-stat-item">
           <div class="le-stat-number">
-            <%= number_display(@recoveries) %>+
+            <%= recoveries_display %>+
           </div>
 
           <div class="le-stat-label">Stolen bikes recovered</div>
@@ -273,8 +270,8 @@
       <h2>Ready to recover more bikes and clear more crimes?</h2>
 
       <p class="le-cta-subtitle">
-        Join <%= number_display(@organization_count) %>+ organizations using the
-        world's most widely used bike registration network.
+        Join <%= organizations_display %>+ organizations using the world's most
+        widely used bike registration network.
       </p>
 
       <p class="le-nonprofit-message">

@@ -2,6 +2,7 @@
 
 module PageBlock::LandingForLawEnforcement
   class Component < ApplicationComponent
+    include MoneyHelper
     PARTNER_CITIES = %w[Calgary Edmonton Lethbridge Bend Portland Sunnyvale Davis].freeze
 
     TOOLS = [
@@ -45,13 +46,20 @@ module PageBlock::LandingForLawEnforcement
        author: "Officer Brittany Elenes", org: "LAPD"}
     ].freeze
 
-    def initialize(recoveries_value:, recoveries:, organization_count:)
-      @recoveries_value = recoveries_value
-      @recoveries = recoveries
-      @organization_count = organization_count
-    end
 
     private
+
+    def recoveries_value_display
+      as_currency(Counts.recoveries_value / 1_000_000) + "M+"
+    end
+
+    def recoveries_display
+      number_with_delimiter(Counts.recoveries)
+    end
+
+    def organizations_display
+      number_with_delimiter(Counts.organizations)
+    end
 
     def bike_tile_images
       (0..16).map { it.to_s.rjust(2, "0") }
