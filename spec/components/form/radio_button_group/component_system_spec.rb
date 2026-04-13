@@ -12,7 +12,7 @@ RSpec.describe Form::RadioButtonGroup::Component, :js, type: :system do
     expect(page).to have_content "All"
     expect(page).to have_content "Active"
     expect(page).to have_content "Inactive"
-    expect(page).to have_checked_field("search_status", with: "", visible: :hidden)
+    expect(page).to have_css "input[name='search_status'][value=''][checked]", visible: :all
     expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
   end
 
@@ -20,7 +20,7 @@ RSpec.describe Form::RadioButtonGroup::Component, :js, type: :system do
     it "renders with pre-selected value" do
       visit("#{base_path}with_selection")
 
-      expect(page).to have_checked_field("search_status", with: "active", visible: :hidden)
+      expect(page).to have_css "input[name='search_status'][value='active'][checked]", visible: :all
     end
   end
 
@@ -29,10 +29,10 @@ RSpec.describe Form::RadioButtonGroup::Component, :js, type: :system do
       visit("#{base_path}default")
 
       find("label", text: "Active").click
-      expect(page).to have_checked_field("search_status", with: "active", visible: :hidden)
+      expect(page).to have_css "input[name='search_status'][value='active']:checked", visible: :all
 
       find("label", text: "Inactive").click
-      expect(page).to have_checked_field("search_status", with: "inactive", visible: :hidden)
+      expect(page).to have_css "input[name='search_status'][value='inactive']:checked", visible: :all
     end
   end
 end
