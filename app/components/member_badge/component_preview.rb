@@ -2,7 +2,7 @@
 
 module MemberBadge
   class ComponentPreview < ApplicationComponentPreview
-    # @group Level Variants
+    # @!group Level Variants
     # @param level "The membership level"
     def none(level: nil)
       render(MemberBadge::Component.new(level:, classes: "tw:max-w-xs"))

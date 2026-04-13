@@ -2,7 +2,7 @@
 
 module Admin::AddressRecordCell
   class ComponentPreview < ApplicationComponentPreview
-    # @group Address Variants
+    # @!group Address Variants
 
     def with_us_state
       address_record = AddressRecord.new(

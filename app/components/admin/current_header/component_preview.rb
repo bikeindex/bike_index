@@ -2,7 +2,7 @@
 
 module Admin::CurrentHeader
   class ComponentPreview < ApplicationComponentPreview
-    # @group Header Variants
+    # @!group Header Variants
 
     def default
       render(Admin::CurrentHeader::Component.new(params: passed_params))

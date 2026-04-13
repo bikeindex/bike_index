@@ -2,7 +2,7 @@
 
 module Admin::StravaRateLimit
   class ComponentPreview < ApplicationComponentPreview
-    # @group amount Variants
+    # @!group amount Variants
     def high_rate_limit
       render(Admin::StravaRateLimit::Component.new(rate_limit_json: high_rate_limit_json))
     end

@@ -1,4 +1,9 @@
 <div class="tw:mb-4">
   <%= @form_builder.label @attribute, @label_text, class: "twlabel" %>
-  <%= render(Form::Input::Component.new(form_builder: @form_builder, attribute: @attribute, kind: @kind, html_options: @html_options)) %>
+
+  <% if radio_button_group? %>
+    <%= render(Form::RadioButtonGroup::Component.new(name: @attribute, entries: @entries, selected: @selected)) %>
+  <% else %>
+    <%= render(Form::Input::Component.new(form_builder: @form_builder, attribute: @attribute, kind: @kind, html_options: @html_options)) %>
+  <% end %>
 </div>

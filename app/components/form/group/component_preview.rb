@@ -19,6 +19,10 @@ module Form
       def custom_label
         {template: "form/group/component_preview/custom_label"}
       end
+
+      def radio_button_group
+        {template: "form/group/component_preview/radio_button_group"}
+      end
       # @!endgroup
     end
   end
