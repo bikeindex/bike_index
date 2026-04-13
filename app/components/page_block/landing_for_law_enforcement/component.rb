@@ -3,6 +3,7 @@
 module PageBlock::LandingForLawEnforcement
   class Component < ApplicationComponent
     include MoneyHelper
+
     PARTNER_CITIES = %w[Calgary Edmonton Lethbridge Bend Portland Sunnyvale Davis].freeze
 
     TOOLS = [
@@ -45,7 +46,6 @@ module PageBlock::LandingForLawEnforcement
       {quote: "We are very excited to partner with Bike Index, as this partnership symbolizes a joint effort in returning countless numbers of bicycles to their rightful owners.",
        author: "Officer Brittany Elenes", org: "LAPD"}
     ].freeze
-
 
     private
 
