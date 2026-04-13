@@ -19,7 +19,12 @@
       </p>
 
       <div class="le-hero-buttons">
-        <%= link_to "Schedule a Demo", new_organization_path, class: "le-btn-primary" %>
+        <button
+          data-open-modal="law-enforcement-demo-modal"
+          class="le-btn-primary"
+        >
+          Schedule a Demo
+        </button>
       </div>
 
       <div class="le-hero-stats">
@@ -280,8 +285,34 @@
       </p>
 
       <div class="le-cta-buttons">
-        <%= link_to "Schedule a Demo", new_organization_path, class: "le-btn-primary" %>
+        <button
+          data-open-modal="law-enforcement-demo-modal"
+          class="le-btn-primary"
+        >
+          Schedule a Demo
+        </button>
       </div>
     </div>
   </section>
+
+  <%= render(UI::Modal::Component.new(title: "Contact us for a free trial", id: "law-enforcement-demo-modal")) do |modal| %>
+    <% modal.with_body do %>
+      <%= form_for @feedback do |f| %>
+        <%= render(Form::Group::Component.new(form_builder: f, attribute: :name, label_text: "City", html_options: {required: true})) %>
+        <%= render(Form::Group::Component.new(form_builder: f, attribute: :phone_number)) %>
+        <%= render(Form::Group::Component.new(form_builder: f, attribute: :email, kind: :email_field, html_options: {required: true, value: @current_user&.email})) %>
+
+        <div class="tw:hidden">
+          <%= render(Form::Group::Component.new(form_builder: f, attribute: :additional, kind: :text_area, label_text: "Additional information")) %>
+        </div>
+
+        <%= f.hidden_field :feedback_type, value: "lead_for_city" %>
+        <%= f.hidden_field :body, value: "lead" %>
+
+        <div class="tw:pt-2">
+          <%= f.submit "Sign up", class: "le-btn-primary tw:w-full tw:cursor-pointer" %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
 </div>
