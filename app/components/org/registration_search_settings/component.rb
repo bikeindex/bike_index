@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Org::BikeSearchSettings
+module Org::RegistrationSearchSettings
   class Component < ApplicationComponent
     COLUMN_RENAME_KEYS = %i[
       created_at_cell
@@ -62,7 +62,7 @@ module Org::BikeSearchSettings
       @skip_search_and_filters = skip_search_and_filters
     end
 
-    # Called via delegation from Org::BikeSearch
+    # Called via delegation from Org::RegistrationSearch
     def active_search_filter_descriptions
       values = {search_stickers: @search_stickers, search_address: @search_address, search_status: @search_status}
 
@@ -99,31 +99,6 @@ module Org::BikeSearchSettings
       @cycle_type ||= begin
         merged = @params.merge(@interpreted_params)
         BikeServices::Displayer.vehicle_search?(merged) ? translation(".vehicle") : translation(".bike")
-      end
-    end
-
-    def filter_radio_tag(name, value, label_text, checked, first: false, last: false)
-      round = if first
-        "tw:rounded-l"
-      elsif last
-        "tw:rounded-r"
-      else
-        ""
-      end
-      border_l = first ? "" : "tw:-ml-px"
-
-      tag.label(class: [
-        "tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:mb-0!",
-        "tw:border tw:border-gray-300 tw:px-3 tw:py-1 tw:text-sm tw:leading-snug",
-        "tw:transition-colors tw:has-[:checked]:bg-gray-700 tw:has-[:checked]:text-white tw:has-[:checked]:border-gray-700",
-        "tw:hover:bg-gray-100 tw:has-[:checked]:hover:bg-gray-700",
-        round, border_l
-      ].join(" ")) do
-        radio_button_tag(name, value, checked,
-          class: "tw:sr-only",
-          form: "Search_Form",
-          data: {action: "change->org--registration-search#filterChanged"}) +
-          label_text.html_safe
       end
     end
 

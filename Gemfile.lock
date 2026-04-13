@@ -184,7 +184,7 @@ GEM
       marcel (~> 1.0.0)
       ssrf_filter (~> 1.0)
     cgi (0.5.1)
-    chartkick (5.2.0)
+    chartkick (5.2.1)
     chunky_png (1.4.0)
     coderay (1.1.3)
     coercible (1.0.0)

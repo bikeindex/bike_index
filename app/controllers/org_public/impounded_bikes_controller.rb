@@ -6,7 +6,7 @@ module OrgPublic
 
     def index
       @per_page = permitted_per_page
-      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       @pagy, @impound_records = pagy(:countish, available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
