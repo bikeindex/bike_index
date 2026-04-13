@@ -3,9 +3,9 @@
 module Form
   module RadioButtonGroup
     class Component < ApplicationComponent
-      def initialize(name:, options:, selected: nil, form: nil, data: {})
+      def initialize(name:, entries:, selected: nil, form: nil, data: {})
         @name = name
-        @options = options
+        @entries = entries
         @selected = selected.to_s
         @form = form
         @data = data
@@ -13,8 +13,8 @@ module Form
 
       def call
         tag.div(class: "tw:flex tw:flex-wrap") do
-          safe_join(@options.each_with_index.map { |option, i|
-            radio_button(option, first: i == 0, last: i == @options.size - 1)
+          safe_join(@entries.each_with_index.map { |option, i|
+            radio_button(option, first: i == 0, last: i == @entries.size - 1)
           })
         end
       end
