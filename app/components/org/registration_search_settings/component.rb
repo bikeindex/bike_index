@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Org::BikeSearchSettings
+module Org::RegistrationSearchSettings
   class Component < ApplicationComponent
     COLUMN_RENAME_KEYS = %i[
       created_at_cell
@@ -62,7 +62,7 @@ module Org::BikeSearchSettings
       @skip_search_and_filters = skip_search_and_filters
     end
 
-    # Called via delegation from Org::BikeSearch
+    # Called via delegation from Org::RegistrationSearch
     def active_search_filter_descriptions
       values = {search_stickers: @search_stickers, search_address: @search_address, search_status: @search_status}
 
