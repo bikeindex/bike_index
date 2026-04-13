@@ -298,6 +298,7 @@
   <%= render(UI::Modal::Component.new(title: "Contact us for a free trial", id: "law-enforcement-demo-modal")) do |modal| %>
     <% modal.with_body do %>
       <%= form_for @feedback do |f| %>
+        <%= render(Form::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: "Name")) %>
         <%= render(Form::Group::Component.new(form_builder: f, attribute: :name, label_text: "City", html_options: {required: true})) %>
         <%= render(Form::Group::Component.new(form_builder: f, attribute: :phone_number)) %>
         <%= render(Form::Group::Component.new(form_builder: f, attribute: :email, kind: :email_field, html_options: {required: true, value: @current_user&.email})) %>
