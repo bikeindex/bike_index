@@ -28,6 +28,9 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       expect(feedback.email).to eq "admin@testuni.edu"
       expect(feedback.phone_number).to eq "5551234567"
       expect(feedback.title).to eq "New School lead: Test University"
+
+      Email::FeedbackNotificationJob.drain
+      expect(ActionMailer::Base.deliveries.count).to eq 1
     end
   end
 
@@ -48,6 +51,9 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       expect(feedback.email).to eq "officer@portland.gov"
       expect(feedback.phone_number).to eq "5551234567"
       expect(feedback.title).to eq "New City lead: Portland"
+
+      Email::FeedbackNotificationJob.drain
+      expect(ActionMailer::Base.deliveries.count).to eq 1
     end
   end
 end
