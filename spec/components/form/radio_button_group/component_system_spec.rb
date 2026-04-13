@@ -34,7 +34,7 @@ RSpec.describe Form::RadioButtonGroup::Component, :js, type: :system do
     it "renders with pre-selected value" do
       visit("#{base_path}with_selection")
 
-      expect(page).to have_css "input[name='search_status'][value='active'][checked]", visible: :all
+      expect(page).to have_css "input[name='search_filter'][value='active'][checked]", visible: :all
     end
   end
 end
