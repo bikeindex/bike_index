@@ -4,6 +4,10 @@ module PageBlock::LandingForSchools
   class Component < ApplicationComponent
     include MoneyHelper
 
+    def initialize(feedback: Feedback.new)
+      @feedback = feedback
+    end
+
     private
 
     def recoveries_value_display

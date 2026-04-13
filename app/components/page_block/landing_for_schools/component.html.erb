@@ -19,7 +19,7 @@
       </p>
 
       <div class="le-hero-buttons">
-        <%= link_to "Schedule a Demo", campus_packages_path, class: "le-btn-primary" %>
+        <button data-open-modal="schools-demo-modal" class="le-btn-primary">Schedule a Demo</button>
       </div>
 
       <div class="le-hero-stats">
@@ -278,8 +278,43 @@
       </p>
 
       <div class="le-cta-buttons">
-        <%= link_to "Schedule a Demo", campus_packages_path, class: "le-btn-primary" %>
+        <button data-open-modal="schools-demo-modal" class="le-btn-primary">Schedule a Demo</button>
       </div>
     </div>
   </section>
+
+  <%= render(UI::Modal::Component.new(title: "Contact us for a free trial", id: "schools-demo-modal")) do |modal| %>
+    <% modal.with_body do %>
+      <%= form_for @feedback, html: { class: "organized-form" } do |f| %>
+        <div class="tw:space-y-4">
+          <div>
+            <%= f.label :name, "School", class: "twlabel" %>
+            <%= f.text_field :name, required: true, class: "twinput" %>
+          </div>
+
+          <div>
+            <%= f.label :phone_number, class: "twlabel" %>
+            <%= f.text_field :phone_number, class: "twinput" %>
+          </div>
+
+          <div class="tw:hidden">
+            <%= f.label :additional, "Additional information", class: "twlabel" %>
+            <%= f.text_area :additional, class: "twinput" %>
+          </div>
+
+          <div>
+            <%= f.label :email, class: "twlabel" %>
+            <%= f.email_field :email, value: helpers.current_user&.email, required: true, class: "twinput" %>
+          </div>
+
+          <%= f.hidden_field :feedback_type, value: "lead_for_school" %>
+          <%= f.hidden_field :body %>
+
+          <div class="tw:pt-2">
+            <%= f.submit "Sign up", class: "le-btn-primary tw:w-full tw:cursor-pointer" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
 </div>

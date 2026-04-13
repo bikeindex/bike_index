@@ -47,6 +47,11 @@ module PageBlock::LandingForLawEnforcement
        author: "Officer Brittany Elenes", org: "LAPD"}
     ].freeze
 
+    def initialize(feedback: Feedback.new)
+      @feedback = feedback
+    end
+
+
     private
 
     def recoveries_value_display
