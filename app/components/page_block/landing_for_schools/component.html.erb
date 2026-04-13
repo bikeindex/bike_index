@@ -289,34 +289,20 @@
 
   <%= render(UI::Modal::Component.new(title: "Contact us for a free trial", id: "schools-demo-modal")) do |modal| %>
     <% modal.with_body do %>
-      <%= form_for @feedback, html: { class: "organized-form" } do |f| %>
-        <div class="tw:space-y-4">
-          <div>
-            <%= f.label :name, "School", class: "twlabel" %>
-            <%= f.text_field :name, required: true, class: "twinput" %>
-          </div>
+      <%= form_for @feedback do |f| %>
+        <%= render(Form::Group::Component.new(form_builder: f, attribute: :name, label_text: "School", html_options: {required: true})) %>
+        <%= render(Form::Group::Component.new(form_builder: f, attribute: :phone_number)) %>
 
-          <div>
-            <%= f.label :phone_number, class: "twlabel" %>
-            <%= f.text_field :phone_number, class: "twinput" %>
-          </div>
+        <div class="tw:hidden">
+          <%= render(Form::Group::Component.new(form_builder: f, attribute: :additional, kind: :text_area, label_text: "Additional information")) %>
+        </div>
 
-          <div class="tw:hidden">
-            <%= f.label :additional, "Additional information", class: "twlabel" %>
-            <%= f.text_area :additional, class: "twinput" %>
-          </div>
+        <%= render(Form::Group::Component.new(form_builder: f, attribute: :email, kind: :email_field, html_options: {required: true, value: @current_user&.email})) %>
+        <%= f.hidden_field :feedback_type, value: "lead_for_school" %>
+        <%= f.hidden_field :body, value: "lead" %>
 
-          <div>
-            <%= f.label :email, class: "twlabel" %>
-            <%= f.email_field :email, value: @current_user&.email, required: true, class: "twinput" %>
-          </div>
-
-          <%= f.hidden_field :feedback_type, value: "lead_for_school" %>
-          <%= f.hidden_field :body, value: "lead" %>
-
-          <div class="tw:pt-2">
-            <%= f.submit "Sign up", class: "le-btn-primary tw:w-full tw:cursor-pointer" %>
-          </div>
+        <div class="tw:pt-2">
+          <%= f.submit "Sign up", class: "le-btn-primary tw:w-full tw:cursor-pointer" %>
         </div>
       <% end %>
     <% end %>
