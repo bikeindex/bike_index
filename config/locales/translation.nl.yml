@@ -3935,50 +3935,6 @@ nl:
       embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
         op uw website
       registration_drive: Gebruik Bike Index om een registratierit te hosten
-    for_law_enforcement:
-      automated_tweets: geautomatiseerde tweets
-      bend_reduces_bike_theft_by_60_percent: Bocht vermindert fietsdiefstal met 60
-        procent
-      bike_index_for_law_enforcement: Fietsindex voor wetshandhaving
-      here: hier
-      if_you_want_to_collaborate_html: Als je wilt samenwerken met andere afdelingen
-        in je stad om een register te beheren, lees je meer over Bike Index voor gemeenten
-        %{link}.
-      is_your_department_equipped_to_fight_bike: Is uw afdeling uitgerust om fietsdiefstal
-        te bestrijden? Bike Index kan u helpen fietsen weer in de juiste handen te
-        krijgen.
-      local_ambassadors: lokale ambassadeurs
-      our_extensive_archive_has_helped_officers: Ons uitgebreide archief heeft officieren
-        geholpen om fietsen terug te vinden die betrokken zijn in criminele situaties,
-        van eenvoudige diefstal tot chop-shops, drugshuizen - zelfs schermringen en
-        online zwarte markten.
-      put_a_lock_on_bike_theft: Zet een slot op fietsdiefstal
-      recover_your_citizens_bikes: Herstel de fietsen van je burgers
-      related_articles: 'Gerelateerde artikelen:'
-      sign_up_for_free: Gratis inschrijven
-      trusted_by_law_enforcement_everywhere: Overal vertrouwd door wetshandhavers
-      with_over_600_partnerships_html: Met meer dan 600 partnerships is Bike Index
-        de marktleider op het gebied van fietsregistratie. Word gratis lid van ons
-        netwerk %{link}, of vraag ons om u in contact te brengen met een bestaande
-        partner in wetshandhaving.
-      you_have_the_authority_to_bring_html: U heeft de bevoegdheid om fietsen terug
-        te brengen - dat is geen kleine verantwoordelijkheid. Daarom hebben we tools
-        - zoals onze integratie met LeadsOnline en %{automated_tweets_link} van gestolen
-        fietsen - om uw community veilig te houden. Maak verbinding met %{local_ambassadors_link}
-        en spotters om de verkoop van gestolen fietsen tegen te houden, gestolen fietsen
-        snel in beslag te nemen en te blokkeren.
-      youre_the_first_one: Jij bent de eerste waar je burgers naar kijken als hun
-        fietsen worden gestolen. Ga naar en doorzoek onze internationale database
-        om de fietsen van uw gemeenschap terug te geven aan hun rechtmatige eigenaars.
-      bike_index_organization_impounding: Fietsen in beslag nemen met Bike Index
-      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
-        op uw website
-      calgary_doubles: Calgary verdubbelt fietsherstelpercentage met Bike Index
-      check_out: Bekijk onze
-      law_enforcement_deck: partnerdeck voor wetshandhaving
-      used_by_law_enforcement_everywhere: Overal gebruikt door wetshandhavers
-      with_over_registrations_and_almost: Met meer dan %{registrations} registraties
-        en %{stolen_recoveries} gestolen fietsen weten we hoe we kunnen helpen.
     packages_list:
       forever: Voor altijd
       free: GRATIS
