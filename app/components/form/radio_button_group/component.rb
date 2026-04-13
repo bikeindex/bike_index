@@ -36,7 +36,7 @@ module Form
 
         tag.label(class: [
           "tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:mb-0!",
-          "tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:px-3 tw:py-1 tw:text-sm tw:leading-snug",
+          "tw:bg-white tw:dark:bg-gray-800 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:px-3 tw:py-1 tw:text-sm tw:leading-snug",
           "tw:transition-colors tw:has-[:checked]:bg-gray-700 tw:has-[:checked]:text-white tw:has-[:checked]:border-gray-700",
           "tw:dark:has-[:checked]:bg-gray-300 tw:dark:has-[:checked]:text-gray-900 tw:dark:has-[:checked]:border-gray-300",
           "tw:hover:bg-gray-100 tw:has-[:checked]:hover:bg-gray-700",
