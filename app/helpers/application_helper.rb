@@ -81,7 +81,7 @@ module ApplicationHelper
 
   def body_class
     if controller_name == "landing_pages" || @force_landing_page_render
-      if %w[for_schools].include?(action_name)
+      if %w[for_schools for_law_enforcement].include?(action_name)
         "kelsey_landing-page-body"
       else
         "landing-page-body"
