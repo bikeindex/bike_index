@@ -248,23 +248,32 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response).to render_template :multi_search
     end
 
-    context "with serial turbo request" do
-      let!(:bike) { FactoryBot.create(:bike_organized, serial_number: "ABCD1234", creation_organization: current_organization) }
-      let!(:other_bike) { FactoryBot.create(:bike, serial_number: "WXYZ9999") }
+  end
 
-      it "searches and returns matching org bikes" do
-        get "#{base_url}/multi_search", params: {serial: "ABCD1234"},
-          headers: {"Accept" => "text/vnd.turbo-stream.html"}
-        expect(response.status).to eq(200)
-        expect(response.media_type).to eq("text/vnd.turbo-stream.html")
-        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-      end
+  describe "multi_search_response" do
+    let!(:bike) { FactoryBot.create(:bike_organized, serial_number: "ABCD1234", creation_organization: current_organization) }
+    let!(:other_bike) { FactoryBot.create(:bike, serial_number: "WXYZ9999") }
 
-      it "does not return bikes from other orgs" do
-        get "#{base_url}/multi_search", params: {serial: "WXYZ9999"},
+    it "searches and returns matching org bikes" do
+      get "#{base_url}/multi_search_response", params: {serial: "ABCD1234"},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
+      expect(response.status).to eq(200)
+      expect(response.media_type).to eq("text/vnd.turbo-stream.html")
+      expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+    end
+
+    it "does not return bikes from other orgs" do
+      get "#{base_url}/multi_search_response", params: {serial: "WXYZ9999"},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
+      expect(response.status).to eq(200)
+      expect(assigns(:bikes)).to be_empty
+    end
+
+    context "without serial param" do
+      it "returns bad request" do
+        get "#{base_url}/multi_search_response",
           headers: {"Accept" => "text/vnd.turbo-stream.html"}
-        expect(response.status).to eq(200)
-        expect(assigns(:bikes)).to be_empty
+        expect(response.status).to eq(400)
       end
     end
   end
@@ -285,6 +294,17 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get "#{base_url}/multi_search"
         expect(response.status).to eq(200)
         expect(response).to render_template :multi_search
+      end
+    end
+
+    describe "multi_search_response" do
+      let!(:bike) { FactoryBot.create(:bike_organized, serial_number: "ABCD1234", creation_organization: current_organization) }
+
+      it "searches and returns matching org bikes" do
+        get "#{base_url}/multi_search_response", params: {serial: "ABCD1234"},
+          headers: {"Accept" => "text/vnd.turbo-stream.html"}
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
       end
     end
   end
