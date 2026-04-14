@@ -130,7 +130,7 @@ group :development do
   gem "guard-rspec", require: false
   gem "letter_opener"
   gem "rerun" # restart sidekiq processes in development on app change
-  gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
+  gem "hotwire-livereload", "~> 2.1.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
   gem "annotaterb" # Add comments with the attributes to Rails Model
   gem "benchmark"
