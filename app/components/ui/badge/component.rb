@@ -20,8 +20,13 @@ module UI::Badge
       gray: "tw:bg-gray-300 tw:text-gray-900 tw:dark:bg-gray-700 tw:dark:text-gray-200",
       purple: "tw:bg-purple-300 tw:text-purple-900 tw:dark:bg-purple-800 tw:dark:text-purple-200",
       rose: "tw:bg-rose-400 tw:text-rose-950 tw:dark:bg-rose-800 tw:dark:text-rose-300",
-      orange: "tw:bg-orange-400 tw:text-orange-950 tw:dark:bg-orange-800 tw:dark:text-orange-300"
+      orange: "tw:bg-orange-400 tw:text-orange-950 tw:dark:bg-orange-800 tw:dark:text-orange-300",
+      empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600"
     }.freeze
+
+    def self.badge_classes(color:, size:)
+      [BASE_CLASSES, COLORS[color], SIZES[size]].join(" ")
+    end
 
     def initialize(text:, title: nil, color: :gray, size: :md)
       @text = text
@@ -30,14 +35,9 @@ module UI::Badge
       @size = SIZES.include?(size) ? size : :md
     end
 
-    private
-
-    def badge_classes
-      [
-        BASE_CLASSES,
-        COLORS[@color],
-        SIZES[@size]
-      ].join(" ")
+    def call
+      content_tag(:span, content.presence || @text,
+        class: self.class.badge_classes(color: @color, size: @size), title: @title)
     end
   end
 end

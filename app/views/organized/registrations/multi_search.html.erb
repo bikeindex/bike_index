@@ -1,6 +1,10 @@
 <div
   data-controller="org--multi-serial-search"
   data-org--multi-serial-search-url-value="<%= multi_search_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
+  data-org--multi-serial-search-empty-class-value="<%= UI::Badge::Component.badge_classes(color: :empty, size: :md) %>"
+  data-org--multi-serial-search-success-class-value="<%= UI::Badge::Component.badge_classes(color: :success, size: :md) %>"
+  data-org--multi-serial-search-gray-class-value="<%= UI::Badge::Component.badge_classes(color: :gray, size: :md) %>"
+  data-org--multi-serial-search-spinner-value="<%= render(UI::LoadingSpinner::Component.new(size: :sm)) %>"
 >
   <div class="tw:mx-auto tw:mb-6 tw:max-w-2xl">
     <h3 class="tw:mb-4 tw:text-center">Multiple Serial Search</h3>
@@ -12,20 +16,20 @@
         data: {"org--multi-serial-search-target": "textarea"} %>
 
       <div class="tw:mt-2 tw:flex tw:justify-end">
-        <button
-          type="submit"
-          class="twbtn-blue tw:disabled:cursor-wait"
-          data-org--multi-serial-search-target="button"
-        >
-          Search serials
-        </button>
+        <%= render UI::Button::Component.new(
+          text: "Search serials",
+          color: :primary,
+          size: :lg,
+          kind: :submit,
+          data: {"org--multi-serial-search-target": "button"}
+        ) %>
       </div>
     </form>
   </div>
 
   <div
     data-org--multi-serial-search-target="serialChips"
-    class="tw:mb-4 tw:flex tw:flex-wrap tw:gap-1"
+    class="tw:mb-4 tw:flex tw:flex-wrap tw:gap-3"
   ></div>
 
   <div id="multi_serial_results" data-org--multi-serial-search-target="results"></div>

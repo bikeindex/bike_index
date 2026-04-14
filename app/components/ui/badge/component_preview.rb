@@ -4,8 +4,8 @@ module UI
   module Badge
     class ComponentPreview < ApplicationComponentPreview
       # @!group Colors
-      def green
-        render(UI::Badge::Component.new(text: "Donor", color: :green))
+      def success
+        render(UI::Badge::Component.new(text: "Donor", color: :success))
       end
 
       def notice_sm
@@ -30,6 +30,10 @@ module UI
 
       def cyan_lg
         render(UI::Badge::Component.new(text: "Theft Alert", color: :cyan, size: :lg))
+      end
+
+      def empty_md
+        render_with_template(template: "ui/badge/preview/empty_md")
       end
       # @!endgroup
     end

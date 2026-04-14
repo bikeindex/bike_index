@@ -1,80 +1,65 @@
 import { Controller } from '@hotwired/stimulus'
-import TimeLocalizer from '@bikeindex/time-localizer'
 
-/* global window, CSS */
+/* global Turbo */
 
 // Connects to data-controller='org--multi-serial-search'
 export default class extends Controller {
   static targets = ['textarea', 'button', 'serialChips', 'results']
-  static values = { url: String }
+  static values = { url: String, emptyClass: String, successClass: String, grayClass: String, spinner: String }
 
   connect () {
-    if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
+    const serialsParam = new URL(window.location).searchParams.get('serials')
+    if (serialsParam) {
+      this.textareaTarget.value = serialsParam
+      this.search(this.parseSerials(serialsParam))
+    }
   }
 
-  async submit (event) {
+  submit (event) {
     event.preventDefault()
+    const serials = this.parseSerials(this.textareaTarget.value)
+    if (!serials.length) return
+    this.search(serials)
+  }
 
-    const text = this.textareaTarget.value.trim()
-    if (!text) return
-
-    const serials = [...new Set(
+  parseSerials (text) {
+    return [...new Set(
       text.split(/[,\n]/).map(s => s.trim()).filter(s => s)
     )]
+  }
+
+  async search (serials) {
+    const url = new URL(window.location.pathname, window.location.origin)
+    url.searchParams.set('serials', serials.join(','))
+    window.history.pushState({}, '', url)
 
     this.resultsTarget.innerHTML = ''
-    this.renderChips(serials)
+    this.renderPlaceholderChips(serials)
     this.buttonTarget.disabled = true
 
-    for (const serial of serials) {
-      await this.searchSerial(serial)
-    }
+    await Promise.all(serials.map((serial, index) => this.searchSerial(serial, index)))
 
     this.buttonTarget.disabled = false
   }
 
-  renderChips (serials) {
-    this.serialChipsTarget.innerHTML = serials.map(serial =>
-      `<span class="tw:rounded tw:px-2 tw:py-1 tw:text-sm tw:bg-gray-100"
-             data-serial-chip="${serial}">${this.escapeHtml(serial)}</span>`
+  renderPlaceholderChips (serials) {
+    this.serialChipsTarget.innerHTML = serials.map((serial, index) =>
+      `<span id="chip_${index}" class="${this.emptyClassValue}">${this.escapeHtml(serial)} ${this.spinnerValue}</span>`
     ).join('')
   }
 
-  async searchSerial (serial) {
+  async searchSerial (serial, index) {
     const url = new URL(this.urlValue, window.location.origin)
     url.searchParams.set('serial', serial)
+    url.searchParams.set('chip_id', `chip_${index}`)
 
     const response = await fetch(url, {
-      headers: {
-        Accept: 'text/vnd.turbo-stream.html',
-        'X-Requested-With': 'XMLHttpRequest'
-      }
+      headers: { Accept: 'text/vnd.turbo-stream.html' }
     })
 
     if (response.ok) {
-      const html = await response.text()
-      // Process turbo stream manually to append content
-      const template = document.createElement('template')
-      template.innerHTML = html
-      const streams = template.content.querySelectorAll('turbo-stream')
-      streams.forEach(stream => {
-        const content = stream.querySelector('template').content
-        this.resultsTarget.appendChild(content.cloneNode(true))
-      })
-
-      // Mark chip as matched or not
-      const chip = this.serialChipsTarget.querySelector(`[data-serial-chip="${CSS.escape(serial)}"]`)
-      if (chip) {
-        const hasResults = this.resultsTarget.lastElementChild?.querySelector('table tbody tr')
-        if (hasResults) {
-          chip.classList.remove('tw:bg-gray-100')
-          chip.classList.add('tw:bg-blue-500', 'tw:text-white')
-        } else {
-          chip.classList.add('tw:line-through')
-        }
-      }
-
-      if (window.timeLocalizer) window.timeLocalizer.localize()
+      await Turbo.renderStreamMessage(await response.text())
+      window.timeLocalizer?.localize()
     }
   }
 
