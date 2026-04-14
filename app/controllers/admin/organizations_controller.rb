@@ -23,10 +23,6 @@ class Admin::OrganizationsController < Admin::BaseController
     @pagy, @bikes = pagy(:countish, bikes, limit: 10, page: permitted_page)
   end
 
-  def show_deleted
-    @organizations = Organization.only_deleted.all
-  end
-
   def recover
     @organization = Organization.only_deleted.find(params[:id]).restore(recursive: true)
     redirect_to admin_organizations_url
@@ -127,7 +123,7 @@ class Admin::OrganizationsController < Admin::BaseController
     return @matching_organizations if defined?(@matching_organizations)
 
     @search_paid = Binxtils::InputNormalizer.boolean(params[:search_paid])
-    matching_organizations = Organization.unscoped.where(deleted_at: nil) # We don't want deleted orgs
+    matching_organizations = search_deleted_scope(Organization.all)
     matching_organizations = matching_organizations.paid if @search_paid
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
 
@@ -158,13 +154,13 @@ class Admin::OrganizationsController < Admin::BaseController
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
     matching_organizations = matching_organizations.where(approved: (sort_direction == "desc")) if sort_column == "approved"
-    @time_range_column = sort_column if %w[updated_at].include?(sort_column)
+    @time_range_column = sort_column if %w[updated_at deleted_at].include?(sort_column)
     @time_range_column ||= "created_at"
     @matching_organizations = matching_organizations.where(@time_range_column => @time_range)
   end
 
   def sortable_columns
-    %w[created_at name approved pos_kind bikes].freeze
+    %w[created_at deleted_at name approved pos_kind bikes].freeze
   end
 
   def organization_settings

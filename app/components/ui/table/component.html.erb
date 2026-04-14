@@ -1,4 +1,7 @@
-<div class="tw:-mx-4 tw:mb-4 tw:overflow-x-scroll tw:px-4 tw:pb-3">
+<div
+  class="tw:-mx-4 tw:mb-4 tw:overflow-x-scroll tw:px-4 tw:pb-3"
+  data-controller="ui-table"
+>
   <table class="<%= table_classes %>">
     <thead class="tw:bg-gray-50 tw:text-sm tw:dark:bg-gray-700">
       <tr>
@@ -11,24 +14,16 @@
     </thead>
 
     <tbody>
-      <% @records.each_with_index do |record, row_index| %>
-        <tr>
-          <% cache_if(@cache_key, [@cache_key, record]) do %>
+      <% @records.each do |record| %>
+        <% cache_if(@cache_key, [@cache_key, record]) do %>
+          <tr>
             <% @columns.each do |col| %>
-              <% next if col.uncached %>
-
               <td class="<%= col.td_classes(bordered: @bordered) %>">
                 <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
               </td>
             <% end %>
-          <% end %>
-
-          <% uncached_columns.each do |col| %>
-            <td class="<%= col.td_classes(bordered: @bordered) %>">
-              <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
-            </td>
-          <% end %>
-        </tr>
+          </tr>
+        <% end %>
       <% end %>
     </tbody>
   </table>

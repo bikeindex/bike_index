@@ -2,7 +2,7 @@
 
 module Admin::UserCell
   class ComponentPreview < ApplicationComponentPreview
-    # @group User Cell Variants
+    # @!group User Cell Variants
     def default
       render(Admin::UserCell::Component.new(user: lookbook_user))
     end

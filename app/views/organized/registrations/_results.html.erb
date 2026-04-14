@@ -1,4 +1,4 @@
-<%= render(Org::BikeSearch::Component.new(
+<%= render(Org::RegistrationSearch::Component.new(
   organization: current_organization,
   pagy: @pagy,
   bikes: @bikes,
@@ -15,6 +15,5 @@
   bike_sticker: @bike_sticker,
   model_audit: @model_audit,
   skip_search_and_filters: true,
-  include_avery: true,
   skip_settings: true
 )) %>

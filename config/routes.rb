@@ -262,7 +262,6 @@ Rails.application.routes.draw do
     resources :organizations do
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
-      collection { get :show_deleted }
     end
     get "recover_organization", to: "organizations#recover"
 

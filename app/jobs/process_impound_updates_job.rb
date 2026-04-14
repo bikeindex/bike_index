@@ -2,7 +2,8 @@ class ProcessImpoundUpdatesJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   def perform(impound_record_id)
-    impound_record = ImpoundRecord.find(impound_record_id)
+    impound_record = ImpoundRecord.find_by(id: impound_record_id)
+    return if impound_record.blank?
 
     update_display_ids(impound_record) if impound_record.organized?
     claim_retrieved = nil

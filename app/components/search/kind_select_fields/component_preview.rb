@@ -2,7 +2,7 @@
 
 module Search::KindSelectFields
   class ComponentPreview < ApplicationComponentPreview
-    # @group Kind scopes
+    # @!group Kind scopes
     def default
       render(Search::KindSelectFields::Component.new(kind_scope: "stolen"))
     end

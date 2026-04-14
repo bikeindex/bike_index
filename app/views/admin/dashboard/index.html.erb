@@ -1,0 +1,73 @@
+<h1 class="text-center">Go Hard</h1>
+
+<% if Organization.example.blank? %>
+  <div class="alert alert-danger">
+    <h4>Example organization is broken!</h4>
+    <p>This breaks things. Tell Seth.</p>
+  </div>
+<% end %>
+
+<h2 class="mb-4 mt-4">
+  Recent <%= link_to "Bikes", admin_bikes_url %>
+</h2>
+
+<%= render partial: "/admin/bikes/table", locals: { bikes: @bikes } %>
+
+<% today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count %>
+<% yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today %>
+<% bikes = [{name: "Registrations", data: UI::Chart::Component.time_range_counts(collection: Bike.unscoped.current.not_stolen.where(created_at: @time_range), time_range: @time_range, column: "bikes.created_at")}, {name: "Stolen", data: UI::Chart::Component.time_range_counts(collection: Bike.unscoped.current.status_stolen.where(created_at: @time_range), time_range: @time_range, column: "bikes.created_at")}] %>
+
+<div class="row justify-content-end">
+  <div class="col-auto">
+    <p>
+      <%= number_with_delimiter(Bike.count) %> bikes total
+      <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
+    </p>
+  </div>
+</div>
+
+<%= render(UI::Chart::Component.new(series: bikes, time_range: @time_range, stacked: true)) %>
+
+<hr>
+
+<% cache(User.maximum(:created_at)) do %>
+  <h2 class="mt-4">
+    Recent <%= link_to "Users", admin_users_url %>
+  </h2>
+
+  <%= render partial: "/admin/users/table" %>
+
+  <div class="row justify-content-end">
+    <div class="col-auto">
+      <p>
+        <%= number_with_delimiter(User.valid_only.count) %> users total
+        <% today = User.valid_only.where("users.created_at >= ?", Time.current.beginning_of_day).count %>
+        
+        <% yesterday = (User.valid_only.where("users.created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today %>
+        
+        <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
+      </p>
+    </div>
+  </div>
+<% end %>
+
+<hr>
+
+<h2 class="mt-4">
+  Recent <%= link_to "Organizations", admin_organizations_url %>
+</h2>
+
+<%= render partial: "/admin/organizations/table" %>
+
+<div class="row justify-content-end">
+  <div class="col-auto">
+    <p>
+      <%= number_with_delimiter(Organization.count) %> Organizations total
+      <% today = Organization.where("created_at >= ?", Time.current.beginning_of_day).count %>
+      
+      <% yesterday = (Organization.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today %>
+      
+      <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
+    </p>
+  </div>
+</div>

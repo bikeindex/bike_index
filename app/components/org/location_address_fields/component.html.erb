@@ -1,7 +1,7 @@
 <div
   class="form-group address-group"
-  data-controller="legacy-form-well--address-record"
-  data-legacy-form-well--address-record-us-id-value="<%= Country.united_states_id %>"
+  data-controller="form--legacy-form-well--address-record"
+  data-form--legacy-form-well--address-record-us-id-value="<%= Country.united_states_id %>"
 >
   <%= @builder.label :street, translation(:address) %>
   <%= @builder.text_field :street, placeholder: translation(:street), class: "form-control" %>
@@ -17,7 +17,7 @@
         { include_blank: true, prompt: translation(".state") },
         {
           :class => "form-control tw:mt-2! #{initial_state_class}",
-          "data-legacy-form-well--address-record-target" => "state",
+          "data-form--legacy-form-well--address-record-target" => "state",
         },
       ) %>
 
@@ -25,7 +25,7 @@
         :region_string,
         :placeholder => translation(".region"),
         :class => "form-control tw:mt-2! #{initial_region_class}",
-        "data-legacy-form-well--address-record-target" => "region",
+        "data-form--legacy-form-well--address-record-target" => "region",
       ) %>
     </div>
 
@@ -42,7 +42,7 @@
         { prompt: translation(".choose_country"), required: true },
         {
           :class => "form-control tw:mt-2!",
-          "data-legacy-form-well--address-record-target" => "country",
+          "data-form--legacy-form-well--address-record-target" => "country",
         }
       ) %>
     </div>

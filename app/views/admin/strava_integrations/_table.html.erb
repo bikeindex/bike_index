@@ -1,4 +1,4 @@
-<%# locals: (collection:, render_sortable: false) %>
+<%# locals: (collection:, render_sortable: false, render_deleted: false) %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |strava_integration| %>
@@ -7,11 +7,13 @@
     <% end %>
   <% end %>
 
-  <% table.column(sortable: "deleted_at") do |strava_integration| %>
-    <% if strava_integration.deleted_at.present? %>
-      <small class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
-        <%= render UI::Time::Component.new(time: strava_integration.deleted_at) %>
-      </small>
+  <% if render_deleted %>
+    <% table.column(sortable: "deleted_at") do |strava_integration| %>
+      <% if strava_integration.deleted_at.present? %>
+        <small class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
+          <%= render UI::Time::Component.new(time: strava_integration.deleted_at) %>
+        </small>
+      <% end %>
     <% end %>
   <% end %>
 
@@ -52,7 +54,7 @@
   <% end %>
 
   <% table.column(sortable: "activities_downloaded_count", label: "Activities") do |strava_integration| %>
-    <%= link_to strava_integration.activities_downloaded_count, admin_strava_activities_path(search_strava_integration_id: strava_integration.id) %>
+    <%= link_to number_display(strava_integration.activities_downloaded_count), admin_strava_activities_path(search_strava_integration_id: strava_integration.id) %>
 
     <% if !strava_integration.synced? && strava_integration.athlete_activity_count.present? %>
       <small class="less-strong">

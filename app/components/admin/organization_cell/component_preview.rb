@@ -2,7 +2,7 @@
 
 module Admin::OrganizationCell
   class ComponentPreview < ApplicationComponentPreview
-    # @group Organization Variants
+    # @!group Organization Variants
 
     def with_organization
       render(Admin::OrganizationCell::Component.new(organization:))

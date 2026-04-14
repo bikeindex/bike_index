@@ -16,6 +16,15 @@ class Admin::BaseController < ApplicationController
 
   private
 
+  def search_deleted_scope(scope)
+    @render_deleted = %w[including only].include?(params[:search_deleted]) ? params[:search_deleted] : false
+    case @render_deleted
+    when "only" then scope.only_deleted
+    when "including" then scope.with_deleted
+    else scope
+    end
+  end
+
   def admin_search_bike_statuses(bikes, default_statuses: nil)
     # Search ignored overrides status searches
     @ignored_only = Binxtils::InputNormalizer.boolean(params[:search_ignored])

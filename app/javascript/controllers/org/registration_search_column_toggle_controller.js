@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--registration-search-column-toggle'
 export default class extends Controller {
   static targets = ['checkboxes']
-  static values = { enabledColumns: Array, defaultColumns: Array }
+  static values = { enabledColumns: Array, defaultColumns: Array, assignBikeSticker: Boolean }
 
   connect () {
     this.refreshEnabledColumns()
@@ -24,30 +24,45 @@ export default class extends Controller {
   }
 
   refreshEnabledColumns () {
-    this.enabledColumnsValue = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
+    // Stimulus Array values return a fresh copy on each read, so mutating
+    // via push won't persist (and assign_bike_sticker_cell is ignored)
+    // build the full array, then assign it once.
+    const columns = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
       [...th.classList].find(c => c.endsWith('_cell'))
     ).filter(Boolean)
+
+    if (this.assignBikeStickerValue) {
+      columns.push('assign_bike_sticker_cell')
+    }
+
+    this.enabledColumnsValue = columns
   }
 
   columnToggled () {
     this.updateVisibleColumns()
   }
 
-  // Avery export requires a page reload because the server conditionally
-  // renders avery column cells based on the search_avery_export param
-  averyToggled (event) {
-    const url = new URL(window.location)
-    if (event.target.checked) {
-      url.searchParams.set('search_avery_export', 'true')
-    } else {
-      url.searchParams.delete('search_avery_export')
-    }
-    url.searchParams.set('search_no_js', 'true')
-    window.location = url.toString()
+  selectAll () {
+    this.setAllCheckboxes(true)
   }
 
-  isAveryCheckbox (cb) {
-    return cb.dataset.action?.includes('averyToggled')
+  selectNone () {
+    this.setAllCheckboxes(false)
+  }
+
+  selectDefault () {
+    const defaults = this.defaultColumnsValue
+    this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.checked = defaults.includes(cb.name)
+    })
+    this.updateVisibleColumns()
+  }
+
+  setAllCheckboxes (checked) {
+    this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.checked = checked
+    })
+    this.updateVisibleColumns()
   }
 
   selectStoredVisibleColumns () {
@@ -58,7 +73,6 @@ export default class extends Controller {
     }
 
     this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      if (this.isAveryCheckbox(cb)) return
       cb.checked = columns.includes(cb.name)
     })
     this.updateVisibleColumns()
@@ -66,37 +80,23 @@ export default class extends Controller {
 
   updateVisibleColumns () {
     const checked = []
-    const visible = []
     this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      if (this.isAveryCheckbox(cb)) {
-        // Avery state is URL-driven, not stored in localStorage, but still
-        // needs to be in the visible list so the column cells are shown
-        if (cb.checked) visible.push(cb.name)
-        return
-      }
-      if (cb.checked) {
-        checked.push(cb.name)
-        visible.push(cb.name)
-      }
+      if (cb.checked) checked.push(cb.name)
     })
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
-    const firstVisible = this.enabledColumnsValue.find(col => visible.includes(col))
-    const lastVisible = [...this.enabledColumnsValue].reverse().find(col => visible.includes(col))
-
-    const borderClasses = {
-      th: { first: 'tw:ui-table-bordered-th-first', last: 'tw:ui-table-bordered-th-last' },
-      td: { first: 'tw:ui-table-bordered-td-first', last: 'tw:ui-table-bordered-td-last' }
+    if (this.assignBikeStickerValue) {
+      checked.push('assign_bike_sticker_cell')
     }
 
     this.enabledColumnsValue.forEach(col => {
-      const isVisible = visible.includes(col)
+      const isVisible = checked.includes(col)
       this.element.querySelectorAll(`.${col}`).forEach(el => {
         el.classList.toggle('tw:hidden', !isVisible)
-        const tag = el.tagName === 'TH' ? 'th' : 'td'
-        el.classList.toggle(borderClasses[tag].first, col === firstVisible)
-        el.classList.toggle(borderClasses[tag].last, col === lastVisible)
       })
     })
+
+    // Re-apply first/last visible column border styles via ui-table controller
+    window.dispatchEvent(new Event('ui-table:refresh'))
   }
 }

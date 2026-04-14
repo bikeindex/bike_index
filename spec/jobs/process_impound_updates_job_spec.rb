@@ -8,6 +8,12 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
   let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, processed: false, kind: kind) }
   let(:kind) { "note" }
 
+  context "when impound_record not found" do
+    it "returns without error" do
+      expect { instance.perform(999999) }.not_to raise_error
+    end
+  end
+
   it "resolves the impound_record_update" do
     impound_record.reload
     # The factory force updates bike, so force un-update

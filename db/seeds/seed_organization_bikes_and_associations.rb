@@ -204,3 +204,21 @@ puts "Seeding non-cycle types and e-vehicles"
   bike = seed_org_bike(creator:, user:, owner_email: owner_emails.sample, cycle_type: type[:cycle_type], propulsion_type: type[:propulsion_type])
   FindOrCreateModelAuditJob.new.perform(bike.id)
 end
+
+# --- Bike Sticker Batch "HO" for Hogwarts ---
+puts "Creating bike sticker batch HO with 20 stickers..."
+sticker_batch = BikeStickerBatch.create!(
+  prefix: "HO",
+  organization: hogwarts,
+  user: member,
+  code_number_length: 4
+)
+sticker_batch.create_codes(20, initial_code_integer: 0)
+
+# Assign 3 stickers to bikes
+hogwarts_bikes = hogwarts.bikes.limit(3)
+sticker_batch.bike_stickers.limit(3).each_with_index do |sticker, i|
+  sticker.claim(user: member, bike: hogwarts_bikes[i])
+  puts "  Assigned sticker #{sticker.code} to bike ##{hogwarts_bikes[i].id}"
+end
+puts "Bike sticker batch HO seeded with 20 stickers (3 assigned to bikes)"

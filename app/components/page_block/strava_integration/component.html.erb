@@ -46,13 +46,13 @@
       <p><%= translation(".sync_error_description") %></p>
     <% end %>
     <%= link_to translation(".disconnect_strava"),
-        helpers.strava_integration_path,
+        strava_integration_path,
         method: :delete,
         class: "btn btn-sm btn-outline-danger tw:mt-4",
         data: { confirm: translation(".disconnect_confirm") } %>
   <% else %>
     <p><%= translation(".integrate_your_bikes_with_strava") %></p>
-    <%= link_to helpers.new_strava_integration_path do %>
+    <%= link_to new_strava_integration_path do %>
       <%= helpers.image_tag("logos/btn_strava_connect.svg", alt: translation(".connect_with_strava"), style: "height: 32px; width: auto;") %>
     <% end %>
   <% end %>

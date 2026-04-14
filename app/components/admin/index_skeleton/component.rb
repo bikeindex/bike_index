@@ -35,6 +35,7 @@ module Admin::IndexSkeleton
       @render_chart = controller.instance_variable_get(:@render_chart)
       @pagy = controller.instance_variable_get(:@pagy)
       @per_page = controller.instance_variable_get(:@per_page)
+      @render_deleted = controller.instance_variable_get(:@render_deleted)
       @time_range = controller.instance_variable_get(:@time_range)
       @period = controller.instance_variable_get(:@period)
       @time_range_column = @time_range_column_override || controller.instance_variable_get(:@time_range_column) || "created_at"
@@ -77,6 +78,28 @@ module Admin::IndexSkeleton
         pagy: @pagy, per_page: @per_page, time_range: @time_range,
         period: @period, time_range_column: @time_range_column, params: @params
       )
+    end
+
+    def show_deleted_link?
+      !@render_deleted.nil?
+    end
+
+    def deleted_active?
+      @render_deleted.present? && @render_deleted != false
+    end
+
+    def deleted_label
+      case @render_deleted
+      when "including" then "Including deleted"
+      when "only" then "Only deleted"
+      else "deleted"
+      end
+    end
+
+    def deleted_item_class(value)
+      if value.nil? ? !deleted_active? : @render_deleted == value
+        "active"
+      end
     end
 
     def default_table_view

@@ -2,7 +2,7 @@
 
 module Admin::Badges::BikeHiddenExplanation
   class ComponentPreview < ApplicationComponentPreview
-    # @group Hidden Variants
+    # @!group Hidden Variants
     def user_hidden
       render(Admin::Badges::BikeHiddenExplanation::Component.new(bike: Bike.with_user_hidden.where(user_hidden: true).last))
     end
