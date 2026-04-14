@@ -239,13 +239,19 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
       click_button "Search serials"
 
-      # All results consolidated into one table with serial header rows
-      expect(page).to have_css("#chip_2.tw\\:bg-gray-300", wait: 15)
-      expect(page).to have_css("table", count: 1)
-      expect(page).to have_css("table tbody tr", minimum: 4) # 3 header rows + at least 2 bike rows
+      # Both matching serials show results with tables
+      expect(page).to have_css("#multi_serial_results table", minimum: 2, wait: 15)
+
+      # Non-matching serial shows "No matches found"
+      expect(page).to have_content("No matches found")
 
       # Other org's bike is not shown
       expect(page).not_to have_content("SERIAL333")
+
+      # Matched chips use success badge, unmatched use gray
+      expect(page).to have_css("#chip_0.tw\\:bg-emerald-500", wait: 15)
+      expect(page).to have_css("#chip_1.tw\\:bg-emerald-500", wait: 15)
+      expect(page).to have_css("#chip_2.tw\\:bg-gray-300", wait: 15)
     end
   end
 

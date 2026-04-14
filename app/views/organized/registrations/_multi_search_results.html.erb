@@ -1,4 +1,9 @@
-<div class="multi-search-serial-result" data-serial="<%= @serial %>" data-count="<%= @pagy.count %>">
+<div class="tw:mb-6">
+  <h4 class="uncap">
+    Serial: <span class="serial-span"><%= @serial %></span>
+    <span class="tw:text-sm tw:font-normal tw:text-gray-500">— <%= number_display(@pagy.count) %> <%= "result".pluralize(@pagy.count) %></span>
+  </h4>
+
   <% if @bikes.any? %>
     <%= render(Org::RegistrationSearch::Component.new(
       organization: current_organization,
@@ -13,13 +18,17 @@
       skip_settings: true
     )) %>
   <% elsif @close_serials&.any? %>
-    <p class="tw:text-gray-500 tw:px-3">
-      No exact matches. Close:
+    <p class="tw:text-gray-500">No exact matches. Close serials:</p>
+    <ul class="tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-0">
       <% @close_serials.each do |bike| %>
-        <a href="<%= bike_path(bike) %>" class="twlink"><%= bike.serial_number %></a>
+        <li>
+          <a href="<%= bike_path(bike) %>" class="twlink">
+            <%= bike.serial_number %>
+          </a>
+        </li>
       <% end %>
-    </p>
+    </ul>
   <% else %>
-    <p class="tw:text-gray-500 tw:px-3">No matches found</p>
+    <p class="tw:text-gray-500">No matches found</p>
   <% end %>
 </div>

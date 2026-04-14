@@ -41,7 +41,6 @@ export default class extends Controller {
 
     await Promise.all(serials.map((serial, index) => this.searchSerial(serial, index)))
 
-    this.consolidateTables()
     this.buttonTarget.disabled = false
     this.searching = false
   }
@@ -78,48 +77,5 @@ export default class extends Controller {
       Turbo.renderStreamMessage(await response.text())
       window.timeLocalizer?.localize()
     }
-  }
-
-  consolidateTables () {
-    const results = Array.from(this.resultsTarget.querySelectorAll('.multi-search-serial-result'))
-    const baseResult = results.find(r => r.querySelector('table'))
-    if (!baseResult) return
-
-    const baseTable = baseResult.querySelector('table')
-    const tbody = baseTable.querySelector('tbody')
-    const colCount = baseTable.querySelector('thead tr')?.children.length || 1
-
-    results.forEach(result => {
-      const serial = result.dataset.serial
-      const count = result.dataset.count
-
-      // Add serial header row
-      const headerRow = document.createElement('tr')
-      headerRow.className = 'tw:bg-gray-50 tw:dark:bg-gray-700'
-      const headerCell = document.createElement('td')
-      headerCell.colSpan = colCount
-      headerCell.className = 'tw:px-3 tw:py-2 tw:text-sm tw:font-medium'
-      headerCell.innerHTML = `Serial: <span class="serial-span">${serial}</span> <span class="tw:text-gray-500">— ${count} result${count === '1' ? '' : 's'}</span>`
-
-      // Add close serials or no-match message for non-matching serials
-      const noMatchMsg = result.querySelector('p')
-      if (noMatchMsg) {
-        headerCell.innerHTML += ` <span class="tw:text-gray-400">${noMatchMsg.innerHTML.trim()}</span>`
-      }
-
-      headerRow.appendChild(headerCell)
-      tbody.appendChild(headerRow)
-
-      // Move bike rows from this result's table into the shared tbody
-      const table = result.querySelector('table')
-      if (table && table !== baseTable) {
-        table.querySelectorAll('tbody tr').forEach(row => tbody.appendChild(row))
-      }
-    })
-
-    // Replace results with just the consolidated table wrapper
-    const wrapper = baseTable.closest('.org-registration-search-component') || baseTable.parentElement
-    this.resultsTarget.innerHTML = ''
-    this.resultsTarget.appendChild(wrapper)
   }
 }
