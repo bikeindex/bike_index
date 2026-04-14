@@ -298,6 +298,7 @@
         <div class="tw:hidden">
           <%= render(Form::Group::Component.new(form_builder: f, attribute: :additional, kind: :text_area, label_text: "Additional information")) %>
         </div>
+
         <%= f.hidden_field :feedback_type, value: "lead_for_school" %>
         <%= f.hidden_field :body, value: "lead" %>
 
