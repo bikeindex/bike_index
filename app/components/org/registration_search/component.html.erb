@@ -78,7 +78,7 @@
       <% end %>
 
       <% table.column(label: translation(".serial"), classes: "hideableColumn serial_number_cell") do |bike| %>
-        <%= helpers.render_serial_display(bike) %>
+        <%= helpers.render_serial_display(bike, @current_user) %>
       <% end %>
 
       <% table.column(sortable: "propulsion_type", label: translation(".propulsion_type"), classes: "hideableColumn propulsion_type_cell") do |bike| %>

@@ -112,6 +112,6 @@
     %small
       first #{@per_page} shown, #{link_to "see all", organization_registrations_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)}
 
-= render(Org::RegistrationSearch::Component.new(organization: current_organization, pagy: @pagy, bikes: @bikes, per_page: @per_page, params: params, model_audit: @model_audit, skip_search_and_filters: true))
+= render(Org::RegistrationSearch::Component.new(organization: current_organization, current_user:, pagy: @pagy, bikes: @bikes, per_page: @per_page, params: params, model_audit: @model_audit, skip_search_and_filters: true))
 
 = render partial: "/organized/model_audits/submit_model_attestation"
