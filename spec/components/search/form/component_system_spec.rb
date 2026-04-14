@@ -27,6 +27,20 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       page.execute_script("window.localStorage.clear()")
     end
 
+    def open_select2_dropdown
+      find(".select2-container").click
+      # Wait for select2 to load - production API can be slow in CI
+      expect(page).to have_no_content("Searching", wait: 10)
+      expect(page).to have_content("Registrations that are Black")
+    end
+
+    def select2_third_option
+      page.send_keys :arrow_down
+      page.send_keys :arrow_down
+      page.send_keys :arrow_down
+      page.send_keys :return
+    end
+
     def expect_count(kind_scope, value = :greater_than_zero)
       kind_scope_text = find("[data-count-target=\"#{kind_scope}\"]").text
       # Check that the text matches the pattern (\d+) and extract the number
@@ -66,16 +80,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
       find("label", text: "Stolen in search area").click
 
-      find(".select2-container").click
-      # Wait for select2 to load - production API can be slow in CI
-      expect(page).to have_no_content("Searching", wait: 10)
-      expect(page).to have_content("Registrations that are Black")
-
-      page.send_keys :arrow_down
-      page.send_keys :arrow_down
-      page.send_keys :arrow_down
-
-      page.send_keys :return
+      open_select2_dropdown
+      select2_third_option
 
       # NOTE: Since this uses production data, values are consistent
       expect(find("#query_items", visible: false).value).to eq(["c_5"])
@@ -113,10 +119,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       visit(preview_path)
 
       expect(find("#query_items", visible: false).value).to be_blank
-      find(".select2-container").click
-
-      expect(page).to have_no_content("Searching", wait: 10)
-      expect(page).to have_content("Registrations that are Black")
+      open_select2_dropdown
       # Scroll down, verify it loads more
       page.execute_script(<<-JS)
         const container = document.querySelector('.select2-results__options');
@@ -145,16 +148,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
         kind_scopes.each { |kind_scope| expect_count(kind_scope, 0) }
 
-        find(".select2-container").click
-        # Wait for select2 to load - production API can be slow in CI
-        expect(page).to have_no_content("Searching", wait: 10)
-        expect(page).to have_content("Registrations that are Black")
-
-        page.send_keys :arrow_down
-        page.send_keys :arrow_down
-        page.send_keys :arrow_down
-
-        page.send_keys :return
+        open_select2_dropdown
+        select2_third_option
 
         # NOTE: Since this uses production data, values are consistent
         expect(find("#query_items", visible: false).value).to match_array(%w[v_9 c_5])
