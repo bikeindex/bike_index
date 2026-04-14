@@ -67,8 +67,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       find("label", text: "Stolen in search area").click
 
       find(".select2-container").click
-      # Wait for select2 to load
-      expect(page).to have_content("Registrations that are Black", wait: 5)
+      # Wait for select2 to load - production API can be slow in CI
+      expect(page).to have_no_content("Searching", wait: 10)
+      expect(page).to have_content("Registrations that are Black")
 
       page.send_keys :arrow_down
       page.send_keys :arrow_down
@@ -114,7 +115,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       expect(find("#query_items", visible: false).value).to be_blank
       find(".select2-container").click
 
-      expect(page).to have_content("Registrations that are Black", wait: 5)
+      expect(page).to have_no_content("Searching", wait: 10)
+      expect(page).to have_content("Registrations that are Black")
       # Scroll down, verify it loads more
       page.execute_script(<<-JS)
         const container = document.querySelector('.select2-results__options');
@@ -144,8 +146,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         kind_scopes.each { |kind_scope| expect_count(kind_scope, 0) }
 
         find(".select2-container").click
-        # Wait for select2 to load
-        expect(page).to have_content("Registrations that are Black", wait: 5)
+        # Wait for select2 to load - production API can be slow in CI
+        expect(page).to have_no_content("Searching", wait: 10)
+        expect(page).to have_content("Registrations that are Black")
 
         page.send_keys :arrow_down
         page.send_keys :arrow_down
