@@ -106,6 +106,10 @@ class Feedback < ApplicationRecord
     self.feedback_hash = (feedback_hash || {}).merge(phone_number: val)
   end
 
+  def contact_name=(val)
+    self.feedback_hash = (feedback_hash || {}).merge(contact_name: val)
+  end
+
   def notify_admins
     BikeDeleterJob.new.perform(bike.id, false, user_id) if delete_request? && bike.present?
     return true if self.class.no_notification_kinds.include?(kind)
@@ -143,6 +147,10 @@ class Feedback < ApplicationRecord
 
   def phone_number
     (feedback_hash || {})["phone_number"]
+  end
+
+  def contact_name
+    (feedback_hash || {})["contact_name"]
   end
 
   def kind_humanized
