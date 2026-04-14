@@ -241,11 +241,11 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
   end
 
-  describe "multi_serial_search" do
+  describe "multi_search" do
     it "renders" do
-      get "#{base_url}/multi_serial_search"
+      get "#{base_url}/multi_search"
       expect(response.status).to eq(200)
-      expect(response).to render_template :multi_serial_search
+      expect(response).to render_template :multi_search
     end
 
     context "with serial turbo request" do
@@ -253,7 +253,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       let!(:other_bike) { FactoryBot.create(:bike, serial_number: "WXYZ9999") }
 
       it "searches and returns matching org bikes" do
-        get "#{base_url}/multi_serial_search", params: {serial: "ABCD1234"},
+        get "#{base_url}/multi_search", params: {serial: "ABCD1234"},
           headers: {"Accept" => "text/vnd.turbo-stream.html"}
         expect(response.status).to eq(200)
         expect(response.media_type).to eq("text/vnd.turbo-stream.html")
@@ -261,7 +261,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
 
       it "does not return bikes from other orgs" do
-        get "#{base_url}/multi_serial_search", params: {serial: "WXYZ9999"},
+        get "#{base_url}/multi_search", params: {serial: "WXYZ9999"},
           headers: {"Accept" => "text/vnd.turbo-stream.html"}
         expect(response.status).to eq(200)
         expect(assigns(:bikes)).to be_empty
@@ -280,11 +280,11 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
-    describe "multi_serial_search" do
+    describe "multi_search" do
       it "renders" do
-        get "#{base_url}/multi_serial_search"
+        get "#{base_url}/multi_search"
         expect(response.status).to eq(200)
-        expect(response).to render_template :multi_serial_search
+        expect(response).to render_template :multi_search
       end
     end
   end

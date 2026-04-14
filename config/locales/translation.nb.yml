@@ -5402,7 +5402,7 @@ nb:
       manage_impounding: Håndtere beslaglegging
       manage_users: Administrer brukere
       model_audits: E-kjøretøyrevisjon
-      multi_serial_search: Multiseriesøk
+      multi_search: Multiseriesøk
       org_bikes: "%{org_name} Sykler"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} steder"

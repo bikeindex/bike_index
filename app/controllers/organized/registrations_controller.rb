@@ -4,7 +4,7 @@ module Organized
 
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
 
-    skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
+    skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search]
 
     def index
       set_period
@@ -42,7 +42,7 @@ module Organized
       end
     end
 
-    def multi_serial_search
+    def multi_search
       @serial = params[:serial].to_s.strip
       return unless @serial.present?
 

@@ -4881,7 +4881,7 @@ nl:
       lightspeed_integration_panel: Lightspeed-integratiepaneel
       manage_impounding: Beheer inbeslagname
       manage_users: Gebruikers beheren
-      multi_serial_search: Multi-serieel zoeken
+      multi_search: Multi-serieel zoeken
       org_bikes: "%{org_name} Fietsen"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locaties"

@@ -387,7 +387,7 @@ Rails.application.routes.draw do
     get "landing", to: "manages#landing", as: :landing
     resources :registrations, only: %i[index] do
       collection do
-        get :multi_serial_search
+        get :multi_search
       end
     end
     resources :bikes, only: %i[new create show update] do

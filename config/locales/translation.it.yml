@@ -4290,7 +4290,7 @@ it:
       manage_impounding:
       manage_users:
       model_audits:
-      multi_serial_search:
+      multi_search:
       org_bikes:
       org_dashboard:
       org_locations:
