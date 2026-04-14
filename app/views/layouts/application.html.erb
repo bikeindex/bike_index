@@ -24,7 +24,7 @@
 
     <%= javascript_include_tag 'application_revised' %>
     <%= javascript_importmap_tags %>
-
+    <%= hotwire_livereload_tags if Rails.env.development? %>
 
     <script>
       window.BikeIndex.translator = (keyspace) => {
