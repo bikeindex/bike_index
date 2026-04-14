@@ -106,8 +106,14 @@ RSpec.describe Org::RegistrationSearch::Component, type: :component do
     end
   end
 
-  context "when bike is user_hidden" do
-    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, user_hidden: true) }
+  context "when bike is user_hidden and org cannot edit" do
+    let(:bike) do
+      FactoryBot.create(:bike_organized,
+        creation_organization: organization,
+        user_hidden: true,
+        claimed: true,
+        can_edit_claimed: false)
+    end
 
     it "renders the serial number" do
       expect(component).to have_css("tbody tr", count: 1)
