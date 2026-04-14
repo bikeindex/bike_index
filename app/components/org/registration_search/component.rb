@@ -3,6 +3,7 @@
 module Org::RegistrationSearch
   class Component < ApplicationComponent
     include SortableHelper
+    include BikeHelper
 
     delegate :additional_registration_fields, :column_renames,
       :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
