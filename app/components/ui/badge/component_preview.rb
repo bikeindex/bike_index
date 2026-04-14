@@ -32,6 +32,7 @@ module UI
         render(UI::Badge::Component.new(text: "Theft Alert", color: :cyan, size: :lg))
       end
 
+      # Renders nested components, requires template
       def empty_md
         render_with_template(template: "ui/badge/preview/empty_md")
       end
