@@ -11,8 +11,9 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
     expect(page).to have_current_path("/my_account", wait: 5)
   end
 
-  def fill_in_and_submit_demo_form(name_label:, name_value:, email: nil)
+  def fill_in_and_submit_demo_form(name_label:, name_value:, contact_name: "Jane Doe", email: nil)
     expect(page).to have_content("Contact us for a free trial", wait: 5)
+    fill_in "Name", with: contact_name
     fill_in name_label, with: name_value
     fill_in "Phone number", with: "5551234567"
     fill_in "Email", with: email if email
@@ -22,7 +23,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
   context "for_schools" do
     let(:target_attributes) do
       {kind: "lead_for_school", name: "Test University", email: "admin@testuni.edu",
-       phone_number: "5551234567", title: "New School lead: Test University"}
+       contact_name: "Jane Doe", phone_number: "5551234567", title: "New School lead: Test University"}
     end
 
     it "submits a school lead via hero button" do
@@ -46,7 +47,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let(:target_attributes) do
       {kind: "lead_for_city", name: "Portland", email: user.email,
-       phone_number: "5551234567", title: "New City lead: Portland"}
+       contact_name: "Jane Doe", phone_number: "5551234567", title: "New City lead: Portland"}
     end
 
     it "submits a city lead via CTA button" do
