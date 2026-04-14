@@ -17,7 +17,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
     fill_in name_label, with: name_value
     fill_in "Phone number", with: "5551234567"
     fill_in "Email", with: email if email
-    click_button "Sign up"
+    click_button "Let's chat"
   end
 
   context "for_schools" do
