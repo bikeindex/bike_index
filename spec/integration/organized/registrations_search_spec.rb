@@ -234,14 +234,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       visit multi_serial_path
 
       expect(page).to have_content(/multiple serial search/i)
-      # Wait for Stimulus controller to connect
       expect(page).to have_css("[data-controller='org--multi-serial-search']", wait: 5)
 
       find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
       click_button "Search serials"
-
-      # Serial chips appear immediately
-      expect(page).to have_css("[data-serial-chip]", count: 3, wait: 10)
 
       # Both matching serials show results with tables
       expect(page).to have_css("#multi_serial_results table", minimum: 2, wait: 15)
@@ -252,9 +248,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       # Other org's bike is not shown
       expect(page).not_to have_content("SERIAL333")
 
-      # Matched chips are blue, unmatched are strikethrough
-      expect(page).to have_css("[data-serial-chip].tw\\:bg-blue-500", count: 2)
-      expect(page).to have_css("[data-serial-chip].tw\\:line-through", count: 1)
+      # Matched chips use success badge, unmatched use gray
+      expect(page).to have_css("#chip_0.tw\\:bg-emerald-500", wait: 15)
+      expect(page).to have_css("#chip_1.tw\\:bg-emerald-500", wait: 15)
+      expect(page).to have_css("#chip_2.tw\\:bg-gray-300", wait: 15)
     end
   end
 
