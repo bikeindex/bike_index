@@ -4,10 +4,10 @@
   data-org--multi-serial-search-empty-class-value="<%= UI::Badge::Component.badge_classes(color: :empty, size: :md) %>"
   data-org--multi-serial-search-success-class-value="<%= UI::Badge::Component.badge_classes(color: :success, size: :md) %>"
   data-org--multi-serial-search-gray-class-value="<%= UI::Badge::Component.badge_classes(color: :gray, size: :md) %>"
-  data-org--multi-serial-search-spinner-value="<%= render(UI::LoadingSpinner::Component.new(size: :sm)) %>"
+  data-org--multi-serial-search-spinner-value="<%= ERB::Util.html_escape(render(UI::LoadingSpinner::Component.new(size: :sm)).to_str) %>"
 >
   <div class="tw:mx-auto tw:mb-6 tw:max-w-2xl">
-    <h3 class="tw:mb-4 tw:text-center">Multiple Serial Search</h3>
+    <h3 class="tw:mb-4 uncap">Multiple Serial Search</h3>
 
     <form data-action="submit->org--multi-serial-search#submit">
       <%= text_area_tag :serials, nil,

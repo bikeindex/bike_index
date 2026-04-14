@@ -231,3 +231,7 @@ body.dark {
     max-width: 1140px;
   }
 }
+
+.serial-span {
+  @apply tw:text-sm tw:font-mono tw:font-light tw:text-gray-900 tw:dark:text-gray-100;
+}
