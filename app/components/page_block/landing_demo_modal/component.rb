@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module LandingDemoModal
+module PageBlock::LandingDemoModal
   class Component < ApplicationComponent
     def initialize(feedback:, feedback_type:, modal_id:, name_label:, current_user: nil)
       @feedback = feedback

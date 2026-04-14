@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe LandingDemoModal::Component, type: :component do
+RSpec.describe PageBlock::LandingDemoModal::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {feedback: Feedback.new, name_label: "School", feedback_type: "lead_for_school", modal_id: "schools-demo-modal"} }
