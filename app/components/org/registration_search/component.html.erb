@@ -49,7 +49,7 @@
   <% bike_sticker = @bike_sticker %>
 
   <%= tag.div(data: table_wrapper_data_attributes) do %>
-    <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-bikes_2", render_sortable: true)) do |table| %>
+    <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-bikes_3", render_sortable: true)) do |table| %>
       <% table.column(label: translation(".url"), classes: "hideableColumn url_cell") do |bike| %>
         <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
           <%= bike.html_url %>
@@ -78,7 +78,7 @@
       <% end %>
 
       <% table.column(label: translation(".serial"), classes: "hideableColumn serial_number_cell") do |bike| %>
-        render_serial_display(<%= bike.serial_number %>)
+        <%= render_serial_display(bike.serial_number) %>
       <% end %>
 
       <% table.column(sortable: "propulsion_type", label: translation(".propulsion_type"), classes: "hideableColumn propulsion_type_cell") do |bike| %>
