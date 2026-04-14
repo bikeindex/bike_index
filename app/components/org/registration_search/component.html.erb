@@ -11,6 +11,7 @@
     </div>
   <% end %>
 
+  <% unless @skip_count %>
   <div class="tw:mt-4 tw:flex tw:items-baseline tw:justify-between">
     <p class="tw:mb-0">
       <% bikes_count = number_display(@pagy.count) %>
@@ -31,6 +32,7 @@
       <em><%= helpers.humanized_time_range(@time_range) %></em>
     </p>
   </div>
+  <% end %>
 
   <% unless @skip_search_and_filters %>
     <% if @model_audit.present? %>
@@ -214,7 +216,7 @@
     <% end %>
   <% end %>
 
-  <% if show_pagination? %>
+  <% if show_pagination? && !@skip_count %>
     <div class="paginate-container paginate-container-bottom row">
       <div class="col-md-8 mb-2 mt-4">
         <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @params, size: :lg, data: {turbo_action: "advance"})) %>

@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-/* global Turbo */
+/* global Turbo, requestAnimationFrame */
 
 // Connects to data-controller='org--multi-serial-search'
 export default class extends Controller {
@@ -41,6 +41,9 @@ export default class extends Controller {
 
     await Promise.all(serials.map((serial, index) => this.searchSerial(serial, index)))
 
+    // Wait a frame for Turbo stream DOM updates to complete
+    await new Promise(resolve => requestAnimationFrame(resolve))
+    this.sortAndFilterResults()
     this.buttonTarget.disabled = false
     this.searching = false
   }
@@ -62,6 +65,19 @@ export default class extends Controller {
     span.className = 'serial-span tw:mr-3'
     span.textContent = serial.toUpperCase()
     return span
+  }
+
+  sortAndFilterResults () {
+    const results = Array.from(this.resultsTarget.querySelectorAll('.multi-search-serial-result'))
+    results
+      .sort((a, b) => parseInt(a.dataset.serialIndex) - parseInt(b.dataset.serialIndex))
+      .forEach(result => {
+        if (result.dataset.resultCount === '0') {
+          result.remove()
+        } else {
+          this.resultsTarget.appendChild(result)
+        }
+      })
   }
 
   async searchSerial (serial, index) {
