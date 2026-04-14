@@ -55,4 +55,4 @@
   %h2.mt-2.mb-2= t(".errors")
   = render(Org::BulkImportError::Component.new(bulk_import: @bulk_import))
 
-= render(Org::RegistrationSearch::Component.new(organization: current_organization, pagy: @pagy, bikes: @bikes, per_page: @per_page, params: params, skip_search_and_filters: true))
+= render(Org::RegistrationSearch::Component.new(organization: current_organization, current_user:, pagy: @pagy, bikes: @bikes, per_page: @per_page, params: params, skip_search_and_filters: true))
