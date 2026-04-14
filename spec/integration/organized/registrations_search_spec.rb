@@ -223,6 +223,42 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end
   end
 
+  context "multi serial search" do
+    let(:enabled_feature_slugs) { %w[show_multi_serial] }
+    let(:multi_serial_path) { "/o/#{organization.to_param}/registrations/multi_serial_search" }
+
+    let!(:bike_a) { FactoryBot.create(:bike_organized, serial_number: "SERIAL111", creation_organization: organization) }
+    let!(:bike_b) { FactoryBot.create(:bike_organized, serial_number: "SERIAL222", creation_organization: organization) }
+    let!(:other_org_bike) { FactoryBot.create(:bike, serial_number: "SERIAL333") }
+
+    it "searches multiple serials and shows results" do
+      visit multi_serial_path
+
+      expect(page).to have_content(/multiple serial search/i)
+      # Wait for Stimulus controller to connect
+      expect(page).to have_css("[data-controller='org--multi-serial-search']", wait: 5)
+
+      find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
+      click_button "Search serials"
+
+      # Serial chips appear immediately
+      expect(page).to have_css("[data-serial-chip]", count: 3, wait: 10)
+
+      # Both matching serials show results with tables
+      expect(page).to have_css("#multi_serial_results table", minimum: 2, wait: 15)
+
+      # Non-matching serial shows "No matches found"
+      expect(page).to have_content("No matches found")
+
+      # Other org's bike is not shown
+      expect(page).not_to have_content("SERIAL333")
+
+      # Matched chips are blue, unmatched are strikethrough
+      expect(page).to have_css("[data-serial-chip].tw\\:bg-blue-500", count: 2)
+      expect(page).to have_css("[data-serial-chip].tw\\:line-through", count: 1)
+    end
+  end
+
   context "with avery_export enabled" do
     let(:enabled_feature_slugs) { %w[bike_search avery_export reg_address bike_stickers csv_exports] }
     let!(:avery_bike) do
