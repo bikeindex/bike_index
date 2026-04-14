@@ -33,8 +33,8 @@ module UI
       end
 
       # Renders nested components, requires template
-      def empty_md
-        render_with_template(template: "ui/badge/preview/empty_md")
+      def empty_md_with_content
+        render_with_template(template: "ui/badge/preview/empty_md_with_content")
       end
       # @!endgroup
     end
