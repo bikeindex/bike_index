@@ -40,6 +40,13 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
 
       Email::FeedbackNotificationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.subject).to eq "New School lead: Test University"
+      body = mail.body.encoded
+      expect(body).to include("admin@testuni.edu")
+      expect(body).to include("Test University")
+      expect(body).to include("Jane Doe")
+      expect(body).to include("5551234567")
     end
   end
 
@@ -65,6 +72,13 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
 
       Email::FeedbackNotificationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.subject).to eq "New City lead: Portland"
+      body = mail.body.encoded
+      expect(body).to include(user.email)
+      expect(body).to include("Portland")
+      expect(body).to include("Jane Doe")
+      expect(body).to include("5551234567")
     end
   end
 end
