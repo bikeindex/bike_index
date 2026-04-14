@@ -5,7 +5,10 @@
   show_overview_dashboard = passed_organization.overview_dashboard?
   show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" # If viewing the dashboard, show the link
   # Show bulk import if passed organization has show_bulk_import, or if looking at show_bulk_import
-  show_bulk_import = passed_organization.show_bulk_import? || controller_name == "bulk_imports" %>
+  show_bulk_import = passed_organization.show_bulk_import? || controller_name == "bulk_imports"
+  # TODO: Enable for everyone once it's good enough
+  show_multi_search = passed_organization.law_enforcement?
+%>
 
 <% if passed_organization.ambassador? %>
   <li>
@@ -50,7 +53,7 @@
       </span>
     </li>
   <% end %>
-  <% if passed_organization.show_multi_serial? %>
+  <% if show_multi_search %>
     <li>
       <%= active_link t(".multi_search"), multi_search_organization_registrations_path(passed_organization.to_param), class: "nav-link secondary-item" %>
     </li>

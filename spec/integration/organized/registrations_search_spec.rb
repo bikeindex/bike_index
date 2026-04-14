@@ -224,7 +224,6 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   context "multi serial search" do
-    let(:enabled_feature_slugs) { %w[show_multi_serial] }
     let(:multi_serial_path) { "/o/#{organization.to_param}/registrations/multi_search" }
 
     let!(:bike_a) { FactoryBot.create(:bike_organized, serial_number: "SERIAL111", creation_organization: organization) }

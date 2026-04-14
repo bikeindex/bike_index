@@ -27,6 +27,7 @@ en:
         model_cell: Model
         none: none
         notes_cell: Registration Notes
+        multi_search: multi serial search
         owner_email_cell: Sent to
         owner_name_cell: Owner name
         propulsion_type_cell: E-vehicle (propulsion)
