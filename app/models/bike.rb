@@ -936,9 +936,12 @@ class Bike < ApplicationRecord
   end
 
   def can_see_hidden_serial?(u = nil)
-    authorized?(u) ||
-      u&.id.present? && u.id == user&.id ||
+    return false if u.blank?
+    return true if authorized?(u) || u.id.present? && u.id == user&.id ||
       current_impound_record.present? && current_impound_record.authorized?(u)
+
+    # Seeing serial doesn't require edit access to bike
+    (u.organization_roles.pluck(:organization_id) & bike_organizations.pluck(:organization_id)).any
   end
 
   def calculated_current_ownership

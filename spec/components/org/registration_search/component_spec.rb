@@ -106,6 +106,15 @@ RSpec.describe Org::RegistrationSearch::Component, type: :component do
     end
   end
 
+  context "when bike is user_hidden" do
+    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, user_hidden: true) }
+
+    it "renders the serial number" do
+      expect(component).to have_css("tbody tr", count: 1)
+      expect(component).to have_text(bike.serial_number)
+    end
+  end
+
   context "with csv_exports enabled" do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
