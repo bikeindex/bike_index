@@ -293,8 +293,8 @@ GEM
     faraday_middleware (1.2.1)
       faraday (~> 1.0)
     fast_blank (1.0.1)
-    ffi (1.17.4-arm64-darwin)
-    ffi (1.17.4-x86_64-linux-gnu)
+    ffi (1.17.3-arm64-darwin)
+    ffi (1.17.3-x86_64-linux-gnu)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -388,10 +388,10 @@ GEM
     honeybadger (5.27.0)
       logger
       ostruct
-    hotwire-livereload (2.1.1)
-      actioncable (>= 7.0.0)
+    hotwire-livereload (1.4.1)
+      actioncable (>= 6.0.0)
       listen (>= 3.0.0)
-      railties (>= 7.0.0)
+      railties (>= 6.0.0)
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     http (4.4.1)
@@ -618,7 +618,7 @@ GEM
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
       rack (>= 3.0.0, < 4)
-    rack-session (2.1.2)
+    rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
     rack-test (2.2.0)
@@ -665,7 +665,7 @@ GEM
       tsort (>= 0.2)
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
-    rake (13.4.1)
+    rake (13.3.1)
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
@@ -957,7 +957,7 @@ DEPENDENCIES
   haml
   herb
   honeybadger
-  hotwire-livereload (~> 2.1.1)
+  hotwire-livereload (~> 1.4.1)
   i18n-country-translations
   i18n-js
   i18n-tasks
