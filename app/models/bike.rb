@@ -941,7 +941,7 @@ class Bike < ApplicationRecord
       current_impound_record.present? && current_impound_record.authorized?(u)
 
     # Seeing serial doesn't require edit access to bike
-    (u.organization_roles.pluck(:organization_id) & bike_organizations.pluck(:organization_id)).any
+    (u.organization_roles.pluck(:organization_id) & bike_organizations.pluck(:organization_id)).any?
   end
 
   def calculated_current_ownership
