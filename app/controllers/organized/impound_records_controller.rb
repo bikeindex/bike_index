@@ -1,6 +1,6 @@
 module Organized
   class ImpoundRecordsController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
 
     MIN_DISTANCE = 0.01
     DEFAULT_DISTANCE = 1

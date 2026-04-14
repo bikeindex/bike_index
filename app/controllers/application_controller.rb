@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   include ControllerHelpers
-  include SetPeriod
+  include Binxtils::SetPeriod
+
+  self.default_earliest_time = Time.at(1134972000).freeze # Earliest bike created at
   include Turbo::Redirection
   include Pagy::Method
 
@@ -107,6 +109,18 @@ class ApplicationController < ActionController::Base
     I18n.with_locale(requested_locale, &action)
   ensure # Make sure we reset default timezone
     Time.zone = Binxtils::TimeParser.default_time_zone
+  end
+
+  def earliest_organization_period_date
+    return nil if current_organization.blank?
+
+    start_time = current_organization.created_at - 6.months
+    start_time = Time.current - 1.year if start_time > (Time.current - 1.year)
+    start_time
+  end
+
+  def earliest_period_date
+    earliest_organization_period_date || default_earliest_time
   end
 
   # Handle localization / currency conversion exceptions by redirecting to the

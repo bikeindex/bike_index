@@ -150,7 +150,7 @@ GEM
     bcrypt (3.1.13)
     benchmark (0.5.0)
     bigdecimal (4.1.1)
-    binxtils (0.1.0)
+    binxtils (0.3.0)
       activerecord
       activesupport
       functionable
@@ -331,7 +331,7 @@ GEM
     formatador (1.2.3)
       reline
     forwardable (1.4.0)
-    functionable (0.1.0)
+    functionable (1.1.0)
     geocoder (1.8.5)
       base64 (>= 0.1.0)
       csv (>= 3.0.0)
@@ -508,7 +508,7 @@ GEM
     mini_magick (5.3.1)
       logger
     mini_mime (1.1.5)
-    minitest (6.0.3)
+    minitest (6.0.4)
       drb (~> 2.0)
       prism (~> 1.5)
     monetize (1.12.0)
@@ -918,7 +918,7 @@ DEPENDENCIES
   axlsx (~> 3.0.0.pre)
   bcrypt
   benchmark
-  binxtils
+  binxtils (~> 0.3)
   bootsnap
   brakeman
   bullet

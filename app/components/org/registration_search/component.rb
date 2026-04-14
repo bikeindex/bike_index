@@ -2,7 +2,7 @@
 
 module Org::RegistrationSearch
   class Component < ApplicationComponent
-    include SortableHelper
+    include Binxtils::SortableHelper
     include BikeHelper
 
     delegate :additional_registration_fields, :column_renames,

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::MembershipsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_membership, only: %i[show update]
 

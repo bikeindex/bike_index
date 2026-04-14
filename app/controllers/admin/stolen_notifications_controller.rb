@@ -1,5 +1,5 @@
 class Admin::StolenNotificationsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_notification, only: [:show, :resend]
 

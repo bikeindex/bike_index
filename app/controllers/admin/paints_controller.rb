@@ -1,5 +1,5 @@
 class Admin::PaintsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_paint, only: [:show, :edit, :update, :destroy]
 

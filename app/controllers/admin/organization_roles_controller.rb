@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::OrganizationRolesController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_organization_role, only: %i[show edit update destroy]
   before_action :find_organizations, except: %i[index destroy]

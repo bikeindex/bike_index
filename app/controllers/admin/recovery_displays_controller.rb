@@ -1,5 +1,5 @@
 class Admin::RecoveryDisplaysController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_recovery_displays, only: [:edit, :update, :destroy]
 

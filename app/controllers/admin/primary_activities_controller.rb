@@ -1,5 +1,5 @@
 class Admin::PrimaryActivitiesController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_primary_activity, except: %i[index]
 

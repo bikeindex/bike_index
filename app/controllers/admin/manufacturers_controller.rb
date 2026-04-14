@@ -1,5 +1,5 @@
 class Admin::ManufacturersController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
