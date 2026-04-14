@@ -39,7 +39,7 @@ export default class extends Controller {
     this.renderPlaceholderChips(serials)
     this.buttonTarget.disabled = true
 
-    // await Promise.all(serials.map((serial, index) => this.searchSerial(serial, index)))
+    await Promise.all(serials.map((serial, index) => this.searchSerial(serial, index)))
 
     this.buttonTarget.disabled = false
     this.searching = false
