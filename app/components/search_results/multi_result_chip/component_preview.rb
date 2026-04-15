@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Search::MultiResultChip
+module SearchResults::MultiResultChip
   class ComponentPreview < ApplicationComponentPreview
     # @!group Results
     def one_result
