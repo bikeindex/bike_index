@@ -233,8 +233,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     it "searches multiple serials and shows results" do
       visit multi_serial_path
 
-      expect(page).to have_content(/multiple serial search/i)
+      expect(page).to have_content(/multi search/i)
       expect(page).to have_css("[data-controller~='org--multi-serial-search']", wait: 5)
+
+      # Toggle buttons should not be visible without bike_stickers feature
+      expect(page).not_to have_button("Serials")
+      expect(page).not_to have_button("Bike Stickers")
 
       find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
       click_button "Search serials"
@@ -246,6 +250,43 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css(".multi-search-serial-result", count: 2)
       expect(page).not_to have_content("No matches found")
       expect(page).not_to have_content("SERIAL333")
+    end
+
+    context "with bike_stickers enabled" do
+      let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes bike_stickers] }
+      let!(:sticker_a) { FactoryBot.create(:bike_sticker, code: "STKR100", organization:) }
+      let!(:sticker_b) { FactoryBot.create(:bike_sticker_claimed, code: "STKR200", organization:) }
+      let!(:other_org_sticker) { FactoryBot.create(:bike_sticker, code: "STKR300") }
+
+      it "toggles to sticker search and shows results" do
+        visit multi_serial_path
+
+        # Toggle buttons are visible
+        expect(page).to have_button("Serials")
+        expect(page).to have_button("Bike Stickers")
+
+        # Switch to sticker search
+        click_button "Bike Stickers"
+
+        expect(page).to have_current_path(/search_kind=stickers/, wait: 5)
+        expect(page).to have_field("serials", placeholder: /sticker codes/i)
+
+        find("textarea#serials").set("STKR100, STKR200, STKR300")
+        click_button "Search stickers"
+
+        # Chips for non-org sticker show gray (no results)
+        expect(page).to have_css("#chip_2.tw\\:bg-gray-300", wait: 15)
+
+        # Only org stickers returned
+        expect(page).to have_css(".multi-search-serial-result", count: 2)
+
+        # Switch back to serials
+        click_button "Serials"
+        expect(page).not_to have_current_path(/search_kind=stickers/)
+
+        # Previous results cleared
+        expect(page).not_to have_css(".multi-search-serial-result")
+      end
     end
   end
 
