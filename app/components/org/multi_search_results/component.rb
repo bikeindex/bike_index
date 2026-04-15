@@ -22,7 +22,7 @@ module Org::MultiSearchResults
     end
 
     def show_view_all?
-      @pagy.count > 10
+      @pagy.count > @pagy.limit
     end
 
     def view_all_path

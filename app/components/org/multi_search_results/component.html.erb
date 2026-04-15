@@ -5,12 +5,15 @@
   data-result-count="<%= @pagy.count %>"
 >
   <h4 class="uncap tw:mt-4 tw:mb-0 tw:px-1">
-    Serial: <span class="serial-span"><%= @serial %></span>
+    <%= translation(".serial_label") %>
+    <span class="serial-span"><%= @serial %></span>
+
     <span class="tw:text-sm tw:font-normal tw:text-gray-500">
-      — <%= helpers.number_display(@pagy.count) %> <%= "result".pluralize(@pagy.count) %>
+      <%= translation(".result_count_html", count: helpers.number_display(@pagy.count), results: "result".pluralize(@pagy.count)) %>
+
       <% if show_view_all? %>
-        — first 10 shown,
-        <%= link_to " view all", view_all_path, class: "twlink", data: {turbo_frame: "_top"} %>
+        <%= translation(".first_n_shown_html", limit: @pagy.limit) %>
+        <%= link_to translation(".view_all"), view_all_path, class: "twlink", data: {turbo_frame: "_top"} %>
       <% end %>
     </span>
   </h4>
@@ -30,15 +33,17 @@
       skip_count: true
     )) %>
   <% elsif @close_serials&.any? %>
-    <p class="tw:text-gray-500">No exact matches. Close serials:</p>
+    <p class="tw:text-gray-500"><%= translation(".no_exact_matches") %></p>
     <ul class="tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-0">
       <% @close_serials.each do |bike| %>
         <li>
-          <a href="<%= bike_path(bike) %>" class="twlink"><%= bike.serial_number %></a>
+          <a href="<%= bike_path(bike) %>" class="twlink">
+            <%= bike.serial_number %>
+          </a>
         </li>
       <% end %>
     </ul>
   <% else %>
-    <p class="tw:text-gray-500">No matches found</p>
+    <p class="tw:text-gray-500"><%= translation(".no_matches_found") %></p>
   <% end %>
 </div>
