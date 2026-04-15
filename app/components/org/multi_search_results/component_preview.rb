@@ -7,8 +7,8 @@ module Org::MultiSearchResults
       pagy = Pagy::Offset.new(count: bikes.count, page: 1, limit: 10)
       render Component.new(
         organization: lookbook_organization,
-        serial: "SERIAL111",
-        serial_chip_id: "chip_0",
+        query: "SERIAL111",
+        chip_id: "chip_0",
         pagy:,
         bikes:,
         interpreted_params: {},

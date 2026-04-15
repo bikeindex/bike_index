@@ -1,9 +1,10 @@
 <%= turbo_stream.append :multi_serial_results do %>
-  <%= render Org::MultiSearchStickerResults::Component.new(
+  <%= render Org::MultiSearchResults::Component.new(
     organization: current_organization,
     query: @query,
-    query_chip_id: @query_chip_id,
+    chip_id: @query_chip_id,
     pagy: @pagy,
+    search_kind: "stickers",
     bike_stickers: @bike_stickers
   ) %>
 <% end %>

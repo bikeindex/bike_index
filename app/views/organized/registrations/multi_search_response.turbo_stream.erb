@@ -1,8 +1,8 @@
 <%= turbo_stream.append :multi_serial_results do %>
   <%= render Org::MultiSearchResults::Component.new(
     organization: current_organization,
-    serial: @serial,
-    serial_chip_id: @serial_chip_id,
+    query: @serial,
+    chip_id: @serial_chip_id,
     pagy: @pagy,
     bikes: @bikes,
     interpreted_params: @interpreted_params,
