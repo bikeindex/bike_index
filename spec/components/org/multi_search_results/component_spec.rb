@@ -11,7 +11,7 @@ RSpec.describe Org::MultiSearchResults::Component, type: :component do
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
       render_inline(described_class.new(
-        organization:, serial:, serial_chip_id:, pagy:, bikes:,
+        organization:, query: serial, chip_id: serial_chip_id, pagy:, bikes:,
         interpreted_params:, per_page:, close_serials:
       ))
     end

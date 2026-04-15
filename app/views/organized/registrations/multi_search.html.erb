@@ -20,7 +20,10 @@
     <h3 class="uncap tw:mb-4">Multi Search</h3>
 
     <% if current_organization.enabled?("bike_stickers") %>
-      <div class="tw:flex tw:gap-0 tw:mb-4" data-org--multi-serial-search-target="toggleGroup">
+      <div
+        class="tw:mb-4 tw:flex tw:gap-0"
+        data-org--multi-serial-search-target="toggleGroup"
+      >
         <%= render UI::Button::Component.new(
           text: "Serials",
           color: :secondary,
@@ -32,6 +35,7 @@
             action: "click->org--multi-serial-search#switchToSerials"
           }
         ) %>
+
         <%= render UI::Button::Component.new(
           text: "Bike Stickers",
           color: :secondary,
