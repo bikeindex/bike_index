@@ -1,5 +1,14 @@
 <%= turbo_stream.append :multi_serial_results do %>
-  <%= render partial: "multi_search_results" %>
+  <%= render Org::MultiSearchResults::Component.new(
+    organization: current_organization,
+    serial: @serial,
+    serial_chip_id: @serial_chip_id,
+    pagy: @pagy,
+    bikes: @bikes,
+    interpreted_params: @interpreted_params,
+    per_page: @per_page,
+    close_serials: @close_serials
+  ) %>
 <% end %>
 
 <% if @serial_chip_id %>

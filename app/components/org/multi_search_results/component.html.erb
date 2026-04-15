@@ -1,25 +1,29 @@
 <div
   class="multi-search-serial-result"
-  id="result_<%= @serial_chip_id&.delete_prefix("chip_") %>"
-  data-serial-index="<%= @serial_chip_id&.delete_prefix("chip_") %>"
+  id="result_<%= result_index %>"
+  data-serial-index="<%= result_index %>"
   data-result-count="<%= @pagy.count %>"
 >
   <h4 class="uncap tw:mt-4 tw:mb-0 tw:px-1">
     Serial: <span class="serial-span"><%= @serial %></span>
-    <span class="tw:text-sm tw:font-normal tw:text-gray-500">— <%= number_display(@pagy.count) %> <%= "result".pluralize(@pagy.count) %> <% if @pagy.count > 10 %>— first 10 shown,<%= link_to " view all",
-          organization_registrations_path(organization_id: current_organization.to_param, search_serial: @serial),
-          class: "twlink", data: {turbo_frame: "_top"} %><% end %></span>
+    <span class="tw:text-sm tw:font-normal tw:text-gray-500">
+      — <%= helpers.number_display(@pagy.count) %> <%= "result".pluralize(@pagy.count) %>
+      <% if show_view_all? %>
+        — first 10 shown,
+        <%= link_to " view all", view_all_path, class: "twlink", data: {turbo_frame: "_top"} %>
+      <% end %>
+    </span>
   </h4>
 
   <% if @bikes.any? %>
     <%= render(Org::RegistrationSearch::Component.new(
-      organization: current_organization,
+      organization: @organization,
       pagy: @pagy,
       bikes: @bikes,
       interpreted_params: @interpreted_params,
       sortable_search_params:,
       per_page: @per_page,
-      params:,
+      params: helpers.params,
       search_query_present: true,
       skip_search_and_filters: true,
       skip_settings: true,
@@ -30,9 +34,7 @@
     <ul class="tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-0">
       <% @close_serials.each do |bike| %>
         <li>
-          <a href="<%= bike_path(bike) %>" class="twlink">
-            <%= bike.serial_number %>
-          </a>
+          <a href="<%= bike_path(bike) %>" class="twlink"><%= bike.serial_number %></a>
         </li>
       <% end %>
     </ul>
