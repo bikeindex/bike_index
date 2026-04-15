@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    search:
+      multi_result_chip:
+        no_results: no matches

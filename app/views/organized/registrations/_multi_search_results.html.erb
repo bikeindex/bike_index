@@ -1,15 +1,14 @@
-<div class="multi-search-serial-result" data-serial-index="<%= @serial_chip_id&.delete_prefix("chip_") %>" data-result-count="<%= @pagy.count %>">
-  <h4 class="uncap tw:mb-0 tw:mt-4 tw:px-1">
+<div
+  class="multi-search-serial-result"
+  id="result_<%= @serial_chip_id&.delete_prefix("chip_") %>"
+  data-serial-index="<%= @serial_chip_id&.delete_prefix("chip_") %>"
+  data-result-count="<%= @pagy.count %>"
+>
+  <h4 class="uncap tw:mt-4 tw:mb-0 tw:px-1">
     Serial: <span class="serial-span"><%= @serial %></span>
-    <span class="tw:text-sm tw:font-normal tw:text-gray-500">
-      — <%= number_display(@pagy.count) %> <%= "result".pluralize(@pagy.count) %>
-      <% if @pagy.count > 10 %>
-        — first 10 shown,
-        <%= link_to "view all",
+    <span class="tw:text-sm tw:font-normal tw:text-gray-500">— <%= number_display(@pagy.count) %> <%= "result".pluralize(@pagy.count) %> <% if @pagy.count > 10 %>— first 10 shown,<%= link_to "view all",
           organization_registrations_path(organization_id: current_organization.to_param, search_serial: @serial),
-          class: "twlink", data: {turbo_frame: "_top"} %>
-      <% end %>
-    </span>
+          class: "twlink", data: {turbo_frame: "_top"} %><% end %></span>
   </h4>
 
   <% if @bikes.any? %>

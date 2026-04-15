@@ -247,7 +247,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template :multi_search
     end
-
   end
 
   describe "multi_search_response" do

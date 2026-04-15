@@ -1,11 +1,13 @@
 <%= turbo_stream.append :multi_serial_results do %>
   <%= render partial: "multi_search_results" %>
 <% end %>
+
 <% if @serial_chip_id %>
   <%= turbo_stream.replace @serial_chip_id do %>
-    <span id="<%= @serial_chip_id %>"
-      class="<%= UI::Badge::Component.badge_classes(color: @bikes.any? ? :success : :gray, size: :md) %>">
-      <span class="serial-span"><%= @serial %></span>
-    </span>
+    <%= render Search::MultiResultChip::Component.new(
+      serial: @serial,
+      serial_chip_id: @serial_chip_id,
+      result_count: @pagy.count
+    ) %>
   <% end %>
 <% end %>

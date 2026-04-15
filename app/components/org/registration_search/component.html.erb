@@ -12,26 +12,26 @@
   <% end %>
 
   <% unless @skip_count %>
-  <div class="tw:mt-4 tw:flex tw:items-baseline tw:justify-between">
-    <p class="tw:mb-0">
-      <% bikes_count = number_display(@pagy.count) %>
+    <div class="tw:mt-4 tw:flex tw:items-baseline tw:justify-between">
+      <p class="tw:mb-0">
+        <% bikes_count = number_display(@pagy.count) %>
 
-      <% if show_search_query_summary? %>
-        <%= translation(".matching_bikes_html",
+        <% if show_search_query_summary? %>
+          <%= translation(".matching_bikes_html",
             count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count)) %>
-      <% else %>
-        <%= translation(".registered_bikes_html",
+        <% else %>
+          <%= translation(".registered_bikes_html",
             count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count),
             org_name: @organization.short_name) %>
-      <% end %>
+        <% end %>
 
-      <% if active_search_filter_descriptions.any? %>
-        <em>— <%= safe_join(active_search_filter_descriptions, " · ") %></em>
-      <% end %>
+        <% if active_search_filter_descriptions.any? %>
+          <em>— <%= safe_join(active_search_filter_descriptions, " · ") %></em>
+        <% end %>
 
-      <em><%= helpers.humanized_time_range(@time_range) %></em>
-    </p>
-  </div>
+        <em><%= helpers.humanized_time_range(@time_range) %></em>
+      </p>
+    </div>
   <% end %>
 
   <% unless @skip_search_and_filters %>

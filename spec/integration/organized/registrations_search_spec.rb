@@ -246,7 +246,6 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css(".multi-search-serial-result", count: 2)
       expect(page).not_to have_content("No matches found")
       expect(page).not_to have_content("SERIAL333")
-
     end
   end
 

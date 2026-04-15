@@ -2,6 +2,7 @@
   organization: current_organization,
   skip_search_and_filters: true
 ) %>
+
 <div
   data-controller="org--multi-serial-search org--registration-search org--registration-search-column-toggle"
   data-org--multi-serial-search-url-value="<%= multi_search_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
@@ -12,7 +13,7 @@
   data-org--registration-search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
 >
   <div class="tw:mx-auto tw:mb-6 tw:max-w-2xl">
-    <h3 class="tw:mb-4 uncap">Multiple Serial Search</h3>
+    <h3 class="uncap tw:mb-4">Multiple Serial Search</h3>
 
     <form data-action="submit->org--multi-serial-search#submit">
       <%= text_area_tag :serials, nil,

@@ -50,7 +50,7 @@ module OrganizedHelper
     fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits registrations]
     return "container-fluid" if fluid.include?(controller_name)
 
-    if (controller_name == "bulk_imports" && action_name == "show")
+    if controller_name == "bulk_imports" && action_name == "show"
       return "container-fluid"
     end
     "container"
