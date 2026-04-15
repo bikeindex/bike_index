@@ -277,6 +277,34 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
   end
 
+  describe "multi_search_sticker_response" do
+    let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "CA112", organization: current_organization) }
+    let!(:other_sticker) { FactoryBot.create(:bike_sticker, code: "ZZ999") }
+
+    it "searches and returns matching org stickers" do
+      get "#{base_url}/multi_search_sticker_response", params: {query: "CA112"},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
+      expect(response.status).to eq(200)
+      expect(response.media_type).to eq("text/vnd.turbo-stream.html")
+      expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker.id])
+    end
+
+    it "does not return stickers from other orgs" do
+      get "#{base_url}/multi_search_sticker_response", params: {query: "ZZ999"},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
+      expect(response.status).to eq(200)
+      expect(assigns(:bike_stickers)).to be_empty
+    end
+
+    context "without query param" do
+      it "returns bad request" do
+        get "#{base_url}/multi_search_sticker_response",
+          headers: {"Accept" => "text/vnd.turbo-stream.html"}
+        expect(response.status).to eq(400)
+      end
+    end
+  end
+
   context "given an authenticated ambassador" do
     include_context :request_spec_logged_in_as_ambassador
     let(:base_url) { "/o/#{current_organization.to_param}/registrations" }
