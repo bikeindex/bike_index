@@ -1,0 +1,44 @@
+<% settings = Org::RegistrationSearchSettings::Component.new(
+  organization: current_organization,
+  skip_search_and_filters: true
+) %>
+
+<div
+  data-controller="org--multi-serial-search org--registration-search org--registration-search-column-toggle"
+  data-org--multi-serial-search-url-value="<%= multi_search_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
+  data-org--multi-serial-search-empty-class-value="<%= UI::Badge::Component.badge_classes(color: :empty, size: :md) %>"
+  data-org--multi-serial-search-success-class-value="<%= UI::Badge::Component.badge_classes(color: :success, size: :md) %>"
+  data-org--multi-serial-search-gray-class-value="<%= UI::Badge::Component.badge_classes(color: :gray, size: :md) %>"
+  data-org--multi-serial-search-spinner-value="<%= ERB::Util.html_escape(render(UI::LoadingSpinner::Component.new(size: :sm)).to_str) %>"
+  data-org--registration-search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
+>
+  <div class="tw:mx-auto tw:mb-6 tw:max-w-2xl">
+    <h3 class="uncap tw:mb-4">Multiple Serial Search</h3>
+
+    <form data-action="submit->org--multi-serial-search#submit">
+      <%= text_area_tag :serials, nil,
+        placeholder: "Enter multiple serial numbers, separated by commas or new lines",
+        class: "twinput tw:w-full tw:font-mono tw:h-32 tw:resize-none",
+        data: {"org--multi-serial-search-target": "textarea"} %>
+
+      <div class="tw:mt-2 tw:flex tw:justify-end">
+        <%= render UI::Button::Component.new(
+          text: "Search serials",
+          color: :primary,
+          size: :lg,
+          kind: :submit,
+          data: {"org--multi-serial-search-target": "button"}
+        ) %>
+      </div>
+    </form>
+  </div>
+
+  <div
+    data-org--multi-serial-search-target="serialChips"
+    class="tw:mb-4 tw:flex tw:flex-wrap tw:gap-3"
+  ></div>
+
+  <%= render settings %>
+
+  <div id="multi_serial_results" data-org--multi-serial-search-target="results"></div>
+</div>

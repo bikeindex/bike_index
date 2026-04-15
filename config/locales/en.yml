@@ -5179,7 +5179,7 @@ en:
       manage_impounding: Manage impounding
       manage_users: Manage users
       model_audits: E-Vehicle audits
-      multi_serial_search: Multi serial search
+      multi_search: Multi search
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locations"

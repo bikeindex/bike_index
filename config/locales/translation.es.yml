@@ -4254,7 +4254,6 @@ es:
       manage_impounding:
       manage_users:
       model_audits:
-      multi_serial_search:
       org_bikes:
       org_dashboard:
       org_locations:
@@ -4268,6 +4267,7 @@ es:
       stolen_hot_sheet_configuration:
       stolen_message:
       super_admin_view:
+      multi_search:
     organized_skeleton:
       additional_features_html:
       admin_panel:
@@ -4520,6 +4520,8 @@ es:
       vehicle_thumbnail:
         registered_not_stolen:
       container:
+        no_results:
+      multi_result_chip:
         no_results:
     page_block:
       marketplace_listing_panel:
@@ -4817,6 +4819,14 @@ es:
         url_cell:
         vehicle:
         visible_columns:
+        multi_search:
+      multi_search_results:
+        first_n_shown_html:
+        no_exact_matches:
+        no_matches_found:
+        result_count_html:
+        serial_label:
+        view_all:
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved:

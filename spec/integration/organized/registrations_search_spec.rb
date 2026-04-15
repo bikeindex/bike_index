@@ -223,6 +223,32 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end
   end
 
+  context "multi serial search" do
+    let(:multi_serial_path) { "/o/#{organization.to_param}/registrations/multi_search" }
+
+    let!(:bike_a) { FactoryBot.create(:bike_organized, serial_number: "SERIAL111", creation_organization: organization) }
+    let!(:bike_b) { FactoryBot.create(:bike_organized, serial_number: "SERIAL222", creation_organization: organization) }
+    let!(:other_org_bike) { FactoryBot.create(:bike, serial_number: "SERIAL333") }
+
+    it "searches multiple serials and shows results" do
+      visit multi_serial_path
+
+      expect(page).to have_content(/multiple serial search/i)
+      expect(page).to have_css("[data-controller~='org--multi-serial-search']", wait: 5)
+
+      find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
+      click_button "Search serials"
+
+      # Chips update with results
+      expect(page).to have_css("#chip_2.tw\\:bg-gray-300", wait: 15)
+
+      # Results sorted by chip order, empty results removed
+      expect(page).to have_css(".multi-search-serial-result", count: 2)
+      expect(page).not_to have_content("No matches found")
+      expect(page).not_to have_content("SERIAL333")
+    end
+  end
+
   context "with avery_export enabled" do
     let(:enabled_feature_slugs) { %w[bike_search avery_export reg_address bike_stickers csv_exports] }
     let!(:avery_bike) do

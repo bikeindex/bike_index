@@ -5,7 +5,8 @@
   show_overview_dashboard = passed_organization.overview_dashboard?
   show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" # If viewing the dashboard, show the link
   # Show bulk import if passed organization has show_bulk_import, or if looking at show_bulk_import
-  show_bulk_import = passed_organization.show_bulk_import? || controller_name == "bulk_imports" %>
+  show_bulk_import = passed_organization.show_bulk_import? || controller_name == "bulk_imports"
+  show_multi_search = passed_organization.enabled?("bike_search") %>
 
 <% if passed_organization.ambassador? %>
   <li>
@@ -18,7 +19,7 @@
     <%= active_link t(".getting_started"), getting_started_organization_ambassador_dashboard_path(organization_id: passed_organization.to_param), class: "nav-link" %>
   </li>
   <li>
-    <%= active_link t(".multi_serial_search"), multi_serial_search_organization_registrations_path(organization_id: passed_organization.to_param), class: "nav-link" %>
+    <%= active_link t(".multi_search"), multi_search_organization_registrations_path(organization_id: passed_organization.to_param), class: "nav-link" %>
   </li>
   <li>
     <%= active_link t(".discuss"), "https://discuss.bikeindex.org", class: "nav-link" %>
@@ -50,9 +51,9 @@
       </span>
     </li>
   <% end %>
-  <% if passed_organization.show_multi_serial? %>
+  <% if show_multi_search %>
     <li>
-      <%= active_link t(".multi_serial_search"), multi_serial_search_organization_registrations_path(passed_organization.to_param), class: "nav-link secondary-item" %>
+      <%= active_link t(".multi_search"), multi_search_organization_registrations_path(passed_organization.to_param), class: "nav-link secondary-item" %>
     </li>
   <% end %>
   <% if passed_organization.enabled?("show_recoveries") # I don't want to show a grayed link for this %>
