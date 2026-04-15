@@ -234,7 +234,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       visit multi_serial_path
 
       expect(page).to have_content(/multiple serial search/i)
-      expect(page).to have_css("[data-controller='org--multi-serial-search']", wait: 5)
+      expect(page).to have_css("[data-controller~='org--multi-serial-search']", wait: 5)
 
       find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
       click_button "Search serials"

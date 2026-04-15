@@ -25,9 +25,9 @@ en:
         impounded_cell: Impounded
         manufacturer_cell: Manufacturer
         model_cell: Model
+        multi_search: multi serial search
         none: none
         notes_cell: Registration Notes
-        multi_search: multi serial search
         owner_email_cell: Sent to
         owner_name_cell: Owner name
         propulsion_type_cell: E-vehicle (propulsion)

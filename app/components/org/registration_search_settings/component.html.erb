@@ -125,9 +125,6 @@
 </div>
 
 <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-4">
-  <%= link_to translation("multi_search"),
-      multi_search_organization_registrations_path(organization_id: @organization.to_param),
-      class: "gray-link" %>
   <button
     type="button"
     class="btn btn-sm btn-outline-primary uncap <%= 'active' if settings_default_open? %>"

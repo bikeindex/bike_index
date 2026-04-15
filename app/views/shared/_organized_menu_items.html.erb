@@ -6,8 +6,7 @@
   show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" # If viewing the dashboard, show the link
   # Show bulk import if passed organization has show_bulk_import, or if looking at show_bulk_import
   show_bulk_import = passed_organization.show_bulk_import? || controller_name == "bulk_imports"
-  # TODO: Enable for everyone once it's good enough
-  show_multi_search = passed_organization.law_enforcement?
+  show_multi_search = passed_organization.enabled?("bike_search")
 %>
 
 <% if passed_organization.ambassador? %>

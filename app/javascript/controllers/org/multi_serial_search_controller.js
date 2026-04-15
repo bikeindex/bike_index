@@ -44,6 +44,9 @@ export default class extends Controller {
     // Wait a frame for Turbo stream DOM updates to complete
     await new Promise(resolve => requestAnimationFrame(resolve))
     this.sortAndFilterResults()
+    // Trigger column toggle to apply stored column visibility to new tables
+    this.element.dispatchEvent(new Event('turbo:frame-render', { bubbles: true }))
+    window.timeLocalizer?.localize()
     this.buttonTarget.disabled = false
     this.searching = false
   }
@@ -91,7 +94,6 @@ export default class extends Controller {
 
     if (response.ok) {
       Turbo.renderStreamMessage(await response.text())
-      window.timeLocalizer?.localize()
     }
   }
 }
