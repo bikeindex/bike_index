@@ -3,7 +3,6 @@
 module Org::RegistrationSearch
   class Component < ApplicationComponent
     include Binxtils::SortableHelper
-    include BikeHelper
 
     delegate :additional_registration_fields, :column_renames,
       :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
@@ -14,6 +13,7 @@ module Org::RegistrationSearch
       per_page:,
       params:,
       bikes: [],
+      current_user: nil,
       interpreted_params: {},
       sortable_search_params: {},
       search_stickers: nil,
@@ -30,6 +30,7 @@ module Org::RegistrationSearch
       @organization = organization
       @pagy = pagy
       @bikes = bikes
+      @current_user = current_user
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
       @per_page = per_page
