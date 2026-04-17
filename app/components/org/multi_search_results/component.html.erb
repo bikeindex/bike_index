@@ -18,78 +18,32 @@
     </span>
   </h4>
 
-  <% if sticker_search? %>
-    <% if @bike_stickers.any? %>
-      <table class="tw:mt-2 tw:w-full tw:border-collapse tw:text-sm">
-        <thead>
-          <tr class="tw:border-b tw:border-gray-200 tw:text-left">
-            <th class="tw:px-2 tw:py-2">Code</th>
-            <th class="tw:px-2 tw:py-2">Claimed</th>
-            <th class="tw:px-2 tw:py-2">Bike</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <% @bike_stickers.each do |bike_sticker| %>
-            <tr class="tw:border-b tw:border-gray-100 tw:hover:bg-gray-50">
-              <td class="tw:px-2 tw:py-2">
-                <%= link_to bike_sticker.pretty_code,
-                  helpers.edit_organization_sticker_path(organization_id: @organization.to_param, id: bike_sticker.code),
-                  class: "twlink tw:font-mono" %>
-              </td>
-
-              <td class="tw:px-2 tw:py-2">
-                <% if bike_sticker.claimed? && bike_sticker.claimed_at.present? %>
-                  <span class="localizeTime">
-                    <%= helpers.l(bike_sticker.claimed_at, format: :convert_time) %>
-                  </span>
-                <% else %>
-                  <span class="tw:text-gray-400">unclaimed</span>
-                <% end %>
-              </td>
-
-              <td class="tw:px-2 tw:py-2">
-                <% if bike_sticker.claimed? %>
-                  <%= link_to helpers.organized_bike_text(bike_sticker.bike),
-                    helpers.bike_path(bike_sticker.bike, organization_id: @organization.to_param),
-                    class: "twlink" %>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    <% else %>
-      <p class="tw:text-gray-500"><%= translation(".no_matches_found") %></p>
-    <% end %>
+  <% if @bikes&.any? %>
+    <%= render(Org::RegistrationSearch::Component.new(
+      organization: @organization,
+      pagy: @pagy,
+      bikes: @bikes,
+      interpreted_params: @interpreted_params,
+      sortable_search_params:,
+      per_page: @per_page,
+      params: helpers.params,
+      search_query_present: true,
+      skip_search_and_filters: true,
+      skip_settings: true,
+      skip_count: true
+    )) %>
+  <% elsif @close_serials&.any? %>
+    <p class="tw:text-gray-500"><%= translation(".no_exact_matches") %></p>
+    <ul class="tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-0">
+      <% @close_serials.each do |bike| %>
+        <li>
+          <a href="<%= bike_path(bike) %>" class="twlink">
+            <%= bike.serial_number %>
+          </a>
+        </li>
+      <% end %>
+    </ul>
   <% else %>
-    <% if @bikes.any? %>
-      <%= render(Org::RegistrationSearch::Component.new(
-        organization: @organization,
-        pagy: @pagy,
-        bikes: @bikes,
-        interpreted_params: @interpreted_params,
-        sortable_search_params:,
-        per_page: @per_page,
-        params: helpers.params,
-        search_query_present: true,
-        skip_search_and_filters: true,
-        skip_settings: true,
-        skip_count: true
-      )) %>
-    <% elsif @close_serials&.any? %>
-      <p class="tw:text-gray-500"><%= translation(".no_exact_matches") %></p>
-      <ul class="tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-0">
-        <% @close_serials.each do |bike| %>
-          <li>
-            <a href="<%= bike_path(bike) %>" class="twlink">
-              <%= bike.serial_number %>
-            </a>
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <p class="tw:text-gray-500"><%= translation(".no_matches_found") %></p>
-    <% end %>
+    <p class="tw:text-gray-500"><%= translation(".no_matches_found") %></p>
   <% end %>
 </div>

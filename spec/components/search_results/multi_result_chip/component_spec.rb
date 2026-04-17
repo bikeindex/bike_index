@@ -3,9 +3,9 @@
 require "rails_helper"
 
 RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
-  let(:component) { render_inline(described_class.new(serial:, serial_chip_id:, result_count:)) }
+  let(:component) { render_inline(described_class.new(chip_id:, result_count:, serial:)) }
   let(:serial) { "SERIAL111" }
-  let(:serial_chip_id) { "chip_0" }
+  let(:chip_id) { "chip_0" }
   let(:result_count) { 1 }
 
   context "with results" do

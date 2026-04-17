@@ -63,8 +63,9 @@ module Organized
       return head(:bad_request) unless @query.present?
 
       @per_page = 10
-      @bike_stickers = current_organization.bike_stickers.sticker_code_search(@query)
-      @pagy, @bike_stickers = pagy(:countish, @bike_stickers.includes(:bike).reorder("bike_stickers.id desc"), limit: @per_page, page: permitted_page)
+      bike_ids = current_organization.bike_stickers.sticker_code_search(@query).where.not(bike_id: nil).select(:bike_id)
+      bikes = Bike.where(id: bike_ids)
+      @pagy, @bikes = pagy(:countish, bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
     end
 
     private

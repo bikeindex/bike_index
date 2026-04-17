@@ -5,7 +5,7 @@ module Org::MultiSearchResults
     include SortableHelper
 
     def initialize(organization:, query:, chip_id:, pagy:, search_kind: "serials",
-      bikes: nil, interpreted_params: nil, per_page: nil, close_serials: nil, bike_stickers: nil)
+      bikes: nil, interpreted_params: nil, per_page: nil, close_serials: nil)
       @organization = organization
       @query = query
       @chip_id = chip_id
@@ -15,7 +15,6 @@ module Org::MultiSearchResults
       @interpreted_params = interpreted_params
       @per_page = per_page
       @close_serials = close_serials
-      @bike_stickers = bike_stickers
     end
 
     private

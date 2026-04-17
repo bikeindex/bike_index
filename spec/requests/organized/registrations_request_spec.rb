@@ -278,22 +278,31 @@ RSpec.describe Organized::RegistrationsController, type: :request do
   end
 
   describe "multi_search_sticker_response" do
-    let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "CA112", organization: current_organization) }
+    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+    let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, code: "CA112", organization: current_organization, bike:) }
+    let!(:unclaimed_sticker) { FactoryBot.create(:bike_sticker, code: "CA113", organization: current_organization) }
     let!(:other_sticker) { FactoryBot.create(:bike_sticker, code: "ZZ999") }
 
-    it "searches and returns matching org stickers" do
+    it "returns bikes from matching claimed stickers" do
       get "#{base_url}/multi_search_sticker_response", params: {query: "CA112"},
         headers: {"Accept" => "text/vnd.turbo-stream.html"}
       expect(response.status).to eq(200)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
-      expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker.id])
+      expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
     end
 
-    it "does not return stickers from other orgs" do
+    it "returns no bikes for unclaimed stickers" do
+      get "#{base_url}/multi_search_sticker_response", params: {query: "CA113"},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
+      expect(response.status).to eq(200)
+      expect(assigns(:bikes)).to be_empty
+    end
+
+    it "does not return bikes from other orgs' stickers" do
       get "#{base_url}/multi_search_sticker_response", params: {query: "ZZ999"},
         headers: {"Accept" => "text/vnd.turbo-stream.html"}
       expect(response.status).to eq(200)
-      expect(assigns(:bike_stickers)).to be_empty
+      expect(assigns(:bikes)).to be_empty
     end
 
     context "without query param" do

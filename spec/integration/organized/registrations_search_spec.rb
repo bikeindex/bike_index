@@ -271,14 +271,15 @@ RSpec.describe "Organized registrations search", :js, type: :system do
         expect(page).to have_current_path(/search_kind=stickers/, wait: 5)
         expect(page).to have_field("serials", placeholder: /sticker codes/i)
 
-        find("textarea#serials").set("STKR100, STKR200, STKR300")
+        find("textarea#serials").set("STKR200, STKR100, STKR300")
         click_button "Search stickers"
 
-        # Chips for non-org sticker show gray (no results)
-        expect(page).to have_css("#chip_2.tw\\:bg-gray-300", wait: 15)
+        # Chips for unclaimed and non-org stickers show gray (no bikes)
+        expect(page).to have_css("#chip_1.tw\\:bg-gray-300", wait: 15)
+        expect(page).to have_css("#chip_2.tw\\:bg-gray-300")
 
-        # Only org stickers returned
-        expect(page).to have_css(".multi-search-serial-result", count: 2)
+        # Only claimed org sticker has a bike result
+        expect(page).to have_css("#chip_0.tw\\:bg-emerald-500")
 
         # Switch back to serials
         click_button "Serials"

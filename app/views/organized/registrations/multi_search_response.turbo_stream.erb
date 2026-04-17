@@ -14,9 +14,9 @@
 <% if @serial_chip_id %>
   <%= turbo_stream.replace @serial_chip_id do %>
     <%= render SearchResults::MultiResultChip::Component.new(
-      serial: @serial,
-      serial_chip_id: @serial_chip_id,
-      result_count: @pagy.count
+      chip_id: @serial_chip_id,
+      result_count: @pagy.count,
+      serial: @serial
     ) %>
   <% end %>
 <% end %>
