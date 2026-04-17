@@ -22,6 +22,7 @@
             = email_field_tag :email, nil, required: true, class: 'form-control'
         .col-md-6
           .actions{ style: "margin-top: 2.5rem;" }
+            = turnstile_widget
             = submit_tag t(".resend_confirmation_email"), class: 'btn btn-primary'
 
 

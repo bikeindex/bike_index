@@ -51,6 +51,14 @@ module Sessionable
     store_return_and_authenticate_user(translation_key: :create_account, flash_type: :info)
   end
 
+  def verify_turnstile!
+    return true if Integrations::CloudflareTurnstile.verify(params[:"cf-turnstile-response"], ip: forwarded_ip_address)
+
+    flash[:error] = translation(:turnstile_failed, scope: [:controllers, :concerns, :sessionable, __method__])
+    redirect_back(fallback_location: new_session_url)
+    false
+  end
+
   private
 
   def cookie_options(user)

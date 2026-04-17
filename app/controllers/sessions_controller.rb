@@ -2,6 +2,7 @@ class SessionsController < ApplicationController
   include Sessionable
 
   before_action :skip_if_signed_in, only: [:new, :magic_link]
+  before_action :verify_turnstile!, only: [:create, :create_magic_link]
 
   def new
     render_partner_or_default_signin_layout

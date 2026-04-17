@@ -5,6 +5,15 @@ module ApplicationHelper
     super([key, locale: I18n.locale], options, &block)
   end
 
+  def turnstile_widget
+    return nil unless Integrations::CloudflareTurnstile.configured?
+
+    safe_join([
+      javascript_include_tag("https://challenges.cloudflare.com/turnstile/v0/api.js", async: true, defer: true),
+      content_tag(:div, "", class: "cf-turnstile tw:my-4", data: {sitekey: Integrations::CloudflareTurnstile::SITE_KEY})
+    ])
+  end
+
   def notification_delivery_display(status)
     text = if status == "delivery_success"
       check_mark

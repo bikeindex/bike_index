@@ -1755,6 +1755,8 @@ en:
             are unsure as to the reasons for this, please contact us.
         skip_if_signed_in:
           already_signed_in: You're already signed in!
+        verify_turnstile:
+          turnstile_failed: Bot check failed. Please try again.
     feedbacks:
       block_the_spam:
         please_sign_in: Please sign in to send that message

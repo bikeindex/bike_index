@@ -1,0 +1,41 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://challenges.cloudflare.com/turnstile/v0/siteverify
+    body:
+      encoding: US-ASCII
+      string: secret=1x0000000000000000000000000000000AA&response=XXXX.DUMMY.TOKEN.XXXX
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 17 Apr 2026 07:18:57 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 9ed9a89ffecf80fd-SJC
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: '{"challenge_ts":"2026-04-17T07:18:57.274Z","error-codes":[],"hostname":"example.com","metadata":{"result_with_testing_key":true},"success":true}'
+  recorded_at: Fri, 17 Apr 2026 07:18:57 GMT
+recorded_with: VCR 6.4.0

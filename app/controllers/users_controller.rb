@@ -3,6 +3,8 @@ class UsersController < ApplicationController
 
   before_action :skip_if_signed_in, only: %i[new]
   before_action :find_user_from_token_for_password_reset!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
+  before_action :verify_turnstile!, only: %i[send_password_reset_email]
+  before_action :verify_turnstile!, only: %i[resend_confirmation_email], unless: -> { unconfirmed_current_user.present? }
 
   def new
     @user ||= User.new(email: params[:email])

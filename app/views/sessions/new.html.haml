@@ -66,6 +66,7 @@
                 = f.check_box :remember_me, value: '1', checked: true
                 = t(".keep_me_logged_in")
 
+            = turnstile_widget
             = f.submit t(".log_in"), class: 'btn btn-primary btn-lg'
 
           %p.forgot-password-link= link_to t(".forgot_your_password"), request_password_reset_form_users_path

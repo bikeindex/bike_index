@@ -34,7 +34,8 @@ Rails.application.configure do
       "https://platform.twitter.com",
       "https://api.mapbox.com",
       "https://cdn.jsdelivr.net",
-      "https://js.stripe.com"
+      "https://js.stripe.com",
+      "https://challenges.cloudflare.com"
     policy.style_src :self, :unsafe_inline,
       "https://fonts.googleapis.com",
       "https://www.gstatic.com", # Google Translate styles
@@ -77,7 +78,8 @@ Rails.application.configure do
       "https://web.facebook.com",
       "https://m.facebook.com",
       "https://platform.twitter.com",
-      "https://js.stripe.com"
+      "https://js.stripe.com",
+      "https://challenges.cloudflare.com"
     policy.report_uri -> do
       "https://api.honeybadger.io/v1/browser/csp?api_key=#{ENV["HONEYBADGER_CSP_API_KEY"]}&report_only=false&env=#{Rails.env}&context[user_id]=#{current_user&.id if respond_to?(:current_user)}"
     end

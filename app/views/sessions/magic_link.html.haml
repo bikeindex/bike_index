@@ -21,4 +21,5 @@
     = form_tag create_magic_link_session_path, method: 'post' do
       .form-group
         %input{ name: 'email', id: 'email', type: 'text', placeholder: t(".your_email_address"), class: 'form-control' }
+      = turnstile_widget
       %input{ type: 'submit', value: t(".get_sign_in_link"), class: 'btn btn-primary btn-lg' }
