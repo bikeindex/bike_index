@@ -4,6 +4,7 @@ module Organized
 
     before_action :ensure_access_to_bike_stickers! # Because this checks ensure_admin
     before_action :find_bike_sticker, only: %i[edit update]
+    before_action :ensure_sticker_for_current_organization, only: :edit
 
     def index
       @per_page = permitted_per_page
@@ -72,6 +73,14 @@ module Organized
       return true if current_organization.enabled?("bike_stickers") || current_user.superuser?
 
       raise_do_not_have_access!
+    end
+
+    def ensure_sticker_for_current_organization
+      return true if [@bike_sticker.organization_id, @bike_sticker.secondary_organization_id]
+        .include?(current_organization.id)
+
+      flash[:error] = translation(:not_your_organizations_sticker, bike_sticker: @bike_sticker.code)
+      redirect_back(fallback_location: organization_stickers_path(organization_id: current_organization.to_param)) && return
     end
   end
 end

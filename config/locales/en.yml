@@ -1900,6 +1900,8 @@ en:
       stickers:
         find_bike_sticker:
           unable_to_find_sticker: 'Unable to find sticker with code: %{bike_sticker}.'
+        ensure_sticker_for_current_organization:
+          not_your_organizations_sticker: "Sticker %{bike_sticker} isn't your organization's sticker."
         update:
           cannot_update: >-
             You can't update that %{bike_sticker_kind}. Please contact support@bikeindex.org

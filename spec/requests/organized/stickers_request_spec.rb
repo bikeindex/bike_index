@@ -92,6 +92,23 @@ RSpec.describe Organized::StickersController, type: :request do
           expect(response).to render_template(:edit)
           expect(assigns(:current_organization)&.id).to eq current_organization.id
         end
+        context "non-organization bike_sticker" do
+          let(:og_organization) { FactoryBot.create(:organization) }
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: og_organization, code: "zzz999") }
+          it "redirects back with a flash error" do
+            get "#{base_url}/#{bike_sticker.code}/edit", headers: {"HTTP_REFERER" => stickers_root_path}
+            expect(response).to redirect_to(stickers_root_path)
+            expect(flash[:error]).to match(/organization/i)
+          end
+          context "when current_organization is the secondary_organization" do
+            let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: og_organization, secondary_organization: current_organization, code: "zzz999") }
+            it "renders" do
+              get "#{base_url}/#{bike_sticker.code}/edit"
+              expect(response).to render_template(:edit)
+              expect(assigns(:bike_sticker)&.id).to eq bike_sticker.id
+            end
+          end
+        end
       end
 
       describe "update" do
