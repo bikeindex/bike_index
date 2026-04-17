@@ -115,6 +115,38 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       # TODO: test for entering location: you, location: anywhere
     end
 
+    it "sanitizes XSS in autocomplete results" do
+      # Mock autocomplete API to return a payload that sets a DOM attribute if executed
+      page.execute_script(<<~JS)
+        var origAjax = $.ajax;
+        $.ajax = function(settings) {
+          if (settings.url && settings.url.includes('autocomplete')) {
+            var d = $.Deferred();
+            setTimeout(function() {
+              d.resolve({
+                matches: [{
+                  search_id: 'xss_test',
+                  text: '<img src=x onerror="document.body.dataset.xss=1">',
+                  category: 'colors',
+                  display: null
+                }]
+              });
+            }, 50);
+            return d.promise();
+          }
+          return origAjax.apply(this, arguments);
+        };
+      JS
+
+      find(".select2-container").click
+      expect(page).to have_css(".select2-results__option", wait: 5)
+
+      # Select the malicious option to also test selection rendering
+      find(".select2-results__option").click
+
+      expect(page.evaluate_script("document.body.dataset.xss")).to be_nil
+    end
+
     it "scrolls through paginated options" do
       visit(preview_path)
 
