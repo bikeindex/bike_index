@@ -2,16 +2,16 @@
 
 module SearchResults::MultiResultChip
   class Component < ApplicationComponent
-    def initialize(serial:, serial_chip_id:, result_count:)
+    def initialize(serial:, chip_id:, result_count:)
       @serial = serial
-      @serial_chip_id = serial_chip_id
+      @chip_id = chip_id
       @result_count = result_count
     end
 
     def call
-      content_tag(:span, id: @serial_chip_id, class: badge_classes) do
+      content_tag(:span, id: @chip_id, class: badge_classes) do
         if has_results?
-          content_tag(:a, href: "#result_#{@serial_chip_id.delete_prefix("chip_")}", class: serial_span_classes) do
+          content_tag(:a, href: "#result_#{@chip_id.delete_prefix("chip_")}", class: serial_span_classes) do
             @serial
           end
         else

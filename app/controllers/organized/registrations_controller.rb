@@ -47,7 +47,7 @@ module Organized
 
     def multi_search_response
       @serial = params[:serial].to_s.strip
-      @serial_chip_id = params[:chip_id].to_s.strip.presence
+      @chip_id = params[:chip_id].to_s.strip.presence
       return head(:bad_request) unless @serial.present?
 
       @interpreted_params = BikeSearchable.searchable_interpreted_params({serial: @serial, stolenness: "all"}, ip: forwarded_ip_address)
