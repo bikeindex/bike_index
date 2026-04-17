@@ -16,14 +16,14 @@ end
 #
 # This forces preview_class to re-resolve on every access in development,
 # so it always returns the current class from the autoloader.
-Rails.application.config.after_initialize do
-  next unless Rails.env.development?
-
-  Lookbook::PreviewEntity.class_eval do
-    def preview_class
-      @code_object.path.constantize
-    rescue NameError
-      @preview_class
+if Rails.env.development?
+  Rails.application.config.after_initialize do
+    Lookbook::PreviewEntity.class_eval do
+      def preview_class
+        @code_object.path.constantize
+      rescue NameError
+        @preview_class
+      end
     end
   end
 end
