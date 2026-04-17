@@ -4,7 +4,7 @@ module Organized
 
     before_action :ensure_access_to_bike_stickers! # Because this checks ensure_admin
     before_action :find_bike_sticker, only: %i[edit update]
-    before_action :ensure_sticker_for_current_organization, only: :edit
+    before_action :ensure_sticker_for_current_organization, only: %i[edit update]
 
     def index
       @per_page = permitted_per_page
@@ -76,6 +76,7 @@ module Organized
     end
 
     def ensure_sticker_for_current_organization
+      return true unless @bike_sticker.claimed?
       return true if [@bike_sticker.organization_id, @bike_sticker.secondary_organization_id]
         .include?(current_organization.id)
 
