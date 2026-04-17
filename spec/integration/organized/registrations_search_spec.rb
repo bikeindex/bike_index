@@ -254,8 +254,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     context "with bike_stickers enabled" do
       let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes bike_stickers] }
+      let(:claimed_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       let!(:sticker_a) { FactoryBot.create(:bike_sticker, code: "STKR100", organization:) }
-      let!(:sticker_b) { FactoryBot.create(:bike_sticker_claimed, code: "STKR200", organization:) }
+      let!(:sticker_b) { FactoryBot.create(:bike_sticker_claimed, code: "STKR200", organization:, bike: claimed_bike) }
       let!(:other_org_sticker) { FactoryBot.create(:bike_sticker, code: "STKR300") }
 
       it "toggles to sticker search and shows results" do
