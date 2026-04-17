@@ -25,6 +25,7 @@ en:
         impounded_cell: Impounded
         manufacturer_cell: Manufacturer
         model_cell: Model
+        multi_search: multi serial search
         none: none
         notes_cell: Registration Notes
         owner_email_cell: Sent to

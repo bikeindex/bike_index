@@ -4,7 +4,7 @@ module Organized
 
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
 
-    skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
+    skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response]
 
     def index
       set_period
@@ -42,7 +42,19 @@ module Organized
       end
     end
 
-    def multi_serial_search
+    def multi_search
+    end
+
+    def multi_search_response
+      @serial = params[:serial].to_s.strip
+      @serial_chip_id = params[:chip_id].to_s.strip.presence
+      return head(:bad_request) unless @serial.present?
+
+      @interpreted_params = BikeSearchable.searchable_interpreted_params({serial: @serial, stolenness: "all"}, ip: forwarded_ip_address)
+      bikes = current_organization.bikes.search(@interpreted_params)
+      @per_page = 10
+      @pagy, @bikes = pagy(:countish, bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
+      @close_serials = current_organization.bikes.search_close_serials(@interpreted_params).limit(25) if @bikes.none?
     end
 
     private

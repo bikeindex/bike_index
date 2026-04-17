@@ -292,10 +292,6 @@ class Organization < ApplicationRecord
     ascend_or_broken_ascend? || any_enabled?(%w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen])
   end
 
-  def show_multi_serial?
-    enabled?("show_multi_serial") || %w[law_enforcement].include?(kind)
-  end
-
   def public_impound_bikes?
     enabled?("impound_bikes_public") # feature slug applied in calculated_enabled_feature_slugs
   end

@@ -5402,7 +5402,6 @@ nb:
       manage_impounding: Håndtere beslaglegging
       manage_users: Administrer brukere
       model_audits: E-kjøretøyrevisjon
-      multi_serial_search: Multiseriesøk
       org_bikes: "%{org_name} Sykler"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} steder"
@@ -5416,6 +5415,7 @@ nb:
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-konfigurasjon
       stolen_message: Stjålet melding
       super_admin_view: Superadministrator for %{org_name}
+      multi_search: Multisøk
     organized_skeleton:
       additional_features_html: Bike Index gir tilleggsfunksjoner for verifiserte
         rettshåndhevelsesorganisasjoner. Ta kontakt med %{email_link} for å få dem
@@ -5716,6 +5716,8 @@ nb:
         registered_not_stolen: registrert, ikke stjålet
       container:
         no_results: Ingen registreringer samsvarte nøyaktig med søket ditt
+      multi_result_chip:
+        no_results: ingen treff
     page_block:
       marketplace_listing_panel:
         condition: Betingelse
@@ -6048,6 +6050,14 @@ nb:
         url_cell: URL-adresse
         vehicle: registrering
         visible_columns: Synlige kolonner
+        multi_search: søk i flere serier
+      multi_search_results:
+        first_n_shown_html: "— først vist %{limit},"
+        no_exact_matches: 'Ingen eksakte treff. Nære serier:'
+        no_matches_found: Ingen treff funnet
+        result_count_html: "— %{count} %{results}"
+        serial_label: 'Serie:'
+        view_all: se alle
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne

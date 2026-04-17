@@ -28,6 +28,12 @@ export default class extends Controller {
     this.initializeHeaderSearch($(this.inputTarget), this.apiUrlValue)
   }
 
+  escapeHtml (text) {
+    const div = document.createElement('div')
+    div.textContent = text
+    return div.innerHTML
+  }
+
   initializeHeaderSearch ($queryField, url) {
     const perPage = 15
     // TODO: Find this dynamically? Set it at a higher level?
@@ -53,6 +59,7 @@ export default class extends Controller {
       placeholder: $queryField.attr('placeholder'), // Pull placeholder from HTML
       // dropdownParent: $(searchFormSelector), // Append to search for for easier css access
       templateResult: formatSearchText, // let custom formatter work
+      templateSelection: (item) => this.escapeHtml(item.text), // Escape selected item text
       // selectOnClose: true // Turned off in PR#2325
       escapeMarkup: function (markup) { return markup }, // Allow our fancy display of options
       ajax: {
@@ -126,15 +133,16 @@ export default class extends Controller {
   }
 
   formatSearchText (item, translations) {
-    if (item.loading) return item.text
-    if (item.category === 'propulsion') return '<span>' + translations.searchFor + ' <strong>' + item.text + '</strong> only</span>'
-    if (item.category === 'cycle_type') return '<span>' + translations.searchOnlyFor + ' <strong>' + item.text + '</strong></span>'
+    if (item.loading) return this.escapeHtml(item.text)
+    const text = this.escapeHtml(item.text)
+    if (item.category === 'propulsion') return '<span>' + translations.searchFor + ' <strong>' + text + '</strong> only</span>'
+    if (item.category === 'cycle_type') return '<span>' + translations.searchOnlyFor + ' <strong>' + text + '</strong></span>'
 
     const getPrefix = () => {
       if (item.category === 'colors') {
         const p = "<span class='sch_'>" + translations.searchObjName + ' ' + translations.thatAre + ' </span>'
         if (item.display) {
-          return p + "<span class='sclr' style='background: " + item.display + ";'></span>"
+          return p + "<span class='sclr' style='background: " + this.escapeHtml(item.display) + ";'></span>"
         } else {
           return p + "<span class='sclr'>stckrs</span>"
         }
@@ -147,7 +155,7 @@ export default class extends Controller {
       }
     }
 
-    return getPrefix() + " <span class='label'>" + item.text + '</span>'
+    return getPrefix() + " <span class='label'>" + text + '</span>'
   }
 
   // Don't include manufacturers if a manufacturer is selected

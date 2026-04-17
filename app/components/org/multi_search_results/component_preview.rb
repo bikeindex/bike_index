@@ -1,17 +1,18 @@
 # frozen_string_literal: true
 
-module Org::RegistrationSearch
+module Org::MultiSearchResults
   class ComponentPreview < ApplicationComponentPreview
     # @display legacy_stylesheet true
     def default
       pagy = Pagy::Offset.new(count: bikes.count, page: 1, limit: 10)
-      render Org::RegistrationSearch::Component.new(
+      render Component.new(
         organization: lookbook_organization,
+        serial: "SERIAL111",
+        serial_chip_id: "chip_0",
         pagy:,
         bikes:,
-        per_page: 10,
-        params: {},
-        time_range: 1.year.ago..Time.current
+        interpreted_params: {},
+        per_page: 10
       )
     end
 
