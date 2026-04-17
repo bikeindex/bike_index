@@ -31,14 +31,9 @@ class Rack::Attack
     request.ip unless request.path.start_with?(*SKIP_THROTTLE_PREFIXES)
   end
 
-  # Sign-in: exponential backoff per IP
-  # Level 1: 10 requests in 60 seconds
-  # Level 2: 20 requests in 3600 seconds (1 hour)
-  # Level 3: 30 requests in 216000 seconds (2.5 days)
-  (1..3).each do |level|
-    throttle("sign_in/ip/#{level}", limit: 10 * level, period: (60**level).seconds) do |request|
-      request.ip if request.post? && request.path == SIGN_IN_PATH
-    end
+  # Sign-in: 10 per minute per IP
+  throttle("sign_in/ip", limit: 10, period: 1.minute) do |request|
+    request.ip if request.post? && request.path == SIGN_IN_PATH
   end
 
   # Sign-in: 5 per 20 seconds per email (protects individual accounts)
@@ -50,18 +45,13 @@ class Rack::Attack
     end
   end
 
-  # Sensitive auth endpoints: exponential backoff per IP
-  # Level 1: 5 requests in 60 seconds
-  # Level 2: 10 requests in 3600 seconds (1 hour)
-  # Level 3: 15 requests in 216000 seconds (2.5 days)
-  (1..3).each do |level|
-    throttle("sensitive_auth/ip/#{level}", limit: 5 * level, period: (60**level).seconds) do |request|
-      if request.post?
-        if SENSITIVE_AUTH_PATHS.include?(request.path)
-          request.ip
-        elsif request.path.start_with?("/user_emails/") && request.path.end_with?("/resend_confirmation")
-          request.ip
-        end
+  # Sensitive auth endpoints: 5 per minute per IP
+  throttle("sensitive_auth/ip", limit: 5, period: 1.minute) do |request|
+    if request.post?
+      if SENSITIVE_AUTH_PATHS.include?(request.path)
+        request.ip
+      elsif request.path.start_with?("/user_emails/") && request.path.end_with?("/resend_confirmation")
+        request.ip
       end
     end
   end
