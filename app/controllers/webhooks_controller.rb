@@ -2,7 +2,6 @@
 
 class WebhooksController < ApplicationController
   STRIPE_WEBHOOK_SECRET = ENV["STRIPE_WEBHOOK_SECRET"].freeze
-  STRAVA_WEBHOOK_VERIFY_TOKEN = ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"]
 
   skip_before_action :verify_authenticity_token
 
@@ -46,7 +45,7 @@ class WebhooksController < ApplicationController
   private
 
   def strava_verify_subscription
-    if params["hub.verify_token"] == STRAVA_WEBHOOK_VERIFY_TOKEN
+    if params["hub.verify_token"] == ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"]
       render json: {"hub.challenge" => params["hub.challenge"]}, status: :ok
     else
       head :forbidden
