@@ -319,11 +319,10 @@ RSpec.describe "BikesController#create", type: :request do
       }
     end
 
-    before do
+    include_context :geocoder_real
+    it "does not have address, has association", :flaky do
       Geocoder.configure(lookup: :test, ip_lookup: :test)
       Geocoder::Lookup::Test.set_default_stub([])
-    end
-    it "does not have address, has association", :flaky do
       Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
         expect {
