@@ -25,16 +25,24 @@ RSpec.describe ScheduledStoreLogSearchesJob, type: :job do
   end
 
   describe "enqueue_workers" do
-    before { Sidekiq::Job.clear_all }
+    before do
+      Sidekiq::Job.clear_all
+      RedisPool.conn { |r| r.del(LogSearcher::Reader::KEY) }
+    end
+
+    def push_log_lines(count)
+      RedisPool.conn { |r| count.times { r.lpush(LogSearcher::Reader::KEY, "dummy") } }
+    end
+
     it "enqueues workers for all the log lines" do
-      allow(LogSearcher::Reader).to receive(:log_lines_in_redis) { 50 }
+      push_log_lines(50)
       expect(described_class.jobs.count).to eq 0
       instance.perform
       expect(described_class.jobs.count).to eq 50
     end
     context "over 1000 log lines" do
       it "enqueues 1k and re-enqueues scheduler" do
-        allow(LogSearcher::Reader).to receive(:log_lines_in_redis) { 5000 }
+        push_log_lines(5000)
         expect(described_class.jobs.count).to eq 0
         instance.perform
         # Not testing precisely that MAX_W enqueued with true, 1 enqueued to reschedule - but good enough

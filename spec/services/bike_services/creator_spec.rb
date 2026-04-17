@@ -580,11 +580,7 @@ RSpec.describe BikeServices::Creator do
     end
 
     describe "with ip_address, doorkeeper_app_id and ios_version" do
-      before { allow(GeocodeHelper).to receive(:assignable_address_hash_for).and_return(address_hash) }
-      let(:address_hash) do
-        {kind: "ownership", city: "Casper", latitude: 42.8489653, longitude: -106.3014667, postal_code: "82601",
-         region_string: "WY", country_id: Country.united_states_id, street: "1740 East 2nd Street"}
-      end
+      include_context :geocoder_default_location
       let(:bike_params) do
         {primary_frame_color_id: color.id, manufacturer_id: manufacturer.id,
          owner_email: "something@stuff.com", ios_version: "1.6.9"}
@@ -599,7 +595,11 @@ RSpec.describe BikeServices::Creator do
         expect(bike.current_ownership.registration_info).to match_hash_indifferently({ip_address:, ios_version: "1.6.9"})
         expect(bike.current_ownership.doorkeeper_app_id).to eq 69
         expect(bike.address_record).to be_present
-        expect(bike.address_record).to have_attributes address_hash
+        expect(bike.address_record).to have_attributes(
+          kind: "ownership", city: "New York", street: "278 Broadway",
+          postal_code: "10007", region_string: "NY",
+          country_id: Country.united_states_id
+        )
       end
     end
   end

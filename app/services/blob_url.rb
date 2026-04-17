@@ -4,8 +4,6 @@
 module BlobUrl
   extend Functionable
 
-  SERVICE = Bikeindex::Application.config.active_storage.service
-  LOCAL_STORAGE = %i[local test].include?(SERVICE)
   STORAGE_HOST = ENV.fetch("ACTIVE_STORAGE_HOST", "https://uploads.bikeindex.org")
   STORAGE_HOST_DEV = ENV.fetch("ACTIVE_STORAGE_HOST_DEV", nil)
 
@@ -24,7 +22,7 @@ module BlobUrl
   #
 
   def local_storage?(blob)
-    LOCAL_STORAGE && blob.service&.name == SERVICE
+    %i[local test].include?(blob.service&.name)
   end
 
   def storage_host_for(blob)

@@ -3,7 +3,6 @@
 module Integrations::Strava::ProxyRequester
   extend Functionable
 
-  STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3).to_i
   SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
 
   # returns {user:, strava_integration:} if valid
@@ -66,7 +65,7 @@ module Integrations::Strava::ProxyRequester
   # Returns an existing valid token, or revokes the most recent expired one
   # and creates a new one (matches Doorkeeper's refresh flow)
   def find_or_create_access_token(resource_owner_id)
-    application_id = STRAVA_DOORKEEPER_APP_ID
+    application_id = strava_doorkeeper_app_id
     access_token = Doorkeeper::AccessToken
       .where(application_id:, resource_owner_id:)
       .order(id: :desc)
@@ -111,8 +110,12 @@ module Integrations::Strava::ProxyRequester
     {json:, status: 200}
   end
 
+  def strava_doorkeeper_app_id
+    ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3).to_i
+  end
+
   def authorized_app?(token)
-    token.application_id == STRAVA_DOORKEEPER_APP_ID
+    token.application_id == strava_doorkeeper_app_id
   end
 
   def proxy_request_type(url, request_method)
@@ -155,7 +158,7 @@ module Integrations::Strava::ProxyRequester
     body.except(*SENSITIVE_KEYS)
   end
 
-  conceal :internal_response?, :internal_response!,
+  conceal :strava_doorkeeper_app_id, :internal_response?, :internal_response!,
     :authorized_app?, :proxy_request_type, :validate_url!,
     :serialize_proxy_response, :sanitize_response_body
 end

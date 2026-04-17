@@ -35,13 +35,12 @@ RSpec.describe PublicImagesController, type: :request do
         end
         context "stolen bike" do
           let(:bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
-          it "creates an image, runs StolenProcessor" do
+          it "creates an image, enqueues StolenProcessor" do
             expect(bike.reload.current_stolen_record_id).to be_present
-            expect(Images::StolenProcessor).to receive(:update_alert_images)
             bike.update_column :updated_at, Time.current - 1.hour
-            Sidekiq::Testing.inline! do
-              post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
-            end
+            Sidekiq::Job.clear_all
+            post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
+            expect(CallbackJob::AfterBikeSaveJob.jobs.count).to eq 1
             expect(bike.reload.updated_at).to be_within(1).of Time.current
             expect(bike.public_images.first.name).to eq "cool name"
           end

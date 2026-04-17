@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "Strava search", :js, type: :system do
   it "renders the compiled strava_search SPA" do
     strava_app = FactoryBot.create(:doorkeeper_app, is_internal: true)
-    stub_const("Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", strava_app.id)
+    ENV["STRAVA_DOORKEEPER_APP_ID"] = strava_app.id.to_s
 
     user = FactoryBot.create(:user_confirmed)
     FactoryBot.create(:strava_integration, user:, strava_id: "12345")

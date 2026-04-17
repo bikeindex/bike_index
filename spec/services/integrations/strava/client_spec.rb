@@ -252,7 +252,7 @@ RSpec.describe Integrations::Strava::Client, type: :service do
   end
 
   describe ".create_webhook_subscription" do
-    before { stub_const("Integrations::Strava::Client::STRAVA_WEBHOOK_TOKEN", "test_verify_token") }
+    before { ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"] = "test_verify_token" }
 
     it "creates a webhook subscription" do
       VCR.use_cassette("strava-create_webhook_subscription") do

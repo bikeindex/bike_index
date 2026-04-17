@@ -91,7 +91,7 @@ module Integrations::Strava::Client
         client_id: STRAVA_KEY,
         client_secret: STRAVA_SECRET,
         callback_url: Rails.application.routes.url_helpers.strava_webhooks_url,
-        verify_token: STRAVA_WEBHOOK_TOKEN
+        verify_token: ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"]
       }
     end
   end

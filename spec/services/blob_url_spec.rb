@@ -20,10 +20,6 @@ RSpec.describe BlobUrl do
       let(:production_host) { "https://uploads.bikeindex.org" }
       let(:dev_host) { "https://dev-uploads.bikeindex.org" }
 
-      before do
-        stub_const("BlobUrl::LOCAL_STORAGE", false)
-      end
-
       context "cloudflare_production service" do
         before do
           allow(blob.service).to receive(:name).and_return(:cloudflare_production)

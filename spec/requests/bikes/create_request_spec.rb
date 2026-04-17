@@ -319,17 +319,16 @@ RSpec.describe "BikesController#create", type: :request do
       }
     end
 
-    include_context :geocoder_real
+    before do
+      Geocoder.configure(lookup: :test, ip_lookup: :test)
+      Geocoder::Lookup::Test.set_default_stub([])
+    end
     it "does not have address, has association", :flaky do
       Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
-        # TODO: Fix Geocoder requests, remove stub and uncomment VCR
-        allow(GeocodeHelper).to receive(:assignable_address_hash_for).and_return({})
-        # VCR.use_cassette("bikes_controller-create-reg_address_blank", match_requests_on: [:method]) do
         expect {
           post base_url, params: {bike: bike_params.merge(cycle_type: "non-e-scooter")}
         }.to change(Bike, :count).by(1)
-        # end
       end
       expect(flash[:success]).to be_present
       new_bike = Bike.last
