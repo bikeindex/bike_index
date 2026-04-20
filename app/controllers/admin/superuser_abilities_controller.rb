@@ -1,5 +1,5 @@
 class Admin::SuperuserAbilitiesController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_superuser_ability, except: [:index]
 

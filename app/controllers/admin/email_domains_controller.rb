@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::EmailDomainsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_email_domain, only: %i[show update]
   helper_method :searchable_statuses, :matching_email_domains

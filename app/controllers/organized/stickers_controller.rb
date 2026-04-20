@@ -1,6 +1,6 @@
 module Organized
   class StickersController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
 
     before_action :ensure_access_to_bike_stickers! # Because this checks ensure_admin
     before_action :find_bike_sticker, only: %i[edit update]

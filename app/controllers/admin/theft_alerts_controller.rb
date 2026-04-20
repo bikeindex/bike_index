@@ -1,5 +1,5 @@
 class Admin::TheftAlertsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_theft_alert, only: [:edit, :update]
 

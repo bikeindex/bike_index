@@ -1,4 +1,7 @@
 module ApplicationHelper
+  include Binxtils::NavHelper
+  include Binxtils::SortableHelper
+
   # Override ActionView `cache` helper, adding the current locale to the cache
   # key.
   def cache(key = {}, options = {}, &block)
@@ -30,19 +33,6 @@ module ApplicationHelper
     html_options[:class] ||= ""
     html_options[:class] += " active" if current_page_active?(link_path, match_controller)
     link_to(raw(link_text), link_path, html_options).html_safe
-  end
-
-  def current_page_active?(link_path, match_controller = false)
-    if match_controller
-      begin
-        link_controller = Rails.application.routes.recognize_path(link_path)[:controller]
-        Rails.application.routes.recognize_path(request.url)[:controller] == link_controller
-      rescue # This mainly fails in testing - but why not rescue always
-        false
-      end
-    else
-      current_page?(link_path)
-    end
   end
 
   # Used to render the page wrapper

@@ -1,5 +1,5 @@
 class Admin::UsersController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_user, only: %i[show edit update destroy]
   helper_method :invalid_user_options

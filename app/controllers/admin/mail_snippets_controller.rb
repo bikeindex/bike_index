@@ -1,5 +1,5 @@
 class Admin::MailSnippetsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_snippet, except: [:index, :new, :create]
 

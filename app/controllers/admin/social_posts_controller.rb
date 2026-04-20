@@ -1,5 +1,5 @@
 class Admin::SocialPostsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_social_post, except: [:new, :create, :index]
 

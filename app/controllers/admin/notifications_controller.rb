@@ -1,5 +1,5 @@
 class Admin::NotificationsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   def index
     params[:page] || 1

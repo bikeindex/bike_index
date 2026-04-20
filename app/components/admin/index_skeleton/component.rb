@@ -2,7 +2,7 @@
 
 module Admin::IndexSkeleton
   class Component < ApplicationComponent
-    include SortableHelper
+    include Binxtils::SortableHelper
 
     def initialize(
       collection: nil,

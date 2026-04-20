@@ -1,6 +1,6 @@
 module Organized
   class RegistrationsController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
 
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
 
