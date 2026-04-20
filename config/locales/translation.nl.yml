@@ -2391,6 +2391,9 @@ nl:
             op met support@bikeindex.org als u denkt dat dit mogelijk zou moeten zijn.
         find_bike_sticker:
           unable_to_find_sticker: 'Kan sticker met code niet vinden: %{bike_sticker}.'
+        ensure_sticker_for_current_organization:
+          not_your_organizations_sticker: Sticker %{bike_sticker} is niet de sticker
+            van uw organisatie.
       users:
         create:
           insufficient_invitations: U hebt geprobeerd %{invite_count} gebruikers uit
