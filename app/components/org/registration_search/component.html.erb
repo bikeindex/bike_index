@@ -116,7 +116,9 @@
             <%= link_to "\u{1F50E}", organization_registrations_path(organization_id: organization.to_param, search_email: bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
           </small>
         <% else %>
-          <em class="tw:text-gray-400"><%= t("components.org.registration_search.email_hidden") %></em>
+          <em class="tw:text-gray-400">
+            <%= t("components.org.registration_search.email_hidden") %>
+          </em>
         <% end %>
       <% end %>
 
