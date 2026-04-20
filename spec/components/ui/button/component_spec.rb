@@ -103,10 +103,10 @@ RSpec.describe UI::Button::Component, type: :component do
   end
 
   context "with data attributes" do
-    let(:options) { {text: "Click", data: {action: "click->modal#open"}} }
+    let(:options) { {text: "Click", data: {action: "click->ui--modal#open"}} }
 
     it "renders data attributes" do
-      expect(component).to have_css("button[data-action='click->modal#open']")
+      expect(component).to have_css("button[data-action='click->ui--modal#open']")
     end
   end
 end
