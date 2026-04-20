@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller="modal"
+// Connects to data-controller="ui--modal"
 export default class extends Controller {
   connect () {
     this.boundOpen = this.openFromTrigger.bind(this)

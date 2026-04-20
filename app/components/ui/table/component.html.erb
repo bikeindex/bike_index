@@ -1,12 +1,13 @@
 <div
   class="tw:-mx-4 tw:mb-4 tw:overflow-x-scroll tw:px-4 tw:pb-3"
-  data-controller="ui-table"
+  data-controller="ui--table"
+  data-ui--table-sticky-value="<%= @sticky %>"
 >
   <table class="<%= table_classes %>">
     <thead class="tw:bg-gray-50 tw:text-sm tw:dark:bg-gray-700">
       <tr>
         <% @columns.each do |col| %>
-          <th class="<%= col.th_classes(bordered: @bordered) %>">
+          <th class="<%= [col.th_classes(bordered: @bordered), sticky_th_classes].compact.join(" ") %>">
             <%= col.render_header(render_sortable: @render_sortable, current_sort:, current_direction:, sortable_url: method(:sortable_url)) %>
           </th>
         <% end %>

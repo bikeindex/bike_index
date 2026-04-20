@@ -1,7 +1,7 @@
 <dialog
   id="<%= @id %>"
-  data-controller="modal"
-  data-action="click->modal#backdropClick keydown->modal#handleKeydown"
+  data-controller="ui--modal"
+  data-action="click->ui--modal#backdropClick keydown->ui--modal#handleKeydown"
   class="
     tw:m-auto tw:w-full tw:max-w-lg tw:bg-transparent tw:p-0
     tw:backdrop:bg-black/50 tw:backdrop:backdrop-blur-sm tw:open:flex
@@ -27,7 +27,7 @@
 
         <button
           type="button"
-          data-action="click->modal#close"
+          data-action="click->ui--modal#close"
           aria-label="Close"
           class="
             tw:text-gray-400 tw:hover:text-gray-600
