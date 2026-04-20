@@ -1,5 +1,6 @@
 module ApplicationHelper
   include Binxtils::NavHelper
+  include Binxtils::SortableHelper
 
   # Override ActionView `cache` helper, adding the current locale to the cache
   # key.
