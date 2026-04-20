@@ -61,9 +61,8 @@ export default class extends Controller {
   }
 
   async updatePosition () {
-    const placement = this.menuTarget.dataset.dropdownPlacementValue || this.placementValue
     const { x, y } = await computePosition(this.buttonTarget, this.menuTarget, {
-      placement,
+      placement: this.placementValue,
       middleware: [
         offset(4),
         flip(),

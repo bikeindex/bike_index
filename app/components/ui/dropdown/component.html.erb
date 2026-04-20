@@ -1,4 +1,8 @@
-<div class="tw:relative tw:inline-block" data-controller="ui--dropdown">
+<div
+  class="tw:relative tw:inline-block"
+  data-controller="ui--dropdown"
+  data-ui--dropdown-placement-value="<%= floating_ui_placement %>"
+>
   <button
     type="button"
     class="<%= button_classes %>"
@@ -26,7 +30,6 @@
       tw:bg-white tw:shadow-lg tw:dark:border-gray-700 tw:dark:bg-gray-800
     "
     data-ui--dropdown-target="menu"
-    data-ui--dropdown-placement-value="<%= floating_ui_placement %>"
   >
     <ul role="menu" class="twdropdown" aria-labelledby="<%= button_id %>">
       <% entries.each do |entry| %>
