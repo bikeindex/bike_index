@@ -92,6 +92,35 @@ RSpec.describe Organized::StickersController, type: :request do
           expect(response).to render_template(:edit)
           expect(assigns(:current_organization)&.id).to eq current_organization.id
         end
+        context "unclaimed non-organization bike_sticker" do
+          let(:og_organization) { FactoryBot.create(:organization) }
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: og_organization, code: "zzz999") }
+          it "renders" do
+            get "#{base_url}/#{bike_sticker.code}/edit"
+            expect(response).to render_template(:edit)
+            expect(assigns(:bike_sticker)&.id).to eq bike_sticker.id
+          end
+        end
+        context "claimed non-organization bike_sticker" do
+          let(:og_organization) { FactoryBot.create(:organization) }
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: og_organization, code: "zzz999") }
+          it "redirects back with a flash error" do
+            get "#{base_url}/#{bike_sticker.code}/edit", headers: {"HTTP_REFERER" => stickers_root_path}
+            expect(response).to redirect_to(stickers_root_path)
+            expect(flash[:error]).to match(/organization/i)
+          end
+          context "when current_organization is the secondary_organization" do
+            let!(:bike_sticker) do
+              FactoryBot.create(:bike_sticker_claimed, organization: og_organization, code: "zzz999")
+                .tap { |s| s.update!(secondary_organization: current_organization) }
+            end
+            it "renders" do
+              get "#{base_url}/#{bike_sticker.code}/edit"
+              expect(response).to render_template(:edit)
+              expect(assigns(:bike_sticker)&.id).to eq bike_sticker.id
+            end
+          end
+        end
       end
 
       describe "update" do
@@ -160,10 +189,10 @@ RSpec.describe Organized::StickersController, type: :request do
             end
           end
         end
-        context "non-organization bike_sticker" do
+        context "unclaimed non-organization bike_sticker" do
           let(:og_organization) { FactoryBot.create(:organization) }
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: og_organization) }
-          it "updates" do
+          it "updates and assigns secondary_organization" do
             expect(bike_sticker.reload.organization_id).to be_present
             expect(bike_sticker.claimed?).to be_falsey
             expect {
@@ -177,6 +206,20 @@ RSpec.describe Organized::StickersController, type: :request do
             expect(bike_sticker.organization_id).to eq og_organization.id
             expect(bike_sticker.secondary_organization_id).to eq current_organization.id
             expect(bike_sticker.bike_id).to eq bike2.id
+          end
+        end
+        context "claimed non-organization bike_sticker" do
+          let(:og_organization) { FactoryBot.create(:organization) }
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: og_organization) }
+          it "redirects back with a flash error and does not update" do
+            expect {
+              put "#{base_url}/#{bike_sticker.code}", params: {bike_id: bike2.id},
+                headers: {"HTTP_REFERER" => stickers_root_path}
+            }.to_not change(BikeStickerUpdate, :count)
+            expect(response).to redirect_to(stickers_root_path)
+            expect(flash[:error]).to match(/organization/i)
+            expect(bike_sticker.reload.bike_id).to_not eq bike2.id
+            expect(bike_sticker.secondary_organization_id).to be_nil
           end
         end
         context "nil bike_id" do
