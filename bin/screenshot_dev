@@ -1,7 +1,9 @@
 #!/bin/bash
 # Usage: bin/screenshot_dev <url-path> <page-slug>
 # Captures desktop (1440x900) and mobile (390x844) PNGs of
-# $BASE_URL<url-path> to tmp/pr_screenshots/<branch>-<page>-{desktop,mobile}.png
+# $BASE_URL<url-path> to tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png
+# The timestamp suffix makes each invocation's output URL unique so
+# GitHub's image cache doesn't serve a stale copy after re-runs.
 # Prints the two paths on stdout, one per line.
 
 set -eu
@@ -35,14 +37,16 @@ find_chrome() {
 }
 chrome="$(find_chrome)"
 branch_slug="$(git rev-parse --abbrev-ref HEAD | tr '/' '-')"
+timestamp="$(date +%Y%m%d-%H%M%S)"
 out_dir="tmp/pr_screenshots"
 url="${BASE_URL}${url_path}"
 mobile_ua="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 
 mkdir -p "$out_dir"
+rm -f "${out_dir}/${branch_slug}-${page_slug}"-*.png
 
-desktop_path="${out_dir}/${branch_slug}-${page_slug}-desktop.png"
-mobile_path="${out_dir}/${branch_slug}-${page_slug}-mobile.png"
+desktop_path="${out_dir}/${branch_slug}-${page_slug}-${timestamp}-desktop.png"
+mobile_path="${out_dir}/${branch_slug}-${page_slug}-${timestamp}-mobile.png"
 
 "$chrome" --headless=new --disable-gpu --hide-scrollbars \
   --virtual-time-budget=10000 \

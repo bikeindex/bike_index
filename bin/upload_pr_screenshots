@@ -14,7 +14,7 @@ gh release view "$tag" --repo "$repo" >/dev/null 2>&1 \
        --title "PR screenshots" \
        --notes "Auto-uploaded PR screenshots — do not delete."
 
-gh release upload "$tag" tmp/pr_screenshots/*.png --repo "$repo" --clobber
+gh release upload "$tag" tmp/pr_screenshots/*.png --repo "$repo"
 
 for f in tmp/pr_screenshots/*.png; do
   echo "https://github.com/${repo}/releases/download/${tag}/$(basename "$f")"
