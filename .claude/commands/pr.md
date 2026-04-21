@@ -9,13 +9,13 @@ Create a pull request for the current branch. If the diff contains frontend chan
 
 ### 1. Gather branch state and start bin/dev
 
-Run in parallel:
+Set `DEV_PORT=${DEV_PORT:-3042}` once and reuse it below. Run in parallel:
 - `git status` (no `-uall`)
 - `git diff main...HEAD --stat`
 - `git diff main...HEAD --name-only`
 - `git log main..HEAD --oneline`
-- `gh pr view --json number,url,title 2>/dev/null` — is there already a PR?
-- `curl -fs "http://localhost:${DEV_PORT:-3042}/" >/dev/null` — is `bin/dev` already up?
+- `EXISTING_PR=$(gh pr view --json number,url,title 2>/dev/null)` — capture for step 7.
+- `curl -fs "http://localhost:$DEV_PORT/" >/dev/null` — is `bin/dev` already up?
 
 If the branch has no commits ahead of `main`, stop and tell the user.
 
@@ -42,18 +42,20 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
-If you started `bin/dev` in step 1, poll `curl -fs "http://localhost:${DEV_PORT:-3042}/" >/dev/null` until it succeeds before taking screenshots — Foreman takes a few seconds to come up.
+Before screenshots, poll `curl -fs "http://localhost:$DEV_PORT/" >/dev/null` until it succeeds — Foreman takes a few seconds to come up.
 
 ### 4. Capture screenshots
 
-Use headless Chrome. Save to `tmp/pr_screenshots/` (create if missing).
+Use headless Chrome. Save to `tmp/pr_screenshots/`.
+
+Filename convention: `<branch-slug>-<page-slug>-<device>.png`, where `<branch-slug>` is `$(git rev-parse --abbrev-ref HEAD | tr '/' '-')`, `<page-slug>` is derived from the page (e.g. `bike-show`, `admin-strava-activities`), and `<device>` is `desktop` or `mobile`. The branch prefix makes filenames unique across PRs so release-asset uploads don't collide.
 
 Desktop (1440x900):
 ```
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
   --headless --disable-gpu --hide-scrollbars \
   --window-size=1440,900 \
-  --screenshot="tmp/pr_screenshots/<name>-desktop.png" \
+  --screenshot="tmp/pr_screenshots/<filename>.png" \
   "http://localhost:$DEV_PORT/<path>"
 ```
 
@@ -63,11 +65,9 @@ Mobile (390x844, iPhone-ish):
   --headless --disable-gpu --hide-scrollbars \
   --window-size=390,844 \
   --user-agent="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1" \
-  --screenshot="tmp/pr_screenshots/<name>-mobile.png" \
+  --screenshot="tmp/pr_screenshots/<filename>.png" \
   "http://localhost:$DEV_PORT/<path>"
 ```
-
-`<name>` should be a short slug derived from the page (e.g. `bike-show`, `admin-strava-activities`). One desktop + one mobile per page.
 
 After capture, check file sizes — a PNG under ~5KB usually means the page errored. Diagnose it:
 
@@ -80,40 +80,21 @@ Only stop and surface to the user once you understand the cause and either (a) h
 
 ### 5. Host the images
 
-Upload screenshots as release assets on a reused prerelease in the repo, using only `gh` (for auth) and `curl` (for the binary upload). No branch commits, no third-party dependencies.
-
-The strategy: find or create a single prerelease tagged `_pr-screenshots`, then POST each PNG to its `uploads.github.com` endpoint. GitHub returns a public `browser_download_url` for each asset.
+Upload screenshots as release assets on a reused prerelease in the repo, using `gh` subcommands — no `curl`, no third-party deps.
 
 ```bash
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+TAG=_pr-screenshots
 
-# Find or create the screenshots prerelease (one-time per repo; reused forever)
-RELEASE_ID=$(gh api "repos/$REPO/releases/tags/_pr-screenshots" --jq '.id' 2>/dev/null)
-if [ -z "$RELEASE_ID" ]; then
-  RELEASE_ID=$(gh api "repos/$REPO/releases" -X POST \
-    -f tag_name=_pr-screenshots \
-    -f name="PR screenshots" \
-    -F prerelease=true \
-    -f body="Auto-uploaded PR screenshots — do not delete; image embeds reference these assets." \
-    --jq '.id')
-fi
+gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1 \
+  || gh release create "$TAG" --repo "$REPO" --prerelease \
+       --title "PR screenshots" \
+       --notes "Auto-uploaded PR screenshots — do not delete."
 
-# Upload one file, printing its public URL
-upload_screenshot() {
-  local path="$1"
-  local name="pr-$(date +%s)-$(basename "$path")"  # timestamp prefix avoids name collisions across PRs
-  curl -sS -f -X POST \
-    -H "Authorization: Bearer $(gh auth token)" \
-    -H "Content-Type: image/png" \
-    --data-binary "@$path" \
-    "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=$name" \
-    | jq -r '.browser_download_url'
-}
+gh release upload "$TAG" tmp/pr_screenshots/*.png --repo "$REPO"
 ```
 
-Run `upload_screenshot` once per file and capture the URL. URLs look like `https://github.com/<owner>/<repo>/releases/download/_pr-screenshots/<name>` and are publicly accessible.
-
-If an upload fails, surface the error and fall back to creating the PR without screenshots — don't block PR creation on screenshot hosting.
+First run in a repo creates the prerelease; subsequent runs reuse it. URLs follow the stable pattern `https://github.com/<owner>/<repo>/releases/download/_pr-screenshots/<filename>`, so you can construct them without parsing any API response.
 
 ### 6. Build the PR body
 
@@ -124,17 +105,16 @@ Structure:
 
 ## Screenshots
 
+### <page name>
+
 | Desktop | Mobile |
 | --- | --- |
-| <img src="<desktop-raw-url>" width="600"> | <img src="<mobile-raw-url>" width="300"> |
-
-<one row per screenshotted page; add a caption row above each table if there are multiple pages>
+| <img src="<desktop-url>" width="600"> | <img src="<mobile-url>" width="300"> |
 ```
 
 Rules for the Screenshots section:
 - Omit the whole `## Screenshots` section if there are no frontend changes.
-- Each screenshotted page gets its own table (so desktop and mobile for the same page sit side-by-side).
-- If there are multiple pages, precede each table with a `### <page name>` subheading.
+- Each page gets a `### <page name>` subheading followed by its own 1-row table — desktop on the left, mobile on the right.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells.
 
 Follow the repo's existing PR body style — look at the last few merged PRs (`gh pr list --state merged --limit 5 --json body,title`) to match tone and length. Keep the title under ~70 chars.
@@ -143,13 +123,11 @@ Follow the repo's existing PR body style — look at the last few merged PRs (`g
 
 Push the branch: `git push -u origin HEAD`.
 
-- If `gh pr view` returned an existing PR earlier: `gh pr edit <num> --body-file <tmp-body-file>` (don't overwrite the title unless the user asks).
+- If `$EXISTING_PR` from step 1 was non-empty: `gh pr edit <num> --body-file <tmp-body-file>` (don't overwrite the title unless the user asks).
 - Otherwise: `gh pr create --base main --title "..." --body-file <tmp-body-file>`.
 
 Always pass the body via `--body-file` (not inline `--body`) to preserve formatting. Return the PR URL at the end.
 
 ## Notes
 
-- Do not skip hooks (`--no-verify`) on any commits or pushes.
-- The first run in a repo creates a prerelease tagged `_pr-screenshots`; every run after that reuses it. This is expected — don't treat the `404 → create` flow as an error.
-- If headless Chrome fails (missing binary, crash) or an upload fails, report the failure clearly and fall back to creating the PR without screenshots — don't block PR creation on screenshot tooling.
+- If headless Chrome or the release upload fails, report the failure clearly and fall back to creating the PR without screenshots — don't block PR creation on screenshot tooling.
