@@ -13,12 +13,12 @@ export default class extends Controller {
   connect () {
     this.applyEdgeStyles()
     this.boundRefresh = () => this.applyEdgeStyles()
+    this.boundResize = () => this.onResize()
     window.addEventListener('ui-table:refresh', this.boundRefresh)
+    window.addEventListener('resize', this.boundResize)
 
     if (this.stickyValue) {
-      this.boundResize = () => this.setupSticky()
       this.boundScroll = () => this.onScroll()
-      window.addEventListener('resize', this.boundResize)
       this.setupSticky()
     }
   }
@@ -33,6 +33,16 @@ export default class extends Controller {
     if (this.boundScroll) {
       window.removeEventListener('scroll', this.boundScroll)
     }
+    if (this.resizeFrame) cancelAnimationFrame(this.resizeFrame)
+  }
+
+  onResize () {
+    if (this.resizeFrame) return
+    this.resizeFrame = requestAnimationFrame(() => {
+      this.resizeFrame = null
+      this.applyEdgeStyles()
+      if (this.stickyValue) this.setupSticky()
+    })
   }
 
   refresh () {
