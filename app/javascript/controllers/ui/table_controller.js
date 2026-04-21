@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-/* global CSS, getComputedStyle, requestAnimationFrame */
+/* global CSS, getComputedStyle, requestAnimationFrame, cancelAnimationFrame */
 
 // Connects to data-controller='ui--table'
 // Applies first/last visible column styles (rounding, borders) that CSS
