@@ -78,7 +78,7 @@
                   %td
                     = number_display(nil_count)
 
-= render PeriodSelect::Component.new
+= render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 .row.mt-4
   .col

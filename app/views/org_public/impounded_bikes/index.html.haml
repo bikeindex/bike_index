@@ -7,7 +7,7 @@
     %strong.uncap= current_organization.name
     Impounded bikes
 
-  = render PeriodSelect::Component.new(prepend_text: "Impounded during:")
+  = render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, prepend_text: "Impounded during:")
 
   .mt-4
     = render partial: "/shared/bike_search_form", locals: {include_hidden_search_fields: true, search_path: organization_impounded_bikes_path(organization_id: current_organization.to_param)}

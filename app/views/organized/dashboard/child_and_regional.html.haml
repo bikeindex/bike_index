@@ -16,7 +16,7 @@
   = column_chart claimed_ownerships, thousands: ",", stacked: true, colors: ["#88a2e0", "#ffc281"]
 
 %div{ style: "margin-top: 50px;" }
-  = render PeriodSelect::Component.new
+  = render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 %h3.mt-4.uncap
   - if current_organization.regional?

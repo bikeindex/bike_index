@@ -91,7 +91,7 @@
                   %strong= MoneyFormatter.money_format(matching_invoices.sum(:amount_paid_cents))
 
 .mt-2
-  = render PeriodSelect::Component.new(include_future: true)
+  = render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, include_future: true)
 
 %p
   Total paid:

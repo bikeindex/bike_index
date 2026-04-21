@@ -106,6 +106,7 @@ This project also uses the ViewComponent gem to render components.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`
 - View components must initialize with keyword arguments
 - In view components, prefer instance variables to attr_accessor
+- Never read controller state from a component via `controller.instance_variable_get`. Everything the component needs must be passed in as an explicit keyword argument by the caller.
 - In ViewComponent templates, use `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`).
   - You don't need to prefix paths (e.g. do `new_bike_path` NOT `helpers.new_bike_path`)
 

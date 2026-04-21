@@ -2,6 +2,7 @@
 
 module PeriodSelect
   class ComponentPreview < ApplicationComponentPreview
+    # @!group Period Select Variants
     def default
       render(PeriodSelect::Component.new(
         period: "all",
@@ -26,5 +27,6 @@ module PeriodSelect
         end_time: Time.current + 7.days
       ))
     end
+    # @endgroup
   end
 end

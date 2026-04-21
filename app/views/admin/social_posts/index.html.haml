@@ -34,7 +34,7 @@
   = column_chart time_range_counts(collection: matching_social_posts), stacked: true, thousands: ","
 
 .mt-2
-  = render PeriodSelect::Component.new(include_future: true)
+  = render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, include_future: true)
 
 .row.mt-4.mb-4
   .col-sm-5

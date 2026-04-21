@@ -3,21 +3,13 @@
 require "rails_helper"
 
 RSpec.describe PeriodSelect::Component, type: :component do
-  let(:instance) { described_class.new(**options) }
+  let(:instance) { described_class.new(period:, start_time:, end_time:, **options) }
   let(:options) { {} }
   let(:period) { "all" }
+  let(:start_time) { Time.current - 1.year }
+  let(:end_time) { Time.current }
 
-  def render_component
-    with_request_url("/admin") do
-      ctrl = vc_test_controller
-      ctrl.instance_variable_set(:@period, period)
-      ctrl.instance_variable_set(:@start_time, Time.current - 1.year)
-      ctrl.instance_variable_set(:@end_time, Time.current)
-      render_inline(instance)
-    end
-  end
-
-  let(:component) { render_component }
+  let(:component) { with_request_url("/admin") { render_inline(instance) } }
 
   it "renders period buttons with active class on the selected period" do
     expect(component).to have_css("#timeSelectionBtnGroup")
@@ -69,8 +61,8 @@ RSpec.describe PeriodSelect::Component, type: :component do
   end
 
   context "without start_time" do
-    it "raises" do
-      expect { render_inline(instance) }.to raise_error(/set_period/)
+    it "raises ArgumentError" do
+      expect { described_class.new(period:, end_time:) }.to raise_error(ArgumentError, /start_time/)
     end
   end
 end

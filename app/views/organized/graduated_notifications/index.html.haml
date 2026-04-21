@@ -14,7 +14,7 @@
         %br
         Please email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"} to set up graduated notifications.
 
-= render PeriodSelect::Component.new
+= render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 .mt-4
   = render(Search::FormOrganized::Component.new(target_search_path: organization_graduated_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params))

@@ -1,6 +1,6 @@
 <%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
 
-<%= render PeriodSelect::Component.new %>
+<%= render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
 
 <div class="mb-4"></div>
 

@@ -19,7 +19,7 @@
         = link_to 'New Post', new_admin_news_url, class: "btn btn-success btn-sm"
 
 .mt-2
-  = render PeriodSelect::Component.new
+  = render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 %p
   -# if searching by tags, count returns the group count
