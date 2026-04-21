@@ -49,7 +49,7 @@
   <% end %>
 
   <% table.column(sortable: "distance_meters", label: "Distance (miles)", classes: "tw:text-xs") do |strava_activity| %>
-    <%= number_display(strava_activity.distance_miles.round) %>
+    <%= number_display(strava_activity.distance_miles&.round) %>
   <% end %>
 
   <% table.column(label: "Gear", header_classes: "tw:font-normal") do |strava_activity| %>
