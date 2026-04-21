@@ -55,7 +55,7 @@
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
         %th.table-checkbox-select
-          %a{ href: "#", data: { action: "click->table-multi-delete#toggleAll" } }
+          %button{ type: "button", class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", data: { action: "click->table-multi-delete#toggleAll" } }
             = check_mark
         %th
           Date indexed

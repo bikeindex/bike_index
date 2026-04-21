@@ -39,7 +39,7 @@
     data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
   >
     <%= render(UI::Table::Component.new(records: bikes, cache_key: "admin-bikes-v2", render_sortable:, classes: show_serial ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
-      <% table.column(label: link_to(check_mark, "#", data: {action: "click->table-multi-delete#toggleAll"}), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bike| %>
+      <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", data: {action: "click->table-multi-delete#toggleAll"}), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bike| %>
         <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false, data: {"table-multi-delete-target" => "checkbox"} %>
       <% end %>
 
