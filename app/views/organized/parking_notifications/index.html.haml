@@ -96,13 +96,23 @@
           %a#FitMapTrigger{href: "#", class: (@page_data[:default_location] ? "currently-hidden" : "")}
             Fit map to notifications
   #timeSelectionBtnGroup.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "", "data-nosubmit" => "true" }
-    - %w[hour day week month year all].each do |period_kind|
-      %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == period_kind), href: url_for(sortable_search_params.merge(period: period_kind)), data: { period: period_kind } }
-        - if period_kind == "all"
-          All
-        - else
-          %span.d-none.d-md-inline-block past
-          = period_kind == "week" ? "7 days" : period_kind == "month" ? "30 days" : period_kind
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "hour"), href: url_for(sortable_search_params.merge(period: "hour")), data: { period: "hour" } }
+      %span.d-none.d-md-inline-block past
+      hour
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "day"), href: url_for(sortable_search_params.merge(period: "day")), data: { period: "day" } }
+      %span.d-none.d-md-inline-block past
+      day
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "week"), href: url_for(sortable_search_params.merge(period: "week")), data: { period: "week" } }
+      %span.d-none.d-md-inline-block past
+      7 days
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "month"), href: url_for(sortable_search_params.merge(period: "month")), data: { period: "month" } }
+      %span.d-none.d-md-inline-block past
+      30 days
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "year"), href: url_for(sortable_search_params.merge(period: "year")), data: { period: "year" } }
+      %span.d-none.d-md-inline-block past
+      year
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "all"), href: url_for(sortable_search_params.merge(period: "all")), data: { period: "all" } }
+      All
     %button#periodSelectCustom.btn.btn-outline-secondary.btn-sm.ml-2{ class: ("active" if @period == "custom"), data: { period: "custom" } }
       custom
 
