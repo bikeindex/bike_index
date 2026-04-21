@@ -2,7 +2,7 @@
 
 module UI::Badge
   class Component < ApplicationComponent
-    BASE_CLASSES = "tw:inline-flex tw:border tw:items-center tw:leading-4 tw:rounded-full tw:cursor-default"
+    BASE_CLASSES = "tw:inline-flex tw:border tw:items-center tw:leading-4 tw:rounded-full"
 
     SIZES = {
       sm: "tw:text-xs tw:font-medium tw:px-1 tw:py-px",
@@ -24,20 +24,31 @@ module UI::Badge
       empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600"
     }.freeze
 
-    def self.badge_classes(color:, size:)
-      [BASE_CLASSES, COLORS[color], SIZES[size]].join(" ")
+    def self.badge_classes(color:, size:, cursor: "tw:cursor-default")
+      [BASE_CLASSES, cursor, COLORS[color], SIZES[size]].join(" ")
     end
 
     def initialize(text:, title: nil, color: :gray, size: :md)
       @text = text
-      @title = title || text
+      @title = title
       @color = COLORS.key?(color) ? color : :gray
       @size = SIZES.include?(size) ? size : :md
     end
 
     def call
-      content_tag(:span, content.presence || @text,
-        class: self.class.badge_classes(color: @color, size: @size), title: @title)
+      badge = content_tag(:span, content.presence || @text, class: badge_class)
+      return badge unless custom_title?
+      render(UI::Tooltip::Component.new(text: @title)) { badge }
+    end
+
+    private
+
+    def custom_title?
+      @title.present? && @title != @text
+    end
+
+    def badge_class
+      self.class.badge_classes(color: @color, size: @size, cursor: custom_title? ? "tw:cursor-help" : "tw:cursor-default")
     end
   end
 end
