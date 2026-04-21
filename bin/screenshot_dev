@@ -17,11 +17,15 @@ url_path="$1"
 page_slug="$2"
 
 find_chrome() {
-  if [ -n "${CHROME:-}" ]; then echo "$CHROME"; return; fi
+  if [ -n "${CHROME:-}" ]; then
+    command -v "$CHROME" >/dev/null 2>&1 || { echo "\$CHROME set but not executable: $CHROME" >&2; exit 1; }
+    echo "$CHROME"; return
+  fi
   for candidate in \
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+    "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary" \
     "/Applications/Chromium.app/Contents/MacOS/Chromium" \
-    google-chrome google-chrome-stable chromium chromium-browser; do
+    google-chrome google-chrome-stable chromium chromium-browser chrome; do
     if [ -x "$candidate" ] || command -v "$candidate" >/dev/null 2>&1; then
       echo "$candidate"; return
     fi
@@ -40,12 +44,12 @@ mkdir -p "$out_dir"
 desktop_path="${out_dir}/${branch_slug}-${page_slug}-desktop.png"
 mobile_path="${out_dir}/${branch_slug}-${page_slug}-mobile.png"
 
-"$chrome" --headless --disable-gpu --hide-scrollbars \
+"$chrome" --headless=new --disable-gpu --hide-scrollbars \
   --window-size=1440,900 \
   --screenshot="$desktop_path" \
   "$url"
 
-"$chrome" --headless --disable-gpu --hide-scrollbars \
+"$chrome" --headless=new --disable-gpu --hide-scrollbars \
   --window-size=390,844 \
   --user-agent="$mobile_ua" \
   --screenshot="$mobile_path" \
