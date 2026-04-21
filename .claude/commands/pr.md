@@ -7,7 +7,7 @@ Create a pull request for the current branch. If the diff contains frontend chan
 
 ## Workflow
 
-### 1. Gather branch state
+### 1. Gather branch state and start bin/dev
 
 Run in parallel:
 - `git status` (no `-uall`)
@@ -15,8 +15,11 @@ Run in parallel:
 - `git diff main...HEAD --name-only`
 - `git log main..HEAD --oneline`
 - `gh pr view --json number,url,title 2>/dev/null` — is there already a PR?
+- `curl -fs "http://localhost:${DEV_PORT:-3042}/" >/dev/null` — is `bin/dev` already up?
 
 If the branch has no commits ahead of `main`, stop and tell the user.
+
+If `bin/dev` isn't responding, start it in the background with `bin/dev` — Tailwind and JS assets need to rebuild before any commit.
 
 ### 2. Classify the diff
 
@@ -39,7 +42,7 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
-If the dev server is not already running on `http://localhost:3042` (or `$DEV_PORT` / `$CONDUCTOR_PORT`), start it yourself in the background with `bin/dev` before continuing — the user always wants it running before commits so Tailwind / JS assets are rebuilt. Wait for the server to respond (`curl -fs http://localhost:$DEV_PORT/ >/dev/null`) before taking screenshots.
+If you started `bin/dev` in step 1, poll `curl -fs "http://localhost:${DEV_PORT:-3042}/" >/dev/null` until it succeeds before taking screenshots — Foreman takes a few seconds to come up.
 
 ### 4. Capture screenshots
 
@@ -147,7 +150,6 @@ Always pass the body via `--body-file` (not inline `--body`) to preserve formatt
 
 ## Notes
 
-- Always ensure `bin/dev` is running (start it in the background if not) before committing, so Tailwind and JS assets are rebuilt.
 - Do not skip hooks (`--no-verify`) on any commits or pushes.
 - The first run in a repo creates a prerelease tagged `_pr-screenshots`; every run after that reuses it. This is expected — don't treat the `404 → create` flow as an error.
 - If headless Chrome fails (missing binary, crash) or an upload fails, report the failure clearly and fall back to creating the PR without screenshots — don't block PR creation on screenshot tooling.
