@@ -15,7 +15,21 @@ eval "$(ruby "$(dirname "$0")/env" --export)"
 
 url_path="$1"
 page_slug="$2"
-chrome="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+find_chrome() {
+  if [ -n "${CHROME:-}" ]; then echo "$CHROME"; return; fi
+  for candidate in \
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+    "/Applications/Chromium.app/Contents/MacOS/Chromium" \
+    google-chrome google-chrome-stable chromium chromium-browser; do
+    if [ -x "$candidate" ] || command -v "$candidate" >/dev/null 2>&1; then
+      echo "$candidate"; return
+    fi
+  done
+  echo "bin/screenshot: no Chrome/Chromium binary found. Set \$CHROME to override." >&2
+  exit 1
+}
+chrome="$(find_chrome)"
 branch_slug="$(git rev-parse --abbrev-ref HEAD | tr '/' '-')"
 out_dir="tmp/pr_screenshots"
 url="${BASE_URL}${url_path}"
