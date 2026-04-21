@@ -39,7 +39,7 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
-If the dev server is not already running on `http://localhost:3042` (or `$DEV_PORT` / `$CONDUCTOR_PORT`), ask the user to start `bin/dev` first rather than starting it yourself — it's long-running and interactive.
+If the dev server is not already running on `http://localhost:3042` (or `$DEV_PORT` / `$CONDUCTOR_PORT`), start it yourself in the background with `bin/dev` before continuing — the user always wants it running before commits so Tailwind / JS assets are rebuilt. Wait for the server to respond (`curl -fs http://localhost:$DEV_PORT/ >/dev/null`) before taking screenshots.
 
 ### 4. Capture screenshots
 
@@ -127,7 +127,7 @@ Always pass the body via `--body-file` (not inline `--body`) to preserve formatt
 
 ## Notes
 
-- Do not run `bin/dev` yourself — it's a long-running foreground process. Ask the user to start it.
+- Always ensure `bin/dev` is running (start it in the background if not) before committing, so Tailwind and JS assets are rebuilt. Don't ask the user to start it.
 - Do not skip hooks (`--no-verify`) on any commits or pushes.
 - `gh-attach`'s release-asset strategy creates a single prerelease tagged `_gh-attach-assets` in the repo on first use and reuses it forever — this is expected, don't treat it as an error.
 - If headless Chrome fails (missing binary, crash) or `gh-attach` fails, report the failure clearly and fall back to creating the PR without screenshots — don't block PR creation on screenshot tooling.
