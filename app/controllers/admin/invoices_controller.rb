@@ -1,5 +1,5 @@
 class Admin::InvoicesController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   def index
     @per_page = permitted_per_page(default: 50)
@@ -22,6 +22,7 @@ class Admin::InvoicesController < Admin::BaseController
   end
 
   def latest_period_date
+    return super unless @period.in?(%w[all custom])
     Invoice.maximum(:subscription_end_at) || Time.current
   end
 

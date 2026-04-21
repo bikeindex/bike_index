@@ -1,5 +1,5 @@
 class Admin::MailchimpValuesController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   def index
     @mailchimp_values = matching_mailchimp_values.order(sort_column + " " + sort_direction)

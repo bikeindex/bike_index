@@ -12,7 +12,7 @@ RSpec.describe UI::Modal::Component, type: :component do
     end
 
     expect(component).to have_css("dialog#test-modal")
-    expect(component).to have_css("[data-controller='modal']")
+    expect(component).to have_css("[data-controller='ui--modal']")
     expect(component).to have_text("Test Modal")
     expect(component).to have_text("Body content")
     expect(component).to have_css("button[aria-label='Close']")

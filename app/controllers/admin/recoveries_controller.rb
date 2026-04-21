@@ -1,5 +1,5 @@
 class Admin::RecoveriesController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   helper_method :available_recoveries
 

@@ -1,5 +1,5 @@
 class Admin::BikesController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_bike, only: %i[edit update show]
   before_action :set_period, only: %i[index missing_manufacturer]
@@ -62,7 +62,7 @@ class Admin::BikesController < Admin::BaseController
 
   def get_destroy
     if params[:id] == "multi_delete"
-      bike_ids = defined?(params[:bikes_selected].keys) ? params[:bikes_selected].keys : params[:bikes_selected]
+      bike_ids = params[:bikes_selected].respond_to?(:keys) ? params[:bikes_selected].keys : Array(params[:bikes_selected])
       if bike_ids.any?
         bike_ids.each { |id| BikeDeleterJob.perform_async(id.to_i, false, current_user.id) }
         flash[:success] = "#{bike_ids.count} #{"bike".pluralize(bike_ids.count)} deleted!"

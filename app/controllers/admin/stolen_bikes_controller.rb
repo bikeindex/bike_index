@@ -1,5 +1,5 @@
 class Admin::StolenBikesController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_bike, only: %i[edit update]
   helper_method :available_stolen_records

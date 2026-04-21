@@ -2,7 +2,7 @@
 
 module Admin::BikeCell
   class Component < ApplicationComponent
-    include SortableHelper
+    include Binxtils::SortableHelper
 
     def initialize(
       bike: nil,

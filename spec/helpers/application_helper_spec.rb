@@ -102,6 +102,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
     before do
       helper.extend(ControllerHelpers)
+      helper.extend(Binxtils::ControllerNamespace)
       allow(view).to receive(:controller_namespace) { controller_namespace }
     end
 
@@ -344,6 +345,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     context "bikes controller" do
       before do
         helper.extend(ControllerHelpers)
+        helper.extend(Binxtils::ControllerNamespace)
         allow(view).to receive(:controller_name) { "bikes" }
         allow(view).to receive(:controller_namespace) { nil }
       end

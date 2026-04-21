@@ -15,5 +15,15 @@ RSpec.describe Admin::StravaActivitiesController, type: :request do
       expect(response).to render_template(:index)
       expect(assigns(:collection).pluck(:id)).to eq([strava_activity.id])
     end
+
+    context "with nil distance_meters" do
+      let!(:strava_activity) { FactoryBot.create(:strava_activity, distance_meters: nil) }
+
+      it "responds with ok" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(assigns(:collection).pluck(:id)).to eq([strava_activity.id])
+      end
+    end
   end
 end

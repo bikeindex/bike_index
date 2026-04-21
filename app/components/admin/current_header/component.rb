@@ -2,7 +2,7 @@
 
 module Admin::CurrentHeader
   class Component < ApplicationComponent
-    include SortableHelper
+    include Binxtils::SortableHelper
 
     HEADER_KEYS = %i[
       organization_id

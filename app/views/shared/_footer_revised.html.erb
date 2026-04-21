@@ -176,7 +176,7 @@
   </nav>
 </footer>
 
-<% skip_facebook ||= controller_namespace.in?(%w[organized oauth]) %>
+<% skip_facebook ||= controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" %>
 
 <% unless skip_facebook %>
   <%# Facebook pixel %>

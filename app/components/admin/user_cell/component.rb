@@ -2,7 +2,7 @@
 
 module Admin::UserCell
   class Component < ApplicationComponent
-    include SortableHelper
+    include Binxtils::SortableHelper
 
     def initialize(
       user: nil,

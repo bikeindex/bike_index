@@ -3,7 +3,7 @@ import { computePosition, flip, shift, offset } from '@floating-ui/dom'
 
 let zCounter = 50
 
-// Connects to data-controller="dropdown"
+// Connects to data-controller="ui--dropdown"
 export default class extends Controller {
   static targets = ['menu', 'button']
   static values = {
@@ -61,9 +61,8 @@ export default class extends Controller {
   }
 
   async updatePosition () {
-    const placement = this.menuTarget.dataset.dropdownPlacementValue || this.placementValue
     const { x, y } = await computePosition(this.buttonTarget, this.menuTarget, {
-      placement,
+      placement: this.placementValue,
       middleware: [
         offset(4),
         flip(),

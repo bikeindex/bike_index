@@ -1,5 +1,5 @@
 class StolenBikeListingsController < ApplicationController
-  include SortableTable
+  include Binxtils::SortableTable
 
   def index
     @render_info = calculated_render_info
