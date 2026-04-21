@@ -37,7 +37,7 @@ module SearchResults::MultiResultChip
     end
 
     def serial_span_classes
-      "serial-span tw:underline! tw:hover:font-bold! tw:text-emerald-900! tw:py-1 tw:px-2"
+      "serial-span tw:underline! tw:hover:font-bold! tw:text-emerald-900! tw:dark:text-emerald-200! tw:py-1 tw:px-2"
     end
 
     def badge_classes
