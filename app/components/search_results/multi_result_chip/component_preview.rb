@@ -14,6 +14,10 @@ module SearchResults::MultiResultChip
     def no_results
       render(Component.new(serial: "NONEXISTENT", chip_id: "chip_2", result_count: 0))
     end
+
+    def error
+      render(Component.new(serial: "SERIAL333", chip_id: "chip_3", result_count: 0, error: true))
+    end
     # @!endgroup
   end
 end
