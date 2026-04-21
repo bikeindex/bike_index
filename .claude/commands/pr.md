@@ -70,27 +70,40 @@ After capture, check file sizes — a PNG under ~5KB usually means the page erro
 
 ### 5. Host the images
 
-Use [`gh-attach`](https://github.com/Addono/gh-attach) with the `release-asset` strategy. It uploads each image to a single reused prerelease tagged `_gh-attach-assets` in the repo, and returns a public URL — no branch commits, no browser session.
+Upload screenshots as release assets on a reused prerelease in the repo, using only `gh` (for auth) and `curl` (for the binary upload). No branch commits, no third-party dependencies.
 
-First-time setup (check once, install if missing):
+The strategy: find or create a single prerelease tagged `_pr-screenshots`, then POST each PNG to its `uploads.github.com` endpoint. GitHub returns a public `browser_download_url` for each asset.
+
+```bash
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+
+# Find or create the screenshots prerelease (one-time per repo; reused forever)
+RELEASE_ID=$(gh api "repos/$REPO/releases/tags/_pr-screenshots" --jq '.id' 2>/dev/null)
+if [ -z "$RELEASE_ID" ]; then
+  RELEASE_ID=$(gh api "repos/$REPO/releases" -X POST \
+    -f tag_name=_pr-screenshots \
+    -f name="PR screenshots" \
+    -F prerelease=true \
+    -f body="Auto-uploaded PR screenshots — do not delete; image embeds reference these assets." \
+    --jq '.id')
+fi
+
+# Upload one file, printing its public URL
+upload_screenshot() {
+  local path="$1"
+  local name="pr-$(date +%s)-$(basename "$path")"  # timestamp prefix avoids name collisions across PRs
+  curl -sS -f -X POST \
+    -H "Authorization: Bearer $(gh auth token)" \
+    -H "Content-Type: image/png" \
+    --data-binary "@$path" \
+    "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=$name" \
+    | jq -r '.browser_download_url'
+}
 ```
-gh extension list | grep -q Addono/gh-attach || gh extension install Addono/gh-attach
-```
 
-The PR needs to exist before uploading (gh-attach targets a specific PR number). So reorder:
-1. Push the branch: `git push -u origin HEAD`
-2. Create a draft PR first with a placeholder body so you have a number: `gh pr create --base main --draft --title "..." --body "uploading screenshots..."`. Capture the PR number from the returned URL.
-3. For each screenshot, upload and capture the markdown:
-   ```
-   gh attach upload tmp/pr_screenshots/<name>-desktop.png \
-     --target <owner>/<repo>#<pr-number> \
-     --strategy release-asset
-   ```
-   The command prints a URL like `https://github.com/<owner>/<repo>/releases/download/_gh-attach-assets/<file>`. Capture it.
-4. Build the final PR body (step 6) using those URLs.
-5. Update the PR with the final body and promote from draft: `gh pr edit <num> --body-file <tmp-body-file>` then `gh pr ready <num>`.
+Run `upload_screenshot` once per file and capture the URL. URLs look like `https://github.com/<owner>/<repo>/releases/download/_pr-screenshots/<name>` and are publicly accessible.
 
-If `gh-attach` install or upload fails, fall back to creating the PR without screenshots and surface the error to the user — don't block PR creation on screenshot hosting.
+If an upload fails, surface the error and fall back to creating the PR without screenshots — don't block PR creation on screenshot hosting.
 
 ### 6. Build the PR body
 
@@ -116,12 +129,12 @@ Rules for the Screenshots section:
 
 Follow the repo's existing PR body style — look at the last few merged PRs (`gh pr list --state merged --limit 5 --json body,title`) to match tone and length. Keep the title under ~70 chars.
 
-### 7. Finalize the PR
+### 7. Create or update the PR
 
-Branching on which path you took:
+Push the branch: `git push -u origin HEAD`.
 
-- **Frontend path (draft PR was created in step 5):** `gh pr edit <num> --title "..." --body-file <tmp-body-file>` with the final body, then `gh pr ready <num>`.
-- **No-frontend path:** push the branch, then `gh pr create --base main --title "..." --body-file <tmp-body-file>`. If `gh pr view` already found an existing PR, use `gh pr edit` instead (don't overwrite the title unless the user asks).
+- If `gh pr view` returned an existing PR earlier: `gh pr edit <num> --body-file <tmp-body-file>` (don't overwrite the title unless the user asks).
+- Otherwise: `gh pr create --base main --title "..." --body-file <tmp-body-file>`.
 
 Always pass the body via `--body-file` (not inline `--body`) to preserve formatting. Return the PR URL at the end.
 
@@ -129,5 +142,5 @@ Always pass the body via `--body-file` (not inline `--body`) to preserve formatt
 
 - Always ensure `bin/dev` is running (start it in the background if not) before committing, so Tailwind and JS assets are rebuilt. Don't ask the user to start it.
 - Do not skip hooks (`--no-verify`) on any commits or pushes.
-- `gh-attach`'s release-asset strategy creates a single prerelease tagged `_gh-attach-assets` in the repo on first use and reuses it forever — this is expected, don't treat it as an error.
-- If headless Chrome fails (missing binary, crash) or `gh-attach` fails, report the failure clearly and fall back to creating the PR without screenshots — don't block PR creation on screenshot tooling.
+- The first run in a repo creates a prerelease tagged `_pr-screenshots`; every run after that reuses it. This is expected — don't treat the `404 → create` flow as an error.
+- If headless Chrome fails (missing binary, crash) or an upload fails, report the failure clearly and fall back to creating the PR without screenshots — don't block PR creation on screenshot tooling.
