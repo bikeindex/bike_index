@@ -1,7 +1,7 @@
 #!/bin/bash
 # Usage: bin/screenshot <url-path> <page-slug>
 # Captures desktop (1440x900) and mobile (390x844) PNGs of
-# http://localhost:$DEV_PORT<url-path> to tmp/pr_screenshots/<branch>-<page>-{desktop,mobile}.png
+# $BASE_URL<url-path> to tmp/pr_screenshots/<branch>-<page>-{desktop,mobile}.png
 # Prints the two paths on stdout, one per line.
 
 set -eu
@@ -11,13 +11,14 @@ if [ $# -ne 2 ]; then
   exit 1
 fi
 
+eval "$(ruby "$(dirname "$0")/env" --export)"
+
 url_path="$1"
 page_slug="$2"
-dev_port="${DEV_PORT:-3042}"
 chrome="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 branch_slug="$(git rev-parse --abbrev-ref HEAD | tr '/' '-')"
 out_dir="tmp/pr_screenshots"
-url="http://localhost:${dev_port}${url_path}"
+url="${BASE_URL}${url_path}"
 mobile_ua="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 
 mkdir -p "$out_dir"

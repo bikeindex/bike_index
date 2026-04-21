@@ -9,13 +9,13 @@ Create a pull request for the current branch. If the diff contains frontend chan
 
 ### 1. Gather branch state and start bin/dev
 
-Set `DEV_PORT=${DEV_PORT:-3042}` once and reuse it below. Run in parallel:
+Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right CONDUCTOR_PORT fallback. Then run in parallel:
 - `git status` (no `-uall`)
 - `git diff main...HEAD --stat`
 - `git diff main...HEAD --name-only`
 - `git log main..HEAD --oneline`
 - `EXISTING_PR=$(gh pr view --json number,url,title 2>/dev/null)` — capture for step 7.
-- `curl -fs "http://localhost:$DEV_PORT/" >/dev/null` — is `bin/dev` already up?
+- `curl -fs "$BASE_URL/" >/dev/null` — is `bin/dev` already up?
 
 If the branch has no commits ahead of `main`, stop and tell the user.
 
@@ -42,7 +42,7 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
-Before screenshots, poll `curl -fs "http://localhost:$DEV_PORT/" >/dev/null` until it succeeds — Foreman takes a few seconds to come up.
+Before screenshots, poll `curl -fs "$BASE_URL/" >/dev/null` until it succeeds — Foreman takes a few seconds to come up.
 
 ### 4. Capture screenshots
 
@@ -52,8 +52,8 @@ Call `bin/screenshot <url-path> <page-slug>` for each page. It captures desktop 
 
 After capture, check file sizes — a PNG under ~5KB usually means the page errored. Diagnose it:
 
-1. `curl -s -o /dev/null -w "%{http_code}\n" "http://localhost:$DEV_PORT/<path>"` to get the HTTP status.
-2. `curl -s "http://localhost:$DEV_PORT/<path>" | head -200` to see the response body (usually a Rails error page with the exception and top of the backtrace).
+1. `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"` to get the HTTP status.
+2. `curl -s "$BASE_URL/<path>" | head -200` to see the response body (usually a Rails error page with the exception and top of the backtrace).
 3. `tail -200 log/development.log` for the full backtrace and any SQL involved.
 4. Based on what you find: route missing → re-check the path; auth/redirect → pick a URL that doesn't require login or log in via a seed account; missing fixture → pick a different id or seed it; genuine bug in the diff → this is what you want to know before shipping — fix it or tell the user.
 
