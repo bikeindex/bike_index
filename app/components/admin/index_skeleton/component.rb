@@ -38,6 +38,8 @@ module Admin::IndexSkeleton
       @render_deleted = controller.instance_variable_get(:@render_deleted)
       @time_range = controller.instance_variable_get(:@time_range)
       @period = controller.instance_variable_get(:@period)
+      @start_time = controller.instance_variable_get(:@start_time)
+      @end_time = controller.instance_variable_get(:@end_time)
       @time_range_column = @time_range_column_override || controller.instance_variable_get(:@time_range_column) || "created_at"
       @user_subject = controller.instance_variable_get(:@user_subject)
       @bike = controller.instance_variable_get(:@bike)
