@@ -1,5 +1,5 @@
 class Admin::BikeVersionsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   def index
     @per_page = permitted_per_page(default: 50)

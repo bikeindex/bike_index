@@ -3,7 +3,7 @@
 module UI
   module Table
     class Component < ApplicationComponent
-      include SortableHelper
+      include Binxtils::SortableHelper
 
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
       def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil, render_sortable: false)

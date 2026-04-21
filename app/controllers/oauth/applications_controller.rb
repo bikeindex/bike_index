@@ -1,8 +1,8 @@
 module Oauth
   class ApplicationsController < Doorkeeper::ApplicationsController
     include ControllerHelpers
-    include SetPeriod
-    include SortableTable
+    include Binxtils::SetPeriod
+    include Binxtils::SortableTable
     include Pagy::Method
 
     before_action :store_return_and_authenticate_user

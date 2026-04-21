@@ -2391,6 +2391,9 @@ nl:
             op met support@bikeindex.org als u denkt dat dit mogelijk zou moeten zijn.
         find_bike_sticker:
           unable_to_find_sticker: 'Kan sticker met code niet vinden: %{bike_sticker}.'
+        ensure_sticker_for_current_organization:
+          not_your_organizations_sticker: Sticker %{bike_sticker} is niet de sticker
+            van uw organisatie.
       users:
         create:
           insufficient_invitations: U hebt geprobeerd %{invite_count} gebruikers uit
@@ -4881,7 +4884,6 @@ nl:
       lightspeed_integration_panel: Lightspeed-integratiepaneel
       manage_impounding: Beheer inbeslagname
       manage_users: Gebruikers beheren
-      multi_serial_search: Multi-serieel zoeken
       org_bikes: "%{org_name} Fietsen"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locaties"
@@ -4896,6 +4898,7 @@ nl:
       super_admin_view: Superbeheerder voor %{org_name}
       stolen_message: Gestolen bericht
       model_audits: Audits van e-voertuigen
+      multi_search: Meerdere zoekopdrachten
     bike_search_form:
       anywhere: Overal
       doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
@@ -5869,6 +5872,8 @@ nl:
         registered_not_stolen: geregistreerd, niet gestolen
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
+      multi_result_chip:
+        no_results: geen overeenkomsten
     page_block:
       marketplace_listing_panel:
         condition: Voorwaarde
@@ -6207,6 +6212,15 @@ nl:
         url_cell: URL
         vehicle: Registratie
         visible_columns: Zichtbare kolommen
+        multi_search: multi serieel zoeken
+      multi_search_results:
+        first_n_shown_html: "— eerst %{limit} weergegeven,"
+        no_exact_matches: 'Geen exacte overeenkomsten. Serienummers die er dichtbij
+          liggen:'
+        no_matches_found: Geen overeenkomsten gevonden
+        result_count_html: "— %{count} %{results}"
+        serial_label: 'Serial:'
+        view_all: alles bekijken
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat

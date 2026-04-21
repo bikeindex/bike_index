@@ -1,7 +1,7 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
     include Rails::Pagination
-    include SortableTable
+    include Binxtils::SortableTable
 
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]

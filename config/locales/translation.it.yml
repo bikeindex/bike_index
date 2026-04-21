@@ -2463,6 +2463,8 @@ it:
           unable_to_find_sticker:
         update:
           cannot_update:
+        ensure_sticker_for_current_organization:
+          not_your_organizations_sticker:
       users:
         create:
           insufficient_invitations:
@@ -4290,7 +4292,6 @@ it:
       manage_impounding:
       manage_users:
       model_audits:
-      multi_serial_search:
       org_bikes:
       org_dashboard:
       org_locations:
@@ -4304,6 +4305,7 @@ it:
       stolen_hot_sheet_configuration:
       stolen_message: Messaggio di furto
       super_admin_view: Super Amministratore per %{org_name}
+      multi_search:
     organized_skeleton:
       additional_features_html: Bike Index offre funzionalità aggiuntive per le forze
         dell'ordine verificate. Contatta %{email_link} per abilitarle.
@@ -4603,6 +4605,8 @@ it:
         registered_not_stolen:
       container:
         no_results:
+      multi_result_chip:
+        no_results:
     page_block:
       marketplace_listing_panel:
         condition:
@@ -4899,6 +4903,14 @@ it:
         url_cell:
         vehicle:
         visible_columns:
+        multi_search:
+      multi_search_results:
+        first_n_shown_html:
+        no_exact_matches:
+        no_matches_found:
+        result_count_html:
+        serial_label:
+        view_all:
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved:

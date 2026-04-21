@@ -70,7 +70,6 @@ class OrganizationFeature < ApplicationRecord
     show_bulk_import
     show_bulk_import_impound
     show_bulk_import_stolen
-    show_multi_serial
     show_partial_registrations
     show_recoveries
     skip_ownership_email

@@ -1,5 +1,5 @@
 class Admin::OrganizationsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_organization, only: [:show, :edit, :update, :destroy]
 

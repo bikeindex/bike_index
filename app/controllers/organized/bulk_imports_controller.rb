@@ -1,6 +1,6 @@
 module Organized
   class BulkImportsController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
 
     skip_before_action :ensure_member!
 

@@ -19,7 +19,12 @@
       </p>
 
       <div class="le-hero-buttons">
-        <%= link_to "Schedule a Demo", new_organization_path, class: "le-btn-primary" %>
+        <button
+          data-open-modal="law-enforcement-demo-modal"
+          class="le-btn-primary"
+        >
+          Schedule a Demo
+        </button>
       </div>
 
       <div class="le-hero-stats">
@@ -280,8 +285,15 @@
       </p>
 
       <div class="le-cta-buttons">
-        <%= link_to "Schedule a Demo", new_organization_path, class: "le-btn-primary" %>
+        <button
+          data-open-modal="law-enforcement-demo-modal"
+          class="le-btn-primary"
+        >
+          Schedule a Demo
+        </button>
       </div>
     </div>
   </section>
+
+  <%= render(PageBlock::LandingDemoModal::Component.new(feedback: @feedback, current_user: @current_user, name_label: "City", feedback_type: "lead_for_city", modal_id: "law-enforcement-demo-modal")) %>
 </div>

@@ -1,5 +1,5 @@
 class Admin::BikesController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_bike, only: %i[edit update show]
   before_action :set_period, only: %i[index missing_manufacturer]

@@ -1,0 +1,21 @@
+<%= render(UI::Modal::Component.new(title: "Contact us for a free trial", id: @modal_id)) do |modal| %>
+  <% modal.with_body do %>
+    <%= form_for @feedback do |f| %>
+      <%= render(Form::Group::Component.new(form_builder: f, attribute: :name, label_text: @name_label, html_options: {required: true})) %>
+      <%= render(Form::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: "Name")) %>
+      <%= render(Form::Group::Component.new(form_builder: f, attribute: :email, kind: :email_field, html_options: {required: true, value: @current_user&.email})) %>
+      <%= render(Form::Group::Component.new(form_builder: f, attribute: :phone_number)) %>
+
+      <div class="tw:hidden">
+        <%= render(Form::Group::Component.new(form_builder: f, attribute: :additional, kind: :text_area, label_text: "Additional information")) %>
+      </div>
+
+      <%= f.hidden_field :feedback_type, value: @feedback_type %>
+      <%= f.hidden_field :body, value: "lead" %>
+
+      <div class="tw:pt-2">
+        <%= f.submit "Let's chat", class: "le-btn-primary tw:w-full tw:cursor-pointer" %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

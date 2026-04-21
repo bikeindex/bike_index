@@ -106,6 +106,25 @@ RSpec.describe Org::RegistrationSearch::Component, type: :component do
     end
   end
 
+  context "when bike is user_hidden and org cannot edit" do
+    let(:current_user) { FactoryBot.create(:organization_role_claimed, organization:).user }
+    let(:options) do
+      super().merge(current_user:)
+    end
+    let(:bike) do
+      FactoryBot.create(:bike_organized,
+        creation_organization: organization,
+        user_hidden: true,
+        claimed: true,
+        can_edit_claimed: false)
+    end
+
+    it "renders the serial number" do
+      expect(component).to have_css("tbody tr", count: 1)
+      expect(component).to have_text(bike.serial_display(current_user))
+    end
+  end
+
   context "with csv_exports enabled" do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 

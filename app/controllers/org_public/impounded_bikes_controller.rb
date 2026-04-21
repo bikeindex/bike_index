@@ -1,6 +1,6 @@
 module OrgPublic
   class ImpoundedBikesController < OrgPublic::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
 
     before_action :ensure_public_impound_bikes!
 
