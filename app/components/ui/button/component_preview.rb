@@ -26,7 +26,7 @@ module UI
       end
 
       def secondary_with_data
-        render(UI::Button::Component.new(text: "Secondary with data", color: :secondary, data: {action: "click->modal#open"}))
+        render(UI::Button::Component.new(text: "Secondary with data", color: :secondary, data: {action: "click->ui--modal#open"}))
       end
       # @!endgroup
 

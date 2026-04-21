@@ -12,6 +12,10 @@ module UI
         render(UI::Badge::Component.new(text: "Organization", color: :notice, size: :sm))
       end
 
+      def notice_sm_with_title
+        render(UI::Badge::Component.new(text: "N", title: "Notice", color: :notice, size: :sm))
+      end
+
       def purple_md
         render(UI::Badge::Component.new(text: "Superuser", color: :purple, size: :md))
       end

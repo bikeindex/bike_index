@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='alert'
+// Connects to data-controller='ui--alert'
 export default class extends Controller {
   close () {
     this.element.classList.add('tw:opacity-0', 'tw:scale-95')

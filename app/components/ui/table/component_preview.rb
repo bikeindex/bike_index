@@ -30,6 +30,18 @@ module UI
         end
       end
 
+      def sticky
+        colors = enthusiasm_colors
+        many = sample_records * 8
+        render(UI::Table::Component.new(records: many, sticky: true, sort: "first_seen", sort_direction: "desc")) do |table|
+          table.column(label: "Cryptid", lower_right: ->(r) { r.region }) { |r| r.name }
+          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
+          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
+          table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
+          table.column(label: "First Seen", sort_indicator: "first_seen") { |r| render(UI::Time::Component.new(time: r.first_seen)) }
+        end
+      end
+
       def unbordered
         colors = enthusiasm_colors
         render(UI::Table::Component.new(records: sample_records, unbordered: true, sort: "first_seen", sort_direction: "desc")) do |table|

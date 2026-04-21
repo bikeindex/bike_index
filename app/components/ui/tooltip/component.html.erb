@@ -1,0 +1,33 @@
+<span class="ui-tooltip tw:inline-block" data-controller="ui--tooltip">
+  <span
+    data-ui--tooltip-target="trigger"
+    data-action="
+      mouseenter->ui--tooltip#showOnHover
+      mouseleave->ui--tooltip#hideOnHover
+      focusin->ui--tooltip#showOnFocus
+      focusout->ui--tooltip#hideOnFocusout
+    "
+    tabindex="0"
+    aria-describedby="<%= tooltip_id %>"
+    class="
+      tw:inline-block tw:rounded tw:focus:outline-none
+      tw:focus-visible:ring-2 tw:focus-visible:ring-purple-400
+    "
+  >
+    <%= content %>
+  </span>
+
+  <span
+    data-ui--tooltip-target="tooltip"
+    role="tooltip"
+    id="<%= tooltip_id %>"
+    class="
+      tw:pointer-events-none tw:z-50 tw:hidden tw:rounded tw:border
+      tw:border-purple-400 tw:bg-purple-900 tw:px-2 tw:py-1 tw:text-xs
+      tw:whitespace-nowrap tw:text-white tw:dark:border-purple-300
+      tw:dark:bg-purple-100 tw:dark:text-purple-900
+    "
+  >
+    <%= tooltip_body %>
+  </span>
+</span>

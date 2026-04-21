@@ -116,8 +116,32 @@
   .ui-table tbody tr:nth-child(even) {
     @apply tw:bg-gray-100 tw:dark:bg-gray-800;
   }
-  /* First/last visible column rounding and borders are applied by ui_table_controller.js
-     because CSS :first-child/:last-child can't skip hidden columns */
+  /* Default first/last column rounding/borders. ui_table_controller.js
+     reapplies these to the first/last *visible* column when columns are hidden. */
+  .ui-table thead tr th:first-child {
+    @apply tw:rounded-tl-sm;
+  }
+  .ui-table thead tr th:last-child {
+    @apply tw:rounded-tr-sm;
+  }
+  .ui-table tbody tr:last-child td:first-child {
+    @apply tw:rounded-bl-sm;
+  }
+  .ui-table tbody tr:last-child td:last-child {
+    @apply tw:rounded-br-sm;
+  }
+  .ui-table-bordered tbody tr td:first-child {
+    @apply tw:ui-table-bordered-td-first;
+  }
+  .ui-table-bordered tbody tr td:last-child {
+    @apply tw:ui-table-bordered-td-last;
+  }
+  .ui-table-bordered thead tr th:first-child {
+    @apply tw:ui-table-bordered-th-first;
+  }
+  .ui-table-bordered thead tr th:last-child {
+    @apply tw:ui-table-bordered-th-last;
+  }
 }
 
 /* Create utility classes for the sides of the table so that it can be applied in JS when columns are hidden */

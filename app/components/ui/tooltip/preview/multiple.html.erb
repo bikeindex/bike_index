@@ -1,0 +1,19 @@
+<div class="tw:flex tw:flex-col tw:gap-6 tw:p-8">
+  <%= render(UI::Tooltip::Component.new(text: "5–9 mi")) do %>
+    <i
+      class="
+        tw:block tw:h-5 tw:w-5 tw:cursor-help tw:rounded tw:bg-purple-400
+        tw:dark:bg-purple-700
+      "
+    ></i>
+  <% end %>
+
+  <%= render(UI::Tooltip::Component.new(text: "More information about this thing")) do %>
+    hover or focus me
+  <% end %>
+
+  <%= render(UI::Tooltip::Component.new) do |tooltip| %>
+    <% tooltip.with_body { '<span class="tooltip-body-imperial">5 mi</span>'.html_safe } %>
+    body slot trigger
+  <% end %>
+</div>
