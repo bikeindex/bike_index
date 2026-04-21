@@ -15,7 +15,7 @@
   = column_chart time_range_counts(collection: matching_model_audits, column: @time_range_column), stacked: true, thousands: ","
 
 .mt-2
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
 
 .mt-4
 = form_tag admin_model_audits_path, method: :get do

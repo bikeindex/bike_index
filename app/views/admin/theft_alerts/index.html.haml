@@ -93,7 +93,7 @@
                 %td.small= count[2]
                 %td= number_display(count[3])
 
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
   .row.mb-4.mt-4
     .col
       = form_tag admin_theft_alerts_path, method: :get, class: "form-inline" do

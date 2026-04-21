@@ -95,7 +95,7 @@
         %li.nav-item
           %a#FitMapTrigger{href: "#", class: (@page_data[:default_location] ? "currently-hidden" : "")}
             Fit map to notifications
-  = render partial: "/shared/period_select", locals: { skip_submission: true }
+  = render PeriodSelect::Component.new(skip_submission: true)
 
   .mt-4
     = render(Search::FormOrganized::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params))

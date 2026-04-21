@@ -39,7 +39,7 @@
   = column_chart time_range_counts(collection: matching_bike_stickers, column: @time_range_column), stacked: true, thousands: ","
 
 .mt-2
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
 
 - if @bike_sticker_batch.present?
   - if Binxtils::InputNormalizer.boolean(params[:search_show_problems])

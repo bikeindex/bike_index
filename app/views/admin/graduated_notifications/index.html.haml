@@ -30,7 +30,7 @@
   = column_chart time_range_counts(collection: matching_graduated_notifications, column: time_range_column), stacked: true, thousands: ","
 
 .mt-2.mb-4
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
 
 = render_admin_pagination_with_count(collection: @graduated_notifications)
 

@@ -114,7 +114,7 @@
   <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
 <% end %>
 
-<%= render partial: "/shared/period_select" %>
+<%= render PeriodSelect::Component.new %>
 
 <% unless admin_nav_display_view_all %>
   <p>

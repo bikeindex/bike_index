@@ -23,4 +23,4 @@
 
   - if !["general", ""].include?(@kind) # General and location tables don't have period select :/
     .col-12.mt-4
-      = render partial: "/shared/period_select"
+      = render PeriodSelect::Component.new

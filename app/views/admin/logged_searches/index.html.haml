@@ -41,7 +41,7 @@
     = column_chart time_range_counts(collection: matching_logged_searches, column: @time_range_column), stacked: true, thousands: ","
 
 .mt-2
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
 
 .mt-4
 

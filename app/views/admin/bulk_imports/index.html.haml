@@ -59,7 +59,7 @@
                 = number_display(matching_bulk_imports.where(organization_id: id).count)
 
 .mt-4
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
 
 = render_admin_pagination_with_count(collection: @bulk_imports, count: matching_bulk_imports.size)
 

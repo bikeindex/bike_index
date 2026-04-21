@@ -12,7 +12,7 @@
   .mb-4= column_chart time_range_counts(collection: searched_stolen_notifications, column: @time_range_column), stacked: true, thousands: ","
 
 
-= render partial: "/shared/period_select"
+= render PeriodSelect::Component.new
 
 = render_admin_pagination_with_count(collection: @stolen_notifications, count: searched_stolen_notifications.count)
 

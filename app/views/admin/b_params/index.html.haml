@@ -25,7 +25,7 @@
     = render(UI::Chart::Component.new(series: b_params_data, time_range: @time_range, stacked: true))
 
 .mt-4
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
 
 .row.mt-4
   .col-md-5

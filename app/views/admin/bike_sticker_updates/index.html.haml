@@ -98,7 +98,7 @@
               = number_display(matching_sticker_per_org_id.map { |id, values| values[:total] }.sum)
 
 .mt-2
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
 
 .row.mt-4.mb-2
   .col-md-6

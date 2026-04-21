@@ -40,7 +40,7 @@
     = column_chart time_range_counts(collection: @matching_bikes), stacked: true, thousands: ","
 
 .mt-4
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
 
 .row.mt-4.mb-2
   .col-md-5

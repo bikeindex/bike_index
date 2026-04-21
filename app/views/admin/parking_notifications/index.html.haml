@@ -40,7 +40,7 @@
                   = number_with_delimiter(number)
 
 .mt-4.mb-4
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
 
 = render_admin_pagination_with_count(collection: @parking_notifications)
 

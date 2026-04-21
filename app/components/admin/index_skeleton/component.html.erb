@@ -49,7 +49,7 @@
   <% end %>
 <% end %>
 
-<div class="mt-2 mb-4"><%= render partial: "/shared/period_select" %></div>
+<div class="mt-2 mb-4"><%= render PeriodSelect::Component.new %></div>
 
 <% if @admin_search_form.present? %>
   <%= @admin_search_form %>

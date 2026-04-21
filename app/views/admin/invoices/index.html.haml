@@ -91,7 +91,7 @@
                   %strong= MoneyFormatter.money_format(matching_invoices.sum(:amount_paid_cents))
 
 .mt-2
-  = render partial: "/shared/period_select", locals: { include_future: true }
+  = render PeriodSelect::Component.new(include_future: true)
 
 %p
   Total paid:

@@ -33,7 +33,7 @@
 
   = column_chart feedback_counts, stacked: true, thousands: ",", colors: colors
 
-= render partial: "/shared/period_select"
+= render PeriodSelect::Component.new
 
 - if @render_kind_counts
   .row.mt-4.mb-4

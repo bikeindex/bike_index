@@ -1,6 +1,6 @@
 <%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
 
-<%= render partial: "/shared/period_select" %>
+<%= render PeriodSelect::Component.new %>
 
 <div class="mb-4"></div>
 

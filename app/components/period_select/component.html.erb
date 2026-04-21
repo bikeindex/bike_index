@@ -1,0 +1,121 @@
+<div data-controller="collapse">
+  <div
+    id="timeSelectionBtnGroup"
+    class="text-right <%= "custom-period-selected" if @period == "custom" %>"
+    role="group"
+    data-nosubmit="<%= @skip_submission %>"
+  >
+    <% if @prepend_text.present? %>
+      <span class="mr-2 less-strong d-block d-lg-inline-block">
+        <%= @prepend_text %>
+      </span>
+    <% end %>
+
+    <% if @include_future %>
+      <a
+        class="btn btn-outline-secondary btn-sm period-select-standard <%= active_class("next_week") %>"
+        href="<%= period_url("next_week") %>"
+        data-period="next_week"
+      >
+        <span class="d-none d-md-inline-block">
+          <%= translation(".next") %>
+        </span>
+
+        <%= translation(".seven_days") %>
+      </a>
+      <a
+        class="btn btn-outline-secondary btn-sm period-select-standard <%= active_class("next_month") %>"
+        href="<%= period_url("next_month") %>"
+        data-period="next_month"
+      >
+        <span class="d-none d-md-inline-block">
+          <%= translation(".next") %>
+        </span>
+
+        <%= translation(".thirty_days") %>
+      </a>
+    <% end %>
+
+    <a
+      class="btn btn-outline-secondary btn-sm period-select-standard <%= active_class("hour") %>"
+      href="<%= period_url("hour") %>"
+      data-period="hour"
+    >
+      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
+      <%= translation(".hour") %>
+    </a>
+
+    <a
+      class="btn btn-outline-secondary btn-sm period-select-standard <%= active_class("day") %>"
+      href="<%= period_url("day") %>"
+      data-period="day"
+    >
+      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
+      <%= translation(".day") %>
+    </a>
+
+    <a
+      class="btn btn-outline-secondary btn-sm period-select-standard <%= active_class("week") %>"
+      href="<%= period_url("week") %>"
+      data-period="week"
+    >
+      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
+      <%= translation(".seven_days") %>
+    </a>
+
+    <a
+      class="btn btn-outline-secondary btn-sm period-select-standard <%= active_class("month") %>"
+      href="<%= period_url("month") %>"
+      data-period="month"
+    >
+      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
+      <%= translation(".thirty_days") %>
+    </a>
+
+    <a
+      class="btn btn-outline-secondary btn-sm period-select-standard <%= active_class("year") %>"
+      href="<%= period_url("year") %>"
+      data-period="year"
+    >
+      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
+      <%= translation(".year") %>
+    </a>
+
+    <a
+      class="btn btn-outline-secondary btn-sm period-select-standard <%= active_class("all") %>"
+      href="<%= period_url("all") %>"
+      data-period="all"
+    >
+      <%= translation(".all") %>
+    </a>
+
+    <button
+      id="periodSelectCustom"
+      class="btn btn-outline-secondary btn-sm ml-2 <%= active_class("custom") %>"
+      data-period="custom"
+      data-action="click->collapse#toggle"
+    >
+      <%= translation(".custom") %>
+    </button>
+  </div>
+
+  <form
+    id="timeSelectionCustom"
+    class="<%= custom_form_classes %>"
+    data-collapse-target="content"
+  >
+    <div class="form-group">
+      <%= label_tag :start_time_selector, translation(".from"), class: "control-label mr-2" %>
+      <%= datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control" %>
+    </div>
+
+    <div class="form-group end-time-contrtol">
+      <%= label_tag :end_time_selector, translation(".to"), class: "control-label mr-2" %>
+      <%= datetime_local_field_tag :end_time_selector, @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control" %>
+    </div>
+
+    <button id="updatePeriodSelectCustom" class="btn btn-success btn-sm ml-2">
+      <%= translation(".update") %>
+    </button>
+  </form>
+</div>

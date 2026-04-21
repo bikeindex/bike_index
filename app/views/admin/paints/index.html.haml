@@ -12,7 +12,7 @@
   = column_chart time_range_counts(collection: matching_paints), stacked: true, thousands: ","
 
 .mt-2
-  = render partial: "/shared/period_select"
+  = render PeriodSelect::Component.new
 
 .row.mt-4
   .col-sm-7

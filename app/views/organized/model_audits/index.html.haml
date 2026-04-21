@@ -4,7 +4,7 @@
   %h1
     E-Vehicle audits
 
-= render partial: "/shared/period_select"
+= render PeriodSelect::Component.new
 
 .mt-4.mb-4
   = pluralize(number_with_delimiter(@pagy.count), "matching models")
