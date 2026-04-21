@@ -147,7 +147,7 @@ Always pass the body via `--body-file` (not inline `--body`) to preserve formatt
 
 ## Notes
 
-- Always ensure `bin/dev` is running (start it in the background if not) before committing, so Tailwind and JS assets are rebuilt. Don't ask the user to start it.
+- Always ensure `bin/dev` is running (start it in the background if not) before committing, so Tailwind and JS assets are rebuilt.
 - Do not skip hooks (`--no-verify`) on any commits or pushes.
 - The first run in a repo creates a prerelease tagged `_pr-screenshots`; every run after that reuses it. This is expected — don't treat the `404 → create` flow as an error.
 - If headless Chrome fails (missing binary, crash) or an upload fails, report the failure clearly and fall back to creating the PR without screenshots — don't block PR creation on screenshot tooling.
