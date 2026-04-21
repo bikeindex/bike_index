@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--multi-serial-search'
 export default class extends Controller {
   static targets = ['textarea', 'button', 'serialChips', 'results']
-  static values = { url: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, spinner: String }
+  static values = { url: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
     if (this.searching) return
@@ -96,22 +96,19 @@ export default class extends Controller {
       if (response.ok) {
         Turbo.renderStreamMessage(await response.text())
       } else {
-        this.showChipError(serial, index)
+        this.showChipError(serial, index, `Server error ${response.status}`)
       }
     } catch {
-      this.showChipError(serial, index)
+      this.showChipError(serial, index, 'Network error')
     }
   }
 
-  showChipError (serial, index) {
+  showChipError (serial, index, message) {
     const chip = document.getElementById(`chip_${index}`)
     if (!chip) return
     chip.className = this.errorClassValue
     chip.innerHTML = ''
     chip.appendChild(this.serialSpan(serial))
-    const errorLabel = document.createElement('small')
-    errorLabel.className = 'tw:block tw:text-2xs tw:leading-none tw:ml-3'
-    errorLabel.textContent = 'error'
-    chip.appendChild(errorLabel)
+    chip.insertAdjacentHTML('beforeend', this.errorTooltipValue.replace('__MESSAGE__', message))
   }
 }

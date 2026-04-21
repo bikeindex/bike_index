@@ -16,7 +16,7 @@ module SearchResults::MultiResultChip
     end
 
     def error
-      render(Component.new(serial: "SERIAL333", chip_id: "chip_3", result_count: 0, error: true))
+      render(Component.new(serial: "SERIAL333", chip_id: "chip_3", result_count: 0, error: true, error_message: "Server error 500"))
     end
     # @!endgroup
   end

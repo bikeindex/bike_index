@@ -2,11 +2,12 @@
 
 module SearchResults::MultiResultChip
   class Component < ApplicationComponent
-    def initialize(serial:, chip_id:, result_count:, error: false)
+    def initialize(serial:, chip_id:, result_count:, error: false, error_message: nil)
       @serial = serial
       @chip_id = chip_id
       @result_count = result_count
       @error = error
+      @error_message = error_message
     end
 
     def call
@@ -17,13 +18,19 @@ module SearchResults::MultiResultChip
           end
         else
           inner = content_tag(:span, @serial, class: "serial-span")
-          inner += content_tag(:small, @error ? "error" : translation(".no_results"), class: "tw:block tw:text-2xs tw:leading-none tw:ml-3")
+          inner += trailing_label
           inner
         end
       end
     end
 
     private
+
+    def trailing_label
+      label = content_tag(:small, @error ? "error" : translation(".no_results"), class: "tw:block tw:text-2xs tw:leading-none tw:ml-3")
+      return label unless @error && @error_message.present?
+      render(UI::Tooltip::Component.new(text: @error_message)) { label }
+    end
 
     def has_results?
       !@error && @result_count > 0
@@ -39,7 +46,8 @@ module SearchResults::MultiResultChip
       else
         (has_results? ? :success : :gray)
       end
-      b_classes = UI::Badge::Component.badge_classes(color:, size: :md)
+      cursor = (@error && @error_message.present?) ? "tw:cursor-help" : "tw:cursor-default"
+      b_classes = UI::Badge::Component.badge_classes(color:, size: :md, cursor:)
       b_classes += " tw:p-0! tw:cursor-pointer" if has_results?
       b_classes
     end
