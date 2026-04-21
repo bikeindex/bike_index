@@ -1,5 +1,5 @@
 class Admin::ExternalRegistryCredentialsController < Admin::BaseController
-  include SetPeriod
+  include Binxtils::SetPeriod
 
   before_action :set_period, only: %i[index]
   before_action :find_external_registry_credential, only: %i[edit update reset]

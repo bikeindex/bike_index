@@ -64,7 +64,9 @@
       aria-haspopup="true"
       aria-expanded="false"
     >
-      <% if @pos_search_type.present? %>
+      <% if @pos_search_type == "any_pos" %>
+        POS of any type
+      <% elsif @pos_search_type.present? %>
         <%= @pos_search_type.humanize %>
       <% else %>
         POS
@@ -79,12 +81,14 @@
 
       <div class="dropdown-divider"></div>
       <% any_pos_active = @pos_search_type == "any_pos" %>
-      <%= link_to "Any POS", url_for(sortable_search_params.merge(search_pos: any_pos_active ? nil : "any_pos")), class: "dropdown-item #{any_pos_active ? 'active' : ''}" %>
+      <%= link_to "POS of any type", url_for(sortable_search_params.merge(search_pos: any_pos_active ? nil : "any_pos")), class: "dropdown-item #{any_pos_active ? 'active' : ''}" %>
       <% no_pos_active = @pos_search_type == "no_pos" %>
 
       <%= link_to url_for(sortable_search_params.merge(search_pos: no_pos_active ? nil : "no_pos")), class: "dropdown-item #{no_pos_active ? 'active' : ''}" do %>
         <strong>Not</strong> POS
       <% end %>
+
+      <%= link_to "any (POS or not)", url_for(sortable_search_params.merge(search_pos: nil)), class: "dropdown-item #{@pos_search_type.blank? ? 'active' : ''}" %>
     </div>
   </li>
 

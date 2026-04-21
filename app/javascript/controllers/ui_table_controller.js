@@ -9,11 +9,21 @@ export default class extends Controller {
   connect () {
     this.applyEdgeStyles()
     this.boundRefresh = () => this.applyEdgeStyles()
+    this.boundResize = () => {
+      if (this.resizeFrame) return
+      this.resizeFrame = requestAnimationFrame(() => {
+        this.resizeFrame = null
+        this.applyEdgeStyles()
+      })
+    }
     window.addEventListener('ui-table:refresh', this.boundRefresh)
+    window.addEventListener('resize', this.boundResize)
   }
 
   disconnect () {
     window.removeEventListener('ui-table:refresh', this.boundRefresh)
+    window.removeEventListener('resize', this.boundResize)
+    if (this.resizeFrame) cancelAnimationFrame(this.resizeFrame)
   }
 
   refresh () {

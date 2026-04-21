@@ -4,7 +4,7 @@
   <table class="table table-striped table-bordered table-sm">
     <thead class="thead-light sortable">
       <th class="table-checkbox-select">
-        <a id="multi-checkbox-selector" href="#"><%= check_mark %></a>
+        <a href="#" data-action="click->table-multi-delete#toggleAll"><%= check_mark %></a>
       </th>
 
       <th><%= sortable "created_at", "Stolen created", render_sortable: %></th>
@@ -27,7 +27,7 @@
 
         <tr>
           <td class="display-multi-check table-checkbox-select">
-            <%= check_box_tag "sr_selected[#{stolen_record.id}]", stolen_record.id %>
+            <%= check_box_tag "sr_selected[#{stolen_record.id}]", stolen_record.id, false, data: {"table-multi-delete-target" => "checkbox"} %>
           </td>
 
           <td>

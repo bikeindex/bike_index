@@ -70,7 +70,7 @@
     </p>
   <% end %>
 
-  <%= form_tag approve_admin_stolen_bike_path(id: "multi_approve"), method: :post do %>
+  <%= form_tag approve_admin_stolen_bike_path(id: "multi_approve"), method: :post, data: {controller: "table-multi-delete"} do %>
     <%= render partial: "table", locals: {render_sortable: true} %>
 
     <div class="mb-3 text-center">

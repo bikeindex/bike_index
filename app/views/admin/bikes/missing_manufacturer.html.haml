@@ -43,7 +43,7 @@
 
 = render_admin_pagination_with_count(collection: @bikes)
 
-= form_tag update_manufacturers_admin_bikes_path do
+= form_tag update_manufacturers_admin_bikes_path, data: {controller: "table-multi-delete"} do
   .row
     .col-md-4
       .fancy-select.unfancy
@@ -55,7 +55,7 @@
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
         %th.table-checkbox-select
-          %a#multi-checkbox-selector{ href: "#" }
+          %a{ href: "#", data: { action: "click->table-multi-delete#toggleAll" } }
             = check_mark
         %th
           Date indexed
@@ -70,7 +70,7 @@
         - @bikes.each do |bike|
           %tr
             %td.table-checkbox-select
-              = check_box_tag "bikes_selected[#{bike.id}]", bike.id
+              = check_box_tag "bikes_selected[#{bike.id}]", bike.id, false, data: { "table-multi-delete-target" => "checkbox" }
             %td
               .less-strong-hold
                 %a.localizeTime{ href: edit_admin_bike_url(bike) }

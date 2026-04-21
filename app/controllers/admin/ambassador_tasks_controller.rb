@@ -1,5 +1,5 @@
 class Admin::AmbassadorTasksController < Admin::BaseController
-  include SetPeriod
+  include Binxtils::SetPeriod
 
   before_action :set_period, only: %i[index]
   before_action :find_ambassador_task, only: %w[edit update]

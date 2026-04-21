@@ -1,5 +1,5 @@
 class Admin::TheftAlertPlansController < Admin::BaseController
-  include SetPeriod
+  include Binxtils::SetPeriod
 
   before_action :set_period, only: %i[index]
 

@@ -36,6 +36,11 @@ class Admin::BaseController < ApplicationController
     @default_statuses = default_statuses || DEFAULT_SEARCH_STATUSES
     @searched_statuses = @default_statuses if @searched_statuses.blank?
     @not_default_statuses = @searched_statuses != @default_statuses
+    # Only-modifier selections return every status; augment so checkbox UI reflects that.
+    only_modifiers = %w[deleted_only spam_only example_only]
+    if (@searched_statuses - only_modifiers).empty? && (@searched_statuses & only_modifiers).any?
+      @searched_statuses = @default_statuses + @searched_statuses
+    end
 
     if @searched_statuses.include?("example_only")
       bikes = bikes.where(example: true)

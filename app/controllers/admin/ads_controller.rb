@@ -1,5 +1,5 @@
 class Admin::AdsController < Admin::BaseController
-  include SetPeriod
+  include Binxtils::SetPeriod
 
   before_action :set_period, only: %i[index]
   before_action :find_ad, except: [:index, :new, :create]
