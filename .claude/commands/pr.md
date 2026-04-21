@@ -117,7 +117,7 @@ If an upload fails, surface the error and fall back to creating the PR without s
 Structure:
 
 ```markdown
-<summary of the change — 1–3 short paragraphs or bullets, written by you based on the diff and recent commits>
+<summary of the change — 2–5 bullets written by you based on the diff and recent commits>
 
 ## Screenshots
 
