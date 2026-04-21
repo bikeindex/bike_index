@@ -66,7 +66,14 @@ Mobile (390x844, iPhone-ish):
 
 `<name>` should be a short slug derived from the page (e.g. `bike-show`, `admin-strava-activities`). One desktop + one mobile per page.
 
-After capture, check file sizes — a PNG under ~5KB usually means the page errored. If so, curl the URL, surface the error to the user, and stop.
+After capture, check file sizes — a PNG under ~5KB usually means the page errored. Diagnose it:
+
+1. `curl -s -o /dev/null -w "%{http_code}\n" "http://localhost:$DEV_PORT/<path>"` to get the HTTP status.
+2. `curl -s "http://localhost:$DEV_PORT/<path>" | head -200` to see the response body (usually a Rails error page with the exception and top of the backtrace).
+3. `tail -200 log/development.log` for the full backtrace and any SQL involved.
+4. Based on what you find: route missing → re-check the path; auth/redirect → pick a URL that doesn't require login or log in via a seed account; missing fixture → pick a different id or seed it; genuine bug in the diff → this is what you want to know before shipping — fix it or tell the user.
+
+Only stop and surface to the user once you understand the cause and either (a) have a fix to propose, (b) need input they must provide (e.g. which URL to screenshot instead), or (c) concluded it's a real bug in the PR.
 
 ### 5. Host the images
 
