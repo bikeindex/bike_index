@@ -1,5 +1,5 @@
 #!/bin/bash
-# Usage: bin/screenshot <url-path> <page-slug>
+# Usage: bin/screenshot_dev <url-path> <page-slug>
 # Captures desktop (1440x900) and mobile (390x844) PNGs of
 # $BASE_URL<url-path> to tmp/pr_screenshots/<branch>-<page>-{desktop,mobile}.png
 # Prints the two paths on stdout, one per line.
@@ -26,7 +26,7 @@ find_chrome() {
       echo "$candidate"; return
     fi
   done
-  echo "bin/screenshot: no Chrome/Chromium binary found. Set \$CHROME to override." >&2
+  echo "bin/screenshot_dev: no Chrome/Chromium binary found. Set \$CHROME to override." >&2
   exit 1
 }
 chrome="$(find_chrome)"

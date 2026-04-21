@@ -46,7 +46,7 @@ Before screenshots, poll `curl -fs "$BASE_URL/" >/dev/null` until it succeeds �
 
 ### 4. Capture screenshots
 
-Call `bin/screenshot <url-path> <page-slug>` for each page. It captures desktop (1440×900) and mobile (390×844) PNGs to `tmp/pr_screenshots/<branch>-<page>-{desktop,mobile}.png` and prints the two paths. The branch prefix keeps filenames unique across PRs so release-asset uploads don't collide.
+Call `bin/screenshot_dev <url-path> <page-slug>` for each page. It captures desktop (1440×900) and mobile (390×844) PNGs to `tmp/pr_screenshots/<branch>-<page>-{desktop,mobile}.png` and prints the two paths. The branch prefix keeps filenames unique across PRs so release-asset uploads don't collide.
 
 `<page-slug>` should be a short identifier for the page (e.g. `bike-show`, `admin-strava-activities`). `<url-path>` starts with `/` (e.g. `/bikes/42`).
 
