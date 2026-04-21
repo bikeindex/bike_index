@@ -20,17 +20,8 @@ RSpec.describe PeriodSelect::Component, type: :component do
     expect(component).not_to have_css(".custom-period-selected")
   end
 
-  it "defaults data-nosubmit to false and omits prepend_text" do
-    expect(component).to have_css("[data-nosubmit='false']")
+  it "omits prepend_text by default" do
     expect(component).not_to have_css(".less-strong")
-  end
-
-  context "with skip_submission" do
-    let(:options) { {skip_submission: true} }
-
-    it "sets data-nosubmit true" do
-      expect(component).to have_css("[data-nosubmit='true']")
-    end
   end
 
   context "with include_future" do

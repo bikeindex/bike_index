@@ -95,7 +95,26 @@
         %li.nav-item
           %a#FitMapTrigger{href: "#", class: (@page_data[:default_location] ? "currently-hidden" : "")}
             Fit map to notifications
-  = render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, skip_submission: true)
+  #timeSelectionBtnGroup.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "", "data-nosubmit" => "true" }
+    - %w[hour day week month year all].each do |period_kind|
+      %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == period_kind), href: url_for(sortable_search_params.merge(period: period_kind)), data: { period: period_kind } }
+        - if period_kind == "all"
+          All
+        - else
+          %span.d-none.d-md-inline-block past
+          = period_kind == "week" ? "7 days" : period_kind == "month" ? "30 days" : period_kind
+    %button#periodSelectCustom.btn.btn-outline-secondary.btn-sm.ml-2{ class: ("active" if @period == "custom"), data: { period: "custom" } }
+      custom
+
+  %form#timeSelectionCustom.custom-time-selection.mt-2.mb-2.collapse{ class: @period == "custom" ? "in show" : "" }
+    .form-group
+      = label_tag :start_time_selector, "From", class: "control-label mr-2"
+      = datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
+    .form-group.end-time-contrtol
+      = label_tag :end_time_selector, "To", class: "control-label mr-2"
+      = datetime_local_field_tag :end_time_selector, @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
+    %button#updatePeriodSelectCustom.btn.btn-success.btn-sm.ml-2
+      Update
 
   .mt-4
     = render(Search::FormOrganized::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params))

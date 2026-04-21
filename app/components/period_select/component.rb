@@ -2,9 +2,7 @@
 
 module PeriodSelect
   class Component < ApplicationComponent
-    def initialize(period:, start_time:, end_time:, skip_submission: false,
-      include_future: false, prepend_text: nil)
-      @skip_submission = skip_submission
+    def initialize(period:, start_time:, end_time:, include_future: false, prepend_text: nil)
       @include_future = include_future
       @prepend_text = prepend_text
       @period = period
