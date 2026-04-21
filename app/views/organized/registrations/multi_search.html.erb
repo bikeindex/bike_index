@@ -16,7 +16,7 @@
   data-org--multi-serial-search-success-class-value="<%= UI::Badge::Component.badge_classes(color: :success, size: :md) %>"
   data-org--multi-serial-search-gray-class-value="<%= UI::Badge::Component.badge_classes(color: :gray, size: :md) %>"
   data-org--multi-serial-search-error-class-value="<%= UI::Badge::Component.badge_classes(color: :error, size: :md, cursor: "tw:cursor-help") %>"
-  data-org--multi-serial-search-error-tooltip-value="<%= ERB::Util.html_escape(error_tooltip_template) %>"
+  data-org--multi-serial-search-error-tooltip-value="<%= ERB::Util.html_escape(error_tooltip_template.to_str) %>"
   data-org--multi-serial-search-spinner-value="<%= ERB::Util.html_escape(render(UI::LoadingSpinner::Component.new(size: :sm)).to_str) %>"
   data-org--registration-search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
 >
