@@ -46,28 +46,9 @@ Before screenshots, poll `curl -fs "http://localhost:$DEV_PORT/" >/dev/null` unt
 
 ### 4. Capture screenshots
 
-Use headless Chrome. Save to `tmp/pr_screenshots/`.
+Call `bin/screenshot <url-path> <page-slug>` for each page. It captures desktop (1440×900) and mobile (390×844) PNGs to `tmp/pr_screenshots/<branch>-<page>-{desktop,mobile}.png` and prints the two paths. The branch prefix keeps filenames unique across PRs so release-asset uploads don't collide.
 
-Filename convention: `<branch-slug>-<page-slug>-<device>.png`, where `<branch-slug>` is `$(git rev-parse --abbrev-ref HEAD | tr '/' '-')`, `<page-slug>` is derived from the page (e.g. `bike-show`, `admin-strava-activities`), and `<device>` is `desktop` or `mobile`. The branch prefix makes filenames unique across PRs so release-asset uploads don't collide.
-
-Desktop (1440x900):
-```
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-  --headless --disable-gpu --hide-scrollbars \
-  --window-size=1440,900 \
-  --screenshot="tmp/pr_screenshots/<filename>.png" \
-  "http://localhost:$DEV_PORT/<path>"
-```
-
-Mobile (390x844, iPhone-ish):
-```
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-  --headless --disable-gpu --hide-scrollbars \
-  --window-size=390,844 \
-  --user-agent="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1" \
-  --screenshot="tmp/pr_screenshots/<filename>.png" \
-  "http://localhost:$DEV_PORT/<path>"
-```
+`<page-slug>` should be a short identifier for the page (e.g. `bike-show`, `admin-strava-activities`). `<url-path>` starts with `/` (e.g. `/bikes/42`).
 
 After capture, check file sizes — a PNG under ~5KB usually means the page errored. Diagnose it:
 
@@ -80,21 +61,7 @@ Only stop and surface to the user once you understand the cause and either (a) h
 
 ### 5. Host the images
 
-Upload screenshots as release assets on a reused prerelease in the repo, using `gh` subcommands — no `curl`, no third-party deps.
-
-```bash
-REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
-TAG=_pr-screenshots
-
-gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1 \
-  || gh release create "$TAG" --repo "$REPO" --prerelease \
-       --title "PR screenshots" \
-       --notes "Auto-uploaded PR screenshots — do not delete."
-
-gh release upload "$TAG" tmp/pr_screenshots/*.png --repo "$REPO"
-```
-
-First run in a repo creates the prerelease; subsequent runs reuse it. URLs follow the stable pattern `https://github.com/<owner>/<repo>/releases/download/_pr-screenshots/<filename>`, so you can construct them without parsing any API response.
+Run `bin/upload_pr_screenshots`. It uploads every PNG in `tmp/pr_screenshots/` to a reused prerelease tagged `_pr-screenshots` (creating it on first use) and prints the public URL for each file. Capture the output for step 6.
 
 ### 6. Build the PR body
 
