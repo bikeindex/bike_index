@@ -72,7 +72,7 @@ Structure:
 
 ## Screenshots
 
-### <page name>
+### <url-path>
 
 | Desktop | Mobile |
 | --- | --- |
@@ -81,7 +81,7 @@ Structure:
 
 Rules for the Screenshots section:
 - Omit the whole `## Screenshots` section if there are no frontend changes.
-- Each page gets a `### <page name>` subheading followed by its own 1-row table — desktop on the left, mobile on the right.
+- Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own 1-row table — desktop on the left, mobile on the right.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells.
 
 Follow the repo's existing PR body style — look at the last few merged PRs (`gh pr list --state merged --limit 5 --json body,title`) to match tone and length. Keep the title under ~70 chars.
