@@ -73,5 +73,6 @@ vendor/strava_search/node_modules/
 vendor/strava_search/dist/
 vendor/strava_search/storybook-static/
 
-# Ignore .claude settings
-.claude/
+# Ignore .claude settings (but keep shared commands)
+.claude/*
+!.claude/commands/
