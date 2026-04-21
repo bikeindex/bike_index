@@ -45,11 +45,13 @@ desktop_path="${out_dir}/${branch_slug}-${page_slug}-desktop.png"
 mobile_path="${out_dir}/${branch_slug}-${page_slug}-mobile.png"
 
 "$chrome" --headless=new --disable-gpu --hide-scrollbars \
+  --virtual-time-budget=10000 \
   --window-size=1440,900 \
   --screenshot="$desktop_path" \
   "$url"
 
 "$chrome" --headless=new --disable-gpu --hide-scrollbars \
+  --virtual-time-budget=10000 \
   --window-size=390,844 \
   --user-agent="$mobile_ua" \
   --screenshot="$mobile_path" \
