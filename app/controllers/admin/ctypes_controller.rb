@@ -1,49 +1,51 @@
-class Admin::CtypesController < Admin::BaseController
-  before_action :find_ctypes, only: [:edit, :update, :destroy]
+module Admin
+  class CtypesController < Admin::BaseController
+    before_action :find_ctypes, only: [:edit, :update, :destroy]
 
-  def index
-    @ctypes = Ctype.all
-  end
-
-  def new
-    @ctype = Ctype.new
-  end
-
-  def edit
-  end
-
-  def update
-    if @ctype.update(permitted_parameters)
-      flash[:success] = "Component Type Saved!"
-      redirect_to admin_ctypes_url
-    else
-      render action: :edit
+    def index
+      @ctypes = Ctype.all
     end
-  end
 
-  def create
-    @ctype = Ctype.create(permitted_parameters)
-    if @ctype.save
-      flash[:success] = "Component type created!"
-      redirect_to admin_ctypes_url
-    else
-      render action: :new
+    def new
+      @ctype = Ctype.new
     end
-  end
 
-  def destroy
-    @ctype.destroy
-    redirect_to admin_ctypes_url
-  end
+    def edit
+    end
 
-  protected
+    def update
+      if @ctype.update(permitted_parameters)
+        flash[:success] = "Component Type Saved!"
+        redirect_to admin_ctypes_url
+      else
+        render action: :edit
+      end
+    end
 
-  def permitted_parameters
-    params.require(:ctype).permit(:name, :slug, :secondary_name, :image, :image_cache, :cgroup_id, :cgroup, :has_multiple, :cgroup_name)
-  end
+    def create
+      @ctype = Ctype.create(permitted_parameters)
+      if @ctype.save
+        flash[:success] = "Component type created!"
+        redirect_to admin_ctypes_url
+      else
+        render action: :new
+      end
+    end
 
-  def find_ctypes
-    @ctype = Ctype.friendly_find(params[:id])
-    raise ActionController::RoutingError.new("Not Found") unless @ctype.present?
+    def destroy
+      @ctype.destroy
+      redirect_to admin_ctypes_url
+    end
+
+    protected
+
+    def permitted_parameters
+      params.require(:ctype).permit(:name, :slug, :secondary_name, :image, :image_cache, :cgroup_id, :cgroup, :has_multiple, :cgroup_name)
+    end
+
+    def find_ctypes
+      @ctype = Ctype.friendly_find(params[:id])
+      raise ActionController::RoutingError.new("Not Found") unless @ctype.present?
+    end
   end
 end

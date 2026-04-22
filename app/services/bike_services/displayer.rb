@@ -1,155 +1,157 @@
 # Contains methods used for display, which don't return HTML.
 # Use BikeHelper for methods that do return HTML
 
-module BikeServices::Displayer
-  extend Functionable
+module BikeServices
+  module Displayer
+    extend Functionable
 
-  # This is just a quick hack, will improve
-  def vehicle_search?(params_and_interpreted_params)
-    return true if (%i[propulsion_type cycle_type] & params_and_interpreted_params.keys).any? ||
-      params_and_interpreted_params[:search_model_audit_id].present?
+    # This is just a quick hack, will improve
+    def vehicle_search?(params_and_interpreted_params)
+      return true if (%i[propulsion_type cycle_type] & params_and_interpreted_params.keys).any? ||
+        params_and_interpreted_params[:search_model_audit_id].present?
 
-    # Vehicle or propulsion type query items
-    (params_and_interpreted_params[:query_items] || [])
-      .any? { it.start_with?("v_", "p_") }
-  end
-
-  # user arg because all methods have it
-  def paint_description?(bike, _user = nil)
-    bike.pos? && bike.paint.present?
-  end
-
-  # Users send unstolen notifications through the organized_access_panel
-  # The contact owner box only shows up for stolen bikes
-  def display_contact_owner?(bike, user = nil)
-    bike.current_stolen_record.present?
-  end
-
-  def display_impound_claim?(bike, user = nil)
-    return false if bike.owner.present? && bike.owner == user
-    return true if bike.current_impound_record.present?
-    return false if user.blank?
-
-    bike.impound_claims_submitting.active.where(user_id: user.id).any? ||
-      bike.impound_claims_claimed.active.where(user_id: user.id).any?
-  end
-
-  def display_marketplace_message?(bike, _user = nil)
-    bike.status_with_owner? && bike.is_for_sale? && bike.current_marketplace_listing.present?
-  end
-
-  def display_sticker_edit?(bike, user = nil)
-    return false unless user.present? && !bike.version?
-    return true if user.superuser? || user.enabled?("bike_stickers")
-    # user_can_claim_sticker? checks if they've made too many sticker updates
-    return false unless BikeSticker.user_can_claim_sticker?(user)
-    return true if bike.bike_stickers.any?(&:user_editable?) ||
-      user.updated_bike_stickers.any?(&:user_editable?)
-
-    bike_ids = user.bike_ids
-    # Return false if no bikes
-    return false if bike_ids.none?
-
-    sticker_ids = BikeStickerUpdate.where(bike_id: bike_ids).distinct.pluck(:bike_sticker_id)
-    return true if BikeSticker.where(id: sticker_ids).any?(&:user_editable?)
-
-    # Any organizations, for any bikes from user, with stickers
-    Organization.where(id: BikeOrganization.where(bike_id: bike_ids).pluck(:organization_id))
-      .with_enabled_feature_slugs("bike_stickers_user_editable").any?
-  end
-
-  def display_edit_address_fields?(bike, user = nil)
-    return false unless user_edit_bike_address?(bike, user)
-    # Make absolutely sure with stolen bikes
-    return false if bike.version? || bike.current_stolen_record_id.present? ||
-      BikeServices::CalculateLocation.registration_address_source(bike) == "marketplace_listing"
-
-    # parking notifications, impounded, stolen etc use the associated record for their address
-    %w[status_impounded unregistered_parking_notification status_stolen].exclude?(bike.status)
-  end
-
-  def edit_street_address?(bike, user = nil)
-    return false if bike.user&.no_address? || bike.creation_organization&.enabled?("no_address")
-
-    bike.address_record&.street.present? || bike.creation_organization&.enabled?("reg_address")
-  end
-
-  def thumb_image_url(bike)
-    return bike.thumb_path if bike.thumb_path.present?
-    return nil if bike.stock_photo_url.blank?
-
-    small = bike.stock_photo_url.split("/")
-    ext = "/small_" + small.pop
-    small.join("/") + ext
-  end
-
-  def header_image_urls(bike)
-    if bike.thumb_path.blank?
-      return single_image_hash(bike.stock_photo_url) if bike.stock_photo_url.present?
-
-      return false # Because there are no images
+      # Vehicle or propulsion type query items
+      (params_and_interpreted_params[:query_items] || [])
+        .any? { it.start_with?("v_", "p_") }
     end
 
-    if (stolen_record = bike.current_stolen_record).present?
-      if stolen_record.images_attached?
-        return {
-          square: BlobUrl.for(stolen_record.image_square),
-          facebook: BlobUrl.for(stolen_record.image_opengraph),
-          twitter: BlobUrl.for(stolen_record.image_opengraph)
-        }
+    # user arg because all methods have it
+    def paint_description?(bike, _user = nil)
+      bike.pos? && bike.paint.present?
+    end
+
+    # Users send unstolen notifications through the organized_access_panel
+    # The contact owner box only shows up for stolen bikes
+    def display_contact_owner?(bike, user = nil)
+      bike.current_stolen_record.present?
+    end
+
+    def display_impound_claim?(bike, user = nil)
+      return false if bike.owner.present? && bike.owner == user
+      return true if bike.current_impound_record.present?
+      return false if user.blank?
+
+      bike.impound_claims_submitting.active.where(user_id: user.id).any? ||
+        bike.impound_claims_claimed.active.where(user_id: user.id).any?
+    end
+
+    def display_marketplace_message?(bike, _user = nil)
+      bike.status_with_owner? && bike.is_for_sale? && bike.current_marketplace_listing.present?
+    end
+
+    def display_sticker_edit?(bike, user = nil)
+      return false unless user.present? && !bike.version?
+      return true if user.superuser? || user.enabled?("bike_stickers")
+      # user_can_claim_sticker? checks if they've made too many sticker updates
+      return false unless BikeSticker.user_can_claim_sticker?(user)
+      return true if bike.bike_stickers.any?(&:user_editable?) ||
+        user.updated_bike_stickers.any?(&:user_editable?)
+
+      bike_ids = user.bike_ids
+      # Return false if no bikes
+      return false if bike_ids.none?
+
+      sticker_ids = BikeStickerUpdate.where(bike_id: bike_ids).distinct.pluck(:bike_sticker_id)
+      return true if BikeSticker.where(id: sticker_ids).any?(&:user_editable?)
+
+      # Any organizations, for any bikes from user, with stickers
+      Organization.where(id: BikeOrganization.where(bike_id: bike_ids).pluck(:organization_id))
+        .with_enabled_feature_slugs("bike_stickers_user_editable").any?
+    end
+
+    def display_edit_address_fields?(bike, user = nil)
+      return false unless user_edit_bike_address?(bike, user)
+      # Make absolutely sure with stolen bikes
+      return false if bike.version? || bike.current_stolen_record_id.present? ||
+        BikeServices::CalculateLocation.registration_address_source(bike) == "marketplace_listing"
+
+      # parking notifications, impounded, stolen etc use the associated record for their address
+      %w[status_impounded unregistered_parking_notification status_stolen].exclude?(bike.status)
+    end
+
+    def edit_street_address?(bike, user = nil)
+      return false if bike.user&.no_address? || bike.creation_organization&.enabled?("no_address")
+
+      bike.address_record&.street.present? || bike.creation_organization&.enabled?("reg_address")
+    end
+
+    def thumb_image_url(bike)
+      return bike.thumb_path if bike.thumb_path.present?
+      return nil if bike.stock_photo_url.blank?
+
+      small = bike.stock_photo_url.split("/")
+      ext = "/small_" + small.pop
+      small.join("/") + ext
+    end
+
+    def header_image_urls(bike)
+      if bike.thumb_path.blank?
+        return single_image_hash(bike.stock_photo_url) if bike.stock_photo_url.present?
+
+        return false # Because there are no images
       end
 
-      facebook_image = stolen_record.alert_image&.image_url(:facebook)
-      if facebook_image.present?
-        return {
-          square: facebook_image,
-          facebook: facebook_image,
-          twitter: stolen_record.alert_image.image_url(:twitter)
-        }
+      if (stolen_record = bike.current_stolen_record).present?
+        if stolen_record.images_attached?
+          return {
+            square: BlobUrl.for(stolen_record.image_square),
+            facebook: BlobUrl.for(stolen_record.image_opengraph),
+            twitter: BlobUrl.for(stolen_record.image_opengraph)
+          }
+        end
+
+        facebook_image = stolen_record.alert_image&.image_url(:facebook)
+        if facebook_image.present?
+          return {
+            square: facebook_image,
+            facebook: facebook_image,
+            twitter: stolen_record.alert_image.image_url(:twitter)
+          }
+        end
+      end
+      single_image_hash(bike.public_images.limit(1)&.first&.image_url(:large))
+    end
+
+    def origin_title(creation_description)
+      return nil unless creation_description.present?
+
+      extended_description = {
+        "web" => "Registered with self registration process",
+        "org reg" => "Registered by internal, organization member form",
+        "landing page" => "Registration began with incomplete registration, via organization landing page",
+        "bulk reg" => "Registered by spreadsheet import"
+      }
+      if %w[Lightspeed Ascend].include?(creation_description)
+        "Automatically registered by bike shop point of sale (#{creation_description} POS)"
+      else
+        extended_description[creation_description] || "Registered via #{creation_description}"
       end
     end
-    single_image_hash(bike.public_images.limit(1)&.first&.image_url(:large))
-  end
 
-  def origin_title(creation_description)
-    return nil unless creation_description.present?
+    #
+    # private below here
+    #
 
-    extended_description = {
-      "web" => "Registered with self registration process",
-      "org reg" => "Registered by internal, organization member form",
-      "landing page" => "Registration began with incomplete registration, via organization landing page",
-      "bulk reg" => "Registered by spreadsheet import"
-    }
-    if %w[Lightspeed Ascend].include?(creation_description)
-      "Automatically registered by bike shop point of sale (#{creation_description} POS)"
-    else
-      extended_description[creation_description] || "Registered via #{creation_description}"
-    end
-  end
+    def user_edit_bike_address?(bike, user = nil)
+      return false if user.blank?
 
-  #
-  # private below here
-  #
-
-  def user_edit_bike_address?(bike, user = nil)
-    return false if user.blank?
-
-    if bike.user.present?
-      # If the user has set their address, that's the only way to update bike addresses
-      return false if bike.user.address_set_manually
-      if bike.user == user
-        # If user is bike owner, check for user_registration_organizations with reg_address -
-        # because then they need to edit address via their account page
-        return user.uro_organizations.with_enabled_feature_slugs("reg_address").none?
+      if bike.user.present?
+        # If the user has set their address, that's the only way to update bike addresses
+        return false if bike.user.address_set_manually
+        if bike.user == user
+          # If user is bike owner, check for user_registration_organizations with reg_address -
+          # because then they need to edit address via their account page
+          return user.uro_organizations.with_enabled_feature_slugs("reg_address").none?
+        end
       end
+      # otherwise if bike is new, for superusers or users authorized by organization
+      bike.id.blank? || user.superuser? || bike.authorized_by_organization?(u: user)
     end
-    # otherwise if bike is new, for superusers or users authorized by organization
-    bike.id.blank? || user.superuser? || bike.authorized_by_organization?(u: user)
-  end
 
-  def single_image_hash(image_url)
-    {square: image_url, twitter: image_url, facebook: image_url}
-  end
+    def single_image_hash(image_url)
+      {square: image_url, twitter: image_url, facebook: image_url}
+    end
 
-  conceal :user_edit_bike_address?, :single_image_hash
+    conceal :user_edit_bike_address?, :single_image_hash
+  end
 end
