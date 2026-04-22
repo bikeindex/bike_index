@@ -2,7 +2,7 @@
   <%= render Org::MultiSearchResults::Component.new(
     organization: current_organization,
     query: @query,
-    chip_id: @query_chip_id,
+    chip_id: @chip_id,
     pagy: @pagy,
     search_kind: "stickers",
     bikes: @bikes,
@@ -10,10 +10,10 @@
   ) %>
 <% end %>
 
-<% if @query_chip_id %>
-  <%= turbo_stream.replace @query_chip_id do %>
+<% if @chip_id %>
+  <%= turbo_stream.replace @chip_id do %>
     <%= render SearchResults::MultiResultChip::Component.new(
-      chip_id: @query_chip_id,
+      chip_id: @chip_id,
       result_count: @pagy.count,
       sticker: @query
     ) %>

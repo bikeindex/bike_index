@@ -2,7 +2,7 @@
 
 module Org::ImpoundRecordsIndex
   class Component < ApplicationComponent
-    include SortableHelper
+    include Binxtils::SortableHelper
 
     def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, time_range:, available_statuses:, current_organization:, search_proximity:, search_location:, interpreted_params:)
       @pagy = pagy

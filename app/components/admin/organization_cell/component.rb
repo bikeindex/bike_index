@@ -2,7 +2,7 @@
 
 module Admin::OrganizationCell
   class Component < ApplicationComponent
-    include SortableHelper
+    include Binxtils::SortableHelper
 
     def initialize(organization: nil, organization_id: nil, render_search: false)
       @organization = organization

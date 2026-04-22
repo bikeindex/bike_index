@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--multi-serial-search'
 export default class extends Controller {
   static targets = ['textarea', 'button', 'serialChips', 'results', 'serialsToggle', 'stickersToggle', 'settingsContainer']
-  static values = { url: String, stickerUrl: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, spinner: String }
+  static values = { url: String, stickerUrl: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
     if (this.searching) return
@@ -153,12 +153,18 @@ export default class extends Controller {
     url.searchParams.set('serial', serial)
     url.searchParams.set('chip_id', `chip_${index}`)
 
-    const response = await fetch(url, {
-      headers: { Accept: 'text/vnd.turbo-stream.html' }
-    })
+    try {
+      const response = await fetch(url, {
+        headers: { Accept: 'text/vnd.turbo-stream.html' }
+      })
 
-    if (response.ok) {
-      Turbo.renderStreamMessage(await response.text())
+      if (response.ok) {
+        Turbo.renderStreamMessage(await response.text())
+      } else {
+        this.showChipError(serial, index, `Server error ${response.status}`)
+      }
+    } catch {
+      this.showChipError(serial, index, 'Network error')
     }
   }
 
@@ -167,12 +173,27 @@ export default class extends Controller {
     url.searchParams.set('query', query)
     url.searchParams.set('chip_id', `chip_${index}`)
 
-    const response = await fetch(url, {
-      headers: { Accept: 'text/vnd.turbo-stream.html' }
-    })
+    try {
+      const response = await fetch(url, {
+        headers: { Accept: 'text/vnd.turbo-stream.html' }
+      })
 
-    if (response.ok) {
-      Turbo.renderStreamMessage(await response.text())
+      if (response.ok) {
+        Turbo.renderStreamMessage(await response.text())
+      } else {
+        this.showChipError(query, index, `Server error ${response.status}`)
+      }
+    } catch {
+      this.showChipError(query, index, 'Network error')
     }
+  }
+
+  showChipError (serial, index, message) {
+    const chip = document.getElementById(`chip_${index}`)
+    if (!chip) return
+    chip.className = this.errorClassValue
+    chip.innerHTML = ''
+    chip.appendChild(this.serialSpan(serial))
+    chip.insertAdjacentHTML('beforeend', this.errorTooltipValue.replace('__MESSAGE__', message))
   }
 }

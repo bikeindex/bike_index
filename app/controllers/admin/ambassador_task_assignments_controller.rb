@@ -1,5 +1,5 @@
 class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   def index
     matching_assignments =

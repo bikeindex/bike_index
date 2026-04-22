@@ -2,7 +2,7 @@
 
 module Org::MultiSearchResults
   class Component < ApplicationComponent
-    include SortableHelper
+    include Binxtils::SortableHelper
 
     def initialize(organization:, query:, chip_id:, pagy:, search_kind: "serials",
       bikes: nil, interpreted_params: nil, per_page: nil, close_serials: nil)

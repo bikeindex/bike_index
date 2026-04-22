@@ -191,6 +191,22 @@ RSpec.describe StravaRequest, type: :model do
       end
     end
 
+    context "404 record not found" do
+      let(:response) do
+        instance_double(Faraday::Response, success?: false, status: 404, headers:,
+          body: {"message" => "Record Not Found", "errors" => [{"resource" => "Activity", "field" => "id", "code" => "invalid"}]})
+      end
+
+      it "marks as error but does not raise even with raise_on_error" do
+        expect {
+          strava_request.update_from_response(response, raise_on_error: true)
+        }.not_to raise_error
+
+        expect(strava_request.reload.error?).to be true
+        expect(strava_request.parameters).to eq({page: 1, error_response_status: 404}.as_json)
+      end
+    end
+
     context "rate limited response with re_enqueue" do
       let(:response) { instance_double(Faraday::Response, success?: false, status: 429, headers:, body: "Rate limited") }
 

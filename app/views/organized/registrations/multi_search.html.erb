@@ -5,6 +5,12 @@
 
 <% search_kind = params[:search_kind] == "stickers" ? "stickers" : "serials" %>
 
+<% error_tooltip_template = capture do %>
+  <%= render(UI::Tooltip::Component.new(text: "__MESSAGE__")) do %>
+    <small class="tw:text-2xs tw:ml-3 tw:block tw:leading-none">error</small>
+  <% end %>
+<% end %>
+
 <div
   data-controller="org--multi-serial-search org--registration-search org--registration-search-column-toggle"
   data-org--multi-serial-search-url-value="<%= multi_search_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
@@ -13,6 +19,8 @@
   data-org--multi-serial-search-empty-class-value="<%= UI::Badge::Component.badge_classes(color: :empty, size: :md) %>"
   data-org--multi-serial-search-success-class-value="<%= UI::Badge::Component.badge_classes(color: :success, size: :md) %>"
   data-org--multi-serial-search-gray-class-value="<%= UI::Badge::Component.badge_classes(color: :gray, size: :md) %>"
+  data-org--multi-serial-search-error-class-value="<%= UI::Badge::Component.badge_classes(color: :error, size: :md, cursor: "tw:cursor-help") %>"
+  data-org--multi-serial-search-error-tooltip-value="<%= ERB::Util.html_escape(error_tooltip_template.to_str) %>"
   data-org--multi-serial-search-spinner-value="<%= ERB::Util.html_escape(render(UI::LoadingSpinner::Component.new(size: :sm)).to_str) %>"
   data-org--registration-search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
 >
@@ -20,10 +28,7 @@
     <h3 class="uncap tw:mb-4">Multi Search</h3>
 
     <% if current_organization.enabled?("bike_stickers") %>
-      <div
-        class="tw:mb-4 tw:flex tw:gap-0"
-        data-org--multi-serial-search-target="toggleGroup"
-      >
+      <div class="tw:mb-4 tw:flex tw:gap-0">
         <%= render UI::Button::Component.new(
           text: "Serials",
           color: :secondary,

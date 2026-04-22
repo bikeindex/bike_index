@@ -1898,6 +1898,9 @@ en:
           successfully_created: Parking Notification for %{bike_type} created
           unable_to_create: Unable to create - %{errors}
       stickers:
+        ensure_sticker_for_current_organization:
+          not_your_organizations_sticker: Sticker %{bike_sticker} isn't your organization's
+            sticker.
         find_bike_sticker:
           unable_to_find_sticker: 'Unable to find sticker with code: %{bike_sticker}.'
         update:

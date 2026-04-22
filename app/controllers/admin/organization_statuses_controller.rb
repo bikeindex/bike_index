@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::OrganizationStatusesController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   WITH_POS_GRAPH_PARAMS = {search_pos_kind: "not_no_pos", render_chart: true}.freeze
 

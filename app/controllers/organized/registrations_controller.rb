@@ -1,6 +1,6 @@
 module Organized
   class RegistrationsController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
 
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
 
@@ -47,7 +47,7 @@ module Organized
 
     def multi_search_response
       @serial = params[:serial].to_s.strip
-      @serial_chip_id = params[:chip_id].to_s.strip.presence
+      @chip_id = params[:chip_id].to_s.strip.presence
       return head(:bad_request) unless @serial.present?
 
       @interpreted_params = BikeSearchable.searchable_interpreted_params({serial: @serial, stolenness: "all"}, ip: forwarded_ip_address)
@@ -59,7 +59,7 @@ module Organized
 
     def multi_search_sticker_response
       @query = params[:query].to_s.strip
-      @query_chip_id = params[:chip_id].to_s.strip.presence
+      @chip_id = params[:chip_id].to_s.strip.presence
       return head(:bad_request) unless @query.present?
 
       @per_page = 10

@@ -1,5 +1,5 @@
 class Admin::SocialAccountsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_social_account, only: %i[show edit update destroy check_credentials]
 

@@ -3,10 +3,10 @@
 module UI
   module Table
     class Component < ApplicationComponent
-      include SortableHelper
+      include Binxtils::SortableHelper
 
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
-      def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil, render_sortable: false)
+      def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil, render_sortable: false, sticky: false)
         @records = records
         @cache_key = cache_key
         @classes = classes
@@ -14,6 +14,7 @@ module UI
         @sort = sort
         @sort_direction = sort ? (sort_direction || "desc") : sort_direction
         @render_sortable = render_sortable
+        @sticky = sticky
         @columns = []
       end
 
@@ -48,6 +49,11 @@ module UI
 
       def sortable_columns
         @columns.filter_map(&:sortable)
+      end
+
+      # Stacking + background so the header paints over scrolled rows.
+      def sticky_th_classes
+        @sticky ? "tw:relative tw:z-10 tw:bg-gray-50 tw:dark:bg-gray-700" : nil
       end
 
       def table_classes

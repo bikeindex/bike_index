@@ -61,10 +61,7 @@ class Email::DonationJob < ApplicationJob
 
     payment.user.bikes.select do |b|
       b.stolen_recovery? && b.recovered_records.where(recovered_at: relevant_period(payment)).any?
-    end.sort do |a, b|
-      # most recent recovery
-      a.recovered_records.last.recovered_at <=> b.recovered_records.recovered_at
-    end
+    end.sort_by { |bike| bike.recovered_records.first.recovered_at }
   end
 
   def matching_stolen_bikes(payment)

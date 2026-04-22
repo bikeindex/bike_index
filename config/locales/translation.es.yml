@@ -2423,6 +2423,8 @@ es:
           unable_to_find_sticker:
         update:
           cannot_update:
+        ensure_sticker_for_current_organization:
+          not_your_organizations_sticker:
       users:
         create:
           insufficient_invitations:

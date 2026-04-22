@@ -2572,6 +2572,9 @@ nb:
         update:
           cannot_update: Du kan ikke oppdatere det %{bike_sticker_kind}. Ta kontakt
             med support@bikeindex.org hvis du tror du burde være i stand til det.
+        ensure_sticker_for_current_organization:
+          not_your_organizations_sticker: Klistremerket %{bike_sticker} er ikke organisasjonens
+            klistremerke.
       users:
         create:
           insufficient_invitations: Du prøvde å invitere %{invite_count}-brukere,

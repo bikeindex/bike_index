@@ -1,5 +1,5 @@
 class Admin::PaymentsController < Admin::BaseController
-  include SortableTable
+  include Binxtils::SortableTable
 
   before_action :find_payment, only: %i[edit update]
 
