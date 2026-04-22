@@ -14,7 +14,7 @@ Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$RE
 - `git diff main...HEAD --stat`
 - `git diff main...HEAD --name-only`
 - `git log main..HEAD --oneline`
-- `EXISTING_PR=$(gh pr view --json number,url,title 2>/dev/null)` — capture for step 7.
+- `EXISTING_PR=$(gh pr view --json number,url,title 2>/dev/null)` — capture for step 5.
 - `curl -fs "$BASE_URL/" >/dev/null` — is `bin/dev` already up?
 
 If the branch has no commits ahead of `main`, stop and tell the user.
@@ -31,7 +31,7 @@ A change is "frontend" if any changed path matches:
 - `config/tailwind*`, `tailwind.config.*`, `postcss.config.*`
 - `*.scss`, `*.css`, `*.coffee`, `*.js`, `*.ts`
 
-If there are no frontend changes, skip steps 3–5 and go straight to step 6 (no Screenshots section).
+If there are no frontend changes, skip steps 3–4 and 6–7 — step 5 still creates the PR, just without a Screenshots section.
 
 ### 3. Decide which URLs to screenshot
 
@@ -46,7 +46,7 @@ Before screenshots, poll `curl -fs "$BASE_URL/" >/dev/null` until it succeeds �
 
 ### 4. Capture screenshots
 
-Call `bin/screenshot_dev <url-path> <page-slug>` for each page. It captures desktop (1440×900) and mobile (390×844) PNGs to `tmp/pr_screenshots/<branch>-<page>-{desktop,mobile}.png` and prints the two paths. The branch prefix keeps filenames unique across PRs so release-asset uploads don't collide.
+Call `bin/screenshot_dev <url-path> <page-slug>` for each page. It captures desktop (1440×900) and mobile (390×844) PNGs to `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png` and prints the two paths.
 
 `<page-slug>` should be a short identifier for the page (e.g. `bike-show`, `admin-strava-activities`). `<url-path>` starts with `/` (e.g. `/bikes/42`).
 
@@ -59,16 +59,30 @@ After capture, check file sizes — a PNG under ~5KB usually means the page erro
 
 Only stop and surface to the user once you understand the cause and either (a) have a fix to propose, (b) need input they must provide (e.g. which URL to screenshot instead), or (c) concluded it's a real bug in the PR.
 
-### 5. Host the images
+### 5. Build the summary body and create/update the PR
 
-Run `bin/upload_pr_screenshots`. It uploads every PNG in `tmp/pr_screenshots/` to a reused prerelease tagged `_pr-screenshots` (creating it on first use) and prints the public URL for each file. Capture the output for step 6.
+Write a summary of the change (2–5 bullets based on the diff and recent commits) to a temp file. Follow the repo's existing PR body style — look at the last few merged PRs (`gh pr list --state merged --limit 5 --json body,title`) to match tone and length. Keep the title under ~70 chars.
 
-### 6. Build the PR body
+If there are no frontend changes, this is the final body — skip steps 6–7.
 
-Structure:
+Push the branch: `git push -u origin HEAD`.
+
+- If `$EXISTING_PR` from step 1 was non-empty: `gh pr edit <num> --body-file <tmp-body-file>` (don't overwrite the title unless the user asks).
+- Otherwise: `gh pr create --base main --title "..." --body-file <tmp-body-file>`. Capture the PR number from the output.
+
+Always pass the body via `--body-file` (not inline `--body`) to preserve formatting.
+
+### 6. Upload screenshots and get inline URLs
+
+Invoke the `github-upload-image-to-pr` skill to upload each PNG from step 4 to the PR's comment textarea — GitHub mints persistent `user-attachments/assets/` URLs that render inline in the browser (release assets would force a download on click). The skill clears the textarea without submitting the comment.
+
+Collect the returned URLs, keyed by which file they correspond to (desktop vs. mobile, per page).
+
+### 7. Append the Screenshots section to the PR body
+
+Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again:
 
 ```markdown
-<summary of the change — 2–5 bullets written by you based on the diff and recent commits>
 
 ## Screenshots
 
@@ -76,25 +90,15 @@ Structure:
 
 | Desktop | Mobile |
 | --- | --- |
-| <img src="<desktop-url>" width="600"> | <img src="<mobile-url>" width="300"> |
+| <img src="<desktop-user-attachments-url>" width="600"> | <img src="<mobile-user-attachments-url>" width="300"> |
 ```
 
-Rules for the Screenshots section:
-- Omit the whole `## Screenshots` section if there are no frontend changes.
+Rules:
 - Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own 1-row table — desktop on the left, mobile on the right.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells.
 
-Follow the repo's existing PR body style — look at the last few merged PRs (`gh pr list --state merged --limit 5 --json body,title`) to match tone and length. Keep the title under ~70 chars.
-
-### 7. Create or update the PR
-
-Push the branch: `git push -u origin HEAD`.
-
-- If `$EXISTING_PR` from step 1 was non-empty: `gh pr edit <num> --body-file <tmp-body-file>` (don't overwrite the title unless the user asks).
-- Otherwise: `gh pr create --base main --title "..." --body-file <tmp-body-file>`.
-
-Always pass the body via `--body-file` (not inline `--body`) to preserve formatting. Return the PR URL at the end.
+Return the PR URL at the end.
 
 ## Notes
 
-- If headless Chrome or the release upload fails, report the failure clearly and fall back to creating the PR without screenshots — don't block PR creation on screenshot tooling.
+- If headless Chrome or the skill upload fails, report the failure clearly and leave the PR without screenshots — don't block PR creation on screenshot tooling.
