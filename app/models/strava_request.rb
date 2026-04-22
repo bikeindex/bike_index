@@ -182,7 +182,7 @@ class StravaRequest < AnalyticsRecord
 
       StravaRequest.create!(user_id:, strava_integration_id:, request_type:, proxy_request:,
         parameters: parameters.except("error_response_status"))
-    elsif error? && raise_on_error
+    elsif error? && raise_on_error && response.status != 404
       raise "Strava API error #{response.status}: #{response.body}"
     end
   end

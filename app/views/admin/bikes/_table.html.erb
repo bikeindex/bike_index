@@ -29,7 +29,7 @@
   <style>.ui-table thead {display: none !important;}</style>
 <% end %>
 
-<%= form_tag get_destroy_admin_bike_path(id: "multi_delete"), method: :get do %>
+<%= form_tag get_destroy_admin_bike_path(id: "multi_delete"), method: :get, data: {controller: "table-multi-delete"} do %>
   <div class="display-multi-check mb-3 text-center">
     <%= submit_tag 'Delete selected', class: 'btn btn-outline-danger' %>
   </div>
@@ -38,9 +38,9 @@
     data-controller="update-cached-sortable-links"
     data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
   >
-    <%= render(UI::Table::Component.new(records: bikes, cache_key: "admin-bikes", render_sortable:, classes: show_serial ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
-      <% table.column(label: link_to(check_mark, "#", id: "multi-checkbox-selector"), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bike| %>
-        <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id %>
+    <%= render(UI::Table::Component.new(records: bikes, cache_key: "admin-bikes-v2", render_sortable:, classes: show_serial ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
+      <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", data: {action: "click->table-multi-delete#toggleAll"}), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bike| %>
+        <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false, data: {"table-multi-delete-target" => "checkbox"} %>
       <% end %>
 
       <% table.column(sortable: "id", label: "Added", lower_right: ->(bike) { content_tag(:span, bike.id, class: "only-dev-visible") }) do |bike| %>

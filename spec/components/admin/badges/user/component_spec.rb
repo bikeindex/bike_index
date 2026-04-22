@@ -27,10 +27,9 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
       expect(user.donor?).to be_truthy
       result = render_component(user:)
       expect(result).to have_text("D")
-      expect(result).to have_css("[title='Donor']", text: "D")
+      expect(result).to have_css("[role='tooltip']", text: "Donor", visible: :all)
 
       result_full = render_component(user:, full_text: true)
-      expect(result_full).to have_css("[title='Donor']", text: "D")
       expect(result_full).to have_text(/D\s*onor/)
     end
 
@@ -41,13 +40,13 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
         expect(user.donor?).to be_truthy
         expect(user.theft_alert_purchaser?).to be_truthy
         result = render_component(user:)
-        expect(result).to have_css("[title='Donor']", text: "D")
-        expect(result).to have_css("[title='Promoted alert purchaser']", text: "P")
+        expect(result).to have_css("[role='tooltip']", text: "Donor", visible: :all)
+        expect(result).to have_css("[role='tooltip']", text: "Promoted alert purchaser", visible: :all)
 
         # If superuser, don't show other stuff
         FactoryBot.create(:superuser_ability, user:)
         result_superuser = render_component(user:)
-        expect(result_superuser).to have_css("[title='Superuser']", text: "S")
+        expect(result_superuser).to have_css("[role='tooltip']", text: "Superuser", visible: :all)
       end
     end
   end
@@ -61,10 +60,10 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
       expect(membership.reload.status).to eq "active"
       expect(user.donor?).to be_falsey
       result = render_component(user:)
-      expect(result).to have_css("[title='Member']")
+      expect(result).to have_css("[role='tooltip']", text: "Member", visible: :all)
 
       component_text = whitespace_normalized_body_text(result.to_html)
-      expect(component_text).to eq("M")
+      expect(component_text).to eq("M Member")
     end
 
     it "renders full text" do
@@ -93,7 +92,7 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
       expect(user.reload).to be_present
       result = render_component(user:)
       component_text = whitespace_normalized_body_text(result.to_html)
-      expect(component_text).to eq("R")
+      expect(component_text).to eq("R Recovered bike")
     end
   end
 
@@ -104,7 +103,7 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
     it "renders org icon for unpaid org" do
       expect(user.paid_org?).to be_falsey
       result = render_component(user:)
-      expect(result).to have_css("[title='organization member - Bike Shop']")
+      expect(result).to have_css("[role='tooltip']", text: "organization member - Bike Shop", visible: :all)
       expect(result).to have_text("O-BS")
     end
 
@@ -115,10 +114,10 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
         expect(user.paid_org?).to be_truthy
         allow_any_instance_of(Organization).to receive(:paid_money?).and_return(true)
         result = render_component(user:)
-        expect(result).to have_css("[title='Paid organization member - Law Enforcement']")
+        expect(result).to have_css("[role='tooltip']", text: "Paid organization member - Law Enforcement", visible: :all)
 
         component_text = whitespace_normalized_body_text(result.to_html)
-        expect(component_text).to eq("$O-P")
+        expect(component_text).to eq("$O-P Paid organization member - Law Enforcement")
 
         result_full = render_component(user:, full_text: true)
         component_text = whitespace_normalized_body_text(result_full.to_html)
@@ -132,7 +131,7 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
     it "shows banned" do
       result = render_component(user:)
       expect(result).to have_text("B")
-      expect(result).to have_css("[title='Banned']")
+      expect(result).to have_css("[role='tooltip']", text: "Banned", visible: :all)
 
       result_full = render_component(user:, full_text: true)
       component_text = whitespace_normalized_body_text(result_full.to_html)
@@ -146,7 +145,7 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
         user.reload
         result = render_component(user:)
         expect(result).to have_text("B")
-        expect(result).to have_css("[title='Banned: Known criminal']")
+        expect(result).to have_css("[role='tooltip']", text: "Banned: Known criminal", visible: :all)
 
         result_full = render_component(user:, full_text: true)
         component_text = whitespace_normalized_body_text(result_full.to_html)
@@ -161,7 +160,7 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
     it "shows email banned" do
       result = render_component(user:)
       expect(result).to have_text("EB")
-      expect(result).to have_css("[title='Email Banned: domain']")
+      expect(result).to have_css("[role='tooltip']", text: "Email Banned: domain", visible: :all)
 
       result_full = render_component(user:, full_text: true)
       component_text = whitespace_normalized_body_text(result_full.to_html)
