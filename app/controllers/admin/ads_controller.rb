@@ -1,55 +1,57 @@
-class Admin::AdsController < Admin::BaseController
-  include Binxtils::SetPeriod
+module Admin
+  class AdsController < Admin::BaseController
+    include Binxtils::SetPeriod
 
-  before_action :set_period, only: %i[index]
-  before_action :find_ad, except: [:index, :new, :create]
-  before_action :find_organizations, only: [:new, :edit]
+    before_action :set_period, only: %i[index]
+    before_action :find_ad, except: [:index, :new, :create]
+    before_action :find_organizations, only: [:new, :edit]
 
-  def index
-    @ads = Ad.all
-  end
-
-  def show
-    redirect_to edit_admin_ad_url(@ad)
-  end
-
-  def edit
-  end
-
-  def update
-    if @ad.update(permitted_parameters)
-      flash[:success] = "Ad Saved!"
-      redirect_to admin_ad_url(@ad)
-    else
-      render action: :edit
+    def index
+      @ads = Ad.all
     end
-  end
 
-  def new
-    @ad = Ad.new
-  end
-
-  def create
-    @ad = Ad.create(permitted_parameters)
-    if @ad.save
-      flash[:success] = "Ad Created!"
+    def show
       redirect_to edit_admin_ad_url(@ad)
-    else
-      render action: :new
     end
-  end
 
-  protected
+    def edit
+    end
 
-  def permitted_parameters
-    params.require(:ad).permit(:title, :body, :target_url, :organization_id, :image)
-  end
+    def update
+      if @ad.update(permitted_parameters)
+        flash[:success] = "Ad Saved!"
+        redirect_to admin_ad_url(@ad)
+      else
+        render action: :edit
+      end
+    end
 
-  def find_ad
-    @ad = Ad.find(params[:id])
-  end
+    def new
+      @ad = Ad.new
+    end
 
-  def find_organizations
-    @organizations = Organization.all
+    def create
+      @ad = Ad.create(permitted_parameters)
+      if @ad.save
+        flash[:success] = "Ad Created!"
+        redirect_to edit_admin_ad_url(@ad)
+      else
+        render action: :new
+      end
+    end
+
+    protected
+
+    def permitted_parameters
+      params.require(:ad).permit(:title, :body, :target_url, :organization_id, :image)
+    end
+
+    def find_ad
+      @ad = Ad.find(params[:id])
+    end
+
+    def find_organizations
+      @organizations = Organization.all
+    end
   end
 end

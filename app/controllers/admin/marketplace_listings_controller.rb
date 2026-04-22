@@ -1,53 +1,55 @@
-class Admin::MarketplaceListingsController < Admin::BaseController
-  include Binxtils::SortableTable
+module Admin
+  class MarketplaceListingsController < Admin::BaseController
+    include Binxtils::SortableTable
 
-  def index
-    @per_page = permitted_per_page(default: 50)
-    @pagy, @collection = pagy(:countish,
-      matching_marketplace_listings.includes(:seller, :item, :buyer, :address_record)
-        .reorder("marketplace_listings.#{sort_column} #{sort_direction}"),
-      limit: @per_page,
-      page: permitted_page)
-  end
-
-  def show
-    @marketplace_listing = MarketplaceListing.find(params[:id])
-    @marketplace_messages = @marketplace_listing.marketplace_messages.order(id: :desc).limit(25)
-  end
-
-  helper_method :matching_marketplace_listings, :searchable_statuses
-
-  protected
-
-  def sortable_columns
-    %w[created_at updated_at published_at end_at item_id amount_cents condition status seller_id buyer_id]
-  end
-
-  def earliest_period_date
-    Time.at(1746075600) # 2025-05-01 00:00 - first message sent this month
-  end
-
-  def searchable_statuses
-    MarketplaceListing.statuses.keys.map(&:to_s) + ["removed_or_sold"]
-  end
-
-  def matching_marketplace_listings
-    marketplace_listings = MarketplaceListing
-    @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
-    marketplace_listings = marketplace_listings.send(@status) if @status.present?
-
-    if params[:search_bike_id].present?
-      @bike = Bike.unscoped.find_by(id: params[:search_bike_id])
-
-      marketplace_listings = marketplace_listings.where(item_id: params[:search_bike_id], item_type: "Bike")
+    def index
+      @per_page = permitted_per_page(default: 50)
+      @pagy, @collection = pagy(:countish,
+        matching_marketplace_listings.includes(:seller, :item, :buyer, :address_record)
+          .reorder("marketplace_listings.#{sort_column} #{sort_direction}"),
+        limit: @per_page,
+        page: permitted_page)
     end
 
-    if params[:user_id].present?
-      marketplace_listings = marketplace_listings.for_user(user_subject&.id || params[:user_id])
+    def show
+      @marketplace_listing = MarketplaceListing.find(params[:id])
+      @marketplace_messages = @marketplace_listing.marketplace_messages.order(id: :desc).limit(25)
     end
 
-    @time_range_column = sort_column if %w[updated_at published_at end_at].include?(sort_column)
-    @time_range_column ||= "created_at"
-    marketplace_listings.where(@time_range_column => @time_range)
+    helper_method :matching_marketplace_listings, :searchable_statuses
+
+    protected
+
+    def sortable_columns
+      %w[created_at updated_at published_at end_at item_id amount_cents condition status seller_id buyer_id]
+    end
+
+    def earliest_period_date
+      Time.at(1746075600) # 2025-05-01 00:00 - first message sent this month
+    end
+
+    def searchable_statuses
+      MarketplaceListing.statuses.keys.map(&:to_s) + ["removed_or_sold"]
+    end
+
+    def matching_marketplace_listings
+      marketplace_listings = MarketplaceListing
+      @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
+      marketplace_listings = marketplace_listings.send(@status) if @status.present?
+
+      if params[:search_bike_id].present?
+        @bike = Bike.unscoped.find_by(id: params[:search_bike_id])
+
+        marketplace_listings = marketplace_listings.where(item_id: params[:search_bike_id], item_type: "Bike")
+      end
+
+      if params[:user_id].present?
+        marketplace_listings = marketplace_listings.for_user(user_subject&.id || params[:user_id])
+      end
+
+      @time_range_column = sort_column if %w[updated_at published_at end_at].include?(sort_column)
+      @time_range_column ||= "created_at"
+      marketplace_listings.where(@time_range_column => @time_range)
+    end
   end
 end
