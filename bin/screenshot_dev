@@ -1,7 +1,7 @@
 #!/bin/bash
 # Usage: bin/screenshot_dev <url-path> <page-slug>
-# Captures desktop (1440x900 viewport) and mobile (Pixel 7 emulation, full-page)
-# screenshots of $BASE_URL<url-path> via Playwright's screenshot CLI to
+# Captures desktop (1440x900 viewport) and mobile (Pixel 7 emulation) screenshots
+# of $BASE_URL<url-path> via Playwright's screenshot CLI to
 # tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png
 #
 # Mobile uses real device emulation (viewport, DPR, touch, mobile UA) because
@@ -41,7 +41,6 @@ npx -y playwright@latest screenshot \
 npx -y playwright@latest screenshot \
   --channel chrome \
   --device "Pixel 7" \
-  --full-page \
   "$url" "$mobile_path"
 
 echo "$desktop_path"
