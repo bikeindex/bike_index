@@ -8,7 +8,7 @@ description: >-
   Always use this skill when the user wants to visually document changes in a pull request,
   even if they don't use the word "upload" — phrases like "put the screenshot in the PR" or
   "show the image in the PR" should trigger this skill.
-  Supports Chrome DevTools MCP (preferred) / Playwright MCP / agent-browser as browser automation backends.
+  Supports Playwright MCP (preferred) / Chrome DevTools MCP / agent-browser as browser automation backends.
 allowed-tools: Bash(agent-browser:*), Bash(gh:*), Bash(npx:*), Bash(cp:*), ToolSearch, Read, Glob, Write
 ---
 
@@ -42,11 +42,11 @@ cp /path/to/CleanShot*keyword*.png /tmp/screenshot.png
 
 ### Priority Order
 
-1. **Chrome DevTools MCP** (MCP connection, `mcp__chrome-devtools__*`) — preferred; native Chrome DevTools Protocol integration
-2. **Playwright MCP** (MCP connection, `mcp__playwright__*`) — fallback MCP option if already installed
+1. **Playwright MCP** (MCP connection, `mcp__playwright__*`) — preferred; cross-browser automation with stable APIs
+2. **Chrome DevTools MCP** (MCP connection, `mcp__chrome-devtools__*`) — fallback MCP option if already installed
 3. **agent-browser** (CLI via Bash — last-resort fallback, login state preserved with `--profile`)
 
-MCP-based tools spawn or attach to a Chrome instance. By default Chrome DevTools MCP launches a fresh Chrome profile, so **you will need to sign into github.com the first time** in the spawned window (the session then persists across reuse). agent-browser can persist login state using `--profile ~/.agent-browser-github`.
+MCP-based tools spawn or attach to a browser instance. By default they launch a fresh profile, so **you will need to sign into github.com the first time** in the spawned window (the session then persists across reuse). agent-browser can persist login state using `--profile ~/.agent-browser-github`.
 
 ### Detection
 
@@ -60,24 +60,24 @@ Bash: agent-browser --version
 
 ### If no browser tool is installed
 
-Recommend the user install **Chrome DevTools MCP only** — it's sufficient for this skill and avoids prompting them to choose between backends:
+Recommend the user install **Playwright MCP only** — it's sufficient for this skill and avoids prompting them to choose between backends:
 
 ```bash
-claude mcp add chrome-devtools -- npx -y chrome-devtools-mcp@latest
+claude mcp add playwright -- npx -y @playwright/mcp@latest
 ```
 
-After install, the Claude Code session must be restarted for `mcp__chrome-devtools__*` tools to register. Do not suggest Playwright MCP or agent-browser unless the user explicitly asks for an alternative.
+After install, the Claude Code session must be restarted for `mcp__playwright__*` tools to register. Do not suggest Chrome DevTools MCP or agent-browser unless the user explicitly asks for an alternative.
 
 ## Tool Compatibility Matrix
 
-| Operation | Chrome DevTools MCP | Playwright MCP | agent-browser (CLI/Bash) |
-|-----------|---------------------|----------------|--------------------------|
-| **Navigate** | `navigate_page` | `browser_navigate` | `agent-browser --headed open {url}` |
-| **Snapshot** | `take_snapshot` | `browser_snapshot` | `agent-browser snapshot` |
-| **Screenshot** | `take_screenshot` | `browser_take_screenshot` | `agent-browser screenshot {path}` |
-| **Click** | `click` (uid) | `browser_click` (ref) | `agent-browser click {ref}` |
-| **File Upload** | `upload_file` (uid, filePath) | `browser_file_upload` (paths) | `agent-browser upload {ref} {path}` |
-| **JS Eval** | `evaluate_script` (function) | `browser_evaluate` (function) | `agent-browser eval '{js}'` |
+| Operation | Playwright MCP | Chrome DevTools MCP | agent-browser (CLI/Bash) |
+|-----------|----------------|---------------------|--------------------------|
+| **Navigate** | `browser_navigate` | `navigate_page` | `agent-browser --headed open {url}` |
+| **Snapshot** | `browser_snapshot` | `take_snapshot` | `agent-browser snapshot` |
+| **Screenshot** | `browser_take_screenshot` | `take_screenshot` | `agent-browser screenshot {path}` |
+| **Click** | `browser_click` (ref) | `click` (uid) | `agent-browser click {ref}` |
+| **File Upload** | `browser_file_upload` (paths) | `upload_file` (uid, filePath) | `agent-browser upload {ref} {path}` |
+| **JS Eval** | `browser_evaluate` (function) | `evaluate_script` (function) | `agent-browser eval '{js}'` |
 | **Login State** | Persists across calls; sign in once | Persists across calls; sign in once | Preserved with `--profile` |
 
 ## Steps
@@ -87,10 +87,10 @@ After install, the Claude Code session must be restarted for `mcp__chrome-devtoo
 Navigate to the PR page and immediately take a snapshot to verify login state.
 
 ```javascript
-// Playwright MCP
+// Playwright MCP (preferred)
 browser_navigate({ url: "https://github.com/{owner}/{repo}/pull/{number}" })
 
-// Chrome DevTools MCP
+// Chrome DevTools MCP (fallback)
 navigate_page({ url: "https://github.com/{owner}/{repo}/pull/{number}", type: "url" })
 
 // agent-browser (use --profile to persist login state)
@@ -127,7 +127,7 @@ GitHub renders a file upload input in the comment form. Try these selectors in o
 }
 ```
 
-For Chrome DevTools MCP, you can also take a snapshot to find the `uid` of the file upload element directly.
+For Playwright MCP and Chrome DevTools MCP, you can also take a snapshot to find the `ref`/`uid` of the file upload element directly.
 
 ### Step 3: Upload images one by one
 
@@ -136,8 +136,8 @@ Upload each image file using the detected tool. Wait **2–3 seconds between upl
 For multiple images, upload them all to the same comment textarea before extracting URLs — this is more efficient than navigating between uploads.
 
 ```javascript
-// Chrome DevTools MCP: upload_file requires the uid of the input element
 // Playwright MCP: browser_file_upload takes the element ref and file path(s) array
+// Chrome DevTools MCP: upload_file requires the uid of the input element
 // agent-browser: agent-browser upload {ref} {absolute_path}
 ```
 
@@ -211,7 +211,7 @@ Reload the page and take a screenshot to confirm the images are displayed correc
 
 - **Image sizing**: Control display size via HTML `<img>` tags: `<img width="800" alt="description" src="..." />`
 - **Multiple images**: Upload all images in one session to the same textarea; extract all URLs before clearing
-- **Prefer MCP tools**: Always prefer Playwright or Chrome DevTools MCP over agent-browser for simpler setup
+- **Prefer MCP tools**: Always prefer Playwright MCP (first) or Chrome DevTools MCP (second) over agent-browser for simpler setup
 - **agent-browser login persistence**: Use `--profile ~/.agent-browser-github` to persist GitHub login across sessions
 
 ## Troubleshooting
