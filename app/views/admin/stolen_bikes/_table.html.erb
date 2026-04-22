@@ -4,7 +4,13 @@
   <table class="table table-striped table-bordered table-sm">
     <thead class="thead-light sortable">
       <th class="table-checkbox-select">
-        <button type="button" class="twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer" data-action="click->table-multi-delete#toggleAll"><%= check_mark %></button>
+        <button
+          type="button"
+          class="twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0"
+          data-action="click->table-multi-delete#toggleAll"
+        >
+          <%= check_mark %>
+        </button>
       </th>
 
       <th><%= sortable "created_at", "Stolen created", render_sortable: %></th>
