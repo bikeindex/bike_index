@@ -1,9 +1,14 @@
 #!/bin/bash
 # Usage: bin/screenshot_dev <url-path> <page-slug>
-# Captures desktop (1440x900) and mobile (390x844) PNGs of
-# $BASE_URL<url-path> to tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png
-# The timestamp suffix makes each invocation's output URL unique so
-# GitHub's image cache doesn't serve a stale copy after re-runs.
+# Captures desktop (1440x900 viewport) and mobile (Pixel 7 emulation, full-page)
+# screenshots of $BASE_URL<url-path> via Playwright's screenshot CLI to
+# tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png
+#
+# Mobile uses real device emulation (viewport, DPR, touch, mobile UA) because
+# Chrome's CLI --window-size has a ~500px minimum on macOS and doesn't trigger
+# responsive CSS. --channel chrome reuses the system Chrome install; first
+# invocation downloads the playwright npm package via npx.
+#
 # Prints the two paths on stdout, one per line.
 
 set -eu
@@ -17,30 +22,10 @@ eval "$(ruby "$(dirname "$0")/env" --export)"
 
 url_path="$1"
 page_slug="$2"
-
-find_chrome() {
-  if [ -n "${CHROME:-}" ]; then
-    command -v "$CHROME" >/dev/null 2>&1 || { echo "\$CHROME set but not executable: $CHROME" >&2; exit 1; }
-    echo "$CHROME"; return
-  fi
-  for candidate in \
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-    "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary" \
-    "/Applications/Chromium.app/Contents/MacOS/Chromium" \
-    google-chrome google-chrome-stable chromium chromium-browser chrome; do
-    if [ -x "$candidate" ] || command -v "$candidate" >/dev/null 2>&1; then
-      echo "$candidate"; return
-    fi
-  done
-  echo "bin/screenshot_dev: no Chrome/Chromium binary found. Set \$CHROME to override." >&2
-  exit 1
-}
-chrome="$(find_chrome)"
 branch_slug="$(git rev-parse --abbrev-ref HEAD | tr '/' '-')"
 timestamp="$(date +%Y%m%d-%H%M%S)"
 out_dir="tmp/pr_screenshots"
 url="${BASE_URL}${url_path}"
-mobile_ua="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 
 mkdir -p "$out_dir"
 rm -f "${out_dir}/${branch_slug}-${page_slug}"-*.png
@@ -48,20 +33,16 @@ rm -f "${out_dir}/${branch_slug}-${page_slug}"-*.png
 desktop_path="${out_dir}/${branch_slug}-${page_slug}-${timestamp}-desktop.png"
 mobile_path="${out_dir}/${branch_slug}-${page_slug}-${timestamp}-mobile.png"
 
-"$chrome" --headless=new --disable-gpu --hide-scrollbars \
-  --virtual-time-budget=10000 \
-  --force-device-scale-factor=2 \
-  --window-size=1440,900 \
-  --screenshot="$desktop_path" \
-  "$url"
+npx -y playwright@latest screenshot \
+  --channel chrome \
+  --viewport-size=1440,900 \
+  "$url" "$desktop_path"
 
-"$chrome" --headless=new --disable-gpu --hide-scrollbars \
-  --virtual-time-budget=10000 \
-  --force-device-scale-factor=2 \
-  --window-size=390,844 \
-  --user-agent="$mobile_ua" \
-  --screenshot="$mobile_path" \
-  "$url"
+npx -y playwright@latest screenshot \
+  --channel chrome \
+  --device "Pixel 7" \
+  --full-page \
+  "$url" "$mobile_path"
 
 echo "$desktop_path"
 echo "$mobile_path"

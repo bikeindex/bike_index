@@ -3,7 +3,7 @@ description: Create a pull request, with desktop+mobile screenshots for frontend
 allowed-tools: Bash, Read, Glob, Grep
 ---
 
-Create a pull request for the current branch. If the diff contains frontend changes, capture desktop and mobile screenshots of the affected pages and embed them in the PR body under a `## Screenshots` section.
+Create a pull request for the current branch. If the diff contains frontend changes, capture desktop and mobile screenshots of the affected pages with Playwright and embed them in the PR body under a `## Screenshots` section.
 
 ## Workflow
 
@@ -46,7 +46,7 @@ Before screenshots, poll `curl -fs "$BASE_URL/" >/dev/null` until it succeeds �
 
 ### 4. Capture screenshots
 
-Call `bin/screenshot_dev <url-path> <page-slug>` for each page. It captures desktop (1440×900) and mobile (390×844) PNGs to `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png` and prints the two paths.
+Call `bin/screenshot_dev <url-path> <page-slug>` for each page. It captures desktop (1440×900 viewport) and mobile (Pixel 7 emulation, full-page) PNGs via Playwright to `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png` and prints the two paths. First invocation downloads the playwright npm package via `npx`; subsequent runs are fast.
 
 `<page-slug>` should be a short identifier for the page (e.g. `bike-show`, `admin-strava-activities`). `<url-path>` starts with `/` (e.g. `/bikes/42`).
 
@@ -101,4 +101,4 @@ Return the PR URL at the end.
 
 ## Notes
 
-- If headless Chrome or the skill upload fails, report the failure clearly and leave the PR without screenshots — don't block PR creation on screenshot tooling.
+- If Playwright or the skill upload fails, report the failure clearly and leave the PR without screenshots — don't block PR creation on screenshot tooling.
