@@ -2,7 +2,7 @@
   <%= render Org::MultiSearchResults::Component.new(
     organization: current_organization,
     serial: @serial,
-    serial_chip_id: @serial_chip_id,
+    chip_id: @chip_id,
     pagy: @pagy,
     bikes: @bikes,
     interpreted_params: @interpreted_params,
@@ -11,11 +11,11 @@
   ) %>
 <% end %>
 
-<% if @serial_chip_id %>
-  <%= turbo_stream.replace @serial_chip_id do %>
+<% if @chip_id %>
+  <%= turbo_stream.replace @chip_id do %>
     <%= render SearchResults::MultiResultChip::Component.new(
       serial: @serial,
-      serial_chip_id: @serial_chip_id,
+      chip_id: @chip_id,
       result_count: @pagy.count
     ) %>
   <% end %>

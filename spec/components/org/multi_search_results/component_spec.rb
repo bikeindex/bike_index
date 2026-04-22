@@ -5,13 +5,13 @@ require "rails_helper"
 RSpec.describe Org::MultiSearchResults::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization) }
   let(:serial) { "SERIAL111" }
-  let(:serial_chip_id) { "chip_0" }
+  let(:chip_id) { "chip_0" }
   let(:interpreted_params) { {} }
   let(:per_page) { 10 }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
       render_inline(described_class.new(
-        organization:, serial:, serial_chip_id:, pagy:, bikes:,
+        organization:, serial:, chip_id:, pagy:, bikes:,
         interpreted_params:, per_page:, close_serials:
       ))
     end

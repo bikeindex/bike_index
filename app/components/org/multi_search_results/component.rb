@@ -5,10 +5,10 @@ module Org
     class Component < ApplicationComponent
       include Binxtils::SortableHelper
 
-      def initialize(organization:, serial:, serial_chip_id:, pagy:, bikes:, interpreted_params:, per_page:, close_serials: nil)
+      def initialize(organization:, serial:, chip_id:, pagy:, bikes:, interpreted_params:, per_page:, close_serials: nil)
         @organization = organization
         @serial = serial
-        @serial_chip_id = serial_chip_id
+        @chip_id = chip_id
         @pagy = pagy
         @bikes = bikes
         @interpreted_params = interpreted_params
@@ -19,7 +19,7 @@ module Org
       private
 
       def result_index
-        @serial_chip_id&.delete_prefix("chip_")
+        @chip_id&.delete_prefix("chip_")
       end
 
       def show_view_all?
