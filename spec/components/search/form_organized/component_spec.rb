@@ -21,10 +21,10 @@ RSpec.describe Search::FormOrganized::Component, type: :component do
     expect(component).not_to have_css("input[name='search_proximity']")
   end
 
-  context "with interpreted_params values" do
+  context "with interpreted_params and organized_params values" do
+    let(:options) { {target_search_path:, interpreted_params:, organized_params: {search_email: "test@example.com"}} }
     let(:interpreted_params) do
       {
-        search_email: "test@example.com",
         raw_serial: "ABC123",
         serial: "ABC123",
         search_stickers: "sticker1",
