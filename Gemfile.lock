@@ -677,9 +677,9 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
-    reactionview (0.1.6)
+    reactionview (0.3.0)
       actionview (>= 7.0)
-      herb (>= 0.7.5, < 1.0.0)
+      herb (>= 0.9.0, < 1.0.0)
     redcarpet (3.6.1)
     redis (5.4.1)
       redis-client (>= 0.22.0)
