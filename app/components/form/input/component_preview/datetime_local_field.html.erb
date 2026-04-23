@@ -1,0 +1,3 @@
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(Form::Input::Component.new(form_builder: f, attribute: :start_time, kind: :datetime_local_field, html_options: {step: 60})) %>
+<% end %>

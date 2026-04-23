@@ -111,26 +111,41 @@
     ) %>
   </div>
 
-  <form
-    id="timeSelectionCustom"
-    class="<%= custom_form_classes %>"
-    data-collapse-target="content"
-  >
-    <div class="form-group">
-      <%= label_tag :start_time_selector, translation(".from"), class: "control-label mr-2" %>
-      <%= datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control" %>
-    </div>
+  <%= form_with(
+    url: "#",
+    method: :get,
+    builder: BikeIndexFormBuilder,
+    html: {id: "timeSelectionCustom", class: custom_form_classes, "data-collapse-target": "content"}
+  ) do |f| %>
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-3">
+      <div class="tw:flex tw:items-center tw:gap-2">
+        <%= f.label :start_time_selector, translation(".from"), class: "twlabel tw:m-0" %>
 
-    <div class="form-group end-time-control">
-      <%= label_tag :end_time_selector, translation(".to"), class: "control-label mr-2" %>
-      <%= datetime_local_field_tag :end_time_selector, @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control" %>
-    </div>
+        <%= render Form::Input::Component.new(
+          form_builder: f,
+          attribute: :start_time_selector,
+          kind: :datetime_local_field,
+          html_options: {value: @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60}
+        ) %>
+      </div>
 
-    <%= render UI::Button::Component.new(
-      text: translation(".update"),
-      color: :primary,
-      size: :sm,
-      kind: :submit
-    ) %>
-  </form>
+      <div class="tw:flex tw:items-center tw:gap-2">
+        <%= f.label :end_time_selector, translation(".to"), class: "twlabel tw:m-0" %>
+
+        <%= render Form::Input::Component.new(
+          form_builder: f,
+          attribute: :end_time_selector,
+          kind: :datetime_local_field,
+          html_options: {value: @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60}
+        ) %>
+      </div>
+
+      <%= render UI::Button::Component.new(
+        text: translation(".update"),
+        color: :primary,
+        size: :sm,
+        kind: :submit
+      ) %>
+    </div>
+  <% end %>
 </div>

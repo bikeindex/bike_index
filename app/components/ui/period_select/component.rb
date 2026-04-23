@@ -18,7 +18,7 @@ module UI
       end
 
       def custom_form_classes
-        base = "custom-time-selection mt-2 mb-2"
+        base = "tw:mt-3 tw:mb-2"
         (@period == "custom") ? base : "#{base} tw:hidden"
       end
     end
