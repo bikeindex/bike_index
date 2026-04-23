@@ -181,6 +181,13 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_current_path(/period=custom/, wait: 10)
     expect(page).to have_css("button#periodSelectCustom.active")
     expect(rendered_bike_ids).to eq([bike2.id])
+
+    # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago)
+    visit "#{bikes_path}?search_email=bob@example.com&period=year"
+    expect(page).to have_css("table", wait: 10)
+    expect(page).to have_field("search_email", with: "bob@example.com")
+    expect(page).to have_css("a.period-select-standard.active[data-period='year']")
+    expect(rendered_bike_ids).to eq([bike2.id])
   end
 
   context "with stolen and impounded bikes" do
