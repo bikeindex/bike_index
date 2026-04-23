@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='period-select'
+// Connects to data-controller="ui--period-select"
 // Merges the current URL's query params when navigating via a period link so
 // filters like search_email persist across period changes.
 export default class extends Controller {

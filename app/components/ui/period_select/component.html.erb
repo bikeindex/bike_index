@@ -1,0 +1,136 @@
+<div data-controller="collapse ui--period-select">
+  <div
+    id="timeSelectionBtnGroup"
+    class="text-right tw:flex tw:flex-wrap tw:justify-end tw:gap-2 <%= "custom-period-selected" if @period == "custom" %>"
+    role="group"
+  >
+    <% if @prepend_text.present? %>
+      <span class="mr-2 less-strong d-block d-lg-inline-block">
+        <%= @prepend_text %>
+      </span>
+    <% end %>
+
+    <% if @include_future %>
+      <%= render UI::ButtonLink::Component.new(
+        href: period_url("next_week"),
+        size: :sm,
+        active: @period == "next_week",
+        html_class: "period-select-standard",
+        data: {period: "next_week", action: "click->ui--period-select#select"}
+      ) do %>
+        <span class="d-none d-md-inline-block">
+          <%= translation(".next") %>
+        </span>
+
+        <%= translation(".seven_days") %>
+      <% end %>
+      <%= render UI::ButtonLink::Component.new(
+        href: period_url("next_month"),
+        size: :sm,
+        active: @period == "next_month",
+        html_class: "period-select-standard",
+        data: {period: "next_month", action: "click->ui--period-select#select"}
+      ) do %>
+        <span class="d-none d-md-inline-block">
+          <%= translation(".next") %>
+        </span>
+
+        <%= translation(".thirty_days") %>
+      <% end %>
+    <% end %>
+
+    <%= render UI::ButtonLink::Component.new(
+      href: period_url("hour"),
+      size: :sm,
+      active: @period == "hour",
+      html_class: "period-select-standard",
+      data: {period: "hour", action: "click->ui--period-select#select"}
+    ) do %>
+      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
+      <%= translation(".hour") %>
+    <% end %>
+
+    <%= render UI::ButtonLink::Component.new(
+      href: period_url("day"),
+      size: :sm,
+      active: @period == "day",
+      html_class: "period-select-standard",
+      data: {period: "day", action: "click->ui--period-select#select"}
+    ) do %>
+      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
+      <%= translation(".day") %>
+    <% end %>
+
+    <%= render UI::ButtonLink::Component.new(
+      href: period_url("week"),
+      size: :sm,
+      active: @period == "week",
+      html_class: "period-select-standard",
+      data: {period: "week", action: "click->ui--period-select#select"}
+    ) do %>
+      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
+      <%= translation(".seven_days") %>
+    <% end %>
+
+    <%= render UI::ButtonLink::Component.new(
+      href: period_url("month"),
+      size: :sm,
+      active: @period == "month",
+      html_class: "period-select-standard",
+      data: {period: "month", action: "click->ui--period-select#select"}
+    ) do %>
+      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
+      <%= translation(".thirty_days") %>
+    <% end %>
+
+    <%= render UI::ButtonLink::Component.new(
+      href: period_url("year"),
+      size: :sm,
+      active: @period == "year",
+      html_class: "period-select-standard",
+      data: {period: "year", action: "click->ui--period-select#select"}
+    ) do %>
+      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
+      <%= translation(".year") %>
+    <% end %>
+
+    <%= render UI::ButtonLink::Component.new(
+      href: period_url("all"),
+      size: :sm,
+      active: @period == "all",
+      html_class: "period-select-standard",
+      text: translation(".all"),
+      data: {period: "all", action: "click->ui--period-select#select"}
+    ) %>
+
+    <%= render UI::Button::Component.new(
+      text: translation(".custom"),
+      size: :sm,
+      active: @period == "custom",
+      data: {period: "custom", action: "click->collapse#toggle"}
+    ) %>
+  </div>
+
+  <form
+    id="timeSelectionCustom"
+    class="<%= custom_form_classes %>"
+    data-collapse-target="content"
+  >
+    <div class="form-group">
+      <%= label_tag :start_time_selector, translation(".from"), class: "control-label mr-2" %>
+      <%= datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control" %>
+    </div>
+
+    <div class="form-group end-time-control">
+      <%= label_tag :end_time_selector, translation(".to"), class: "control-label mr-2" %>
+      <%= datetime_local_field_tag :end_time_selector, @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control" %>
+    </div>
+
+    <%= render UI::Button::Component.new(
+      text: translation(".update"),
+      color: :primary,
+      size: :sm,
+      kind: :submit
+    ) %>
+  </form>
+</div>
