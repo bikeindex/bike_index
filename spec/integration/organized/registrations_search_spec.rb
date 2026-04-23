@@ -153,17 +153,21 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 1)
     expect(page).to have_content("alice@example.com")
 
-    # filters by period and custom time range — remove pagination-filler bikes so period filter is unambiguous
-    organization.bikes.where.not(id: [bike1.id, bike2.id]).destroy_all
+    # filters by period and custom time range — scope to bob@example.com (bike2) so search_email persists through period clicks
     visit bikes_path
     expect(page).to have_css("table", wait: 10)
+    fill_in "search_email", with: "bob@example.com"
+    find("#search-button").click
+    expect(page).to have_current_path(/search_email=bob/, wait: 10)
     expect(page).to have_css("a.period-select-standard.active[data-period='all']")
-    expect(rendered_bike_ids).to match_array([bike1.id, bike2.id])
+    expect(rendered_bike_ids).to eq([bike2.id])
+    expect(find("#search_email").value).to eq("bob@example.com")
 
-    # "past year" still includes bike2 (3 days ago)
+    # "past year" still includes bike2 (3 days ago); search_email input stays populated
     page.execute_script("document.querySelector(\"a.period-select-standard[data-period='year']\").click()")
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_css("a.period-select-standard.active[data-period='year']")
+    expect(find("#search_email").value).to eq("bob@example.com")
     expect(rendered_bike_ids).to eq([bike2.id])
 
     # "past day" excludes bike2 (3 days ago > 1 day)
