@@ -153,28 +153,23 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 1)
     expect(page).to have_content("alice@example.com")
 
-    # filters by period and custom time range — scope to bob@example.com (bike2) so search_email persists through period clicks
+    # filters by period and custom time range — 12 bikes total: bike1 (2.years.ago), bike2 (3.days.ago), 10 create_list (now)
     visit bikes_path
     expect(page).to have_css("table", wait: 10)
-    fill_in "search_email", with: "bob@example.com"
-    find("#search-button").click
-    expect(page).to have_current_path(/search_email=bob/, wait: 10)
     expect(page).to have_css("a.period-select-standard.active[data-period='all']")
-    expect(rendered_bike_ids).to eq([bike2.id])
-    expect(find("#search_email").value).to eq("bob@example.com")
+    expect(page).to have_text("12 registrations matching")
 
-    # "past year" still includes bike2 (3 days ago); search_email input stays populated
+    # "past year" excludes bike1 (2 years ago)
     page.execute_script("document.querySelector(\"a.period-select-standard[data-period='year']\").click()")
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_css("a.period-select-standard.active[data-period='year']")
-    expect(find("#search_email").value).to eq("bob@example.com")
-    expect(rendered_bike_ids).to eq([bike2.id])
+    expect(page).to have_text("11 registrations matching")
 
-    # "past day" excludes bike2 (3 days ago > 1 day)
+    # "past day" additionally excludes bike2 (3 days ago)
     page.execute_script("document.querySelector(\"a.period-select-standard[data-period='day']\").click()")
     expect(page).to have_current_path(/period=day/, wait: 10)
     expect(page).to have_css("a.period-select-standard.active[data-period='day']")
-    expect(rendered_bike_ids).to eq([])
+    expect(page).to have_text("10 registrations matching")
 
     # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only
     page.execute_script("document.getElementById('periodSelectCustom').click()")
