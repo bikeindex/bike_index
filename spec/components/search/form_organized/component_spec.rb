@@ -21,8 +21,8 @@ RSpec.describe Search::FormOrganized::Component, type: :component do
     expect(component).not_to have_css("input[name='search_proximity']")
   end
 
-  context "with interpreted_params and organized_params values" do
-    let(:options) { {target_search_path:, interpreted_params:, organized_params: {search_email: "test@example.com"}} }
+  context "with interpreted_params values" do
+    let(:component) { with_request_url("/?search_email=test@example.com") { render_inline(instance) } }
     let(:interpreted_params) do
       {
         raw_serial: "ABC123",

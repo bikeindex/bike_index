@@ -32,7 +32,6 @@
       target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
       target_frame: :organized_bikes_results_frame,
       interpreted_params: form_interpreted_params,
-      organized_params: params.slice(:search_email, :search_notes),
       settings_component: registration_search_settings
     )) do %>
       <% if @bike_sticker.present? %>
