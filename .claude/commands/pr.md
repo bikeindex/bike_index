@@ -46,16 +46,26 @@ Before screenshots, poll `curl -fs "$BASE_URL/" >/dev/null` until it succeeds �
 
 ### 4. Capture screenshots
 
-Call `bin/screenshot_dev <url-path> <page-slug>` for each page. It captures desktop (1440×900 viewport) and mobile (Pixel 7 emulation, full-page) PNGs via Playwright to `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png` and prints the two paths. First invocation downloads the playwright npm package via `npx`; subsequent runs are fast.
+Use Playwright MCP (`mcp__playwright__*`) to capture desktop and mobile screenshots. The MCP browser session persists across calls, so sign-in sticks — you'll only need to sign in once per machine.
 
-`<page-slug>` should be a short identifier for the page (e.g. `bike-show`, `admin-strava-activities`). `<url-path>` starts with `/` (e.g. `/bikes/42`).
+Paths: `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Before capturing, remove stale shots: `rm -f tmp/pr_screenshots/<branch>-<page>-*.png`. `<page-slug>` is a short identifier (e.g. `bike-show`, `admin-strava-activities`). `<url-path>` starts with `/`.
 
-After capture, check file sizes — a PNG under ~5KB usually means the page errored. Diagnose it:
+For each page:
+
+1. `browser_resize` → 1440×900
+2. `browser_navigate` → `$BASE_URL<url-path>`
+3. If the page URL contains `/session/new`: ask the user to sign in via the visible Playwright MCP browser window, wait for confirmation, then re-navigate.
+4. `browser_take_screenshot` → `...-desktop.png`
+5. `browser_resize` → 390×844 (narrow viewport; no true mobile emulation, but responsive CSS breakpoints trigger correctly — Playwright sets viewport via CDP, bypassing Chrome's window-size floor)
+6. `browser_navigate` → same URL (reload so any width-dependent JS re-measures)
+7. `browser_take_screenshot` → `...-mobile.png`
+
+After capture, sanity-check each PNG. A file under ~5KB usually means the page errored; also check `browser_console_messages` for uncaught JS errors. Diagnose:
 
 1. `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"` to get the HTTP status.
 2. `curl -s "$BASE_URL/<path>" | head -200` to see the response body (usually a Rails error page with the exception and top of the backtrace).
 3. `tail -200 log/development.log` for the full backtrace and any SQL involved.
-4. Based on what you find: route missing → re-check the path; auth/redirect → pick a URL that doesn't require login or log in via a seed account; missing fixture → pick a different id or seed it; genuine bug in the diff → this is what you want to know before shipping — fix it or tell the user.
+4. Based on what you find: route missing → re-check the path; auth/redirect → pick a URL that doesn't require login or sign in; missing fixture → pick a different id or seed it; genuine bug in the diff → fix it or tell the user.
 
 Only stop and surface to the user once you understand the cause and either (a) have a fix to propose, (b) need input they must provide (e.g. which URL to screenshot instead), or (c) concluded it's a real bug in the PR.
 
@@ -105,4 +115,5 @@ Return the PR URL at the end.
 
 ## Notes
 
-- If Playwright or the skill upload fails, report the failure clearly and leave the PR without screenshots — don't block PR creation on screenshot tooling.
+- If Playwright MCP or the upload skill fails, report the failure clearly and leave the PR without screenshots — don't block PR creation on screenshot tooling.
+- If Playwright MCP tools aren't registered (`mcp__playwright__*` missing), tell the user to install: `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart the session.
