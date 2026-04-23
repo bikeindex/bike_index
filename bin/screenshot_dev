@@ -6,42 +6,55 @@
 #
 # Mobile uses real device emulation (viewport, DPR, touch, mobile UA) because
 # Chrome's CLI --window-size has a ~500px minimum on macOS and doesn't trigger
-# responsive CSS. --channel chrome reuses the system Chrome install; first
-# invocation downloads the playwright npm package via npx.
+# responsive CSS. --channel chrome reuses the system Chrome install; playwright
+# itself is a devDependency in package.json.
+#
+# Exits non-zero if any JS console errors or uncaught page errors occur.
 #
 # Prints the two paths on stdout, one per line.
-
 set -eu
-
 if [ $# -ne 2 ]; then
   echo "Usage: $0 <url-path> <page-slug>" >&2
   exit 1
 fi
-
 eval "$(ruby "$(dirname "$0")/env" --export)"
-
 url_path="$1"
 page_slug="$2"
 branch_slug="$(git rev-parse --abbrev-ref HEAD | tr '/' '-')"
 timestamp="$(date +%Y%m%d-%H%M%S)"
 out_dir="tmp/pr_screenshots"
 url="${BASE_URL}${url_path}"
-
 mkdir -p "$out_dir"
 rm -f "${out_dir}/${branch_slug}-${page_slug}"-*.png
-
 desktop_path="${out_dir}/${branch_slug}-${page_slug}-${timestamp}-desktop.png"
 mobile_path="${out_dir}/${branch_slug}-${page_slug}-${timestamp}-mobile.png"
-
-npx -y playwright@latest screenshot \
-  --channel chrome \
-  --viewport-size=1440,900 \
-  "$url" "$desktop_path"
-
-npx -y playwright@latest screenshot \
-  --channel chrome \
-  --device "Pixel 7" \
-  "$url" "$mobile_path"
-
+node -e "$(cat <<'JS'
+const { chromium, devices } = require('playwright');
+const [url, desktopPath, mobilePath] = process.argv.slice(1);
+(async () => {
+  const browser = await chromium.launch({ channel: 'chrome' });
+  const errors = [];
+  const capture = async (contextOptions, path, label) => {
+    const context = await browser.newContext(contextOptions);
+    const page = await context.newPage();
+    page.on('console', (msg) => { if (msg.type() === 'error') errors.push(`[${label}] console: ${msg.text()}`); });
+    page.on('pageerror', (err) => errors.push(`[${label}] pageerror: ${err.message}`));
+    console.error(`Navigating to ${url}`);
+    await page.goto(url, { waitUntil: 'load' });
+    console.error(`Capturing screenshot into ${path}`);
+    await page.screenshot({ path });
+    await context.close();
+  };
+  await capture({ viewport: { width: 1440, height: 900 } }, desktopPath, 'desktop');
+  await capture(devices['Pixel 7'], mobilePath, 'mobile');
+  await browser.close();
+  if (errors.length) {
+    console.error('Console errors detected:');
+    for (const e of errors) console.error('  ' + e);
+    process.exit(1);
+  }
+})();
+JS
+)" "$url" "$desktop_path" "$mobile_path"
 echo "$desktop_path"
 echo "$mobile_path"

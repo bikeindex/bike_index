@@ -44,6 +44,13 @@ chdir APP_ROOT do
       ln_sf root_storage, "storage"
     end
 
+    # Symlink node_modules so every workspace shares one install
+    root_node_modules = File.join(root, "node_modules")
+    mkdir_p root_node_modules unless Dir.exist?(root_node_modules)
+    puts "Symlinking node_modules from #{root_node_modules}..."
+    rm_rf "node_modules"
+    ln_sf root_node_modules, "node_modules"
+
     # Copy Facebook VCR cassettes
     fb_cassettes = File.join(root, "spec/vcr_cassettes/facebook")
     if Dir.exist?(fb_cassettes)

@@ -75,3 +75,6 @@ vendor/strava_search/storybook-static/
 
 # Ignore local Claude Code settings
 .claude/settings.local.json
+
+# Ignore Playwright MCP session cache (snapshots, console logs)
+.playwright-mcp/
