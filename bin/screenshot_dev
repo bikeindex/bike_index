@@ -6,8 +6,8 @@
 #
 # Mobile uses real device emulation (viewport, DPR, touch, mobile UA) because
 # Chrome's CLI --window-size has a ~500px minimum on macOS and doesn't trigger
-# responsive CSS. --channel chrome reuses the system Chrome install; first
-# invocation downloads the playwright npm package via npx.
+# responsive CSS. --channel chrome reuses the system Chrome install; playwright
+# itself is a devDependency in package.json.
 #
 # Exits non-zero if any JS console errors or uncaught page errors occur.
 #
@@ -28,13 +28,7 @@ mkdir -p "$out_dir"
 rm -f "${out_dir}/${branch_slug}-${page_slug}"-*.png
 desktop_path="${out_dir}/${branch_slug}-${page_slug}-${timestamp}-desktop.png"
 mobile_path="${out_dir}/${branch_slug}-${page_slug}-${timestamp}-mobile.png"
-# Cache playwright in a stable location so we can require() it from node -e.
-cache_dir="${TMPDIR:-/tmp}/bikeindex_screenshot_dev"
-if [ ! -d "${cache_dir}/node_modules/playwright" ]; then
-  mkdir -p "$cache_dir"
-  (cd "$cache_dir" && npm install --silent --no-save --no-audit --no-fund --prefix "$cache_dir" playwright@latest >&2)
-fi
-NODE_PATH="${cache_dir}/node_modules" node -e "$(cat <<'JS'
+node -e "$(cat <<'JS'
 const { chromium, devices } = require('playwright');
 const [url, desktopPath, mobilePath] = process.argv.slice(1);
 (async () => {
