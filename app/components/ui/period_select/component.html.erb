@@ -10,98 +10,14 @@
       </span>
     <% end %>
 
-    <% if @include_future %>
-      <%= render UI::ButtonLink::Component.new(
-        href: period_url("next_week"),
-        size: :sm,
-        active: @period == "next_week",
-        html_class: "period-select-standard",
-        data: {period: "next_week", action: "click->ui--period-select#select"}
-      ) do %>
-        <span class="d-none d-md-inline-block">
-          <%= translation(".next") %>
-        </span>
-
-        <%= translation(".seven_days") %>
-      <% end %>
-      <%= render UI::ButtonLink::Component.new(
-        href: period_url("next_month"),
-        size: :sm,
-        active: @period == "next_month",
-        html_class: "period-select-standard",
-        data: {period: "next_month", action: "click->ui--period-select#select"}
-      ) do %>
-        <span class="d-none d-md-inline-block">
-          <%= translation(".next") %>
-        </span>
-
-        <%= translation(".thirty_days") %>
+    <% visible_periods.each do |p| %>
+      <%= render period_button(p[:key]) do %>
+        <% if p[:prefix] %>
+          <span class="d-none d-md-inline-block"><%= translation(".#{p[:prefix]}") %></span>
+        <% end %>
+        <%= translation(".#{p[:label]}") %>
       <% end %>
     <% end %>
-
-    <%= render UI::ButtonLink::Component.new(
-      href: period_url("hour"),
-      size: :sm,
-      active: @period == "hour",
-      html_class: "period-select-standard",
-      data: {period: "hour", action: "click->ui--period-select#select"}
-    ) do %>
-      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
-      <%= translation(".hour") %>
-    <% end %>
-
-    <%= render UI::ButtonLink::Component.new(
-      href: period_url("day"),
-      size: :sm,
-      active: @period == "day",
-      html_class: "period-select-standard",
-      data: {period: "day", action: "click->ui--period-select#select"}
-    ) do %>
-      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
-      <%= translation(".day") %>
-    <% end %>
-
-    <%= render UI::ButtonLink::Component.new(
-      href: period_url("week"),
-      size: :sm,
-      active: @period == "week",
-      html_class: "period-select-standard",
-      data: {period: "week", action: "click->ui--period-select#select"}
-    ) do %>
-      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
-      <%= translation(".seven_days") %>
-    <% end %>
-
-    <%= render UI::ButtonLink::Component.new(
-      href: period_url("month"),
-      size: :sm,
-      active: @period == "month",
-      html_class: "period-select-standard",
-      data: {period: "month", action: "click->ui--period-select#select"}
-    ) do %>
-      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
-      <%= translation(".thirty_days") %>
-    <% end %>
-
-    <%= render UI::ButtonLink::Component.new(
-      href: period_url("year"),
-      size: :sm,
-      active: @period == "year",
-      html_class: "period-select-standard",
-      data: {period: "year", action: "click->ui--period-select#select"}
-    ) do %>
-      <span class="d-none d-md-inline-block"><%= translation(".past") %></span>
-      <%= translation(".year") %>
-    <% end %>
-
-    <%= render UI::ButtonLink::Component.new(
-      href: period_url("all"),
-      size: :sm,
-      active: @period == "all",
-      html_class: "period-select-standard",
-      text: translation(".all"),
-      data: {period: "all", action: "click->ui--period-select#select"}
-    ) %>
 
     <%= render UI::Button::Component.new(
       text: translation(".custom"),
