@@ -3,7 +3,7 @@
 module Form
   module Input
     class Component < ApplicationComponent
-      KINDS = %i[text_field text_area email_field number_field].freeze
+      KINDS = %i[text_field text_area email_field number_field datetime_local_field].freeze
 
       def initialize(form_builder:, attribute:, kind: :text_field, html_options: {})
         @form_builder = form_builder
