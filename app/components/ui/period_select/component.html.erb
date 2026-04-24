@@ -13,8 +13,11 @@
     <% visible_periods.each do |p| %>
       <%= render period_button(p[:key]) do %>
         <% if p[:prefix] %>
-          <span class="d-none d-md-inline-block"><%= translation(".#{p[:prefix]}") %></span>
+          <span class="d-none d-md-inline-block">
+            <%= translation(".#{p[:prefix]}") %>
+          </span>
         <% end %>
+
         <%= translation(".#{p[:label]}") %>
       <% end %>
     <% end %>
