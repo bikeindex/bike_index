@@ -5847,6 +5847,19 @@ nb:
       definition_list:
         row:
           no_value: ingen
+      period_select:
+        all: Alle
+        custom: tilpasset
+        day: dag
+        from: Fra
+        hour: time
+        next: neste
+        past: forbi
+        seven_days: 7 dager
+        thirty_days: 30 dager
+        to: Til
+        update: Oppdater
+        year: år
     org:
       location_address_fields:
         address: Adresse
