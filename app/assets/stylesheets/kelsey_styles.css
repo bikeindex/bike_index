@@ -1,0 +1,25 @@
+/*
+ *= require_self
+ *= require kelsey/homepage
+ *= require kelsey/landing_pages
+ */
+
+:root {
+  --redesign-blue-500: #3397dc;
+  --redesign-blue-800: #016ec2;
+  --redesign-red-500: #cc0000;
+  --redesign-purple-500: #715eb2;
+  --redesign-gray-100: #f5f5f5;
+  --redesign-gray-500: #666;
+  --redesign-gray-800: #333;
+}
+
+.kelsey_styles .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.kelsey_styles h2 {
+  font-weight: bold;
+}

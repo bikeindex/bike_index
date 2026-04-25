@@ -1,6 +1,6 @@
 module Organized
   class ModelAuditsController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
 
     before_action :ensure_access_to_model_audits!
 

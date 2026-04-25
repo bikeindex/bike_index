@@ -3,10 +3,10 @@
 module UI
   module Table
     class Component < ApplicationComponent
-      include SortableHelper
+      include Binxtils::SortableHelper
 
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
-      def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil, render_sortable: false)
+      def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil, render_sortable: false, sticky: false)
         @records = records
         @cache_key = cache_key
         @classes = classes
@@ -14,11 +14,12 @@ module UI
         @sort = sort
         @sort_direction = sort ? (sort_direction || "desc") : sort_direction
         @render_sortable = render_sortable
+        @sticky = sticky
         @columns = []
       end
 
-      def column(label: nil, sortable: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
-        @columns << UI::TableColumn::Component.new(label:, sortable:, classes:, header_classes:, lower_right:, &block)
+      def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
+        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, lower_right:, &block)
         nil
       end
 
@@ -50,15 +51,15 @@ module UI
         @columns.filter_map(&:sortable)
       end
 
-      def last_row?(row_index) = row_index == @records.length - 1
-
-      def sortable_url(sort, direction)
-        url_for(sortable_search_params.merge(sort:, direction:))
+      # Stacking + background so the header paints over scrolled rows.
+      def sticky_th_classes
+        @sticky ? "tw:relative tw:z-10 tw:bg-gray-50 tw:dark:bg-gray-700" : nil
       end
 
       def table_classes
         [
-          "tw:min-w-full tw:text-left tw:border-separate! tw:border-spacing-0",
+          "ui-table tw:min-w-full tw:text-left tw:border-separate! tw:border-spacing-0",
+          ("ui-table-bordered" if @bordered),
           @classes
         ].compact.join(" ")
       end

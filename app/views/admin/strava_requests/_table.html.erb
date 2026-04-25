@@ -48,13 +48,13 @@
     ) %>
   <% end %>
 
-  <% table.column(label: "Params") do |strava_request| %>
+  <% table.column(label: "Params", header_classes: "tw:font-normal") do |strava_request| %>
     <small>
       <%= strava_request.parameters&.to_json if strava_request.parameters.present? %>
     </small>
   <% end %>
 
-  <% table.column(label: "Rate limit") do |strava_request| %>
+  <% table.column(label: "Rate limit", header_classes: "tw:font-normal") do |strava_request| %>
     <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: strava_request.rate_limit) %>
   <% end %>
 
@@ -64,7 +64,7 @@
     </small>
   <% end %>
 
-  <% table.column(label: "User") do |strava_request| %>
+  <% table.column(label: "User", header_classes: "tw:font-normal") do |strava_request| %>
     <%= render Admin::UserCell::Component.new(user: strava_request.user, user_id: strava_request.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_request.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_request.strava_integration_id))) %>
   <% end %>
 <% end %>

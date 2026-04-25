@@ -1,10 +1,3 @@
-# Assign REDIS_URL before loading action cable
-if ENV.fetch("REDIS_URL", "").empty?
-  # NOTE: DEV_PORT is set in bin/dev
-  redis_db = (ENV.fetch("DEV_PORT", 3042).to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
-  ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_db}"
-end
-
 require_relative "boot"
 
 require "rails"
@@ -21,7 +14,6 @@ require "action_view/railtie"
 require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
-require "rack/throttle"
 require_relative "../lib/ip_spoof_attack_filter"
 
 # Require the gems listed in Gemfile, including any gems
@@ -32,6 +24,13 @@ module Bikeindex
   class Application < Rails::Application
     config.redis_default_url = ENV["REDIS_URL"]
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
+    # Separate Redis database for Rack::Attack to avoid key collisions with app cache.
+    # Note: eviction still operates server-wide, not per database.
+    config.redis_rack_attack_url = if config.redis_cache_url.match?(%r{/\d+\z})
+      config.redis_cache_url.sub(%r{/(\d+)\z}) { "/#{$1.to_i + 1}" }
+    else
+      "#{config.redis_cache_url}/1"
+    end
 
     config.load_defaults 8.0
 
@@ -70,10 +69,6 @@ module Bikeindex
     config.middleware.insert_after ActionDispatch::RemoteIp, IpSpoofAttackFilter
     config.middleware.use Rack::Deflater
     config.middleware.insert 0, Rack::UTF8Sanitizer
-    config.middleware.use Rack::Throttle::Minute,
-      max: ENV["MIN_MAX_RATE"].to_i,
-      cache: Redis.new(url: config.redis_cache_url),
-      key_prefix: :throttle
 
     # Add middleware to make i18n configuration thread-safe
     config.middleware.use I18n::Middleware

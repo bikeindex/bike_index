@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Organized::ExportsController, type: :request do
-  let(:root_path) { organization_bikes_path(organization_id: current_organization.to_param) }
+  let(:root_path) { organization_registrations_path(organization_id: current_organization.to_param) }
   let(:exports_root_path) { organization_exports_path(organization_id: current_organization.to_param) }
   let(:export) { FactoryBot.create(:export_organization, organization: current_organization) }
   let(:base_url) { exports_root_path }

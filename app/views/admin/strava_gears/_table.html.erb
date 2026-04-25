@@ -11,7 +11,7 @@
     </small>
   <% end %>
 
-  <% table.column(label: "Name") do |strava_gear| %>
+  <% table.column(label: "Name", header_classes: "tw:font-normal") do |strava_gear| %>
     <%= strava_gear.strava_gear_display_name %>
   <% end %>
 
@@ -19,7 +19,7 @@
     <%= strava_gear.gear_type %>
   <% end %>
 
-  <% table.column(label: "Gear ID") do |strava_gear| %>
+  <% table.column(label: "Gear ID", header_classes: "tw:font-normal") do |strava_gear| %>
     <code><%= strava_gear.strava_id %></code>
   <% end %>
 
@@ -27,24 +27,24 @@
     <%= number_display(strava_gear.total_distance_miles) %>
   <% end %>
 
-  <% table.column(label: "Enriched") do |strava_gear| %>
+  <% table.column(label: "Enriched", header_classes: "tw:font-normal") do |strava_gear| %>
     <% if strava_gear.enriched? %>
       <%= render UI::Badge::Component.new(text: "E", title: "Enriched", color: :cyan, size: :sm) %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Linked Bike") do |strava_gear| %>
+  <% table.column(label: "Linked Bike", header_classes: "tw:font-normal") do |strava_gear| %>
     <% if strava_gear.item.present? %>
       <%= link_to strava_gear.item.title_string.truncate(30), bike_path(strava_gear.item), class: "small" %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Activities") do |strava_gear| %>
+  <% table.column(label: "Activities", header_classes: "tw:font-normal") do |strava_gear| %>
     <%= number_display(strava_gear.calculated_strava_activities.count) %>
   <% end %>
 
   <% unless skip_strava_integration %>
-    <% table.column(label: "User") do |strava_gear| %>
+    <% table.column(label: "User", header_classes: "tw:font-normal") do |strava_gear| %>
       <%= render Admin::UserCell::Component.new(user: strava_gear.strava_integration.user, user_id: strava_gear.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_gear.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_gear.strava_integration_id))) %>
     <% end %>
   <% end %>

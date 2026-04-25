@@ -4,8 +4,8 @@ RSpec.describe BikeHelper, type: :helper do
   describe "render_serial_display" do
     let(:bike) { Bike.new(serial_number: serial_number, cycle_type: "tandem") }
     let(:serial_number) { "fff333" }
-    it "is in a code element" do
-      expect(render_serial_display(bike)).to eq("<code class=\"bike-serial\">FFF333</code>")
+    it "is in a span element" do
+      expect(render_serial_display(bike)).to eq("<span class=\"serial-span\">FFF333</span>")
     end
     context "unknown" do
       let(:serial_number) { "unknown" }
@@ -15,7 +15,7 @@ RSpec.describe BikeHelper, type: :helper do
     end
     context "hidden" do
       let(:target) { "<span class=\"less-strong\">hidden</span> <em class=\"small less-less-strong\">because tandem is impounded</em>" }
-      let(:target_authorized) { "<code class=\"bike-serial\">FFF333</code> <em class=\"small less-less-strong\">hidden for unauthorized users</em>" }
+      let(:target_authorized) { "<span class=\"serial-span\">FFF333</span> <em class=\"small less-less-strong\">hidden for unauthorized users</em>" }
       it "returns target" do
         bike.status = "status_impounded"
         expect(render_serial_display(bike)).to eq target
@@ -23,14 +23,14 @@ RSpec.describe BikeHelper, type: :helper do
         expect(render_serial_display(bike, User.new)).to eq target
         superuser = FactoryBot.create(:superuser)
         expect(render_serial_display(bike, superuser)).to eq target_authorized
-        expect(render_serial_display(bike, superuser, skip_explanation: true)).to eq "<code class=\"bike-serial\">FFF333</code>"
+        expect(render_serial_display(bike, superuser, skip_explanation: true)).to eq "<span class=\"serial-span\">FFF333</span>"
       end
     end
     context "with bike_version" do
       let(:bike) { FactoryBot.create(:bike, serial_number: serial_number) }
       let(:bike_version) { FactoryBot.create(:bike_version, bike:) }
       it "renders without error" do
-        expect(render_serial_display(bike_version)).to eq("<code class=\"bike-serial\">FFF333</code>")
+        expect(render_serial_display(bike_version)).to eq("<span class=\"serial-span\">FFF333</span>")
       end
     end
   end

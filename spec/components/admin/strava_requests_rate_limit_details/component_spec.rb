@@ -17,6 +17,8 @@ RSpec.describe Admin::StravaRequestsRateLimitDetails::Component, type: :componen
     expect(component.text).to include(Integrations::Strava::Client::RATE_LIMIT_HEADROOM.to_s)
     expect(component.text).to include(Integrations::Strava::Client::FETCH_ACTIVITY_SHORT_HEADROOM.to_s)
     expect(component.text).to include(Integrations::Strava::Client::FETCH_ACTIVITY_LONG_HEADROOM.to_s)
+    expect(component.text).to include("enqueuer fetch_activity headroom:")
+    expect(component.css("i").text).to include("enqueuer")
   end
 
   context "when more than a minute until short reset" do

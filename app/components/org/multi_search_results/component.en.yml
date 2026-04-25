@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    org:
+      multi_search_results:
+        first_n_shown_html: "— first %{limit} shown,"
+        no_exact_matches: 'No exact matches. Close serials:'
+        no_matches_found: No matches found
+        result_count_html: "— %{count} %{results}"
+        serial_label: 'Serial:'
+        view_all: view all

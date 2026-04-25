@@ -24,7 +24,7 @@
   <% end %>
 
   <% unless skip_updates %>
-    <% table.column(label: "Updates") do |bike_sticker| %>
+    <% table.column(label: "Updates", header_classes: "tw:font-normal") do |bike_sticker| %>
       <%= link_to number_display(bike_sticker.bike_sticker_updates.count), admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id) %>
     <% end %>
   <% end %>
@@ -48,7 +48,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Bike") do |bike_sticker| %>
+  <% table.column(label: "Bike", header_classes: "tw:font-normal") do |bike_sticker| %>
     <% if bike_sticker.claimed? %>
       <%= helpers.organized_bike_text(bike_sticker.bike) %>
     <% elsif bike_sticker.bike_id.present? %>

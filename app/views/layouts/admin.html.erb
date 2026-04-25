@@ -97,7 +97,7 @@
       <%= link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto less-strong d-none d-lg-inline-block" %>
     </nav>
 
-    <%= render "/layouts/revised_messages" %>
+    <%= render(Alerts::FlashMessages::Component.new(flash:)) %>
 
     <section id="admin-content" class="pb-4 mb-4">
       <div class="container-fluid mt-4 pb-4"><%= yield %></div>

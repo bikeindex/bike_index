@@ -148,7 +148,7 @@
           <%= link_to "view only bikes created by", url_for(sortable_search_params.merge(search_only_creation_organization: true)) %>
         <% end %>
         |
-        <%= link_to "org bikes view", organization_bikes_path(organization_id: current_organization.to_param) %>
+        <%= link_to "org bikes view", organization_registrations_path(organization_id: current_organization.to_param) %>
       </p>
     <% end %>
 

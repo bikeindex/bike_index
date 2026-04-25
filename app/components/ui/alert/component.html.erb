@@ -1,10 +1,9 @@
 <div
   class="tw:flex tw:items-baseline tw:gap-4 tw:rounded-sm tw:border tw:p-4 tw:transition-all tw:duration-300 <%= @margin_classes %> <%= color_classes %>"
   role="alert"
-  data-controller="alert"
+  data-controller="ui--alert"
 >
   <div class="tw:w-4">
-    <%# currently always showing the same icon, but... could update to do better in the future %>
     <svg
       class="tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0"
       aria-hidden="true"
@@ -36,7 +35,7 @@
       type="button"
       class="tw:-mx-1.5 tw:-my-1.5 tw:ms-auto tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-sm tw:p-1.5 tw:focus:ring-2 <%= dismissable_color_classes %>"
       aria-label="Close"
-      data-action="click->alert#close"
+      data-action="click->ui--alert#close"
     >
       <span class="tw:sr-only">Close</span>
 

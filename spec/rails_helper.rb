@@ -14,11 +14,19 @@ if ENV["COVERAGE"] == "true"
   Rails.application.eager_load! if defined?(Rails)
 end
 
+# Adjust REDIS_URL for parallel test workers (each gets its own Redis DB)
+if ENV["TEST_ENV_NUMBER"]
+  redis_database = (ENV.fetch("DEV_PORT", 3042).to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
+  ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_database}"
+end
+
 # Assign here because only one .env file
 ENV["BASE_URL"] = "http://test.host"
 ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
 ENV["PARALLEL_TEST_FIRST_IS_1"] = "true" # number parallel databases correctly
+ENV["RACK_ATTACK_MAX_LIMIT"] ||= "12"
+ENV["RACK_ATTACK_API_MAX_LIMIT"] ||= "15"
 require "spec_helper"
 # Load functionable patch before Rails boot so all Functionable modules get permissive test hooks
 require File.expand_path("../../config/boot", __FILE__)
@@ -45,6 +53,9 @@ end
 
 require "view_component/test_helpers"
 require "view_component/system_test_helpers"
+require "axe-rspec"
+
+SKIPPABLE_AXE_RULES = %w[aria-allowed-role color-contrast heading-order html-has-lang landmark-one-main landmark-unique page-has-heading-one region]
 
 ActiveRecord::Migration.maintain_test_schema!
 

@@ -1,0 +1,34 @@
+# frozen_string_literal: true
+
+module Org
+  module MultiSearchResults
+    class Component < ApplicationComponent
+      include Binxtils::SortableHelper
+
+      def initialize(organization:, serial:, chip_id:, pagy:, bikes:, interpreted_params:, per_page:, close_serials: nil)
+        @organization = organization
+        @serial = serial
+        @chip_id = chip_id
+        @pagy = pagy
+        @bikes = bikes
+        @interpreted_params = interpreted_params
+        @per_page = per_page
+        @close_serials = close_serials
+      end
+
+      private
+
+      def result_index
+        @chip_id&.delete_prefix("chip_")
+      end
+
+      def show_view_all?
+        @pagy.count > @pagy.limit
+      end
+
+      def view_all_path
+        helpers.organization_registrations_path(organization_id: @organization.to_param, search_serial: @serial)
+      end
+    end
+  end
+end

@@ -14,7 +14,8 @@
 #
 # Indexes
 #
-#  index_user_emails_on_user_id  (user_id)
+#  index_user_emails_on_email_confirmed  (email) WHERE (confirmation_token IS NULL)
+#  index_user_emails_on_user_id          (user_id)
 #
 class UserEmail < ActiveRecord::Base
   belongs_to :user, touch: true

@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Default environment variables for development and test.
+# Required from config/boot.rb so all Rails entry points get these defaults.
+# Can also be run standalone: `eval "$(ruby bin/env --export)"` from bash.
+
+ENV["DEV_PORT"] ||= ENV.fetch("CONDUCTOR_PORT", "3042")
+ENV["BASE_URL"] ||= "http://localhost:#{ENV["DEV_PORT"]}"
+ENV["REDIS_URL"] ||= "redis://localhost:6379/#{(ENV["DEV_PORT"].to_i - 1) % 16}"
+
+# When called with --export, print shell export statements for bash scripts
+if ARGV.include?("--export")
+  %w[DEV_PORT BASE_URL REDIS_URL].each do |key|
+    puts "export #{key}=#{ENV[key]}"
+  end
+end

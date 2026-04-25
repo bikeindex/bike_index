@@ -1,7 +1,0 @@
----
-en:
-  components:
-    org:
-      bike_search_row:
-        email_hidden: email hidden
-        mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>

@@ -23,32 +23,32 @@
 
   <% if matching_count %>
     <% all_matching = matching_bike_stickers %>
-    <% table.column(label: "Matching count") do |batch| %>
+    <% table.column(label: "Matching count", header_classes: "tw:font-normal") do |batch| %>
       <%= number_display(all_matching.where(bike_sticker_batch_id: batch.id).count) %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Count") do |batch| %>
+  <% table.column(label: "Count", header_classes: "tw:font-normal") do |batch| %>
     <small><%= number_display(batch.bike_stickers.count) %></small>
   <% end %>
 
-  <% table.column(label: "Claimed") do |batch| %>
+  <% table.column(label: "Claimed", header_classes: "tw:font-normal") do |batch| %>
     <small><%= number_display(batch.bike_stickers.claimed.count) %></small>
   <% end %>
 
-  <% table.column(label: "Prefix") do |batch| %>
+  <% table.column(label: "Prefix", header_classes: "tw:font-normal") do |batch| %>
     <small><%= batch.prefix %></small>
   <% end %>
 
-  <% table.column(label: "Min") do |batch| %>
+  <% table.column(label: "Min", header_classes: "tw:font-normal") do |batch| %>
     <small><%= number_display(batch.min_code_integer) %></small>
   <% end %>
 
-  <% table.column(label: "Max") do |batch| %>
+  <% table.column(label: "Max", header_classes: "tw:font-normal") do |batch| %>
     <small><%= number_display(batch.max_code_integer) %></small>
   <% end %>
 
-  <% table.column(label: "Notes") do |batch| %>
+  <% table.column(label: "Notes", header_classes: "tw:font-normal") do |batch| %>
     <small><%= batch.notes %></small>
   <% end %>
 <% end %>

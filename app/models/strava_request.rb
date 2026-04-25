@@ -20,8 +20,10 @@
 #
 # Indexes
 #
+#  index_strava_requests_on_requested_at_with_rate_limit            (requested_at) WHERE (rate_limit IS NOT NULL)
 #  index_strava_requests_on_strava_integration_id_and_requested_at  (strava_integration_id,requested_at)
 #  index_strava_requests_on_user_id                                 (user_id)
+#  index_strava_requests_pending_on_integration_id_request_type     (strava_integration_id,request_type) WHERE (response_status = 0)
 #
 class StravaRequest < AnalyticsRecord
   REQUEST_TYPE_ENUM = {
@@ -43,7 +45,8 @@ class StravaRequest < AnalyticsRecord
     skipped: 6,
     insufficient_token_privileges: 7,
     binx_response: 8,
-    binx_response_rate_limited: 9
+    binx_response_rate_limited: 9,
+    token_expired: 10
   }.freeze
   PENDING_OR_SUCCESS = %i[success pending].freeze
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
@@ -173,12 +176,15 @@ class StravaRequest < AnalyticsRecord
       update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
     end
 
-    if binx_response_rate_limited? || rate_limited? || service_unavailable?(response)
+    if token_expired?
+      StravaRequest.create!(user_id:, strava_integration_id:, request_type:, proxy_request:,
+        parameters: parameters.except("error_response_status"))
+    elsif binx_response_rate_limited? || rate_limited? || service_unavailable?(response)
       return unless re_enqueue_if_rate_limited_or_unavailable
 
       StravaRequest.create!(user_id:, strava_integration_id:, request_type:, proxy_request:,
         parameters: parameters.except("error_response_status"))
-    elsif error? && raise_on_error
+    elsif error? && raise_on_error && response.status != 404
       raise "Strava API error #{response.status}: #{response.body}"
     end
   end
@@ -193,7 +199,7 @@ class StravaRequest < AnalyticsRecord
     elsif response.status == 429
       :rate_limited
     elsif response.status == 401
-      :token_refresh_failed
+      :token_expired
     elsif insufficient_token_privileges_response?(response)
       :insufficient_token_privileges
     else

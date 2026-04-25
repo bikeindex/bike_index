@@ -10,6 +10,7 @@ RSpec.describe Search::FormOrganized::Component, :js, type: :system do
       visit(preview_path)
 
       expect(page).to have_css("form#Search_Form")
+      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
       expect(page).to have_field("search_email")
       expect(page).to have_field("serial")
     end

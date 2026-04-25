@@ -1,0 +1,54 @@
+<%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
+
+<%= render partial: "/shared/period_select" %>
+
+<div class="mb-4"></div>
+
+<% registration_search_settings = Org::RegistrationSearchSettings::Component.new(
+  organization: current_organization,
+  interpreted_params: @interpreted_params,
+  sortable_search_params:,
+  params:,
+  search_stickers: @search_stickers,
+  search_address: @search_address,
+  search_status: @search_status,
+  bike_sticker: @bike_sticker
+) %>
+
+<% form_interpreted_params = @interpreted_params.merge(
+  search_stickers: @search_stickers.presence,
+  search_address: @search_address.presence,
+  search_status: @search_status
+).compact %>
+
+<div
+  class="org-registration-search-component"
+  data-controller="org--registration-search org--registration-search-column-toggle"
+  data-org--registration-search-column-toggle-default-columns-value="<%= registration_search_settings.initially_checked_columns.to_json %>"
+  data-org--registration-search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
+>
+  <div class="mb-4">
+    <%= render(Search::FormOrganized::Component.new(
+      target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
+      target_frame: :organized_bikes_results_frame,
+      interpreted_params: form_interpreted_params,
+      settings_component: registration_search_settings
+    )) do %>
+      <% if @bike_sticker.present? %>
+        <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%= turbo_frame_tag :organized_bikes_results_frame do %>
+    <% if @render_results %>
+      <%= render partial: "results" %>
+    <% else %>
+      <span id="loadedWithoutResults" class="tw:hidden"></span>
+    <% end %>
+  <% end %>
+</div>
+
+<div id="hiddenLoadingSpinner" class="tw:hidden">
+  <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
+</div>

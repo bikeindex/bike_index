@@ -24,7 +24,7 @@ RSpec.describe UI::Table::Component, type: :component do
     expect(component).to have_css("th", text: "Email")
     expect(component).to have_css("td", text: "Alice")
     expect(component).to have_css("td", text: "bob@example.com")
-    expect(component).to have_css("tbody.twtable-striped")
+    expect(component).to have_css("table.ui-table")
   end
 
   context "with custom classes" do
@@ -83,6 +83,33 @@ RSpec.describe UI::Table::Component, type: :component do
       end
     end
 
+    context "with sort_indicator on a non-sortable column" do
+      it "renders the sort arrow without a link when matching current sort" do
+        result = render_inline(described_class.new(records:, render_sortable: true, sort: "created_at", sort_direction: "desc")) do |table|
+          table.column(sortable: "created_at") { |r| r.name }
+          table.column(label: "Date", sort_indicator: "created_at") { |r| r.email }
+        end
+
+        # The sort_indicator column shows the arrow but no link
+        headers = result.css("th")
+        indicator_th = headers[1]
+        expect(indicator_th.text).to include("Date")
+        expect(indicator_th.text).to include("\u2193") # down arrow for desc
+        expect(indicator_th.css("a")).to be_empty
+      end
+
+      it "does not render an arrow when sort_indicator does not match current sort" do
+        result = render_inline(described_class.new(records:, render_sortable: true, sort: "email")) do |table|
+          table.column(sortable: "email") { |r| r.email }
+          table.column(label: "Date", sort_indicator: "created_at") { |r| r.name }
+        end
+
+        headers = result.css("th")
+        indicator_th = headers[1]
+        expect(indicator_th.text.strip).to eq("Date")
+      end
+    end
+
     context "with render_sortable false" do
       it "renders column labels without sort links" do
         result = render_inline(described_class.new(records:)) do |table|
@@ -130,10 +157,8 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  context "with cache_key" do
-    let(:memory_store) { ActiveSupport::Cache::MemoryStore.new }
-
-    before { allow(ApplicationController).to receive(:cache_store).and_return(memory_store) }
+  context "with cache_key", :caching do
+    include_context :caching_basic
 
     it "caches each row" do
       users = FactoryBot.create_list(:user, 2)
@@ -174,6 +199,53 @@ RSpec.describe UI::Table::Component, type: :component do
           table.column(label: "Name") { |u| u.name }
         end
       end
+    end
+  end
+
+  context "with empty header" do
+    it "renders an empty th when label is empty string" do
+      result = render_inline(described_class.new(records:)) do |table|
+        table.column(label: "Name") { |r| r.name }
+        table.column(label: "") { |r| r.email }
+      end
+
+      headers = result.css("th")
+      expect(headers[0].text.strip).to eq("Name")
+      expect(headers[1].text.strip).to eq("")
+    end
+
+    it "renders an empty th when no label or sortable provided" do
+      result = render_inline(described_class.new(records:)) do |table|
+        table.column(label: "Name") { |r| r.name }
+        table.column { |r| r.email }
+      end
+
+      headers = result.css("th")
+      expect(headers[1].text.strip).to eq("")
+    end
+
+    it "renders an empty th with sortable column when label is empty string" do
+      allow_any_instance_of(described_class).to receive(:sortable_url).and_return("/")
+
+      result = render_inline(described_class.new(records:, render_sortable: true, sort: "email")) do |table|
+        table.column(sortable: "email", label: "") { |r| r.email }
+      end
+
+      # Still renders the sort link, just with no text label
+      expect(result).to have_css("th a.twlink")
+    end
+  end
+
+  context "with header_classes font-normal" do
+    it "adds font-normal class to th" do
+      result = render_inline(described_class.new(records:)) do |table|
+        table.column(label: "Name") { |r| r.name }
+        table.column(label: "Email", header_classes: "tw:font-normal") { |r| r.email }
+      end
+
+      headers = result.css("th")
+      expect(headers[0]["class"]).not_to include("font-normal")
+      expect(headers[1]["class"]).to include("font-normal")
     end
   end
 

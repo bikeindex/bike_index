@@ -11,11 +11,12 @@ RSpec.describe UI::Alert::Component, :js, type: :system do
     it "is dismissable" do
       visit(preview_path)
 
-      expect(page).to have_content "A simple alert with some info"
+      expect(page).to have_content "Dismissable error"
+      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
 
       find('button[aria-label="Close"]').click
 
-      expect(page).to_not have_content "a simple alert with some info"
+      expect(page).to_not have_content "Dismissable error"
     end
   end
 end

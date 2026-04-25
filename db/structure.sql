@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -35,6 +36,20 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
 --
 
 COMMENT ON EXTENSION pg_stat_statements IS 'track planning and execution statistics of all SQL statements executed';
+
+
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
 
 
 SET default_tablespace = '';
@@ -5817,6 +5832,13 @@ CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks U
 
 
 --
+-- Name: index_b_params_on_bike_owner_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_bike_owner_email_trgm ON public.b_params USING gin ((((params -> 'bike'::text) ->> 'owner_email'::text)) public.gin_trgm_ops);
+
+
+--
 -- Name: index_b_params_on_created_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5824,17 +5846,17 @@ CREATE INDEX index_b_params_on_created_bike_id ON public.b_params USING btree (c
 
 
 --
+-- Name: index_b_params_on_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_email_trgm ON public.b_params USING gin (email public.gin_trgm_ops) WHERE (created_bike_id IS NULL);
+
+
+--
 -- Name: index_b_params_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (organization_id);
-
-
---
--- Name: index_bike_organization_notes_on_bike_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_organization_notes_on_bike_id ON public.bike_organization_notes USING btree (bike_id);
 
 
 --
@@ -6041,6 +6063,13 @@ CREATE INDEX index_bike_versions_on_tertiary_frame_color_id ON public.bike_versi
 
 
 --
+-- Name: index_bikes_current_listing_order; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_listing_order ON public.bikes USING btree (listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
 -- Name: index_bikes_on_address_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6132,6 +6161,13 @@ CREATE INDEX index_bikes_on_model_audit_id ON public.bikes USING btree (model_au
 
 
 --
+-- Name: index_bikes_on_owner_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_owner_email_trgm ON public.bikes USING gin (owner_email public.gin_trgm_ops);
+
+
+--
 -- Name: index_bikes_on_paint_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6216,6 +6252,13 @@ CREATE INDEX index_components_on_manufacturer_id ON public.components USING btre
 
 
 --
+-- Name: index_customer_contacts_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_customer_contacts_on_bike_id ON public.customer_contacts USING btree (bike_id);
+
+
+--
 -- Name: index_email_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6227,6 +6270,13 @@ CREATE INDEX index_email_bans_on_user_id ON public.email_bans USING btree (user_
 --
 
 CREATE INDEX index_email_domains_on_creator_id ON public.email_domains USING btree (creator_id);
+
+
+--
+-- Name: index_email_domains_on_domain_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_domains_on_domain_trgm ON public.email_domains USING gin (domain public.gin_trgm_ops);
 
 
 --
@@ -6696,6 +6746,13 @@ CREATE INDEX index_normalized_serial_segments_on_segment ON public.normalized_se
 --
 
 CREATE INDEX index_notifications_on_bike_id ON public.notifications USING btree (bike_id);
+
+
+--
+-- Name: index_notifications_on_message_channel_target_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_notifications_on_message_channel_target_trgm ON public.notifications USING gin (message_channel_target public.gin_trgm_ops);
 
 
 --
@@ -7175,13 +7232,6 @@ CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records
 
 
 --
--- Name: index_strava_activities_on_strava_integration_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_strava_activities_on_strava_integration_id ON public.strava_activities USING btree (strava_integration_id);
-
-
---
 -- Name: index_strava_activities_on_strava_integration_id_and_strava_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7193,13 +7243,6 @@ CREATE UNIQUE INDEX index_strava_activities_on_strava_integration_id_and_strava_
 --
 
 CREATE UNIQUE INDEX index_strava_gears_on_item_type_and_item_id ON public.strava_gears USING btree (item_type, item_id) WHERE (item_id IS NOT NULL);
-
-
---
--- Name: index_strava_gears_on_strava_integration_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_strava_gears_on_strava_integration_id ON public.strava_gears USING btree (strava_integration_id);
 
 
 --
@@ -7336,6 +7379,13 @@ CREATE INDEX index_user_bans_on_user_id ON public.user_bans USING btree (user_id
 
 
 --
+-- Name: index_user_emails_on_email_confirmed; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_emails_on_email_confirmed ON public.user_emails USING btree (email) WHERE (confirmation_token IS NULL);
+
+
+--
 -- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7382,6 +7432,13 @@ CREATE INDEX index_users_on_auth_token ON public.users USING btree (auth_token);
 --
 
 CREATE INDEX index_users_on_email ON public.users USING btree (email) WHERE (deleted_at IS NULL);
+
+
+--
+-- Name: index_users_on_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_email_trgm ON public.users USING gin (email public.gin_trgm_ops) WHERE (deleted_at IS NULL);
 
 
 --
@@ -7491,6 +7548,11 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260425103043'),
+('20260425000001'),
+('20260424000002'),
+('20260424000001'),
+('20260412183446'),
 ('20260401222346'),
 ('20260401211310'),
 ('20260331160943'),

@@ -17,11 +17,7 @@ class FeedbacksController < ApplicationController
       else
         translation(:thanks_for_your_message)
       end
-      if request.env["HTTP_REFERER"].present? && (request.env["HTTP_REFERER"] != request.env["REQUEST_URI"])
-        redirect_back(fallback_location: help_path, allow_other_host: true)
-      else
-        redirect_to help_path
-      end
+      redirect_back(fallback_location: help_path)
     else
       @page_errors = @feedback.errors
       render(:index) && return if request.referer.blank?
@@ -52,7 +48,7 @@ class FeedbacksController < ApplicationController
 
   def permitted_parameters
     params.require(:feedback).permit(:body, :email, :name, :title, :feedback_type, :feedback_hash,
-      :package_size, :phone_number, :additional)
+      :package_size, :phone_number, :contact_name, :additional)
   end
 
   def set_permitted_format

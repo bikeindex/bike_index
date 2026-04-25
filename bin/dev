@@ -12,8 +12,7 @@ touch log/redis.log
 > log/redis.log
 redis-server > log/redis.log &
 
-export DEV_PORT=${CONDUCTOR_PORT:-${DEV_PORT:-3042}}
-export BASE_URL=http://localhost:$DEV_PORT
+eval "$(ruby bin/env --export)"
 
 # Pass --strava to start the strava_search Vite dev server
 FOREMAN_ARGS="-f Procfile.dev"

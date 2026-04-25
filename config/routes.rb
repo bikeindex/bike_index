@@ -262,7 +262,6 @@ Rails.application.routes.draw do
     resources :organizations do
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
-      collection { get :show_deleted }
     end
     get "recover_organization", to: "organizations#recover"
 
@@ -355,8 +354,6 @@ Rails.application.routes.draw do
   get "theft-ring", to: redirect("theft-rings")
   resources :stolen_bike_listings, only: %i[index]
 
-  get "/auth/failure", to: "integrations#integrations_controller_creation_error"
-
   %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
     protect_your_bike serials about where vendor_terms resources image_resources privacy terms security
     how_not_to_buy_stolen dev_and_design lightspeed membership].freeze.each do |page|
@@ -388,11 +385,16 @@ Rails.application.routes.draw do
     get "/", to: "dashboard#root", as: :root
     resources :dashboard, only: %i[index]
     get "landing", to: "manages#landing", as: :landing
-    resources :bikes, only: %i[index new create show update] do
+    resources :registrations, only: %i[index] do
+      collection do
+        get :multi_search
+        get :multi_search_response
+      end
+    end
+    resources :bikes, only: %i[new create show update] do
       collection do
         get :recoveries
         get :incompletes
-        get :multi_serial_search
         get :new_iframe
       end
       member { post :resend_incomplete_email }

@@ -1,10 +1,11 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
     include Rails::Pagination
-    include SortableTable
+    include Binxtils::SortableTable
 
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
+    around_action :set_reading_role, only: :index
 
     before_action :set_failed_and_repeated_ivars
 
@@ -19,7 +20,7 @@ module Organized
         map_center_lng: map_center(@search_bounding_box).last
       }
 
-      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       # These are set here because we render them in HTML

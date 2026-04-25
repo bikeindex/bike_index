@@ -1,0 +1,20 @@
+<%= render(Org::RegistrationSearch::Component.new(
+  organization: current_organization,
+  current_user:,
+  pagy: @pagy,
+  bikes: @bikes,
+  interpreted_params: @interpreted_params,
+  sortable_search_params:,
+  per_page: @per_page,
+  params:,
+  search_stickers: @search_stickers,
+  search_address: @search_address,
+  search_status: @search_status,
+  search_query_present: @search_query_present,
+  time_range: @time_range,
+  stolenness: @stolenness,
+  bike_sticker: @bike_sticker,
+  model_audit: @model_audit,
+  skip_search_and_filters: true,
+  skip_settings: true
+)) %>

@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require "fileutils"
+load File.expand_path("env", __dir__)
 include FileUtils
 
 # path to your application root.
@@ -43,6 +44,13 @@ chdir APP_ROOT do
       ln_sf root_storage, "storage"
     end
 
+    # Symlink node_modules so every workspace shares one install
+    root_node_modules = File.join(root, "node_modules")
+    mkdir_p root_node_modules unless Dir.exist?(root_node_modules)
+    puts "Symlinking node_modules from #{root_node_modules}..."
+    rm_rf "node_modules"
+    ln_sf root_node_modules, "node_modules"
+
     # Copy Facebook VCR cassettes
     fb_cassettes = File.join(root, "spec/vcr_cassettes/facebook")
     if Dir.exist?(fb_cassettes)
@@ -81,13 +89,13 @@ chdir APP_ROOT do
 
   unless without_seeds
     puts "\n== Seeding database =="
-    system "bin/rake db:seed"
+    system! "bin/rake db:seed"
 
     puts "\n== Preparing test database (including parallelism) =="
-    system "bin/rake parallel:prepare"
+    system! "bin/rake parallel:prepare"
 
     puts "\n== loading typeahead and bike counts =="
-    system "bin/rake setup:reset_autocomplete setup:load_counts"
+    system! "bin/rake setup:reset_autocomplete setup:load_counts"
   end
 
   puts "\n== Removing old logs and tempfiles =="

@@ -34,6 +34,7 @@ RSpec.describe "Bike search", :js, type: :system do
     visit "/search/registrations"
 
     expect(page).to have_css(".bike-box-item", wait: 10)
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
 
     # Initial load doesn't add a duplicate history entry, so back button returns to previous page
     page.go_back

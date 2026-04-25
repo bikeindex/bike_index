@@ -1,4 +1,8 @@
 class NewsController < ApplicationController
+  content_security_policy do |policy|
+    policy.img_src :self, :data, :blob, :https
+  end
+
   def index
     @blogs = matching_blogs
     @blogs_count ||= @blogs.count

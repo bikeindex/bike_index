@@ -55,7 +55,4 @@
   %h2.mt-2.mb-2= t(".errors")
   = render(Org::BulkImportError::Component.new(bulk_import: @bulk_import))
 
-- bike_search = Org::BikeSearch::Component.new(organization: current_organization, pagy: @pagy, per_page: @per_page, params: params, skip_search_and_filters: true)
-= render(bike_search) do
-  - @bikes.each do |bike|
-    = render partial: "/organized/bikes/cached_bike_table_row", locals: {bike:, bike_search:}
+= render(Org::RegistrationSearch::Component.new(organization: current_organization, current_user:, pagy: @pagy, bikes: @bikes, per_page: @per_page, params: params, skip_search_and_filters: true))

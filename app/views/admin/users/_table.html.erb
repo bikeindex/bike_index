@@ -35,21 +35,21 @@
     <%= render Admin::UserCell::Component.new(email: user.email, user:, render_search: false) %>
   <% end %>
 
-  <% table.column(label: "Secondary Emails") do |user| %>
+  <% table.column(label: "Secondary Emails", header_classes: "tw:font-normal") do |user| %>
     <small class="tw:text-gray-400">
       <%= user.secondary_emails.join(", ") %>
     </small>
   <% end %>
 
-  <% table.column(label: "Name") do |user| %>
+  <% table.column(label: "Name", header_classes: "tw:font-normal") do |user| %>
     <%= user.name if user.name? %>
   <% end %>
 
-  <% table.column(label: "Bikes") do |user| %>
+  <% table.column(label: "Bikes", header_classes: "tw:font-normal") do |user| %>
     <%= number_display(user.ownerships.count) %>
   <% end %>
 
-  <% table.column(label: "OrganizationRoles") do |user| %>
+  <% table.column(label: "OrganizationRoles", header_classes: "tw:font-normal") do |user| %>
     <% if user.organization_roles.present? %>
       <% visible_roles = user.organization_roles.reject { |or_role| or_role.organization.ambassador? } %>
       <% visible_roles.each_with_index do |organization_role, i| %>
@@ -62,13 +62,13 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Ambassador tasks", classes: "tw:text-xs") do |user| %>
+  <% table.column(label: "Ambassador tasks", classes: "tw:text-xs", header_classes: "tw:font-normal") do |user| %>
     <% if user.ambassador? %>
       <%= number_display(Ambassador.find(user.id).progress_count) %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Admin?") do |user| %>
+  <% table.column(label: "Admin?", header_classes: "tw:font-normal") do |user| %>
     <small>
       <%= "super" if user.superuser? %>
       <%= "developer" if user.developer? %>
@@ -79,7 +79,7 @@
     </small>
   <% end %>
 
-  <% table.column(label: "Confirmed", classes: "tw:text-xs") do |user| %>
+  <% table.column(label: "Confirmed", classes: "tw:text-xs", header_classes: "tw:font-normal") do |user| %>
     <%= check_mark if user.confirmed %>
   <% end %>
 <% end %>

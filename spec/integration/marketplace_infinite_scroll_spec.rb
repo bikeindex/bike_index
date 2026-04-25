@@ -21,8 +21,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
         amount_cents: 100_00 * i)
       listing.update(published_at: Time.current - i.seconds)
     end
-    # Stub the API_URL to use the production urls, for more accurate testing
-    stub_const("Search::EverythingCombobox::Component::API_URL", "https://bikeindex.org/api/autocomplete")
+    # Load manufacturers into autocomplete Redis so the local API returns results
+    Autocomplete::Loader.load_all(%w[Manufacturer])
   end
 
   def click_last_bike_and_go_back
@@ -52,6 +52,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
 
     # Wait for the initial results to load
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
     # Get the initial bike IDs visible on page 1
     initial_bikes = page.all("[data-test-id^='vehicle-thumbnail-linkspan-']").map do |el|
       el["data-test-id"].split("-").last

@@ -27,7 +27,7 @@ gem "lograge" # Structure log data, put it in single lines to improve the functi
 gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 gem "responders" # Rails responders modules
-gem "rack-throttle" # Rate limiting
+gem "rack-attack" # Rate limiting
 gem "secure_headers", "~> 7.2"
 
 # Speed, performance, etc
@@ -68,7 +68,7 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 gem "rqrcode", "3.2.0" # QR Code image generator
 
 # Functionality extensions
-gem "binxtils" # Bike Index utilities
+gem "binxtils", "~> 0.3.2" # Bike Index utilities
 gem "functionable" # Functional modules
 gem "flipper" # Feature flagging
 gem "flipper-active_record" # Feature flagging
@@ -170,4 +170,5 @@ group :test do
   gem "capybara" # For view components
   gem "selenium-webdriver" # For capybara
   gem "chunky_png" # used to test that generated images match their targets
+  gem "axe-core-rspec" # Accessibility testing
 end

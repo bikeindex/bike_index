@@ -122,8 +122,8 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(organized_container).to eq "container"
       end
     end
-    context "bikes index" do
-      let(:controller_name) { "bikes" }
+    context "registrations index" do
+      let(:controller_name) { "registrations" }
       it "is container-fluid" do
         expect(organized_container).to eq "container-fluid"
       end
@@ -164,17 +164,18 @@ RSpec.describe OrganizedHelper, type: :helper do
     it "is falsey" do
       expect(organized_include_javascript_pack?).to be_falsey
     end
-    context "bikes" do
-      let(:controller_name) { "bikes" }
+    context "registrations" do
+      let(:controller_name) { "registrations" }
       it "is truthy" do
         expect(organized_include_javascript_pack?).to be_truthy
       end
-      context "recoveries" do
-        let(:action_name) { "recoveries" }
-        it "is truthy" do
-          expect(organized_container).to eq "container"
-          expect(organized_include_javascript_pack?).to be_truthy
-        end
+    end
+    context "bikes recoveries" do
+      let(:controller_name) { "bikes" }
+      let(:action_name) { "recoveries" }
+      it "is truthy" do
+        expect(organized_container).to eq "container"
+        expect(organized_include_javascript_pack?).to be_truthy
       end
     end
   end

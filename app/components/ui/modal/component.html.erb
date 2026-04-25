@@ -1,0 +1,58 @@
+<dialog
+  id="<%= @id %>"
+  data-controller="ui--modal"
+  data-action="click->ui--modal#backdropClick keydown->ui--modal#handleKeydown"
+  class="
+    tw:m-auto tw:w-full tw:max-w-lg tw:bg-transparent tw:p-0
+    tw:backdrop:bg-black/50 tw:backdrop:backdrop-blur-sm tw:open:flex
+    tw:open:items-center tw:open:justify-center
+  "
+>
+  <div
+    class="
+      tw:mx-4 tw:w-full tw:overflow-hidden tw:rounded-xl tw:bg-white
+      tw:shadow-xl tw:dark:bg-gray-800
+    "
+  >
+    <% if @title %>
+      <div
+        class="
+          tw:flex tw:items-center tw:justify-between tw:border-b
+          tw:border-gray-200 tw:px-5 tw:py-4 tw:dark:border-gray-700
+        "
+      >
+        <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-white">
+          <%= @title %>
+        </h3>
+
+        <button
+          type="button"
+          data-action="click->ui--modal#close"
+          aria-label="Close"
+          class="
+            tw:text-gray-400 tw:hover:text-gray-600
+            tw:dark:hover:text-gray-300
+          "
+        >
+          <svg
+            class="tw:h-5 tw:w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+    <% end %>
+
+    <div class="tw:px-5 tw:py-4">
+      <%= body %>
+    </div>
+  </div>
+</dialog>

@@ -2423,6 +2423,8 @@ es:
           unable_to_find_sticker:
         update:
           cannot_update:
+        ensure_sticker_for_current_organization:
+          not_your_organizations_sticker:
       users:
         create:
           insufficient_invitations:
@@ -3204,50 +3206,6 @@ es:
       trusted_by_community_groups_everywhere:
       used_by_community_groups_everywhere:
       we_provide_free_and_easy_access_to_our_re:
-    for_law_enforcement:
-      automated_tweets:
-      bend_reduces_bike_theft_by_60_percent:
-      bike_index_for_law_enforcement:
-      bike_index_organization_impounding:
-      calgary_doubles:
-      check_out:
-      embed_a_bike_index_registration_form:
-      here:
-      if_you_want_to_collaborate_html:
-      is_your_department_equipped_to_fight_bike:
-      law_enforcement_deck:
-      local_ambassadors:
-      our_extensive_archive_has_helped_officers:
-      put_a_lock_on_bike_theft:
-      recover_your_citizens_bikes:
-      related_articles:
-      sign_up_for_free:
-      trusted_by_law_enforcement_everywhere:
-      used_by_law_enforcement_everywhere:
-      with_over_600_partnerships_html:
-      with_over_registrations_and_almost:
-      you_have_the_authority_to_bring_html:
-      youre_the_first_one:
-    for_schools:
-      bike_index_for_universities:
-      bike_index_users_provide:
-      check_out:
-      embed_a_bike_index_registration_form:
-      features_amp_pricing:
-      how_it_works:
-      keep_campus_bikes_in_order:
-      make_bike_registration_better:
-      must_read:
-      protecting_bikes_on_campus_can_be:
-      read_about_our_html:
-      related_articles:
-      schools_deck:
-      six_best_features_for_schools:
-      trusted_by_top_universities:
-      weve_designed_a_platform:
-      your_students_can_register_their_bikes:
-      bike_index_admin_guide:
-      how_to_use_bike_index_qr_stickers:
     packages_list:
       forever:
       free:
@@ -4298,7 +4256,6 @@ es:
       manage_impounding:
       manage_users:
       model_audits:
-      multi_serial_search:
       org_bikes:
       org_dashboard:
       org_locations:
@@ -4312,6 +4269,7 @@ es:
       stolen_hot_sheet_configuration:
       stolen_message:
       super_admin_view:
+      multi_search:
     organized_skeleton:
       additional_features_html:
       admin_panel:
@@ -4550,23 +4508,6 @@ es:
         search_owner_email:
         submit:
         search_notes:
-    legacy_form_well:
-      address_record:
-        address:
-        address_school:
-        choose_country:
-        city:
-        postal_code:
-        region:
-        state:
-        your_full_address_is_required:
-        address_no_street:
-        street_2:
-        address_or_intersection:
-        where_was_it_status:
-      address_record_with_default:
-        edit_my_account_path:
-        use_account_address:
     search_results:
       bike_box:
         location:
@@ -4581,6 +4522,8 @@ es:
       vehicle_thumbnail:
         registered_not_stolen:
       container:
+        no_results:
+      multi_result_chip:
         no_results:
     page_block:
       marketplace_listing_panel:
@@ -4687,8 +4630,19 @@ es:
       definition_list:
         row:
           no_value:
-      alert_for_errors:
-        errors_prevented_this_from_being_saved:
+      period_select:
+        all:
+        custom:
+        day:
+        from:
+        hour:
+        next:
+        past:
+        seven_days:
+        thirty_days:
+        to:
+        update:
+        year:
     org:
       location_address_fields:
         address:
@@ -4716,88 +4670,6 @@ es:
         status_records:
         update_impound_record:
         update_multiple_records:
-      bike_search:
-        avery:
-        bike:
-        color:
-        impounded:
-        link:
-        manufacturer:
-        matching_bikes_html:
-        mfg_model_color_html:
-        model:
-        owner_name:
-        propulsion_type:
-        registered:
-        registered_bikes_html:
-        sent_to:
-        status_cell:
-        sticker:
-        stolen:
-        updated:
-        vehicle:
-        vehicle_type:
-        affiliation:
-        avery_exportable:
-        e_vehicle_propulsion:
-        phone:
-        reg_address:
-        secondary_number:
-        source:
-        student_id:
-        url:
-        e_vehicles_for_audit:
-        serial:
-        view_matching_any_audit:
-        notes:
-        impound_id:
-        assign_bike_sticker:
-      bike_search_row:
-        email_hidden:
-        mfg_model_color_html:
-      bike_search_settings:
-        address:
-        all:
-        avery_cell:
-        bike:
-        color_cell:
-        create_export_of_vehicles:
-        created_at_cell:
-        creation_description_cell:
-        cycle_type_cell:
-        filter_impounded_html:
-        filter_no_address_html:
-        filter_no_sticker_html:
-        filter_not_impounded_html:
-        filter_not_stolen_or_impounded_html:
-        filter_stolen_html:
-        filter_with_address_html:
-        filter_with_stickers_html:
-        impounded_cell:
-        manufacturer_cell:
-        model_cell:
-        owner_email_cell:
-        owner_name_cell:
-        propulsion_type_cell:
-        reg_address_cell:
-        reg_extra_registration_number_cell:
-        reg_organization_affiliation_cell:
-        reg_phone_cell:
-        reg_student_id_cell:
-        serial_number_cell:
-        settings:
-        status:
-        status_cell:
-        sticker_cell:
-        stickers:
-        stolen_cell:
-        updated_at_cell:
-        url_cell:
-        vehicle:
-        visible_columns:
-        notes_cell:
-        show_notes_search:
-        impound_id_cell:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:
@@ -4879,3 +4751,115 @@ es:
         organizations:
         reprocess_instruction:
         unknown_ascend_name:
+      registration_search:
+        affiliation:
+        assign_bike_sticker:
+        avery:
+        avery_exportable:
+        bike:
+        color:
+        e_vehicle_propulsion:
+        e_vehicles_for_audit:
+        email_hidden:
+        impound_id:
+        impounded:
+        link:
+        link_sticker:
+        manufacturer:
+        matching_bikes_html:
+        mfg_model_color_html:
+        model:
+        notes:
+        owner_name:
+        phone:
+        propulsion_type:
+        reg_address:
+        registered:
+        registered_bikes_html:
+        secondary_number:
+        sent_to:
+        serial:
+        source:
+        status_cell:
+        sticker:
+        stolen:
+        student_id:
+        updated:
+        url:
+        vehicle:
+        vehicle_type:
+        view_matching_any_audit:
+      registration_search_settings:
+        address:
+        all:
+        avery_cell:
+        bike:
+        color_cell:
+        create_export_of_vehicles:
+        created_at_cell:
+        creation_description_cell:
+        cycle_type_cell:
+        default:
+        filter_impounded_html:
+        filter_no_address_html:
+        filter_no_sticker_html:
+        filter_not_impounded_html:
+        filter_not_stolen_or_impounded_html:
+        filter_stolen_html:
+        filter_with_address_html:
+        filter_with_stickers_html:
+        impound_id_cell:
+        impounded_cell:
+        manufacturer_cell:
+        model_cell:
+        none:
+        notes_cell:
+        owner_email_cell:
+        owner_name_cell:
+        propulsion_type_cell:
+        reg_address_cell:
+        reg_extra_registration_number_cell:
+        reg_organization_affiliation_cell:
+        reg_phone_cell:
+        reg_student_id_cell:
+        serial_number_cell:
+        settings:
+        show_notes_search:
+        status:
+        status_cell:
+        sticker_cell:
+        stickers:
+        stolen_cell:
+        updated_at_cell:
+        url_cell:
+        vehicle:
+        visible_columns:
+        multi_search:
+      multi_search_results:
+        first_n_shown_html:
+        no_exact_matches:
+        no_matches_found:
+        result_count_html:
+        serial_label:
+        view_all:
+    alerts:
+      object_errors:
+        errors_prevented_this_from_being_saved:
+    form:
+      legacy_form_well:
+        address_record:
+          address:
+          address_no_street:
+          address_or_intersection:
+          address_school:
+          choose_country:
+          city:
+          postal_code:
+          region:
+          state:
+          street_2:
+          where_was_it_status:
+          your_full_address_is_required:
+        address_record_with_default:
+          edit_my_account_path:
+          use_account_address:

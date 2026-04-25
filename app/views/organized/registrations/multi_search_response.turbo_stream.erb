@@ -1,0 +1,22 @@
+<%= turbo_stream.append :multi_serial_results do %>
+  <%= render Org::MultiSearchResults::Component.new(
+    organization: current_organization,
+    serial: @serial,
+    chip_id: @chip_id,
+    pagy: @pagy,
+    bikes: @bikes,
+    interpreted_params: @interpreted_params,
+    per_page: @per_page,
+    close_serials: @close_serials
+  ) %>
+<% end %>
+
+<% if @chip_id %>
+  <%= turbo_stream.replace @chip_id do %>
+    <%= render SearchResults::MultiResultChip::Component.new(
+      serial: @serial,
+      chip_id: @chip_id,
+      result_count: @pagy.count
+    ) %>
+  <% end %>
+<% end %>

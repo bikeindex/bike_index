@@ -12,44 +12,44 @@
 </h2>
 
 <h6 class="tw:mt-2 tw:mb-1 tw:text-sm tw:opacity-65">
-  format <code>:convert_time</code>
+  format <code>:localize_time</code>
 </h6>
 
 <p id="current-time">
   <span class="tw:text-sm tw:opacity-65">Current time:</span>
-  <%= render(UI::Time::Component.new(time: Time.current)) %>
+  <%= render(UI::Time::Component.new(time: ::Time.current)) %>
 </p>
 
 <p>
   <span class="tw:text-sm tw:opacity-65">Yesterday:</span>
-  <%= render(UI::Time::Component.new(time: Time.current - 1.day)) %>
+  <%= render(UI::Time::Component.new(time: ::Time.current - 1.day)) %>
 </p>
 
 <p>
   <span class="tw:text-sm tw:opacity-65">Tomorrow:</span>
-  <%= render(UI::Time::Component.new(time: Time.current + 1.day)) %>
+  <%= render(UI::Time::Component.new(time: ::Time.current + 1.day)) %>
 </p>
 
 <p>
   <span class="tw:text-sm tw:opacity-65">One week ago:</span>
-  <%= render(UI::Time::Component.new(time: Time.current - 7.days)) %>
+  <%= render(UI::Time::Component.new(time: ::Time.current - 7.days)) %>
 </p>
 
 <p>
   <span class="tw:text-sm tw:opacity-65">One year ago:</span>
-  <%= render(UI::Time::Component.new(time: Time.current - 1.year)) %>
+  <%= render(UI::Time::Component.new(time: ::Time.current - 1.year)) %>
 </p>
 
 <h6 class="tw:mt-5 tw:mb-1 tw:text-sm tw:opacity-65">
-  format <code>:convert_time_precise</code>
+  format <code>:localize_time_precise</code>
 </h6>
 
 <p>
   <span class="tw:text-sm tw:opacity-65">Yesterday (precise time):</span>
-  <%= render(UI::Time::Component.new(time: Time.current - 1.day, format: :convert_time_precise)) %>
+  <%= render(UI::Time::Component.new(time: ::Time.current - 1.day, format: :localize_time_precise)) %>
 </p>
 
 <p>
   <span class="tw:text-sm tw:opacity-65">One year ago (precise time):</span>
-  <%= render(UI::Time::Component.new(time: Time.current - 1.year, format: :convert_time_precise)) %>
+  <%= render(UI::Time::Component.new(time: ::Time.current - 1.year, format: :localize_time_precise)) %>
 </p>

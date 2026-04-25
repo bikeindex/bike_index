@@ -15,7 +15,7 @@
     <%= render UI::Time::Component.new(time: strava_activity.start_date) %>
   <% end %>
 
-  <% table.column(label: "Title") do |strava_activity| %>
+  <% table.column(label: "Title", header_classes: "tw:font-normal") do |strava_activity| %>
     <% if strava_activity.photos&.dig("photo_url").present? %>
       📷
     <% end %>
@@ -49,10 +49,10 @@
   <% end %>
 
   <% table.column(sortable: "distance_meters", label: "Distance (miles)", classes: "tw:text-xs") do |strava_activity| %>
-    <%= number_display(strava_activity.distance_miles.round) %>
+    <%= number_display(strava_activity.distance_miles&.round) %>
   <% end %>
 
-  <% table.column(label: "Gear") do |strava_activity| %>
+  <% table.column(label: "Gear", header_classes: "tw:font-normal") do |strava_activity| %>
     <% if strava_activity.gear_id.present? %>
       <small><%= strava_activity.calculated_gear_name %></small>
       <% gear_assoc = strava_activity.strava_integration.strava_gears.find { |ga| ga.strava_id == strava_activity.gear_id } %>
@@ -62,7 +62,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "User") do |strava_activity| %>
+  <% table.column(label: "User", header_classes: "tw:font-normal") do |strava_activity| %>
     <%= render Admin::UserCell::Component.new(user: strava_activity.strava_integration.user, user_id: strava_activity.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_activity.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_activity.strava_integration_id))) %>
   <% end %>
 

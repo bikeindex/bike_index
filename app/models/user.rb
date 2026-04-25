@@ -58,6 +58,7 @@
 #  index_users_on_address_record_id         (address_record_id)
 #  index_users_on_auth_token                (auth_token)
 #  index_users_on_email                     (email) WHERE (deleted_at IS NULL)
+#  index_users_on_email_trgm                (email) WHERE (deleted_at IS NULL) USING gin
 #  index_users_on_token_for_password_reset  (token_for_password_reset)
 #  index_users_on_username                  (username) WHERE (deleted_at IS NULL)
 #
@@ -117,6 +118,7 @@ class User < ApplicationRecord
   has_one :user_ban
 
   validates_uniqueness_of :username
+  validates_with UserNameValidator
   validates :password,
     presence: true,
     length: {within: 12..100},

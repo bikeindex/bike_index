@@ -227,7 +227,7 @@ RSpec.describe BikesController, type: :controller do
           get :scanned, params: {id: "D0900", organization_id: organization.to_param}
           expect(assigns(:bike_sticker)).to eq bike_sticker2
           expect(session[:passive_organization_id]).to eq organization.id
-          expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_sticker: bike_sticker2.code)
+          expect(response).to redirect_to organization_registrations_path(organization_id: organization.to_param, bike_sticker: bike_sticker2.code)
         end
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
@@ -237,7 +237,7 @@ RSpec.describe BikesController, type: :controller do
             get :scanned, params: {id: "D900", organization_id: "BikeIndex"}
             expect(assigns(:bike_sticker)).to eq bike_sticker2
             expect(session[:passive_organization_id]).to eq organization.id
-            expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_sticker: bike_sticker2.code)
+            expect(response).to redirect_to organization_registrations_path(organization_id: organization.to_param, bike_sticker: bike_sticker2.code)
           end
         end
       end
