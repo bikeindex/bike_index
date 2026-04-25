@@ -3,6 +3,7 @@ module OrgPublic
     include Binxtils::SortableTable
 
     before_action :ensure_public_impound_bikes!
+    around_action :set_reading_role
 
     def index
       @per_page = permitted_per_page

@@ -5,6 +5,7 @@ module Organized
 
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
+    around_action :set_reading_role, only: :index
 
     before_action :set_failed_and_repeated_ivars
 
