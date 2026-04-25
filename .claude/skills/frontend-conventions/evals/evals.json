@@ -1,0 +1,33 @@
+{
+  "skill_name": "frontend-conventions",
+  "evals": [
+    {
+      "id": 0,
+      "name": "form-search-input",
+      "prompt": "Add a 'search by serial number' input and label to the top of the bikes index page. It should be a simple form that submits to the existing search action. Show me the modified view and any new partial/component you'd add.",
+      "expected_output": "ERB/view code using twinput class on the input, twlabel on the label, and tw: prefix on any Tailwind utility classes.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "profile-stat-row",
+      "prompt": "On the user profile page, show the user's total registered bikes count and the sum of all bike values they own. Style it like a stat row at the top of the page.",
+      "expected_output": "ERB/view code using the number_display helper for both numbers, with tw: prefix on Tailwind classes.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "bike-card-component",
+      "prompt": "Create a new BikeCardComponent that takes a bike and renders the manufacturer, year, frame_model, and value. Use it on the bikes index page in place of whatever partial is currently rendering each bike.",
+      "expected_output": "A ViewComponent with keyword-argument initializer, instance variables (no attr_accessor), helpers. prefix in the template, number_display for year/value, tw: prefix on Tailwind classes.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "notifications-dropdown",
+      "prompt": "Build a notifications dropdown for the navbar — bell icon with an unread count badge, click to expand a panel showing recent notifications. Should close when clicked outside.",
+      "expected_output": "Stimulus controller (not CoffeeScript), tw: prefix on Tailwind classes, number_display for the unread count, ViewComponent if structured as a component.",
+      "files": []
+    }
+  ]
+}

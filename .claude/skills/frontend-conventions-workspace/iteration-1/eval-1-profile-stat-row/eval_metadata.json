@@ -1,0 +1,19 @@
+{
+  "eval_id": 1,
+  "eval_name": "profile-stat-row",
+  "prompt": "On the user profile page, show the user's total registered bikes count and the sum of all bike values they own. Style it like a stat row at the top of the page.",
+  "assertions": [
+    {
+      "text": "Bike count is rendered through `number_display`",
+      "check": "regex: number_display\\([^)]*(count|bikes|size|length)[^)]*\\) appears in output"
+    },
+    {
+      "text": "Total bike value is rendered through `number_display`",
+      "check": "regex: number_display\\([^)]*(value|total|sum)[^)]*\\) appears in output"
+    },
+    {
+      "text": "Tailwind utility classes use the `tw:` prefix",
+      "check": "no class token in any class=\"...\" attribute matches a Tailwind utility pattern without the `tw:` prefix"
+    }
+  ]
+}

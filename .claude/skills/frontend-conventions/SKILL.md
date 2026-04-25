@@ -20,10 +20,15 @@ The `bin/dev` command handles building and updating Tailwind and JS.
 ## Tailwind classes and helpers
 
 - Tailwind classes have the prefix `tw:` (e.g. `tw:text-blue`, `tw:flex`, `tw:gap-4`).
+  - The `tw:` prefix comes **before** variant modifiers, not after. Use `tw:dark:bg-gray-800`, `tw:hover:bg-blue-600`, `tw:sm:flex`, `tw:focus-visible:ring-2`. Never `dark:tw:bg-gray-800` — variant prefixes layer on top of `tw:`.
 - Form fields should use the `twinput` class.
 - Labels should use the `twlabel` class.
 - Basic links should use the `twlink` class.
-- **Every number** should be rendered with `number_display(number)`.
+- **Every number** should be rendered with `number_display(number)`. This applies even when a number is composed into a string with non-numeric values — wrap the number itself, not the surrounding string.
+  - Good: `[number_display(@bike.year), @bike.mnfg_name].join(" ")`
+  - Bad: `[@bike.year, @bike.mnfg_name].join(" ")`
+  - "Number" includes years, counts, prices, distances, IDs — anything numeric, even when it reads like a label.
+- **Currency amounts** use `amount_display(obj)` instead of `number_display` directly. It takes an object that responds to `amount_cents`, `amount`, `currency_symbol`, and `currency_name` (e.g. a `MarketplaceListing`), and renders the symbol + `number_display(amount)` together. Don't reach for `number_to_currency` or roll your own.
 
 ## ViewComponent rules
 

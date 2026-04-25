@@ -1,0 +1,36 @@
+{
+  "eval_id": 3,
+  "eval_name": "notifications-dropdown",
+  "summary": {
+    "pass_rate": 0.75,
+    "passed": 3,
+    "failed": 1,
+    "total": 4
+  },
+  "expectations": [
+    {
+      "text": "Uses a Stimulus controller (no `.coffee`; JS imports/extends Stimulus `Controller`)",
+      "passed": true,
+      "evidence": "Stimulus import: yes; extends Controller: yes; CoffeeScript: no"
+    },
+    {
+      "text": "Unread count is rendered through `number_display`",
+      "passed": true,
+      "evidence": "Found number_display(unread-like)"
+    },
+    {
+      "text": "Tailwind utility classes use the `tw:` prefix",
+      "passed": true,
+      "evidence": "All `tw:`-prefixed"
+    },
+    {
+      "text": "If structured as a ViewComponent, initialize uses keyword args and template uses `helpers.` prefix (no attr_*)",
+      "passed": false,
+      "evidence": "kwarg init: True; helpers. used: True; attr_*: present (violates skill)"
+    }
+  ],
+  "timing": {
+    "total_duration_seconds": 148.9,
+    "total_tokens": 48996
+  }
+}

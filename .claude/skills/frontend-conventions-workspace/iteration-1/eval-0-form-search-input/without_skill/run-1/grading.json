@@ -1,0 +1,31 @@
+{
+  "eval_id": 0,
+  "eval_name": "form-search-input",
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  },
+  "expectations": [
+    {
+      "text": "Form input element uses the `twinput` class",
+      "passed": true,
+      "evidence": "Found `twinput` reference"
+    },
+    {
+      "text": "Form label uses the `twlabel` class",
+      "passed": true,
+      "evidence": "Found `twlabel` reference"
+    },
+    {
+      "text": "Tailwind utility classes use the `tw:` prefix",
+      "passed": true,
+      "evidence": "All Tailwind utility tokens are `tw:`-prefixed"
+    }
+  ],
+  "timing": {
+    "total_duration_seconds": 105.2,
+    "total_tokens": 33849
+  }
+}

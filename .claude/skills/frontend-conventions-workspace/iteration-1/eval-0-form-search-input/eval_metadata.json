@@ -1,0 +1,19 @@
+{
+  "eval_id": 0,
+  "eval_name": "form-search-input",
+  "prompt": "Add a 'search by serial number' input and label to the top of the bikes index page. It should be a simple form that submits to the existing search action. Show me the modified view and any new partial/component you'd add.",
+  "assertions": [
+    {
+      "text": "Form input element uses the `twinput` class",
+      "check": "regex: class=\"[^\"]*\\btwinput\\b[^\"]*\" appears on at least one <input ...> tag in any .html.erb file"
+    },
+    {
+      "text": "Form label uses the `twlabel` class",
+      "check": "regex: class=\"[^\"]*\\btwlabel\\b[^\"]*\" appears on at least one <label ...> tag in any .html.erb file"
+    },
+    {
+      "text": "Tailwind utility classes use the `tw:` prefix (no bare `flex`/`px-N`/`bg-`/`rounded`/etc.)",
+      "check": "no class token in any class=\"...\" attribute matches a Tailwind utility pattern without the `tw:` prefix"
+    }
+  ]
+}

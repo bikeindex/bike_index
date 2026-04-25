@@ -1,0 +1,41 @@
+{
+  "eval_id": 2,
+  "eval_name": "bike-card-component",
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 5,
+    "failed": 0,
+    "total": 5
+  },
+  "expectations": [
+    {
+      "text": "Component `initialize` uses keyword arguments (e.g. `def initialize(bike:)`)",
+      "passed": true,
+      "evidence": "Found `def initialize(bike:)`"
+    },
+    {
+      "text": "Component does NOT use `attr_accessor`/`attr_reader`",
+      "passed": true,
+      "evidence": "No attr_* found"
+    },
+    {
+      "text": "Component template uses `helpers.` prefix when calling Rails view helpers",
+      "passed": true,
+      "evidence": "No bare Rails helper calls detected in templates"
+    },
+    {
+      "text": "Year and value are rendered through `number_display`",
+      "passed": true,
+      "evidence": "year=True, value=True"
+    },
+    {
+      "text": "Tailwind utility classes use the `tw:` prefix",
+      "passed": true,
+      "evidence": "All `tw:`-prefixed"
+    }
+  ],
+  "timing": {
+    "total_duration_seconds": 135.3,
+    "total_tokens": 40737
+  }
+}
