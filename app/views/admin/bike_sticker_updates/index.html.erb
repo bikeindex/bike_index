@@ -164,25 +164,16 @@
 <% end %>
 
 <% admin_search_form = capture do %>
-  <div class="row mt-4 mb-2">
-    <div class="col-md-6">
-      <p>
-        <%= number_display(matching_bike_sticker_updates.size) %> matching
-        sticker updates <em><%= humanized_time_range(@time_range) %></em>
-      </p>
-    </div>
+  <div class="tw:mt-4 tw:mb-2 tw:flex tw:justify-end">
+    <%= form_tag admin_bike_sticker_updates_path, method: :get, class: "form-inline" do %>
+      <%= render partial: "/shared/hidden_search_fields" %>
 
-    <div class="col-md-6 text-right">
-      <%= form_tag admin_bike_sticker_updates_path, method: :get, class: "form-inline" do %>
-        <%= render partial: "/shared/hidden_search_fields" %>
+      <div class="form-group">
+        <%= text_field_tag :search_query, params[:search_query], placeholder: "search for bike sticker", class: "form-control" %>
+      </div>
 
-        <div class="form-group ml-2">
-          <%= text_field_tag :search_query, params[:search_query], placeholder: "search for bike sticker", class: "form-control" %>
-        </div>
-
-        <%= submit_tag "Search", name: "search", class: "btn btn-primary ml-2" %>
-      <% end %>
-    </div>
+      <%= submit_tag "Search", name: "search", class: "btn btn-primary ml-2" %>
+    <% end %>
   </div>
 <% end %>
 
