@@ -5844,6 +5844,13 @@ CREATE INDEX index_b_params_on_created_bike_id ON public.b_params USING btree (c
 
 
 --
+-- Name: index_b_params_on_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_email_trgm ON public.b_params USING gin (email public.gin_trgm_ops) WHERE (created_bike_id IS NULL);
+
+
+--
 -- Name: index_b_params_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6233,6 +6240,13 @@ CREATE INDEX index_components_on_bike_version_id ON public.components USING btre
 --
 
 CREATE INDEX index_components_on_manufacturer_id ON public.components USING btree (manufacturer_id);
+
+
+--
+-- Name: index_customer_contacts_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_customer_contacts_on_bike_id ON public.customer_contacts USING btree (bike_id);
 
 
 --
@@ -7525,6 +7539,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260425103043'),
 ('20260424000002'),
 ('20260424000001'),
 ('20260412183446'),
