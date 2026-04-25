@@ -1,0 +1,82 @@
+[
+  {
+    "query": "Hey can you grab that cleanshot screenshot in my downloads (the one called something like 'CleanShot 2026-04-25 at 11.32.png' I think) and slap it onto PR #3456? It's showing the new dashboard layout we just shipped.",
+    "should_trigger": true
+  },
+  {
+    "query": "I just finished testing the search refactor. There are 3 screenshots in /tmp/search-test/ — before.png, after-empty.png, and after-results.png. Put them on the open PR for the search-fix branch please.",
+    "should_trigger": true
+  },
+  {
+    "query": "put these two images in the description of pr 1247: ~/Desktop/login-mobile.png and ~/Desktop/login-desktop.png",
+    "should_trigger": true
+  },
+  {
+    "query": "PR https://github.com/bikeindex/bikeindex/pull/3456 needs visual evidence of the layout change. The screenshot is at /Users/seth/Pictures/Screenshots/dashboard-fix.png — drop it in the description under the test plan section.",
+    "should_trigger": true
+  },
+  {
+    "query": "show the before/after on the PR. before is /tmp/before.png, after is /tmp/after.png. PR is the one for the 'theme-toggle' branch",
+    "should_trigger": true
+  },
+  {
+    "query": "can you embed these UI screenshots in the description of #2891? files are at /tmp/ui-1.png /tmp/ui-2.png /tmp/ui-3.png. I want them all under a Screenshots heading.",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to document the flaky CI failure in the PR comments — screenshot of the failing run is at ~/Downloads/failing-spec.png, and the PR is the one I just opened for the 'fix-flake' branch.",
+    "should_trigger": true
+  },
+  {
+    "query": "got a screenshot of the bug repro. attach it to the PR. file is at /tmp/repro.png, pr is for 'investigate-301-redirect'",
+    "should_trigger": true
+  },
+  {
+    "query": "put the screenshot in the PR",
+    "should_trigger": true
+  },
+  {
+    "query": "/Users/seth/Desktop/Screen Shot 2026-04-24 at 3.12.41 PM.png — can this go on PR 3402? wanting to show the loading state I fixed",
+    "should_trigger": true
+  },
+  {
+    "query": "Open a new PR for branch 'fix-search-typo' with these screenshots embedded in the description: ~/Desktop/before.png, ~/Desktop/after.png. Title can just be 'Fix search typo'.",
+    "should_trigger": false
+  },
+  {
+    "query": "Take a screenshot of localhost:3042/bikes and save it to /tmp/bikes-list.png so I can reference it later",
+    "should_trigger": false
+  },
+  {
+    "query": "Add bike-thumbnail.png to app/assets/images and commit it on this branch — we'll use it for the empty state placeholder.",
+    "should_trigger": false
+  },
+  {
+    "query": "Show me the screenshots that are already attached to PR #3456 so I can compare them to what's on staging.",
+    "should_trigger": false
+  },
+  {
+    "query": "Upload this photo (~/Downloads/repro.png) to Linear ticket BIK-892 so I can reference it from the PR description without having it in the GitHub history.",
+    "should_trigger": false
+  },
+  {
+    "query": "Comment on PR 3456 to say the migration looks safe to ship — no screenshots, just a plain text comment from me",
+    "should_trigger": false
+  },
+  {
+    "query": "How do I include an image in a markdown file in this repo? Want to put a diagram in docs/architecture.md — markdown syntax, not anything fancy.",
+    "should_trigger": false
+  },
+  {
+    "query": "Resize ~/Downloads/dashboard-photo.png to 800px wide and save it as dashboard-thumb.png in the same folder",
+    "should_trigger": false
+  },
+  {
+    "query": "Push my local screenshots-branch up to origin so the team can pull it down and look at the Sketch mockups I committed there",
+    "should_trigger": false
+  },
+  {
+    "query": "Update the README to reference the new architecture diagram at docs/arch.svg — just change the image link in the 'Architecture' section",
+    "should_trigger": false
+  }
+]
