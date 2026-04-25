@@ -22,8 +22,9 @@
 #
 # Indexes
 #
-#  index_b_params_on_created_bike_id  (created_bike_id)
-#  index_b_params_on_organization_id  (organization_id)
+#  index_b_params_on_bike_owner_email_trgm  ((((params -> 'bike'::text) ->> 'owner_email'::text)) gin_trgm_ops) USING gin
+#  index_b_params_on_created_bike_id        (created_bike_id)
+#  index_b_params_on_organization_id        (organization_id)
 #
 
 # b_param stands for Bike param

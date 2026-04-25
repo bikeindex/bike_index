@@ -9,6 +9,19 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
     expect(described_class.frequency).to be > 20.hours
   end
 
+  describe "enqueue_workers" do
+    let!(:email_domains) { FactoryBot.create_list(:email_domain, 3) }
+
+    it "staggers per-domain jobs to avoid overwhelming the database" do
+      Sidekiq::Job.clear_all
+      described_class.new.perform
+      jobs = described_class.jobs.sort_by { |j| j["at"] || 0 }
+      expect(jobs.map { |j| j["args"] }.flatten).to eq(email_domains.map(&:id))
+      ats = jobs.map { |j| j["at"] || Time.current.to_f }
+      expect(ats.each_cons(2).map { |a, b| (b - a).round }).to all(eq(described_class::STAGGER_INTERVAL.to_i))
+    end
+  end
+
   describe "perform" do
     let(:instance) { described_class.new }
     let!(:user) { FactoryBot.create(:user_confirmed, email: "example@#{user_domain}") }

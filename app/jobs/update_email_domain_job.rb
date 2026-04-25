@@ -4,6 +4,7 @@ class UpdateEmailDomainJob < ScheduledJob
   prepend ScheduledJobRecorder
 
   CREATE_TLD_SUBDOMAIN_COUNT = 3
+  STAGGER_INTERVAL = 5.seconds
   SENDGRID_VALIDATION_KEY = ENV["SENDGRID_EMAIL_VALIDATION_KEY"].freeze
   VALIDATE_WITH_SENDGRID = EmailDomain::VERIFICATION_ENABLED && SENDGRID_VALIDATION_KEY.present?
   SENDGRID_VALIDATION_URL = "https://api.sendgrid.com/v3/validations/email"
@@ -48,7 +49,7 @@ class UpdateEmailDomainJob < ScheduledJob
       email_domain.calculated_users.find_each { |user| user.really_destroy! }
     elsif email_domain.provisional_ban? && email_domain.tld_matches_subdomains?
       email_domain.calculated_subdomains.where.not(status: email_domain.status).pluck(:id)
-        .each { UpdateEmailDomainJob.perform_async(it) }
+        .each_with_index { |id, inx| UpdateEmailDomainJob.perform_in(STAGGER_INTERVAL * inx, id) }
     end
     email_domain
   end
@@ -56,7 +57,9 @@ class UpdateEmailDomainJob < ScheduledJob
   private
 
   def enqueue_workers
-    EmailDomain.pluck(:id).each { |id| self.class.perform_async(id) }
+    EmailDomain.pluck(:id).each_with_index do |id, inx|
+      self.class.perform_in(STAGGER_INTERVAL * inx, id)
+    end
   end
 
   def calculated_data(email_domain)
