@@ -5990,6 +5990,19 @@ nl:
       definition_list:
         row:
           no_value: geen
+      period_select:
+        all: Alle
+        custom: Custom
+        day: dag
+        from: uit
+        hour: Uur
+        next: Volgende
+        past: Verleden
+        seven_days: 7 dagen
+        thirty_days: 30 dagen
+        to: Naar
+        update: Bijwerken
+        year: jaar
     org:
       location_address_fields:
         address: Adres
