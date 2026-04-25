@@ -32,6 +32,7 @@ Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScr
 
 ## Pull requests
 
+- When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs, captures desktop+mobile screenshots, and embeds them in the PR body.
 - To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, the `gh` CLI **cannot upload images** — use the `github-upload-image-to-pr` skill, which drives a real browser to GitHub's user-attachments uploader.
 
 ## Architecture notes
