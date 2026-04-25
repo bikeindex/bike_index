@@ -193,19 +193,23 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to be_present
 
     # Server reads the cookie and uses it to bucket chart data via groupdate.
-    # 5 AM UTC = 9 PM PST the previous day, so PST and UTC fall on different days.
+    # 5 AM UTC = 9 PM PDT (or 12 AM CDT) the previous day, so PDT and CDT fall on different days.
     bulk_import_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
     FactoryBot.create(:bulk_import, organization:, created_at: bulk_import_created_at)
     la_date_key = bulk_import_created_at.in_time_zone("America/Los_Angeles").strftime("%Y-%-m-%-d")
-    utc_date_key = bulk_import_created_at.strftime("%Y-%-m-%-d")
-    expect(la_date_key).not_to eq(utc_date_key)
+    cdt_date_key = bulk_import_created_at.in_time_zone("America/Chicago").strftime("%Y-%-m-%-d")
+    expect(la_date_key).not_to eq(cdt_date_key)
 
-    page.driver.browser.manage.add_cookie(name: "timezone", value: "America/Los_Angeles", path: "/")
+    # Replace the cookie via JS the same way the app does, so attributes (SameSite, path)
+    # match and Chrome reliably overwrites the existing cookie set on previous loads.
+    page.execute_script("document.cookie = 'timezone=America/Los_Angeles;path=/;max-age=31536000;SameSite=Lax'")
+    expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to eq("America/Los_Angeles")
+
     visit "/o/#{organization.to_param}/bulk_imports?render_chart=true&period=month"
     expect(page).to have_css("table", wait: 10)
-    # Chartkick init renders inline as array tuples; LA bucket has count 1, UTC bucket has 0
+    # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket has 0
     expect(page.html).to include(%(["#{la_date_key}",1]))
-    expect(page.html).to include(%(["#{utc_date_key}",0]))
+    expect(page.html).to include(%(["#{cdt_date_key}",0]))
   end
 
   context "with stolen and impounded bikes" do
