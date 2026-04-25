@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Organized registrations search", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:, created_at: 5.years.ago) }
-  let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes] }
+  let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes show_bulk_import] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bikes_path) { "/o/#{organization.to_param}/registrations" }
 
@@ -188,6 +188,24 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_field("search_email", with: "bob@example.com")
     expect(page).to have_css("a.period-select-standard.active[data-period='year']")
     expect(rendered_bike_ids).to eq([bike2.id])
+
+    # JS (application.js + TimeLocalizer) sets a timezone cookie from window.localTimezone
+    expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to be_present
+
+    # Server reads the cookie and uses it to bucket chart data via groupdate.
+    # 5 AM UTC = 9 PM PST the previous day, so PST and UTC fall on different days.
+    bulk_import_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
+    FactoryBot.create(:bulk_import, organization:, created_at: bulk_import_created_at)
+    la_date_key = bulk_import_created_at.in_time_zone("America/Los_Angeles").strftime("%Y-%-m-%-d")
+    utc_date_key = bulk_import_created_at.strftime("%Y-%-m-%-d")
+    expect(la_date_key).not_to eq(utc_date_key)
+
+    page.driver.browser.manage.add_cookie(name: "timezone", value: "America/Los_Angeles", path: "/")
+    visit "/o/#{organization.to_param}/bulk_imports?render_chart=true&period=month"
+    expect(page).to have_css("table", wait: 10)
+    # Chartkick init renders inline as array tuples; LA bucket has count 1, UTC bucket has 0
+    expect(page.html).to include(%(["#{la_date_key}",1]))
+    expect(page.html).to include(%(["#{utc_date_key}",0]))
   end
 
   context "with stolen and impounded bikes" do
