@@ -171,28 +171,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("a.period-select-standard.active[data-period='day']")
     expect(page).to have_text("10 registrations matching")
 
-    # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only
-    page.execute_script("document.getElementById('periodSelectCustom').click()")
-    start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
-    end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
-    page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
-    page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
-    page.execute_script("document.getElementById('updatePeriodSelectCustom').click()")
-    expect(page).to have_current_path(/period=custom/, wait: 10)
-    expect(page).to have_css("button#periodSelectCustom.active")
-    expect(rendered_bike_ids).to eq([bike2.id])
-
-    # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago)
-    visit "#{bikes_path}?search_email=bob@example.com&period=year"
-    expect(page).to have_css("table", wait: 10)
-    expect(page).to have_field("search_email", with: "bob@example.com")
-    expect(page).to have_css("a.period-select-standard.active[data-period='year']")
-    expect(rendered_bike_ids).to eq([bike2.id])
-
-    # JS (application.js + TimeLocalizer) sets a timezone cookie from window.localTimezone
+    # JS (application.js + TimeLocalizer) sets a timezone cookie from window.localTimezone.
+    # The server reads it in set_locale and uses it to bucket chart data via groupdate.
+    # Run this before the custom period click below — that submission posts a timezone
+    # param, which gets persisted in session[:timezone] and overrides the cookie.
     expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to be_present
 
-    # Server reads the cookie and uses it to bucket chart data via groupdate.
     # 5 AM UTC = 9 PM PDT (or 12 AM CDT) the previous day, so PDT and CDT fall on different days.
     bulk_import_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
     FactoryBot.create(:bulk_import, organization:, created_at: bulk_import_created_at)
@@ -210,6 +194,26 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket has 0
     expect(page.html).to include(%(["#{la_date_key}",1]))
     expect(page.html).to include(%(["#{cdt_date_key}",0]))
+
+    # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only
+    visit bikes_path
+    expect(page).to have_css("table", wait: 10)
+    page.execute_script("document.getElementById('periodSelectCustom').click()")
+    start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
+    end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
+    page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
+    page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
+    page.execute_script("document.getElementById('updatePeriodSelectCustom').click()")
+    expect(page).to have_current_path(/period=custom/, wait: 10)
+    expect(page).to have_css("button#periodSelectCustom.active")
+    expect(rendered_bike_ids).to eq([bike2.id])
+
+    # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago)
+    visit "#{bikes_path}?search_email=bob@example.com&period=year"
+    expect(page).to have_css("table", wait: 10)
+    expect(page).to have_field("search_email", with: "bob@example.com")
+    expect(page).to have_css("a.period-select-standard.active[data-period='year']")
+    expect(rendered_bike_ids).to eq([bike2.id])
   end
 
   context "with stolen and impounded bikes" do
