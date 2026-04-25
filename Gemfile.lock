@@ -332,7 +332,7 @@ GEM
       reline
     forwardable (1.4.0)
     functionable (1.2.0)
-    geocoder (1.8.5)
+    geocoder (1.8.6)
       base64 (>= 0.1.0)
       csv (>= 3.0.0)
     gettext (3.4.9)
