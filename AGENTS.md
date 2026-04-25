@@ -1,4 +1,4 @@
-Bike Index is a Rails webapp
+Bike Index is a Rails webapp.
 
 [mise](https://mise.jdx.dev/) is used for Ruby and Node version management.
 
