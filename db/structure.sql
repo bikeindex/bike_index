@@ -6061,6 +6061,13 @@ CREATE INDEX index_bike_versions_on_tertiary_frame_color_id ON public.bike_versi
 
 
 --
+-- Name: index_bikes_current_listing_order; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_listing_order ON public.bikes USING btree (listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
 -- Name: index_bikes_on_address_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7540,6 +7547,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260425103043'),
+('20260425000001'),
 ('20260424000002'),
 ('20260424000001'),
 ('20260412183446'),
