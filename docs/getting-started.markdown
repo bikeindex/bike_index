@@ -1,6 +1,6 @@
 # Getting Started Guide
 
-These instructions will set up an Ubuntu instance to run and develop BikeIndex.
+These instructions will set up an Ubuntu instance to run and develop Bike Index.
 
 ### Prerequisites
 
