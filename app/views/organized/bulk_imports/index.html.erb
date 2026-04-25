@@ -9,7 +9,7 @@
 </div>
 
 <% if @render_chart %>
-  <%= column_chart time_range_counts(collection: available_bulk_imports), stacked: true, thousands: "," %>
+  <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_bulk_imports), time_range: @time_range, stacked: true)) %>
 <% end %>
 
 <div class="text-right mb-2">
