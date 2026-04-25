@@ -6,7 +6,6 @@ module Organized
     DEFAULT_DISTANCE = 1
 
     before_action :find_impound_record, except: [:index]
-    around_action :set_reading_role, only: :index
 
     def index
       @per_page = permitted_per_page
