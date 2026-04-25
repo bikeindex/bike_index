@@ -1,0 +1,137 @@
+<div
+  class="[&_.form-group]:tw:mb-0 tw:my-4 tw:border tw:border-gray-300/70 tw:bg-gray-100 tw:px-3 tw:pt-4 tw:pb-3 <%= 'tw:hidden!' unless settings_default_open? %>"
+  data-org--registration-search-target="settings"
+>
+  <div class="tw:mb-1 tw:flex tw:items-baseline tw:gap-2">
+    <h3 class="header-font-alt tw:mb-4! tw:pr-1">
+      <%= translation(".visible_columns") %>
+    </h3>
+
+    <%= render UI::Button::Component.new(text: translation(".all"), color: :link,
+          data: { action: "click->org--registration-search-column-toggle#selectAll" }) %>
+
+    <%= render UI::Button::Component.new(text: translation(".none"), color: :link,
+          data: { action: "click->org--registration-search-column-toggle#selectNone" }) %>
+
+    <%= render UI::Button::Component.new(text: translation(".default"), color: :link,
+          data: { action: "click->org--registration-search-column-toggle#selectDefault" }) %>
+  </div>
+
+  <% column_rows = (enabled_columns.size / 3.0).ceil %>
+
+  <div
+    class="
+      tw:grid tw:grid-cols-2 tw:gap-x-1 tw:gap-y-3 tw:pb-6
+      tw:md:grid-flow-col tw:md:grid-cols-3
+    "
+    style="grid-template-rows: repeat(<%= column_rows %>, auto)"
+    data-org--registration-search-column-toggle-target="checkboxes"
+  >
+    <% enabled_columns.each do |cell_name| %>
+      <label
+        class="
+          tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-1
+          tw:leading-[1.25]!
+        "
+      >
+        <%= check_box_tag cell_name, cell_name, false,
+            data: { action: "change->org--registration-search-column-toggle#columnToggled" } %>
+
+        <%= column_renames[cell_name.to_sym] %>
+      </label>
+    <% end %>
+  </div>
+
+  <% unless @skip_search_and_filters %>
+    <% if @organization.enabled?("bike_stickers") %>
+      <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
+        <span class="sort-group-label"><%= translation(".stickers") %></span>
+
+        <%= render Form::RadioButtonGroup::Component.new(
+          name: :search_stickers,
+          selected: @search_stickers.presence || "",
+          entries: [
+            {value: "", label: translation(".all")},
+            {value: "with", label: translation(".filter_with_stickers_html")},
+            {value: "none", label: translation(".filter_no_sticker_html")}
+          ],
+          form: "Search_Form",
+          data: {action: "change->org--registration-search#filterChanged"}
+        ) %>
+      </div>
+    <% end %>
+    <% if @organization.enabled?("reg_address") %>
+      <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
+        <span class="sort-group-label"><%= translation(".address") %></span>
+
+        <%= render Form::RadioButtonGroup::Component.new(
+          name: :search_address,
+          selected: @search_address.presence || "",
+          entries: [
+            {value: "", label: translation(".all")},
+            {value: "with_street", label: translation(".filter_with_address_html")},
+            {value: "without_street", label: translation(".filter_no_address_html")}
+          ],
+          form: "Search_Form",
+          data: {action: "change->org--registration-search#filterChanged"}
+        ) %>
+      </div>
+    <% end %>
+    <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
+      <span class="sort-group-label"><%= translation(".status") %></span>
+
+      <% status_entries = [{value: "all", label: translation(".all")}]
+        if @organization.enabled?("impound_bikes")
+          status_entries << {value: "not_impounded", label: translation(".filter_not_impounded_html")}
+          status_entries << {value: "impounded", label: translation(".filter_impounded_html")}
+        end
+        status_entries << {value: "with_owner", label: translation(".filter_not_stolen_or_impounded_html")}
+        status_entries << {value: "stolen", label: translation(".filter_stolen_html")} %>
+
+      <%= render Form::RadioButtonGroup::Component.new(
+        name: :search_status,
+        selected: @search_status,
+        entries: status_entries,
+        form: "Search_Form",
+        data: {action: "change->org--registration-search#filterChanged"}
+      ) %>
+    </div>
+    <div
+      class="
+        tw:mt-6 tw:mb-3 tw:flex tw:flex-wrap tw:items-center
+        tw:justify-between tw:gap-2
+      "
+    >
+      <% if @organization.enabled?("registration_notes") %>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary uncap"
+          data-action="click->org--registration-search#toggleNotesSearch"
+          data-org--registration-search-target="notesButton"
+        >
+          <%= translation(".show_notes_search") %>
+        </button>
+      <% end %>
+
+      <% if @organization.enabled?("csv_exports") %>
+        <div class="tw:ml-auto tw:text-right">
+          <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
+              organization_registrations_path(search_params.merge(create_export: true)),
+              class: "gray-link", data: {turbo_frame: "_top", "org--registration-search-target": "exportLink"} %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-4">
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary uncap <%= 'active' if settings_default_open? %>"
+    data-action="click->org--registration-search#toggleSettings"
+    data-org--registration-search-target="settingsButton"
+  >
+    <%= translation(".settings") %>
+    <%= helpers.inline_svg_tag "icons/settings_slider.svg", class: "tw:inline", alt: "settings icon" %>
+  </button>
+</div>

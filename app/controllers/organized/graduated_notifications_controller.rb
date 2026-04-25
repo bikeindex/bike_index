@@ -1,6 +1,6 @@
 module Organized
   class GraduatedNotificationsController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
 
     before_action :ensure_access_to_graduated_notifications!
 
@@ -8,7 +8,7 @@ module Organized
 
     def index
       @per_page = permitted_per_page
-      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       @pagy, @graduated_notifications = pagy(:countish, available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")

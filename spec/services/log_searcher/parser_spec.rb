@@ -52,6 +52,15 @@ RSpec.describe LogSearcher::Parser do
           expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
         end
 
+        context "with null byte in param value" do
+          let(:log_line) { 'I, [2025-06-19T22:42:11.977671 #476502]  INFO -- : [3d819221-d975-462b-abb6-1dcc26ceb47b] {"method":"GET","path":"/search/marketplace","format":"html","controller":"Search::MarketplaceController","action":"index","status":200,"allocations":18272,"duration":91.09,"view":18.83,"db":12.74,"remote_ip":"198.27.190.253","u_id":69,"params":{"query_items":["m_244"],"distance":"50","location":"Chicago, IL","marketplace_scope":"for_sale_proximity","search_result_view":"1\u0000xxx"},"@timestamp":"2025-06-19T22:42:11.977Z","@version":"1","message":"[200] GET /search/marketplace (Search::MarketplaceController#index)"}' }
+          it "scrubs null bytes so the result can be stored as jsonb" do
+            parsed = described_class.parse_log_line(log_line)
+            expect(parsed[:query_items]["search_result_view"]).to eq "1xxx"
+            expect(parsed.to_json).not_to include("\u0000")
+          end
+        end
+
         context "count" do
           let(:log_line) { 'I, [2025-06-19T22:42:11.977671 #476516]  INFO -- : [29e848c7-c6ac-4a7d-bc3a-34bbf44dc8ce] {"method":"GET","path":"/search/marketplace/counts","format":"*/*","controller":"Search::MarketplaceController","action":"counts","status":200,"allocations":8787,"duration":50.22,"view":0.33,"db":12.42,"remote_ip":"198.27.190.253","u_id":69,"params":{"query_items":["m_244"],"distance":"50","location":"Chicago, IL","marketplace_scope":"for_sale_proximity","marketplace":{}},"@timestamp":"2025-06-19T22:42:12.090Z","@version":"1","message":"[200] GET /search/marketplace/counts (Search::MarketplaceController#counts)"}' }
           let(:target) do

@@ -1,23 +1,25 @@
 # frozen_string_literal: true
 
-module Search::EverythingCombobox
-  class Component < ApplicationComponent
-    API_URL = "/api/autocomplete"
+module Search
+  module EverythingCombobox
+    class Component < ApplicationComponent
+      API_URL = "/api/autocomplete"
 
-    def initialize(selected_query_items_options:, query:, search_obj_name: nil)
-      @opt_vals = opt_vals_for(selected_query_items_options)
-      @query = query
-      @search_obj_name = search_obj_name
-    end
+      def initialize(selected_query_items_options:, query:, search_obj_name: nil)
+        @opt_vals = opt_vals_for(selected_query_items_options)
+        @query = query
+        @search_obj_name = search_obj_name
+      end
 
-    private
+      private
 
-    def opt_vals_for(selected_query_items_options)
-      selected_query_items_options.map do |item|
-        if item.is_a?(String)
-          [item, item]
-        else
-          [item["text"], item["search_id"]]
+      def opt_vals_for(selected_query_items_options)
+        selected_query_items_options.map do |item|
+          if item.is_a?(String)
+            [item, item]
+          else
+            [item["text"], item["search_id"]]
+          end
         end
       end
     end

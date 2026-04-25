@@ -4,7 +4,7 @@
 
 <div class="mb-4"></div>
 
-<% bike_search_settings = Org::BikeSearchSettings::Component.new(
+<% registration_search_settings = Org::RegistrationSearchSettings::Component.new(
   organization: current_organization,
   interpreted_params: @interpreted_params,
   sortable_search_params:,
@@ -22,9 +22,9 @@
 ).compact %>
 
 <div
-  class="org-bikes-search-component"
+  class="org-registration-search-component"
   data-controller="org--registration-search org--registration-search-column-toggle"
-  data-org--registration-search-column-toggle-default-columns-value="<%= bike_search_settings.initially_checked_columns.to_json %>"
+  data-org--registration-search-column-toggle-default-columns-value="<%= registration_search_settings.initially_checked_columns.to_json %>"
   data-org--registration-search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
 >
   <div class="mb-4">
@@ -32,7 +32,7 @@
       target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
       target_frame: :organized_bikes_results_frame,
       interpreted_params: form_interpreted_params,
-      settings_component: bike_search_settings
+      settings_component: registration_search_settings
     )) do %>
       <% if @bike_sticker.present? %>
         <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>

@@ -1,5 +1,5 @@
 {
-  "setup": "bin/setup",
+  "setup": "bin/setup --without_seeds && bin/fix_structure",
   "server": "bin/dev",
   "teardown": "bin/conductor_teardown"
 }

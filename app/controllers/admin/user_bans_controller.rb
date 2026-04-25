@@ -1,36 +1,38 @@
-class Admin::UserBansController < Admin::BaseController
-  include SortableTable
+module Admin
+  class UserBansController < Admin::BaseController
+    include Binxtils::SortableTable
 
-  def index
-    @per_page = permitted_per_page(default: 50)
-    @pagy, @collection = pagy(:countish,
-      matching_user_bans.includes(:user, :creator).reorder("user_bans.#{sort_column} #{sort_direction}"),
-      limit: @per_page,
-      page: permitted_page)
-  end
-
-  helper_method :matching_user_bans
-
-  protected
-
-  def sortable_columns
-    %w[created_at reason user_id creator_id]
-  end
-
-  def earliest_period_date
-    Time.at(1665173442) # 2022-10-01 00:00 - user ban model added
-  end
-
-  def viewing_deleted?
-  end
-
-  def matching_user_bans
-    user_bans = search_deleted_scope(UserBan.all)
-
-    if params[:user_id].present?
-      user_bans = user_bans.where(creator_id: user_subject&.id || params[:user_id])
+    def index
+      @per_page = permitted_per_page(default: 50)
+      @pagy, @collection = pagy(:countish,
+        matching_user_bans.includes(:user, :creator).reorder("user_bans.#{sort_column} #{sort_direction}"),
+        limit: @per_page,
+        page: permitted_page)
     end
 
-    user_bans.where(created_at: @time_range)
+    helper_method :matching_user_bans
+
+    protected
+
+    def sortable_columns
+      %w[created_at reason user_id creator_id]
+    end
+
+    def earliest_period_date
+      Time.at(1665173442) # 2022-10-01 00:00 - user ban model added
+    end
+
+    def viewing_deleted?
+    end
+
+    def matching_user_bans
+      user_bans = search_deleted_scope(UserBan.all)
+
+      if params[:user_id].present?
+        user_bans = user_bans.where(creator_id: user_subject&.id || params[:user_id])
+      end
+
+      user_bans.where(created_at: @time_range)
+    end
   end
 end

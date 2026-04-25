@@ -1,0 +1,240 @@
+<%= tag.div(class: "org-registration-search-component", data: component_wrapper_data_attributes) do %>
+  <% if @skip_search_and_filters %>
+    <%= render(settings_component) unless @skip_settings %>
+  <% else %>
+    <div class="mb-4">
+      <%= render(Search::FormOrganized::Component.new(
+        target_search_path: organization_registrations_path(organization_id: @organization.to_param),
+        interpreted_params: @interpreted_params,
+        settings_component: @skip_settings ? nil : settings_component
+      )) %>
+    </div>
+  <% end %>
+
+  <% unless @skip_count %>
+    <div class="tw:mt-4 tw:flex tw:items-baseline tw:justify-between">
+      <p class="tw:mb-0">
+        <% bikes_count = number_display(@pagy.count) %>
+
+        <% if show_search_query_summary? %>
+          <%= translation(".matching_bikes_html",
+            count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count)) %>
+        <% else %>
+          <%= translation(".registered_bikes_html",
+            count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count),
+            org_name: @organization.short_name) %>
+        <% end %>
+
+        <% if active_search_filter_descriptions.any? %>
+          <em>— <%= safe_join(active_search_filter_descriptions, " · ") %></em>
+        <% end %>
+
+        <em><%= helpers.humanized_time_range(@time_range) %></em>
+      </p>
+    </div>
+  <% end %>
+
+  <% unless @skip_search_and_filters %>
+    <% if @model_audit.present? %>
+      <p class="mt-0">
+        <%= translation(".e_vehicles_for_audit") %>
+        <a class="gray-link" href="<%= organization_model_audit_path(@model_audit.to_param, organization_id: @organization.to_param) %>"><%= model_audit_display(@model_audit) %></a>
+        &nbsp;
+        <%= link_to translation(".view_matching_any_audit"),
+            url_for(@sortable_search_params.merge(search_model_audit_id: nil)),
+            class: "gray-link small" %>
+      </p>
+    <% end %>
+  <% end %>
+
+  <% organization = @organization %>
+  <% bike_sticker = @bike_sticker %>
+
+  <%= tag.div(data: table_wrapper_data_attributes) do %>
+    <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-bikes_3", render_sortable: true)) do |table| %>
+      <% table.column(label: translation(".url"), classes: "hideableColumn url_cell") do |bike| %>
+        <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
+          <%= bike.html_url %>
+        </code>
+      <% end %>
+
+      <% table.column(sortable: "id", label: translation(".registered"), classes: "hideableColumn created_at_cell") do |bike| %>
+        <a
+          class="twlink localizeTime"
+          href="<%= bike_path(bike, organization_id: organization.to_param) %>"
+          data-turbo-frame="_top"
+          aria-label="View bike"
+        >
+          <%= l bike.created_at, format: :convert_time %>
+        </a>
+      <% end %>
+
+      <% table.column(sortable: "updated_by_user_at", label: translation(".updated"), classes: "hideableColumn updated_at_cell") do |bike| %>
+        <small class="localizeTime">
+          <%= l bike.updated_by_user_fallback, format: :convert_time %>
+        </small>
+      <% end %>
+
+      <% table.column(label: translation(".stolen"), classes: "hideableColumn stolen_cell") do |bike| %>
+        <%= check_mark if bike.status_stolen? %>
+      <% end %>
+
+      <% table.column(label: translation(".serial"), classes: "hideableColumn serial_number_cell") do |bike| %>
+        <%= helpers.render_serial_display(bike, @current_user) %>
+      <% end %>
+
+      <% table.column(sortable: "propulsion_type", label: translation(".propulsion_type"), classes: "hideableColumn propulsion_type_cell") do |bike| %>
+        <span class="<%= 'tw:text-gray-400' if bike.propulsion_type == 'foot-pedal' %>">
+          <%= bike.propulsion_titleize %>
+        </span>
+      <% end %>
+
+      <% table.column(sortable: "cycle_type", label: translation(".vehicle_type"), classes: "hideableColumn cycle_type_cell") do |bike| %>
+        <span class="<%= 'tw:text-gray-400' if bike.cycle_type == 'bike' %>">
+          <%= bike.type_titleize %>
+        </span>
+      <% end %>
+
+      <% table.column(sortable: "mnfg_name", label: translation(".manufacturer"), classes: "hideableColumn manufacturer_cell") do |bike| %>
+        <%= bike.mnfg_name %>
+      <% end %>
+
+      <% table.column(sortable: "frame_model", label: translation(".model"), classes: "hideableColumn model_cell") do |bike| %>
+        <%= bike.frame_model %>
+      <% end %>
+
+      <% table.column(label: translation(".color"), classes: "hideableColumn color_cell") do |bike| %>
+        <span class="tw:text-gray-400">
+          <%= bike.frame_colors.join(", ") %>
+        </span>
+      <% end %>
+
+      <% table.column(sortable: "owner_email", label: translation(".sent_to"), classes: "hideableColumn owner_email_cell") do |bike| %>
+        <% if bike.email_visible_for?(organization) %>
+          <%= bike.owner_email %>
+          <small>
+            <%= link_to "\u{1F50E}", organization_registrations_path(organization_id: organization.to_param, search_email: bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
+          </small>
+        <% else %>
+          <em class="tw:text-gray-400"><%= translation(".email_hidden") %></em>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: translation(".source"), classes: "hideableColumn creation_description_cell") do |bike| %>
+        <% if bike.creation_description %>
+          <small class="tw:text-gray-400">
+            <%= helpers.origin_display(bike.creation_description) %>
+          </small>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: translation(".owner_name"), classes: "hideableColumn owner_name_cell") do |bike| %>
+        <% if bike.owner_name.present? %>
+          <em><%= bike.owner_name %></em>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: translation(".status_cell"), classes: "hideableColumn status_cell tw:text-xs") do |bike| %>
+        <%= helpers.status_display(bike.status_humanized_no_with_owner) %>
+      <% end %>
+
+      <% if organization.enabled?("registration_notes") %>
+        <% table.column(label: translation(".notes"), classes: "hideableColumn notes_cell tw:leading-none") do |bike| %>
+          <small>
+            <%= BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: organization.id)&.body %>
+          </small>
+        <% end %>
+      <% end %>
+
+      <% additional_registration_fields.each do |reg_field| %>
+        <% next if reg_field == "extra_registration_number" %>
+
+        <% table.column(label: column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell") do |bike| %>
+          <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
+
+          <% if bike_attr == "address" %>
+            <% if bike.valid_mailing_address? %>
+              <small>
+                <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(bike), visible_attribute: :street) %>
+              </small>
+            <% end %>
+          <% elsif bike_attr == "organization_affiliation" %>
+            <%= bike.organization_affiliation(organization)&.humanize %>
+          <% elsif bike_attr == "student_id" %>
+            <%= bike.student_id(organization)&.humanize %>
+          <% else %>
+            <%= bike.send(bike_attr) %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: translation(".secondary_number"), classes: "hideableColumn extra_registration_number_cell") do |bike| %>
+        <%= bike.extra_registration_number %>
+      <% end %>
+
+      <% if organization.enabled?("impound_bikes") %>
+        <% table.column(label: translation(".impound_id"), classes: "hideableColumn impound_id_cell") do |bike| %>
+          <% if bike.status_impounded? && bike.current_impound_record.present? %>
+            <%= number_display(bike.current_impound_record.id) %>
+          <% end %>
+        <% end %>
+        <% table.column(label: translation(".impounded"), classes: "hideableColumn impounded_cell") do |bike| %>
+          <% if bike.status_impounded? && bike.current_impound_record&.created_at&.present? %>
+            <small class="localizeTime">
+              <%= l bike.current_impound_record.created_at, format: :convert_time %>
+            </small>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% if @organization.enabled?("avery_export") %>
+        <% table.column(label: translation(".avery"), classes: "hideableColumn avery_cell") do |bike| %>
+          <%= check_mark if bike.avery_exportable? %>
+        <% end %>
+      <% end %>
+
+      <% if organization.enabled?("bike_stickers") %>
+        <% table.column(label: translation(".sticker"), classes: "hideableColumn sticker_cell tw:pt-0", header_classes: "tw:pt-1") do |bike| %>
+          <% bike.bike_stickers.each_with_index do |bs, index| %>
+            <% if bs.organization.present? && bs.organization_id == organization.id %>
+              <%= link_to bs.pretty_code, edit_organization_sticker_path(id: bs.code, organization_id: bs.organization&.to_param), class: "tw:text-xs tw:block tw:mt-1", data: {turbo_frame: "_top"} %>
+            <% else %>
+              <small class="tw:mt-1 tw:block tw:text-xs">
+                <%= bs.pretty_code %>
+              </small>
+            <% end %>
+          <% end %>
+        <% end %>
+        <% table.column(label: translation(".assign_bike_sticker"), classes: "assign_bike_sticker_cell tw:hidden") do |bike| %>
+          <small>
+            <a data-bike-id="<%= bike.id %>">
+              <%= t("components.org.registration_search.link_sticker") %>
+            </a>
+          </small>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if show_pagination? && !@skip_count %>
+    <div class="paginate-container paginate-container-bottom row">
+      <div class="col-md-8 mb-2 mt-4">
+        <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @params, size: :lg, data: {turbo_action: "advance"})) %>
+      </div>
+
+      <div class="col-md-4 text-right">
+        <%= select_tag :per_page_select,
+          options_for_select(
+            [10, 25, 50, 100].map { |i| ["#{i} #{cycle_type.pluralize(10)} per page", i] },
+            selected: @per_page
+          ),
+          class: "form-control d-inline-block",
+          style: "width: 100%; max-width: 15rem; margin-top:15px;",
+          data: {
+            org__registration_search_target: "perPage",
+            action: "change->org--registration-search#perPageChanged"
+          } %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

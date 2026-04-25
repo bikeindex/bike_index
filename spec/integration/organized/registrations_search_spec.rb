@@ -3,13 +3,13 @@
 require "rails_helper"
 
 RSpec.describe "Organized registrations search", :js, type: :system do
-  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:, created_at: 5.years.ago) }
   let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bikes_path) { "/o/#{organization.to_param}/registrations" }
 
-  let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "alice@example.com") }
-  let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "bob@example.com") }
+  let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "alice@example.com", created_at: 2.years.ago) }
+  let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "bob@example.com", created_at: 3.days.ago) }
 
   before do
     # Ensure gear types exist so bike show page doesn't write during readonly mode
@@ -33,6 +33,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     if find(settings_selector, visible: :all)["class"].include?("tw:hidden!")
       click_button "settings"
     end
+  end
+
+  def rendered_bike_ids
+    page.all("tbody tr a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
   end
 
   it "searches by email and serial" do
@@ -148,6 +152,42 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_current_path(/search_notes=red/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
     expect(page).to have_content("alice@example.com")
+
+    # filters by period and custom time range — 12 bikes total: bike1 (2.years.ago), bike2 (3.days.ago), 10 create_list (now)
+    visit bikes_path
+    expect(page).to have_css("table", wait: 10)
+    expect(page).to have_css("a.period-select-standard.active[data-period='all']")
+    expect(page).to have_text("12 registrations matching")
+
+    # "past year" excludes bike1 (2 years ago)
+    page.execute_script("document.querySelector(\"a.period-select-standard[data-period='year']\").click()")
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    expect(page).to have_css("a.period-select-standard.active[data-period='year']")
+    expect(page).to have_text("11 registrations matching")
+
+    # "past day" additionally excludes bike2 (3 days ago)
+    page.execute_script("document.querySelector(\"a.period-select-standard[data-period='day']\").click()")
+    expect(page).to have_current_path(/period=day/, wait: 10)
+    expect(page).to have_css("a.period-select-standard.active[data-period='day']")
+    expect(page).to have_text("10 registrations matching")
+
+    # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only
+    page.execute_script("document.getElementById('periodSelectCustom').click()")
+    start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
+    end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
+    page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
+    page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
+    page.execute_script("document.getElementById('updatePeriodSelectCustom').click()")
+    expect(page).to have_current_path(/period=custom/, wait: 10)
+    expect(page).to have_css("button#periodSelectCustom.active")
+    expect(rendered_bike_ids).to eq([bike2.id])
+
+    # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago)
+    visit "#{bikes_path}?search_email=bob@example.com&period=year"
+    expect(page).to have_css("table", wait: 10)
+    expect(page).to have_field("search_email", with: "bob@example.com")
+    expect(page).to have_css("a.period-select-standard.active[data-period='year']")
+    expect(rendered_bike_ids).to eq([bike2.id])
   end
 
   context "with stolen and impounded bikes" do
@@ -220,6 +260,32 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("th.serial_number_cell", visible: :visible)
       expect(page).to have_css("th.impounded_cell", visible: :visible)
+    end
+  end
+
+  context "multi serial search" do
+    let(:multi_serial_path) { "/o/#{organization.to_param}/registrations/multi_search" }
+
+    let!(:bike_a) { FactoryBot.create(:bike_organized, serial_number: "SERIAL111", creation_organization: organization) }
+    let!(:bike_b) { FactoryBot.create(:bike_organized, serial_number: "SERIAL222", creation_organization: organization) }
+    let!(:other_org_bike) { FactoryBot.create(:bike, serial_number: "SERIAL333") }
+
+    it "searches multiple serials and shows results" do
+      visit multi_serial_path
+
+      expect(page).to have_content(/multiple serial search/i)
+      expect(page).to have_css("[data-controller~='org--multi-serial-search']", wait: 5)
+
+      find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
+      click_button "Search serials"
+
+      # Chips update with results
+      expect(page).to have_css("#chip_2.tw\\:bg-gray-300", wait: 15)
+
+      # Results sorted by chip order, empty results removed
+      expect(page).to have_css(".multi-search-serial-result", count: 2)
+      expect(page).not_to have_content("No matches found")
+      expect(page).not_to have_content("SERIAL333")
     end
   end
 

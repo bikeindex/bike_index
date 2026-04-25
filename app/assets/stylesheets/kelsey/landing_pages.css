@@ -393,9 +393,10 @@
 }
 
 .kelsey_styles .le-tool-item img {
+  display: block;
   width: 80px;
   height: 80px;
-  margin-bottom: 1rem;
+  margin: 0 auto 1rem;
   object-fit: contain;
 }
 

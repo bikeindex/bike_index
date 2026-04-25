@@ -27,6 +27,20 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       page.execute_script("window.localStorage.clear()")
     end
 
+    def open_select2_dropdown
+      find(".select2-container").click
+      # Wait for select2 to load - production API can be slow in CI
+      expect(page).to have_no_content("Searching", wait: 10)
+      expect(page).to have_content("Registrations that are Black")
+    end
+
+    def select2_third_option
+      page.send_keys :arrow_down
+      page.send_keys :arrow_down
+      page.send_keys :arrow_down
+      page.send_keys :return
+    end
+
     def expect_count(kind_scope, value = :greater_than_zero)
       kind_scope_text = find("[data-count-target=\"#{kind_scope}\"]").text
       # Check that the text matches the pattern (\d+) and extract the number
@@ -66,15 +80,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
       find("label", text: "Stolen in search area").click
 
-      find(".select2-container").click
-      # Wait for select2 to load
-      expect(page).to have_content("Registrations that are Black", wait: 5)
-
-      page.send_keys :arrow_down
-      page.send_keys :arrow_down
-      page.send_keys :arrow_down
-
-      page.send_keys :return
+      open_select2_dropdown
+      select2_third_option
 
       # NOTE: Since this uses production data, values are consistent
       expect(find("#query_items", visible: false).value).to eq(["c_5"])
@@ -108,13 +115,43 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       # TODO: test for entering location: you, location: anywhere
     end
 
+    it "sanitizes XSS in autocomplete results" do
+      # Mock autocomplete API to return a payload that sets a DOM attribute if executed
+      page.execute_script(<<~JS)
+        var origAjax = $.ajax;
+        $.ajax = function(settings) {
+          if (settings.url && settings.url.includes('autocomplete')) {
+            var d = $.Deferred();
+            setTimeout(function() {
+              d.resolve({
+                matches: [{
+                  search_id: 'xss_test',
+                  text: '<img src=x onerror="document.body.dataset.xss=1">',
+                  category: 'colors',
+                  display: null
+                }]
+              });
+            }, 50);
+            return d.promise();
+          }
+          return origAjax.apply(this, arguments);
+        };
+      JS
+
+      find(".select2-container").click
+      expect(page).to have_css(".select2-results__option", wait: 5)
+
+      # Select the malicious option to also test selection rendering
+      find(".select2-results__option").click
+
+      expect(page.evaluate_script("document.body.dataset.xss")).to be_nil
+    end
+
     it "scrolls through paginated options" do
       visit(preview_path)
 
       expect(find("#query_items", visible: false).value).to be_blank
-      find(".select2-container").click
-
-      expect(page).to have_content("Registrations that are Black", wait: 5)
+      open_select2_dropdown
       # Scroll down, verify it loads more
       page.execute_script(<<-JS)
         const container = document.querySelector('.select2-results__options');
@@ -143,15 +180,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
         kind_scopes.each { |kind_scope| expect_count(kind_scope, 0) }
 
-        find(".select2-container").click
-        # Wait for select2 to load
-        expect(page).to have_content("Registrations that are Black", wait: 5)
-
-        page.send_keys :arrow_down
-        page.send_keys :arrow_down
-        page.send_keys :arrow_down
-
-        page.send_keys :return
+        open_select2_dropdown
+        select2_third_option
 
         # NOTE: Since this uses production data, values are consistent
         expect(find("#query_items", visible: false).value).to match_array(%w[v_9 c_5])

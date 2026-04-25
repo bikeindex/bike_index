@@ -149,8 +149,8 @@ GEM
     base64 (0.3.0)
     bcrypt (3.1.13)
     benchmark (0.5.0)
-    bigdecimal (4.0.1)
-    binxtils (0.1.0)
+    bigdecimal (4.1.1)
+    binxtils (0.3.2)
       activerecord
       activesupport
       functionable
@@ -184,7 +184,7 @@ GEM
       marcel (~> 1.0.0)
       ssrf_filter (~> 1.0)
     cgi (0.5.1)
-    chartkick (5.2.0)
+    chartkick (5.2.1)
     chunky_png (1.4.0)
     coderay (1.1.3)
     coercible (1.0.0)
@@ -239,17 +239,17 @@ GEM
     dry-configurable (1.3.0)
       dry-core (~> 1.1)
       zeitwerk (~> 2.6)
-    dry-core (1.1.0)
+    dry-core (1.2.0)
       concurrent-ruby (~> 1.0)
       logger
       zeitwerk (~> 2.6)
-    dry-inflector (1.2.0)
+    dry-inflector (1.3.1)
     dry-logic (1.6.0)
       bigdecimal
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.1)
       zeitwerk (~> 2.6)
-    dry-types (1.9.0)
+    dry-types (1.9.1)
       bigdecimal (>= 3.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.0)
@@ -258,7 +258,7 @@ GEM
       zeitwerk (~> 2.6)
     dumb_delegator (1.1.0)
     equalizer (0.0.11)
-    erb (6.0.2)
+    erb (6.0.4)
     erubi (1.13.1)
     excon (0.76.0)
     execjs (2.7.0)
@@ -298,6 +298,7 @@ GEM
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
+    fiddle (1.1.8)
     flamegraph (0.9.5)
     flipper (1.3.6)
       concurrent-ruby (< 2)
@@ -330,12 +331,15 @@ GEM
     formatador (1.2.3)
       reline
     forwardable (1.4.0)
-    functionable (0.1.0)
-    geocoder (1.8.5)
+    functionable (1.2.0)
+    geocoder (1.8.6)
       base64 (>= 0.1.0)
       csv (>= 3.0.0)
-    gettext (3.3.7)
+    gettext (3.4.9)
+      erubi
       locale (>= 2.0.5)
+      prime
+      racc
       text (>= 1.3.0)
     globalid (1.3.0)
       activesupport (>= 6.1)
@@ -345,8 +349,8 @@ GEM
     google-protobuf (4.34.0-x86_64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
-    grape (3.0.1)
-      activesupport (>= 7.0)
+    grape (3.1.1)
+      activesupport (>= 7.1)
       dry-configurable
       dry-types (>= 1.1)
       mustermann-grape (~> 1.1.0)
@@ -458,7 +462,8 @@ GEM
       logger
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    locale (2.1.3)
+    locale (2.1.5)
+      fiddle
     logger (1.7.0)
     lograge (0.14.0)
       actionpack (>= 4)
@@ -503,7 +508,7 @@ GEM
     mini_magick (5.3.1)
       logger
     mini_mime (1.1.5)
-    minitest (6.0.2)
+    minitest (6.0.4)
       drb (~> 2.0)
       prism (~> 1.5)
     monetize (1.12.0)
@@ -672,9 +677,9 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
-    reactionview (0.1.6)
+    reactionview (0.3.0)
       actionview (>= 7.0)
-      herb (>= 0.7.5, < 1.0.0)
+      herb (>= 0.9.0, < 1.0.0)
     redcarpet (3.6.1)
     redis (5.4.1)
       redis-client (>= 0.22.0)
@@ -838,8 +843,8 @@ GEM
     thread_safe (0.3.6)
     tilt (2.7.0)
     timeout (0.6.1)
-    translation (1.26)
-      gettext (~> 3.2, >= 3.2.5, <= 3.3.7)
+    translation (1.41)
+      gettext (~> 3.2, >= 3.2.5, <= 3.4.9)
     tsort (0.2.0)
     turbo-rails (2.0.11)
       actionpack (>= 6.0.0)
@@ -913,7 +918,7 @@ DEPENDENCIES
   axlsx (~> 3.0.0.pre)
   bcrypt
   benchmark
-  binxtils
+  binxtils (~> 0.3.2)
   bootsnap
   brakeman
   bullet

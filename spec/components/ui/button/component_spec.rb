@@ -34,6 +34,25 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with link color" do
+    let(:color) { :link }
+
+    it "renders link styles" do
+      html = component.to_html
+      expect(html).to include("tw:underline")
+      expect(html).to include("tw:text-blue-600")
+      expect(html).not_to include("tw:bg-blue-600")
+    end
+
+    context "with non-default size" do
+      let(:size) { :lg }
+
+      it "raises ArgumentError" do
+        expect { instance }.to raise_error(ArgumentError, /size is not supported for link color/)
+      end
+    end
+  end
+
   context "with invalid color" do
     let(:color) { :invalid }
 
@@ -84,10 +103,10 @@ RSpec.describe UI::Button::Component, type: :component do
   end
 
   context "with data attributes" do
-    let(:options) { {text: "Click", data: {action: "click->modal#open"}} }
+    let(:options) { {text: "Click", data: {action: "click->ui--modal#open"}} }
 
     it "renders data attributes" do
-      expect(component).to have_css("button[data-action='click->modal#open']")
+      expect(component).to have_css("button[data-action='click->ui--modal#open']")
     end
   end
 end

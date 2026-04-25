@@ -3,6 +3,7 @@
 
 module ControllerHelpers
   extend ActiveSupport::Concern
+  include Binxtils::ControllerNamespace
 
   # Include port in auth cookie key to prevent collisions across dev workspaces,
   # matching the session store key pattern in config/initializers/session_store.rb
@@ -11,7 +12,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
-      :controller_namespace, :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
+      :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency
     before_action :enable_rack_profiler
 
@@ -245,14 +246,6 @@ module ControllerHelpers
 
     scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
     I18n.t(key, **kwargs, scope: scope.compact)
-  end
-
-  def controller_namespace
-    return @controller_namespace if defined?(@controller_namespace)
-
-    @controller_namespace = if self.class.module_parent.name != "Object"
-      self.class.module_parent.name.underscore.downcase
-    end
   end
 
   # This is overridden in FeedbacksController and InfoController

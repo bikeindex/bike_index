@@ -1613,6 +1613,24 @@ en:
           serial: 'Serial:'
           stolen_at: 'Stolen at:'
           stolen_from: 'Stolen from:'
+    form:
+      legacy_form_well:
+        address_record:
+          address: Street address
+          address_no_street: Address
+          address_or_intersection: Address or intersection
+          address_school: Campus mailing address
+          choose_country: Choose country
+          city: City
+          postal_code: Postal Code
+          region: Region / Province
+          state: State
+          street_2: Street address line 2 (optional)
+          where_was_it_status: Where was it %{bike_status}?
+          your_full_address_is_required: Your full address is required by %{org_name}
+        address_record_with_default:
+          edit_my_account_path: edit on my account
+          use_account_address: Use account address
     org:
       impound_records_index:
         matching_impound_record:
@@ -1880,6 +1898,9 @@ en:
           successfully_created: Parking Notification for %{bike_type} created
           unable_to_create: Unable to create - %{errors}
       stickers:
+        ensure_sticker_for_current_organization:
+          not_your_organizations_sticker: Sticker %{bike_sticker} isn't your organization's
+            sticker.
         find_bike_sticker:
           unable_to_find_sticker: 'Unable to find sticker with code: %{bike_sticker}.'
         update:
@@ -3769,50 +3790,6 @@ en:
         rides a bicycle, in any capacity. Bike Index is a community-driven effort
         in recovering lost and stolen bikes. No matter the type of bike or cyclist,
         we want to keep all bikes rolling with the owners that need them.
-    for_law_enforcement:
-      automated_tweets: automated tweets
-      bend_reduces_bike_theft_by_60_percent: Bend reduces bike theft by 60 percent
-      bike_index_for_law_enforcement: Bike Index for Law Enforcement
-      bike_index_organization_impounding: Impounding bikes with Bike Index
-      calgary_doubles: Calgary doubles bike recovery rate with Bike Index
-      check_out: Check out our
-      embed_a_bike_index_registration_form: Embed a bike registration form on your
-        website
-      here: here
-      if_you_want_to_collaborate_html: >-
-        If you want to collaborate with other departments in your city to manage a
-        registry, learn more about Bike Index for municipalities %{link}.
-      is_your_department_equipped_to_fight_bike: >-
-        Is your department equipped to fight bike theft? Bike Index can help you get
-        bikes back into the right hands.
-      law_enforcement_deck: law enforcement partner deck
-      local_ambassadors: local ambassadors
-      our_extensive_archive_has_helped_officers: >-
-        Our extensive archive has helped officers recover bikes involved in criminal
-        situations, from simple theft to chop shops, drug houses - even fencing rings
-        and online black markets.
-      put_a_lock_on_bike_theft: Put a lock on bike theft
-      recover_your_citizens_bikes: Recover your citizen's bikes
-      related_articles: 'Related articles:'
-      sign_up_for_free: Sign up for free
-      trusted_by_law_enforcement_everywhere: Trusted by law enforcement everywhere
-      used_by_law_enforcement_everywhere: Used by law enforcement everywhere
-      with_over_600_partnerships_html: >-
-        With %{organization_counts} partnerships, Bike Index is the industry leader
-        in bicycle registration. Join our network for free %{link}, or ask us to put
-        you in touch with an existing partner in law enforcement.
-      with_over_registrations_and_almost: >-
-        With over %{registrations} registrations and %{stolen_recoveries} stolen bicycle
-        recoveries, we know how to help.
-      you_have_the_authority_to_bring_html: >-
-        You have the authority to bring bikes back - that’s no small responsibility.
-        That’s why we have tools - such as our integration with LeadsOnline and %{automated_tweets_link}
-        of stolen bikes - to keep your community safe. Connect with %{local_ambassadors_link}
-        and spotters to quickly confiscate and block sales of stolen bikes.
-      youre_the_first_one: >-
-        You're the first one your citizens look to when their bikes are stolen. Access
-        and search our international database to return your community's bikes to
-        their rightful owners.
     packages_list:
       forever: Forever
       free: Free
@@ -5205,7 +5182,7 @@ en:
       manage_impounding: Manage impounding
       manage_users: Manage users
       model_audits: E-Vehicle audits
-      multi_serial_search: Multi serial search
+      multi_search: Multi search
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locations"
