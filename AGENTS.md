@@ -109,6 +109,10 @@ This project also uses the ViewComponent gem to render components.
 - In ViewComponent templates, use `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`).
   - You don't need to prefix paths (e.g. do `new_bike_path` NOT `helpers.new_bike_path`)
 
+## Pull requests
+
+- To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, the `gh` CLI **cannot upload images** — use the `github-upload-image-to-pr` skill, which drives a real browser to GitHub's user-attachments uploader.
+
 ## Architecture notes
 
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
