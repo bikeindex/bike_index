@@ -68,6 +68,14 @@ module UI
         @thousands = thousands
         @colors = colors || COLORS
       end
+
+      def call
+        helpers.column_chart @series,
+          stacked: @stacked,
+          thousands: @thousands,
+          colors: @colors,
+          xtitle: ::Time.zone.now.strftime("Times in %Z")
+      end
     end
   end
 end
