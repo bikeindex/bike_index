@@ -33,7 +33,7 @@
 
   = column_chart feedback_counts, stacked: true, thousands: ",", colors: colors
 
-= render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
+= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 - if @render_kind_counts
   .row.mt-4.mb-4

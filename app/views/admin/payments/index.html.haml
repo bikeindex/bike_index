@@ -73,7 +73,7 @@
   = column_chart payments_counts_nozero.reject { |c| c[:count] < 1 }.map { |c| {name: c[:name], data: c[:data_money]} }, stacked: true, thousands: ",", prefix: "$", round: 2
 
 .mt-4.mb-4
-  = render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
+  = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 .row.mb-4
   .col-sm

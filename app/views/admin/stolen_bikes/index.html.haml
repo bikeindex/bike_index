@@ -28,7 +28,7 @@
         Date stolen
     = column_chart time_range_counts(collection: available_stolen_records, column: time_range_column), stacked: true, thousands: ","
 
-= render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
+= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 - unless @only_without_location
   = form_tag admin_stolen_bikes_path, method: :get do

@@ -63,7 +63,7 @@
                   = number_with_delimiter(number)
 
 .mt-4.mb-4
-  = render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
+  = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 = render_admin_pagination_with_count(collection: @impound_records, count: matching_impound_records.size)
 

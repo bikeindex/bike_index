@@ -33,7 +33,7 @@
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_user_registration_organizations, column: @time_range_column), stacked: true, thousands: ","
-= render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
+= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 = render_admin_pagination_with_count(collection: @user_registration_organizations, count: matching_user_registration_organizations.size)
 

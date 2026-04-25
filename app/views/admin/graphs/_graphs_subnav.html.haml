@@ -23,4 +23,4 @@
 
   - if !["general", ""].include?(@kind) # General and location tables don't have period select :/
     .col-12.mt-4
-      = render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
+      = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)

@@ -114,7 +114,7 @@
   <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
 <% end %>
 
-<%= render PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
+<%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
 
 <% unless admin_nav_display_view_all %>
   <p>
