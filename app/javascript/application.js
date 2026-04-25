@@ -19,13 +19,11 @@ window.Stimulus = application
 lazyLoadControllersFrom('controllers', application)
 
 function localizeTime () {
+  // TimeLocalizer's constructor writes the timezone cookie so the server
+  // can bucket charts in the user's local timezone (Binxtils::SetPeriod
+  // reads the cookie in set_timezone).
   if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
   window.timeLocalizer.localize()
-
-  // Set timezone cookie so server-side charts use the correct timezone
-  if (window.localTimezone && document.cookie.indexOf('timezone=' + window.localTimezone) === -1) {
-    document.cookie = 'timezone=' + window.localTimezone + ';path=/;max-age=31536000;SameSite=Lax'
-  }
 }
 
 // Load honeybadger dynamically so ad blockers don't break the entire app

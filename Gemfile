@@ -68,7 +68,7 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 gem "rqrcode", "3.2.0" # QR Code image generator
 
 # Functionality extensions
-gem "binxtils", "~> 0.3.2" # Bike Index utilities
+gem "binxtils", git: "https://github.com/bikeindex/binxtils.git", branch: "claude/timezone-cookie-storage-vDTLn" # Bike Index utilities — TODO: revert to released version after PR #13 ships
 gem "functionable" # Functional modules
 gem "flipper" # Feature flagging
 gem "flipper-active_record" # Feature flagging
