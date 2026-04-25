@@ -145,5 +145,13 @@ RSpec.describe PrimaryActivity, type: :model do
 
       expect(described_class.friendly_find_id_and_family_ids("dafdsfasdf")).to eq([])
     end
+
+    context "string with null byte" do
+      it "does not raise" do
+        expect(described_class.friendly_find_id_and_family_ids("1\u0000xxx")).to eq([])
+        expect(described_class.friendly_find_id_and_family_ids("#{primary_activity_family.id}\u0000"))
+          .to eq([primary_activity_family.id, family_ids])
+      end
+    end
   end
 end

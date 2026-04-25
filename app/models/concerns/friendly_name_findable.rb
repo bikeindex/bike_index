@@ -24,7 +24,9 @@ module FriendlyNameFindable
     end
 
     def strip_if_str!(str)
-      str.strip! if str.is_a?(String) && !str.frozen?
+      return unless str.is_a?(String) && !str.frozen?
+      str.delete!("\u0000")
+      str.strip!
     end
   end
 end
