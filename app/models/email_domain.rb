@@ -18,7 +18,8 @@
 #
 # Indexes
 #
-#  index_email_domains_on_creator_id  (creator_id)
+#  index_email_domains_on_creator_id   (creator_id)
+#  index_email_domains_on_domain_trgm  (domain) USING gin
 #
 class EmailDomain < ApplicationRecord
   include StatusHumanizable
