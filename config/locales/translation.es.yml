@@ -4630,6 +4630,19 @@ es:
       definition_list:
         row:
           no_value:
+      period_select:
+        all:
+        custom:
+        day:
+        from:
+        hour:
+        next:
+        past:
+        seven_days:
+        thirty_days:
+        to:
+        update:
+        year:
     org:
       location_address_fields:
         address:

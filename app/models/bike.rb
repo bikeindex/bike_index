@@ -72,6 +72,7 @@
 #
 # Indexes
 #
+#  index_bikes_current_listing_order         (listing_order) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
 #  index_bikes_on_address_record_id          (address_record_id) WHERE (address_record_id IS NOT NULL)
 #  index_bikes_on_creation_organization_id   (creation_organization_id) WHERE (creation_organization_id IS NOT NULL)
 #  index_bikes_on_current_impound_record_id  (current_impound_record_id) WHERE (current_impound_record_id IS NOT NULL)
@@ -85,6 +86,7 @@
 #  index_bikes_on_lower_mnfg_name            (lower((mnfg_name)::text))
 #  index_bikes_on_manufacturer_id            (manufacturer_id)
 #  index_bikes_on_model_audit_id             (model_audit_id) WHERE (model_audit_id IS NOT NULL)
+#  index_bikes_on_owner_email_trgm           (owner_email) USING gin
 #  index_bikes_on_paint_id                   (paint_id) WHERE (paint_id IS NOT NULL)
 #  index_bikes_on_primary_activity_id        (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
 #  index_bikes_on_primary_frame_color_id     (primary_frame_color_id)

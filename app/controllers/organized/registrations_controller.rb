@@ -5,6 +5,7 @@ module Organized
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
 
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response, :multi_search_sticker_response]
+    around_action :set_reading_role, only: [:multi_search_response, :multi_search_sticker_response]
 
     def index
       set_period

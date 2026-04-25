@@ -45,7 +45,7 @@ module LogSearcher
       endpoint = parse_endpoint(opts)
       return nil unless LoggedSearch.endpoints_sym.include?(endpoint)
 
-      query_items = (opts["params"] || {}).select { |_, value| value.present? }
+      query_items = scrub_null_bytes(opts["params"] || {}).select { |_, value| value.present? }
       if query_items["search_secondary"].present? && query_items["search_secondary"].is_a?(Array) &&
           query_items["search_secondary"].reject(&:blank?).none?
 
@@ -99,6 +99,15 @@ module LogSearcher
       Time.parse("#{time_str} UTC")
     end
 
+    def scrub_null_bytes(value)
+      case value
+      when String then value.delete("\u0000")
+      when Array then value.map { |v| scrub_null_bytes(v) }
+      when Hash then value.transform_values { |v| scrub_null_bytes(v) }
+      else value
+      end
+    end
+
     def stolenness_for(endpoint, opts)
       if endpoint == :api_v2_bikes
         case opts["path"]
@@ -127,6 +136,6 @@ module LogSearcher
       end
     end
 
-    conceal :includes_query?, :parse_endpoint, :organization_from_params, :parse_request_time, :stolenness_for
+    conceal :includes_query?, :parse_endpoint, :organization_from_params, :parse_request_time, :scrub_null_bytes, :stolenness_for
   end
 end

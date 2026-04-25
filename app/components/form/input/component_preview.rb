@@ -15,6 +15,10 @@ module Form
       def email_field
         {template: "form/input/component_preview/email_field"}
       end
+
+      def datetime_local_field
+        {template: "form/input/component_preview/datetime_local_field"}
+      end
       # @!endgroup
     end
   end
