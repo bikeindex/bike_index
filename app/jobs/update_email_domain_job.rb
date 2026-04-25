@@ -57,7 +57,7 @@ class UpdateEmailDomainJob < ScheduledJob
   private
 
   def enqueue_workers
-    EmailDomain.pluck(:id).each_with_index do |id, inx|
+    EmailDomain.order(:id).pluck(:id).each_with_index do |id, inx|
       self.class.perform_in(STAGGER_INTERVAL * inx, id)
     end
   end

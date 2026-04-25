@@ -5,6 +5,7 @@ module Organized
     before_action :ensure_access_to_graduated_notifications!
 
     before_action :find_graduated_notification, except: [:index]
+    around_action :set_reading_role, only: :index
 
     def index
       @per_page = permitted_per_page
