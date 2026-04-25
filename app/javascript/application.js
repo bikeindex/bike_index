@@ -23,9 +23,8 @@ function localizeTime () {
   window.timeLocalizer.localize()
 
   // Set timezone cookie so server-side charts use the correct timezone
-  const timezone = window.localTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone
-  if (timezone && document.cookie.indexOf('timezone=' + timezone) === -1) {
-    document.cookie = 'timezone=' + timezone + ';path=/;max-age=31536000;SameSite=Lax'
+  if (window.localTimezone && document.cookie.indexOf('timezone=' + window.localTimezone) === -1) {
+    document.cookie = 'timezone=' + window.localTimezone + ';path=/;max-age=31536000;SameSite=Lax'
   }
 }
 
