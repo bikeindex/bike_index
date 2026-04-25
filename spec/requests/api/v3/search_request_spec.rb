@@ -193,6 +193,8 @@ RSpec.describe "Search API V3", type: :request do
   end
 
   describe "/count" do
+    before { Rails.cache.clear }
+
     context "incorrect stolenness value" do
       it "returns an error message" do
         get "/api/v3/search/count", params: {stolenness: "something else", format: :json}
