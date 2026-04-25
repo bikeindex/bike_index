@@ -19,9 +19,6 @@ window.Stimulus = application
 lazyLoadControllersFrom('controllers', application)
 
 function localizeTime () {
-  // TimeLocalizer's constructor writes the timezone cookie so the server
-  // can bucket charts in the user's local timezone (Binxtils::SetPeriod
-  // reads the cookie in set_timezone).
   if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
   window.timeLocalizer.localize()
 }

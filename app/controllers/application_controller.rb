@@ -96,10 +96,7 @@ class ApplicationController < ActionController::Base
       # If it's a valid timezone, save to session
       session[:timezone] = timezone&.name
     end
-    # Set the timezone on a per request basis if we have a timezone saved.
-    # The cookie fallback lives in Binxtils::SetPeriod#set_timezone, so it
-    # only applies to controllers that include SetPeriod — which is fine,
-    # since that's where charts (and groupdate) render.
+    # Set the timezone on a per request basis if we have a timezone saved
     if session[:timezone].present?
       Time.zone = timezone || Binxtils::TimeZoneParser.parse(session[:timezone])
     end

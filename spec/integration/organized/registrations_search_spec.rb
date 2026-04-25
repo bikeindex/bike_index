@@ -171,8 +171,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("a.period-select-standard.active[data-period='day']")
     expect(page).to have_text("10 registrations matching")
 
-    # TimeLocalizer's constructor writes a timezone cookie from window.localTimezone.
-    # Binxtils::SetPeriod#set_timezone reads it and uses it to bucket chart data via groupdate.
+    # JS (application.js + TimeLocalizer) sets a timezone cookie from window.localTimezone.
+    # The server reads it in set_locale and uses it to bucket chart data via groupdate.
     # Run this before the custom period click below — that submission posts a timezone
     # param, which gets persisted in session[:timezone] and overrides the cookie.
     expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to be_present
