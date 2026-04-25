@@ -917,7 +917,7 @@ DEPENDENCIES
   axlsx (~> 3.0.0.pre)
   bcrypt
   benchmark
-  binxtils (~> 0.4.1)
+  binxtils
   bootsnap
   brakeman
   bullet
