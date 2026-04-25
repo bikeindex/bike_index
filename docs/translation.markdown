@@ -1,5 +1,5 @@
 Translation / Localization
-====================
+==========================
 
 **Table of Contents**
 
