@@ -36,7 +36,7 @@ This project uses the ViewComponent gem to render components.
 
 - **Prefer view components to partials.**
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
-- View components must initialize with **keyword arguments**.
+- View components must initialize with **keyword arguments**. Everything the component needs must be passed in explicitly by the caller — never reach into controller state from inside a component (e.g. `controller.instance_variable_get(:@bike)`). If the component needs `@bike`, the caller renders `Component.new(bike: @bike)`.
 - In view components, **prefer instance variables to `attr_accessor`**.
 - In ViewComponent templates, use the `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`).
   - You don't need to prefix paths (e.g. do `new_bike_path`, NOT `helpers.new_bike_path`).
