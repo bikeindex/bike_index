@@ -1,6 +1,8 @@
 class StolenBikeListingsController < ApplicationController
   include Binxtils::SortableTable
 
+  around_action :set_reading_role
+
   def index
     @render_info = calculated_render_info
     if @render_info

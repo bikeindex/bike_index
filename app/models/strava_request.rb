@@ -20,8 +20,10 @@
 #
 # Indexes
 #
+#  index_strava_requests_on_requested_at_with_rate_limit            (requested_at) WHERE (rate_limit IS NOT NULL)
 #  index_strava_requests_on_strava_integration_id_and_requested_at  (strava_integration_id,requested_at)
 #  index_strava_requests_on_user_id                                 (user_id)
+#  index_strava_requests_pending_on_integration_id_request_type     (strava_integration_id,request_type) WHERE (response_status = 0)
 #
 class StravaRequest < AnalyticsRecord
   REQUEST_TYPE_ENUM = {
