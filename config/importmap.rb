@@ -8,8 +8,7 @@ pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 # pin "flowbite", to: "https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.turbo.min.js"
 pin "luxon", to: "https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/es6/luxon.js"
-# TODO: revert to npm version after binxtils PR #13 is released
-pin "@bikeindex/time-localizer", to: "https://cdn.jsdelivr.net/gh/bikeindex/binxtils@309c2f2c302a6613d67dc1b781c48dd570f49e7b/index.js"
+pin "@bikeindex/time-localizer", to: "https://cdn.jsdelivr.net/npm/@bikeindex/time-localizer@0.2.1/dist/index.js"
 pin "@floating-ui/dom", to: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.3/+esm"
 
 # jQuery is required for select2, which is used by search. It should not be used!

@@ -1,15 +1,4 @@
 GIT
-  remote: https://github.com/bikeindex/binxtils.git
-  revision: 309c2f2c302a6613d67dc1b781c48dd570f49e7b
-  branch: claude/timezone-cookie-storage-vDTLn
-  specs:
-    binxtils (0.4.0)
-      functionable
-      loofah
-      rails
-      rails-html-sanitizer
-
-GIT
   remote: https://github.com/bikeindex/carrierwave_backgrounder.git
   revision: 7b2b0e9bc43f2ec20f09db3fea7bbc5f167f52c7
   specs:
@@ -161,6 +150,11 @@ GEM
     bcrypt (3.1.13)
     benchmark (0.5.0)
     bigdecimal (4.1.1)
+    binxtils (0.4.1)
+      functionable
+      loofah
+      rails
+      rails-html-sanitizer
     bootsnap (1.18.6)
       msgpack (~> 1.2)
     brakeman (8.0.4)
@@ -923,7 +917,7 @@ DEPENDENCIES
   axlsx (~> 3.0.0.pre)
   bcrypt
   benchmark
-  binxtils!
+  binxtils (~> 0.4.1)
   bootsnap
   brakeman
   bullet
