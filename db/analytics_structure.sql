@@ -315,6 +315,13 @@ CREATE INDEX index_organization_statuses_on_organization_id ON public.organizati
 
 
 --
+-- Name: index_strava_requests_on_requested_at_with_rate_limit; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_strava_requests_on_requested_at_with_rate_limit ON public.strava_requests USING btree (requested_at DESC) WHERE (rate_limit IS NOT NULL);
+
+
+--
 -- Name: index_strava_requests_on_strava_integration_id_and_requested_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -326,6 +333,13 @@ CREATE INDEX index_strava_requests_on_strava_integration_id_and_requested_at ON 
 --
 
 CREATE INDEX index_strava_requests_on_user_id ON public.strava_requests USING btree (user_id);
+
+
+--
+-- Name: index_strava_requests_pending_on_integration_id_request_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_strava_requests_pending_on_integration_id_request_type ON public.strava_requests USING btree (strava_integration_id, request_type) WHERE (response_status = 0);
 
 
 --
@@ -342,6 +356,7 @@ CREATE INDEX index_versions_on_item_type_and_item_id ON public.versions USING bt
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260425121709'),
 ('20260318174948'),
 ('20260306001002'),
 ('20260303050228'),
