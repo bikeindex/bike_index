@@ -15,7 +15,7 @@
   </a>
 </div>
 
-<%= render partial: "/shared/period_select" %>
+<%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
 
 <%= render(Org::ImpoundRecordsIndex::Component.new(
   pagy: @pagy,

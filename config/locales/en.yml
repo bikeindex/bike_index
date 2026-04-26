@@ -5223,19 +5223,6 @@ en:
       viewing_our_streamlined_page: >-
         You're currently viewing our streamlined Bike Shop registration page, which
         is what we recommend using
-    period_select:
-      all: All
-      custom: custom
-      day: day
-      from: From
-      hour: hour
-      next: next
-      past: past
-      seven_days: 7 days
-      thirty_days: 30 days
-      to: To
-      update: Update
-      year: year
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}

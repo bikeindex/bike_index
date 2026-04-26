@@ -1,6 +1,6 @@
 <%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
 
-<%= render partial: "/shared/period_select" %>
+<%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
 
 <div class="tw:mt-2 tw:text-right">
   <%= link_to t(".render_chart", default: "Render chart"),
