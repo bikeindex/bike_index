@@ -201,7 +201,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
     page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
     page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
-    page.execute_script("document.querySelector(\"#timeSelectionCustom button[type='submit']\").click()")
+    page.execute_script("document.querySelector(\"[data-controller~='ui--period-select'] button[type='submit']\").click()")
     expect(page).to have_current_path(/period=custom/, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
 

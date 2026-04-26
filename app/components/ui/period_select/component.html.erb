@@ -34,7 +34,7 @@
     url: "#",
     method: :get,
     builder: BikeIndexFormBuilder,
-    html: {id: "timeSelectionCustom", class: custom_form_classes, "data-collapse-target": "content"}
+    html: {class: custom_form_classes, data: {collapse_target: "content", action: "submit->ui--period-select#submit"}}
   ) do |f| %>
     <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-3">
       <div class="tw:flex tw:items-center tw:gap-2">
