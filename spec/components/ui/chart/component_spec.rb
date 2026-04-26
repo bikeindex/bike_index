@@ -6,14 +6,16 @@ RSpec.describe UI::Chart::Component, type: :component do
   let(:time_range) { 1.week.ago..Time.current }
   let(:instance) { described_class.new(series: [{name: "Test", data: {}}], time_range:) }
 
-  it "renders with default colors and a timezone in the xtitle" do
+  it "renders with default colors and a timezone badge" do
     Time.zone = "America/Los_Angeles"
-    script_content = render_inline(instance).css("script").text
+    component = render_inline(instance)
+    script_content = component.css("script").text
     expect(script_content).to be_present
     described_class::COLORS.each do |color|
       expect(script_content).to include(color)
     end
-    expect(script_content).to include("Times in PDT")
+    expect(component.text).to include("PDT")
+    expect(component.css("[title]").to_html).to include("America/Los_Angeles")
   end
 
   context "with custom colors" do
