@@ -83,7 +83,7 @@ module Admin
 
       @time_range_column = sort_column if %w[date_stolen created_at].include?(sort_column)
       @time_range_column ||= "recovered_at"
-      recoveries.where(@time_range_column => @time_range)
+      recoveries.unscope(:order).where("stolen_records.#{@time_range_column}" => @time_range)
     end
 
     def permitted_parameters

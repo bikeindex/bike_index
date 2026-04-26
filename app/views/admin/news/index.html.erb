@@ -1,0 +1,57 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @search_kind == "all" ? "" : "active" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @search_kind == "all" %>
+        All kinds
+      <% else %>
+        <%= @search_kind.humanize %>
+        only
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All kinds", admin_news_index_path(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@search_kind == 'all' ? 'active' : ''}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% Blog.kinds.each do |kind| %>
+        <%= link_to "#{kind.humanize} only", admin_news_index_path(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@search_kind == kind ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "New Post", new_admin_news_url, class: "btn btn-success btn-sm" %>
+  </li>
+<% end %>
+
+<% table_view = capture do %>
+  <p>
+    <% count = available_blogs.count %>
+    <% count = count.keys.count if count.is_a?(Hash) %>
+    <%= number_with_delimiter(count) %> matching
+    <em><%= humanized_time_range(@time_range) %></em>
+    <% if @tags.present? %>
+      <span class="less-strong">
+        with tags: <%= @tags.pluck(:name).join(", ") %>
+      </span>
+    <% end %>
+  </p>
+
+  <%= render partial: "/admin/news/table", locals: {blogs: @blogs, skip_kind: @search_kind != "all"} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @blogs,
+  viewing: "News/Blogs/Info",
+  nav_header_list_items:,
+  table_view:,
+  chart_collection: @render_chart && available_blogs
+)) %>
