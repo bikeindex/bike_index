@@ -4647,6 +4647,9 @@ en:
         created: Created
         notification_number: Notification#
         resolved: Resolved
+    registrations:
+      search:
+        render_chart: Render chart
     stickers:
       edit:
         bike: Bike

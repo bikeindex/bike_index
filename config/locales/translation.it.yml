@@ -3963,6 +3963,9 @@ it:
       index:
         impound_records:
         render_chart:
+    registrations:
+      search:
+        render_chart:
   organized_mailer:
     custom_message:
       subject:

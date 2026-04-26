@@ -4999,6 +4999,9 @@ nb:
       index:
         impound_records: Beslaglegg poster
         render_chart: Gjengi diagram
+    registrations:
+      search:
+        render_chart: Gjengi diagram
   organized_mailer:
     custom_message:
       subject: "%{org_name} - plasseringen av din %{mnfg_name}"

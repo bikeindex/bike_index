@@ -4497,6 +4497,9 @@ nl:
       index:
         impound_records: Inbeslagnamegegevens
         render_chart: Rendergrafiek
+    registrations:
+      search:
+        render_chart: Rendergrafiek
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"

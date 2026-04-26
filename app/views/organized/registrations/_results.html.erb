@@ -1,3 +1,11 @@
+<% if @render_chart && @available_bikes.present? %>
+  <%= render(UI::Chart::Component.new(
+    series: time_range_counts(collection: @available_bikes.unscope(:order), column: "bikes.created_at"),
+    time_range: @time_range,
+    stacked: true
+  )) %>
+<% end %>
+
 <%= render(Org::RegistrationSearch::Component.new(
   organization: current_organization,
   current_user:,
