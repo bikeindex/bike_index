@@ -150,11 +150,10 @@ GEM
     bcrypt (3.1.13)
     benchmark (0.5.0)
     bigdecimal (4.1.1)
-    binxtils (0.3.2)
-      activerecord
-      activesupport
+    binxtils (0.4.1)
       functionable
       loofah
+      rails
       rails-html-sanitizer
     bootsnap (1.18.6)
       msgpack (~> 1.2)
@@ -918,7 +917,7 @@ DEPENDENCIES
   axlsx (~> 3.0.0.pre)
   bcrypt
   benchmark
-  binxtils (~> 0.3.2)
+  binxtils
   bootsnap
   brakeman
   bullet

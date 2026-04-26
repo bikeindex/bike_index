@@ -13,8 +13,12 @@ RSpec.describe GraphingHelper, type: :helper do
     end
     describe "time_range_counts" do
       let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 1, " 1:18 PM" => 0, " 1:19 PM" => 0} }
-      it "returns the thing with want" do
+      it "buckets in the current Time.zone" do
         expect(time_range_counts(collection: Payment.all)).to eq target_counts
+
+        Time.zone = "America/Los_Angeles"
+        expect(time_range_counts(collection: Payment.all))
+          .to eq({"11:16 AM" => 0, "11:17 AM" => 1, "11:18 AM" => 0, "11:19 AM" => 0})
       end
     end
     describe "time_range_counts" do
