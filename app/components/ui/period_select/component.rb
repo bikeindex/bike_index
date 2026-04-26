@@ -34,7 +34,7 @@ module UI
           size: :sm,
           active: @period == period_key,
           class: "period-select-standard",
-          data: {period: period_key, action: "click->ui--period-select#select"}
+          data: {period: period_key}
         )
       end
 

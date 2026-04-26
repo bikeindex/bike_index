@@ -1,21 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Preserves current URL params when navigating via a period link or the
-// custom-range form — period buttons are server-rendered, so their hrefs go
-// stale after turbo-stream search updates pushState new params (e.g. search_email).
+// Submits the custom-range form by rebuilding the URL from window.location so
+// non-period filters (e.g. search_email) survive — the form itself only carries
+// start_time_selector / end_time_selector, so a default GET would drop them.
 export default class extends Controller {
-  select (event) {
-    const link = event.currentTarget
-    if (!link.href) return
-    event.preventDefault()
-    const linkUrl = new URL(link.href, window.location.origin)
-    const newUrl = new URL(window.location.href)
-    linkUrl.searchParams.forEach((value, key) => {
-      newUrl.searchParams.set(key, value)
-    })
-    window.location.href = newUrl.pathname + newUrl.search
-  }
-
   submit (event) {
     event.preventDefault()
     const form = event.currentTarget
