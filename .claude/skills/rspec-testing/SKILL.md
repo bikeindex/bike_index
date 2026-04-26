@@ -21,6 +21,10 @@ This project uses RSpec. All business logic should be tested.
 - Avoid mocking objects.
   - If making external requests, use VCR. Don't manually write VCR cassettes — record them by running the tests.
 
+## Always fix failing tests
+
+Fix every failing test, even ones that were already failing on `main`. Confirming a failure pre-dates your branch (via `git stash` or checking out `main`) explains *what* broke — not whether you fix it. You fix it.
+
 ## Structuring with `context` and `let`
 
 Use `context` and `let` to isolate what varies between examples. Each `it` block should live in a `context` that names the condition, with `let` overrides for only what differs in that case. **Avoid repeating setup across sibling `it` blocks.**
