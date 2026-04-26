@@ -6,5 +6,6 @@
   },
   "enabledPlugins": {
     "example-skills@anthropic-agent-skills": true
-  }
+  },
+  "enabledMcpjsonServers": ["playwright"]
 }

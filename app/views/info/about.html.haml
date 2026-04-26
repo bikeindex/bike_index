@@ -1,5 +1,5 @@
-- bikes_count = number_with_precision(Bike.count.round(-3), precision: 0, delimiter: ",")
-- partners_count = number_with_precision(Organization.count.round(-1), precision: 0, delimiter: ",")
+- bikes_count = number_with_precision(Counts.total_bikes.round(-3), precision: 0, delimiter: ",")
+- partners_count = number_with_precision(Counts.organizations.round(-1), precision: 0, delimiter: ",")
 - nonprofit_blog_link = link_to(t(".nonprofit_status"), news_path("bike-index--now-a-nonprofit"))
 
 %h1= t(".about_bike_index")

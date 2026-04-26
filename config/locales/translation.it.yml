@@ -4712,6 +4712,19 @@ it:
       definition_list:
         row:
           no_value:
+      period_select:
+        all: Tutti
+        custom: personalizzato
+        day: giorno
+        from: Da
+        hour: ora
+        next: prossimo
+        past: passato
+        seven_days: 7 giorni
+        thirty_days: 30 giorni
+        to: A
+        update: Aggiorna
+        year: anno
     org:
       location_address_fields:
         address: Indirizzo
