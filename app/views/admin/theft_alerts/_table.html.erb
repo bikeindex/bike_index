@@ -1,0 +1,176 @@
+<% render_sortable ||= false %>
+<% skip_bike ||= false %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="small-header">
+      <tr>
+        <th><%= sortable "created_at", render_sortable: %></th>
+        <th><%= sortable "status", render_sortable: %></th>
+
+        <% unless skip_bike %>
+          <th>Bike</th>
+        <% end %>
+
+        <th>User</th>
+        <th><%= sortable "theft_alert_plan_id", "Plan", render_sortable: %></th>
+
+        <th>
+          <%= sortable "amount_cents_facebook_spent", "Fbook spent", render_sortable: %>
+        </th>
+
+        <th><%= sortable "start_at", "Start", render_sortable: %></th>
+        <th><%= sortable "end_at", render_sortable: %></th>
+
+        <% if display_dev_info? %>
+          <th class="only-dev-visible small">FB updated</th>
+          <th class="only-dev-visible small">FB objective</th>
+        <% end %>
+
+        <th><%= sortable "reach", render_sortable: %></th>
+        <th class="small">Clicks</th>
+        <th>City</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% theft_alerts.each do |theft_alert| %>
+        <tr>
+          <td>
+            <%= link_to l(theft_alert.created_at, format: :convert_time), edit_admin_theft_alert_path(theft_alert), class: "localizeTime" %>
+            <small class="less-strong"><%= theft_alert.id %></small>
+          </td>
+
+          <td>
+            <% if theft_alert.recovered? %>
+              <%= link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: "text-success" %>
+            <% end %>
+
+            <% if theft_alert.failed_to_activate? %>
+              <span class="text-danger">Failed activation!</span>
+            <% elsif theft_alert.activating? %>
+              <span class="text-success">activating!</span>
+            <% else %>
+              <% unless theft_alert.recovered? && theft_alert.inactive? %>
+                <span class="<%= theft_alert_status_class(theft_alert) %>">
+                  <%= theft_alert.status %>
+                </span>
+              <% end %>
+              <% if theft_alert.pending? %>
+                <% if theft_alert.activateable? %>
+                  <em class="small text-success">activateable</em>
+                <% else %>
+                  <em class="small d-block">
+                    <span class="text-danger">missing:</span>
+                    <% missing = [] %>
+                    <% missing << "photo" if theft_alert.missing_photo? %>
+                    <% missing << "location" if theft_alert.missing_location? %>
+                    <% missing << "payment" unless theft_alert.paid? %>
+                    <% missing << "approval" unless theft_alert.stolen_record_approved? %>
+
+                    <%= missing.join(", ") %>
+                  </em>
+                <% end %>
+              <% end %>
+            <% end %>
+          </td>
+
+          <% unless skip_bike %>
+            <td>
+              <%= render Admin::BikeCell::Component.new(bike: theft_alert.bike, bike_id: theft_alert.bike_id) %>
+            </td>
+          <% end %>
+
+          <td>
+            <%= cache(theft_alert.user) do %>
+              <%= render Admin::UserCell::Component.new(user: theft_alert.user, render_search: true, user_id: theft_alert.user_id) %>
+            <% end %>
+          </td>
+
+          <td>
+            <% theft_alert_plan = theft_alert.theft_alert_plan %>
+
+            <small>
+              <%= theft_alert.amount_facebook %>
+              <span class="less-strong"><%= theft_alert_plan.name %></span>
+            </small>
+          </td>
+
+          <td>
+            <% if theft_alert.amount_cents_facebook_spent.to_i > 0 %>
+              <%= theft_alert.amount_facebook_spent %>
+            <% end %>
+          </td>
+
+          <td>
+            <% if theft_alert.start_at.present? %>
+              <small class="localizeTime">
+                <%= l(theft_alert.start_at, format: :convert_time) %>
+              </small>
+            <% end %>
+          </td>
+
+          <td>
+            <% if theft_alert.end_at.present? %>
+              <small class="localizeTime">
+                <%= l(theft_alert.end_at, format: :convert_time) %>
+              </small>
+            <% end %>
+          </td>
+
+          <% if display_dev_info? %>
+            <td>
+              <% if theft_alert.facebook_updated_at.present? %>
+                <small class="localizeTime">
+                  <%= l theft_alert.facebook_updated_at, format: :convert_time %>
+                </small>
+              <% end %>
+            </td>
+            <td>
+              <% if theft_alert.objective_adset.present? %>
+                <small
+                  title="Campaign: <%= theft_alert.objective_campaign %>&#10;Adset: <%= theft_alert.objective_adset %>&#10;"
+                >
+                  <%= theft_alert.objective_campaign.humanize.downcase.gsub("outcome", "").strip %>
+                </small>
+              <% end %>
+            </td>
+          <% end %>
+
+          <td><%= number_display(theft_alert.reach) %></td>
+
+          <td>
+            <small>
+              <%= number_display(theft_alert.engagement&.dig("unique_clicks")) %>
+            </small>
+          </td>
+
+          <td>
+            <%= theft_alert.city %>
+
+            <% if theft_alert.region_record.present? %>
+              <small class="less-strong">
+                <%= theft_alert.region_record.abbreviation %>
+              </small>
+            <% elsif theft_alert.country.present? && theft_alert.country != Country.united_states %>
+              <small class="less-strong"><%= theft_alert.country.name %></small>
+            <% end %>
+          </td>
+
+          <td>
+            <small>
+              <%= theft_alert.notes %>
+
+              <% if theft_alert.facebook_post_url.present? %>
+                <small class="d-block">
+                  <%= link_to "facebook", theft_alert.facebook_post_url %>
+                </small>
+              <% end %>
+            </small>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

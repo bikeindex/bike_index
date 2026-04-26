@@ -1,5 +1,9 @@
 module Admin
   class TheftAlertPlansController < Admin::BaseController
+    include Binxtils::SetPeriod
+
+    before_action :set_period, only: %i[index]
+
     def index
       @theft_alert_plans = TheftAlertPlan.order(:amount_cents)
     end

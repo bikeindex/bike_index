@@ -1,0 +1,71 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @search_completeness != 'all' ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= @search_completeness.humanize %>
+    </a>
+
+    <div class="dropdown-menu">
+      <% %w[all only_incomplete only_complete].each do |kind| %>
+        <% kind_active = @search_completeness == kind %>
+        <%= link_to kind.humanize, admin_b_params_path(sortable_search_params.merge(search_completeness: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <% if @search_completeness == "all" %>
+      <% b_params_data = [
+        {name: "incomplete", data: UI::Chart::Component.time_range_counts(collection: matching_b_params.without_bike, time_range: @time_range)},
+        {name: "completed", data: UI::Chart::Component.time_range_counts(collection: matching_b_params.with_bike, time_range: @time_range)}
+      ] %>
+      <%= render(UI::Chart::Component.new(series: b_params_data, time_range: @time_range, stacked: true, colors: ["#ffc281", "#178813"])) %>
+    <% else %>
+      <% b_params_data = UI::Chart::Component.time_range_counts(collection: matching_b_params, time_range: @time_range) %>
+      <%= render(UI::Chart::Component.new(series: b_params_data, time_range: @time_range, stacked: true)) %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <div class="row mt-4">
+    <div class="col-md-5">
+      <p>
+        <%= number_with_delimiter(matching_b_params.count, delimiter: ',') %>
+        partial bikes <em><%= humanized_time_range(@time_range) %>,</em>
+        <strong><%= number_with_delimiter(matching_b_params.where("created_at > ?", Time.current - 24.hours).count) %></strong>
+        today
+      </p>
+    </div>
+
+    <div class="col-md-7">
+      <%= form_tag admin_b_params_path, method: :get, class: "form-inline" do %>
+        <%= hidden_field_tag :search_completeness, params[:search_completeness] %>
+
+        <div class="form-group ml-auto mr-2 mb-2">
+          <%= text_field_tag :query, params[:query], placeholder: "Find by email", class: "form-control" %>
+        </div>
+
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @b_params,
+  viewing: "Partial bikes",
+  rendered_chart:,
+  nav_header_list_items:,
+  admin_search_form:
+)) %>

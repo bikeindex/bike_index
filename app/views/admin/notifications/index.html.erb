@@ -1,0 +1,143 @@
+<% show_error_column = Binxtils::InputNormalizer.boolean(params[:search_show_error]) %>
+
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "show errors", url_for(sortable_search_params.merge(search_show_error: !show_error_column)), class: "nav-link #{show_error_column ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @kind != 'all' ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= @kind.titleize %> <%= (special_kind_scopes + ["all"]).include?(@kind) ? "kinds" : "" %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@kind == 'all' ? 'active' : ''}" %>
+
+      <% special_kind_scopes.each do |kind| %>
+        <%= link_to "#{kind.titleize} kinds", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : ''}" %>
+      <% end %>
+
+      <div class="dropdown-divider"></div>
+
+      <% Notification.kinds.each do |kind| %>
+        <%= link_to Notification.kind_humanized(kind).titleize, url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Only undelivered", url_for(sortable_search_params.merge(search_undelivered: !@undelivered)), class: "nav-link #{@undelivered ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "With bike", url_for(sortable_search_params.merge(search_with_bike: !@with_bike)), class: "nav-link #{@with_bike ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}" %>
+  </li>
+<% end %>
+
+<% colors = %w[#B60205 #D93F0B #FBCA04 #0E8A16 #006B75 #1D76DB #0052CC #5319E7 #D4C5F9 #2C3E50 #F9D0C4 #C2E0C6 #C5DEF5 #7DCABB #3f3a44 #d54692 #168124 #9b6b3b #e0b70f #a79be8] %>
+
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <% if @render_kind_counts %>
+      <% active_colors = colors.dup
+      series = Notification.kinds.each_with_index.filter_map do |k, i|
+        if matching_notifications.where(kind: k).any?
+          {name: Notification.kind_humanized(k).titleize, data: UI::Chart::Component.time_range_counts(collection: matching_notifications.where(kind: k), time_range: @time_range, column: @time_range_column)}
+        else
+          active_colors -= [colors[i]]
+          nil
+        end
+      end %>
+      <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true, colors: active_colors)) %>
+    <% else %>
+      <% series = [{name: "Notifications", data: UI::Chart::Component.time_range_counts(collection: matching_notifications, time_range: @time_range, column: @time_range_column)}] %>
+      <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true, colors:)) %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <div class="row mt-4">
+    <div class="col">
+      <%= form_tag admin_notifications_path, method: :get, class: "form-inline" do %>
+        <%= render partial: "/shared/hidden_search_fields" %>
+        <%= hidden_field_tag :search_with_bike, params[:search_with_bike] %>
+        <%= hidden_field_tag :search_undelivered, params[:search_undelivered] %>
+
+        <div class="form-group ml-auto mr-2 mb-2">
+          <%= text_field_tag :query, params[:query], placeholder: "Search email/phone", class: "form-control" %>
+        </div>
+
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% table_view = capture do %>
+  <% if @render_kind_counts %>
+    <div class="row mt-4 mb-4">
+      <div class="col-md-6 offset-md-3">
+        <div class="card">
+          <div class="card-body">
+            <h3>Kinds</h3>
+
+            <table class="table-list wide-definition">
+              <tbody>
+                <% Notification.kinds.each_with_index do |kind, index| %>
+                  <% count = matching_notifications.where(kind: kind).count %>
+                  <% next unless count > 0 %>
+
+                  <tr>
+                    <td>
+                      <div
+                        style="width: 1em; height: 1em; background: <%= colors[index] %>; float: right; margin-left: 0.4rem;"
+                      ></div>
+
+                      <%= link_to Notification.kind_humanized(kind).titleize, url_for(sortable_search_params.merge(search_kind: kind)) %>
+                    </td>
+
+                    <td><%= number_display(count) %></td>
+                  </tr>
+                <% end %>
+
+                <% nil_count = matching_notifications.where(kind: nil).count %>
+
+                <% if nil_count > 0 %>
+                  <tr>
+                    <td>Nil</td>
+                    <td><%= number_display(nil_count) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= render partial: "/admin/notifications/table", locals: {notifications: @notifications, render_sortable: true, skip_error: !show_error_column} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @notifications,
+  viewing: "Notifications",
+  nav_header_list_items:,
+  rendered_chart:,
+  admin_search_form:,
+  table_view:
+)) %>

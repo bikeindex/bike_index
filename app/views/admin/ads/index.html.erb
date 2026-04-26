@@ -1,0 +1,11 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "New ad", new_admin_ad_url, class: "nav-link" %>
+  </li>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @ads,
+  skip_charting: true,
+  nav_header_list_items:
+)) %>
