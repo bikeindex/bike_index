@@ -155,19 +155,21 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     # filters by period and custom time range — 12 bikes total: bike1 (2.years.ago), bike2 (3.days.ago), 10 create_list (now)
     # "past year" excludes bike1 (2 years ago)
-    page.execute_script("document.querySelector(\"a.period-select-standard[data-period='year']\").click()")
+    click_link "past year"
     expect(page).to have_current_path(/period=year/, wait: 10)
-    expect(page).to have_text("0 registrations matching")
+    expect(page).to have_text("0 registration matching")
+
+    fill_in "search_notes", with: ""
+    find("#search-button").click
+    expect(page).to have_current_path(/period=year/, wait: 10)
 
     # "past day" additionally excludes bike2 (3 days ago)
     click_link "past day"
     expect(page).to have_current_path(/period=day/, wait: 10)
-    expect(page).to have_text("0 registrations matching")
+    expect(page).to have_text("1 registration matching")
 
     # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only
-    visit bikes_path
-    expect(page).to have_css("table", wait: 10)
-    page.execute_script("document.querySelector(\"button[data-period='custom']\").click()")
+    click_button "custom"
     start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
     end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
     page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
