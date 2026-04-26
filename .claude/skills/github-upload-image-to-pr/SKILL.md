@@ -85,7 +85,9 @@ Take a snapshot and scroll to the bottom to find the comment area. GitHub render
 
 ## Step 5: Upload images one by one
 
-Upload each image with `browser_file_upload` (takes the element ref and a file paths array). Wait **2–3 seconds between uploads** so GitHub can process each file, then **3–5 seconds after the last upload** before reading URLs in step 6 — GitHub injects the markdown asynchronously after each file finishes processing.
+The `<input type="file">` from step 4 is **CSS-hidden** — calling `browser_file_upload` against its ref directly fails with "can only be used when there is related modal state present." First click the visible **"Paste, drop, or click to add files"** button (or "Attach files" toolbar icon) on the comment form to open the native file chooser, then `browser_file_upload` will satisfy that chooser.
+
+Upload each image with `browser_file_upload` (takes the element ref and a file paths array). Wait **2–3 seconds between uploads** so GitHub can process each file, then **3–5 seconds after the last upload** before reading URLs in step 6 — GitHub injects the image markup asynchronously after each file finishes processing.
 
 For multiple images, upload them all to the same comment textarea before extracting URLs — this is more efficient than navigating between uploads.
 
@@ -93,7 +95,7 @@ For multiple images, upload them all to the same comment textarea before extract
 
 ## Step 6: Retrieve uploaded image URLs
 
-Read the textarea value via `browser_evaluate` — GitHub injects markdown image syntax like `![description](https://github.com/user-attachments/assets/...)` after each upload finishes processing.
+Read the textarea value via `browser_evaluate` — GitHub injects either markdown or HTML referencing the upload after each file finishes processing.
 
 The **standard textarea selector** (referenced again in step 7) prefers the known ID and falls back to a substring match in case GitHub renames it:
 
@@ -105,14 +107,17 @@ The **standard textarea selector** (referenced again in step 7) prefers the know
 }
 ```
 
-The response contains URLs in the format:
+GitHub may inject **either form** depending on image dimensions / file type:
 ```
 ![image](https://github.com/user-attachments/assets/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+<img width="..." height="..." alt="..." src="https://github.com/user-attachments/assets/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
 ```
 
-Extract all image URLs/markdown from the textarea value before clearing it.
+Both render the image in the PR — preserve whichever form GitHub used. If you need to extract just the URL (e.g., to rewrap), match the asset path with a regex that ignores wrapper syntax: `https://github\.com/user-attachments/assets/[0-9a-f-]+`.
 
 ## Step 7: Clear the textarea (do not submit the comment)
+
+Submitting via the UI's "Comment" button would post a public comment as a side effect of the upload. The only thing that should determine where the image lands (PR body vs. a new comment) is step 8 — so the textarea here is purely an upload-staging surface, never a submission surface. Clear it, then let `gh pr edit` / `gh pr comment` decide the destination.
 
 Use the **standard textarea selector** from step 6, then assign `ta.value = ""`:
 
