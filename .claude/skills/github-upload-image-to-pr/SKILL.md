@@ -132,11 +132,13 @@ Use the **standard textarea selector** from step 6, then assign `ta.value = ""`:
 
 ## Step 8: Embed images in the PR
 
+In both options below, substitute whichever form (markdown `![](...)` or HTML `<img ...>`) GitHub returned in step 6 — preserve it verbatim instead of rewrapping.
+
 **Option A — Update PR description** (append images to existing body):
 ```bash
 EXISTING_BODY=$(gh pr view {PR_NUMBER} --json body -q .body)
 
-gh pr edit {PR_NUMBER} --body "$(printf '%s\n\n## Screenshots\n\n%s' "$EXISTING_BODY" "![screenshot](https://github.com/user-attachments/assets/...)")"
+gh pr edit {PR_NUMBER} --body "$(printf '%s\n\n## Screenshots\n\n%s' "$EXISTING_BODY" "<image markup from step 6>")"
 ```
 
 If `$EXISTING_BODY` already contains a `## Screenshots` heading (e.g., on re-runs), this will create a duplicate section. Check first with `grep -q "^## Screenshots" <<< "$EXISTING_BODY"` and either replace the existing section or post as a comment (Option B) instead.
@@ -145,14 +147,14 @@ If `$EXISTING_BODY` already contains a `## Screenshots` heading (e.g., on re-run
 ```bash
 gh pr comment {PR_NUMBER} --body "## Screenshots
 
-![screenshot](https://github.com/user-attachments/assets/...)"
+<image markup from step 6>"
 ```
 
 Use Option A by default unless the user explicitly asks for a comment, or if the PR description is already long and a comment would be cleaner.
 
 ## Step 9: Verify the result
 
-Reload the page and take a screenshot to confirm the images are displayed correctly.
+Reload the page in the Playwright browser and take a screenshot to confirm the images render correctly. **Do not** verify with `curl` — `user-attachments/assets/` URLs return HTTP 302 to a session-signed S3 URL that 403s for unauthenticated clients. The 302 alone confirms the asset exists; the browser-rendered check is the only authoritative "did it display" signal.
 
 ## Tips
 
