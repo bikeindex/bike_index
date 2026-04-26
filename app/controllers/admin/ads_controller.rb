@@ -1,5 +1,8 @@
 module Admin
   class AdsController < Admin::BaseController
+    include Binxtils::SetPeriod
+
+    before_action :set_period, only: %i[index]
     before_action :find_ad, except: [:index, :new, :create]
     before_action :find_organizations, only: [:new, :edit]
 

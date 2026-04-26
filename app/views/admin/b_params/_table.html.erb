@@ -1,0 +1,80 @@
+<div class="full-screen-table mt-4">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light sortable">
+      <th><%= sortable "created_at" %></th>
+      <th class="small"><%= sortable "updated_at" %></th>
+      <th><%= sortable "email" %></th>
+      <th><%= sortable "creator_id" %></th>
+      <th><%= sortable "created_bike_id", "Bike" %></th>
+      <th><small><%= sortable "origin" %></small></th>
+      <th class="small">Organization</th>
+      <th>Errors</th>
+      <th>Data</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |b_param| %>
+        <tr>
+          <td>
+            <a
+              class="localizeTime preciseTime"
+              href="<%= admin_b_param_url(b_param.id) %>"
+            >
+              <%= l b_param.created_at, format: :convert_time %>
+            </a>
+          </td>
+
+          <td>
+            <small class="localizeTime preciseTime">
+              <%= l b_param.updated_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <td><%= b_param.email %></td>
+
+          <td>
+            <small class="less-strong">
+              <% if b_param.creator.present? %>
+                <%= link_to b_param.creator.display_name, admin_user_path(b_param.creator_id) %>
+              <% end %>
+            </small>
+          </td>
+
+          <td>
+            <% if b_param.created_bike_id.present? %>
+              <%= link_to b_param.created_bike_id, admin_bike_path(b_param.created_bike_id) %>
+            <% end %>
+          </td>
+
+          <td>
+            <small><%= b_param.origin&.humanize %></small>
+          </td>
+
+          <td>
+            <% if b_param.creation_organization.present? %>
+              <%= link_to b_param.creation_organization.name, admin_b_params_path(organization_id: b_param.creation_organization.id) %>
+            <% end %>
+          </td>
+
+          <td>
+            <% if b_param.bike_errors.present? %>
+              <%= b_param.bike_errors.each { |f| f.to_s.humanize } %>
+            <% end %>
+
+            <% if b_param.errors.present? %>
+              <%= b_param.errors.each_key { |f| f.to_s.humanize } %>
+            <% end %>
+          </td>
+
+          <td>
+            <div
+              style="max-width: 450px; overflow: scroll; white-space: nowrap;"
+            >
+              <%= pretty_print_json(b_param.params) %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

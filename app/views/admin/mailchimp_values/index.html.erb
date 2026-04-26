@@ -1,0 +1,42 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @list != "all" ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= @list.titleize %> <%= @list == "all" ? "lists" : "list" %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All lists", url_for(sortable_search_params.merge(search_list: nil)), class: "dropdown-item #{@list == 'all' ? 'active' : ''}" %>
+      <%= link_to "Organization list", url_for(sortable_search_params.merge(search_list: "organization")), class: "dropdown-item #{@list == 'organization' ? 'active' : ''}" %>
+      <%= link_to "Individual list", url_for(sortable_search_params.merge(search_list: "individual")), class: "dropdown-item #{@list == 'individual' ? 'active' : ''}" %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "update values", admin_mailchimp_values_path, action: :create, method: :post, class: "nav-link" %>
+  </li>
+
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      href=".data-cell-collapsed"
+      aria-expanded="false"
+      data-toggle="collapse"
+    >
+      Toggle data
+    </a>
+  </li>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @mailchimp_values,
+  viewing: "Mailchimp Values",
+  skip_charting: true,
+  nav_header_list_items:
+)) %>

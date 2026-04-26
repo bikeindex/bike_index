@@ -1,0 +1,207 @@
+<% payments_counts = Payment.kinds.map do |kind|
+    next if @kind.present? && kind != @kind
+    payments_of_kind = matching_payments.where(kind:)
+    {
+      kind:,
+      name: Payment.kind_humanized(kind),
+      data: UI::Chart::Component.time_range_counts(collection: payments_of_kind, time_range: @time_range),
+      data_money: UI::Chart::Component.time_range_amounts(collection: payments_of_kind, time_range: @time_range, convert_to_dollars: true),
+      count: payments_of_kind.count,
+      money: MoneyFormatter.money_format(payments_of_kind.sum(:amount_cents))
+    }
+  end.compact
+  payments_counts_nozero = payments_counts.reject { |c| c[:count] < 1 } %>
+
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "New payment", new_admin_payment_url, class: "nav-link" %>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @kind.present? ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @kind.blank? %>
+        All kinds
+      <% else %>
+        <%= @kind.titleize %>
+        only
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All kinds", url_for(sortable_search_params.merge(search_kind: "all")), class: "dropdown-item #{@kind.present? ? 'active' : ''}" %>
+      <%= link_to "Organization only", url_for(sortable_search_params.merge(search_kind: "organization")), class: "dropdown-item #{@kind == 'organization' ? 'active' : ''}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% Payment.kinds.each do |kind| %>
+        <%= link_to "#{kind.titleize} only", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @incompleteness != 'paid' ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @incompleteness == "all" %>
+        Paid and Incomplete
+      <% else %>
+        <%= @incompleteness.titleize %>
+        only
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "Paid and Incomplete", url_for(sortable_search_params.merge(search_incompleteness: "all")), class: "dropdown-item #{@incompleteness == 'all' ? 'active' : ''}" %>
+
+      <div class="dropdown-divider"></div>
+      <%= link_to "Paid only", url_for(sortable_search_params.merge(search_incompleteness: "paid")), class: "dropdown-item #{@incompleteness == 'paid' ? 'active' : ''}" %>
+      <%= link_to "Incomplete only", url_for(sortable_search_params.merge(search_incompleteness: "incomplete")), class: "dropdown-item #{@incompleteness == 'incomplete' ? 'active' : ''}" %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @payment_method != 'all' ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @payment_method == "all" %>
+        All methods
+      <% elsif @payment_method == "show" %>
+        All methods, shown
+      <% else %>
+        <%= @payment_method.titleize %>
+        only
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <% if @render_method %>
+        <%= link_to "All methods", url_for(sortable_search_params.merge(search_payment_method: "all")), class: "nav-link" %>
+      <% else %>
+        <%= link_to "All methods, shown", url_for(sortable_search_params.merge(search_payment_method: "show")), class: "nav-link" %>
+      <% end %>
+
+      <div class="dropdown-divider"></div>
+
+      <% Payment.payment_methods.each do |payment_method| %>
+        <%= link_to "#{payment_method.titleize} only", url_for(sortable_search_params.merge(search_payment_method: payment_method)), class: "dropdown-item #{@payment_method == payment_method ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <h4 class="mt-2">Counts</h4>
+    <%= column_chart payments_counts_nozero.map { |c| {name: c[:name], data: c[:data]} }, stacked: true, thousands: "," %>
+
+    <h4 class="mt-2">Amounts</h4>
+    <%= column_chart payments_counts_nozero.reject { |c| c[:count] < 1 }.map { |c| {name: c[:name], data: c[:data_money]} }, stacked: true, thousands: ",", prefix: "$", round: 2 %>
+  <% end %>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <%= form_tag admin_payments_path, method: :get do %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+    <%= hidden_field_tag :search_payment_method, params[:search_payment_method] %>
+    <%= hidden_field_tag :search_incompleteness, params[:search_incompleteness] %>
+
+    <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
+      <div class="mt-2 mr-2">
+        <%= text_field_tag :search_email, params[:search_email], placeholder: "Search by email", class: "form-control" %>
+      </div>
+
+      <div class="mt-2 mr-2">
+        <%= text_field_tag :query, params[:query], placeholder: "Search by referral", class: "form-control" %>
+      </div>
+
+      <div class="mt-2 mr-2">
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <div class="row mb-4">
+    <div class="col-sm">
+      <p class="mt-2">
+        A total of
+        <%= MoneyFormatter.money_format(matching_payments.sum(:amount_cents)) %>
+      </p>
+    </div>
+
+    <% if payments_counts.present? %>
+      <div class="col-sm">
+        <div class="full-screen-table">
+          <table class="table table-striped table-bordered table-sm text-center">
+            <thead>
+              <% payments_counts.each do |payment_count| %>
+                <th>
+                  <%= payment_count[:name].pluralize %>
+
+                  <% if params[:search_kind].present? %>
+                    <%= link_to "view all kinds", admin_payments_path(sortable_search_params.merge(search_kind: "")), class: "small em" %>
+                  <% else %>
+                    <%= link_to "view", admin_payments_path(sortable_search_params.merge(search_kind: payment_count[:kind])), class: "small em" %>
+                  <% end %>
+                </th>
+              <% end %>
+            </thead>
+
+            <tbody>
+              <tr>
+                <% payments_counts.each do |payment_count| %>
+                  <td>
+                    <em class="less-strong">
+                      <%= number_with_delimiter(payment_count[:count]) %> -
+                    </em>
+
+                    <%= payment_count[:money] %>
+
+                    <% if payment_count[:name] == "payment" && payment_count[:count] > 0 %>
+                      <br>
+                      <small class="text-warning">
+                        There shouldn't be payments without invoices
+                      </small>
+                    <% end %>
+                  </td>
+                <% end %>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%= render partial: "table", locals: {payments: @payments, render_sortable: true, skip_paid_at: @incompleteness == "paid", render_method: @render_method} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @payments,
+  viewing: "Payments",
+  rendered_chart:,
+  nav_header_list_items:,
+  admin_search_form:,
+  table_view:
+)) %>

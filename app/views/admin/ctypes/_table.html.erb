@@ -1,0 +1,23 @@
+<% render_sortable ||= false %>
+
+<div class="full-screen-table mt-4 mb-4">
+  <table class="table table-striped table-bordered">
+    <thead class="thead-light">
+      <th>Name</th>
+      <th>Slug</th>
+      <th>Component group</th>
+      <th class="large-screens">Has image?</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |ctype| %>
+        <tr>
+          <td><%= link_to ctype.name, edit_admin_ctype_url(ctype) %></td>
+          <td><%= ctype.slug %></td>
+          <td><%= ctype.cgroup.name.titleize %></td>
+          <td class="large-screens"><%= check_mark if ctype.image? %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

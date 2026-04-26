@@ -1,0 +1,114 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<% unless display_dev_info? %>
+  <style>.only-dev-visible {display: none !important;} </style>
+<% end %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm without-exterior-border">
+    <thead class="small-header">
+      <th>
+        <small>
+          <%= sortable "created_at", render_sortable: render_sortable %>
+        </small>
+      </th>
+
+      <% if sort_column == "updated_at" %>
+        <th>
+          <small>
+            <%= sortable "updated_at", render_sortable: render_sortable %>
+          </small>
+        </th>
+      <% end %>
+
+      <th>
+        <%= sortable "model_audit_id", render_sortable: render_sortable %>
+      </th>
+
+      <th><small>Vehicles&nbsp;#</small></th>
+      <th><%= sortable "kind", render_sortable: render_sortable %></th>
+
+      <th>
+        <%= sortable "organization_id", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "user_id", render_sortable: render_sortable %></th>
+      <th>File/URL</th>
+      <th>Info</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |model_attestation| %>
+        <% model_audit = model_attestation.model_audit %>
+
+        <tr>
+          <td>
+            <span class="localizeTime">
+              <%= l model_attestation.created_at, format: :convert_time %>
+            </span>
+
+            <code class="small d-inline-block only-dev-visible">
+              <%= model_attestation.id %>
+            </code>
+          </td>
+
+          <% if sort_column == "updated_at" %>
+            <td class="small">
+              <span class="localizeTime">
+                <%= l model_attestation.updated_at, format: :convert_time %>
+              </span>
+            </td>
+          <% end %>
+
+          <td style="min-width: 200px">
+            <strong><%= model_audit.mnfg_name %></strong>
+            <%= model_audit_frame_model_display(model_audit, truncate: true) %>
+
+            <small>
+              <%= link_to search_emoji, url_for(sortable_search_params.merge(search_model_audit_id: model_audit.id)) %>
+            </small>
+
+            <% if model_attestation.organization_id.present? %>
+              <%= link_to "view in org", organization_model_audit_path(model_attestation.model_audit_id, organization_id: model_attestation.organization&.to_param), class: "small d-inline-block less-strong" %>
+            <% end %>
+          </td>
+
+          <td>
+            <%= link_to number_display(model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_audit.id) %>
+          </td>
+
+          <td><%= model_attestation.kind_humanized %></td>
+
+          <td>
+            <% if model_attestation.organization %>
+              <%= link_to model_attestation.organization&.short_name || model_attestation.organization_id, organization_model_audits_path(organization_id: model_attestation.organization&.to_param), class: "text-link" %>
+              <small>
+                <%= link_to search_emoji, url_for(sortable_search_params.merge(organization_id: model_attestation.organization&.to_param)) %>
+              </small>
+            <% end %>
+          </td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: model_attestation.user, render_search: true) %>
+          </td>
+
+          <td>
+            <% if model_attestation.file.present? %>
+              <strong>
+                <%= link_to "File", model_attestation.file.url, target: "_blank" %>
+              </strong>
+            <% end %>
+
+            <% if model_attestation.url.present? %>
+              <small>
+                <%= link_to truncate(model_attestation.url), model_attestation.url %>
+              </small>
+            <% end %>
+          </td>
+
+          <td><%= model_attestation.info %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,94 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <a
+      class="nav-link dropdown-toggle <%= @endpoint != 'all' ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @endpoint == "all" %>
+        All endpoints
+      <% elsif special_endpoints.include?(@endpoint) %>
+        <%= @endpoint.humanize %>
+      <% else %>
+        <%= @endpoint %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All endpoints", url_for(sortable_search_params.merge(search_endpoint: nil)), class: "dropdown-item #{@endpoint == 'all' ? 'active' : ''}" %>
+
+      <% special_endpoints.each do |endpoint| %>
+        <% endpoint_active = @endpoint == endpoint %>
+        <%= link_to endpoint.humanize, url_for(sortable_search_params.merge(search_endpoint: endpoint_active ? nil : endpoint)), class: "dropdown-item #{endpoint_active ? 'active' : ''}" %>
+      <% end %>
+
+      <div class="dropdown-divider"></div>
+
+      <% LoggedSearch.endpoints.keys.each do |endpoint| %>
+        <% endpoint_active = @endpoint == endpoint %>
+        <%= link_to endpoint, url_for(sortable_search_params.merge(search_endpoint: endpoint_active ? nil : endpoint)), class: "dropdown-item #{endpoint_active ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "serial", url_for(sortable_search_params.merge(search_serial: !@serial)), class: "nav-link #{@serial ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "location", url_for(sortable_search_params.merge(search_with_location: !@with_location)), class: "nav-link #{@with_location ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "include query", url_for(sortable_search_params.merge(search_includes_query: !@includes_query)), class: "nav-link #{@includes_query ? 'active' : ''}" %>
+  </li>
+<% end %>
+
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <% if @endpoint.present? %>
+      <% endpoints = matching_logged_searches.distinct.pluck(:endpoint).sort %>
+      <% counts_by_endpoint = endpoints.map { |endpoint| {name: endpoint, data: time_range_counts(collection: matching_logged_searches.where(endpoint:), column: @time_range_column)} } %>
+      <%= column_chart counts_by_endpoint, stacked: true, thousands: "," %>
+    <% else %>
+      <%= column_chart time_range_counts(collection: matching_logged_searches, column: @time_range_column), stacked: true, thousands: "," %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <% if params[:search_endpoint].present? %>
+    <p>
+      Viewing only Searches <strong>to</strong>
+      <% if special_endpoints.include?(params[:search_endpoint]) %>
+        <em><%= params[:search_endpoint].humanize %></em>
+      <% else %>
+        <code><%= params[:search_endpoint] %></code>
+      <% end %>
+      <%= link_to "view for all endpoints", url_for(sortable_search_params.merge(search_endpoint: nil)), class: "gray-link small" %>
+    </p>
+  <% end %>
+
+  <% if params[:search_ip_address].present? %>
+    <p>
+      Viewing only Searches <strong>from</strong>
+      <code><%= params[:search_ip_address] %></code>
+      <%= link_to "view from any ip address", url_for(sortable_search_params.merge(search_ip_address: nil)), class: "gray-link small" %>
+    </p>
+  <% end %>
+
+  <%= render partial: "table", locals: {logged_searches: @logged_searches} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @logged_searches,
+  viewing: "Logged Searches",
+  rendered_chart:,
+  nav_header_list_items:,
+  table_view:
+)) %>

@@ -1,0 +1,112 @@
+<% render_sortable ||= false %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light sortable">
+      <th class="table-checkbox-select">
+        <button
+          type="button"
+          class="twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0"
+          data-action="click->table-multi-delete#toggleAll"
+        >
+          <%= check_mark %>
+        </button>
+      </th>
+
+      <th><%= sortable "created_at", "Stolen created", render_sortable: %></th>
+
+      <th class="small">
+        <%= sortable "date_stolen", "Stolen at", render_sortable: %>
+      </th>
+
+      <th>Bike info</th>
+      <th>Theft info</th>
+      <th class="small">Country</th>
+      <th>City</th>
+      <th>Approved</th>
+    </thead>
+
+    <tbody>
+      <% @stolen_records.each do |stolen_record| %>
+        <%# Handle cases where bike is user hidden or deleted %>
+        <% bike = stolen_record.bike || Bike.unscoped.find(stolen_record.bike_id) %>
+
+        <tr>
+          <td class="display-multi-check table-checkbox-select">
+            <%= check_box_tag "sr_selected[#{stolen_record.id}]", stolen_record.id, false, data: {"table-multi-delete-target" => "checkbox"} %>
+          </td>
+
+          <td>
+            <a
+              class="small"
+              href="<%= edit_admin_stolen_bike_url(stolen_record, stolen_record_id: true) %>"
+            >
+              <% created_date = stolen_record&.created_at || bike&.created_at %>
+
+              <span class="localizeTime">
+                <%= l created_date, format: :convert_time %>
+              </span>
+            </a>
+          </td>
+
+          <td>
+            <% if stolen_record&.date_stolen&.present? %>
+              <small class="localizeTime">
+                <%= l stolen_record.date_stolen, format: :convert_time %>
+              </small>
+            <% end %>
+          </td>
+
+          <td>
+            <% if bike.present? %>
+              <%= bike.title_string %>
+              <% if bike.thumb_path.present? %>
+                <small>&#x1f4f7;</small>
+              <% end %>
+            <% else %>
+              <span class="text-warning">no bike</span>
+            <% end %>
+
+            <% if stolen_record && stolen_record.estimated_value.present? %>
+              <br>
+              <small class="less-strong">
+                $<%= stolen_record.estimated_value %>
+              </small>
+            <% end %>
+          </td>
+
+          <% if stolen_record.present? %>
+            <td style="width: 50%;"><%= stolen_record.theft_description %></td>
+            <td class="small">
+              <% if stolen_record.country.present? %>
+                <% if stolen_record.country == Country.united_states %>
+                  <small class="less-strong">US</small>
+                <% else %>
+                  <small class="text-success">
+                    <%= stolen_record.country.iso %>
+                  </small>
+                <% end %>
+              <% end %>
+            </td>
+            <td>
+              <span class="<%= stolen_record.city.blank? ? "less-strong" : "" %>">
+                <%= [stolen_record.city, stolen_record.state&.abbreviation, stolen_record.zipcode].reject(&:blank?).first %>
+              </span>
+            </td>
+            <td class="table-cell-check">
+              <%= check_mark if stolen_record.approved %>
+              <%= render(Admin::Badges::User::Component.new(user: bike&.user)) %>
+            </td>
+          <% else %>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+              <%= render(Admin::Badges::User::Component.new(user: bike&.user)) %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

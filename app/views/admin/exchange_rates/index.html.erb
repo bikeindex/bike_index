@@ -1,0 +1,41 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "New Exchange Rate", new_admin_exchange_rate_path, class: "nav-link" %>
+  </li>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <div class="row">
+    <div class="col-md-6">
+      <% if filter_params.any? %>
+        <p>
+          <%= pluralize number_with_delimiter(@exchange_rates.count), "matching exchange rate" %>
+          <em><%= link_to "view all", admin_exchange_rates_path %></em>
+        </p>
+      <% end %>
+    </div>
+
+    <div class="col-md-6">
+      <%= form_tag admin_exchange_rates_path, method: :get, class: "form-inline admin-filter-menu" do %>
+        <%= render partial: "/shared/hidden_search_fields" %>
+
+        <div class="form-group ml-2">
+          <%= select_tag :search_to,
+            options_for_select(ExchangeRate.pluck(:to).uniq),
+            prompt: "Filter by target currency",
+            class: "form-control" %>
+        </div>
+
+        <%= submit_tag "Filter", name: "search", class: "btn btn-primary ml-2" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @exchange_rates,
+  viewing: "Exchange Rates",
+  skip_charting: true,
+  nav_header_list_items:,
+  admin_search_form:
+)) %>
