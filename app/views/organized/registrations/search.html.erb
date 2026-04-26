@@ -38,6 +38,7 @@
 
   <%= turbo_frame_tag :organized_bikes_results_frame do %>
     <%= render partial: "period_filter_bar" %>
+
     <% if @render_results %>
       <%= render partial: "results" %>
     <% else %>
