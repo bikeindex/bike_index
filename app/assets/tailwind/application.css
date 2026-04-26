@@ -90,8 +90,8 @@
 
   .twdropdown li[role="menuitem"] > a.active,
   .twdropdown li[role="menuitem"] > a:active {
-    @apply tw:bg-gray-100 tw:font-semibold tw:text-gray-900
-      tw:dark:bg-gray-700 tw:dark:text-gray-100;
+    @apply tw:bg-gray-200 tw:font-semibold tw:text-gray-900
+      tw:dark:bg-gray-600 tw:dark:text-gray-100;
   }
 
   .twdropdown li[role="menuitem"]:has(+ li[role="separator"]) > a {
