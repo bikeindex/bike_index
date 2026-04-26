@@ -1,0 +1,96 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @search_status != 'all' ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @search_status == "all" %>
+        All Statuses
+      <% else %>
+        <%= Bike.status_humanized(@search_status) %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All statuses", admin_external_registry_bikes_path(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@search_status == 'all' ? 'active' : ''}" %>
+
+      <% %w[status_with_owner status_stolen status_impounded].each do |status| %>
+        <% status_active = @search_status == status %>
+        <%= link_to Bike.status_humanized(status), admin_external_registry_bikes_path(sortable_search_params.merge(search_status: status_active ? nil : status)), class: "dropdown-item #{status_active ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @search_type != 'all' ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @search_type == "all" %>
+        All Registries
+      <% else %>
+        <%= ExternalRegistryBike.registry_name(@search_type) %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All Registries", admin_external_registry_bikes_path(sortable_search_params.merge(search_type: nil)), class: "dropdown-item #{@search_type == 'all' ? 'active' : ''}" %>
+
+      <% registry_types.each do |registry_type| %>
+        <% type_active = @search_type == registry_type %>
+        <%= link_to ExternalRegistryBike.registry_name(registry_type), admin_external_registry_bikes_path(sortable_search_params.merge(search_type: type_active ? nil : registry_type)), class: "dropdown-item #{type_active ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <% if @search_type == "all" %>
+      <% series = registry_types.map { |search_type| {name: ExternalRegistryBike.registry_name(search_type), data: UI::Chart::Component.time_range_counts(collection: @matching_bikes.where(type: "ExternalRegistryBike::#{search_type}"), time_range: @time_range, column: @time_range_column.presence || "created_at")} } %>
+      <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"])) %>
+    <% else %>
+      <% series = [{name: "External Registry Bikes", data: UI::Chart::Component.time_range_counts(collection: @matching_bikes, time_range: @time_range, column: @time_range_column.presence || "created_at")}] %>
+      <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true)) %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <%= form_tag admin_external_registry_bikes_path, method: :get, class: "form-inline" do %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+
+    <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
+      <div class="mt-2 mr-2">
+        <%= text_field_tag :search_serial_normalized, params[:search_serial_normalized], placeholder: "Search serial number", class: "form-control" %>
+      </div>
+
+      <div class="mt-2">
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "table", locals: {render_sortable: true} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @bikes,
+  viewing: "External Registry Bikes",
+  rendered_chart:,
+  nav_header_list_items:,
+  admin_search_form:,
+  table_view:
+)) %>

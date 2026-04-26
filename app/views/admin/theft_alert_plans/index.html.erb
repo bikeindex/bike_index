@@ -1,0 +1,12 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "New Promoted Alert Plan", new_admin_theft_alert_plan_path, class: "nav-link" %>
+  </li>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @theft_alert_plans,
+  index_title: "Promoted Alert Plans",
+  nav_header_list_items:,
+  skip_charting: true
+)) %>

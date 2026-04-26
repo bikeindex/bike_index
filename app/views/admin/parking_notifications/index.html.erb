@@ -1,0 +1,74 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @search_status == 'all' ? '' : 'active' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= @search_status.humanize %> notifications
+    </a>
+
+    <div class="dropdown-menu">
+      <% (%w[all resolved active] + ParkingNotification.statuses).each do |kind| %>
+        <% kind_active = @search_status == kind %>
+        <% kind_link_params = sortable_search_params.merge(search_status: (kind_active ? nil : kind)) %>
+
+        <%= link_to "#{kind.humanize} notifications", admin_parking_notifications_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}" %>
+
+        <% if kind == "active" %>
+          <div class="dropdown-divider"></div>
+        <% end %>
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <% data = UI::Chart::Component.time_range_counts(collection: matching_parking_notifications, time_range: @time_range, column: "created_at") %>
+    <%= render(UI::Chart::Component.new(series: [{name: "Parking Notifications", data:}], time_range: @time_range, stacked: true)) %>
+
+    <% unless params[:organization_id].present? %>
+      <div class="row mt-4">
+        <div class="col-md-6 offset-md-3">
+          <table class="table-list wide-definition">
+            <tbody>
+              <% matching_parking_notifications.distinct.pluck(:organization_id).map { |id| [id, matching_parking_notifications.where(organization_id: id).count] }.sort_by { |_id, number| number }.each do |id, number| %>
+                <% organization = Organization.unscoped.find_by_id(id) if id.present? %>
+
+                <tr>
+                  <td>
+                    <% if organization.present? %>
+                      <%= link_to organization.short_name, admin_parking_notifications_path(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "") %>
+                    <% else %>
+                      <%= link_to "no organization", admin_parking_notifications_path(sortable_search_params.merge(organization_id: "none")), class: "gray-link" %>
+                    <% end %>
+                  </td>
+
+                  <td><%= number_with_delimiter(number) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "/admin/parking_notifications/table", locals: {parking_notifications: @parking_notifications, render_sortable: true} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @parking_notifications,
+  viewing: "Parking notifications",
+  nav_header_list_items:,
+  rendered_chart:,
+  table_view:
+)) %>
