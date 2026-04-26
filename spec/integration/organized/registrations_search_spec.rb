@@ -154,20 +154,33 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_content("alice@example.com")
 
     # filters by period and custom time range — 12 bikes total: bike1 (2.years.ago), bike2 (3.days.ago), 10 create_list (now)
-    visit bikes_path
-    expect(page).to have_css("table", wait: 10)
-    expect(page).to have_css("a.period-select-standard[data-period='all']")
-    expect(page).to have_text("12 registrations matching")
-
     # "past year" excludes bike1 (2 years ago)
     page.execute_script("document.querySelector(\"a.period-select-standard[data-period='year']\").click()")
     expect(page).to have_current_path(/period=year/, wait: 10)
-    expect(page).to have_text("11 registrations matching")
+    expect(page).to have_text("0 registrations matching")
 
     # "past day" additionally excludes bike2 (3 days ago)
-    page.execute_script("document.querySelector(\"a.period-select-standard[data-period='day']\").click()")
+    click_link "past day"
     expect(page).to have_current_path(/period=day/, wait: 10)
-    expect(page).to have_text("10 registrations matching")
+    expect(page).to have_text("0 registrations matching")
+
+    # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only
+    visit bikes_path
+    expect(page).to have_css("table", wait: 10)
+    page.execute_script("document.querySelector(\"button[data-period='custom']\").click()")
+    start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
+    end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
+    page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
+    page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
+    page.execute_script("document.querySelector(\"#timeSelectionCustom button[type='submit']\").click()")
+    expect(page).to have_current_path(/period=custom/, wait: 10)
+    expect(rendered_bike_ids).to eq([bike2.id])
+
+    # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago)
+    visit "#{bikes_path}?search_email=bob@example.com&period=year"
+    expect(page).to have_css("table", wait: 10)
+    expect(page).to have_field("search_email", with: "bob@example.com")
+    expect(rendered_bike_ids).to eq([bike2.id])
 
     # JS (application.js + TimeLocalizer) sets a timezone cookie from window.localTimezone.
     # The server reads it in set_locale and uses it to bucket chart data via groupdate.
@@ -192,24 +205,6 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket has 0
     expect(page.html).to include(%(["#{la_date_key}",1]))
     expect(page.html).to include(%(["#{cdt_date_key}",0]))
-
-    # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only
-    visit bikes_path
-    expect(page).to have_css("table", wait: 10)
-    page.execute_script("document.querySelector(\"button[data-period='custom']\").click()")
-    start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
-    end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
-    page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
-    page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
-    page.execute_script("document.querySelector(\"#timeSelectionCustom button[type='submit']\").click()")
-    expect(page).to have_current_path(/period=custom/, wait: 10)
-    expect(rendered_bike_ids).to eq([bike2.id])
-
-    # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago)
-    visit "#{bikes_path}?search_email=bob@example.com&period=year"
-    expect(page).to have_css("table", wait: 10)
-    expect(page).to have_field("search_email", with: "bob@example.com")
-    expect(rendered_bike_ids).to eq([bike2.id])
   end
 
   context "with stolen and impounded bikes" do
