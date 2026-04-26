@@ -4497,6 +4497,9 @@ nl:
       index:
         impound_records: Inbeslagnamegegevens
         render_chart: Rendergrafiek
+    registrations:
+      search:
+        render_chart: Rendergrafiek
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -4749,19 +4752,6 @@ nl:
       you: U
       your_bikes: Je fietsen
       your_preferences: Jouw voorkeuren
-    period_select:
-      all: Alle
-      past: Verleden
-      thirty_days: 30 dagen
-      seven_days: 7 dagen
-      day: dag
-      hour: Uur
-      year: jaar
-      custom: Custom
-      from: uit
-      to: Naar
-      update: Bijwerken
-      next: Volgende
     edit_bike_skeleton:
       edit: Bewerken
       owned_but_hasnt_been_claimed_html: Eigendom van <em>%{owner_email}</em> maar

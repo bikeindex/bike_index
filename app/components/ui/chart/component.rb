@@ -24,7 +24,8 @@ module UI
             group_by_method(time_range),
             column,
             range: time_range,
-            format: group_by_format(time_range)
+            format: group_by_format(time_range),
+            time_zone: ::Time.zone
           )
         end
 

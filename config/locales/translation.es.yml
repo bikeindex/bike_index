@@ -3924,6 +3924,9 @@ es:
       index:
         impound_records:
         render_chart:
+    registrations:
+      search:
+        render_chart:
   organized_mailer:
     custom_message:
       subject:
@@ -4285,19 +4288,6 @@ es:
       use_ascend:
       use_lightspeed_retail_pos:
       viewing_our_streamlined_page:
-    period_select:
-      all:
-      custom:
-      day:
-      from:
-      hour:
-      next:
-      past:
-      seven_days:
-      thirty_days:
-      to:
-      update:
-      year:
     user_general_alert:
       add_location_theft_bike_title_html:
       add_photo_theft_bike_title_html:

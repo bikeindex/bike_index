@@ -3,7 +3,7 @@
 </div>
 
 <% if @render_chart %>
-  <%= column_chart time_range_counts(collection: available_impound_records), stacked: true, thousands: "," %>
+  <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_impound_records), time_range: @time_range, stacked: true)) %>
 <% end %>
 
 <div class="text-right mb-2 mt-4">
@@ -15,7 +15,7 @@
   </a>
 </div>
 
-<%= render partial: "/shared/period_select" %>
+<%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
 
 <%= render(Org::ImpoundRecordsIndex::Component.new(
   pagy: @pagy,

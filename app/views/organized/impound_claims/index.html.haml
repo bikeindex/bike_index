@@ -3,11 +3,11 @@
     Impound Claims
 
 - if @render_chart
-  = column_chart time_range_counts(collection: available_impound_claims), stacked: true, thousands: ","
+  = render(UI::Chart::Component.new(series: time_range_counts(collection: available_impound_claims), time_range: @time_range, stacked: true))
 .text-right.mb-2
   %a.btn.btn-sm.less-strong.btn-outline-secondary{ href: organization_impound_claims_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)), class: (@render_chart ? "active" : "") }
     Render chart
-= render partial: "/shared/period_select"
+= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 .row.mb-4
   .col-md-7.col-lg-9.mt-4

@@ -3963,6 +3963,9 @@ it:
       index:
         impound_records:
         render_chart:
+    registrations:
+      search:
+        render_chart:
   organized_mailer:
     custom_message:
       subject:
@@ -4327,19 +4330,6 @@ it:
       viewing_our_streamlined_page: Al momento stai visualizzando la nostra pagina
         di registrazione semplificata per i negozi di biciclette, che è quella che
         ti consigliamo di utilizzare
-    period_select:
-      all: Tutti
-      custom: personalizzato
-      day: giorno
-      from: Da
-      hour: ora
-      next: prossimo
-      past: passato
-      seven_days: 7 giorni
-      thirty_days: 30 giorni
-      to: A
-      update: Aggiorna
-      year: anno
     user_general_alert:
       add_location_theft_bike_title_html: Aggiungere il luogo del furto del vostro
         <strong>%{bike_title}</strong>

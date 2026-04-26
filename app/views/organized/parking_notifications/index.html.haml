@@ -95,7 +95,36 @@
         %li.nav-item
           %a#FitMapTrigger{href: "#", class: (@page_data[:default_location] ? "currently-hidden" : "")}
             Fit map to notifications
-  = render partial: "/shared/period_select", locals: { skip_submission: true }
+  #timeSelectionBtnGroup.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "", "data-nosubmit" => "true" }
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "hour"), href: url_for(sortable_search_params.merge(period: "hour")), data: { period: "hour" } }
+      %span.d-none.d-md-inline-block past
+      hour
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "day"), href: url_for(sortable_search_params.merge(period: "day")), data: { period: "day" } }
+      %span.d-none.d-md-inline-block past
+      day
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "week"), href: url_for(sortable_search_params.merge(period: "week")), data: { period: "week" } }
+      %span.d-none.d-md-inline-block past
+      7 days
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "month"), href: url_for(sortable_search_params.merge(period: "month")), data: { period: "month" } }
+      %span.d-none.d-md-inline-block past
+      30 days
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "year"), href: url_for(sortable_search_params.merge(period: "year")), data: { period: "year" } }
+      %span.d-none.d-md-inline-block past
+      year
+    %a.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "all"), href: url_for(sortable_search_params.merge(period: "all")), data: { period: "all" } }
+      All
+    %button#periodSelectCustom.btn.btn-outline-secondary.btn-sm.ml-2{ class: ("active" if @period == "custom"), data: { period: "custom" } }
+      custom
+
+  %form#timeSelectionCustom.custom-time-selection.mt-2.mb-2.collapse{ class: @period == "custom" ? "in show" : "" }
+    .form-group
+      = label_tag :start_time_selector, "From", class: "control-label mr-2"
+      = datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
+    .form-group.end-time-contrtol
+      = label_tag :end_time_selector, "To", class: "control-label mr-2"
+      = datetime_local_field_tag :end_time_selector, @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
+    %button#updatePeriodSelectCustom.btn.btn-success.btn-sm.ml-2
+      Update
 
   .mt-4
     = render(Search::FormOrganized::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params))
