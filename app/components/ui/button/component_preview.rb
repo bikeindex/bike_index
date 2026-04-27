@@ -17,12 +17,13 @@ module UI
         render(UI::Button::Component.new(text: "Primary Active", color: :primary, active: true))
       end
 
+      # @label secondary (with data)
       def secondary
-        render(UI::Button::Component.new(text: "Secondary", color: :secondary))
+        render(UI::Button::Component.new(text: "Secondary", color: :secondary, data: {action: "click->ui--modal#open"}))
       end
 
       def secondary_active
-        render(UI::Button::Component.new(text: "Secondary Active", color: :secondary, active: true))
+        render(UI::Button::Component.new(text: "Secondary Active", color: :secondary, active: true, data: {action: "click->ui--modal#open"}))
       end
 
       def error
@@ -39,10 +40,6 @@ module UI
 
       def link_active
         render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
-      end
-
-      def secondary_with_data
-        render(UI::Button::Component.new(text: "Secondary with data", color: :secondary, data: {action: "click->ui--modal#open"}))
       end
       # @!endgroup
 
