@@ -212,9 +212,10 @@ class Organization < ApplicationRecord
     end
 
     def admin_text_search(n)
-      return nil unless n.present?
+      n = normalize_friendly_str(n)
+      return nil if n.blank?
 
-      str = "%#{n.strip}%"
+      str = "%#{n}%"
       match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name address_records.city]
       left_outer_joins(:locations, :location_address_records)
         .distinct
