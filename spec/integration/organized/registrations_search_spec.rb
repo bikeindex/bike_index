@@ -191,10 +191,6 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_field("search_email", with: "bob@example.com")
     expect(rendered_bike_ids).to eq([bike2.id])
 
-    # JS (application.js + TimeLocalizer) sets a timezone cookie from window.localTimezone.
-    # The server reads it in set_locale and uses it to bucket chart data via groupdate.
-    expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to be_present
-
     # 5 AM UTC = 9 PM PDT (or 12 AM CDT) the previous day, so PDT and CDT fall on different days.
     chart_bike_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
     bike2.update_columns(created_at: chart_bike_created_at)
@@ -202,14 +198,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     cdt_date_key = chart_bike_created_at.in_time_zone("America/Chicago").strftime("%Y-%-m-%-d")
     expect(la_date_key).not_to eq(cdt_date_key)
 
-    # Replace the cookie via JS the same way the app does, so attributes (SameSite, path)
-    # match and Chrome reliably overwrites the existing cookie set on previous loads.
-    page.execute_script("document.cookie = 'timezone=America/Los_Angeles;path=/;max-age=31536000;SameSite=Lax'")
-    expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to eq("America/Los_Angeles")
-
-    # Switch to past 30 days for daily chart bucketing, then enable the chart on the search page
-    click_link "past 30 days"
-    expect(page).to have_current_path(/period=month/, wait: 10)
+    # Pin timezone to LA via the URL param. The earlier custom-range click set
+    # session[:timezone] from Intl.DateTimeFormat (varies between local dev and
+    # CI), and set_timezone prefers session over cookie — so passing timezone in
+    # params is the only way to make chart bucketing deterministic here.
+    visit "#{bikes_path}?timezone=America/Los_Angeles&search_email=bob@example.com&period=month"
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
 
     click_link "Render chart"
     expect(page).to have_current_path(/render_chart=true/, wait: 10)
