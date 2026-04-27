@@ -26,14 +26,16 @@ class State < ApplicationRecord
 
   class << self
     def friendly_find(str, country_id: nil)
-      return nil unless str.present?
+      str = Binxtils::InputNormalizer.string(str) if str.is_a?(String)
+      return nil if str.blank?
 
       matches = country_id.present? ? where(country_id:) : all
-      matches.fuzzy_abbr_find(str) || matches.where("lower(name) = ?", str.downcase.strip).first
+      matches.fuzzy_abbr_find(str) || matches.where("lower(name) = ?", str.downcase).first
     end
 
     def fuzzy_abbr_find(str)
-      str && where("lower(abbreviation) = ?", str.downcase.strip).first
+      str = Binxtils::InputNormalizer.string(str) if str.is_a?(String)
+      str.present? && where("lower(abbreviation) = ?", str.downcase).first
     end
 
     def valid_names

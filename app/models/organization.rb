@@ -201,9 +201,8 @@ class Organization < ApplicationRecord
     end
 
     def friendly_find(n)
-      return nil unless n.present?
       return n if n.is_a?(Organization)
-      n = Binxtils::InputNormalizer.string(n) if n.is_a?(String)
+      n = normalize_friendly_str(n)
       return nil if n.blank?
       return find_by_id(n) if integer_string?(n)
 

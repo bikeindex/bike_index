@@ -29,7 +29,7 @@ class Country < ApplicationRecord
     end
 
     def friendly_find(name_or_iso)
-      name_or_iso = name_or_iso&.to_s&.strip&.downcase
+      name_or_iso = normalize_friendly_str(name_or_iso)&.downcase
       return if name_or_iso.blank?
       return where(id: name_or_iso).first if integer_string?(name_or_iso)
       return united_states if %w[us usa].include?(name_or_iso)

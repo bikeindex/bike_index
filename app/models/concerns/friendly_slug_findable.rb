@@ -4,12 +4,11 @@ module FriendlySlugFindable
 
   module ClassMethods
     def friendly_find(str)
+      str = normalize_friendly_str(str)
       return nil if str.blank?
-
-      str.strip! if str.is_a?(String)
       return where(id: str).first if integer_string?(str)
 
-      find_by_slug(Slugifyer.slugify(str)) || where("lower(name) = ?", str.downcase.strip).first
+      find_by_slug(Slugifyer.slugify(str)) || where("lower(name) = ?", str.downcase).first
     end
 
     def friendly_find_id(str)
