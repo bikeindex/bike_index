@@ -70,7 +70,17 @@ module UI
       end
 
       def call
-        helpers.column_chart @series, stacked: @stacked, thousands: @thousands, colors: @colors
+        helpers.column_chart @series, stacked: @stacked, thousands: @thousands, colors: chart_colors
+      end
+
+      private
+
+      # Chartkick treats a flat colors array as per-bar colors for single-series
+      # column charts (chartkick.js singleSeriesFormat branch), which paints each
+      # bar a different color. Use just the first color so single-series bars are
+      # uniform; keep the full palette for multi-series ({name:, data:} arrays).
+      def chart_colors
+        @series.is_a?(Hash) ? [@colors.first] : @colors
       end
     end
   end
