@@ -43,7 +43,7 @@
       <%= link_to t(".render_chart", default: "Render chart"),
         organization_registrations_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)),
         class: "btn btn-sm btn-outline-secondary #{"active" if @render_chart}",
-        data: {turbo_frame: "_top"} %>
+        data: {turbo_action: "advance"} %>
     </div>
 
     <% if @render_results %>

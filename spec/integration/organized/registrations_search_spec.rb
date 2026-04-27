@@ -162,6 +162,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     fill_in "search_notes", with: ""
     find("#search-button").click
     expect(page).to have_current_path(/period=year/, wait: 10)
+    expect(page).to have_text("11 registrations matching")
 
     # "past day" additionally excludes bike2 (3 days ago)
     click_link "past day"
@@ -183,10 +184,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_link "past year"
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
-
     fill_in "search_email", with: "bob@example.com"
     find("#search-button").click
-
     expect(page).to have_current_path(/search_email=bob/, wait: 10)
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_field("search_email", with: "bob@example.com")
