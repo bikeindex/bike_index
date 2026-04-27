@@ -25,6 +25,16 @@ This project uses RSpec. All business logic should be tested.
 
 Fix every failing test, even ones that were already failing on `main`. Confirming a failure pre-dates your branch (via `git stash` or checking out `main`) explains *what* broke — not whether you fix it. You fix it.
 
+## Don't weaken assertions to make a failing test pass
+
+When a test goes red, the default move is **investigate why**, not edit the assertion to match the new output. Watch for these tempting "fixes" that are actually erasing signal:
+
+- Changing an expected value to whatever the page/chart/response now happens to render (e.g. `0` → `null`, an exact count → a range, a specific string → a substring/regex).
+- Loosening `eq` to `include`, dropping `count:` constraints, or replacing `expect(...).to ...` with `expect(...).not_to be_nil`.
+- Deleting the assertion entirely with a "looks unrelated" handwave.
+
+The right loop: reproduce the failure, figure out *what* changed and *why*, then decide intentionally — fix the code if the original assertion captured the right behavior, or update the assertion (with a comment) if the behavior intentionally changed. If you're about to change a test "to make it easier", stop and explain why the new expectation is correct, not just convenient.
+
 ## Structuring with `context` and `let`
 
 Use `context` and `let` to isolate what varies between examples. Each `it` block should live in a `context` that names the condition, with `let` overrides for only what differs in that case. **Avoid repeating setup across sibling `it` blocks.**
