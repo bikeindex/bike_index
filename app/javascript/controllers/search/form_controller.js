@@ -82,17 +82,9 @@ export default class extends Controller {
     this.syncHiddenFieldsFromUrl()
   }
 
-  // Period buttons and the render-chart link live inside the results turbo-frame
-  // and use data-turbo-action="advance" so the frame swaps in place and the URL
-  // advances. The form (FormOrganized) sits outside the frame, so its hidden
-  // fields (period, start_time, render_chart, etc.) keep the values they had at
-  // initial render. Without this sync, the next form submit would carry stale
-  // hidden values and silently drop the period the user just chose.
-  //
-  // Only update fields whose value actually differs from the URL — avoids
-  // dispatching change events / dirtying inputs unnecessarily, and only touches
-  // hidden fields so user-typed text inputs (search_email, serial, etc.) stay
-  // intact even when the URL doesn't carry them yet.
+  // The form sits outside the results frame, so frame-nav period clicks advance
+  // the URL but leave its hidden fields stale. Sync from the URL so the next
+  // submit doesn't drop the period the user just chose.
   syncHiddenFieldsFromUrl () {
     const params = new URLSearchParams(window.location.search)
     this.formTarget.querySelectorAll('input[type="hidden"]').forEach(input => {
