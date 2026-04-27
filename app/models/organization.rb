@@ -203,6 +203,7 @@ class Organization < ApplicationRecord
     def friendly_find(n)
       return nil unless n.present?
       return n if n.is_a?(Organization)
+      n = n.delete("\u0000").strip if n.is_a?(String)
       return find_by_id(n) if integer_string?(n)
 
       slug = Slugifyer.slugify(n)

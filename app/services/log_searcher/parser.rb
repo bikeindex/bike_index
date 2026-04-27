@@ -64,8 +64,14 @@ module LogSearcher
         stolenness: stolenness_for(endpoint, opts),
         serial_normalized: SerialNormalizer.normalized_and_corrected(query_items["serial"]),
         includes_query: includes_query?(query_items),
-        page: [nil, "1", "undefined"].include?(query_items["page"]) ? nil : query_items["page"].to_i
+        page: page_for(query_items["page"])
       }
+    end
+
+    def page_for(value)
+      return nil if [nil, "1", "undefined"].include?(value)
+      return nil unless value.is_a?(String) || value.is_a?(Numeric)
+      value.to_i
     end
 
     #
@@ -136,6 +142,6 @@ module LogSearcher
       end
     end
 
-    conceal :includes_query?, :parse_endpoint, :organization_from_params, :parse_request_time, :scrub_null_bytes, :stolenness_for
+    conceal :includes_query?, :parse_endpoint, :organization_from_params, :page_for, :parse_request_time, :scrub_null_bytes, :stolenness_for
   end
 end

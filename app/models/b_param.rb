@@ -629,6 +629,7 @@ class BParam < ApplicationRecord
 
   def assign_bike_val(key, val)
     ensure_valid_params
+    val = val.delete("\u0000") if val.is_a?(String)
     self.params["bike"][key] = val
   end
 

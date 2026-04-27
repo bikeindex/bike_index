@@ -263,6 +263,10 @@ RSpec.describe Organization, type: :model do
       expect(Organization.friendly_find("bikeeastbay")).to eq organization3
       expect(Organization.friendly_find(organization)).to eq organization
     end
+    it "scrubs null bytes rather than raising" do
+      expect(Organization.friendly_find("1\u0000xxx")).to be_nil
+      expect(Organization.friendly_find("#{organization.id}\u0000")).to eq organization
+    end
   end
 
   describe "#nearby_organizations" do
