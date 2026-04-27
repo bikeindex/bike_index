@@ -75,10 +75,8 @@ module UI
 
       private
 
-      # Chartkick treats a flat colors array as per-bar colors for single-series
-      # column charts (chartkick.js singleSeriesFormat branch), which paints each
-      # bar a different color. Use just the first color so single-series bars are
-      # uniform; keep the full palette for multi-series ({name:, data:} arrays).
+      # Chartkick paints single-series column bars per-color from a flat array;
+      # collapse to one so bars are uniform.
       def chart_colors
         @series.is_a?(Hash) ? [@colors.first] : @colors
       end
