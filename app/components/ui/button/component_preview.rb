@@ -22,6 +22,7 @@ module UI
         render(UI::Button::Component.new(text: "Secondary", color: :secondary, data: {action: "click->ui--modal#open"}))
       end
 
+      # @label secondary active (with data)
       def secondary_active
         render(UI::Button::Component.new(text: "Secondary Active", color: :secondary, active: true, data: {action: "click->ui--modal#open"}))
       end
