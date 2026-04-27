@@ -169,16 +169,6 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_current_path(/period=day/, wait: 10)
     expect(page).to have_text("10 registrations matching")
 
-    # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only
-    click_button "custom"
-    start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
-    end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
-    page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
-    page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
-    page.execute_script("document.querySelector(\"[data-controller~='ui--period-select'] button[type='submit']\").click()")
-    expect(page).to have_current_path(/period=custom/, wait: 10)
-    expect(rendered_bike_ids).to eq([bike2.id])
-
     # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago).
     # Search on the page (no URL navigation): switch to past year, then submit the email filter.
     click_link "past year"
@@ -191,6 +181,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_field("search_email", with: "bob@example.com")
     expect(rendered_bike_ids).to eq([bike2.id])
 
+    # Chart test must run before the custom-range click below: that submission
+    # writes session[:timezone] from Intl.DateTimeFormat (varies between local
+    # Chrome and CI's headless Chrome), and set_timezone prefers session over
+    # cookie — so the cookie override only takes effect while session is empty.
+    expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to be_present
+
     # 5 AM UTC = 9 PM PDT (or 12 AM CDT) the previous day, so PDT and CDT fall on different days.
     chart_bike_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
     bike2.update_columns(created_at: chart_bike_created_at)
@@ -198,12 +194,14 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     cdt_date_key = chart_bike_created_at.in_time_zone("America/Chicago").strftime("%Y-%-m-%-d")
     expect(la_date_key).not_to eq(cdt_date_key)
 
-    # Pin timezone to LA via the URL param. The earlier custom-range click set
-    # session[:timezone] from Intl.DateTimeFormat (varies between local dev and
-    # CI), and set_timezone prefers session over cookie — so passing timezone in
-    # params is the only way to make chart bucketing deterministic here.
-    visit "#{bikes_path}?timezone=America/Los_Angeles&search_email=bob@example.com&period=month"
-    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    # Replace the cookie via JS the same way the app does, so attributes (SameSite, path)
+    # match and Chrome reliably overwrites the existing cookie set on previous loads.
+    page.execute_script("document.cookie = 'timezone=America/Los_Angeles;path=/;max-age=31536000;SameSite=Lax'")
+    expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to eq("America/Los_Angeles")
+
+    # Switch to past 30 days for daily chart bucketing, then enable the chart on the search page
+    click_link "past 30 days"
+    expect(page).to have_current_path(/period=month/, wait: 10)
 
     click_link "Render chart"
     expect(page).to have_current_path(/render_chart=true/, wait: 10)
@@ -211,6 +209,23 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket is empty (null)
     expect(page.html).to include(%(["#{la_date_key}",1]))
     expect(page.html).to include(%(["#{cdt_date_key}",null]))
+
+    # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only.
+    # Runs after the chart test because the Stimulus submit posts a timezone param that pins
+    # session[:timezone], which would otherwise override the cookie set above.
+    click_link "past year"
+    fill_in "search_email", with: ""
+    find("#search-button").click
+    expect(page).to have_current_path(/period=year/, wait: 10)
+
+    click_button "custom"
+    start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
+    end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
+    page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
+    page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
+    page.execute_script("document.querySelector(\"[data-controller~='ui--period-select'] button[type='submit']\").click()")
+    expect(page).to have_current_path(/period=custom/, wait: 10)
+    expect(rendered_bike_ids).to eq([bike2.id])
   end
 
   context "with stolen and impounded bikes" do
