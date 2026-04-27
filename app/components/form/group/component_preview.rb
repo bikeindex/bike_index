@@ -16,6 +16,10 @@ module Form
         {template: "form/group/component_preview/text_area"}
       end
 
+      def check_box
+        {template: "form/group/component_preview/check_box"}
+      end
+
       def custom_label
         {template: "form/group/component_preview/custom_label"}
       end
