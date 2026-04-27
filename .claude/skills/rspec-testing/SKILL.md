@@ -21,6 +21,10 @@ This project uses RSpec. All business logic should be tested.
 - Avoid mocking objects.
   - If making external requests, use VCR. Don't manually write VCR cassettes — record them by running the tests.
 
+## Always fix failing tests
+
+Fix every failing test, even ones that were already failing on `main`. Confirming a failure pre-dates your branch (via `git stash` or checking out `main`) explains *what* broke — not whether you fix it. You fix it.
+
 ## Don't weaken assertions to make a failing test pass
 
 When a test goes red, the default move is **investigate why**, not edit the assertion to match the new output. Watch for these tempting "fixes" that are actually erasing signal:
