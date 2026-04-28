@@ -5958,6 +5958,19 @@ nl:
         you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
           Bike Index
         youre_almost_done_registering: Je bent bijna klaar met registreren!
+      organization_invitation:
+        hello: Hallo %{name},
+        join_org: Doe mee met %{org_name}
+        welcome_to_bike_index: Welkom bij Bike Index
+        you_are_a_member: "%{sender_name} heeft aangegeven dat u lid bent van %{org_name}."
+      partial_registration:
+        click_below_to_complete_your_registration: Klik hieronder om uw registratie
+          te voltooien
+        finish_it: Maak het af!
+        just_a_few_steps_away_html: U bent slechts een paar stappen verwijderd van
+          het registreren van uw <strong>%{color_and_brand}</strong> in 's werelds
+          meest uitgebreide <strong>fietsregister</strong> !
+        youre_almost_done: Je bent bijna klaar!
     messages:
       thread_show:
         can_not_send_new_message: Helaas, u kunt geen nieuw bericht versturen.

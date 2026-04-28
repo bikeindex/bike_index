@@ -1,9 +1,0 @@
----
-nb:
-  components:
-    emails:
-      organization_invitation:
-        hello: Hei %{name},
-        join_org: Bli med %{org_name}
-        welcome_to_bike_index: Velkommen til Bike Index
-        you_are_a_member: "%{sender_name} har indikert at du er medlem av %{org_name}."

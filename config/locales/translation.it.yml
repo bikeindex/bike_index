@@ -4672,6 +4672,16 @@ it:
         when_you_do:
         you_added_a_bike_type_on_bike_index:
         youre_almost_done_registering:
+      organization_invitation:
+        hello:
+        join_org:
+        welcome_to_bike_index:
+        you_are_a_member:
+      partial_registration:
+        click_below_to_complete_your_registration:
+        finish_it:
+        just_a_few_steps_away_html:
+        youre_almost_done:
     messages:
       thread_show:
         can_not_send_new_message:
