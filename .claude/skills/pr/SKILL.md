@@ -19,7 +19,7 @@ Create or update a pull request for the current branch. If the diff contains fro
 ## When to apply each path
 
 - **No PR exists yet** → run the full workflow (steps 1–7 as applicable) and `gh pr create`.
-- **PR exists, user wants the body rewritten or updated** → skip Playwright/screenshots unless the user asks for new captures. Re-do step 5 (build a fresh body that describes the *current* diff) and `gh pr edit <num> --body-file ...`. Don't append a changelog of recent edits — rewrite to describe the end state.
+- **PR exists, user wants the body rewritten or updated** → always re-do step 5 to describe the *current* diff and `gh pr edit <num> --body-file ...`. Don't append a changelog of recent edits — rewrite to describe the end state. Recapture screenshots when the existing captures are stale: re-classify the diff (step 2), and if commits since the last capture touched a page that's already screenshotted, or added a new affected page, recapture those (steps 3–4/6–7). Skip screenshot work only when nothing screenshot-relevant has moved.
 
 ## Workflow
 
