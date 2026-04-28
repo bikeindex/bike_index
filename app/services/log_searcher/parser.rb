@@ -68,15 +68,15 @@ module LogSearcher
       }
     end
 
+    #
+    # private below here
+    #
+
     def page_for(value)
       return nil if [nil, "1", "undefined"].include?(value)
       return nil unless value.is_a?(String) || value.is_a?(Numeric)
       value.to_i
     end
-
-    #
-    # private below here
-    #
 
     def includes_query?(query_items)
       query_items.except(*NON_QUERY_ITEMS).present?
