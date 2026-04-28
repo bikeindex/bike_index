@@ -58,10 +58,11 @@ tail -1 tmp/2026-4-27.production.log
 grep -oE '"status":[0-9]+' tmp/2026-4-27.production.log | sort | uniq -c | sort -rn
 ```
 
-**Slow requests over a threshold (in ms).** Use `awk` rather than a regex — durations are floats with arbitrary digit counts and a regex like `"duration":[5-9][0-9]{4}` will silently miss values:
+**Slow requests over a threshold (in ms).** Use `awk` rather than a regex — durations are floats with arbitrary digit counts and a regex like `"duration":[5-9][0-9]{4}` will silently miss values. Pre-filtering with `rg --text` to lines that have a `duration` field is ~2× faster than awk-alone over a full-day log, because stack-trace lines never match:
 
 ```bash
-awk -F'"duration":' '$2 != "" {split($2,a,","); if (a[1]+0 > 60000) print}' tmp/2026-4-27.production.log
+rg --text '"duration":[0-9.]+' tmp/2026-4-27.production.log \
+  | awk -F'"duration":' '{split($2,a,","); if (a[1]+0 > 60000) print}'
 ```
 
 Pipe that into `grep -oE '"path":"[^"]+"' | sort | uniq -c | sort -rn` to group by path, or `grep -oE '"status":[0-9]+'` for status mix.
@@ -110,6 +111,9 @@ grep -B0 -A1 "PG::TRSerializationFailure" tmp/2026-4-27.production.log | head -4
 - **Durations are ms**, not seconds. A "slow" search is `> 60000`, not `> 60`.
 - **The replication-conflict cancel error** (`PG::TRSerializationFailure: canceling statement due to conflict with recovery`) means the *replica* killed the query because WAL recovery was blocked — it's a symptom of a slow query holding the replica too long, not a bug in the SQL itself. Look for the underlying duration to find the real cause.
 - **Bots and scanners produce a lot of noise** in 4xx and 5xx counts (path-traversal probes, `.well-known/*` lookups, npm CDN-style 404s). Eyeball the path before treating an error spike as a real issue.
+- **`rg` will silently truncate the file as "binary"** if it hits a `\0` byte — easy on production logs because path-traversal scanner payloads, exception messages, and odd request bodies all contain nulls. Always pass `--text` (or `-a`) when using `rg` on a log file. Without it, you may search only a small prefix and get a confidently wrong count. `grep` doesn't have this behavior.
+- **The Bash tool truncates long lines in piped output** with `[... omitted end of long line]` (around 330 chars), even when the pipeline ends in a file redirect. Fields at the *end* of a Lograge JSON line (`@timestamp`, `@version`, `message`) get clipped if you do `rg <line-pattern> | grep -oE '<trailing-field>'`. Workarounds: (a) use `awk` directly on the file — no pipe, full lines preserved; (b) use `rg -o '<pattern>' file.log` so the *match* itself (short) is what enters the pipeline, not the whole line.
+- **One scanner IP can dominate counts.** A single bot can rack up tens of thousands of 4xx/5xx and make a real user-facing issue look bigger than it is. Always check `"remote_ip"` distribution before treating an error spike as a real signal — group by IP first, then re-run analyses excluding the dominant scanner.
 
 ## When `jq` is and isn't worth it
 
