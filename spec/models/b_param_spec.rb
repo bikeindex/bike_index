@@ -514,6 +514,17 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "string assignments scrub null bytes" do
+    it "saves without raising when input contains a null byte" do
+      b_param = BParam.new
+      b_param.owner_email = "1\u0000foo@example.com"
+      b_param.cycle_type = "tall\u0000-bike"
+      expect(b_param.bike["owner_email"]).to eq "1foo@example.com"
+      expect(b_param.bike["cycle_type"]).to eq "tall-bike"
+      expect { b_param.save! }.not_to raise_error
+    end
+  end
+
   describe "display_email?" do
     context "owner_email present" do
       it "is false" do

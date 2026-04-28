@@ -10,6 +10,11 @@ RSpec.describe Search::MarketplaceController, type: :request do
     expect(search_marketplace_path).to eq base_url
   end
 
+  it "renders without erroring when page is hash-injected" do
+    get "#{base_url}?search_no_js=true&page%5B%24eq%5D=2"
+    expect(response).to have_http_status(:success)
+  end
+
   context "with listings" do
     let(:seller) { FactoryBot.create(:user, :with_address_record, address_in: :davis) }
     let(:item) { FactoryBot.create(:bike, :with_primary_activity, cycle_type: "personal-mobility", propulsion_type: "throttle") }
