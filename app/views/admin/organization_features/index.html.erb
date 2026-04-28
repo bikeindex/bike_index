@@ -1,0 +1,12 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "New Feature", new_admin_organization_feature_url, class: "nav-link" %>
+  </li>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @organization_features,
+  viewing: "Organization Features",
+  skip_charting: true,
+  nav_header_list_items:
+)) %>

@@ -4999,6 +4999,9 @@ nb:
       index:
         impound_records: Beslaglegg poster
         render_chart: Gjengi diagram
+    registrations:
+      search:
+        render_chart: Gjengi diagram
   organized_mailer:
     custom_message:
       subject: "%{org_name} - plasseringen av din %{mnfg_name}"
@@ -5439,19 +5442,6 @@ nb:
       use_lightspeed_retail_pos: Bruker du Lightspeed Retail POS?
       viewing_our_streamlined_page: Du ser for øyeblikket på vår strømlinjeformede
         Bike Shop-registreringsside, som er det vi anbefaler å bruke
-    period_select:
-      all: Alle
-      custom: tilpasset
-      day: dag
-      from: Fra
-      hour: time
-      next: neste
-      past: forbi
-      seven_days: 7 dager
-      thirty_days: 30 dager
-      to: Til
-      update: Oppdater
-      year: år
     user_general_alert:
       add_location_theft_bike_title_html: Legg til stedet for tyveriet av din <strong>%{bike_title}</strong>
       add_photo_theft_bike_title_html: Legg til et bilde på <strong>%{bike_title}</strong>

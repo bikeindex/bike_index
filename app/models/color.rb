@@ -44,9 +44,11 @@ class Color < ApplicationRecord
 
   def self.friendly_find(n)
     # Use the FriendlyNameFindable version, then the first part of the string (for slug), then grasp at straws
+    n = normalize_friendly_str(n)
+    return nil if n.blank?
     super ||
-      where("lower(name) ILIKE ?", "#{n.to_s.downcase.strip}%").first ||
-      where("lower(name) ILIKE ?", "%#{n.to_s.downcase.strip}%").first
+      where("lower(name) ILIKE ?", "#{n.to_s.downcase}%").first ||
+      where("lower(name) ILIKE ?", "%#{n.to_s.downcase}%").first
   end
 
   def autocomplete_hash

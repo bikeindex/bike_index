@@ -16,12 +16,12 @@ module Form
         {template: "form/group/component_preview/text_area"}
       end
 
-      def custom_label
-        {template: "form/group/component_preview/custom_label"}
+      def check_box
+        {template: "form/group/component_preview/check_box"}
       end
 
-      def radio_button_group
-        {template: "form/group/component_preview/radio_button_group"}
+      def custom_label
+        {template: "form/group/component_preview/custom_label"}
       end
       # @!endgroup
     end

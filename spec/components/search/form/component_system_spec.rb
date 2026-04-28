@@ -30,7 +30,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     def open_select2_dropdown
       find(".select2-container").click
       # Wait for select2 to load - production API can be slow in CI
-      expect(page).to have_no_content("Searching", wait: 10)
+      expect(page).to have_no_content("Searching", wait: 30)
       expect(page).to have_content("Registrations that are Black")
     end
 

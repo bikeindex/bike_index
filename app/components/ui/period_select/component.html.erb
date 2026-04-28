@@ -12,13 +12,13 @@
 
     <% visible_periods.each do |p| %>
       <%= render period_button(p[:key]) do %>
-        <% if p[:prefix] %>
-          <span class="d-none d-md-inline-block">
-            <%= translation(".#{p[:prefix]}") %>
-          </span>
-        <% end %>
-
-        <%= translation(".#{p[:label]}") %>
+        <span>
+          <% if p[:prefix] %>
+            <span class="d-none d-md-inline">
+              <%= translation(".#{p[:prefix]}") %>
+            </span>
+          <% end %><%= translation(".#{p[:label]}") %>
+        </span>
       <% end %>
     <% end %>
 
@@ -34,7 +34,7 @@
     url: "#",
     method: :get,
     builder: BikeIndexFormBuilder,
-    html: {id: "timeSelectionCustom", class: custom_form_classes, "data-collapse-target": "content"}
+    html: {class: custom_form_classes, data: {collapse_target: "content", action: "submit->ui--period-select#submit"}}
   ) do |f| %>
     <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-3">
       <div class="tw:flex tw:items-center tw:gap-2">

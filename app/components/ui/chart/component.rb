@@ -24,7 +24,8 @@ module UI
             group_by_method(time_range),
             column,
             range: time_range,
-            format: group_by_format(time_range)
+            format: group_by_format(time_range),
+            time_zone: ::Time.zone
           )
         end
 
@@ -69,7 +70,15 @@ module UI
       end
 
       def call
-        helpers.column_chart @series, stacked: @stacked, thousands: @thousands, colors: @colors
+        helpers.column_chart @series, stacked: @stacked, thousands: @thousands, colors: chart_colors
+      end
+
+      private
+
+      # Chartkick paints single-series column bars per-color from a flat array;
+      # collapse to one so bars are uniform.
+      def chart_colors
+        @series.is_a?(Hash) ? [@colors.first] : @colors
       end
     end
   end

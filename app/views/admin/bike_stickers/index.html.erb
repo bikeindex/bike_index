@@ -1,0 +1,151 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "New batch", new_admin_bike_sticker_path, class: "btn btn-outline-success btn-sm" %>
+  </li>
+
+  <li class="nav-item">
+    <small>
+      <%= link_to "reassign", reassign_admin_bike_stickers_path, class: "btn btn-outline-secondary btn-sm less-strong ml-2" %>
+    </small>
+  </li>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <div class="mt-4">
+    <% unless @bike_sticker_batch.present? %>
+      <h5>
+        <%= number_display(@bike_sticker_batches.count) %>
+
+        <% if @matching_batches %>
+          matching
+          <%= "batch".pluralize(@bike_sticker_batches.count) %>
+        <% elsif @all_batches %>
+          batches
+          <small class="less-strong">
+            - show
+            <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)) %>
+          </small>
+        <% else %>
+          most recent batches
+          <small class="less-strong">
+            - <%= number_display(BikeStickerBatch.count) %>
+            <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "less-strong" %>
+          </small>
+        <% end %>
+      </h5>
+    <% end %>
+
+    <%= render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false, matching_count: @matching_batches} %>
+  </div>
+
+  <% if @bike_sticker_batch.present? %>
+    <% if Binxtils::InputNormalizer.boolean(params[:search_show_problems]) %>
+      <div class="mt-4 mb-4">
+        <h4>
+          Showing Problem stickers
+          <small><%= link_to "hide", url_for(sortable_search_params.merge(search_show_problems: false)), class: "less-strong" %></small>
+        </h4>
+
+        <% duplicated = @bike_sticker_batch.duplicated_integers %>
+        <span class="d-block strong">Duplicates:</span>
+
+        <% if duplicated.any? %>
+          <ul>
+            <% duplicated.each do |int| %>
+              <li class="small"><code><%= int %></code></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <em class="less-strong">None</em>
+        <% end %>
+
+        <span class="d-block strong">Non-sequential stickers:</span>
+
+        <% if @bike_sticker_batch.non_sequential_integers.any? %>
+          <ul>
+            <% @bike_sticker_batch.non_sequential_integers.each do |arr| %>
+              <li class="small"><%= arr[0] %> > <%= arr[1] %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <em class="less-strong">none</em>
+        <% end %>
+      </div>
+      <hr>
+    <% else %>
+      <div class="text-center pt-4">
+        <%= link_to "Show problem stickers for Batch ##{@bike_sticker_batch.id}", url_for(sortable_search_params.merge(search_show_problems: true)), class: "btn btn-outline-warning btn-sm" %>
+
+        <em class="ml-2 less-strong">
+          (duplicates and non-sequential stickers)
+        </em>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <p>
+        <%= number_display(matching_bike_stickers.size) %> matching
+        <%= "sticker".pluralize(matching_bike_stickers.size) %>
+        <% unless @search_claimed %>
+          <span class="less-strong">
+            <%= number_with_delimiter(matching_bike_stickers.claimed.count) %>
+            claimed
+          </span>
+        <% end %>
+        <%= @period == "all" ? "" : "were" %>
+        <em>
+          <%= humanized_time_range_column(@time_range_column) %>
+          <%= humanized_time_range(@time_range) %>
+        </em>
+        <% if sortable_search_params? %>
+          -
+          <em><%= link_to "view all stickers", url_for %></em>
+        <% end %>
+      </p>
+
+      <% if @bike_sticker_batch.present? %>
+        <p>
+          <strong>Viewing Just Batch #<%= @bike_sticker_batch.id %></strong>
+
+          <small>
+            <%= link_to "view all batches", url_for(sortable_search_params.except(:search_bike_sticker_batch_id)) %>
+          </small>
+        </p>
+      <% end %>
+    </div>
+
+    <div class="col-md-6 mt-2">
+      <%= form_tag admin_bike_stickers_path, method: :get, class: "form-inline" do %>
+        <%= render partial: "/shared/hidden_search_fields" %>
+        <%= hidden_field_tag :search_bike_sticker_batch_id, params[:search_bike_sticker_batch_id] %>
+
+        <div class="form-check ml-auto ml-2">
+          <%= check_box_tag :search_claimed, true, @search_claimed, class: "form-check-input" %>
+          <%= label_tag :search_claimed, "Claimed only" %>
+        </div>
+
+        <div class="form-group ml-2">
+          <%= text_field_tag :search_query, params[:search_query], placeholder: "search sticker", class: "form-control" %>
+        </div>
+
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary ml-2" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "table", locals: {bike_stickers: @bike_stickers, render_sortable: true} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @bike_stickers,
+  viewing: "Stickers",
+  chart_collection: @render_chart && matching_bike_stickers,
+  time_range_column: @time_range_column,
+  nav_header_list_items:,
+  admin_search_form:,
+  table_view:
+)) %>
