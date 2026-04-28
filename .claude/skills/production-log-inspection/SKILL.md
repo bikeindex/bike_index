@@ -19,7 +19,7 @@ description: >-
 Bike Index production logs live at `tmp/<YYYY-M-D>.production.log` (e.g. `tmp/2026-4-27.production.log`). They're typically **400+ MB and ~1M lines per day**, so:
 
 - **Never `Read` or `cat` the whole file.** Use `grep`/`awk`/`head`/`tail` to slice.
-- **Never paste raw log lines into your reply.** Synthesize counts and examples.
+- **Synthesize by default; paste at most one short example when it's load-bearing.** Lograge lines are 400+ chars of mostly-structural JSON, so dumping multiple into a reply is unreadable and burns context. A single representative line for an exception or a slow request is fine — a wall of grep output is not.
 
 ## Log line format
 
