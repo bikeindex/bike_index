@@ -40,3 +40,5 @@ This project uses the ViewComponent gem to render components.
 - In view components, **prefer instance variables to `attr_accessor`**.
 - In ViewComponent templates, use the `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`).
   - You don't need to prefix paths (e.g. do `new_bike_path`, NOT `helpers.new_bike_path`).
+  - You don't need to prefix tag builders (`tag.span`, `content_tag`, `safe_join`) — `ActionView::Helpers::TagHelper` and `OutputSafetyHelper` are already mixed into `ViewComponent::Base`. Use `tag.span("foo")`, NOT `helpers.tag.span("foo")`.
+  - Rule of thumb: try the bare call first. Only add `helpers.` if it actually fails (NoMethodError) — most app-level helpers do need it, but ActionView's tag/url builders don't.
