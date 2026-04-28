@@ -26,6 +26,9 @@ class PaymentsController < ApplicationController
     @payment.stripe_checkout_session
 
     redirect_to @payment.stripe_checkout_session.url, allow_other_host: true
+  rescue Stripe::InvalidRequestError => e
+    flash[:notice] = "Unable to process payment: #{e.message}"
+    redirect_back(fallback_location: new_payment_path)
   end
 
   private
