@@ -3,11 +3,10 @@
 module Emails
   module GraduatedNotification
     class Component < ApplicationComponent
-      def initialize(graduated_notification:, bike: nil, email_preview: false, email_preview_tokenized_url: nil)
+      def initialize(graduated_notification:, bike: nil, email_preview: false)
         @graduated_notification = graduated_notification
         @bike = bike
         @email_preview = email_preview
-        @email_preview_tokenized_url = email_preview_tokenized_url
       end
 
       private
@@ -25,7 +24,7 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? @email_preview_tokenized_url : helpers.retrieval_link_url(@graduated_notification)
+        @email_preview ? EMAIL_PREVIEW_URL : helpers.retrieval_link_url(@graduated_notification)
       end
     end
   end

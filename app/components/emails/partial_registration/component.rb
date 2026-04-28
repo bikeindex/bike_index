@@ -3,10 +3,9 @@
 module Emails
   module PartialRegistration
     class Component < ApplicationComponent
-      def initialize(b_param:, email_preview: false, email_preview_tokenized_url: nil)
+      def initialize(b_param:, email_preview: false)
         @b_param = b_param
         @email_preview = email_preview
-        @email_preview_tokenized_url = email_preview_tokenized_url
       end
 
       private
@@ -23,7 +22,7 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? @email_preview_tokenized_url : new_bike_url(b_param_token: @b_param.id_token)
+        @email_preview ? EMAIL_PREVIEW_URL : new_bike_url(b_param_token: @b_param.id_token)
       end
 
       def organization_snippet_body

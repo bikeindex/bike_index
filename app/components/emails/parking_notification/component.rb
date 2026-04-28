@@ -3,11 +3,10 @@
 module Emails
   module ParkingNotification
     class Component < ApplicationComponent
-      def initialize(parking_notification:, bike: nil, email_preview: false, email_preview_tokenized_url: nil)
+      def initialize(parking_notification:, bike: nil, email_preview: false)
         @parking_notification = parking_notification
         @bike = bike
         @email_preview = email_preview
-        @email_preview_tokenized_url = email_preview_tokenized_url
       end
 
       private
@@ -42,7 +41,7 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? @email_preview_tokenized_url : helpers.retrieval_link_url(@parking_notification)
+        @email_preview ? EMAIL_PREVIEW_URL : helpers.retrieval_link_url(@parking_notification)
       end
 
       def map_url
