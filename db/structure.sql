@@ -713,7 +713,8 @@ CREATE TABLE public.bikes (
     serial_segments_migrated_at timestamp without time zone,
     model_audit_id bigint,
     primary_activity_id bigint,
-    address_record_id bigint
+    address_record_id bigint,
+    search_vector tsvector GENERATED ALWAYS AS (((setweight(to_tsvector('simple'::regconfig, (COALESCE(serial_number, ''::character varying))::text), 'A'::"char") || setweight(to_tsvector('simple'::regconfig, COALESCE(cached_data, ''::text)), 'B'::"char")) || setweight(to_tsvector('simple'::regconfig, COALESCE(all_description, ''::text)), 'C'::"char"))) STORED
 );
 
 
@@ -6187,6 +6188,13 @@ CREATE INDEX index_bikes_on_primary_frame_color_id ON public.bikes USING btree (
 
 
 --
+-- Name: index_bikes_on_search_vector; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_search_vector ON public.bikes USING gin (search_vector);
+
+
+--
 -- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7546,6 +7554,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260428142526'),
 ('20260425103043'),
 ('20260425000001'),
 ('20260424000002'),

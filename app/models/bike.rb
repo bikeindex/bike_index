@@ -38,6 +38,7 @@
 #  pdf                         :string(255)
 #  propulsion_type             :integer          default("foot-pedal")
 #  rear_tire_narrow            :boolean          default(TRUE)
+#  search_vector               :tsvector
 #  serial_normalized           :string(255)
 #  serial_normalized_no_space  :string
 #  serial_number               :string(255)      not null
@@ -90,6 +91,7 @@
 #  index_bikes_on_paint_id                   (paint_id) WHERE (paint_id IS NOT NULL)
 #  index_bikes_on_primary_activity_id        (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
 #  index_bikes_on_primary_frame_color_id     (primary_frame_color_id)
+#  index_bikes_on_search_vector              (search_vector) USING gin
 #  index_bikes_on_secondary_frame_color_id   (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL)
 #  index_bikes_on_status                     (status)
 #  index_bikes_on_tertiary_frame_color_id    (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL)
@@ -221,11 +223,9 @@ class Bike < ApplicationRecord
 
   default_scope -> { default_includes.current.order(listing_order: :desc) }
 
-  pg_search_scope :pg_search, against: {
-    serial_number: "A",
-    cached_data: "B",
-    all_description: "C"
-  }
+  pg_search_scope :pg_search,
+    against: {serial_number: "A", cached_data: "B", all_description: "C"},
+    using: {tsearch: {tsvector_column: "search_vector"}}
 
   pg_search_scope :admin_search,
     against: {owner_email: "A"},
