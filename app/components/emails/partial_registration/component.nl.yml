@@ -6,7 +6,7 @@ nl:
         click_below_to_complete_your_registration: Klik hieronder om uw registratie
           te voltooien
         finish_it: Maak het af!
-        just_a_few_steps_away_html: U bent slechts een paar stappen verwijderd van
-          het registreren van uw <strong>%{color_and_brand}</strong> in 's werelds
-          meest uitgebreide <strong>fietsregister</strong> !
+        just_a_few_steps_away_html: >-
+          U bent slechts een paar stappen verwijderd van het registreren van uw <strong>%{color_and_brand}</strong>
+          in 's werelds meest uitgebreide <strong>fietsregister</strong> !
         youre_almost_done: Je bent bijna klaar!
