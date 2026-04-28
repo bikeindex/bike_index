@@ -63,6 +63,8 @@ production:
     database: "<%= ENV['POSTGRESQL_DATABASE'] %>"
     username: "<%= ENV['POSTGRESQL_USERNAME'] %>"
     password: "<%= ENV['POSTGRESQL_PASSWORD'] %>"
+    variables:
+      statement_timeout: 60000
 
   analytics:
     <<: *default
