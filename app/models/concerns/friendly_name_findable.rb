@@ -3,12 +3,11 @@ module FriendlyNameFindable
 
   module ClassMethods
     def friendly_find(str)
+      str = normalize_friendly_str(str)
       return nil if str.blank?
-
-      strip_if_str!(str)
       return where(id: str).first if integer_string?(str)
 
-      where("lower(name) = ?", str.downcase.strip).first
+      where("lower(name) = ?", str.downcase).first
     end
 
     def friendly_find!(str)
@@ -23,10 +22,8 @@ module FriendlyNameFindable
       str.is_a?(Integer) || str.match(/\A\d+\z/).present?
     end
 
-    def strip_if_str!(str)
-      return unless str.is_a?(String) && !str.frozen?
-      str.delete!("\u0000")
-      str.strip!
+    def normalize_friendly_str(str)
+      str.is_a?(String) ? Binxtils::InputNormalizer.string(str) : str
     end
   end
 end

@@ -73,7 +73,8 @@ class Blog < ApplicationRecord
     end
 
     def friendly_find(str)
-      return nil unless str.present?
+      str = Binxtils::InputNormalizer.string(str) if str.is_a?(String)
+      return nil if str.blank?
       return find_by_id(str) if integer_slug?(str)
 
       slug = slugify_title(str)

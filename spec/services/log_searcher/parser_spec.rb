@@ -61,6 +61,14 @@ RSpec.describe LogSearcher::Parser do
           end
         end
 
+        context "with hash-injected page param" do
+          let(:log_line) { 'I, [2026-04-27T12:06:53.334338 #277631]  INFO -- : [989d075e-a235-40ed-a408-6919a54c1b4d] {"method":"GET","path":"/search/marketplace","format":"html","controller":"Search::MarketplaceController","action":"index","status":500,"allocations":5792,"duration":12.78,"view":0.0,"db":5.01,"remote_ip":"193.233.112.165","u_id":null,"params":{"button":"","currency":"$","distance":"100","location":"you","marketplace_scope":"for_sale","page":{"$eq":"2"},"price_max_amount":"","price_min_amount":"","primary_activity":"","search_result_view":"thumbnail"},"@timestamp":"2026-04-27T12:06:53.334Z","@version":"1","message":"[500] GET /search/marketplace (Search::MarketplaceController#index)"}' }
+          it "stores nil page rather than raising" do
+            parsed = described_class.parse_log_line(log_line)
+            expect(parsed[:page]).to be_nil
+          end
+        end
+
         context "count" do
           let(:log_line) { 'I, [2025-06-19T22:42:11.977671 #476516]  INFO -- : [29e848c7-c6ac-4a7d-bc3a-34bbf44dc8ce] {"method":"GET","path":"/search/marketplace/counts","format":"*/*","controller":"Search::MarketplaceController","action":"counts","status":200,"allocations":8787,"duration":50.22,"view":0.33,"db":12.42,"remote_ip":"198.27.190.253","u_id":69,"params":{"query_items":["m_244"],"distance":"50","location":"Chicago, IL","marketplace_scope":"for_sale_proximity","marketplace":{}},"@timestamp":"2025-06-19T22:42:12.090Z","@version":"1","message":"[200] GET /search/marketplace/counts (Search::MarketplaceController#counts)"}' }
           let(:target) do
