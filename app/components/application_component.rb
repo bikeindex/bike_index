@@ -3,10 +3,6 @@
 class ApplicationComponent < ViewComponent::Base
   include ApplicationComponentHelper
 
-  # Placeholder for tokenized URLs in email previews — real tokens shouldn't
-  # appear on the screen of an admin previewing the email.
-  EMAIL_PREVIEW_URL = "/404"
-
   def raise_if_invalid_value!(attribute, value, options = {})
     return if options.include?(value)
 

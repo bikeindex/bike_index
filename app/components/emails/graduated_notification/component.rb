@@ -24,7 +24,7 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? EMAIL_PREVIEW_URL : helpers.retrieval_link_url(@graduated_notification)
+        @email_preview ? OrganizedMailer::PREVIEW_TOKEN_URL : helpers.retrieval_link_url(@graduated_notification)
       end
     end
   end

@@ -1,6 +1,10 @@
 # Every email in here has the potential to be owned by an organization -
 # but they aren't necessarily
 class OrganizedMailer < ApplicationMailer
+  # Placeholder for tokenized URLs in email previews — real tokens shouldn't
+  # appear on the screen of an admin previewing the email.
+  PREVIEW_TOKEN_URL = "/404"
+
   helper TranslationHelper
   default content_type: "multipart/alternative",
     parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]

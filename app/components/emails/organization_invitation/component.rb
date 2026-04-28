@@ -24,7 +24,7 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? EMAIL_PREVIEW_URL : new_user_url(email: invited_email)
+        @email_preview ? OrganizedMailer::PREVIEW_TOKEN_URL : new_user_url(email: invited_email)
       end
     end
   end

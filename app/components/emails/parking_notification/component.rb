@@ -41,7 +41,7 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? EMAIL_PREVIEW_URL : helpers.retrieval_link_url(@parking_notification)
+        @email_preview ? OrganizedMailer::PREVIEW_TOKEN_URL : helpers.retrieval_link_url(@parking_notification)
       end
 
       def map_url

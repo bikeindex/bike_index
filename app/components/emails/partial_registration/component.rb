@@ -22,7 +22,7 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? EMAIL_PREVIEW_URL : new_bike_url(b_param_token: @b_param.id_token)
+        @email_preview ? OrganizedMailer::PREVIEW_TOKEN_URL : new_bike_url(b_param_token: @b_param.id_token)
       end
 
       def organization_snippet_body
