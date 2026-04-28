@@ -2,8 +2,8 @@
 name: production-log-inspection
 description: >-
   Inspect Bike Index production Rails logs at `tmp/*.production.log` —
-  JSON-per-request format produced by Lograge, hundreds of MB per day,
-  far too large to read end-to-end. Trigger when the user asks to
+  JSON-per-request format produced by Lograge, far too large to read
+  end-to-end. Trigger when the user asks to
   review, investigate, audit, or pull stats from a production log file
   (slow requests, error spikes, status-code distribution, exception
   stack traces, per-endpoint hit counts, suspicious traffic). Also
@@ -16,10 +16,10 @@ description: >-
 
 # Inspecting production logs
 
-Bike Index production logs live at `tmp/<YYYY-M-D>.production.log` (e.g. `tmp/2026-4-27.production.log`). They're typically **400+ MB and ~1M lines per day**, so:
+Bike Index production logs live at `tmp/<YYYY-M-D>.production.log` (e.g. `tmp/2026-4-27.production.log`). They're large, so:
 
 - **Never `Read` or `cat` the whole file.** Use `grep`/`awk`/`head`/`tail` to slice.
-- **Synthesize by default; paste at most one short example when it's load-bearing.** Lograge lines are 400+ chars of mostly-structural JSON, so dumping multiple into a reply is unreadable and burns context. A single representative line for an exception or a slow request is fine — a wall of grep output is not.
+- **Synthesize by default; paste at most one short example when it's load-bearing.** Lograge lines are long and mostly structural JSON — dumping multiple into a reply is unreadable and burns context. A single representative line for an exception or a slow request is fine; a wall of grep output is not.
 
 ## Log line format
 
@@ -110,12 +110,12 @@ grep -B0 -A1 "PG::TRSerializationFailure" tmp/2026-4-27.production.log | head -4
 - **Durations are ms**, not seconds. A "slow" search is `> 60000`, not `> 60`.
 - **The replication-conflict cancel error** (`PG::TRSerializationFailure: canceling statement due to conflict with recovery`) means the *replica* killed the query because WAL recovery was blocked — it's a symptom of a slow query holding the replica too long, not a bug in the SQL itself. Look for the underlying duration to find the real cause.
 - **Bots and scanners produce a lot of noise** in 4xx and 5xx counts (path-traversal probes, `.well-known/*` lookups, npm CDN-style 404s). Eyeball the path before treating an error spike as a real issue.
-- **The Bash tool truncates long lines in piped output** with `[... omitted end of long line]` (around 330 chars), even when the pipeline ends in a file redirect. Fields at the *end* of a Lograge JSON line (`@timestamp`, `@version`, `message`) get clipped if you stage with `grep <line-pattern> | grep -oE '<trailing-field>'`. Workarounds: (a) `awk` directly on the file — no pipe, full lines preserved; (b) `grep -oE '<pattern>' file.log` so the *match* itself (short) is what enters the pipeline, not the whole line.
+- **The Bash tool truncates long lines in piped output** with `[... omitted end of long line]`, even when the pipeline ends in a file redirect. Fields at the *end* of a Lograge JSON line (`@timestamp`, `@version`, `message`) get clipped if you stage with `grep <line-pattern> | grep -oE '<trailing-field>'`. Workarounds: (a) `awk` directly on the file — no pipe, full lines preserved; (b) `grep -oE '<pattern>' file.log` so the *match* itself (short) is what enters the pipeline, not the whole line.
 - **One scanner IP can dominate counts.** A single bot can rack up tens of thousands of 4xx/5xx and make a real user-facing issue look bigger than it is. Always check `"remote_ip"` distribution before treating an error spike as a real signal — group by IP first, then re-run analyses excluding the dominant scanner.
 
 ## When `jq` is and isn't worth it
 
-The lines are JSON, so `jq` is tempting — but you have to strip the syslog prefix first, and over 400+ MB it's noticeably slower than `grep`/`awk`. Use `jq` when you need to group by **two or more** JSON fields at once, or when params/payload structure matters; otherwise `awk -F'"key":'` patterns above are faster.
+The lines are JSON, so `jq` is tempting — but you have to strip the syslog prefix first, and on a full-day log it's noticeably slower than `grep`/`awk`. Use `jq` when you need to group by **two or more** JSON fields at once, or when params/payload structure matters; otherwise `awk -F'"key":'` patterns above are faster.
 
 ```bash
 # strip prefix, then jq — only worth it for multi-field aggregations
