@@ -630,7 +630,7 @@ class BParam < ApplicationRecord
   def assign_bike_val(key, val)
     ensure_valid_params
     val = Binxtils::InputNormalizer.string(val) if val.is_a?(String)
-    self.params["bike"][key] = val
+    self.params["bike"][key] = val if val.present?
   end
 
   def clean_key_value(key, value)
