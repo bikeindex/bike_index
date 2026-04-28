@@ -1,0 +1,22 @@
+[
+  {"query": "let's open a pr for this branch", "should_trigger": true},
+  {"query": "I'm done with the marketplace fixes, push it up and make a PR for me", "should_trigger": true},
+  {"query": "update the description on the pr to mention the bbox change too", "should_trigger": true},
+  {"query": "the body of #3476 needs to mention that we're using a real binxtils version now, can you rewrite it?", "should_trigger": true},
+  {"query": "let's get this branch up for review", "should_trigger": true},
+  {"query": "create a pr based on what's on this branch right now, base it on main", "should_trigger": true},
+  {"query": "fix the pr description, it still has a test plan section we agreed to drop", "should_trigger": true},
+  {"query": "open a pull request and capture screenshots since I touched the search results page", "should_trigger": true},
+  {"query": "rewrite the pr body — it's stale after the last 3 commits I pushed", "should_trigger": true},
+  {"query": "the description on PR 3441 doesn't capture what we actually shipped, redo it from the current diff", "should_trigger": true},
+  {"query": "review pr #3441 and tell me if there are any issues with the approach", "should_trigger": false},
+  {"query": "do a security review on this branch before I open the pr — i'm worried about the null byte handling", "should_trigger": false},
+  {"query": "attach the desktop and mobile screenshots in tmp/pr_screenshots/ to PR 3470", "should_trigger": false},
+  {"query": "drop a comment on the open PR saying we need to revisit the cycle_type validation", "should_trigger": false},
+  {"query": "what's the status of PR 3472? did CI pass on the run from this morning?", "should_trigger": false},
+  {"query": "merge the pr if all checks are green and there are no review comments", "should_trigger": false},
+  {"query": "summarize the changes on this branch in plain English so I can paste it into Slack — don't open a pr or anything", "should_trigger": false},
+  {"query": "remind me which PR added the Enumable cycle_type guard, I think it was a few weeks ago", "should_trigger": false},
+  {"query": "look at the comments on pr 3472 and tell me if I need to address anything before merge", "should_trigger": false},
+  {"query": "close pr 3441 without merging, we're abandoning that approach", "should_trigger": false}
+]
