@@ -30,13 +30,13 @@ RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
     end
   end
 
-  it "Doesn't break if logo.dev returns 400" do
-    VCR.use_cassette("get_manufacturer_logo_worker-bad-request", vcr_config) do
-      manufacturer = FactoryBot.create(:manufacturer, website: "bad-request-domain.example")
+  it "Doesn't break when website has a path" do
+    VCR.use_cassette("get_manufacturer_logo_worker-website-with-path", vcr_config) do
+      manufacturer = FactoryBot.create(:manufacturer, website: "http://www.ternbicycles.com/us/")
       described_class.new.perform(manufacturer.id)
       manufacturer.reload
-      expect(manufacturer.logo).to_not be_present
-      expect(manufacturer.logo_source).to be_nil
+      expect(manufacturer.logo).to be_present
+      expect(manufacturer.logo_source).to eq("Logo.dev")
     end
   end
 

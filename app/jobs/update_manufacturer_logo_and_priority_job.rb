@@ -10,7 +10,16 @@ class UpdateManufacturerLogoAndPriorityJob < ScheduledJob
   end
 
   def self.logo_url(manufacturer)
-    "https://img.logo.dev/#{manufacturer.website.gsub(/\Ahttps?:\/\//i, "")}?size=400&fallback=404&token=#{API_KEY}"
+    host = website_host(manufacturer.website)
+    return if host.blank?
+
+    "https://img.logo.dev/#{host}?size=400&fallback=404&token=#{API_KEY}"
+  end
+
+  def self.website_host(website)
+    URI.parse(Urlifyer.urlify(website)).host
+  rescue URI::InvalidURIError
+    nil
   end
 
   def perform(id = nil)
@@ -39,9 +48,9 @@ class UpdateManufacturerLogoAndPriorityJob < ScheduledJob
     return if manufacturer.website.blank? || manufacturer.logo.present?
 
     logo_url = self.class.logo_url(manufacturer)
+    return if logo_url.blank?
 
     status_response = Net::HTTP.get_response(URI(logo_url))
-
     return unless status_response.is_a?(Net::HTTPSuccess)
 
     manufacturer.update!(remote_logo_url: logo_url, logo_source: "Logo.dev")
