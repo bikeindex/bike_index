@@ -42,7 +42,7 @@ class UpdateManufacturerLogoAndPriorityJob < ScheduledJob
 
     status_response = Net::HTTP.get_response(URI(logo_url))
 
-    return if status_response.is_a?(Net::HTTPNotFound)
+    return unless status_response.is_a?(Net::HTTPSuccess)
 
     manufacturer.update!(remote_logo_url: logo_url, logo_source: "Logo.dev")
   end
