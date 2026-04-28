@@ -1,0 +1,25 @@
+<p>
+  Your <%= @impound_claim.claim_kind_humanized %>
+  <% if bike_claimed.present? %>
+    for
+    <%= link_to bike_claimed.title_string, bike_url(bike_claimed) %>
+  <% end %>
+  has been <strong><%= @impound_claim.status_humanized %></strong>
+</p>
+
+<% if @impound_claim.response_message.present? %>
+  <p>
+    <em>Message:</em>
+    <%= @impound_claim.response_message %>
+  </p>
+<% end %>
+
+<% if organization_message_snippet_body.present? %>
+  <%= organization_message_snippet_body.html_safe %>
+<% elsif @impound_claim.approved? %>
+  <p>
+    Please reply to this message or contact
+    <%= link_to @impound_claim.impound_record_email, "mailto:#{@impound_claim.impound_record_email}" %>
+    to arrange to pick up your <%= bike_submitting&.type || "bike" %>
+  </p>
+<% end %>

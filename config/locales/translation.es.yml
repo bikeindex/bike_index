@@ -3937,18 +3937,8 @@ es:
     finished_stolen_registration:
       subject:
     organization_invitation:
-      html:
-        hello:
-        join_org:
-        welcome_to_bike_index:
-        you_are_a_member:
       subject:
     partial_registration:
-      html:
-        click_below_to_complete_your_registration:
-        finish_it:
-        just_a_few_steps_away_html:
-        youre_almost_done:
       subject:
   payments:
     form:

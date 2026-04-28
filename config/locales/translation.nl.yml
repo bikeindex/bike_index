@@ -4510,21 +4510,8 @@ nl:
     finished_stolen_registration:
       subject: Bevestig uw %{organization_name} gestolen %{bike_type} op Bike Index
     organization_invitation:
-      html:
-        hello: Hallo %{name},
-        join_org: Doe mee met %{org_name}
-        welcome_to_bike_index: Welkom bij Bike Index
-        you_are_a_member: "%{sender_name} heeft aangegeven dat u lid bent van %{org_name}."
       subject: Doe mee met %{organization_name} op Bike Index
     partial_registration:
-      html:
-        click_below_to_complete_your_registration: Klik hieronder om uw registratie
-          te voltooien
-        finish_it: Maak het af!
-        just_a_few_steps_away_html: U bent slechts een paar stappen verwijderd van
-          het registreren van uw <strong>%{color_and_brand}</strong> in 's werelds
-          meest uitgebreide <strong>fietsregister</strong> !
-        youre_almost_done: Je bent bijna klaar!
       subject: Voltooi uw %{organization_name} registratie van de fietsindex!
   plan_features:
     automatic_registration_through_pos: Automatische registratie via uw POS

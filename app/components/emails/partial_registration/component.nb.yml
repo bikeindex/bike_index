@@ -1,0 +1,10 @@
+---
+nb:
+  components:
+    emails:
+      partial_registration:
+        click_below_to_complete_your_registration: Klikk nedenfor for å fullføre registreringen
+        finish_it: Gjøre det ferdig!
+        just_a_few_steps_away_html: Du er bare noen få skritt unna å registrere din
+          <strong>%{color_and_brand}</strong> i verdens mest omfattende sykkelregister!
+        youre_almost_done: Du er nesten ferdig!

@@ -1,0 +1,111 @@
+<h1 class="uncap" style="margin-bottom: 1rem;">
+  <%= @hot_sheet.subject %>
+</h1>
+
+<% @stolen_records.each do |stolen_record| %>
+  <% bike = stolen_record.bike %>
+  <% bike.update(updated_at: Time.current) %>
+
+  <div class="hot-sheet-bike-display">
+    <table class="bike-display">
+      <tbody>
+        <tr>
+          <td class="info-holder bike-display-wrapper-cell">
+            <table class="table-list">
+              <tr class="bike-title">
+                <td colspan="2">
+                  <%= link_to helpers.organized_bike_text(bike, skip_creation: true), bike_link(bike) %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>Serial</td>
+
+                <td>
+                  <% if bike.no_serial? %>
+                    <em class="less-strong">
+                      <%= bike.serial_display&.downcase %>
+                    </em>
+                  <% else %>
+                    <span class="serial-display">
+                      <%= bike.serial_display %>
+                    </span>
+                  <% end %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <span class="stolen-color">Stolen at</span>
+                </td>
+
+                <td>
+                  <%= stolen_record.date_stolen.strftime("%l%P") %>
+
+                  <% if stolen_at_label(stolen_record) %>
+                    <strong><%= stolen_at_label(stolen_record) %></strong>
+                  <% else %>
+                    <%= helpers.l stolen_record.date_stolen, format: :standard_display %>
+                  <% end %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>From</td>
+
+                <td>
+                  <%= GeocodeableLegacy.address(stolen_record, country: false) %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>PD&nbsp;report</td>
+
+                <td>
+                  <%= stolen_record.police_report_number %>
+
+                  <% if stolen_record.police_report_number.present? %>
+                    <small class="less-strong">
+                      <%= stolen_record.police_report_department %>
+                    </small>
+                  <% end %>
+                </td>
+              </tr>
+            </table>
+          </td>
+
+          <td class="image-holder bike-display-wrapper-cell <%= 'placeholder' if thumb_placeholder?(bike) %>">
+            <a href="<%= bike_link(bike) %>">
+              <img src="<%= thumb_url(bike) %>">
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<% if organization.overview_dashboard? %>
+  <div class="clear-org-buttons">
+    <%= link_to "View #{organization.short_name} Dashboard", organization_dashboard_index_url(organization_id: organization.to_param), class: "org-button" %>
+  </div>
+<% end %>
+
+<div class="email-hot-sheet-link-footer">
+  <p>
+    View this
+    <em><%= link_to "Stolen Bike Hot Sheet", organization_hot_sheet_url(organization_id: organization.to_param, day: @hot_sheet.sheet_date) %></em>
+    on Bike Index
+  </p>
+
+  <div class="clear-org-buttons">
+    <%= link_to "Search Stolen Bikes near #{organization_address&.city}", bikes_url(stolenness: "proximity", distance: 100, location: search_location), class: "org-button" %>
+  </div>
+
+  <p class="hot-sheet-notification-change">
+    <small class="less-strong">
+      Don't want to receive hot sheets emails? Update your email preferences on
+      <%= link_to "your account page", edit_my_account_url %>.
+    </small>
+  </p>
+</div>

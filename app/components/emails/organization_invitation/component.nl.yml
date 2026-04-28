@@ -1,0 +1,9 @@
+---
+nl:
+  components:
+    emails:
+      organization_invitation:
+        hello: Hallo %{name},
+        join_org: Doe mee met %{org_name}
+        welcome_to_bike_index: Welkom bij Bike Index
+        you_are_a_member: "%{sender_name} heeft aangegeven dat u lid bent van %{org_name}."
