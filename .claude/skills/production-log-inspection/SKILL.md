@@ -1,7 +1,7 @@
 ---
 name: production-log-inspection
 description: >-
-  Inspect Bike Index production Rails logs at `tmp/*.production.log` —
+  Inspect the Bike Index production Rails log at `tmp/production.log` —
   JSON-per-request format produced by Lograge, far too large to read
   end-to-end. Trigger when the user asks to
   review, investigate, audit, or pull stats from a production log file
@@ -16,7 +16,7 @@ description: >-
 
 # Inspecting production logs
 
-Bike Index production logs live at `tmp/<YYYY-M-D>.production.log` (e.g. `tmp/2026-4-27.production.log`). They're large, so:
+The Bike Index production log lives at `tmp/production.log`. It's large, so:
 
 - **Never `Read` or `cat` the whole file.** Use `grep`/`awk`/`head`/`tail` to slice.
 - **Synthesize by default; paste at most one short example when it's load-bearing.** Lograge lines are long and mostly structural JSON — dumping multiple into a reply is unreadable and burns context. A single representative line for an exception or a slow request is fine; a wall of grep output is not.
@@ -48,20 +48,20 @@ When a request raises, you also get **separate, non-JSON lines** with the same r
 **Time range covered.**
 
 ```bash
-head -1 tmp/2026-4-27.production.log
-tail -1 tmp/2026-4-27.production.log
+head -1 tmp/production.log
+tail -1 tmp/production.log
 ```
 
 **Status-code distribution.**
 
 ```bash
-grep -oE '"status":[0-9]+' tmp/2026-4-27.production.log | sort | uniq -c | sort -rn
+grep -oE '"status":[0-9]+' tmp/production.log | sort | uniq -c | sort -rn
 ```
 
 **Slow requests over a threshold (in ms).** Use `awk` rather than a regex — durations are floats with arbitrary digit counts and a regex like `"duration":[5-9][0-9]{4}` will silently miss values:
 
 ```bash
-awk -F'"duration":' '$2 != "" {split($2,a,","); if (a[1]+0 > 60000) print}' tmp/2026-4-27.production.log
+awk -F'"duration":' '$2 != "" {split($2,a,","); if (a[1]+0 > 60000) print}' tmp/production.log
 ```
 
 Pipe that into `grep -oE '"path":"[^"]+"' | sort | uniq -c | sort -rn` to group by path, or `grep -oE '"status":[0-9]+'` for status mix.
@@ -69,7 +69,7 @@ Pipe that into `grep -oE '"path":"[^"]+"' | sort | uniq -c | sort -rn` to group 
 **Distribution stats (p50/p90/p99).**
 
 ```bash
-awk -F'"duration":' '$2 != "" {split($2,a,","); print a[1]+0}' tmp/2026-4-27.production.log \
+awk -F'"duration":' '$2 != "" {split($2,a,","); print a[1]+0}' tmp/production.log \
   | sort -n \
   | awk 'BEGIN{c=0}{v[c++]=$1; s+=$1} END{print "n="c, "p50="v[int(c*.5)], "p90="v[int(c*.9)], "p99="v[int(c*.99)], "max="v[c-1], "mean="s/c}'
 ```
@@ -77,13 +77,13 @@ awk -F'"duration":' '$2 != "" {split($2,a,","); print a[1]+0}' tmp/2026-4-27.pro
 **Most-hit endpoints.**
 
 ```bash
-grep -oE '"controller":"[^"]+","action":"[^"]+"' tmp/2026-4-27.production.log | sort | uniq -c | sort -rn | head -20
+grep -oE '"controller":"[^"]+","action":"[^"]+"' tmp/production.log | sort | uniq -c | sort -rn | head -20
 ```
 
 **5xx counts by endpoint.** Filter to `"status":5` first to keep the line set small:
 
 ```bash
-grep '"status":5' tmp/2026-4-27.production.log \
+grep '"status":5' tmp/production.log \
   | grep -oE '"controller":"[^"]+","action":"[^"]+"' | sort | uniq -c | sort -rn
 ```
 
@@ -92,7 +92,7 @@ grep '"status":5' tmp/2026-4-27.production.log \
 The JSON request line tells you a request 500'd but not *why*. Grab the request id from the JSON line, then `grep -n` the whole file for that id — Rails writes the exception class and backtrace as separate lines with the same `[request-id]` prefix:
 
 ```bash
-grep -n "0591f694-49b4-4c9c-b49e-4fef89ae8d7b" tmp/2026-4-27.production.log
+grep -n "0591f694-49b4-4c9c-b49e-4fef89ae8d7b" tmp/production.log
 ```
 
 Look for lines starting with `E,` (ERROR severity) and lines beginning `[<id>] ActiveRecord::…` / `[<id>] ActionView::…` / `[<id>] Caused by:` / `[<id>] app/…:NN`. The trailing `app/…` lines are the user-code frames (Rails strips gem frames by default).
@@ -100,7 +100,7 @@ Look for lines starting with `E,` (ERROR severity) and lines beginning `[<id>] A
 To find clusters of the same exception, search for the exception class plus a line of context:
 
 ```bash
-grep -B0 -A1 "PG::TRSerializationFailure" tmp/2026-4-27.production.log | head -40
+grep -B0 -A1 "PG::TRSerializationFailure" tmp/production.log | head -40
 ```
 
 ## Pitfalls
@@ -119,7 +119,7 @@ The lines are JSON, so `jq` is tempting — but you have to strip the syslog pre
 
 ```bash
 # strip prefix, then jq — only worth it for multi-field aggregations
-sed -E 's/^[^{]+//' tmp/2026-4-27.production.log \
+sed -E 's/^[^{]+//' tmp/production.log \
   | jq -r 'select(.status==500) | "\(.controller)#\(.action)\t\(.duration)"' \
   | sort | uniq -c | sort -rn | head
 ```
