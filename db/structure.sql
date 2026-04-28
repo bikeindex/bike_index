@@ -51,6 +51,23 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
 
 
+--
+-- Name: bikes_search_vector_update(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.bikes_search_vector_update() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  NEW.search_vector :=
+    setweight(to_tsvector('simple', coalesce(NEW.serial_number, '')), 'A') ||
+    setweight(to_tsvector('simple', coalesce(NEW.cached_data, '')), 'B') ||
+    setweight(to_tsvector('simple', coalesce(NEW.all_description, '')), 'C');
+  RETURN NEW;
+END
+$$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -714,7 +731,7 @@ CREATE TABLE public.bikes (
     model_audit_id bigint,
     primary_activity_id bigint,
     address_record_id bigint,
-    search_vector tsvector GENERATED ALWAYS AS (((setweight(to_tsvector('simple'::regconfig, (COALESCE(serial_number, ''::character varying))::text), 'A'::"char") || setweight(to_tsvector('simple'::regconfig, COALESCE(cached_data, ''::text)), 'B'::"char")) || setweight(to_tsvector('simple'::regconfig, COALESCE(all_description, ''::text)), 'C'::"char"))) STORED
+    search_vector tsvector
 );
 
 
@@ -7480,6 +7497,13 @@ CREATE UNIQUE INDEX unique_assignment_to_ambassador ON public.ambassador_task_as
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
+
+
+--
+-- Name: bikes bikes_search_vector_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER bikes_search_vector_trigger BEFORE INSERT OR UPDATE OF serial_number, cached_data, all_description ON public.bikes FOR EACH ROW EXECUTE FUNCTION public.bikes_search_vector_update();
 
 
 --
