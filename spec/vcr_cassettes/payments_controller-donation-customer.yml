@@ -294,9 +294,9 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_IKAqOsl6Cv1SIT","request_duration_ms":454}}'
+      - '{"last_request_metrics":{"request_id":"req_jPzFuFS4XJOX7a","request_duration_ms":407}}'
       Idempotency-Key:
-      - 2fb12b58-bc81-4ef4-9b36-4f7809253e24
+      - bcef9016-0b22-4487-b29e-3a2155be9c72
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -313,11 +313,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 03 Apr 2026 13:12:53 GMT
+      - Tue, 28 Apr 2026 15:33:00 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '3906'
+      - '3996'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -336,13 +336,17 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=WTQQIC7f6vIyzn7htHAPST8rxzNrQDi0jfT0af-AWX9NIR9d9lajbxNZveeLW3huoyik9FNHc_9WBScd
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=VbHfLfgJs-T4GfT80dTlB33bw66-rIWseBvuW75wij_E0g_bbqIvJe5XmYchFKzSvKpRZa0s7tBqNeO3
       Idempotency-Key:
-      - 2fb12b58-bc81-4ef4-9b36-4f7809253e24
+      - bcef9016-0b22-4487-b29e-3a2155be9c72
       Original-Request:
-      - req_8fckReS621fkw2
+      - req_ubn3p9z9i7PSb7
+      Report-To:
+      - '{"group":"csp","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/csp-report-v2?q=VbHfLfgJs-T4GfT80dTlB33bw66-rIWseBvuW75wij_E0g_bbqIvJe5XmYchFKzSvKpRZa0s7tBqNeO3&t=1"}],"include_subdomains":true}'
+      Reporting-Endpoints:
+      - csp="https://q.stripe.com/csp-report-v2?q=VbHfLfgJs-T4GfT80dTlB33bw66-rIWseBvuW75wij_E0g_bbqIvJe5XmYchFKzSvKpRZa0s7tBqNeO3&t=1"
       Request-Id:
-      - req_8fckReS621fkw2
+      - req_ubn3p9z9i7PSb7
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -361,7 +365,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a101zGo58F9HbqA6MZu0chU0gfiAD1Kyd1ebwruohgLowUwmSn8PxC6BJZ",
+          "id": "cs_test_a1YGb5WONjfWDLIo5y0GDgTQ4fBSCFj2axWt3SztB19q9voPB5gygJfuZK",
           "object": "checkout.session",
           "adaptive_pricing": {
             "enabled": true
@@ -399,7 +403,7 @@ http_interactions:
           },
           "consent": null,
           "consent_collection": null,
-          "created": 1775221973,
+          "created": 1777390380,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -424,7 +428,7 @@ http_interactions:
           },
           "customer_email": null,
           "discounts": [],
-          "expires_at": 1775308372,
+          "expires_at": 1777476780,
           "integration_identifier": null,
           "invoice": null,
           "invoice_creation": {
@@ -441,6 +445,9 @@ http_interactions:
           },
           "livemode": false,
           "locale": null,
+          "managed_payments": {
+            "enabled": false
+          },
           "metadata": {},
           "mode": "payment",
           "origin_context": null,
@@ -488,8 +495,8 @@ http_interactions:
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a101zGo58F9HbqA6MZu0chU0gfiAD1Kyd1ebwruohgLowUwmSn8PxC6BJZ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1YGb5WONjfWDLIo5y0GDgTQ4fBSCFj2axWt3SztB19q9voPB5gygJfuZK#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaX09BbE1nX0lWR2ZkUVxvNXY3RG0yaEtgJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
           "wallet_options": null
         }
-  recorded_at: Fri, 03 Apr 2026 13:12:53 GMT
+  recorded_at: Tue, 28 Apr 2026 15:33:00 GMT
 recorded_with: VCR 6.4.0

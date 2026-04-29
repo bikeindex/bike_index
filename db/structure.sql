@@ -6194,6 +6194,13 @@ CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree
 
 
 --
+-- Name: index_bikes_on_serial_normalized_no_space_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_serial_normalized_no_space_trgm ON public.bikes USING gin (serial_normalized_no_space public.gin_trgm_ops) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
 -- Name: index_bikes_on_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7546,6 +7553,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260428000001'),
 ('20260425103043'),
 ('20260425000001'),
 ('20260424000002'),
