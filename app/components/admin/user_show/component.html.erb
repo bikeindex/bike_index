@@ -476,7 +476,7 @@
 <h4 class="mt-4">
   OrganizationRoles
   <small class="less-strong mr-3"><%= number_display(@user.organization_roles.count) %></small>
-  
+
   <small class="d-inline-block less-strong"><% reg_orgs_count = @user.user_registration_organizations.count %> <%= link_to admin_user_registration_organizations_path(user_id: @user.id) do %><%= number_display(reg_orgs_count) %><% end %> <%= "registration org".pluralize(reg_orgs_count) %></small>
 </h4>
 
