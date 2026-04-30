@@ -3,7 +3,7 @@
     <p>
       Viewing only Searches <strong>for</strong>
       <em><%= model_audit_frame_model_display(@model_audit, truncate: false) %></em>
-
+      
       <%= link_to "view for all model audits", url_for(sortable_search_params.merge(search_model_audit_id: nil)), class: "gray-link small" %>
     </p>
   <% end %>
