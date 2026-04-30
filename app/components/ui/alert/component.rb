@@ -28,13 +28,13 @@ module UI
       def color_classes
         case @kind
         when :notice
-          "#{text_color_classes} tw:bg-blue-50 tw:dark:bg-gray-800 tw:border-blue-300 tw:dark:border-blue-800"
+          "#{text_color_classes} tw:bg-blue-50 tw:dark:bg-blue-950 tw:border-blue-300 tw:dark:border-blue-800"
         when :error
-          "#{text_color_classes} tw:bg-red-50 tw:dark:bg-gray-800 tw:border-red-300 tw:dark:border-red-800"
+          "#{text_color_classes} tw:bg-red-50 tw:dark:bg-red-950 tw:border-red-300 tw:dark:border-red-800"
         when :warning
-          "#{text_color_classes} tw:bg-yellow-50 tw:dark:bg-gray-800 tw:border-yellow-300 tw:dark:border-yellow-800"
+          "#{text_color_classes} tw:bg-yellow-50 tw:dark:bg-yellow-950 tw:border-yellow-300 tw:dark:border-yellow-800"
         when :success
-          "#{text_color_classes} tw:bg-green-50 tw:dark:bg-gray-800 tw:border-green-300 tw:dark:border-green-800"
+          "#{text_color_classes} tw:bg-green-50 tw:dark:bg-green-950 tw:border-green-300 tw:dark:border-green-800"
         end
       end
 
@@ -50,13 +50,13 @@ module UI
       def dismissable_color_classes
         case @kind
         when :notice
-          "tw:bg-blue-50 tw:focus:ring-blue-400 tw:hover:bg-blue-200 tw:dark:bg-gray-800 tw:dark:hover:bg-gray-700"
+          "tw:bg-blue-50 tw:focus:ring-blue-400 tw:hover:bg-blue-200 tw:dark:bg-blue-950 tw:dark:hover:bg-blue-900"
         when :error
-          "tw:bg-red-50 tw:focus:ring-red-400 tw:hover:bg-red-200 tw:dark:bg-gray-800 tw:dark:hover:bg-gray-700"
+          "tw:bg-red-50 tw:focus:ring-red-400 tw:hover:bg-red-200 tw:dark:bg-red-950 tw:dark:hover:bg-red-900"
         when :warning
-          "tw:bg-yellow-50 tw:focus:ring-yellow-400 tw:hover:bg-yellow-200 tw:dark:bg-gray-800 tw:dark:hover:bg-gray-700"
+          "tw:bg-yellow-50 tw:focus:ring-yellow-400 tw:hover:bg-yellow-200 tw:dark:bg-yellow-950 tw:dark:hover:bg-yellow-900"
         when :success
-          "tw:bg-green-50 tw:focus:ring-green-400 tw:hover:bg-green-200 tw:dark:bg-gray-800 tw:dark:hover:bg-gray-700"
+          "tw:bg-green-50 tw:focus:ring-green-400 tw:hover:bg-green-200 tw:dark:bg-green-950 tw:dark:hover:bg-green-900"
         end
       end
     end
