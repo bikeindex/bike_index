@@ -13,14 +13,14 @@ module UI
 
       COLORS = {
         primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:hover:bg-blue-700 tw:active:bg-blue-800 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:hover:bg-blue-600 tw:dark:active:bg-blue-700",
-        secondary: "tw:text-gray-700 tw:bg-gray-50 tw:border tw:border-gray-300 tw:hover:bg-gray-100 tw:hover:border-gray-400 tw:active:bg-gray-200 tw:focus:ring-blue-500/40 tw:dark:text-gray-200 tw:dark:bg-gray-700 tw:dark:border-gray-500 tw:dark:hover:bg-gray-800 tw:dark:hover:border-gray-600 tw:dark:active:bg-gray-900",
+        secondary: "tw:text-gray-700 tw:bg-gray-50 tw:border tw:border-gray-300 tw:hover:bg-gray-200 tw:hover:border-gray-400 tw:active:bg-gray-300 tw:focus:ring-blue-500/40 tw:dark:text-gray-200 tw:dark:bg-gray-700 tw:dark:border-gray-500 tw:dark:hover:bg-gray-800 tw:dark:hover:border-gray-600 tw:dark:active:bg-gray-900",
         error: "tw:text-white tw:bg-red-600 tw:border tw:border-red-600 tw:hover:bg-red-700 tw:active:bg-red-800 tw:focus:ring-red-500/40 tw:dark:bg-red-500 tw:dark:border-red-500 tw:dark:hover:bg-red-600 tw:dark:active:bg-red-700",
         link: "tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:underline tw:active:text-blue-800 tw:active:dark:text-blue-300 tw:active:font-bold tw:p-0 tw:focus:outline-none"
       }.freeze
 
       ACTIVE_COLORS = {
         primary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-blue-700 tw:dark:bg-blue-600",
-        secondary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-gray-100 tw:border-gray-400 tw:dark:bg-gray-800 tw:dark:border-gray-600",
+        secondary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-gray-200 tw:border-gray-400 tw:dark:bg-gray-800 tw:dark:border-gray-600",
         error: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-700 tw:dark:bg-red-600",
         link: "tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold"
       }.freeze
