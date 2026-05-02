@@ -5,6 +5,7 @@
 
 <% @stolen_records.each do |stolen_record| %>
   <% bike = stolen_record.bike %>
+
   <%# Bump bike cached attributes, to be sure we have all the info %>
   <% bike.update(updated_at: Time.current) %>
 
