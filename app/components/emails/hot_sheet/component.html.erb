@@ -1,9 +1,11 @@
+<%# TODO: translations %>
 <h1 class="uncap" style="margin-bottom: 1rem;">
   <%= @hot_sheet.subject %>
 </h1>
 
 <% @stolen_records.each do |stolen_record| %>
   <% bike = stolen_record.bike %>
+  <%# Bump bike cached attributes, to be sure we have all the info %>
   <% bike.update(updated_at: Time.current) %>
 
   <div class="hot-sheet-bike-display">
@@ -40,6 +42,7 @@
                 </td>
 
                 <td>
+                  <%# Render the hour %>
                   <%= stolen_record.date_stolen.strftime("%l%P") %>
 
                   <% if stolen_at_label(stolen_record) %>
@@ -64,6 +67,7 @@
                 <td>
                   <%= stolen_record.police_report_number %>
 
+                  <%# Only show the department if there is a number, some people put it in anyway %>
                   <% if stolen_record.police_report_number.present? %>
                     <small class="less-strong">
                       <%= stolen_record.police_report_department %>

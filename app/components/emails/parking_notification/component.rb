@@ -34,6 +34,7 @@ module Emails
       end
 
       def show_pickup_link?
+        # other notifications don't show pick up bike link
         return false if @parking_notification.other_parking_notification?
         return false if @parking_notification.impound_notification?
 

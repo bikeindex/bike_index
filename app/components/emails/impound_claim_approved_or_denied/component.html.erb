@@ -7,6 +7,7 @@
   has been <strong><%= @impound_claim.status_humanized %></strong>
 </p>
 
+<%# Note: should be escaped %>
 <% if @impound_claim.response_message.present? %>
   <p>
     <em>Message:</em>
@@ -14,6 +15,7 @@
   </p>
 <% end %>
 
+<%# If there is an organization message snippet, use it, otherwise default "reply to" message %>
 <% if organization_message_snippet_body.present? %>
   <%= organization_message_snippet_body.html_safe %>
 <% elsif @impound_claim.approved? %>
