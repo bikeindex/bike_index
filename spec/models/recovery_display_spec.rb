@@ -80,7 +80,7 @@ RSpec.describe RecoveryDisplay, type: :model do
     context "stolen record" do
       let(:t) { Time.current }
       let(:bike) { FactoryBot.create(:bike) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, :in_nyc_legacy, recovered_at: t, recovered_description: "stuff", bike: bike) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, :in_nyc, recovered_at: t, recovered_description: "stuff", bike: bike) }
       let(:recovery_display) { RecoveryDisplay.new }
       it "sets attrs from stolen record" do
         recovery_display = RecoveryDisplay.from_stolen_record_id(stolen_record.id)

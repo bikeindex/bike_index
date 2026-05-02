@@ -138,25 +138,25 @@ FactoryBot.define do
     # These factories are separate from the stolen bike factory because we only want to call after create once
     factory :stolen_bike_in_amsterdam, traits: [:stolen_trait] do
       after(:create) do |bike|
-        create(:stolen_record, :in_amsterdam_legacy, bike: bike)
+        create(:stolen_record, :in_amsterdam, bike: bike)
         bike.reload
       end
     end
     factory :stolen_bike_in_los_angeles, traits: [:stolen_trait] do
       after(:create) do |bike|
-        create(:stolen_record, :in_los_angeles_legacy, bike: bike)
+        create(:stolen_record, :in_los_angeles, bike: bike)
         bike.reload
       end
     end
     factory :stolen_bike_in_nyc, traits: [:stolen_trait] do
       after(:create) do |bike|
-        create(:stolen_record, :in_nyc_legacy, bike: bike)
+        create(:stolen_record, :in_nyc, bike: bike)
         bike.reload
       end
     end
     factory :stolen_bike_in_chicago, traits: [:stolen_trait] do
       after(:create) do |bike|
-        create(:stolen_record, :in_chicago_legacy, bike: bike)
+        create(:stolen_record, :in_chicago, bike: bike)
         bike.reload
       end
     end

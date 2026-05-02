@@ -17,7 +17,7 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
     let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 3999) }
     let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Salsa") }
     let(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
-    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver_legacy, bike: bike, approved: true) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, bike: bike, approved: true) }
     let(:facebook_data) { {campaign_id: "222", adset_id: "333", ad_id: "444", activating_at: Time.current.to_i} }
     let(:start_at) { Time.current - 1.minute }
     let(:end_at) { Time.current + theft_alert_plan.duration_days_facebook }

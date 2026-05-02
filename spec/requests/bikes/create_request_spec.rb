@@ -24,8 +24,8 @@ RSpec.describe "BikesController#create", type: :request do
       country_id: country.id,
       street: "2459 West Division Street",
       city: "Chicago",
-      zipcode: "60622",
-      state_id: state.id
+      postal_code: "60622",
+      region_record_id: state.id
     }
   end
 
@@ -172,7 +172,7 @@ RSpec.describe "BikesController#create", type: :request do
           expect(bike.title_string.length).to be < 160 # Because the full frame_model makes things stupid
           expect(bike.current_ownership.status).to eq "status_stolen"
           stolen_record = bike.current_stolen_record
-          chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+          chicago_stolen_params.except(:region_record_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
         end
       end
       it "creates a bike and doesn't create a b_param" do

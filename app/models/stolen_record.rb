@@ -25,6 +25,7 @@
 #  phone_for_users                :boolean          default(TRUE)
 #  police_report_department       :string(255)
 #  police_report_number           :string(255)
+#  postal_code                    :string(255)
 #  proof_of_ownership             :boolean
 #  receive_notifications          :boolean          default(TRUE)
 #  recovered_at                   :datetime
@@ -34,11 +35,11 @@
 #  recovery_posted                :boolean          default(FALSE)
 #  recovery_share                 :text
 #  recovery_tweet                 :text
+#  region_string                  :string
 #  secondary_phone                :string(255)
 #  street                         :string(255)
 #  theft_description              :text
 #  tsved_at                       :datetime
-#  zipcode                        :string(255)
 #  created_at                     :datetime         not null
 #  updated_at                     :datetime         not null
 #  bike_id                        :integer
@@ -46,7 +47,7 @@
 #  creation_organization_id       :integer
 #  organization_stolen_message_id :bigint
 #  recovering_user_id             :integer
-#  state_id                       :integer
+#  region_record_id               :integer
 #
 # Indexes
 #
@@ -57,7 +58,8 @@
 #
 class StolenRecord < ApplicationRecord
   include ActiveModel::Dirty
-  include GeocodeableLegacy
+  include AddressRecordedWithinBoundingBox
+  include Geocodeable
   include DefaultCurrencyable
 
   RECOVERY_DISPLAY_STATUS_ENUM = {
@@ -110,9 +112,10 @@ class StolenRecord < ApplicationRecord
 
   validates_presence_of :date_stolen
 
-  attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
+  attr_accessor :timezone, :skip_update, :skip_geocoding # timezone provides a backup and permits assignment
 
   before_save :set_calculated_attributes
+  after_validation :bike_index_geocode, if: :should_be_geocoded?
   after_commit :update_associations
 
   default_scope { current }
@@ -132,9 +135,18 @@ class StolenRecord < ApplicationRecord
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
-  scope :without_location, -> { without_street } # References geocodeable without_street, we need to reconcile this
+  scope :with_location, -> { where.not(latitude: nil) }
+  scope :with_street, -> { with_location.where.not(street: nil) }
+  scope :without_street, -> { where(street: ["", nil]) }
+  scope :without_location, -> { without_street }
 
   class << self
+    def permitted_visible_attribute(string_or_sym = nil, default: nil)
+      return string_or_sym.to_sym if string_or_sym.present?
+
+      default&.to_sym
+    end
+
     def recovery_display_statuses
       RECOVERY_DISPLAY_STATUS_ENUM.keys.map(&:to_s)
     end
@@ -207,16 +219,38 @@ class StolenRecord < ApplicationRecord
     image_four_by_five&.blob&.metadata&.dig("image_id")
   end
 
+  def skip_geocoding?
+    skip_geocoding.present?
+  end
+
   # override to enable reverse geocoding if applicable
   def should_be_geocoded?
     !skip_geocoding?
+  end
+
+  def street_2
+  end
+
+  def publicly_visible_attribute = :postal_code
+  def show_address = false
+
+  def latitude_public
+    return nil if latitude.blank?
+
+    latitude.round(Bike::PUBLIC_COORD_LENGTH)
+  end
+
+  def longitude_public
+    return nil if longitude.blank?
+
+    longitude.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   # Override to add reverse geocoding functionality
   def bike_index_geocode
     if address_changed?
       self.attributes = if address_present?
-        GeocodeHelper.coordinates_for(address)
+        GeocodeHelper.coordinates_for(formatted_address_string(render_country: true))
       else
         {latitude: nil, longitude: nil}
       end
@@ -224,9 +258,10 @@ class StolenRecord < ApplicationRecord
     # Try to fill in missing attributes by reverse geocoding
     return if latitude.blank? || longitude.blank? || all_location_attributes_present?
 
-    geohelper_attrs = GeocodeHelper.assignable_address_hash_for(latitude: latitude, longitude: longitude)
+    geohelper_attrs = GeocodeHelper.assignable_address_hash_for(latitude:, longitude:, new_attrs: true)
     attrs_to_assign = geohelper_attrs.keys.reject { |gattr| self[gattr].present? }
     self.attributes = geohelper_attrs.slice(*attrs_to_assign)
+    assign_region_record if region_string_changed?
   end
 
   def recovered?
@@ -249,7 +284,7 @@ class StolenRecord < ApplicationRecord
 
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?
-    address.present?
+    address_present?
   end
 
   # Overrides geocodeable without_location, we need more specificity
@@ -257,26 +292,13 @@ class StolenRecord < ApplicationRecord
     street.blank?
   end
 
-  # Used to be an attribute, removed in PR#1959
-  def show_address
-    false
-  end
-
-  def address(force_show_address: false, country: [:iso, :optional])
-    GeocodeableLegacy.address(
-      self,
-      street: force_show_address || show_address,
-      country: country
-    ).presence
-  end
-
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
     self.secondary_phone = Phonifyer.phonify(secondary_phone)
     self.date_stolen = self.class.corrected_date_stolen(date_stolen)
-    self.street = nil unless street.present? # Make it easier to find blank addresses
+    self.street = street.strip.gsub(/\s*,\z/, "") if street.present?
     if city.present?
-      self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize
+      self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.gsub(/\s*,\z/, "").titleize
     end
     update_tsved_at
     @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
@@ -303,7 +325,7 @@ class StolenRecord < ApplicationRecord
 
     row = ""
     if with_stolen_locations
-      row << "#{tsv_col(city)}\t#{tsv_col(state && state.abbreviation)}\t"
+      row << "#{tsv_col(city)}\t#{tsv_col(region)}\t"
     end
     row << tsv_col(b.mnfg_name)
     row << "\t"
@@ -314,7 +336,7 @@ class StolenRecord < ApplicationRecord
     row << tsv_col(b.frame_colors.to_sentence)
     row << tsv_col(b.description)
     row << " #{tsv_col(theft_description)}"
-    row << " Stolen from: #{tsv_col(address)}"
+    row << " Stolen from: #{tsv_col(formatted_address_string)}"
     row << "\t"
     row << "Article\t" if with_article
     row << date_stolen.strftime("%Y-%m-%d")
@@ -400,6 +422,8 @@ class StolenRecord < ApplicationRecord
 
   private
 
+  # Map legacy country: option to render_country: for backward compatibility
+
   # The read replica can't make database changes, but can enqueue the worker - which will make the changes
   def enqueue_worker(location_changed = false)
     StolenBike::AfterStolenRecordSaveJob.perform_async(id, location_changed)
@@ -413,8 +437,8 @@ class StolenRecord < ApplicationRecord
   end
 
   def all_location_attributes_present?
-    return false if country_id.blank? || city.blank? || zipcode.blank?
+    return false if country_id.blank? || city.blank? || postal_code.blank?
 
-    (country_id == Country.united_states_id) ? state_id.present? : true
+    (country_id == Country.united_states_id) ? region_record_id.present? : true
   end
 end

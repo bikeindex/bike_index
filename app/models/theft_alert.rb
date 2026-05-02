@@ -63,7 +63,7 @@ class TheftAlert < ApplicationRecord
   validate :alert_cannot_begin_in_past_or_after_ends
 
   delegate :duration_days, :duration_days_facebook, :amount_cents, to: :theft_alert_plan
-  delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
+  delegate :country, :city, :region_record, :postal_code, :street, to: :stolen_record, allow_nil: true
 
   before_validation :set_calculated_attributes
 
@@ -100,7 +100,7 @@ class TheftAlert < ApplicationRecord
 
     def cities_count
       joins(:stolen_record)
-        .group("stolen_records.country_id", "stolen_records.city", "stolen_records.state_id")
+        .group("stolen_records.country_id", "stolen_records.city", "stolen_records.region_record_id")
         .count
         .map { |c| flatten_city(c) }
         .sort_by { |c| -c[3] }
@@ -218,7 +218,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def address_string
-    stolen_record&.address(force_show_address: true, country: [:iso])
+    stolen_record&.formatted_address_string(visible_attribute: :street, render_country: :if_different).presence
   end
 
   def stolen_record_approved?

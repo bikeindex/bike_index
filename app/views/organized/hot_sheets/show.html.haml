@@ -103,7 +103,7 @@
                       %td
                         %span.stolen-color From
                       %td
-                        = GeocodeableLegacy.address(stolen_record, country: false)
+                        = stolen_record.formatted_address_string(render_country: false)
 
                     %tr
                       %td

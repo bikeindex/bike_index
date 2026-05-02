@@ -43,7 +43,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 999) }
       let(:bike) { Bike.new(id: 430872, mnfg_name: "Trek") } # Manually stubbing so test has a valid URL
       let(:canada) { Country.canada }
-      let(:stolen_record) { StolenRecord.new(bike: bike, city: "Edmonton", street: "10000 138 st", zipcode: "T5N 2H7", country: canada) }
+      let(:stolen_record) { StolenRecord.new(bike: bike, city: "Edmonton", street: "10000 138 st", postal_code: "T5N 2H7", country: canada) }
       let(:theft_alert) do
         TheftAlert.new(id: 12, theft_alert_plan: theft_alert_plan,
           stolen_record: stolen_record,

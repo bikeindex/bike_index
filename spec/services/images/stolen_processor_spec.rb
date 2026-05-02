@@ -180,7 +180,7 @@ RSpec.describe Images::StolenProcessor do
 
   describe "#stolen_record_location" do
     let(:state) { FactoryBot.create(:state_california) }
-    let(:location_attrs) { {state: state, country: Country.united_states, street: "100 W 1st St", city: "Los Angeles", zipcode: "90021", latitude: 34.05223, longitude: -118.24368} }
+    let(:location_attrs) { {region_record: state, country: Country.united_states, street: "100 W 1st St", city: "Los Angeles", postal_code: "90021", latitude: 34.05223, longitude: -118.24368} }
     context "stolen record with a location" do
       let(:stolen_record) { StolenRecord.new(location_attrs) }
       it "returns the stolen record location" do
@@ -188,15 +188,15 @@ RSpec.describe Images::StolenProcessor do
         expect(described_class.send(:stolen_record_location, stolen_record)).to eq("Los Angeles, CA")
       end
     end
-    context "stolen_record without street, zipcode or city" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record, location_attrs.slice(:country, :state, :latitude, :longitude).merge(skip_geocoding: false)) }
+    context "stolen_record without street, postal_code or city" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record, location_attrs.slice(:country, :region_record, :latitude, :longitude).merge(skip_geocoding: false)) }
       it "returns without" do
         expect(stolen_record.to_coordinates).to eq([nil, nil])
         expect(described_class.send(:stolen_record_location, stolen_record)).to be_blank
       end
     end
     context "Edmonton" do
-      let(:location_attrs) { {street: "7935 Gateway Blvd", city: "Edmonton", zipcode: "T6E 3X8", latitude: 53.515072, longitude: -113.494412, state: nil, country: Country.canada} }
+      let(:location_attrs) { {street: "7935 Gateway Blvd", city: "Edmonton", postal_code: "T6E 3X8", latitude: 53.515072, longitude: -113.494412, region_record: nil, country: Country.canada} }
       let(:stolen_record) { FactoryBot.create(:stolen_record, location_attrs.merge(skip_geocoding: true)) }
       it "returns edmonton" do
         stolen_record.reload

@@ -50,7 +50,7 @@
                 <%= @bike.status_impounded? ? t(".found") : t(".stolen_from") %>
               </strong>
 
-              <%= stolen_record.address(country: [:skip_default]) %>
+              <%= stolen_record.formatted_address_string %>
             </li>
             <li>
               <strong><%= t(".stolen_at") %></strong>

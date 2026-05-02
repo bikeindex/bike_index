@@ -48,11 +48,7 @@ module SearchResults
       end
 
       def address_string
-        if @event_record.is_a?(ImpoundRecord)
-          @event_record.formatted_address_string # It's address_record
-        else
-          @event_record.address(country: [:iso])
-        end
+        @event_record.formatted_address_string
       end
 
       # copies from application_helper

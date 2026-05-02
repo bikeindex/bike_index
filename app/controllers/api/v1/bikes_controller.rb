@@ -93,6 +93,10 @@ module API
         params[:bike] = JSON.parse params[:bike] if params[:bike].is_a?(String)
         params[:stolen_record] = JSON.parse params[:stolen_record] if params[:stolen_record].is_a?(String)
         params[:components] = JSON.parse params[:components] if params[:components].is_a?(String)
+        if params[:stolen_record].present?
+          params[:stolen_record][:postal_code] = params[:stolen_record].delete(:zipcode) if params[:stolen_record][:zipcode].present?
+          params[:stolen_record][:street] = params[:stolen_record].delete(:address) if params[:stolen_record][:address].present?
+        end
         params
       end
 

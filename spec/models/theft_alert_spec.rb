@@ -51,7 +51,7 @@ RSpec.describe TheftAlert, type: :model do
     end
     context "is activateable" do
       # let(:bike) { FactoryBot.create(:bike) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, :in_vancouver_legacy, approved:) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, :in_vancouver, approved:) }
       let(:approved) { false }
       let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, facebook_data: {}) }
       it "is truthy" do
@@ -105,7 +105,7 @@ RSpec.describe TheftAlert, type: :model do
       end
     end
     context "with alert_image" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver_legacy, approved: true) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, approved: true) }
       let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, facebook_data: {campaign_id: "xxxx"}) }
       it "is activateable" do
         expect(theft_alert.missing_location?).to be_falsey
@@ -205,7 +205,7 @@ RSpec.describe TheftAlert, type: :model do
 
   describe "admin differences" do
     let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, ad_radius_miles: 24) }
-    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, :in_vancouver_legacy, approved: true) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, :in_vancouver, approved: true) }
     let(:theft_alert) do
       FactoryBot.create(:theft_alert,
         theft_alert_plan: theft_alert_plan,

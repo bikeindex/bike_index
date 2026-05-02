@@ -221,7 +221,7 @@ module Images
     def stolen_record_location(stolen_record)
       return nil unless stolen_record.to_coordinates.any?
 
-      GeocodeableLegacy.address(stolen_record, street: false, zipcode: false, country: [:skip_default, :name])
+      stolen_record.formatted_address_string(visible_attribute: :city, render_country: :if_different)
         .gsub("'", "\\'")
     end
 

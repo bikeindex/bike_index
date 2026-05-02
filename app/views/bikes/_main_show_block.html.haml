@@ -94,7 +94,7 @@
           = render partial: "stolen_map", locals: { mapping_record: @stolen_record }
         .col-md-4
           = render(UI::DefinitionList::Container::Component.new) do
-            = render(UI::DefinitionList::Row::Component.new(label: t(".location"), value: @stolen_record.address(country: [:skip_default])))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".location"), value: @stolen_record.formatted_address_string))
             = render(UI::DefinitionList::Row::Component.new(label: t(".locking_description"), value: @stolen_record.locking_description))
             = render(UI::DefinitionList::Row::Component.new(label: t(".locking_circumvented"), value: @stolen_record.lock_defeat_description))
             = render(UI::DefinitionList::Row::Component.new(label: t(".stolen_at"), value: @stolen_record.date_stolen, time_localizer_settings: %i[preciseTime originalTimeZone]))

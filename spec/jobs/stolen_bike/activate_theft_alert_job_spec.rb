@@ -14,7 +14,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 3999) }
       let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Salsa") }
       let(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver_legacy, bike: bike, approved: true) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, bike: bike, approved: true) }
       let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, theft_alert_plan: theft_alert_plan, stolen_record: stolen_record) }
       before do
         allow_any_instance_of(TheftAlert).to receive(:facebook_name) { "Test Theft Alert (worker)" }

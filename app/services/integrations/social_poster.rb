@@ -29,7 +29,7 @@ module Integrations
       self.close_social_accounts = SocialAccount.in_proximity(stolen_record)
       self.nearest_social_account = close_social_accounts.find { |i| i.not_national? } || close_social_accounts.first
       self.city = stolen_record&.city
-      self.state = stolen_record&.state&.abbreviation
+      self.state = stolen_record&.region
       self.neighborhood = stolen_record&.neighborhood
     end
 

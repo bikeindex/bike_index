@@ -6,7 +6,7 @@ module BikeServices
     def self.old_attr_accessible
       # recovery_tweet, recovery_share # We edit this in the admin panel
       %i[police_report_number police_report_department locking_description lock_defeat_description
-        timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
+        timezone date_stolen bike creation_organization_id country_id region_record_id street postal_code city latitude
         longitude theft_description current phone secondary_phone phone_for_everyone
         phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
         approved recovered_at recovered_description index_helped_recovery can_share_recovery
@@ -46,7 +46,7 @@ module BikeServices
         stolen_record.country = Country.friendly_find(@stolen_params["country"])
       end
 
-      stolen_record.state_id = State.fuzzy_abbr_find(@stolen_params["state"])&.id if @stolen_params["state"].present?
+      stolen_record.region_record_id = State.fuzzy_abbr_find(@stolen_params["state"])&.id if @stolen_params["state"].present?
       if @stolen_params["phone_no_show"]
         stolen_record.attributes = {
           phone_for_everyone: false,
@@ -59,8 +59,8 @@ module BikeServices
     end
 
     def permitted_attributes(params)
-      ActionController::Parameters.new(params).permit(:phone, :secondary_phone, :street, :city, :zipcode,
-        :country_id, :state_id, :police_report_number, :police_report_department, :estimated_value,
+      ActionController::Parameters.new(params).permit(:phone, :secondary_phone, :street, :city, :postal_code,
+        :country_id, :region_record_id, :police_report_number, :police_report_department, :estimated_value,
         :theft_description, :locking_description, :lock_defeat_description, :proof_of_ownership,
         :receive_notifications, :phone_for_everyone, :phone_for_users,
         :phone_for_shops, :phone_for_police, :skip_geocoding)

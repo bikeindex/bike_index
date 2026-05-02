@@ -360,12 +360,12 @@ class Bike < ApplicationRecord
         .flat_map { |bike, matches| matches.map { |match| [bike, match] } }
     end
 
-    # Search for currently stolen bikes reported stolen in the given city, state
-    # and/or country. `city`, `state` and `country` are accepted as strings /
+    # Search for currently stolen bikes reported stolen in the given city, region
+    # and/or country. `city`, `region` and `country` are accepted as strings /
     # symbols of the name or abbreviation, and are matched conjointly.
-    def currently_stolen_in(city: nil, state: nil, country: nil)
-      location = {city: city, state: state, country: country}.select { |_, v| v.present? }
-      location[:state] &&= State.find_by("name = ? OR abbreviation = ?", state, state)
+    def currently_stolen_in(city: nil, region: nil, country: nil)
+      location = {city: city, region_record: region, country: country}.select { |_, v| v.present? }
+      location[:region_record] &&= State.find_by("name = ? OR abbreviation = ?", region, region)
       location[:country] &&= Country.find_by("name = ? OR iso = ?", country, country)
       return none if location.values.any?(&:blank?)
 
@@ -666,8 +666,10 @@ class Bike < ApplicationRecord
 
   def build_new_stolen_record(new_attrs = {})
     new_country_id = address_record&.country_id || creator&.address_record&.country_id || Country.united_states&.id
+    new_attrs = new_attrs.to_h.with_indifferent_access
+    permitted = BikeServices::StolenRecordUpdator.old_attr_accessible
     new_stolen_record = stolen_records
-      .build({country_id: new_country_id, phone: phone, current: true}.merge(new_attrs))
+      .build({country_id: new_country_id, phone: phone, current: true}.merge(new_attrs.slice(*permitted)))
     new_stolen_record.date_stolen ||= Time.current # in case a blank value was passed in new_attrs
     if created_at.blank? || created_at > Time.current - 1.day
       new_stolen_record.creation_organization_id = creation_organization_id
@@ -716,9 +718,8 @@ class Bike < ApplicationRecord
     creation_organization.default_location.address_hash_legacy != addy
   end
 
-  # NOTE! This will return different hashes - legacy hashes for stolen & impound
   def address_hash
-    current_stolen_record&.address_hash || current_impound_record&.address_hash_legacy ||
+    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
       address_record&.address_hash
   end
 

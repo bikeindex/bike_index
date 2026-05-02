@@ -126,6 +126,7 @@ class BParam < ApplicationRecord
       if stolen_attrs.present? && stolen_attrs.delete_if { |k, v| v.blank? } && stolen_attrs.keys.any?
         h["stolen_record"] = stolen_attrs
         h["stolen_record"]["street"] = h["stolen_record"].delete("address") if h["stolen_record"]["address"].present?
+        h["stolen_record"]["postal_code"] = h["stolen_record"].delete("zipcode") if h["stolen_record"]["zipcode"].present?
       end
       h
     end

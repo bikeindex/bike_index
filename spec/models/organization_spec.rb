@@ -57,7 +57,7 @@ RSpec.describe Organization, type: :model do
 
       # stolen record doesn't automatically set latitude on bike,
       # because of testing skip - so use an existing bike with location set
-      nonorg_stolen_record = FactoryBot.create(:stolen_record, :in_nyc_legacy, bike: nonorg_bikes.last)
+      nonorg_stolen_record = FactoryBot.create(:stolen_record, :in_nyc, bike: nonorg_bikes.last)
       nonorg_stolen_record.add_recovery_information
 
       expect(nyc_org1.nearby_bikes.pluck(:id))
