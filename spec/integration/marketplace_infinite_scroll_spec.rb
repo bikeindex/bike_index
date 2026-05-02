@@ -38,38 +38,42 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     sleep 1
   end
 
-  def bike_show_links
-    page.all(:link, href: %r{/bikes/\d+\z})
-  end
-
   it "automatically loads the next page when scrolling to bottom", :flaky do
     expect(manufacturer1.reload.id).to eq 1003 # sanity check - otherwise the search won't work
     expect(manufacturer2.reload.id).to eq 764 # sanity check - otherwise the search won't work
     visit marketplace_url
 
     # Wait for the initial results to load
-    expect(page).to have_link(href: %r{/bikes/\d+\z}, count: 12, wait: 10)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
     expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
-    initial_bikes = bike_show_links.map { |a| a[:href][%r{/bikes/(\d+)}, 1] }
+    # Get the initial bike IDs visible on page 1
+    initial_bikes = page.all("[data-test-id^='vehicle-thumbnail-linkspan-']").map do |el|
+      el["data-test-id"].split("-").last
+    end
+    expect(initial_bikes.count).to eq(12)
     # Verify the lazy-loading frame for page 2 exists
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
     scroll_to_lazy_load
     # Wait for page 2 to load (3 more items should appear)
-    expect(page).to have_link(href: %r{/bikes/\d+\z}, minimum: 13, wait: 10)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, minimum: 13)
+    # Get all bike IDs now visible
+    all_bikes = page.all("[data-test-id^='vehicle-thumbnail-linkspan-']").map do |el|
+      el["data-test-id"].split("-").last
+    end
     # Verify that we have more bikes than initially
-    expect(bike_show_links.count).to be > initial_bikes.count
+    expect(all_bikes.count).to be > initial_bikes.count
 
     # Change the search filters By adding a max price and submit via pressing enter
     # and verify that infinite scroll still works
     fill_in "price_max_amount", with: "1300"
     find_field("price_max_amount").send_keys(:return)
     # Wait for filtered results to load
-    expect(page).to have_link(href: %r{/bikes/\d+\z}, count: 12, wait: 10)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
     # Verify lazy frame exists
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
     scroll_to_lazy_load
     # Should load more results
-    expect(page).to have_link(href: %r{/bikes/\d+\z}, count: 14, wait: 10)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 14)
 
     # And then search "Yuba" without price filter
     # Which will return 8 bikes - so the page won't have the ability to scroll. Verify that it works correctly
@@ -81,7 +85,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     find(".select2-search__field").send_keys(:enter)
     page.send_keys :return
     # Should load new results
-    expect(page).to have_link(href: %r{/bikes/\d+\z}, count: 8, wait: 10)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 8)
     # Should NOT have a lazy-loading frame for page 2
     expect(page).not_to have_css("turbo-frame#page_2")
   end
