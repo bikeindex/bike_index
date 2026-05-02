@@ -25,13 +25,6 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     Autocomplete::Loader.load_all(%w[Manufacturer])
   end
 
-  def click_last_bike_and_go_back
-    all("[data-test-id^='vehicle-thumbnail-linkspan-'] a").last.click
-    expect(page).to have_css("h1.bike-title", wait: 10)
-    page.go_back
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10)
-  end
-
   def scroll_to_lazy_load
     # Scroll the lazy-loading frame into view
     page.execute_script(<<~JS)
@@ -73,7 +66,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # Change the search filters By adding a max price and submit via pressing enter
     # and verify that infinite scroll still works
     fill_in "price_max_amount", with: "1300"
-    find("#price_max_amount").send_keys(:return)
+    find_field("price_max_amount").send_keys(:return)
     # Wait for filtered results to load
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
     # Verify lazy frame exists
