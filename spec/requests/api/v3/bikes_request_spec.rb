@@ -23,14 +23,47 @@ RSpec.describe "Bikes API V3", type: :request do
   include_context :existing_doorkeeper_app
 
   describe "find by id" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:target) { {"id" => bike.id, "status" => "with owner", "for_sale" => false} }
+
     it "returns one with from an id" do
-      bike = FactoryBot.create(:bike)
       get "/api/v3/bikes/#{bike.id}", params: {format: :json}
       expect(response.code).to eq("200")
-      expect(json_result["bike"]["id"]).to eq(bike.id)
+      expect(json_result["bike"]).to include(target)
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
+    end
+
+    context "for sale bike" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, is_for_sale: true) }
+
+      it "returns status with owner and for_sale true" do
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"]).to include(target.merge("for_sale" => true))
+      end
+    end
+
+    context "stolen bike marked for sale" do
+      let(:bike) { FactoryBot.create(:stolen_bike, is_for_sale: true) }
+
+      it "returns status stolen and for_sale true" do
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"]).to include(target.merge("status" => "stolen", "for_sale" => true))
+      end
+    end
+
+    context "impounded as found" do
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+
+      it "returns status found" do
+        expect(impound_record.kind).to eq "found"
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"]).to include(target.merge("status" => "found"))
+      end
     end
 
     it "responds with missing" do

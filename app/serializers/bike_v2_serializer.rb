@@ -14,6 +14,7 @@ class BikeV2Serializer < ApplicationSerializer
     :registry_url,
     :serial,
     :status,
+    :for_sale,
     :stolen,
     :stolen_coordinates,
     :stolen_location,
@@ -46,7 +47,13 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def status
-    object.status_humanized
+    return "found" if object.status_found?
+
+    Bike.status_humanized(object.status)
+  end
+
+  def for_sale
+    object.is_for_sale?
   end
 
   def location_found

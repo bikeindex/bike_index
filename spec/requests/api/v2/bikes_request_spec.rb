@@ -16,6 +16,15 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
     end
 
+    context "for sale bike" do
+      it "returns status 'with owner' and for_sale: true" do
+        bike = FactoryBot.create(:bike, :with_ownership, is_for_sale: true)
+        get "/api/v2/bikes/#{bike.id}", params: {format: :json}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"]).to include("status" => "with owner", "for_sale" => true)
+      end
+    end
+
     it "responds with missing" do
       get "/api/v2/bikes/10", params: {format: :json}
       expect(response.code).to eq("404")
