@@ -1,0 +1,100 @@
+<h2 class="uncap">
+  <%= @impound_claim.claim_kind_humanized.titleize %> submitted!
+</h2>
+
+<strong class="mt-4"><%= link_to "View the claim", claim_url %></strong>
+
+<table class="table-list">
+  <tbody>
+    <tr>
+      <td>Claim Created</td>
+
+      <td>
+        <%= link_to helpers.email_time_display(@impound_claim.created_at), claim_url %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>User</td>
+
+      <td>
+        <%= @impound_claim.user.display_name %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Verified phone?</td>
+
+      <td>
+        <%= "true" if @impound_claim.user.phone_confirmed? %>
+      </td>
+    </tr>
+
+    <% if bike_submitting.present? %>
+      <tr>
+        <td>Bike</td>
+
+        <td>
+          <%= link_to helpers.organized_bike_text(bike_submitting), bike_url(bike_submitting, organization_id: organization.to_param) %>
+        </td>
+      </tr>
+    <% end %>
+
+    <tr>
+      <td>Bike registered</td>
+
+      <td>
+        <% if bike_submitting.present? %>
+          <%= helpers.email_time_display(bike_submitting.created_at) %>
+        <% end %>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="uncap mt-4">
+  <% if @impound_claim.organized? %>
+    <%= organization.short_name %>
+  <% else %>
+    Your
+  <% end %>
+  <%= @impound_claim.kind.titleize %> <%= @impound_claim.bike_type %>:
+</h3>
+
+<div class="row">
+  <div class="col-md-6 mt-2">
+    <table class="table-list">
+      <tbody>
+        <% if @impound_claim.organized? %>
+          <tr>
+            <td>Impound ID</td>
+
+            <td>
+              <strong>
+                <%= link_to impound_record.display_id, organization_impound_record_url(impound_record.display_id, organization_id: organization.id) %>
+              </strong>
+            </td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>Bike</td>
+
+          <td>
+            <% if bike_claimed.present? %>
+              <%= link_to helpers.organized_bike_text(bike_claimed), bike_url(bike_claimed, organization_id: organization.to_param) %>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td><%= @impound_claim.kind %></td>
+
+          <td>
+            <%= helpers.email_time_display(impound_record.created_at) %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

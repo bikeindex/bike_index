@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    emails:
+      partial_registration:
+        click_below_to_complete_your_registration: Click below to complete your registration
+        finish_it: Finish it!
+        just_a_few_steps_away_html: >-
+          You're just a few steps away from registering your <strong>%{color_and_brand}</strong>
+          on the world's most comprehensive bike registry!
+        youre_almost_done: You’re Almost Done!

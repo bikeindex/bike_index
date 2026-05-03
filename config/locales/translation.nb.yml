@@ -5012,19 +5012,8 @@ nb:
     finished_stolen_registration:
       subject: Bekreft din %{organization_name}stjålne %{bike_type} på Bike Index
     organization_invitation:
-      html:
-        hello: Hei %{name},
-        join_org: Bli med %{org_name}
-        welcome_to_bike_index: Velkommen til Bike Index
-        you_are_a_member: "%{sender_name} har indikert at du er medlem av %{org_name}."
       subject: Bli med %{organization_name} på Bike Index
     partial_registration:
-      html:
-        click_below_to_complete_your_registration: Klikk nedenfor for å fullføre registreringen
-        finish_it: Gjøre det ferdig!
-        just_a_few_steps_away_html: Du er bare noen få skritt unna å registrere din
-          <strong>%{color_and_brand}</strong> i verdens mest omfattende sykkelregister!
-        youre_almost_done: Du er nesten ferdig!
       subject: Fullfør registreringen av %{organization_name}Bike Index!
   payments:
     form:
@@ -5815,6 +5804,17 @@ nb:
         when_you_do: når du gjør det!
         you_added_a_bike_type_on_bike_index: Du la til en %{bike_type} på Bike Index
         youre_almost_done_registering: Du er nesten ferdig med registreringen!
+      organization_invitation:
+        hello: Hei %{name},
+        join_org: Bli med %{org_name}
+        welcome_to_bike_index: Velkommen til Bike Index
+        you_are_a_member: "%{sender_name} har indikert at du er medlem av %{org_name}."
+      partial_registration:
+        click_below_to_complete_your_registration: Klikk nedenfor for å fullføre registreringen
+        finish_it: Gjøre det ferdig!
+        just_a_few_steps_away_html: Du er bare noen få skritt unna å registrere din
+          <strong>%{color_and_brand}</strong> i verdens mest omfattende sykkelregister!
+        youre_almost_done: Du er nesten ferdig!
     messages:
       thread_show:
         can_not_send_new_message: Beklager, du kan ikke sende en ny melding.
