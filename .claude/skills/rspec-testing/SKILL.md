@@ -35,6 +35,39 @@ When a test goes red, the correct move is **investigate why**, not edit the asse
 
 The right loop: reproduce the failure, figure out *what* changed and *why*, then decide intentionally — fix the code if the original assertion captured the right behavior, or update the assertion (with a comment) if the behavior intentionally changed. If you're about to change a test "to make it easier", stop and explain why the new expectation is correct, not just convenient.
 
+## Match a target attributes hash, not one attribute at a time
+
+When you're checking several fields on the same object or response, build one expected-attributes hash and assert against it in a single matcher. Don't write a chain of one-attribute-per-line `expect`s.
+
+- Object (ActiveRecord, plain Ruby): `expect(record).to have_attributes(target_attributes)`
+- Hash (JSON response, parsed body): `expect(hash).to eq(target.as_json)` for full match, or `expect(hash).to include(target_attributes)` for partial.
+
+This collapses what would be 4 brittle assertions into 1, makes the *contract* visible at a glance, and gives a single readable diff when something changes. It also avoids the trap of weak per-field assertions like `expect(x).to be_present` or `expect(url).not_to include("blank.png")` standing in for "the right value" — match the value directly.
+
+### Good
+
+```ruby
+target_attributes = {kind: "found", impounded_description: "Some description"}
+expect(impound_record).to have_attributes(target_attributes)
+
+expect(json_result["memberships"]).to eq([target_membership.as_json])
+```
+
+### Bad
+
+```ruby
+expect(impound_record.kind).to eq("found")
+expect(impound_record.impounded_description).to be_present
+expect(impound_record.impounded_description).to eq("Some description")
+
+logo_url = json_result["memberships"].first["organization_logo_url"]
+expect(logo_url).to be_present
+expect(logo_url).not_to include("blank.png")
+expect(logo_url).to eq(organization.avatar_url)
+```
+
+The bad version spreads one logical assertion across many lines, mixes weak presence checks with the real expected value, and produces noisier failure output.
+
 ## Structuring with `context` and `let`
 
 Use `context` and `let` to isolate what varies between examples. Each `it` block should live in a `context` that names the condition, with `let` overrides for only what differs in that case. **Avoid repeating setup across sibling `it` blocks.**

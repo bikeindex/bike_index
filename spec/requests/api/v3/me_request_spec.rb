@@ -54,10 +54,8 @@ RSpec.describe "Me API V3", type: :request do
         it "returns the avatar URL as organization_logo_url" do
           get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
           expect(response.response_code).to eq(200)
-          logo_url = json_result["memberships"].first["organization_logo_url"]
-          expect(logo_url).to be_present
-          expect(logo_url).not_to include("blank.png")
-          expect(logo_url).to eq(organization_role.organization.reload.avatar_url)
+          expect(organization_role.organization.reload).to have_attributes(avatar?: true)
+          expect(json_result["memberships"]).to eq([target_membership.merge(organization_logo_url: organization_role.organization.avatar_url).as_json])
         end
       end
     end
