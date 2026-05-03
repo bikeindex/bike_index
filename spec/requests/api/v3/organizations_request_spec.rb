@@ -109,6 +109,7 @@ RSpec.describe "Organization API V3", type: :request do
             website: "https://bikes.geoffereth.com",
             kind: "bike_shop",
             slug: "geoffs-bike-shop",
+            logo_url: nil,
             locations: [
               {address: "1111 SE Belmont Street, Portland, OR 97215, United States"}.merge(location_1),
               {address: "2222 SE Morrison Street, Portland, OR 97214, United States"}.merge(location_2)
@@ -229,6 +230,7 @@ RSpec.describe "Organization API V3", type: :request do
           website: "https://bikes.geoffereth.com",
           kind: "bike_shop",
           slug: "geoffs-bike-shop",
+          logo_url: nil,
           locations: [{
             address: "1300 W 14th Pl, Chicago, IL 60608, United States",
             name: location.name,
