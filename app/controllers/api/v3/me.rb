@@ -32,7 +32,7 @@ module API
               organization_slug: membership.organization.slug,
               organization_id: membership.organization_id,
               organization_access_token: membership.organization.access_token,
-              organization_logo_url: membership.organization.avatar_url,
+              organization_logo_url: (membership.organization.avatar_url if membership.organization.avatar?),
               user_is_organization_admin: membership.role == "admin"
             }
           end
