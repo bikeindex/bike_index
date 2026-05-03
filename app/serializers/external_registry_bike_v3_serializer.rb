@@ -42,4 +42,8 @@ class ExternalRegistryBikeV3Serializer < BikeV2Serializer
 
   def stolen_coordinates
   end
+
+  def for_sale
+    false
+  end
 end
