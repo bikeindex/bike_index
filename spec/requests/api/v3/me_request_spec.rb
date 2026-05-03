@@ -24,9 +24,11 @@ RSpec.describe "Me API V3", type: :request do
       let(:target_membership) do
         {
           organization_name: organization_role.organization.name,
+          organization_short_name: organization_role.organization.short_name,
           organization_slug: organization_role.organization.slug,
           organization_id: organization_role.organization_id,
           organization_access_token: organization_role.organization.access_token,
+          organization_logo_url: organization_role.organization.avatar_url,
           user_is_organization_admin: false
         }
       end
