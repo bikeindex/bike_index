@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
-  let(:component) { render_inline(described_class.new(serial:, chip_id:, result_count:, error:, error_message:)) }
+  let(:component) { render_inline(described_class.new(chip_id:, result_count:, serial:, error:, error_message:)) }
   let(:serial) { "SERIAL111" }
   let(:chip_id) { "chip_0" }
   let(:result_count) { 1 }

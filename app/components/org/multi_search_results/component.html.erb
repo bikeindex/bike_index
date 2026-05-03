@@ -5,8 +5,8 @@
   data-result-count="<%= @pagy.count %>"
 >
   <h4 class="uncap tw:mt-4 tw:mb-0 tw:px-1">
-    <%= translation(".serial_label") %>
-    <span class="serial-span"><%= @serial %></span>
+    <%= sticker_search? ? "Sticker:" : translation(".serial_label") %>
+    <span class="serial-span"><%= @query %></span>
 
     <span class="tw:text-sm tw:font-normal tw:text-gray-500">
       <%= translation(".result_count_html", count: helpers.number_display(@pagy.count), results: "result".pluralize(@pagy.count)) %>
@@ -18,7 +18,7 @@
     </span>
   </h4>
 
-  <% if @bikes.any? %>
+  <% if @bikes&.any? %>
     <%= render(Org::RegistrationSearch::Component.new(
       organization: @organization,
       pagy: @pagy,

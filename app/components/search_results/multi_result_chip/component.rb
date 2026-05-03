@@ -3,10 +3,10 @@
 module SearchResults
   module MultiResultChip
     class Component < ApplicationComponent
-      def initialize(serial:, chip_id:, result_count:, error: false, error_message: nil)
-        @serial = serial
+      def initialize(chip_id:, result_count:, serial: nil, sticker: nil, error: false, error_message: nil)
         @chip_id = chip_id
         @result_count = result_count
+        @label = serial || sticker
         @error = error
         @error_message = error_message
       end
@@ -15,10 +15,10 @@ module SearchResults
         content_tag(:span, id: @chip_id, class: badge_classes) do
           if has_results?
             content_tag(:a, href: "#result_#{@chip_id.delete_prefix("chip_")}", class: serial_span_classes) do
-              @serial
+              @label
             end
           else
-            inner = content_tag(:span, @serial, class: "serial-span")
+            inner = content_tag(:span, @label, class: "serial-span")
             inner += trailing_label
             inner
           end

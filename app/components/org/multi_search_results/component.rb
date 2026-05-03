@@ -5,11 +5,13 @@ module Org
     class Component < ApplicationComponent
       include Binxtils::SortableHelper
 
-      def initialize(organization:, serial:, chip_id:, pagy:, bikes:, interpreted_params:, per_page:, close_serials: nil)
+      def initialize(organization:, query:, chip_id:, pagy:, search_kind: "serials",
+        bikes: nil, interpreted_params: nil, per_page: nil, close_serials: nil)
         @organization = organization
-        @serial = serial
+        @query = query
         @chip_id = chip_id
         @pagy = pagy
+        @search_kind = search_kind
         @bikes = bikes
         @interpreted_params = interpreted_params
         @per_page = per_page
@@ -17,6 +19,10 @@ module Org
       end
 
       private
+
+      def sticker_search?
+        @search_kind == "stickers"
+      end
 
       def result_index
         @chip_id&.delete_prefix("chip_")
@@ -27,7 +33,11 @@ module Org
       end
 
       def view_all_path
-        helpers.organization_registrations_path(organization_id: @organization.to_param, search_serial: @serial)
+        if sticker_search?
+          helpers.organization_stickers_path(organization_id: @organization.to_param, query: @query)
+        else
+          helpers.organization_registrations_path(organization_id: @organization.to_param, search_serial: @query)
+        end
       end
     end
   end

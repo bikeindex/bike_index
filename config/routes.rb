@@ -389,6 +389,7 @@ Rails.application.routes.draw do
       collection do
         get :multi_search
         get :multi_search_response
+        get :multi_search_sticker_response
       end
     end
     resources :bikes, only: %i[new create show update] do
