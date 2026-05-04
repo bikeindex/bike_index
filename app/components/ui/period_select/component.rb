@@ -33,7 +33,7 @@ module UI
           href: period_url(period_key),
           size: :sm,
           active: @period == period_key,
-          class: "period-select-standard tw:px-1.5! tw:sm:px-2.5!",
+          class: "period-select-standard",
           data: {period: period_key, turbo_action: "advance"}
         )
       end
