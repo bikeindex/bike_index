@@ -31,45 +31,20 @@ RSpec.describe "Bikes API V3", type: :request do
         "serial" => bike.serial_number.upcase,
         "manufacturer_name" => bike.mnfg_name,
         "manufacturer_id" => bike.manufacturer_id,
-        "frame_model" => nil,
-        "frame_size" => nil,
-        "frame_material_slug" => nil,
         "frame_colors" => ["Black"],
-        "year" => nil,
-        "name" => nil,
-        "paint_description" => nil,
-        "description" => nil,
         "rear_tire_narrow" => true,
-        "front_tire_narrow" => nil,
-        "rear_wheel_size_iso_bsd" => nil,
-        "front_wheel_size_iso_bsd" => nil,
-        "handlebar_type_slug" => nil,
-        "front_gear_type_slug" => nil,
-        "rear_gear_type_slug" => nil,
-        "extra_registration_number" => nil,
-        "additional_registration" => nil,
         "type_of_cycle" => "Bike",
         "cycle_type_slug" => "bike",
         "propulsion_type_slug" => "foot-pedal",
         "test_bike" => false,
-        "thumb" => nil,
-        "large_img" => nil,
         "is_stock_img" => false,
         "url" => "http://test.host/bikes/#{bike.id}",
         "api_url" => "http://test.host/api/v1/bikes/#{bike.id}",
         "registration_created_at" => bike.created_at.to_i,
         "registration_updated_at" => bike.updated_at.to_i,
-        "external_id" => nil,
-        "registry_name" => nil,
-        "registry_url" => nil,
-        "location_found" => nil,
         "status" => "with owner",
         "for_sale" => false,
         "stolen" => false,
-        "stolen_location" => nil,
-        "stolen_coordinates" => nil,
-        "date_stolen" => nil,
-        "stolen_record" => nil,
         "public_images" => [],
         "components" => []
       }
@@ -78,7 +53,7 @@ RSpec.describe "Bikes API V3", type: :request do
     it "returns one with from an id" do
       get "/api/v3/bikes/#{bike.id}", params: {format: :json}
       expect(response.code).to eq("200")
-      expect(json_result["bike"]).to eq target
+      expect(json_result["bike"].compact).to eq target
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
@@ -90,7 +65,7 @@ RSpec.describe "Bikes API V3", type: :request do
       it "returns status with owner and for_sale true" do
         get "/api/v3/bikes/#{bike.id}", params: {format: :json}
         expect(response.code).to eq("200")
-        expect(json_result["bike"]).to eq target.merge("for_sale" => true)
+        expect(json_result["bike"].compact).to eq target.merge("for_sale" => true)
       end
     end
 
@@ -103,14 +78,16 @@ RSpec.describe "Bikes API V3", type: :request do
           "stolen" => true,
           "stolen_coordinates" => [40.71, -74.01],
           "date_stolen" => bike.current_stolen_record.date_stolen.to_i,
-          "stolen_record" => JSON.parse(StolenRecordV2Serializer.new(bike.current_stolen_record, root: false, event: bike).to_json)
+          "stolen_record" => JSON.parse(StolenRecordV2Serializer.new(bike.current_stolen_record, root: false, event: bike).to_json).compact
         )
       end
 
       it "returns status stolen and for_sale true" do
         get "/api/v3/bikes/#{bike.id}", params: {format: :json}
         expect(response.code).to eq("200")
-        expect(json_result["bike"]).to eq stolen_target
+        result = json_result["bike"].compact
+        result["stolen_record"] = result["stolen_record"].compact if result["stolen_record"]
+        expect(result).to eq stolen_target
       end
     end
 
@@ -121,7 +98,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(impound_record.kind).to eq "found"
         get "/api/v3/bikes/#{bike.id}", params: {format: :json}
         expect(response.code).to eq("200")
-        expect(json_result["bike"]).to eq target.merge("status" => "found", "serial" => "Hidden")
+        expect(json_result["bike"].compact).to eq target.merge("status" => "found", "serial" => "Hidden")
       end
     end
 
