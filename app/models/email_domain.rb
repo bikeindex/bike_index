@@ -69,7 +69,7 @@ class EmailDomain < ApplicationRecord
 
       domain = "@#{domain}" if email_or_domain.match?("@")
 
-      find_matching_domain(domain) || create(domain:, skip_processing:)
+      find_matching_domain(domain) || create_or_find_by(domain:) { it.skip_processing = skip_processing }
     end
 
     def find_matching_domain(domain)
