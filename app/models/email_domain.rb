@@ -18,8 +18,9 @@
 #
 # Indexes
 #
-#  index_email_domains_on_creator_id   (creator_id)
-#  index_email_domains_on_domain_trgm  (domain) USING gin
+#  index_email_domains_on_creator_id     (creator_id)
+#  index_email_domains_on_domain_trgm    (domain) USING gin
+#  index_email_domains_on_domain_unique  (domain) UNIQUE WHERE (deleted_at IS NULL)
 #
 class EmailDomain < ApplicationRecord
   include StatusHumanizable
@@ -45,7 +46,7 @@ class EmailDomain < ApplicationRecord
   belongs_to :creator, class_name: "User"
 
   validates_presence_of :domain
-  validates_uniqueness_of :domain
+  validates_uniqueness_of :domain, on: :create
   validate :domain_is_expected_format
   validate :domain_does_not_match_existing, on: :create
 
