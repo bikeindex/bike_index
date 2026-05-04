@@ -141,6 +141,19 @@ RSpec.describe "Me API V3", type: :request do
       expect(json_result["bikes"].is_a?(Array)).to be_truthy
       expect(response.response_code).to eq(200)
     end
+
+    context "with for sale bike" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: user.email, is_for_sale: true) }
+
+      it "uses BikeV3Serializer (status not 'for sale', for_sale: true)" do
+        token.update_attribute :scopes, "read_bikes"
+        get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
+        expect(response.response_code).to eq(200)
+        result = json_result["bikes"].find { |b| b["id"] == bike.id }
+        expect(result).to include("status" => "with owner", "for_sale" => true)
+      end
+    end
+
     it "403s if read_bikes_spec isn't in token" do
       get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
       expect(response.response_code).to eq(403)

@@ -23,14 +23,83 @@ RSpec.describe "Bikes API V3", type: :request do
   include_context :existing_doorkeeper_app
 
   describe "find by id" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:target) do
+      {
+        "id" => bike.id,
+        "title" => bike.title_string,
+        "serial" => bike.serial_number.upcase,
+        "manufacturer_name" => bike.mnfg_name,
+        "manufacturer_id" => bike.manufacturer_id,
+        "frame_colors" => ["Black"],
+        "rear_tire_narrow" => true,
+        "type_of_cycle" => "Bike",
+        "cycle_type_slug" => "bike",
+        "propulsion_type_slug" => "foot-pedal",
+        "test_bike" => false,
+        "is_stock_img" => false,
+        "url" => "http://test.host/bikes/#{bike.id}",
+        "api_url" => "http://test.host/api/v1/bikes/#{bike.id}",
+        "registration_created_at" => bike.created_at.to_i,
+        "registration_updated_at" => bike.updated_at.to_i,
+        "status" => "with owner",
+        "for_sale" => false,
+        "stolen" => false,
+        "public_images" => [],
+        "components" => []
+      }
+    end
+
     it "returns one with from an id" do
-      bike = FactoryBot.create(:bike)
       get "/api/v3/bikes/#{bike.id}", params: {format: :json}
       expect(response.code).to eq("200")
-      expect(json_result["bike"]["id"]).to eq(bike.id)
+      expect(json_result["bike"].compact).to eq target
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
+    end
+
+    context "for sale bike" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, is_for_sale: true) }
+
+      it "returns status with owner and for_sale true" do
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"].compact).to eq target.merge("for_sale" => true)
+      end
+    end
+
+    context "stolen bike marked for sale" do
+      let(:bike) { FactoryBot.create(:stolen_bike, is_for_sale: true) }
+      let(:stolen_target) do
+        target.merge(
+          "status" => "stolen",
+          "for_sale" => true,
+          "stolen" => true,
+          "stolen_coordinates" => [40.71, -74.01],
+          "date_stolen" => bike.current_stolen_record.date_stolen.to_i,
+          "stolen_record" => JSON.parse(StolenRecordV2Serializer.new(bike.current_stolen_record, root: false, event: bike).to_json).compact
+        )
+      end
+
+      it "returns status stolen and for_sale true" do
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json}
+        expect(response.code).to eq("200")
+        result = json_result["bike"].compact
+        result["stolen_record"] = result["stolen_record"].compact if result["stolen_record"]
+        expect(result).to eq stolen_target
+      end
+    end
+
+    context "impounded as found" do
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+
+      it "returns status found" do
+        expect(impound_record.kind).to eq "found"
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"].compact).to eq target.merge("status" => "found", "serial" => "Hidden")
+      end
     end
 
     it "responds with missing" do
