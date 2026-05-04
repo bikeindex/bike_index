@@ -30,6 +30,16 @@ RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
     end
   end
 
+  it "Doesn't break when logo.dev returns 200 with a non-image body" do
+    VCR.use_cassette("get_manufacturer_logo_worker-non-image", vcr_config) do
+      manufacturer = FactoryBot.create(:manufacturer, name: "Ibera", website: "http://www.ibera.info/")
+      described_class.new.perform(manufacturer.id)
+      manufacturer.reload
+      expect(manufacturer.logo).to_not be_present
+      expect(manufacturer.logo_source).to be_nil
+    end
+  end
+
   it "Doesn't break when website has a path" do
     VCR.use_cassette("get_manufacturer_logo_worker-website-with-path", vcr_config) do
       manufacturer = FactoryBot.create(:manufacturer, website: "http://www.ternbicycles.com/us/")
