@@ -30,6 +30,17 @@ RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
     end
   end
 
+  it "Doesn't break when logo.dev returns 200 with a non-image body" do
+    manufacturer = FactoryBot.create(:manufacturer, website: "https://example.com")
+    logo_url = described_class.logo_url(manufacturer)
+    WebMock.stub_request(:get, logo_url)
+      .to_return(status: 200, body: '{"err":"oops"}', headers: {"Content-Type" => "application/json"})
+    described_class.new.perform(manufacturer.id)
+    manufacturer.reload
+    expect(manufacturer.logo).to_not be_present
+    expect(manufacturer.logo_source).to be_nil
+  end
+
   it "Doesn't break when website has a path" do
     VCR.use_cassette("get_manufacturer_logo_worker-website-with-path", vcr_config) do
       manufacturer = FactoryBot.create(:manufacturer, website: "http://www.ternbicycles.com/us/")
