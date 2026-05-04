@@ -155,7 +155,7 @@ GEM
       loofah
       rails
       rails-html-sanitizer
-    bootsnap (1.18.6)
+    bootsnap (1.24.1)
       msgpack (~> 1.2)
     brakeman (8.0.4)
       racc
