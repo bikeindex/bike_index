@@ -176,6 +176,51 @@ RSpec.shared_examples "bike_attributable" do
     end
   end
 
+  describe "cached_data_array" do
+    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
+    let(:primary_frame_color) { Color.friendly_find("Purple") || FactoryBot.create(:color, name: "Purple") }
+    let(:secondary_frame_color) { Color.friendly_find("Red") || FactoryBot.create(:color, name: "Red") }
+    let(:tertiary_frame_color) { Color.friendly_find("Silver, gray or bare metal") || FactoryBot.create(:color, name: "Silver, gray or bare metal") }
+    let(:rear_wheel_size) { FactoryBot.create(:wheel_size, name: "26") }
+    let(:front_wheel_size) { FactoryBot.create(:wheel_size, name: "20") }
+    let(:paint) { FactoryBot.create(:paint, name: "fluorescent green") }
+    let(:obj) do
+      FactoryBot.create(model_sym,
+        manufacturer:,
+        cycle_type: "cargo",
+        propulsion_type: "pedal-assist",
+        frame_material: "steel",
+        year: 2020,
+        frame_model: "Cross-Check",
+        frame_size: "m",
+        primary_frame_color:,
+        secondary_frame_color:,
+        tertiary_frame_color:,
+        rear_wheel_size:,
+        front_wheel_size:,
+        extra_registration_number: "EXTRA-123",
+        paint:)
+    end
+    it "includes all cached attributes" do
+      expect(obj.cached_data_array).to match_array([
+        obj.mnfg_name,
+        obj.propulsion_type_name,
+        obj.year,
+        obj.primary_frame_color.name,
+        obj.secondary_frame_color.name,
+        obj.tertiary_frame_color.name,
+        "fluorescent green",
+        obj.frame_material_name,
+        obj.frame_size,
+        obj.frame_model,
+        "#{obj.rear_wheel_size.name} wheel",
+        "#{obj.front_wheel_size.name} wheel",
+        obj.extra_registration_number,
+        obj.type
+      ])
+    end
+  end
+
   describe "status_humanized" do
     let(:obj) { FactoryBot.build(model_sym) }
     it "returns" do
