@@ -1,6 +1,10 @@
 # Every email in here has the potential to be owned by an organization -
 # but they aren't necessarily
 class OrganizedMailer < ApplicationMailer
+  # Placeholder for tokenized URLs in email previews — real tokens shouldn't
+  # appear on the screen of an admin previewing the email.
+  PREVIEW_TOKEN_URL = "/404"
+
   helper TranslationHelper
   default content_type: "multipart/alternative",
     parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
@@ -41,13 +45,13 @@ class OrganizedMailer < ApplicationMailer
   def organization_invitation(organization_role)
     @organization_role = organization_role
     @organization = @organization_role.organization
-    @sender = @organization_role.sender
-    @vars = {email: @organization_role.invited_email}
-    @new_user = User.fuzzy_email_find(@vars[:email]).present?
+    sender = @organization_role.sender
+    email = @organization_role.invited_email
+    @is_new_user = User.fuzzy_email_find(email).blank?
 
-    I18n.with_locale(@sender&.preferred_language) do
+    I18n.with_locale(sender&.preferred_language) do
       mail(reply_to: reply_to,
-        to: @vars[:email],
+        to: email,
         subject: default_i18n_subject(default_subject_vars),
         tag: __callee__)
     end
@@ -57,9 +61,8 @@ class OrganizedMailer < ApplicationMailer
     @parking_notification = parking_notification
     @organization = @parking_notification.organization
     @bike = @parking_notification.bike
-    @sender = @parking_notification.user
 
-    I18n.with_locale(@sender&.preferred_language) do
+    I18n.with_locale(@parking_notification.user&.preferred_language) do
       mail(reply_to: @parking_notification.reply_to_email,
         to: @parking_notification.email,
         tag: __callee__,
@@ -106,7 +109,7 @@ class OrganizedMailer < ApplicationMailer
 
   def impound_claim_submitted(impound_claim)
     @impound_claim = impound_claim
-    set_impound_claim_ivars
+    @organization = @impound_claim.organization
     mail(reply_to: "contact@bikeindex.org",
       to: @impound_claim.impound_record_email,
       subject: "New impound claim submitted",
@@ -115,7 +118,7 @@ class OrganizedMailer < ApplicationMailer
 
   def impound_claim_approved_or_denied(impound_claim)
     @impound_claim = impound_claim
-    set_impound_claim_ivars
+    @organization = @impound_claim.organization
     mail(reply_to: impound_claim.impound_record_email,
       to: @impound_claim.user.email,
       subject: "Your impound claim was #{@impound_claim.status_humanized}",
@@ -135,13 +138,6 @@ class OrganizedMailer < ApplicationMailer
       organization_name: @organization && "#{@organization.short_name} ",
       bike_type: @bike && "#{@bike.type} "
     }
-  end
-
-  def set_impound_claim_ivars
-    @impound_record = @impound_claim.impound_record
-    @organization = @impound_claim.organization
-    @bike_claimed = @impound_claim.bike_claimed
-    @bike_submitting = @impound_claim.bike_submitting
   end
 
   def reply_to

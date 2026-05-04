@@ -53,8 +53,9 @@ module Admin
         end
       end
 
-      def pie_chart_opts(colors)
-        opts = {thousands: ",", library: {plugins: {legend: {position: "bottom"}}}}
+      def pie_chart_opts(colors, data)
+        legend = (data.size > 4) ? false : {position: "bottom"}
+        opts = {thousands: ",", library: {plugins: {legend:}}}
         opts[:colors] = colors if colors
         opts
       end

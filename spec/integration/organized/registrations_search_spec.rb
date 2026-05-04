@@ -83,7 +83,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("table", wait: 10)
 
     fill_in "search_email", with: "alice@example.com"
-    find("#search_email").send_keys(:return)
+    find_field("search_email").send_keys(:return)
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)

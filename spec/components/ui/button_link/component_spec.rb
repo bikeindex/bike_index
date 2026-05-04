@@ -12,7 +12,7 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
     expect(component).to have_text("Link")
     html = component.to_html
     expect(html).to include("tw:inline-flex")
-    expect(html).to include("tw:bg-white")
+    expect(html).to include("tw:bg-gray-50")
   end
 
   context "with primary color" do

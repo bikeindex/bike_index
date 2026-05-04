@@ -1,0 +1,70 @@
+<h1>
+  <%= @parking_notification.subject %>
+</h1>
+
+<% if organization_snippet_body.present? %>
+  <div style="margin-top: 20px;"></div>
+  <%= organization_snippet_body.html_safe %>
+<% end %>
+
+<% if @parking_notification.repeat_record? %>
+  <h2 class="uncap" style="margin-top: 1rem;">
+    This is your <%= @parking_notification.notification_number.ordinalize %>
+    notification!
+  </h2>
+<% end %>
+
+<% if impound_record && impound_location.present? %>
+  <div style="padding: 1rem; border: 1px solid #ccc; margin: 1rem 0;">
+    <strong>It is being held at <%= impound_location.name %></strong>
+    <br>
+
+    <em>
+      <%= render UI::AddressDisplay::Component.new(address_record: impound_location.address_record, visible_attribute: :street, kind: :single_line) %>
+    </em>
+  </div>
+<% end %>
+
+<% if @parking_notification.message.present? %>
+  <div
+    style="padding: 0.5rem 1rem; border: 1px solid #ccc; margin: 1rem 0 2rem;"
+  >
+    <strong>
+      <%= @parking_notification.repeat_record? ? "Original" : "Individual" %>
+      message:
+    </strong>
+
+    <br>
+    <%= @parking_notification.message %>
+  </div>
+<% end %>
+
+<p>
+  <strong class="less-strong">
+    Your <em><%= bike.title_string %></em>
+    <%= @parking_notification.impound_notification? ? "was located at:" : "is located at:" %>
+  </strong>
+
+  <em><%= @parking_notification.formatted_address_string %></em>
+</p>
+
+<img class="geolocated-message-map" src="<%= map_url %>">
+
+<% if show_pickup_link? %>
+  <div class="mark-retrieved-box">
+    <%= link_to "I picked up my #{bike.type}", tokenized_url, "data-pm-no-track" => true, class: "binx-button" %>
+
+    <p>
+      <em>
+        Let <strong><%= organization&.name %></strong> know that you retrieved
+        your <%= bike.type %>! Click the button above.
+      </em>
+    </p>
+  </div>
+<% end %>
+
+<% if @parking_notification.image.present? %>
+  <a href="<%= @parking_notification.image_url %>">
+    <%= image_tag @parking_notification.image_url(:large), style: "display: block; margin: 20px auto; width: auto; max-width: 100%; height: auto; max-height: 400px;" %>
+  </a>
+<% end %>

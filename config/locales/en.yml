@@ -4755,20 +4755,8 @@ en:
     finished_stolen_registration:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
-      html:
-        hello: Hello %{name},
-        join_org: Join %{org_name}
-        welcome_to_bike_index: Welcome to Bike Index
-        you_are_a_member: "%{sender_name} has indicated that you are a member of %{org_name}."
       subject: Join %{organization_name}on Bike Index
     partial_registration:
-      html:
-        click_below_to_complete_your_registration: Click below to complete your registration
-        finish_it: Finish it!
-        just_a_few_steps_away_html: >-
-          You're just a few steps away from registering your <strong>%{color_and_brand}</strong>
-          on the world's most comprehensive bike registry!
-        youre_almost_done: You’re Almost Done!
       subject: Finish your %{organization_name}Bike Index registration!
   payments:
     form:
