@@ -46,6 +46,15 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect_render_donation(true, mail)
         expect_render_supporters(true, mail)
       end
+      context "with a bogus primary_frame_color_id" do
+        let(:b_param) do
+          FactoryBot.create(:b_param_stolen,
+            params: {bike: {owner_email: "bike_owner@example.com", primary_frame_color_id: "ndbGRKFw')) OR 96=(SELECT 96 FROM PG_SLEEP(15))--"}})
+        end
+        it "renders without raising" do
+          expect { OrganizedMailer.partial_registration(b_param).body.encoded }.not_to raise_error
+        end
+      end
     end
     context "with organization" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
