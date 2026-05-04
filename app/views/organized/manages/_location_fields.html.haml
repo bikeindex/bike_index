@@ -14,8 +14,9 @@
   .form-group.row
     %label.org-form-label
       = f.label :street, t(".address")
-    = f.fields_for :address_record do |address_form|
-      = render(Org::LocationAddressFields::Component.new(form_builder: address_form))
+    .col-sm-8
+      = f.fields_for :address_record do |address_form|
+        = render(Org::LocationAddressFields::Component.new(form_builder: address_form))
 
 
 - else
