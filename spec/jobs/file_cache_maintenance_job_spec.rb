@@ -43,7 +43,6 @@ RSpec.describe FileCacheMaintenanceJob, type: :job do
           registry_url
           serial
           status
-          for_sale
           stolen
           stolen_coordinates
           stolen_location
