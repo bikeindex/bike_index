@@ -528,7 +528,7 @@ GEM
       mustermann (>= 1.0.0)
     naught (1.1.0)
     nenv (0.3.0)
-    net-imap (0.6.3)
+    net-imap (0.6.4)
       date
       net-protocol
     net-pop (0.1.2)
