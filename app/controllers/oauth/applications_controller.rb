@@ -67,6 +67,11 @@ module Oauth
         doorkeeper_apps = doorkeeper_apps.where(owner_id: user_subject&.id || params[:user_id])
       end
 
+      if params[:search_query].present?
+        str = "%#{params[:search_query].strip}%"
+        doorkeeper_apps = doorkeeper_apps.where("oauth_applications.name ILIKE :str OR oauth_applications.uid ILIKE :str", str:)
+      end
+
       @time_range_column = sort_column if %w[updated_at].include?(sort_column)
       @time_range_column ||= "created_at"
       doorkeeper_apps.where(@time_range_column => @time_range)
