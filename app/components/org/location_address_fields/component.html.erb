@@ -6,6 +6,7 @@
   <% if @show_label %>
     <%= @builder.label :street, translation(:address) %>
   <% end %>
+
   <%= @builder.text_field :street, placeholder: translation(:street), class: "form-control" %>
   <%= @builder.text_field :city, required: true, placeholder: translation(:city), class: "form-control" %>
 
