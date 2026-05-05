@@ -15,10 +15,7 @@ module Emails
       end
 
       def color_and_brand
-        parts = []
-        parts << Color.find(@b_param.primary_frame_color_id)&.name if @b_param.primary_frame_color_id.present?
-        parts << @b_param.mnfg_name
-        parts.compact.join(" ")
+        [@b_param.primary_frame_color.presence, @b_param.mnfg_name].compact.join(" ")
       end
 
       def tokenized_url
