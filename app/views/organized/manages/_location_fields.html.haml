@@ -16,7 +16,7 @@
       = f.label :street, t(".address")
     .col-sm-8
       = f.fields_for :address_record do |address_form|
-        = render(Org::LocationAddressFields::Component.new(form_builder: address_form))
+        = render(Org::LocationAddressFields::Component.new(form_builder: address_form, show_label: false))
 
 
 - else

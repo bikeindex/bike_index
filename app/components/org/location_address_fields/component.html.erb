@@ -3,7 +3,10 @@
   data-controller="form--legacy-form-well--address-record"
   data-form--legacy-form-well--address-record-us-id-value="<%= Country.united_states_id %>"
 >
-  <%= @builder.label :street, translation(:address) %>
+  <% if @show_label %>
+    <%= @builder.label :street, translation(:address) %>
+  <% end %>
+
   <%= @builder.text_field :street, placeholder: translation(:street), class: "form-control" %>
   <%= @builder.text_field :city, required: true, placeholder: translation(:city), class: "form-control" %>
 
