@@ -18,8 +18,9 @@
 #
 # Indexes
 #
-#  index_email_domains_on_creator_id   (creator_id)
-#  index_email_domains_on_domain_trgm  (domain) USING gin
+#  index_email_domains_on_creator_id     (creator_id)
+#  index_email_domains_on_domain_trgm    (domain) USING gin
+#  index_email_domains_on_domain_unique  (domain) UNIQUE WHERE (deleted_at IS NULL)
 #
 class EmailDomain < ApplicationRecord
   include StatusHumanizable
@@ -45,7 +46,7 @@ class EmailDomain < ApplicationRecord
   belongs_to :creator, class_name: "User"
 
   validates_presence_of :domain
-  validates_uniqueness_of :domain
+  validates_uniqueness_of :domain, on: :create
   validate :domain_is_expected_format
   validate :domain_does_not_match_existing, on: :create
 
@@ -68,7 +69,7 @@ class EmailDomain < ApplicationRecord
 
       domain = "@#{domain}" if email_or_domain.match?("@")
 
-      find_matching_domain(domain) || create(domain:, skip_processing:)
+      find_matching_domain(domain) || create_or_find_by(domain:) { it.skip_processing = skip_processing }
     end
 
     def find_matching_domain(domain)

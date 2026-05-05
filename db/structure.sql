@@ -6310,6 +6310,13 @@ CREATE INDEX index_email_domains_on_domain_trgm ON public.email_domains USING gi
 
 
 --
+-- Name: index_email_domains_on_domain_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_email_domains_on_domain_unique ON public.email_domains USING btree (domain) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_exchange_rates_on_from_and_to; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7585,6 +7592,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260430122735'),
 ('20260428142526'),
 ('20260428000001'),
 ('20260425103043'),
