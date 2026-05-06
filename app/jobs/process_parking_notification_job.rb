@@ -1,7 +1,43 @@
+# Wrapped in a redlock keyed on parking_notification_id: the email-send guard
+# (`delivery_status.blank?`) is read-then-write, so concurrent workers picking
+# up jobs queued from cascading after_commits could each pass the check and
+# deliver duplicate emails.
 class ProcessParkingNotificationJob < ApplicationJob
+  REDLOCK_PREFIX = "ProcessParkingNotificationLock-#{Rails.env.slice(0, 3)}"
+
   sidekiq_options queue: "notify"
 
+  def self.redlock_key(parking_notification_id)
+    "#{REDLOCK_PREFIX}-#{parking_notification_id}"
+  end
+
+  def self.new_lock_manager
+    Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
+  end
+
+  def self.locked_for?(parking_notification_id)
+    new_lock_manager.locked?(redlock_key(parking_notification_id))
+  end
+
+  def lock_duration_ms
+    1.minute.in_milliseconds.to_i
+  end
+
   def perform(parking_notification_id)
+    lock_manager = self.class.new_lock_manager
+    redlock = lock_manager.lock(self.class.redlock_key(parking_notification_id), lock_duration_ms)
+    return unless redlock
+
+    begin
+      run(parking_notification_id)
+    ensure
+      lock_manager.unlock(redlock)
+    end
+  end
+
+  private
+
+  def run(parking_notification_id)
     parking_notification = ParkingNotification.find(parking_notification_id)
 
     if parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
