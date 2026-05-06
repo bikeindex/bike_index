@@ -28,7 +28,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
 
     tooltip = tooltips.first
     trigger = find("[aria-describedby='#{tooltip[:id]}']")
-    expect(trigger[:tabindex]).to eq "0"
+    expect(trigger.tag_name).to eq "button"
     expect(tooltip.text(:all)).to eq "5–9 mi"
     expect(tooltip).not_to be_visible
 
@@ -54,6 +54,13 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     expect(tooltip).to be_visible
     find("body").hover
     expect(tooltip).not_to be_visible
+
+    # Esc closes the tooltip
+    trigger.hover
+    expect(tooltip).to be_visible
+    page.send_keys(:escape)
+    expect(tooltip).not_to be_visible
+    find("body").hover
 
     # Hover-then-focus stays visible until BOTH clear
     trigger.hover

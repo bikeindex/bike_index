@@ -7,7 +7,10 @@ description: >-
   arguments, instance variables, `helpers.` prefix in templates). Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
   controllers, Tailwind classes, or any frontend code that touches styling
-  or interactivity. Stimulus.js is the JavaScript framework; SCSS and
+  or interactivity. **Also trigger before any
+  `mcp__playwright__browser_take_screenshot` call** — this skill defines
+  the required `tmp/` filename rule so screenshots don't land in the
+  project root. Stimulus.js is the JavaScript framework; SCSS and
   CoffeeScript files exist but are deprecated.
 ---
 
@@ -40,3 +43,7 @@ This project uses the ViewComponent gem to render components.
 - In view components, **prefer instance variables to `attr_accessor`**.
 - In ViewComponent templates, use the `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`).
   - Rule of thumb: try the bare call first. Only add `helpers.` if it fails with `NoMethodError` — route helpers (`new_bike_path`) and ActionView tag/url builders (`tag.span`, `content_tag`, `link_to`) are mixed into `ViewComponent::Base` directly, so they don't need it.
+
+## Manual browser verification
+
+**Every `mcp__playwright__browser_take_screenshot` call must pass a `filename:` that starts with `tmp/`** (e.g. `tmp/tooltip-hover.png`). The MCP tool's default root is the project root — a bare filename like `tooltip.png` lands in the working tree, shows up in `git status`, and has to be cleaned up by hand. `tmp/` is gitignored, so screenshots there stay out of commits and don't pollute the diff. This rule applies to ad-hoc visual verification, not just PR-screenshot capture.

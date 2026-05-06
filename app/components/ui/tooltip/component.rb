@@ -3,20 +3,56 @@
 module UI
   module Tooltip
     class Component < ApplicationComponent
+      TRIGGER_ACTIONS = "mouseenter->ui--tooltip#showOnHover mouseleave->ui--tooltip#hideOnHover " \
+        "focusin->ui--tooltip#showOnFocus focusout->ui--tooltip#hideOnFocusout"
+
+      TRIGGER_CLASS = "tw:inline-block tw:rounded tw:cursor-help tw:focus:outline-none " \
+        "tw:focus-visible:ring-2 tw:focus-visible:ring-purple-400"
+
       renders_one :body
+      renders_one :tooltip_button, ->(**attrs) { tag.button(**trigger_attrs(**attrs)) { tooltip_span } }
 
       def initialize(text: nil)
         @text = text
       end
 
+      def call
+        return tooltip_button if tooltip_button?
+
+        tag.button(**trigger_attrs(class: TRIGGER_CLASS)) { safe_join([content, tooltip_span]) }
+      end
+
       private
+
+      def trigger_attrs(data: {}, **extra_attrs)
+        action = [data[:action], TRIGGER_ACTIONS].compact.join(" ")
+        {
+          type: "button",
+          "aria-label": @text.presence,
+          "aria-describedby": tooltip_id,
+          data: {controller: "ui--tooltip", "ui--tooltip-target": "trigger", **data, action:},
+          **extra_attrs
+        }
+      end
+
+      def tooltip_id
+        @tooltip_id ||= "tooltip-#{SecureRandom.hex(4)}"
+      end
 
       def tooltip_body
         body? ? body : @text
       end
 
-      def tooltip_id
-        @tooltip_id ||= "tooltip-#{SecureRandom.hex(4)}"
+      def tooltip_span
+        tag.span(
+          tooltip_body,
+          role: "tooltip",
+          id: tooltip_id,
+          data: {"ui--tooltip-target": "tooltip"},
+          class: "tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:rounded tw:bg-purple-900 " \
+            "tw:px-2 tw:py-1 tw:text-xs tw:text-white tw:border tw:border-purple-400 tw:z-50 " \
+            "tw:dark:border-purple-300 tw:dark:bg-purple-100 tw:dark:text-purple-900"
+        )
       end
     end
   end
