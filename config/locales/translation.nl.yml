@@ -3857,7 +3857,6 @@ nl:
       our_community_is_your_community: Onze gemeenschap is uw gemeenschap
       plug_your_city_in_nationally: Sluit je stad landelijk aan.
       related_articles: 'Gerelateerde artikelen:'
-      schedule_a_demo:
       trusted_by_municipalities_everywhere: Overal vertrouwd door gemeenten
       bike_index_new_dashboard: Nieuw fietsindexdashboard handig voor het bestrijden
         van fietscriminaliteit
@@ -3867,6 +3866,7 @@ nl:
       check_out: Bekijk onze
       cities_deck: steden partner deck
       used_by_municipalities_everywhere: Overal gebruikt door gemeenten
+      schedule_a_demo: Plan een demo
     for_community_groups:
       bike_index_for_community_groups: Bike Index voor Community's
       bike_index_launches_new_ambassadors_progr: Bike Index lanceert een nieuw Ambassadeurs
@@ -4477,11 +4477,11 @@ nl:
     automatic_registration_through_pos: Automatische registratie via uw POS
     create_organization_account: Maak een organisatieaccount en neem contact op met
       registranten
+    social_media_and_email_marketing: Social media en e-mail marketing campagneactiva
     embed_registration_form: Sluit het aangepaste registratieformulier van uw organisatie
       in op uw website
     import_registrations_from_previous: Importeer registraties uit een voormalig registratiesysteem
     search_bikes_organization: Zoek fietsen in uw organisatieaccount
-    social_media_and_email_marketing: Social media en e-mail marketing campagneactiva
   sessions:
     magic_link:
       enter_email_address: Voer je e-mailadres in, we sturen je een e-mail met een
