@@ -6,11 +6,14 @@ module UI
       TRIGGER_ACTIONS = "mouseenter->ui--tooltip#showOnHover mouseleave->ui--tooltip#hideOnHover " \
         "focusin->ui--tooltip#showOnFocus focusout->ui--tooltip#hideOnFocusout"
 
-      TRIGGER_CLASS = "tw:inline-block tw:rounded tw:cursor-help tw:focus:outline-none " \
-        "tw:focus-visible:ring-2 tw:focus-visible:ring-purple-400"
+      TRIGGER_CLASS = "tw:inline-block tw:rounded tw:cursor-help " \
+        "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
 
       renders_one :body
-      renders_one :tooltip_button, ->(**attrs) { tag.button(**trigger_attrs(**attrs)) { tooltip_span } }
+      renders_one :tooltip_button, ->(**attrs, &block) {
+        inner = block ? safe_join([capture(&block), tooltip_span], " ") : tooltip_span
+        tag.button(**trigger_attrs(**attrs)) { inner }
+      }
 
       def initialize(text: nil)
         @text = text
@@ -50,7 +53,7 @@ module UI
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
           class: "twtext-color tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:rounded " \
-            "tw:bg-white tw:px-2 tw:py-1 tw:text-xs tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
+            "tw:bg-white tw:px-2 tw:py-1 tw:text-xs tw:font-normal tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
             "tw:dark:bg-gray-800 tw:dark:border-gray-700"
         )
       end

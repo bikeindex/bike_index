@@ -9,11 +9,14 @@ module UI
       end
 
       def with_tooltip_button_slot
-        render(UI::Tooltip::Component.new(text: "Custom trigger element via slot")) do |tooltip|
+        render(UI::Tooltip::Component.new(text: "Visible to other riders viewing your bike")) do |tooltip|
           tooltip.with_tooltip_button(
-            class: "tw:px-2 tw:py-1 tw:rounded tw:bg-gray-200 tw:dark:bg-gray-700",
-            data: {action: "click->custom#noop"}
-          )
+            class: "tw:inline-flex tw:items-center tw:justify-center tw:h-5 tw:w-5 tw:rounded-full " \
+              "tw:bg-gray-200 tw:text-gray-700 tw:hover:bg-gray-300 " \
+              "tw:dark:bg-gray-700 tw:dark:text-gray-200 tw:dark:hover:bg-gray-600 " \
+              "tw:text-xs tw:font-bold tw:cursor-help " \
+              "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+          ) { "?" }
         end
       end
       # @!endgroup
