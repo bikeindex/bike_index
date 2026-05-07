@@ -48,7 +48,7 @@
   <em><%= @parking_notification.formatted_address_string %></em>
 </p>
 
-<img class="geolocated-message-map" src="<%= map_url %>">
+<%= image_tag map_url, class: "geolocated-message-map", alt: "Map showing #{@parking_notification.formatted_address_string}" %>
 
 <% if show_pickup_link? %>
   <div class="mark-retrieved-box">
