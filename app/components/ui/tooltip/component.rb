@@ -19,7 +19,7 @@ module UI
       def call
         return tooltip_button if tooltip_button?
 
-        tag.button(**trigger_attrs(class: TRIGGER_CLASS)) { safe_join([content, tooltip_span]) }
+        tag.button(**trigger_attrs(class: TRIGGER_CLASS)) { safe_join([content, tooltip_span], " ") }
       end
 
       private
