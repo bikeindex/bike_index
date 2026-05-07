@@ -3772,44 +3772,6 @@ nl:
       simply_the_best_bike_registry: Het beste fietsregister
       try_for_free: Probeer gratis
       year: jaar
-    campus_packages:
-      additional: Extra
-      all_plans_come_with_a_30day_free_trial: Alle abonnementen bevatten een gratis
-        proefperiode van 30 dagen
-      bike_index_for_colleges_universities: Bike Index voor Hogescholen en Universiteiten
-      choose_a_package_size: Kies een pakketgrootte
-      clean_up_your_campus_messy_registry: Ruim het rommelige register van uw Campus
-        op.
-      compare_plans_and_features: Vergelijk plannen en functies
-      contact_us: Contacteer ons
-      contact_us_for_trial: Neem contact met ons op voor een gratis proefperiode
-      forever: Voor altijd
-      free: GRATIS
-      package_title: "%{name} pakket"
-      questions_want_to_get_started: Vragen? Wilt u beginnen?
-      sign_up: Registreren
-      sign_up_now: Meld je nu aan
-      try_for_free: Probeer gratis
-      year: jaar
-    cities_packages:
-      additional: Extra
-      all_plans_come_with_a_30day_free_trial: Alle abonnementen bevatten een gratis
-        proefperiode van 30 dagen
-      bike_index_for_cities: Bike Index voor steden
-      choose_a_package_size: Kies een pakketgrootte
-      compare_plans_and_features: Vergelijk Plannen en Functies
-      contact_us: Contacteer ons
-      contact_us_for_trial: Neem contact met ons op voor een gratis proefperiode
-      forever: Voor altijd
-      free: GRATIS
-      give_your_constituents_the_bike_registry_: Geef uw afnemers het fietsregister
-        dat ze willen
-      package_title: "%{name} pakket"
-      questions_want_to_get_started: Vragen? Wilt u beginnen?
-      sign_up: Registreren
-      sign_up_now: Meld je nu aan
-      try_for_free: Probeer gratis
-      year: jaar
     find_out_more:
       custom_development_available: A la carte functies en aangepaste ontwikkeling
         beschikbaar.
@@ -3887,7 +3849,6 @@ nl:
         Bike Index consolideert alles op één beheersbare plaats.
       engage_your_residents_and_recover_their_b: Betrek uw bewoners, krijg hun fietsen
         terug, en zij zullen voor altijd van u houden.
-      features_amp_pricing: Functies & prijzen
       mitigate_the_registration_mess: Beperk de registratiepuinhoop
       no_more_index_cards_or_excel_sheets_give_: Geen indexkaarten of excel sheets
         meer. Geef uw burgers de tools om zich in minder dan twee minuten vanaf een
@@ -4061,8 +4022,6 @@ nl:
     landing_pages_ascend: Stijg POS op Bike Index
     landing_pages_bike_shop_packages: Fietsindex voor fietsenwinkels - functies en
       prijzen
-    landing_pages_campus_packages: Fietsindex voor scholen - functies en prijzen
-    landing_pages_cities_packages: Bike Index voor steden - functies en prijzen
     landing_pages_for_bike_shops: Fietsindex voor fietsenwinkels
     landing_pages_for_cities: Bike Index voor steden
     landing_pages_for_community_groups: Fietsindex voor communitygroepen
@@ -4517,35 +4476,11 @@ nl:
     automatic_registration_through_pos: Automatische registratie via uw POS
     create_organization_account: Maak een organisatieaccount en neem contact op met
       registranten
-    export_custom_data: Aangepaste gegevens exporteren naar CSV / XLSX-bestanden
-    qr_sticker: QR sticker scannen en berichten verzenden
-    social_media_and_email_marketing: Social media en e-mail marketing campagneactiva
-    staff_accounts: Personeelsrekeningen
-    organization_dashboard: Stads- en politie-dashboard - analyseer statistieken over
-      lokale registratie op basis van postcode
-    campus_bike_management_suite: Campus Bike Management Suite - tag fietsen, neem
-      contact op met eigenaren, log achtergelaten en in beslag genomen fietsrecords,
-      stuur vervolgmeldingen
-    contact_unfinished_registrants: Neem contact op met registranten die de registratie
-      niet hebben voltooid
-    custom_form_fields: Voeg aangepaste formuliervelden toe aan uw registratiepagina
-    customize_emails: Pas e-mails aan die u verzendt vanuit Bike Index
     embed_registration_form: Sluit het aangepaste registratieformulier van uw organisatie
       in op uw website
-    graduated_bikes: Geautomatiseerde migratie van afgestudeerde fietsen uit het systeem
     import_registrations_from_previous: Importeer registraties uit een voormalig registratiesysteem
-    priority_programming_support: Prioriteit bij programmering, hosting en ondersteuning
-    qr_sticker_scanning_and_messaging: QR sticker scannen en berichten verzenden
-    school_landing_page: Landingspagina voor registratie van het schoolmerk
     search_bikes_organization: Zoek fietsen in uw organisatieaccount
-    department_landing_page: Landingspagina voor registratie van een afdelingsmerk
-    law_enforcement_list_html: Wetshandhavingsinstrumenten:<ol class="le-list"><li>
-      Bulk serieel zoeken</li><li> Gemarkeerde dubbele registraties en geloofwaardigheidsscores
-      van fietsen</li><li> Mogelijkheid om gebruikers een bericht te sturen, zelfs
-      als ze fietsen niet als gestolen hebben gemarkeerd</li><li> Cross-database zoeken</li><li>
-      Integratie met LeadsOnline</li><li> Dagelijks gestolen fietsen hot sheet</li><li>
-      Openbare inbeslagname pagina</li></ol>
-    impound_bikes: Fietsen in beslag nemen en claiminzendingen ontvangen
+    social_media_and_email_marketing: Social media en e-mail marketing campagneactiva
   sessions:
     magic_link:
       enter_email_address: Voer je e-mailadres in, we sturen je een e-mail met een

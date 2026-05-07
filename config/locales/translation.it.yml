@@ -3135,40 +3135,6 @@ it:
       simply_the_best_bike_registry:
       try_for_free:
       year:
-    campus_packages:
-      additional:
-      all_plans_come_with_a_30day_free_trial:
-      bike_index_for_colleges_universities:
-      choose_a_package_size:
-      clean_up_your_campus_messy_registry:
-      compare_plans_and_features:
-      contact_us:
-      contact_us_for_trial:
-      forever:
-      free:
-      package_title:
-      questions_want_to_get_started:
-      sign_up:
-      sign_up_now:
-      try_for_free:
-      year:
-    cities_packages:
-      additional:
-      all_plans_come_with_a_30day_free_trial:
-      bike_index_for_cities:
-      choose_a_package_size:
-      compare_plans_and_features:
-      contact_us:
-      contact_us_for_trial:
-      forever:
-      free:
-      give_your_constituents_the_bike_registry_:
-      package_title:
-      questions_want_to_get_started:
-      sign_up:
-      sign_up_now:
-      try_for_free:
-      year:
     find_out_more:
       all_accounts_come_with_bike_index:
       custom_development_available:
@@ -3219,7 +3185,6 @@ it:
       cities_deck:
       embed_a_bike_index_registration_form:
       engage_your_residents_and_recover_their_b:
-      features_amp_pricing:
       mitigate_the_registration_mess:
       no_more_index_cards_or_excel_sheets_give_:
       our_community_is_your_community:
@@ -3383,8 +3348,6 @@ it:
     landing_pages_ambassadors_how_to:
     landing_pages_ascend:
     landing_pages_bike_shop_packages:
-    landing_pages_campus_packages:
-    landing_pages_cities_packages:
     landing_pages_for_bike_shops:
     landing_pages_for_cities:
     landing_pages_for_community_groups:
@@ -3991,26 +3954,11 @@ it:
       your_donation_saved_bikes:
   plan_features:
     automatic_registration_through_pos:
-    campus_bike_management_suite:
-    contact_unfinished_registrants:
     create_organization_account:
-    custom_form_fields:
-    customize_emails:
-    department_landing_page:
     embed_registration_form:
-    export_custom_data:
-    graduated_bikes:
     import_registrations_from_previous:
-    impound_bikes:
-    law_enforcement_list_html:
-    organization_dashboard:
-    priority_programming_support:
-    qr_sticker:
-    qr_sticker_scanning_and_messaging:
-    school_landing_page:
     search_bikes_organization:
     social_media_and_email_marketing:
-    staff_accounts:
   public_images:
     edit:
       editing_bike_html:

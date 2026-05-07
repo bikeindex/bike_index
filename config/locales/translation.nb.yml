@@ -3984,43 +3984,6 @@ nb:
       simply_the_best_bike_registry: Rett og slett det beste sykkelregisteret
       try_for_free: Prøv gratis
       year: år
-    campus_packages:
-      additional: Ytterligere
-      all_plans_come_with_a_30day_free_trial: Alle planer kommer med en 30-dagers
-        gratis prøveperiode
-      bike_index_for_colleges_universities: Sykkelindeks for høyskoler og universiteter
-      choose_a_package_size: Velg en pakkestørrelse
-      clean_up_your_campus_messy_registry: Rydd opp i Campus sitt rotete register.
-      compare_plans_and_features: Sammenlign planer og funksjoner
-      contact_us: Kontakt oss
-      contact_us_for_trial: Kontakt oss for en gratis prøveperiode
-      forever: For alltid
-      free: Gratis
-      package_title: "%{name}-pakken"
-      questions_want_to_get_started: Spørsmål? Vil du komme i gang?
-      sign_up: Registrer deg
-      sign_up_now: Registrer deg nå
-      try_for_free: Prøv gratis
-      year: år
-    cities_packages:
-      additional: Ytterligere
-      all_plans_come_with_a_30day_free_trial: Alle planer kommer med en 30-dagers
-        gratis prøveperiode
-      bike_index_for_cities: Sykkelindeks for byer
-      choose_a_package_size: Velg en pakkestørrelse
-      compare_plans_and_features: Sammenlign planer og funksjoner
-      contact_us: Kontakt oss
-      contact_us_for_trial: Kontakt oss for en gratis prøveperiode
-      forever: For alltid
-      free: Gratis
-      give_your_constituents_the_bike_registry_: Gi velgerne dine sykkelregisteret
-        de ønsker
-      package_title: "%{name}-pakken"
-      questions_want_to_get_started: Spørsmål? Vil du komme i gang?
-      sign_up: Registrer deg
-      sign_up_now: Registrer deg nå
-      try_for_free: Prøv gratis
-      year: år
     find_out_more:
       all_accounts_come_with_bike_index: Alle kontoer kommer med Bike Index-fellesskap
         og sosiale medier-verktøy, e-post- og videostøtte, og søk i Bike Index-registeret.
@@ -4101,7 +4064,6 @@ nb:
         på nettstedet ditt
       engage_your_residents_and_recover_their_b: Engasjer beboerne dine og finn syklene
         deres, og de vil elske deg for alltid.
-      features_amp_pricing: Funksjoner og priser
       mitigate_the_registration_mess: Redusere registreringsrotet
       no_more_index_cards_or_excel_sheets_give_: Ingen flere kartotekkort eller excelark.
         Gi innbyggerne verktøyene til å registrere seg fra en smarttelefon på mindre
@@ -4302,8 +4264,6 @@ nb:
     landing_pages_ascend: Ascend POS på Bike Index
     landing_pages_bike_shop_packages: Sykkelindeks for sykkelbutikker – funksjoner
       og priser
-    landing_pages_campus_packages: Sykkelindeks for skoler – funksjoner og priser
-    landing_pages_cities_packages: Sykkelindeks for byer – funksjoner og priser
     landing_pages_for_bike_shops: Sykkelindeks for sykkelbutikker
     landing_pages_for_cities: Sykkelindeks for byer
     landing_pages_for_community_groups: Sykkelindeks for fellesskapsgrupper
@@ -5027,34 +4987,12 @@ nb:
       your_donation_saved_bikes: Din donasjon på $%{amount} har nettopp reddet syklene.
   plan_features:
     automatic_registration_through_pos: Automatisk registrering via POS
-    campus_bike_management_suite: Campus bike management suite - merk sykler, kontakt
-      eiere, logger forlatte og beslaglegge sykkelposter, send oppfølgingsvarsler
-    contact_unfinished_registrants: Ta kontakt med påmeldte som ikke har fullført
-      registreringen
     create_organization_account: Opprett organisasjonskonto og kontakt registranter
-    custom_form_fields: Legg til egendefinerte skjemafelt på registreringssiden din
-    customize_emails: Tilpass e-poster du sender fra Bike Index
-    department_landing_page: Landingsside for avdelingsmerket registrering
     embed_registration_form: Bygg inn organisasjonens tilpassede registreringsskjema
       på nettstedet ditt
-    export_custom_data: Eksporter tilpassede data til CSV/XLSX-filer
-    graduated_bikes: Automatisert migrering av graderte sykler ut av systemet
     import_registrations_from_previous: Importer registreringer fra et tidligere registreringssystem
-    impound_bikes: Beslag sykler og motta krav
-    law_enforcement_list_html: Rettshåndhevelsesverktøy:<ol class="le-list"><li> Masseseriesøk</li><li>
-      Flagget duplikatregistreringer og sykkeltroverdighetspoeng</li><li> Evne til
-      å sende meldinger til brukere selv om de ikke har merket sykler som stjålne</li><li>
-      Søk på tvers av databaser</li><li> Integrasjon med LeadsOnline</li><li> Daglig
-      stjålne sykler hot sheet</li></ol>
-    organization_dashboard: By- og politidashbord - analyser statistikk om lokal registrering
-      basert på postnummer
-    priority_programming_support: Prioritert programmering, hosting og støtte
-    qr_sticker: QR-klistremerke skanning og meldinger
-    qr_sticker_scanning_and_messaging: QR-klistremerke skanning og meldinger
-    school_landing_page: Landingsside for registrering av skolemerket
     search_bikes_organization: Søk etter sykler i organisasjonskontoen din
     social_media_and_email_marketing: Aktiver til sosiale medier og e-postmarkedsføringskampanjer
-    staff_accounts: Personalregnskap
   public_images:
     edit:
       editing_bike_html: "<span>Tilbakepil</span> Tilbake til <em>redigeringssykkel</em>"

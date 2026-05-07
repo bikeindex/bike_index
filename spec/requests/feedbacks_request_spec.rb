@@ -77,9 +77,9 @@ RSpec.describe FeedbacksController, type: :request do
                                package_size: ""
                              }
                            },
-              headers: {"HTTP_REFERER" => "http://www.example.com/cities_packages"}
+              headers: {"HTTP_REFERER" => "http://www.example.com/for_cities"}
           }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
-          expect(response).to redirect_to "http://www.example.com/cities_packages"
+          expect(response).to redirect_to "http://www.example.com/for_cities"
           expect(flash[:success]).to be_present
           feedback = Feedback.last
           expect(feedback.title).to eq "New City lead: Chicago"
