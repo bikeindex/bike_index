@@ -49,9 +49,9 @@ module UI
           role: "tooltip",
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
-          class: "tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:rounded tw:bg-purple-900 " \
-            "tw:px-2 tw:py-1 tw:text-xs tw:text-white tw:border tw:border-purple-400 tw:z-50 " \
-            "tw:dark:border-purple-300 tw:dark:bg-purple-100 tw:dark:text-purple-900"
+          class: "twtext-color tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:rounded " \
+            "tw:bg-white tw:px-2 tw:py-1 tw:text-xs tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
+            "tw:dark:bg-gray-800 tw:dark:border-gray-700"
         )
       end
     end
