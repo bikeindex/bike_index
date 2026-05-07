@@ -12,6 +12,13 @@
           %h3= t(".actually_get_people_registered_and_do_it_")
           %h3= t(".plug_your_city_in_nationally")
 
+    .ribbon.mobile-contact-link
+      .container
+        %h2
+          %button.btn.btn-primary.btn-lg{ "data-open-modal" => "cities-demo-modal", type: "button" }
+            = t(".schedule_a_demo")
+            %span.chevron &raquo;
+
   .container
     .row.main-body-row
       .landing-why-col
@@ -46,8 +53,13 @@
         .next-steps-wrap
           %header
             = t(".trusted_by_municipalities_everywhere")
+            %button.btn.btn-primary.btn-lg{ "data-open-modal" => "cities-demo-modal", type: "button" }
+              = t(".schedule_a_demo")
+              %span.chevron &raquo;
 
           .trusted-by
             .header
               = t(".used_by_municipalities_everywhere")
             = image_tag "landing_pages/logos/law-enforcement.png", alt: "municipal partners"
+
+= render(PageBlock::LandingDemoModal::Component.new(feedback: @feedback, current_user:, name_label: "City", feedback_type: "lead_for_city", modal_id: "cities-demo-modal"))
