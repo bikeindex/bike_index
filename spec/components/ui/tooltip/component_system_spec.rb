@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe UI::Tooltip::Component, :js, type: :system do
-  let(:preview_url) { "/rails/view_components/ui/tooltip/component/multiple" }
+  let(:preview_url) { "/lookbook/preview/ui/tooltip/variants" }
 
   def tooltip_position(id)
     page.evaluate_script(<<~JS)
@@ -102,7 +102,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
   end
 
   it "is accessible in dark mode" do
-    visit "#{preview_url}?lookbook[display][theme]=dark"
+    visit "#{preview_url}?_display=#{CGI.escape({theme: "dark"}.to_json)}"
 
     expect(page).to have_css("[role='tooltip']", visible: :all)
     expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
