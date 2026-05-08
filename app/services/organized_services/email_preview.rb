@@ -2,8 +2,7 @@ module OrganizedServices
   module EmailPreview
     extend Functionable
 
-    # Placeholder for tokenized URLs in email previews — real tokens shouldn't
-    # appear on the screen of an admin previewing the email.
+    # Placeholder for tokenized URLs in email previews — to make sure preview token links don't work
     TOKEN_PATH = "/404"
 
     def view_component(kind:, organization:, user:, params:)
