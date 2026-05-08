@@ -70,6 +70,12 @@ module Org
         @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
       end
 
+      def bike_in_org?(bike)
+        @bike_in_org ||= {}
+        return @bike_in_org[bike.id] if @bike_in_org.key?(bike.id)
+        @bike_in_org[bike.id] = bike.organized?(@organization)
+      end
+
       def component_wrapper_data_attributes
         return {} if @skip_settings
         {controller: "org--registration-search org--registration-search-column-toggle",

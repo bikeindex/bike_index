@@ -49,6 +49,7 @@
 
   <% organization = @organization %>
   <% bike_sticker = @bike_sticker %>
+  <% bike_in_org = method(:bike_in_org?) %>
 
   <%= tag.div(data: table_wrapper_data_attributes) do %>
     <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-bikes_3", render_sortable: true)) do |table| %>
@@ -109,6 +110,8 @@
         </span>
       <% end %>
 
+      <% hidden_html = tag.small(translation(".hidden_not_registered", org_name: organization.short_name), class: "less-strong") %>
+
       <% table.column(sortable: "owner_email", label: translation(".sent_to"), classes: "hideableColumn owner_email_cell") do |bike| %>
         <% if bike.email_visible_for?(organization) %>
           <%= bike.owner_email %>
@@ -116,7 +119,7 @@
             <%= link_to "\u{1F50E}", organization_registrations_path(organization_id: organization.to_param, search_email: bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
           </small>
         <% else %>
-          <em class="tw:text-gray-400"><%= translation(".email_hidden") %></em>
+          <%= hidden_html %>
         <% end %>
       <% end %>
 
@@ -129,8 +132,12 @@
       <% end %>
 
       <% table.column(label: translation(".owner_name"), classes: "hideableColumn owner_name_cell") do |bike| %>
-        <% if bike.owner_name.present? %>
-          <em><%= bike.owner_name %></em>
+        <% if bike_in_org.(bike) %>
+          <% if bike.owner_name.present? %>
+            <em><%= bike.owner_name %></em>
+          <% end %>
+        <% else %>
+          <%= hidden_html %>
         <% end %>
       <% end %>
 
@@ -140,9 +147,13 @@
 
       <% if organization.enabled?("registration_notes") %>
         <% table.column(label: translation(".notes"), classes: "hideableColumn notes_cell tw:leading-none") do |bike| %>
-          <small>
-            <%= BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: organization.id)&.body %>
-          </small>
+          <% if bike_in_org.(bike) %>
+            <small>
+              <%= BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: organization.id)&.body %>
+            </small>
+          <% else %>
+            <%= hidden_html %>
+          <% end %>
         <% end %>
       <% end %>
 
@@ -150,67 +161,94 @@
         <% next if reg_field == "extra_registration_number" %>
 
         <% table.column(label: column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell") do |bike| %>
-          <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
-
-          <% if bike_attr == "address" %>
-            <% if bike.valid_mailing_address? %>
-              <small>
-                <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(bike), visible_attribute: :street) %>
-              </small>
+          <% if bike_in_org.(bike) %>
+            <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
+            <% if bike_attr == "address" %>
+              <% if bike.valid_mailing_address? %>
+                <small>
+                  <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(bike), visible_attribute: :street) %>
+                </small>
+              <% end %>
+            <% elsif bike_attr == "organization_affiliation" %>
+              <%= bike.organization_affiliation(organization)&.humanize %>
+            <% elsif bike_attr == "student_id" %>
+              <%= bike.student_id(organization)&.humanize %>
+            <% else %>
+              <%= bike.send(bike_attr) %>
             <% end %>
-          <% elsif bike_attr == "organization_affiliation" %>
-            <%= bike.organization_affiliation(organization)&.humanize %>
-          <% elsif bike_attr == "student_id" %>
-            <%= bike.student_id(organization)&.humanize %>
           <% else %>
-            <%= bike.send(bike_attr) %>
+            <%= hidden_html %>
           <% end %>
         <% end %>
       <% end %>
 
       <% table.column(label: translation(".secondary_number"), classes: "hideableColumn extra_registration_number_cell") do |bike| %>
-        <%= bike.extra_registration_number %>
+        <% if bike_in_org.(bike) %>
+          <%= bike.extra_registration_number %>
+        <% else %>
+          <%= hidden_html %>
+        <% end %>
       <% end %>
 
       <% if organization.enabled?("impound_bikes") %>
         <% table.column(label: translation(".impound_id"), classes: "hideableColumn impound_id_cell") do |bike| %>
-          <% if bike.status_impounded? && bike.current_impound_record.present? %>
-            <%= number_display(bike.current_impound_record.id) %>
+          <% if bike_in_org.(bike) %>
+            <% if bike.status_impounded? && bike.current_impound_record.present? %>
+              <%= number_display(bike.current_impound_record.id) %>
+            <% end %>
+          <% else %>
+            <%= hidden_html %>
           <% end %>
         <% end %>
         <% table.column(label: translation(".impounded"), classes: "hideableColumn impounded_cell") do |bike| %>
-          <% if bike.status_impounded? && bike.current_impound_record&.created_at&.present? %>
-            <small class="localizeTime">
-              <%= l bike.current_impound_record.created_at, format: :convert_time %>
-            </small>
+          <% if bike_in_org.(bike) %>
+            <% if bike.status_impounded? && bike.current_impound_record&.created_at&.present? %>
+              <small class="localizeTime">
+                <%= l bike.current_impound_record.created_at, format: :convert_time %>
+              </small>
+            <% end %>
+          <% else %>
+            <%= hidden_html %>
           <% end %>
         <% end %>
       <% end %>
 
       <% if @organization.enabled?("avery_export") %>
         <% table.column(label: translation(".avery"), classes: "hideableColumn avery_cell") do |bike| %>
-          <%= check_mark if bike.avery_exportable? %>
+          <% if bike_in_org.(bike) %>
+            <%= check_mark if bike.avery_exportable? %>
+          <% else %>
+            <%= hidden_html %>
+          <% end %>
         <% end %>
       <% end %>
 
       <% if organization.enabled?("bike_stickers") %>
         <% table.column(label: translation(".sticker"), classes: "hideableColumn sticker_cell tw:pt-0", header_classes: "tw:pt-1") do |bike| %>
-          <% bike.bike_stickers.each_with_index do |bs, index| %>
-            <% if bs.organization.present? && bs.organization_id == organization.id %>
-              <%= link_to bs.pretty_code, edit_organization_sticker_path(id: bs.code, organization_id: bs.organization&.to_param), class: "tw:text-xs tw:block tw:mt-1", data: {turbo_frame: "_top"} %>
-            <% else %>
-              <small class="tw:mt-1 tw:block tw:text-xs">
-                <%= bs.pretty_code %>
-              </small>
+          <% if bike_in_org.(bike) %>
+            <% bike.bike_stickers.each_with_index do |bs, index| %>
+              <% if bs.organization.present? && bs.organization_id == organization.id %>
+                <%= link_to bs.pretty_code, edit_organization_sticker_path(id: bs.code, organization_id: bs.organization&.to_param), class: "tw:text-xs tw:block tw:mt-1", data: {turbo_frame: "_top"} %>
+              <% else %>
+                <small class="tw:mt-1 tw:block tw:text-xs">
+                  <%= bs.pretty_code %>
+                </small>
+              <% end %>
             <% end %>
+          <% else %>
+            <%= hidden_html %>
           <% end %>
         <% end %>
         <% table.column(label: translation(".assign_bike_sticker"), classes: "assign_bike_sticker_cell tw:hidden") do |bike| %>
-          <small>
-            <a data-bike-id="<%= bike.id %>">
-              <%= t("components.org.registration_search.link_sticker") %>
-            </a>
-          </small>
+          <% if bike_in_org.(bike) %>
+            <small>
+              <a data-bike-id="<%= bike.id %>">
+                <%= t("components.org.registration_search.link_sticker") %>
+              </a>
+            </small>
+          <% else %>
+            <%= hidden_html %>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>

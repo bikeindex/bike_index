@@ -4699,7 +4699,7 @@ es:
         color:
         e_vehicle_propulsion:
         e_vehicles_for_audit:
-        email_hidden:
+        hidden_not_registered:
         impound_id:
         impounded:
         link:

@@ -5921,7 +5921,7 @@ nb:
         color: Farge
         e_vehicle_propulsion: Elbil (fremdrift)
         e_vehicles_for_audit: 'Elbiler for revisjon:'
-        email_hidden: e-post skjult
+        hidden_not_registered: "skjult, ikke registrert hos %{org_name}"
         impound_id: Beslags-ID
         impounded: Beslaglagt
         link: Link

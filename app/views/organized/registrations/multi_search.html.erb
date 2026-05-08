@@ -29,7 +29,19 @@
         class: "twinput tw:w-full tw:font-mono tw:h-32 tw:resize-none",
         data: {"org--multi-serial-search-target": "textarea"} %>
 
-      <div class="tw:mt-2 tw:flex tw:justify-end">
+      <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:gap-3">
+        <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
+          <%= check_box_tag :search_all, "1", false,
+            data: {
+              "org--multi-serial-search-target": "searchAll",
+              action: "change->org--multi-serial-search#searchAllToggled"
+            } %>
+
+          <span>
+            Search all bikes (not just <%= current_organization.short_name %>)
+          </span>
+        </label>
+
         <%= render UI::Button::Component.new(
           text: "Search serials",
           color: :primary,

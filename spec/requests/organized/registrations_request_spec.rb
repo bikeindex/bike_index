@@ -268,6 +268,22 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(assigns(:bikes)).to be_empty
     end
 
+    context "with search_all" do
+      it "returns matching bikes from any organization" do
+        get "#{base_url}/multi_search_response", params: {serial: "WXYZ9999", search_all: "1"},
+          headers: {"Accept" => "text/vnd.turbo-stream.html"}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_all)).to eq true
+        expect(assigns(:bikes).pluck(:id)).to eq([other_bike.id])
+      end
+
+      it "does not redact bike data when bike belongs to the org" do
+        get "#{base_url}/multi_search_response", params: {serial: "ABCD1234", search_all: "1"},
+          headers: {"Accept" => "text/vnd.turbo-stream.html"}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+      end
+    end
+
     context "without serial param" do
       it "returns bad request" do
         get "#{base_url}/multi_search_response",
