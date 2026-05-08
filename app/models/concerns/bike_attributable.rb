@@ -184,6 +184,7 @@ module BikeAttributable
       ((propulsion_type_name == "Foot pedal") ? nil : propulsion_type_name),
       year,
       frame_colors,
+      paint&.name,
       frame_material && frame_material_name,
       frame_size,
       frame_model,

@@ -54,6 +54,14 @@ RSpec.describe SpamEstimator do
         end
       end
     end
+    context "malicious cached_data" do
+      let(:paint) { FactoryBot.create(:paint, name: "' UNION SELECT username, password FROM users--") }
+      let(:bike) { FactoryBot.create(:bike, paint:) }
+      it "returns 100" do
+        expect(bike.cached_data).to include("union select")
+        expect(described_class.estimate_bike(bike)).to eq 100
+      end
+    end
     context "stolen_record" do
       let(:bike) { Bike.new }
       let(:stolen_record) { StolenRecord.new(theft_description: str, street: street) }
@@ -236,6 +244,44 @@ RSpec.describe SpamEstimator do
         expect(described_class.send(:space_count_suspiciousness, "#{str} #{str}#{str}1234")).to eq 60
         expect(described_class.send(:space_count_suspiciousness, "#{str} #{str} #{str}234")).to eq 0
       end
+    end
+  end
+
+  describe "looks_malicious?" do
+    it "is false for blank strings" do
+      expect(described_class.send(:looks_malicious?, nil)).to be_falsey
+      expect(described_class.send(:looks_malicious?, "")).to be_falsey
+    end
+
+    it "is false for benign strings" do
+      expect(described_class.send(:looks_malicious?, "Surly Cross-Check")).to be_falsey
+      expect(described_class.send(:looks_malicious?, "5434 N Mains St")).to be_falsey
+      expect(described_class.send(:looks_malicious?, "It was stolen last night")).to be_falsey
+      expect(described_class.send(:looks_malicious?, "Diverge 1.0")).to be_falsey
+      expect(described_class.send(:looks_malicious?, "SON Nabendynamo (Wilfried Schmidt Maschinenbau)")).to be_falsey
+    end
+
+    it "is false for markdown/html strings" do
+      str = "so long as you don't spend too much time thinking about torture, the lack of sanitation, or [Theon Greyjoy](http://en.wikipedia.org/wiki/Theon_Greyjoy#Theon_Greyjoy).\r\n\r\n<img class=\"post-image\" src=\"https://files.bikeindex.org/uploads/Pu/1136/large_sketch.jpg\" alt=\"Sketch of some medieval things. Inspiration for Bike Index illustrations"
+      expect(described_class.send(:looks_malicious?, str)).to be_falsey
+    end
+
+    it "detects XSS attempts" do
+      expect(described_class.send(:looks_malicious?, "<script>alert('xss')</script>")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "< SCRIPT >alert(1)</script>")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "<iframe src='evil.com'></iframe>")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "<IMG SRC=javascript:alert('XSS')>")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "<body onload=alert('XSS')>")).to be_truthy
+      expect(described_class.send(:looks_malicious?, '<svg onload="alert(1)">')).to be_truthy
+    end
+
+    it "detects SQL injection attempts" do
+      expect(described_class.send(:looks_malicious?, "1' OR '1'='1")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "'; DROP TABLE users; --")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "1 UNION SELECT * FROM passwords")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "x'; DELETE FROM bikes WHERE 1=1; --")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "admin'; INSERT INTO users VALUES('a')--")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "ndbGRKFw')) OR 96=(SELECT 96 FROM PG_SLEEP(15))--")).to be_truthy
     end
   end
 
