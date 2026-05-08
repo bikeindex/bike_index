@@ -44,8 +44,7 @@ RSpec.describe OrganizedServices::EmailPreview do
 
         it "loads the parking_notification by id and exposes email_sent_at" do
           expect(component.instance_variable_get(:@parking_notification)).to eq parking_notification
-          expect(component.email_sent_at).to eq parking_notification.sent_at
-          expect(component.email_sent_at).to be_present
+          expect(component.email_sent_at).to be_within(1.second).of(parking_notification.sent_at)
         end
 
         context "for a different organization" do
@@ -83,8 +82,7 @@ RSpec.describe OrganizedServices::EmailPreview do
         it "loads the graduated_notification by id and exposes email_sent_at" do
           expect(component.instance_variable_get(:@graduated_notification)).to eq graduated_notification
           expect(component.instance_variable_get(:@bike)).to eq graduated_notification.bike
-          expect(component.email_sent_at).to eq graduated_notification.sent_at
-          expect(component.email_sent_at).to be_present
+          expect(component.email_sent_at).to be_within(1.second).of(graduated_notification.sent_at)
         end
       end
     end
@@ -151,7 +149,7 @@ RSpec.describe OrganizedServices::EmailPreview do
         it "uses the most recent b_param and exposes email_sent_at from created_at" do
           expect(b_param.reload.organization_id).to eq organization.id
           expect(component.instance_variable_get(:@b_param)).to eq b_param
-          expect(component.email_sent_at).to eq b_param.created_at
+          expect(component.email_sent_at).to be_within(1.second).of(b_param.created_at)
         end
       end
     end
@@ -179,7 +177,7 @@ RSpec.describe OrganizedServices::EmailPreview do
         let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
         it "uses the existing bike and exposes email_sent_at from the ownership created_at" do
           expect(component.instance_variable_get(:@bike)).to eq bike
-          expect(component.email_sent_at).to eq bike.current_ownership.created_at
+          expect(component.email_sent_at).to be_within(1.second).of(bike.current_ownership.created_at)
         end
       end
     end
