@@ -2,6 +2,10 @@ module OrganizedServices
   module EmailPreview
     extend Functionable
 
+    # Placeholder for tokenized URLs in email previews — real tokens shouldn't
+    # appear on the screen of an admin previewing the email.
+    TOKEN_PATH = "/404"
+
     def view_component(kind:, organization:, user:, params:)
       if ParkingNotification.kinds.include?(kind)
         parking_notification = find_or_build_parking_notification(kind:, organization:, user:, params:)
