@@ -42,7 +42,7 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? OrganizedMailer::PREVIEW_TOKEN_URL : helpers.retrieval_link_url(@parking_notification)
+        @email_preview ? OrganizedServices::EmailPreview::TOKEN_PATH : helpers.retrieval_link_url(@parking_notification)
       end
 
       def map_url

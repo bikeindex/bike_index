@@ -8,34 +8,23 @@ module Organized
     end
 
     def show
+      # @email_preview and @organization are read by the email layout
+      # (app/views/layouts/email.html.erb) and MailerHelper#render_supporters?
       @email_preview = true
       @organization = current_organization
-      if ParkingNotification.kinds.include?(@kind)
-        find_or_build_parking_notification
-        render template: "/organized_mailer/parking_notification", layout: "email"
-      elsif @kind == "graduated_notification"
-        find_or_build_graduated_notification
-        render template: "/organized_mailer/graduated_notification", layout: "email"
-      elsif %w[impound_claim_approved impound_claim_denied].include?(@kind)
-        find_or_build_impound_claim(@kind)
-        render template: "/organized_mailer/impound_claim_approved_or_denied", layout: "email"
-      elsif @kind == "partial_registration"
-        build_partial_email
-        render template: "/organized_mailer/partial_registration", layout: "email"
-      else # Default to finished email
-        build_finished_email
-        render Emails::FinishedRegistration::Component.new(
-          ownership: @ownership,
-          bike: @bike,
-          email_preview: true
-        ), layout: "email"
-      end
+      render OrganizedServices::EmailPreview.view_component(
+        kind: @kind, organization: current_organization, user: current_user, params: params
+      ), layout: "email"
     end
 
     def edit
       # Attempt to build an impound claim if it's an impound_claim kind - sometimes we can't
       # and we want to render that on the frontend
-      find_or_build_impound_claim(@kind) if @impound_claim_kind
+      if @impound_claim_kind
+        @impound_claim = OrganizedServices::EmailPreview.find_or_build_impound_claim(
+          kind: @kind, organization: @organization, params: params
+        )
+      end
     end
 
     def update
@@ -54,40 +43,6 @@ module Organized
 
     def mail_snippets
       current_organization.mail_snippets.where(kind: MailSnippet.organization_message_kinds)
-    end
-
-    def parking_notifications
-      current_organization.parking_notifications
-    end
-
-    # What if they don't have any bikes! return something
-    def default_bike
-      bike = current_organization.created_bikes.reorder(:id).last
-      bike ||= current_organization.bikes.reorder(:id).last
-      return bike if bike.present?
-
-      bike = Bike.new(id: 42,
-        creation_organization: current_organization,
-        owner_email: current_user.email,
-        creator: current_user,
-        manufacturer: Manufacturer.other,
-        frame_model: "Example bike",
-        primary_frame_color: Color.black)
-      @ownership = bike.ownerships.build(owner_email: bike.owner_email, creator: current_user, id: 420)
-      bike.current_ownership = @ownership
-      bike
-    end
-
-    def default_stolen_bike
-      bike = current_organization.bikes.status_stolen.last
-      if bike.blank?
-        bike = default_bike
-        bike.current_stolen_record = StolenRecord.new(date_stolen: Time.current - 1.day)
-      end
-      if OrganizationStolenMessage.for(current_organization).is_enabled
-        bike.current_stolen_record.organization_stolen_message = OrganizationStolenMessage.for(current_organization)
-      end
-      bike
     end
 
     def viewable_email_kinds
@@ -130,54 +85,6 @@ module Organized
       else
         params.require(:mail_snippet).permit(:body, :is_enabled, :subject)
       end
-    end
-
-    def build_partial_email
-      @b_param = @organization.b_params.order(:created_at).last
-      @b_param ||= BParam.new(organization_id: @organization.id)
-    end
-
-    def build_finished_email
-      @bike = (@kind == "organization_stolen_message") ? default_stolen_bike : default_bike
-      @ownership ||= @bike.current_ownership # Gross things to make default_bike work
-    end
-
-    def find_or_build_graduated_notification
-      graduated_notifications = @organization.graduated_notifications
-      @graduated_notification = graduated_notifications.find(params[:graduated_notification_id]) if params[:graduated_notification_id].present?
-      @graduated_notification ||= graduated_notifications.last
-      @graduated_notification ||= GraduatedNotification.new(organization_id: current_organization.id, bike: default_bike)
-      @bike = @graduated_notification.bike || default_bike
-      @graduated_notification
-    end
-
-    def find_or_build_impound_claim(kind)
-      status = (@kind == "impound_claim_approved") ? "approved" : "denied"
-      impound_claims = @organization.impound_claims
-      @impound_claim = impound_claims.find(params[:impound_claim_id]) if params[:impound_claim_id].present?
-      @impound_claim ||= impound_claims.where(status: status).last
-      return @impound_claim if @impound_claim.present?
-
-      impound_record = current_organization.impound_records.last
-      # Just can't make it happen, so skip preview
-      if impound_record.present?
-        @impound_claim = impound_record.impound_claims.build(status: status)
-      end
-    end
-
-    def find_or_build_parking_notification
-      parking_notifications = current_organization.parking_notifications
-      @parking_notification = parking_notifications.find(params[:parking_notification_id]) if params[:parking_notification_id].present?
-      @parking_notification ||= parking_notifications.where(kind: @kind).last
-      unless @parking_notification.present?
-        @parking_notification = parking_notifications.build(bike: default_bike,
-          kind: @kind,
-          user: current_user,
-          created_at: Time.current - 1.hour)
-        @parking_notification.set_location_from_organization
-      end
-      @bike = @parking_notification.bike || default_bike
-      @parking_notification
     end
   end
 end
