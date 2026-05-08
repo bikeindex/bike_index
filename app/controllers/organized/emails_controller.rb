@@ -8,6 +8,10 @@ module Organized
     end
 
     def show
+      # @email_preview and @organization are read by the email layout
+      # (app/views/layouts/email.html.erb) and MailerHelper#render_supporters?
+      @email_preview = true
+      @organization = current_organization
       render OrganizedServices::EmailPreview.view_component(
         kind: @kind, organization: current_organization, user: current_user, params: params
       ), layout: "email"

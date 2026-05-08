@@ -63,6 +63,7 @@ RSpec.describe Organized::EmailsController, type: :request do
 
     describe "show" do
       context "appears_abandoned_notification" do
+        let!(:header_snippet) { FactoryBot.create(:mail_snippet, kind: "header", organization: current_organization, body: "<p>HEADER SNIPPET</p>", is_enabled: true) }
         it "renders" do
           expect(bike).to be_present
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -71,6 +72,12 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response.status).to eq(200)
           expect(components).to include("Emails::ParkingNotification::Component")
           expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          # Layout/helper hooks: @email_preview enables the preview-only CSS and suppresses
+          # the supporters block; @organization makes the layout render org snippets even
+          # though controller_path is "organized/emails", not "organized_mailer".
+          expect(response.body).to include("html { background: #e6e6e6;")
+          expect(response.body).to_not include("Bike Index is also supported by")
+          expect(response.body).to include("HEADER SNIPPET")
           expect(assigns(:kind)).to eq "appears_abandoned_notification"
           current_organization.reload
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
