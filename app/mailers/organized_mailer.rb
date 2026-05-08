@@ -12,6 +12,7 @@ class OrganizedMailer < ApplicationMailer
   def partial_registration(b_param)
     @b_param = b_param
     @organization = @b_param.creation_organization
+    component = Emails::PartialRegistration::Component.new(b_param: @b_param)
 
     I18n.with_locale(@user&.preferred_language) do
       mail(
@@ -19,7 +20,7 @@ class OrganizedMailer < ApplicationMailer
         to: @b_param.owner_email,
         subject: default_i18n_subject(default_subject_vars),
         tag: __callee__
-      )
+      ) { |format| format.html { render component } }
     end
   end
 
@@ -27,6 +28,7 @@ class OrganizedMailer < ApplicationMailer
     @ownership = ownership
     @bike = Bike.unscoped.find(@ownership.bike_id)
     @organization = @ownership.organization
+    component = Emails::FinishedRegistration::Component.new(ownership: @ownership, bike: @bike)
     subject = I18n.t("organized_mailer.finished#{finished_registration_type}_registration.subject", **default_subject_vars)
     tag = __callee__
     tag = "#{tag}_pos" if @ownership.pos? && @ownership.new_registration?
@@ -34,7 +36,7 @@ class OrganizedMailer < ApplicationMailer
       mail(reply_to: reply_to,
         to: @ownership.owner_email,
         subject:,
-        tag:)
+        tag:) { |format| format.html { render component } }
     end
   end
 
@@ -44,12 +46,13 @@ class OrganizedMailer < ApplicationMailer
     sender = @organization_role.sender
     email = @organization_role.invited_email
     @is_new_user = User.fuzzy_email_find(email).blank?
+    component = Emails::OrganizationInvitation::Component.new(organization_role: @organization_role, is_new_user: @is_new_user)
 
     I18n.with_locale(sender&.preferred_language) do
       mail(reply_to: reply_to,
         to: email,
         subject: default_i18n_subject(default_subject_vars),
-        tag: __callee__)
+        tag: __callee__) { |format| format.html { render component } }
     end
   end
 
@@ -57,14 +60,15 @@ class OrganizedMailer < ApplicationMailer
     @parking_notification = parking_notification
     @organization = @parking_notification.organization
     @bike = @parking_notification.bike
+    component = Emails::ParkingNotification::Component.new(parking_notification: @parking_notification, bike: @bike)
 
     I18n.with_locale(@parking_notification.user&.preferred_language) do
       mail(reply_to: @parking_notification.reply_to_email,
         to: @parking_notification.email,
         tag: __callee__,
         subject: @parking_notification.subject) do |format|
-        format.html { render "parking_notification" }
-        format.text { render "parking_notification" }
+        format.html { render component }
+        format.text { render component }
       end
     end
   end
@@ -73,12 +77,13 @@ class OrganizedMailer < ApplicationMailer
     @graduated_notification = graduated_notification
     @organization = @graduated_notification.organization
     @bike = @graduated_notification.bike
+    component = Emails::GraduatedNotification::Component.new(graduated_notification: @graduated_notification, bike: @bike)
 
     I18n.with_locale(@user&.preferred_language) do
       mail(reply_to: reply_to,
         to: @graduated_notification.email,
         subject: @graduated_notification.subject,
-        tag: __callee__)
+        tag: __callee__) { |format| format.html { render component } }
     end
   end
 
@@ -95,30 +100,33 @@ class OrganizedMailer < ApplicationMailer
     else
       direct_to = recipient_emails.shift
     end
+    component = Emails::HotSheet::Component.new(hot_sheet: @hot_sheet, stolen_records: @stolen_records)
 
     mail(reply_to: reply_to,
       to: direct_to,
       bcc: recipient_emails,
       subject: @hot_sheet.subject,
-      tag: __callee__)
+      tag: __callee__) { |format| format.html { render component } }
   end
 
   def impound_claim_submitted(impound_claim)
     @impound_claim = impound_claim
     @organization = @impound_claim.organization
+    component = Emails::ImpoundClaimSubmitted::Component.new(impound_claim: @impound_claim)
     mail(reply_to: "contact@bikeindex.org",
       to: @impound_claim.impound_record_email,
       subject: "New impound claim submitted",
-      tag: __callee__)
+      tag: __callee__) { |format| format.html { render component } }
   end
 
   def impound_claim_approved_or_denied(impound_claim)
     @impound_claim = impound_claim
     @organization = @impound_claim.organization
+    component = Emails::ImpoundClaimApprovedOrDenied::Component.new(impound_claim: @impound_claim)
     mail(reply_to: impound_claim.impound_record_email,
       to: @impound_claim.user.email,
       subject: "Your impound claim was #{@impound_claim.status_humanized}",
-      tag: __callee__)
+      tag: __callee__) { |format| format.html { render component } }
   end
 
   private
