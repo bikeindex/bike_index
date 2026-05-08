@@ -12,12 +12,11 @@ module Organized
       # (app/views/layouts/email.html.erb) and MailerHelper#render_supporters?
       @email_preview = true
       @organization = current_organization
-      @email_sent_at = OrganizedServices::EmailPreview.email_sent_at(
-        kind: @kind, organization: current_organization, params: params
-      )
-      render OrganizedServices::EmailPreview.view_component(
+      component = OrganizedServices::EmailPreview.view_component(
         kind: @kind, organization: current_organization, user: current_user, params: params
-      ), layout: "email"
+      )
+      @email_sent_at = component.try(:email_sent_at)
+      render component, layout: "email"
     end
 
     def edit

@@ -9,6 +9,12 @@ module Emails
         @email_preview = email_preview
       end
 
+      # Read by the email layout to render header/footer snippets at the version that was
+      # in effect when the notification was sent.
+      def email_sent_at
+        @parking_notification.sent_at
+      end
+
       private
 
       def organization
