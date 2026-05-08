@@ -2,43 +2,26 @@ module OrganizedServices
   module EmailPreview
     extend Functionable
 
-    def call(kind:, organization:, user:, params:)
-      base_assigns = {organization:, kind:, email_preview: true}
-
+    def view_component(kind:, organization:, user:, params:)
       if ParkingNotification.kinds.include?(kind)
         parking_notification = find_or_build_parking_notification(kind:, organization:, user:, params:)
         bike = parking_notification.bike || default_bike(organization:, user:)
-        {
-          render: {template: "/organized_mailer/parking_notification", layout: "email"},
-          assigns: base_assigns.merge(parking_notification:, bike:)
-        }
+        Emails::ParkingNotification::Component.new(parking_notification:, bike:, email_preview: true)
       elsif kind == "graduated_notification"
         graduated_notification = find_or_build_graduated_notification(organization:, user:, params:)
         bike = graduated_notification.bike || default_bike(organization:, user:)
-        {
-          render: {template: "/organized_mailer/graduated_notification", layout: "email"},
-          assigns: base_assigns.merge(graduated_notification:, bike:)
-        }
+        Emails::GraduatedNotification::Component.new(graduated_notification:, bike:, email_preview: true)
       elsif %w[impound_claim_approved impound_claim_denied].include?(kind)
-        impound_claim = find_or_build_impound_claim(kind:, organization:, params:)
-        {
-          render: {template: "/organized_mailer/impound_claim_approved_or_denied", layout: "email"},
-          assigns: base_assigns.merge(impound_claim:)
-        }
+        Emails::ImpoundClaimApprovedOrDenied::Component.new(
+          impound_claim: find_or_build_impound_claim(kind:, organization:, params:)
+        )
       elsif kind == "partial_registration"
         b_param = organization.b_params.order(:created_at).last ||
           BParam.new(organization_id: organization.id)
-        {
-          render: {template: "/organized_mailer/partial_registration", layout: "email"},
-          assigns: base_assigns.merge(b_param:)
-        }
+        Emails::PartialRegistration::Component.new(b_param:, email_preview: true)
       else
         bike = (kind == "organization_stolen_message") ? default_stolen_bike(organization:, user:) : default_bike(organization:, user:)
-        ownership = bike.current_ownership
-        {
-          render: {component: Emails::FinishedRegistration::Component.new(ownership:, bike:, email_preview: true), layout: "email"},
-          assigns: base_assigns.merge(bike:, ownership:)
-        }
+        Emails::FinishedRegistration::Component.new(ownership: bike.current_ownership, bike:, email_preview: true)
       end
     end
 

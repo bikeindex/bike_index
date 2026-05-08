@@ -32,9 +32,6 @@ RSpec.describe Organized::EmailsController, type: :request do
         it "renders" do
           get "#{base_url}/appears_abandoned_notification"
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/parking_notification")
-          expect(assigns(:parking_notification)).to eq parking_notification
-          expect(assigns(:email_preview)).to be_truthy
           expect(response.body).to_not match(parking_notification.retrieval_link_token)
         end
       end
@@ -70,10 +67,6 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(current_organization.bikes.pluck(:id)).to eq([bike.id])
           get "#{base_url}/appears_abandoned_notification"
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/parking_notification")
-          expect(assigns(:parking_notification).is_a?(ParkingNotification)).to be_truthy
-          expect(assigns(:parking_notification).retrieval_link_token).to be_blank
-          expect(assigns(:email_preview)).to be_truthy
           expect(assigns(:kind)).to eq "appears_abandoned_notification"
           current_organization.reload
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -84,9 +77,6 @@ RSpec.describe Organized::EmailsController, type: :request do
         it "renders passed id" do
           get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: parking_notification.id}
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/parking_notification")
-          expect(assigns(:parking_notification)).to eq parking_notification
-          expect(assigns(:email_preview)).to be_truthy
           expect(assigns(:kind)).to eq "parked_incorrectly_notification"
           expect(response.body).to_not match(parking_notification.retrieval_link_token)
         end
@@ -104,10 +94,6 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(current_organization.bikes.pluck(:id)).to eq([])
           get "#{base_url}/appears_abandoned_notification"
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/parking_notification")
-          expect(assigns(:parking_notification).is_a?(ParkingNotification)).to be_truthy
-          expect(assigns(:parking_notification).retrieval_link_token).to be_blank
-          expect(assigns(:email_preview)).to be_truthy
           expect(assigns(:kind)).to eq "appears_abandoned_notification"
           current_organization.reload
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -118,9 +104,6 @@ RSpec.describe Organized::EmailsController, type: :request do
         it "renders" do
           get "#{base_url}/graduated_notification", params: {graduated_notification_id: graduated_notification.id}
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/graduated_notification")
-          expect(assigns(:graduated_notification).id).to eq graduated_notification.id
-          expect(assigns(:email_preview)).to be_truthy
           expect(response.body).to_not match(graduated_notification.marked_remaining_link_token)
           expect(assigns(:kind)).to eq "graduated_notification"
         end
@@ -151,7 +134,6 @@ RSpec.describe Organized::EmailsController, type: :request do
         it "renders" do
           get "#{base_url}/partial_registration"
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/partial_registration")
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration partial_registration graduated_notification])
         end
       end
@@ -166,10 +148,6 @@ RSpec.describe Organized::EmailsController, type: :request do
           # Fake bike doesn't have status_stolen, so it renders the normal registration message
           expect(response.body).to include("Protect your bike by following these locking guidelines")
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
-          expect(assigns(:bike).id).to eq 42
-          expect(assigns(:bike).current_stolen_record).to be_present
-          # Because the stolen_message is blank
-          expect(assigns(:bike).current_stolen_record.organization_stolen_message_id).to be_blank
         end
         context "with a stolen bike" do
           let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
@@ -184,9 +162,6 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(response.body).to include("something here") # organization_stolen_message body
             expect(response.body).to include("registered your bike on Bike Index")
             expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
-            expect(assigns(:bike).id).to eq bike.id
-            expect(assigns(:bike).current_stolen_record).to be_present
-            expect(assigns(:bike).current_stolen_record.organization_stolen_message_id).to eq organization_stolen_message.id
             expect(response.body).to_not match(bike.current_ownership.token)
           end
         end

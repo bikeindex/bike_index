@@ -8,19 +8,9 @@ module Organized
     end
 
     def show
-      preview = OrganizedServices::EmailPreview.call(
-        kind: @kind,
-        organization: current_organization,
-        user: current_user,
-        params: params
-      )
-      preview[:assigns].each { |name, value| instance_variable_set("@#{name}", value) }
-
-      if (component = preview[:render][:component])
-        render component, layout: preview[:render][:layout]
-      else
-        render template: preview[:render][:template], layout: preview[:render][:layout]
-      end
+      render OrganizedServices::EmailPreview.view_component(
+        kind: @kind, organization: current_organization, user: current_user, params: params
+      ), layout: "email"
     end
 
     def edit
