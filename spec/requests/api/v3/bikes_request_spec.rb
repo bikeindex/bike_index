@@ -96,6 +96,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
       it "returns status found" do
         expect(impound_record.kind).to eq "found"
+        bike.reload
         get "/api/v3/bikes/#{bike.id}", params: {format: :json}
         expect(response.code).to eq("200")
         expect(json_result["bike"].compact).to eq target.merge("status" => "found", "serial" => "Hidden")
