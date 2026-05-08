@@ -33,6 +33,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           components = rendered_view_component_names { get "#{base_url}/appears_abandoned_notification" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::ParkingNotification::Component")
+          expect(response.body).to include(OrganizedMailer::PREVIEW_TOKEN_URL)
           expect(response.body).to_not match(parking_notification.retrieval_link_token)
         end
       end
@@ -69,6 +70,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           components = rendered_view_component_names { get "#{base_url}/appears_abandoned_notification" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::ParkingNotification::Component")
+          expect(response.body).to include(OrganizedMailer::PREVIEW_TOKEN_URL)
           expect(assigns(:kind)).to eq "appears_abandoned_notification"
           current_organization.reload
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -82,6 +84,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           end
           expect(response.status).to eq(200)
           expect(components).to include("Emails::ParkingNotification::Component")
+          expect(response.body).to include(OrganizedMailer::PREVIEW_TOKEN_URL)
           expect(assigns(:kind)).to eq "parked_incorrectly_notification"
           expect(response.body).to_not match(parking_notification.retrieval_link_token)
         end
@@ -100,6 +103,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           components = rendered_view_component_names { get "#{base_url}/appears_abandoned_notification" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::ParkingNotification::Component")
+          expect(response.body).to include(OrganizedMailer::PREVIEW_TOKEN_URL)
           expect(assigns(:kind)).to eq "appears_abandoned_notification"
           current_organization.reload
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -113,6 +117,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           end
           expect(response.status).to eq(200)
           expect(components).to include("Emails::GraduatedNotification::Component")
+          expect(response.body).to include(OrganizedMailer::PREVIEW_TOKEN_URL)
           expect(response.body).to_not match(graduated_notification.marked_remaining_link_token)
           expect(assigns(:kind)).to eq "graduated_notification"
         end
@@ -131,12 +136,14 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response.status).to eq(200)
           expect(components).to include("Emails::FinishedRegistration::Component")
           expect(response.body).to include("Protect your bike by following these locking guidelines")
+          expect(response.body).to include(OrganizedMailer::PREVIEW_TOKEN_URL)
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
           # And it defaults to finished registration, if unable to parse kind
           components = rendered_view_component_names { get "#{base_url}/whateverrrrr" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::FinishedRegistration::Component")
           expect(response.body).to include("Protect your bike by following these locking guidelines")
+          expect(response.body).to include(OrganizedMailer::PREVIEW_TOKEN_URL)
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
         end
       end
@@ -146,6 +153,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           components = rendered_view_component_names { get "#{base_url}/partial_registration" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::PartialRegistration::Component")
+          expect(response.body).to include(OrganizedMailer::PREVIEW_TOKEN_URL)
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration partial_registration graduated_notification])
         end
       end
@@ -155,25 +163,37 @@ RSpec.describe Organized::EmailsController, type: :request do
         it "renders" do
           expect(organization_stolen_message.id).to be_present
           expect(organization_stolen_message.body).to be_blank
-          get "#{base_url}/organization_stolen_message"
+          components = rendered_view_component_names { get "#{base_url}/organization_stolen_message" }
           expect(response.status).to eq(200)
+          expect(components).to include("Emails::FinishedRegistration::Component")
           # Fake bike doesn't have status_stolen, so it renders the normal registration message
           expect(response.body).to include("Protect your bike by following these locking guidelines")
+          expect(response.body).to include(OrganizedMailer::PREVIEW_TOKEN_URL)
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
         end
         context "with a stolen bike" do
           let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
           it "renders that bike" do
             organization_stolen_message.update(body: "something here", is_enabled: true)
+            stolen_record.update(organization_stolen_message: organization_stolen_message)
             expect(bike.reload.status).to eq "status_stolen"
             expect(bike.current_ownership.token).to be_present
             expect(current_organization.bikes.pluck(:id)).to eq([bike.id])
-            get "#{base_url}/organization_stolen_message"
+            components = rendered_view_component_names { get "#{base_url}/organization_stolen_message" }
             expect(response.status).to eq(200)
+            expect(components).to include("Emails::FinishedRegistration::Component")
             # When claim_message is present, it renders the claim_message partial
             expect(response.body).to include("something here") # organization_stolen_message body
             expect(response.body).to include("registered your bike on Bike Index")
+            # Stolen-specific text rendered by the FinishedRegistration component
+            expect(response.body).to include("Mark your bike recovered")
+            expect(response.body).to include("Hopefully you find the")
+            # Confirms the bike rendered is the real stolen bike
+            expect(response.body).to include(bike.serial_display)
+            expect(bike.reload.current_stolen_record).to be_present
+            expect(bike.current_stolen_record.organization_stolen_message_id).to eq organization_stolen_message.id
             expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
+            expect(response.body).to include(OrganizedMailer::PREVIEW_TOKEN_URL)
             expect(response.body).to_not match(bike.current_ownership.token)
           end
         end
