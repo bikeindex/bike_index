@@ -102,6 +102,35 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(response.status).to eq 404
           end
         end
+        context "with mail_snippet edited after the notification was sent" do
+          include_context :with_paper_trail
+
+          let!(:mail_snippet) do
+            FactoryBot.create(:mail_snippet,
+              kind: "parked_incorrectly_notification",
+              organization: current_organization,
+              is_enabled: true,
+              body: "snippet body when sent")
+          end
+          let!(:parking_notification) do
+            FactoryBot.create(:parking_notification,
+              organization: current_organization,
+              kind: "parked_incorrectly_notification",
+              delivery_status: "email_success",
+              created_at: 1.hour.ago)
+          end
+
+          it "renders the snippet body that was active when the email was sent" do
+            mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+            mail_snippet.update!(body: "snippet body now")
+
+            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: parking_notification.id}
+            expect(response.status).to eq(200)
+            expect(parking_notification.sent_at).to be_present
+            expect(response.body).to include("snippet body when sent")
+            expect(response.body).to_not include("snippet body now")
+          end
+        end
       end
       context "no bikes" do
         it "renders" do
