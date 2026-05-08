@@ -15,7 +15,7 @@ module Organized
       component = OrganizedServices::EmailPreview.view_component(
         kind: @kind, organization: current_organization, user: current_user, params: params
       )
-      @email_sent_at = component.try(:email_sent_at)
+      @email_sent_at = component.email_sent_at
       render component, layout: "email"
     end
 

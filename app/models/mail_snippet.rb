@@ -114,10 +114,7 @@ class MailSnippet < ApplicationRecord
       ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved]
     end
 
-    # Returns the enabled snippet for organization+kind. With `time`, returns the snippet
-    # as it was at that moment (via paper_trail), so previews of already-sent emails
-    # show the snippet that was in effect when the email was sent — including snippets
-    # that have since been destroyed.
+    # With `time`, reifies the snippet via paper_trail (including destroyed ones).
     def for_organization(organization_id:, kind:, time: nil)
       snippet = where(organization_id:, kind:).first
 
