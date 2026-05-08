@@ -8,6 +8,10 @@ module Emails
         @email_preview = email_preview
       end
 
+      def email_sent_at
+        @b_param&.created_at if @b_param&.persisted?
+      end
+
       private
 
       def organization
@@ -23,7 +27,7 @@ module Emails
       end
 
       def organization_snippet_body
-        organization&.mail_snippet_body("partial_registration")
+        organization&.mail_snippet_body("partial_registration", time: email_sent_at)
       end
     end
   end

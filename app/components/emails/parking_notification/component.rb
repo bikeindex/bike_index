@@ -26,11 +26,7 @@ module Emails
       end
 
       def organization_snippet_body
-        MailSnippet.for_organization(
-          organization_id: organization.id,
-          kind: @parking_notification.kind,
-          time: @parking_notification.sent_at
-        )&.body
+        MailSnippet.for_organization(organization_id: organization.id, kind: @parking_notification.kind, time: email_sent_at)&.body
       end
 
       def impound_record

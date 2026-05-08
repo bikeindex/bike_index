@@ -15,6 +15,10 @@ module Emails
         @email_preview = email_preview
       end
 
+      def email_sent_at
+        @ownership&.created_at if @ownership&.persisted?
+      end
+
       private
 
       def bike
