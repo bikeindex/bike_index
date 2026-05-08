@@ -28,6 +28,14 @@ module OrganizedServices
       end
     end
 
+    # Returns the time the email was sent, when previewing an already-sent message.
+    # Used so the email layout can render header/footer snippets as they were at sent time.
+    def email_sent_at(kind:, organization:, params:)
+      return nil unless ParkingNotification.kinds.include?(kind) && params[:parking_notification_id].present?
+
+      organization.parking_notifications.find_by(id: params[:parking_notification_id])&.sent_at
+    end
+
     def find_or_build_impound_claim(kind:, organization:, params:)
       status = (kind == "impound_claim_approved") ? "approved" : "denied"
       impound_claims = organization.impound_claims

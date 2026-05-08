@@ -116,13 +116,36 @@ class MailSnippet < ApplicationRecord
 
     # Returns the enabled snippet for organization+kind. With `time`, returns the snippet
     # as it was at that moment (via paper_trail), so previews of already-sent emails
-    # show the snippet that was in effect when the email was sent.
+    # show the snippet that was in effect when the email was sent — including snippets
+    # that have since been destroyed.
     def for_organization(organization_id:, kind:, time: nil)
       snippet = where(organization_id:, kind:).first
-      return nil if snippet.blank?
 
-      snippet = snippet.paper_trail.version_at(time) if time.present?
+      if time.present?
+        snippet = snippet.present? ? snippet.paper_trail.version_at(time) : reify_destroyed_at(organization_id:, kind:, time:)
+      end
+
       snippet if snippet&.is_enabled
+    end
+
+    # Reify a snippet that no longer exists, by finding the destroy version after `time`
+    # and walking back to the version active at `time`.
+    def reify_destroyed_at(organization_id:, kind:, time:)
+      return nil unless KIND_ENUM.key?(kind.to_sym)
+
+      destroy_version = PaperTrail::Version
+        .where(item_type: name, event: "destroy")
+        .where("object @> ?", {organization_id:, kind: kind.to_s}.to_json)
+        .where("created_at > ?", time)
+        .order(:created_at).first
+      return nil if destroy_version.blank?
+
+      next_version = PaperTrail::Version
+        .where(item_type: name, item_id: destroy_version.item_id)
+        .where("created_at > ?", time)
+        .order(:created_at).first
+
+      next_version&.reify
     end
   end
 

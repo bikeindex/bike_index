@@ -102,7 +102,7 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(response.status).to eq 404
           end
         end
-        context "with mail_snippet edited after the notification was sent" do
+        context "with mail_snippet changes after the notification was sent" do
           include_context :with_paper_trail
 
           let!(:mail_snippet) do
@@ -111,6 +111,13 @@ RSpec.describe Organized::EmailsController, type: :request do
               organization: current_organization,
               is_enabled: true,
               body: "snippet body when sent")
+          end
+          let!(:header_snippet) do
+            FactoryBot.create(:mail_snippet,
+              kind: "header",
+              organization: current_organization,
+              is_enabled: true,
+              body: "header when sent")
           end
           let!(:sent_parking_notification) do
             FactoryBot.create(:parking_notification,
@@ -128,22 +135,27 @@ RSpec.describe Organized::EmailsController, type: :request do
           before do
             mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
             mail_snippet.update!(body: "snippet body now")
+            header_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+            header_snippet.destroy!
           end
 
-          it "renders the snippet at sent time, but the current snippet for unsent notifications" do
+          it "renders snippets as they were at sent time (including destroyed ones), and current snippets for unsent notifications" do
             expect(sent_parking_notification.sent_at).to be_present
             expect(unsent_parking_notification.sent_at).to be_nil
             expect(mail_snippet.reload.body).to eq "snippet body now"
+            expect(MailSnippet.where(kind: "header", organization: current_organization)).to be_empty
 
             get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: sent_parking_notification.id}
             expect(response.status).to eq(200)
             expect(response.body).to include("snippet body when sent")
+            expect(response.body).to include("header when sent")
             expect(response.body).to_not include("snippet body now")
 
             get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: unsent_parking_notification.id}
             expect(response.status).to eq(200)
             expect(response.body).to include("snippet body now")
             expect(response.body).to_not include("snippet body when sent")
+            expect(response.body).to_not include("header when sent")
           end
         end
       end

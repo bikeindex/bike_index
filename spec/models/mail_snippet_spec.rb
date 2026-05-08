@@ -124,6 +124,17 @@ RSpec.describe MailSnippet, type: :model do
         result = MailSnippet.for_organization(organization_id: organization.id, kind: "impound_notification", time: past_time)
         expect(result).to be_nil
       end
+
+      it "reifies a snippet that was destroyed after the requested time" do
+        header = FactoryBot.create(:mail_snippet, kind: "header", organization:, is_enabled: true, body: "old header")
+        header.versions.first.update_columns(created_at: 2.hours.ago)
+        header.destroy!
+
+        result = MailSnippet.for_organization(organization_id: organization.id, kind: "header", time: past_time)
+        expect(result.body).to eq "old header"
+        expect(result.is_enabled).to be true
+        expect(MailSnippet.for_organization(organization_id: organization.id, kind: "header")).to be_nil
+      end
     end
   end
 

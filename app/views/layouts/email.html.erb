@@ -50,14 +50,14 @@
         <%# We only render snippets for organized messages - or if we're doing a preview %>
         <% render_organization_snippets = @organization.present? && (controller_path == "organized_mailer" || @email_preview) %>
 
-        <% if render_organization_snippets && @organization.mail_snippet_body("header").present? %>
-          <%= @organization.mail_snippet_body("header").html_safe %>
+        <% if render_organization_snippets && @organization.mail_snippet_body("header", time: @email_sent_at).present? %>
+          <%= @organization.mail_snippet_body("header", time: @email_sent_at).html_safe %>
         <% end %>
 
         <%= yield %>
 
-        <% if render_organization_snippets && @organization.mail_snippet_body("footer").present? %>
-          <%= @organization.mail_snippet_body("footer").html_safe %>
+        <% if render_organization_snippets && @organization.mail_snippet_body("footer", time: @email_sent_at).present? %>
+          <%= @organization.mail_snippet_body("footer", time: @email_sent_at).html_safe %>
         <% end %>
       </div>
 
