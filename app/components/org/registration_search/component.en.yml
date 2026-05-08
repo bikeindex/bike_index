@@ -11,7 +11,7 @@ en:
         color: Color
         e_vehicle_propulsion: E-vehicle (propulsion)
         e_vehicles_for_audit: 'E-Vehicles for audit:'
-        hidden_not_registered: "hidden, not registered with %{org_name}"
+        hidden_not_registered: hidden, not registered with %{org_name}
         impound_id: Impound ID
         impounded: Impounded
         link: Link
