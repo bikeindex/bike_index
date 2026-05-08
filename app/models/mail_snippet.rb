@@ -128,6 +128,8 @@ class MailSnippet < ApplicationRecord
       snippet if snippet&.is_enabled
     end
 
+    private
+
     # Reify a snippet that no longer exists, by finding the destroy version after `time`
     # and walking back to the version active at `time`.
     def reify_destroyed_at(organization_id:, kind:, time:)
