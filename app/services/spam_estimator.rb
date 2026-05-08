@@ -15,14 +15,14 @@ module SpamEstimator
     ;\s*(?:drop|delete|truncate|exec)\b
   /xi
 
-  def estimate_bike(bike, stolen_record = nil)
+  def estimate_bike(bike, stolen_record = nil, skip_malicious: false)
     estimate = 0
     return estimate if bike.blank?
-    return 100 if looks_malicious?(bike.cached_data)
+    return 100 if !skip_malicious && looks_malicious?(bike.cached_data)
 
     estimate += 35 if bike.creation_organization&.spam_registrations
-    estimate += 0.2 * string_spaminess(bike.frame_model)
-    estimate += 0.4 * string_spaminess(bike.manufacturer_other)
+    estimate += 0.2 * string_spaminess(bike.frame_model, skip_malicious:)
+    estimate += 0.4 * string_spaminess(bike.manufacturer_other, skip_malicious:)
     estimate += domain_estimate(bike.owner_email)
     estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
 
@@ -31,9 +31,9 @@ module SpamEstimator
 
   # eariot are the most frequent letters - this could be incorporated into calculations
   # Currently, doing a weird vowel count thing
-  def string_spaminess(str)
+  def string_spaminess(str, skip_malicious: false)
     return 0 if str.blank?
-    return 100 if looks_malicious?(str)
+    return 100 if !skip_malicious && looks_malicious?(str)
 
     str_length ||= str.length.to_f
     return 10 if str_length == 1
