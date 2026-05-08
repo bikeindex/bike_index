@@ -206,6 +206,21 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
       end
     end
 
+    context "redlock held by another worker" do
+      before do
+        @lock_manager = described_class.new_lock_manager
+        @redlock = @lock_manager.lock(described_class.redlock_key(parking_notification.id), 5000)
+      end
+      after { @lock_manager.unlock(@redlock) }
+      it "does not send" do
+        expect(parking_notification.send_email?).to be_truthy
+        expect(described_class.locked_for?(parking_notification.id)).to be_truthy
+        instance.perform(parking_notification.id)
+        expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+        expect(parking_notification.reload.delivery_status).to be_blank
+      end
+    end
+
     context "impound_notification with location" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
       let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization: organization, name: "Impound Facility") }

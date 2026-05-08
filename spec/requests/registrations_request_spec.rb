@@ -234,6 +234,21 @@ RSpec.describe RegistrationsController, type: :request do
           expect(assigns(:simple_header)).to be_truthy
         end
       end
+      context "with a bogus primary_frame_color_id (HB #122918826)" do
+        include_context :test_csrf_token
+        let(:bogus_color_id) { "ndbGRKFw')) OR 96=(SELECT 96 FROM PG_SLEEP(15))--" }
+        it "creates a bparam and the partial registration mailer still sends" do
+          ActionMailer::Base.deliveries = []
+          post base_url, params: {b_param: {owner_email: "scan@stuff.com", primary_frame_color_id: bogus_color_id}}
+          expect(response).to render_template(:create)
+          b_param = BParam.last
+          expect(b_param.primary_frame_color_id).to eq bogus_color_id
+          expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
+          Email::PartialRegistrationJob.drain
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+          expect(ActionMailer::Base.deliveries.last.to).to eq(["scan@stuff.com"])
+        end
+      end
       context "all values set" do
         let(:attrs) do
           {

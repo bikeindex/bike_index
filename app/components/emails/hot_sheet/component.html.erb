@@ -81,7 +81,7 @@
 
           <td class="image-holder bike-display-wrapper-cell <%= 'placeholder' if thumb_placeholder?(bike) %>">
             <a href="<%= bike_link(bike) %>">
-              <img src="<%= thumb_url(bike) %>">
+              <%= image_tag thumb_url(bike), alt: bike.title_string %>
             </a>
           </td>
         </tr>

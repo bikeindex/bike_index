@@ -80,7 +80,9 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
-If `bin/dev` isn't already up (`curl -fs "$BASE_URL/" >/dev/null` fails), start it in the background — Tailwind and JS need to compile before screenshots will render correctly. Then poll the same `curl` until it succeeds.
+**Never start or stop `bin/dev` for the user.** The dev server is the user's process. Starting your own copy can land you on a different DB; stopping theirs interrupts work.
+
+Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** (`bin/dev` from their own terminal), then resume once they confirm. Do not background-launch it yourself, even temporarily.
 
 ### 5. Capture screenshots
 
