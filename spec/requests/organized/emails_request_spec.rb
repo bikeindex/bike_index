@@ -112,23 +112,38 @@ RSpec.describe Organized::EmailsController, type: :request do
               is_enabled: true,
               body: "snippet body when sent")
           end
-          let!(:parking_notification) do
+          let!(:sent_parking_notification) do
             FactoryBot.create(:parking_notification,
               organization: current_organization,
               kind: "parked_incorrectly_notification",
               delivery_status: "email_success",
               created_at: 1.hour.ago)
           end
+          let!(:unsent_parking_notification) do
+            FactoryBot.create(:parking_notification,
+              organization: current_organization,
+              kind: "parked_incorrectly_notification")
+          end
 
-          it "renders the snippet body that was active when the email was sent" do
+          before do
             mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
             mail_snippet.update!(body: "snippet body now")
+          end
 
-            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: parking_notification.id}
+          it "renders the snippet at sent time, but the current snippet for unsent notifications" do
+            expect(sent_parking_notification.sent_at).to be_present
+            expect(unsent_parking_notification.sent_at).to be_nil
+            expect(mail_snippet.reload.body).to eq "snippet body now"
+
+            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: sent_parking_notification.id}
             expect(response.status).to eq(200)
-            expect(parking_notification.sent_at).to be_present
             expect(response.body).to include("snippet body when sent")
             expect(response.body).to_not include("snippet body now")
+
+            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: unsent_parking_notification.id}
+            expect(response.status).to eq(200)
+            expect(response.body).to include("snippet body now")
+            expect(response.body).to_not include("snippet body when sent")
           end
         end
       end
