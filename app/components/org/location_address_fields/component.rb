@@ -3,8 +3,9 @@
 module Org
   module LocationAddressFields
     class Component < ApplicationComponent
-      def initialize(form_builder:)
+      def initialize(form_builder:, show_label: true)
         @builder = form_builder
+        @show_label = show_label
 
         @initial_country_id = @builder.object.country_id || Country.united_states_id
       end

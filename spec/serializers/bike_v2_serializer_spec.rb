@@ -30,6 +30,7 @@ RSpec.describe BikeV2Serializer do
         description: nil,
         external_id: nil,
         status: "with owner",
+        for_sale: false,
         propulsion_type_slug: "foot-pedal",
         cycle_type_slug: "bike"
       }

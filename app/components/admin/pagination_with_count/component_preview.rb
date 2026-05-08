@@ -14,6 +14,17 @@ module Admin
         ))
       end
 
+      def many_pages
+        pagy = Pagy::Offset.new(count: 559, page: 1, limit: 50)
+        render(Admin::PaginationWithCount::Component.new(
+          collection: collection,
+          viewing: "application",
+          pagy:,
+          per_page: 50,
+          params: {}
+        ))
+      end
+
       def with_viewing_override
         pagy = Pagy::Offset.new(count: 50, page: 1, limit: 25)
         render(Admin::PaginationWithCount::Component.new(

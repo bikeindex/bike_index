@@ -1,0 +1,37 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://img.logo.dev/www.ibera.info?fallback=404&size=400&token=<LOGO_API_TOKEN>
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '14'
+      Connection:
+      - keep-alive
+      Date:
+      - Wed, 29 Apr 2026 22:31:08 GMT
+      Cache-Control:
+      - max-age=86400, stale-while-revalidate=600
+      X-Cache:
+      - Error from cloudfront
+    body:
+      encoding: UTF-8
+      string: 'not an image!'
+  recorded_at: Wed, 29 Apr 2026 22:31:08 GMT
+recorded_with: VCR 6.3.1

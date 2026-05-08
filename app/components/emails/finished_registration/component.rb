@@ -77,7 +77,7 @@ module Emails
 
       def bike_url_with_token
         if @email_preview
-          "/404"
+          OrganizedMailer::PREVIEW_TOKEN_URL
         else
           bike_url(bike, t: @ownership.token, email:)
         end
@@ -85,7 +85,7 @@ module Emails
 
       def recovery_url
         if @email_preview
-          "/404"
+          OrganizedMailer::PREVIEW_TOKEN_URL
         else
           edit_bike_recovery_url(bike_id: bike.id, token: bike.fetch_current_stolen_record.find_or_create_recovery_link_token)
         end

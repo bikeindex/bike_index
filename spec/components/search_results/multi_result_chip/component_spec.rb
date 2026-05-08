@@ -49,7 +49,7 @@ RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
     it "renders error badge without a tooltip" do
       expect(component).to have_css("span#chip_0")
       expect(component).not_to have_css("a")
-      expect(component).not_to have_css(".ui-tooltip")
+      expect(component).not_to have_css("[role=tooltip]", visible: :all)
       expect(component).to have_css("span.serial-span", text: "SERIAL111")
       expect(component).to have_css("small", text: "error")
     end
@@ -62,7 +62,7 @@ RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
       let(:error_message) { "Server error 500" }
 
       it "wraps the error label in a tooltip showing the message and uses the help cursor" do
-        expect(component).to have_css(".ui-tooltip small", text: "error")
+        expect(component).to have_css("button[data-controller~='ui--tooltip'] small", text: "error")
         expect(component).to have_css("[role=tooltip]", text: "Server error 500", visible: :all)
         expect(component.to_html).to include("tw:cursor-help")
       end

@@ -93,7 +93,8 @@
               \- or email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org", target: "_blank"}.
       = f.text_area :body, rows: 4, maxlength: @object.max_body_length, placeholder: "Custom text", class: "form-control"
     - if @kind == "other_parking_notification"
-      = render(UI::Alert::Component.new(text: "Other parking notifications don't include a \"picked up the bike\" link", kind: :info, margin_classes: 'tw:mt-2 mb-4'))
+      = render(UI::Alert::Component.new(kind: :info, margin_classes: 'tw:mt-2 mb-4')) do
+        Parking Notifications of type <strong>Other</strong> (like this one) don't include a "picked up the bike" link
 
     .form-group
       = f.check_box :is_enabled

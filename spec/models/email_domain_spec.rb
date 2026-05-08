@@ -16,6 +16,14 @@ RSpec.describe EmailDomain, type: :model do
         expect(email_domain.errors.full_messages.join).to match(".")
       end
     end
+
+    context "concurrent inserts of the same domain" do
+      let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@example.com") }
+      let(:duplicate) { FactoryBot.build(:email_domain, domain: "@example.com") }
+      it "is rejected by the unique index even when validations are skipped" do
+        expect { duplicate.save(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
+      end
+    end
   end
 
   describe "contained in another" do

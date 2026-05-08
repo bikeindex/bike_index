@@ -51,6 +51,23 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
 
 
+--
+-- Name: bikes_search_vector_update(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.bikes_search_vector_update() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  NEW.search_vector :=
+    setweight(to_tsvector('simple', coalesce(NEW.serial_number, '')), 'A') ||
+    setweight(to_tsvector('simple', coalesce(NEW.cached_data, '')), 'B') ||
+    setweight(to_tsvector('simple', coalesce(NEW.all_description, '')), 'C');
+  RETURN NEW;
+END
+$$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -713,7 +730,8 @@ CREATE TABLE public.bikes (
     serial_segments_migrated_at timestamp without time zone,
     model_audit_id bigint,
     primary_activity_id bigint,
-    address_record_id bigint
+    address_record_id bigint,
+    search_vector tsvector
 );
 
 
@@ -6187,10 +6205,24 @@ CREATE INDEX index_bikes_on_primary_frame_color_id ON public.bikes USING btree (
 
 
 --
+-- Name: index_bikes_on_search_vector; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_search_vector ON public.bikes USING gin (search_vector);
+
+
+--
 -- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL);
+
+
+--
+-- Name: index_bikes_on_serial_normalized_no_space_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_serial_normalized_no_space_trgm ON public.bikes USING gin (serial_normalized_no_space public.gin_trgm_ops) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
 
 
 --
@@ -6275,6 +6307,13 @@ CREATE INDEX index_email_domains_on_creator_id ON public.email_domains USING btr
 --
 
 CREATE INDEX index_email_domains_on_domain_trgm ON public.email_domains USING gin (domain public.gin_trgm_ops);
+
+
+--
+-- Name: index_email_domains_on_domain_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_email_domains_on_domain_unique ON public.email_domains USING btree (domain) WHERE (deleted_at IS NULL);
 
 
 --
@@ -7468,6 +7507,13 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
+-- Name: bikes bikes_search_vector_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER bikes_search_vector_trigger BEFORE INSERT OR UPDATE OF serial_number, cached_data, all_description ON public.bikes FOR EACH ROW EXECUTE FUNCTION public.bikes_search_vector_update();
+
+
+--
 -- Name: theft_alerts fk_rails_3c23dcdc45; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -7546,6 +7592,9 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260430122735'),
+('20260428142526'),
+('20260428000001'),
 ('20260425103043'),
 ('20260425000001'),
 ('20260424000002'),
