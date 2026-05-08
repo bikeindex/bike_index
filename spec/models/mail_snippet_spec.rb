@@ -74,66 +74,92 @@ RSpec.describe MailSnippet, type: :model do
   describe "for_organization" do
     include_context :with_paper_trail
 
+    subject(:result) { MailSnippet.for_organization(organization_id:, kind:, time:) }
+
     let(:organization) { FactoryBot.create(:organization) }
+    let(:organization_id) { organization.id }
     let(:kind) { "parked_incorrectly_notification" }
+    let(:time) { nil }
+    let(:body) { "current body" }
+    let(:is_enabled) { true }
     let!(:mail_snippet) do
-      FactoryBot.create(:mail_snippet, kind:, organization:, is_enabled: true, body: "current body")
+      FactoryBot.create(:mail_snippet, kind:, organization:, is_enabled:, body:)
     end
 
-    it "returns the current snippet without time" do
-      expect(MailSnippet.for_organization(organization_id: organization.id, kind:)).to eq mail_snippet
+    context "without time" do
+      it "returns the current snippet" do
+        expect(result).to eq mail_snippet
+      end
     end
 
-    it "returns nil for unknown organization" do
-      expect(MailSnippet.for_organization(organization_id: organization.id + 999, kind:)).to be_nil
+    context "with unknown organization" do
+      let(:organization_id) { organization.id + 999 }
+
+      it "returns nil" do
+        expect(result).to be_nil
+      end
     end
 
     context "when currently disabled" do
+      let(:is_enabled) { false }
+
       it "returns nil" do
-        mail_snippet.update!(is_enabled: false)
-        expect(MailSnippet.for_organization(organization_id: organization.id, kind:)).to be_nil
+        expect(result).to be_nil
       end
     end
 
-    context "with time" do
-      let(:past_time) { 1.hour.ago }
+    context "with time after the snippet was edited" do
+      let(:time) { 1.hour.ago }
 
-      it "returns the snippet body that was in effect at that time" do
-        # Backdate the create version so updates count as later
+      before do
         mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
         mail_snippet.update!(body: "updated body")
+      end
 
-        result = MailSnippet.for_organization(organization_id: organization.id, kind:, time: past_time)
+      it "returns the snippet body that was in effect at that time" do
         expect(result.body).to eq "current body"
-        expect(MailSnippet.for_organization(organization_id: organization.id, kind:).body).to eq "updated body"
       end
+    end
 
-      it "returns nil if the snippet did not exist yet at that time" do
-        # Move the create version to be after the query time
-        mail_snippet.versions.first.update_columns(created_at: Time.current)
+    context "with time before the snippet was created" do
+      let(:time) { 1.day.ago }
 
-        result = MailSnippet.for_organization(organization_id: organization.id, kind:, time: 1.day.ago)
+      before { mail_snippet.versions.first.update_columns(created_at: Time.current) }
+
+      it "returns nil" do
         expect(result).to be_nil
       end
+    end
 
-      it "returns nil if the snippet was disabled at that time" do
-        disabled_snippet = FactoryBot.create(:mail_snippet, kind: "impound_notification", organization:, is_enabled: false, body: "disabled")
-        disabled_snippet.versions.first.update_columns(created_at: 2.hours.ago)
-        disabled_snippet.update!(is_enabled: true)
+    context "with time when the snippet was disabled" do
+      let(:kind) { "impound_notification" }
+      let(:body) { "disabled" }
+      let(:is_enabled) { false }
+      let(:time) { 1.hour.ago }
 
-        result = MailSnippet.for_organization(organization_id: organization.id, kind: "impound_notification", time: past_time)
-        expect(result).to be_nil
+      before do
+        mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+        mail_snippet.update!(is_enabled: true)
       end
 
-      it "reifies a snippet that was destroyed after the requested time" do
-        header = FactoryBot.create(:mail_snippet, kind: "header", organization:, is_enabled: true, body: "old header")
-        header.versions.first.update_columns(created_at: 2.hours.ago)
-        header.destroy!
+      it "returns nil" do
+        expect(result).to be_nil
+      end
+    end
 
-        result = MailSnippet.for_organization(organization_id: organization.id, kind: "header", time: past_time)
+    context "with snippet destroyed after the requested time" do
+      let(:kind) { "header" }
+      let(:body) { "old header" }
+      let(:time) { 1.hour.ago }
+
+      before do
+        mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+        mail_snippet.destroy!
+      end
+
+      it "reifies the snippet as it was at that time" do
         expect(result.body).to eq "old header"
         expect(result.is_enabled).to be true
-        expect(MailSnippet.for_organization(organization_id: organization.id, kind: "header")).to be_nil
       end
     end
   end
