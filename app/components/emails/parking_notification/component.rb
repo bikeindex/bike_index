@@ -20,7 +20,11 @@ module Emails
       end
 
       def organization_snippet_body
-        organization.mail_snippets.enabled.where(kind: @parking_notification.kind).first&.body
+        MailSnippet.for_organization(
+          organization_id: organization.id,
+          kind: @parking_notification.kind,
+          time: @parking_notification.sent_at
+        )&.body
       end
 
       def impound_record

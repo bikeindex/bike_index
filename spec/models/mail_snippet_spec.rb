@@ -71,6 +71,62 @@ RSpec.describe MailSnippet, type: :model do
     end
   end
 
+  describe "for_organization" do
+    include_context :with_paper_trail
+
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:kind) { "parked_incorrectly_notification" }
+    let!(:mail_snippet) do
+      FactoryBot.create(:mail_snippet, kind:, organization:, is_enabled: true, body: "current body")
+    end
+
+    it "returns the current snippet without time" do
+      expect(MailSnippet.for_organization(organization_id: organization.id, kind:)).to eq mail_snippet
+    end
+
+    it "returns nil for unknown organization" do
+      expect(MailSnippet.for_organization(organization_id: organization.id + 999, kind:)).to be_nil
+    end
+
+    context "when currently disabled" do
+      it "returns nil" do
+        mail_snippet.update!(is_enabled: false)
+        expect(MailSnippet.for_organization(organization_id: organization.id, kind:)).to be_nil
+      end
+    end
+
+    context "with time" do
+      let(:past_time) { 1.hour.ago }
+
+      it "returns the snippet body that was in effect at that time" do
+        # Backdate the create version so updates count as later
+        mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+        mail_snippet.update!(body: "updated body")
+
+        result = MailSnippet.for_organization(organization_id: organization.id, kind:, time: past_time)
+        expect(result.body).to eq "current body"
+        expect(MailSnippet.for_organization(organization_id: organization.id, kind:).body).to eq "updated body"
+      end
+
+      it "returns nil if the snippet did not exist yet at that time" do
+        # Move the create version to be after the query time
+        mail_snippet.versions.first.update_columns(created_at: Time.current)
+
+        result = MailSnippet.for_organization(organization_id: organization.id, kind:, time: 1.day.ago)
+        expect(result).to be_nil
+      end
+
+      it "returns nil if the snippet was disabled at that time" do
+        disabled_snippet = FactoryBot.create(:mail_snippet, kind: "impound_notification", organization:, is_enabled: false, body: "disabled")
+        disabled_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+        disabled_snippet.update!(is_enabled: true)
+
+        result = MailSnippet.for_organization(organization_id: organization.id, kind: "impound_notification", time: past_time)
+        expect(result).to be_nil
+      end
+    end
+  end
+
   describe "newsletter" do
     let(:mail_snippet) { FactoryBot.create(:mail_snippet, kind: :newsletter) }
     let(:mail_snippet_2) { FactoryBot.create(:mail_snippet, kind: :newsletter) }
