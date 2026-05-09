@@ -71,9 +71,9 @@ module Org
       end
 
       def hidden_not_registered_tag
-        @hidden_not_registered_tag ||= tag.small(
+        @hidden_not_registered_tag ||= tag.em(
           translation(".hidden_not_registered", org_name: @organization.short_name),
-          class: "less-strong"
+          class: "less-strong tw:leading-snug tw:text-xs"
         )
       end
 
