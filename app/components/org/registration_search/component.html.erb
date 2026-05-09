@@ -49,7 +49,6 @@
 
   <% organization = @organization %>
   <% bike_sticker = @bike_sticker %>
-  <% bike_in_org = method(:bike_in_org?) %>
 
   <%= tag.div(data: table_wrapper_data_attributes) do %>
     <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-bikes_3", render_sortable: true)) do |table| %>
@@ -132,7 +131,7 @@
       <% end %>
 
       <% table.column(label: translation(".owner_name"), classes: "hideableColumn owner_name_cell") do |bike| %>
-        <% if bike_in_org.(bike) %>
+        <% if bike.organized?(organization) %>
           <% if bike.owner_name.present? %>
             <em><%= bike.owner_name %></em>
           <% end %>
@@ -147,7 +146,7 @@
 
       <% if organization.enabled?("registration_notes") %>
         <% table.column(label: translation(".notes"), classes: "hideableColumn notes_cell tw:leading-none") do |bike| %>
-          <% if bike_in_org.(bike) %>
+          <% if bike.organized?(organization) %>
             <small>
               <%= BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: organization.id)&.body %>
             </small>
@@ -161,7 +160,7 @@
         <% next if reg_field == "extra_registration_number" %>
 
         <% table.column(label: column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell") do |bike| %>
-          <% if bike_in_org.(bike) %>
+          <% if bike.organized?(organization) %>
             <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
             <% if bike_attr == "address" %>
               <% if bike.valid_mailing_address? %>
@@ -183,7 +182,7 @@
       <% end %>
 
       <% table.column(label: translation(".secondary_number"), classes: "hideableColumn extra_registration_number_cell") do |bike| %>
-        <% if bike_in_org.(bike) %>
+        <% if bike.organized?(organization) %>
           <%= bike.extra_registration_number %>
         <% else %>
           <%= hidden_html %>
@@ -192,7 +191,7 @@
 
       <% if organization.enabled?("impound_bikes") %>
         <% table.column(label: translation(".impound_id"), classes: "hideableColumn impound_id_cell") do |bike| %>
-          <% if bike_in_org.(bike) %>
+          <% if bike.organized?(organization) %>
             <% if bike.status_impounded? && bike.current_impound_record.present? %>
               <%= number_display(bike.current_impound_record.id) %>
             <% end %>
@@ -201,7 +200,7 @@
           <% end %>
         <% end %>
         <% table.column(label: translation(".impounded"), classes: "hideableColumn impounded_cell") do |bike| %>
-          <% if bike_in_org.(bike) %>
+          <% if bike.organized?(organization) %>
             <% if bike.status_impounded? && bike.current_impound_record&.created_at&.present? %>
               <small class="localizeTime">
                 <%= l bike.current_impound_record.created_at, format: :convert_time %>
@@ -215,7 +214,7 @@
 
       <% if @organization.enabled?("avery_export") %>
         <% table.column(label: translation(".avery"), classes: "hideableColumn avery_cell") do |bike| %>
-          <% if bike_in_org.(bike) %>
+          <% if bike.organized?(organization) %>
             <%= check_mark if bike.avery_exportable? %>
           <% else %>
             <%= hidden_html %>
@@ -225,7 +224,7 @@
 
       <% if organization.enabled?("bike_stickers") %>
         <% table.column(label: translation(".sticker"), classes: "hideableColumn sticker_cell tw:pt-0", header_classes: "tw:pt-1") do |bike| %>
-          <% if bike_in_org.(bike) %>
+          <% if bike.organized?(organization) %>
             <% bike.bike_stickers.each_with_index do |bs, index| %>
               <% if bs.organization.present? && bs.organization_id == organization.id %>
                 <%= link_to bs.pretty_code, edit_organization_sticker_path(id: bs.code, organization_id: bs.organization&.to_param), class: "tw:text-xs tw:block tw:mt-1", data: {turbo_frame: "_top"} %>
@@ -240,7 +239,7 @@
           <% end %>
         <% end %>
         <% table.column(label: translation(".assign_bike_sticker"), classes: "assign_bike_sticker_cell tw:hidden") do |bike| %>
-          <% if bike_in_org.(bike) %>
+          <% if bike.organized?(organization) %>
             <small>
               <a data-bike-id="<%= bike.id %>">
                 <%= t("components.org.registration_search.link_sticker") %>
