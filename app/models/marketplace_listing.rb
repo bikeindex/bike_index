@@ -68,6 +68,7 @@ class MarketplaceListing < ApplicationRecord
 
   scope :current, -> { where(status: CURRENT_STATUSES) }
   scope :removed_or_sold, -> { where(status: %i[removed sold]) }
+  scope :promoted, -> { where(seller_member: true) }
 
   class << self
     # Only works for bikes currently...
@@ -230,6 +231,7 @@ class MarketplaceListing < ApplicationRecord
   def set_calculated_attributes
     self.seller_id ||= item.user&.id
     self.status ||= "draft"
+    self.seller_member = seller&.member? || false if seller_id_changed? || new_record?
 
     if status == "for_sale"
       if valid_publishable?

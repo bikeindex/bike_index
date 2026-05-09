@@ -85,6 +85,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(membership.reload.status).to eq "active"
           expect(paid_seller.reload.member?).to be true
           expect(seller.reload.member?).to be false
+          expect(promoted_listing.reload.seller_member).to be true
 
           get base_url, as: :turbo_stream
           expect(response).to have_http_status(:success)
@@ -92,13 +93,51 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
           expect(response.body).to include("Promoted")
 
-          # Ending the membership removes the listing from promoted
+          # End the membership and run AfterUserChangeJob to refresh the cached seller_member
           membership.update(status: :ended, end_at: Time.current - 1.day)
+          CallbackJob::AfterUserChangeJob.new.perform(paid_seller.id)
+          expect(promoted_listing.reload.seller_member).to be false
+
           get base_url, as: :turbo_stream
           expect(response).to have_http_status(:success)
           expect(assigns(:promoted_bikes)).to eq([])
           expect(assigns(:bikes).pluck(:id)).to match_array([item.id, promoted_item.id])
           expect(response.body).not_to include("Promoted")
+        end
+
+        context "with more promoted listings than fit on a page" do
+          let!(:extra_promoted_listings) do
+            Array.new(13) do |i|
+              extra_item = FactoryBot.create(:bike, :with_primary_activity)
+              FactoryBot.create(:marketplace_listing, :for_sale,
+                address_record: paid_seller.address_record, seller: paid_seller, item: extra_item,
+                amount_cents: 800_00,
+                published_at: Time.current - (i + 1).minutes)
+            end
+          end
+
+          it "renders all promoted listings on page 1 in full and paginates standard listings independently" do
+            extra_standard_items = Array.new(13) do |i|
+              extra_item = FactoryBot.create(:bike, :with_primary_activity)
+              FactoryBot.create(:marketplace_listing, :for_sale,
+                address_record: seller.address_record, seller:, item: extra_item, amount_cents: 200_00,
+                published_at: Time.current - (i + 1).hours)
+              extra_item
+            end
+
+            get base_url, as: :turbo_stream
+            promoted_ids = [promoted_item.id, *extra_promoted_listings.map(&:item_id)]
+            expect(assigns(:promoted_bikes).map(&:id)).to match_array(promoted_ids)
+            expect(assigns(:promoted_bikes).size).to eq 14
+            expect(assigns(:bikes).pluck(:id)).to eq([item.id, *extra_standard_items.first(11).map(&:id)])
+            expect(assigns(:pagy).next).to eq 2
+
+            # Page 2 has no Promoted section, just remaining standard listings
+            get "#{base_url}?page=2", as: :turbo_stream
+            expect(assigns(:promoted_bikes)).to be_nil
+            expect(assigns(:bikes).pluck(:id)).to eq(extra_standard_items.last(2).map(&:id))
+            expect(response.body).not_to include(">Promoted</h2>")
+          end
         end
       end
 
