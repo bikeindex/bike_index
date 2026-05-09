@@ -27,12 +27,6 @@ export default class extends Controller {
     this.search(serials)
   }
 
-  searchAllToggled () {
-    const serials = this.parseSerials(this.textareaTarget.value)
-    if (!serials.length) return
-    this.search(serials)
-  }
-
   get searchAll () {
     return this.hasSearchAllTarget && this.searchAllTarget.checked
   }

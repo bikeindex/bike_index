@@ -32,10 +32,7 @@
       <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:gap-3">
         <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
           <%= check_box_tag :search_all, "1", false,
-            data: {
-              "org--multi-serial-search-target": "searchAll",
-              action: "change->org--multi-serial-search#searchAllToggled"
-            } %>
+            data: {"org--multi-serial-search-target": "searchAll"} %>
 
           <span>
             Search all bikes (not just <%= current_organization.short_name %>)

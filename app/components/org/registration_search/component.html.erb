@@ -109,7 +109,7 @@
         </span>
       <% end %>
 
-      <% hidden_html = tag.small(translation(".hidden_not_registered", org_name: organization.short_name), class: "less-strong") %>
+      <% hidden_html = hidden_not_registered_tag %>
 
       <% table.column(sortable: "owner_email", label: translation(".sent_to"), classes: "hideableColumn owner_email_cell") do |bike| %>
         <% if bike.email_visible_for?(organization) %>
