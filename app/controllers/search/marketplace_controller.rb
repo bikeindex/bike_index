@@ -13,7 +13,15 @@ module Search
       @is_marketplace = true
 
       if @render_results
-        @pagy, @bikes = pagy(:countish, searched_bikes.reorder("marketplace_listings.published_at DESC"),
+        sorted = searched_bikes.reorder("marketplace_listings.published_at DESC")
+
+        if @page == 1
+          member_seller_ids = Membership.active.select(:user_id)
+          @promoted_bikes = sorted.where(marketplace_listings: {seller_id: member_seller_ids}).to_a
+          sorted = sorted.where.not(marketplace_listings: {seller_id: member_seller_ids})
+        end
+
+        @pagy, @bikes = pagy(:countish, sorted,
           limit: 12, page: @page, max_pages: MAX_INDEX_PAGE)
       end
 

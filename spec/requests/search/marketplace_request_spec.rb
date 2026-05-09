@@ -72,6 +72,45 @@ RSpec.describe Search::MarketplaceController, type: :request do
         end
       end
 
+      context "promoted listings" do
+        let(:paid_seller) { FactoryBot.create(:user, :with_address_record, address_in: :davis) }
+        let!(:membership) { FactoryBot.create(:membership, user: paid_seller) }
+        let(:promoted_item) { FactoryBot.create(:bike, :with_primary_activity) }
+        let!(:promoted_listing) do
+          FactoryBot.create(:marketplace_listing, :for_sale,
+            address_record: paid_seller.address_record, seller: paid_seller, item: promoted_item, amount_cents: 700_00)
+        end
+
+        it "partitions promoted listings above standard listings, hides section when none exist" do
+          expect(membership.reload.status).to eq "active"
+          expect(paid_seller.reload.member?).to be true
+          expect(seller.reload.member?).to be false
+
+          get base_url, as: :turbo_stream
+          expect(response).to have_http_status(:success)
+          expect(assigns(:promoted_bikes).map(&:id)).to eq([promoted_item.id])
+          expect(assigns(:bikes).pluck(:id)).to eq([item.id])
+          expect(response.body).to include("Promoted")
+
+          # Ending the membership removes the listing from promoted
+          membership.update(status: :ended, end_at: Time.current - 1.day)
+          get base_url, as: :turbo_stream
+          expect(response).to have_http_status(:success)
+          expect(assigns(:promoted_bikes)).to eq([])
+          expect(assigns(:bikes).pluck(:id)).to match_array([item.id, promoted_item.id])
+          expect(response.body).not_to include("Promoted")
+        end
+
+        context "page 2" do
+          it "does not assign promoted_bikes" do
+            get "#{base_url}?page=2", as: :turbo_stream
+            expect(response).to have_http_status(:success)
+            expect(assigns(:promoted_bikes)).to be_nil
+            expect(response.body).not_to include("Promoted")
+          end
+        end
+      end
+
       context "turbo_stream" do
         it "renders" do
           get base_url, as: :turbo_stream
