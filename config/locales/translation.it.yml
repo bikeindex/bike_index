@@ -4781,7 +4781,7 @@ it:
         color: Colore
         e_vehicle_propulsion:
         e_vehicles_for_audit:
-        hidden_not_registered:
+        email_hidden:
         impound_id:
         impounded:
         link: Collegamento
@@ -4810,6 +4810,7 @@ it:
         vehicle:
         vehicle_type:
         view_matching_any_audit:
+        hidden_not_registered:
       registration_search_settings:
         address:
         all: Tutti

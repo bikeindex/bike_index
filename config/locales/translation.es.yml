@@ -4699,7 +4699,7 @@ es:
         color:
         e_vehicle_propulsion:
         e_vehicles_for_audit:
-        hidden_not_registered:
+        email_hidden:
         impound_id:
         impounded:
         link:
@@ -4728,6 +4728,7 @@ es:
         vehicle:
         vehicle_type:
         view_matching_any_audit:
+        hidden_not_registered:
       registration_search_settings:
         address:
         all:
