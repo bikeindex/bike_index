@@ -4,6 +4,7 @@ module SearchResults
   module MultiResultChip
     class Component < ApplicationComponent
       def initialize(chip_id:, result_count:, serial: nil, sticker: nil, error: false, error_message: nil)
+        raise ArgumentError, "exactly one of serial: or sticker: is required" unless serial.present? ^ sticker.present?
         @chip_id = chip_id
         @result_count = result_count
         @label = serial || sticker

@@ -43,6 +43,26 @@ RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
     end
   end
 
+  context "with sticker instead of serial" do
+    let(:component) { render_inline(described_class.new(chip_id:, result_count:, sticker: "STKR100")) }
+
+    it "uses the sticker as the chip label" do
+      expect(component).to have_css("span#chip_0 a", text: "STKR100")
+    end
+  end
+
+  context "with neither serial nor sticker" do
+    it "raises ArgumentError" do
+      expect { described_class.new(chip_id:, result_count:) }.to raise_error(ArgumentError, /serial: or sticker:/)
+    end
+  end
+
+  context "with both serial and sticker" do
+    it "raises ArgumentError" do
+      expect { described_class.new(chip_id:, result_count:, serial: "S1", sticker: "K1") }.to raise_error(ArgumentError, /serial: or sticker:/)
+    end
+  end
+
   context "with error" do
     let(:error) { true }
 
