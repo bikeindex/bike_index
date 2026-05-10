@@ -4,13 +4,12 @@
     <li class="divider-nav-item"></li>
   <% when :disabled %>
     <li>
-      <span class="<%= disabled_classes(item) %>">
-        <%= item[:label] %>
-      </span>
+      <span class="<%= disabled_classes(item) %>"><%= item[:label] %></span>
     </li>
   <% when :link %>
     <li>
       <% active = active_state(item) %>
+
       <% if active.nil? %>
         <%= helpers.active_link item[:label], item[:path], match_controller: item[:match_controller], class: link_classes(item, false) %>
       <% else %>

@@ -119,10 +119,11 @@ RSpec.describe OrganizedServices::MenuItems do
       expect(after_labels).to include("Super Admin for #{organization.short_name}")
     end
 
-    it "busts the cache when the organization changes" do
+    it "busts the cache when org-feature changes touch the user" do
       first = described_class.for(organization:, current_user:)
-      organization.update(updated_at: Time.current + 1.second)
-      second = described_class.for(organization: organization.reload, current_user:)
+      # Simulate UpdateOrganizationAssociationsJob touching the member user
+      current_user.update(updated_at: Time.current + 1.second, skip_update: true)
+      second = described_class.for(organization:, current_user: current_user.reload)
       expect(cache_store.instance_variable_get(:@data).size).to eq 2
       expect(first).to eq second # same payload, but cached separately because key changed
     end

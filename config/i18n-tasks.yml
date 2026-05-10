@@ -158,6 +158,7 @@ ignore_unused:
   - "activerecord.models.*"
   - "controllers.*" # our translation helper component blocks detection
   - "components.*" # our translation helper component blocks detection
+  - "shared.organized_menu_items.*" # used dynamically by OrganizedServices::MenuItems
   - "*_mailer.*"
   - "date.*"
   - "datetime.*"

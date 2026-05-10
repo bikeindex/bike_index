@@ -22,21 +22,24 @@ module OrganizedServices
     extend Functionable
 
     CACHE_VERSION = "v1"
-    CACHE_EXPIRES_IN = 1.hour
 
     def for(organization:, current_user:)
       return [] if organization.nil?
 
-      Rails.cache.fetch(cache_key(organization, current_user), expires_in: CACHE_EXPIRES_IN) do
+      Rails.cache.fetch(cache_key(organization, current_user)) do
         build_items(organization, current_user)
       end
     end
 
+    # UpdateOrganizationAssociationsJob touches every member user when an org
+    # changes, so user.cache_key_with_version covers both per-user changes
+    # (roles, superuser ability) and org-feature changes. Only the org id is
+    # needed to distinguish orgs the user belongs to.
     def cache_key(organization, current_user)
       [
         "organized_menu_items",
         CACHE_VERSION,
-        organization.cache_key_with_version,
+        organization.id,
         current_user&.cache_key_with_version
       ]
     end
@@ -153,12 +156,12 @@ module OrganizedServices
     def feature_items(organization)
       items = []
 
-      if organization.enabled?("bike_stickers")
-        items << link(translation(:registration_stickers),
+      items << if organization.enabled?("bike_stickers")
+        link(translation(:registration_stickers),
           routes.organization_stickers_path(organization_id: organization.to_param),
           match_controller: true)
       else
-        items << {type: :disabled, label: translation(:registration_stickers), secondary: false}
+        {type: :disabled, label: translation(:registration_stickers), secondary: false}
       end
 
       if organization.enabled?("hot_sheet")
