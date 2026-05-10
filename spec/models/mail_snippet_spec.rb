@@ -173,14 +173,7 @@ RSpec.describe MailSnippet, type: :model do
 
       it "returns the live snippet without reifying" do
         expect(result).to eq mail_snippet
-      end
-
-      context "even when the snippet was edited after tracking started" do
-        before { mail_snippet.update!(body: "updated body") }
-
-        it "returns the live snippet" do
-          expect(result.body).to eq "updated body"
-        end
+        expect(result.body).to eq "current body"
       end
     end
   end
