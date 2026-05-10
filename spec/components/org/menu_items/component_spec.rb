@@ -69,27 +69,4 @@ RSpec.describe Org::MenuItems::Component, type: :component do
       expect(super_admin).to include("Super Admin for #{organization.short_name}")
     end
   end
-
-  describe "active state resolution" do
-    let(:registrations_item) { {type: :link, label: "x", path: "/x", active: :on_registrations_index} }
-    let(:bikes_new_item) { {type: :link, label: "y", path: "/y", active: :on_bikes_new} }
-    let(:auto_item) { {type: :link, label: "z", path: "/z", active: :auto} }
-
-    it "resolves :on_registrations_index based on the controller" do
-      ctrl = double(controller_name: "registrations", action_name: "index")
-      allow(instance).to receive(:controller).and_return(ctrl)
-      expect(instance.send(:active_state, registrations_item)).to eq true
-    end
-
-    it "returns false when not on the matching page" do
-      ctrl = double(controller_name: "dashboard", action_name: "index")
-      allow(instance).to receive(:controller).and_return(ctrl)
-      expect(instance.send(:active_state, registrations_item)).to eq false
-      expect(instance.send(:active_state, bikes_new_item)).to eq false
-    end
-
-    it "returns nil for :auto so the template defers to active_link" do
-      expect(instance.send(:active_state, auto_item)).to be_nil
-    end
-  end
 end

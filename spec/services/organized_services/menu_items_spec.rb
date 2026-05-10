@@ -16,17 +16,17 @@ RSpec.describe OrganizedServices::MenuItems do
         expect(types).to include(:link, :divider, :trailing_divider)
       end
 
-      it "marks the registrations link with :on_registrations_index symbol (resolved at render time)" do
+      it "marks the registrations link with the :on_registrations_index active key" do
         registrations = items.find { |i| i[:label] == "#{organization.short_name} Bikes" }
         expect(registrations[:active]).to eq :on_registrations_index
       end
 
-      it "marks the add-a-bike link with :on_bikes_new symbol" do
+      it "marks the add-a-bike link with the :on_bikes_new active key" do
         add_bike = items.find { |i| i[:label] == "Add a bike" }
         expect(add_bike[:active]).to eq :on_bikes_new
       end
 
-      it "always includes disabled placeholders (component decides whether to render)" do
+      it "always includes disabled placeholders" do
         disabled = items.select { |i| i[:type] == :disabled }
         expect(disabled.map { |i| i[:label] }).to include("Registration stickers")
       end
@@ -119,13 +119,12 @@ RSpec.describe OrganizedServices::MenuItems do
       expect(after_labels).to include("Super Admin for #{organization.short_name}")
     end
 
-    it "busts the cache when org-feature changes touch the user" do
+    it "busts the cache when the user is touched (e.g. via UpdateOrganizationAssociationsJob)" do
       first = described_class.for(organization:, current_user:)
-      # Simulate UpdateOrganizationAssociationsJob touching the member user
       current_user.update(updated_at: Time.current + 1.second, skip_update: true)
       second = described_class.for(organization:, current_user: current_user.reload)
       expect(cache_store.instance_variable_get(:@data).size).to eq 2
-      expect(first).to eq second # same payload, but cached separately because key changed
+      expect(first).to eq second
     end
   end
 end

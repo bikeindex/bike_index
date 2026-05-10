@@ -12,7 +12,7 @@ class UpdateOrganizationAssociationsJob < ApplicationJob
       organization.locations.each { |l| l.update(updated_at: Time.current, skip_update: true) }
       # Touch member users so caches keyed on user.cache_key_with_version (e.g. the
       # organized menu) pick up org-feature changes
-      organization.users.each { |u| u.update(updated_at: Time.current, skip_update: true) }
+      organization.users.update_all(updated_at: Time.current)
       organization.reload # Just in case default location has changed
       organization.update(skip_update: true, updated_at: Time.current)
       add_organization_manufacturers(organization)
