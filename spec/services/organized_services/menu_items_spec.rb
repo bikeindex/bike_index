@@ -8,61 +8,75 @@ RSpec.describe OrganizedServices::MenuItems do
 
     context "with a basic organization" do
       let(:organization) { FactoryBot.create(:organization) }
-
-      it "returns canonical link items and dividers" do
-        labels = items.map { |i| i[:label] }.compact
-        expect(labels).to include("#{organization.short_name} Bikes", "Add a bike")
-        types = items.map { |i| i[:type] }
-        expect(types).to include(:link, :divider, :trailing_divider)
+      let(:org_param) { organization.to_param }
+      let(:registrations_item) do
+        {type: :link, label: "#{organization.short_name} Bikes",
+         path: "/o/#{org_param}/registrations", secondary: false,
+         active: :on_registrations_index, match_controller: false}
+      end
+      let(:add_bike_item) do
+        {type: :link, label: "Add a bike",
+         path: "/o/#{org_param}/bikes/new", secondary: false,
+         active: :on_bikes_new, match_controller: false}
+      end
+      let(:disabled_incomplete_registrations) do
+        {type: :disabled, label: "Incomplete registrations", secondary: true}
+      end
+      let(:disabled_registration_stickers) do
+        {type: :disabled, label: "Registration stickers", secondary: false}
       end
 
-      it "marks the registrations link with the :on_registrations_index active key" do
-        registrations = items.find { |i| i[:label] == "#{organization.short_name} Bikes" }
-        expect(registrations[:active]).to eq :on_registrations_index
-      end
-
-      it "marks the add-a-bike link with the :on_bikes_new active key" do
-        add_bike = items.find { |i| i[:label] == "Add a bike" }
-        expect(add_bike[:active]).to eq :on_bikes_new
-      end
-
-      it "always includes disabled placeholders" do
-        disabled = items.select { |i| i[:type] == :disabled }
-        expect(disabled.map { |i| i[:label] }).to include("Registration stickers")
+      it "returns the canonical link/divider/disabled items with the right active markers" do
+        expect(items).to include(registrations_item, add_bike_item,
+          disabled_incomplete_registrations, disabled_registration_stickers,
+          {type: :divider}, {type: :trailing_divider})
       end
     end
 
     context "with an ambassador organization" do
       let(:organization) { FactoryBot.create(:organization_ambassador) }
+      let(:org_param) { organization.to_param }
+      let(:dashboard_item) do
+        {type: :link, label: "#{organization.short_name} Dashboard",
+         path: "/o/#{org_param}/ambassador_dashboard", secondary: false,
+         active: :auto, match_controller: false}
+      end
 
-      it "returns ambassador-specific items" do
+      it "returns ambassador-specific items in order" do
         labels = items.select { |i| i[:type] == :link }.map { |i| i[:label] }
-        expect(labels).to include("#{organization.short_name} Dashboard", "Resources",
-          "Getting started", "Multi search", "Discuss")
+        expect(labels).to eq(["#{organization.short_name} Dashboard", "Resources",
+          "Getting started", "Multi search", "Discuss"])
+        expect(items).to include(dashboard_item)
       end
     end
 
-    context "with an organization that has impound_bikes enabled" do
+    context "with impound_bikes enabled" do
       let(:organization) do
         FactoryBot.create(:organization_with_organization_features,
           enabled_feature_slugs: ["impound_bikes"])
       end
+      let(:impound_item) do
+        {type: :link, label: "Impounded Bikes",
+         path: "/o/#{organization.to_param}/impound_records", secondary: true,
+         active: :auto, match_controller: true}
+      end
 
-      it "includes impounded bikes as a secondary link" do
-        impound = items.find { |i| i[:label] == "Impounded Bikes" }
-        expect(impound).to be_present
-        expect(impound[:secondary]).to eq true
-        expect(impound[:match_controller]).to eq true
+      it "includes impounded bikes as a secondary, controller-matched link" do
+        expect(items).to include(impound_item)
       end
     end
 
     context "as a superuser" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:current_user) { FactoryBot.create(:superuser) }
+      let(:super_admin_item) do
+        {type: :super_admin_link,
+         label: "Super Admin for #{organization.short_name}",
+         path: "/admin/organizations/#{organization.to_param}"}
+      end
 
-      it "appends a super_admin_link" do
-        expect(items.last[:type]).to eq :super_admin_link
-        expect(items.last[:label]).to eq "Super Admin for #{organization.short_name}"
+      it "appends a super_admin_link as the last item" do
+        expect(items.last).to eq super_admin_item
       end
     end
 
@@ -70,7 +84,7 @@ RSpec.describe OrganizedServices::MenuItems do
       let(:organization) { FactoryBot.create(:organization) }
       let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
 
-      it "includes manage_users and org_profile links" do
+      it "includes manage_users, profile, and locations links" do
         labels = items.map { |i| i[:label] }
         expect(labels).to include("Manage users",
           "#{organization.short_name} profile",
@@ -85,46 +99,31 @@ RSpec.describe OrganizedServices::MenuItems do
     end
   end
 
-  describe "caching" do
+  describe "caching", :caching do
+    include_context :caching_basic
+
     let(:organization) { FactoryBot.create(:organization) }
-    let(:cache_store) { ActiveSupport::Cache::MemoryStore.new }
 
-    around do |example|
-      original = Rails.cache
-      Rails.cache = cache_store
-      example.run
-      Rails.cache = original
-    end
-
-    it "caches the items per [organization, user]" do
+    it "memoizes per [organization, user], busts on user touch and superuser ability create" do
       first = described_class.for(organization:, current_user:)
       second = described_class.for(organization:, current_user:)
       expect(first).to eq second
-      expect(cache_store.instance_variable_get(:@data).size).to eq 1
-    end
+      expect(cache.instance_variable_get(:@data).size).to eq 1
 
-    it "produces distinct cache entries for different users" do
       other_user = FactoryBot.create(:organization_user, organization:)
-      described_class.for(organization:, current_user:)
       described_class.for(organization:, current_user: other_user)
-      expect(cache_store.instance_variable_get(:@data).size).to eq 2
-    end
+      expect(cache.instance_variable_get(:@data).size).to eq 2
 
-    it "busts the cache when the user becomes a superuser" do
-      cached_labels = described_class.for(organization:, current_user:).map { |i| i[:label] }
-      expect(cached_labels).not_to include("Super Admin for #{organization.short_name}")
+      labels_before = described_class.for(organization:, current_user:).map { |i| i[:label] }
+      expect(labels_before).not_to include("Super Admin for #{organization.short_name}")
 
       FactoryBot.create(:superuser_ability, user: current_user)
-      after_labels = described_class.for(organization:, current_user: current_user.reload).map { |i| i[:label] }
-      expect(after_labels).to include("Super Admin for #{organization.short_name}")
-    end
+      labels_after = described_class.for(organization:, current_user: current_user.reload).map { |i| i[:label] }
+      expect(labels_after).to include("Super Admin for #{organization.short_name}")
 
-    it "busts the cache when the user is touched (e.g. via UpdateOrganizationAssociationsJob)" do
-      first = described_class.for(organization:, current_user:)
       current_user.update(updated_at: Time.current + 1.second, skip_update: true)
-      second = described_class.for(organization:, current_user: current_user.reload)
-      expect(cache_store.instance_variable_get(:@data).size).to eq 2
-      expect(first).to eq second
+      described_class.for(organization:, current_user: current_user.reload)
+      expect(cache.instance_variable_get(:@data).size).to eq 4
     end
   end
 end

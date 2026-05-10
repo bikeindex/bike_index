@@ -67,8 +67,7 @@ module OrganizedServices
       items = []
 
       if organization.overview_dashboard?
-        items << link("#{organization.short_name} dashboard",
-          routes.organization_dashboard_index_path(organization_id: organization.to_param))
+        items << dashboard_link(organization)
         items << divider
       end
 
@@ -81,6 +80,21 @@ module OrganizedServices
       items << {type: :trailing_divider}
 
       items
+    end
+
+    # Public helpers for the component to inject route-specific overrides
+    # (so the menu still shows the dashboard / bulk-imports link when the
+    # user is on those pages, even if the org doesn't have the feature).
+    def dashboard_link(organization)
+      link("#{organization.short_name} dashboard",
+        routes.organization_dashboard_index_path(organization_id: organization.to_param))
+    end
+
+    def bulk_import_link(organization)
+      bulk_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
+      link(bulk_label,
+        routes.organization_bulk_imports_path(organization_id: organization.to_param),
+        match_controller: true)
     end
 
     def additional_divider?(organization)
@@ -130,12 +144,7 @@ module OrganizedServices
         organization.enabled?("parking_notifications")
       items << divider if divider_below
 
-      if organization.show_bulk_import?
-        bulk_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
-        items << link(bulk_label,
-          routes.organization_bulk_imports_path(organization_id: organization.to_param),
-          match_controller: true)
-      end
+      items << bulk_import_link(organization) if organization.show_bulk_import?
 
       if organization.lightspeed_or_broken_lightspeed?
         items << link(translation(:lightspeed_integration_panel),

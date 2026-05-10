@@ -5,10 +5,13 @@ RSpec.shared_context :caching_enabled do
     config.around(:each, :caching) do |example|
       ActionController::Base.perform_caching = true
       ActionController::Base.cache_store = cache
+      original_rails_cache = Rails.cache
+      Rails.cache = cache
       example.run
     ensure
       ActionController::Base.perform_caching = false
       ActionController::Base.cache_store = :null_store
+      Rails.cache = original_rails_cache if original_rails_cache
     end
   end
 end
