@@ -1,21 +1,19 @@
 ---
 name: sandbox-test-setup
 description: >-
-  Bike Index sandbox/environment setup for running Ruby specs in Claude
-  Code's web sandbox. The Gemfile pins `ruby "4.0.2"` and that's the
-  version we actually need to run — Ruby 3.x is *not* an acceptable
-  substitute (Bundler refuses, and the lockfile pins
-  `BUNDLED WITH 4.0.0.beta2`). No prebuilt 4.0.2 binary is reachable
-  (`cache.ruby-lang.org` is firewalled, and `ruby/ruby-builder`'s
-  toolcache currently tops out at 3.5.0-preview1), so this skill builds
-  Ruby 4.0.2 from the GitHub source tag — about 8–10 minutes the first
-  time. Also covers postgres/redis startup, the tailwind build, the
-  matching ChromeDriver, and the local CDN proxy needed for
-  `:js, type: :system` specs (jsdelivr is firewalled but
-  registry.npmjs.org isn't). Trigger whenever a session needs to run
-  RSpec, the user reports `Bundler::RubyVersionMismatch` / `command not
-  found: rspec` / `tailwind.css is not present` / chromedriver
-  version-mismatch errors, or before attempting any system spec.
+  Bike Index sandbox setup for running Ruby specs in Claude Code's web
+  sandbox. The Gemfile pins `ruby "4.0.2"` and the lockfile pins
+  `BUNDLED WITH 4.0.0.beta2`, so don't fall back to a 3.x ruby — no
+  prebuilt 4.0.2 binary is reachable (`cache.ruby-lang.org` is
+  firewalled, `ruby/ruby-builder`'s toolcache tops out at 3.5.0-preview1)
+  so build it from the GitHub source tag, ~8–10 min on a 4-core sandbox.
+  Also covers postgres/redis, the tailwind build, the Chrome-matching
+  ChromeDriver, and the local CDN proxy needed for `:js, type: :system`
+  specs (jsdelivr is firewalled, registry.npmjs.org isn't). Trigger
+  whenever a session needs to run RSpec, the user reports
+  `Bundler::RubyVersionMismatch` / `command not found: rspec` /
+  `tailwind.css is not present` / chromedriver version-mismatch errors,
+  or before attempting any system spec.
 ---
 
 # Running Ruby + RSpec in the Claude Code sandbox
@@ -90,8 +88,12 @@ Confirm it works:
 
 ## Toolchain on PATH
 
+The Playwright Chromium directory has a build number that changes
+between sandbox images, so glob it instead of hardcoding:
+
 ```bash
-export PATH="/opt/ruby-4.0.2/x64/bin:/opt/pw-browsers/chromium-1194/chrome-linux:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
+CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
+export PATH="/opt/ruby-4.0.2/x64/bin:$CHROME_DIR:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
 export LD_LIBRARY_PATH="/opt/ruby-4.0.2/x64/lib:$LD_LIBRARY_PATH"
 
 bundle install   # no Gemfile edits needed
@@ -155,17 +157,23 @@ Two extra hurdles in the sandbox:
 
 ### 1. Chrome + matching ChromeDriver
 
-- Chrome binary: `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` —
-  add that dir to PATH (already in the export above).
-- `/opt/node22/bin/chromedriver` is too new (147 vs Chrome 141). Install
-  the matching one from Google's CfT bucket (storage.googleapis.com is
-  allowed):
+- Chrome binary lives at `/opt/pw-browsers/chromium-*/chrome-linux/chrome`
+  — the `chromium-NNNN` directory has a Playwright build number that
+  changes between sandbox images, so glob it.
+- `/opt/node22/bin/chromedriver` is too new (it tracks current stable,
+  Chrome here is whatever Playwright bundled). Pull the matching driver
+  from Google's CfT bucket — `storage.googleapis.com` is allowed and
+  every CfT release publishes its driver under the exact Chrome version
+  string:
   ```bash
-  curl -sL "https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.37/linux64/chromedriver-linux64.zip" \
+  CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
+  CHROME_VER=$("$CHROME_DIR/chrome" --version | grep -oE "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+")
+  curl -sfL "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VER}/linux64/chromedriver-linux64.zip" \
     -o /tmp/chromedriver.zip
   unzip -o -q /tmp/chromedriver.zip -d /tmp
   cp /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
   ```
+  Add `"$CHROME_DIR"` to PATH (already in the export above).
 - Capybara's default `:selenium_chrome_headless` doesn't pass
   `--no-sandbox` or a unique `--user-data-dir`, both required when
   running as root inside a container. Drop a temp file in `spec/support/`
@@ -260,7 +268,8 @@ trusts the self-signed cert.
 [ -x /opt/ruby-4.0.2/x64/bin/ruby ] || { echo "Build Ruby first"; exit 1; }
 
 # 2. Toolchain
-export PATH="/opt/ruby-4.0.2/x64/bin:/opt/pw-browsers/chromium-1194/chrome-linux:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
+CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
+export PATH="/opt/ruby-4.0.2/x64/bin:$CHROME_DIR:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
 export LD_LIBRARY_PATH="/opt/ruby-4.0.2/x64/lib:$LD_LIBRARY_PATH"
 
 # 3. Services
