@@ -118,7 +118,8 @@ class MailSnippet < ApplicationRecord
 
     # With `time`, reifies the snippet via paper_trail (including destroyed ones).
     # Snippets created before PAPER_TRAIL_TRACKING_STARTED_AT have no recorded create
-    # version, so they're returned as-is rather than reified.
+    # version, so they fall back to the live snippet when paper_trail has no relevant
+    # version to return.
     def for_organization(organization_id:, kind:, time: nil)
       snippet = where(organization_id:, kind:).first
 
@@ -128,7 +129,7 @@ class MailSnippet < ApplicationRecord
         elsif snippet.created_at >= PAPER_TRAIL_TRACKING_STARTED_AT
           snippet.paper_trail.version_at(time)
         else
-          snippet
+          snippet.paper_trail.version_at(time) || snippet
         end
       end
 

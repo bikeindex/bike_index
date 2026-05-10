@@ -171,9 +171,21 @@ RSpec.describe MailSnippet, type: :model do
         mail_snippet.versions.first.update_columns(created_at: MailSnippet::PAPER_TRAIL_TRACKING_STARTED_AT - 1.year)
       end
 
-      it "returns the live snippet without reifying" do
-        expect(result).to eq mail_snippet
-        expect(result.body).to eq "current body"
+      context "with no edits since tracking started" do
+        it "returns the live snippet" do
+          expect(result).to eq mail_snippet
+          expect(result.body).to eq "current body"
+        end
+      end
+
+      context "with an edit since tracking started, queried before that edit" do
+        let(:time) { 1.hour.ago }
+
+        before { mail_snippet.update!(body: "updated body") }
+
+        it "reifies the pre-edit body from paper_trail" do
+          expect(result.body).to eq "current body"
+        end
       end
     end
   end
