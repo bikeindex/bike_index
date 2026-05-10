@@ -2,57 +2,99 @@
 name: sandbox-test-setup
 description: >-
   Bike Index sandbox/environment setup for running Ruby specs in Claude
-  Code's web sandbox. The Gemfile pins `ruby "4.0.2"` (which doesn't
-  exist anywhere downloadable), but Ruby 3.4.6 is preinstalled at
-  `/opt/ruby-3.4.6/x64`. This skill walks through getting `bundle exec
-  rspec` running end-to-end: PATH/LD_LIBRARY_PATH, the temporary Gemfile
-  pin relax, postgres/redis startup, the tailwind build, the matching
-  ChromeDriver, and the local CDN proxy needed for `:js, type: :system`
-  specs (jsdelivr is firewalled but registry.npmjs.org isn't). Trigger
-  whenever a session needs to run RSpec, the user reports
-  `Bundler::RubyVersionMismatch` / `command not found: rspec` /
-  `tailwind.css is not present` / chromedriver version-mismatch errors,
-  or before attempting any system spec.
+  Code's web sandbox. The Gemfile pins `ruby "4.0.2"` and that's the
+  version we actually need to run — Ruby 3.x is *not* an acceptable
+  substitute (Bundler refuses, and the lockfile pins
+  `BUNDLED WITH 4.0.0.beta2`). No prebuilt 4.0.2 binary is reachable
+  (`cache.ruby-lang.org` is firewalled, and `ruby/ruby-builder`'s
+  toolcache currently tops out at 3.5.0-preview1), so this skill builds
+  Ruby 4.0.2 from the GitHub source tag — about 8–10 minutes the first
+  time. Also covers postgres/redis startup, the tailwind build, the
+  matching ChromeDriver, and the local CDN proxy needed for
+  `:js, type: :system` specs (jsdelivr is firewalled but
+  registry.npmjs.org isn't). Trigger whenever a session needs to run
+  RSpec, the user reports `Bundler::RubyVersionMismatch` / `command not
+  found: rspec` / `tailwind.css is not present` / chromedriver
+  version-mismatch errors, or before attempting any system spec.
 ---
 
 # Running Ruby + RSpec in the Claude Code sandbox
 
-The bike_index Gemfile pins `ruby "4.0.2"`. **Ruby 4.0.2 doesn't exist on
-cache.ruby-lang.org or as a `ruby/ruby-builder` toolcache release**, and
-`cache.ruby-lang.org` is blocked by the sandbox network proxy. Don't burn
-time trying to install it — Ruby 3.4.6 is already extracted at
-`/opt/ruby-3.4.6/x64/`. The codebase uses Ruby 3.4-only syntax (`it`
-block parameter, etc.) so 3.4.6 runs everything fine.
+The bike_index Gemfile pins `ruby "4.0.2"` and `Gemfile.lock` pins
+`BUNDLED WITH 4.0.0.beta2`. We actually need Ruby 4.0.2 — don't fall
+back to 3.x and patch the Gemfile, because Bundler 4.x's resolver
+behaves differently and you'll waste time chasing fake regressions.
 
-Always **revert any Gemfile / Gemfile.lock / spec/support changes you
-made just to get tests running** before committing.
+The catch: no prebuilt 4.0.2 binary is reachable from the sandbox.
+`cache.ruby-lang.org` returns 403 from the egress proxy, and
+`ruby/ruby-builder`'s toolcache release currently tops out at
+`3.5.0-preview1`. Build it from the GitHub source tag instead — the
+build below takes about 8–10 minutes on a 4-core sandbox.
 
-## One-shot toolchain setup
+Once `/opt/ruby-4.0.2/x64/` exists, **don't touch the Gemfile**.
+`bundle install` works as-is.
+
+## One-shot Ruby 4.0.2 build
+
+Skip if `/opt/ruby-4.0.2/x64/bin/ruby --version` already prints 4.0.2.
+GitHub source tarballs lack a pre-generated `configure` script, so we
+run `autogen.sh` first. The `make install` step also has to download
+about 30 bundled gems via `BASERUBY` — `Downloader::RubyGems` hardcodes
+`ssl_ca_cert` to its bundled certs, which don't include the sandbox's
+egress-proxy CA, so we pre-stage every bundled gem with `curl` (curl
+honours `/etc/ssl/certs/ca-certificates.crt`) before running
+`make install`.
 
 ```bash
-# Ruby on PATH + libruby on LD_LIBRARY_PATH
-export PATH="/opt/ruby-3.4.6/x64/bin:/opt/pw-browsers/chromium-1194/chrome-linux:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
-export LD_LIBRARY_PATH="/opt/ruby-3.4.6/x64/lib:$LD_LIBRARY_PATH"
+# 1. Source — GitHub tag tarball (cache.ruby-lang.org is blocked)
+mkdir -p /tmp/ruby-build-src && cd /tmp/ruby-build-src
+curl -sfL "https://github.com/ruby/ruby/archive/refs/tags/v4.0.2.tar.gz" \
+  | tar -xz
+cd ruby-4.0.2
 
-# Shebangs in the prebuilt tarball point at /opt/hostedtoolcache/Ruby/3.4.6/x64
-# (where GitHub Actions extracts it). Symlink so `gem`, `bundle`, etc. work.
-mkdir -p /opt/hostedtoolcache/Ruby/3.4.6
-[ -e /opt/hostedtoolcache/Ruby/3.4.6/x64 ] || \
-  ln -s /opt/ruby-3.4.6/x64 /opt/hostedtoolcache/Ruby/3.4.6/x64
+# 2. Generate ./configure (GitHub source tarballs don't ship it)
+./autogen.sh
 
-# Relax the Gemfile pin so Bundler stops complaining. LOCAL ONLY — revert before commit.
-sed -i 's/^ruby "4\.0\.2"/ruby ">= 3.4"/' Gemfile
-bundle install
+# 3. Pre-stage every bundled gem (avoids the rubygems-cert MITM issue)
+while read name ver _; do
+  case "$name" in ''|'#'*) continue ;; esac
+  out="gems/${name}-${ver}.gem"
+  [ -s "$out" ] || curl -sfL --max-time 60 -o "$out" \
+    "https://rubygems.org/downloads/${name}-${ver}.gem"
+done < gems/bundled_gems
+
+# 4. Configure + build + install (BASERUBY = preinstalled /opt/ruby-3.3.6)
+mkdir -p /tmp/ruby-build-src/build && cd /tmp/ruby-build-src/build
+/tmp/ruby-build-src/ruby-4.0.2/configure \
+  --prefix=/opt/ruby-4.0.2/x64 \
+  --enable-shared \
+  --disable-install-doc \
+  --with-openssl-dir=/usr
+make -j"$(nproc)"
+SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt make install
+
+# 5. Match the GitHub-Actions hostedtoolcache layout some shebangs assume
+mkdir -p /opt/hostedtoolcache/Ruby/4.0.2
+[ -e /opt/hostedtoolcache/Ruby/4.0.2/x64 ] || \
+  ln -s /opt/ruby-4.0.2/x64 /opt/hostedtoolcache/Ruby/4.0.2/x64
+
+cd /home/user/bike_index
 ```
 
-If `/opt/ruby-3.4.6` is missing, fetch it from `ruby/ruby-builder`
-(GitHub is reachable):
+Confirm it works:
 
 ```bash
-mkdir -p /opt/ruby-3.4.6
-curl -sL "https://github.com/ruby/ruby-builder/releases/download/toolcache/ruby-3.4.6-ubuntu-24.04.tar.gz" \
-  -o /tmp/ruby-3.4.6.tar.gz
-tar -xzf /tmp/ruby-3.4.6.tar.gz -C /opt/ruby-3.4.6
+/opt/ruby-4.0.2/x64/bin/ruby --version
+# => ruby 4.0.2 ... [x86_64-linux]
+```
+
+## Toolchain on PATH
+
+```bash
+export PATH="/opt/ruby-4.0.2/x64/bin:/opt/pw-browsers/chromium-1194/chrome-linux:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
+export LD_LIBRARY_PATH="/opt/ruby-4.0.2/x64/lib:$LD_LIBRARY_PATH"
+
+bundle install   # no Gemfile edits needed
 ```
 
 ## Services + DB
@@ -99,9 +141,9 @@ layout-rendering request specs, not just system specs.)
 ## Running plain specs
 
 ```bash
+export PATH="/opt/ruby-4.0.2/x64/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
+export LD_LIBRARY_PATH="/opt/ruby-4.0.2/x64/lib:$LD_LIBRARY_PATH"
 eval "$(ruby bin/env --export)"
-export LD_LIBRARY_PATH="/opt/ruby-3.4.6/x64/lib:$LD_LIBRARY_PATH"
-export PATH="/opt/ruby-3.4.6/x64/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
 export RAILS_ENV=test CI=1
 
 bundle exec rspec spec/models spec/requests spec/jobs
@@ -214,34 +256,32 @@ trusts the self-signed cert.
 ## End-to-end: a green spec run from a fresh shell
 
 ```bash
-# 1. Toolchain
-export PATH="/opt/ruby-3.4.6/x64/bin:/opt/pw-browsers/chromium-1194/chrome-linux:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
-export LD_LIBRARY_PATH="/opt/ruby-3.4.6/x64/lib:$LD_LIBRARY_PATH"
-mkdir -p /opt/hostedtoolcache/Ruby/3.4.6
-[ -e /opt/hostedtoolcache/Ruby/3.4.6/x64 ] || \
-  ln -s /opt/ruby-3.4.6/x64 /opt/hostedtoolcache/Ruby/3.4.6/x64
+# 1. Build Ruby 4.0.2 if missing (see "One-shot Ruby 4.0.2 build" above)
+[ -x /opt/ruby-4.0.2/x64/bin/ruby ] || { echo "Build Ruby first"; exit 1; }
 
-# 2. Services
+# 2. Toolchain
+export PATH="/opt/ruby-4.0.2/x64/bin:/opt/pw-browsers/chromium-1194/chrome-linux:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
+export LD_LIBRARY_PATH="/opt/ruby-4.0.2/x64/lib:$LD_LIBRARY_PATH"
+
+# 3. Services
 service postgresql start
 service redis-server start
 
-# 3. App env
+# 4. App env (no Gemfile edits needed)
 cd /home/user/bike_index
-sed -i 's/^ruby "4\.0\.2"/ruby ">= 3.4"/' Gemfile
 bundle install
 eval "$(ruby bin/env --export)"
 export RAILS_ENV=test CI=1
 bundle exec rails db:migrate db:test:prepare
 bundle exec rails tailwindcss:build  # only if specs render the layout
 
-# 4a. Plain specs
+# 5a. Plain specs
 bundle exec rspec spec/models spec/requests spec/jobs
 
-# 4b. System specs — start the CDN proxy first (see section above), then:
+# 5b. System specs — start the CDN proxy first (see section above), then:
 LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration
 
-# 5. Always revert local-only edits before committing
-git checkout HEAD -- Gemfile Gemfile.lock
+# 6. Revert any spec/support/* helper you added before committing
 rm -f spec/support/_zz_local_chrome.rb
 ```
 
