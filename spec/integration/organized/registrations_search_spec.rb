@@ -321,7 +321,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       visit multi_serial_path
 
       expect(page).to have_content(/multi search/i)
-      expect(page).to have_css("[data-controller~='org--multi-serial-search']", wait: 5)
+      expect(page).to have_css("[data-controller~='org--multi-search']", wait: 5)
 
       # Toggle buttons should not be visible without bike_stickers feature
       expect(page).not_to have_button("Serials")

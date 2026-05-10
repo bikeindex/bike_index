@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global Turbo, requestAnimationFrame */
 
-// Connects to data-controller='org--multi-serial-search'
+// Connects to data-controller='org--multi-search'
 export default class extends Controller {
   static targets = ['textarea', 'button', 'serialChips', 'results', 'serialsToggle', 'stickersToggle', 'searchAll']
   static values = { url: String, stickerUrl: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }

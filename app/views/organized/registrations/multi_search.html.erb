@@ -12,16 +12,16 @@
 <% end %>
 
 <div
-  data-controller="org--multi-serial-search org--registration-search org--registration-search-column-toggle"
-  data-org--multi-serial-search-url-value="<%= multi_search_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
-  data-org--multi-serial-search-sticker-url-value="<%= multi_search_sticker_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
-  data-org--multi-serial-search-search-kind-value="<%= search_kind %>"
-  data-org--multi-serial-search-empty-class-value="<%= UI::Badge::Component.badge_classes(color: :empty, size: :md) %>"
-  data-org--multi-serial-search-success-class-value="<%= UI::Badge::Component.badge_classes(color: :success, size: :md) %>"
-  data-org--multi-serial-search-gray-class-value="<%= UI::Badge::Component.badge_classes(color: :gray, size: :md) %>"
-  data-org--multi-serial-search-error-class-value="<%= UI::Badge::Component.badge_classes(color: :error, size: :md, cursor: "tw:cursor-help") %>"
-  data-org--multi-serial-search-error-tooltip-value="<%= ERB::Util.html_escape(error_tooltip_template.to_str) %>"
-  data-org--multi-serial-search-spinner-value="<%= ERB::Util.html_escape(render(UI::LoadingSpinner::Component.new(size: :sm)).to_str) %>"
+  data-controller="org--multi-search org--registration-search org--registration-search-column-toggle"
+  data-org--multi-search-url-value="<%= multi_search_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
+  data-org--multi-search-sticker-url-value="<%= multi_search_sticker_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
+  data-org--multi-search-search-kind-value="<%= search_kind %>"
+  data-org--multi-search-empty-class-value="<%= UI::Badge::Component.badge_classes(color: :empty, size: :md) %>"
+  data-org--multi-search-success-class-value="<%= UI::Badge::Component.badge_classes(color: :success, size: :md) %>"
+  data-org--multi-search-gray-class-value="<%= UI::Badge::Component.badge_classes(color: :gray, size: :md) %>"
+  data-org--multi-search-error-class-value="<%= UI::Badge::Component.badge_classes(color: :error, size: :md, cursor: "tw:cursor-help") %>"
+  data-org--multi-search-error-tooltip-value="<%= ERB::Util.html_escape(error_tooltip_template.to_str) %>"
+  data-org--multi-search-spinner-value="<%= ERB::Util.html_escape(render(UI::LoadingSpinner::Component.new(size: :sm)).to_str) %>"
   data-org--registration-search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
 >
   <div class="tw:mx-auto tw:mb-6 tw:max-w-2xl">
@@ -36,8 +36,8 @@
           active: search_kind == "serials",
           html_class: "tw:rounded-r-none!",
           data: {
-            "org--multi-serial-search-target": "serialsToggle",
-            action: "click->org--multi-serial-search#switchToSerials"
+            "org--multi-search-target": "serialsToggle",
+            action: "click->org--multi-search#switchToSerials"
           }
         ) %>
 
@@ -48,23 +48,23 @@
           active: search_kind == "stickers",
           html_class: "tw:rounded-l-none! tw:border-l-0!",
           data: {
-            "org--multi-serial-search-target": "stickersToggle",
-            action: "click->org--multi-serial-search#switchToStickers"
+            "org--multi-search-target": "stickersToggle",
+            action: "click->org--multi-search#switchToStickers"
           }
         ) %>
       </div>
     <% end %>
 
-    <form data-action="submit->org--multi-serial-search#submit">
+    <form data-action="submit->org--multi-search#submit">
       <%= text_area_tag :serials, nil,
         placeholder: search_kind == "stickers" ? "Enter multiple sticker codes, separated by commas or new lines" : "Enter multiple serial numbers, separated by commas or new lines",
         class: "twinput tw:w-full tw:font-mono tw:h-32 tw:resize-none",
-        data: {"org--multi-serial-search-target": "textarea"} %>
+        data: {"org--multi-search-target": "textarea"} %>
 
       <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:gap-3">
         <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
           <%= check_box_tag :search_all, "1", false,
-            data: {"org--multi-serial-search-target": "searchAll"} %>
+            data: {"org--multi-search-target": "searchAll"} %>
 
           <span>
             Search all bikes (not just <%= current_organization.short_name %>)
@@ -76,18 +76,18 @@
           color: :primary,
           size: :lg,
           kind: :submit,
-          data: {"org--multi-serial-search-target": "button"}
+          data: {"org--multi-search-target": "button"}
         ) %>
       </div>
     </form>
   </div>
 
   <div
-    data-org--multi-serial-search-target="serialChips"
+    data-org--multi-search-target="serialChips"
     class="tw:mb-4 tw:flex tw:flex-wrap tw:gap-3"
   ></div>
 
   <%= render settings %>
 
-  <div id="multi_serial_results" data-org--multi-serial-search-target="results"></div>
+  <div id="multi_serial_results" data-org--multi-search-target="results"></div>
 </div>
