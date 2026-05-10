@@ -132,4 +132,30 @@ RSpec.describe Org::RegistrationSearch::Component, type: :component do
       expect(component).to have_link(text: /Create export/, visible: :all)
     end
   end
+
+  context "when bike does not belong to the organization" do
+    let(:enabled_feature_slugs) { %w[bike_search reg_phone bike_stickers] }
+    let(:other_org) { FactoryBot.create(:organization) }
+    let(:bike) do
+      FactoryBot.create(:bike_organized,
+        creation_organization: other_org,
+        owner_email: "stranger@example.com",
+        extra_registration_number: "SECRET-EXTRA",
+        phone: "555-555-1212")
+    end
+
+    it "redacts private fields and leaves non-private columns visible" do
+      expect(component).to have_css("tbody tr", count: 1)
+      expect(component).to have_text(bike.mnfg_name)
+      # Private contact info is redacted with the shared hidden marker
+      expect(component).not_to have_text("stranger@example.com")
+      expect(component).not_to have_text("555-555-1212")
+      hidden_text = "hidden, not registered with #{organization.short_name}"
+      expect(component).to have_css(".owner_email_cell em.less-strong", text: hidden_text)
+      expect(component).to have_css(".owner_name_cell em.less-strong", text: hidden_text)
+      expect(component).to have_css(".reg_phone_cell em.less-strong", text: hidden_text)
+      # Non-private columns are visible
+      expect(component).to have_text("SECRET-EXTRA")
+    end
+  end
 end
