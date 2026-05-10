@@ -1,29 +1,51 @@
 # frozen_string_literal: true
 
-# Builds the data for the organization menu (sidebar + dropdown).
+# Returns the canonical organization menu item data — the same payload regardless
+# of how the menu is being rendered (sidebar vs. dropdown) or which page is current.
+# Cached per [organization, user]; the component handles per-request concerns
+# (dropdown filtering, active-link resolution).
 #
-# Each returned item is a Hash with one of these shapes:
+# Item shapes:
 #   {type: :divider}
-#   {type: :disabled, label:, secondary:}
+#   {type: :trailing_divider}            # last divider; component drops it in dropdown for non-superusers
+#   {type: :disabled, label:, secondary:} # component drops these in dropdown
 #   {type: :link, label:, path:, secondary:, match_controller:, active:}
 #   {type: :super_admin_link, label:, path:}
 #
-# `active:` is true | false | :auto. Items marked :auto rely on the
-# `active_link` view helper to compare paths against the current request.
+# `active:` is one of:
+#   :auto                                  - component uses active_link helper
+#   :on_registrations_index                - component computes from current request
+#   :on_bikes_new                          - "
+#   :on_bikes_new_with_parking_notification - "
 module OrganizedServices
   module MenuItems
     extend Functionable
 
-    def for(organization:, current_user:, controller_name: nil, action_name: nil,
-      unregistered_parking_notification: nil, is_dropdown: false)
+    CACHE_VERSION = "v1"
+    CACHE_EXPIRES_IN = 1.hour
+
+    def for(organization:, current_user:)
       return [] if organization.nil?
 
-      if organization.ambassador?
-        ambassador_items(organization)
-      else
-        standard_items(organization:, current_user:, controller_name:, action_name:,
-          unregistered_parking_notification:, is_dropdown:)
-      end + super_admin_items(organization, current_user)
+      Rails.cache.fetch(cache_key(organization, current_user), expires_in: CACHE_EXPIRES_IN) do
+        build_items(organization, current_user)
+      end
+    end
+
+    def cache_key(organization, current_user)
+      [
+        "organized_menu_items",
+        CACHE_VERSION,
+        organization.cache_key_with_version,
+        current_user&.id,
+        current_user&.superuser? || false,
+        current_user&.admin_of?(organization) || false
+      ]
+    end
+
+    def build_items(organization, current_user)
+      base = organization.ambassador? ? ambassador_items(organization) : standard_items(organization, current_user)
+      base + super_admin_items(organization, current_user)
     end
 
     def ambassador_items(organization)
@@ -40,29 +62,22 @@ module OrganizedServices
       ]
     end
 
-    def standard_items(organization:, current_user:, controller_name:, action_name:,
-      unregistered_parking_notification:, is_dropdown:)
-      render_disabled = !is_dropdown
-      show_overview_dashboard = organization.overview_dashboard? ||
-        (controller_name == "dashboard" && action_name == "index")
-      show_bulk_import = organization.show_bulk_import? || controller_name == "bulk_imports"
-
+    def standard_items(organization, current_user)
       items = []
 
-      if show_overview_dashboard
+      if organization.overview_dashboard?
         items << link("#{organization.short_name} dashboard",
           routes.organization_dashboard_index_path(organization_id: organization.to_param))
         items << divider
       end
 
-      items.concat(registration_items(organization, controller_name, action_name, render_disabled))
-      items.concat(add_bike_items(organization, controller_name, action_name,
-        unregistered_parking_notification, show_bulk_import))
+      items.concat(registration_items(organization))
+      items.concat(add_bike_items(organization))
       items << divider
 
-      items.concat(feature_items(organization, render_disabled))
+      items.concat(feature_items(organization))
       items.concat(admin_items(organization, current_user, additional_divider: additional_divider?(organization)))
-      items << divider unless is_dropdown && !current_user&.superuser?
+      items << {type: :trailing_divider}
 
       items
     end
@@ -73,12 +88,11 @@ module OrganizedServices
       end
     end
 
-    def registration_items(organization, controller_name, action_name, render_disabled)
-      on_registrations_path = controller_name == "registrations" && action_name == "index"
+    def registration_items(organization)
       items = [
         link(translation(:org_bikes, org_name: organization.short_name),
           routes.organization_registrations_path(organization_id: organization.to_param),
-          active: on_registrations_path)
+          active: :on_registrations_index)
       ]
 
       if organization.enabled?("impound_bikes")
@@ -90,7 +104,7 @@ module OrganizedServices
       if organization.enabled?("show_partial_registrations")
         items << link(translation(:incomplete_registrations),
           routes.incompletes_organization_bikes_path(organization.to_param), secondary: true)
-      elsif render_disabled && !organization.bike_shop?
+      elsif !organization.bike_shop?
         items << {type: :disabled, label: translation(:incomplete_registrations), secondary: true}
       end
 
@@ -107,21 +121,15 @@ module OrganizedServices
       items
     end
 
-    def add_bike_items(organization, controller_name, action_name,
-      unregistered_parking_notification, show_bulk_import)
-      new_bike_with_parking_notification = controller_name == "bikes" &&
-        action_name == "new" && unregistered_parking_notification.present?
-      new_bike_active = controller_name == "bikes" && action_name == "new" &&
-        !new_bike_with_parking_notification
-
+    def add_bike_items(organization)
       items = [link(translation(:add_a_bike),
-        routes.new_organization_bike_path(organization.to_param), active: new_bike_active)]
+        routes.new_organization_bike_path(organization.to_param), active: :on_bikes_new)]
 
-      divider_below = show_bulk_import || organization.lightspeed_or_broken_lightspeed? ||
+      divider_below = organization.show_bulk_import? || organization.lightspeed_or_broken_lightspeed? ||
         organization.enabled?("parking_notifications")
       items << divider if divider_below
 
-      if show_bulk_import
+      if organization.show_bulk_import?
         bulk_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
         items << link(bulk_label,
           routes.organization_bulk_imports_path(organization_id: organization.to_param),
@@ -138,20 +146,20 @@ module OrganizedServices
           routes.organization_parking_notifications_path(organization_id: organization.to_param))
         items << link(translation(:parking_notification_unregistered),
           routes.new_organization_bike_path(organization.to_param, parking_notification: true),
-          secondary: true, active: new_bike_with_parking_notification)
+          secondary: true, active: :on_bikes_new_with_parking_notification)
       end
 
       items
     end
 
-    def feature_items(organization, render_disabled)
+    def feature_items(organization)
       items = []
 
       if organization.enabled?("bike_stickers")
         items << link(translation(:registration_stickers),
           routes.organization_stickers_path(organization_id: organization.to_param),
           match_controller: true)
-      elsif render_disabled
+      else
         items << {type: :disabled, label: translation(:registration_stickers), secondary: false}
       end
 
@@ -249,8 +257,8 @@ module OrganizedServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :ambassador_items, :standard_items, :registration_items, :add_bike_items,
-      :feature_items, :admin_items, :super_admin_items, :additional_divider?,
+    conceal :build_items, :cache_key, :ambassador_items, :standard_items, :registration_items,
+      :add_bike_items, :feature_items, :admin_items, :super_admin_items, :additional_divider?,
       :link, :divider, :translation, :routes
   end
 end

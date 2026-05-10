@@ -4,29 +4,31 @@ RSpec.describe OrganizedServices::MenuItems do
   let(:current_user) { FactoryBot.create(:organization_user, organization:) }
 
   describe "for" do
-    subject(:items) do
-      described_class.for(organization:, current_user:,
-        controller_name: "registrations", action_name: "index")
-    end
+    subject(:items) { described_class.for(organization:, current_user:) }
 
     context "with a basic organization" do
       let(:organization) { FactoryBot.create(:organization) }
 
-      it "returns a registrations link, add bike link and dividers" do
+      it "returns canonical link items and dividers" do
         labels = items.map { |i| i[:label] }.compact
         expect(labels).to include("#{organization.short_name} Bikes", "Add a bike")
         types = items.map { |i| i[:type] }
-        expect(types).to include(:link, :divider)
+        expect(types).to include(:link, :divider, :trailing_divider)
       end
 
-      it "marks the registrations link active when on the index" do
+      it "marks the registrations link with :on_registrations_index symbol (resolved at render time)" do
         registrations = items.find { |i| i[:label] == "#{organization.short_name} Bikes" }
-        expect(registrations[:active]).to eq true
+        expect(registrations[:active]).to eq :on_registrations_index
       end
 
-      it "marks the add-a-bike link inactive when not on bikes#new" do
+      it "marks the add-a-bike link with :on_bikes_new symbol" do
         add_bike = items.find { |i| i[:label] == "Add a bike" }
-        expect(add_bike[:active]).to eq false
+        expect(add_bike[:active]).to eq :on_bikes_new
+      end
+
+      it "always includes disabled placeholders (component decides whether to render)" do
+        disabled = items.select { |i| i[:type] == :disabled }
+        expect(disabled.map { |i| i[:label] }).to include("Registration stickers")
       end
     end
 
@@ -78,21 +80,45 @@ RSpec.describe OrganizedServices::MenuItems do
 
     context "with no organization" do
       it "returns an empty array" do
-        expect(described_class.for(organization: nil, current_user: nil,
-          controller_name: "x", action_name: "y")).to eq([])
+        expect(described_class.for(organization: nil, current_user: nil)).to eq([])
       end
     end
+  end
 
-    context "is_dropdown: true" do
-      let(:organization) { FactoryBot.create(:organization) }
+  describe "caching" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:cache_store) { ActiveSupport::Cache::MemoryStore.new }
 
-      it "skips the trailing divider for non-superusers" do
-        dropdown = described_class.for(organization:, current_user:,
-          controller_name: "x", action_name: "y", is_dropdown: true)
-        non_dropdown = described_class.for(organization:, current_user:,
-          controller_name: "x", action_name: "y", is_dropdown: false)
-        expect(dropdown.count { |i| i[:type] == :divider }).to be < non_dropdown.count { |i| i[:type] == :divider }
-      end
+    around do |example|
+      original = Rails.cache
+      Rails.cache = cache_store
+      example.run
+      Rails.cache = original
+    end
+
+    it "caches the items per [organization, user]" do
+      expect(Rails).to receive(:cache).at_least(:once).and_call_original
+      first = described_class.for(organization:, current_user:)
+      second = described_class.for(organization:, current_user:)
+      expect(first).to eq second
+      expect(cache_store.instance_variable_get(:@data).size).to eq 1
+    end
+
+    it "produces distinct cache entries for different users" do
+      other_user = FactoryBot.create(:organization_user, organization:)
+      described_class.for(organization:, current_user:)
+      described_class.for(organization:, current_user: other_user)
+      expect(cache_store.instance_variable_get(:@data).size).to eq 2
+    end
+
+    it "busts the cache when the user becomes a superuser" do
+      described_class.for(organization:, current_user:)
+      cached_labels = described_class.for(organization:, current_user:).map { |i| i[:label] }
+      expect(cached_labels).not_to include("Super Admin for #{organization.short_name}")
+
+      FactoryBot.create(:superuser_ability, user: current_user)
+      after_labels = described_class.for(organization:, current_user:).map { |i| i[:label] }
+      expect(after_labels).to include("Super Admin for #{organization.short_name}")
     end
   end
 end
