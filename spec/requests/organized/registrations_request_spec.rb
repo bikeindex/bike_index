@@ -298,39 +298,35 @@ RSpec.describe Organized::RegistrationsController, type: :request do
   end
 
   describe "multi_search_sticker_response" do
+    let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+    let(:other_bike) { FactoryBot.create(:bike) }
     let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, code: "CA112", organization: current_organization, bike:) }
     let!(:unclaimed_sticker) { FactoryBot.create(:bike_sticker, code: "CA113", organization: current_organization) }
-    let!(:other_sticker) { FactoryBot.create(:bike_sticker, code: "ZZ999") }
+    let!(:other_sticker) { FactoryBot.create(:bike_sticker_claimed, code: "ZZ999", bike: other_bike) }
 
-    it "returns bikes from matching claimed stickers" do
-      get "#{base_url}/multi_search_sticker_response", params: {query: "CA112"},
-        headers: {"Accept" => "text/vnd.turbo-stream.html"}
+    it "returns claimed-sticker bikes (own + cross-org with redaction), skips unclaimed, 400s without query" do
+      # Own-org claimed sticker → bike returned
+      get "#{base_url}/multi_search_sticker_response", params: {query: "CA112"}, headers: turbo_headers
       expect(response.status).to eq(200)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-    end
 
-    it "returns no bikes for unclaimed stickers" do
-      get "#{base_url}/multi_search_sticker_response", params: {query: "CA113"},
-        headers: {"Accept" => "text/vnd.turbo-stream.html"}
+      # Unclaimed sticker → no bike
+      get "#{base_url}/multi_search_sticker_response", params: {query: "CA113"}, headers: turbo_headers
       expect(response.status).to eq(200)
       expect(assigns(:bikes)).to be_empty
-    end
 
-    it "does not return bikes from other orgs' stickers" do
-      get "#{base_url}/multi_search_sticker_response", params: {query: "ZZ999"},
-        headers: {"Accept" => "text/vnd.turbo-stream.html"}
+      # Cross-org claimed sticker → bike surfaces, private fields redacted
+      get "#{base_url}/multi_search_sticker_response", params: {query: "ZZ999"}, headers: turbo_headers
       expect(response.status).to eq(200)
-      expect(assigns(:bikes)).to be_empty
-    end
+      expect(assigns(:bikes).pluck(:id)).to eq([other_bike.id])
+      expect(response.body).to include("hidden, not registered with #{current_organization.short_name}")
+      expect(response.body).not_to include(other_bike.owner_email)
 
-    context "without query param" do
-      it "returns bad request" do
-        get "#{base_url}/multi_search_sticker_response",
-          headers: {"Accept" => "text/vnd.turbo-stream.html"}
-        expect(response.status).to eq(400)
-      end
+      # Missing query → bad request
+      get "#{base_url}/multi_search_sticker_response", headers: turbo_headers
+      expect(response.status).to eq(400)
     end
   end
 

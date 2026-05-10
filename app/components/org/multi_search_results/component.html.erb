@@ -5,7 +5,7 @@
   data-result-count="<%= @pagy.count %>"
 >
   <h4 class="uncap tw:mt-4 tw:mb-0 tw:px-1">
-    <%= sticker_search? ? "Sticker:" : translation(".serial_label") %>
+    <%= translation(sticker_search? ? ".sticker_label" : ".serial_label") %>
     <span class="serial-span"><%= @query %></span>
 
     <span class="tw:text-sm tw:font-normal tw:text-gray-500">

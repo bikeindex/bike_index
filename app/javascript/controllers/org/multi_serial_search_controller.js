@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--multi-serial-search'
 export default class extends Controller {
-  static targets = ['textarea', 'button', 'serialChips', 'results', 'serialsToggle', 'stickersToggle', 'settingsContainer', 'searchAll']
+  static targets = ['textarea', 'button', 'serialChips', 'results', 'serialsToggle', 'stickersToggle', 'searchAll']
   static values = { url: String, stickerUrl: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
@@ -50,10 +50,6 @@ export default class extends Controller {
     const serialsActive = this.searchKindValue !== 'stickers'
     this.updateButtonActive(this.serialsToggleTarget, serialsActive)
     this.updateButtonActive(this.stickersToggleTarget, !serialsActive)
-
-    if (this.hasSettingsContainerTarget) {
-      this.settingsContainerTarget.hidden = !serialsActive
-    }
   }
 
   updateButtonActive (button, active) {
