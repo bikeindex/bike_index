@@ -80,6 +80,25 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
     end
   end
 
+  describe "touching member users" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:user1) { FactoryBot.create(:organization_user, organization:) }
+    let!(:user2) { FactoryBot.create(:organization_user, organization:) }
+    let!(:other_user) { FactoryBot.create(:user_confirmed) }
+
+    it "touches every member user (so caches keyed on user.cache_key_with_version pick up org changes)" do
+      [user1, user2, other_user].each { |u| u.update_columns(updated_at: Time.current - 1.hour) }
+
+      expect { instance.perform(organization.id) }
+        .to change { user1.reload.updated_at }
+        .and change { user2.reload.updated_at }
+
+      expect(user1.reload.updated_at).to be_within(2).of(Time.current)
+      expect(user2.reload.updated_at).to be_within(2).of(Time.current)
+      expect(other_user.reload.updated_at).to be < Time.current - 30.minutes
+    end
+  end
+
   describe "organization_manufacturers" do
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
     let!(:manufacturer_organization) { FactoryBot.create(:organization_with_organization_features, manufacturer: manufacturer, enabled_feature_slugs: ["official_manufacturer"]) }
