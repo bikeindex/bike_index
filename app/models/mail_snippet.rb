@@ -21,6 +21,8 @@
 class MailSnippet < ApplicationRecord
   has_paper_trail only: %i[body is_enabled kind subject]
 
+  PAPER_TRAIL_TRACKING_STARTED_AT = Time.zone.local(2026, 4, 1).freeze
+
   KIND_ENUM = {
     custom: 0,
     header: 1,
@@ -115,11 +117,19 @@ class MailSnippet < ApplicationRecord
     end
 
     # With `time`, reifies the snippet via paper_trail (including destroyed ones).
+    # Snippets created before PAPER_TRAIL_TRACKING_STARTED_AT have no recorded create
+    # version, so they're returned as-is rather than reified.
     def for_organization(organization_id:, kind:, time: nil)
       snippet = where(organization_id:, kind:).first
 
       if time.present?
-        snippet = snippet.present? ? snippet.paper_trail.version_at(time) : reify_destroyed_at(organization_id:, kind:, time:)
+        snippet = if snippet.blank?
+          reify_destroyed_at(organization_id:, kind:, time:)
+        elsif snippet.created_at >= PAPER_TRAIL_TRACKING_STARTED_AT
+          snippet.paper_trail.version_at(time)
+        else
+          snippet
+        end
       end
 
       snippet if snippet&.is_enabled

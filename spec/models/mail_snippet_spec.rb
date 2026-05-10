@@ -162,6 +162,27 @@ RSpec.describe MailSnippet, type: :model do
         expect(result.is_enabled).to be true
       end
     end
+
+    context "with snippet created before paper_trail tracking started" do
+      let(:time) { MailSnippet::PAPER_TRAIL_TRACKING_STARTED_AT - 1.day }
+
+      before do
+        mail_snippet.update_columns(created_at: MailSnippet::PAPER_TRAIL_TRACKING_STARTED_AT - 1.year)
+        mail_snippet.versions.first.update_columns(created_at: MailSnippet::PAPER_TRAIL_TRACKING_STARTED_AT - 1.year)
+      end
+
+      it "returns the live snippet without reifying" do
+        expect(result).to eq mail_snippet
+      end
+
+      context "even when the snippet was edited after tracking started" do
+        before { mail_snippet.update!(body: "updated body") }
+
+        it "returns the live snippet" do
+          expect(result.body).to eq "updated body"
+        end
+      end
+    end
   end
 
   describe "newsletter" do
