@@ -175,28 +175,12 @@ Two extra hurdles in the sandbox:
   ```
   Add `"$CHROME_DIR"` to PATH (already in the export above).
 - Capybara's default `:selenium_chrome_headless` doesn't pass
-  `--no-sandbox` or a unique `--user-data-dir`, both required when
-  running as root inside a container. Drop a temp file in `spec/support/`
-  that overrides the driver behind an env flag, so it's only active when
-  you opt in:
-  ```ruby
-  # spec/support/_zz_local_chrome.rb (delete before commit)
-  if ENV["LOCAL_CHROME_OVERRIDE"]
-    Capybara.register_driver :selenium_chrome_headless do |app|
-      options = Selenium::WebDriver::Chrome::Options.new
-      options.add_argument("--headless=new")
-      options.add_argument("--no-sandbox")
-      options.add_argument("--disable-dev-shm-usage")
-      options.add_argument("--disable-site-isolation-trials")
-      options.add_argument("--ignore-certificate-errors")
-      options.add_argument("--host-resolver-rules=MAP cdn.jsdelivr.net 127.0.0.1:8443")
-      options.add_argument("--user-data-dir=/tmp/chrome-test-#{Process.pid}-#{rand(10_000)}")
-      Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
-    end
-  end
-  ```
-  The `_zz_` prefix makes `Dir[...].sort` load it last so it overrides
-  the Capybara default. **Delete the file before committing.**
+  `--no-sandbox` or a unique `--user-data-dir`, both required when Chrome
+  runs as root inside a container. `spec/support/local_chrome.rb`
+  re-registers the driver with the right flags, gated on
+  `LOCAL_CHROME_OVERRIDE=1` so CI and dev machines are unaffected. Set
+  the env var when running system specs in this sandbox; nothing else
+  to do.
 
 ### 2. `cdn.jsdelivr.net` is firewalled
 
@@ -284,9 +268,6 @@ bundle exec rspec spec/models spec/requests spec/jobs
 
 # 5b. System specs — start the CDN proxy first (see section above), then:
 LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration
-
-# 6. Revert any spec/support/* helper you added before committing
-rm -f spec/support/_zz_local_chrome.rb
 ```
 
 ## Sandbox network: what's allowed vs. blocked
