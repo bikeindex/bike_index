@@ -5950,6 +5950,7 @@ nb:
         vehicle: registrering
         vehicle_type: Bil type
         view_matching_any_audit: visning som samsvarer med enhver revisjon
+        hidden_not_registered: skjult, ikke registrert hos %{org_name}
       registration_search_settings:
         address: 'Adresse:'
         all: Alle

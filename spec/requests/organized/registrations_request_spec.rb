@@ -268,6 +268,26 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(assigns(:bikes)).to be_empty
     end
 
+    context "with search_all" do
+      let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
+
+      it "widens results across orgs, redacting non-org data and leaving org bikes intact" do
+        # Other-org bike: returned, with private fields redacted
+        get "#{base_url}/multi_search_response", params: {serial: "WXYZ9999", search_all: "1"}, headers: turbo_headers
+        expect(response.status).to eq(200)
+        expect(assigns(:search_all)).to eq true
+        expect(assigns(:bikes).pluck(:id)).to eq([other_bike.id])
+        expect(response.body).to include("hidden, not registered with #{current_organization.short_name}")
+        expect(response.body).not_to include(other_bike.owner_email)
+
+        # Own-org bike: full data renders, no redaction marker
+        get "#{base_url}/multi_search_response", params: {serial: "ABCD1234", search_all: "1"}, headers: turbo_headers
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+        expect(response.body).to include(bike.owner_email)
+        expect(response.body).not_to include("hidden, not registered")
+      end
+    end
+
     context "without serial param" do
       it "returns bad request" do
         get "#{base_url}/multi_search_response",

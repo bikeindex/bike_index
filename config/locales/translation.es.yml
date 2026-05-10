@@ -4728,6 +4728,7 @@ es:
         vehicle:
         vehicle_type:
         view_matching_any_audit:
+        hidden_not_registered:
       registration_search_settings:
         address:
         all:

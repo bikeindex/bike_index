@@ -8,6 +8,15 @@ module RequestSpecHelpers
     root_url
   end
 
+  # Captures the ViewComponent classes rendered during the given block,
+  # via the !render.view_component ActiveSupport notification.
+  def rendered_view_component_names(&block)
+    names = []
+    callback = ->(_, _, _, _, payload) { names << payload[:name] if payload[:name] }
+    ActiveSupport::Notifications.subscribed(callback, "render.view_component", &block)
+    names
+  end
+
   def log_in(current_user = nil)
     return if current_user == false # Allow skipping log in by setting current_user: false
 

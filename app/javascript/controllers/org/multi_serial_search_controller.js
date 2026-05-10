@@ -4,13 +4,16 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--multi-serial-search'
 export default class extends Controller {
-  static targets = ['textarea', 'button', 'serialChips', 'results', 'serialsToggle', 'stickersToggle', 'settingsContainer']
+  static targets = ['textarea', 'button', 'serialChips', 'results', 'serialsToggle', 'stickersToggle', 'settingsContainer', 'searchAll']
   static values = { url: String, stickerUrl: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
     if (this.searching) return
     this.updateToggleUI()
     const params = new URL(window.location).searchParams
+    if (this.hasSearchAllTarget && params.get('search_all') === '1') {
+      this.searchAllTarget.checked = true
+    }
     const serialsParam = params.get('serials')
     if (serialsParam) {
       this.textareaTarget.value = serialsParam
@@ -78,6 +81,10 @@ export default class extends Controller {
     this.search(serials)
   }
 
+  get searchAll () {
+    return this.hasSearchAllTarget && this.searchAllTarget.checked
+  }
+
   parseSerials (text) {
     return [...new Set(
       text.split(/[,\n]/).map(s => s.trim()).filter(s => s)
@@ -90,6 +97,11 @@ export default class extends Controller {
     url.searchParams.set('serials', serials.join(','))
     if (this.searchKindValue === 'stickers') {
       url.searchParams.set('search_kind', 'stickers')
+    }
+    if (this.searchAll) {
+      url.searchParams.set('search_all', '1')
+    } else {
+      url.searchParams.delete('search_all')
     }
     window.history.pushState({}, '', url)
 
@@ -152,6 +164,7 @@ export default class extends Controller {
     const url = new URL(this.urlValue, window.location.origin)
     url.searchParams.set('serial', serial)
     url.searchParams.set('chip_id', `chip_${index}`)
+    if (this.searchAll) url.searchParams.set('search_all', '1')
 
     try {
       const response = await fetch(url, {

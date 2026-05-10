@@ -51,11 +51,13 @@ module Organized
       @chip_id = params[:chip_id].to_s.strip.presence
       return head(:bad_request) unless @serial.present?
 
+      @search_all = Binxtils::InputNormalizer.boolean(params[:search_all])
       @interpreted_params = BikeSearchable.searchable_interpreted_params({serial: @serial, stolenness: "all"}, ip: forwarded_ip_address)
-      bikes = current_organization.bikes.search(@interpreted_params)
+      search_scope = @search_all ? Bike : current_organization.bikes
+      bikes = search_scope.search(@interpreted_params)
       @per_page = 10
       @pagy, @bikes = pagy(:countish, bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
-      @close_serials = current_organization.bikes.search_close_serials(@interpreted_params).limit(25) if @bikes.none?
+      @close_serials = search_scope.search_close_serials(@interpreted_params).limit(25) if @bikes.none?
     end
 
     def multi_search_sticker_response
