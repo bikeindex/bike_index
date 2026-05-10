@@ -365,6 +365,31 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
     end
   end
 
+  describe "marketplace_listing seller_member" do
+    let(:user) { FactoryBot.create(:user_confirmed, :with_address_record) }
+    let!(:membership) { FactoryBot.create(:membership, user:) }
+    let(:current_listing) do
+      FactoryBot.create(:marketplace_listing, :for_sale, address_record: user.address_record, seller: user)
+    end
+    let(:sold_listing) do
+      FactoryBot.create(:marketplace_listing, :for_sale, address_record: user.address_record, seller: user)
+    end
+
+    it "keeps seller_member true on sold listings after the user stops being a member" do
+      expect(user.reload.member?).to be true
+      expect(current_listing.seller_member).to be true
+      sold_listing.update!(status: :sold, end_at: Time.current)
+      expect(sold_listing.reload).to have_attributes(status: "sold", seller_member: true)
+
+      membership.update!(status: :ended, end_at: Time.current - 1.day)
+      expect(user.reload.member?).to be false
+      instance.perform(user.id)
+
+      expect(current_listing.reload.seller_member).to be false
+      expect(sold_listing.reload.seller_member).to be true
+    end
+  end
+
   describe "deleted user" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
