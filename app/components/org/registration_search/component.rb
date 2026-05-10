@@ -70,6 +70,13 @@ module Org
         @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
       end
 
+      def hidden_not_registered_tag
+        @hidden_not_registered_tag ||= tag.em(
+          translation(".hidden_not_registered", org_name: @organization.short_name),
+          class: "less-strong tw:leading-snug tw:text-xs"
+        )
+      end
+
       def component_wrapper_data_attributes
         return {} if @skip_settings
         {controller: "org--registration-search org--registration-search-column-toggle",

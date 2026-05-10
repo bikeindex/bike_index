@@ -51,7 +51,9 @@
   <% bike_sticker = @bike_sticker %>
 
   <%= tag.div(data: table_wrapper_data_attributes) do %>
-    <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-bikes_3", render_sortable: true)) do |table| %>
+    <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-bikes_4", render_sortable: true)) do |table| %>
+      <% hidden_html = hidden_not_registered_tag %>
+
       <% table.column(label: translation(".url"), classes: "hideableColumn url_cell") do |bike| %>
         <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
           <%= bike.html_url %>
@@ -109,8 +111,10 @@
         </span>
       <% end %>
 
-      <% table.column(sortable: "owner_email", label: translation(".sent_to"), classes: "hideableColumn owner_email_cell") do |bike| %>
-        <% if bike.email_visible_for?(organization) %>
+      <% table.column(sortable: "owner_email", label: translation(".sent_to"), classes: "hideableColumn owner_email_cell tw:leading-none") do |bike| %>
+        <% if !bike.organized?(organization) %>
+          <%= hidden_html %>
+        <% elsif bike.email_visible_for?(organization) %>
           <%= bike.owner_email %>
           <small>
             <%= link_to "\u{1F50E}", organization_registrations_path(organization_id: organization.to_param, search_email: bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
@@ -120,7 +124,7 @@
         <% end %>
       <% end %>
 
-      <% table.column(label: translation(".source"), classes: "hideableColumn creation_description_cell") do |bike| %>
+      <% table.column(label: translation(".source"), classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
         <% if bike.creation_description %>
           <small class="tw:text-gray-400">
             <%= helpers.origin_display(bike.creation_description) %>
@@ -128,9 +132,13 @@
         <% end %>
       <% end %>
 
-      <% table.column(label: translation(".owner_name"), classes: "hideableColumn owner_name_cell") do |bike| %>
-        <% if bike.owner_name.present? %>
-          <em><%= bike.owner_name %></em>
+      <% table.column(label: translation(".owner_name"), classes: "hideableColumn owner_name_cell tw:leading-none") do |bike| %>
+        <% if bike.organized?(organization) %>
+          <% if bike.owner_name.present? %>
+            <em><%= bike.owner_name %></em>
+          <% end %>
+        <% else %>
+          <%= hidden_html %>
         <% end %>
       <% end %>
 
@@ -149,21 +157,24 @@
       <% additional_registration_fields.each do |reg_field| %>
         <% next if reg_field == "extra_registration_number" %>
 
-        <% table.column(label: column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell") do |bike| %>
-          <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
-
-          <% if bike_attr == "address" %>
-            <% if bike.valid_mailing_address? %>
-              <small>
-                <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(bike), visible_attribute: :street) %>
-              </small>
+        <% table.column(label: column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
+          <% if bike.organized?(organization) %>
+            <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
+            <% if bike_attr == "address" %>
+              <% if bike.valid_mailing_address? %>
+                <small>
+                  <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(bike), visible_attribute: :street) %>
+                </small>
+              <% end %>
+            <% elsif bike_attr == "organization_affiliation" %>
+              <%= bike.organization_affiliation(organization)&.humanize %>
+            <% elsif bike_attr == "student_id" %>
+              <%= bike.student_id(organization)&.humanize %>
+            <% else %>
+              <%= bike.send(bike_attr) %>
             <% end %>
-          <% elsif bike_attr == "organization_affiliation" %>
-            <%= bike.organization_affiliation(organization)&.humanize %>
-          <% elsif bike_attr == "student_id" %>
-            <%= bike.student_id(organization)&.humanize %>
           <% else %>
-            <%= bike.send(bike_attr) %>
+            <%= hidden_html %>
           <% end %>
         <% end %>
       <% end %>
@@ -173,23 +184,31 @@
       <% end %>
 
       <% if organization.enabled?("impound_bikes") %>
-        <% table.column(label: translation(".impound_id"), classes: "hideableColumn impound_id_cell") do |bike| %>
-          <% if bike.status_impounded? && bike.current_impound_record.present? %>
-            <%= number_display(bike.current_impound_record.id) %>
+        <% table.column(label: translation(".impound_id"), classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
+          <% if bike.organized?(organization) %>
+            <% if bike.status_impounded? && bike.current_impound_record.present? %>
+              <%= number_display(bike.current_impound_record.id) %>
+            <% end %>
+          <% else %>
+            <%= hidden_html %>
           <% end %>
         <% end %>
-        <% table.column(label: translation(".impounded"), classes: "hideableColumn impounded_cell") do |bike| %>
-          <% if bike.status_impounded? && bike.current_impound_record&.created_at&.present? %>
-            <small class="localizeTime">
-              <%= l bike.current_impound_record.created_at, format: :convert_time %>
-            </small>
+        <% table.column(label: translation(".impounded"), classes: "hideableColumn impounded_cell tw:leading-none") do |bike| %>
+          <% if bike.organized?(organization) %>
+            <% if bike.status_impounded? && bike.current_impound_record&.created_at&.present? %>
+              <small class="localizeTime">
+                <%= l bike.current_impound_record.created_at, format: :convert_time %>
+              </small>
+            <% end %>
+          <% else %>
+            <%= hidden_html %>
           <% end %>
         <% end %>
       <% end %>
 
       <% if @organization.enabled?("avery_export") %>
         <% table.column(label: translation(".avery"), classes: "hideableColumn avery_cell") do |bike| %>
-          <%= check_mark if bike.avery_exportable? %>
+          <% check_mark if bike.organized?(organization) && bike.avery_exportable? %>
         <% end %>
       <% end %>
 
