@@ -78,7 +78,7 @@ RSpec.describe OrganizedServices::MenuItems do
 
     context "with no organization" do
       it "returns an empty array" do
-        expect(described_class.for(organization: nil, current_user:,
+        expect(described_class.for(organization: nil, current_user: nil,
           controller_name: "x", action_name: "y")).to eq([])
       end
     end

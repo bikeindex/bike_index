@@ -23,10 +23,8 @@ RSpec.describe Org::MenuItems::Component, type: :component do
   end
 
   context "with no organization" do
-    let(:organization) { nil }
-
     it "does not render" do
-      expect(described_class.new(organization: nil, current_user:).render?).to be false
+      expect(described_class.new(organization: nil, current_user: nil).render?).to be false
     end
   end
 
