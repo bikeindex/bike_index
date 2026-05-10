@@ -49,15 +49,17 @@
       <div class="binx-body">
         <%# We only render snippets for organized messages - or if we're doing a preview %>
         <% render_organization_snippets = @organization.present? && (controller_path == "organized_mailer" || @email_preview) %>
+        <% header_snippet = render_organization_snippets ? @organization.mail_snippet_body("header", time: @email_sent_at) : nil %>
+        <% footer_snippet = render_organization_snippets ? @organization.mail_snippet_body("footer", time: @email_sent_at) : nil %>
 
-        <% if render_organization_snippets && @organization.mail_snippet_body("header", time: @email_sent_at).present? %>
-          <%= @organization.mail_snippet_body("header", time: @email_sent_at).html_safe %>
+        <% if header_snippet.present? %>
+          <%= header_snippet.html_safe %>
         <% end %>
 
         <%= yield %>
 
-        <% if render_organization_snippets && @organization.mail_snippet_body("footer", time: @email_sent_at).present? %>
-          <%= @organization.mail_snippet_body("footer", time: @email_sent_at).html_safe %>
+        <% if footer_snippet.present? %>
+          <%= footer_snippet.html_safe %>
         <% end %>
       </div>
 
