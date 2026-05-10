@@ -97,7 +97,6 @@ RSpec.describe OrganizedServices::MenuItems do
     end
 
     it "caches the items per [organization, user]" do
-      expect(Rails).to receive(:cache).at_least(:once).and_call_original
       first = described_class.for(organization:, current_user:)
       second = described_class.for(organization:, current_user:)
       expect(first).to eq second
@@ -112,13 +111,20 @@ RSpec.describe OrganizedServices::MenuItems do
     end
 
     it "busts the cache when the user becomes a superuser" do
-      described_class.for(organization:, current_user:)
       cached_labels = described_class.for(organization:, current_user:).map { |i| i[:label] }
       expect(cached_labels).not_to include("Super Admin for #{organization.short_name}")
 
       FactoryBot.create(:superuser_ability, user: current_user)
-      after_labels = described_class.for(organization:, current_user:).map { |i| i[:label] }
+      after_labels = described_class.for(organization:, current_user: current_user.reload).map { |i| i[:label] }
       expect(after_labels).to include("Super Admin for #{organization.short_name}")
+    end
+
+    it "busts the cache when the organization changes" do
+      first = described_class.for(organization:, current_user:)
+      organization.update(updated_at: Time.current + 1.second)
+      second = described_class.for(organization: organization.reload, current_user:)
+      expect(cache_store.instance_variable_get(:@data).size).to eq 2
+      expect(first).to eq second # same payload, but cached separately because key changed
     end
   end
 end

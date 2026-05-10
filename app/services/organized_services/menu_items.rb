@@ -37,9 +37,7 @@ module OrganizedServices
         "organized_menu_items",
         CACHE_VERSION,
         organization.cache_key_with_version,
-        current_user&.id,
-        current_user&.superuser? || false,
-        current_user&.admin_of?(organization) || false
+        current_user&.cache_key_with_version
       ]
     end
 
