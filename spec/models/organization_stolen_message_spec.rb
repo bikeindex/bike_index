@@ -21,7 +21,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       expect(Organization.with_stolen_message.pluck(:id)).to eq([])
     end
     context "organization with location" do
-      let(:organization) { FactoryBot.create(:organization, :in_nyc_legacy, kind: "bike_manufacturer", search_radius_miles: 94) }
+      let(:organization) { FactoryBot.create(:organization, :in_nyc, kind: "bike_manufacturer", search_radius_miles: 94) }
       it "uses location" do
         expect(organization_stolen_message.reload.latitude).to eq organization.location_latitude
         expect(organization_stolen_message.longitude).to eq organization.location_longitude
@@ -124,7 +124,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       end
     end
     context "with an area organization_stolen_message" do
-      let(:organization2) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: ["organization_stolen_message"]) }
+      let(:organization2) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["organization_stolen_message"]) }
       let(:area_attrs) { {kind: "area", is_enabled: true, body: "Something cool", search_radius_miles: 100} }
       let!(:organization_stolen_message2) { OrganizationStolenMessage.where(organization_id: organization2.id).first_or_create }
       before { organization_stolen_message2.update(area_attrs) }

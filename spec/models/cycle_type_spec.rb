@@ -34,6 +34,12 @@ RSpec.describe CycleType, type: :model do
         expect(finder.short_name).to eq "Cargo Bike"
       end
     end
+    context "numeric string with no matching slug id" do
+      it "returns nil rather than raising" do
+        expect(CycleType.find_sym("19039792")).to be_nil
+        expect(CycleType.friendly_find("19039792")).to be_nil
+      end
+    end
     context "EPAMD" do
       let(:cycle_type) { CycleType.new("personal-mobility") }
 

@@ -20,7 +20,7 @@ RSpec.describe "Strava Proxy API", type: :request do
 
   context "token from wrong app" do
     it "returns 403" do
-      stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", 99999)
+      stub_const("Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", 99999)
       post base_url, params: {url: "athlete/activities", method: "GET", access_token: doorkeeper_token.token}
       expect(response.status).to eq 403
       expect(json_result[:error]).to eq "Unauthorized application"
@@ -29,7 +29,7 @@ RSpec.describe "Strava Proxy API", type: :request do
   end
 
   context "valid token and app" do
-    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
+    before { stub_const("Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
 
     context "no strava integration" do
       it "returns 404" do

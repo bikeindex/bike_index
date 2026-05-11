@@ -58,6 +58,14 @@ a.optional-form-block {
   }
 }
 
+.shown-other {
+  display: none;
+
+  &.unhidden {
+    display: block;
+  }
+}
+
 #email_check_message {
   cursor: pointer;
 

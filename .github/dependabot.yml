@@ -5,6 +5,8 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 1
+  ignore:
+    - dependency-name: hotwire-livereload # see #3418
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

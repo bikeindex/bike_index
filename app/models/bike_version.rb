@@ -90,7 +90,7 @@ class BikeVersion < ApplicationRecord
   attr_writer :end_at_shown, :start_at_shown
 
   delegate :bike_versions,
-    :no_serial?, :serial_display, :serial_number, :serial_unknown, :made_without_serial?,
+    :no_serial?, :serial_display, :serial_hidden?, :serial_number, :serial_unknown, :made_without_serial?,
     to: :bike, allow_nil: true
 
   before_validation :set_calculated_attributes

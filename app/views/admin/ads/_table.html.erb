@@ -1,0 +1,44 @@
+<% render_sortable ||= false %>
+
+<div class="full-screen-table">
+  <table class="table table-bordered table-striped">
+    <thead>
+      <th class="w-25">Created</th>
+      <th class="w-25">Organization</th>
+      <th class="w-25">Text</th>
+      <th class="w-25">image</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |ad| %>
+        <tr>
+          <td class="w-25">
+            <a class="localizeTime" href="<%= edit_admin_ad_url(ad) %>">
+              <%= l ad.created_at, format: :convert_time %>
+            </a>
+          </td>
+
+          <td class="w-25">
+            <%= ad.organization.name if ad.organization.present? %>
+          </td>
+
+          <td class="w-25">
+            <h3>
+              <%= link_to ad.title, edit_admin_ad_url(ad), class: "text-dark" %>
+            </h3>
+
+            <p>
+              <%= link_to ad.body, edit_admin_ad_url(ad), class: "text-dark" %>
+            </p>
+          </td>
+
+          <td class="w-25">
+            <% if ad.image.present? %>
+              <%= image_tag ad.image_url(:small) %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

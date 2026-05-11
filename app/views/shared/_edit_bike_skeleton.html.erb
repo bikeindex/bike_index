@@ -24,9 +24,7 @@
 
         <% if @bike.deleted? %>
           <em class="text-danger uncap d-block">
-            This
-            <%= @bike.version? ? "version" : @bike.type %>
-            was deleted
+            This <%= @bike.version? ? "version" : @bike.type %> was deleted
             <% if @bike.deleted_at.present? %>
               <span class="localizeTime preciseTime withPreposition">
                 <%= l(@bike.deleted_at, format: :convert_time) %>

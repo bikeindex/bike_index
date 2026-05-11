@@ -34,6 +34,7 @@ RSpec.describe "Bike search", :js, type: :system do
     visit "/search/registrations"
 
     expect(page).to have_css(".bike-box-item", wait: 10)
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
 
     # Initial load doesn't add a duplicate history entry, so back button returns to previous page
     page.go_back
@@ -42,7 +43,7 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
 
     # Select "All registrations" stolenness
-    find("label[for='stolenness_all']").click
+    choose("stolenness_all", allow_label_click: true, visible: :all)
 
     # Search for Blue via the Select2 combobox
     find(".select2-container").click
@@ -60,9 +61,9 @@ RSpec.describe "Bike search", :js, type: :system do
     click_first_bike_and_go_back
 
     # Switch to proximity search for NYC
-    find("label[for='stolenness_proximity']").click
-    find("#distance").set("200")
-    find("#location").set("New York, NY")
+    choose("stolenness_proximity", allow_label_click: true, visible: :all)
+    fill_in "distance", with: "200"
+    fill_in "location", with: "New York, NY"
     find("#search-button").click
 
     # Only the blue NYC bike (proximity + color filter still active)

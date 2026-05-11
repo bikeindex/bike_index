@@ -1,0 +1,3 @@
+<%= render UI::Badge::Component.new(text: "Pending", color: :empty, size: :md) do %>
+  <span class="tw:mr-3">Pending</span> <%= render UI::LoadingSpinner::Component.new(size: :sm) %>
+<% end %>

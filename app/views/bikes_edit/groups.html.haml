@@ -21,6 +21,7 @@
 
               - displayed_other_organizations = false
               - @bike.bike_organizations.reorder(:created_at).each_with_index do |bike_organization, index|
+                - next if bike_organization.organization.blank?
                 - next if bike_organization.organization == @bike.creation_organization
                 - main_label = displayed_other_organizations ? nil : t(".other_organizations")
                 - displayed_other_organizations = true

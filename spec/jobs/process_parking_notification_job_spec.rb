@@ -72,9 +72,9 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
           user: user, bike: bike, organization: organization,
           kind: "impound_notification", initial_record: initial,
           latitude: 37.7749, longitude: -122.4194,
-          street: "1 Market St", city: "San Francisco", zipcode: "94105",
+          street: "1 Market St", city: "San Francisco", postal_code: "94105",
           use_entered_address: "1",
-          state_id: State.find_or_create_by(name: "California", abbreviation: "CA", country: Country.united_states).id,
+          region_record_id: State.find_or_create_by(name: "California", abbreviation: "CA", country: Country.united_states).id,
           country_id: Country.united_states.id)
       end
       it "creates impound_record with impounded_from_address_record from parking notification location" do
@@ -203,6 +203,21 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
       it "does not send" do
         instance.perform(parking_notification.id)
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+      end
+    end
+
+    context "redlock held by another worker" do
+      before do
+        @lock_manager = described_class.new_lock_manager
+        @redlock = @lock_manager.lock(described_class.redlock_key(parking_notification.id), 5000)
+      end
+      after { @lock_manager.unlock(@redlock) }
+      it "does not send" do
+        expect(parking_notification.send_email?).to be_truthy
+        expect(described_class.locked_for?(parking_notification.id)).to be_truthy
+        instance.perform(parking_notification.id)
+        expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+        expect(parking_notification.reload.delivery_status).to be_blank
       end
     end
 

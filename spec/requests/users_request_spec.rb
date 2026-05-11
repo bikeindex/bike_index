@@ -156,6 +156,32 @@ RSpec.describe UsersController, type: :request do
     end
   end
 
+  describe "resend_confirmation_email with rack_attack" do
+    include_context :rack_attack
+
+    it "returns 429 after exceeding the limit" do
+      5.times do
+        post "#{base_url}/resend_confirmation_email", params: {email: "a@b.com"}
+        expect(response.status).to_not eq 429
+      end
+      post "#{base_url}/resend_confirmation_email", params: {email: "a@b.com"}
+      expect(response).to have_http_status(:too_many_requests)
+    end
+  end
+
+  describe "send_password_reset_email with rack_attack" do
+    include_context :rack_attack
+
+    it "returns 429 after exceeding the limit" do
+      5.times do
+        post "#{base_url}/send_password_reset_email", params: {email: "a@b.com"}
+        expect(response.status).to_not eq 429
+      end
+      post "#{base_url}/send_password_reset_email", params: {email: "a@b.com"}
+      expect(response).to have_http_status(:too_many_requests)
+    end
+  end
+
   describe "request_password_reset_form" do
     it "renders" do
       get "#{base_url}/request_password_reset_form"

@@ -4,7 +4,7 @@
   %h1
     E-Vehicle audits
 
-= render partial: "/shared/period_select"
+= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 .mt-4.mb-4
   = pluralize(number_with_delimiter(@pagy.count), "matching models")
@@ -70,6 +70,6 @@
             update
 
 .pt-4.pb-4
-  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+  = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
 
 = render partial: "/organized/model_audits/submit_model_attestation"

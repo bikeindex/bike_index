@@ -44,7 +44,7 @@
                     %h4
                       = link_to bike.title_string, bike_path(bike)
           .pt-4.pb-4
-            = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+            = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
         - else
           %h2
             = t(".this_user_has_no_bikes_yet")

@@ -5,7 +5,8 @@
   show_overview_dashboard = passed_organization.overview_dashboard?
   show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" # If viewing the dashboard, show the link
   # Show bulk import if passed organization has show_bulk_import, or if looking at show_bulk_import
-  show_bulk_import = passed_organization.show_bulk_import? || controller_name == "bulk_imports" %>
+  show_bulk_import = passed_organization.show_bulk_import? || controller_name == "bulk_imports"
+  show_multi_search = passed_organization.enabled?("bike_search") %>
 
 <% if passed_organization.ambassador? %>
   <li>
@@ -18,7 +19,7 @@
     <%= active_link t(".getting_started"), getting_started_organization_ambassador_dashboard_path(organization_id: passed_organization.to_param), class: "nav-link" %>
   </li>
   <li>
-    <%= active_link t(".multi_serial_search"), multi_serial_search_organization_bikes_path(organization_id: passed_organization.to_param), class: "nav-link" %>
+    <%= active_link t(".multi_search"), multi_search_organization_registrations_path(organization_id: passed_organization.to_param), class: "nav-link" %>
   </li>
   <li>
     <%= active_link t(".discuss"), "https://discuss.bikeindex.org", class: "nav-link" %>
@@ -30,9 +31,9 @@
     </li>
     <li class="divider-nav-item"></li>
   <% end %>
-  <% on_bikes_path = controller_name == "bikes" && action_name == "index" && params[:organization_id].present? # Because we want to ignore queries and stuff %>
+  <% on_registrations_path = controller_name == "registrations" && action_name == "index" && params[:organization_id].present? # Because we want to ignore queries and stuff %>
   <li>
-    <%= link_to t(".org_bikes", org_name: passed_organization.short_name), organization_bikes_path(organization_id: passed_organization.to_param), class: "nav-link #{on_bikes_path ? 'active' : ''}" %>
+    <%= link_to t(".org_bikes", org_name: passed_organization.short_name), organization_registrations_path(organization_id: passed_organization.to_param), class: "nav-link #{on_registrations_path ? 'active' : ''}" %>
   </li>
   <% if passed_organization.enabled?("impound_bikes") %>
     <li>
@@ -50,9 +51,9 @@
       </span>
     </li>
   <% end %>
-  <% if passed_organization.show_multi_serial? %>
+  <% if show_multi_search %>
     <li>
-      <%= active_link t(".multi_serial_search"), multi_serial_search_organization_bikes_path(passed_organization.to_param), class: "nav-link secondary-item" %>
+      <%= active_link t(".multi_search"), multi_search_organization_registrations_path(passed_organization.to_param), class: "nav-link secondary-item" %>
     </li>
   <% end %>
   <% if passed_organization.enabled?("show_recoveries") # I don't want to show a grayed link for this %>

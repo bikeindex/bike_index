@@ -1,0 +1,12 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "New Credential", new_admin_external_registry_credential_path, class: "nav-link" %>
+  </li>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @external_registry_credentials,
+  index_title: "External Registry Credentials",
+  nav_header_list_items:,
+  skip_charting: true
+)) %>

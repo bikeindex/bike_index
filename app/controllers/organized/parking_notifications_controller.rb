@@ -1,10 +1,11 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
     include Rails::Pagination
-    include SortableTable
+    include Binxtils::SortableTable
 
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
+    around_action :set_reading_role, only: :index
 
     before_action :set_failed_and_repeated_ivars
 
@@ -19,7 +20,7 @@ module Organized
         map_center_lng: map_center(@search_bounding_box).last
       }
 
-      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       # These are set here because we render them in HTML
@@ -133,7 +134,7 @@ module Organized
       use_entered_address = Binxtils::InputNormalizer.boolean(params.dig(:parking_notification, :use_entered_address))
       params.require(:parking_notification)
         .permit(:message, :internal_notes, :bike_id, :kind, :is_repeat, :image, :image_cache,
-          :latitude, :longitude, :accuracy, :street, :city, :zipcode, :state_id, :country_id)
+          :latitude, :longitude, :accuracy, :street, :city, :postal_code, :region_record_id, :region_string, :country_id)
         .merge(user_id: current_user.id, organization_id: current_organization.id,
           use_entered_address: use_entered_address)
     end

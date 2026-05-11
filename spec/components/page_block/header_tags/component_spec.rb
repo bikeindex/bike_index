@@ -94,8 +94,10 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
       expect(component.css("title")).to have_text "About Bike Index"
       expect(component.css('meta[name="description"]').first["content"]).to eq "Why we made Bike Index and who we are"
       expect(component.to_s).to match('<meta http-equiv="Content-Language" content="en">')
-      # Validate that JSON LD is rendering without escaping. Can't get this test to work right :/
-      # expect(component.to_html).not_to match("{\x22@context\x22")
+      # Validate that JSON LD description is not HTML-escaped
+      json_ld_scripts = component.css('script[type="application/ld+json"]')
+      org_json = json_ld_scripts.map { |s| JSON.parse(s.text) }.find { |j| j["@type"] == "Organization" }
+      expect(org_json["description"]).to eq default_description
     end
 
     context "locale: nl" do
@@ -350,7 +352,7 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
         end
       end
       context "impounded" do
-        let(:parking_notification) { FactoryBot.create(:parking_notification_organized, :in_edmonton_legacy, bike: bike, use_entered_address: true) }
+        let(:parking_notification) { FactoryBot.create(:parking_notification_organized, :in_edmonton, bike: bike, use_entered_address: true) }
         let(:organization) { parking_notification.organization }
         let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, address_in: :edmonton, bike: bike, parking_notification: parking_notification, organization: organization) }
         let(:title_extended) { "Impounded #{title}" }
@@ -359,7 +361,7 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
           "Impounded: #{Time.current.strftime("%Y-%m-%d")}, in: Edmonton, AB T6G 2B3, Canada"
         end
         it "returns expected things" do
-          expect(parking_notification.reload.address).to eq "9330 Groat Rd NW, Edmonton, AB T6G 2B3, CA"
+          expect(parking_notification.reload.formatted_address_string).to eq "9330 Groat Rd NW, Edmonton, AB T6G 2B3, Canada"
           impound_record.reload
           expect(bike.reload.current_impound_record.formatted_address_string).to eq "Edmonton, AB T6G 2B3, Canada"
           expect(bike.status_humanized).to eq "impounded"

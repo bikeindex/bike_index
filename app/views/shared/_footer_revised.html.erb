@@ -55,9 +55,11 @@
               <%= active_link t(".protect_your_bike"), protect_your_bike_path %>
             </li>
 
-            <li>
-              <%= active_link t(".stolen_bike_map"), "https://map.bikewise.org/" %>
-            </li>
+            <% if Flipper.enabled?(:strava_integration, current_user) %>
+              <li>
+                <%= active_link t(".strava_search"), strava_search_path %>
+              </li>
+            <% end %>
           </ul>
         </nav>
 
@@ -174,7 +176,7 @@
   </nav>
 </footer>
 
-<% skip_facebook ||= controller_namespace.in?(%w[organized oauth]) %>
+<% skip_facebook ||= controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" %>
 
 <% unless skip_facebook %>
   <%# Facebook pixel %>
@@ -192,7 +194,7 @@
       height="1"
       width="1"
       style="display:none"
-      src="https://www.facebook.com/tr?id=199066297131941&ev=PageView&noscript=1"
+      src="https://www.facebook.com/tr?id=199066297131941&amp;ev=PageView&amp;noscript=1"
       alt=""
     >
   </noscript>

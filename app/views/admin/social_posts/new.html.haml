@@ -4,7 +4,7 @@
       New Post
 
 #postForm
-  = render(UI::AlertForErrors::Component.new(object: @social_post))
+  = render(Alerts::ObjectErrors::Component.new(object: @social_post))
 
   = form_for [:admin, @social_post], url: { action: "create", controller: "social_posts" } do |f|
     .row

@@ -23,7 +23,7 @@
           class: "twlabel tw:sr-only" %>
 
           <%= text_field_tag :search_email,
-          @interpreted_params[:search_email],
+          params[:search_email],
           placeholder: translation(".search_owner_email"),
           class: "twinput tw:flex-1 fieldResetsCounts" %>
 
@@ -40,14 +40,14 @@
           <% if render_notes_field? %>
             <div
               class="tw:hidden tw:flex-1"
-              data-org--bike-search-target="notesField"
+              data-org--registration-search-target="notesField"
             >
               <%= label_tag :search_notes,
                 translation(".search_notes"),
                 class: "twlabel tw:sr-only" %>
 
               <%= text_field_tag :search_notes,
-                @interpreted_params[:search_notes],
+                params[:search_notes],
                 placeholder: translation(".search_notes"),
                 class: "twinput tw:w-full fieldResetsCounts" %>
             </div>

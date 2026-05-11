@@ -2,11 +2,11 @@
 
 class StravaSearchController < ApplicationController
   content_security_policy false, only: [:index]
-  before_action :store_return_and_authenticate_user, only: [:index]
 
   def index
-    unless current_user.strava_integration
-      return redirect_to new_strava_integration_path(scope: :strava_search)
+    unless current_user&.strava_integration
+      @connect_url = new_strava_integration_path(scope: :strava_search)
+      return render :connect
     end
 
     strava_integration = current_user.strava_integration
@@ -39,7 +39,7 @@ class StravaSearchController < ApplicationController
     strava_integration = current_user.strava_integration
     return render json: {error: "No Strava integration"}, status: 404 unless strava_integration
 
-    access_token = StravaJobs::ProxyRequester.find_or_create_access_token(current_user.id)
+    access_token = Integrations::Strava::ProxyRequester.find_or_create_access_token(current_user.id)
 
     render json: {
       access_token: access_token.token,

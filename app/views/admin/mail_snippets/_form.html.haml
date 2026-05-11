@@ -20,7 +20,7 @@
         View
         = link_to "#{@mail_snippet.organization.short_name}'s #{@mail_snippet.which_organization_email} edit page", edit_organization_email_path(@mail_snippet.which_organization_email, organization_id: @mail_snippet.organization_id)
 
-= render(UI::AlertForErrors::Component.new(object:@mail_snippet))
+= render(Alerts::ObjectErrors::Component.new(object:@mail_snippet))
 
 - def select_display(k); "#{MailSnippet.kind_humanized(k)} - in #{MailSnippet.organization_email_for(k)} emails" end
 .form-group.fancy-select.unfancy

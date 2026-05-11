@@ -1,8 +1,8 @@
 module Oauth
   class ApplicationsController < Doorkeeper::ApplicationsController
     include ControllerHelpers
-    include SetPeriod
-    include SortableTable
+    include Binxtils::SetPeriod
+    include Binxtils::SortableTable
     include Pagy::Method
 
     before_action :store_return_and_authenticate_user
@@ -65,6 +65,11 @@ module Oauth
 
       if params[:user_id].present?
         doorkeeper_apps = doorkeeper_apps.where(owner_id: user_subject&.id || params[:user_id])
+      end
+
+      if params[:search_query].present?
+        str = "%#{params[:search_query].strip}%"
+        doorkeeper_apps = doorkeeper_apps.where("oauth_applications.name ILIKE :str OR oauth_applications.uid ILIKE :str", str:)
       end
 
       @time_range_column = sort_column if %w[updated_at].include?(sort_column)

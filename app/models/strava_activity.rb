@@ -31,7 +31,6 @@
 #
 # Indexes
 #
-#  index_strava_activities_on_strava_integration_id                (strava_integration_id)
 #  index_strava_activities_on_strava_integration_id_and_strava_id  (strava_integration_id,strava_id) UNIQUE
 #
 class StravaActivity < ApplicationRecord
@@ -113,7 +112,7 @@ class StravaActivity < ApplicationRecord
         average_speed: detail["average_speed"],
         suffer_score: detail["suffer_score"],
         photos:,
-        segment_locations: StravaJobs::SegmentLocations.locations_for(detail["segment_efforts"]),
+        segment_locations: Integrations::Strava::SegmentLocations.locations_for(detail["segment_efforts"]),
         kudos_count: detail["kudos_count"],
         enriched_at: Time.current,
         strava_data: strava_data_from(detail)

@@ -61,6 +61,7 @@ class Manufacturer < ApplicationRecord
     end
 
     def friendly_find(n)
+      n = Binxtils::InputNormalizer.string(n) if n.is_a?(String)
       return nil if n.blank?
 
       if n.is_a?(Integer) || n.match(/\A\d+\z/).present?

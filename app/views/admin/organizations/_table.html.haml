@@ -1,5 +1,8 @@
 - render_sortable ||= false
 
+- unless @render_deleted
+  %style .deleted-col { display: none; }
+
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light.sortable
@@ -17,12 +20,13 @@
         Type
       %th
         = sortable "pos_kind", "POS", render_sortable: render_sortable
+      %th.deleted-col
+        = sortable "deleted_at", render_sortable: render_sortable
       %th
         Locations
     %tbody
       - @organizations.each do |organization|
-        - cache(organization) do
-          - next if organization.deleted_at.present?
+        - cache([organization, "v1"]) do
           %tr
             %td
               = link_to organization.name, admin_organization_url(organization)
@@ -55,6 +59,10 @@
                 - link_class = pos_kind.match?("broken") ? "text-warning" : "gray-link"
                 %small
                   = link_to pos_kind.humanize, admin_organizations_path(sortable_search_params.merge(search_pos: organization.pos_kind)), class: link_class
+            %td.deleted-col
+              - if organization.deleted_at.present?
+                %small.text-danger.localizeTime
+                  = l organization.deleted_at, format: :convert_time
             %td
               .less-strong-hold
                 = number_display(organization.locations.count)

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Law Enforcement | Bike Index</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo-section">
+          <img
+            src="assets/bike index logo_white-blue.png"
+            alt="Bike Index Logo"
+            class="logo"
+          >
+
+          <span class="logo-divider">|</span>
+
+          <a
+            href="https://bikeindex.org/news/bike-index--now-a-nonprofit"
+            class="tagline"
+            target="_blank"
+          >
+            <span>the non-profit</span>
+            <span>bike registry</span>
+          </a>
+        </div>
+
+        <ul class="nav-menu">
+          <li class="dropdown">
+            <a href="about.html">About</a>
+
+            <ul class="dropdown-menu">
+              <li><a href="#who-we-are">Who We Are</a></li>
+              <li><a href="#who-were-for">Who We're For</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="database.html">Search</a>
+
+            <ul class="dropdown-menu">
+              <li><a href="stolen-bike.html">Stolen Bikes</a></li>
+              <li><a href="#marketplace">Marketplace</a></li>
+            </ul>
+          </li>
+
+          <li><a href="#news">News</a></li>
+          <li><a href="stolen-bike.html">Stolen bike?</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li class="menu-divider">|</li>
+          <li><a href="#login" class="login-btn">Login</a></li>
+          <li><a href="#signup" class="signup-btn">Sign up</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="le-hero-section">
+        <div class="le-bike-tiles-grid" id="leBikeTilesGrid"></div>
+
+        <div class="le-hero-content">
+          <h1>The #1 platform for bike theft recovery</h1>
+
+          <p class="le-hero-tagline">
+            Bike Index is a comprehensive database and management tool that
+            gives law enforcement real-time metrics, investigative tools, and a
+            community-powered recovery platform, so you can clear more cases and
+            protect your community.
+          </p>
+
+          <div class="le-hero-buttons">
+            <a href="#schedule-demo" class="le-btn-primary">Schedule a Demo</a>
+          </div>
+
+          <div class="le-hero-stats">
+            <div class="le-stat-item">
+              <div class="le-stat-number">2x</div>
+              <div class="le-stat-label">Double your recovery rate</div>
+            </div>
+
+            <div class="le-stat-item">
+              <div class="le-stat-number">$3M</div>
+              <div class="le-stat-label">Worth of bikes recovered</div>
+            </div>
+
+            <div class="le-stat-item">
+              <div class="le-stat-number">17,000+</div>
+              <div class="le-stat-label">Stolen bikes recovered</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trusted Municipalities Section -->
+      <section class="le-municipalities-section">
+        <div class="container">
+          <h2>Trusted by law enforcement nationwide</h2>
+
+          <div class="le-partners-carousel-wrapper">
+            <div class="le-partners-grid" id="partnersCarousel">
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Calgary.png"
+                  alt="Calgary"
+                >
+
+                <span>Calgary</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Edmonton.png"
+                  alt="Edmonton"
+                >
+
+                <span>Edmonton</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Lethbridge.png"
+                  alt="Lethbridge"
+                >
+
+                <span>Lethbridge</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Boise City.png"
+                  alt="Boise City"
+                >
+
+                <span>Boise City</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/LA.png"
+                  alt="Los Angeles"
+                >
+
+                <span>Los Angeles</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img src="assets/PartnerOrgs/lawpartners/Bend.png" alt="Bend">
+                <span>Bend</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Portland.png"
+                  alt="Portland"
+                >
+
+                <span>Portland</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Sunnyvale.png"
+                  alt="Sunnyvale"
+                >
+
+                <span>Sunnyvale</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img src="assets/PartnerOrgs/lawpartners/Davis.png" alt="Davis">
+                <span>Davis</span>
+              </div>
+
+              <!-- Duplicate for seamless loop -->
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Calgary.png"
+                  alt="Calgary"
+                >
+
+                <span>Calgary</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Edmonton.png"
+                  alt="Edmonton"
+                >
+
+                <span>Edmonton</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Lethbridge.png"
+                  alt="Lethbridge"
+                >
+
+                <span>Lethbridge</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Boise City.png"
+                  alt="Boise City"
+                >
+
+                <span>Boise City</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/LA.png"
+                  alt="Los Angeles"
+                >
+
+                <span>Los Angeles</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img src="assets/PartnerOrgs/lawpartners/Bend.png" alt="Bend">
+                <span>Bend</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Portland.png"
+                  alt="Portland"
+                >
+
+                <span>Portland</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img
+                  src="assets/PartnerOrgs/lawpartners/Sunnyvale.png"
+                  alt="Sunnyvale"
+                >
+
+                <span>Sunnyvale</span>
+              </div>
+
+              <div class="le-partner-logo">
+                <img src="assets/PartnerOrgs/lawpartners/Davis.png" alt="Davis">
+                <span>Davis</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Three Features Section -->
+      <section class="le-features-section">
+        <div class="container">
+          <h2>A universal system that outperforms closed local registries</h2>
+
+          <div class="le-features-grid">
+            <div class="le-feature-block">
+              <div class="le-feature-icon">
+                <img
+                  src="assets/DrawnAssets/partners/assets-law_1.png"
+                  alt="Dashboard"
+                >
+              </div>
+
+              <h3>Law Enforcement Dashboard</h3>
+
+              <p>
+                See registration efforts in real-time. Track regional metrics,
+                filter by time period, and export data to share results up the
+                chain of command.
+              </p>
+            </div>
+
+            <div class="le-feature-block">
+              <div class="le-feature-icon">
+                <img
+                  src="assets/DrawnAssets/partners/assets-law_2.png"
+                  alt="Resources"
+                >
+              </div>
+
+              <h3>Investigative Resources</h3>
+
+              <p>
+                QR stickers, LeadsOnline integration, daily stolen bike hot
+                sheets, and credibility badges help you identify bad actors and
+                verify ownership.
+              </p>
+            </div>
+
+            <div class="le-feature-block">
+              <div class="le-feature-icon">
+                <img
+                  src="assets/DrawnAssets/partners/assets-law_3.png"
+                  alt="Community"
+                >
+              </div>
+
+              <h3>Community Recovery</h3>
+
+              <p>
+                Our network of ambassadors and social media tools turn your
+                community into allies. Automatic theft alerts on Twitter,
+                Facebook, and Instagram.
+              </p>
+            </div>
+          </div>
+
+          <!-- Tabbed Widget -->
+          <div class="le-tabbed-widget">
+            <div class="le-tab-buttons">
+              <button class="le-tab-button active" data-tab="database">
+                All-in-One Database Management for Operational Efficiency
+              </button>
+
+              <button class="le-tab-button" data-tab="defense">
+                First Line of Defense Against Theft for Your Citizens
+              </button>
+            </div>
+
+            <div class="le-tab-content">
+              <div class="le-tab-panel active" id="tab-database">
+                <div class="le-tab-panel-content">
+                  <div class="le-tab-icon">
+                    <img src="assets/cities.gif" alt="Database Management">
+                  </div>
+
+                  <div class="le-tab-text">
+                    <p>
+                      Your city becomes part of a coordinated,
+                      nationally-trusted system so you can clear more cases
+                      without increasing workload:
+                    </p>
+
+                    <ul>
+                      <li>
+                        Our law enforcement dashboard with regional metrics,
+                        trend tracking, and exportable reporting to share up the
+                        chain of command and manage real-time data
+                      </li>
+
+                      <li>
+                        Investigate and recover more bikes with QR stickers,
+                        serial search, owner credibility badges, impound lot
+                        management, LeadsOnline integration, and direct secure
+                        messaging with owners.
+                      </li>
+
+                      <li>
+                        Utilize free bike shop POS integrations, daily stolen
+                        bike hot sheets, social alerts, and ambassador networks
+                        that expand your reach without increasing staffing
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="le-tab-panel" id="tab-defense">
+                <div class="le-tab-panel-content">
+                  <div class="le-tab-icon">
+                    <img
+                      src="assets/theft-victims.gif"
+                      alt="First Line of Defense"
+                    >
+                  </div>
+
+                  <div class="le-tab-text">
+                    <p>
+                      Greater security, higher recovery potential, and empowered
+                      citizens:
+                    </p>
+
+                    <ul>
+                      <li>
+                        Be the first line of defense against bike theft and make
+                        resale of stolen bikes significantly harder through our
+                        public registry, social alerts, and a coordinated
+                        recovery network
+                      </li>
+
+                      <li>
+                        Our partnerships with law enforcement, community
+                        organizations, and bike shops increase recovery rates
+                        through a free, secure platform
+                      </li>
+
+                      <li>
+                        Secure digital proof of ownership provides peace of mind
+                        for proactive bike owners with privacy-centric controls
+                        and communication.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tools Overview Section -->
+      <section class="le-tools-section">
+        <div class="container">
+          <h2>Comprehensive tools for every scenario</h2>
+
+          <div class="le-tools-grid">
+            <div class="le-tool-item" data-tool="leadsonline">
+              <img
+                src="assets/DrawnAssets/lawenforcement/features_0001_leadsonline.png"
+                alt="LeadsOnline Integration"
+              >
+
+              <h4>LeadsOnline Integration</h4>
+
+              <div class="le-tool-details">
+                <p>
+                  Theft victims add their police report number, entering bikes
+                  into LEADS so pawn shops can flag stolen property.
+                </p>
+              </div>
+            </div>
+
+            <div class="le-tool-item" data-tool="hot-sheet">
+              <img
+                src="assets/DrawnAssets/lawenforcement/features_0005_daily-hot-sheet.png"
+                alt="Daily Hot Sheet"
+              >
+
+              <h4>Daily Hot Sheet</h4>
+
+              <div class="le-tool-details">
+                <p>
+                  Local stolen bike reports delivered to your inbox every
+                  morning with complete details and photos.
+                </p>
+              </div>
+            </div>
+
+            <div class="le-tool-item" data-tool="dashboard">
+              <img
+                src="assets/DrawnAssets/lawenforcement/features_0008_dashboard-analytics.png"
+                alt="Law Enforcement Dashboard Analytics"
+              >
+
+              <h4>Law Enforcement Dashboard Analytics</h4>
+
+              <div class="le-tool-details">
+                <p>
+                  Filter bikes by time and status to track trends and identify
+                  where recovery efforts are most effective.
+                </p>
+              </div>
+            </div>
+
+            <div class="le-tool-item" data-tool="direct-contact">
+              <img
+                src="assets/DrawnAssets/lawenforcement/features_0009_direct-communication.png"
+                alt="Direct Contact"
+              >
+
+              <h4>Direct Contact with Owners</h4>
+
+              <div class="le-tool-details">
+                <p>
+                  Message bike owners directly via phone or email for abandoned
+                  bikes and recovered property with logged communications.
+                </p>
+              </div>
+            </div>
+
+            <div class="le-tool-item" data-tool="export">
+              <img
+                src="assets/DrawnAssets/lawenforcement/features_0007_data-export.png"
+                alt="Data Export"
+              >
+
+              <h4>Data Export</h4>
+
+              <div class="le-tool-details">
+                <p>
+                  Export and share registration and recovery data with
+                  leadership to demonstrate program impact and success.
+                </p>
+              </div>
+            </div>
+
+            <div class="le-tool-item" data-tool="impound">
+              <img
+                src="assets/DrawnAssets/lawenforcement/features_0002_impound-lot.png"
+                alt="Impound Lot Management"
+              >
+
+              <h4>Impound Lot Management</h4>
+
+              <div class="le-tool-details">
+                <p>
+                  Upload and search impound lot bikes, automatically notify
+                  owners, and manage ownership claims through the platform.
+                </p>
+              </div>
+            </div>
+
+            <div class="le-tool-item" data-tool="credibility">
+              <img
+                src="assets/DrawnAssets/lawenforcement/features_0004_credibility-badges.png"
+                alt="Credibility Badges"
+              >
+
+              <h4>Credibility Badges</h4>
+
+              <div class="le-tool-details">
+                <p>
+                  Owner credibility scores based on account age, registration
+                  source, and history help identify legitimate claims.
+                </p>
+              </div>
+            </div>
+
+            <div class="le-tool-item" data-tool="pos">
+              <img
+                src="assets/DrawnAssets/lawenforcement/features_0000_POS.png"
+                alt="POS Integration"
+              >
+
+              <h4>POS Integration</h4>
+
+              <div class="le-tool-details">
+                <p>
+                  Local bike shops automatically register every bike they sell
+                  directly into your law enforcement dashboard system.
+                </p>
+              </div>
+            </div>
+
+            <div class="le-tool-item" data-tool="social-alerts">
+              <img
+                src="assets/DrawnAssets/lawenforcement/features_0003_social-media-alerts.png"
+                alt="Social Media Alerts"
+              >
+
+              <h4>Social Media Alerts</h4>
+
+              <div class="le-tool-details">
+                <p>
+                  Automatic social media posts on Twitter, Facebook, and
+                  Instagram reach bike-sympathetic community members who can
+                  help.
+                </p>
+              </div>
+            </div>
+
+            <div class="le-tool-item" data-tool="qr-stickers">
+              <img
+                src="assets/DrawnAssets/lawenforcement/features_0006_qr-stickers.png"
+                alt="QR Stickers"
+              >
+
+              <h4>QR Stickers</h4>
+
+              <div class="le-tool-details">
+                <p>
+                  Tamper-proof stickers break apart when removed and provide
+                  instant owner lookup for recovered bikes in the field.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonials Section -->
+      <section class="le-testimonials-section">
+        <div class="container">
+          <h2>Testimonials</h2>
+
+          <div class="le-testimonials-carousel-wrapper">
+            <div class="le-testimonials-grid" id="testimonialsCarousel">
+              <div class="le-testimonial active">
+                <p class="le-testimonial-quote">
+                  "We're going to find a lot more stolen bikes quicker and hope
+                  to alleviate the bike thefts that are happening."
+                </p>
+
+                <div class="le-testimonial-author">
+                  <strong>Cst. Shawn Davis</strong>
+                  <span>LPS</span>
+                </div>
+              </div>
+
+              <div class="le-testimonial">
+                <p class="le-testimonial-quote">
+                  "With Calgarians already registering almost 9,000 bikes and
+                  further building Bike Index's database, Calgary's recovery
+                  number is already climbing."
+                </p>
+
+                <div class="le-testimonial-author">
+                  <strong>Cst. Dan Seibel</strong>
+                  <span>CPS</span>
+                </div>
+              </div>
+
+              <div class="le-testimonial">
+                <p class="le-testimonial-quote">
+                  "We are very excited to partner with Bike Index, as this
+                  partnership symbolizes a joint effort in returning countless
+                  numbers of bicycles to their rightful owners."
+                </p>
+
+                <div class="le-testimonial-author">
+                  <strong>Officer Brittany Elenes</strong>
+                  <span>LAPD</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="le-testimonial-nav">
+              <button class="le-testimonial-arrow" id="testimonialPrev">
+                ‹
+              </button>
+
+              <div class="le-testimonial-dots" id="testimonialDots"></div>
+
+              <button class="le-testimonial-arrow" id="testimonialNext">
+                ›
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Final CTA Section -->
+      <section class="le-cta-section">
+        <div class="container">
+          <h2>Ready to recover more bikes and clear more crimes?</h2>
+
+          <p class="le-cta-subtitle">
+            Join 1,800+ organizations using the world's most widely used bike
+            registration network.
+          </p>
+
+          <p class="le-nonprofit-message">
+            We're a 501(c)(3) non-profit. Our mission is bike theft recovery,
+            not profit. Let's talk about what works for your department.
+          </p>
+
+          <div class="le-cta-buttons">
+            <a href="#schedule-demo" class="le-btn-primary">Schedule a Demo</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+
+    <script src="law-enforcement.js"></script>
+  </body>
+</html>

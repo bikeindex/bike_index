@@ -1,0 +1,53 @@
+<% collection ||= @mailchimp_values %>
+<% render_sortable ||= false %>
+
+<table
+  class="table table-striped table-bordered table-sm without-exterior-border"
+  id="recordsTable"
+>
+  <thead class="small-header hidden-md-down">
+    <th><%= render_sortable ? sortable("name") : "Name" %></th>
+    <th class="small"><%= render_sortable ? sortable("slug") : "Slug" %></th>
+    <th><%= render_sortable ? sortable("list") : "List" %></th>
+    <th><%= render_sortable ? sortable("kind") : "Kind" %></th>
+    <th>Mailchimp ID</th>
+
+    <th class="small">
+      <%= render_sortable ? sortable("created_at") : "Created at" %>
+    </th>
+
+    <th class="small">
+      <%= render_sortable ? sortable("updated_at") : "Updated at" %>
+    </th>
+
+    <th class="collapse data-cell-collapsed">Data</th>
+  </thead>
+
+  <tbody>
+    <% collection.each do |mailchimp_value| %>
+      <tr>
+        <td><%= mailchimp_value.name %></td>
+        <td class="small"><%= mailchimp_value.slug %></td>
+        <td><%= mailchimp_value.list %></td>
+        <td><%= mailchimp_value.kind %></td>
+        <td><%= mailchimp_value.mailchimp_id %></td>
+
+        <td>
+          <small class="localizeTime preciseTime">
+            <%= l(mailchimp_value.created_at, format: :convert_time) %>
+          </small>
+        </td>
+
+        <td>
+          <small class="localizeTime preciseTime">
+            <%= l(mailchimp_value.updated_at, format: :convert_time) %>
+          </small>
+        </td>
+
+        <td class="collapse data-cell data-cell-collapsed small">
+          <%= pretty_print_json(mailchimp_value.data) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe SortableHelper, type: :helper do
+RSpec.describe ApplicationHelper, type: :helper do
   before { controller.params = ActionController::Parameters.new(passed_params) }
 
   describe "sortable_search_params" do
@@ -54,7 +54,7 @@ RSpec.describe SortableHelper, type: :helper do
     let(:sort_column) { "name" }
     let(:sort_direction) { "asc" }
 
-    before { allow_any_instance_of(SortableHelper).to receive(:sortable_url).and_return("/") }
+    before { allow_any_instance_of(Binxtils::SortableHelper).to receive(:sortable_url).and_return("/") }
 
     context "when render_sortable is false" do
       it "returns only the title string when skip_sortable is true" do

@@ -16,7 +16,7 @@
           .dropdown-menu
             - %w[all initial transferred].each do |claimedness|
               - claimedness_active = claimedness == @search_claimedness
-              = link_to "#{claimedness.titleize} registrations", organization_bikes_path(search_claimedness: claimedness), class: "dropdown-item #{claimedness_active ? 'active' : ''}"
+              = link_to "#{claimedness.titleize} registrations", organization_registrations_path(search_claimedness: claimedness), class: "dropdown-item #{claimedness_active ? 'active' : ''}"
               - if claimedness == "all" # Add a divider after all
                 .dropdown-divider
 
@@ -76,4 +76,4 @@
                 method: "PUT"
 
 .pt-4.pb-4
-  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+  = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

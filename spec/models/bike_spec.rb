@@ -1283,6 +1283,19 @@ RSpec.describe Bike, type: :model do
           expect(bike.serial_display(impound_user)).to eq "HELLO PARTY"
         end
       end
+      context "when user shares an organization with the bike" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let(:org_user) { FactoryBot.create(:organization_user, organization:) }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, serial_number: "Hello Party", creation_organization: organization) }
+        let!(:impound_record) { FactoryBot.create(:impound_record, bike:) }
+
+        it "shows serial to org member without edit access" do
+          expect(bike.reload.status).to eq "status_impounded"
+          expect(bike.authorized?(org_user)).to be_falsey
+          expect(bike.send(:can_see_hidden_serial?, org_user)).to be_truthy
+          expect(bike.serial_display(org_user)).to eq "HELLO PARTY"
+        end
+      end
     end
   end
 
@@ -1356,7 +1369,7 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "valid_mailing_address?" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago_legacy, enabled_feature_slugs: ["reg_address"]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 
     it "is falsey without registration address" do

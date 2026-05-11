@@ -77,6 +77,19 @@ RSpec.describe "Search API V3", type: :request do
         expect(json_result["bikes"][0]["id"]).to eq bike2.id
       end
     end
+    context "non-stolen for-sale bike" do
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+      let(:listed_bike) { marketplace_listing.item }
+
+      it "serializes status as 'with owner' with for_sale: true" do
+        expect(listed_bike.reload.is_for_sale).to be_truthy
+        get "/api/v3/search", params: {stolenness: "non", format: :json}
+        expect(response.status).to eq 200
+        result = json_result["bikes"].find { |b| b["id"] == listed_bike.id }
+        expect(result).to include("status" => "with owner", "for_sale" => true)
+      end
+    end
+
     context "proximity" do
       let(:ip_address) { "23.115.69.69" }
       let(:headers) { {"HTTP_X_FORWARDED_FOR" => ip_address} }
@@ -161,6 +174,7 @@ RSpec.describe "Search API V3", type: :request do
             registry_url
             serial
             status
+            for_sale
             stolen
             stolen_coordinates
             stolen_location
@@ -176,7 +190,25 @@ RSpec.describe "Search API V3", type: :request do
     end
   end
 
+  describe "rack_attack" do
+    include_context :rack_attack
+
+    it "throttles after exceeding the API limit, returns JSON" do
+      expect(Rack::Attack::API_MAX_REQUESTS).to eq 15
+      # Send 2x the limit so throttling is guaranteed even if a
+      # period boundary resets the counter mid-test.
+      (Rack::Attack::API_MAX_REQUESTS * 2).times do
+        get "/api/v3/search", params: {stolenness: "non", format: :json}
+      end
+      expect(response).to have_http_status(:too_many_requests)
+      expect(response.content_type).to include("application/json")
+      expect(JSON.parse(response.body)).to eq("error" => "Too Many Requests")
+    end
+  end
+
   describe "/count" do
+    before { Rails.cache.clear }
+
     context "incorrect stolenness value" do
       it "returns an error message" do
         get "/api/v3/search/count", params: {stolenness: "something else", format: :json}

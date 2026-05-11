@@ -2,6 +2,7 @@ class BikeVersionsController < ApplicationController
   before_action :render_ad, only: %i[index show]
   before_action :find_bike_version, except: %i[index create]
   before_action :ensure_user_allowed_to_edit_version, except: %i[index show create]
+  around_action :set_reading_role, only: :index
 
   def index
     @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_search_params)

@@ -9,7 +9,7 @@ module BikeHelper
         I18n.t(serial_text.tr(" ", "_"), scope: %i[helpers bike_helper]),
         class: "less-strong")
     else
-      content_tag(:code, bike.serial_display(user), class: "bike-serial")
+      content_tag(:span, bike.serial_display(user), class: "serial-span")
     end
     return serial_html unless bike.serial_hidden? && !skip_explanation
 

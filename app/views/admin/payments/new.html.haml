@@ -2,7 +2,7 @@
   New Payment
 
 = form_for [:admin, @payment] do |f|
-  = render(UI::AlertForErrors::Component.new(object: @payment))
+  = render(Alerts::ObjectErrors::Component.new(object: @payment))
 
   .row
     .col-md-6

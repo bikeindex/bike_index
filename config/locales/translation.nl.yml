@@ -2391,6 +2391,9 @@ nl:
             op met support@bikeindex.org als u denkt dat dit mogelijk zou moeten zijn.
         find_bike_sticker:
           unable_to_find_sticker: 'Kan sticker met code niet vinden: %{bike_sticker}.'
+        ensure_sticker_for_current_organization:
+          not_your_organizations_sticker: Sticker %{bike_sticker} is niet de sticker
+            van uw organisatie.
       users:
         create:
           insufficient_invitations: U hebt geprobeerd %{invite_count} gebruikers uit
@@ -3769,44 +3772,6 @@ nl:
       simply_the_best_bike_registry: Het beste fietsregister
       try_for_free: Probeer gratis
       year: jaar
-    campus_packages:
-      additional: Extra
-      all_plans_come_with_a_30day_free_trial: Alle abonnementen bevatten een gratis
-        proefperiode van 30 dagen
-      bike_index_for_colleges_universities: Bike Index voor Hogescholen en Universiteiten
-      choose_a_package_size: Kies een pakketgrootte
-      clean_up_your_campus_messy_registry: Ruim het rommelige register van uw Campus
-        op.
-      compare_plans_and_features: Vergelijk plannen en functies
-      contact_us: Contacteer ons
-      contact_us_for_trial: Neem contact met ons op voor een gratis proefperiode
-      forever: Voor altijd
-      free: GRATIS
-      package_title: "%{name} pakket"
-      questions_want_to_get_started: Vragen? Wilt u beginnen?
-      sign_up: Registreren
-      sign_up_now: Meld je nu aan
-      try_for_free: Probeer gratis
-      year: jaar
-    cities_packages:
-      additional: Extra
-      all_plans_come_with_a_30day_free_trial: Alle abonnementen bevatten een gratis
-        proefperiode van 30 dagen
-      bike_index_for_cities: Bike Index voor steden
-      choose_a_package_size: Kies een pakketgrootte
-      compare_plans_and_features: Vergelijk Plannen en Functies
-      contact_us: Contacteer ons
-      contact_us_for_trial: Neem contact met ons op voor een gratis proefperiode
-      forever: Voor altijd
-      free: GRATIS
-      give_your_constituents_the_bike_registry_: Geef uw afnemers het fietsregister
-        dat ze willen
-      package_title: "%{name} pakket"
-      questions_want_to_get_started: Vragen? Wilt u beginnen?
-      sign_up: Registreren
-      sign_up_now: Meld je nu aan
-      try_for_free: Probeer gratis
-      year: jaar
     find_out_more:
       custom_development_available: A la carte functies en aangepaste ontwikkeling
         beschikbaar.
@@ -3884,7 +3849,6 @@ nl:
         Bike Index consolideert alles op één beheersbare plaats.
       engage_your_residents_and_recover_their_b: Betrek uw bewoners, krijg hun fietsen
         terug, en zij zullen voor altijd van u houden.
-      features_amp_pricing: Functies & prijzen
       mitigate_the_registration_mess: Beperk de registratiepuinhoop
       no_more_index_cards_or_excel_sheets_give_: Geen indexkaarten of excel sheets
         meer. Geef uw burgers de tools om zich in minder dan twee minuten vanaf een
@@ -3902,6 +3866,7 @@ nl:
       check_out: Bekijk onze
       cities_deck: steden partner deck
       used_by_municipalities_everywhere: Overal gebruikt door gemeenten
+      schedule_a_demo: Plan een demo
     for_community_groups:
       bike_index_for_community_groups: Bike Index voor Community's
       bike_index_launches_new_ambassadors_progr: Bike Index lanceert een nieuw Ambassadeurs
@@ -3935,90 +3900,6 @@ nl:
       embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
         op uw website
       registration_drive: Gebruik Bike Index om een registratierit te hosten
-    for_law_enforcement:
-      automated_tweets: geautomatiseerde tweets
-      bend_reduces_bike_theft_by_60_percent: Bocht vermindert fietsdiefstal met 60
-        procent
-      bike_index_for_law_enforcement: Fietsindex voor wetshandhaving
-      here: hier
-      if_you_want_to_collaborate_html: Als je wilt samenwerken met andere afdelingen
-        in je stad om een register te beheren, lees je meer over Bike Index voor gemeenten
-        %{link}.
-      is_your_department_equipped_to_fight_bike: Is uw afdeling uitgerust om fietsdiefstal
-        te bestrijden? Bike Index kan u helpen fietsen weer in de juiste handen te
-        krijgen.
-      local_ambassadors: lokale ambassadeurs
-      our_extensive_archive_has_helped_officers: Ons uitgebreide archief heeft officieren
-        geholpen om fietsen terug te vinden die betrokken zijn in criminele situaties,
-        van eenvoudige diefstal tot chop-shops, drugshuizen - zelfs schermringen en
-        online zwarte markten.
-      put_a_lock_on_bike_theft: Zet een slot op fietsdiefstal
-      recover_your_citizens_bikes: Herstel de fietsen van je burgers
-      related_articles: 'Gerelateerde artikelen:'
-      sign_up_for_free: Gratis inschrijven
-      trusted_by_law_enforcement_everywhere: Overal vertrouwd door wetshandhavers
-      with_over_600_partnerships_html: Met meer dan 600 partnerships is Bike Index
-        de marktleider op het gebied van fietsregistratie. Word gratis lid van ons
-        netwerk %{link}, of vraag ons om u in contact te brengen met een bestaande
-        partner in wetshandhaving.
-      you_have_the_authority_to_bring_html: U heeft de bevoegdheid om fietsen terug
-        te brengen - dat is geen kleine verantwoordelijkheid. Daarom hebben we tools
-        - zoals onze integratie met LeadsOnline en %{automated_tweets_link} van gestolen
-        fietsen - om uw community veilig te houden. Maak verbinding met %{local_ambassadors_link}
-        en spotters om de verkoop van gestolen fietsen tegen te houden, gestolen fietsen
-        snel in beslag te nemen en te blokkeren.
-      youre_the_first_one: Jij bent de eerste waar je burgers naar kijken als hun
-        fietsen worden gestolen. Ga naar en doorzoek onze internationale database
-        om de fietsen van uw gemeenschap terug te geven aan hun rechtmatige eigenaars.
-      bike_index_organization_impounding: Fietsen in beslag nemen met Bike Index
-      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
-        op uw website
-      calgary_doubles: Calgary verdubbelt fietsherstelpercentage met Bike Index
-      check_out: Bekijk onze
-      law_enforcement_deck: partnerdeck voor wetshandhaving
-      used_by_law_enforcement_everywhere: Overal gebruikt door wetshandhavers
-      with_over_registrations_and_almost: Met meer dan %{registrations} registraties
-        en %{stolen_recoveries} gestolen fietsen weten we hoe we kunnen helpen.
-    for_schools:
-      bike_index_for_universities: Fietsindex voor universiteiten
-      bike_index_users_provide: Bike Index-gebruikers verstrekken serienummers, eigendomsbewijzen
-        en identificatiegegevens over hun fietsen. Wanneer een fiets als verloren
-        of gestolen wordt gemeld, kunnen onze partners de fietsindex doorzoeken om
-        deze te identificeren, lokaliseren en volgen vanaf elke computer of smartphone.
-        Ons uitgebreide archief heeft officieren geholpen om fietsen terug te vinden
-        die betrokken zijn in criminele situaties, van eenvoudige diefstal tot chop-shops,
-        drugshuizen - zelfs schermringen en online zwarte markten.
-      features_amp_pricing: Functies en prijzen
-      how_it_works: Hoe het werkt
-      keep_campus_bikes_in_order: Houd campusfietsen op orde
-      make_bike_registration_better: Maak fietsregistratie beter
-      protecting_bikes_on_campus_can_be: Het beschermen van fietsen op de campus kan
-        een fulltime baan zijn. Laat ons helpen.
-      read_about_our_html: Lees meer over onze meer dan %{count} terugvorderingen
-        op onze blog. Voor een volledige lijst met partners van Bike Index bezoekt
-        u onze partners-pagina en neemt u contact met ons op voor informatie over
-        samenwerking met Bike Index.
-      related_articles: 'Gerelateerde artikelen:'
-      trusted_by_top_universities: Vertrouwd door topuniversiteiten
-      weve_designed_a_platform: 'We hebben een platform ontworpen om een fundamentele
-        barrière op te lossen bij het beschermen van fietsen: het ontbreken van een
-        universeel fietsregister. Met onze geconsolideerde universitaire registratiesites
-        is het eenvoudiger voor politie- en transportafdelingen om campusfietsen te
-        zoeken en te recupereren.'
-      your_students_can_register_their_bikes: Uw studenten kunnen hun fietsen registreren,
-        het eigendom verifiëren en de gemeenschap waarschuwen dat ze fietsen missen
-        van overal. Het enige dat ze nodig hebben is elke smartphone of laptop. Je
-        hebt toegang tot de gegevens erachter om te begrijpen hoe je fietsen op je
-        campus het beste kunt beschermen.
-      must_read: Moet lezen -
-      six_best_features_for_schools: De zes beste functies van Bike Index voor fietsbeheer
-        op de campus
-      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
-        op uw website
-      check_out: Bekijk onze
-      schools_deck: universitair partnerdeck
-      bike_index_admin_guide: Bike Index Campus Management Admin-handleiding
-      how_to_use_bike_index_qr_stickers: Hoe gebruik je Bike Index QR-stickers?
     packages_list:
       forever: Voor altijd
       free: GRATIS
@@ -4142,8 +4023,6 @@ nl:
     landing_pages_ascend: Stijg POS op Bike Index
     landing_pages_bike_shop_packages: Fietsindex voor fietsenwinkels - functies en
       prijzen
-    landing_pages_campus_packages: Fietsindex voor scholen - functies en prijzen
-    landing_pages_cities_packages: Bike Index voor steden - functies en prijzen
     landing_pages_for_bike_shops: Fietsindex voor fietsenwinkels
     landing_pages_for_cities: Bike Index voor steden
     landing_pages_for_community_groups: Fietsindex voor communitygroepen
@@ -4578,6 +4457,9 @@ nl:
       index:
         impound_records: Inbeslagnamegegevens
         render_chart: Rendergrafiek
+    registrations:
+      search:
+        render_chart: Rendergrafiek
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -4588,55 +4470,18 @@ nl:
     finished_stolen_registration:
       subject: Bevestig uw %{organization_name} gestolen %{bike_type} op Bike Index
     organization_invitation:
-      html:
-        hello: Hallo %{name},
-        join_org: Doe mee met %{org_name}
-        welcome_to_bike_index: Welkom bij Bike Index
-        you_are_a_member: "%{sender_name} heeft aangegeven dat u lid bent van %{org_name}."
       subject: Doe mee met %{organization_name} op Bike Index
     partial_registration:
-      html:
-        click_below_to_complete_your_registration: Klik hieronder om uw registratie
-          te voltooien
-        finish_it: Maak het af!
-        just_a_few_steps_away_html: U bent slechts een paar stappen verwijderd van
-          het registreren van uw <strong>%{color_and_brand}</strong> in 's werelds
-          meest uitgebreide <strong>fietsregister</strong> !
-        youre_almost_done: Je bent bijna klaar!
       subject: Voltooi uw %{organization_name} registratie van de fietsindex!
   plan_features:
     automatic_registration_through_pos: Automatische registratie via uw POS
     create_organization_account: Maak een organisatieaccount en neem contact op met
       registranten
-    export_custom_data: Aangepaste gegevens exporteren naar CSV / XLSX-bestanden
-    qr_sticker: QR sticker scannen en berichten verzenden
     social_media_and_email_marketing: Social media en e-mail marketing campagneactiva
-    staff_accounts: Personeelsrekeningen
-    organization_dashboard: Stads- en politie-dashboard - analyseer statistieken over
-      lokale registratie op basis van postcode
-    campus_bike_management_suite: Campus Bike Management Suite - tag fietsen, neem
-      contact op met eigenaren, log achtergelaten en in beslag genomen fietsrecords,
-      stuur vervolgmeldingen
-    contact_unfinished_registrants: Neem contact op met registranten die de registratie
-      niet hebben voltooid
-    custom_form_fields: Voeg aangepaste formuliervelden toe aan uw registratiepagina
-    customize_emails: Pas e-mails aan die u verzendt vanuit Bike Index
     embed_registration_form: Sluit het aangepaste registratieformulier van uw organisatie
       in op uw website
-    graduated_bikes: Geautomatiseerde migratie van afgestudeerde fietsen uit het systeem
     import_registrations_from_previous: Importeer registraties uit een voormalig registratiesysteem
-    priority_programming_support: Prioriteit bij programmering, hosting en ondersteuning
-    qr_sticker_scanning_and_messaging: QR sticker scannen en berichten verzenden
-    school_landing_page: Landingspagina voor registratie van het schoolmerk
     search_bikes_organization: Zoek fietsen in uw organisatieaccount
-    department_landing_page: Landingspagina voor registratie van een afdelingsmerk
-    law_enforcement_list_html: Wetshandhavingsinstrumenten:<ol class="le-list"><li>
-      Bulk serieel zoeken</li><li> Gemarkeerde dubbele registraties en geloofwaardigheidsscores
-      van fietsen</li><li> Mogelijkheid om gebruikers een bericht te sturen, zelfs
-      als ze fietsen niet als gestolen hebben gemarkeerd</li><li> Cross-database zoeken</li><li>
-      Integratie met LeadsOnline</li><li> Dagelijks gestolen fietsen hot sheet</li><li>
-      Openbare inbeslagname pagina</li></ol>
-    impound_bikes: Fietsen in beslag nemen en claiminzendingen ontvangen
   sessions:
     magic_link:
       enter_email_address: Voer je e-mailadres in, we sturen je een e-mail met een
@@ -4806,7 +4651,6 @@ nl:
       privacy_policy: Privacybeleid
       resources: Middelen
       schools_and_universities: Scholen en universiteiten
-      stolen_bike_map: Gestolen fietskaart
       stolen_bike_recoveries: Gestolen fietsherstel
       store: Winkel
       support_us: Steun ons
@@ -4819,6 +4663,7 @@ nl:
       protect_your_bike: Bescherm je fiets
       how_to_get_your_stolen_bike_back: Haal je gestolen fiets terug
       press_inquiries: Persvragen
+      strava_search: Zoeken en bijwerken op Strava
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:
@@ -4830,19 +4675,6 @@ nl:
       you: U
       your_bikes: Je fietsen
       your_preferences: Jouw voorkeuren
-    period_select:
-      all: Alle
-      past: Verleden
-      thirty_days: 30 dagen
-      seven_days: 7 dagen
-      day: dag
-      hour: Uur
-      year: jaar
-      custom: Custom
-      from: uit
-      to: Naar
-      update: Bijwerken
-      next: Volgende
     edit_bike_skeleton:
       edit: Bewerken
       owned_but_hasnt_been_claimed_html: Eigendom van <em>%{owner_email}</em> maar
@@ -4965,7 +4797,6 @@ nl:
       lightspeed_integration_panel: Lightspeed-integratiepaneel
       manage_impounding: Beheer inbeslagname
       manage_users: Gebruikers beheren
-      multi_serial_search: Multi-serieel zoeken
       org_bikes: "%{org_name} Fietsen"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locaties"
@@ -4980,6 +4811,7 @@ nl:
       super_admin_view: Superbeheerder voor %{org_name}
       stolen_message: Gestolen bericht
       model_audits: Audits van e-voertuigen
+      multi_search: Meerdere zoekopdrachten
     bike_search_form:
       anywhere: Overal
       doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
@@ -5938,23 +5770,6 @@ nl:
         search_owner_email: Zoek eigenaar e-mail
         submit: Voorleggen
         search_notes: Zoeknotities
-    legacy_form_well:
-      address_record:
-        address: Adres
-        address_school: Postadres van de campus
-        choose_country: Kies land
-        city: City
-        postal_code: Postcode
-        region: Regio / Provincie
-        state: Staat
-        your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
-        address_no_street: Adres
-        street_2: Straatadres regel 2 (optioneel)
-        address_or_intersection: Adres of kruispunt
-        where_was_it_status: Waar was het %{bike_status}?
-      address_record_with_default:
-        edit_my_account_path: bewerken op mijn account
-        use_account_address: Gebruik accountadres
     search_results:
       bike_box:
         location: Plaats
@@ -5970,6 +5785,8 @@ nl:
         registered_not_stolen: geregistreerd, niet gestolen
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
+      multi_result_chip:
+        no_results: geen overeenkomsten
     page_block:
       marketplace_listing_panel:
         condition: Voorwaarde
@@ -6077,6 +5894,19 @@ nl:
         you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
           Bike Index
         youre_almost_done_registering: Je bent bijna klaar met registreren!
+      organization_invitation:
+        hello: Hallo %{name},
+        join_org: Doe mee met %{org_name}
+        welcome_to_bike_index: Welkom bij Bike Index
+        you_are_a_member: "%{sender_name} heeft aangegeven dat u lid bent van %{org_name}."
+      partial_registration:
+        click_below_to_complete_your_registration: Klik hieronder om uw registratie
+          te voltooien
+        finish_it: Maak het af!
+        just_a_few_steps_away_html: U bent slechts een paar stappen verwijderd van
+          het registreren van uw <strong>%{color_and_brand}</strong> in 's werelds
+          meest uitgebreide <strong>fietsregister</strong> !
+        youre_almost_done: Je bent bijna klaar!
     messages:
       thread_show:
         can_not_send_new_message: Helaas, u kunt geen nieuw bericht versturen.
@@ -6099,9 +5929,19 @@ nl:
       definition_list:
         row:
           no_value: geen
-      alert_for_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
-          dit %{object_name} wordt opgeslagen:"
+      period_select:
+        all: Alle
+        custom: Custom
+        day: dag
+        from: uit
+        hour: Uur
+        next: Volgende
+        past: Verleden
+        seven_days: 7 dagen
+        thirty_days: 30 dagen
+        to: Naar
+        update: Bijwerken
+        year: jaar
     org:
       location_address_fields:
         address: Adres
@@ -6129,88 +5969,6 @@ nl:
         status_records: "%{status} records"
         update_impound_record: Update het inbeslagnameregister
         update_multiple_records: Meerdere records bijwerken
-      bike_search:
-        avery: Avery?
-        bike: Registratie
-        color: Kleur
-        impounded: In beslag genomen bij
-        link: Link
-        manufacturer: Fabrikant
-        matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
-        mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
-        model: Model
-        owner_name: Eigenaar naam
-        propulsion_type: Voortstuwing
-        registered: Geregistreerd
-        registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
-        sent_to: Verzonden naar
-        status_cell: Toestand
-        sticker: Sticker
-        stolen: Gestolen
-        updated: Bijgewerkt
-        vehicle: Registratie
-        vehicle_type: 'Voertuigtype:'
-        affiliation: Aansluiting
-        avery_exportable: Avery Exporteerbaar
-        e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
-        phone: Telefoon
-        reg_address: Adres
-        secondary_number: Secundair#
-        source: Bron
-        student_id: Student-ID
-        url: URL
-        e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
-        serial: Serie
-        view_matching_any_audit: weergave die overeenkomt met elke audit
-        notes: Notes
-        impound_id: Inbeslagname-ID
-      bike_search_row:
-        email_hidden: email verborgen
-        link: Link
-        mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
-      bike_search_settings:
-        address: 'Adres:'
-        all: Alle
-        avery_cell: Avery Exporteerbaar
-        bike: Registratie
-        color_cell: Kleur
-        create_export_of_vehicles: Export maken van gezochte %{cycle_type}
-        created_at_cell: Geregistreerd
-        creation_description_cell: Bron
-        cycle_type_cell: 'Voertuigtype:'
-        filter_impounded_html: alleen <strong>in beslag genomen</strong>
-        filter_no_address_html: alleen <strong>geen</strong> adres
-        filter_no_sticker_html: alleen <strong>geen</strong> sticker
-        filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
-        filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
-        filter_stolen_html: alleen gestolen
-        filter_with_address_html: alleen <strong>met</strong> adres
-        filter_with_stickers_html: alleen <strong>met</strong> stickers
-        impounded_cell: In beslag genomen bij
-        manufacturer_cell: Fabrikant
-        model_cell: Model
-        owner_email_cell: Verzonden naar
-        owner_name_cell: Eigenaar naam
-        propulsion_type_cell: Elektrisch voertuig (aandrijving)
-        reg_address_cell: Adres
-        reg_extra_registration_number_cell: Secundair#
-        reg_organization_affiliation_cell: Aansluiting
-        reg_phone_cell: Telefoon
-        reg_student_id_cell: Student-ID
-        serial_number_cell: Serie
-        settings: Instellingen
-        status: 'Toestand:'
-        status_cell: Toestand
-        sticker_cell: Sticker
-        stickers: 'stickers:'
-        stolen_cell: Gestolen
-        updated_at_cell: Bijgewerkt
-        url_cell: URL
-        vehicle: Registratie
-        visible_columns: Zichtbare kolommen
-        notes_cell: Notes
-        show_notes_search: notities weergeven zoeken
-        impound_id_cell: Inbeslagname-ID
       bike_access_panel:
         access_panel: Toegangspaneel
         added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd
@@ -6287,6 +6045,7 @@ nl:
         note_by: door %{user}
         notes: Notes
         save_notes: Bewaar notitie
+        region: Regio
       bulk_import_error:
         ascend: Stijg op
         ascend_unprocessable_html: Het bulkimportproces <span class="text-danger">is
@@ -6309,3 +6068,118 @@ nl:
         reprocess_instruction: Ga terug naar deze pagina en klik op de knop 'import
           opnieuw verwerken' hieronder.
         unknown_ascend_name: Onbekende Ascend-naam
+      registration_search:
+        affiliation: Aansluiting
+        assign_bike_sticker: Sticker toewijzen
+        avery: Avery?
+        avery_exportable: Avery Exporteerbaar
+        bike: Registratie
+        color: Kleur
+        e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
+        e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
+        email_hidden: email verborgen
+        impound_id: Inbeslagname-ID
+        impounded: In beslag genomen bij
+        link: Link
+        link_sticker: link sticker
+        manufacturer: Fabrikant
+        matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
+        mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
+        model: Model
+        notes: Notes
+        owner_name: Eigenaar naam
+        phone: Telefoon
+        propulsion_type: Voortstuwing
+        reg_address: Adres
+        registered: Geregistreerd
+        registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
+        secondary_number: Secundair#
+        sent_to: Verzonden naar
+        serial: Serie
+        source: Bron
+        status_cell: Toestand
+        sticker: Sticker
+        stolen: Gestolen
+        student_id: Student-ID
+        updated: Bijgewerkt
+        url: URL
+        vehicle: Registratie
+        vehicle_type: 'Voertuigtype:'
+        view_matching_any_audit: weergave die overeenkomt met elke audit
+        hidden_not_registered: verborgen, niet geregistreerd bij %{org_name}
+      registration_search_settings:
+        address: 'Adres:'
+        all: Alle
+        avery_cell: Avery Exporteerbaar
+        bike: Registratie
+        color_cell: Kleur
+        create_export_of_vehicles: Export maken van gezochte %{cycle_type}
+        created_at_cell: Geregistreerd
+        creation_description_cell: Bron
+        cycle_type_cell: 'Voertuigtype:'
+        default: standaard
+        filter_impounded_html: alleen <strong>in beslag genomen</strong>
+        filter_no_address_html: alleen <strong>geen</strong> adres
+        filter_no_sticker_html: alleen <strong>geen</strong> sticker
+        filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
+        filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
+        filter_stolen_html: alleen gestolen
+        filter_with_address_html: alleen <strong>met</strong> adres
+        filter_with_stickers_html: alleen <strong>met</strong> stickers
+        impound_id_cell: Inbeslagname-ID
+        impounded_cell: In beslag genomen bij
+        manufacturer_cell: Fabrikant
+        model_cell: Model
+        none: geen
+        notes_cell: Notes
+        owner_email_cell: Verzonden naar
+        owner_name_cell: Eigenaar naam
+        propulsion_type_cell: Elektrisch voertuig (aandrijving)
+        reg_address_cell: Adres
+        reg_extra_registration_number_cell: Secundair#
+        reg_organization_affiliation_cell: Aansluiting
+        reg_phone_cell: Telefoon
+        reg_student_id_cell: Student-ID
+        serial_number_cell: Serie
+        settings: Instellingen
+        show_notes_search: notities weergeven zoeken
+        status: 'Toestand:'
+        status_cell: Toestand
+        sticker_cell: Sticker
+        stickers: 'stickers:'
+        stolen_cell: Gestolen
+        updated_at_cell: Bijgewerkt
+        url_cell: URL
+        vehicle: Registratie
+        visible_columns: Zichtbare kolommen
+        multi_search: multi serieel zoeken
+      multi_search_results:
+        first_n_shown_html: "— eerst %{limit} weergegeven,"
+        no_exact_matches: 'Geen exacte overeenkomsten. Serienummers die er dichtbij
+          liggen:'
+        no_matches_found: Geen overeenkomsten gevonden
+        result_count_html: "— %{count} %{results}"
+        serial_label: 'Serial:'
+        view_all: alles bekijken
+    alerts:
+      object_errors:
+        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+          dit %{object_name} wordt opgeslagen:"
+    form:
+      legacy_form_well:
+        address_record:
+          address: Adres
+          address_no_street: Adres
+          address_or_intersection: Adres of kruispunt
+          address_school: Postadres van de campus
+          choose_country: Kies land
+          city: City
+          postal_code: Postcode
+          region: Regio / Provincie
+          state: Staat
+          street_2: Straatadres regel 2 (optioneel)
+          where_was_it_status: Waar was het %{bike_status}?
+          your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
+        address_record_with_default:
+          edit_my_account_path: bewerken op mijn account
+          use_account_address: Gebruik accountadres

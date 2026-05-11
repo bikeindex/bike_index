@@ -28,7 +28,7 @@
 #
 class StravaIntegration < ApplicationRecord
   STATUS_ENUM = {pending: 0, syncing: 1, synced: 2, error: 3}.freeze
-  DEFAULT_SCOPE_COUNT = Integrations::StravaClient::DEFAULT_SCOPE.count(",")
+  DEFAULT_SCOPE_COUNT = Integrations::Strava::Client::DEFAULT_SCOPE.count(",")
 
   acts_as_paranoid
 
@@ -46,7 +46,7 @@ class StravaIntegration < ApplicationRecord
   before_destroy :mark_disconnected
 
   scope :token_expired, -> { where("token_expires_at IS NULL OR token_expires_at < ?", Time.current) }
-  scope :permissions_default, -> { where(strava_permissions: Integrations::StravaClient::DEFAULT_SCOPE) }
+  scope :permissions_default, -> { where(strava_permissions: Integrations::Strava::Client::DEFAULT_SCOPE) }
   scope :permissions_less, -> {
     where("strava_permissions IS NULL OR LENGTH(strava_permissions) - LENGTH(REPLACE(strava_permissions, ',', '')) < ?", DEFAULT_SCOPE_COUNT)
   }
@@ -59,21 +59,21 @@ class StravaIntegration < ApplicationRecord
   end
 
   def permissions_default?
-    strava_permissions == Integrations::StravaClient::DEFAULT_SCOPE
+    strava_permissions == Integrations::Strava::Client::DEFAULT_SCOPE
   end
 
   def permissions_strava_search_default?
-    strava_permissions == Integrations::StravaClient::STRAVA_SEARCH_SCOPE
+    strava_permissions == Integrations::Strava::Client::STRAVA_SEARCH_SCOPE
   end
 
   def permissions_less?
     return true if strava_permissions.blank?
 
-    strava_permissions.split(",").length < Integrations::StravaClient::DEFAULT_SCOPE.split(",").length
+    strava_permissions.split(",").length < Integrations::Strava::Client::DEFAULT_SCOPE.split(",").length
   end
 
   def permissions_more?
-    strava_permissions.present? && strava_permissions.split(",").length > Integrations::StravaClient::DEFAULT_SCOPE.split(",").length
+    strava_permissions.present? && strava_permissions.split(",").length > Integrations::Strava::Client::DEFAULT_SCOPE.split(",").length
   end
 
   def has_activity_write?
@@ -112,13 +112,10 @@ class StravaIntegration < ApplicationRecord
     return if !force_update && activities_downloaded_count == calculated_downloaded && synced?
 
     self.status = calculated_status
-    # Update before enqueueing the enrich requests, to make double enqueueing less likely
+    # Update before enqueuing the enrich requests, to make double enqueuing less likely
     update!(activities_downloaded_count: calculated_downloaded)
-    return unless synced?
 
-    enqueue_enrich_activity_requests
-    enqueue_gear_requests
-    strava_gears.find_each(&:update_total_distance!)
+    StravaJobs::EnqueueEnrichActivities.perform_async(id) if synced?
   end
 
   def unknown_gear_ids
@@ -142,30 +139,6 @@ class StravaIntegration < ApplicationRecord
     else
       :synced
     end
-  end
-
-  def enqueue_gear_requests
-    already_enqueued = StravaRequest.pending
-      .where(strava_integration_id: id, request_type: :fetch_gear)
-      .pluck(Arel.sql("parameters->>'strava_gear_id'"))
-
-    gear_ids_to_request.each do |strava_gear_id|
-      next if already_enqueued.include?(strava_gear_id)
-      StravaRequest.create!(user_id:, strava_integration_id: id,
-        request_type: :fetch_gear, parameters: {strava_gear_id:})
-    end
-  end
-
-  def enqueue_enrich_activity_requests
-    already_enqueued = StravaRequest.pending
-      .where(strava_integration_id: id, request_type: :fetch_activity)
-      .pluck(Arel.sql("parameters->>'strava_id'"))
-
-    strava_activities.not_enriched.where.not(strava_id: already_enqueued).pluck(:strava_id)
-      .each do |strava_id|
-        StravaRequest.create!(user_id:, strava_integration_id: id,
-          request_type: :fetch_activity, parameters: {strava_id:})
-      end
   end
 
   def mark_disconnected

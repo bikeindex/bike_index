@@ -77,6 +77,7 @@ RSpec.describe BikeVersionCreatorJob, type: :job do
         bike.primary_frame_color.name,
         bike.secondary_frame_color.name,
         bike.tertiary_frame_color.name,
+        paint.name,
         "#{bike.rear_wheel_size.name} wheel",
         "#{bike.front_wheel_size.name} wheel",
         component_manufacturer.short_name,

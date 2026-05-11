@@ -15,19 +15,19 @@ ca_state = State.find_by_abbreviation("CA")
 
 # San Francisco locations (lat/lng pairs with street addresses)
 sf_locations = [
-  {latitude: 37.7749, longitude: -122.4194, street: "1 Market St", city: "San Francisco", zipcode: "94105"},
-  {latitude: 37.7851, longitude: -122.4094, street: "345 Stockton St", city: "San Francisco", zipcode: "94108"},
-  {latitude: 37.7694, longitude: -122.4862, street: "1001 Great Hwy", city: "San Francisco", zipcode: "94121"},
-  {latitude: 37.7599, longitude: -122.4148, street: "2501 Mission St", city: "San Francisco", zipcode: "94110"},
-  {latitude: 37.8024, longitude: -122.4058, street: "Pier 39", city: "San Francisco", zipcode: "94133"},
-  {latitude: 37.7695, longitude: -122.4529, street: "750 Judah St", city: "San Francisco", zipcode: "94122"},
-  {latitude: 37.7840, longitude: -122.4089, street: "77 Maiden Ln", city: "San Francisco", zipcode: "94108"},
-  {latitude: 37.7683, longitude: -122.4539, street: "1350 9th Ave", city: "San Francisco", zipcode: "94122"},
-  {latitude: 37.7956, longitude: -122.3933, street: "100 The Embarcadero", city: "San Francisco", zipcode: "94105"},
-  {latitude: 37.7589, longitude: -122.4380, street: "3201 24th St", city: "San Francisco", zipcode: "94110"},
-  {latitude: 37.7736, longitude: -122.4312, street: "55 Haight St", city: "San Francisco", zipcode: "94102"},
-  {latitude: 37.7879, longitude: -122.4074, street: "870 Market St", city: "San Francisco", zipcode: "94102"},
-  {latitude: 37.7616, longitude: -122.4346, street: "3100 Mission St", city: "San Francisco", zipcode: "94110"}
+  {latitude: 37.7749, longitude: -122.4194, street: "1 Market St", city: "San Francisco", postal_code: "94105"},
+  {latitude: 37.7851, longitude: -122.4094, street: "345 Stockton St", city: "San Francisco", postal_code: "94108"},
+  {latitude: 37.7694, longitude: -122.4862, street: "1001 Great Hwy", city: "San Francisco", postal_code: "94121"},
+  {latitude: 37.7599, longitude: -122.4148, street: "2501 Mission St", city: "San Francisco", postal_code: "94110"},
+  {latitude: 37.8024, longitude: -122.4058, street: "Pier 39", city: "San Francisco", postal_code: "94133"},
+  {latitude: 37.7695, longitude: -122.4529, street: "750 Judah St", city: "San Francisco", postal_code: "94122"},
+  {latitude: 37.7840, longitude: -122.4089, street: "77 Maiden Ln", city: "San Francisco", postal_code: "94108"},
+  {latitude: 37.7683, longitude: -122.4539, street: "1350 9th Ave", city: "San Francisco", postal_code: "94122"},
+  {latitude: 37.7956, longitude: -122.3933, street: "100 The Embarcadero", city: "San Francisco", postal_code: "94105"},
+  {latitude: 37.7589, longitude: -122.4380, street: "3201 24th St", city: "San Francisco", postal_code: "94110"},
+  {latitude: 37.7736, longitude: -122.4312, street: "55 Haight St", city: "San Francisco", postal_code: "94102"},
+  {latitude: 37.7879, longitude: -122.4074, street: "870 Market St", city: "San Francisco", postal_code: "94102"},
+  {latitude: 37.7616, longitude: -122.4346, street: "3100 Mission St", city: "San Francisco", postal_code: "94110"}
 ]
 
 pn_kinds = %w[appears_abandoned_notification parked_incorrectly_notification appears_abandoned_notification parked_incorrectly_notification]
@@ -78,8 +78,8 @@ initial_notifications = []
     kind: pn_kinds[i % pn_kinds.length],
     street: loc[:street],
     city: loc[:city],
-    zipcode: loc[:zipcode],
-    state_id: ca_state&.id,
+    postal_code: loc[:postal_code],
+    region_record_id: ca_state&.id,
     country_id: us&.id,
     skip_geocoding: true,
     message: "Bike found #{loc[:street]} - notification ##{i + 1}"
@@ -101,8 +101,8 @@ end
     initial_record_id: initial.id,
     street: loc[:street],
     city: loc[:city],
-    zipcode: loc[:zipcode],
-    state_id: ca_state&.id,
+    postal_code: loc[:postal_code],
+    region_record_id: ca_state&.id,
     country_id: us&.id,
     skip_geocoding: true,
     message: "Repeat notification - impounding bike from #{loc[:street]}",
@@ -126,8 +126,8 @@ unreg_b_param = BParam.create!(
       kind: "parked_incorrectly_notification",
       street: loc[:street],
       city: loc[:city],
-      zipcode: loc[:zipcode],
-      state_id: ca_state&.id,
+      postal_code: loc[:postal_code],
+      region_record_id: ca_state&.id,
       country_id: us&.id,
       skip_geocoding: true
     }
@@ -169,8 +169,8 @@ puts "Creating 5 impound records in San Francisco for Hogwarts..."
         address_record_attributes: {
           street: loc[:street],
           city: loc[:city],
-          zipcode: loc[:zipcode],
-          state_id: ca_state&.id.to_s,
+          postal_code: loc[:postal_code],
+          region_record_id: ca_state&.id.to_s,
           country_id: us&.id.to_s,
           skip_geocoding: true
         }
@@ -204,3 +204,21 @@ puts "Seeding non-cycle types and e-vehicles"
   bike = seed_org_bike(creator:, user:, owner_email: owner_emails.sample, cycle_type: type[:cycle_type], propulsion_type: type[:propulsion_type])
   FindOrCreateModelAuditJob.new.perform(bike.id)
 end
+
+# --- Bike Sticker Batch "HO" for Hogwarts ---
+puts "Creating bike sticker batch HO with 20 stickers..."
+sticker_batch = BikeStickerBatch.create!(
+  prefix: "HO",
+  organization: hogwarts,
+  user: member,
+  code_number_length: 4
+)
+sticker_batch.create_codes(20, initial_code_integer: 0)
+
+# Assign 3 stickers to bikes
+hogwarts_bikes = hogwarts.bikes.limit(3)
+sticker_batch.bike_stickers.limit(3).each_with_index do |sticker, i|
+  sticker.claim(user: member, bike: hogwarts_bikes[i])
+  puts "  Assigned sticker #{sticker.code} to bike ##{hogwarts_bikes[i].id}"
+end
+puts "Bike sticker batch HO seeded with 20 stickers (3 assigned to bikes)"

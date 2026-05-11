@@ -201,7 +201,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification).to have_attributes parking_notification_params.except(:use_entered_address)
         expect(parking_notification.user).to eq current_user
         expect(parking_notification.organization).to eq current_organization
-        expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+        expect(parking_notification.formatted_address_string).to eq default_location[:formatted_address_no_country]
         expect(parking_notification.location_from_address).to be_falsey
         expect(ProcessParkingNotificationJob.jobs.count).to eq 1
 
@@ -242,7 +242,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification).to have_attributes parking_notification_params.except(:use_entered_address)
           expect(parking_notification.user).to eq current_user
           expect(parking_notification.organization).to eq current_organization
-          expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+          expect(parking_notification.formatted_address_string).to eq default_location[:formatted_address_no_country]
           expect(parking_notification.location_from_address).to be_falsey
 
           bike.reload
@@ -255,7 +255,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
       context "manual address and repeat" do
         let(:state) { FactoryBot.create(:state_california) }
-        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state, kind: "parked_incorrectly_notification") }
+        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, region_record: state, kind: "parked_incorrectly_notification") }
         let(:parking_notification_params) do
           {
             kind: "impound_notification",
@@ -269,8 +269,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             is_repeat: "true",
             street: "300 Lakeside Dr",
             city: "Oakland",
-            zipcode: "94612",
-            state_id: state.id,
+            postal_code: "94612",
+            region_record_id: state.id,
             country_id: Country.united_states.id
           }
         end
@@ -325,7 +325,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   describe "send_additional" do
     let!(:parking_notification_initial) do
       FactoryBot.create(:parking_notification,
-        :in_los_angeles_legacy,
+        :in_los_angeles,
         bike: bike,
         organization: current_organization,
         message: "some message to the user",
@@ -405,7 +405,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(bike.status).to eq "status_with_owner"
       end
       context "multiple parking notifications" do
-        let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles_legacy, organization: current_organization, delivery_status: "email_success") }
+        let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization, delivery_status: "email_success") }
         it "marks both retrieved" do
           Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
@@ -454,7 +454,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     context "replaced" do
       let!(:parking_notification2) do
         FactoryBot.create(:parking_notification,
-          :in_chicago_legacy,
+          :in_chicago,
           bike: bike,
           initial_record_id: parking_notification_initial.id,
           organization: current_organization,
@@ -531,7 +531,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
     end
     context "impound_notification - multiple" do
-      let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles_legacy, organization: current_organization) }
+      let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization) }
       it "impounds them both" do
         bike.reload
         expect(bike.status).to eq "status_with_owner"

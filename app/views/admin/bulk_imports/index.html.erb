@@ -1,0 +1,121 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "org count", url_for(sortable_search_params.merge(search_org_count: !@org_count)), class: "nav-link #{@org_count ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item dropdown">
+    <% search_errors_text = @search_errors || "With and without errors" %>
+
+    <a
+      class="nav-link dropdown-toggle <%= @search_errors.present? ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= search_errors_text.titleize %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "With and without errors", url_for(sortable_search_params.merge(search_errors: nil)), class: "dropdown-item #{@search_errors.blank? ? 'active' : ''}" %>
+      <%= link_to "Without errors", url_for(sortable_search_params.merge(search_errors: "no_error")), class: "dropdown-item #{@search_errors == 'no_error' ? 'active' : ''}" %>
+
+      <div class="dropdown-divider"></div>
+      <%= link_to "File Error (fully blocks import)", url_for(sortable_search_params.merge(search_errors: "file_error")), class: "dropdown-item #{@search_errors == 'file_error' ? 'active' : ''}" %>
+      <%= link_to "Line Error", url_for(sortable_search_params.merge(search_errors: "line_error")), class: "dropdown-item #{@search_errors == 'line_error' ? 'active' : ''}" %>
+      <%= link_to "Ascend error", url_for(sortable_search_params.merge(search_errors: "ascend_error")), class: "dropdown-item #{@search_errors == 'ascend_error' ? 'active' : ''}" %>
+      <%= link_to "Any Error", url_for(sortable_search_params.merge(search_errors: "any_error")), class: "dropdown-item #{@search_errors == 'any_error' ? 'active' : ''}" %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @progress != 'all' ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= @progress.titleize %> <%= "progresses" if @progress == "all" %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All progresses", url_for(sortable_search_params.merge(search_progress: nil)), class: "dropdown-item #{@progress == 'all' ? 'active' : ''}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% BulkImport.progresses.each do |progress| %>
+        <%= link_to progress.humanize, url_for(sortable_search_params.merge(search_progress: progress)), class: "dropdown-item #{@progress == progress ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Only Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_ascend: @only_ascend ? nil : "only_ascend")), class: "nav-link #{@only_ascend ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Not Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_ascend: @not_ascend ? nil : "not_ascend")), class: "nav-link #{@not_ascend ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "New bulk import", new_admin_bulk_import_url, class: "nav-link" %>
+  </li>
+<% end %>
+
+<% rendered_chart = capture do %>
+  <% chart_data = UI::Chart::Component.time_range_counts(collection: matching_bulk_imports, time_range: @time_range) %>
+  <%= render(UI::Chart::Component.new(series: [{name: "Bulk imports", data: chart_data}], time_range: @time_range)) %>
+<% end %>
+
+<% table_view = capture do %>
+  <% if @org_count %>
+    <div class="col-sm-6 offset-sm-3 mt-4">
+      <div class="full-screen-table">
+        <table class="table table-striped table-bordered table-sm">
+          <thead>
+            <th class="text-left">Organization</th>
+            <th class="text-right">Imports</th>
+          </thead>
+
+          <tbody>
+            <% matching_bulk_imports.distinct.pluck(:organization_id).each do |id| %>
+              <tr>
+                <td>
+                  <% if id.present? %>
+                    <% organization = Organization.find_by_id(id) %>
+                    <%= link_to organization&.name || id, url_for(sortable_search_params.merge(organization_id: id)) %>
+                    <%= link_to link_emoji, admin_organization_path(id) %>
+                  <% else %>
+                    <%= link_to "No organization", url_for(sortable_search_params.merge(organization_id: "none")) %>
+                    <span class="text-danger">missing org!</span>
+                  <% end %>
+                </td>
+
+                <td>
+                  <%= number_display(matching_bulk_imports.where(organization_id: id).count) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+
+  <% unless display_dev_info? %>
+    <style>.only-dev-visible {display: none !important;} </style>
+  <% end %>
+
+  <%= render partial: "/admin/bulk_imports/table", locals: {collection: @bulk_imports, render_sortable: true} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @bulk_imports,
+  viewing: "Bulk imports",
+  rendered_chart:,
+  nav_header_list_items:,
+  table_view:
+)) %>

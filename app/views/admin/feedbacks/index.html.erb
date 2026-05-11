@@ -1,0 +1,126 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @search_kind == 'all' ? '' : 'active' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @search_kind == "all" %>
+        All kinds
+      <% else %>
+        <%= Feedback.kind_humanized(@search_kind) %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <% permitted_kinds.each do |kind| %>
+        <% kind_active = @search_kind == kind %>
+        <% kind_display = kind == "all" ? "All kinds" : Feedback.kind_humanized(kind) %>
+
+        <%= link_to kind_display, url_for(sortable_search_params.merge(search_kind: (kind_active ? nil : kind))), class: "dropdown-item #{kind_active ? 'active' : ''}" %>
+
+        <% if kind == "stolen_tip" %>
+          <div class="dropdown-divider"></div>
+        <% end %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}" %>
+  </li>
+<% end %>
+
+<% colors = %w[#B60205 #D93F0B #FBCA04 #0E8A16 #006B75 #1D76DB #0052CC #5319E7 #D4C5F9 #2C3E50 #F9D0C4 #C2E0C6 #C5DEF5 #7DCABB] %>
+
+<% rendered_chart = capture do %>
+  <% if @render_kind_counts %>
+    <% series = Feedback.kinds.map { |k| {name: Feedback.kind_humanized(k), data: UI::Chart::Component.time_range_counts(collection: available_feedbacks.where(kind: k), time_range: @time_range, column: @time_range_column.presence || "created_at")} } %>
+  <% else %>
+    <% series = [{name: "Feedback", data: UI::Chart::Component.time_range_counts(collection: available_feedbacks, time_range: @time_range, column: @time_range_column.presence || "created_at")}] %>
+  <% end %>
+
+  <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true, colors:)) %>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <%= form_tag url_for, method: :get do %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+
+    <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
+      <div class="mt-2 mr-2">
+        <%= text_field_tag :search_bike_id, params[:search_bike_id], placeholder: "Search Bike ID", class: "form-control" %>
+      </div>
+
+      <div class="mt-2 mr-2">
+        <%= select_tag :search_kind, options_for_select(Feedback.kinds.map { |t| [Feedback.kind_humanized(t), t] }, selected: params[:search_kind]), {prompt: "Search Kind", class: "form-control"} %>
+      </div>
+
+      <div class="mt-2 mr-2">
+        <%= text_field_tag :search_email, params[:search_email], placeholder: "Search email", class: "form-control" %>
+      </div>
+
+      <div class="mt-2">
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <% if @render_kind_counts %>
+    <div class="row mt-4 mb-4">
+      <div class="col-md-6 offset-md-3">
+        <div class="card">
+          <div class="card-body">
+            <h3>Kinds</h3>
+
+            <table class="table-list wide-definition">
+              <tbody>
+                <% Feedback.kinds.each_with_index do |kind, index| %>
+                  <% count = available_feedbacks.where(kind: kind).count %>
+                  <% next unless count > 0 %>
+
+                  <tr>
+                    <td>
+                      <div
+                        style="width: 1em; height: 1em; background: <%= colors[index] %>; float: right; margin-left: 0.4rem;"
+                      ></div>
+
+                      <%= link_to Feedback.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind)) %>
+                    </td>
+
+                    <td><%= number_display(count) %></td>
+                  </tr>
+                <% end %>
+
+                <% nil_count = available_feedbacks.where(kind: nil).count %>
+
+                <% if nil_count > 0 %>
+                  <tr>
+                    <td>Nil</td>
+                    <td><%= number_display(nil_count) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= render partial: "/admin/feedbacks/table", locals: {feedbacks: @feedbacks, render_sortable: true} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @feedbacks,
+  viewing: "Feedback & Messages",
+  rendered_chart:,
+  nav_header_list_items:,
+  admin_search_form:,
+  table_view:
+)) %>

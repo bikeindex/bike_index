@@ -16,6 +16,10 @@
 #  creator_id    :integer
 #  user_id       :integer
 #
+# Indexes
+#
+#  index_customer_contacts_on_bike_id  (bike_id)
+#
 class CustomerContact < ApplicationRecord
   KIND_ENUM = {
     stolen_contact: 0,

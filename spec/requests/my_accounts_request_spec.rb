@@ -188,6 +188,18 @@ RSpec.describe MyAccountsController, type: :request do
     # force skip_update to be false, like it is in reality (unblocks updating)
     before { current_user.skip_update = false }
 
+    context "reserved username" do
+      it "doesn't update username" do
+        current_user.reload
+        expect(current_user.username).to eq "something"
+        patch base_url, params: {id: current_user.username, user: {username: "confirm"}, edit_template: "sharing"}
+        expect(response).to render_template(:edit)
+        expect(assigns(:page_errors)).to include("Username is reserved")
+        current_user.reload
+        expect(current_user.username).to eq("something")
+      end
+    end
+
     context "nil username" do
       it "doesn't update username" do
         current_user.reload
@@ -463,7 +475,7 @@ RSpec.describe MyAccountsController, type: :request do
     end
 
     context "organization with hotsheet" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: ["hot_sheet"]) }
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
       let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
       let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:organization_role) { current_user.organization_roles.first }
@@ -733,6 +745,19 @@ RSpec.describe MyAccountsController, type: :request do
         expect(Bike.count).to eq 1
         expect(flash[:error]).to eq "Organization admins cannot delete their accounts. Email support@bikeindex.org for help"
       end
+    end
+  end
+
+  describe "update with rack_attack" do
+    include_context :rack_attack
+
+    it "returns 429 after exceeding the limit" do
+      5.times do
+        patch base_url, params: {user: {password: "newpass123"}}
+        expect(response.status).to_not eq 429
+      end
+      patch base_url, params: {user: {password: "newpass123"}}
+      expect(response).to have_http_status(:too_many_requests)
     end
   end
 end

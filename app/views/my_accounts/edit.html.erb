@@ -23,7 +23,9 @@
             <% @edit_templates.each do |template, description| %>
               <option
                 value="<%= template_url(template) %>"
-                <%= 'selected' if @edit_template == template %>
+                <% if @edit_template == template %>
+                  selected
+                <% end %>
               >
                 <%= description %>
               </option>

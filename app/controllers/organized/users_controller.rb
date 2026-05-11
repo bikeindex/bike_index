@@ -1,6 +1,6 @@
 module Organized
   class UsersController < Organized::AdminController
-    include SortableTable
+    include Binxtils::SortableTable
 
     before_action :find_organization_role, only: [:edit, :update, :destroy]
     before_action :reject_self_updates, only: [:update, :destroy]

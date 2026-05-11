@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+sed -i '' -e '/SET transaction_timeout = 0;/d' -e '/^\\restrict /d' -e '/^\\unrestrict /d' db/*.sql

@@ -31,92 +31,94 @@
 #  index_external_registry_bikes_on_serial_normalized  (serial_normalized)
 #  index_external_registry_bikes_on_type               (type)
 #
-class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
-  DATE_REGEX = %r{overgebracht .+ op (?<day>\d{1,2})-(?<month>\d{1,2})-(?<year>\d{4})}
-  LOCATION_REGEX = %r{Locatie gevonden: (.+?)\.}
-  SERIAL_NUMBER_REGEX = %r{framenummer '(?:<strong>)?(.+)(?:</strong>)?'}
+class ExternalRegistryBike
+  class VerlorenOfGevondenBike < ExternalRegistryBike
+    DATE_REGEX = %r{overgebracht .+ op (?<day>\d{1,2})-(?<month>\d{1,2})-(?<year>\d{4})}
+    LOCATION_REGEX = %r{Locatie gevonden: (.+?)\.}
+    SERIAL_NUMBER_REGEX = %r{framenummer '(?:<strong>)?(.+)(?:</strong>)?'}
 
-  class << self
-    def build_from_api_response(attrs = {})
-      is_bike = attrs["Category"] == "fiets"
-      return unless is_bike
+    class << self
+      def build_from_api_response(attrs = {})
+        is_bike = attrs["Category"] == "fiets"
+        return unless is_bike
 
-      description = attrs["Description"].presence
+        description = attrs["Description"].presence
 
-      bike = find_or_initialize_by(
-        external_id: attrs["ObjectNumber"].presence,
-        serial_number: parse_serial_number(description),
-        type: to_s
-      )
+        bike = find_or_initialize_by(
+          external_id: attrs["ObjectNumber"].presence,
+          serial_number: parse_serial_number(description),
+          type: to_s
+        )
 
-      bike.cycle_type = "bike"
-      bike.status = "status_impounded" # No need for converter, they all come in as abandoned
-      bike.country = Country.netherlands
-      bike.description = description
-      bike.frame_model = attrs["SubCategory"].presence
-      bike.date_stolen = parse_date_found(description, attrs["RegistrationDate"].presence)
-      bike.mnfg_name = brand(attrs["Brand"].presence)
-      bike.frame_colors = colors(attrs["Color"].presence)
-      bike.info_hash = {object_id: attrs["ObjectId"]}
+        bike.cycle_type = "bike"
+        bike.status = "status_impounded" # No need for converter, they all come in as abandoned
+        bike.country = Country.netherlands
+        bike.description = description
+        bike.frame_model = attrs["SubCategory"].presence
+        bike.date_stolen = parse_date_found(description, attrs["RegistrationDate"].presence)
+        bike.mnfg_name = brand(attrs["Brand"].presence)
+        bike.frame_colors = colors(attrs["Color"].presence)
+        bike.info_hash = {object_id: attrs["ObjectId"]}
 
-      bike.location_found = [
-        parse_location_found(description, attrs["StorageLocation"]),
-        bike.country.iso
-      ].select(&:present?).join(" - ")
+        bike.location_found = [
+          parse_location_found(description, attrs["StorageLocation"]),
+          bike.country.iso
+        ].select(&:present?).join(" - ")
 
-      bike
+        bike
+      end
+
+      def impounded_kind
+        ImpoundRecord.impounded_kind
+      end
+
+      private
+
+      def parse_date_found(description, registration_date)
+        match_data = DATE_REGEX.match(description)
+        return registration_date.to_datetime if registration_date && !match_data
+
+        %i[year month day]
+          .map { |m| match_data[m] }
+          .join("-")
+          .to_datetime
+      end
+
+      def parse_location_found(description, storage_location)
+        match_data = LOCATION_REGEX.match(description)
+        return match_data[1].strip if match_data
+        return storage_location&.strip&.titleize if storage_location.is_a?(String)
+
+        %w[Name City]
+          .map { |key| storage_location[key]&.strip&.titleize }
+          .select(&:present?)
+          .join(", ")
+      end
+
+      def parse_serial_number(description)
+        match_data = SERIAL_NUMBER_REGEX.match(description)
+        return "absent" if match_data.blank? || absent?(match_data[1])
+
+        match_data[1]
+      end
     end
 
-    def impounded_kind
-      ImpoundRecord.impounded_kind
+    def registry_url
+      "https://verlorenofgevonden.nl"
     end
 
-    private
-
-    def parse_date_found(description, registration_date)
-      match_data = DATE_REGEX.match(description)
-      return registration_date.to_datetime if registration_date && !match_data
-
-      %i[year month day]
-        .map { |m| match_data[m] }
-        .join("-")
-        .to_datetime
+    def url
+      [registry_url, "overzicht?search=#{external_id}"].join("/")
     end
 
-    def parse_location_found(description, storage_location)
-      match_data = LOCATION_REGEX.match(description)
-      return match_data[1].strip if match_data
-      return storage_location&.strip&.titleize if storage_location.is_a?(String)
+    def image_url
+      return if info_hash["object_id"].blank?
 
-      %w[Name City]
-        .map { |key| storage_location[key]&.strip&.titleize }
-        .select(&:present?)
-        .join(", ")
+      [registry_url, "assets", "image", info_hash["object_id"]].join("/")
     end
 
-    def parse_serial_number(description)
-      match_data = SERIAL_NUMBER_REGEX.match(description)
-      return "absent" if match_data.blank? || absent?(match_data[1])
-
-      match_data[1]
+    def thumb_url
+      image_url
     end
-  end
-
-  def registry_url
-    "https://verlorenofgevonden.nl"
-  end
-
-  def url
-    [registry_url, "overzicht?search=#{external_id}"].join("/")
-  end
-
-  def image_url
-    return if info_hash["object_id"].blank?
-
-    [registry_url, "assets", "image", info_hash["object_id"]].join("/")
-  end
-
-  def thumb_url
-    image_url
   end
 end
