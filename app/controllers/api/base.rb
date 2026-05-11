@@ -69,6 +69,11 @@ module API
       include: [GrapeLogging::Loggers::BinxLogger.new,
         GrapeLogging::Loggers::FilterParameters.new]
     use ::APIAuthorization::OAuth2
+
+    rescue_from :all do |e|
+      API::Base.respond_to_error(e)
+    end
+
     mount API::V3::RootV3
     mount API::V2::RootV2
 
