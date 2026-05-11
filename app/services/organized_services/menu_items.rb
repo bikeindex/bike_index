@@ -28,13 +28,31 @@ module OrganizedServices
     # changes, so user.cache_key_with_version covers both per-user changes
     # and org-feature changes.
     def for(organization:, current_user:)
-      return [] if organization.nil?
+      return [] if organization.nil? || current_user.nil?
 
-      key = ["organized_menu_items_v1", organization.id, current_user&.cache_key_with_version]
-      Rails.cache.fetch(key) do
+      Rails.cache.fetch(["organized_menu_items_v1", organization.id, current_user.cache_key_with_version]) do
         build_items(organization, current_user)
       end
     end
+
+    # Public helpers for the component to inject route-specific overrides
+    # (so the menu still shows the dashboard / bulk-imports link when the
+    # user is on those pages, even if the org doesn't have the feature).
+    def dashboard_link(organization)
+      link("#{organization.short_name} dashboard",
+        routes.organization_dashboard_index_path(organization_id: organization.to_param))
+    end
+
+    def bulk_import_link(organization)
+      bulk_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
+      link(bulk_label,
+        routes.organization_bulk_imports_path(organization_id: organization.to_param),
+        active: :match_controller)
+    end
+
+    #
+    # private below here
+    #
 
     def build_items(organization, current_user)
       organization.ambassador? ? ambassador_items(organization) : standard_items(organization, current_user)
@@ -71,25 +89,6 @@ module OrganizedServices
 
       items
     end
-
-    # Public helpers for the component to inject route-specific overrides
-    # (so the menu still shows the dashboard / bulk-imports link when the
-    # user is on those pages, even if the org doesn't have the feature).
-    def dashboard_link(organization)
-      link("#{organization.short_name} dashboard",
-        routes.organization_dashboard_index_path(organization_id: organization.to_param))
-    end
-
-    def bulk_import_link(organization)
-      bulk_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
-      link(bulk_label,
-        routes.organization_bulk_imports_path(organization_id: organization.to_param),
-        active: :match_controller)
-    end
-
-    #
-    # private below here
-    #
 
     def additional_divider?(organization)
       %w[bike_stickers hot_sheet csv_exports graduated_notifications model_audits].any? do |slug|
@@ -200,7 +199,7 @@ module OrganizedServices
     end
 
     def admin_items(organization, current_user, additional_divider:)
-      return [] unless current_user&.admin_of?(organization) || current_user&.superuser?
+      return [] unless current_user.admin_of?(organization) || current_user.superuser?
 
       items = []
       items << divider if additional_divider
