@@ -3,7 +3,7 @@
 #/
 #/ Clean up workspace-specific resources for this checkout: drops the
 #/ workspace-specific dev/test databases, removes the row from the
-#/ bikeindex_workspaces.workspace_ids table, and deletes .workspace_id.
+#/ dev_workspaces.workspace_ids table, and deletes .workspace_id.
 
 set -e
 cd $(dirname "$0")/..
@@ -45,7 +45,7 @@ done
 
 workspace_int="${WORKSPACE_ID#w}"
 echo "Removing workspace_ids row: $workspace_int"
-psql -d bikeindex_workspaces -tAXc "DELETE FROM workspace_ids WHERE id = ${workspace_int}" 2>/dev/null || true
+psql -d dev_workspaces -tAXc "DELETE FROM workspace_ids WHERE id = ${workspace_int}" 2>/dev/null || true
 
 rm -f .workspace_id
 

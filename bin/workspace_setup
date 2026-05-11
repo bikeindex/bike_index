@@ -4,7 +4,7 @@
 # Assigns this checkout a workspace ID (the smallest unused integer >= 3072,
 # so deleted IDs are reused) and writes it to .workspace_id at the repo root,
 # then runs bin/setup. The ID is loaded by bin/env to populate WORKSPACE_ID.
-# IDs are tracked in the local Postgres `bikeindex_workspaces` database so
+# IDs are tracked in the local Postgres `dev_workspaces` database so
 # multiple checkouts on the same machine each get a distinct ID.
 #
 # Pass --without_seeds to skip db:seed, parallel:prepare, and
@@ -14,7 +14,7 @@ require "fileutils"
 
 APP_ROOT = File.expand_path("..", __dir__)
 WORKSPACE_FILE = File.join(APP_ROOT, ".workspace_id")
-WORKSPACE_DB = "bikeindex_workspaces"
+WORKSPACE_DB = "dev_workspaces"
 
 setup_args = []
 ARGV.each do |arg|
