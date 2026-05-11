@@ -1,0 +1,13 @@
+<h1><%= translation("youre_almost_done") %></h1>
+
+<p>
+  <%= translation("just_a_few_steps_away_html", color_and_brand: color_and_brand) %>
+</p>
+
+<% if organization_snippet_body.present? %>
+  <%= organization_snippet_body.html_safe %>
+<% end %>
+
+<p><%= translation("click_below_to_complete_your_registration") %></p>
+
+<%= link_to translation("finish_it"), tokenized_url, "data-pm-no-track" => true, class: "binx-button" %>

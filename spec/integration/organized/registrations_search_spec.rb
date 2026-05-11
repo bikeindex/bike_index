@@ -83,7 +83,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("table", wait: 10)
 
     fill_in "search_email", with: "alice@example.com"
-    find("#search_email").send_keys(:return)
+    find_field("search_email").send_keys(:return)
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
@@ -154,32 +154,44 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_content("alice@example.com")
 
     # filters by period and custom time range — 12 bikes total: bike1 (2.years.ago), bike2 (3.days.ago), 10 create_list (now)
-    visit bikes_path
-    expect(page).to have_css("table", wait: 10)
-    expect(page).to have_css("a.period-select-standard[data-period='all']")
-    expect(page).to have_text("12 registrations matching")
-
     # "past year" excludes bike1 (2 years ago)
-    page.execute_script("document.querySelector(\"a.period-select-standard[data-period='year']\").click()")
+    click_link "past year"
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    expect(page).to have_text("0 registrations matching")
+
+    fill_in "search_notes", with: ""
+    find("#search-button").click
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_text("11 registrations matching")
 
     # "past day" additionally excludes bike2 (3 days ago)
-    page.execute_script("document.querySelector(\"a.period-select-standard[data-period='day']\").click()")
+    click_link "past day"
     expect(page).to have_current_path(/period=day/, wait: 10)
     expect(page).to have_text("10 registrations matching")
 
-    # JS (application.js + TimeLocalizer) sets a timezone cookie from window.localTimezone.
-    # The server reads it in set_locale and uses it to bucket chart data via groupdate.
-    # Run this before the custom period click below — that submission posts a timezone
-    # param, which gets persisted in session[:timezone] and overrides the cookie.
+    # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago).
+    # Search on the page (no URL navigation): switch to past year, then submit the email filter.
+    click_link "past year"
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    fill_in "search_email", with: "bob@example.com"
+    find("#search-button").click
+    expect(page).to have_current_path(/search_email=bob/, wait: 10)
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    expect(page).to have_field("search_email", with: "bob@example.com")
+    expect(rendered_bike_ids).to eq([bike2.id])
+
+    # Chart test must run before the custom-range click below: that submission
+    # writes session[:timezone] from Intl.DateTimeFormat (varies between local
+    # Chrome and CI's headless Chrome), and set_timezone prefers session over
+    # cookie — so the cookie override only takes effect while session is empty.
     expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to be_present
 
     # 5 AM UTC = 9 PM PDT (or 12 AM CDT) the previous day, so PDT and CDT fall on different days.
-    bulk_import_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
-    FactoryBot.create(:bulk_import, organization:, created_at: bulk_import_created_at)
-    la_date_key = bulk_import_created_at.in_time_zone("America/Los_Angeles").strftime("%Y-%-m-%-d")
-    cdt_date_key = bulk_import_created_at.in_time_zone("America/Chicago").strftime("%Y-%-m-%-d")
+    chart_bike_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
+    bike2.update_columns(created_at: chart_bike_created_at)
+    la_date_key = chart_bike_created_at.in_time_zone("America/Los_Angeles").strftime("%Y-%-m-%-d")
+    cdt_date_key = chart_bike_created_at.in_time_zone("America/Chicago").strftime("%Y-%-m-%-d")
     expect(la_date_key).not_to eq(cdt_date_key)
 
     # Replace the cookie via JS the same way the app does, so attributes (SameSite, path)
@@ -187,28 +199,32 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.execute_script("document.cookie = 'timezone=America/Los_Angeles;path=/;max-age=31536000;SameSite=Lax'")
     expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to eq("America/Los_Angeles")
 
-    visit "/o/#{organization.to_param}/bulk_imports?render_chart=true&period=month"
-    expect(page).to have_css("table", wait: 10)
-    # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket has 0
-    expect(page.html).to include(%(["#{la_date_key}",1]))
-    expect(page.html).to include(%(["#{cdt_date_key}",0]))
+    # Switch to past 30 days for daily chart bucketing, then enable the chart on the search page
+    click_link "past 30 days"
+    expect(page).to have_current_path(/period=month/, wait: 10)
 
-    # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only
-    visit bikes_path
+    click_link "Render chart"
+    expect(page).to have_current_path(/render_chart=true/, wait: 10)
     expect(page).to have_css("table", wait: 10)
-    page.execute_script("document.querySelector(\"button[data-period='custom']\").click()")
+    # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket is empty (null)
+    expect(page.html).to include(%(["#{la_date_key}",1]))
+    expect(page.html).to include(%(["#{cdt_date_key}",null]))
+
+    # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only.
+    # Runs after the chart test because the Stimulus submit posts a timezone param that pins
+    # session[:timezone], which would otherwise override the cookie set above.
+    click_link "past year"
+    fill_in "search_email", with: ""
+    find("#search-button").click
+    expect(page).to have_current_path(/period=year/, wait: 10)
+
+    click_button "custom"
     start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
     end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
     page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
     page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
-    page.execute_script("document.querySelector(\"#timeSelectionCustom button[type='submit']\").click()")
+    page.execute_script("document.querySelector(\"[data-controller~='ui--period-select'] button[type='submit']\").click()")
     expect(page).to have_current_path(/period=custom/, wait: 10)
-    expect(rendered_bike_ids).to eq([bike2.id])
-
-    # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago)
-    visit "#{bikes_path}?search_email=bob@example.com&period=year"
-    expect(page).to have_css("table", wait: 10)
-    expect(page).to have_field("search_email", with: "bob@example.com")
     expect(rendered_bike_ids).to eq([bike2.id])
   end
 
@@ -288,15 +304,24 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   context "multi serial search" do
     let(:multi_serial_path) { "/o/#{organization.to_param}/registrations/multi_search" }
 
-    let!(:bike_a) { FactoryBot.create(:bike_organized, serial_number: "SERIAL111", creation_organization: organization) }
+    let!(:bike_a) { FactoryBot.create(:bike_organized, serial_number: "SERIAL111", owner_email: "owner-alpha@example.com", creation_organization: organization) }
     let!(:bike_b) { FactoryBot.create(:bike_organized, serial_number: "SERIAL222", creation_organization: organization) }
     let!(:other_org_bike) { FactoryBot.create(:bike, serial_number: "SERIAL333") }
 
-    it "searches multiple serials and shows results" do
+    around do |example|
+      ActionController::Base.perform_caching = true
+      ActionController::Base.cache_store = ActiveSupport::Cache::MemoryStore.new
+      example.run
+    ensure
+      ActionController::Base.perform_caching = false
+      ActionController::Base.cache_store = :null_store
+    end
+
+    it "searches multiple serials, shows results, and caches rows by updated_at" do
       visit multi_serial_path
 
       expect(page).to have_content(/multiple serial search/i)
-      expect(page).to have_css("[data-controller~='org--multi-serial-search']", wait: 5)
+      expect(page).to have_css("[data-controller~='org--multi-search']", wait: 5)
 
       find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
       click_button "Search serials"
@@ -308,6 +333,21 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css(".multi-search-serial-result", count: 2)
       expect(page).not_to have_content("No matches found")
       expect(page).not_to have_content("SERIAL333")
+      expect(page).to have_content("owner-alpha@example.com")
+
+      # Mutate without bumping updated_at — reload should serve the cached row
+      bike_a.update_columns(owner_email: "owner-beta@example.com")
+      visit page.current_url
+
+      expect(page).to have_content("owner-alpha@example.com", wait: 10)
+      expect(page).not_to have_content("owner-beta@example.com")
+
+      # Bump updated_at to bust the per-row cache
+      bike_a.update_column(:updated_at, 1.second.from_now)
+      visit page.current_url
+
+      expect(page).to have_content("owner-beta@example.com", wait: 10)
+      expect(page).not_to have_content("owner-alpha@example.com")
     end
   end
 

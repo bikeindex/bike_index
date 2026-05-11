@@ -1,0 +1,52 @@
+#!/bin/sh
+#/ Usage: bin/workspace_teardown
+#/
+#/ Clean up workspace-specific resources for this checkout: drops the
+#/ workspace-specific dev/test databases, removes the row from the
+#/ dev_workspaces.workspace_ids table, and deletes .workspace_id.
+
+set -e
+cd $(dirname "$0")/..
+
+if [ -z "$WORKSPACE_ID" ] && [ -f .workspace_id ]; then
+  WORKSPACE_ID="w$(cat .workspace_id)"
+fi
+
+if [ -z "$WORKSPACE_ID" ]; then
+  echo "WORKSPACE_ID not set and .workspace_id missing, skipping teardown."
+  exit 0
+fi
+
+echo "Tearing down workspace: $WORKSPACE_ID"
+
+# Drop workspace-specific development databases
+for db in "bikeindex_development_${WORKSPACE_ID}" \
+          "bikeindex_analytics_development_${WORKSPACE_ID}"; do
+  echo "Dropping database: $db"
+  dropdb --if-exists "$db" 2>/dev/null || true
+done
+
+# Drop workspace-specific test databases
+for db in "bikeindex_test_${WORKSPACE_ID}" \
+          "bikeindex_test_${WORKSPACE_ID}_replica" \
+          "bikeindex_analytics_test_${WORKSPACE_ID}"; do
+  echo "Dropping database: $db"
+  dropdb --if-exists "$db" 2>/dev/null || true
+done
+
+# Also drop parallel test databases (TEST_ENV_NUMBER suffixed)
+for i in $(seq 1 8); do
+  for db in "bikeindex_test_${WORKSPACE_ID}${i}" \
+            "bikeindex_test_${WORKSPACE_ID}_replica${i}" \
+            "bikeindex_analytics_test_${WORKSPACE_ID}${i}"; do
+    dropdb --if-exists "$db" 2>/dev/null || true
+  done
+done
+
+workspace_int="${WORKSPACE_ID#w}"
+echo "Removing workspace_ids row: $workspace_int"
+psql -d dev_workspaces -tAXc "DELETE FROM workspace_ids WHERE id = ${workspace_int}" 2>/dev/null || true
+
+rm -f .workspace_id
+
+echo "Workspace teardown complete!"

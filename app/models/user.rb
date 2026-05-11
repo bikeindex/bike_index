@@ -175,6 +175,7 @@ class User < ApplicationRecord
     end
 
     def username_friendly_find(str)
+      str = Binxtils::InputNormalizer.string(str) if str.is_a?(String)
       return if str.blank?
 
       if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
@@ -185,6 +186,7 @@ class User < ApplicationRecord
     end
 
     def friendly_find(str)
+      str = Binxtils::InputNormalizer.string(str) if str.is_a?(String)
       username_friendly_find(str) || fuzzy_email_find(str)
     end
 

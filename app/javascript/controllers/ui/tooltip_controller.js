@@ -22,6 +22,7 @@ export default class extends Controller {
 
   connect () {
     this.clickOutside = this.clickOutside.bind(this)
+    this.keydownEscape = this.keydownEscape.bind(this)
   }
 
   disconnect () {
@@ -55,6 +56,13 @@ export default class extends Controller {
     this.sync()
   }
 
+  keydownEscape (event) {
+    if (event.key !== 'Escape') return
+    this.hoverActive = false
+    this.persistentActive = false
+    this.sync()
+  }
+
   sync () {
     if (this.hoverActive || this.persistentActive) this.open()
     else this.close()
@@ -66,6 +74,7 @@ export default class extends Controller {
     topZIndex += 1
     this.tooltipTarget.style.zIndex = topZIndex
     this.tooltipTarget.classList.remove('tw:hidden')
+    document.addEventListener('keydown', this.keydownEscape)
     this.cleanup = autoUpdate(this.triggerTarget, this.tooltipTarget, () => this.updatePosition())
   }
 
@@ -74,6 +83,7 @@ export default class extends Controller {
     this.isOpen = false
     this.tooltipTarget.classList.add('tw:hidden')
     document.removeEventListener('click', this.clickOutside)
+    document.removeEventListener('keydown', this.keydownEscape)
     if (this.cleanup) {
       this.cleanup()
       this.cleanup = null

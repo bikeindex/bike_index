@@ -24,15 +24,18 @@ RSpec.describe "Me API V3", type: :request do
       let(:target_membership) do
         {
           organization_name: organization_role.organization.name,
+          organization_short_name: organization_role.organization.short_name,
           organization_slug: organization_role.organization.slug,
           organization_id: organization_role.organization_id,
           organization_access_token: organization_role.organization.access_token,
+          organization_logo_url: nil,
           user_is_organization_admin: false
         }
       end
       it "responds with all available attributes with full scoped token" do
         user.reload
         expect(user.secondary_emails).to eq(["d@f.co"])
+        expect(organization_role.organization.avatar?).to be_falsey
         get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect(json_result["user"]["name"]).to eq(user.name)
@@ -43,6 +46,17 @@ RSpec.describe "Me API V3", type: :request do
         expect(json_result["memberships"].is_a?(Array)).to be_truthy
         expect(json_result["memberships"]).to eq([target_membership.as_json])
         expect(response.response_code).to eq(200)
+      end
+
+      context "organization with uploaded avatar" do
+        let(:avatar) { Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
+        before { organization_role.organization.update!(avatar: avatar) }
+        it "returns the avatar URL as organization_logo_url" do
+          get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
+          expect(response.response_code).to eq(200)
+          expect(organization_role.organization.reload).to have_attributes(avatar?: true)
+          expect(json_result["memberships"]).to eq([target_membership.merge(organization_logo_url: organization_role.organization.avatar_url).as_json])
+        end
       end
     end
 
@@ -127,6 +141,19 @@ RSpec.describe "Me API V3", type: :request do
       expect(json_result["bikes"].is_a?(Array)).to be_truthy
       expect(response.response_code).to eq(200)
     end
+
+    context "with for sale bike" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: user.email, is_for_sale: true) }
+
+      it "uses BikeV3Serializer (status not 'for sale', for_sale: true)" do
+        token.update_attribute :scopes, "read_bikes"
+        get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
+        expect(response.response_code).to eq(200)
+        result = json_result["bikes"].find { |b| b["id"] == bike.id }
+        expect(result).to include("status" => "with owner", "for_sale" => true)
+      end
+    end
+
     it "403s if read_bikes_spec isn't in token" do
       get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
       expect(response.response_code).to eq(403)

@@ -79,5 +79,18 @@ export default class extends Controller {
     if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
       window.timeLocalizer.localize()
     }
+    this.syncHiddenFieldsFromUrl()
+  }
+
+  // The form sits outside the results frame, so frame-nav period clicks advance
+  // the URL but leave its hidden fields stale. Sync from the URL so the next
+  // submit doesn't drop the period the user just chose.
+  syncHiddenFieldsFromUrl () {
+    const params = new URLSearchParams(window.location.search)
+    this.formTarget.querySelectorAll('input[type="hidden"]').forEach(input => {
+      if (!input.name || !params.has(input.name)) return
+      const newValue = params.get(input.name)
+      if (input.value !== newValue) input.value = newValue
+    })
   }
 }

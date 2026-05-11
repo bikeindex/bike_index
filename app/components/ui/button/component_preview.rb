@@ -13,34 +13,30 @@ module UI
         render(UI::Button::Component.new(text: "Primary", color: :primary))
       end
 
+      def primary_active
+        render(UI::Button::Component.new(text: "Primary Active", color: :primary, active: true))
+      end
+
+      # @label secondary (with data)
       def secondary
-        render(UI::Button::Component.new(text: "Secondary", color: :secondary))
+        render(UI::Button::Component.new(text: "Secondary", color: :secondary, data: {action: "click->ui--modal#open"}))
+      end
+
+      # @label secondary active (with data)
+      def secondary_active
+        render(UI::Button::Component.new(text: "Secondary Active", color: :secondary, active: true, data: {action: "click->ui--modal#open"}))
       end
 
       def error
         render(UI::Button::Component.new(text: "Delete", color: :error))
       end
 
-      def link
-        render(UI::Button::Component.new(text: "Link style", color: :link))
-      end
-
-      def secondary_with_data
-        render(UI::Button::Component.new(text: "Secondary with data", color: :secondary, data: {action: "click->ui--modal#open"}))
-      end
-      # @!endgroup
-
-      # @!group Active
-      def primary_active
-        render(UI::Button::Component.new(text: "Primary Active", color: :primary, active: true))
-      end
-
-      def secondary_active
-        render(UI::Button::Component.new(text: "Secondary Active", color: :secondary, active: true))
-      end
-
       def error_active
         render(UI::Button::Component.new(text: "Error Active", color: :error, active: true))
+      end
+
+      def link
+        render(UI::Button::Component.new(text: "Link style", color: :link))
       end
 
       def link_active

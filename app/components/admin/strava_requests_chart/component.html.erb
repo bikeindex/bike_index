@@ -14,7 +14,7 @@
   <% pie_columns.each do |title, data, colors| %>
     <div>
       <h4><%= title %></h4>
-      <%= helpers.pie_chart(data, **pie_chart_opts(colors)) %>
+      <%= helpers.pie_chart(data, **pie_chart_opts(colors, data)) %>
     </div>
   <% end %>
 </div>

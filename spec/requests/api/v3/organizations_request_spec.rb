@@ -105,9 +105,11 @@ RSpec.describe "Organization API V3", type: :request do
         let(:target_response) do
           {
             name: "Geoff's Bike Shop",
+            short_name: "Geoff's Bike Shop",
             website: "https://bikes.geoffereth.com",
             kind: "bike_shop",
             slug: "geoffs-bike-shop",
+            logo_url: nil,
             locations: [
               {address: "1111 SE Belmont Street, Portland, OR 97215, United States"}.merge(location_1),
               {address: "2222 SE Morrison Street, Portland, OR 97214, United States"}.merge(location_2)
@@ -122,6 +124,16 @@ RSpec.describe "Organization API V3", type: :request do
           expect(response.code).to eq("201")
           expect(json_result["organization"]).to match_hash_indifferently target_response
         end
+
+        context "with explicit short_name" do
+          let(:organization_json) { organization_attrs.merge(short_name: "Geoff's").to_json }
+          it "uses the provided short_name and slug" do
+            post url, params: organization_json, headers: json_headers
+            expect(response.code).to eq("201")
+            expect(json_result["organization"]).to match_hash_indifferently target_response.merge(short_name: "Geoff's", slug: "geoffs")
+          end
+        end
+
         describe "with no ALLOWED_WRITE_ORGANIZATIONS" do
           it "creates an organization" do
             ENV["ALLOWED_WRITE_ORGANIZATIONS"] = nil
@@ -173,6 +185,70 @@ RSpec.describe "Organization API V3", type: :request do
           expect(response).to be_created
           expect(response.code).to eq("201")
         end
+      end
+    end
+  end
+
+  describe "index" do
+    let(:token) { create_doorkeeper_token(scopes: :read_organization_membership) }
+    let(:url) { "/api/v3/organizations?access_token=#{token.token}" }
+
+    context "without access token" do
+      it "returns a 401" do
+        get "/api/v3/organizations"
+        expect(response.code).to eq("401")
+      end
+    end
+
+    context "without read_organization_membership scope" do
+      let(:token) { create_doorkeeper_token(scopes: :read_bikes) }
+      it "returns a 403" do
+        get url, headers: json_headers
+        expect(response.code).to eq("403")
+      end
+    end
+
+    context "user has no organizations" do
+      it "returns an empty array" do
+        get url, headers: json_headers
+        expect(response.code).to eq("200")
+        expect(json_result["organizations"]).to eq([])
+      end
+    end
+
+    context "user is a member of organizations" do
+      let(:organization) { FactoryBot.create(:organization, :in_chicago, name: "Geoff's Bike Shop", website: "https://bikes.geoffereth.com", kind: "bike_shop") }
+      let(:other_organization) { FactoryBot.create(:organization, name: "Other Shop", website: "https://other.example.com", kind: "bike_shop") }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user, organization: organization) }
+      let!(:other_organization_role) { FactoryBot.create(:organization_role_claimed, user: user, organization: other_organization) }
+      let!(:not_my_organization) { FactoryBot.create(:organization) }
+      let(:location) { organization.locations.first }
+      let(:target_organization) do
+        {
+          name: "Geoff's Bike Shop",
+          short_name: "Geoff's Bike Shop",
+          website: "https://bikes.geoffereth.com",
+          kind: "bike_shop",
+          slug: "geoffs-bike-shop",
+          logo_url: nil,
+          locations: [{
+            address: "1300 W 14th Pl, Chicago, IL 60608, United States",
+            name: location.name,
+            phone: nil,
+            street: "1300 W 14th Pl",
+            city: "Chicago",
+            state: "Illinois",
+            country: "United States",
+            zipcode: "60608"
+          }]
+        }
+      end
+
+      it "returns only the user's organizations, serialized" do
+        get url, headers: json_headers
+        expect(response.code).to eq("200")
+        expect(json_result["organizations"].pluck("slug")).to match_array([organization.slug, other_organization.slug])
+        expect(json_result["organizations"].find { |o| o["slug"] == organization.slug }).to match_hash_indifferently target_organization
       end
     end
   end

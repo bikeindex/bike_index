@@ -1,0 +1,23 @@
+<%= @parking_notification.subject %>
+
+
+<% if @parking_notification.repeat_record? %>
+This is your <%= @parking_notification.notification_number.ordinalize %> notification!
+<% end %>
+This is for your <%= bike.title_string %>.
+
+<% if impound_record && impound_location.present? %>
+It is being held at <%= impound_location.name %>
+
+<%= render UI::AddressDisplay::Component.new(address_record: impound_location.address_record, visible_attribute: :street, kind: :multiline) %>
+<% end %>
+<% if @parking_notification.impound_notification? %>
+It was located at: <%= @parking_notification.formatted_address_string %>
+<% else %>
+It is located at: <%= @parking_notification.formatted_address_string %>
+<% end %>
+
+---
+
+
+<%= @parking_notification.message %>
