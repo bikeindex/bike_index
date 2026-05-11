@@ -8,6 +8,7 @@ module Organized
     around_action :set_reading_role, only: :multi_search_response
 
     def index
+      return head(:not_acceptable) unless request.format.html? || request.format.turbo_stream?
       set_period
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
 
