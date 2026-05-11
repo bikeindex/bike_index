@@ -10,11 +10,14 @@ RSpec.describe Org::MenuItems::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization) }
   let(:current_user) { FactoryBot.create(:organization_user, organization:) }
 
-  it "renders nav links, dividers, and disabled placeholders for a member of a basic org" do
+  it "renders nav links, dividers, and disabled placeholders (incl. the dashboard route override)" do
     expect(instance.render?).to be true
+    expect(organization.overview_dashboard?).to be false
     expect(component.css("li").length).to be > 0
     expect(component.css("a.nav-link").map(&:text).map(&:strip)).to include(
-      "#{organization.short_name} Bikes", "Add a bike"
+      "#{organization.short_name} Bikes",
+      "Add a bike",
+      "#{organization.short_name} dashboard"
     )
     expect(component.css("li.divider-nav-item").length).to be > 0
     expect(component.css("span.disabled-menu-item").map(&:text).map(&:strip))
@@ -59,30 +62,13 @@ RSpec.describe Org::MenuItems::Component, type: :component do
   end
 
   describe "route overrides" do
-    context "on the dashboard with overview_dashboard? off" do
-      let(:component) do
-        with_request_url("/o/#{organization.to_param}/dashboard") { render_inline(instance) }
-      end
-
-      it "still renders the dashboard link so the active page is represented" do
-        expect(organization.overview_dashboard?).to be false
-        labels = component.css("a.nav-link").map(&:text).map(&:strip)
-        expect(labels).to include("#{organization.short_name} dashboard")
-      end
-    end
-
     context "on bulk_imports without show_bulk_import?" do
       let(:component) do
         with_request_url("/o/#{organization.to_param}/bulk_imports") { render_inline(instance) }
       end
 
-      it "still renders the bulk imports link" do
+      it "renders the injected bulk imports link with a divider above it" do
         expect(organization.show_bulk_import?).to be false
-        labels = component.css("a.nav-link").map(&:text).map(&:strip)
-        expect(labels).to include("Bulk Imports")
-      end
-
-      it "inserts a divider above the injected bulk imports link" do
         items = component.css("li").to_a
         bulk_link_index = items.index { |li| li.css("a.nav-link").text.strip == "Bulk Imports" }
         expect(bulk_link_index).to be > 0
