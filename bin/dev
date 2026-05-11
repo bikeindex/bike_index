@@ -13,6 +13,8 @@ touch log/redis.log
 redis-server > log/redis.log &
 
 eval "$(ruby bin/env --export)"
+echo "Starting server on http://localhost:$DEV_PORT"
+echo
 
 # Pass --strava to start the strava_search Vite dev server
 FOREMAN_ARGS="-f Procfile.dev"
@@ -28,3 +30,4 @@ if test -f .env.development; then
 else
   bundle exec foreman start $FOREMAN_ARGS
 fi
+

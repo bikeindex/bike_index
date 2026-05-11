@@ -2,14 +2,18 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global Turbo, requestAnimationFrame */
 
-// Connects to data-controller='org--multi-serial-search'
+// Connects to data-controller='org--multi-search'
 export default class extends Controller {
-  static targets = ['textarea', 'button', 'serialChips', 'results']
+  static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll']
   static values = { url: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
     if (this.searching) return
-    const serialsParam = new URL(window.location).searchParams.get('serials')
+    const params = new URL(window.location).searchParams
+    if (this.hasSearchAllTarget && params.get('search_all') === '1') {
+      this.searchAllTarget.checked = true
+    }
+    const serialsParam = params.get('serials')
     if (serialsParam) {
       this.textareaTarget.value = serialsParam
       this.search(this.parseSerials(serialsParam))
@@ -23,6 +27,10 @@ export default class extends Controller {
     this.search(serials)
   }
 
+  get searchAll () {
+    return this.hasSearchAllTarget && this.searchAllTarget.checked
+  }
+
   parseSerials (text) {
     return [...new Set(
       text.split(/[,\n]/).map(s => s.trim()).filter(s => s)
@@ -33,6 +41,11 @@ export default class extends Controller {
     this.searching = true
     const url = new URL(window.location.pathname, window.location.origin)
     url.searchParams.set('serials', serials.join(','))
+    if (this.searchAll) {
+      url.searchParams.set('search_all', '1')
+    } else {
+      url.searchParams.delete('search_all')
+    }
     window.history.pushState({}, '', url)
 
     this.resultsTarget.innerHTML = ''
@@ -87,6 +100,7 @@ export default class extends Controller {
     const url = new URL(this.urlValue, window.location.origin)
     url.searchParams.set('serial', serial)
     url.searchParams.set('chip_id', `chip_${index}`)
+    if (this.searchAll) url.searchParams.set('search_all', '1')
 
     try {
       const response = await fetch(url, {
