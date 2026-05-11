@@ -1,111 +1,43 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Assigns this checkout a workspace ID (an integer 3070..4020) and writes it
+# to .workspace_id at the repo root, then runs bin/setup. The ID is loaded by
+# bin/env to populate WORKSPACE_ID. IDs are tracked in the local Postgres
+# `bikeindex_workspaces` database so multiple checkouts on the same machine
+# each get a distinct ID.
+
 require "fileutils"
 
-# path to your application root.
 APP_ROOT = File.expand_path("..", __dir__)
+WORKSPACE_FILE = File.join(APP_ROOT, ".workspace_id")
+WORKSPACE_DB = "bikeindex_workspaces"
 
-# Assign this checkout a WORKSPACE_ID before loading env / db config that
-# depends on it. Safe to call repeatedly: exits early once .workspace_id exists.
-system(File.expand_path("workspace_id_setup", __dir__)) || abort("workspace_id_setup failed")
-
-load File.expand_path("env", __dir__)
-include FileUtils
-
-without_seeds = ARGV.include?("--without_seeds")
-
-def system!(*args)
-  system(*args) || abort("\n== Command #{args} failed ==")
+def psql(database, query)
+  output = IO.popen(["psql", "-d", database, "-tAX", "-c", query], &:read)
+  abort "psql failed for #{database}: #{query}" unless $?.success?
+  output.strip
 end
 
-chdir APP_ROOT do
-  # Conductor workspace setup
-  if ENV["CONDUCTOR_ROOT_PATH"]
-    root = ENV["CONDUCTOR_ROOT_PATH"]
-    puts "== Setting up Conductor workspace =="
-
-    # Copy .env.test from root repo
-    env_test = File.join(root, ".env.test")
-    if File.exist?(env_test)
-      puts "Copying .env.test from #{root}..."
-      cp env_test, ".env.test"
-    end
-
-    # Copy .env.conductor_dev from root repo
-    env_dev = File.join(root, ".env.conductor_dev")
-    if File.exist?(env_dev)
-      puts "Copying .env.conductor_dev from #{root}..."
-      cp env_dev, ".env.development"
-    end
-
-    # Symlink storage directory for Active Storage
-    root_storage = File.join(root, "storage")
-    if Dir.exist?(root_storage)
-      puts "Symlinking storage from #{root_storage}..."
-      rm_rf "storage"
-      ln_sf root_storage, "storage"
-    else
-      puts "Creating storage directory at #{root_storage}..."
-      mkdir_p root_storage
-      ln_sf root_storage, "storage"
-    end
-
-    # Symlink node_modules so every workspace shares one install
-    root_node_modules = File.join(root, "node_modules")
-    mkdir_p root_node_modules unless Dir.exist?(root_node_modules)
-    puts "Symlinking node_modules from #{root_node_modules}..."
-    rm_rf "node_modules"
-    ln_sf root_node_modules, "node_modules"
-
-    # Copy Facebook VCR cassettes
-    fb_cassettes = File.join(root, "spec/vcr_cassettes/facebook")
-    if Dir.exist?(fb_cassettes)
-      puts "Copying spec/vcr_cassettes/facebook from #{root}..."
-      mkdir_p "spec/vcr_cassettes/facebook"
-      Dir.glob(File.join(fb_cassettes, "*")).each { |f| cp f, "spec/vcr_cassettes/facebook/" }
-    end
+if File.exist?(WORKSPACE_FILE)
+  puts "workspace ID already set: w#{File.read(WORKSPACE_FILE).strip}"
+else
+  unless system("psql", "-d", "postgres", "-tAXc", "SELECT 1 FROM pg_database WHERE datname = '#{WORKSPACE_DB}'", out: File::NULL)
+    abort "Could not query Postgres. Is it running?"
   end
 
-  puts "== Checking Ruby version =="
-  required_ruby = File.read(".tool-versions")[/ruby (\S+)/, 1]
-  if required_ruby && RUBY_VERSION != required_ruby
-    if ENV["SETUP_RUBY_INSTALLED"]
-      abort "Failed to activate Ruby #{required_ruby} via mise after installing"
-    end
-    abort "mise is required but not found. See https://mise.jdx.dev/" unless system("which mise > /dev/null 2>&1")
-    puts "Ruby #{required_ruby} required (current: #{RUBY_VERSION}), installing via mise..."
-    system!("mise install ruby@#{required_ruby}")
-    exec({"SETUP_RUBY_INSTALLED" => "1"}, "mise", "exec", "--", "ruby", __FILE__, *ARGV)
+  if psql("postgres", "SELECT 1 FROM pg_database WHERE datname = '#{WORKSPACE_DB}'").empty?
+    system("createdb", WORKSPACE_DB) || abort("Failed to create database #{WORKSPACE_DB}")
   end
 
-  puts "== Installing dependencies =="
-  system! "gem install bundler --conservative"
-  system("bundle check") || system!("bundle install")
+  psql(WORKSPACE_DB, "CREATE TABLE IF NOT EXISTS workspace_ids (id INTEGER PRIMARY KEY)")
+  last_id = psql(WORKSPACE_DB, "SELECT MAX(id) FROM workspace_ids")
 
-  puts "== Starting redis so database can be migrated =="
-  system "redis-server &"
+  next_id = last_id.empty? ? rand(3070..4020) : last_id.to_i + 1
 
-  # Install JavaScript dependencies
-  system('npm install')
-
-  puts "\n== Preparing database =="
-
-  # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev
-  system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate"
-
-  unless without_seeds
-    puts "\n== Seeding database =="
-    system! "bin/rake db:seed"
-
-    puts "\n== Preparing test database (including parallelism) =="
-    system! "bin/rake parallel:prepare"
-
-    puts "\n== loading typeahead and bike counts =="
-    system! "bin/rake setup:reset_autocomplete setup:load_counts"
-  end
-
-  puts "\n== Removing old logs and tempfiles =="
-  system! "bin/rails log:clear tmp:clear"
-
-  puts "\n== Restarting application server =="
-  system! "bin/rails restart"
+  psql(WORKSPACE_DB, "INSERT INTO workspace_ids (id) VALUES (#{next_id})")
+  File.write(WORKSPACE_FILE, next_id.to_s)
+  puts "workspace ID set to w#{next_id}"
 end
+
+exec File.expand_path("setup", __dir__), *ARGV
