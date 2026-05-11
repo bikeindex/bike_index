@@ -28,29 +28,15 @@
     <h3 class="uncap tw:mb-4">Multi Search</h3>
 
     <% if current_organization.enabled?("bike_stickers") %>
-      <div class="tw:mb-4 tw:flex tw:gap-0">
-        <%= render UI::Button::Component.new(
-          text: "Serials",
-          color: :secondary,
-          size: :md,
-          active: search_kind == "serials",
-          html_class: "tw:rounded-r-none!",
-          data: {
-            "org--multi-search-target": "serialsToggle",
-            action: "click->org--multi-search#switchToSerials"
-          }
-        ) %>
-
-        <%= render UI::Button::Component.new(
-          text: "Bike Stickers",
-          color: :secondary,
-          size: :md,
-          active: search_kind == "stickers",
-          html_class: "tw:rounded-l-none! tw:border-l-0!",
-          data: {
-            "org--multi-search-target": "stickersToggle",
-            action: "click->org--multi-search#switchToStickers"
-          }
+      <div class="tw:mb-4">
+        <%= render Form::RadioButtonGroup::Component.new(
+          name: :search_kind,
+          selected: search_kind,
+          entries: [
+            {value: "serials", label: "Serials"},
+            {value: "stickers", label: "Registration Stickers"}
+          ],
+          data: {action: "change->org--multi-search#switchKind"}
         ) %>
       </div>
     <% end %>

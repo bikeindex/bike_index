@@ -323,9 +323,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_content(/multi search/i)
       expect(page).to have_css("[data-controller~='org--multi-search']", wait: 5)
 
-      # Toggle buttons should not be visible without bike_stickers feature
-      expect(page).not_to have_button("Serials")
-      expect(page).not_to have_button("Bike Stickers")
+      # Kind toggle radios should not be present without bike_stickers feature
+      expect(page).not_to have_field("Serials", visible: :all)
+      expect(page).not_to have_field("Registration Stickers", visible: :all)
 
       find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
       click_button "Search serials"
@@ -364,12 +364,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       it "toggles to sticker search and shows results" do
         visit multi_serial_path
 
-        # Toggle buttons are visible
-        expect(page).to have_button("Serials")
-        expect(page).to have_button("Bike Stickers")
+        # Kind toggle radios are present
+        expect(page).to have_field("Serials", visible: :all)
+        expect(page).to have_field("Registration Stickers", visible: :all)
 
         # Switch to sticker search
-        click_button "Bike Stickers"
+        choose "Registration Stickers", allow_label_click: true, visible: :all
 
         expect(page).to have_current_path(/search_kind=stickers/, wait: 5)
         expect(page).to have_field("serials", placeholder: /sticker codes/i)
@@ -385,7 +385,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
         expect(page).to have_css("#chip_0.tw\\:bg-emerald-500")
 
         # Switch back to serials
-        click_button "Serials"
+        choose "Serials", allow_label_click: true, visible: :all
         expect(page).not_to have_current_path(/search_kind=stickers/)
 
         # Previous results cleared

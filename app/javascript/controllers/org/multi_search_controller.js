@@ -4,12 +4,11 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--multi-search'
 export default class extends Controller {
-  static targets = ['textarea', 'button', 'serialChips', 'results', 'serialsToggle', 'stickersToggle', 'searchAll']
+  static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll']
   static values = { url: String, stickerUrl: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
     if (this.searching) return
-    this.updateToggleUI()
     const params = new URL(window.location).searchParams
     if (this.hasSearchAllTarget && params.get('search_all') === '1') {
       this.searchAllTarget.checked = true
@@ -21,43 +20,17 @@ export default class extends Controller {
     }
   }
 
-  switchToSerials () {
-    if (this.searchKindValue === 'serials') return
-    this.searchKindValue = 'serials'
-    this.onSearchKindChange()
-  }
-
-  switchToStickers () {
-    if (this.searchKindValue === 'stickers') return
-    this.searchKindValue = 'stickers'
-    this.onSearchKindChange()
-  }
-
-  onSearchKindChange () {
-    this.updateToggleUI()
+  switchKind (event) {
+    const value = event.target.value
+    if (this.searchKindValue === value) return
+    this.searchKindValue = value
     this.updatePlaceholderAndButton()
     this.resultsTarget.innerHTML = ''
     this.serialChipsTarget.innerHTML = ''
 
     const url = new URL(window.location.pathname, window.location.origin)
-    url.searchParams.set('search_kind', this.searchKindValue)
+    url.searchParams.set('search_kind', value)
     window.history.pushState({}, '', url)
-  }
-
-  updateToggleUI () {
-    if (!this.hasSerialsToggleTarget || !this.hasStickersToggleTarget) return
-
-    const serialsActive = this.searchKindValue !== 'stickers'
-    this.updateButtonActive(this.serialsToggleTarget, serialsActive)
-    this.updateButtonActive(this.stickersToggleTarget, !serialsActive)
-  }
-
-  updateButtonActive (button, active) {
-    // Toggle the active ring/bg classes from UI::Button::Component ACTIVE_COLORS[:secondary]
-    const activeClasses = ['tw:ring-2', 'tw:ring-blue-500/40', 'tw:bg-gray-100', 'tw:border-gray-400', 'tw:dark:bg-gray-700', 'tw:dark:border-gray-500']
-    activeClasses.forEach(cls => {
-      button.classList.toggle(cls, active)
-    })
   }
 
   updatePlaceholderAndButton () {
