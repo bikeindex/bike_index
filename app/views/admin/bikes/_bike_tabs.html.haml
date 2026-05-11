@@ -18,7 +18,7 @@
             .alert.alert-danger.mb-4
               %h4.text-danger #{bike.type_titleize} Deleted
               Deleted:
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l bike.deleted_at, format: :convert_time
           - if bike.likely_spam?
             .alert.alert-danger.mb-4
@@ -88,9 +88,9 @@
                 %td
                   Created
                 %td
-                  %span.convertTime
+                  %span.localizeTime
                     = l bike.created_at, format: :convert_time
-                  %small.convertTimezone
+                  %small.localizeTimezone
               %tr
                 %td
                   Creation
@@ -128,7 +128,7 @@
                 %td
                   Updated
                 %td
-                  %span.convertTime
+                  %span.localizeTime
                     = l bike.updated_by_user_fallback, format: :convert_time
                   - if bike.updator_id.present?
                     %em.small
@@ -141,7 +141,7 @@
                           %em missing
                   - if bike.not_updated_by_user?
                     %em.small.less-strong not updated after creation
-                  %small.only-dev-visible.convertTime
+                  %small.only-dev-visible.localizeTime
                     = l bike.updated_at, format: :convert_time
 
               - pdf ||= false
@@ -233,12 +233,12 @@
             %tr
               %td
                 Stolen record created
-              %td.convertTime
+              %td.localizeTime
                 = l stolen_record.created_at, format: :convert_time
             %tr
               %td
                 Stolen at
-              %td.convertTime
+              %td.localizeTime
                 = l stolen_record.date_stolen, format: :convert_time
             %tr
               %td
@@ -313,7 +313,7 @@
                 Recovered at
               %td
                 - if stolen_record.recovered_at.present?
-                  %span.convertTime{ href: bike.present? ? admin_bike_url(bike) : "#" }
+                  %span.localizeTime{ href: bike.present? ? admin_bike_url(bike) : "#" }
                     = l stolen_record.recovered_at, format: :convert_time
             %tr
               %td

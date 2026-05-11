@@ -72,7 +72,7 @@
                   %h3.mt-4.uncap
                     %em
                       This claim was submitted
-                      %span.convertTime.withPreposition
+                      %span.localizeTime.withPreposition
                         = l impound_claim.created_at, format: :convert_time
                   - if impound_claim.successful?
                     %p

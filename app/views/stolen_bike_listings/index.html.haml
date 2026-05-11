@@ -90,7 +90,7 @@
             -#    %code.small.only-dev-visible
             -#      = stolen_bike_listing.updated_photo_folder
             %td
-              %small.convertTime
+              %small.localizeTime
                 = l stolen_bike_listing.listed_at, format: :convert_time
               - if display_dev_info?
                 %em.small.less-strong.only-dev-visible
@@ -127,7 +127,7 @@
     .col-md-4.mt-4
       .ad-block.ad-binx.ad468x60
     .col-md-8.col-lg-4.pt-4.pb-4
-      = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+      = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
 
 
   - unless @stolen_bike_listings.present?

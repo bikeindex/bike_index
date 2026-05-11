@@ -47,10 +47,10 @@
                 - date = recovery.created_at
                 %span.text-danger
                   no recovery date
-              %span.convertTime
+              %span.localizeTime
                 = l date, format: :convert_time
           %td
-            %small.convertTime
+            %small.localizeTime
               = l recovery.date_stolen, format: :convert_time
           %td
             %small

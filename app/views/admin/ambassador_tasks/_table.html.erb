@@ -1,0 +1,23 @@
+<% render_sortable ||= false %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered ambassador-tasks-table">
+    <thead class="small-header">
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% collection.each do |task| %>
+        <tr>
+          <td><%= task.title %></td>
+          <td><%= task.description_html.html_safe %></td>
+          <td><%= link_to "Edit", edit_admin_ambassador_task_path(task) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

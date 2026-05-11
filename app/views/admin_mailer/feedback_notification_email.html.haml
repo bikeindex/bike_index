@@ -80,6 +80,12 @@
   %p
     %strong
       Lead for #{@feedback.lead_type}: #{@feedback.name}
+  - if @feedback.contact_name.present?
+    %p
+      Contact name: #{@feedback.contact_name}
+  - if @feedback.phone_number.present?
+    %p
+      Phone: #{@feedback.phone_number}
   %p
     = feedback_body
 

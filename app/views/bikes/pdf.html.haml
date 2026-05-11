@@ -91,7 +91,7 @@
           %tr
             %td.td-title
               = t(".registered")
-            %td.convertTime
+            %td.localizeTime
               = @bike.created_at.strftime("time.format.convert_time")
               = t(".to")
               - if @bike.owner.present? && @bike.owner.name.present?

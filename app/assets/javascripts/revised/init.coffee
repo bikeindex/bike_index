@@ -68,7 +68,7 @@ class BikeIndex.Init extends BikeIndex
       bike_versions_show: BikeIndex.BikesShow
       bikes_index: BikeIndex.BikesIndex
       bike_versions_index: BikeIndex.BikesIndex
-      organized_bikes_index: BikeIndex.BikesIndex
+
       orgpublic_impounded_bikes_index: BikeIndex.BikesIndex
       organized_graduated_notifications_index: BikeIndex.BikesIndex
       my_accounts_edit: BikeIndex.UsersEdit
@@ -126,7 +126,7 @@ class BikeIndex.Init extends BikeIndex
 
   localizeTimes: ->
     # NOTE: This uses time_parser-coffeeimport.js - not time_parser.js
-    window.timeParser ||= new TimeParser()
+    window.timeParser ||= new TimeParserLegacy()
     window.timeParser.localize()
 
   # copy of bike_index_utilities.js function

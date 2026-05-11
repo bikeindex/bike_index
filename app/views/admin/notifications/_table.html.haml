@@ -43,11 +43,11 @@
         - cache(["admin_notifications_table", notification]) do
           %tr
             %td
-              %span.convertTime
+              %span.localizeTime
                 = l(notification.created_at, format: :convert_time)
               %code.small.only-dev-visible= notification.id
             %td
-              %small.convertTime
+              %small.localizeTime
                 = l(notification.updated_at, format: :convert_time)
             %td
               - if notification.notifiable.present?

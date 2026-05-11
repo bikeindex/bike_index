@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Assigns this checkout a workspace ID (the smallest unused integer >= 3072,
+# so deleted IDs are reused) and writes it to .workspace_id at the repo root,
+# then runs bin/setup. The ID is loaded by bin/env to populate WORKSPACE_ID.
+# IDs are tracked in the local Postgres `dev_workspaces` database so
+# multiple checkouts on the same machine each get a distinct ID.
+#
+# Pass --without_seeds to skip db:seed, parallel:prepare, and
+# autocomplete/count loading in bin/setup.
+
+require "fileutils"
+
+APP_ROOT = File.expand_path("..", __dir__)
+WORKSPACE_FILE = File.join(APP_ROOT, ".workspace_id")
+WORKSPACE_DB = "dev_workspaces"
+
+setup_args = []
+ARGV.each do |arg|
+  case arg
+  when "--without_seeds" then setup_args << arg
+  else abort "Unknown option: #{arg}"
+  end
+end
+
+def psql(database, query)
+  output = IO.popen(["psql", "-d", database, "-tAX", "-c", query], &:read)
+  abort "psql failed for #{database}: #{query}" unless $?.success?
+  output.strip
+end
+
+if File.exist?(WORKSPACE_FILE)
+  puts "workspace ID already set: w#{File.read(WORKSPACE_FILE).strip}"
+else
+  unless system("psql", "-d", "postgres", "-tAXc", "SELECT 1 FROM pg_database WHERE datname = '#{WORKSPACE_DB}'", out: File::NULL)
+    abort "Could not query Postgres. Is it running?"
+  end
+
+  if psql("postgres", "SELECT 1 FROM pg_database WHERE datname = '#{WORKSPACE_DB}'").empty?
+    system("createdb", WORKSPACE_DB) || abort("Failed to create database #{WORKSPACE_DB}")
+  end
+
+  psql(WORKSPACE_DB, "CREATE TABLE IF NOT EXISTS workspace_ids (id INTEGER PRIMARY KEY)")
+  taken = psql(WORKSPACE_DB, "SELECT id FROM workspace_ids").split("\n").map(&:to_i)
+  next_id = 3072
+  next_id += 1 while taken.include?(next_id)
+
+  psql(WORKSPACE_DB, "INSERT INTO workspace_ids (id) VALUES (#{next_id})")
+  File.write(WORKSPACE_FILE, next_id.to_s)
+  puts "workspace ID set to w#{next_id}"
+end
+
+system(File.expand_path("setup", __dir__), *setup_args) || abort("bin/setup failed")
+exec File.expand_path("fix_structure", __dir__)

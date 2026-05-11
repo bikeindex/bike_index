@@ -10,14 +10,14 @@ module API
     rescue_from ArgumentError, with: :render_bad_request
 
     def create
-      auth_response = StravaJobs::ProxyRequester.authorize_user_and_strava_integration(doorkeeper_token)
+      auth_response = Integrations::Strava::ProxyRequester.authorize_user_and_strava_integration(doorkeeper_token)
       if auth_response[:error].present?
         render json: {error: auth_response[:error]}, status: auth_response[:status]
         return
       end
 
       if !auth_response[:strava_integration].synced? || Binxtils::InputNormalizer.boolean(params[:sync_status])
-        render json: StravaJobs::ProxyRequester.sync_status(auth_response[:strava_integration])
+        render json: Integrations::Strava::ProxyRequester.sync_status(auth_response[:strava_integration])
         return
       end
 
@@ -30,7 +30,7 @@ module API
         return
       end
 
-      result = StravaJobs::ProxyRequester.create_and_execute(
+      result = Integrations::Strava::ProxyRequester.create_and_execute(
         strava_integration: auth_response[:strava_integration], user: auth_response[:user],
         url: permitted_params[:url], method: permitted_params[:method], body: permitted_params[:body]&.to_h
       )

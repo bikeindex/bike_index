@@ -16,7 +16,7 @@
         %tr
           %td Created
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l(@graduated_notification.created_at, format: :convert_time)
         %tr
           %td Status
@@ -32,26 +32,26 @@
           %tr.small.only-dev-visible
             %td updated
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@graduated_notification.updated_at, format: :convert_time)
         - if @graduated_notification.processed? && @graduated_notification.processed_at.present?
           %tr
             %td Sent
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@graduated_notification.processed_at, format: :convert_time)
         - else
           %tr
             %td Will send
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@graduated_notification.pending_period_ends_at, format: :convert_time)
         - if @graduated_notification.processed?
           %tr
             %td Marked not graduated
             %td
               - if @graduated_notification.marked_remaining_at.present?
-                %span.convertTime.preciseTime
+                %span.localizeTime.preciseTime
                   = l(@graduated_notification.marked_remaining_at, format: :convert_time)
                 - if @graduated_notification.marked_remaining_by.present?
                   %small.less-strong
@@ -78,7 +78,7 @@
         - @graduated_notification.associated_bikes.each do |bike|
           %tr
             %td
-              %span.convertTime
+              %span.localizeTime
                 = l(bike.created_at, format: :convert_time)
             %td
               = link_to organized_bike_text(bike), bike_path(bike, organization_id: current_organization.to_param)

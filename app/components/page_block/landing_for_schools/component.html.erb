@@ -1,0 +1,291 @@
+<div class="kelsey_styles">
+  <%# Hero Section %>
+  <section class="le-hero-section">
+    <div
+      class="le-bike-tiles-grid"
+      data-controller="landing-pages--bike-tiles"
+      data-landing-pages--bike-tiles-target="grid"
+      data-landing-pages--bike-tiles-images-value="<%= bike_tile_images.to_json %>"
+    ></div>
+
+    <div class="le-hero-content">
+      <h1>The #1 platform for campus bike management</h1>
+
+      <p class="le-hero-tagline">
+        Bike Index is a comprehensive database and management tool that gives
+        universities real-time metrics, streamlined workflows, and a
+        community-powered recovery platform, so you can keep bikes in students'
+        hands and reduce administrative burden.
+      </p>
+
+      <div class="le-hero-buttons">
+        <button data-open-modal="schools-demo-modal" class="le-btn-primary">
+          Schedule a Demo
+        </button>
+      </div>
+
+      <div class="le-hero-stats">
+        <div class="le-stat-item">
+          <div class="le-stat-number"><%= recoveries_value_display %></div>
+          <div class="le-stat-label">Worth of bikes recovered</div>
+        </div>
+
+        <div class="le-stat-item">
+          <div class="le-stat-number">
+            <%= recoveries_display %>+
+          </div>
+
+          <div class="le-stat-label">Stolen bikes recovered</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# Trusted Universities Section %>
+  <section class="le-municipalities-section">
+    <div class="container">
+      <h2>Used proudly on campuses nationwide</h2>
+
+      <div class="le-partners-carousel-wrapper">
+        <div class="le-partners-grid">
+          <% 2.times do %>
+            <% university_partners.each do |partner| %>
+              <div class="le-partner-logo">
+                <%= image_tag "kelsey/university_partners/#{partner[:file]}", alt: partner[:name] %>
+                <span><%= partner[:name] %></span>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# Features Section %>
+  <section class="le-features-section">
+    <div class="container">
+      <h2>
+        Bike Index is the #1 open-source platform for universities to manage
+        bikes and keep them in campus members' hands
+      </h2>
+
+      <div class="le-features-grid">
+        <% features.each do |feature| %>
+          <div class="le-feature-block">
+            <div class="le-feature-icon">
+              <%= image_tag feature[:image], alt: feature[:title] %>
+            </div>
+
+            <h3><%= feature[:title] %></h3>
+
+            <p><%= feature[:text] %></p>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Tabbed Widget %>
+      <div class="le-tabbed-widget" data-controller="landing-pages--tabs">
+        <div class="le-tab-buttons">
+          <button
+            class="le-tab-button active"
+            data-tab="database"
+            data-landing-pages--tabs-target="button"
+            data-action="click->landing-pages--tabs#select"
+          >
+            All-in-One Database Management for Operational Efficiency
+          </button>
+
+          <button
+            class="le-tab-button"
+            data-tab="defense"
+            data-landing-pages--tabs-target="button"
+            data-action="click->landing-pages--tabs#select"
+          >
+            First Line of Defense Against Theft for Your Campus Members
+          </button>
+        </div>
+
+        <div class="le-tab-content">
+          <div
+            class="le-tab-panel active"
+            id="tab-database"
+            data-landing-pages--tabs-target="panel"
+          >
+            <div class="le-tab-panel-content">
+              <div class="le-tab-icon">
+                <%= image_tag "kelsey/unis.gif", alt: "Database Management" %>
+              </div>
+
+              <div class="le-tab-text">
+                <p>
+                  Easier management, stronger data, smarter campus mobility
+                  oversight through:
+                </p>
+
+                <ul>
+                  <li>
+                    Our nationally recognized, trusted platform replaces
+                    fragmented or outdated in-house tracking systems
+                  </li>
+
+                  <li>
+                    All-in-One management tool features streamlined reporting
+                    and tracking with clear, prescriptive workflows for
+                    lost/stolen bike cases
+                  </li>
+
+                  <li>
+                    Reduces administrative burden by improving interdepartmental
+                    coordination (campus police, transportation, student
+                    services) and aligning your campus with national best
+                    practices in bike theft prevention
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="le-tab-panel"
+            id="tab-defense"
+            data-landing-pages--tabs-target="panel"
+          >
+            <div class="le-tab-panel-content">
+              <div class="le-tab-icon">
+                <%= image_tag "kelsey/theft-victims.gif", alt: "First Line of Defense" %>
+              </div>
+
+              <div class="le-tab-text">
+                <p>
+                  Greater security, higher recovery potential, and empowered
+                  riders:
+                </p>
+
+                <ul>
+                  <li>
+                    Our publicly searchable record of database is the first line
+                    of defense against bike theft and makes resale of stolen
+                    bikes significantly harder
+                  </li>
+
+                  <li>
+                    Our partnerships with law enforcement, community
+                    organizations, and bike shops increase recovery rates
+                  </li>
+
+                  <li>
+                    Secure digital proof of ownership provides peace of mind and
+                    creates a proactive step students, faculty, and staff can
+                    take to protect their investment
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# Tools Overview Section %>
+  <section class="le-tools-section">
+    <div class="container">
+      <h2>Comprehensive tools for every scenario</h2>
+
+      <div class="le-tools-grid">
+        <% tools.each do |tool| %>
+          <div class="le-tool-item">
+            <%= image_tag tool[:image], alt: tool[:title] %>
+
+            <h4><%= tool[:title] %></h4>
+
+            <div class="le-tool-details">
+              <p><%= tool[:text] %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <%# Testimonials Section %>
+  <section
+    class="le-testimonials-section"
+    data-controller="landing-pages--testimonials"
+  >
+    <div class="container">
+      <h2>Testimonials</h2>
+
+      <div class="le-testimonials-carousel-wrapper">
+        <div class="le-testimonials-grid">
+          <% testimonials.each_with_index do |testimonial, index| %>
+            <div
+              class="le-testimonial <%= 'active' if index == 0 %>"
+              data-landing-pages--testimonials-target="testimonial"
+            >
+              <div class="le-testimonial-content">
+                <div class="le-testimonial-text">
+                  <p class="le-testimonial-quote">
+                    "<%= testimonial[:quote] %>"
+                  </p>
+
+                  <div class="le-testimonial-author">
+                    <strong><%= testimonial[:author] %></strong>
+                    <span><%= testimonial[:role] %></span>
+                  </div>
+                </div>
+
+                <div class="le-testimonial-image">
+                  <%= image_tag testimonial[:image], alt: "Bike Love" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="le-testimonial-nav">
+          <button
+            class="le-testimonial-arrow"
+            data-action="click->landing-pages--testimonials#prev"
+          >
+            &lsaquo;
+          </button>
+
+          <div class="le-testimonial-dots" data-testimonials-dots></div>
+
+          <button
+            class="le-testimonial-arrow"
+            data-action="click->landing-pages--testimonials#next"
+          >
+            &rsaquo;
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# Final CTA Section %>
+  <section class="le-cta-section">
+    <div class="container">
+      <h2>Ready to modernize your campus bike program?</h2>
+
+      <p class="le-cta-subtitle">
+        Join <%= organizations_display %>+ organizations using the world's most
+        widely used bike registration network.
+      </p>
+
+      <p class="le-nonprofit-message">
+        We're a 501(c)(3) non-profit. Our mission is bike theft recovery, not
+        profit. Let's talk about what works for your campus.
+      </p>
+
+      <div class="le-cta-buttons">
+        <button data-open-modal="schools-demo-modal" class="le-btn-primary">
+          Schedule a Demo
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <%= render(PageBlock::LandingDemoModal::Component.new(feedback: @feedback, current_user: @current_user, name_label: "School", feedback_type: "lead_for_school", modal_id: "schools-demo-modal")) %>
+</div>

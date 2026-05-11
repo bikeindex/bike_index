@@ -95,11 +95,11 @@
         <td>Created</td>
 
         <td>
-          <span class="convertTime preciseTime">
+          <span class="localizeTime preciseTime">
             <%= l @organization.created_at, format: :convert_time %>
           </span>
 
-          <small class="convertTimezone"></small>
+          <small class="localizeTimezone"></small>
         </td>
       </tr>
 
@@ -107,7 +107,7 @@
         <td>Updated</td>
 
         <td>
-          <span class="convertTime preciseTime">
+          <span class="localizeTime preciseTime">
             <%= l @organization.updated_at, format: :convert_time %>
           </span>
         </td>
@@ -252,9 +252,7 @@
     <% if @organization.parent_organization.present? %>
       <p>
         Parent
-        <strong class="em">
-          <%= @organization.parent_organization.short_name %>
-        </strong>
+        <strong class="em"><%= @organization.parent_organization.short_name %></strong>
         has
         <%= link_to admin_organization_invoices_path(organization_id: @organization.parent_organization.to_param) do %>
           <%= pluralize(@organization.parent_organization.invoices.count, "invoice") %>
@@ -570,7 +568,7 @@
   </div>
 
   <div class="col-sm-6 text-right">
-    <%= link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param), class: "gray-link mt-3 d-inline-block" %>
+    <%= link_to "org bikes view", organization_registrations_path(organization_id: @organization.to_param), class: "gray-link mt-3 d-inline-block" %>
   </div>
 </div>
 
@@ -600,7 +598,7 @@
             <small class="less-strong">
               <%= link_to admin_organization_path(@organization, deleted_organization_roles: false), class: "gray-link" do %>
                 <%= number_with_delimiter(@organization.organization_roles.count) %>
-                 <strong>NOT</strong> deleted organization role
+                <strong>NOT</strong> deleted organization role
               <% end %>
             </small>
           <% end %>

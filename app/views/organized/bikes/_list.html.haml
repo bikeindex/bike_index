@@ -16,7 +16,7 @@
           .dropdown-menu
             - %w[all initial transferred].each do |claimedness|
               - claimedness_active = claimedness == @search_claimedness
-              = link_to "#{claimedness.titleize} registrations", organization_bikes_path(search_claimedness: claimedness), class: "dropdown-item #{claimedness_active ? 'active' : ''}"
+              = link_to "#{claimedness.titleize} registrations", organization_registrations_path(search_claimedness: claimedness), class: "dropdown-item #{claimedness_active ? 'active' : ''}"
               - if claimedness == "all" # Add a divider after all
                 .dropdown-divider
 
@@ -26,7 +26,7 @@
       %tr
         %th.date-added
           = t(".added")
-          %small.convertTimezone
+          %small.localizeTimezone
         %th= t(".manufacturer")
         %th= t(".model")
         %th= t(".color")
@@ -43,7 +43,7 @@
       - @bikes.each do |bike|
         %tr
           %td
-            = link_to l(bike.created_at, format: :convert_time), bike_path(bike, organization_id: current_organization.to_param), class: "convertTime"
+            = link_to l(bike.created_at, format: :convert_time), bike_path(bike, organization_id: current_organization.to_param), class: "localizeTime"
           %td
             = bike.mnfg_name
           %td
@@ -76,4 +76,4 @@
                 method: "PUT"
 
 .pt-4.pb-4
-  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+  = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

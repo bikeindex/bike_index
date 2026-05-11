@@ -147,6 +147,15 @@ RSpec.describe Email::DonationJob, type: :job do
         expect(payment.notifications.first.bike_id).to be_present
         expect(payment.notifications.first.bike_id).to eq recovery2.bike&.id
       end
+
+      context "with multiple recovered bikes" do
+        let!(:recovery1) { FactoryBot.create(:stolen_record_recovered, bike: bike1, recovered_at: Time.current - 2.weeks) }
+        it "picks the most recent recovery" do
+          user.reload
+          expect(instance.calculated_notification_kind(payment)).to eq "donation_recovered"
+          expect(instance.bike_for_notification(payment, "donation_recovered")&.id).to eq bike2.id
+        end
+      end
     end
   end
 end

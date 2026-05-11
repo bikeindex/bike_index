@@ -5,9 +5,9 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-ruby "3.4.8"
+ruby "4.0.2"
 
-# Gems that are no longer in standard library as Ruby 3.4
+# Gems that are no longer in standard library as of Ruby 3.4
 gem "csv"
 gem "observer"
 gem "prime"
@@ -20,13 +20,14 @@ gem "puma" # App server
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg" # Postgres
+gem "paper_trail" # audit logging
 gem "paranoia" # soft delete
 gem "pg_search"
 gem "lograge" # Structure log data, put it in single lines to improve the functionality
 gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 gem "responders" # Rails responders modules
-gem "rack-throttle" # Rate limiting
+gem "rack-attack" # Rate limiting
 gem "secure_headers", "~> 7.2"
 
 # Speed, performance, etc
@@ -67,6 +68,7 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 gem "rqrcode", "3.2.0" # QR Code image generator
 
 # Functionality extensions
+gem "binxtils" # Bike Index utilities
 gem "functionable" # Functional modules
 gem "flipper" # Feature flagging
 gem "flipper-active_record" # Feature flagging
@@ -168,4 +170,5 @@ group :test do
   gem "capybara" # For view components
   gem "selenium-webdriver" # For capybara
   gem "chunky_png" # used to test that generated images match their targets
+  gem "axe-core-rspec" # Accessibility testing
 end

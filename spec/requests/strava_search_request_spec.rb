@@ -5,20 +5,24 @@ require "rails_helper"
 RSpec.describe StravaSearchController, type: :request do
   let(:strava_app) { FactoryBot.create(:doorkeeper_app, is_internal: true) }
 
-  before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", strava_app.id) }
+  before { stub_const("Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", strava_app.id) }
 
   describe "GET /strava_search" do
-    it "redirects to login when not signed in" do
+    it "renders connect page when not signed in" do
       get strava_search_path
-      expect(response).to redirect_to(new_session_path)
+      expect(response.status).to eq 200
+      expect(response.body).to include("Connect with Strava")
+      expect(response.body).to include("btn_strava_connect")
     end
 
     context "signed in" do
       include_context :request_spec_logged_in_as_user
 
-      it "redirects to strava integration setup when user has no integration" do
+      it "renders connect page when user has no integration" do
         get strava_search_path
-        expect(response).to redirect_to(new_strava_integration_path(scope: :strava_search))
+        expect(response.status).to eq 200
+        expect(response.body).to include("Connect with Strava")
+        expect(response.body).to include("btn_strava_connect")
       end
 
       context "with strava integration" do
@@ -44,7 +48,7 @@ RSpec.describe StravaSearchController, type: :request do
         end
 
         context "with activity:write permission" do
-          let(:strava_permissions) { Integrations::StravaClient::STRAVA_SEARCH_SCOPE }
+          let(:strava_permissions) { Integrations::Strava::Client::STRAVA_SEARCH_SCOPE }
 
           it "renders with hasActivityWrite true" do
             get strava_search_path

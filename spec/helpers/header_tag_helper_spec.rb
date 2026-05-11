@@ -4,6 +4,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
   describe "header_tags_component_options" do
     before do
       helper.extend(ControllerHelpers)
+      helper.extend(Binxtils::ControllerNamespace)
       allow(view).to receive(:controller_name) { controller_name }
       allow(view).to receive(:action_name) { action_name }
       # These two methods are defined in application controller

@@ -27,6 +27,7 @@ RSpec.describe "time_localizer.js", :js, type: :system do
     tz_str = Binxtils::TimeZoneParser.parse(time_zone).now.strftime("%Z")
 
     expect(page).to have_content("Current time: #{current_time}", wait: 5)
+    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
     expect(page).to have_content("Yesterday: #{yesterday}")
     expect(page).to have_content("Tomorrow: #{tomorrow}")
     expect(page).to have_content("One week ago: #{one_week_ago}")

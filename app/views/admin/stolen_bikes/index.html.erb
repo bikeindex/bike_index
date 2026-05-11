@@ -1,0 +1,89 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item">
+    <%= link_to "promoted alerts", admin_stolen_bikes_url(sortable_search_params.merge(search_with_promoted_alert: !@with_promoted_alert)), class: "nav-link #{@with_promoted_alert ? 'active' : ''}" %>
+  </li>
+
+  <li class="nav-item">
+    <% if @unapproved_only %>
+      <%= link_to "All stolen (not just unverified)", admin_stolen_bikes_url(sortable_search_params.merge(search_unapproved: true)), class: "nav-link" %>
+    <% else %>
+      <%= link_to "Only unverified bikes", admin_stolen_bikes_url(sortable_search_params.merge(search_unapproved: false)), class: "nav-link" %>
+    <% end %>
+  </li>
+<% end %>
+
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <div class="col-12 mt-2 mb-4">
+      <h4>
+        <% if sort_column == "created_at" %>
+          <% time_range_column = "stolen_records.created_at" %>
+          Stolen records created
+        <% else %>
+          <% time_range_column = "stolen_records.date_stolen" %>
+          Date stolen
+        <% end %>
+      </h4>
+
+      <%= column_chart time_range_counts(collection: available_stolen_records, column: time_range_column), stacked: true, thousands: "," %>
+    </div>
+  <% end %>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <% unless @only_without_location %>
+    <%= form_tag admin_stolen_bikes_path, method: :get do %>
+      <div class="mt-4 mb-4 d-flex justify-content-end">
+        <%= hidden_field_tag :search_unapproved, params[:search_unapproved] %>
+        <%= render partial: "/shared/hidden_search_fields" %>
+
+        <div class="mt-2">
+          <em class="small less-strong mr-1 d-md-inline d-none">within</em>
+          <%= number_field_tag :search_distance, @distance, class: "form-control d-inline-block", style: "width: 5rem;" %>
+
+          <em class="small less-strong ml-1 mr-1 d-md-inline d-none">
+            miles of
+          </em>
+        </div>
+
+        <div class="mt-2 ml-2">
+          <%= text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control" %>
+        </div>
+
+        <div class="mt-2 ml-2">
+          <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "/admin/social_accounts/errored" %>
+
+  <% if @unapproved_only %>
+    <p class="mt-4 mb-0">
+      Showing only unapproved records
+      <em><% if @only_without_location %><strong>without location</strong><small class="less-strong">        view        <%= link_to "records with location", url_for(sortable_search_params.merge(search_without_location: false)) %>      </small><% else %><small class="less-strong">        <%= number_display(@unapproved_without_location_count) %> unapproved        records        <%= link_to "without location", url_for(sortable_search_params.merge(search_without_location: true)) %>      </small><% end %></em>
+    </p>
+  <% end %>
+
+  <%= form_tag approve_admin_stolen_bike_path(id: "multi_approve"), method: :post, data: {controller: "table-multi-delete"} do %>
+    <%= render partial: "table", locals: {render_sortable: true} %>
+
+    <div class="mb-3 text-center">
+      <%= submit_tag 'Approve selected', class: 'btn btn-outline-primary' %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @stolen_records,
+  viewing: "Stolen Bikes",
+  nav_header_list_items:,
+  rendered_chart:,
+  admin_search_form:,
+  table_view:
+)) %>

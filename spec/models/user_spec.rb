@@ -443,7 +443,7 @@ RSpec.describe User, type: :model do
   end
 
   describe "updating no_non_theft_notification" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: ["hot_sheet"]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
     let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
     let(:user) { FactoryBot.create(:user, notification_newsletters: true) }
     let!(:organization_role) { FactoryBot.create(:organization_role, user: user, organization: organization, hot_sheet_notification: :notification_daily) }

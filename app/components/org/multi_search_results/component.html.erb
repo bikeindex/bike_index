@@ -1,0 +1,49 @@
+<div
+  class="multi-search-serial-result"
+  id="result_<%= result_index %>"
+  data-serial-index="<%= result_index %>"
+  data-result-count="<%= @pagy.count %>"
+>
+  <h4 class="uncap tw:mt-4 tw:mb-0 tw:px-1">
+    <%= translation(".serial_label") %>
+    <span class="serial-span"><%= @serial %></span>
+
+    <span class="tw:text-sm tw:font-normal tw:text-gray-500">
+      <%= translation(".result_count_html", count: helpers.number_display(@pagy.count), results: "result".pluralize(@pagy.count)) %>
+
+      <% if show_view_all? %>
+        <%= translation(".first_n_shown_html", limit: @pagy.limit) %>
+        <%= link_to translation(".view_all"), view_all_path, class: "twlink", data: {turbo_frame: "_top"} %>
+      <% end %>
+    </span>
+  </h4>
+
+  <% if @bikes.any? %>
+    <%= render(Org::RegistrationSearch::Component.new(
+      organization: @organization,
+      pagy: @pagy,
+      bikes: @bikes,
+      interpreted_params: @interpreted_params,
+      sortable_search_params:,
+      per_page: @per_page,
+      params: helpers.params,
+      search_query_present: true,
+      skip_search_and_filters: true,
+      skip_settings: true,
+      skip_count: true
+    )) %>
+  <% elsif @close_serials&.any? %>
+    <p class="tw:text-gray-500"><%= translation(".no_exact_matches") %></p>
+    <ul class="tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-0">
+      <% @close_serials.each do |bike| %>
+        <li>
+          <a href="<%= bike_path(bike) %>" class="twlink">
+            <%= bike.serial_number %>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="tw:text-gray-500"><%= translation(".no_matches_found") %></p>
+  <% end %>
+</div>

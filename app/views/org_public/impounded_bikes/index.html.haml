@@ -7,7 +7,7 @@
     %strong.uncap= current_organization.name
     Impounded bikes
 
-  = render partial: "/shared/period_select", locals: {prepend_text: "Impounded during:"}
+  = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, prepend_text: "Impounded during:")
 
   .mt-4
     = render partial: "/shared/bike_search_form", locals: {include_hidden_search_fields: true, search_path: organization_impounded_bikes_path(organization_id: current_organization.to_param)}
@@ -35,7 +35,7 @@
             %td
               = impound_record.display_id
             %td
-              %a.convertTime.preciseTime
+              %a.localizeTime.preciseTime
                 = l(impound_record.created_at, format: :convert_time)
             %td
               - if impound_record.bike.present?
@@ -57,7 +57,7 @@
               = impound_record.formatted_address_string(visible_attribute: :street)
 
   .pt-4.pb-4
-    = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+    = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
 
 -# include javascript because of period select
 <script src="/vendored_assets/application.js"></script>

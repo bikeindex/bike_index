@@ -108,7 +108,7 @@
 
           <td>
             <% if invoice.subscription_start_at.present? %>
-              <span class="convertTime">
+              <span class="localizeTime">
                 <%= l invoice.subscription_start_at, format: :convert_time %>
               </span>
             <% end %>
@@ -118,7 +118,7 @@
             <% if invoice.endless? %>
               <small class="less-strong">endless</small>
             <% elsif invoice.subscription_end_at.present? %>
-              <span class="convertTime <%= invoice.subscription_end_at < Time.current ? 'text-danger' : '' %>">
+              <span class="localizeTime <%= invoice.subscription_end_at < Time.current ? 'text-danger' : '' %>">
                 <%= l invoice.subscription_end_at, format: :convert_time %>
               </span>
             <% end %>
@@ -138,7 +138,7 @@
                 <% invoice.payments.each do |payment| %>
                   <li style="font-size: 80%;">
                     <%= link_to "#{payment.amount_formatted} #{payment.payment_method}", admin_payment_path(payment) %>,
-                    <span class="convertTime"><%= l payment.created_at, format: :convert_time %></span>
+                    <span class="localizeTime"><%= l payment.created_at, format: :convert_time %></span>
                   </li>
                 <% end %>
               </ul>

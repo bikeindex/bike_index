@@ -15,7 +15,7 @@
               %td
                 Error at:
               %td
-                %span.convertTime
+                %span.localizeTime
                   = l @social_account.last_error_at, format: :convert_time
             %tr
               %td
@@ -38,7 +38,7 @@
             %td= attr.humanize
             %td
               - if @social_account.send(attr).present?
-                %span.convertTime
+                %span.localizeTime
                   = l @social_account.send(attr), format: :convert_time
         - @social_account.attributes.except("account_info", "last_error_at", "created_at", "updated_at", "last_error").each_pair do |attr, value|
           %tr

@@ -22,17 +22,21 @@
       Application Id:
     </h4>
 
-    <p><code id="application_id"><%= @application.uid %></code></p>
+    <p class="tw:overflow-x-auto tw:whitespace-nowrap">
+      <code id="application_id"><%= @application.uid %></code>
+    </p>
 
     <h4 class="mb-1 uncap" style="font-size: 18px;">
       Secret:
     </h4>
 
-    <p><code id="secret"><%= @application.secret %></code></p>
+    <p class="tw:overflow-x-auto tw:whitespace-nowrap">
+      <code id="secret"><%= @application.secret %></code>
+    </p>
 
     <h4 class="mb-1 uncap" style="font-size: 18px;">
       Bikes registered
-      <em class="less-strong tw:text-xs">NOTE: only tracked since <span class="convertTime"><%= START_TRACKING_REGISTRATION_APP_ID_AT %></span></em>
+      <em class="less-strong tw:text-xs">NOTE: only tracked since <span class="localizeTime"><%= START_TRACKING_REGISTRATION_APP_ID_AT %></span></em>
     </h4>
 
     <p>

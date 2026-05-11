@@ -1,0 +1,3 @@
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(Form::Input::Component.new(form_builder: f, attribute: :name, kind: :text_field, html_options: {placeholder: "Your name"})) %>
+<% end %>

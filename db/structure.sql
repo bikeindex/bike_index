@@ -37,6 +37,37 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
 COMMENT ON EXTENSION pg_stat_statements IS 'track planning and execution statistics of all SQL statements executed';
 
 
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
+-- Name: bikes_search_vector_update(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.bikes_search_vector_update() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  NEW.search_vector :=
+    setweight(to_tsvector('simple', coalesce(NEW.serial_number, '')), 'A') ||
+    setweight(to_tsvector('simple', coalesce(NEW.cached_data, '')), 'B') ||
+    setweight(to_tsvector('simple', coalesce(NEW.all_description, '')), 'C');
+  RETURN NEW;
+END
+$$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -374,6 +405,40 @@ ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 
 --
+-- Name: bike_organization_notes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_organization_notes (
+    id bigint NOT NULL,
+    body text,
+    user_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    bike_id bigint NOT NULL,
+    organization_id bigint NOT NULL
+);
+
+
+--
+-- Name: bike_organization_notes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_organization_notes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_organization_notes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_organization_notes_id_seq OWNED BY public.bike_organization_notes.id;
+
+
+--
 -- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -665,7 +730,8 @@ CREATE TABLE public.bikes (
     serial_segments_migrated_at timestamp without time zone,
     model_audit_id bigint,
     primary_activity_id bigint,
-    address_record_id bigint
+    address_record_id bigint,
+    search_vector tsvector
 );
 
 
@@ -1211,7 +1277,8 @@ CREATE TABLE public.exports (
     rows integer,
     options jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone
 );
 
 
@@ -2892,11 +2959,11 @@ CREATE TABLE public.parking_notifications (
     accuracy double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    zipcode character varying,
+    postal_code character varying,
     city character varying,
     neighborhood character varying,
     country_id bigint,
-    state_id bigint,
+    region_record_id bigint,
     message text,
     location_from_address boolean DEFAULT false,
     delivery_status character varying,
@@ -2908,7 +2975,8 @@ CREATE TABLE public.parking_notifications (
     retrieved_by_id bigint,
     image text,
     image_processing boolean DEFAULT false NOT NULL,
-    repeat_number integer
+    repeat_number integer,
+    region_string character varying
 );
 
 
@@ -4206,6 +4274,13 @@ ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_p
 
 
 --
+-- Name: bike_organization_notes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_organization_notes ALTER COLUMN id SET DEFAULT nextval('public.bike_organization_notes_id_seq'::regclass);
+
+
+--
 -- Name: bike_organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4934,6 +5009,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_organization_notes bike_organization_notes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_organization_notes
+    ADD CONSTRAINT bike_organization_notes_pkey PRIMARY KEY (id);
 
 
 --
@@ -5765,6 +5848,13 @@ CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks U
 
 
 --
+-- Name: index_b_params_on_bike_owner_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_bike_owner_email_trgm ON public.b_params USING gin ((((params -> 'bike'::text) ->> 'owner_email'::text)) public.gin_trgm_ops);
+
+
+--
 -- Name: index_b_params_on_created_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5772,10 +5862,38 @@ CREATE INDEX index_b_params_on_created_bike_id ON public.b_params USING btree (c
 
 
 --
+-- Name: index_b_params_on_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_email_trgm ON public.b_params USING gin (email public.gin_trgm_ops) WHERE (created_bike_id IS NULL);
+
+
+--
 -- Name: index_b_params_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (organization_id);
+
+
+--
+-- Name: index_bike_organization_notes_on_bike_id_and_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_bike_organization_notes_on_bike_id_and_organization_id ON public.bike_organization_notes USING btree (bike_id, organization_id);
+
+
+--
+-- Name: index_bike_organization_notes_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_organization_notes_on_organization_id ON public.bike_organization_notes USING btree (organization_id);
+
+
+--
+-- Name: index_bike_organization_notes_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_organization_notes_on_user_id ON public.bike_organization_notes USING btree (user_id);
 
 
 --
@@ -5961,6 +6079,13 @@ CREATE INDEX index_bike_versions_on_tertiary_frame_color_id ON public.bike_versi
 
 
 --
+-- Name: index_bikes_current_listing_order; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_listing_order ON public.bikes USING btree (listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
 -- Name: index_bikes_on_address_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6052,6 +6177,13 @@ CREATE INDEX index_bikes_on_model_audit_id ON public.bikes USING btree (model_au
 
 
 --
+-- Name: index_bikes_on_owner_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_owner_email_trgm ON public.bikes USING gin (owner_email public.gin_trgm_ops);
+
+
+--
 -- Name: index_bikes_on_paint_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6073,10 +6205,24 @@ CREATE INDEX index_bikes_on_primary_frame_color_id ON public.bikes USING btree (
 
 
 --
+-- Name: index_bikes_on_search_vector; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_search_vector ON public.bikes USING gin (search_vector);
+
+
+--
 -- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL);
+
+
+--
+-- Name: index_bikes_on_serial_normalized_no_space_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_serial_normalized_no_space_trgm ON public.bikes USING gin (serial_normalized_no_space public.gin_trgm_ops) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
 
 
 --
@@ -6136,6 +6282,13 @@ CREATE INDEX index_components_on_manufacturer_id ON public.components USING btre
 
 
 --
+-- Name: index_customer_contacts_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_customer_contacts_on_bike_id ON public.customer_contacts USING btree (bike_id);
+
+
+--
 -- Name: index_email_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6147,6 +6300,20 @@ CREATE INDEX index_email_bans_on_user_id ON public.email_bans USING btree (user_
 --
 
 CREATE INDEX index_email_domains_on_creator_id ON public.email_domains USING btree (creator_id);
+
+
+--
+-- Name: index_email_domains_on_domain_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_domains_on_domain_trgm ON public.email_domains USING gin (domain public.gin_trgm_ops);
+
+
+--
+-- Name: index_email_domains_on_domain_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_email_domains_on_domain_unique ON public.email_domains USING btree (domain) WHERE (deleted_at IS NULL);
 
 
 --
@@ -6619,6 +6786,13 @@ CREATE INDEX index_notifications_on_bike_id ON public.notifications USING btree 
 
 
 --
+-- Name: index_notifications_on_message_channel_target_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_notifications_on_message_channel_target_trgm ON public.notifications USING gin (message_channel_target public.gin_trgm_ops);
+
+
+--
 -- Name: index_notifications_on_notifiable_type_and_notifiable_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6864,17 +7038,17 @@ CREATE INDEX index_parking_notifications_on_organization_id ON public.parking_no
 
 
 --
+-- Name: index_parking_notifications_on_region_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parking_notifications_on_region_record_id ON public.parking_notifications USING btree (region_record_id);
+
+
+--
 -- Name: index_parking_notifications_on_retrieved_by_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_parking_notifications_on_retrieved_by_id ON public.parking_notifications USING btree (retrieved_by_id);
-
-
---
--- Name: index_parking_notifications_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_parking_notifications_on_state_id ON public.parking_notifications USING btree (state_id);
 
 
 --
@@ -7095,13 +7269,6 @@ CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records
 
 
 --
--- Name: index_strava_activities_on_strava_integration_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_strava_activities_on_strava_integration_id ON public.strava_activities USING btree (strava_integration_id);
-
-
---
 -- Name: index_strava_activities_on_strava_integration_id_and_strava_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7113,13 +7280,6 @@ CREATE UNIQUE INDEX index_strava_activities_on_strava_integration_id_and_strava_
 --
 
 CREATE UNIQUE INDEX index_strava_gears_on_item_type_and_item_id ON public.strava_gears USING btree (item_type, item_id) WHERE (item_id IS NOT NULL);
-
-
---
--- Name: index_strava_gears_on_strava_integration_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_strava_gears_on_strava_integration_id ON public.strava_gears USING btree (strava_integration_id);
 
 
 --
@@ -7256,6 +7416,13 @@ CREATE INDEX index_user_bans_on_user_id ON public.user_bans USING btree (user_id
 
 
 --
+-- Name: index_user_emails_on_email_confirmed; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_emails_on_email_confirmed ON public.user_emails USING btree (email) WHERE (confirmation_token IS NULL);
+
+
+--
 -- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7305,6 +7472,13 @@ CREATE INDEX index_users_on_email ON public.users USING btree (email) WHERE (del
 
 
 --
+-- Name: index_users_on_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_email_trgm ON public.users USING gin (email public.gin_trgm_ops) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_users_on_token_for_password_reset; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7330,6 +7504,13 @@ CREATE UNIQUE INDEX unique_assignment_to_ambassador ON public.ambassador_task_as
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
+
+
+--
+-- Name: bikes bikes_search_vector_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER bikes_search_vector_trigger BEFORE INSERT OR UPDATE OF serial_number, cached_data, all_description ON public.bikes FOR EACH ROW EXECUTE FUNCTION public.bikes_search_vector_update();
 
 
 --
@@ -7411,8 +7592,21 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260430122735'),
+('20260428142526'),
+('20260428000001'),
+('20260425103043'),
+('20260425000001'),
+('20260424000002'),
+('20260424000001'),
+('20260412183446'),
+('20260401211310'),
+('20260331160943'),
+('20260319153927'),
+('20260318211638'),
 ('20260310045539'),
 ('20260310031750'),
+('20260308002919'),
 ('20260305025122'),
 ('20260304181710'),
 ('20260220053202'),

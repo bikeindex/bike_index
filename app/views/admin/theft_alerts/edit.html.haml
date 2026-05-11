@@ -51,7 +51,7 @@
 
               %p
                 Activation started at:
-                %span.convertTime= l( @theft_alert.activating_at, format: :convert_time)
+                %span.localizeTime= l( @theft_alert.activating_at, format: :convert_time)
 
               %p
                 %strong Don't activate again
@@ -90,7 +90,7 @@
           %td Activation began
           %td
             - if @theft_alert.activating_at.present?
-              %span.convertTime
+              %span.localizeTime
                 = l @theft_alert.activating_at, format: :convert_time
               - if @theft_alert.paid_at.present?
                 %small.ml-2.less-strong
@@ -100,12 +100,12 @@
           %td last FB update
           %td
             - if @theft_alert.facebook_updated_at.present?
-              %span.convertTime
+              %span.localizeTime
                 = l @theft_alert.facebook_updated_at, format: :convert_time
               %small.ml-2.less-strong
                 = @theft_alert.live? ? "alert ends" : "alert ended"
                 - if @theft_alert.end_at.present?
-                  %span.convertTime
+                  %span.localizeTime
                     = l @theft_alert.end_at, format: :convert_time
         %tr
           %td Notify?

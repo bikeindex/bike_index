@@ -179,6 +179,19 @@ RSpec.describe PaymentsController, type: :request do
       end
     end
 
+    context "with amount below stripe minimum" do
+      it "redirects back with the stripe error message" do
+        VCR.use_cassette("payments_controller-below-stripe-minimum", match_requests_on: [:method], re_record_interval:) do
+          post base_url, params: {
+            is_arbitrary: false,
+            payment: {amount_cents: 1, currency: "USD", kind: "donation"}
+          }
+        end
+        expect(response).to redirect_to(new_payment_path)
+        expect(flash[:notice]).to match(/unable to process payment/i)
+      end
+    end
+
     context "with user" do
       include_context :request_spec_logged_in_as_user
       it "makes a onetime payment with current user" do

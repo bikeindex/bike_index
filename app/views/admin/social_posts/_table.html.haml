@@ -37,7 +37,7 @@
       - social_posts.each do |social_post|
         %tr
           %td
-            %a.convertTime{ href: admin_social_post_path(social_post.id) }
+            %a.localizeTime{ href: admin_social_post_path(social_post.id) }
               = l(social_post.created_at, format: :convert_time)
           %td
             %small.less-strong

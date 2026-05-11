@@ -81,22 +81,23 @@ module API
         get "/count" do
           max_limit = 11_000
           ActiveRecord::Base.connected_to(role: :reading) do
-            # Doing extra stuff to make this query more efficient, since this is called all the time
             interpreted_params = BikeSearchable.searchable_interpreted_params(params.merge(stolenness: "proximity"), ip: forwarded_ip_address)
-            # Un-scope to remove the unnecessary eager loading
-            bikes = Bike.unscoped.current.search(interpreted_params.merge(stolenness: "all"))
-            # And then execute the specific BikeSearchable#search_matching_stolenness query for each
-            proximity = if interpreted_params[:bounding_box].present?
-              bikes.stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box]).limit(max_limit).count
-            else # we're probably in testing, but regardless, just skip
-              0
+            Rails.cache.fetch(["api/v3/search/count", interpreted_params], expires_in: 5.minutes) do
+              # Un-scope to remove the unnecessary eager loading
+              bikes = Bike.unscoped.current.search(interpreted_params.merge(stolenness: "all"))
+              # And then execute the specific BikeSearchable#search_matching_stolenness query for each
+              proximity = if interpreted_params[:bounding_box].present?
+                bikes.stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box]).limit(max_limit).count
+              else # we're probably in testing, but regardless, just skip
+                0
+              end
+              {
+                non: bikes.status_with_owner.limit(max_limit).count,
+                stolen: bikes.stolen_or_impounded.limit(max_limit).count,
+                proximity:,
+                for_sale: bikes.for_sale.limit(max_limit).count
+              }
             end
-            {
-              non: bikes.status_with_owner.limit(max_limit).count,
-              stolen: bikes.stolen_or_impounded.limit(max_limit).count,
-              proximity:,
-              for_sale: bikes.for_sale.limit(max_limit).count
-            }
           end
         end
 

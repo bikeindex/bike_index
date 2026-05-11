@@ -12,7 +12,7 @@ RSpec.describe Organized::EmailsController, type: :request do
 
   context "logged_in_as_organization_user" do
     include_context :request_spec_logged_in_as_organization_user
-    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: enabled_feature_slugs) }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
     describe "index" do
       it "redirects to the organization root path" do
         get base_url
@@ -30,11 +30,10 @@ RSpec.describe Organized::EmailsController, type: :request do
             bike: bike)
         end
         it "renders" do
-          get "#{base_url}/appears_abandoned_notification"
+          components = rendered_view_component_names { get "#{base_url}/appears_abandoned_notification" }
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/parking_notification")
-          expect(assigns(:parking_notification)).to eq parking_notification
-          expect(assigns(:email_preview)).to be_truthy
+          expect(components).to include("Emails::ParkingNotification::Component")
+          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(response.body).to_not match(parking_notification.retrieval_link_token)
         end
       end
@@ -51,7 +50,7 @@ RSpec.describe Organized::EmailsController, type: :request do
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
-    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: enabled_feature_slugs) }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
     describe "index" do
       it "renders" do
         get base_url
@@ -64,16 +63,21 @@ RSpec.describe Organized::EmailsController, type: :request do
 
     describe "show" do
       context "appears_abandoned_notification" do
+        let!(:header_snippet) { FactoryBot.create(:mail_snippet, kind: "header", organization: current_organization, body: "<p>HEADER SNIPPET</p>", is_enabled: true) }
         it "renders" do
           expect(bike).to be_present
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
           expect(current_organization.bikes.pluck(:id)).to eq([bike.id])
-          get "#{base_url}/appears_abandoned_notification"
+          components = rendered_view_component_names { get "#{base_url}/appears_abandoned_notification" }
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/parking_notification")
-          expect(assigns(:parking_notification).is_a?(ParkingNotification)).to be_truthy
-          expect(assigns(:parking_notification).retrieval_link_token).to be_blank
-          expect(assigns(:email_preview)).to be_truthy
+          expect(components).to include("Emails::ParkingNotification::Component")
+          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          # Layout/helper hooks: @email_preview enables the preview-only CSS and suppresses
+          # the supporters block; @organization makes the layout render org snippets even
+          # though controller_path is "organized/emails", not "organized_mailer".
+          expect(response.body).to include("html { background: #e6e6e6;")
+          expect(response.body).to_not include("Bike Index is also supported by")
+          expect(response.body).to include("HEADER SNIPPET")
           expect(assigns(:kind)).to eq "appears_abandoned_notification"
           current_organization.reload
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -82,11 +86,12 @@ RSpec.describe Organized::EmailsController, type: :request do
       context "passed id" do
         let!(:parking_notification) { FactoryBot.create(:parking_notification, organization: current_organization, kind: "parked_incorrectly_notification") }
         it "renders passed id" do
-          get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: parking_notification.id}
+          components = rendered_view_component_names do
+            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: parking_notification.id}
+          end
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/parking_notification")
-          expect(assigns(:parking_notification)).to eq parking_notification
-          expect(assigns(:email_preview)).to be_truthy
+          expect(components).to include("Emails::ParkingNotification::Component")
+          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:kind)).to eq "parked_incorrectly_notification"
           expect(response.body).to_not match(parking_notification.retrieval_link_token)
         end
@@ -102,12 +107,10 @@ RSpec.describe Organized::EmailsController, type: :request do
         it "renders" do
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
           expect(current_organization.bikes.pluck(:id)).to eq([])
-          get "#{base_url}/appears_abandoned_notification"
+          components = rendered_view_component_names { get "#{base_url}/appears_abandoned_notification" }
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/parking_notification")
-          expect(assigns(:parking_notification).is_a?(ParkingNotification)).to be_truthy
-          expect(assigns(:parking_notification).retrieval_link_token).to be_blank
-          expect(assigns(:email_preview)).to be_truthy
+          expect(components).to include("Emails::ParkingNotification::Component")
+          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:kind)).to eq "appears_abandoned_notification"
           current_organization.reload
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -116,11 +119,12 @@ RSpec.describe Organized::EmailsController, type: :request do
       context "graduated_notification passed id" do
         let!(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: current_organization) }
         it "renders" do
-          get "#{base_url}/graduated_notification", params: {graduated_notification_id: graduated_notification.id}
+          components = rendered_view_component_names do
+            get "#{base_url}/graduated_notification", params: {graduated_notification_id: graduated_notification.id}
+          end
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/graduated_notification")
-          expect(assigns(:graduated_notification).id).to eq graduated_notification.id
-          expect(assigns(:email_preview)).to be_truthy
+          expect(components).to include("Emails::GraduatedNotification::Component")
+          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(response.body).to_not match(graduated_notification.marked_remaining_link_token)
           expect(assigns(:kind)).to eq "graduated_notification"
         end
@@ -135,23 +139,28 @@ RSpec.describe Organized::EmailsController, type: :request do
       context "finished_registration" do
         let(:enabled_feature_slugs) { %w[customize_emails] }
         it "renders" do
-          get "#{base_url}/finished_registration"
+          components = rendered_view_component_names { get "#{base_url}/finished_registration" }
           expect(response.status).to eq(200)
+          expect(components).to include("Emails::FinishedRegistration::Component")
           expect(response.body).to include("Protect your bike by following these locking guidelines")
+          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
           # And it defaults to finished registration, if unable to parse kind
-          get "#{base_url}/whateverrrrr"
+          components = rendered_view_component_names { get "#{base_url}/whateverrrrr" }
           expect(response.status).to eq(200)
+          expect(components).to include("Emails::FinishedRegistration::Component")
           expect(response.body).to include("Protect your bike by following these locking guidelines")
+          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
         end
       end
       context "partial_registration" do
         let(:enabled_feature_slugs) { %w[customize_emails show_partial_registrations graduated_notifications] }
         it "renders" do
-          get "#{base_url}/partial_registration"
+          components = rendered_view_component_names { get "#{base_url}/partial_registration" }
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/partial_registration")
+          expect(components).to include("Emails::PartialRegistration::Component")
+          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration partial_registration graduated_notification])
         end
       end
@@ -161,32 +170,37 @@ RSpec.describe Organized::EmailsController, type: :request do
         it "renders" do
           expect(organization_stolen_message.id).to be_present
           expect(organization_stolen_message.body).to be_blank
-          get "#{base_url}/organization_stolen_message"
+          components = rendered_view_component_names { get "#{base_url}/organization_stolen_message" }
           expect(response.status).to eq(200)
+          expect(components).to include("Emails::FinishedRegistration::Component")
           # Fake bike doesn't have status_stolen, so it renders the normal registration message
           expect(response.body).to include("Protect your bike by following these locking guidelines")
+          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
-          expect(assigns(:bike).id).to eq 42
-          expect(assigns(:bike).current_stolen_record).to be_present
-          # Because the stolen_message is blank
-          expect(assigns(:bike).current_stolen_record.organization_stolen_message_id).to be_blank
         end
         context "with a stolen bike" do
           let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
           it "renders that bike" do
             organization_stolen_message.update(body: "something here", is_enabled: true)
+            stolen_record.update(organization_stolen_message: organization_stolen_message)
             expect(bike.reload.status).to eq "status_stolen"
             expect(bike.current_ownership.token).to be_present
             expect(current_organization.bikes.pluck(:id)).to eq([bike.id])
-            get "#{base_url}/organization_stolen_message"
+            components = rendered_view_component_names { get "#{base_url}/organization_stolen_message" }
             expect(response.status).to eq(200)
+            expect(components).to include("Emails::FinishedRegistration::Component")
             # When claim_message is present, it renders the claim_message partial
             expect(response.body).to include("something here") # organization_stolen_message body
             expect(response.body).to include("registered your bike on Bike Index")
+            # Stolen-specific text rendered by the FinishedRegistration component
+            expect(response.body).to include("Mark your bike recovered")
+            expect(response.body).to include("Hopefully you find the")
+            # Confirms the bike rendered is the real stolen bike
+            expect(response.body).to include(bike.serial_display)
+            expect(bike.reload.current_stolen_record).to be_present
+            expect(bike.current_stolen_record.organization_stolen_message_id).to eq organization_stolen_message.id
             expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
-            expect(assigns(:bike).id).to eq bike.id
-            expect(assigns(:bike).current_stolen_record).to be_present
-            expect(assigns(:bike).current_stolen_record.organization_stolen_message_id).to eq organization_stolen_message.id
+            expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
             expect(response.body).to_not match(bike.current_ownership.token)
           end
         end
@@ -217,6 +231,8 @@ RSpec.describe Organized::EmailsController, type: :request do
     end
 
     describe "update" do
+      include_context :with_paper_trail
+
       it "creates" do
         expect(current_organization.mail_snippets.count).to eq 0
         put "#{base_url}/impound_notification", params: {
@@ -234,7 +250,11 @@ RSpec.describe Organized::EmailsController, type: :request do
         expect(mail_snippet.body).to eq "cool new things"
         expect(mail_snippet.subject).to eq "a fancy custom subject"
         expect(mail_snippet.is_enabled).to be_truthy
+        version = mail_snippet.versions.last
+        expect(version.event).to eq "create"
+        expect(version.whodunnit).to eq current_user.id.to_s
       end
+
       context "existing" do
         let!(:mail_snippet) do
           FactoryBot.create(:mail_snippet,
@@ -260,6 +280,9 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(mail_snippet.body).to eq "cool new things"
           expect(mail_snippet.subject).to eq "a fancy custom subject"
           expect(mail_snippet.is_enabled).to be_falsey
+          version = mail_snippet.versions.last
+          expect(version.event).to eq "update"
+          expect(version.whodunnit).to eq current_user.id.to_s
         end
       end
     end
@@ -267,7 +290,7 @@ RSpec.describe Organized::EmailsController, type: :request do
 
   context "logged_in_as_superuser" do
     include_context :request_spec_logged_in_as_superuser
-    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc_legacy, enabled_feature_slugs: enabled_feature_slugs, kind: "bike_shop") }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs, kind: "bike_shop") }
     # Also defined in controller
     let(:viewable_kinds) { ParkingNotification.kinds + %w[finished_registration partial_registration graduated_notification impound_claim_approved impound_claim_denied organization_stolen_message] }
     describe "edit" do

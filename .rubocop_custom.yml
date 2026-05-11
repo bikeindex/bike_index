@@ -7,6 +7,13 @@ AllCops:
     - "spec/vcr_cassettes/*"
     - "vendor/bundle/**/*"
 
+Style/ClassAndModuleChildren:
+  Enabled: true
+  EnforcedStyle: nested
+  AutoCorrect: always
+  Exclude:
+    - "config/initializers/rack_attack.rb"
+
 Layout/ClassStructure:
   Enabled: true
   ExpectedOrder:

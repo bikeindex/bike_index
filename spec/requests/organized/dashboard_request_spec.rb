@@ -7,7 +7,7 @@ RSpec.describe Organized::BaseController, type: :request do
 
       it "redirects to the bikes page" do
         get "/o/#{current_organization.to_param}"
-        expect(response).to redirect_to(organization_bikes_path(organization_id: current_organization.to_param))
+        expect(response).to redirect_to(organization_registrations_path(organization_id: current_organization.to_param))
         get "/user_root_url_redirect"
         expect(response).to redirect_to(organization_root_path(organization_id: current_organization.to_param))
       end
@@ -31,7 +31,7 @@ RSpec.describe Organized::BaseController, type: :request do
       it "redirects to the ambassador dashboard" do
         expect(current_user.default_organization.law_enforcement?).to be_truthy
         get "/o/#{current_organization.to_param}"
-        expect(response).to redirect_to(organization_bikes_path(organization_id: current_organization.to_param))
+        expect(response).to redirect_to(organization_registrations_path(organization_id: current_organization.to_param))
         get "/user_root_url_redirect"
         # default_bike_search_path
         expect(response).to redirect_to(search_registrations_path(stolenness: "all"))
@@ -62,7 +62,7 @@ RSpec.describe Organized::BaseController, type: :request do
         expect(current_organization.parent?).to be_truthy
         expect(current_organization.overview_dashboard?).to be_falsey
         get "/o/#{current_organization.to_param}/dashboard"
-        expect(response).to redirect_to(organization_bikes_path)
+        expect(response).to redirect_to(organization_registrations_path)
         # ... but it renders if the current_user is superuser
         FactoryBot.create(:superuser_ability, user: current_user)
         get "/o/#{current_organization.to_param}/dashboard"
@@ -107,7 +107,7 @@ RSpec.describe Organized::BaseController, type: :request do
         expect(current_organization.reload.official_manufacturer?).to be_falsey
         expect(current_organization.overview_dashboard?).to be_falsey
         get "/o/#{current_organization.to_param}/dashboard"
-        expect(response).to redirect_to(organization_bikes_path)
+        expect(response).to redirect_to(organization_registrations_path)
       end
       context "with official_manufacturer" do
         let(:current_organization) { FactoryBot.create(:organization_with_organization_features, manufacturer_id: manufacturer.id, enabled_feature_slugs: ["official_manufacturer"]) }

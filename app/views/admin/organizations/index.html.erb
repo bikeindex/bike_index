@@ -1,0 +1,100 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown dropleft small">
+    <% active_kind = params[:search_kind] %>
+
+    <a
+      class="nav-link dropdown-toggle <%= active_kind.present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= active_kind.present? ? active_kind.humanize : "Kind" %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All Kinds", admin_organizations_path(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{active_kind.blank? ? 'active' : ''}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% Organization.kinds.each do |kind| %>
+        <%= link_to kind.humanize, admin_organizations_path(sortable_search_params.merge(search_kind: kind == active_kind ? nil : kind)), class: "dropdown-item #{active_kind == kind ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown dropleft small">
+    <% active_pos_kind = params[:search_pos] %>
+
+    <a
+      class="nav-link dropdown-toggle <%= active_pos_kind.present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <%= active_pos_kind.present? ? active_pos_kind.humanize : "POS" %>
+    </a>
+
+    <div class="dropdown-menu">
+      <% (%w[with_pos without_pos broken_pos] + Organization.pos_kinds).each do |pos_kind| %>
+        <%= link_to pos_kind.humanize, admin_organizations_path(sortable_search_params.merge(search_pos: active_pos_kind == pos_kind ? nil : pos_kind)), class: "dropdown-item #{active_pos_kind == pos_kind ? 'active' : ''}" %>
+
+        <% if pos_kind == "broken_pos" %>
+          <div class="dropdown-divider"></div>
+        <% end %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Paid", admin_organizations_path(sortable_search_params.merge(search_paid: !@search_paid)), class: "nav-link #{@search_paid ? "active" : ""}" %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "New Organization", new_admin_organization_url, class: "nav-link" %>
+  </li>
+<% end %>
+
+<style>.form-control.selectize-control { width: 100%; }</style>
+
+<% admin_search_form = capture do %>
+  <%= form_tag admin_organizations_path, method: :get do %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+    <%= hidden_field_tag :search_paid, @search_paid %>
+    <%= hidden_field_tag :search_pos, params[:search_pos] %>
+
+    <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
+      <div
+        class="fancy-select no-restore-on-backspace unfancy col-md-4 mt-2"
+        style="margin-bottom: -0.4rem; padding-left: 0;"
+      >
+        <% features_group = OrganizationFeature.order(name: :desc).pluck(:name, :id) %>
+        <% settings_group = [["With Stolen Message", "with_stolen_message"], ["Opted into Theft Survey", "theft_survey"], ["Shown on map", "mapped"], ["NOT shown on map", "not_mapped"], ["Not Approved", "not_approved"]] %>
+        <% opt_groups = [["Settings", settings_group], ["Features", features_group]] %>
+
+        <%= select_tag :search_features_and_settings, grouped_options_for_select(opt_groups, selected: @features_and_settings_ids), placeholder: "With features", class: "form-control", include_blank: true, multiple: true %>
+      </div>
+
+      <div class="align-self-end mt-2 mr-2">
+        <%= text_field_tag :search_query, params[:search_query], placeholder: "Name/Location", class: "form-control" %>
+      </div>
+
+      <div class="mt-2 mr-2">
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% table_view = render(partial: "/admin/organizations/table", locals: {render_sortable: true}) %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @organizations,
+  nav_header_list_items:,
+  chart_collection: @render_chart && matching_organizations,
+  admin_search_form:,
+  table_view:
+)) %>

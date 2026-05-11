@@ -201,8 +201,9 @@ class Organization < ApplicationRecord
     end
 
     def friendly_find(n)
-      return nil unless n.present?
       return n if n.is_a?(Organization)
+      n = normalize_friendly_str(n)
+      return nil if n.blank?
       return find_by_id(n) if integer_string?(n)
 
       slug = Slugifyer.slugify(n)
@@ -211,9 +212,10 @@ class Organization < ApplicationRecord
     end
 
     def admin_text_search(n)
-      return nil unless n.present?
+      n = normalize_friendly_str(n)
+      return nil if n.blank?
 
-      str = "%#{n.strip}%"
+      str = "%#{n}%"
       match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name address_records.city]
       left_outer_joins(:locations, :location_address_records)
         .distinct
@@ -290,10 +292,6 @@ class Organization < ApplicationRecord
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?
     ascend_or_broken_ascend? || any_enabled?(%w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen])
-  end
-
-  def show_multi_serial?
-    enabled?("show_multi_serial") || %w[law_enforcement].include?(kind)
   end
 
   def public_impound_bikes?

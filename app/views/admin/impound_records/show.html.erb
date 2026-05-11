@@ -30,7 +30,7 @@
           <td>Created</td>
 
           <td>
-            <span class="convertTime preciseTime">
+            <span class="localizeTime preciseTime">
               <%= l(@impound_record.created_at, format: :convert_time) %>
             </span>
           </td>
@@ -40,7 +40,7 @@
           <td>Updated</td>
 
           <td>
-            <span class="convertTime preciseTime">
+            <span class="localizeTime preciseTime">
               <%= l(@impound_record.updated_at, format: :convert_time) %>
             </span>
           </td>
@@ -135,7 +135,7 @@
       <% @impound_record.impound_record_updates.each do |impound_record_update| %>
         <tr>
           <td>
-            <span class="convertTime preciseTime">
+            <span class="localizeTime preciseTime">
               <%= l(impound_record_update.created_at, format: :convert_time) %>
             </span>
           </td>

@@ -76,6 +76,7 @@ jobs:
         ci_node_total: [4]
         ci_node_index: [0, 1, 2, 3]
     env:
+      REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
       TZ: "America/Chicago"
       COVERAGE: false # additional configuration is needed for parallelized tests
@@ -125,6 +126,8 @@ jobs:
         run: bin/rails assets:precompile --trace
       # Run tests
       - name: Run tests
+        env:
+          SKIP_CSS_BUILD: true
         run: bin/knapsack_pro_tests
       # Until parallel reporting is set up, skip sending code coverage reports
       # - name: publish code coverage

@@ -1,6 +1,6 @@
 module Organized
   class ImpoundRecordsController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
 
     MIN_DISTANCE = 0.01
     DEFAULT_DISTANCE = 1
@@ -9,7 +9,7 @@ module Organized
 
     def index
       @per_page = permitted_per_page
-      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       @pagy, @impound_records = pagy(:countish, available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
@@ -90,7 +90,7 @@ module Organized
 
       if bike_search_params_present?
         bikes = a_impound_records.bikes.search(@interpreted_params)
-        bikes = BikeServices::OrgSearch.email_and_name(bikes, params[:search_email])
+        bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
         a_impound_records = a_impound_records.where(bike_id: bikes.pluck(:id))
       elsif params[:search_bike_id].present?
         a_impound_records = a_impound_records.where(bike_id: params[:search_bike_id])

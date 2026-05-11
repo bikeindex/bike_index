@@ -50,7 +50,7 @@ module Enumable
       end
       slug = (slugs & [str]).first
       slug ||= names_and_secondary_names.detect { |names| names.include?(str) }&.first
-      if slug.blank? && str[/\(/].present?
+      if slug.blank? && str.is_a?(String) && str[/\(/].present?
         str = str.split("(").first.strip
         slug = names_and_secondary_names.detect { |names| names.include?(str) }&.first
       end

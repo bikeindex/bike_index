@@ -79,12 +79,12 @@ module GraphingHelper
     end
     content_tag(:span) do
       concat "from "
-      concat content_tag(:em, l(time_range.first, format: :convert_time), class: "convertTime #{precision_class}")
+      concat content_tag(:em, l(time_range.first, format: :convert_time), class: "localizeTime #{precision_class}")
       concat " to "
       if time_range.last > Time.current - 5.minutes
         concat content_tag(:em, "now")
       else
-        concat content_tag(:em, l(time_range.last, format: :convert_time), class: "convertTime #{precision_class}")
+        concat content_tag(:em, l(time_range.last, format: :convert_time), class: "localizeTime #{precision_class}")
       end
     end
   end
@@ -127,14 +127,15 @@ module GraphingHelper
 
   private
 
-  def collection_grouped(collection:, column: "created_at", time_range: nil, time_zone: nil)
+  def collection_grouped(collection:, column: "created_at", time_range: nil)
     time_range ||= @time_range
     # Note: by specifying the range parameter, we force it to display empty days
     collection.send(
       group_by_method(time_range),
       column,
       range: time_range,
-      format: group_by_format(time_range)
+      format: group_by_format(time_range),
+      time_zone: Time.zone
     )
   end
 

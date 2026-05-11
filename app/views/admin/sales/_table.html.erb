@@ -27,7 +27,7 @@
         <tr>
           <td>
             <div class="less-strong-hold">
-              <%= link_to admin_sale_path(sale), class: "convertTime" do %>
+              <%= link_to admin_sale_path(sale), class: "localizeTime" do %>
                 <%= l sale.created_at, format: :convert_time %>
               <% end %>
 
@@ -40,7 +40,7 @@
           </td>
 
           <td>
-            <small class="convertTime">
+            <small class="localizeTime">
               <%= l sale.sold_at, format: :convert_time %>
             </small>
           </td>

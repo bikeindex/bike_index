@@ -607,7 +607,7 @@ RSpec.describe BulkImportJob, type: :job do
 
     describe "register bike" do
       let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
-      context "valid organization bike" do
+      context "valid organization bike", :flaky do
         let(:organization) { FactoryBot.create(:organization_with_auto_user) }
         let!(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
         let(:row) { {manufacturer: " Surly", serial_number: "na", color: nil, owner_email: "test2@bikeindex.org", year: "2018", model: "Midnight Special", cycle_type: "tandem"} }
@@ -657,7 +657,7 @@ RSpec.describe BulkImportJob, type: :job do
           context "with chartreuse paint" do
             let(:green) { FactoryBot.create(:color, name: "Green") }
             let!(:paint) { FactoryBot.create(:paint, name: color, color: green) }
-            it "assigns", :flaky do
+            it "assigns" do
               expect(Paint.count).to eq 1
               bike = expect_registered_bike(row.merge(color: " ChartreuSE  "))
 

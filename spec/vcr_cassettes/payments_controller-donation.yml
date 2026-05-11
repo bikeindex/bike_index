@@ -174,14 +174,12 @@ http_interactions:
     uri: https://api.stripe.com/v1/checkout/sessions
     body:
       encoding: UTF-8
-      string: submit_type=donate&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=MXN&line_items[0][price_data][product_data][name]=Donation&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew&customer_email=user3s%40bikeindex.org
+      string: submit_type=donate&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=MXN&line_items[0][price_data][product_data][name]=Donation&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew&customer_email=user1s%40bikeindex.org
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
-      X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_8Gwd22WHoAgKEi","request_duration_ms":335}}'
       Idempotency-Key:
-      - 7aff7177-f043-45f1-aeb4-1f0b5efba13d
+      - 24c42470-fb51-48f0-ae33-084ce7f9b0c3
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -198,11 +196,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Tue, 24 Feb 2026 18:23:04 GMT
+      - Tue, 28 Apr 2026 15:32:59 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '3743'
+      - '3867'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -221,13 +219,17 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=1BhH5EIvs7_cxwG8cRQTppPStQrNq6ApY3ZoMf2IIf8CHze3Vpyl1V66vf6sNxrVitHPvKTSaQPfUy2e
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=VbHfLfgJs-T4GfT80dTlB33bw66-rIWseBvuW75wij_E0g_bbqIvJe5XmYchFKzSvKpRZa0s7tBqNeO3
       Idempotency-Key:
-      - 7aff7177-f043-45f1-aeb4-1f0b5efba13d
+      - 24c42470-fb51-48f0-ae33-084ce7f9b0c3
       Original-Request:
-      - req_mJg5q4DQQpKXWX
+      - req_jPzFuFS4XJOX7a
+      Report-To:
+      - '{"group":"csp","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/csp-report-v2?q=VbHfLfgJs-T4GfT80dTlB33bw66-rIWseBvuW75wij_E0g_bbqIvJe5XmYchFKzSvKpRZa0s7tBqNeO3&t=1"}],"include_subdomains":true}'
+      Reporting-Endpoints:
+      - csp="https://q.stripe.com/csp-report-v2?q=VbHfLfgJs-T4GfT80dTlB33bw66-rIWseBvuW75wij_E0g_bbqIvJe5XmYchFKzSvKpRZa0s7tBqNeO3&t=1"
       Request-Id:
-      - req_mJg5q4DQQpKXWX
+      - req_jPzFuFS4XJOX7a
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -239,14 +241,14 @@ http_interactions:
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       X-Wc:
-      - ABGHIJ
+      - 3c3
       Strict-Transport-Security:
       - max-age=63072000; includeSubDomains; preload
     body:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1cWKmpcdOWcYZ6dj3nOC0qYtFERPSQWbbfslGDIgjxRJC6oCwAIB083b2",
+          "id": "cs_test_a1H7PTIC4OBWv900WO9g8o76NJknBh02dWQwfFiG9UohfrZxwWTbvwhkQd",
           "object": "checkout.session",
           "adaptive_pricing": {
             "enabled": true
@@ -284,7 +286,7 @@ http_interactions:
           },
           "consent": null,
           "consent_collection": null,
-          "created": 1771957384,
+          "created": 1777390379,
           "currency": "mxn",
           "currency_conversion": null,
           "custom_fields": [],
@@ -300,16 +302,17 @@ http_interactions:
           "customer_details": {
             "address": null,
             "business_name": null,
-            "email": "user3s@bikeindex.org",
+            "email": "user1s@bikeindex.org",
             "individual_name": null,
             "name": null,
             "phone": null,
             "tax_exempt": "none",
             "tax_ids": null
           },
-          "customer_email": "user3s@bikeindex.org",
+          "customer_email": "user1s@bikeindex.org",
           "discounts": [],
-          "expires_at": 1772043784,
+          "expires_at": 1777476779,
+          "integration_identifier": null,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -325,6 +328,9 @@ http_interactions:
           },
           "livemode": false,
           "locale": null,
+          "managed_payments": {
+            "enabled": false
+          },
           "metadata": {},
           "mode": "payment",
           "origin_context": null,
@@ -365,8 +371,8 @@ http_interactions:
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1cWKmpcdOWcYZ6dj3nOC0qYtFERPSQWbbfslGDIgjxRJC6oCwAIB083b2#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1H7PTIC4OBWv900WO9g8o76NJknBh02dWQwfFiG9UohfrZxwWTbvwhkQd#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaX09BbE1nX0lWR2ZkUVxvNXY3RG0yaEtgJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
           "wallet_options": null
         }
-  recorded_at: Tue, 24 Feb 2026 18:23:04 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Tue, 28 Apr 2026 15:32:59 GMT
+recorded_with: VCR 6.4.0

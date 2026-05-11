@@ -1,15 +1,16 @@
 module Organized
   class GraduatedNotificationsController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
 
     before_action :ensure_access_to_graduated_notifications!
 
     before_action :find_graduated_notification, except: [:index]
+    around_action :set_reading_role, only: :index
 
     def index
       @per_page = permitted_per_page
       @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
-      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       if @render_results

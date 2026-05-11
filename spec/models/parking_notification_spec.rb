@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe ParkingNotification, type: :model do
-  it_behaves_like "geocodeable_legacy"
-
   describe "factory" do
     let(:parking_notification) { FactoryBot.create(:parking_notification, kind: "appears_abandoned_notification") }
     let(:bike) { parking_notification.bike }
@@ -292,28 +290,27 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
-  describe "address" do
-    # Copies StolenRecord, needs to be moved to a concern
+  describe "formatted_address_string" do
     let(:country) { Country.create(name: "Neverland", iso: "NEVVVV") }
     let(:state) { State.create(country_id: country.id, name: "BullShit", abbreviation: "XXX") }
     it "creates an address" do
       parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
         city: "Chicago",
-        state_id: state.id,
-        zipcode: "60647",
+        region_record_id: state.id,
+        postal_code: "60647",
         country_id: country.id)
       expect(parking_notification.show_address).to be_truthy
-      expect(parking_notification.address).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
+      expect(parking_notification.formatted_address_string).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, Neverland")
     end
     it "is ok with missing information" do
       parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
-        zipcode: "60647",
+        postal_code: "60647",
         country_id: country.id)
-      expect(parking_notification.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
+      expect(parking_notification.formatted_address_string).to eq("2200 N Milwaukee Ave, 60647, Neverland")
     end
     it "returns even if no country" do
       parking_notification = ParkingNotification.new(street: "302666 Richmond Blvd")
-      expect(parking_notification.address).to eq parking_notification.street
+      expect(parking_notification.formatted_address_string).to eq parking_notification.street
     end
   end
 
@@ -336,9 +333,9 @@ RSpec.describe ParkingNotification, type: :model do
       let(:parking_notification) { FactoryBot.build(:parking_notification, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
       it "sets address" do
         parking_notification.save
-        expect(parking_notification.state).to eq state
+        expect(parking_notification.region_record).to eq state
         expect(parking_notification.country).to eq country
-        expect(parking_notification.address).to be_present
+        expect(parking_notification.formatted_address_string).to be_present
         expect(parking_notification.valid?).to be_truthy
         expect(parking_notification.id).to be_present
         expect(parking_notification.location_from_address).to be_falsey

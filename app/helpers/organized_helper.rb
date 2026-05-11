@@ -47,10 +47,13 @@ module OrganizedHelper
   end
 
   def organized_container
-    fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits]
+    fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits registrations]
     return "container-fluid" if fluid.include?(controller_name)
 
-    (controller_name == "bikes" && action_name == "index") ? "container-fluid" : "container"
+    if controller_name == "bulk_imports" && action_name == "show"
+      return "container-fluid"
+    end
+    "container"
   end
 
   def organized_include_javascript_pack?

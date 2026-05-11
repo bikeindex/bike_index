@@ -7,7 +7,7 @@
 Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
-    policy.font_src :self, "https://fonts.gstatic.com", "http://fonts.gstatic.com", :data
+    policy.font_src :self, "https://fonts.gstatic.com", "http://fonts.gstatic.com", "https://themes.googleusercontent.com", :data
     policy.img_src :self, "https://files.bikeindex.org",
       "https://uploads.bikeindex.org",
       "https://bikebook.s3.amazonaws.com",
@@ -20,6 +20,7 @@ Rails.application.configure do
       "https://www.facebook.com",
       "https://connect.facebook.net",
       "https://pbs.twimg.com",
+      "https://www.googleadservices.com",
       "https://syndication.twitter.com", :data, :blob
     policy.object_src :none
     # unsafe_eval is required for application_revised.js jQuery - remove it when possible!
@@ -78,10 +79,9 @@ Rails.application.configure do
       "https://platform.twitter.com",
       "https://js.stripe.com"
     policy.report_uri -> do
-      "https://api.honeybadger.io/v1/browser/csp?api_key=#{ENV["HONEYBADGER_CSP_API_KEY"]}&report_only=true&env=#{Rails.env}&context[user_id]=#{current_user&.id if respond_to?(:current_user)}"
+      "https://api.honeybadger.io/v1/browser/csp?api_key=#{ENV["HONEYBADGER_CSP_API_KEY"]}&report_only=false&env=#{Rails.env}&context[user_id]=#{current_user&.id if respond_to?(:current_user)}"
     end
   end
 
-  # Report violations without enforcing the policy.
-  config.content_security_policy_report_only = true
+  config.content_security_policy_report_only = false
 end

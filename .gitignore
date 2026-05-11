@@ -45,6 +45,9 @@ manufacturer.tsv
 # Ignore special configuration env file
 .env.*
 
+# Per-checkout workspace ID (set by bin/workspace_setup)
+.workspace_id
+
 # Ignore asset stuff
 /public/packs
 /public/packs-test
@@ -73,5 +76,8 @@ vendor/strava_search/node_modules/
 vendor/strava_search/dist/
 vendor/strava_search/storybook-static/
 
-# Ignore .claude settings
-.claude/
+# Ignore local Claude Code settings
+.claude/settings.local.json
+
+# Ignore Playwright MCP session cache (snapshots, console logs)
+.playwright-mcp/

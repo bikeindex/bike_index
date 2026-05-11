@@ -3,15 +3,14 @@
   <div class="alert alert-danger mt-4 mb-4">
     <h3 class="uncap">Your <%= @bike.type %> is currently impounded!</h3>
     Impounded
-    <em class="localizeTime">
-      <%= l @bike.current_impound_record.impounded_at, format: :convert_time %>
-    </em>
+    <em class="localizeTime"><%= l @bike.current_impound_record.impounded_at, format: :convert_time %></em>
+
+
     <em class="small localizeTimezone"></em>
-    by
-    <strong><%= @bike.current_impound_record.organization&.name %></strong>
+    by <strong><%= @bike.current_impound_record.organization&.name %></strong>
     <% if @bike.current_impound_record.parking_notification.present? %>
       from
-      <%= @bike.current_impound_record.parking_notification.address %>
+      <%= @bike.current_impound_record.parking_notification.formatted_address_string %>
     <% end %>
   </div>
 <% end %>
@@ -72,7 +71,9 @@
             </td>
 
             <td class="hidden-sm-cells">
-              <small><%= address_formatted(parking_notification) %></small>
+              <small>
+                <%= parking_notification.formatted_address_string %>
+              </small>
             </td>
 
             <td class="hidden-sm-cells">

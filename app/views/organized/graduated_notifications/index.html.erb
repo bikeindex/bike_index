@@ -21,7 +21,7 @@
   </div>
 <% end %>
 
-<%= render partial: "/shared/period_select" %>
+<%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
 
 <div class="mt-4">
   <%= render(Search::FormOrganized::Component.new(

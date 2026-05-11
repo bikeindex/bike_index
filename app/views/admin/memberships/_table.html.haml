@@ -25,7 +25,7 @@
         %tr
           %td
             .less-strong-hold
-              %a.convertTime{ href: admin_membership_url(membership) }
+              %a.localizeTime{ href: admin_membership_url(membership) }
                 = l membership.created_at, format: :convert_time
               %span.less-strong-right.d-none.d-md-block
                 = membership.id
@@ -34,11 +34,11 @@
               = cache(membership.user) do
                 = render Admin::UserCell::Component.new(user: membership.user, user_id: membership.user_id, render_search: false)
           %td
-            %span.convertTime
+            %span.localizeTime
               = l membership.start_at, format: :convert_time
           %td
             - if membership.end_at.present?
-              %span.convertTime
+              %span.localizeTime
                 = l membership.end_at, format: :convert_time
           %td
             = membership.level_humanized

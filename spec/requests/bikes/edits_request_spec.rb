@@ -106,6 +106,32 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(response.body).to match(/<title>Versions: #{bike.title_string}/)
     end
   end
+  describe "groups edit_template" do
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_creator) }
+    let!(:other_organization) { FactoryBot.create(:organization) }
+    let!(:other_bike_organization) { FactoryBot.create(:bike_organization, bike:, organization: other_organization) }
+
+    it "renders" do
+      get "#{base_url}/groups"
+      expect(response.status).to eq 200
+      expect(response).to render_template(:groups)
+      expect(response.body).to include(bike.creation_organization.name)
+      expect(response.body).to include(other_organization.name)
+    end
+
+    context "with a soft-deleted non-creation organization" do
+      before { other_organization.destroy }
+
+      it "renders without the deleted organization" do
+        expect(other_bike_organization.reload.organization).to be_nil
+        get "#{base_url}/groups"
+        expect(response.status).to eq 200
+        expect(response).to render_template(:groups)
+        expect(response.body).to include(bike.creation_organization.name)
+        expect(response.body).to_not include(other_organization.name)
+      end
+    end
+  end
   describe "marketplace" do
     # TODO: update when MARKETPLACE_FREE_UNTIL changes
     # it "redirects" do

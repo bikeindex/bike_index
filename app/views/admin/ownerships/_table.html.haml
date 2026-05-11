@@ -33,13 +33,13 @@
         %tr
           %td
             .less-strong-hold
-              %a.convertTime{ href: edit_admin_ownership_url(ownership.id) }
+              %a.localizeTime{ href: edit_admin_ownership_url(ownership.id) }
                 = l ownership.created_at, format: :convert_time
               &nbsp;
               %code.less-strong-right.d-none.d-md-block
                 = ownership.id
           %td
-            %small.convertTime
+            %small.localizeTime
               = l ownership.updated_at, format: :convert_time
           - unless skip_bike
             %td
@@ -70,7 +70,7 @@
           %td
             - if ownership.claimed
               - if ownership.claimed_at.present?
-                %span.convertTime
+                %span.localizeTime
                   = l ownership.claimed_at, format: :convert_time
               - else
                 %small.less-strong unknown time

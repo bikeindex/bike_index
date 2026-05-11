@@ -22,8 +22,10 @@
 #
 # Indexes
 #
-#  index_b_params_on_created_bike_id  (created_bike_id)
-#  index_b_params_on_organization_id  (organization_id)
+#  index_b_params_on_bike_owner_email_trgm  ((((params -> 'bike'::text) ->> 'owner_email'::text)) gin_trgm_ops) USING gin
+#  index_b_params_on_created_bike_id        (created_bike_id)
+#  index_b_params_on_email_trgm             (email) WHERE (created_bike_id IS NULL) USING gin
+#  index_b_params_on_organization_id        (organization_id)
 #
 
 # b_param stands for Bike param
@@ -579,7 +581,7 @@ class BParam < ApplicationRecord
 
     attrs = params["parking_notification"].with_indifferent_access
       .slice(:latitude, :longitude, :kind, :internal_notes, :message, :accuracy,
-        :use_entered_address, :street, :city, :zipcode, :state_id, :country_id, :skip_geocoding)
+        :use_entered_address, :street, :city, :postal_code, :region_record_id, :region_string, :country_id, :skip_geocoding)
     attrs.merge(organization_id: creation_organization_id,
       user_id: creator_id,
       bike_id: created_bike_id,
@@ -627,7 +629,8 @@ class BParam < ApplicationRecord
 
   def assign_bike_val(key, val)
     ensure_valid_params
-    self.params["bike"][key] = val
+    val = Binxtils::InputNormalizer.string(val) if val.is_a?(String)
+    self.params["bike"][key] = val if val.present?
   end
 
   def clean_key_value(key, value)

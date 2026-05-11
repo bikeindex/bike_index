@@ -64,12 +64,12 @@ class OrganizationFeature < ApplicationRecord
     organization_stolen_message
     passwordless_users
     regional_bike_counts
+    registration_notes
     require_reg_address
     require_reg_student_id
     show_bulk_import
     show_bulk_import_impound
     show_bulk_import_stolen
-    show_multi_serial
     show_partial_registrations
     show_recoveries
     skip_ownership_email

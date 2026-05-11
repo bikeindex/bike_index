@@ -88,9 +88,9 @@ RSpec.describe InfoController, type: :request do
   end
 
   describe "where" do
-    let!(:organization1) { FactoryBot.create(:organization, :in_nyc_legacy, show_on_map: true) }
-    let!(:organization2) { FactoryBot.create(:organization, :in_chicago_legacy, show_on_map: false) }
-    let!(:organization3) { FactoryBot.create(:organization, :in_edmonton_legacy, show_on_map: true) }
+    let!(:organization1) { FactoryBot.create(:organization, :in_nyc, show_on_map: true) }
+    let!(:organization2) { FactoryBot.create(:organization, :in_chicago, show_on_map: false) }
+    let!(:organization3) { FactoryBot.create(:organization, :in_edmonton, show_on_map: true) }
     it "renders" do
       get "/where"
       expect(response.status).to eq(200)

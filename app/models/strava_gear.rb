@@ -21,7 +21,6 @@
 # Indexes
 #
 #  index_strava_gears_on_item_type_and_item_id                (item_type,item_id) UNIQUE WHERE (item_id IS NOT NULL)
-#  index_strava_gears_on_strava_integration_id                (strava_integration_id)
 #  index_strava_gears_on_strava_integration_id_and_strava_id  (strava_integration_id,strava_id) UNIQUE
 #
 class StravaGear < ApplicationRecord

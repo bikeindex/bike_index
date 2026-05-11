@@ -6,7 +6,7 @@ module StravaJobs
 
     def self.total_pages(activity_count)
       if (activity_count || 0).to_i > 0
-        a_count = (activity_count.to_f / Integrations::StravaClient::ACTIVITIES_PER_PAGE).ceil
+        a_count = (activity_count.to_f / Integrations::Strava::Client::ACTIVITIES_PER_PAGE).ceil
         a_count + (a_count / 4.0).round
       else
         2
@@ -20,13 +20,13 @@ module StravaJobs
       return unless strava_integration
 
       athlete_response = execute_request(strava_integration, :fetch_athlete) {
-        Integrations::StravaClient.fetch_athlete(strava_integration)
+        Integrations::Strava::Client.fetch_athlete(strava_integration)
       }
       raise unless athlete_response.success?
       athlete = athlete_response.body
 
       stats_response = execute_request(strava_integration, :fetch_athlete_stats) {
-        Integrations::StravaClient.fetch_athlete_stats(strava_integration)
+        Integrations::Strava::Client.fetch_athlete_stats(strava_integration)
       }
       strava_integration.update_from_athlete_and_stats(athlete, stats_response.success? ? stats_response.body : nil)
 

@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import TimeLocalizer from 'utils/time_localizer'
+import TimeLocalizer from '@bikeindex/time-localizer'
 
 /* global window  */
 
@@ -28,6 +28,11 @@ export default class extends Controller {
 
     // if the frame was loaded without results, submit the form
     if (this.frameElement?.querySelector('#loadedWithoutResults')) {
+      // Use replace for the initial auto-submit so it doesn't add a duplicate history entry
+      this.formTarget.setAttribute('data-turbo-action', 'replace')
+      this.frameElement.addEventListener('turbo:frame-render', () => {
+        this.formTarget.setAttribute('data-turbo-action', 'advance')
+      }, { once: true })
       this.formTarget.requestSubmit()
     }
 
@@ -74,5 +79,18 @@ export default class extends Controller {
     if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
       window.timeLocalizer.localize()
     }
+    this.syncHiddenFieldsFromUrl()
+  }
+
+  // The form sits outside the results frame, so frame-nav period clicks advance
+  // the URL but leave its hidden fields stale. Sync from the URL so the next
+  // submit doesn't drop the period the user just chose.
+  syncHiddenFieldsFromUrl () {
+    const params = new URLSearchParams(window.location.search)
+    this.formTarget.querySelectorAll('input[type="hidden"]').forEach(input => {
+      if (!input.name || !params.has(input.name)) return
+      const newValue = params.get(input.name)
+      if (input.value !== newValue) input.value = newValue
+    })
   }
 }

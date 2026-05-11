@@ -32,7 +32,7 @@
 
         <tr>
           <td>Strava ID</td>
-          <td><%= @strava_integration.strava_id %></td>
+          <td><%= number_display(@strava_integration.strava_id) %></td>
         </tr>
 
         <tr>
@@ -198,7 +198,8 @@
     <div class="col-md-12">
       <h4>
         <%= link_to admin_strava_gears_path(search_strava_integration_id: @strava_integration.id) do %>
-          Strava Gear (<%= @strava_integration.strava_gears.count %>)
+          Strava Gear
+          (<%= number_display(@strava_integration.strava_gears.count) %>)
         <% end %>
 
         <% if unknown_gear.present? %>

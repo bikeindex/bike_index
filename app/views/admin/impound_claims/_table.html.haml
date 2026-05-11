@@ -26,10 +26,10 @@
     - impound_claims.each do |impound_claim|
       %tr
         %td
-          %a.convertTime.preciseTime{href: admin_impound_claim_path(impound_claim) }
+          %a.localizeTime.preciseTime{href: admin_impound_claim_path(impound_claim) }
             = l(impound_claim.created_at, format: :convert_time)
         %td
-          %span.convertTime.preciseTime
+          %span.localizeTime.preciseTime
             = l(impound_claim.updated_at, format: :convert_time)
         - unless skip_organization
           %td
@@ -54,5 +54,5 @@
         - unless skip_status
           %td
             - if impound_claim.resolved_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(impound_claim.resolved_at, format: :convert_time)

@@ -18,7 +18,7 @@
       %td= t(".claimed")
       %td
         - if @bike_sticker.claimed_at.present?
-          %span.convertTime
+          %span.localizeTime
             = l(@bike_sticker.created_at, format: :convert_time)
     %tr
       %td= t(".bike")
@@ -80,7 +80,7 @@
         - bike_sticker_updates.reorder(created_at: :desc).each do |bike_sticker_update|
           %tr
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(bike_sticker_update.created_at, format: :convert_time)
               - if display_dev_info?
                 %small.code.only-dev-visible= bike_sticker_update.id

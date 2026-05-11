@@ -1,0 +1,273 @@
+<% if @bike.present? %>
+  <%= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "theft_alerts", display_recovery: true} %>
+  <h1 class="mt-5 mb-4">
+    Promoted Alerts
+    <%= link_to "New Promoted alert", new_admin_theft_alert_path(bike_id: @bike.id), class: "small btn btn-outline-success btn-sm ml-2" %>
+  </h1>
+  <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true} %>
+<% else %>
+  <% nav_header_list_items = capture do %>
+    <li class="nav-item dropdown dropleft">
+      <a
+        class="nav-link dropdown-toggle <%= @status != "all" ? "active" : "" %>"
+        href="#"
+        role="button"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <%= "#{@status.titleize} #{@status == "all" ? "statuses" : "alerts"}" %>
+      </a>
+
+      <div class="dropdown-menu">
+        <%= link_to "All statuses", url_for(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@status == 'all' ? 'active' : ''}" %>
+
+        <div class="dropdown-divider"></div>
+
+        <% available_statuses.each do |status| %>
+          <%= link_to "#{status.humanize} alerts", url_for(sortable_search_params.merge(search_status: status)), class: "dropdown-item #{@status == status ? 'active' : ''}" %>
+        <% end %>
+      </div>
+    </li>
+
+    <li class="nav-item dropdown">
+      <a
+        class="nav-link dropdown-toggle <%= @search_paid_admin.present? ? "active" : "" %>"
+        href="#"
+        role="button"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <%= @search_paid_admin.humanize %>
+      </a>
+
+      <div class="dropdown-menu">
+        <% available_paid_admin.each do |paid_admin| %>
+          <% if paid_admin == "paid_and_unpaid" %>
+            <div class="dropdown-divider"></div>
+          <% end %>
+
+          <%= link_to paid_admin.humanize, url_for(sortable_search_params.merge(search_paid_admin: paid_admin)), class: "dropdown-item #{@search_paid_admin == paid_admin ? 'active' : ''}" %>
+        <% end %>
+      </div>
+    </li>
+
+    <li class="nav-item">
+      <%= link_to "fbook data", url_for(sortable_search_params.merge(search_facebook_data: !@search_facebook_data)), class: "nav-link #{@search_facebook_data ? 'active' : ''}" %>
+    </li>
+
+    <li class="nav-item">
+      <%= link_to "recovered", url_for(sortable_search_params.merge(search_recovered: !@search_recovered)), class: "nav-link #{@search_recovered ? 'active' : ''}" %>
+    </li>
+
+    <li class="nav-item">
+      <%= link_to "location counts", admin_theft_alerts_path(sortable_search_params.merge(search_location_counts: !@location_counts)), class: "nav-link #{@location_counts ? 'active' : ''}" %>
+    </li>
+  <% end %>
+  <% theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| searched_theft_alerts.where(theft_alert_plan: plan).any? } %>
+  <% stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {id: searched_theft_alerts.pluck(:id)}) %>
+  <% rendered_chart = nil %>
+  <% if @render_chart %>
+    <% rendered_chart = capture do %>
+      <% theft_alerts_graph = theft_alert_plans.map do |theft_alert_plan|
+          {
+            name: theft_alert_plan.name,
+            data: time_range_counts(collection: searched_theft_alerts.where(theft_alert_plan_id: theft_alert_plan.id))
+          }
+        end
+        alerts_recoveries_graph = theft_alert_plans.map do |theft_alert_plan|
+          {
+            name: "#{theft_alert_plan.name} recoveries",
+            data: time_range_counts(collection: stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}), column: "theft_alerts.created_at")
+          }
+        end
+
+        if @search_facebook_data
+          facebook_reach_graph = theft_alert_plans.map do |theft_alert_plan|
+            {
+              name: theft_alert_plan.name,
+              data: time_range_amounts(collection: searched_theft_alerts.where(theft_alert_plan_id: theft_alert_plan.id), amount_column: "reach")
+            }
+          end
+        end %>
+
+      <div class="col-12 mt-2">
+        <%= column_chart theft_alerts_graph, stacked: true, thousands: "," %>
+      </div>
+
+      <% if @search_facebook_data %>
+        <h3 class="mt-5">
+          <em>Sum of Facebook reach for ads started in the period</em>
+        </h3>
+        <%= column_chart facebook_reach_graph, stacked: true, thousands: "," %>
+        <div class="mt-5"></div>
+      <% end %>
+
+      <% unless @search_recovered %>
+        <div class="col-12 mt-2">
+          <%= column_chart alerts_recoveries_graph, stacked: true, thousands: "," %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% admin_search_form = capture do %>
+    <div class="row mb-4 mt-4">
+      <div class="col">
+        <%= form_tag admin_theft_alerts_path, method: :get, class: "form-inline" do %>
+          <%= hidden_field_tag :search_recovery_display_status, @search_recovered %>
+          <%= hidden_field_tag :search_status, @status %>
+          <%= hidden_field_tag :search_paid_admin, @search_paid %>
+          <%= hidden_field_tag :search_facebook_data, @search_facebook_data %>
+          <%= hidden_field_tag :search_recovered, @search_recovered %>
+          <%= hidden_field_tag :search_location_counts, @location_counts %>
+          <%= render partial: "/shared/hidden_search_fields" %>
+
+          <div class="form-group ml-auto mr-1 mb-2">
+            <em class="small less-strong mr-1 d-md-inline d-none">within</em>
+            <%= number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;" %>
+
+            <em class="small less-strong ml-1 mr-1 d-md-inline d-none">
+              miles of
+            </em>
+          </div>
+
+          <div class="form-group mr-2 mb-2">
+            <%= text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control" %>
+          </div>
+
+          <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+        <% end %>
+      </div>
+
+      <% if theft_alert_plans.present? %>
+        <div class="col">
+          <div class="full-screen-table">
+            <table class="table table-striped table-bordered table-sm">
+              <thead>
+                <th></th>
+                <th>Count</th>
+                <th>Fbook Reach</th>
+                <th>Fbook Spend</th>
+                <th>Revenue</th>
+                <th class="small">Recovered</th>
+              </thead>
+
+              <tbody>
+                <% alert_count_total = 0 %>
+                <% fbook_reach_total = 0 %>
+                <% fbook_cents_total = 0 %>
+                <% revenue_cents_total = 0 %>
+                <% recovered_count_total = 0 %>
+
+                <% theft_alert_plans.each do |theft_alert_plan| %>
+                  <tr>
+                    <td>
+                      <%= theft_alert_plan.name %>
+
+                      <small>
+                        <%= MoneyFormatter.money_format(theft_alert_plan.amount_cents_facebook) %>
+                      </small>
+                    </td>
+
+                    <td>
+                      <% alert_count = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).count %>
+                      <% alert_count_total += alert_count %>
+                      <%= number_display(alert_count) %>
+                    </td>
+
+                    <td>
+                      <% fbook_reach = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).sum(:reach) %>
+                      <% fbook_reach_total += fbook_reach %>
+                      <%= number_display(fbook_reach) %>
+                    </td>
+
+                    <td>
+                      <% fbook_cents = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).sum(:amount_cents_facebook_spent) %>
+                      <% fbook_cents_total += fbook_cents %>
+                      <%= MoneyFormatter.money_format(fbook_cents) %>
+                    </td>
+
+                    <td class="small">
+                      <% revenue_cents = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).paid_cents %>
+                      <% revenue_cents_total += revenue_cents %>
+                      <%= MoneyFormatter.money_format(revenue_cents) %>
+                    </td>
+
+                    <td class="small">
+                      <% recovered_count = stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}).count %>
+                      <% recovered_count_total += recovered_count %>
+                      <%= number_display(recovered_count) %>
+                    </td>
+                  </tr>
+                <% end %>
+
+                <tr style="border-top: 2px solid #000">
+                  <td><strong>Total</strong></td>
+                  <td><%= number_display(alert_count_total) %></td>
+                  <td><%= number_display(fbook_reach_total) %></td>
+                  <td><%= MoneyFormatter.money_format(fbook_cents_total) %></td>
+
+                  <td>
+                    <small>
+                      <%= MoneyFormatter.money_format(revenue_cents_total) %>
+                    </small>
+                  </td>
+
+                  <td class="small">
+                    <%= number_display(recovered_count_total) %>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+  <% table_view = capture do %>
+    <% if @location_counts %>
+      <div class="col-md-8 offset-md-2 mb-3">
+        <div
+          class="full-screen-table"
+          style="max-height: 500px; overflow-y: scroll;"
+        >
+          <table class="table table-striped table-bordered table-sm">
+            <thead>
+              <th>Country</th>
+              <th>City</th>
+              <th>State</th>
+              <th>Count</th>
+            </thead>
+
+            <tbody>
+              <% searched_theft_alerts.cities_count.each do |count| %>
+                <tr>
+                  <td class="small"><%= count[0] %></td>
+
+                  <td>
+                    <% link_text = count[1].present? ? count[1] : "Blank location" %>
+                    <%= link_to link_text, admin_theft_alerts_path(sortable_search_params.merge(search_location: "#{count[1]}, #{count[2]} #{count[0]}")) %>
+                  </td>
+
+                  <td class="small"><%= count[2] %></td>
+                  <td><%= number_display(count[3]) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: false} %>
+  <% end %>
+  <%= render(Admin::IndexSkeleton::Component.new(
+    collection: @theft_alerts,
+    viewing: "Promoted Alerts",
+    nav_header_list_items:,
+    rendered_chart:,
+    admin_search_form:,
+    table_view:
+  )) %>
+<% end %>

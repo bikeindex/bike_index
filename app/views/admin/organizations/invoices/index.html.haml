@@ -25,7 +25,7 @@
       - @organization.payments.each do |payment|
         %tr
           %td
-            %a.convertTime{ href: edit_admin_payment_path(payment) }
+            %a.localizeTime{ href: edit_admin_payment_path(payment) }
               = l payment.created_at, format: :convert_time
           %td
             - if payment.user_id.present?
@@ -38,7 +38,7 @@
             - if payment.invoice_id.present?
               = link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id: @organization.to_param, id: payment.invoice.to_param)
               - if payment.invoice.subscription_start_at
-                %small.convertTime
+                %small.localizeTime
                   = l payment.invoice.subscription_start_at, format: :convert_time
           %td
             %small

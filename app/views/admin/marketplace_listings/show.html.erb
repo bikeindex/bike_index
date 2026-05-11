@@ -62,7 +62,7 @@
           <td>Created</td>
 
           <td>
-            <span class="convertTime preciseTime">
+            <span class="localizeTime preciseTime">
               <%= l @marketplace_listing.created_at, format: :convert_time %>
             </span>
           </td>
@@ -73,7 +73,7 @@
             <td>Published</td>
 
             <td>
-              <span class="convertTime preciseTime">
+              <span class="localizeTime preciseTime">
                 <%= l @marketplace_listing.published_at, format: :convert_time %>
               </span>
             </td>
@@ -85,7 +85,7 @@
             <td>Ended</td>
 
             <td>
-              <span class="convertTime preciseTime">
+              <span class="localizeTime preciseTime">
                 <%= l @marketplace_listing.end_at, format: :convert_time %>
               </span>
             </td>

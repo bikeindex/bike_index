@@ -23,10 +23,10 @@
     - parking_notifications.each do |parking_notification|
       %tr
         %td
-          %a.convertTime.preciseTime{ href: organization_parking_notification_path(parking_notification.id, organization_id: parking_notification.organization_id) }
+          %a.localizeTime.preciseTime{ href: organization_parking_notification_path(parking_notification.id, organization_id: parking_notification.organization_id) }
             = l(parking_notification.created_at, format: :convert_time)
         %td
-          %span.convertTime.preciseTime
+          %span.localizeTime.preciseTime
             = l(parking_notification.updated_at, format: :convert_time)
         - unless current_organization.present?
           %td
@@ -55,5 +55,5 @@
             = parking_notification.user&.display_name&.truncate(20)
         %td
           - if parking_notification.resolved_at.present?
-            %small.convertTime.preciseTime
+            %small.localizeTime.preciseTime
               = l(parking_notification.resolved_at, format: :convert_time)

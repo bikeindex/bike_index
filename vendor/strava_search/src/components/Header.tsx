@@ -73,6 +73,7 @@ export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingF
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center gap-2 px-2 py-1 hover:bg-white/20 rounded-md transition-colors"
+                  aria-label="Account menu"
                 >
                   {athlete.profile_medium ? (
                     <img

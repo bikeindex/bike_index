@@ -21,7 +21,7 @@
   = column_chart claimed_ownerships, thousands: ",", stacked: true, colors: ["#88a2e0", "#178813"]
 
 %div{ style: "margin-top: 50px;" }
-  = render partial: "/shared/period_select"
+  = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
 %h3.mt-4.uncap
   Registrations
@@ -80,6 +80,6 @@
             %td
               = link_to organization.name, organization_dashboard_index_path(organization_id: organization.to_param)
             %td
-              %small.convertTime= l(organization.created_at, format: :convert_time)
+              %small.localizeTime= l(organization.created_at, format: :convert_time)
             %td
               = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)

@@ -89,7 +89,7 @@
 
         <td>
           <a
-            class="convertTime preciseTime"
+            class="localizeTime preciseTime"
             href="<%= organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id) %>"
           >
             <%= l(impound_record.created_at, format: :convert_time) %>
@@ -97,7 +97,7 @@
         </td>
 
         <td>
-          <span class="convertTime preciseTime">
+          <span class="localizeTime preciseTime">
             <%= l(impound_record.updated_at, format: :convert_time) %>
           </span>
         </td>
@@ -133,7 +133,7 @@
         <% if render_resolved_at %>
           <td>
             <% if impound_record.resolved_at.present? %>
-              <span class="convertTime preciseTime">
+              <span class="localizeTime preciseTime">
                 <%= l(impound_record.resolved_at, format: :convert_time) %>
               </span>
             <% end %>

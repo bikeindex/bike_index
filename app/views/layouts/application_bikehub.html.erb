@@ -6,6 +6,9 @@
     <%= render(PageBlock::HeaderTags::Component.new(**header_tags_component_options)) %>
     <%= csrf_meta_tags %>
     <%= stylesheet_link_tag 'revised', media: 'all' %>
+    <%= tag.meta name: "honeybadger-api-key", content: ENV["HONEYBADGER_FRONTEND_API_KEY"] %>
+    <%= tag.meta name: "honeybadger-environment", content: Rails.env %>
+    <%= stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload" %>
 
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700"
@@ -20,6 +23,7 @@
     >
 
     <%= javascript_include_tag 'application_revised' %>
+    <%= javascript_importmap_tags %>
 
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
     <script>

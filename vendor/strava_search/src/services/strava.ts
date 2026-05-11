@@ -165,7 +165,12 @@ export async function getActivities(
     params.append('after', Math.floor(after / 1000).toString());
   }
 
-  return apiRequest<StravaActivity[]>(`/athlete/activities?${params.toString()}`);
+  const result = await apiRequest<StravaActivity[]>(`/athlete/activities?${params.toString()}`);
+  if (!Array.isArray(result)) {
+    console.warn('getActivities received non-array response:', result);
+    return [];
+  }
+  return result;
 }
 
 export async function getActivity(id: number): Promise<StravaActivity> {

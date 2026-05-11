@@ -31,7 +31,7 @@
 .row.mb-4.mt-4
   .col-md-6
     .pt-4.pb-4
-      = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+      = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
   - if @show_user_search
     .col-md-6.text-right{ style: "margin-top: 0.25rem;" }
       = form_tag organization_users_path(organization_id: current_organization.to_param), method: :get, class: "form-inline" do
@@ -60,7 +60,7 @@
       - @organization_roles.each do |organization_role|
         %tr
           %td
-            %a.convertTime{ href: edit_organization_user_path(organization_role.id, organization_id: current_organization.to_param) }
+            %a.localizeTime{ href: edit_organization_user_path(organization_role.id, organization_id: current_organization.to_param) }
               = l(organization_role.created_at, format: :convert_time)
           %td
             = organization_role.invited_display_name
@@ -68,7 +68,7 @@
               = organization_role.invited_email
           %td
             - if organization_role.claimed_at.present?
-              %span.convertTime
+              %span.localizeTime
                 = l(organization_role.created_at, format: :convert_time)
           %td
             - if organization_role.admin?

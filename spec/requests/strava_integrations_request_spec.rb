@@ -20,7 +20,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
         location = response.location
         expect(location).to include("state=")
         scope_param = CGI.parse(URI.parse(location).query)["scope"].first
-        expect(scope_param).to eq Integrations::StravaClient::DEFAULT_SCOPE
+        expect(scope_param).to eq Integrations::Strava::Client::DEFAULT_SCOPE
       end
 
       context "with strava_search scope" do
@@ -30,7 +30,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
           location = response.location
           expect(location).to include("state=")
           scope_param = CGI.parse(URI.parse(location).query)["scope"].first
-          expect(scope_param).to eq Integrations::StravaClient::STRAVA_SEARCH_SCOPE
+          expect(scope_param).to eq Integrations::Strava::Client::STRAVA_SEARCH_SCOPE
         end
       end
     end
@@ -79,6 +79,31 @@ RSpec.describe StravaIntegrationsController, type: :request do
         end
       end
 
+      context "with expired session (no session state)" do
+        it "redirects with error flash and does not create integration" do
+          expect {
+            get "/strava_integration/callback", params: {code: "test_auth_code", state: "stale_state_from_url"}
+          }.to change(StravaIntegration, :count).by(0)
+          expect(response).to redirect_to(my_account_path)
+          expect(flash[:error]).to match(/invalid oauth state/i)
+        end
+      end
+
+      context "with insufficient permissions" do
+        it "redirects with error and does not create integration or strava_requests" do
+          oauth_state = initiate_oauth_flow
+          expect {
+            get "/strava_integration/callback",
+              params: {code: "test_auth_code", state: oauth_state, scope: "read,activity:write"}
+          }.to change(StravaIntegration, :count).by(0)
+            .and change(StravaRequest, :count).by(0)
+            .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(0)
+
+          expect(response).to redirect_to(my_account_path)
+          expect(flash[:error]).to match(/permission/i)
+        end
+      end
+
       context "with valid code and state" do
         it "creates strava integration and enqueues sync job" do
           oauth_state = initiate_oauth_flow
@@ -97,19 +122,19 @@ RSpec.describe StravaIntegrationsController, type: :request do
             expect(strava_integration.refresh_token).to be_present
             expect(strava_integration.strava_id).to eq("2430215")
             expect(strava_integration.status).to eq("pending")
-            expect(strava_integration.strava_permissions).to eq Integrations::StravaClient::DEFAULT_SCOPE
+            expect(strava_integration.strava_permissions).to eq Integrations::Strava::Client::DEFAULT_SCOPE
           end
         end
 
         context "with strava_search scope" do
-          it "redirects to strava_search" do
+          it "redirects to my_account and stores strava_search permissions" do
             oauth_state = initiate_oauth_flow
             VCR.use_cassette("strava-exchange_token") do
               get "/strava_integration/callback",
-                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
-              expect(response).to redirect_to(strava_search_path)
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::STRAVA_SEARCH_SCOPE}
+              expect(response).to redirect_to(my_account_path)
               expect(flash[:success]).to match(/connected/i)
-              expect(current_user.reload.strava_integration.strava_permissions).to eq Integrations::StravaClient::STRAVA_SEARCH_SCOPE
+              expect(current_user.reload.strava_integration.strava_permissions).to eq Integrations::Strava::Client::STRAVA_SEARCH_SCOPE
             end
           end
         end
@@ -120,16 +145,16 @@ RSpec.describe StravaIntegrationsController, type: :request do
             oauth_state = initiate_oauth_flow(scope: "strava_search", return_to:)
             VCR.use_cassette("strava-exchange_token") do
               get "/strava_integration/callback",
-                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::STRAVA_SEARCH_SCOPE}
               expect(response).to redirect_to(return_to)
             end
           end
 
-          it "ignores external return_to URLs" do
+          it "ignores external return_to URLs and falls back to strava_search" do
             oauth_state = initiate_oauth_flow(scope: "strava_search", return_to: "https://evil.com")
             VCR.use_cassette("strava-exchange_token") do
               get "/strava_integration/callback",
-                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::STRAVA_SEARCH_SCOPE}
               expect(response).to redirect_to(strava_search_path)
             end
           end
@@ -143,7 +168,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
             VCR.use_cassette("strava-exchange_token") do
               expect {
                 get "/strava_integration/callback",
-                  params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::DEFAULT_SCOPE}
+                  params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::DEFAULT_SCOPE}
               }.to change(StravaIntegration, :count).by(0)
                 .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(0)
 
@@ -153,7 +178,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
               strava_integration = current_user.reload.strava_integration
               expect(strava_integration.id).to eq existing.id
               expect(strava_integration.access_token).to be_present
-              expect(strava_integration.strava_permissions).to eq Integrations::StravaClient::DEFAULT_SCOPE
+              expect(strava_integration.strava_permissions).to eq Integrations::Strava::Client::DEFAULT_SCOPE
             end
           end
         end
@@ -165,7 +190,8 @@ RSpec.describe StravaIntegrationsController, type: :request do
             oauth_state = initiate_oauth_flow
             VCR.use_cassette("strava-exchange_token") do
               expect {
-                get "/strava_integration/callback", params: {code: "test_auth_code", state: oauth_state}
+                get "/strava_integration/callback",
+                  params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::DEFAULT_SCOPE}
               }.to change(StravaIntegration, :count).by(0)
                 .and change(StravaIntegration.with_deleted, :count).by(1)
                 .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(1)
@@ -187,7 +213,8 @@ RSpec.describe StravaIntegrationsController, type: :request do
             oauth_state = initiate_oauth_flow
             VCR.use_cassette("strava-exchange_token") do
               expect {
-                get "/strava_integration/callback", params: {code: "test_auth_code", state: oauth_state}
+                get "/strava_integration/callback",
+                  params: {code: "test_auth_code", state: oauth_state, scope: Integrations::Strava::Client::DEFAULT_SCOPE}
               }.to change(StravaIntegration, :count).by(0)
                 .and change(StravaIntegration.with_deleted, :count).by(1)
                 .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(1)
@@ -207,7 +234,8 @@ RSpec.describe StravaIntegrationsController, type: :request do
         it "redirects with error flash" do
           oauth_state = initiate_oauth_flow
           VCR.use_cassette("strava-exchange_token_failure") do
-            get "/strava_integration/callback", params: {code: "bad_code", state: oauth_state}
+            get "/strava_integration/callback",
+              params: {code: "bad_code", state: oauth_state, scope: Integrations::Strava::Client::DEFAULT_SCOPE}
             expect(response).to redirect_to(my_account_path)
             expect(flash[:error]).to match(/unable to connect/i)
           end
