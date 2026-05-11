@@ -7,33 +7,33 @@
 set -e
 cd $(dirname "$0")/..
 
-if [ -z "$CONDUCTOR_WORKSPACE_NAME" ]; then
-  echo "Not running in Conductor (CONDUCTOR_WORKSPACE_NAME not set), skipping teardown."
+if [ -z "$WORKSPACE_ID" ]; then
+  echo "Not running in Conductor (WORKSPACE_ID not set), skipping teardown."
   exit 0
 fi
 
-echo "Tearing down Conductor workspace: $CONDUCTOR_WORKSPACE_NAME"
+echo "Tearing down Conductor workspace: $WORKSPACE_ID"
 
 # Drop workspace-specific development databases
-for db in "bikeindex_development_${CONDUCTOR_WORKSPACE_NAME}" \
-          "bikeindex_analytics_development_${CONDUCTOR_WORKSPACE_NAME}"; do
+for db in "bikeindex_development_${WORKSPACE_ID}" \
+          "bikeindex_analytics_development_${WORKSPACE_ID}"; do
   echo "Dropping database: $db"
   dropdb --if-exists "$db" 2>/dev/null || true
 done
 
 # Drop workspace-specific test databases
-for db in "bikeindex_test_${CONDUCTOR_WORKSPACE_NAME}" \
-          "bikeindex_test_${CONDUCTOR_WORKSPACE_NAME}_replica" \
-          "bikeindex_analytics_test_${CONDUCTOR_WORKSPACE_NAME}"; do
+for db in "bikeindex_test_${WORKSPACE_ID}" \
+          "bikeindex_test_${WORKSPACE_ID}_replica" \
+          "bikeindex_analytics_test_${WORKSPACE_ID}"; do
   echo "Dropping database: $db"
   dropdb --if-exists "$db" 2>/dev/null || true
 done
 
 # Also drop parallel test databases (TEST_ENV_NUMBER suffixed)
 for i in $(seq 1 8); do
-  for db in "bikeindex_test_${CONDUCTOR_WORKSPACE_NAME}${i}" \
-            "bikeindex_test_${CONDUCTOR_WORKSPACE_NAME}_replica${i}" \
-            "bikeindex_analytics_test_${CONDUCTOR_WORKSPACE_NAME}${i}"; do
+  for db in "bikeindex_test_${WORKSPACE_ID}${i}" \
+            "bikeindex_test_${WORKSPACE_ID}_replica${i}" \
+            "bikeindex_analytics_test_${WORKSPACE_ID}${i}"; do
     dropdb --if-exists "$db" 2>/dev/null || true
   done
 done
