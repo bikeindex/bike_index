@@ -1,18 +1,23 @@
 #!/bin/sh
-#/ Usage: bin/conductor_teardown
+#/ Usage: bin/workspace_teardown
 #/
-#/ Clean up workspace-specific resources when a Conductor workspace is closed.
-#/ This drops the workspace-specific test databases.
+#/ Clean up workspace-specific resources for this checkout: drops the
+#/ workspace-specific dev/test databases, removes the row from the
+#/ bikeindex_workspaces.workspace_ids table, and deletes .workspace_id.
 
 set -e
 cd $(dirname "$0")/..
 
+if [ -z "$WORKSPACE_ID" ] && [ -f .workspace_id ]; then
+  WORKSPACE_ID="w$(cat .workspace_id)"
+fi
+
 if [ -z "$WORKSPACE_ID" ]; then
-  echo "Not running in Conductor (WORKSPACE_ID not set), skipping teardown."
+  echo "WORKSPACE_ID not set and .workspace_id missing, skipping teardown."
   exit 0
 fi
 
-echo "Tearing down Conductor workspace: $WORKSPACE_ID"
+echo "Tearing down workspace: $WORKSPACE_ID"
 
 # Drop workspace-specific development databases
 for db in "bikeindex_development_${WORKSPACE_ID}" \
@@ -38,4 +43,10 @@ for i in $(seq 1 8); do
   done
 done
 
-echo "Conductor teardown complete!"
+workspace_int="${WORKSPACE_ID#w}"
+echo "Removing workspace_ids row: $workspace_int"
+psql -d bikeindex_workspaces -tAXc "DELETE FROM workspace_ids WHERE id = ${workspace_int}" 2>/dev/null || true
+
+rm -f .workspace_id
+
+echo "Workspace teardown complete!"
