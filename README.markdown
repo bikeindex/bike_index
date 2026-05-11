@@ -33,7 +33,7 @@ _Bike Index also requires some additional libraries. We recommend installing the
 
 Follow [the Getting Started guide](docs/getting-started.markdown) for a complete set up. Or if you're familiar with developing Ruby on Rails applications start with these steps and a local Postgresql installation:
 
-- `bin/setup` sets up the application and seeds test organizations, bikes and users:
+- `bin/workspace_setup` sets up the application and seeds test organizations, bikes and users:
   - Three test user accounts: admin@bikeindex.org, member@bikeindex.org, user@bikeindex.org (all have password `pleaseplease12`)
   - Gives user@bikeindex.org 50 bikes
   - Give test organization Hogwarts all organization features and some test parking notifications

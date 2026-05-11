@@ -1,10 +1,15 @@
 #!/usr/bin/env ruby
 require "fileutils"
-load File.expand_path("env", __dir__)
-include FileUtils
 
 # path to your application root.
 APP_ROOT = File.expand_path("..", __dir__)
+
+# Assign this checkout a WORKSPACE_ID before loading env / db config that
+# depends on it. Safe to call repeatedly: exits early once .workspace_id exists.
+system(File.expand_path("workspace_id_setup", __dir__)) || abort("workspace_id_setup failed")
+
+load File.expand_path("env", __dir__)
+include FileUtils
 
 without_seeds = ARGV.include?("--without_seeds")
 

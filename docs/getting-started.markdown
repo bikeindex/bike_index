@@ -56,7 +56,7 @@ gem install bundler
 bundle install
 
 # 5.3 Set up the app
-bin/setup
+bin/workspace_setup
 
 # 6. Start the development server
 bin/dev

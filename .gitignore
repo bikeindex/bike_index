@@ -45,7 +45,7 @@ manufacturer.tsv
 # Ignore special configuration env file
 .env.*
 
-# Per-checkout workspace ID (set by bin/setup_workspace)
+# Per-checkout workspace ID (set by bin/workspace_id_setup)
 .workspace_id
 
 # Ignore asset stuff
