@@ -22,7 +22,21 @@ module Org
 
       def compose_items
         cached = OrganizedServices::MenuItems.for(organization: @organization, current_user: @current_user)
-        with_route_overrides(cached).reject { |item| skip?(item) }
+        items = with_route_overrides(cached).reject { |item| skip?(item) }
+        items += [divider] if trailing_divider?
+        items += [super_admin_link] if @current_user&.superuser?
+        items
+      end
+
+      def trailing_divider?
+        return false if @organization.ambassador?
+        !@is_dropdown || @current_user&.superuser?
+      end
+
+      def super_admin_link
+        {type: :super_admin_link,
+         label: I18n.t("shared.organized_menu_items.super_admin_view", org_name: @organization.short_name),
+         path: helpers.admin_organization_path(@organization)}
       end
 
       # Re-add the dashboard / bulk-imports link when the user is on those pages
@@ -84,8 +98,7 @@ module Org
       end
 
       def skip?(item)
-        return true if @is_dropdown && item[:type] == :disabled
-        @is_dropdown && item[:type] == :trailing_divider && !@current_user&.superuser?
+        @is_dropdown && item[:type] == :disabled
       end
 
       def link_classes(item, active)
@@ -103,7 +116,7 @@ module Org
       # Returns true/false for explicit cases, nil to defer to the active_link helper.
       def active_state(item)
         case item[:active]
-        when :auto then nil
+        when :auto, :match_controller then nil
         when :on_registrations_index
           routed_controller == "organized/registrations" && routed_action == "index"
         when :on_bikes_new

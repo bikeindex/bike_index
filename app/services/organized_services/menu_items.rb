@@ -7,13 +7,16 @@
 #
 # Item shapes:
 #   {type: :divider}
-#   {type: :trailing_divider}            # last divider; component drops it in dropdown for non-superusers
 #   {type: :disabled, label:, secondary:} # component drops these in dropdown
-#   {type: :link, label:, path:, secondary:, match_controller:, active:}
-#   {type: :super_admin_link, label:, path:}
+#   {type: :link, label:, path:, secondary:, active:}
+#
+# The component appends a trailing divider (for non-ambassador orgs, unless
+# rendering as a dropdown for a non-superuser) and a super_admin_link
+# (for superusers).
 #
 # `active:` is one of:
-#   :auto                                  - component uses active_link helper
+#   :auto                                  - template uses active_link helper
+#   :match_controller                      - template uses active_link with match_controller: true
 #   :on_registrations_index                - component computes from current request
 #   :on_bikes_new                          - "
 #   :on_bikes_new_with_parking_notification - "
@@ -34,8 +37,7 @@ module OrganizedServices
     end
 
     def build_items(organization, current_user)
-      base = organization.ambassador? ? ambassador_items(organization) : standard_items(organization, current_user)
-      base + super_admin_items(organization, current_user)
+      organization.ambassador? ? ambassador_items(organization) : standard_items(organization, current_user)
     end
 
     def ambassador_items(organization)
@@ -66,7 +68,6 @@ module OrganizedServices
 
       items.concat(feature_items(organization))
       items.concat(admin_items(organization, current_user, additional_divider: additional_divider?(organization)))
-      items << {type: :trailing_divider}
 
       items
     end
@@ -83,7 +84,7 @@ module OrganizedServices
       bulk_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
       link(bulk_label,
         routes.organization_bulk_imports_path(organization_id: organization.to_param),
-        match_controller: true)
+        active: :match_controller)
     end
 
     #
@@ -106,7 +107,7 @@ module OrganizedServices
       if organization.enabled?("impound_bikes")
         items << link(translation(:impounded_bikes),
           routes.organization_impound_records_path(organization_id: organization.to_param),
-          secondary: true, match_controller: true)
+          secondary: true, active: :match_controller)
       end
 
       if organization.enabled?("show_partial_registrations")
@@ -161,7 +162,7 @@ module OrganizedServices
       items << if organization.enabled?("bike_stickers")
         link(translation(:registration_stickers),
           routes.organization_stickers_path(organization_id: organization.to_param),
-          match_controller: true)
+          active: :match_controller)
       else
         {type: :disabled, label: translation(:registration_stickers), secondary: false}
       end
@@ -174,25 +175,25 @@ module OrganizedServices
       if organization.enabled?("csv_exports")
         items << link(translation(:exports),
           routes.organization_exports_path(organization_id: organization.to_param),
-          match_controller: true)
+          active: :match_controller)
       end
 
       if organization.enabled?("graduated_notifications")
         items << link(translation(:graduated_notifications),
           routes.organization_graduated_notifications_path(organization_id: organization.to_param),
-          match_controller: true)
+          active: :match_controller)
       end
 
       if organization.enabled?("model_audits")
         items << link(translation(:model_audits),
           routes.organization_model_audits_path(organization_id: organization.to_param),
-          match_controller: true)
+          active: :match_controller)
       end
 
       if organization.impound_claims?
         items << link(translation(:impounded_claims),
           routes.organization_impound_claims_path(organization_id: organization.to_param),
-          match_controller: true)
+          active: :match_controller)
       end
 
       items
@@ -204,7 +205,7 @@ module OrganizedServices
       items = []
       items << divider if additional_divider
       items << link(translation(:manage_users),
-        routes.organization_users_path(organization_id: organization.to_param), match_controller: true)
+        routes.organization_users_path(organization_id: organization.to_param), active: :match_controller)
 
       if organization.enabled?("impound_bikes")
         items << link(translation(:manage_impounding, org_name: organization.short_name),
@@ -218,7 +219,7 @@ module OrganizedServices
 
       if organization.enabled?("customize_emails")
         items << link(translation(:custom_emails),
-          routes.organization_emails_path(organization_id: organization.to_param), match_controller: true)
+          routes.organization_emails_path(organization_id: organization.to_param), active: :match_controller)
       elsif organization.enabled?("organization_stolen_message")
         items << link(translation(:stolen_message),
           routes.edit_organization_email_path("organization_stolen_message", organization_id: organization.to_param))
@@ -232,16 +233,8 @@ module OrganizedServices
       items
     end
 
-    def super_admin_items(organization, current_user)
-      return [] unless current_user&.superuser?
-
-      [{type: :super_admin_link,
-        label: translation(:super_admin_view, org_name: organization.short_name),
-        path: routes.admin_organization_path(organization)}]
-    end
-
-    def link(label, path, secondary: false, active: :auto, match_controller: false)
-      {type: :link, label:, path:, secondary:, active:, match_controller:}
+    def link(label, path, secondary: false, active: :auto)
+      {type: :link, label:, path:, secondary:, active:}
     end
 
     def divider
@@ -257,7 +250,7 @@ module OrganizedServices
     end
 
     conceal :build_items, :ambassador_items, :standard_items, :registration_items,
-      :add_bike_items, :feature_items, :admin_items, :super_admin_items, :additional_divider?,
+      :add_bike_items, :feature_items, :admin_items, :additional_divider?,
       :link, :divider, :translation, :routes
   end
 end

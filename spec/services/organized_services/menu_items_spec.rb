@@ -6,8 +6,8 @@ RSpec.describe OrganizedServices::MenuItems do
   describe "for" do
     subject(:items) { described_class.for(organization:, current_user:) }
 
-    define_method(:link_item) do |label, path, secondary: false, active: :auto, match_controller: false|
-      {type: :link, label:, path:, secondary:, active:, match_controller:}
+    define_method(:link_item) do |label, path, secondary: false, active: :auto|
+      {type: :link, label:, path:, secondary:, active:}
     end
 
     context "with a basic organization" do
@@ -19,7 +19,6 @@ RSpec.describe OrganizedServices::MenuItems do
           link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
-          {type: :trailing_divider}
         ]
       end
 
@@ -49,12 +48,11 @@ RSpec.describe OrganizedServices::MenuItems do
       let(:target) do
         [
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
-          link_item("Impounded Bikes", "/o/#{organization.to_param}/impound_records", secondary: true, match_controller: true),
+          link_item("Impounded Bikes", "/o/#{organization.to_param}/impound_records", secondary: true, active: :match_controller),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
           link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
-          {type: :trailing_divider}
         ]
       end
 
@@ -71,13 +69,9 @@ RSpec.describe OrganizedServices::MenuItems do
           link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
-          link_item("Manage users", "/o/#{organization.to_param}/users", match_controller: true),
+          link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),
           link_item("#{organization.short_name} profile", "/o/#{organization.to_param}/manage"),
-          link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations"),
-          {type: :trailing_divider},
-          {type: :super_admin_link,
-           label: "Super Admin for #{organization.short_name}",
-           path: "/admin/organizations/#{organization.to_param}"}
+          link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations")
         ]
       end
 
@@ -94,10 +88,9 @@ RSpec.describe OrganizedServices::MenuItems do
           link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
-          link_item("Manage users", "/o/#{organization.to_param}/users", match_controller: true),
+          link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),
           link_item("#{organization.short_name} profile", "/o/#{organization.to_param}/manage"),
-          link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations"),
-          {type: :trailing_divider}
+          link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations")
         ]
       end
 
@@ -127,11 +120,11 @@ RSpec.describe OrganizedServices::MenuItems do
       expect(cache.instance_variable_get(:@data).size).to eq 2
 
       labels_before = described_class.for(organization:, current_user:).map { |i| i[:label] }
-      expect(labels_before).not_to include("Super Admin for #{organization.short_name}")
+      expect(labels_before).not_to include("Manage users")
 
       FactoryBot.create(:superuser_ability, user: current_user)
       labels_after = described_class.for(organization:, current_user: current_user.reload).map { |i| i[:label] }
-      expect(labels_after).to include("Super Admin for #{organization.short_name}")
+      expect(labels_after).to include("Manage users")
 
       current_user.update(updated_at: Time.current + 1.second, skip_update: true)
       described_class.for(organization:, current_user: current_user.reload)

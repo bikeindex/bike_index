@@ -1,6 +1,6 @@
 <% items.each do |item| %>
   <% case item[:type] %>
-  <% when :divider, :trailing_divider %>
+  <% when :divider %>
     <li class="divider-nav-item"></li>
   <% when :disabled %>
     <li>
@@ -11,7 +11,7 @@
       <% active = active_state(item) %>
 
       <% if active.nil? %>
-        <%= helpers.active_link item[:label], item[:path], match_controller: item[:match_controller], class: link_classes(item, false) %>
+        <%= helpers.active_link item[:label], item[:path], match_controller: item[:active] == :match_controller, class: link_classes(item, false) %>
       <% else %>
         <%= link_to item[:label], item[:path], class: link_classes(item, active) %>
       <% end %>
