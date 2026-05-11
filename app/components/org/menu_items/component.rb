@@ -21,7 +21,7 @@ module Org
       end
 
       def compose_items
-        cached = OrganizedServices::MenuItems.for(organization: @organization, current_user: @current_user)
+        cached = OrganizedServices::UserMenuItems.for(organization: @organization, current_user: @current_user)
         items = with_route_overrides(cached).reject { |item| skip?(item) }
         items += [divider] if trailing_divider?
         items += [super_admin_link] if @current_user&.superuser?
@@ -67,11 +67,11 @@ module Org
       end
 
       def dashboard_link
-        @dashboard_link ||= OrganizedServices::MenuItems.dashboard_link(@organization)
+        @dashboard_link ||= OrganizedServices::UserMenuItems.dashboard_link(@organization)
       end
 
       def bulk_import_link
-        @bulk_import_link ||= OrganizedServices::MenuItems.bulk_import_link(@organization)
+        @bulk_import_link ||= OrganizedServices::UserMenuItems.bulk_import_link(@organization)
       end
 
       def divider

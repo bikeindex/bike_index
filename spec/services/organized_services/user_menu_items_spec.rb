@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe OrganizedServices::MenuItems do
+RSpec.describe OrganizedServices::UserMenuItems do
   let(:current_user) { FactoryBot.create(:organization_user, organization:) }
 
   describe "for" do
@@ -18,7 +18,7 @@ RSpec.describe OrganizedServices::MenuItems do
           {type: :disabled, label: "Incomplete registrations", secondary: true},
           link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
           {type: :divider},
-          {type: :disabled, label: "Registration stickers", secondary: false},
+          {type: :disabled, label: "Registration stickers", secondary: false}
         ]
       end
 
@@ -52,7 +52,7 @@ RSpec.describe OrganizedServices::MenuItems do
           {type: :disabled, label: "Incomplete registrations", secondary: true},
           link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
           {type: :divider},
-          {type: :disabled, label: "Registration stickers", secondary: false},
+          {type: :disabled, label: "Registration stickers", secondary: false}
         ]
       end
 

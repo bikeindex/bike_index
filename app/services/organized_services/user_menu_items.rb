@@ -21,7 +21,7 @@
 #   :on_bikes_new                          - "
 #   :on_bikes_new_with_parking_notification - "
 module OrganizedServices
-  module MenuItems
+  module UserMenuItems
     extend Functionable
 
     # UpdateOrganizationAssociationsJob touches every member user when an org
