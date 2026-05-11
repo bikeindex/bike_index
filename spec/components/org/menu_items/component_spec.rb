@@ -81,6 +81,13 @@ RSpec.describe Org::MenuItems::Component, type: :component do
         labels = component.css("a.nav-link").map(&:text).map(&:strip)
         expect(labels).to include("Bulk Imports")
       end
+
+      it "inserts a divider above the injected bulk imports link" do
+        items = component.css("li").to_a
+        bulk_link_index = items.index { |li| li.css("a.nav-link").text.strip == "Bulk Imports" }
+        expect(bulk_link_index).to be > 0
+        expect(items[bulk_link_index - 1]["class"].to_s).to include("divider-nav-item")
+      end
     end
 
     context "on a normal page" do

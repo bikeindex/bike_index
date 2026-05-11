@@ -43,10 +43,13 @@ module Org
         on_bulk_imports? && items.none? { |i| i[:type] == :link && i[:path] == bulk_import_link[:path] }
       end
 
+      # Mirrors the old template: a divider is rendered before the bulk-import
+      # link, even though the cached payload already has the unconditional
+      # divider that closes the add-bike section after our injection.
       def insert_after_add_bike(items, item)
         index = items.index { |i| i[:active] == :on_bikes_new }
-        return items + [item] unless index
-        items.dup.insert(index + 1, item)
+        return items + [divider, item] unless index
+        items.dup.insert(index + 1, divider, item)
       end
 
       def dashboard_link

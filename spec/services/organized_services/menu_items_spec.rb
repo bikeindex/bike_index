@@ -6,48 +6,39 @@ RSpec.describe OrganizedServices::MenuItems do
   describe "for" do
     subject(:items) { described_class.for(organization:, current_user:) }
 
+    define_method(:link_item) do |label, path, secondary: false, active: :auto, match_controller: false|
+      {type: :link, label:, path:, secondary:, active:, match_controller:}
+    end
+
     context "with a basic organization" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:org_param) { organization.to_param }
-      let(:registrations_item) do
-        {type: :link, label: "#{organization.short_name} Bikes",
-         path: "/o/#{org_param}/registrations", secondary: false,
-         active: :on_registrations_index, match_controller: false}
-      end
-      let(:add_bike_item) do
-        {type: :link, label: "Add a bike",
-         path: "/o/#{org_param}/bikes/new", secondary: false,
-         active: :on_bikes_new, match_controller: false}
-      end
-      let(:disabled_incomplete_registrations) do
-        {type: :disabled, label: "Incomplete registrations", secondary: true}
-      end
-      let(:disabled_registration_stickers) do
-        {type: :disabled, label: "Registration stickers", secondary: false}
+      let(:target) do
+        [
+          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
+          {type: :disabled, label: "Incomplete registrations", secondary: true},
+          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          {type: :divider},
+          {type: :disabled, label: "Registration stickers", secondary: false},
+          {type: :trailing_divider}
+        ]
       end
 
-      it "returns the canonical link/divider/disabled items with the right active markers" do
-        expect(items).to include(registrations_item, add_bike_item,
-          disabled_incomplete_registrations, disabled_registration_stickers,
-          {type: :divider}, {type: :trailing_divider})
-      end
+      it { expect(items).to eq(target) }
     end
 
     context "with an ambassador organization" do
       let(:organization) { FactoryBot.create(:organization_ambassador) }
-      let(:org_param) { organization.to_param }
-      let(:dashboard_item) do
-        {type: :link, label: "#{organization.short_name} Dashboard",
-         path: "/o/#{org_param}/ambassador_dashboard", secondary: false,
-         active: :auto, match_controller: false}
+      let(:target) do
+        [
+          link_item("#{organization.short_name} Dashboard", "/o/#{organization.to_param}/ambassador_dashboard"),
+          link_item("Resources", "/o/#{organization.to_param}/ambassador_dashboard/resources"),
+          link_item("Getting started", "/o/#{organization.to_param}/ambassador_dashboard/getting_started"),
+          link_item("Multi search", "/o/#{organization.to_param}/registrations/multi_search"),
+          link_item("Discuss", "https://discuss.bikeindex.org")
+        ]
       end
 
-      it "returns ambassador-specific items in order" do
-        labels = items.select { |i| i[:type] == :link }.map { |i| i[:label] }
-        expect(labels).to eq(["#{organization.short_name} Dashboard", "Resources",
-          "Getting started", "Multi search", "Discuss"])
-        expect(items).to include(dashboard_item)
-      end
+      it { expect(items).to eq(target) }
     end
 
     context "with impound_bikes enabled" do
@@ -55,41 +46,62 @@ RSpec.describe OrganizedServices::MenuItems do
         FactoryBot.create(:organization_with_organization_features,
           enabled_feature_slugs: ["impound_bikes"])
       end
-      let(:impound_item) do
-        {type: :link, label: "Impounded Bikes",
-         path: "/o/#{organization.to_param}/impound_records", secondary: true,
-         active: :auto, match_controller: true}
+      let(:target) do
+        [
+          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
+          link_item("Impounded Bikes", "/o/#{organization.to_param}/impound_records", secondary: true, match_controller: true),
+          {type: :disabled, label: "Incomplete registrations", secondary: true},
+          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          {type: :divider},
+          {type: :disabled, label: "Registration stickers", secondary: false},
+          {type: :trailing_divider}
+        ]
       end
 
-      it "includes impounded bikes as a secondary, controller-matched link" do
-        expect(items).to include(impound_item)
-      end
+      it { expect(items).to eq(target) }
     end
 
     context "as a superuser" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:current_user) { FactoryBot.create(:superuser) }
-      let(:super_admin_item) do
-        {type: :super_admin_link,
-         label: "Super Admin for #{organization.short_name}",
-         path: "/admin/organizations/#{organization.to_param}"}
+      let(:target) do
+        [
+          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
+          {type: :disabled, label: "Incomplete registrations", secondary: true},
+          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          {type: :divider},
+          {type: :disabled, label: "Registration stickers", secondary: false},
+          link_item("Manage users", "/o/#{organization.to_param}/users", match_controller: true),
+          link_item("#{organization.short_name} profile", "/o/#{organization.to_param}/manage"),
+          link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations"),
+          {type: :trailing_divider},
+          {type: :super_admin_link,
+           label: "Super Admin for #{organization.short_name}",
+           path: "/admin/organizations/#{organization.to_param}"}
+        ]
       end
 
-      it "appends a super_admin_link as the last item" do
-        expect(items.last).to eq super_admin_item
-      end
+      it { expect(items).to eq(target) }
     end
 
     context "as an org admin" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
-
-      it "includes manage_users, profile, and locations links" do
-        labels = items.map { |i| i[:label] }
-        expect(labels).to include("Manage users",
-          "#{organization.short_name} profile",
-          "#{organization.short_name} locations")
+      let(:target) do
+        [
+          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
+          {type: :disabled, label: "Incomplete registrations", secondary: true},
+          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          {type: :divider},
+          {type: :disabled, label: "Registration stickers", secondary: false},
+          link_item("Manage users", "/o/#{organization.to_param}/users", match_controller: true),
+          link_item("#{organization.short_name} profile", "/o/#{organization.to_param}/manage"),
+          link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations"),
+          {type: :trailing_divider}
+        ]
       end
+
+      it { expect(items).to eq(target) }
     end
 
     context "with no organization" do

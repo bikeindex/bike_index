@@ -97,6 +97,10 @@ module OrganizedServices
         match_controller: true)
     end
 
+    #
+    # private below here
+    #
+
     def additional_divider?(organization)
       %w[bike_stickers hot_sheet csv_exports graduated_notifications model_audits].any? do |slug|
         organization.enabled?(slug)
@@ -246,10 +250,6 @@ module OrganizedServices
         label: translation(:super_admin_view, org_name: organization.short_name),
         path: routes.admin_organization_path(organization)}]
     end
-
-    #
-    # private below here
-    #
 
     def link(label, path, secondary: false, active: :auto, match_controller: false)
       {type: :link, label:, path:, secondary:, active:, match_controller:}
