@@ -1,52 +1,70 @@
-#!/bin/sh
-#/ Usage: bin/workspace_teardown
-#/
-#/ Clean up workspace-specific resources for this checkout: drops the
-#/ workspace-specific dev/test databases, removes the row from the
-#/ dev_workspaces.workspace_ids table, and deletes .workspace_id.
+#!/usr/bin/env ruby
+# frozen_string_literal: true
 
-set -e
-cd $(dirname "$0")/..
+# Clean up workspace-specific resources for this checkout: stops bin/dev,
+# drops the workspace-specific dev/test databases, removes the row from
+# the dev_workspaces.workspace_ids table, and deletes .workspace_id.
 
-if [ -z "$WORKSPACE_ID" ] && [ -f .workspace_id ]; then
-  WORKSPACE_ID="w$(cat .workspace_id)"
-fi
+require "fileutils"
 
-if [ -z "$WORKSPACE_ID" ]; then
-  echo "WORKSPACE_ID not set and .workspace_id missing, skipping teardown."
+APP_ROOT = File.expand_path("..", __dir__)
+WORKSPACE_FILE = File.join(APP_ROOT, ".workspace_id")
+WORKSPACE_DB = "dev_workspaces"
+
+Dir.chdir(APP_ROOT)
+
+workspace_id = ENV["WORKSPACE_ID"]
+if (workspace_id.nil? || workspace_id.empty?) && File.exist?(WORKSPACE_FILE)
+  workspace_id = File.read(WORKSPACE_FILE).strip
+end
+
+if workspace_id.nil? || workspace_id.empty?
+  puts "WORKSPACE_ID not set and .workspace_id missing, skipping teardown."
   exit 0
-fi
+end
 
-echo "Tearing down workspace: $WORKSPACE_ID"
+puts "Tearing down workspace: #{workspace_id}"
 
-# Drop workspace-specific development databases
-for db in "bikeindex_development_${WORKSPACE_ID}" \
-          "bikeindex_analytics_development_${WORKSPACE_ID}"; do
-  echo "Dropping database: $db"
-  dropdb --if-exists "$db" 2>/dev/null || true
-done
+# Stop bin/dev for this workspace (kill the foreman process group on DEV_PORT)
+if workspace_id.match?(/\A\d+\z/)
+  listener_pid = IO.popen(["lsof", "-ti", "tcp:#{workspace_id}", "-sTCP:LISTEN"], err: File::NULL, &:read).split.first
+  if listener_pid
+    pgid = IO.popen(["ps", "-o", "pgid=", "-p", listener_pid], err: File::NULL, &:read).strip
+    unless pgid.empty?
+      puts "Stopping bin/dev (port #{workspace_id}, pgid #{pgid})"
+      begin
+        Process.kill("TERM", -pgid.to_i)
+      rescue Errno::ESRCH, Errno::EPERM
+      end
+    end
+  end
+end
 
-# Drop workspace-specific test databases
-for db in "bikeindex_test_${WORKSPACE_ID}" \
-          "bikeindex_test_${WORKSPACE_ID}_replica" \
-          "bikeindex_analytics_test_${WORKSPACE_ID}"; do
-  echo "Dropping database: $db"
-  dropdb --if-exists "$db" 2>/dev/null || true
-done
+def dropdb(name, announce: true)
+  puts "Dropping database: #{name}" if announce
+  system("dropdb", "--if-exists", name, out: File::NULL, err: File::NULL)
+end
 
-# Also drop parallel test databases (TEST_ENV_NUMBER suffixed)
-for i in $(seq 1 8); do
-  for db in "bikeindex_test_${WORKSPACE_ID}${i}" \
-            "bikeindex_test_${WORKSPACE_ID}_replica${i}" \
-            "bikeindex_analytics_test_${WORKSPACE_ID}${i}"; do
-    dropdb --if-exists "$db" 2>/dev/null || true
-  done
-done
+%W[
+  bikeindex_development_#{workspace_id}
+  bikeindex_analytics_development_#{workspace_id}
+  bikeindex_test_#{workspace_id}
+  bikeindex_test_#{workspace_id}_replica
+  bikeindex_analytics_test_#{workspace_id}
+].each { |db| dropdb(db) }
 
-workspace_int="${WORKSPACE_ID#w}"
-echo "Removing workspace_ids row: $workspace_int"
-psql -d dev_workspaces -tAXc "DELETE FROM workspace_ids WHERE id = ${workspace_int}" 2>/dev/null || true
+# Parallel test databases (TEST_ENV_NUMBER suffixed)
+(1..8).each do |i|
+  %W[
+    bikeindex_test_#{workspace_id}#{i}
+    bikeindex_test_#{workspace_id}_replica#{i}
+    bikeindex_analytics_test_#{workspace_id}#{i}
+  ].each { |db| dropdb(db, announce: false) }
+end
 
-rm -f .workspace_id
+puts "Removing workspace_ids row: #{workspace_id}"
+system("psql", "-d", WORKSPACE_DB, "-tAXc", "DELETE FROM workspace_ids WHERE id = #{workspace_id}", out: File::NULL, err: File::NULL)
 
-echo "Workspace teardown complete!"
+FileUtils.rm_f(WORKSPACE_FILE)
+
+puts "Workspace teardown complete!"

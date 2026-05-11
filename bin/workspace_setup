@@ -31,7 +31,7 @@ def psql(database, query)
 end
 
 if File.exist?(WORKSPACE_FILE)
-  puts "workspace ID already set: w#{File.read(WORKSPACE_FILE).strip}"
+  puts "workspace ID already set: #{File.read(WORKSPACE_FILE).strip}"
 else
   unless system("psql", "-d", "postgres", "-tAXc", "SELECT 1 FROM pg_database WHERE datname = '#{WORKSPACE_DB}'", out: File::NULL)
     abort "Could not query Postgres. Is it running?"
@@ -41,14 +41,16 @@ else
     system("createdb", WORKSPACE_DB) || abort("Failed to create database #{WORKSPACE_DB}")
   end
 
-  psql(WORKSPACE_DB, "CREATE TABLE IF NOT EXISTS workspace_ids (id INTEGER PRIMARY KEY)")
+  if psql(WORKSPACE_DB, "SELECT 1 FROM pg_tables WHERE tablename = 'workspace_ids'").empty?
+    psql(WORKSPACE_DB, "CREATE TABLE workspace_ids (id INTEGER PRIMARY KEY)")
+  end
   taken = psql(WORKSPACE_DB, "SELECT id FROM workspace_ids").split("\n").map(&:to_i)
   next_id = 3072
   next_id += 1 while taken.include?(next_id)
 
   psql(WORKSPACE_DB, "INSERT INTO workspace_ids (id) VALUES (#{next_id})")
   File.write(WORKSPACE_FILE, next_id.to_s)
-  puts "workspace ID set to w#{next_id}"
+  puts "workspace ID set to #{next_id}"
 end
 
 system(File.expand_path("setup", __dir__), *setup_args) || abort("bin/setup failed")
