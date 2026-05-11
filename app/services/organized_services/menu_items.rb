@@ -21,27 +21,16 @@ module OrganizedServices
   module MenuItems
     extend Functionable
 
-    CACHE_VERSION = "v1"
-
+    # UpdateOrganizationAssociationsJob touches every member user when an org
+    # changes, so user.cache_key_with_version covers both per-user changes
+    # and org-feature changes.
     def for(organization:, current_user:)
       return [] if organization.nil?
 
-      Rails.cache.fetch(cache_key(organization, current_user)) do
+      key = ["organized_menu_items_v1", organization.id, current_user&.cache_key_with_version]
+      Rails.cache.fetch(key) do
         build_items(organization, current_user)
       end
-    end
-
-    # UpdateOrganizationAssociationsJob touches every member user when an org
-    # changes, so user.cache_key_with_version covers both per-user changes
-    # (roles, superuser ability) and org-feature changes. Only the org id is
-    # needed to distinguish orgs the user belongs to.
-    def cache_key(organization, current_user)
-      [
-        "organized_menu_items",
-        CACHE_VERSION,
-        organization.id,
-        current_user&.cache_key_with_version
-      ]
     end
 
     def build_items(organization, current_user)
@@ -267,7 +256,7 @@ module OrganizedServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :build_items, :cache_key, :ambassador_items, :standard_items, :registration_items,
+    conceal :build_items, :ambassador_items, :standard_items, :registration_items,
       :add_bike_items, :feature_items, :admin_items, :super_admin_items, :additional_divider?,
       :link, :divider, :translation, :routes
   end
