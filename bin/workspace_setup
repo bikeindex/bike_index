@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Assigns this checkout a workspace ID (an integer 3070..4020) and writes it
-# to .workspace_id at the repo root, then runs bin/setup. The ID is loaded by
-# bin/env to populate WORKSPACE_ID. IDs are tracked in the local Postgres
-# `bikeindex_workspaces` database so multiple checkouts on the same machine
-# each get a distinct ID.
+# Assigns this checkout a workspace ID (starting at 3072, incremented for
+# each new checkout) and writes it to .workspace_id at the repo root, then
+# runs bin/setup. The ID is loaded by bin/env to populate WORKSPACE_ID. IDs
+# are tracked in the local Postgres `bikeindex_workspaces` database so
+# multiple checkouts on the same machine each get a distinct ID.
 
 require "fileutils"
 
@@ -33,7 +33,7 @@ else
   psql(WORKSPACE_DB, "CREATE TABLE IF NOT EXISTS workspace_ids (id INTEGER PRIMARY KEY)")
   last_id = psql(WORKSPACE_DB, "SELECT MAX(id) FROM workspace_ids")
 
-  next_id = last_id.empty? ? rand(3070..4020) : last_id.to_i + 1
+  next_id = last_id.empty? ? 3072 : last_id.to_i + 1
 
   psql(WORKSPACE_DB, "INSERT INTO workspace_ids (id) VALUES (#{next_id})")
   File.write(WORKSPACE_FILE, next_id.to_s)
