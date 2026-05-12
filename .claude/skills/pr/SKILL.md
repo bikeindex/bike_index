@@ -95,6 +95,8 @@ Capture in two passes so each viewport is resized only once:
 1. `browser_resize` → 1440×900. For each page, `browser_navigate` to `$BASE_URL<url-path>` then `browser_take_screenshot` to `...-desktop.png`.
 2. `browser_resize` → 390×844 (mobile viewport). For each page, `browser_navigate` to the same URL then `browser_take_screenshot` to `...-mobile.png`.
 
+Use `fullPage: false` (the viewport-only screenshot) for both. `fullPage: true` produces a "scroll-the-whole-page" image — on mobile that's typically 2000–3000px tall with the dropdown sitting in the first 800px and the rest just being a desaturated background scroll, which is not how a phone actually renders. The viewport-height shot is what reviewers want to see.
+
 If a navigation lands on `/session/new`, sign in with seeded credentials by driving the form via Playwright (don't ask the user to do it manually). Pick the user that exposes the menus/views you need:
 
 - `admin@bikeindex.org` / `pleaseplease12` — has `SuperuserAbility`; the superuser shortcut makes them admin of every org (so they see admin-only menu items + the "Super Admin" link).
