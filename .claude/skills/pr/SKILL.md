@@ -153,21 +153,20 @@ Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-fil
 | <img src="<main-mobile-url>" width="250"> | <img src="<branch-mobile-url>" width="250"> |
 ```
 
-For brand-new pages (URL didn't exist on `main` — see step 6.5), omit the `main` column:
+For brand-new pages (URL didn't exist on `main` — see step 6.5), there's nothing to compare to, so fall back to desktop+mobile side-by-side:
 
 ```markdown
 ### <url-path>
 
-| this branch |
-| --- |
-| <img src="<branch-desktop-url>" width="600"> |
-| <img src="<branch-mobile-url>" width="300"> |
+| Desktop | Mobile |
+| --- | --- |
+| <img src="<branch-desktop-url>" width="600"> | <img src="<branch-mobile-url>" width="300"> |
 ```
 
 Rules:
 - Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own table.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells.
-- Widths: the 2-column comparison cell is narrower than the page, so use ~500/250 for desktop/mobile. Single-column tables can go ~600/300.
+- Widths: the main-vs-branch comparison cells are narrower than the page, so use ~500/250 for desktop/mobile. The desktop+mobile fallback can go ~600/300.
 
 When updating an existing body, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
 
