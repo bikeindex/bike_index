@@ -8,7 +8,7 @@
 workspace_file = File.expand_path("../.workspace_id", __dir__)
 if File.exist?(workspace_file)
   workspace_int = File.read(workspace_file).strip
-  ENV["WORKSPACE_ID"] ||= "w#{workspace_int}"
+  ENV["WORKSPACE_ID"] ||= workspace_int
   ENV["DEV_PORT"] ||= workspace_int
 end
 
