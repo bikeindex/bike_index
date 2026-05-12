@@ -95,7 +95,15 @@ Capture in two passes so each viewport is resized only once:
 1. `browser_resize` → 1440×900. For each page, `browser_navigate` to `$BASE_URL<url-path>` then `browser_take_screenshot` to `...-desktop.png`.
 2. `browser_resize` → 390×844 (mobile viewport). For each page, `browser_navigate` to the same URL then `browser_take_screenshot` to `...-mobile.png`.
 
-If a navigation lands on `/session/new`, ask the user to sign in via the visible Playwright MCP browser window, then continue.
+If a navigation lands on `/session/new`, sign in with seeded credentials by driving the form via Playwright (don't ask the user to do it manually). Pick the user that exposes the menus/views you need:
+
+- `admin@bikeindex.org` / `pleaseplease12` — has `SuperuserAbility`; the superuser shortcut makes them admin of every org (so they see admin-only menu items + the "Super Admin" link).
+- `member@bikeindex.org` / `pleaseplease12` — admin of `Ike's Bikes` only; useful for a non-superuser perspective.
+- `cannondale@bikeindex.org` / `pleaseplease12` — admin of `Cannondale` (manufacturer org).
+
+Seeded orgs to navigate to: **Hogwarts** (`/o/hogwarts/...`) has every org feature except `official_manufacturer` enabled, so it's the right pick when you want the fully-loaded org sidebar/menu. **Ike's Bikes** (`/o/ikes`) has no features, useful for minimal-menu shots. **Cannondale** (`/o/cannondale`) has `official_manufacturer`.
+
+If `DEV_PORT=3042` this is the production-snapshot DB — *don't* drive sign-in programmatically and *don't* screenshot admin/listing pages with real PII (see `feedback_no_programmatic_auth_for_screenshots.md`). Stop and ask instead.
 
 After capture, sanity-check each PNG. A file under ~5KB usually means the page errored; also check `browser_console_messages` for uncaught JS errors. Diagnose:
 
@@ -112,9 +120,40 @@ Invoke the `github-upload-image-to-pr` skill to upload each PNG from step 5 to t
 
 Collect the returned URLs, keyed by which file they correspond to (desktop vs. mobile, per page).
 
+### 6.5 Also capture the same URLs on `main` (when the diff has visual implications)
+
+Before assembling the PR body, capture the **base-branch** version of every screenshot too — so the section becomes a before/after comparison instead of "here's how it looks now." This applies whenever the diff could plausibly affect the rendered output: refactors that should be visually identical (where the comparison documents parity), CSS/HTML/component changes, anything view-related. Skip it only for backend-only diffs where no view rendering changed.
+
+How to capture without disturbing the user's working tree or dev server:
+
+1. `git status` — confirm there are no uncommitted changes. If there are, stop and surface to the user.
+2. Note the current branch: `BRANCH=$(git rev-parse --abbrev-ref HEAD)`.
+3. `git checkout main` — Rails dev mode auto-reloads on file changes; the dev server stays up.
+4. Repeat step 5's two-viewport capture loop, this time writing to `tmp/pr_screenshots/<branch>-<page>-main-<timestamp>-{desktop,mobile}.png` (note the extra `-main` segment).
+5. `git checkout $BRANCH` to return — verify the working tree is clean and on the original branch.
+6. Upload the main shots via the same `github-upload-image-to-pr` flow as in step 6.
+
+If sign-in is required, the seeded credentials from step 5 still work on main (the DB persists across checkouts).
+
 ### 7. Append the Screenshots section to the PR body
 
-Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again:
+Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again. The table layout depends on whether you captured main shots in step 6.5:
+
+**With main comparison (default for view-affecting diffs):**
+
+```markdown
+
+## Screenshots
+
+### <url-path>
+
+| | main | this branch |
+| --- | --- | --- |
+| Desktop | <img src="<main-desktop-url>" width="500"> | <img src="<branch-desktop-url>" width="500"> |
+| Mobile | <img src="<main-mobile-url>" width="250"> | <img src="<branch-mobile-url>" width="250"> |
+```
+
+**Without main comparison (backend-only diffs):**
 
 ```markdown
 
@@ -128,8 +167,9 @@ Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-fil
 ```
 
 Rules:
-- Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own 1-row table — desktop on the left, mobile on the right.
+- Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own table.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells.
+- When the comparison row makes the cells narrower, reduce widths (e.g. 500/250 instead of 600/300) so each image still fits its cell.
 
 When updating an existing body, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
 
