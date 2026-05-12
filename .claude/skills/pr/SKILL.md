@@ -120,9 +120,11 @@ Invoke the `github-upload-image-to-pr` skill to upload each PNG from step 5 to t
 
 Collect the returned URLs, keyed by which file they correspond to (desktop vs. mobile, per page).
 
-### 6.5 Also capture the same URLs on `main` (when the diff has visual implications)
+### 6.5 Also capture the same URLs on `main`
 
-Before assembling the PR body, capture the **base-branch** version of every screenshot too — so the section becomes a before/after comparison instead of "here's how it looks now." This applies whenever the diff could plausibly affect the rendered output: refactors that should be visually identical (where the comparison documents parity), CSS/HTML/component changes, anything view-related. Skip it only for backend-only diffs where no view rendering changed.
+Capture the **base-branch** version of every screenshot from step 5 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you reached step 5 at all, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
+
+Skip per-page only when the URL didn't exist on `main` (a brand-new route or page added in this PR) — there's nothing to compare to.
 
 How to capture without disturbing the user's working tree or dev server:
 
@@ -137,9 +139,7 @@ If sign-in is required, the seeded credentials from step 5 still work on main (t
 
 ### 7. Append the Screenshots section to the PR body
 
-Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again. The table layout depends on whether you captured main shots in step 6.5:
-
-**With main comparison (default for view-affecting diffs):**
+Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again. The default layout is a 2-column `| main | this branch |` table, one table per page-viewport (so wide desktop shots and narrow mobile shots each get their own row of cells with appropriate widths):
 
 ```markdown
 
@@ -147,29 +147,27 @@ Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-fil
 
 ### <url-path>
 
-| | main | this branch |
-| --- | --- | --- |
-| Desktop | <img src="<main-desktop-url>" width="500"> | <img src="<branch-desktop-url>" width="500"> |
-| Mobile | <img src="<main-mobile-url>" width="250"> | <img src="<branch-mobile-url>" width="250"> |
+| main | this branch |
+| --- | --- |
+| <img src="<main-desktop-url>" width="500"> | <img src="<branch-desktop-url>" width="500"> |
+| <img src="<main-mobile-url>" width="250"> | <img src="<branch-mobile-url>" width="250"> |
 ```
 
-**Without main comparison (backend-only diffs):**
+For brand-new pages (URL didn't exist on `main` — see step 6.5), omit the `main` column:
 
 ```markdown
-
-## Screenshots
-
 ### <url-path>
 
-| Desktop | Mobile |
-| --- | --- |
-| <img src="<desktop-user-attachments-url>" width="600"> | <img src="<mobile-user-attachments-url>" width="300"> |
+| this branch |
+| --- |
+| <img src="<branch-desktop-url>" width="600"> |
+| <img src="<branch-mobile-url>" width="300"> |
 ```
 
 Rules:
 - Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own table.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells.
-- When the comparison row makes the cells narrower, reduce widths (e.g. 500/250 instead of 600/300) so each image still fits its cell.
+- Widths: the 2-column comparison cell is narrower than the page, so use ~500/250 for desktop/mobile. Single-column tables can go ~600/300.
 
 When updating an existing body, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
 
