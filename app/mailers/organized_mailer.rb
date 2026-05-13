@@ -53,20 +53,17 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
-  # NOTE: parking_notification is the only method in this mailer that renders a template.
-  # it renders a template because it has a different text output than HTML (the map isn't include in text)
   def parking_notification(parking_notification)
-    @parking_notification = parking_notification
     @organization = parking_notification.organization
-    @bike = parking_notification.bike
+    component_args = {parking_notification:, bike: parking_notification.bike}
 
     I18n.with_locale(parking_notification.user&.preferred_language) do
       mail(reply_to: parking_notification.reply_to_email,
         to: parking_notification.email,
         tag: __callee__,
         subject: parking_notification.subject) do |format|
-        format.html { render "parking_notification" }
-        format.text { render "parking_notification" }
+        format.html { render Emails::ParkingNotification::Component.new(**component_args) }
+        format.text { render Emails::ParkingNotification::Component.new(**component_args) }
       end
     end
   end
