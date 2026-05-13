@@ -19,7 +19,7 @@ Rails.application.configure do
   # Run rails dev:cache to toggle caching.
   if Rails.root.join("tmp", "caching-dev.txt").exist?
     config.action_controller.perform_caching = true
-    config.cache_store = :redis_cache_store, {url: config.redis_cache_url}
+    config.cache_store = Bikeindex::CacheStore.build(redis_url: config.redis_cache_url)
 
     config.public_file_server.headers = {
       "Cache-Control" => "public, max-age=#{2.days.to_i}"
