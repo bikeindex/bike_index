@@ -22,7 +22,7 @@ The workflow is ordered so the always-runs phase (steps 1–3) happens first, th
 
 ### 1. Gather branch state
 
-Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right CONDUCTOR_PORT fallback. Then run in parallel:
+Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback. Then run in parallel:
 - `git status` (no `-uall`)
 - `git diff main...HEAD --stat`
 - `git diff main...HEAD --name-only`
