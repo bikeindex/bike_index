@@ -1,24 +1,23 @@
 ---
 name: sandbox-test-setup
 description: >-
-  Bike Index environment setup for running Ruby specs. Covers two
-  environments — first decide which: **(A) local macOS Conductor
-  workspace** (path begins `/Users/…/conductor/workspaces/…`) where
-  Ruby 4.0.2 is already installed via mise at
-  `/Users/seth/.local/share/mise/installs/ruby/4.0.2/bin/` — DO NOT
-  claim it's missing; `bundle -v` against system `/usr/bin/ruby` 2.6
-  fails because `mise exec` and bare `bundle` don't always pick up the
-  mise shim in this harness, so call the full path directly. **(B)
-  Claude Code's Linux web sandbox** (`/home/user/bike_index`), where
-  Ruby 4.0.2 has to be built from source (~8–10 min) — no prebuilt
-  4.0.2 binary is reachable (cache.ruby-lang.org firewalled). Also
-  covers postgres/redis, the tailwind build, Chrome-matching
-  ChromeDriver, and the local CDN proxy for `:js, type: :system` specs.
-  Trigger whenever a session needs to run RSpec/bundle, the user reports
-  `Bundler::RubyVersionMismatch` / `Could not find 'bundler' (4.0.0.beta2)`
-  / `command not found: rspec` / `tailwind.css is not present` /
-  chromedriver version-mismatch errors, or before claiming an environment
-  can't run specs.
+  Bike Index Ruby + RSpec environment setup. Two environments:
+  **(A) local macOS Conductor workspace** (path begins
+  `/Users/…/conductor/workspaces/…`) — Ruby 4.0.2 is already installed
+  via mise at `/Users/seth/.local/share/mise/installs/ruby/4.0.2/bin/`,
+  but Claude Code's shell sometimes spawns subprocesses without the
+  mise shim, so bare `ruby`/`bundle` falls back to system 2.6 and fails
+  with `Could not find 'bundler' (4.0.0.beta2)` — the fix is a PATH
+  prefix, not a reinstall. **(B) Claude Code's Linux web sandbox**
+  (`/home/user/bike_index`) — Ruby 4.0.2 must be built from source
+  (~8–10 min; `cache.ruby-lang.org` is firewalled), plus postgres/redis,
+  the tailwind build, Chrome-matching ChromeDriver, and a local
+  jsdelivr proxy for `:js, type: :system` specs. Trigger whenever a
+  session needs to run RSpec/bundle/`bin/lint`, or the user reports
+  `Bundler::RubyVersionMismatch` /
+  `Could not find 'bundler' (4.0.0.beta2)` /
+  `command not found: rspec` / `tailwind.css is not present` /
+  chromedriver version-mismatch errors.
 ---
 
 # Running Ruby + RSpec for Bike Index
@@ -33,38 +32,40 @@ First identify the environment:
 
 ## Local macOS (Conductor workspace)
 
-Ruby 4.0.2 is already installed via [mise](https://mise.jdx.dev/) — do
-not assume otherwise based on a failing bare `bundle` or `ruby -v`
-command. The trap: this harness's shell doesn't activate mise shims for
-non-interactive tool calls, so `ruby` resolves to system
-`/usr/bin/ruby` (2.6), and `bundle` fails with
-`Could not find 'bundler' (4.0.0.beta2)`. **The Ruby is installed; the
-PATH isn't right.** Verify with:
+Ruby 4.0.2 is installed via [mise](https://mise.jdx.dev/), but Claude
+Code's shell sometimes spawns subprocesses without the mise shim on
+PATH — bare `ruby` then resolves to `/usr/bin/ruby` (2.6) and `bundle`
+fails with `Could not find 'bundler' (4.0.0.beta2)`. **The Ruby is
+installed; the PATH just isn't right** — don't reinstall, don't edit
+the Gemfile.
+
+Check first; only prefix PATH if `ruby -v` doesn't already print 4.0.2:
 
 ```bash
-ls /Users/seth/.local/share/mise/installs/ruby/4.0.2/bin/ruby
-/Users/seth/.local/share/mise/installs/ruby/4.0.2/bin/ruby -v
-# => ruby 4.0.2 ...
+ruby -v
+# If it's not 4.0.2:
+export PATH="/Users/seth/.local/share/mise/installs/ruby/4.0.2/bin:$PATH"
 ```
 
-If that path exists, use it directly. `mise exec -- ruby` and
-`mise exec -- bundle` are unreliable here (they print system 2.6 anyway).
+`mise exec -- ruby` and `mise exec -- bundle` are unreliable in this
+harness (they can still resolve to system 2.6) — use the direct PATH
+prefix above.
+
+Then run specs the normal way:
 
 ```bash
-export PATH="/Users/seth/.local/share/mise/installs/ruby/4.0.2/bin:$PATH"
 eval "$(ruby bin/env --export)"
 export RAILS_ENV=test
 bundle exec rspec spec/path/to/file_spec.rb
 ```
 
-If a new migration is pending (e.g. a fresh DB was added), run
-`bundle exec rails db:create db:migrate` first — `rails_helper` calls
-`ActiveRecord::Migration.maintain_test_schema!` and aborts otherwise.
+If `rails_helper` aborts complaining about a pending migration, run
+`bundle exec rails db:create db:migrate` first
+(`ActiveRecord::Migration.maintain_test_schema!`).
 
-Lint with `bin/lint` using the same PATH prefix. There is no need to
-build Ruby, set up postgres/redis, run the tailwind build, or proxy
-jsdelivr on macOS — the user's local environment already handles all
-of that.
+Lint with `bin/lint` (same PATH prefix if needed). Postgres, redis,
+the tailwind build, and the jsdelivr proxy are all handled by the
+user's local environment — skip the rest of this skill.
 
 ## Claude Code web sandbox
 
