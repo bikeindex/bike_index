@@ -1,22 +1,72 @@
 ---
 name: sandbox-test-setup
 description: >-
-  Bike Index sandbox setup for running Ruby specs in Claude Code's web
-  sandbox. The Gemfile pins `ruby "4.0.2"` and the lockfile pins
-  `BUNDLED WITH 4.0.0.beta2`, so don't fall back to a 3.x ruby — no
-  prebuilt 4.0.2 binary is reachable (`cache.ruby-lang.org` is
-  firewalled, `ruby/ruby-builder`'s toolcache tops out at 3.5.0-preview1)
-  so build it from the GitHub source tag, ~8–10 min on a 4-core sandbox.
-  Also covers postgres/redis, the tailwind build, the Chrome-matching
-  ChromeDriver, and the local CDN proxy needed for `:js, type: :system`
-  specs (jsdelivr is firewalled, registry.npmjs.org isn't). Trigger
-  whenever a session needs to run RSpec, the user reports
-  `Bundler::RubyVersionMismatch` / `command not found: rspec` /
-  `tailwind.css is not present` / chromedriver version-mismatch errors,
-  or before attempting any system spec.
+  Bike Index environment setup for running Ruby specs. Covers two
+  environments — first decide which: **(A) local macOS Conductor
+  workspace** (path begins `/Users/…/conductor/workspaces/…`) where
+  Ruby 4.0.2 is already installed via mise at
+  `/Users/seth/.local/share/mise/installs/ruby/4.0.2/bin/` — DO NOT
+  claim it's missing; `bundle -v` against system `/usr/bin/ruby` 2.6
+  fails because `mise exec` and bare `bundle` don't always pick up the
+  mise shim in this harness, so call the full path directly. **(B)
+  Claude Code's Linux web sandbox** (`/home/user/bike_index`), where
+  Ruby 4.0.2 has to be built from source (~8–10 min) — no prebuilt
+  4.0.2 binary is reachable (cache.ruby-lang.org firewalled). Also
+  covers postgres/redis, the tailwind build, Chrome-matching
+  ChromeDriver, and the local CDN proxy for `:js, type: :system` specs.
+  Trigger whenever a session needs to run RSpec/bundle, the user reports
+  `Bundler::RubyVersionMismatch` / `Could not find 'bundler' (4.0.0.beta2)`
+  / `command not found: rspec` / `tailwind.css is not present` /
+  chromedriver version-mismatch errors, or before claiming an environment
+  can't run specs.
 ---
 
-# Running Ruby + RSpec in the Claude Code sandbox
+# Running Ruby + RSpec for Bike Index
+
+First identify the environment:
+
+- **Local macOS Conductor workspace** — path starts with
+  `/Users/…/conductor/workspaces/…`, `uname` is `Darwin`. Jump to
+  [Local macOS](#local-macos-conductor-workspace).
+- **Claude Code web sandbox** — path is `/home/user/bike_index`,
+  `uname` is `Linux`. Continue with [the sandbox section](#claude-code-web-sandbox).
+
+## Local macOS (Conductor workspace)
+
+Ruby 4.0.2 is already installed via [mise](https://mise.jdx.dev/) — do
+not assume otherwise based on a failing bare `bundle` or `ruby -v`
+command. The trap: this harness's shell doesn't activate mise shims for
+non-interactive tool calls, so `ruby` resolves to system
+`/usr/bin/ruby` (2.6), and `bundle` fails with
+`Could not find 'bundler' (4.0.0.beta2)`. **The Ruby is installed; the
+PATH isn't right.** Verify with:
+
+```bash
+ls /Users/seth/.local/share/mise/installs/ruby/4.0.2/bin/ruby
+/Users/seth/.local/share/mise/installs/ruby/4.0.2/bin/ruby -v
+# => ruby 4.0.2 ...
+```
+
+If that path exists, use it directly. `mise exec -- ruby` and
+`mise exec -- bundle` are unreliable here (they print system 2.6 anyway).
+
+```bash
+export PATH="/Users/seth/.local/share/mise/installs/ruby/4.0.2/bin:$PATH"
+eval "$(ruby bin/env --export)"
+export RAILS_ENV=test
+bundle exec rspec spec/path/to/file_spec.rb
+```
+
+If a new migration is pending (e.g. a fresh DB was added), run
+`bundle exec rails db:create db:migrate` first — `rails_helper` calls
+`ActiveRecord::Migration.maintain_test_schema!` and aborts otherwise.
+
+Lint with `bin/lint` using the same PATH prefix. There is no need to
+build Ruby, set up postgres/redis, run the tailwind build, or proxy
+jsdelivr on macOS — the user's local environment already handles all
+of that.
+
+## Claude Code web sandbox
 
 The bike_index Gemfile pins `ruby "4.0.2"` and `Gemfile.lock` pins
 `BUNDLED WITH 4.0.0.beta2`. We actually need Ruby 4.0.2 — don't fall
