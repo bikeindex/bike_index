@@ -76,13 +76,15 @@ class DualWriteCacheStore < ActiveSupport::Cache::Store
   end
 
   def increment(name, amount = 1, options = nil)
-    safe_secondary { secondary.increment(name, amount, options) }
-    primary.increment(name, amount, options)
+    args = options ? [name, amount, options] : [name, amount]
+    safe_secondary { secondary.increment(*args) }
+    primary.increment(*args)
   end
 
   def decrement(name, amount = 1, options = nil)
-    safe_secondary { secondary.decrement(name, amount, options) }
-    primary.decrement(name, amount, options)
+    args = options ? [name, amount, options] : [name, amount]
+    safe_secondary { secondary.decrement(*args) }
+    primary.decrement(*args)
   end
 
   def clear(options = nil)
