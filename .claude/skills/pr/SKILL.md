@@ -110,7 +110,7 @@ If a navigation lands on `/session/new`, sign in with seeded credentials by driv
 
 Seeded orgs to navigate to: **Hogwarts** (`/o/hogwarts/...`) has every org feature except `official_manufacturer` enabled, so it's the right pick when you want the fully-loaded org sidebar/menu. **Ike's Bikes** (`/o/ikes`) has no features and no admin, useful for minimal-menu shots. **Cannondale** (`/o/cannondale`) has `official_manufacturer`.
 
-**Verify the signed-in identity is one of the seeded users before continuing.** This guards against capturing/uploading real user PII from a production-snapshot DB (see `feedback_no_programmatic_auth_for_screenshots.md`). After signing in (or on the first navigation if a session already exists), navigate to `/my_account` and check the heading text — it renders `<user.name> on Bike Index`, so the seeded users show as "Admin User", "Member User", or "Cannondale Admin". Pseudo-code:
+**Verify the signed-in identity is one of the seeded users before continuing.** The dev DB could leak PII — see `feedback_no_programmatic_auth_for_screenshots.md`. After signing in (or on the first navigation if a session already exists), navigate to `/my_account` and check the heading text — it renders `<user.name> on Bike Index`, so the seeded users show as "Admin User", "Member User", or "Cannondale Admin". Pseudo-code:
 
 ```js
 const heading = await page.locator('h1').first().textContent();
@@ -118,10 +118,10 @@ const ok = ["Admin User", "Member User", "Cannondale Admin"].some(n => heading.i
 ```
 
 If it isn't one of the three, **stop and ask the user**. Two cases:
-- *Signed in as a non-seed user* — the dev DB is probably a production snapshot or has real data; uploading screenshots could leak PII.
-- *Sign-in with seed credentials failed* — the DB doesn't have the seed users, so it's not a fresh-seeded dev DB; same PII risk.
+- *Signed in as a non-seed user* — the dev DB could leak PII; uploading screenshots is unsafe.
+- *Sign-in with seed credentials failed* — the seeds haven't run. Tell the user to run `bundle exec rails db:seed` (and re-sign in once it completes), then try again.
 
-Either way, do not proceed; ask the user how to handle it (e.g. "want me to skip screenshots, or are you running this against a snapshot you've sanitized?").
+Don't proceed past this gate without the user's explicit go-ahead.
 
 After capture, sanity-check each PNG. A file under ~5KB usually means the page errored; also check `browser_console_messages` for uncaught JS errors. Diagnose:
 
@@ -157,7 +157,9 @@ If sign-in is required, the seeded credentials from step 5 still work on main (t
 
 ### 7. Append the Screenshots section to the PR body
 
-Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again. The default layout is a 2-column `| main | this branch |` table, one table per page-viewport (so wide desktop shots and narrow mobile shots each get their own row of cells with appropriate widths):
+Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again. **Headers are always `| Desktop | Mobile |`** — that stays the same regardless of whether there's a main comparison. The main shots and branch shots stack as additional rows, with a small indicator row between them when both are present.
+
+Default (with main comparison):
 
 ```markdown
 
@@ -165,26 +167,27 @@ Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-fil
 
 ### <url-path>
 
-| main | this branch |
+| Desktop | Mobile |
 | --- | --- |
-| <img src="<main-desktop-url>" width="500"> | <img src="<branch-desktop-url>" width="500"> |
-| <img src="<main-mobile-url>" width="250"> | <img src="<branch-mobile-url>" width="250"> |
+| <img src="<main-desktop-url>" width="500"> | <img src="<main-mobile-url>" width="250"> |
+| main 👆 | this branch 👇 |
+| <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
 ```
 
-For brand-new pages (URL didn't exist on `main` — see step 6.5), there's nothing to compare to, so fall back to desktop+mobile side-by-side:
+Brand-new page (URL didn't exist on `main` — see step 6.5), no comparison row:
 
 ```markdown
 ### <url-path>
 
 | Desktop | Mobile |
 | --- | --- |
-| <img src="<branch-desktop-url>" width="600"> | <img src="<branch-mobile-url>" width="300"> |
+| <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
 ```
 
 Rules:
 - Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own table.
-- Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells.
-- Widths: the main-vs-branch comparison cells are narrower than the page, so use ~500/250 for desktop/mobile. The desktop+mobile fallback can go ~600/300.
+- **Headers are always `| Desktop | Mobile |`** — never `| main | this branch |` or any per-PR variation. Reviewers should see the same column meaning across every PR.
+- Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 
 When updating an existing body, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
 
