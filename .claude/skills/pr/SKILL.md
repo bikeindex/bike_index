@@ -110,12 +110,14 @@ If a navigation lands on `/session/new`, sign in with seeded credentials by driv
 
 Seeded orgs to navigate to: **Hogwarts** (`/o/hogwarts/...`) has every org feature except `official_manufacturer` enabled, so it's the right pick when you want the fully-loaded org sidebar/menu. **Ike's Bikes** (`/o/ikes`) has no features and no admin, useful for minimal-menu shots. **Cannondale** (`/o/cannondale`) has `official_manufacturer`.
 
-**Verify the signed-in identity is one of the seeded users before continuing.** The dev DB could leak PII — see `feedback_no_programmatic_auth_for_screenshots.md`. After signing in (or on the first navigation if a session already exists), navigate to `/my_account` and check the heading text — it renders `<user.name> on Bike Index`, so the seeded users show as "Admin User", "Member User", or "Cannondale Admin". Pseudo-code:
+**Verify the signed-in identity is one of the seeded users before continuing.** The dev DB could leak PII — see `feedback_no_programmatic_auth_for_screenshots.md`. The application layout renders the current user's email on `#navUserSettingLink` via a `data-email` attribute (`app/views/layouts/application.html.erb`), so any authenticated page works for the check:
 
 ```js
-const heading = await page.locator('h1').first().textContent();
-const ok = ["Admin User", "Member User", "Cannondale Admin"].some(n => heading.includes(n));
+const email = document.getElementById('navUserSettingLink')?.dataset.email;
+const ok = ["admin@bikeindex.org", "member@bikeindex.org", "cannondale@bikeindex.org"].includes(email);
 ```
+
+If `email` is `undefined`, the page is unauthenticated — sign in first. If it's set but isn't one of the three, treat that as the failure case below.
 
 If it isn't one of the three, **stop and ask the user**. Two cases:
 - *Signed in as a non-seed user* — the dev DB may have some real data; uploading screenshots could leak PII.
