@@ -113,9 +113,6 @@ jobs:
       - run: bundle install
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
-      - name: Test bin/setup # Test bin/setup - only run on 1 node, knapsack should balance
-        if: matrix.ci_node_index == 0
-        run: bin/setup
       - name: Sync translations (only on main by default)
         if: matrix.ci_node_index == 1
         env:
@@ -156,6 +153,11 @@ jobs:
             app/assets/builds
             public/assets
           key: ${{ steps.assets-cache.outputs.cache-primary-key }}
+      # Test bin/setup (verifies e.g. seeds work) - only run on 1 node, knapsack should balance
+      # Done after asset compilation and caching to save time on that
+      - name: Test bin/setup
+        if: matrix.ci_node_index == 0
+        run: bin/setup
       # Run tests
       - name: Run tests
         env:
