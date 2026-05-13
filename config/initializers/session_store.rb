@@ -6,7 +6,7 @@ else
   "localhost"
 end
 
-# Include port in session key to prevent collisions across Conductor workspaces
+# Include port in session key to prevent collisions across dev workspaces
 key = if Rails.env.production?
   "_bikeindex_session"
 else
