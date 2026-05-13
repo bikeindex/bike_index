@@ -73,8 +73,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ci_node_total: [4]
-        ci_node_index: [0, 1, 2, 3]
+        ci_node_total: [5]
+        ci_node_index: [0, 1, 2, 3, 4]
     env:
       REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
