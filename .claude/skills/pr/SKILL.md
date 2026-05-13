@@ -110,7 +110,18 @@ If a navigation lands on `/session/new`, sign in with seeded credentials by driv
 
 Seeded orgs to navigate to: **Hogwarts** (`/o/hogwarts/...`) has every org feature except `official_manufacturer` enabled, so it's the right pick when you want the fully-loaded org sidebar/menu. **Ike's Bikes** (`/o/ikes`) has no features and no admin, useful for minimal-menu shots. **Cannondale** (`/o/cannondale`) has `official_manufacturer`.
 
-If `DEV_PORT=3042` this is the production-snapshot DB — *don't* drive sign-in programmatically and *don't* screenshot admin/listing pages with real PII (see `feedback_no_programmatic_auth_for_screenshots.md`). Stop and ask instead.
+**Verify the signed-in identity is one of the seeded users before continuing.** This guards against capturing/uploading real user PII from a production-snapshot DB (see `feedback_no_programmatic_auth_for_screenshots.md`). After signing in (or on the first navigation if a session already exists), navigate to `/my_account` and check the heading text — it renders `<user.name> on Bike Index`, so the seeded users show as "Admin User", "Member User", or "Cannondale Admin". Pseudo-code:
+
+```js
+const heading = await page.locator('h1').first().textContent();
+const ok = ["Admin User", "Member User", "Cannondale Admin"].some(n => heading.includes(n));
+```
+
+If it isn't one of the three, **stop and ask the user**. Two cases:
+- *Signed in as a non-seed user* — the dev DB is probably a production snapshot or has real data; uploading screenshots could leak PII.
+- *Sign-in with seed credentials failed* — the DB doesn't have the seed users, so it's not a fresh-seeded dev DB; same PII risk.
+
+Either way, do not proceed; ask the user how to handle it (e.g. "want me to skip screenshots, or are you running this against a snapshot you've sanitized?").
 
 After capture, sanity-check each PNG. A file under ~5KB usually means the page errored; also check `browser_console_messages` for uncaught JS errors. Diagnose:
 
