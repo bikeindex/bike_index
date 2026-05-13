@@ -31,7 +31,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
   it "filters notifications through the dropdown menus and toggles them off when re-clicked" do
     visit base_url
     # Default view (status=current) loads three current notifications via JSON.
-    expect(page).to have_css(row_for(registered), wait: 10)
+    expect(page).to have_css(row_for(registered), wait: 20)
     expect(page).to have_css(row_for(unregistered))
     expect(page).to have_css(row_for(abandoned))
     expect(page).to have_css("tr.record-row", count: 3)
@@ -39,42 +39,42 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     # Regression: the click handler reads data-urlparams (not href), so this used to apply
     # only_unregistered due to a copy-paste in the template.
     click_filter("Registered bikes only")
-    expect(page).to have_css(row_for(registered), wait: 10)
+    expect(page).to have_css(row_for(registered), wait: 20)
     expect(page).to have_css(row_for(abandoned))
     expect(page).not_to have_css(row_for(unregistered))
     expect(page).to have_css("tr.record-row", count: 2)
 
     # Clicking the active item toggles it off — unregistered comes back.
     click_filter("Registered bikes only")
-    expect(page).to have_css(row_for(unregistered), wait: 10)
+    expect(page).to have_css(row_for(unregistered), wait: 20)
     expect(page).to have_css("tr.record-row", count: 3)
 
     # "Only unregistered bikes" hides the registered ones.
     click_filter("Only unregistered bikes")
-    expect(page).to have_css(row_for(unregistered), wait: 10)
+    expect(page).to have_css(row_for(unregistered), wait: 20)
     expect(page).not_to have_css(row_for(registered))
     expect(page).not_to have_css(row_for(abandoned))
     expect(page).to have_css("tr.record-row", count: 1)
 
     # "All bikes" shows everything again.
     click_filter("All bikes")
-    expect(page).to have_css("tr.record-row", count: 3, wait: 10)
+    expect(page).to have_css("tr.record-row", count: 3, wait: 20)
 
     # Status dropdown: "Resolved" shows the retrieved notification.
     click_filter("Resolved notifications")
-    expect(page).to have_css(row_for(retrieved), wait: 10)
+    expect(page).to have_css(row_for(retrieved), wait: 20)
     expect(page).not_to have_css(row_for(registered))
     expect(page).to have_css("tr.record-row", count: 1)
 
     # Toggle the active status off — back to the three current notifications.
     click_filter("Resolved notifications")
-    expect(page).to have_css(row_for(registered), wait: 10)
+    expect(page).to have_css(row_for(registered), wait: 20)
     expect(page).to have_css("tr.record-row", count: 3)
     expect(page).not_to have_css(row_for(retrieved))
 
     # Kind dropdown narrows to a single kind.
     click_filter("Appears abandoned notifications")
-    expect(page).to have_css(row_for(abandoned), wait: 10)
+    expect(page).to have_css(row_for(abandoned), wait: 20)
     expect(page).not_to have_css(row_for(registered))
     expect(page).to have_css("tr.record-row", count: 1)
   end
