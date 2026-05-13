@@ -118,7 +118,7 @@ const ok = ["Admin User", "Member User", "Cannondale Admin"].some(n => heading.i
 ```
 
 If it isn't one of the three, **stop and ask the user**. Two cases:
-- *Signed in as a non-seed user* — the dev DB could leak PII; uploading screenshots is unsafe.
+- *Signed in as a non-seed user* — the dev DB may have some real data; uploading screenshots could leak PII.
 - *Sign-in with seed credentials failed* — the seeds haven't run. Tell the user to run `bundle exec rails db:seed` (and re-sign in once it completes), then try again.
 
 Don't proceed past this gate without the user's explicit go-ahead.
