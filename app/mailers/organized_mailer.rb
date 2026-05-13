@@ -66,7 +66,10 @@ class OrganizedMailer < ApplicationMailer
       mail(reply_to: @parking_notification.reply_to_email,
         to: @parking_notification.email,
         tag: __callee__,
-        subject: @parking_notification.subject) { |format| format.html { render component } }
+        subject: @parking_notification.subject) do |format|
+        format.html { render component }
+        format.text { render component }
+      end
     end
   end
 
