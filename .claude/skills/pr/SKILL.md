@@ -93,9 +93,37 @@ Paths: `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, wh
 Capture in two passes so each viewport is resized only once:
 
 1. `browser_resize` → 1440×900. For each page, `browser_navigate` to `$BASE_URL<url-path>` then `browser_take_screenshot` to `...-desktop.png`.
-2. `browser_resize` → 390×844 (mobile viewport). For each page, `browser_navigate` to the same URL then `browser_take_screenshot` to `...-mobile.png`.
+2. `browser_resize` → 390×844 (iPhone-class mobile viewport). For each page, `browser_navigate` to the same URL then `browser_take_screenshot` to `...-mobile.png`.
 
-If a navigation lands on `/session/new`, ask the user to sign in via the visible Playwright MCP browser window, then continue.
+**Always use `fullPage: false` and never element-only (no `target:` arg).** The screenshot must show the page as it renders in a browser of that viewport size — the chrome around the changed element matters for context. Two failure modes to avoid:
+
+- `fullPage: true` produces a "scroll-the-whole-page" image — on mobile that's typically 2000–3000px tall with the interesting content sitting in the first 800px and the rest just being a desaturated background scroll. Not how a phone renders.
+- `target: <element ref>` (the element-only screenshot) crops to the bounding box of one DOM node. For something tall and narrow like a sidebar nav, that produces a comically thin column (e.g. 216×2025) sliced out of context. Reviewers can't tell where it sits on the page or whether the surrounding layout is right.
+
+Both cases: capture the viewport instead.
+
+If a navigation lands on `/session/new`, sign in with seeded credentials by driving the form via Playwright (don't ask the user to do it manually). Pick the user that exposes the menus/views you need:
+
+- `admin@bikeindex.org` / `pleaseplease12` — has `SuperuserAbility`; the superuser shortcut makes them admin of every org (so they see admin-only menu items + the "Super Admin" link).
+- `member@bikeindex.org` / `pleaseplease12` — `member` (not admin) of `Hogwarts`; useful for a non-admin perspective on the same fully-loaded org `admin@` uses.
+- `cannondale@bikeindex.org` / `pleaseplease12` — admin of `Cannondale` (manufacturer org).
+
+Seeded orgs to navigate to: **Hogwarts** (`/o/hogwarts/...`) has every org feature except `official_manufacturer` enabled, so it's the right pick when you want the fully-loaded org sidebar/menu. **Ike's Bikes** (`/o/ikes`) has no features and no admin, useful for minimal-menu shots. **Cannondale** (`/o/cannondale`) has `official_manufacturer`.
+
+**Verify the signed-in identity is one of the seeded users before continuing.** The dev DB could leak PII — see `feedback_no_programmatic_auth_for_screenshots.md`. The application layout renders the current user's email on `#navUserSettingLink` via a `data-email` attribute (`app/views/layouts/application.html.erb`), so any authenticated page works for the check:
+
+```js
+const email = document.getElementById('navUserSettingLink')?.dataset.email;
+const ok = ["admin@bikeindex.org", "member@bikeindex.org", "cannondale@bikeindex.org"].includes(email);
+```
+
+If `email` is `undefined`, the page is unauthenticated — sign in first. If it's set but isn't one of the three, treat that as the failure case below.
+
+If it isn't one of the three, **stop and ask the user**. Two cases:
+- *Signed in as a non-seed user* — the dev DB may have some real data; uploading screenshots could leak PII.
+- *Sign-in with seed credentials failed* — the seeds haven't run. Tell the user to run `bundle exec rails db:seed` (and re-sign in once it completes), then try again.
+
+Don't proceed past this gate without the user's explicit go-ahead.
 
 After capture, sanity-check each PNG. A file under ~5KB usually means the page errored; also check `browser_console_messages` for uncaught JS errors. Diagnose:
 
@@ -112,9 +140,28 @@ Invoke the `github-upload-image-to-pr` skill to upload each PNG from step 5 to t
 
 Collect the returned URLs, keyed by which file they correspond to (desktop vs. mobile, per page).
 
+### 6.5 Also capture the same URLs on `main`
+
+Capture the **base-branch** version of every screenshot from step 5 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you reached step 5 at all, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
+
+Skip per-page only when the URL didn't exist on `main` (a brand-new route or page added in this PR) — there's nothing to compare to.
+
+How to capture without disturbing the user's working tree or dev server:
+
+1. `git status` — confirm there are no uncommitted changes. If there are, stop and surface to the user.
+2. Note the current branch: `BRANCH=$(git rev-parse --abbrev-ref HEAD)`.
+3. `git checkout main` — Rails dev mode auto-reloads on file changes; the dev server stays up.
+4. Repeat step 5's two-viewport capture loop, this time writing to `tmp/pr_screenshots/<branch>-<page>-main-<timestamp>-{desktop,mobile}.png` (note the extra `-main` segment).
+5. `git checkout $BRANCH` to return — verify the working tree is clean and on the original branch.
+6. Upload the main shots via the same `github-upload-image-to-pr` flow as in step 6.
+
+If sign-in is required, the seeded credentials from step 5 still work on main (the DB persists across checkouts).
+
 ### 7. Append the Screenshots section to the PR body
 
-Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again:
+Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again. **Headers are always `| Desktop | Mobile |`** — that stays the same regardless of whether there's a main comparison. The main shots and branch shots stack as additional rows, with a small indicator row between them when both are present.
+
+Default (with main comparison):
 
 ```markdown
 
@@ -124,12 +171,25 @@ Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-fil
 
 | Desktop | Mobile |
 | --- | --- |
-| <img src="<desktop-user-attachments-url>" width="600"> | <img src="<mobile-user-attachments-url>" width="300"> |
+| <img src="<main-desktop-url>" width="500"> | <img src="<main-mobile-url>" width="250"> |
+| main 👆 | this branch 👇 |
+| <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
+```
+
+Brand-new page (URL didn't exist on `main` — see step 6.5), no comparison row:
+
+```markdown
+### <url-path>
+
+| Desktop | Mobile |
+| --- | --- |
+| <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
 ```
 
 Rules:
-- Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own 1-row table — desktop on the left, mobile on the right.
-- Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells.
+- Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own table.
+- **Headers are always `| Desktop | Mobile |`** — never `| main | this branch |` or any per-PR variation. Reviewers should see the same column meaning across every PR.
+- Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 
 When updating an existing body, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
 
