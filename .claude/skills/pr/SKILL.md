@@ -93,11 +93,14 @@ Paths: `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, wh
 Capture in two passes so each viewport is resized only once:
 
 1. `browser_resize` → 1440×900. For each page, `browser_navigate` to `$BASE_URL<url-path>` then `browser_take_screenshot` to `...-desktop.png`.
-2. `browser_resize` → 390×600 (mobile viewport — see height note below). For each page, `browser_navigate` to the same URL then `browser_take_screenshot` to `...-mobile.png`.
+2. `browser_resize` → 390×844 (iPhone-class mobile viewport). For each page, `browser_navigate` to the same URL then `browser_take_screenshot` to `...-mobile.png`.
 
-Use `fullPage: false` (the viewport-only screenshot) for both. `fullPage: true` produces a "scroll-the-whole-page" image — on mobile that's typically 2000–3000px tall with the interesting content sitting in the first 600–800px and the rest just being a desaturated background scroll, which is not how a phone actually renders. The viewport-height shot is what reviewers want to see.
+**Always use `fullPage: false` and never element-only (no `target:` arg).** The screenshot must show the page as it renders in a browser of that viewport size — the chrome around the changed element matters for context. Two failure modes to avoid:
 
-Mobile height: prefer **390×600** rather than the literal iPhone 844 height. A 390×844 capture, scaled to the ~250px column width that fits in a side-by-side PR table, becomes ~540px tall in the rendered body and visually dominates the page. 600 captures enough of the page to convey context (the top-nav state, any overlay/dropdown headers, the first ~10 menu items) while staying compact in the PR view. If a specific shot needs more (e.g. a sticky footer below the fold), bump that one to 700 — don't go higher unless there's a concrete reason.
+- `fullPage: true` produces a "scroll-the-whole-page" image — on mobile that's typically 2000–3000px tall with the interesting content sitting in the first 800px and the rest just being a desaturated background scroll. Not how a phone renders.
+- `target: <element ref>` (the element-only screenshot) crops to the bounding box of one DOM node. For something tall and narrow like a sidebar nav, that produces a comically thin column (e.g. 216×2025) sliced out of context. Reviewers can't tell where it sits on the page or whether the surrounding layout is right.
+
+Both cases: capture the viewport instead.
 
 If a navigation lands on `/session/new`, sign in with seeded credentials by driving the form via Playwright (don't ask the user to do it manually). Pick the user that exposes the menus/views you need:
 
