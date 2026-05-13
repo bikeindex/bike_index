@@ -18,6 +18,28 @@ RSpec.describe SuperuserAbility, type: :model do
     end
   end
 
+  describe "user touch" do
+    before { user.update_columns(updated_at: Time.current - 1.hour) }
+
+    it "touches the user on create so caches keyed on user.cache_key_with_version bust" do
+      expect { SuperuserAbility.create!(user: user) }
+        .to change { user.reload.updated_at }
+      expect(user.reload.updated_at).to be_within(2).of(Time.current)
+    end
+
+    it "touches the user on update and destroy" do
+      ability = SuperuserAbility.create!(user: user)
+      user.update_columns(updated_at: Time.current - 1.hour)
+
+      expect { ability.update!(controller_name: "graphs") }
+        .to change { user.reload.updated_at }
+
+      user.update_columns(updated_at: Time.current - 1.hour)
+      expect { ability.destroy }
+        .to change { user.reload.updated_at }
+    end
+  end
+
   describe "su_options" do
     let(:user1) { FactoryBot.create(:user) }
     let!(:superuser_ability1) { SuperuserAbility.create(user: user1) }
