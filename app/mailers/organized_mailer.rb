@@ -60,15 +60,14 @@ class OrganizedMailer < ApplicationMailer
     @parking_notification = parking_notification
     @organization = @parking_notification.organization
     @bike = @parking_notification.bike
-    component = Emails::ParkingNotification::Component.new(parking_notification: @parking_notification, bike: @bike)
 
     I18n.with_locale(@parking_notification.user&.preferred_language) do
       mail(reply_to: @parking_notification.reply_to_email,
         to: @parking_notification.email,
         tag: __callee__,
         subject: @parking_notification.subject) do |format|
-        format.html { render component }
-        format.text { render component }
+        format.html { render "parking_notification" }
+        format.text { render "parking_notification" }
       end
     end
   end
