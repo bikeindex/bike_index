@@ -19,7 +19,7 @@
         <li class="divider-nav-item"></li>
       <% end %>
 
-      <%= render partial: "/shared/organized_menu_items", locals: {passed_organization: current_organization} %>
+      <%= render Org::MenuItems::Component.new(organization: current_organization, current_user: current_user, unregistered_parking_notification: @unregistered_parking_notification) %>
     </ul>
   </div>
 </nav>
