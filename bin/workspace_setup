@@ -32,7 +32,7 @@ else
     system("createdb", WORKSPACE_DB) || abort("Failed to create database #{WORKSPACE_DB}")
   end
 
-  psql(WORKSPACE_DB, "CREATE TABLE IF NOT EXISTS workspace_ids (id INTEGER PRIMARY KEY, deleted_at TIMESTAMP)")
+  psql(WORKSPACE_DB, "SET client_min_messages = WARNING; CREATE TABLE IF NOT EXISTS workspace_ids (id INTEGER PRIMARY KEY, deleted_at TIMESTAMP)")
   reusable = psql(WORKSPACE_DB, "SELECT id FROM workspace_ids WHERE deleted_at < NOW() - INTERVAL '#{DELETED_REUSE_DELAY}' ORDER BY id ASC LIMIT 1")
   if reusable.empty?
     next_id = psql(WORKSPACE_DB, "SELECT GREATEST(COALESCE(MAX(id) + 1, 3072), 3072) FROM workspace_ids").to_i
