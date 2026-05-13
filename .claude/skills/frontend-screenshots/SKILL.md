@@ -27,11 +27,11 @@ Drive Playwright MCP to capture viewport screenshots of pages served by `bin/dev
 
 ## Sign in (with the PII gate)
 
-Pick the user the caller specified, or default to `admin@bikeindex.org`. All seeded users use password `pleaseplease12`:
+Pick the user the caller specified, or default to `user@bikeindex.org` (lowest privilege; most non-org-affiliated pages render for them). All seeded users use password `pleaseplease12`:
 
-- `admin@bikeindex.org` — `SuperuserAbility`; effectively admin of every org. Default.
+- `user@bikeindex.org` — no org memberships. Default. Use for personal pages (`/my_account`, `/bikes/new`) or to show how an org-less account sees a route.
 - `member@bikeindex.org` — `member` (not admin) of Hogwarts. Use to capture the non-admin view of an org.
-- `user@bikeindex.org` — no org memberships. Use for personal pages (`/my_account`, `/bikes/new`) or to show how an org-less account sees a route.
+- `admin@bikeindex.org` — `SuperuserAbility`; effectively admin of every org. Use when capturing admin-only menu items, `/admin/...` routes, or org pages where you want the fully-loaded sidebar.
 - `:anonymous` — skip sign-in entirely. Use for public pages where the signed-out rendering is the point.
 
 If a URL redirects to `/session/new` or `/session/magic_link`, drive the form via Playwright — don't ask the user to sign in manually.
