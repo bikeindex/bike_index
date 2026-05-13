@@ -4,17 +4,17 @@ description: >-
   Create or update a pull request for the current branch. Trigger when the user
   asks to create/open/make a PR, or to edit/update/rewrite/fix the PR
   description, body, or summary — for both new PRs (`gh pr create`) and
-  existing ones (`gh pr edit --body-file`). For frontend diffs, captures
-  desktop+mobile screenshots with Playwright MCP and embeds them under a
-  `## Screenshots` section. Use for any verb that lands on a PR's text
-  content: "open a PR", "make a PR", "update the PR description", "rewrite
-  the PR body", "fix the description".
+  existing ones (`gh pr edit --body-file`). For frontend diffs, delegates to
+  the `frontend-screenshots` skill to capture desktop+mobile screenshots and
+  embeds them under a `## Screenshots` section. Use for any verb that lands on
+  a PR's text content: "open a PR", "make a PR", "update the PR description",
+  "rewrite the PR body", "fix the description".
 allowed-tools: Bash, Read, Glob, Grep
 ---
 
 # Pull request workflow
 
-Create or update a pull request for the current branch. If the diff contains frontend changes, capture desktop and mobile screenshots of the affected pages with Playwright and embed them in the PR body under a `## Screenshots` section.
+Create or update a pull request for the current branch. If the diff contains frontend changes, delegate screenshot capture to the `frontend-screenshots` skill and embed the results in the PR body under a `## Screenshots` section.
 
 The workflow is ordered so the always-runs phase (steps 1–3) happens first, then the screenshot phase (steps 4–7) runs only when needed. Each step ends with the conditions under which you stop and return.
 
@@ -64,7 +64,7 @@ Always pass the body via `--body-file` (not inline `--body`) to preserve formatt
 
 **Stop here and return the PR URL** unless step 4's gate says screenshots are needed.
 
-### 4. Decide whether screenshots are needed
+### 4. Decide whether screenshots are needed and which URLs to capture
 
 Only continue past this step when there's a real reason to capture. Otherwise return the PR URL.
 
@@ -80,82 +80,25 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
-**Never start or stop `bin/dev` for the user.** The dev server is the user's process. Starting your own copy can land you on a different DB; stopping theirs interrupts work.
+### 5. Capture branch screenshots
 
-Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** (`bin/dev` from their own terminal), then resume once they confirm. Do not background-launch it yourself, even temporarily.
+Invoke the `frontend-screenshots` skill with the `(url-path, page-slug)` pairs from step 4. It handles dev-server check, sign-in, the seeded-user identity gate, viewport sizing, and per-PNG sanity checks. It returns local paths under `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`.
 
-### 5. Capture screenshots
+If `frontend-screenshots` returns failures it couldn't diagnose, surface them and stop — don't post partial screenshots.
 
-Use Playwright MCP (`mcp__playwright__*`) to capture desktop and mobile screenshots. The MCP browser session persists across calls, so dev-server sign-in is a one-time manual step.
-
-Paths: `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Before capturing, remove stale shots: `rm -f tmp/pr_screenshots/<branch>-<page>-*.png`. `<page-slug>` is a short identifier (e.g. `bike-show`, `admin-strava-activities`).
-
-Capture in two passes so each viewport is resized only once:
-
-1. `browser_resize` → 1440×900. For each page, `browser_navigate` to `$BASE_URL<url-path>` then `browser_take_screenshot` to `...-desktop.png`.
-2. `browser_resize` → 390×844 (iPhone-class mobile viewport). For each page, `browser_navigate` to the same URL then `browser_take_screenshot` to `...-mobile.png`.
-
-**Always use `fullPage: false` and never element-only (no `target:` arg).** The screenshot must show the page as it renders in a browser of that viewport size — the chrome around the changed element matters for context. Two failure modes to avoid:
-
-- `fullPage: true` produces a "scroll-the-whole-page" image — on mobile that's typically 2000–3000px tall with the interesting content sitting in the first 800px and the rest just being a desaturated background scroll. Not how a phone renders.
-- `target: <element ref>` (the element-only screenshot) crops to the bounding box of one DOM node. For something tall and narrow like a sidebar nav, that produces a comically thin column (e.g. 216×2025) sliced out of context. Reviewers can't tell where it sits on the page or whether the surrounding layout is right.
-
-Both cases: capture the viewport instead.
-
-If a navigation lands on `/session/new`, sign in with seeded credentials by driving the form via Playwright (don't ask the user to do it manually). Pick the user that exposes the menus/views you need:
-
-- `admin@bikeindex.org` / `pleaseplease12` — has `SuperuserAbility`; the superuser shortcut makes them admin of every org (so they see admin-only menu items + the "Super Admin" link).
-- `member@bikeindex.org` / `pleaseplease12` — `member` (not admin) of `Hogwarts`; useful for a non-admin perspective on the same fully-loaded org `admin@` uses.
-- `cannondale@bikeindex.org` / `pleaseplease12` — admin of `Cannondale` (manufacturer org).
-
-Seeded orgs to navigate to: **Hogwarts** (`/o/hogwarts/...`) has every org feature except `official_manufacturer` enabled, so it's the right pick when you want the fully-loaded org sidebar/menu. **Ike's Bikes** (`/o/ikes`) has no features and no admin, useful for minimal-menu shots. **Cannondale** (`/o/cannondale`) has `official_manufacturer`.
-
-**Verify the signed-in identity is one of the seeded users before continuing.** The dev DB could leak PII — see `feedback_no_programmatic_auth_for_screenshots.md`. The application layout renders the current user's email on `#navUserSettingLink` via a `data-email` attribute (`app/views/layouts/application.html.erb`), so any authenticated page works for the check:
-
-```js
-const email = document.getElementById('navUserSettingLink')?.dataset.email;
-const ok = ["admin@bikeindex.org", "member@bikeindex.org", "cannondale@bikeindex.org"].includes(email);
-```
-
-If `email` is `undefined`, the page is unauthenticated — sign in first. If it's set but isn't one of the three, treat that as the failure case below.
-
-If it isn't one of the three, **stop and ask the user**. Two cases:
-- *Signed in as a non-seed user* — the dev DB may have some real data; uploading screenshots could leak PII.
-- *Sign-in with seed credentials failed* — the seeds haven't run. Tell the user to run `bundle exec rails db:seed` (and re-sign in once it completes), then try again.
-
-Don't proceed past this gate without the user's explicit go-ahead.
-
-After capture, sanity-check each PNG. A file under ~5KB usually means the page errored; also check `browser_console_messages` for uncaught JS errors. Diagnose:
-
-1. `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"` to get the HTTP status.
-2. `curl -s "$BASE_URL/<path>" | head -200` to see the response body (usually a Rails error page with the exception and top of the backtrace).
-3. `tail -200 log/development.log` for the full backtrace and any SQL involved.
-4. Based on what you find: route missing → re-check the path; auth/redirect → pick a URL that doesn't require login or sign in; missing fixture → pick a different id or seed it; genuine bug in the diff → fix it or tell the user.
-
-Only stop and surface to the user once you understand the cause and either (a) have a fix to propose, (b) need input they must provide (e.g. which URL to screenshot instead), or (c) concluded it's a real bug in the PR.
-
-### 6. Upload screenshots and get inline URLs
+### 6. Upload branch screenshots and get inline URLs
 
 Invoke the `github-upload-image-to-pr` skill to upload each PNG from step 5 to the PR's comment textarea — GitHub mints persistent `user-attachments/assets/` URLs that render inline in the browser (release assets would force a download on click). The skill clears the textarea without submitting the comment.
 
-Collect the returned URLs, keyed by which file they correspond to (desktop vs. mobile, per page).
+Collect the returned URLs, keyed by `(page-slug, viewport)`.
 
-### 6.5 Also capture the same URLs on `main`
+### 6.5 Capture and upload the same URLs on `main`
 
 Capture the **base-branch** version of every screenshot from step 5 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you reached step 5 at all, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
 
 Skip per-page only when the URL didn't exist on `main` (a brand-new route or page added in this PR) — there's nothing to compare to.
 
-How to capture without disturbing the user's working tree or dev server:
-
-1. `git status` — confirm there are no uncommitted changes. If there are, stop and surface to the user.
-2. Note the current branch: `BRANCH=$(git rev-parse --abbrev-ref HEAD)`.
-3. `git checkout main` — Rails dev mode auto-reloads on file changes; the dev server stays up.
-4. Repeat step 5's two-viewport capture loop, this time writing to `tmp/pr_screenshots/<branch>-<page>-main-<timestamp>-{desktop,mobile}.png` (note the extra `-main` segment).
-5. `git checkout $BRANCH` to return — verify the working tree is clean and on the original branch.
-6. Upload the main shots via the same `github-upload-image-to-pr` flow as in step 6.
-
-If sign-in is required, the seeded credentials from step 5 still work on main (the DB persists across checkouts).
+Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against `main` (its step 6 — git checkout dance, captures into `...-main-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs.
 
 ### 7. Append the Screenshots section to the PR body
 
@@ -197,5 +140,4 @@ Return the PR URL.
 
 ## Notes
 
-- If Playwright MCP or the upload skill fails, report the failure clearly and leave the PR without screenshots — don't block PR creation on screenshot tooling.
-- If Playwright MCP tools aren't registered (`mcp__playwright__*` missing), tell the user to install: `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart the session.
+- If `frontend-screenshots` or `github-upload-image-to-pr` fails, report the failure clearly and leave the PR without screenshots — don't block PR creation on screenshot tooling.
