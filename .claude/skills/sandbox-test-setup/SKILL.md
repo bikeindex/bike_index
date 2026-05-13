@@ -63,9 +63,13 @@ If `rails_helper` aborts complaining about a pending migration, run
 `bundle exec rails db:create db:migrate` first
 (`ActiveRecord::Migration.maintain_test_schema!`).
 
-Lint with `bin/lint` (same PATH prefix if needed). Postgres, redis,
-the tailwind build, and the jsdelivr proxy are all handled by the
-user's local environment — skip the rest of this skill.
+Lint with `bin/lint` (same PATH prefix if needed). Postgres, redis, and
+the jsdelivr proxy are handled by your local dev environment. The
+**tailwind build** is the one piece that can still bite a fresh
+Conductor workspace where `bin/dev` / `tailwindcss:build` haven't run
+yet — see [Tailwind build](#tailwind-build-both-environments) below;
+the fix (`bundle exec rails tailwindcss:build`) is the same in both
+environments. The rest of this skill is sandbox-specific.
 
 ## Claude Code web sandbox
 
@@ -177,12 +181,15 @@ export RAILS_ENV=test CI=1
 bundle exec rails db:migrate db:test:prepare
 ```
 
-## Asset pipeline (Sprockets) — request specs that render the layout
+## Tailwind build (both environments)
 
 The application layout calls `stylesheet_link_tag 'tailwind'`. Without
-`app/assets/builds/tailwind.css`, request specs that hit `format: :html`
-fail with `Sprockets::Rails::Helper::AssetNotFound`. **Don't write the
-failure off as "pre-existing" — build Tailwind:**
+`app/assets/builds/tailwind.css`, specs that render the layout (request
+specs hitting `format: :html`, or any `:js, type: :system` spec) fail
+with `Sprockets::Rails::Helper::AssetNotFound`. This applies to both
+the sandbox AND a fresh Conductor workspace where `bin/dev` /
+`tailwindcss:build` haven't run yet. **Don't write the failure off as
+"pre-existing" — build Tailwind:**
 
 ```bash
 bundle exec rails tailwindcss:build
