@@ -53,6 +53,8 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
+  # NOTE: parking_notification is the only method in this mailer that renders a template.
+  # it renders a template because it has a different text output than HTML (the map isn't include in text)
   def parking_notification(parking_notification)
     @parking_notification = parking_notification
     @organization = parking_notification.organization
