@@ -129,8 +129,14 @@ jobs:
       #     and everything tailwind scans (views/components/helpers/javascript)
       # On a partial-key restore, sprockets' tmp/cache makes the rebuild near-instant
       # for unchanged inputs, so the loose restore-keys fallback is worth keeping.
-      - name: Cache precompiled assets
-        uses: actions/cache@v4
+      #
+      # Split into restore/save: all matrix jobs restore, but only ci_node_index == 0
+      # writes the cache. With the combined actions/cache@v4 action, parallel jobs race
+      # on reserveCache and *all* of them lose ("another job may be creating this cache"),
+      # so the cache never gets populated.
+      - name: Restore precompiled assets cache
+        id: assets-cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             tmp/cache/assets
@@ -141,6 +147,15 @@ jobs:
             ${{ runner.os }}-assets-
       - name: build assets
         run: bin/rails assets:precompile --trace
+      - name: Save precompiled assets cache
+        if: matrix.ci_node_index == 0 && steps.assets-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            tmp/cache/assets
+            app/assets/builds
+            public/assets
+          key: ${{ steps.assets-cache.outputs.cache-primary-key }}
       # Run tests
       - name: Run tests
         env:
