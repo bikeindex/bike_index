@@ -121,7 +121,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
-      # Install JS dependencies
+      # Cache compiled assets + sprockets' incremental cache.
+      # Key hashes every input the three asset tools read:
+      #   - sprockets: app/assets/images, javascripts, config/manifest.js, Gemfile.lock (gem versions)
+      #   - dartsass-rails: app/assets/stylesheets, config/initializers/dartsass.rb
+      #   - tailwindcss-rails: app/assets/tailwind, config/tailwind.config.js,
+      #     and everything tailwind scans (views/components/helpers/javascript)
+      # On a partial-key restore, sprockets' tmp/cache makes the rebuild near-instant
+      # for unchanged inputs, so the loose restore-keys fallback is worth keeping.
+      - name: Cache precompiled assets
+        uses: actions/cache@v4
+        with:
+          path: |
+            tmp/cache/assets
+            app/assets/builds
+            public/assets
+          key: ${{ runner.os }}-assets-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/tailwind.config.js', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-assets-
       - name: build assets
         run: bin/rails assets:precompile --trace
       # Run tests
