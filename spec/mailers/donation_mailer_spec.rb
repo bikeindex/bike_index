@@ -11,6 +11,7 @@ RSpec.describe DonationMailer, type: :mailer do
       expect(mail.body.encoded).to match(/gavin/i)
       expect(mail.tag).to eq "donation"
       expect(mail.body.encoded).to_not match(/supported by/i)
+      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("recently donated to Bike Index").and match(/gavin/i)
     end
   end
 
@@ -22,6 +23,7 @@ RSpec.describe DonationMailer, type: :mailer do
           expect(mail.subject).to eq("Thank you for donating to Bike Index")
           expect(mail.to).to eq([payment.email])
           expect(mail.tag).to eq "donation"
+          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Gavin Hoover").and include("BikeIndex.org")
         end
       end
     end
