@@ -64,11 +64,11 @@ hogwarts = Organization.find_by_name("Hogwarts") || Organization.create!(name: "
 hogwarts_invoice = Invoice.create(organization: hogwarts, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
 hogwarts_feature_ids = feature_ids - [official_manufacturer_feature_id]
 hogwarts_invoice.update(organization_feature_ids: hogwarts_feature_ids)
-OrganizationRole.create(organization_id: hogwarts.id, user_id: User.find_by_email("member@bikeindex.org").id, role: "member")
 
 # --- Ike's Bikes ---
 ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
 ikes.save
+OrganizationRole.create(organization_id: ikes.id, user_id: User.find_by_email("member@bikeindex.org").id, role: "admin")
 
 # --- Cannondale ---
 cannondale = Organization.find_by_name("Cannondale") || Organization.create!(name: "Cannondale", manufacturer_id: Manufacturer.find_by_name("Cannondale")&.id)
