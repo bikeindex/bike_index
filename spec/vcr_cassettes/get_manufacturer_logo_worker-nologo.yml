@@ -25,23 +25,21 @@ http_interactions:
       Connection:
       - keep-alive
       Date:
-      - Thu, 13 Nov 2025 16:58:15 GMT
+      - Wed, 13 May 2026 18:04:41 GMT
       Cache-Control:
       - max-age=86400, stale-while-revalidate=600
+      Access-Control-Allow-Origin:
+      - "*"
       X-Cache:
       - Error from cloudfront
       Via:
-      - 1.1 332ef4544bd8b531e8f11abaa4197c08.cloudfront.net (CloudFront)
+      - 1.1 ce74b5c96395745bcb8206d6c9ee0962.cloudfront.net (CloudFront)
       X-Amz-Cf-Pop:
       - SFO5-P2
       X-Amz-Cf-Id:
-      - 1P4MiLnhSyg-pOxXSC-BY5aStO-TFHtfs1UPl_mGe2fCF-H71f0U_w==
-      Age:
-      - '944'
-      Vary:
-      - Origin
+      - bPqp0Jnjca0JvUvS13xrSuK-uriUvh5iXtvwM1sSevKlip6V0dhqnw==
     body:
       encoding: UTF-8
       string: '{"err":"not found"}'
-  recorded_at: Thu, 13 Nov 2025 17:13:59 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Wed, 13 May 2026 18:04:41 GMT
+recorded_with: VCR 6.4.0
