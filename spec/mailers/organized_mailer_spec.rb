@@ -45,7 +45,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.tag).to eq "partial_registration"
         expect_render_donation(true, mail)
         expect_render_supporters(true, mail)
-        expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Almost Done").and include("Finish it")
+        expect(mail.deliver_now.text_part.body.to_s).to include("Almost Done").and include("Finish it")
       end
     end
     context "with organization" do
@@ -64,7 +64,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.tag).to eq "partial_registration"
           expect_render_donation(true, mail)
           expect_render_supporters(true, mail)
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("HEADERXSNIPPET").and include("Almost Done")
+          expect(mail.deliver_now.text_part.body.to_s).to include("HEADERXSNIPPET").and include("Almost Done")
         end
         context "with partial snippet and paid invoice" do
           let!(:partial_mail_snippet) do
@@ -88,7 +88,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
             expect(mail.tag).to eq "partial_registration"
             expect_render_donation(false, mail)
             expect_render_supporters(false, mail)
-            expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("HEADERXSNIPPET").and include("PARTIALYXSNIPPET")
+            expect(mail.deliver_now.text_part.body.to_s).to include("HEADERXSNIPPET").and include("PARTIALYXSNIPPET")
           end
         end
       end
@@ -104,7 +104,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.tag).to eq "finished_registration"
         expect_render_donation(true, mail)
         expect_render_supporters(true, mail)
-        expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Confirm this").and include("Protect your bike")
+        expect(mail.deliver_now.text_part.body.to_s).to include("Confirm this").and include("Protect your bike")
       end
     end
     context "existing bike and ownership passed" do
@@ -120,7 +120,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.tag).to eq "finished_registration"
           expect_render_donation(true, mail)
           expect_render_supporters(true, mail)
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Confirm this").and include("Protect your bike")
+          expect(mail.deliver_now.text_part.body.to_s).to include("Confirm this").and include("Protect your bike")
         end
       end
       context "claimed registration (e.g. self_made)" do
@@ -134,7 +134,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.tag).to eq "finished_registration"
           expect_render_donation(true, mail)
           expect_render_supporters(true, mail)
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Protect your bike")
+          expect(mail.deliver_now.text_part.body.to_s).to include("Protect your bike")
         end
       end
       context "pos registration" do
@@ -151,7 +151,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.tag).to eq "finished_registration_pos"
           expect_render_donation(true, mail)
           expect_render_supporters(false, mail)
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Confirm this").and include(bike.creation_organization.name)
+          expect(mail.deliver_now.text_part.body.to_s).to include("Confirm this").and include(bike.creation_organization.name)
           # But for a transferred registration, it does different
           ownership2 = FactoryBot.create(:ownership, bike: bike)
           expect(bike.reload.current_ownership.id).to eq ownership2.id
@@ -183,7 +183,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.tag).to eq "finished_registration"
           expect_render_donation(true, mail)
           expect_render_supporters(false, mail)
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include(bike.creation_organization.name).and include("Protect your bike")
+          expect(mail.deliver_now.text_part.body.to_s).to include(bike.creation_organization.name).and include("Protect your bike")
           # Transferred registration
           BikeServices::Updator.new(user: user, bike: bike, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json).update_available_attributes
           CallbackJob::AfterBikeSaveJob.new.perform(bike.id, true, true)
@@ -218,7 +218,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.tag).to eq "finished_registration"
           expect_render_donation(true, mail)
           expect_render_supporters(true, mail)
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include(bike.creation_organization.name).and include("Protect your bike")
+          expect(mail.deliver_now.text_part.body.to_s).to include(bike.creation_organization.name).and include("Protect your bike")
         end
         context "Bike shop" do
           let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop") }
@@ -242,7 +242,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.tag).to eq "finished_registration"
           expect_render_donation(true, mail)
           expect_render_supporters(true, mail)
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include(bike.current_stolen_record.find_or_create_recovery_link_token)
+          expect(mail.deliver_now.text_part.body.to_s).to include(bike.current_stolen_record.find_or_create_recovery_link_token)
         end
       end
     end
@@ -274,7 +274,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.body.encoded).to match security_mail_snippet.body
           expect(mail.reply_to).to eq([organization.auto_user.email])
           expect(mail.tag).to eq "finished_registration"
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("WELCOMEXSNIPPET").and include("SECURITYXSNIPPET")
+          expect(mail.deliver_now.text_part.body.to_s).to include("WELCOMEXSNIPPET").and include("SECURITYXSNIPPET")
         end
       end
       context "new stolen registration" do
@@ -307,7 +307,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.subject).to eq("Confirm your Bike Index registration")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.tag).to eq "finished_registration"
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Confirm this").and include("Protect your bike")
+          expect(mail.deliver_now.text_part.body.to_s).to include("Confirm this").and include("Protect your bike")
         end
       end
     end
@@ -322,7 +322,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.subject).to eq("Join #{organization.short_name} on Bike Index")
       expect(mail.reply_to).to eq([organization.auto_user.email])
       expect(mail.tag).to eq "organization_invitation"
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("HEADERXSNIPPET").and include("Join #{organization.short_name}")
+      expect(mail.deliver_now.text_part.body.to_s).to include("HEADERXSNIPPET").and include("Join #{organization.short_name}")
     end
   end
 
@@ -339,7 +339,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.body.encoded).to match target_retrieval_link_url
       expect(mail.reply_to).to eq([parking_notification.reply_to_email])
       expect(mail.tag).to eq "parking_notification"
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("parked incorrectly").and include("It is located at:")
+      expect(mail.deliver_now.text_part.body.to_s).to include("parked incorrectly").and include("It is located at:")
     end
     context "parking_notification kind: other_notification" do
       let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, kind: :other_parking_notification) }
@@ -351,7 +351,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.body.encoded).to_not match target_retrieval_link_url
         expect(mail.reply_to).to eq([parking_notification.reply_to_email])
         expect(mail.tag).to eq "parking_notification"
-        expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("This is for your").and include("It is located at:")
+        expect(mail.deliver_now.text_part.body.to_s).to include("This is for your").and include("It is located at:")
       end
     end
     context "impound" do
@@ -362,7 +362,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.body.encoded).to match "map" # includes location
         expect(mail.body.encoded).to_not match "I picked up my"
         expect(mail.reply_to).to eq([parking_notification.reply_to_email])
-        expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("was impounded").and include("It was located at:")
+        expect(mail.deliver_now.text_part.body.to_s).to include("was impounded").and include("It was located at:")
       end
       context "impound_configuration email" do
         let!(:impound_configuration) { FactoryBot.create(:impound_configuration, email: "example@email.com", organization: organization) }
@@ -371,7 +371,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.body.encoded).to match header_mail_snippet.body
           expect(mail.body.encoded).to match "map" # includes location
           expect(mail.reply_to).to eq(["example@email.com"])
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("was impounded").and include("It was located at:")
+          expect(mail.deliver_now.text_part.body.to_s).to include("was impounded").and include("It was located at:")
         end
       end
       context "with impound_record location" do
@@ -391,7 +391,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.body.encoded).to match "1300 W 14th Pl"
           expect(mail.body.encoded).to match "Chicago"
           expect(mail.body.encoded).to match "IL 60608"
-          expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Main Impound Lot").and include("1300 W 14th Pl")
+          expect(mail.deliver_now.text_part.body.to_s).to include("Main Impound Lot").and include("1300 W 14th Pl")
         end
       end
     end
@@ -410,7 +410,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.to).to eq([graduated_notification.email])
       expect(mail.reply_to).to eq([organization.auto_user.email])
       expect(mail.subject).to eq graduated_notification.subject
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("HEADERXSNIPPET").and include(target_remaining_link_url)
+      expect(mail.deliver_now.text_part.body.to_s).to include("HEADERXSNIPPET").and include(target_remaining_link_url)
     end
     context "with graduated_notification snippet" do
       let(:variable_snippet_kind) { "graduated_notification" }
@@ -423,7 +423,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.reply_to).to eq([organization.auto_user.email])
         expect(mail.subject).to eq graduated_notification.subject
         expect(mail.tag).to eq "graduated_notification"
-        expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("HEADERXSNIPPET").and include(variable_snippet.body.gsub(/<\/?p>/, ""))
+        expect(mail.deliver_now.text_part.body.to_s).to include("HEADERXSNIPPET").and include(variable_snippet.body.gsub(/<\/?p>/, ""))
       end
     end
   end
@@ -450,7 +450,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       # It removes the auto_user from the bcc
       expect(mail.bcc).to eq([recipient.email])
       expect(mail.subject).to eq hot_sheet.subject
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("HEADERXSNIPPET").and include(hot_sheet.subject)
+      expect(mail.deliver_now.text_part.body.to_s).to include("HEADERXSNIPPET").and include(hot_sheet.subject)
       # expect the bike to have a thumb_path
       bike.reload
       expect(bike.thumb_path).to be_present

@@ -11,7 +11,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.to).to eq([user.email])
       expect(mail.tag).to eq "welcome_email"
       expect(mail.body.encoded).to match(/supported by/i)
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Welcome to Bike Index").and match(/supported by/i)
+      expect(mail.deliver_now.text_part.body.to_s).to include("Welcome to Bike Index").and match(/supported by/i)
     end
   end
 
@@ -22,7 +22,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.to).to eq([user.email])
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.tag).to eq "confirmation_email"
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Please confirm your email address").and include("Verify email")
+      expect(mail.deliver_now.text_part.body.to_s).to include("Please confirm your email address").and include("Verify email")
     end
     context "partner signup" do
       let(:user) { FactoryBot.create(:user_bikehub_signup) }
@@ -33,7 +33,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.to).to eq([user.email])
         expect(mail.from).to eq(["contact@bikeindex.org"])
         expect(mail.tag).to eq "confirmation_email"
-        expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Please confirm your email address").and include("Verify email")
+        expect(mail.deliver_now.text_part.body.to_s).to include("Please confirm your email address").and include("Verify email")
       end
     end
   end
@@ -48,7 +48,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       # And just to be sure, test the route a little more
       expect(mail.body.encoded).to match(/users\/update_password_form_with_reset_token\?token=#{user.token_for_password_reset}/)
       expect(mail.tag).to eq "password_reset_email"
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include(user.token_for_password_reset).and include("Reset password")
+      expect(mail.deliver_now.text_part.body.to_s).to include(user.token_for_password_reset).and include("Reset password")
     end
   end
 
@@ -60,7 +60,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.body.encoded).to match(user.magic_link_token)
       expect(mail.tag).to eq "magic_login_link_email"
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include(user.magic_link_token).and include("Sign in")
+      expect(mail.deliver_now.text_part.body.to_s).to include(user.magic_link_token).and include("Sign in")
     end
   end
 
@@ -71,7 +71,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.subject).to match(/confirm/i)
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.tag).to eq "additional_email_confirmation"
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include(user_email.email).and include("Verify email")
+      expect(mail.deliver_now.text_part.body.to_s).to include(user_email.email).and include("Verify email")
     end
   end
 
@@ -85,7 +85,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.from).to eq(["contact@bikeindex.org"])
         expect(mail.body.encoded).to match "donation of"
         expect(mail.tag).to eq "invoice_email"
-        expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("donation of")
+        expect(mail.deliver_now.text_part.body.to_s).to include("donation of")
       end
     end
     context "payment" do
@@ -97,7 +97,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.from).to eq(["contact@bikeindex.org"])
         expect(mail.body.encoded).to_not match "donation of"
         expect(mail.tag).to eq "invoice_email"
-        expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("payment of").and include("Thank you so much")
+        expect(mail.deliver_now.text_part.body.to_s).to include("payment of").and include("Thank you so much")
       end
     end
   end
@@ -124,7 +124,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.to).to eq([customer_contact.user_email])
       expect(mail.subject).to eq "CUSTOM CUSTOMER contact Title"
       expect(mail.from).to eq(["contact@bikeindex.org"])
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("spreading the word about").and include("bikeindex")
+      expect(mail.deliver_now.text_part.body.to_s).to include("spreading the word about").and include("bikeindex")
     end
   end
 
@@ -140,7 +140,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.subject).to eq "Your tall bike (multiple frames fused together) has been marked recovered!"
       expect(mail.from).to eq(["bryan@bikeindex.org"])
       expect(mail.body.encoded).to match recovered_description
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include(recovered_description).and include("was marked")
+      expect(mail.deliver_now.text_part.body.to_s).to include(recovered_description).and include("was marked")
     end
   end
 
@@ -162,7 +162,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.body.encoded).to match("some message")
       expect(mail.reply_to).to eq(["something@stuff.com"])
       expect(mail.from).to eq(["contact@bikeindex.org"])
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("some message")
+      expect(mail.deliver_now.text_part.body.to_s).to include("some message")
     end
   end
 
@@ -177,7 +177,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from.first).to eq("bryan@bikeindex.org")
       expect(mail.body.encoded).to match(stolen_notification.message)
       expect(mail.body.encoded).to match(stolen_notification.reference_url)
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include(stolen_notification.message).and include(stolen_notification.reference_url)
+      expect(mail.deliver_now.text_part.body.to_s).to include(stolen_notification.message).and include(stolen_notification.reference_url)
       expect(mail.reply_to).to eq(["party@example.com"])
       expect(mail.cc).to eq(["bryan@bikeindex.org", "gavin@bikeindex.org"])
       stolen_notification.reload
@@ -199,7 +199,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from.count).to eq(1)
       expect(mail.from.first).to eq("gavin@bikeindex.org")
       expect(mail.body.encoded).to_not match "vendor terms"
-      expect(Premailer::Rails::Hook.perform(mail).text_part.body.to_s).to include("Gavin Hoover and the Bike Index Team").and include("updated our privacy policy")
+      expect(mail.deliver_now.text_part.body.to_s).to include("Gavin Hoover and the Bike Index Team").and include("updated our privacy policy")
     end
   end
 
