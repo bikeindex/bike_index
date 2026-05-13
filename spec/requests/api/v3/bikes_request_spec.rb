@@ -876,6 +876,28 @@ RSpec.describe "Bikes API V3", type: :request do
       end
     end
 
+    it "creates a stolen bike and ignores an unrecognized state string" do
+      bike_attrs[:stolen_record] = {
+        phone: "1234567890",
+        theft_description: "Stolen in Edmonton",
+        country: "CA",
+        city: "Edmonton",
+        street: "10065 Jasper Ave",
+        zipcode: "T5J 3B1",
+        state: "Alberta"
+      }
+      expect {
+        post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+      }.to change(Bike, :count).by(1)
+      expect(response.code).to eq("201")
+      bike = Bike.find(json_result["bike"]["id"])
+      expect(bike.status_stolen?).to be_truthy
+      stolen_record = bike.current_stolen_record
+      expect(stolen_record.country_id).to eq Country.canada.id
+      expect(stolen_record.state_id).to be_nil
+      expect(stolen_record.city).to eq "Edmonton"
+    end
+
     it "does not register a stolen bike unless attrs are present" do
       bike_attrs[:stolen_record] = {
         phone: "",
@@ -1242,6 +1264,27 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.current_stolen_record.date_stolen.to_i).to be > Time.current.to_i - 10
       expect(bike.current_stolen_record.police_report_number).to eq("999999")
       expect(bike.current_stolen_record.show_address).to be_falsey
+    end
+
+    it "updates a bike, adds a stolen record and ignores an unrecognized state string" do
+      params[:stolen_record] = {
+        country: "CA",
+        city: "Edmonton",
+        street: "10065 Jasper Ave",
+        zipcode: "T5J 3B1",
+        state: "Alberta",
+        phone: "1234567890",
+        theft_description: "Stolen in Edmonton"
+      }
+
+      put url, params: params.to_json, headers: json_headers
+
+      expect(response.status).to eq(200)
+      expect(bike.reload.status_stolen?).to be_truthy
+      stolen_record = bike.current_stolen_record
+      expect(stolen_record.country_id).to eq Country.canada.id
+      expect(stolen_record.state_id).to be_nil
+      expect(stolen_record.city).to eq "Edmonton"
     end
 
     it "updates a bike, adds and removes components" do

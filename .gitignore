@@ -78,6 +78,11 @@ vendor/strava_search/storybook-static/
 
 # Ignore local Claude Code settings
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
 
 # Ignore Playwright MCP session cache (snapshots, console logs)
 .playwright-mcp/
+
+# Ignore skill workspaces (skill-creator eval/optimization artifacts) and their pycache
+.claude/skills/*-workspace/
+.claude/skills/**/__pycache__/
