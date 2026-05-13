@@ -105,10 +105,10 @@ Both cases: capture the viewport instead.
 If a navigation lands on `/session/new`, sign in with seeded credentials by driving the form via Playwright (don't ask the user to do it manually). Pick the user that exposes the menus/views you need:
 
 - `admin@bikeindex.org` / `pleaseplease12` — has `SuperuserAbility`; the superuser shortcut makes them admin of every org (so they see admin-only menu items + the "Super Admin" link).
-- `member@bikeindex.org` / `pleaseplease12` — admin of `Ike's Bikes` only; useful for a non-superuser perspective.
+- `member@bikeindex.org` / `pleaseplease12` — `member` (not admin) of `Hogwarts`; useful for a non-admin perspective on the same fully-loaded org `admin@` uses.
 - `cannondale@bikeindex.org` / `pleaseplease12` — admin of `Cannondale` (manufacturer org).
 
-Seeded orgs to navigate to: **Hogwarts** (`/o/hogwarts/...`) has every org feature except `official_manufacturer` enabled, so it's the right pick when you want the fully-loaded org sidebar/menu. **Ike's Bikes** (`/o/ikes`) has no features, useful for minimal-menu shots. **Cannondale** (`/o/cannondale`) has `official_manufacturer`.
+Seeded orgs to navigate to: **Hogwarts** (`/o/hogwarts/...`) has every org feature except `official_manufacturer` enabled, so it's the right pick when you want the fully-loaded org sidebar/menu. **Ike's Bikes** (`/o/ikes`) has no features and no admin, useful for minimal-menu shots. **Cannondale** (`/o/cannondale`) has `official_manufacturer`.
 
 If `DEV_PORT=3042` this is the production-snapshot DB — *don't* drive sign-in programmatically and *don't* screenshot admin/listing pages with real PII (see `feedback_no_programmatic_auth_for_screenshots.md`). Stop and ask instead.
 
