@@ -62,6 +62,7 @@ class OrganizedMailer < ApplicationMailer
         to: parking_notification.email,
         tag: __callee__,
         subject: parking_notification.subject) do |format|
+        # Fresh component per format: ViewComponent locks an instance to the format used on first render
         format.html { render Emails::ParkingNotification::Component.new(**component_args) }
         format.text { render Emails::ParkingNotification::Component.new(**component_args) }
       end
