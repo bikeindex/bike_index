@@ -1,15 +1,17 @@
 ---
 name: frontend-screenshots
 description: >-
-  Capture desktop+mobile screenshots of Bike Index pages in the running
-  `bin/dev` server using Playwright MCP. Owns the capture mechanics: viewport
-  sizing, sign-in via seeded credentials, the seeded-user identity gate that
-  protects against PII leakage from the dev DB, sanity-checking PNGs, and
-  (optionally) capturing the same URLs on a different branch for before/after
-  comparison. Trigger when a task needs to produce viewport screenshots of
-  local pages — PR documentation, bug repros, design review, demos. The
-  caller decides which URLs to capture and what to do with the resulting
-  files; this skill only produces them.
+  Capture desktop+mobile screenshots of Bike Index pages from the running
+  `bin/dev` server via Playwright MCP, with a built-in seeded-user identity
+  gate that prevents the dev DB from leaking PII into uploaded images. Use
+  this whenever a task needs viewport screenshots of local pages — PR
+  documentation, bug repros, before/after comparisons across branches, design
+  review, demos, even when the user just says "grab a screenshot" or "show me
+  what this looks like" without naming Playwright. Handles dev-server check,
+  sign-in with seeded credentials, viewport sizing (desktop 1440×900 +
+  iPhone-class 390×844), per-PNG sanity checks, and optional cross-branch
+  capture. The caller passes `(url-path, page-slug)` pairs; the skill returns
+  local PNG paths.
 allowed-tools: Bash, Read
 ---
 
@@ -20,100 +22,100 @@ Drive Playwright MCP to capture desktop and mobile screenshots of pages served b
 ## Inputs the caller supplies
 
 - A list of `(url-path, page-slug)` pairs to capture. `url-path` is the path component (e.g. `/o/hogwarts/dashboard`). `page-slug` is a short identifier used in filenames (e.g. `hogwarts-dashboard`).
-- Optionally: a branch label (default: `<current-branch>`). When capturing the same URLs on `main` for comparison, pass `main` so the filenames are distinct from the branch shots.
+- Optionally: which seeded user to sign in as, or `:anonymous` to deliberately capture signed-out. Default to `admin@bikeindex.org` since its `SuperuserAbility` shortcut gives it access to every org and shows all admin-only menu items. Override when the caller specifically needs a non-admin perspective (e.g., `member@bikeindex.org` for a non-admin view of Hogwarts) or a signed-in-but-not-in-any-org perspective (`user@bikeindex.org` — useful for personal pages like `/my_account`, `/bikes/new`, or anything that should render without org context). Use `:anonymous` for public pages where the signed-out rendering is what matters (marketing pages, public bike show, public search).
+- Optionally: a branch label, used in filenames. Defaults to the current branch. When the caller wants cross-branch comparison (step 6), passing `main` produces filenames with an extra `-main-` segment so the shots cluster with the originals but stay distinguishable.
 
 ## Output
 
-PNG files at `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where:
-- `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` (or the explicit label the caller passed for cross-branch capture, with `-main` appended)
-- `<timestamp>=$(date +%Y%m%d-%H%M%S)`
+PNG files at `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Cross-branch shots get an extra `-main-` segment: `<branch>-<page>-main-<timestamp>-{desktop,mobile}.png`.
 
 Return the absolute paths, keyed by `(page-slug, viewport)`.
 
+## Preconditions
+
+These run first; if either fails the skill stops before touching Playwright.
+
+**Playwright MCP is registered.** Check that `mcp__playwright__*` tools are available. If not, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart the Claude Code session. Don't try to work around it.
+
+**Dev server is up.** Run `eval "$(ruby bin/env --export)"` once so `$BASE_URL` is set, then `curl -fs "$BASE_URL/" >/dev/null`. Never start or stop `bin/dev` for the user — the dev server is the user's process; starting your own copy can land on a different DB, and stopping theirs interrupts work. If it isn't up, stop and ask the user to start it from their own terminal, then resume once they confirm.
+
 ## Workflow
 
-### 1. Verify Playwright MCP is available
+### 1. Sign in (with the identity gate)
 
-Check that `mcp__playwright__*` tools are registered. If not, tell the user:
+Pick the seeded user — the one the caller specified, or `admin@bikeindex.org` by default. Seeded credentials:
 
-```
-claude mcp add playwright -- npx -y @playwright/mcp@latest
-```
+| User | Password | Role |
+| --- | --- | --- |
+| `admin@bikeindex.org` | `pleaseplease12` | `SuperuserAbility`; effectively admin of every org. Default. |
+| `member@bikeindex.org` | `pleaseplease12` | `member` (not admin) of Hogwarts |
+| `user@bikeindex.org` | `pleaseplease12` | Plain authenticated user, not a member of any org — use for personal pages (`/my_account`, `/bikes/new`, etc.) or to capture how an org-less account sees a route |
 
-…and that the Claude Code session must be restarted afterward.
+Navigate to the first URL. Three cases:
 
-### 2. Verify the dev server is up
+1. **Caller asked for `:anonymous`** — if the page redirects to `/session/new` or `/session/magic_link`, the caller picked an authenticated route by mistake; stop and ask them. Otherwise, confirm `document.getElementById('navUserSettingLink')?.dataset.email` is `undefined`, then capture as signed-out.
+2. **Page redirects to `/session/new` or `/session/magic_link`** — sign in by driving the form via Playwright (don't ask the user to do it manually) with the chosen user's credentials.
+3. **Page renders authenticated** (session already live from a prior call) — proceed straight to the identity check below.
 
-Run `eval "$(ruby bin/env --export)"` once so `$BASE_URL` is set, then:
-
-```bash
-curl -fs "$BASE_URL/" >/dev/null
-```
-
-**Never start or stop `bin/dev` for the user.** The dev server is the user's process. Starting your own copy can land you on a different DB; stopping theirs interrupts work. If it isn't up, **stop and ask the user to start it** (`bin/dev` from their own terminal), then resume once they confirm.
-
-### 3. Sign in if needed (with the identity gate)
-
-Navigate to the first URL. If it lands on `/session/new` or `/session/magic_link`, sign in with seeded credentials by driving the form via Playwright (don't ask the user to do it manually). Pick the user that exposes the menus/views the caller needs:
-
-- `admin@bikeindex.org` / `pleaseplease12` — has `SuperuserAbility`; the superuser shortcut makes them admin of every org (so they see admin-only menu items + the "Super Admin" link).
-- `member@bikeindex.org` / `pleaseplease12` — `member` (not admin) of `Hogwarts`; useful for a non-admin perspective on the same fully-loaded org `admin@` uses.
-- `cannondale@bikeindex.org` / `pleaseplease12` — admin of `Cannondale` (manufacturer org).
-
-Seeded orgs to navigate to:
-- **Hogwarts** (`/o/hogwarts/...`) has every org feature except `official_manufacturer` enabled — the right pick when you want the fully-loaded org sidebar/menu.
-- **Ike's Bikes** (`/o/ikes`) has no features and no admin — useful for minimal-menu shots.
-- **Cannondale** (`/o/cannondale`) has `official_manufacturer`.
-
-**Verify the signed-in identity is one of the seeded users before continuing.** The dev DB could leak PII — see `feedback_no_programmatic_auth_for_screenshots.md`. The application layout renders the current user's email on `#navUserSettingLink` via a `data-email` attribute (`app/views/layouts/application.html.erb`), so any authenticated page works for the check:
+After sign-in, **verify the signed-in identity is one of the seeded users before capturing anything**. The dev DB could leak PII — see `feedback_no_programmatic_auth_for_screenshots.md`. The application layout exposes the current user's email on `#navUserSettingLink` via a `data-email` attribute:
 
 ```js
 const email = document.getElementById('navUserSettingLink')?.dataset.email;
-const ok = ["admin@bikeindex.org", "member@bikeindex.org", "cannondale@bikeindex.org"].includes(email);
+const ok = ["admin@bikeindex.org", "member@bikeindex.org", "user@bikeindex.org"].includes(email);
 ```
 
-If `email` is `undefined`, the page is unauthenticated — sign in first. If it's set but isn't one of the three, **stop and ask the user**. Two cases:
+If `email` is set but isn't one of the seeded users above, **stop and ask the user**. Two cases to distinguish:
 - *Signed in as a non-seed user* — the dev DB may have some real data; uploading screenshots could leak PII.
 - *Sign-in with seed credentials failed* — the seeds haven't run. Tell the user to run `bundle exec rails db:seed` (and re-sign in once it completes), then try again.
 
 Don't proceed past this gate without the user's explicit go-ahead.
 
-### 4. Capture loop
+### 2. Capture loop
 
-Capture in two passes so each viewport is resized only once. Before capturing, remove stale shots for the same `(branch, page)` prefix (use a glob the shell may not match — guard with `2>/dev/null || true`).
+Before capturing, remove stale shots for the same `(branch, page)` prefix:
 
-1. `browser_resize` → 1440×900 (desktop). For each page, `browser_navigate` to `$BASE_URL<url-path>` then `browser_take_screenshot` to `...-desktop.png`.
-2. `browser_resize` → 390×844 (iPhone-class mobile). For each page, `browser_navigate` to the same URL then `browser_take_screenshot` to `...-mobile.png`.
+```bash
+rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true
+```
 
-**Always use `fullPage: false` and never element-only (no `target:` arg).** The screenshot must show the page as it renders in a browser of that viewport size — the chrome around the changed element matters for context. Two failure modes to avoid:
+Capture in two passes so each viewport is resized only once:
 
-- `fullPage: true` produces a "scroll-the-whole-page" image — on mobile that's typically 2000–3000px tall with the interesting content sitting in the first 800px and the rest just being a desaturated background scroll. Not how a phone renders.
-- `target: <element ref>` (the element-only screenshot) crops to the bounding box of one DOM node. For something tall and narrow like a sidebar nav, that produces a comically thin column (e.g. 216×2025) sliced out of context. Reviewers can't tell where it sits on the page or whether the surrounding layout is right.
+1. `browser_resize` → 1440×900 (desktop). For each page, `browser_navigate` to `$BASE_URL<url-path>`, wait for the page to settle (see below), then `browser_take_screenshot` to `...-desktop.png`.
+2. `browser_resize` → 390×844 (iPhone-class mobile). Repeat the navigate-wait-screenshot loop, writing to `...-mobile.png`.
 
-Both cases: capture the viewport instead.
+**Settle before each screenshot.** Stimulus controllers and chart libraries (Chartkick, etc.) finish rendering asynchronously after the document loads. Either `browser_wait_for` on a known element from the page (e.g., a chart's `.chartjs-render-monitor` or a heading specific to the page) or pause briefly (~500ms–1s) before capturing. Pages with lazy renderers will otherwise come out mid-draw.
 
-### 5. Sanity-check each PNG and diagnose failures
+**Always use `fullPage: false` and no `target:` arg.** The screenshot must show the page as it renders in a browser of that viewport size — `fullPage: true` produces an unrepresentative 2000–3000px scroll capture, and element-only crops slice context off (a sidebar nav becomes a 216×2025 column nobody can place). Both flatten the reviewer's mental model of where the change sits on the page.
 
-A file under ~5 KB usually means the page errored. Also check `browser_console_messages` for uncaught JS errors. Diagnose:
+### 3. Sanity-check each PNG and diagnose failures
 
-1. `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"` to get the HTTP status.
-2. `curl -s "$BASE_URL/<path>" | head -200` to see the response body (usually a Rails error page with the exception and top of the backtrace).
+A file under ~5 KB usually means the page errored. Also pull `browser_console_messages` and look for **uncaught exceptions from app code** — Stimulus controllers that fail to register, missing `data-controller` targets, `TypeError`s in `app/javascript/**`. Treat those as capture failures. Ignore noise: Webpacker logs, asset 404s, third-party deprecation warnings, the `404 chartjs-plugin-style-…` line that some chart libraries emit. They're routine and don't indicate the captured page is broken.
+
+Diagnose a failed PNG:
+
+1. `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"` for the HTTP status.
+2. `curl -s "$BASE_URL/<path>" | head -200` for the response body (usually a Rails error page with the exception and top of the backtrace).
 3. `tail -200 log/development.log` for the full backtrace and any SQL involved.
-4. Based on what you find: route missing → re-check the path; auth/redirect → pick a URL that doesn't require login or sign in; missing fixture → pick a different id or seed it; genuine bug in the diff → fix it or tell the user.
+4. Based on what you find: route missing → re-check the path; auth/redirect → sign in or pick a different URL; missing fixture → pick a different id or seed it; genuine bug in the diff → fix it or tell the user.
 
-Only stop and surface to the user once you understand the cause and either (a) have a fix to propose, (b) need input they must provide (e.g. which URL to screenshot instead), or (c) concluded it's a real bug.
+Only stop and surface to the user once you understand the cause and either (a) have a fix to propose, (b) need input they must provide (e.g., which URL to screenshot instead), or (c) concluded it's a real bug.
 
-### 6. (Optional) Capture the same URLs on another branch
+### 4. (Optional) Capture the same URLs on another branch
 
-When the caller wants a before/after comparison, repeat steps 4–5 against a different branch — typically `main` for PR comparisons. Do this without disturbing the user's working tree or dev server:
+When the caller wants a before/after comparison, repeat steps 2–3 against a different branch — typically `main` for PR comparisons.
+
+**This is safe for view/CSS/Stimulus diffs only.** If the branch has new database migrations or `Gemfile.lock` changes, `git checkout main` leaves the running server inconsistent — DB schema ahead of code, or a `LoadError` for a gem the branch added. In that case, skip the main capture and tell the caller the comparison isn't safe to take; capture only the branch shots.
+
+To capture cleanly:
 
 1. `git status` — confirm there are no uncommitted changes. If there are, stop and surface to the user.
-2. Note the current branch: `BRANCH=$(git rev-parse --abbrev-ref HEAD)`.
-3. `git checkout main` — Rails dev mode auto-reloads on file changes; the dev server stays up.
-4. Repeat step 4's two-viewport capture loop, this time writing to `tmp/pr_screenshots/<branch>-<page>-main-<timestamp>-{desktop,mobile}.png` (note the extra `-main` segment — `<branch>` is still the original branch name, so the files cluster together by PR).
-5. `git checkout $BRANCH` to return — verify the working tree is clean and on the original branch.
+2. Diff `db/migrate/` and `Gemfile.lock` between the branch and `main`. If either has changed, abort the main capture as above.
+3. Note the current branch: `BRANCH=$(git rev-parse --abbrev-ref HEAD)`.
+4. `git checkout main` — Rails dev mode auto-reloads on view/code changes; the dev server stays up.
+5. Repeat step 2's two-viewport capture loop, writing to `tmp/pr_screenshots/<branch>-<page>-main-<timestamp>-{desktop,mobile}.png` (note: `<branch>` is still the original branch name, so the files cluster together by PR).
+6. `git checkout $BRANCH` to return — verify the working tree is clean and on the original branch.
 
-The seeded credentials and DB persist across checkouts, so re-signing in usually isn't needed; the identity gate from step 3 still applies if the session expired.
+The seeded credentials and DB rows persist across checkouts, so re-signing in usually isn't needed; the identity gate from step 1 still applies if the session expired.
 
 ## Notes
 
