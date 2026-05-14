@@ -21,16 +21,30 @@ RSpec.describe "Me API V3", type: :request do
       let(:scopes) { all_scopes }
       let!(:secondary_email) { FactoryBot.create(:user_email, user: user, email: "d@f.co") }
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user) }
+      let(:organization) { organization_role.organization }
+      let(:target_menu) do
+        [
+          {type: "link", label: "#{organization.short_name} Bikes",
+           path: "/o/#{organization.slug}/registrations",
+           secondary: false, active: "on_registrations_index"},
+          {type: "disabled", label: "Incomplete registrations", secondary: true},
+          {type: "link", label: "Add a bike",
+           path: "/o/#{organization.slug}/bikes/new",
+           secondary: false, active: "on_bikes_new"},
+          {type: "divider"},
+          {type: "disabled", label: "Registration stickers", secondary: false}
+        ]
+      end
       let(:target_membership) do
         {
-          organization_name: organization_role.organization.name,
-          organization_short_name: organization_role.organization.short_name,
-          organization_slug: organization_role.organization.slug,
-          organization_id: organization_role.organization_id,
-          organization_access_token: organization_role.organization.access_token,
+          organization_name: organization.name,
+          organization_short_name: organization.short_name,
+          organization_slug: organization.slug,
+          organization_id: organization.id,
+          organization_access_token: organization.access_token,
           organization_logo_url: nil,
           user_is_organization_admin: false,
-          menu: OrganizedServices::UserMenuItems.for(organization: organization_role.organization, current_user: user)
+          menu: target_menu
         }
       end
       it "responds with all available attributes with full scoped token" do
