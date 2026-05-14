@@ -168,9 +168,13 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def email_success?
-    return processed_at.present? if created_at && created_at < PRE_NOTIFICATION_INTEGRATION
+    return processed_at.present? if pre_notification_integration?
 
     notifications.where(delivery_status: Notification.delivery_statuses[:delivery_success]).exists?
+  end
+
+  def pre_notification_integration?
+    created_at.present? && created_at < PRE_NOTIFICATION_INTEGRATION
   end
 
   # Get it unscoped, because we delete it
