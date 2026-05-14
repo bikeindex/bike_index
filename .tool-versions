@@ -1,2 +1,4 @@
-nodejs 22.17.1
 ruby 4.0.2
+# NOTE: If updating node version, also update
+nodejs 24.15.0
+
