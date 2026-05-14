@@ -22,7 +22,7 @@ The workflow is ordered so the always-runs phase (steps 1–3) happens first, th
 
 ### 1. Gather branch state
 
-Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right CONDUCTOR_PORT fallback. Then run in parallel:
+Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback. Then run in parallel:
 - `git status` (no `-uall`)
 - `git diff main...HEAD --stat`
 - `git diff main...HEAD --name-only`
@@ -71,7 +71,7 @@ Only continue past this step when there's a real reason to capture. Otherwise re
 - New PR + `FRONTEND=false` → done.
 - New PR + `FRONTEND=true` → continue; capture every affected page.
 - Existing PR + `FRONTEND=false` → done.
-- Existing PR + `FRONTEND=true` → continue only if the captures in the existing body are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit step 5 to those pages. If nothing has moved, done.
+- Existing PR + `FRONTEND=true` → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit step 5 to those pages. If nothing has moved, done.
 
 From the changed files, infer the affected routes. Heuristics:
 - A view at `app/views/bikes/show.html.erb` → `/bikes/:id` (pick a representative id from the dev db, e.g. `Bike.last.id`)
@@ -100,14 +100,25 @@ Skip per-page only when the URL didn't exist on `main` (a brand-new route or pag
 
 Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against `main` (its step 6 — git checkout dance, captures into `...-main-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs.
 
-### 7. Append the Screenshots section to the PR body
+### 7. Post the Screenshots section as the first PR comment
 
-Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again. **Headers are always `| Desktop | Mobile |`** — that stays the same regardless of whether there's a main comparison. The main shots and branch shots stack as additional rows, with a small indicator row between them when both are present.
+Post the screenshots as a **PR comment**, not in the PR body. This keeps the description tight and skimmable — reviewers see the human-written summary first, with screenshots one scroll down. It also avoids re-editing the body (and its notification noise) every time screenshots are recaptured.
+
+On a fresh PR, this comment is naturally the first one. On an update, find the existing screenshots comment (the one authored by you whose body starts with `## Screenshots`) and edit it in place rather than posting a new one:
+
+```bash
+SCREENSHOT_COMMENT_ID=$(gh api repos/{owner}/{repo}/issues/{PR_NUMBER}/comments \
+  --jq '.[] | select(.body | startswith("## Screenshots")) | .id' | head -1)
+```
+
+- If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment <num> --body-file <tmp-comment-file>`.
+- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body=@<tmp-comment-file>`.
+
+**Headers are always `| Desktop | Mobile |`** — that stays the same regardless of whether there's a main comparison. The main shots and branch shots stack as additional rows, with a small indicator row between them when both are present.
 
 Default (with main comparison):
 
 ```markdown
-
 ## Screenshots
 
 ### <url-path>
@@ -134,7 +145,7 @@ Rules:
 - **Headers are always `| Desktop | Mobile |`** — never `| main | this branch |` or any per-PR variation. Reviewers should see the same column meaning across every PR.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 
-When updating an existing body, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
+When updating an existing screenshots comment, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
 
 Return the PR URL.
 
