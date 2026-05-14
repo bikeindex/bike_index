@@ -232,6 +232,7 @@ class Notification < ApplicationRecord
     calculated_email
   end
 
+  # This method takes a block
   # The block performs an email delivery (e.g. SomeMailer.foo.deliver_now).
   # Records success/failure on self, and re-raises non-undeliverable errors.
   def track_email_delivery
