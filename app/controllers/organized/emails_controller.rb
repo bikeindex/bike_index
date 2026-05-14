@@ -8,8 +8,10 @@ module Organized
     end
 
     def show
-      # @email_preview, @organization, and @email_sent_at are read by the email layout
-      # (app/views/layouts/email.html.erb) and MailerHelper#render_supporters?
+      # @email_preview and @organization are read by the email layout
+      # (app/views/layouts/email.html.erb) and MailerHelper#render_supporters?.
+      # @email_sent_at is read by the email layout to render header/footer snippets at the
+      # version that was in effect when the email was sent.
       @email_preview = true
       @organization = current_organization
       component = OrganizedServices::EmailPreview.view_component(
