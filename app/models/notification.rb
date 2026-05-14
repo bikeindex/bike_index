@@ -233,18 +233,19 @@ class Notification < ApplicationRecord
   end
 
   # This method takes a block
-  # The block performs an email delivery (e.g. SomeMailer.foo.deliver_now).
-  # Records success/failure on self, and re-raises non-undeliverable errors.
   def track_email_delivery
     return if delivery_success?
 
     delivery = yield
 
-    record_email_delivery_success(delivery)
+    self.message_id ||= message_id_from_delivery(delivery)
+    update(delivery_status: "delivery_success")
+    user_email&.update_last_email_errored!(email_errored: false)
   rescue => e
-    record_email_delivery_failure(e)
+    update(delivery_status: "delivery_failure", delivery_error: e.class)
+    user_email&.update_last_email_errored!(email_errored: true)
 
-    raise e unless UNDELIVERABLE_ERRORS.include?(e.class.name)
+    raise e unless UNDELIVERABLE_ERRORS.include?(delivery_error)
   end
 
   def delivery_error_spam?
@@ -256,17 +257,6 @@ class Notification < ApplicationRecord
   end
 
   private
-
-  def record_email_delivery_success(delivery)
-    self.message_id ||= message_id_from_delivery(delivery)
-    update(delivery_status: "delivery_success")
-    user_email&.update_last_email_errored!(email_errored: false)
-  end
-
-  def record_email_delivery_failure(error)
-    update(delivery_status: "delivery_failure", delivery_error: error.class)
-    user_email&.update_last_email_errored!(email_errored: true)
-  end
 
   def message_id_from_delivery(delivery)
     defined?(delivery.message_id) ? delivery.message_id : nil
