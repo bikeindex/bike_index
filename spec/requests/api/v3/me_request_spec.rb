@@ -29,7 +29,8 @@ RSpec.describe "Me API V3", type: :request do
           organization_id: organization_role.organization_id,
           organization_access_token: organization_role.organization.access_token,
           organization_logo_url: nil,
-          user_is_organization_admin: false
+          user_is_organization_admin: false,
+          menu: OrganizedServices::UserMenuItems.for(organization: organization_role.organization, current_user: user)
         }
       end
       it "responds with all available attributes with full scoped token" do
