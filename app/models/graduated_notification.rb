@@ -33,7 +33,7 @@
 class GraduatedNotification < ApplicationRecord
   include StatusHumanizable
 
-  STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
+  STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2, delivery_failure: 3}.freeze
   PENDING_PERIOD = 24.hours.freeze
   # Cutoff for when graduated_notifications started routing email delivery through Notification records.
   # Records created before this time have no associated Notification, so email success is implicit.
@@ -82,7 +82,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def self.processed_statuses
-    %w[bike_graduated marked_remaining]
+    %w[bike_graduated marked_remaining delivery_failure]
   end
 
   def self.unprocessed_statuses
@@ -374,7 +374,10 @@ class GraduatedNotification < ApplicationRecord
     return "marked_remaining" if marked_remaining_at.present?
 
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
-    (email_success? || primary_notification.present? && primary_notification.email_success?) ? "bike_graduated" : "pending"
+    return "bike_graduated" if email_success? || primary_notification.present? && primary_notification.email_success?
+    return "delivery_failure" if processed_at.present? && notifications.delivery_failure.exists?
+
+    "pending"
   end
 
   def calculated_email

@@ -103,8 +103,11 @@ RSpec.describe ProcessGraduatedNotificationJob, type: :lib do
         notification = graduated_notification.notifications.first
         expect(notification.delivery_status).to eq "delivery_failure"
         expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
-        expect(graduated_notification.reload.processed_at).to be_present
+        graduated_notification.reload
+        expect(graduated_notification.processed_at).to be_present
         expect(graduated_notification.email_success?).to be_falsey
+        expect(graduated_notification.status).to eq "delivery_failure"
+        expect(graduated_notification).to be_processed
       end
     end
   end
