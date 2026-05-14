@@ -69,8 +69,7 @@ class GraduatedNotification < ApplicationRecord
   scope :pre_notification_integration, -> { where("graduated_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION) }
   scope :email_success, -> {
     legacy = pre_notification_integration.where.not(processed_at: nil)
-    delivered = joins(:notifications)
-      .where(notifications: {delivery_status: Notification.delivery_statuses[:delivery_success]})
+    delivered = joins(:notifications).merge(Notification.delivery_success)
     where(id: legacy.select(:id)).or(where(id: delivered.select(:id)))
   }
 
@@ -170,7 +169,7 @@ class GraduatedNotification < ApplicationRecord
   def email_success?
     return processed_at.present? if pre_notification_integration?
 
-    notifications.where(delivery_status: Notification.delivery_statuses[:delivery_success]).exists?
+    notifications.delivery_success.exists?
   end
 
   def pre_notification_integration?
