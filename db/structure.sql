@@ -1544,8 +1544,7 @@ CREATE TABLE public.graduated_notifications (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     not_most_recent boolean DEFAULT false,
-    marked_remaining_by_id bigint,
-    delivery_error character varying
+    marked_remaining_by_id bigint
 );
 
 
@@ -7594,7 +7593,6 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260514093000'),
 ('20260430122735'),
 ('20260428142526'),
 ('20260428000001'),

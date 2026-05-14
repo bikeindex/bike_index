@@ -4,7 +4,6 @@
 # Database name: primary
 #
 #  id                          :bigint           not null, primary key
-#  delivery_error              :string
 #  delivery_status             :string
 #  email                       :string
 #  marked_remaining_at         :datetime
@@ -34,7 +33,6 @@
 #
 class GraduatedNotification < ApplicationRecord
   include StatusHumanizable
-  include EmailDeliveryTrackable
 
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
   PENDING_PERIOD = 24.hours.freeze
@@ -49,6 +47,7 @@ class GraduatedNotification < ApplicationRecord
   belongs_to :primary_notification, class_name: "GraduatedNotification"
   belongs_to :marked_remaining_by, class_name: "User"
 
+  has_many :notifications, as: :notifiable
   has_many :secondary_notifications, class_name: "GraduatedNotification", foreign_key: :primary_notification_id
 
   validates_presence_of :bike_id, :organization_id, :bike_organization_id
@@ -327,9 +326,10 @@ class GraduatedNotification < ApplicationRecord
     user_registration_organization&.destroy_for_graduated_notification!
     bike_organization&.destroy!
 
-    track_email_delivery do
-      OrganizedMailer.graduated_notification(self).deliver_now if send_email?
-    end
+    deliver_email if send_email?
+
+    @skip_update = true
+    update(processed_at: Time.current, delivery_status: "email_success", skip_update: true)
     return true unless primary_notification?
 
     # Update the associated notifications after updating the primary notification, so if we fail, they can be updated by the worker
@@ -337,14 +337,6 @@ class GraduatedNotification < ApplicationRecord
       notification.process_notification
     end
     true
-  end
-
-  def delivery_success?
-    email_success?
-  end
-
-  def user_email
-    user&.user_emails&.friendly_find(email)
   end
 
   def subject
@@ -355,15 +347,13 @@ class GraduatedNotification < ApplicationRecord
 
   private
 
-  def record_email_delivery_success(_delivery)
-    @skip_update = true
-    update(delivery_status: "email_success", processed_at: Time.current, skip_update: true)
-  end
-
-  def record_email_delivery_failure(error)
-    @skip_update = true
-    update(delivery_status: "delivery_failure", delivery_error: error.class, skip_update: true)
-    user_email&.update_last_email_errored!(email_errored: true)
+  def deliver_email
+    notification = notifications.first ||
+      Notification.create(kind: "graduated_notification", notifiable: self,
+        user_id:, message_channel_target: email, bike_id:)
+    notification.track_email_delivery do
+      OrganizedMailer.graduated_notification(self).deliver_now
+    end
   end
 
   def calculated_status

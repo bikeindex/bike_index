@@ -110,25 +110,25 @@ RSpec.describe GraduatedNotification, type: :model do
     end
   end
 
-  describe "track_email_delivery" do
+  describe "process_notification email routing" do
     let(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: organization) }
 
-    it "marks email_success after delivery" do
-      expect(graduated_notification.delivery_success?).to be_falsey
-      graduated_notification.track_email_delivery do
-        OrganizedMailer.graduated_notification(graduated_notification).deliver_now
-      end
-      graduated_notification.reload
-      expect(graduated_notification.email_success?).to be_truthy
-      expect(graduated_notification.delivery_success?).to be_truthy
-      expect(graduated_notification.processed_at).to be_within(2).of Time.current
+    it "creates a Notification record and records delivery_success" do
+      expect { graduated_notification.process_notification }
+        .to change { graduated_notification.notifications.count }.by(1)
+      notification = graduated_notification.notifications.first
+      expect(notification.kind).to eq "graduated_notification"
+      expect(notification.delivery_status).to eq "delivery_success"
+      expect(notification.message_channel_target).to eq graduated_notification.email
+      expect(graduated_notification.reload.email_success?).to be_truthy
     end
 
-    context "already delivered" do
-      it "does not re-deliver" do
-        graduated_notification.update_column(:delivery_status, "email_success")
+    context "called twice" do
+      it "does not create or send a second time" do
+        graduated_notification.process_notification
         ActionMailer::Base.deliveries = []
-        graduated_notification.track_email_delivery { raise "should not run" }
+        expect { graduated_notification.process_notification }
+          .not_to change { Notification.count }
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
@@ -137,38 +137,13 @@ RSpec.describe GraduatedNotification, type: :model do
       let(:inactive_recipient_error) do
         Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => "inactive"})
       end
-      it "swallows the error and records delivery_failure" do
-        graduated_notification.track_email_delivery { raise inactive_recipient_error }
-        graduated_notification.reload
-        expect(graduated_notification.email_success?).to be_falsey
-        expect(graduated_notification.delivery_status).to eq "delivery_failure"
-        expect(graduated_notification.delivery_error).to eq "Postmark::InactiveRecipientError"
-      end
-
-      context "with a matching user_email" do
-        let(:user) { FactoryBot.create(:user_confirmed, email: graduated_notification.email) }
-        let!(:user_email) { user.user_emails.first }
-        before { graduated_notification.update(user: user) }
-        it "marks the user_email as errored" do
-          expect(user_email.last_email_errored?).to be_falsey
-          graduated_notification.track_email_delivery { raise inactive_recipient_error }
-          expect(graduated_notification.reload.delivery_status).to eq "delivery_failure"
-          expect(user_email.reload.last_email_errored?).to be_truthy
-        end
-      end
-    end
-
-    context "with unknown postmark error" do
-      it "re-raises and records delivery_failure" do
-        expect do
-          graduated_notification.track_email_delivery do
-            raise Postmark::ApiInputError.build("error", {"ErrorCode" => 499})
-          end
-        end.to raise_error(Postmark::ApiInputError)
-        graduated_notification.reload
-        expect(graduated_notification.email_success?).to be_falsey
-        expect(graduated_notification.delivery_status).to eq "delivery_failure"
-        expect(graduated_notification.delivery_error).to eq "Postmark::ApiInputError"
+      it "records delivery_failure on the Notification and still marks the graduated_notification processed" do
+        allow(OrganizedMailer).to receive(:graduated_notification).and_raise(inactive_recipient_error)
+        expect { graduated_notification.process_notification }.not_to raise_error
+        notification = graduated_notification.notifications.first
+        expect(notification.delivery_status).to eq "delivery_failure"
+        expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
+        expect(graduated_notification.reload.email_success?).to be_truthy
       end
     end
   end
