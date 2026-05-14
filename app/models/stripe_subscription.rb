@@ -17,9 +17,8 @@
 #
 # Indexes
 #
-#  index_stripe_subscriptions_on_membership_id           (membership_id)
-#  index_stripe_subscriptions_on_stripe_price_stripe_id  (stripe_price_stripe_id)
-#  index_stripe_subscriptions_on_user_id                 (user_id)
+#  index_stripe_subscriptions_on_membership_id  (membership_id)
+#  index_stripe_subscriptions_on_user_id        (user_id)
 #
 class StripeSubscription < ApplicationRecord
   include ActivePeriodable

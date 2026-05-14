@@ -13,11 +13,6 @@
 #  doorkeeper_app_id :bigint
 #  organization_id   :integer
 #
-# Indexes
-#
-#  index_mail_snippets_on_doorkeeper_app_id  (doorkeeper_app_id)
-#  index_mail_snippets_on_organization_id    (organization_id)
-#
 class MailSnippet < ApplicationRecord
   has_paper_trail only: %i[body is_enabled kind subject]
 

@@ -10,10 +10,6 @@
 #  updated_at   :datetime         not null
 #  country_id   :integer
 #
-# Indexes
-#
-#  index_states_on_country_id  (country_id)
-#
 class State < ApplicationRecord
   belongs_to :country
   has_many :locations

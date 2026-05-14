@@ -18,7 +18,6 @@
 #
 # Indexes
 #
-#  index_email_domains_on_creator_id     (creator_id)
 #  index_email_domains_on_domain_trgm    (domain) USING gin
 #  index_email_domains_on_domain_unique  (domain) UNIQUE WHERE (deleted_at IS NULL)
 #

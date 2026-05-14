@@ -40,7 +40,6 @@
 #  index_ownerships_on_bulk_import_id     (bulk_import_id)
 #  index_ownerships_on_creator_id         (creator_id)
 #  index_ownerships_on_doorkeeper_app_id  (doorkeeper_app_id)
-#  index_ownerships_on_impound_record_id  (impound_record_id)
 #  index_ownerships_on_organization_id    (organization_id)
 #  index_ownerships_on_sale_id            (sale_id)
 #  index_ownerships_on_user_id            (user_id)

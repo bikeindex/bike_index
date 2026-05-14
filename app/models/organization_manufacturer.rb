@@ -12,7 +12,6 @@
 #
 # Indexes
 #
-#  index_organization_manufacturers_on_manufacturer_id  (manufacturer_id)
 #  index_organization_manufacturers_on_organization_id  (organization_id)
 #
 class OrganizationManufacturer < ApplicationRecord
