@@ -13,10 +13,15 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
   let!(:retrieved) { FactoryBot.create(:parking_notification_organized, :retrieved, organization:, user:) }
 
   before do
+    # Force desktop viewport — Chrome's --window-size flag is ignored in headless
+    # mode, and the organized-left-menu is `display: none` below the md breakpoint.
+    page.current_window.resize_to(1920, 1080)
     visit new_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
+    click_link "Parking notifications"
+    expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
   end
 
   def click_filter(text)
@@ -29,7 +34,6 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
   def row_for(notification) = "tr[data-recordid='#{notification.id}']"
 
   it "filters notifications through the dropdown menus and toggles them off when re-clicked" do
-    visit base_url
     # Default view (status=current) loads three current notifications via JSON.
     expect(page).to have_css(row_for(registered), wait: 20)
     expect(page).to have_css(row_for(unregistered))
