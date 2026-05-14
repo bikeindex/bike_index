@@ -66,9 +66,9 @@ class GraduatedNotification < ApplicationRecord
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
   scope :primary_notification, -> { where("primary_notification_id = id") }
   scope :secondary_notification, -> { where.not("primary_notification_id  = id") }
+  scope :pre_notification_integration, -> { where("graduated_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION) }
   scope :email_success, -> {
-    legacy = where("graduated_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION)
-      .where.not(processed_at: nil)
+    legacy = pre_notification_integration.where.not(processed_at: nil)
     delivered = joins(:notifications)
       .where(notifications: {delivery_status: Notification.delivery_statuses[:delivery_success]})
     where(id: legacy.select(:id)).or(where(id: delivered.select(:id)))

@@ -113,7 +113,7 @@ RSpec.describe GraduatedNotification, type: :model do
   describe "process_notification email routing" do
     let(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: organization) }
 
-    it "creates a Notification record and records delivery_success" do
+    it "creates a Notification record, records delivery_success, and is idempotent" do
       expect { graduated_notification.process_notification }
         .to change { graduated_notification.notifications.count }.by(1)
       notification = graduated_notification.notifications.first
@@ -121,16 +121,11 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(notification.delivery_status).to eq "delivery_success"
       expect(notification.message_channel_target).to eq graduated_notification.email
       expect(graduated_notification.reload.email_success?).to be_truthy
-    end
 
-    context "called twice" do
-      it "does not create or send a second time" do
-        graduated_notification.process_notification
-        ActionMailer::Base.deliveries = []
-        expect { graduated_notification.process_notification }
-          .not_to change { Notification.count }
-        expect(ActionMailer::Base.deliveries.count).to eq 0
-      end
+      ActionMailer::Base.deliveries = []
+      expect { graduated_notification.process_notification }
+        .not_to change { Notification.count }
+      expect(ActionMailer::Base.deliveries.count).to eq 0
     end
 
     context "with InactiveRecipientError" do
