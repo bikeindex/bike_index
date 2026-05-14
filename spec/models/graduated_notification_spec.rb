@@ -110,39 +110,6 @@ RSpec.describe GraduatedNotification, type: :model do
     end
   end
 
-  describe "process_notification email routing" do
-    let(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: organization) }
-
-    it "creates a Notification record, records delivery_success, and is idempotent" do
-      expect { graduated_notification.process_notification }
-        .to change { graduated_notification.notifications.count }.by(1)
-      notification = graduated_notification.notifications.first
-      expect(notification.kind).to eq "graduated_notification"
-      expect(notification.delivery_status).to eq "delivery_success"
-      expect(notification.message_channel_target).to eq graduated_notification.email
-      expect(graduated_notification.reload.email_success?).to be_truthy
-
-      ActionMailer::Base.deliveries = []
-      expect { graduated_notification.process_notification }
-        .not_to change { Notification.count }
-      expect(ActionMailer::Base.deliveries.count).to eq 0
-    end
-
-    context "with InactiveRecipientError" do
-      let(:inactive_recipient_error) do
-        Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => "inactive"})
-      end
-      it "records delivery_failure on the Notification and still marks the graduated_notification processed" do
-        allow(OrganizedMailer).to receive(:graduated_notification).and_raise(inactive_recipient_error)
-        expect { graduated_notification.process_notification }.not_to raise_error
-        notification = graduated_notification.notifications.first
-        expect(notification.delivery_status).to eq "delivery_failure"
-        expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
-        expect(graduated_notification.reload.email_success?).to be_truthy
-      end
-    end
-  end
-
   describe "subject" do
     let(:graduated_notification) { FactoryBot.create(:graduated_notification) }
     let(:organization) { graduated_notification.organization }

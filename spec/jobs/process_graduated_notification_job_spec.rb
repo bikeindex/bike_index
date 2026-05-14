@@ -58,4 +58,45 @@ RSpec.describe ProcessGraduatedNotificationJob, type: :lib do
       expect(graduated_notification_primary.associated_notifications.pluck(:id)).to eq([graduated_notification_secondary.id])
     end
   end
+
+  describe "email delivery" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 2.years.to_i, short_name: "Hogwarts") }
+    let(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: organization) }
+
+    it "delivers the renewal email, records a delivery_success Notification, and is idempotent" do
+      ActionMailer::Base.deliveries = []
+      expect { instance.perform(graduated_notification.id) }
+        .to change { graduated_notification.notifications.count }.by(1)
+        .and change { ActionMailer::Base.deliveries.count }.by(1)
+
+      notification = graduated_notification.notifications.first
+      expect(notification.kind).to eq "graduated_notification"
+      expect(notification.delivery_status).to eq "delivery_success"
+      expect(notification.message_channel_target).to eq graduated_notification.email
+
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.to).to eq([graduated_notification.email])
+      expect(mail.subject).to eq("Renew your #{graduated_notification.bike.type} registration with Hogwarts")
+      expect(mail.body.encoded).to include("Renew your #{graduated_notification.bike.type} registration with Hogwarts")
+      expect(mail.body.encoded).to include("Click to renew")
+
+      expect { instance.perform(graduated_notification.id) }
+        .not_to change { Notification.count }
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+    end
+
+    context "with InactiveRecipientError" do
+      let(:inactive_recipient_error) do
+        Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => "inactive"})
+      end
+      it "records delivery_failure on the Notification and still marks the graduated_notification processed" do
+        allow(OrganizedMailer).to receive(:graduated_notification).and_raise(inactive_recipient_error)
+        expect { instance.perform(graduated_notification.id) }.not_to raise_error
+        notification = graduated_notification.notifications.first
+        expect(notification.delivery_status).to eq "delivery_failure"
+        expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
+        expect(graduated_notification.reload.email_success?).to be_truthy
+      end
+    end
+  end
 end
