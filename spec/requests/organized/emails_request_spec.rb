@@ -209,6 +209,42 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
         end
+
+        context "with mail_snippet changes after the ownership was created" do
+          include_context :with_paper_trail
+
+          let!(:welcome_snippet) do
+            FactoryBot.create(:mail_snippet, kind: "welcome", organization: current_organization,
+              is_enabled: true, body: "welcome when sent")
+          end
+          let!(:after_welcome_snippet) do
+            FactoryBot.create(:mail_snippet, kind: "after_welcome", organization: current_organization,
+              is_enabled: true, body: "after_welcome when sent")
+          end
+          let!(:security_snippet) do
+            FactoryBot.create(:mail_snippet, kind: "security", organization: current_organization,
+              is_enabled: true, body: "security when sent")
+          end
+
+          before do
+            bike.current_ownership.update_columns(created_at: 1.hour.ago)
+            [welcome_snippet, after_welcome_snippet, security_snippet].each do |snippet|
+              snippet.versions.first.update_columns(created_at: 2.hours.ago)
+              snippet.update!(body: "#{snippet.kind} now")
+            end
+          end
+
+          it "renders snippets as they were at ownership.created_at" do
+            get "#{base_url}/finished_registration"
+            expect(response.status).to eq(200)
+            expect(response.body).to include("welcome when sent")
+            expect(response.body).to include("after_welcome when sent")
+            expect(response.body).to include("security when sent")
+            expect(response.body).to_not include("welcome now")
+            expect(response.body).to_not include("after_welcome now")
+            expect(response.body).to_not include("security now")
+          end
+        end
       end
       context "partial_registration" do
         let(:enabled_feature_slugs) { %w[customize_emails show_partial_registrations graduated_notifications] }

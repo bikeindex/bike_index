@@ -21,6 +21,11 @@ module Emails
 
       private
 
+      def organization_snippet_body(kind)
+        @organization_snippet_bodies ||= Hash.new { |h, k| h[k] = organization&.mail_snippet_body(k, time: email_sent_at) }
+        @organization_snippet_bodies[kind]
+      end
+
       def bike
         @bike ||= Bike.unscoped.find(@ownership.bike_id)
       end
