@@ -4,7 +4,6 @@
 # Database name: primary
 #
 #  id                          :bigint           not null, primary key
-#  delivery_status             :string
 #  email                       :string
 #  marked_remaining_at         :datetime
 #  marked_remaining_link_token :text
@@ -36,6 +35,9 @@ class GraduatedNotification < ApplicationRecord
 
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
   PENDING_PERIOD = 24.hours.freeze
+  # Cutoff for when graduated_notifications started routing email delivery through Notification records.
+  # Records created before this time have no associated Notification, so email success is implicit.
+  PRE_NOTIFICATION_INTEGRATION = Time.at(1778778474).freeze
 
   enum :status, STATUS_ENUM
 
@@ -64,7 +66,13 @@ class GraduatedNotification < ApplicationRecord
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
   scope :primary_notification, -> { where("primary_notification_id = id") }
   scope :secondary_notification, -> { where.not("primary_notification_id  = id") }
-  scope :email_success, -> { where(delivery_status: "email_success") }
+  scope :email_success, -> {
+    legacy = where("graduated_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION)
+      .where.not(processed_at: nil)
+    delivered = joins(:notifications)
+      .where(notifications: {delivery_status: Notification.delivery_statuses[:delivery_success]})
+    where(id: legacy.select(:id)).or(where(id: delivered.select(:id)))
+  }
 
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)
@@ -160,7 +168,9 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def email_success?
-    delivery_status == "email_success"
+    return processed_at.present? if created_at && created_at < PRE_NOTIFICATION_INTEGRATION
+
+    notifications.where(delivery_status: Notification.delivery_statuses[:delivery_success]).exists?
   end
 
   # Get it unscoped, because we delete it
@@ -329,7 +339,7 @@ class GraduatedNotification < ApplicationRecord
     deliver_email if send_email?
 
     @skip_update = true
-    update(processed_at: Time.current, delivery_status: "email_success", skip_update: true)
+    update(processed_at: Time.current, skip_update: true)
     return true unless primary_notification?
 
     # Update the associated notifications after updating the primary notification, so if we fail, they can be updated by the worker
