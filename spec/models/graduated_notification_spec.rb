@@ -110,6 +110,51 @@ RSpec.describe GraduatedNotification, type: :model do
     end
   end
 
+  describe "track_email_delivery" do
+    let(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: organization) }
+
+    it "marks email_success after delivery" do
+      expect(graduated_notification.delivery_success?).to be_falsey
+      graduated_notification.track_email_delivery do
+        OrganizedMailer.graduated_notification(graduated_notification).deliver_now
+      end
+      graduated_notification.reload
+      expect(graduated_notification.email_success?).to be_truthy
+      expect(graduated_notification.delivery_success?).to be_truthy
+      expect(graduated_notification.processed_at).to be_within(2).of Time.current
+    end
+
+    context "already delivered" do
+      it "does not re-deliver" do
+        graduated_notification.update_column(:delivery_status, "email_success")
+        ActionMailer::Base.deliveries = []
+        graduated_notification.track_email_delivery { raise "should not run" }
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
+    end
+
+    context "with InactiveRecipientError" do
+      let(:inactive_recipient_error) do
+        Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => "inactive"})
+      end
+      it "swallows the error and leaves status pending" do
+        graduated_notification.track_email_delivery { raise inactive_recipient_error }
+        expect(graduated_notification.reload.email_success?).to be_falsey
+      end
+    end
+
+    context "with unknown postmark error" do
+      it "re-raises" do
+        expect do
+          graduated_notification.track_email_delivery do
+            raise Postmark::ApiInputError.build("error", {"ErrorCode" => 499})
+          end
+        end.to raise_error(Postmark::ApiInputError)
+        expect(graduated_notification.reload.email_success?).to be_falsey
+      end
+    end
+  end
+
   describe "subject" do
     let(:graduated_notification) { FactoryBot.create(:graduated_notification) }
     let(:organization) { graduated_notification.organization }

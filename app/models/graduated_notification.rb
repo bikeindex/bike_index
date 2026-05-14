@@ -33,6 +33,7 @@
 #
 class GraduatedNotification < ApplicationRecord
   include StatusHumanizable
+  include EmailDeliveryTrackable
 
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
   PENDING_PERIOD = 24.hours.freeze
@@ -325,11 +326,9 @@ class GraduatedNotification < ApplicationRecord
     user_registration_organization&.destroy_for_graduated_notification!
     bike_organization&.destroy!
 
-    # deliver email before everything, so if fails, we send when we try again
-    OrganizedMailer.graduated_notification(self).deliver_now if send_email?
-
-    @skip_update = true
-    update(processed_at: Time.current, delivery_status: "email_success", skip_update: true)
+    track_email_delivery do
+      OrganizedMailer.graduated_notification(self).deliver_now if send_email?
+    end
     return true unless primary_notification?
 
     # Update the associated notifications after updating the primary notification, so if we fail, they can be updated by the worker
@@ -339,6 +338,10 @@ class GraduatedNotification < ApplicationRecord
     true
   end
 
+  def delivery_success?
+    email_success?
+  end
+
   def subject
     return mail_snippet.subject if mail_snippet&.subject.present?
 
@@ -346,6 +349,16 @@ class GraduatedNotification < ApplicationRecord
   end
 
   private
+
+  def record_email_delivery_success(_delivery)
+    @skip_update = true
+    update(delivery_status: "email_success", processed_at: Time.current, skip_update: true)
+  end
+
+  def record_email_delivery_failure(_error)
+    # graduated_notifications don't persist delivery_error/message_id;
+    # leave status untouched so the worker retries on its next run
+  end
 
   def calculated_status
     # Because prior to commit, the value for the current notification isn't set
