@@ -29,8 +29,6 @@
 #
 
 class Notification < ApplicationRecord
-  include EmailDeliveryTrackable
-
   # TODO: create notifications for every email we send (including other models, e.g. Feedback)
   #
   # Every single notification that we send has a separate enum key - which is a lot!
@@ -39,6 +37,8 @@ class Notification < ApplicationRecord
 
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
   DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
+
+  UNDELIVERABLE_ERRORS = %w[Postmark::InactiveRecipientError Postmark::InvalidEmailAddressError].freeze
 
   enum :kind, KIND_ENUM
   enum :message_channel, MESSAGE_CHANNEL_ENUM
@@ -230,6 +230,20 @@ class Notification < ApplicationRecord
     return calculated_phone if message_channel == "text" || phone_verification?
 
     calculated_email
+  end
+
+  # The block performs an email delivery (e.g. SomeMailer.foo.deliver_now).
+  # Records success/failure on self, and re-raises non-undeliverable errors.
+  def track_email_delivery
+    return if delivery_success?
+
+    delivery = yield
+
+    record_email_delivery_success(delivery)
+  rescue => e
+    record_email_delivery_failure(e)
+
+    raise e unless UNDELIVERABLE_ERRORS.include?(e.class.name)
   end
 
   def delivery_error_spam?
