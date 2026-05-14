@@ -73,9 +73,7 @@ RSpec.describe OrganizedServices::EmailPreview do
 
       context "with a graduated_notification_id param" do
         let!(:graduated_notification) do
-          FactoryBot.create(:graduated_notification, organization: organization).tap do |gn|
-            gn.update_column(:delivery_status, "email_success")
-          end
+          FactoryBot.create(:graduated_notification, organization: organization, delivery_status: "email_success")
         end
         let(:params) { ActionController::Parameters.new(graduated_notification_id: graduated_notification.id) }
 
