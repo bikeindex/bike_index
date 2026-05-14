@@ -1,4 +1,4 @@
 ruby 4.0.2
-# NOTE: If updating node version, also update
+# NOTE: If updating node version, also update .cloud66/manifest.yml
 nodejs 24.15.0
 
