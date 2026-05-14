@@ -137,20 +137,38 @@ RSpec.describe GraduatedNotification, type: :model do
       let(:inactive_recipient_error) do
         Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => "inactive"})
       end
-      it "swallows the error and leaves status pending" do
+      it "swallows the error and records delivery_failure" do
         graduated_notification.track_email_delivery { raise inactive_recipient_error }
-        expect(graduated_notification.reload.email_success?).to be_falsey
+        graduated_notification.reload
+        expect(graduated_notification.email_success?).to be_falsey
+        expect(graduated_notification.delivery_status).to eq "delivery_failure"
+        expect(graduated_notification.delivery_error).to eq "Postmark::InactiveRecipientError"
+      end
+
+      context "with a matching user_email" do
+        let(:user) { FactoryBot.create(:user_confirmed, email: graduated_notification.email) }
+        let!(:user_email) { user.user_emails.first }
+        before { graduated_notification.update(user: user) }
+        it "marks the user_email as errored" do
+          expect(user_email.last_email_errored?).to be_falsey
+          graduated_notification.track_email_delivery { raise inactive_recipient_error }
+          expect(graduated_notification.reload.delivery_status).to eq "delivery_failure"
+          expect(user_email.reload.last_email_errored?).to be_truthy
+        end
       end
     end
 
     context "with unknown postmark error" do
-      it "re-raises" do
+      it "re-raises and records delivery_failure" do
         expect do
           graduated_notification.track_email_delivery do
             raise Postmark::ApiInputError.build("error", {"ErrorCode" => 499})
           end
         end.to raise_error(Postmark::ApiInputError)
-        expect(graduated_notification.reload.email_success?).to be_falsey
+        graduated_notification.reload
+        expect(graduated_notification.email_success?).to be_falsey
+        expect(graduated_notification.delivery_status).to eq "delivery_failure"
+        expect(graduated_notification.delivery_error).to eq "Postmark::ApiInputError"
       end
     end
   end

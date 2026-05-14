@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id                          :bigint           not null, primary key
+#  delivery_error              :string
 #  delivery_status             :string
 #  email                       :string
 #  marked_remaining_at         :datetime
@@ -342,6 +343,10 @@ class GraduatedNotification < ApplicationRecord
     email_success?
   end
 
+  def user_email
+    user&.user_emails&.friendly_find(email)
+  end
+
   def subject
     return mail_snippet.subject if mail_snippet&.subject.present?
 
@@ -355,9 +360,10 @@ class GraduatedNotification < ApplicationRecord
     update(delivery_status: "email_success", processed_at: Time.current, skip_update: true)
   end
 
-  def record_email_delivery_failure(_error)
-    # graduated_notifications don't persist delivery_error/message_id;
-    # leave status untouched so the worker retries on its next run
+  def record_email_delivery_failure(error)
+    @skip_update = true
+    update(delivery_status: "delivery_failure", delivery_error: error.class, skip_update: true)
+    user_email&.update_last_email_errored!(email_errored: true)
   end
 
   def calculated_status
