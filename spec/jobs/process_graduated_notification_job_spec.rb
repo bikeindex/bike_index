@@ -87,16 +87,24 @@ RSpec.describe ProcessGraduatedNotificationJob, type: :lib do
     end
 
     context "with InactiveRecipientError" do
+      # Force a post-integration record so email_success? consults notifications.delivery_success
+      # (legacy rows take the processed_at shortcut and would mask the failure).
+      let(:graduated_notification) do
+        FactoryBot.create(:graduated_notification, organization: organization,
+          created_at: GraduatedNotification::PRE_NOTIFICATION_INTEGRATION + 1.minute)
+      end
       let(:inactive_recipient_error) do
         Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => "inactive"})
       end
-      it "records delivery_failure on the Notification and still marks the graduated_notification processed" do
+      it "records delivery_failure on the Notification and reports email_success? false" do
         allow(OrganizedMailer).to receive(:graduated_notification).and_raise(inactive_recipient_error)
+        allow_any_instance_of(GraduatedNotification).to receive(:processable?).and_return(true)
         expect { instance.perform(graduated_notification.id) }.not_to raise_error
         notification = graduated_notification.notifications.first
         expect(notification.delivery_status).to eq "delivery_failure"
         expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
-        expect(graduated_notification.reload.email_success?).to be_truthy
+        expect(graduated_notification.reload.processed_at).to be_present
+        expect(graduated_notification.email_success?).to be_falsey
       end
     end
   end
