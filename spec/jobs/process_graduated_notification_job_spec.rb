@@ -73,6 +73,7 @@ RSpec.describe ProcessGraduatedNotificationJob, type: :lib do
       expect(notification.kind).to eq "graduated_notification"
       expect(notification.delivery_status).to eq "delivery_success"
       expect(notification.message_channel_target).to eq graduated_notification.email
+      expect(notification.message_id).to be_present
 
       mail = ActionMailer::Base.deliveries.last
       expect(mail.to).to eq([graduated_notification.email])
