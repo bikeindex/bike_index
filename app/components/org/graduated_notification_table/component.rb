@@ -16,19 +16,27 @@ module Org
         @separate_secondary_notifications = separate_secondary_notifications
       end
 
+      def org_param(notification)
+        (@current_organization&.id == notification.organization_id) ? @current_organization&.to_param : notification.organization_id
+      end
+
+      def link_id(notification)
+        return notification.id if @separate_secondary_notifications
+        notification.primary_notification_id.presence || notification.id
+      end
+
+      def status_display(graduated_notification)
+        status = graduated_notification.status_humanized&.titleize
+        content_tag(:span, status.to_s, class: status_class(status))
+      end
+
       private
 
-      def current_org_to_param
-        @current_org_to_param ||= @current_organization&.to_param
-      end
-
-      def notification_link(graduated_notification)
-        return graduated_notification.id if @separate_secondary_notifications
-        graduated_notification.primary_notification_id.presence || graduated_notification.id
-      end
-
-      def org_param_for(notification)
-        @current_organization&.id == notification.organization_id ? current_org_to_param : notification.organization_id
+      def status_class(status)
+        case status
+        when "Bike Graduated" then "text-info"
+        else "less-strong"
+        end
       end
     end
   end

@@ -14,14 +14,17 @@ RSpec.describe Org::GraduatedNotificationTable::Component, type: :component do
       render_inline(instance)
     end
   end
+  let(:options) do
+    {graduated_notifications: [graduated_notification], current_organization: organization,
+     render_sortable:, render_remaining_at:, skip_status:, skip_email:, separate_secondary_notifications:}
+  end
+  let(:render_sortable) { false }
+  let(:render_remaining_at) { false }
+  let(:skip_status) { false }
+  let(:skip_email) { false }
+  let(:separate_secondary_notifications) { false }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 1.year) }
   let(:graduated_notification) { FactoryBot.create(:graduated_notification, organization:) }
-  let(:options) do
-    {
-      graduated_notifications: [graduated_notification],
-      current_organization: organization
-    }
-  end
 
   it "renders the table with the notification row" do
     expect(component).to have_css("table")
@@ -33,7 +36,8 @@ RSpec.describe Org::GraduatedNotificationTable::Component, type: :component do
   end
 
   context "with skip_email and render_remaining_at" do
-    let(:options) { super().merge(skip_email: true, render_remaining_at: true) }
+    let(:skip_email) { true }
+    let(:render_remaining_at) { true }
 
     it "omits the email column and includes the remaining column header" do
       expect(component).not_to have_content(graduated_notification.email)
@@ -42,7 +46,7 @@ RSpec.describe Org::GraduatedNotificationTable::Component, type: :component do
   end
 
   context "with separate_secondary_notifications" do
-    let(:options) { super().merge(separate_secondary_notifications: true) }
+    let(:separate_secondary_notifications) { true }
 
     it "renders the Primary? column" do
       expect(component).to have_content("Primary?")
@@ -50,7 +54,7 @@ RSpec.describe Org::GraduatedNotificationTable::Component, type: :component do
   end
 
   context "with skip_status" do
-    let(:options) { super().merge(skip_status: true) }
+    let(:skip_status) { true }
 
     it "omits the status column header" do
       expect(component).not_to have_content("Status")
