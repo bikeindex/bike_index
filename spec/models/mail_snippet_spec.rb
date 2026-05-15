@@ -71,6 +71,125 @@ RSpec.describe MailSnippet, type: :model do
     end
   end
 
+  describe "for_organization" do
+    include_context :with_paper_trail
+
+    subject(:result) { MailSnippet.for_organization(organization_id:, kind:, time:) }
+
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization_id) { organization.id }
+    let(:kind) { "parked_incorrectly_notification" }
+    let(:time) { nil }
+    let(:body) { "current body" }
+    let(:is_enabled) { true }
+    let!(:mail_snippet) do
+      FactoryBot.create(:mail_snippet, kind:, organization:, is_enabled:, body:)
+    end
+
+    context "without time" do
+      it "returns the current snippet" do
+        expect(result).to eq mail_snippet
+      end
+    end
+
+    context "with unknown organization" do
+      let(:organization_id) { organization.id + 999 }
+
+      it "returns nil" do
+        expect(result).to be_nil
+      end
+    end
+
+    context "when currently disabled" do
+      let(:is_enabled) { false }
+
+      it "returns nil" do
+        expect(result).to be_nil
+      end
+    end
+
+    context "with time after the snippet was edited" do
+      let(:time) { 1.hour.ago }
+
+      before do
+        mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+        mail_snippet.update!(body: "updated body")
+      end
+
+      it "returns the snippet body that was in effect at that time" do
+        expect(result.body).to eq "current body"
+      end
+    end
+
+    context "with time before the snippet was created" do
+      let(:time) { 1.day.ago }
+
+      before { mail_snippet.versions.first.update_columns(created_at: Time.current) }
+
+      it "returns nil" do
+        expect(result).to be_nil
+      end
+    end
+
+    context "with time when the snippet was disabled" do
+      let(:kind) { "impound_notification" }
+      let(:body) { "disabled" }
+      let(:is_enabled) { false }
+      let(:time) { 1.hour.ago }
+
+      before do
+        mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+        mail_snippet.update!(is_enabled: true)
+      end
+
+      it "returns nil" do
+        expect(result).to be_nil
+      end
+    end
+
+    context "with snippet destroyed after the requested time" do
+      let(:kind) { "header" }
+      let(:body) { "old header" }
+      let(:time) { 1.hour.ago }
+
+      before do
+        mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+        mail_snippet.destroy!
+      end
+
+      it "reifies the snippet as it was at that time" do
+        expect(result.body).to eq "old header"
+        expect(result.is_enabled).to be true
+      end
+    end
+
+    context "with snippet created before paper_trail tracking started" do
+      let(:time) { MailSnippet::PAPER_TRAIL_TRACKING_STARTED_AT - 1.day }
+
+      before do
+        mail_snippet.update_columns(created_at: MailSnippet::PAPER_TRAIL_TRACKING_STARTED_AT - 1.year)
+        mail_snippet.versions.first.update_columns(created_at: MailSnippet::PAPER_TRAIL_TRACKING_STARTED_AT - 1.year)
+      end
+
+      context "with no edits since tracking started" do
+        it "returns the live snippet" do
+          expect(result).to eq mail_snippet
+          expect(result.body).to eq "current body"
+        end
+      end
+
+      context "with an edit since tracking started, queried before that edit" do
+        let(:time) { 1.hour.ago }
+
+        before { mail_snippet.update!(body: "updated body") }
+
+        it "reifies the pre-edit body from paper_trail" do
+          expect(result.body).to eq "current body"
+        end
+      end
+    end
+  end
+
   describe "newsletter" do
     let(:mail_snippet) { FactoryBot.create(:mail_snippet, kind: :newsletter) }
     let(:mail_snippet_2) { FactoryBot.create(:mail_snippet, kind: :newsletter) }

@@ -15,8 +15,7 @@
 #
 # Indexes
 #
-#  index_memberships_on_creator_id  (creator_id)
-#  index_memberships_on_user_id     (user_id)
+#  index_memberships_on_user_id  (user_id)
 #
 class Membership < ApplicationRecord
   include ActivePeriodable

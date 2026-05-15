@@ -13,13 +13,10 @@
 #  doorkeeper_app_id :bigint
 #  organization_id   :integer
 #
-# Indexes
-#
-#  index_mail_snippets_on_doorkeeper_app_id  (doorkeeper_app_id)
-#  index_mail_snippets_on_organization_id    (organization_id)
-#
 class MailSnippet < ApplicationRecord
   has_paper_trail only: %i[body is_enabled kind subject]
+
+  PAPER_TRAIL_TRACKING_STARTED_AT = Time.zone.local(2026, 4, 1).freeze
 
   KIND_ENUM = {
     custom: 0,
@@ -112,6 +109,48 @@ class MailSnippet < ApplicationRecord
 
     def organization_message_kinds
       ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved]
+    end
+
+    # With `time`, reifies the snippet via paper_trail (including destroyed ones).
+    # Snippets created before PAPER_TRAIL_TRACKING_STARTED_AT have no recorded create
+    # version, so they fall back to the live snippet when paper_trail has no relevant
+    # version to return.
+    def for_organization(organization_id:, kind:, time: nil)
+      snippet = where(organization_id:, kind:).first
+
+      if time.present?
+        snippet = if snippet.blank?
+          reify_destroyed_at(organization_id:, kind:, time:)
+        elsif snippet.created_at >= PAPER_TRAIL_TRACKING_STARTED_AT
+          snippet.paper_trail.version_at(time)
+        else
+          snippet.paper_trail.version_at(time) || snippet
+        end
+      end
+
+      snippet if snippet&.is_enabled
+    end
+
+    private
+
+    # Reify a snippet that no longer exists, by finding the destroy version after `time`
+    # and walking back to the version active at `time`.
+    def reify_destroyed_at(organization_id:, kind:, time:)
+      return nil unless KIND_ENUM.key?(kind.to_sym)
+
+      destroy_version = PaperTrail::Version
+        .where(item_type: name, event: "destroy")
+        .where("object @> ?", {organization_id:, kind: kind.to_s}.to_json)
+        .where("created_at > ?", time)
+        .order(:created_at).first
+      return nil if destroy_version.blank?
+
+      next_version = PaperTrail::Version
+        .where(item_type: name, item_id: destroy_version.item_id)
+        .where("created_at > ?", time)
+        .order(:created_at).first
+
+      next_version&.reify
     end
   end
 
