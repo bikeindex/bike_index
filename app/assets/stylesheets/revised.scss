@@ -1,6 +1,13 @@
 // Wrap all Bootstrap / legacy styles in @layer legacy so Tailwind's @layer
 // components / utilities (declared in app/assets/tailwind/application.css)
 // can override them by simple cascade order, without needing !important.
+//
+// The layer order must be declared identically here and in
+// app/assets/tailwind/application.css — CSS fixes a layer's position the
+// first time it is named, so whichever stylesheet the browser parses first
+// would otherwise decide the order.
+@layer theme, base, legacy, components, utilities;
+
 @layer legacy {
 
 @import 'legacy_includes/select2';
