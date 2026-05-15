@@ -64,12 +64,14 @@ class GraduatedNotification < ApplicationRecord
   scope :current, -> { where(status: current_statuses) }
   scope :processed, -> { where(status: processed_statuses) }
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
-  scope :primary_notification, -> { where("primary_notification_id = id") }
-  scope :secondary_notification, -> { where.not("primary_notification_id  = id") }
+  scope :primary_notification, -> { where("primary_notification_id = graduated_notifications.id") }
+  scope :secondary_notification, -> { where.not("primary_notification_id = graduated_notifications.id") }
   scope :pre_notification_integration, -> { where("graduated_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION) }
   scope :email_success, -> {
-    delivered = joins(:notifications).merge(Notification.delivery_success)
-    pre_notification_integration.or(where(id: delivered.select(:id)))
+    left_outer_joins(:notifications)
+      .where("(graduated_notifications.created_at < ? AND graduated_notifications.processed_at IS NOT NULL) OR notifications.delivery_status = ?",
+        PRE_NOTIFICATION_INTEGRATION, Notification.delivery_statuses[:delivery_success])
+      .distinct
   }
 
   def self.statuses
