@@ -20,12 +20,21 @@ export default class extends Controller {
   connect () {
     // remove the query field that is for users that don't have JS
     this.nonjsfieldsTargets.forEach(el => { if (el) el.remove() })
+
+    // Turbo caches the rendered DOM (including select2's generated sibling
+    // .select2-container) before back/forward navigation, but the live select2
+    // instance is gone after restore. Strip any stale select2 DOM so the fresh
+    // init below doesn't produce a duplicated, broken widget.
+    const $input = $(this.inputTarget)
+    $input.siblings('.select2-container').remove()
+    $input.removeData('select2').removeAttr('data-select2-id')
+
     // show the combobox
     this.inputTarget.classList.remove('tw:hidden')
 
     // TODO: should we update to remove preload from jquery?
     // Does this need to check that jquery is initialized?
-    this.initializeHeaderSearch($(this.inputTarget), this.apiUrlValue)
+    this.initializeHeaderSearch($input, this.apiUrlValue)
   }
 
   escapeHtml (text) {

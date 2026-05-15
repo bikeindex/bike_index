@@ -14,21 +14,50 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
   let!(:graduated_notification2) { FactoryBot.create(:graduated_notification_bike_graduated, organization:, bike: bike2) }
 
   before do
+    # Ensure gear types exist so the bike show page doesn't write during readonly mode
+    RearGearType.fixed
+    FrontGearType.fixed
     visit new_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
   end
 
-  it "searches by email via turbo" do
+  it "searches by email via turbo, then opens the notification" do
     visit graduated_notifications_path
     # Results load via turbo auto-submit
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
-    expect(page).to have_css("tbody tr", minimum: 2)
+    expect(page).to have_css("tbody tr", count: 2)
+    expect(page).to have_css(".select2-container", count: 1, wait: 10)
 
     # search_no_js should NOT be in the URL (removed by JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
 
+    # The 🔎 emoji next to each email re-filters the table by that email
+    within("tbody tr", text: "alice@example.com") { click_link "🔎" }
+
+    expect(page).to have_current_path(/search_email=alice/, wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_field("search_email", with: "alice@example.com")
+    expect(page).to have_css(".select2-container", count: 1, wait: 10)
+    expect(page).to have_content("alice@example.com")
+    expect(page).not_to have_content("bob@example.com")
+
+    # Back navigation restores the unfiltered listing
+    page.go_back
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
+    expect(page).to have_css("tbody tr", count: 2)
+    expect(page).to have_field("search_email", with: "")
+    expect(page).not_to have_current_path(/search_email=alice/)
+    # Verify select2 is re-initialized cleanly: exactly one container AND it opens
+    # when clicked (catches turbo-cache stale-DOM regression)
+    expect(page).to have_css(".select2-container", count: 1, wait: 10)
+    find(".select2-container").click
+    expect(page).to have_css(".select2-container--open", wait: 5)
+    # Close it again so subsequent interactions aren't blocked by the dropdown
+    find("body").send_keys(:escape)
+
+    # Now exercise the form-submit search path too
     fill_in "search_email", with: "alice@example.com"
     find("#search-button").click
 
@@ -36,5 +65,38 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 1)
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
+
+    within("tbody tr") { first("a.preciseTime").click }
+
+    expect(page).to have_current_path(%r{/o/\S+/graduated_notifications/#{graduated_notification1.id}\z}, wait: 10)
+    expect(page).to have_css("h1", text: "Graduated notification")
+    expect(page).to have_content("alice@example.com")
+    expect(page).to have_content("User Bikes")
+
+    # Going back restores the filtered search: URL, populated field, and single-row table
+    page.go_back
+    expect(page).to have_current_path(/search_email=alice/, wait: 10)
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_field("search_email", with: "alice@example.com")
+    expect(page).to have_content("alice@example.com")
+    expect(page).not_to have_content("bob@example.com")
+    # select2-powered combobox is re-initialized exactly once (no double-init, no missing init)
+    expect(page).to have_css(".select2-container", count: 1, wait: 10)
+
+    within("tbody tr") { find("a[href^='/bikes/']").click }
+
+    expect(page).to have_current_path(%r{/bikes/#{bike1.id}(\?|\z)}, wait: 10)
+    expect(page).to have_css(".organized-access-panel")
+
+    # Going back from the bike show page also restores the filtered search
+    page.go_back
+    expect(page).to have_current_path(/search_email=alice/, wait: 10)
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_field("search_email", with: "alice@example.com")
+    expect(page).to have_content("alice@example.com")
+    expect(page).not_to have_content("bob@example.com")
+    expect(page).to have_css(".select2-container", count: 1, wait: 10)
   end
 end
