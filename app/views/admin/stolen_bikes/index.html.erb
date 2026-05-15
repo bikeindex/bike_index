@@ -70,7 +70,7 @@
     </p>
   <% end %>
 
-  <%= form_tag approve_admin_stolen_bike_path(id: "multi_approve"), method: :post, data: {controller: "table-multi-select"} do %>
+  <%= form_tag approve_admin_stolen_bike_path(id: "multi_approve"), method: :post, data: {controller: "table-multi-checkbox"} do %>
     <%= render partial: "table", locals: {render_sortable: true} %>
 
     <div class="mb-3 text-center">
