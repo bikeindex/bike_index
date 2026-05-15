@@ -65,6 +65,10 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 1)
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
+    # turbo-frame element must survive the turbo_stream response (regression guard:
+    # turbo_stream.replace would remove the frame element, breaking subsequent submits
+    # and back-nav restoration)
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame")
 
     within("tbody tr") { first("a.preciseTime").click }
 

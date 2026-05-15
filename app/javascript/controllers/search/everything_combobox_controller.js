@@ -22,12 +22,19 @@ export default class extends Controller {
     this.nonjsfieldsTargets.forEach(el => { if (el) el.remove() })
 
     // Turbo caches the rendered DOM (including select2's generated sibling
-    // .select2-container) before back/forward navigation, but the live select2
-    // instance is gone after restore. Strip any stale select2 DOM so the fresh
-    // init below doesn't produce a duplicated, broken widget.
+    // .select2-container and the select2-hidden-accessible class it adds to the
+    // underlying <select>) before back/forward navigation, but the live select2
+    // instance is gone after restore. Strip the stale DOM AND the class — without
+    // removing select2-hidden-accessible, the cached `width: 1px !important` rule
+    // is still in effect when select2 re-reads the select's width on init, and
+    // the new .select2-container is sized to 1px wide.
     const $input = $(this.inputTarget)
     $input.siblings('.select2-container').remove()
-    $input.removeData('select2').removeAttr('data-select2-id')
+    $input
+      .removeClass('select2-hidden-accessible')
+      .removeAttr('aria-hidden')
+      .removeAttr('data-select2-id')
+      .removeData('select2')
 
     // show the combobox
     this.inputTarget.classList.remove('tw:hidden')
