@@ -1,3 +1,11 @@
+<% if @render_chart && @available_graduated_notifications.present? %>
+  <%= render(UI::Chart::Component.new(
+    series: time_range_counts(collection: @available_graduated_notifications.unscope(:order), column: "graduated_notifications.created_at"),
+    time_range: @time_range,
+    stacked: true
+  )) %>
+<% end %>
+
 <div class="row mt-4 mb-4">
   <div class="col-sm-6">
     <%= pluralize(number_with_delimiter(@pagy.count), "matching graduated notifications") %>
