@@ -23,7 +23,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
   it "searches by email via turbo" do
     visit graduated_notifications_path
     # Results load via turbo auto-submit
-    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.table", wait: 10)
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
 
     # search_no_js should NOT be in the URL (removed by JS controller)

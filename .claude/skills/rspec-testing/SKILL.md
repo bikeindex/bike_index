@@ -20,6 +20,24 @@ This project uses RSpec. All business logic should be tested.
 - Avoid testing private methods.
 - Avoid mocking objects.
   - If making external requests, use VCR. Don't manually write VCR cassettes — record them by running the tests.
+- Don't use `tap` to bundle factory creation with follow-up setup. Create the record in `let`/`let!`, then do the follow-up work on its own line (a separate statement, or a `before` block). One thing per line reads better and keeps the factory call clean.
+
+### Good
+
+```ruby
+let!(:bike_transferred) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+before { BikeServices::OwnershipTransferer.find_or_create(bike_transferred, updator: user, new_owner_email: "new@example.com") }
+```
+
+### Bad
+
+```ruby
+let!(:bike_transferred) do
+  FactoryBot.create(:bike, :with_ownership_claimed, user:).tap do |bike|
+    BikeServices::OwnershipTransferer.find_or_create(bike, updator: user, new_owner_email: "new@example.com")
+  end
+end
+```
 
 ## Always fix failing tests
 

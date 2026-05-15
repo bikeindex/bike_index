@@ -24,8 +24,6 @@
 # Indexes
 #
 #  index_graduated_notifications_on_bike_id                  (bike_id)
-#  index_graduated_notifications_on_bike_organization_id     (bike_organization_id)
-#  index_graduated_notifications_on_marked_remaining_by_id   (marked_remaining_by_id)
 #  index_graduated_notifications_on_organization_id          (organization_id)
 #  index_graduated_notifications_on_primary_bike_id          (primary_bike_id)
 #  index_graduated_notifications_on_primary_notification_id  (primary_notification_id)

@@ -574,7 +574,7 @@
   <% if graduated_notifications.any? %>
     <div class="parking-notifications-wrap">
       <h3 class="mt-2 mb-3">Graduated notifications</h3>
-      <%= render partial: "/organized/graduated_notifications/table", locals: {graduated_notifications:, skip_email: true, render_remaining_at: true} %>
+      <%= render(Org::GraduatedNotificationTable::Component.new(graduated_notifications:, current_organization: @organization, skip_email: true, render_remaining_at: true)) %>
     </div>
   <% end %>
 <% end %>

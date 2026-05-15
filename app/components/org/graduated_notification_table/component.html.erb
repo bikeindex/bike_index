@@ -1,0 +1,76 @@
+<% component = self %>
+<% separate_secondary = @separate_secondary_notifications %>
+<% skip_email_search = @skip_email_search %>
+
+<%= render(UI::Table::Component.new(records: @graduated_notifications, render_sortable: @render_sortable)) do |table| %>
+  <% table.column(sortable: "created_at") do |graduated_notification| %>
+    <% if helpers.display_dev_info? %>
+      <small class="only-dev-visible"><%= graduated_notification.id %></small>
+    <% end %>
+
+    <%= link_to organization_graduated_notification_path(component.link_id(graduated_notification).to_param, organization_id: graduated_notification.organization_id), class: "localizeTime preciseTime" do %>
+      <%= l(graduated_notification.created_at, format: :convert_time) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "processed_at", label: "Sent") do |graduated_notification| %>
+    <% if graduated_notification.processed_at.present? %>
+      <span class="localizeTime">
+        <%= l(graduated_notification.processed_at, format: :convert_time) %>
+      </span>
+    <% else %>
+      <small class="less-strong">
+        @
+        <span class="localizeTime"><%= l(graduated_notification.pending_period_ends_at, format: :convert_time) %></span>
+      </small>
+    <% end %>
+  <% end %>
+
+  <% if @separate_secondary_notifications %>
+    <% table.column(label: "Primary?") do |graduated_notification| %>
+      <%= helpers.check_mark if graduated_notification.primary_notification? %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: @separate_secondary_notifications ? "Bike" : "Bike(s)") do |graduated_notification| %>
+    <% if graduated_notification.bike.present? %>
+      <%= link_to helpers.organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: component.org_param(graduated_notification)) %>
+    <% end %>
+
+    <% unless separate_secondary %>
+      <% graduated_notification.associated_notifications.each do |associated_notification| %>
+        <small class="d-block" style="padding-left: 0.5rem; line-height: 1.5">
+          <%= link_to helpers.organized_bike_text(associated_notification.bike), bike_path(associated_notification.bike, organization_id: component.org_param(associated_notification)) %>
+        </small>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% unless @skip_status %>
+    <% table.column(label: "Status") do |graduated_notification| %>
+      <%= component.status_display(graduated_notification) %>
+    <% end %>
+  <% end %>
+
+  <% unless @skip_email %>
+    <% table.column(sortable: "email") do |graduated_notification| %>
+      <%= graduated_notification.email %>
+
+      <% unless skip_email_search %>
+        <small>
+          <%= link_to "🔎", url_for(sortable_search_params.merge(search_email: graduated_notification.email)) %>
+        </small>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if @render_remaining_at %>
+    <% table.column(sortable: "marked_remaining_at", label: "Marked Not Graduated") do |graduated_notification| %>
+      <% if graduated_notification.marked_remaining_at.present? %>
+        <span class="localizeTime">
+          <%= l(graduated_notification.marked_remaining_at, format: :convert_time) %>
+        </span>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
