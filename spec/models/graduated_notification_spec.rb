@@ -669,9 +669,9 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification.reload.user_id).to be_blank
         expect(graduated_notification.email).to_not eq user2.email
 
-        graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization)
+        graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization,
+          created_at: Time.current - 25.hours) # Outside the pending period, still post-integration
         expect(graduated_notification2).to be_valid
-        allow_any_instance_of(GraduatedNotification).to receive(:in_pending_period?).and_return(false)
         expect(graduated_notification2.user_id).to eq user2.id
         expect(graduated_notification2.email).to eq user2.email
         expect(graduated_notification2.primary_bike_id).to eq bike.id

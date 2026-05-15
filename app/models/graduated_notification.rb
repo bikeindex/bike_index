@@ -35,7 +35,7 @@ class GraduatedNotification < ApplicationRecord
   PENDING_PERIOD = 24.hours.freeze
   # Cutoff for when graduated_notifications started routing email delivery through Notification records.
   # Records created before this time have no associated Notification. If they're in the DB, they emailed successfully
-  PRE_NOTIFICATION_INTEGRATION = Time.at(1778778474).freeze
+  PRE_NOTIFICATION_INTEGRATION = Time.at(1778500000).freeze
 
   enum :status, STATUS_ENUM
 
