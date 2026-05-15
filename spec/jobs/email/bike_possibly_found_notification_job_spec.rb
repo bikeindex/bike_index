@@ -16,10 +16,19 @@ RSpec.describe Email::BikePossiblyFoundNotificationJob, type: :job do
     expect(bike.serial_normalized).to eq(match.serial_normalized)
     expect(bike.owner_email).to_not eq(match.owner_email)
 
-    described_class.new.perform(bike.id, match.class, match.id)
+    expect {
+      described_class.new.perform(bike.id, match.class, match.id)
+    }.to change(Notification, :count).by(1)
 
     expect(ActionMailer::Base.deliveries.length).to eq(1)
     expect(CustomerMailer).to have_received(:bike_possibly_found_email).once
+
+    notification = Notification.last
+    expect(notification.kind).to eq "bike_possibly_found"
+    expect(notification.bike_id).to eq bike.id
+    expect(notification.notifiable_type).to eq "CustomerContact"
+    expect(notification.delivery_status).to eq "delivery_success"
+    expect(notification.message_id).to be_present
   end
 
   it "skips the bike if it's its own match" do

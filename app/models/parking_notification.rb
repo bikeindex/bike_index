@@ -41,12 +41,9 @@
 # Indexes
 #
 #  index_parking_notifications_on_bike_id            (bike_id)
-#  index_parking_notifications_on_country_id         (country_id)
 #  index_parking_notifications_on_impound_record_id  (impound_record_id)
 #  index_parking_notifications_on_initial_record_id  (initial_record_id)
 #  index_parking_notifications_on_organization_id    (organization_id)
-#  index_parking_notifications_on_region_record_id   (region_record_id)
-#  index_parking_notifications_on_retrieved_by_id    (retrieved_by_id)
 #  index_parking_notifications_on_user_id            (user_id)
 #
 class ParkingNotification < ActiveRecord::Base

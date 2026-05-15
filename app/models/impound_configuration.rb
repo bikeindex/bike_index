@@ -14,10 +14,6 @@
 #  updated_at              :datetime         not null
 #  organization_id         :bigint
 #
-# Indexes
-#
-#  index_impound_configurations_on_organization_id  (organization_id)
-#
 class ImpoundConfiguration < ApplicationRecord
   belongs_to :organization
   has_many :impound_records, through: :organization

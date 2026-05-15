@@ -15,7 +15,16 @@ module Emails
         @email_preview = email_preview
       end
 
+      def email_sent_at
+        @ownership&.created_at if @ownership&.persisted?
+      end
+
       private
+
+      def organization_snippet_body(kind)
+        @organization_snippet_bodies ||= Hash.new { |h, k| h[k] = organization&.mail_snippet_body(k, time: email_sent_at) }
+        @organization_snippet_bodies[kind]
+      end
 
       def bike
         @bike ||= Bike.unscoped.find(@ownership.bike_id)
