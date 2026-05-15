@@ -41,7 +41,7 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
   end
 
-  it "renders per-row canupdate classes and toggles checkbox state as the kind changes" do
+  it "renders per-row canupdate classes and applies multi-updates for matching records" do
     expect(page).to have_css("table tbody tr", count: 2, wait: 10)
 
     registered_cell = cell_for(registered)
@@ -62,25 +62,30 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     click_link "update multiple records"
 
     expect(page).to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true, wait: 5)
-    expect(page).to have_css("input[type=checkbox][name='ids[#{unregistered.id}]']", visible: true)
 
-    # Default kind is retrieved_by_owner: registered enabled, unregistered disabled.
+    # Default kind retrieved_by_owner: only registered's checkbox is enabled.
     expect(checkbox_for(registered)).not_to be_disabled
     expect(checkbox_for(unregistered)).to be_disabled
-
-    # Switching to a kind every record allows enables both.
-    select "Add Internal Note", from: "impound_record_update_kind"
-    expect(checkbox_for(unregistered)).not_to be_disabled
-    expect(checkbox_for(registered)).not_to be_disabled
 
     checkbox_for(registered).check
-    checkbox_for(unregistered).check
+    within("#impoundRecordUpdateForm") { find('input[type=submit]').click }
 
-    # Switching back to retrieved_by_owner re-disables unregistered and clears
-    # its checked state, while leaving registered's checked state alone.
-    select "Owner Retrieved Bike", from: "impound_record_update_kind"
-    expect(checkbox_for(unregistered)).to be_disabled
-    expect(checkbox_for(unregistered)).not_to be_checked
-    expect(checkbox_for(registered)).to be_checked
+    expect(page).to have_content("Updated 1 impound record", wait: 10)
+    expect(registered.impound_record_updates.pluck(:kind)).to eq ["retrieved_by_owner"]
+    expect(unregistered.impound_record_updates).to be_empty
+
+    # Now apply a note update to the unregistered record — a kind it allows.
+    click_link "update multiple records"
+    expect(page).to have_css("input[type=checkbox][name='ids[#{unregistered.id}]']", visible: true, wait: 5)
+    select "Add Internal Note", from: "impound_record_update_kind"
+    expect(checkbox_for(unregistered)).not_to be_disabled
+    checkbox_for(unregistered).check
+    fill_in "impound_record_update[notes]", with: "multi-update note"
+    within("#impoundRecordUpdateForm") { find('input[type=submit]').click }
+
+    expect(page).to have_content("Updated 1 impound record", wait: 10)
+    last_update = unregistered.impound_record_updates.reorder(:id).last
+    expect(last_update.kind).to eq "note"
+    expect(last_update.notes).to eq "multi-update note"
   end
 end
