@@ -3,6 +3,21 @@ require "rails_helper"
 RSpec.describe UserServices::Updator do
   let(:user) { FactoryBot.create(:user, :confirmed, email: "aftercreate@bikeindex.org") }
 
+  describe "bikes_for_user" do
+    let!(:bike_kept) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    let!(:bike_transferred) do
+      FactoryBot.create(:bike, :with_ownership_claimed, user:).tap do |bike|
+        BikeServices::OwnershipTransferer.find_or_create(bike, updator: user, new_owner_email: "newowner@example.com")
+      end
+    end
+    let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user:, deleted_at: Time.current) }
+
+    it "matches user.bikes" do
+      expect(user.bikes.pluck(:id)).to eq([bike_kept.id])
+      expect(described_class.send(:bikes_for_user, user).pluck(:id)).to match_array(user.bikes.pluck(:id))
+    end
+  end
+
   describe "assign_address_from_bikes", vcr: {cassette_name: :assign_address_from_bikes} do
     let!(:state) { FactoryBot.create(:state_california) }
     let!(:country) { Country.united_states }
