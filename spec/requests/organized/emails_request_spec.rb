@@ -145,13 +145,13 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(mail_snippet.reload.body).to eq "snippet body now"
             expect(MailSnippet.where(kind: "header", organization: current_organization)).to be_empty
 
-            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: sent_parking_notification.id}
+            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: sent_parking_notification.id, versioned: true}
             expect(response.status).to eq(200)
             expect(response.body).to include("snippet body when sent")
             expect(response.body).to include("header when sent")
             expect(response.body).to_not include("snippet body now")
 
-            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: unsent_parking_notification.id}
+            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: unsent_parking_notification.id, versioned: true}
             expect(response.status).to eq(200)
             expect(response.body).to include("snippet body now")
             expect(response.body).to_not include("snippet body when sent")
