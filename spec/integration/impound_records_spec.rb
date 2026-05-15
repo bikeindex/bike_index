@@ -28,8 +28,6 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
   end
 
   before do
-    # The "update multiple records" link is in .col-lg-3.hidden-md-down, so a
-    # viewport >= lg (992px) is required for the multiselect flow to be reachable.
     page.current_window.resize_to(1280, 900)
     visit new_session_path
     fill_in "Email", with: user.email
