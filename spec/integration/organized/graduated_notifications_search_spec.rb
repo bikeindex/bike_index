@@ -52,11 +52,22 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 2)
     expect(page).to have_field("search_email", with: "")
     expect(page).not_to have_current_path(/search_email=alice/)
-    # Verify select2 is re-initialized cleanly (catches turbo-cache stale-DOM regression)
+    # select2 combobox search: type a query, pick the autocomplete option, submit
+    # (also catches turbo-cache stale-DOM regression — select2 must be usable)
     expect(page).to have_css(".select2-container", count: 1, wait: 10)
     find(".select2-container").click
-    expect(page).to have_css(".select2-container--open", wait: 5)
-    find("body").send_keys(:escape)
+    find(".select2-search__field").set("Black")
+    expect(page).to have_css(".select2-results__option", text: "Black", wait: 10)
+    find(".select2-results__option", text: "Black", match: :first).click
+    find("#search-button").click
+
+    expect(page).to have_current_path(/query_items/, wait: 10)
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame", wait: 10)
+
+    page.go_back
+    expect(page).not_to have_current_path(/query_items/, wait: 10)
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
+    expect(page).to have_css("tbody tr", count: 2)
 
     # Form submit + direct back-nav: regression guard for turbo-cache spinner state
     fill_in "search_email", with: "alice@example.com"
