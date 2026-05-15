@@ -42,7 +42,7 @@ require "capybara/rspec"
 Capybara.register_driver :chrome_headless do |app|
   options = Selenium::WebDriver::Chrome::Options.new
   options.add_argument("--headless")
-  options.add_argument("--window-size=1920,1080")
+  options.add_argument("--window-size=720,2000")
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
 end
 # Configure Capybara
@@ -97,6 +97,11 @@ RSpec.configure do |config|
   config.include HtmlContentHelpers, type: :component
   config.before(:each, :browser, type: :system) { driven_by(:selenium) }
   config.before(:each, :js, type: :system) { driven_by(:selenium_chrome_headless) }
+  # Chrome's --window-size argument is unreliable in headless mode; resize
+  # explicitly so the viewport matches across local and CI. 720px is below
+  # the md breakpoint (768px) so the org sidebar stays hidden and specs
+  # interact with the mobile dropdown.
+  config.before(:each, type: :system) { page.current_window.resize_to(720, 2000) }
 end
 
 require "vcr"
