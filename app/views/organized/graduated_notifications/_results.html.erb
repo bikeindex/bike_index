@@ -56,7 +56,7 @@
         <% status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status)) %>
         <% display_status = (status == "current") ? "Current (pending & graduated)" : (GraduatedNotification.status_humanized(status)&.titleize || "All statuses") %>
 
-        <%= link_to display_status, organization_graduated_notifications_path(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}" %>
+        <%= link_to display_status, organization_graduated_notifications_path(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}", data: {turbo_action: "advance"} %>
       <% end %>
     </div>
   </div>
