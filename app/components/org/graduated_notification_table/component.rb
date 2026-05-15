@@ -35,6 +35,7 @@ module Org
       def status_class(status)
         case status
         when "Bike Graduated" then "text-info"
+        when "Delivery Failure" then UI::Alert::Component::TEXT_CLASSES[:error]
         else "less-strong"
         end
       end

@@ -82,6 +82,8 @@ module OrganizedHelper
       "text-info"
     when /removed/, "impounded", "trashed", "failed_to_find", /denied/
       "text-danger"
+    when "delivery failure"
+      UI::Alert::Component::TEXT_CLASSES[:error]
     else
       "less-strong"
     end
