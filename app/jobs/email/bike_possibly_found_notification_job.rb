@@ -16,7 +16,14 @@ module Email
 
       email = CustomerMailer.bike_possibly_found_email(contact)
       contact.email = email
-      email.deliver_now if contact.save
+      return unless contact.save
+
+      notification = contact.notification || Notification.create(notifiable: contact,
+        user_id: contact.user_id,
+        bike_id: contact.bike_id,
+        kind: contact.kind)
+
+      notification.track_email_delivery { email.deliver_now }
     end
   end
 end
