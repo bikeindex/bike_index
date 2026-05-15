@@ -9,11 +9,7 @@ module Organized
 
     def index
       @per_page = permitted_per_page
-      # Match turbo_frame_request? (not turbo_request?) so that Turbo Drive page
-      # refetches on back-navigation get the full HTML page (which auto-submits
-      # the form). turbo_request? would also match those refetches and respond
-      # with a turbo_stream, which Turbo Drive cannot render as a page.
-      @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_frame_request?
+      @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
