@@ -42,8 +42,6 @@ When deleting an `id`/`class`, grep the repo for the name before deciding what t
 - Zero consumers: delete it, don't rename it.
 - Consumers exist: either update them, or leave the hook in place — the consumers are the *reason* it earns its spot in the markup.
 
-The wrapper is already addressable via its `data-controller` (e.g. `[data-controller~="ui--period-select"]`) if a stylesheet ever needs it. A standalone "marker class" with no consumer is just lint.
-
 ## ViewComponent rules
 
 This project uses the ViewComponent gem to render components.
