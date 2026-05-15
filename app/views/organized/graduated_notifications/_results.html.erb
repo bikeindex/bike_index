@@ -35,7 +35,7 @@
       </span>
     <% end %>
 
-    <%= render(UI::Dropdown::Component.new(name: GraduatedNotification.status_humanized(@search_status) || "All statuses", button_color: :primary, drop_direction: :left)) do |dropdown| %>
+    <%= render(UI::Dropdown::Component.new(name: GraduatedNotification.status_humanized(@search_status) || "All statuses", button_color: :primary)) do |dropdown| %>
       <% (GraduatedNotification.statuses + %w[current all]).each do |status| %>
         <% dropdown.with_entry_divider if status == "current" %>
 
