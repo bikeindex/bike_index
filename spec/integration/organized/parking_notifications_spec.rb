@@ -13,6 +13,10 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
   let!(:retrieved) { FactoryBot.create(:parking_notification_organized, :retrieved, organization:, user:) }
 
   before do
+    # Pin below the md breakpoint (768px) so the sidebar is hidden and the
+    # mobile org dropdown is the only menu path. Chrome's --window-size flag
+    # is unreliable in headless mode, so resize explicitly.
+    page.current_window.resize_to(720, 2000)
     visit new_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"

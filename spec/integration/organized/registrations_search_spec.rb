@@ -15,6 +15,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Ensure gear types exist so bike show page doesn't write during readonly mode
     RearGearType.fixed
     FrontGearType.fixed
+    # Pin below the md breakpoint (768px) so the sidebar is hidden and the
+    # mobile org dropdown is the only menu path. Chrome's --window-size flag
+    # is unreliable in headless mode, so resize explicitly.
+    page.current_window.resize_to(720, 2000)
     visit new_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
