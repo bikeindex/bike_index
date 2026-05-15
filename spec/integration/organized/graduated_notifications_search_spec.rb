@@ -103,4 +103,27 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).not_to have_content("bob@example.com")
     expect(page).to have_css(".select2-container", count: 1, wait: 10)
   end
+
+  it "restores results after back-navigating from a combobox-driven search" do
+    visit graduated_notifications_path
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
+    expect(page).to have_css("tbody tr", count: 2)
+    expect(page).to have_css(".select2-container", count: 1, wait: 10)
+
+    # Type into the select2 combobox, pick the autocomplete option, then submit
+    find(".select2-container").click
+    find(".select2-search__field").set("Black")
+    expect(page).to have_css(".select2-results__option", text: "Black", wait: 10)
+    find(".select2-results__option", text: "Black", match: :first).click
+    find("#search-button").click
+
+    expect(page).to have_current_path(/query_items/, wait: 10)
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame", wait: 10)
+
+    # Browser back: URL reverts AND the unfiltered results render again
+    page.go_back
+    expect(page).not_to have_current_path(/query_items/, wait: 10)
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
+    expect(page).to have_css("tbody tr", count: 2)
+  end
 end
