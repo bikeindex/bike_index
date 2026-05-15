@@ -23,8 +23,7 @@
 #
 # Indexes
 #
-#  index_strava_integrations_on_deleted_at  (deleted_at)
-#  index_strava_integrations_on_user_id     (user_id) UNIQUE WHERE (deleted_at IS NULL)
+#  index_strava_integrations_on_user_id  (user_id) UNIQUE WHERE (deleted_at IS NULL)
 #
 class StravaIntegration < ApplicationRecord
   STATUS_ENUM = {pending: 0, syncing: 1, synced: 2, error: 3}.freeze

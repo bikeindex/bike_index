@@ -20,7 +20,6 @@
 # Indexes
 #
 #  index_organization_stolen_messages_on_organization_id  (organization_id)
-#  index_organization_stolen_messages_on_updator_id       (updator_id)
 #
 class OrganizationStolenMessage < ApplicationRecord
   include SearchRadiusMetricable

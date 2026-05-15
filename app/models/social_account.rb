@@ -31,10 +31,7 @@
 #
 # Indexes
 #
-#  index_social_accounts_on_country_id              (country_id)
-#  index_social_accounts_on_latitude_and_longitude  (latitude,longitude)
-#  index_social_accounts_on_screen_name             (screen_name)
-#  index_social_accounts_on_state_id                (state_id)
+#  index_social_accounts_on_screen_name  (screen_name)
 #
 class SocialAccount < ApplicationRecord
   include GeocodeableLegacy

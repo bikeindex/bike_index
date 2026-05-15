@@ -13,10 +13,6 @@
 #  updated_at              :datetime         not null
 #  app_id                  :string
 #
-# Indexes
-#
-#  index_external_registry_credentials_on_type  (type)
-#
 class ExternalRegistryCredential
   class Project529Credential < ExternalRegistryCredential
     validates :app_id, :refresh_token, presence: true
