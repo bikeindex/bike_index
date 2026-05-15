@@ -66,10 +66,10 @@ class GraduatedNotification < ApplicationRecord
   scope :secondary_notification, -> { where.not("primary_notification_id = graduated_notifications.id") }
   scope :pre_notification_integration, -> { where("graduated_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION) }
   scope :email_success, -> {
-    base = left_outer_joins(:notifications)
-    legacy = base.pre_notification_integration.where.not(processed_at: nil)
-    delivered = base.merge(Notification.delivery_success)
-    legacy.or(delivered).distinct
+    left_outer_joins(:notifications)
+      .pre_notification_integration.where.not(processed_at: nil)
+      .or(left_outer_joins(:notifications).merge(Notification.delivery_success))
+      .distinct
   }
 
   def self.statuses
