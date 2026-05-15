@@ -35,30 +35,19 @@
       </span>
     <% end %>
 
-    <a
-      class="dropdown-toggle btn btn-outline-primary"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= GraduatedNotification.status_humanized(@search_status) || "All statuses" %>
-    </a>
-
-    <div class="dropdown-menu">
+    <%= render(UI::Dropdown::Component.new(name: GraduatedNotification.status_humanized(@search_status) || "All statuses", button_color: :primary, drop_direction: :left)) do |dropdown| %>
       <% (GraduatedNotification.statuses + %w[current all]).each do |status| %>
-        <% if status == "current" %>
-          <div class="dropdown-divider"></div>
-        <% end %>
+        <% dropdown.with_entry_divider if status == "current" %>
 
         <% status_active = @search_status == status %>
         <% status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status)) %>
         <% display_status = (status == "current") ? "Current (pending & graduated)" : (GraduatedNotification.status_humanized(status)&.titleize || "All statuses") %>
 
-        <%= link_to display_status, organization_graduated_notifications_path(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}", data: {turbo_action: "advance"} %>
+        <% dropdown.with_entry_item do %>
+          <%= link_to display_status, organization_graduated_notifications_path(status_link_params), class: (status_active ? "active" : nil), data: {turbo_action: "advance"} %>
+        <% end %>
       <% end %>
-    </div>
+    <% end %>
   </div>
 </div>
 

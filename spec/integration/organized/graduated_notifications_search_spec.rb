@@ -123,11 +123,11 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).not_to have_content("carol@example.com")
 
     # Status dropdown advances URL; switching to Marked Not Graduated shows only carol
-    within("turbo-frame#graduated_notifications_results_frame") { find(".dropdown-toggle").click }
-    within(".dropdown-menu") { click_link "Marked Not Graduated" }
+    within("turbo-frame#graduated_notifications_results_frame") { find("[data-ui--dropdown-target='button']").click }
+    click_link "Marked Not Graduated"
 
     expect(page).to have_current_path(/search_status=marked_remaining/, wait: 10)
-    expect(page).to have_css(".dropdown-toggle", text: /marked not graduated/i)
+    expect(page).to have_button(text: /marked not graduated/i)
     expect(page).to have_css("tbody tr", count: 1)
     expect(page).to have_content("carol@example.com")
     expect(page).not_to have_content("alice@example.com")
@@ -137,7 +137,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     visit page.current_url
     expect(page).to have_current_path(/search_status=marked_remaining/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
-    expect(page).to have_css(".dropdown-toggle", text: /marked not graduated/i)
+    expect(page).to have_button(text: /marked not graduated/i)
     expect(page).to have_css("tbody tr", count: 1)
     expect(page).to have_content("carol@example.com")
     expect(page).not_to have_content("alice@example.com")
