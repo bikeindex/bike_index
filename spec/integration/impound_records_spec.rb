@@ -27,6 +27,15 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     checkbox_for(impound_record).find(:xpath, "ancestor::td[1]", visible: :all)
   end
 
+  # Headless Chrome on CI sometimes loses the click on these freshly-enabled
+  # checkboxes (set/check/native.click all flaked), so set the property
+  # directly. The form posts the value regardless of how the box got checked.
+  def check_for_update(impound_record)
+    expect(checkbox_for(impound_record)).not_to be_disabled
+    page.execute_script("document.getElementById('ids_#{impound_record.id}').checked = true")
+    expect(checkbox_for(impound_record)).to be_checked
+  end
+
   before do
     page.current_window.resize_to(1280, 900)
     visit new_session_path
@@ -65,11 +74,9 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(page).to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
 
     # Default kind retrieved_by_owner: only registered's checkbox is enabled.
-    expect(checkbox_for(registered)).not_to be_disabled
     expect(checkbox_for(unregistered)).to be_disabled
 
-    checkbox_for(registered).set(true)
-    expect(checkbox_for(registered)).to be_checked
+    check_for_update(registered)
     within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
 
     expect(page).to have_content("Updated 1 impound record", wait: 10)
@@ -80,9 +87,7 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     click_link "update multiple records"
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
     select "Add Internal Note", from: "impound_record_update_kind"
-    expect(checkbox_for(unregistered)).not_to be_disabled
-    checkbox_for(unregistered).set(true)
-    expect(checkbox_for(unregistered)).to be_checked
+    check_for_update(unregistered)
     fill_in "impound_record_update[notes]", with: "multi-update note"
     within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
 
