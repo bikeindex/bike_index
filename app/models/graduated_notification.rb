@@ -67,7 +67,7 @@ class GraduatedNotification < ApplicationRecord
   scope :pre_notification_integration, -> { where("graduated_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION) }
   scope :email_success, -> {
     left_outer_joins(:notifications)
-      .pre_notification_integration.where.not(processed_at: nil)
+      .pre_notification_integration
       .or(left_outer_joins(:notifications).merge(Notification.delivery_success))
       .distinct
   }
