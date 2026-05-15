@@ -7,6 +7,7 @@
     <% if helpers.display_dev_info? %>
       <small class="only-dev-visible"><%= graduated_notification.id %></small>
     <% end %>
+
     <%= link_to organization_graduated_notification_path(component.link_id(graduated_notification).to_param, organization_id: graduated_notification.organization_id), class: "localizeTime preciseTime" do %>
       <%= l(graduated_notification.created_at, format: :convert_time) %>
     <% end %>
@@ -14,7 +15,9 @@
 
   <% table.column(sortable: "processed_at", label: "Sent") do |graduated_notification| %>
     <% if graduated_notification.processed_at.present? %>
-      <span class="localizeTime"><%= l(graduated_notification.processed_at, format: :convert_time) %></span>
+      <span class="localizeTime">
+        <%= l(graduated_notification.processed_at, format: :convert_time) %>
+      </span>
     <% else %>
       <small class="less-strong">
         @
@@ -33,6 +36,7 @@
     <% if graduated_notification.bike.present? %>
       <%= link_to helpers.organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: component.org_param(graduated_notification)) %>
     <% end %>
+
     <% unless separate_secondary %>
       <% graduated_notification.associated_notifications.each do |associated_notification| %>
         <small class="d-block" style="padding-left: 0.5rem; line-height: 1.5">
@@ -51,8 +55,11 @@
   <% unless @skip_email %>
     <% table.column(sortable: "email") do |graduated_notification| %>
       <%= graduated_notification.email %>
+
       <% unless skip_email_search %>
-        <small><%= link_to "🔎", url_for(sortable_search_params.merge(search_email: graduated_notification.email)) %></small>
+        <small>
+          <%= link_to "🔎", url_for(sortable_search_params.merge(search_email: graduated_notification.email)) %>
+        </small>
       <% end %>
     <% end %>
   <% end %>
@@ -60,7 +67,9 @@
   <% if @render_remaining_at %>
     <% table.column(sortable: "marked_remaining_at", label: "Marked Not Graduated") do |graduated_notification| %>
       <% if graduated_notification.marked_remaining_at.present? %>
-        <span class="localizeTime"><%= l(graduated_notification.marked_remaining_at, format: :convert_time) %></span>
+        <span class="localizeTime">
+          <%= l(graduated_notification.marked_remaining_at, format: :convert_time) %>
+        </span>
       <% end %>
     <% end %>
   <% end %>
