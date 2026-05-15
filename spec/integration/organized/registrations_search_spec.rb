@@ -15,13 +15,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Ensure gear types exist so bike show page doesn't write during readonly mode
     RearGearType.fixed
     FrontGearType.fixed
-    # Force desktop viewport — Chrome's --window-size flag is ignored in headless
-    # mode, and the organized-left-menu is `display: none` below the md breakpoint.
-    page.current_window.resize_to(1920, 1080)
     visit new_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
+    find(".alert-success .close").click
+    find("#passive_organization_submenu").click
     click_link "#{organization.short_name} Bikes"
     expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/, wait: 10)
   end
@@ -323,6 +322,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end
 
     it "searches multiple serials, shows results, and caches rows by updated_at" do
+      find("#passive_organization_submenu").click
       click_link "Multi search"
       expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
 

@@ -13,13 +13,12 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
   let!(:retrieved) { FactoryBot.create(:parking_notification_organized, :retrieved, organization:, user:) }
 
   before do
-    # Force desktop viewport — Chrome's --window-size flag is ignored in headless
-    # mode, and the organized-left-menu is `display: none` below the md breakpoint.
-    page.current_window.resize_to(1920, 1080)
     visit new_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
+    find(".alert-success .close").click
+    find("#passive_organization_submenu").click
     click_link "Parking notifications"
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
   end

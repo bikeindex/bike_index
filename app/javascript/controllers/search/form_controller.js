@@ -26,33 +26,26 @@ export default class extends Controller {
     const noJsElement = this.element.querySelector('#search_no_js')
     if (noJsElement) noJsElement.remove()
 
-    this.submitIfEmptyResults()
+    // if the frame was loaded without results, submit the form
+    if (this.frameElement?.querySelector('#loadedWithoutResults')) {
+      // Use replace for the initial auto-submit so it doesn't add a duplicate history entry
+      this.formTarget.setAttribute('data-turbo-action', 'replace')
+      this.frameElement.addEventListener('turbo:frame-render', () => {
+        this.formTarget.setAttribute('data-turbo-action', 'advance')
+      }, { once: true })
+      this.formTarget.requestSubmit()
+    }
+
     this.setupFormFieldListeners()
 
     // Add timeLocalizer and watch for turbo-frame renders
     if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
-    // Re-check after Turbo navigations: on back/forward, connect() can fire
-    // before the frame element is parsed, leaving #loadedWithoutResults in
-    // place with no auto-submit.
-    document.addEventListener('turbo:load', this.submitIfEmptyResults)
-  }
-
-  // if the frame was loaded without results, submit the form
-  submitIfEmptyResults = () => {
-    if (!this.frameElement?.querySelector('#loadedWithoutResults')) return
-    // Use replace for the initial auto-submit so it doesn't add a duplicate history entry
-    this.formTarget.setAttribute('data-turbo-action', 'replace')
-    this.frameElement.addEventListener('turbo:frame-render', () => {
-      this.formTarget.setAttribute('data-turbo-action', 'advance')
-    }, { once: true })
-    this.formTarget.requestSubmit()
   }
 
   disconnect () {
     // Clean up event listener when controller disconnects
     document.removeEventListener('turbo:frame-render', this.frameRenderHandler)
-    document.removeEventListener('turbo:load', this.submitIfEmptyResults)
   }
 
   setupFormFieldListeners () {
