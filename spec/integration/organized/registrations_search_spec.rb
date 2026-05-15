@@ -21,7 +21,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_button "Log in"
     find(".alert-success .close").click
     find("#passive_organization_submenu").click
-    click_link "#{organization.short_name} Bikes"
+    within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
     expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/, wait: 10)
   end
 
@@ -323,7 +323,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     it "searches multiple serials, shows results, and caches rows by updated_at" do
       find("#passive_organization_submenu").click
-      click_link "Multi search"
+      within(".current-organization-submenu") { click_link "Multi search" }
       expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
 
       expect(page).to have_content(/multiple serial search/i)

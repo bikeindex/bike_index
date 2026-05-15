@@ -19,7 +19,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     click_button "Log in"
     find(".alert-success .close").click
     find("#passive_organization_submenu").click
-    click_link "Parking notifications"
+    within(".current-organization-submenu") { click_link "Parking notifications" }
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
   end
 
