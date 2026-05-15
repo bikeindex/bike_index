@@ -72,11 +72,7 @@ export default class extends Controller {
 
     Object.assign(this.menuTarget.style, {
       left: `${x}px`,
-      top: `${y}px`,
-      position: 'absolute',
-      right: 'auto',
-      width: 'auto',
-      maxWidth: 'auto'
+      top: `${y}px`
     })
   }
 
