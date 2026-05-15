@@ -65,12 +65,7 @@ class GraduatedNotification < ApplicationRecord
   scope :primary_notification, -> { where("primary_notification_id = graduated_notifications.id") }
   scope :secondary_notification, -> { where.not("primary_notification_id = graduated_notifications.id") }
   scope :pre_notification_integration, -> { where("graduated_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION) }
-  scope :email_success, -> {
-    left_outer_joins(:notifications)
-      .pre_notification_integration
-      .or(left_outer_joins(:notifications).merge(Notification.delivery_success))
-      .distinct
-  }
+  scope :email_success, -> { where.not(processed_at: nil) }
 
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)
@@ -166,9 +161,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def email_success?
-    return processed_at.present? if pre_notification_integration?
-
-    notifications.delivery_success.exists?
+    processed_at.present?
   end
 
   # Get it unscoped, because we delete it
@@ -367,10 +360,10 @@ class GraduatedNotification < ApplicationRecord
   def calculated_status
     # Because prior to commit, the value for the current notification isn't set
     return "marked_remaining" if marked_remaining_at.present?
+    return "delivery_failure" if processed_at.present? && notifications.delivery_failure.exists?
 
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
     return "bike_graduated" if email_success? || primary_notification.present? && primary_notification.email_success?
-    return "delivery_failure" if processed_at.present? && notifications.delivery_failure.exists?
 
     "pending"
   end
