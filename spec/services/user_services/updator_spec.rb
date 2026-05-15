@@ -5,11 +5,8 @@ RSpec.describe UserServices::Updator do
 
   describe "bikes_for_user" do
     let!(:bike_kept) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
-    let!(:bike_transferred) do
-      FactoryBot.create(:bike, :with_ownership_claimed, user:).tap do |bike|
-        BikeServices::OwnershipTransferer.find_or_create(bike, updator: user, new_owner_email: "newowner@example.com")
-      end
-    end
+    let!(:bike_transferred) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    before { BikeServices::OwnershipTransferer.find_or_create(bike_transferred, updator: user, new_owner_email: "newowner@example.com") }
     let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user:, deleted_at: Time.current) }
 
     it "matches user.bikes" do
