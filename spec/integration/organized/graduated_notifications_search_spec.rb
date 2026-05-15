@@ -10,8 +10,13 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
 
   let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization, owner_email: "alice@example.com", created_at: earliest_time) }
   let(:bike2) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization, owner_email: "bob@example.com", created_at: earliest_time) }
+  let(:bike3) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization, owner_email: "carol@example.com", created_at: earliest_time) }
   let!(:graduated_notification1) { FactoryBot.create(:graduated_notification_bike_graduated, organization:, bike: bike1) }
   let!(:graduated_notification2) { FactoryBot.create(:graduated_notification_bike_graduated, organization:, bike: bike2) }
+  # carol's notification is in the marked_remaining (not graduated) status; the
+  # default "current" filter excludes it, but the "Marked Not Graduated" status
+  # filter shows only her.
+  let!(:graduated_notification3) { FactoryBot.create(:graduated_notification, :marked_remaining, organization:, bike: bike3) }
 
   before do
     # Ensure gear types exist so the bike show page doesn't write during readonly mode
@@ -119,5 +124,44 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
     expect(page).to have_css(".select2-container", count: 1, wait: 10)
+
+    # Clear the email filter via the form so the status dropdown test starts clean
+    fill_in "search_email", with: ""
+    find("#search-button").click
+    expect(page).to have_css("tbody tr", count: 2, wait: 10)
+    expect(page).to have_content("alice@example.com")
+    expect(page).to have_content("bob@example.com")
+    expect(page).not_to have_content("carol@example.com")
+
+    # Status dropdown click: links use data-turbo-action="advance", so the frame
+    # updates AND the URL pushes to history. Switching to "Marked Not Graduated"
+    # shows only carol (and hides alice/bob).
+    within("turbo-frame#graduated_notifications_results_frame") { find(".dropdown-toggle").click }
+    within(".dropdown-menu") { click_link "Marked Not Graduated" }
+
+    expect(page).to have_current_path(/search_status=marked_remaining/, wait: 10)
+    expect(page).to have_css(".dropdown-toggle", text: /marked not graduated/i)
+    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_content("carol@example.com")
+    expect(page).not_to have_content("alice@example.com")
+    expect(page).not_to have_content("bob@example.com")
+
+    # Reload — URL state is preserved AND the dropdown re-renders selected
+    visit page.current_url
+    expect(page).to have_current_path(/search_status=marked_remaining/, wait: 10)
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
+    expect(page).to have_css(".dropdown-toggle", text: /marked not graduated/i)
+    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_content("carol@example.com")
+    expect(page).not_to have_content("alice@example.com")
+    expect(page).not_to have_content("bob@example.com")
+
+    # Submitting the form (e.g. another email search) should preserve the
+    # selected status via the hidden search_status field. Without the hidden
+    # field, status would reset to the default ("current") and carol would
+    # disappear from the results.
+    find("#search-button").click
+    expect(page).to have_current_path(/search_status=marked_remaining/, wait: 10)
+    expect(page).to have_content("carol@example.com")
   end
 end

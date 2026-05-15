@@ -30,11 +30,23 @@
   </div>
 <% end %>
 
+<%#
+  Merge search_status/search_secondary so the form's default hidden_field_tag
+  re-emits them, preserving the selection across submits (e.g. an email search
+  keeps the active status filter). The block-content pattern can't be used
+  here because the form component already renders default hidden_field_tags
+  for these keys AFTER the block, overriding the block's values with empty.
+  Reads params (not @search_status) because @search_status is only set inside
+  available_graduated_notifications, which doesn't run on the initial
+  non-turbo render.
+%>
+<% form_interpreted_params = @interpreted_params.merge(search_status: params[:search_status], search_secondary: params[:search_secondary]).compact %>
+
 <div class="mt-4">
   <%= render(Search::FormOrganized::Component.new(
     target_search_path: organization_graduated_notifications_path(organization_id: current_organization.to_param),
     target_frame: :graduated_notifications_results_frame,
-    interpreted_params: @interpreted_params
+    interpreted_params: form_interpreted_params
   )) %>
 </div>
 
