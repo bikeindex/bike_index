@@ -13,9 +13,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
   let(:bike3) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization, owner_email: "carol@example.com", created_at: earliest_time) }
   let!(:graduated_notification1) { FactoryBot.create(:graduated_notification_bike_graduated, organization:, bike: bike1) }
   let!(:graduated_notification2) { FactoryBot.create(:graduated_notification_bike_graduated, organization:, bike: bike2) }
-  # carol's notification is in the marked_remaining (not graduated) status; the
-  # default "current" filter excludes it, but the "Marked Not Graduated" status
-  # filter shows only her.
+  # marked_remaining is excluded from the default "current" status filter
   let!(:graduated_notification3) { FactoryBot.create(:graduated_notification, :marked_remaining, organization:, bike: bike3) }
 
   before do
@@ -54,19 +52,13 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 2)
     expect(page).to have_field("search_email", with: "")
     expect(page).not_to have_current_path(/search_email=alice/)
-    # Verify select2 is re-initialized cleanly: exactly one container AND it opens
-    # when clicked (catches turbo-cache stale-DOM regression)
+    # Verify select2 is re-initialized cleanly (catches turbo-cache stale-DOM regression)
     expect(page).to have_css(".select2-container", count: 1, wait: 10)
     find(".select2-container").click
     expect(page).to have_css(".select2-container--open", wait: 5)
-    # Close it again so subsequent interactions aren't blocked by the dropdown
     find("body").send_keys(:escape)
 
-    # Search by email via the form, then press back directly. Regression guard
-    # for the turbo:submit-start spinner-replacement: showLoadingSpinnerAndDisableButton
-    # replaces the frame's innerHTML with the spinner before Turbo snapshots the
-    # previous URL. Without a fix, back-nav restores that broken snapshot —
-    # form still has "alice", URL has no query, frame stuck on the spinner.
+    # Form submit + direct back-nav: regression guard for turbo-cache spinner state
     fill_in "search_email", with: "alice@example.com"
     find("#search-button").click
 
@@ -74,9 +66,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 1)
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
-    # turbo-frame element must survive the turbo_stream response (regression guard:
-    # turbo_stream.replace would remove the frame element, breaking subsequent submits
-    # and back-nav restoration)
+    # turbo-frame survives the turbo_stream response (catches replace-vs-update regression)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame")
 
     page.go_back
@@ -85,7 +75,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 2)
     expect(page).to have_field("search_email", with: "")
 
-    # Re-apply the alice filter so the next steps (click row, back-nav) have state
+    # Re-apply alice filter for click-row/back-nav steps
     fill_in "search_email", with: "alice@example.com"
     find("#search-button").click
 
@@ -99,7 +89,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_content("alice@example.com")
     expect(page).to have_content("User Bikes")
 
-    # Going back restores the filtered search: URL, populated field, and single-row table
+    # Back from notification show: filtered search restored
     page.go_back
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
@@ -107,7 +97,6 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_field("search_email", with: "alice@example.com")
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
-    # select2-powered combobox is re-initialized exactly once (no double-init, no missing init)
     expect(page).to have_css(".select2-container", count: 1, wait: 10)
 
     within("tbody tr") { find("a[href^='/bikes/']").click }
@@ -115,7 +104,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_current_path(%r{/bikes/#{bike1.id}(\?|\z)}, wait: 10)
     expect(page).to have_css(".organized-access-panel")
 
-    # Going back from the bike show page also restores the filtered search
+    # Back from bike show: filtered search restored
     page.go_back
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
@@ -125,7 +114,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).not_to have_content("bob@example.com")
     expect(page).to have_css(".select2-container", count: 1, wait: 10)
 
-    # Clear the email filter via the form so the status dropdown test starts clean
+    # Clear email filter for status-dropdown test
     fill_in "search_email", with: ""
     find("#search-button").click
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
@@ -133,9 +122,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_content("bob@example.com")
     expect(page).not_to have_content("carol@example.com")
 
-    # Status dropdown click: links use data-turbo-action="advance", so the frame
-    # updates AND the URL pushes to history. Switching to "Marked Not Graduated"
-    # shows only carol (and hides alice/bob).
+    # Status dropdown advances URL; switching to Marked Not Graduated shows only carol
     within("turbo-frame#graduated_notifications_results_frame") { find(".dropdown-toggle").click }
     within(".dropdown-menu") { click_link "Marked Not Graduated" }
 
@@ -146,7 +133,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).not_to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
 
-    # Reload — URL state is preserved AND the dropdown re-renders selected
+    # Reload preserves URL + dropdown selection
     visit page.current_url
     expect(page).to have_current_path(/search_status=marked_remaining/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
@@ -156,12 +143,17 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).not_to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
 
-    # Submitting the form (e.g. another email search) should preserve the
-    # selected status via the hidden search_status field. Without the hidden
-    # field, status would reset to the default ("current") and carol would
-    # disappear from the results.
+    # Submit again — hidden search_status field preserves the selection
     find("#search-button").click
     expect(page).to have_current_path(/search_status=marked_remaining/, wait: 10)
     expect(page).to have_content("carol@example.com")
+
+    # search_secondary also persists via hidden field
+    visit "#{graduated_notifications_path}?search_secondary=true"
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
+    fill_in "search_email", with: "alice@example.com"
+    find("#search-button").click
+    expect(page).to have_current_path(/search_secondary=true/, wait: 10)
+    expect(page).to have_current_path(/search_email=alice/, wait: 10)
   end
 end

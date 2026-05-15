@@ -31,7 +31,7 @@
   <div class="col-sm-6 text-right">
     <% if display_dev_info? %>
       <span class="only-dev-visible mr-2 pl-1 pr-1 pt-1 pb-2">
-        <%= link_to "separate secondary", url_for(sortable_search_params.merge(search_secondary: !separate_secondary_notifications?)), class: (separate_secondary_notifications? ? "active btn btn-primary btn-sm" : "less-strong small") %>
+        <%= link_to "separate secondary", url_for(sortable_search_params.merge(search_secondary: !separate_secondary_notifications?)), class: (separate_secondary_notifications? ? "active btn btn-primary btn-sm" : "less-strong small"), data: {turbo_action: "advance"} %>
       </span>
     <% end %>
 

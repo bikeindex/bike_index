@@ -21,9 +21,8 @@ export default class extends Controller {
     // remove the query field that is for users that don't have JS
     this.nonjsfieldsTargets.forEach(el => { if (el) el.remove() })
 
-    // On Turbo back-nav the cached snapshot keeps select2's DOM mutations but
-    // not the live instance — keeping select2-hidden-accessible makes select2
-    // read outerWidth=1px on re-init, so strip everything before re-initializing.
+    // Strip stale select2 DOM/classes from cached Turbo snapshot: leaving
+    // select2-hidden-accessible makes select2 read outerWidth=1px on re-init.
     const $input = $(this.inputTarget)
     $input.siblings('.select2-container').remove()
     $input
