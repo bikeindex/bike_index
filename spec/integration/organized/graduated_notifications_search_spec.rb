@@ -57,7 +57,11 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     # Close it again so subsequent interactions aren't blocked by the dropdown
     find("body").send_keys(:escape)
 
-    # Now exercise the form-submit search path too
+    # Search by email via the form, then press back directly. Regression guard
+    # for the turbo:submit-start spinner-replacement: showLoadingSpinnerAndDisableButton
+    # replaces the frame's innerHTML with the spinner before Turbo snapshots the
+    # previous URL. Without a fix, back-nav restores that broken snapshot —
+    # form still has "alice", URL has no query, frame stuck on the spinner.
     fill_in "search_email", with: "alice@example.com"
     find("#search-button").click
 
@@ -69,6 +73,19 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     # turbo_stream.replace would remove the frame element, breaking subsequent submits
     # and back-nav restoration)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame")
+
+    page.go_back
+    expect(page).not_to have_current_path(/search_email=alice/, wait: 10)
+    expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
+    expect(page).to have_css("tbody tr", count: 2)
+    expect(page).to have_field("search_email", with: "")
+
+    # Re-apply the alice filter so the next steps (click row, back-nav) have state
+    fill_in "search_email", with: "alice@example.com"
+    find("#search-button").click
+
+    expect(page).to have_current_path(/search_email=alice/, wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
 
     within("tbody tr") { first("a.preciseTime").click }
 

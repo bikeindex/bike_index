@@ -1,5 +1,15 @@
 <%# TODO: add translations %>
 
+<%# Disable Turbo Drive's snapshot cache. The form lives outside the turbo-frame, %>
+<%# so when a form submit advances the URL via turbo_action="advance", Turbo's %>
+<%# snapshot of the previous URL captures form state that doesn't match the URL %>
+<%# (form="alice" + URL=unfiltered). On back, that mismatched snapshot is %>
+<%# restored. no-cache forces a fresh fetch on back-nav, which re-renders the %>
+<%# page with the form cleared (matching the URL). %>
+<% content_for :header do %>
+  <meta name="turbo-cache-control" content="no-cache">
+<% end %>
+
 <div class="organized-page-header">
   <h1>Graduated notifications</h1>
 </div>
