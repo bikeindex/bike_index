@@ -4,7 +4,6 @@
 # Database name: primary
 #
 #  id                          :bigint           not null, primary key
-#  delivery_status             :string
 #  email                       :string
 #  marked_remaining_at         :datetime
 #  marked_remaining_link_token :text
@@ -32,8 +31,11 @@
 class GraduatedNotification < ApplicationRecord
   include StatusHumanizable
 
-  STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
+  STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2, delivery_failure: 3}.freeze
   PENDING_PERIOD = 24.hours.freeze
+  # Cutoff for when graduated_notifications started routing email delivery through Notification records.
+  # Records created before this time have no associated Notification. If they're in the DB, they emailed successfully
+  PRE_NOTIFICATION_INTEGRATION = Time.at(1778809093).freeze
 
   enum :status, STATUS_ENUM
 
@@ -45,6 +47,7 @@ class GraduatedNotification < ApplicationRecord
   belongs_to :primary_notification, class_name: "GraduatedNotification"
   belongs_to :marked_remaining_by, class_name: "User"
 
+  has_many :notifications, as: :notifiable
   has_many :secondary_notifications, class_name: "GraduatedNotification", foreign_key: :primary_notification_id
 
   validates_presence_of :bike_id, :organization_id, :bike_organization_id
@@ -59,9 +62,15 @@ class GraduatedNotification < ApplicationRecord
   scope :current, -> { where(status: current_statuses) }
   scope :processed, -> { where(status: processed_statuses) }
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
-  scope :primary_notification, -> { where("primary_notification_id = id") }
-  scope :secondary_notification, -> { where.not("primary_notification_id  = id") }
-  scope :email_success, -> { where(delivery_status: "email_success") }
+  scope :primary_notification, -> { where("primary_notification_id = graduated_notifications.id") }
+  scope :secondary_notification, -> { where.not("primary_notification_id = graduated_notifications.id") }
+  scope :pre_notification_integration, -> { where("graduated_notifications.processed_at < ?", PRE_NOTIFICATION_INTEGRATION) }
+  scope :email_success, -> {
+    left_outer_joins(:notifications)
+      .pre_notification_integration
+      .or(left_outer_joins(:notifications).merge(Notification.delivery_success))
+      .distinct
+  }
 
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)
@@ -72,7 +81,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def self.processed_statuses
-    %w[bike_graduated marked_remaining]
+    %w[bike_graduated marked_remaining delivery_failure]
   end
 
   def self.unprocessed_statuses
@@ -157,7 +166,9 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def email_success?
-    delivery_status == "email_success"
+    return true if pre_notification_integration?
+
+    notifications.delivery_success.exists?
   end
 
   # Get it unscoped, because we delete it
@@ -323,11 +334,10 @@ class GraduatedNotification < ApplicationRecord
     user_registration_organization&.destroy_for_graduated_notification!
     bike_organization&.destroy!
 
-    # deliver email before everything, so if fails, we send when we try again
-    OrganizedMailer.graduated_notification(self).deliver_now if send_email?
+    deliver_email if send_email?
 
     @skip_update = true
-    update(processed_at: Time.current, delivery_status: "email_success", skip_update: true)
+    update(processed_at: Time.current, skip_update: true)
     return true unless primary_notification?
 
     # Update the associated notifications after updating the primary notification, so if we fail, they can be updated by the worker
@@ -345,12 +355,24 @@ class GraduatedNotification < ApplicationRecord
 
   private
 
+  def deliver_email
+    notification = notifications.first ||
+      Notification.create(kind: "graduated_notification", notifiable: self,
+        user_id:, message_channel_target: email, bike_id:)
+    notification.track_email_delivery do
+      OrganizedMailer.graduated_notification(self).deliver_now
+    end
+  end
+
   def calculated_status
     # Because prior to commit, the value for the current notification isn't set
     return "marked_remaining" if marked_remaining_at.present?
+    return "delivery_failure" if processed_at.present? && notifications.delivery_failure.exists?
 
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
-    (email_success? || primary_notification.present? && primary_notification.email_success?) ? "bike_graduated" : "pending"
+    return "bike_graduated" if email_success? || primary_notification.present? && primary_notification.email_success?
+
+    "pending"
   end
 
   def calculated_email
@@ -422,5 +444,9 @@ class GraduatedNotification < ApplicationRecord
 
   def mark_previous_notifications_not_most_recent
     previous_notifications.most_recent.update_all(not_most_recent: true)
+  end
+
+  def pre_notification_integration?
+    processed_at.present? && processed_at < PRE_NOTIFICATION_INTEGRATION
   end
 end

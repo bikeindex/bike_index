@@ -1539,7 +1539,6 @@ CREATE TABLE public.graduated_notifications (
     marked_remaining_at timestamp without time zone,
     status integer DEFAULT 0,
     email character varying,
-    delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     not_most_recent boolean DEFAULT false,
@@ -7165,6 +7164,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260514182008'),
 ('20260514085900'),
 ('20260430122735'),
 ('20260428142526'),
