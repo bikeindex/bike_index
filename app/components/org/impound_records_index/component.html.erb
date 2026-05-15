@@ -147,7 +147,7 @@
   </div>
 
   <div class="full-screen-table">
-    <%= render partial: "/organized/impound_records/table", locals: { impound_records: @impound_records, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status } %>
+    <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status)) %>
   </div>
 <% end %>
 
