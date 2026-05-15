@@ -171,10 +171,6 @@ class GraduatedNotification < ApplicationRecord
     notifications.delivery_success.exists?
   end
 
-  def pre_notification_integration?
-    created_at.present? && created_at < PRE_NOTIFICATION_INTEGRATION
-  end
-
   # Get it unscoped, because we delete it
   def bike_organization
     bike_organization_id.present? ? BikeOrganization.unscoped.find_by_id(bike_organization_id) : nil
@@ -448,5 +444,9 @@ class GraduatedNotification < ApplicationRecord
 
   def mark_previous_notifications_not_most_recent
     previous_notifications.most_recent.update_all(not_most_recent: true)
+  end
+
+  def pre_notification_integration?
+    created_at.present? && created_at < PRE_NOTIFICATION_INTEGRATION
   end
 end
