@@ -36,7 +36,7 @@ class GraduatedNotification < ApplicationRecord
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2, delivery_failure: 3}.freeze
   PENDING_PERIOD = 24.hours.freeze
   # Cutoff for when graduated_notifications started routing email delivery through Notification records.
-  # Records created before this time have no associated Notification, so email success is implicit.
+  # Records created before this time have no associated Notification. If they're in the DB, they emailed successfully
   PRE_NOTIFICATION_INTEGRATION = Time.at(1778778474).freeze
 
   enum :status, STATUS_ENUM
@@ -68,9 +68,8 @@ class GraduatedNotification < ApplicationRecord
   scope :secondary_notification, -> { where.not("primary_notification_id  = id") }
   scope :pre_notification_integration, -> { where("graduated_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION) }
   scope :email_success, -> {
-    legacy = pre_notification_integration.where.not(processed_at: nil)
     delivered = joins(:notifications).merge(Notification.delivery_success)
-    where(id: legacy.select(:id)).or(where(id: delivered.select(:id)))
+    pre_notification_integration.or(where(id: delivered.select(:id)))
   }
 
   def self.statuses

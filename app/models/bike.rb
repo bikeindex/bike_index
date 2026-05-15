@@ -472,9 +472,8 @@ class Bike < ApplicationRecord
   end
 
   def messages_count
-    notifications.where("notifications.notifiable_type IS DISTINCT FROM ?", "GraduatedNotification").count +
-      parking_notifications.count + Feedback.bike(id).count +
-      UserAlert.where(bike_id: id).count + GraduatedNotification.where(bike_id: id).count
+    notifications.count + parking_notifications.count + Feedback.bike(id).count +
+      UserAlert.where(bike_id: id).count
   end
 
   # The appropriate edit template to use in the edit view.
