@@ -61,14 +61,18 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
 
     click_link "update multiple records"
 
-    expect(page).to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true, wait: 5)
+    # Wait for the makeMultiUpdate panel to be expanded — the kind <select> is
+    # inside it, so its visibility is the signal the Bootstrap collapse has run.
+    expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
+    expect(page).to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
 
     # Default kind retrieved_by_owner: only registered's checkbox is enabled.
     expect(checkbox_for(registered)).not_to be_disabled
     expect(checkbox_for(unregistered)).to be_disabled
 
-    checkbox_for(registered).check
-    within("#impoundRecordUpdateForm") { find('input[type=submit]').click }
+    checkbox_for(registered).set(true)
+    expect(checkbox_for(registered)).to be_checked
+    within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
 
     expect(page).to have_content("Updated 1 impound record", wait: 10)
     expect(registered.impound_record_updates.pluck(:kind)).to eq ["retrieved_by_owner"]
@@ -76,12 +80,13 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
 
     # Now apply a note update to the unregistered record — a kind it allows.
     click_link "update multiple records"
-    expect(page).to have_css("input[type=checkbox][name='ids[#{unregistered.id}]']", visible: true, wait: 5)
+    expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
     select "Add Internal Note", from: "impound_record_update_kind"
     expect(checkbox_for(unregistered)).not_to be_disabled
-    checkbox_for(unregistered).check
+    checkbox_for(unregistered).set(true)
+    expect(checkbox_for(unregistered)).to be_checked
     fill_in "impound_record_update[notes]", with: "multi-update note"
-    within("#impoundRecordUpdateForm") { find('input[type=submit]').click }
+    within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
 
     expect(page).to have_content("Updated 1 impound record", wait: 10)
     last_update = unregistered.impound_record_updates.reorder(:id).last
