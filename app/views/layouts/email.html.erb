@@ -21,6 +21,15 @@
 
   <body>
     <div class="binx-wrapper">
+      <% if @email_sent_at.present? %>
+        <%= stylesheet_link_tag "tailwind" %>
+        <% if @email_sent_at >= MailSnippet::PAPER_TRAIL_TRACKING_STARTED_AT %>
+          <%= render(UI::Alert::Component.new(kind: :notice, margin_classes: "", text: "this is the version that was shown to the user, not the current version")) %>
+        <% else %>
+          <%= render(UI::Alert::Component.new(kind: :warning, margin_classes: "", text: "This was sent before we tracked versions, so it may not match what the user saw (if you edited your custom email)")) %>
+        <% end %>
+      <% end %>
+
       <% unless @skip_header %>
         <table class="binx-header">
           <tbody>
