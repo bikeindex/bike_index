@@ -64,8 +64,13 @@ class GraduatedNotification < ApplicationRecord
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
   scope :primary_notification, -> { where("primary_notification_id = graduated_notifications.id") }
   scope :secondary_notification, -> { where.not("primary_notification_id = graduated_notifications.id") }
-  scope :pre_notification_integration, -> { where("graduated_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION) }
-  scope :email_success, -> { where.not(processed_at: nil) }
+  scope :pre_notification_integration, -> { where("graduated_notifications.processed_at < ?", PRE_NOTIFICATION_INTEGRATION) }
+  scope :email_success, -> {
+    left_outer_joins(:notifications)
+      .pre_notification_integration
+      .or(left_outer_joins(:notifications).merge(Notification.delivery_success))
+      .distinct
+  }
 
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)
@@ -161,7 +166,9 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def email_success?
-    processed_at.present?
+    return true if pre_notification_integration?
+
+    notifications.delivery_success.exists?
   end
 
   # Get it unscoped, because we delete it
@@ -440,6 +447,6 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def pre_notification_integration?
-    created_at.present? && created_at < PRE_NOTIFICATION_INTEGRATION
+    processed_at.present? && processed_at < PRE_NOTIFICATION_INTEGRATION
   end
 end
