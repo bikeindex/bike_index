@@ -82,7 +82,7 @@
   </div>
 
   <%# Form needs to wrap the table too. Similar to form on parking notification show %>
-  <%= form_for ImpoundRecordUpdate.new, url: organization_impound_record_path("multi_update", organization_id: @current_organization), action: "update", method: :patch do |f| %>
+  <%= form_for ImpoundRecordUpdate.new, url: organization_impound_record_path("multi_update", organization_id: @current_organization), action: "update", method: :patch, data: {controller: "table-multi-checkbox"} do |f| %>
     <div
       id="makeMultiUpdate"
       class="tw:hidden"

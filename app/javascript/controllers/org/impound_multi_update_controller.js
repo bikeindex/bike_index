@@ -4,7 +4,8 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='org--impound-multi-update'
 // Drives the impound records index multi-update form: reveals the update panel
 // and the checkbox column, shows the kind-specific fields, and enables only the
-// checkboxes whose row supports the selected update kind.
+// checkboxes whose row supports the selected update kind. Select-all is handled
+// by the separate table-multi-checkbox controller.
 export default class extends Controller {
   static targets = ['toggle', 'panel', 'kindSelect', 'kindField']
 
@@ -36,15 +37,6 @@ export default class extends Controller {
         checkbox.checked = false
         cell.title = `This record can't be updated with '${this.kindLabel}'`
       }
-    })
-  }
-
-  selectAll (event) {
-    event.preventDefault()
-    this.allChecked = !this.allChecked
-    this.cells.forEach(cell => {
-      const checkbox = cell.querySelector('input[type=checkbox]')
-      if (checkbox && !checkbox.disabled) checkbox.checked = this.allChecked
     })
   }
 
