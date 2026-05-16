@@ -12,6 +12,7 @@
   <% end %>
 </div>
 
+<div data-controller="org--impound-multi-update">
 <div class="row mt-4 mb-4">
   <div class="col-sm-9">
     <%= number_with_delimiter(@pagy.count) %>
@@ -70,10 +71,9 @@
     <div class="text-right">
       <a
         class="gray-link"
-        id="toggleMultiUpdate"
-        href="#makeMultiUpdate"
-        data-toggle="collapse"
-        data-target="#makeMultiUpdate"
+        href="#"
+        data-org--impound-multi-update-target="toggle"
+        data-action="org--impound-multi-update#open"
       >
         <%= translation(".update_multiple_records").downcase %>
       </a>
@@ -83,7 +83,7 @@
 
 <%# Form needs to wrap the table too. Similar to form on parking notification show %>
 <%= form_for ImpoundRecordUpdate.new, url: organization_impound_record_path("multi_update", organization_id: @current_organization), action: "update", method: :patch do |f| %>
-  <div id="makeMultiUpdate" class="collapse">
+  <div id="makeMultiUpdate" class="tw:hidden" data-org--impound-multi-update-target="panel">
     <div class="row">
       <div class="mt-4 mb-4 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
         <div class="card">
@@ -106,11 +106,12 @@
                     <%= f.select :kind,
                       options_for_select(kinds_for_select.map { |k, v| [v.titleize, k] }, "retrieved_by_owner"),
                       {},
-                      class: "form-control" %>
+                      class: "form-control",
+                      data: {"org--impound-multi-update-target": "kindSelect", action: "change->org--impound-multi-update#applyKind"} %>
                   </div>
 
                   <% if @current_organization.enabled?("impound_bikes_locations") %>
-                    <div class="col-sm-6 collapse collapseKind kind_move_location mb-2">
+                    <div class="col-sm-6 tw:hidden mb-2" data-org--impound-multi-update-target="kindField" data-kind="move_location">
                       <%= f.select :location_id,
                         options_for_select(@current_organization.locations.impound_locations.map { |l| [l.name, l.id] }, @current_organization.default_impound_location&.id),
                         {},
@@ -118,12 +119,7 @@
                     </div>
                   <% end %>
 
-                  <div
-                    class="
-                      col-sm-6 collapse collapseKind
-                      kind_transferred_to_new_owner mb-2
-                    "
-                  >
+                  <div class="col-sm-6 tw:hidden mb-2" data-org--impound-multi-update-target="kindField" data-kind="transferred_to_new_owner">
                     <%= f.email_field :transfer_email, placeholder: translation(".new_owner_email"), class: "form-control" %>
                   </div>
                 </div>
@@ -149,6 +145,7 @@
     <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status)) %>
   </div>
 <% end %>
+</div>
 
 <div class="pt-4 pb-4">
   <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>

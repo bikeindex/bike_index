@@ -2,12 +2,12 @@
 
 require "rails_helper"
 
-# Verifies the multi-update behavior wired up in application.js: the per-row
-# `canupdate-<kind>` classes drive which checkboxes get enabled/disabled when
-# the kind dropdown changes. Lives at the integration layer because the JS
-# selectors target `.multiselect-cell.canupdate-X input` on the rendered
-# `<td>`s, so the Org::ImpoundRecordsTable component has to keep those classes
-# on the cell elements themselves (not on a wrapper).
+# Verifies the multi-update behavior driven by the `org--impound-multi-update`
+# Stimulus controller: the per-row `canupdate-<kind>` classes drive which
+# checkboxes get enabled/disabled when the kind dropdown changes. Lives at the
+# integration layer because the controller targets `.multi-update-cell.canupdate-X`
+# on the rendered `<td>`s, so the Org::ImpoundRecordsTable component has to keep
+# those classes on the cell elements themselves (not on a wrapper).
 RSpec.describe "Organized impound records multi-update", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
@@ -69,7 +69,7 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     click_link "update multiple records"
 
     # Wait for the makeMultiUpdate panel to be expanded — the kind <select> is
-    # inside it, so its visibility is the signal the Bootstrap collapse has run.
+    # inside it, so its visibility is the signal the Stimulus controller has run.
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
     expect(page).to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
 

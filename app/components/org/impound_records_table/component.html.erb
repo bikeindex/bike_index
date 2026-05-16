@@ -65,8 +65,8 @@
   <% end %>
 
   <% unless @skip_multiselect %>
-    <% select_all = link_to(check_mark, "#", id: "selectAllSelector") %>
-    <% table.column(label: select_all, classes: method(:multiselect_cell_classes), header_classes: "multiselect-cell table-cell-check collapse") do |impound_record| %>
+    <% select_all = link_to(check_mark, "#", data: {action: "org--impound-multi-update#selectAll"}) %>
+    <% table.column(label: select_all, classes: method(:multiselect_cell_classes), header_classes: "multi-update-cell table-cell-check tw:hidden") do |impound_record| %>
       <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id %>
     <% end %>
   <% end %>

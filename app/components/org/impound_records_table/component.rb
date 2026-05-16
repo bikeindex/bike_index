@@ -17,7 +17,7 @@ module Org
       end
 
       def multiselect_cell_classes(impound_record)
-        ["multiselect-cell table-cell-check collapse",
+        ["multi-update-cell table-cell-check tw:hidden",
           *impound_record.update_multi_kinds.map { |k| "canupdate-#{k}" }].join(" ")
       end
     end
