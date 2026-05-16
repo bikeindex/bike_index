@@ -14,21 +14,17 @@ module UI
       }
 
       PLACEMENTS = {
-        bottom_end: "bottom-end",
-        bottom_start: "bottom-start",
-        top_end: "top-end",
-        top_start: "top-start",
-        right: "right",
-        left: "left"
+        down: "bottom-end",
+        up: "top-end"
       }.freeze
 
-      def initialize(name:, drop_direction: :bottom_end, button_class: nil, button_color: :secondary, button_size: :md, active: false)
+      def initialize(name:, drop_direction: :down, button_class: nil, button_color: :secondary, button_size: :md, active: false)
         @name = name
         @button_class = button_class
         @button_color = button_color
         @button_size = button_size
         @active = active
-        @placement = PLACEMENTS.fetch(drop_direction, PLACEMENTS[:bottom_end])
+        @placement = PLACEMENTS.fetch(drop_direction, PLACEMENTS[:down])
       end
 
       private
