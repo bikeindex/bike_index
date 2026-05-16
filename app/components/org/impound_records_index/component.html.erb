@@ -21,7 +21,7 @@
       <em><%= helpers.humanized_time_range(@time_range) %></em>
 
       <div class="tw:ml-2 tw:inline-block">
-        <%= render(UI::Dropdown::Component.new(name: status_dropdown_text, button_color: :primary, active: @search_status != "current")) do |dropdown| %>
+        <%= render(UI::Dropdown::Component.new(name: status_dropdown_text, button_color: (@search_status == "current") ? :secondary : :primary, active: @search_status != "current")) do |dropdown| %>
           <% @available_statuses.each do |status| %>
             <% status_active = @search_status == status %>
             <% status_link_params = sortable_search_params.merge(organization_id: @current_organization.id, search_status: (status_active ? nil : status)) %>
@@ -34,7 +34,7 @@
       </div>
 
       <div class="tw:ml-2 tw:inline-block">
-        <%= render(UI::Dropdown::Component.new(name: unregisteredness_dropdown_text, button_size: :sm, active: @search_unregisteredness != "all")) do |dropdown| %>
+        <%= render(UI::Dropdown::Component.new(name: unregisteredness_dropdown_text, button_size: :sm, button_color: (@search_unregisteredness == "all") ? :secondary : :primary, active: @search_unregisteredness != "all")) do |dropdown| %>
           <% dropdown.with_entry_item { link_to translation(".all_bikes"), organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: ("active" if @search_unregisteredness == "all") } %>
           <% dropdown.with_entry_item { link_to translation(".only_unregistered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: ("active" if @search_unregisteredness == "only_unregistered") } %>
           <% dropdown.with_entry_item { link_to translation(".only_user_registered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: ("active" if @search_unregisteredness == "only_registered") } %>
