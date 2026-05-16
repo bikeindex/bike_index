@@ -44,14 +44,11 @@
 
     <div class="col-lg-3">
       <div class="text-right">
-        <a
-          class="gray-link"
-          href="#"
-          data-org--impound-multi-update-target="toggle"
-          data-action="org--impound-multi-update#open"
-        >
-          <%= translation(".update_multiple_records").downcase %>
-        </a>
+        <%= render(UI::Button::Component.new(
+          text: translation(".update_multiple_records").downcase,
+          color: :link,
+          data: {"org--impound-multi-update-target": "toggle", action: "org--impound-multi-update#open"}
+        )) %>
       </div>
     </div>
   </div>

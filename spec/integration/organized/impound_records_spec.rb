@@ -61,7 +61,7 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     # Cells are hidden until the user opts into multi-update.
     expect(page).not_to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
 
-    click_link "update multiple records"
+    click_button "update multiple records"
 
     # Wait for the makeMultiUpdate panel to be expanded — the kind <select> is
     # inside it, so its visibility is the signal the Stimulus controller has run.
@@ -79,7 +79,7 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(unregistered.impound_record_updates).to be_empty
 
     # Now apply a note update to the unregistered record — a kind it allows.
-    click_link "update multiple records"
+    click_button "update multiple records"
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
     select "Add Internal Note", from: "impound_record_update_kind"
     check_for_update(unregistered)
