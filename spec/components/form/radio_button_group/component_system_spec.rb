@@ -24,6 +24,17 @@ RSpec.describe Form::RadioButtonGroup::Component, :js, type: :system do
     end
   end
 
+  context "with_html_labels" do
+    it "keeps spaces around inline markup" do
+      visit("#{base_path}with_html_labels")
+
+      # The label is inline-flex, so each text run/element is a separate flex
+      # item — without a wrapper the whitespace between them gets collapsed.
+      expect(find("label", text: "only not impounded")).to be_present
+      expect(find("label", text: "only impounded")).to be_present
+    end
+  end
+
   context "with_selection" do
     it "renders with pre-selected value" do
       visit("#{base_path}with_selection")
