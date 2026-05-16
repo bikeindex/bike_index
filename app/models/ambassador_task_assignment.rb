@@ -12,8 +12,7 @@
 #
 # Indexes
 #
-#  index_ambassador_task_assignments_on_ambassador_task_id  (ambassador_task_id)
-#  unique_assignment_to_ambassador                          (user_id,ambassador_task_id) UNIQUE
+#  unique_assignment_to_ambassador  (user_id,ambassador_task_id) UNIQUE
 #
 # Foreign Keys
 #

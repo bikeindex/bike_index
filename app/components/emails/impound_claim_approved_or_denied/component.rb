@@ -7,6 +7,10 @@ module Emails
         @impound_claim = impound_claim
       end
 
+      def email_sent_at
+        @impound_claim&.resolved_at
+      end
+
       private
 
       def organization
@@ -24,7 +28,7 @@ module Emails
       def organization_message_snippet_body
         return nil unless @impound_claim.organized? && snippet_kind.present?
 
-        organization.mail_snippets.enabled.where(kind: snippet_kind).first&.body
+        MailSnippet.for_organization(organization_id: organization.id, kind: snippet_kind, time: email_sent_at)&.body
       end
 
       def snippet_kind

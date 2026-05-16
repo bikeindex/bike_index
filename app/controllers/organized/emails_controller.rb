@@ -8,13 +8,14 @@ module Organized
     end
 
     def show
-      # @email_preview and @organization are read by the email layout
-      # (app/views/layouts/email.html.erb) and MailerHelper#render_supporters?
+      # @email_sent_at, @email_preview and @organization are read by the email layout
       @email_preview = true
       @organization = current_organization
-      render OrganizedServices::EmailPreview.view_component(
+      component = OrganizedServices::EmailPreview.view_component(
         kind: @kind, organization: current_organization, user: current_user, params: params
-      ), layout: "email"
+      )
+      @email_sent_at = component.email_sent_at if Binxtils::InputNormalizer.boolean(params[:versioned])
+      render component, layout: "email"
     end
 
     def edit

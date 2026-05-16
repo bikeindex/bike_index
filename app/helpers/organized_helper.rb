@@ -80,8 +80,8 @@ module OrganizedHelper
       "text-warning"
     when "resolved_otherwise", "on_deck", /approved/, /retrieved/, "bike graduated", /certified_by/
       "text-info"
-    when /removed/, "impounded", "trashed", "failed_to_find", /denied/
-      "text-danger"
+    when /removed/, "impounded", "trashed", "failed_to_find", /denied/, "delivery failure"
+      UI::Alert::Component::TEXT_CLASSES[:error]
     else
       "less-strong"
     end

@@ -9,6 +9,10 @@ module Emails
         @email_preview = email_preview
       end
 
+      def email_sent_at
+        @graduated_notification.sent_at
+      end
+
       private
 
       def organization
@@ -20,7 +24,7 @@ module Emails
       end
 
       def organization_snippet_body
-        organization.mail_snippets.enabled.graduated_notification.first&.body
+        MailSnippet.for_organization(organization_id: organization.id, kind: "graduated_notification", time: email_sent_at)&.body
       end
 
       def tokenized_url

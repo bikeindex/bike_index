@@ -21,6 +21,15 @@
 
   <body>
     <div class="binx-wrapper">
+      <% if @email_sent_at.present? %>
+        <%= stylesheet_link_tag "tailwind" %>
+        <% if @email_sent_at >= MailSnippet::PAPER_TRAIL_TRACKING_STARTED_AT %>
+          <%= render(UI::Alert::Component.new(kind: :notice, margin_classes: "", text: "this is the version that was shown to the user, not the current version")) %>
+        <% else %>
+          <%= render(UI::Alert::Component.new(kind: :warning, margin_classes: "", text: "This was sent before we tracked versions, so it may not match what the user saw (if you edited your custom email)")) %>
+        <% end %>
+      <% end %>
+
       <% unless @skip_header %>
         <table class="binx-header">
           <tbody>
@@ -49,15 +58,17 @@
       <div class="binx-body">
         <%# We only render snippets for organized messages - or if we're doing a preview %>
         <% render_organization_snippets = @organization.present? && (controller_path == "organized_mailer" || @email_preview) %>
+        <% header_snippet = render_organization_snippets ? @organization.mail_snippet_body("header", time: @email_sent_at) : nil %>
+        <% footer_snippet = render_organization_snippets ? @organization.mail_snippet_body("footer", time: @email_sent_at) : nil %>
 
-        <% if render_organization_snippets && @organization.mail_snippet_body("header").present? %>
-          <%= @organization.mail_snippet_body("header").html_safe %>
+        <% if header_snippet.present? %>
+          <%= header_snippet.html_safe %>
         <% end %>
 
         <%= yield %>
 
-        <% if render_organization_snippets && @organization.mail_snippet_body("footer").present? %>
-          <%= @organization.mail_snippet_body("footer").html_safe %>
+        <% if footer_snippet.present? %>
+          <%= footer_snippet.html_safe %>
         <% end %>
       </div>
 

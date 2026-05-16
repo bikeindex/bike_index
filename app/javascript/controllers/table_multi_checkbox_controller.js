@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller="table-multi-delete"
+// Connects to data-controller="table-multi-checkbox"
 export default class extends Controller {
   static targets = ['checkbox']
 
