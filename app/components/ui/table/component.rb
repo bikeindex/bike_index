@@ -58,7 +58,7 @@ module UI
 
       def table_classes
         [
-          "ui-table tw:min-w-full tw:text-left tw:leading-tight tw:border-separate! tw:border-spacing-0",
+          "ui-table tw:min-w-full tw:text-left tw:leading-[1.25] tw:border-separate! tw:border-spacing-0",
           ("ui-table-bordered" if @bordered),
           @classes
         ].compact.join(" ")
