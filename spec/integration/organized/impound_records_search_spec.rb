@@ -23,7 +23,7 @@ RSpec.describe "Organized impound records search", :js, type: :system do
   it "searches by email" do
     visit impound_records_path
     # Results load via turbo auto-submit (search--form controller)
-    expect(page).to have_css("turbo-frame#organized_impound_records_results_frame table.table", wait: 10)
+    expect(page).to have_css("turbo-frame#organized_impound_records_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
 
     # search_no_js should NOT be in the URL (removed by JS controller)
