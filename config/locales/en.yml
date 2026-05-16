@@ -1047,8 +1047,8 @@ en:
         you have any questions
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}
         back, we really care!
-      thank_you_for_registering_this_found_bike_type: Thank you for registering this
-        found %{bike_type}!
+      thank_you_for_registering_this_found_bike_type: Thank you for reporting this
+        %{bike_type}!
       this_bike_type_is_hidden: This %{bike_type} is hidden!
       this_bike_version_is_hidden_html: "<em>%{version_name}</em> is hidden!"
       were_honored_to_have_your_bike: We're honored to have your %{bike_type} on the
@@ -1124,7 +1124,7 @@ en:
       are_you_certain: Are you certain?
       electric_motorized: Electric (motorized)
       enter_bike_type_details_html: Enter %{type_html} details
-      enter_found_bike_type_details_html: Enter Found %{type_html} details
+      enter_found_bike_type_details_html: Report a %{type_html}
       enter_stolen_bike_type_details_html: Enter Stolen %{type_html} details
       how_to_find_serial: how to find your serial number
       i_just_dont_know_the_serial: I just don't know the serial
@@ -5337,7 +5337,7 @@ en:
     choose_registration:
       add_a_bike_through: Add a bike through
       add_a_stolen_bike: Add a stolen bike
-      add_abandoned_bike_you_found: Add an abandoned bike you found
+      add_abandoned_bike_you_found: Report a bike
       add_your_own_bike: Add your own bike
       register_bike: Register bike
     goodbye:
