@@ -5,7 +5,6 @@ module UI
     class ComponentPreview < ApplicationComponentPreview
       # @!group Variants
 
-      # @label default (drop_direction: down)
       def default
         render(UI::Dropdown::Component.new(name: "Menu")) do |dropdown|
           dropdown.with_entry_item { content_tag(:a, "Profile", href: "#") }
@@ -25,13 +24,6 @@ module UI
           dropdown.with_entry_divider
           dropdown.with_entry_item { icon_link("⚙", "Settings") }
           dropdown.with_entry_item { icon_link("↻", "Sync (active)", active: true) }
-        end
-      end
-
-      def up
-        render(UI::Dropdown::Component.new(name: "up", drop_direction: :up)) do |d|
-          d.with_entry_item { content_tag(:a, "Option 1", href: "#") }
-          d.with_entry_item { content_tag(:a, "Option 2", href: "#") }
         end
       end
 

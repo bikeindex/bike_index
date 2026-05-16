@@ -7,8 +7,7 @@ let zCounter = 50
 export default class extends Controller {
   static targets = ['menu', 'button']
   static values = {
-    open: Boolean,
-    placement: { type: String, default: 'bottom-end' }
+    open: Boolean
   }
 
   connect () {
@@ -62,7 +61,7 @@ export default class extends Controller {
 
   async updatePosition () {
     const { x, y } = await computePosition(this.buttonTarget, this.menuTarget, {
-      placement: this.placementValue,
+      placement: 'bottom-end',
       middleware: [
         offset(4),
         flip(),
