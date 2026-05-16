@@ -15,6 +15,9 @@ export default class extends Controller {
     collapse('show', this.panelTarget)
     this.cells.forEach(cell => cell.classList.remove('tw:hidden'))
     this.applyKind()
+    // Revealing the column changes which cell is last-visible — let the
+    // ui--table controller re-apply edge rounding/borders.
+    window.dispatchEvent(new Event('ui-table:refresh'))
   }
 
   // Show the fields for the selected kind and enable only the rows that allow it
