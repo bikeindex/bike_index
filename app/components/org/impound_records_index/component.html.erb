@@ -20,50 +20,25 @@
 
       <em><%= helpers.humanized_time_range(@time_range) %></em>
 
-      <div class="dropdown d-inline-block ml-2">
-        <a
-          class="dropdown-toggle btn btn-outline-primary <%= 'active' unless @search_status == 'current' %>"
-          href="#"
-          role="button"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          <%= status_dropdown_text %>
-        </a>
-
-        <div class="dropdown-menu">
+      <div class="tw:ml-2 tw:inline-block">
+        <%= render(UI::Dropdown::Component.new(name: status_dropdown_text, button_color: :primary, active: @search_status != "current")) do |dropdown| %>
           <% @available_statuses.each do |status| %>
             <% status_active = @search_status == status %>
             <% status_link_params = sortable_search_params.merge(organization_id: @current_organization.id, search_status: (status_active ? nil : status)) %>
+            <% dropdown.with_entry_item { link_to display_status_for(status), organization_impound_records_path(status_link_params), class: ("active" if status_active) } %>
 
-            <%= link_to display_status_for(status), organization_impound_records_path(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}" %>
-
-            <% if status == "all" %>
-              <%# Add a divider before all %>
-              <div class="dropdown-divider"></div>
-            <% end %>
+            <%# Divider after "all" %>
+            <% dropdown.with_entry_divider if status == "all" %>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
-      <div class="dropdown d-inline-block ml-2">
-        <a
-          class="dropdown-toggle btn btn-sm btn-outline-secondary <%= 'active' unless @search_unregisteredness == 'all' %>"
-          href="#"
-          role="button"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          <%= unregisteredness_dropdown_text %>
-        </a>
-
-        <div class="dropdown-menu">
-          <%= link_to translation(".all_bikes"), organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: "dropdown-item #{@search_unregisteredness == 'all' ? 'active' : ''}" %>
-          <%= link_to translation(".only_unregistered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: "dropdown-item #{@search_unregisteredness == 'only_unregistered' ? 'active' : ''}" %>
-          <%= link_to translation(".only_user_registered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: "dropdown-item #{@search_unregisteredness == 'only_registered' ? 'active' : ''}" %>
-        </div>
+      <div class="tw:ml-2 tw:inline-block">
+        <%= render(UI::Dropdown::Component.new(name: unregisteredness_dropdown_text, button_size: :sm, active: @search_unregisteredness != "all")) do |dropdown| %>
+          <% dropdown.with_entry_item { link_to translation(".all_bikes"), organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: ("active" if @search_unregisteredness == "all") } %>
+          <% dropdown.with_entry_item { link_to translation(".only_unregistered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: ("active" if @search_unregisteredness == "only_unregistered") } %>
+          <% dropdown.with_entry_item { link_to translation(".only_user_registered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: ("active" if @search_unregisteredness == "only_registered") } %>
+        <% end %>
       </div>
     </div>
 
