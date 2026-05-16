@@ -39,8 +39,8 @@ RSpec.describe Org::ImpoundRecordsTable::Component, type: :component do
     expect(component).to have_content("Impounded from")
     expect(component).to have_link(href: Rails.application.routes.url_helpers.organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id))
     expect(component).to have_css("a[data-action='click->table-multi-checkbox#toggleAll']")
-    expect(component).to have_css("td.multi-update-cell.canupdate-note")
-    expect(component).to have_css("input[type='checkbox'][name=\"ids[#{impound_record.id}]\"]")
+    expect(component).to have_css("td.multi-update-cell")
+    expect(component).to have_css("input[type='checkbox'].canupdate-note[name=\"ids[#{impound_record.id}]\"]")
   end
 
   context "with skip_status and render_resolved_at" do

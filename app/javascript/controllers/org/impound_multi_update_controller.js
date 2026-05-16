@@ -29,7 +29,7 @@ export default class extends Controller {
       const checkbox = cell.querySelector('input[type=checkbox]')
       if (!checkbox) return
 
-      const allowed = cell.classList.contains(`canupdate-${kind}`)
+      const allowed = checkbox.classList.contains(`canupdate-${kind}`)
       checkbox.disabled = !allowed
       if (allowed) {
         cell.removeAttribute('title')

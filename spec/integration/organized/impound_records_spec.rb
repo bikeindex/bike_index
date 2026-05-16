@@ -3,11 +3,10 @@
 require "rails_helper"
 
 # Verifies the multi-update behavior driven by the `org--impound-multi-update`
-# Stimulus controller: the per-row `canupdate-<kind>` classes drive which
-# checkboxes get enabled/disabled when the kind dropdown changes. Lives at the
-# integration layer because the controller targets `.multi-update-cell.canupdate-X`
-# on the rendered `<td>`s, so the Org::ImpoundRecordsTable component has to keep
-# those classes on the cell elements themselves (not on a wrapper).
+# Stimulus controller: the per-row `canupdate-<kind>` classes on each row's
+# checkbox drive which checkboxes get enabled/disabled when the kind dropdown
+# changes. Lives at the integration layer because the controller reads those
+# classes off the rendered checkbox inputs.
 RSpec.describe "Organized impound records multi-update", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
@@ -21,10 +20,6 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
 
   def checkbox_for(impound_record)
     find("input[type=checkbox][name='ids[#{impound_record.id}]']", visible: :all)
-  end
-
-  def cell_for(impound_record)
-    checkbox_for(impound_record).find(:xpath, "ancestor::td[1]", visible: :all)
   end
 
   # Headless Chrome on CI sometimes loses the click on these freshly-enabled
@@ -51,17 +46,17 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
   it "renders per-row canupdate classes and applies multi-updates for matching records" do
     expect(page).to have_css("table tbody tr", count: 2, wait: 10)
 
-    registered_cell = cell_for(registered)
-    unregistered_cell = cell_for(unregistered)
+    registered_checkbox = checkbox_for(registered)
+    unregistered_checkbox = checkbox_for(unregistered)
 
     # Every record allows note/removed_from_bike_index/transferred_to_new_owner;
     # only the registered bike allows retrieved_by_owner.
     %w[note removed_from_bike_index transferred_to_new_owner].each do |kind|
-      expect(registered_cell[:class]).to include("canupdate-#{kind}")
-      expect(unregistered_cell[:class]).to include("canupdate-#{kind}")
+      expect(registered_checkbox[:class]).to include("canupdate-#{kind}")
+      expect(unregistered_checkbox[:class]).to include("canupdate-#{kind}")
     end
-    expect(registered_cell[:class]).to include("canupdate-retrieved_by_owner")
-    expect(unregistered_cell[:class]).not_to include("canupdate-retrieved_by_owner")
+    expect(registered_checkbox[:class]).to include("canupdate-retrieved_by_owner")
+    expect(unregistered_checkbox[:class]).not_to include("canupdate-retrieved_by_owner")
 
     # Cells are hidden until the user opts into multi-update.
     expect(page).not_to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)

@@ -15,11 +15,6 @@ module Org
         @skip_location = skip_location.nil? ? !current_organization.enabled?("impound_bikes_locations") : skip_location
         @skip_multiselect = skip_multiselect
       end
-
-      def multiselect_cell_classes(impound_record)
-        ["multi-update-cell table-cell-check tw:hidden",
-          *impound_record.update_multi_kinds.map { |k| "canupdate-#{k}" }].join(" ")
-      end
     end
   end
 end
