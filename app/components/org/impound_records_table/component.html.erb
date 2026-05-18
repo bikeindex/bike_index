@@ -1,10 +1,11 @@
 <% current_organization = @current_organization %>
 
 <%#
-  Per-row classes the org--impound-update-multi Stimulus controller reads; a
-  lambda so the UI::Table cell block (instance_exec'd) can still reach it
+  Per-row update kinds the org--impound-update-multi Stimulus controller reads
+  off the checkbox; a lambda so the UI::Table cell block (instance_exec'd) can
+  still reach it
 %>
-<% canupdate_classes = ->(impound_record) { impound_record.update_multi_kinds.map { |k| "canupdate-#{k}" }.join(" ") } %>
+<% update_kinds = ->(impound_record) { impound_record.update_multi_kinds.join(" ") } %>
 
 <%= render(UI::Table::Component.new(records: @impound_records, render_sortable: @render_sortable)) do |table| %>
   <% table.column(sortable: "display_id_integer", label: "ID") do |impound_record| %>
@@ -73,7 +74,7 @@
   <% unless @skip_multiselect %>
     <% select_all = link_to(check_mark, "#", data: {action: "click->table-multi-checkbox#toggleAll"}) %>
     <% table.column(label: select_all, classes: multiselect_cell_classes) do |impound_record| %>
-      <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id, false, class: canupdate_classes.call(impound_record), data: {"table-multi-checkbox-target" => "checkbox"} %>
+      <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id, false, data: {"table-multi-checkbox-target" => "checkbox", "update-kinds" => update_kinds.call(impound_record)} %>
     <% end %>
   <% end %>
 <% end %>
