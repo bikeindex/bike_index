@@ -72,7 +72,7 @@
 
   <% unless @skip_multiselect %>
     <% select_all = link_to(check_mark, "#", data: {action: "click->table-multi-checkbox#toggleAll"}) %>
-    <% table.column(label: select_all, classes: multiselect_cell_classes, header_classes: multiselect_cell_classes) do |impound_record| %>
+    <% table.column(label: select_all, classes: multiselect_cell_classes) do |impound_record| %>
       <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id, false, class: canupdate_classes.call(impound_record), data: {"table-multi-checkbox-target" => "checkbox"} %>
     <% end %>
   <% end %>
