@@ -22,9 +22,12 @@ module Org
         organization_impound_record_path(record_id, organization_id: @current_organization)
       end
 
-      # table-multi-checkbox drives the multi-update select-all checkbox
+      # Multi mode: table-multi-checkbox drives select-all, and submit is
+      # validated by org--impound-update-multi (blocks empty submissions)
       def form_data
-        {controller: ("table-multi-checkbox" if @multi)}
+        return {} unless @multi
+
+        {controller: "table-multi-checkbox", action: "submit->org--impound-update-multi#validate"}
       end
 
       # The kind <select> change is handled by org--impound-update (field

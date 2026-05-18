@@ -3,11 +3,11 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='org--impound-update-multi'
 // The impound records index multi-update extras: reveals the update panel and
-// the checkbox column, and enables only the checkboxes whose row supports the
-// selected update kind. The kind-specific fields are handled by the separate
-// org--impound-update controller.
+// the checkbox column, enables only the checkboxes whose row supports the
+// selected update kind, and blocks submitting with nothing checked. The
+// kind-specific fields are handled by the separate org--impound-update controller.
 export default class extends Controller {
-  static targets = ['toggle', 'panel', 'kindSelect']
+  static targets = ['toggle', 'panel', 'kindSelect', 'error']
 
   connect () {
     // The panel may be rendered already-open (multi_update=true) — in that
@@ -29,6 +29,21 @@ export default class extends Controller {
     const url = new URL(window.location)
     url.searchParams.set('multi_update', 'true')
     window.history.replaceState(window.history.state, '', url)
+  }
+
+  // Block submitting the form with no rows checked, showing the error alert
+  validate (event) {
+    const anyChecked = [...this.cells].some(cell =>
+      cell.querySelector('input[type=checkbox]')?.checked
+    )
+    this.errorTarget.classList.toggle('tw:hidden', anyChecked)
+    if (!anyChecked) {
+      event.preventDefault()
+      // Stop the event reaching rails-ujs, which would otherwise disable the
+      // data-disable-with submit button and leave it stuck (the form never
+      // navigates away to get a fresh one).
+      event.stopPropagation()
+    }
   }
 
   // Enable only the checkboxes whose row supports the selected kind

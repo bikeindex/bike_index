@@ -73,6 +73,11 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     # Default kind retrieved_by_owner: only registered's checkbox is enabled.
     expect(checkbox_for(unregistered)).to be_disabled
 
+    # Submitting with nothing checked shows an error and doesn't submit
+    within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
+    expect(page).to have_css("[role=alert]", text: /select at least one record/i)
+    expect(unregistered.impound_record_updates).to be_empty
+
     check_for_update(registered)
     within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
 
