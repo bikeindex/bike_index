@@ -11,7 +11,7 @@ listing_locations = [
   {street: "1300 W 14th Pl", city: "Chicago", postal_code: "60608", latitude: 41.8624488, longitude: -87.6591502, region_record: State.find_by_abbreviation("IL")},
   {street: "100 W 1st St", city: "Los Angeles", postal_code: "90012", latitude: 34.05223, longitude: -118.24368, region_record: State.find_by_abbreviation("CA")},
   {street: "55 Water St", city: "New York", postal_code: "10041", latitude: 40.7035731, longitude: -74.0093871, region_record: State.find_by_abbreviation("NY")}
-]
+].map { |location| location.merge(kind: :marketplace_listing, country: Country.united_states, skip_geocoding: true) }
 
 def seed_marketplace_seller(email:, name:)
   user = User.create!(name:, email:, password: "pleaseplease12",
@@ -34,8 +34,7 @@ def seed_marketplace_bike(creator:, seller:, manufacturer_id:, primary_activity_
 end
 
 def seed_marketplace_listing(bike:, seller:, location:, amount_cents:, condition:)
-  address_record = AddressRecord.new(**location, kind: :marketplace_listing,
-    country: Country.united_states, user: seller, bike:, skip_geocoding: true)
+  address_record = AddressRecord.new(location.merge(user: seller, bike:))
   MarketplaceListing.create!(item: bike, seller:, status: :for_sale,
     condition:, amount_cents:, address_record:)
 end
