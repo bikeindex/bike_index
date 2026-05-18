@@ -1,8 +1,8 @@
 <% current_organization = @current_organization %>
 
 <%#
-  Per-row classes the impound-multi-update Stimulus controller reads; a lambda
-  so the UI::Table cell block (instance_exec'd) can still reach it
+  Per-row classes the org--impound-update-multi Stimulus controller reads; a
+  lambda so the UI::Table cell block (instance_exec'd) can still reach it
 %>
 <% canupdate_classes = ->(impound_record) { impound_record.update_multi_kinds.map { |k| "canupdate-#{k}" }.join(" ") } %>
 

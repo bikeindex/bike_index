@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-# Verifies the multi-update behavior driven by the `org--impound-multi-update`
+# Verifies the multi-update behavior driven by the `org--impound-update-multi`
 # Stimulus controller: the per-row `canupdate-<kind>` classes on each row's
 # checkbox drive which checkboxes get enabled/disabled when the kind dropdown
 # changes. Lives at the integration layer because the controller reads those

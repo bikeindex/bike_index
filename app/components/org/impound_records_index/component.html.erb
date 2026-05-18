@@ -12,7 +12,7 @@
   <% end %>
 </div>
 
-<div data-controller="org--impound-multi-update">
+<div data-controller="org--impound-update-multi">
   <div class="row mt-4 mb-4">
     <div class="col-sm-9">
       <%= number_with_delimiter(@pagy.count) %>
@@ -47,7 +47,7 @@
         <%= render(UI::Button::Component.new(
           text: translation(".update_multiple_records").downcase,
           color: :link,
-          data: {"org--impound-multi-update-target": "toggle", action: "org--impound-multi-update#open"}
+          data: {"org--impound-update-multi-target": "toggle", action: "org--impound-update-multi#open"}
         )) %>
       </div>
     </div>
@@ -58,7 +58,7 @@
     <div
       id="makeMultiUpdate"
       class="tw:hidden"
-      data-org--impound-multi-update-target="panel"
+      data-org--impound-update-multi-target="panel"
     >
       <div class="row">
         <div class="mt-4 mb-4 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
@@ -76,20 +76,27 @@
               </div>
 
               <div class="card-body">
-                <div id="impoundRecordUpdateForm">
+                <div
+                  id="impoundRecordUpdateForm"
+                  data-controller="org--impound-update"
+                >
                   <div class="row">
                     <div class="col-sm-6 mb-2" id="kindUpdate">
                       <%= f.select :kind,
                       options_for_select(kinds_for_select.map { |k, v| [v.titleize, k] }, "retrieved_by_owner"),
                       {},
                       class: "form-control",
-                      data: {"org--impound-multi-update-target": "kindSelect", action: "change->org--impound-multi-update#applyKind"} %>
+                      data: {
+                        "org--impound-update-target": "kindSelect",
+                        "org--impound-update-multi-target": "kindSelect",
+                        action: "change->org--impound-update#applyKind change->org--impound-update-multi#refreshChecks"
+                      } %>
                     </div>
 
                     <% if @current_organization.enabled?("impound_bikes_locations") %>
                       <div
                         class="col-sm-6 mb-2 tw:hidden"
-                        data-org--impound-multi-update-target="kindField"
+                        data-org--impound-update-target="kindField"
                         data-kind="move_location"
                       >
                         <%= f.select :location_id,
@@ -101,7 +108,7 @@
 
                     <div
                       class="col-sm-6 mb-2 tw:hidden"
-                      data-org--impound-multi-update-target="kindField"
+                      data-org--impound-update-target="kindField"
                       data-kind="transferred_to_new_owner"
                     >
                       <%= f.email_field :transfer_email, placeholder: translation(".new_owner_email"), class: "form-control" %>
