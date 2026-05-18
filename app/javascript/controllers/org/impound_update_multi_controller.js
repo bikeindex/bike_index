@@ -33,17 +33,27 @@ export default class extends Controller {
 
   // Block submitting the form with no rows checked, showing the error alert
   validate (event) {
-    const anyChecked = [...this.cells].some(cell =>
-      cell.querySelector('input[type=checkbox]')?.checked
-    )
-    this.errorTarget.classList.toggle('tw:hidden', anyChecked)
-    if (!anyChecked) {
+    if (this.anyChecked) {
+      collapse('hide', this.errorTarget)
+    } else {
+      collapse('show', this.errorTarget)
       event.preventDefault()
       // Stop the event reaching rails-ujs, which would otherwise disable the
       // data-disable-with submit button and leave it stuck (the form never
       // navigates away to get a fresh one).
       event.stopPropagation()
     }
+  }
+
+  // Once a row is checked, the "select a record" error no longer applies
+  hideErrorIfChecked () {
+    if (this.anyChecked) collapse('hide', this.errorTarget)
+  }
+
+  get anyChecked () {
+    return [...this.cells].some(cell =>
+      cell.querySelector('input[type=checkbox]')?.checked
+    )
   }
 
   // Enable only the checkboxes whose row supports the selected kind

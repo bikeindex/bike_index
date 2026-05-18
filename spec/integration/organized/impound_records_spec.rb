@@ -24,10 +24,15 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
 
   # Headless Chrome on CI sometimes loses the click on these freshly-enabled
   # checkboxes (set/check/native.click all flaked), so set the property
-  # directly. The form posts the value regardless of how the box got checked.
+  # directly (and fire change, as a real click would). The form posts the
+  # value regardless of how the box got checked.
   def check_for_update(impound_record)
     expect(checkbox_for(impound_record)).not_to be_disabled
-    page.execute_script("document.getElementById('ids_#{impound_record.id}').checked = true")
+    page.execute_script(<<~JS)
+      const el = document.getElementById('ids_#{impound_record.id}')
+      el.checked = true
+      el.dispatchEvent(new Event('change', {bubbles: true}))
+    JS
     expect(checkbox_for(impound_record)).to be_checked
   end
 
@@ -78,7 +83,9 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(page).to have_css("[role=alert]", text: /select at least one record/i)
     expect(unregistered.impound_record_updates).to be_empty
 
+    # Checking a row hides the error again
     check_for_update(registered)
+    expect(page).to have_no_css("[role=alert]", text: /select at least one record/i)
     within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
 
     expect(page).to have_content("Updated 1 impound record", wait: 10)

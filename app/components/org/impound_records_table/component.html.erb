@@ -72,9 +72,9 @@
   <% end %>
 
   <% unless @skip_multiselect %>
-    <% select_all = link_to(check_mark, "#", data: {action: "click->table-multi-checkbox#toggleAll"}) %>
+    <% select_all = link_to(check_mark, "#", data: {action: "click->table-multi-checkbox#toggleAll click->org--impound-update-multi#hideErrorIfChecked"}) %>
     <% table.column(label: select_all, classes: multiselect_cell_classes) do |impound_record| %>
-      <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id, false, data: {"table-multi-checkbox-target" => "checkbox", "update-kinds" => update_kinds.call(impound_record)} %>
+      <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id, false, data: {"table-multi-checkbox-target" => "checkbox", "update-kinds" => update_kinds.call(impound_record), action: "change->org--impound-update-multi#hideErrorIfChecked"} %>
     <% end %>
   <% end %>
 <% end %>
