@@ -22,6 +22,9 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     find(".alert-success .close").click
+    # Wait for the dismissed flash to finish fading out — otherwise the
+    # fixed-position alert can intercept the org submenu/nav clicks below.
+    expect(page).to have_no_css(".alert-success")
     find("#passive_organization_submenu").click
     within(".current-organization-submenu") { click_link "Parking notifications" }
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
