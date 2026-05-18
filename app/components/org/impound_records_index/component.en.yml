@@ -5,6 +5,7 @@ en:
       impound_records_index:
         all_bikes: All bikes
         all_statuses: All statuses
+        hide_update: Hide update
         impound_records: Impound_records
         interpreted_params: Interpreted_params
         only_unregistered: Only unregistered

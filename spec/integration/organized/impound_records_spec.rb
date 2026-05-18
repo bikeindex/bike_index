@@ -93,9 +93,15 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(unregistered.impound_record_updates).to be_empty
 
     # redirect_back keeps multi_update=true, so the index reloads with the
-    # panel server-rendered already-open — the toggle button is gone.
+    # panel server-rendered open — the toggle now reads "hide update".
     expect(page).to have_current_path(/multi_update=true/)
-    expect(page).to have_no_button("update multiple records")
+    expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
+
+    # "hide update" collapses the panel; clicking the toggle again reopens it
+    click_button "hide update"
+    expect(page).to have_select("impound_record_update_kind", visible: :hidden, wait: 5)
+    expect(page).not_to have_current_path(/multi_update=true/)
+    click_button "update multiple records"
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
     expect(page).to have_css("input[type=checkbox][name='ids[#{unregistered.id}]']", visible: true)
 
