@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { collapse } from 'utils/collapse_utils'
+import { CollapseUtils, collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='org--impound-update-multi'
 // The impound records index multi-update extras: reveals the update panel and
@@ -8,7 +8,7 @@ import { collapse } from 'utils/collapse_utils'
 // kind-specific fields are handled by the separate org--impound-update controller.
 export default class extends Controller {
   static targets = ['toggle', 'panel', 'kindSelect', 'error']
-  static values = { openLabel: String, closedLabel: String }
+  static values = { openLabel: String, closedLabel: String, disabledTitle: String }
 
   connect () {
     // The panel may be rendered already-open (multi_update=true) — in that
@@ -57,8 +57,7 @@ export default class extends Controller {
   }
 
   get panelOpen () {
-    return !this.panelTarget.classList.contains('tw:hidden') &&
-      !this.panelTarget.classList.contains('tw:hidden!')
+    return CollapseUtils.isVisible(this.panelTarget)
   }
 
   // Block submitting the form with no rows checked, showing the error alert
@@ -99,7 +98,7 @@ export default class extends Controller {
         cell.removeAttribute('title')
       } else {
         checkbox.checked = false
-        cell.title = `This record can't be updated with '${this.kindLabel}'`
+        cell.title = this.disabledTitleValue.replace('{kind}', this.kindLabel)
       }
     })
   }

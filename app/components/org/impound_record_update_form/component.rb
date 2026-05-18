@@ -33,13 +33,13 @@ module Org
       # The kind <select> change is handled by org--impound-update (field
       # visibility) and, in multi mode, org--impound-update-multi (checkboxes)
       def kind_select_data
-        actions = ["change->org--impound-update#applyKind"]
-        data = {"org--impound-update-target": "kindSelect"}
-        if @multi
-          data[:"org--impound-update-multi-target"] = "kindSelect"
-          actions << "change->org--impound-update-multi#refreshChecks"
-        end
-        data.merge(action: actions.join(" "))
+        data = {"org--impound-update-target": "kindSelect", action: "change->org--impound-update#applyKind"}
+        return data unless @multi
+
+        data.merge(
+          "org--impound-update-multi-target": "kindSelect",
+          action: "#{data[:action]} change->org--impound-update-multi#refreshChecks"
+        )
       end
 
       # The correct kinds for the current impound_record - e.g. no
