@@ -55,85 +55,8 @@
     </div>
   </div>
 
-  <%# Form needs to wrap the table too. Similar to form on parking notification show %>
-  <%= form_for ImpoundRecordUpdate.new, url: organization_impound_record_path("multi_update", organization_id: @current_organization), action: "update", method: :patch, data: {controller: "table-multi-checkbox"} do |f| %>
-    <div
-      id="makeMultiUpdate"
-      class="<%= "tw:hidden" unless multi_update_open? %>"
-      data-org--impound-update-multi-target="panel"
-    >
-      <div class="row">
-        <div class="mt-4 mb-4 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
-          <div class="card">
-            <div class="card-block">
-              <div class="card-title">
-                <h3 class="uncap">
-                  <%= translation(".update_multiple_records") %>
-                  <br>
-
-                  <em class="small less-strong">
-                    <%= translation(".for_table_rows_with_checks") %>
-                  </em>
-                </h3>
-              </div>
-
-              <div class="card-body">
-                <div
-                  id="impoundRecordUpdateForm"
-                  data-controller="org--impound-update"
-                >
-                  <div class="row">
-                    <div class="col-sm-6 mb-2" id="kindUpdate">
-                      <%= f.select :kind,
-                      options_for_select(kinds_for_select.map { |k, v| [v.titleize, k] }, "retrieved_by_owner"),
-                      {},
-                      class: "form-control",
-                      data: {
-                        "org--impound-update-target": "kindSelect",
-                        "org--impound-update-multi-target": "kindSelect",
-                        action: "change->org--impound-update#applyKind change->org--impound-update-multi#refreshChecks"
-                      } %>
-                    </div>
-
-                    <% if @current_organization.enabled?("impound_bikes_locations") %>
-                      <div
-                        class="col-sm-6 mb-2 tw:hidden"
-                        data-org--impound-update-target="kindField"
-                        data-kind="move_location"
-                      >
-                        <%= f.select :location_id,
-                        options_for_select(@current_organization.locations.impound_locations.map { |l| [l.name, l.id] }, @current_organization.default_impound_location&.id),
-                        {},
-                        class: "form-control" %>
-                      </div>
-                    <% end %>
-
-                    <div
-                      class="col-sm-6 mb-2 tw:hidden"
-                      data-org--impound-update-target="kindField"
-                      data-kind="transferred_to_new_owner"
-                    >
-                      <%= f.email_field :transfer_email, placeholder: translation(".new_owner_email"), class: "form-control" %>
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-xs-12">
-                      <%= f.text_area :notes, placeholder: translation(".internal_note"), class: "form-control" %>
-                    </div>
-
-                    <div class="col-xs-12 mt-2">
-                      <%= submit_tag translation(".update_impound_record"), class: "btn btn-success btn-md-lg" %>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
+  <%# The form wraps the table too, so checked rows submit with it %>
+  <%= render(Org::ImpoundRecordUpdateForm::Component.new(current_organization: @current_organization, multi_update_open: multi_update_open?)) do %>
     <div class="full-screen-table">
       <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, multiselect_visible: multi_update_open?)) %>
     </div>
