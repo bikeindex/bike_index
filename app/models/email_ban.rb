@@ -20,7 +20,7 @@ class EmailBan < ApplicationRecord
 
   BLOCK_DUPLICATE_PERIOD = 1.day
   PRE_PERIOD_DUPLICATE_LIMIT = 2
-  PERMITTED_DUPLICATE_DOMAINS = %w[bikeindex.org].freeze
+  PERMITTED_DUPLICATE_DOMAINS = %w[bikeindex.org bikehub.com].freeze
   REASON_ENUM = {email_domain: 0, email_duplicate: 1, delivery_failure: 2}.freeze
 
   enum :reason, REASON_ENUM
@@ -31,6 +31,7 @@ class EmailBan < ApplicationRecord
   validate :is_not_duplicate_ban
 
   before_validation :set_calculated_attributes
+
   class << self
     def ban?(user)
       # Don't suffer a witch to live
