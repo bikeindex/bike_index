@@ -138,5 +138,12 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
 
     expect(page).to have_current_path(/search_unregisteredness=only_unregistered/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 1)
+
+    # Back navigation restores the unfiltered listing. Relies on the no-store
+    # Cache-Control header keeping the page out of the browser bfcache, so
+    # back-nav re-renders instead of restoring the frozen filtered frame.
+    page.go_back
+    expect(page).not_to have_current_path(/search_unregisteredness/, wait: 10)
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 2, wait: 10)
   end
 end
