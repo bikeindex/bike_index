@@ -2,11 +2,11 @@
 
 require "rails_helper"
 
-# Verifies the multi-update behavior driven by the `org--impound-update-multi`
-# Stimulus controller: the per-row `canupdate-<kind>` classes on each row's
-# checkbox drive which checkboxes get enabled/disabled when the kind dropdown
-# changes. Lives at the integration layer because the controller reads those
-# classes off the rendered checkbox inputs.
+# Verifies the impound multi-update behavior: `org--impound-update-multi` reads
+# the per-row `canupdate-<kind>` classes off each checkbox to enable/disable
+# them when the kind dropdown changes, and `org--impound-update` reveals the
+# field for the selected kind. Lives at the integration layer because both
+# controllers react to the rendered DOM.
 RSpec.describe "Organized impound records multi-update", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
@@ -84,7 +84,14 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     # Now apply a note update to the unregistered record — a kind it allows.
     click_button "update multiple records"
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
+
+    # org--impound-update reveals the field for the selected kind
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden)
+    select "Transferred To Owner", from: "impound_record_update_kind"
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: true)
     select "Add Internal Note", from: "impound_record_update_kind"
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden)
+
     check_for_update(unregistered)
     fill_in "impound_record_update[notes]", with: "multi-update note"
     within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
