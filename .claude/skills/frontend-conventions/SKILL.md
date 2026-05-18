@@ -33,6 +33,15 @@ The `bin/dev` command handles building and updating Tailwind and JS.
   - "Number" includes years, counts, prices, distances, IDs — anything numeric, even when it reads like a label.
 - **Currency amounts** use `amount_display(obj)` instead of `number_display` directly. It takes an object that responds to `amount_cents`, `amount`, `currency_symbol`, and `currency_name` (e.g. a `MarketplaceListing`), and renders the symbol + `number_display(amount)` together. Don't reach for `number_to_currency` or roll your own.
 
+## No dead hooks in markup
+
+Only add an `id` or non-utility `class` when something concrete consumes it — a CSS rule, a JS/Stimulus selector, a test fixture, an accessibility attribute. Don't keep or invent "structural identifier" hooks "in case something needs them later," and don't replace a removed hook with a renamed one out of inertia.
+
+When deleting an `id`/`class`, grep the repo for the name before deciding what to do with it:
+
+- Zero consumers: delete it, don't rename it.
+- Consumers exist: either update them, or leave the hook in place — the consumers are the *reason* it earns its spot in the markup.
+
 ## ViewComponent rules
 
 This project uses the ViewComponent gem to render components.

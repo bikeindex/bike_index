@@ -5,13 +5,20 @@
 # Required from config/boot.rb so all Rails entry points get these defaults.
 # Can also be run standalone: `eval "$(ruby bin/env --export)"` from bash.
 
-ENV["DEV_PORT"] ||= ENV.fetch("CONDUCTOR_PORT", "3042")
+workspace_file = File.expand_path("../.workspace_id", __dir__)
+if File.exist?(workspace_file)
+  workspace_int = File.read(workspace_file).strip
+  ENV["WORKSPACE_ID"] ||= workspace_int
+  ENV["DEV_PORT"] ||= workspace_int
+end
+
+ENV["DEV_PORT"] ||= "3042"
 ENV["BASE_URL"] ||= "http://localhost:#{ENV["DEV_PORT"]}"
 ENV["REDIS_URL"] ||= "redis://localhost:6379/#{(ENV["DEV_PORT"].to_i - 1) % 16}"
 
 # When called with --export, print shell export statements for bash scripts
 if ARGV.include?("--export")
-  %w[DEV_PORT BASE_URL REDIS_URL].each do |key|
-    puts "export #{key}=#{ENV[key]}"
+  %w[WORKSPACE_ID DEV_PORT BASE_URL REDIS_URL].each do |key|
+    puts "export #{key}=#{ENV[key]}" if ENV[key]
   end
 end

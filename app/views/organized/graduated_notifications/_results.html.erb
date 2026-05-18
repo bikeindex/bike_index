@@ -1,0 +1,61 @@
+<% if @render_chart && @available_graduated_notifications.present? %>
+  <%= render(UI::Chart::Component.new(
+    series: time_range_counts(collection: @available_graduated_notifications.unscope(:order), column: "graduated_notifications.created_at"),
+    time_range: @time_range,
+    stacked: true
+  )) %>
+<% end %>
+
+<div class="row mt-4 mb-4">
+  <div class="col-sm-6">
+    <%= pluralize(number_with_delimiter(@pagy.count), "matching graduated notifications") %>
+    <em><%= humanized_time_range(@time_range) %></em>
+
+    <% if user_search_params_present? %>
+      <span class="less-strong">
+        for searched user
+        <em><% if params[:user_id].present? %><%= @user_subject.present? ? @user_subject.email : "unknown user" %><% else %><%= params[:search_email] %><% end %></em>
+        
+        <%= link_to "view for all users", url_for(sortable_search_params.merge(user_id: nil, search_email: nil)), class: "gray-link small ml-1" %>
+      </span>
+    <% end %>
+
+    <% if params[:search_bike_id].present? %>
+      <span class="less-strong">
+        for searched bike
+        <%= link_to "view for all bikes", url_for(sortable_search_params.merge(search_bike_id: nil)), class: "gray-link small" %>
+      </span>
+    <% end %>
+  </div>
+
+  <div class="col-sm-6 text-right">
+    <% if display_dev_info? %>
+      <span class="only-dev-visible mr-2 pl-1 pr-1 pt-1 pb-2">
+        <%= link_to "separate secondary", url_for(sortable_search_params.merge(search_secondary: !separate_secondary_notifications?)), class: (separate_secondary_notifications? ? "active btn btn-primary btn-sm" : "less-strong small"), data: {turbo_action: "advance"} %>
+      </span>
+    <% end %>
+
+    <% status_display = ->(status) { (status == "current") ? "Current (pending & graduated)" : (GraduatedNotification.status_humanized(status)&.titleize || "All statuses") } %>
+
+    <%= render(UI::Dropdown::Component.new(name: status_display.call(@search_status), active: @search_status != "current")) do |dropdown| %>
+      <% (GraduatedNotification.statuses + %w[current all]).each do |status| %>
+        <% dropdown.with_entry_divider if status == "current" %>
+
+        <% status_active = @search_status == status %>
+        <% status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status)) %>
+
+        <% dropdown.with_entry_item do %>
+          <%= link_to status_display.call(status), organization_graduated_notifications_path(status_link_params), class: (status_active ? "active" : nil), data: {turbo_action: "advance"} %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<% skip_remaining = (GraduatedNotification.current_statuses + ["current"]).include?(@search_status) %>
+
+<%= render(Org::GraduatedNotificationTable::Component.new(graduated_notifications: @graduated_notifications, current_organization:, render_sortable: true, render_remaining_at: !skip_remaining, separate_secondary_notifications: separate_secondary_notifications?)) %>
+
+<div class="pt-4 pb-4">
+  <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>
+</div>

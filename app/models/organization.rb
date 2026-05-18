@@ -429,11 +429,10 @@ class Organization < ApplicationRecord
       .where(organization_manufacturers: {can_view_counts: true, manufacturer_id: manufacturer_id})
   end
 
-  def mail_snippet_body(snippet_kind)
+  def mail_snippet_body(snippet_kind, time: nil)
     return nil unless MailSnippet.organization_snippet_kinds.include?(snippet_kind)
 
-    snippet = mail_snippets.enabled.where(kind: snippet_kind).first
-    snippet&.body
+    MailSnippet.for_organization(organization_id: id, kind: snippet_kind, time:)&.body
   end
 
   def current_organization_status

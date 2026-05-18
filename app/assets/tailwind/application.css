@@ -71,7 +71,7 @@
   }
 
   .twdropdown {
-    @apply tw:flex-col tw:list-none tw:py-0;
+    @apply tw:flex-col tw:list-none tw:py-0 tw:mb-0;
   }
 
   .twdropdown li[role="menuitem"]:first-child > a {
@@ -161,11 +161,6 @@
 
 @utility base-font {
   @apply tw:antialiased tw:font-sans tw:text-gray-900 tw:dark:text-gray-400;
-}
-
-/* Unlayered so it wins over the size utilities (`tw:px-2.5`) injected by UI::Button */
-.period-select-standard {
-  @apply tw:px-1.5 tw:sm:px-2.5;
 }
 
 @layer base {

@@ -19,13 +19,6 @@
 #  ownership_id           :bigint
 #  seller_id              :bigint
 #
-# Indexes
-#
-#  index_sales_on_item                    (item_type,item_id)
-#  index_sales_on_marketplace_message_id  (marketplace_message_id)
-#  index_sales_on_ownership_id            (ownership_id)
-#  index_sales_on_seller_id               (seller_id)
-#
 class Sale < ApplicationRecord
   include Amountable
   include Currencyable

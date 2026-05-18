@@ -1,6 +1,6 @@
 <%# `MailSnippet`s are only available in english for now %>
-<% if organization&.mail_snippet_body('welcome').present? %>
-  <%= organization.mail_snippet_body('welcome').html_safe %>
+<% if organization_snippet_body('welcome').present? %>
+  <%= organization_snippet_body('welcome').html_safe %>
 <% end %>
 
 <% if @ownership.claim_message.present? %>
@@ -8,8 +8,8 @@
     <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: bike.current_stolen_record} %>
   <% end %>
   <%= render partial: "/shared/claim_message", locals: {bike:, skip_to_see: true} %>
-  <% if organization&.mail_snippet_body('after_welcome').present? %>
-    <%= organization.mail_snippet_body('after_welcome').html_safe %>
+  <% if organization_snippet_body('after_welcome').present? %>
+    <%= organization_snippet_body('after_welcome').html_safe %>
   <% end %>
 <% else %>
   <% if new_user? %>
@@ -40,8 +40,8 @@
       <% end %>
     </h1>
   <% end %>
-  <% if organization&.mail_snippet_body('after_welcome').present? %>
-    <%= organization.mail_snippet_body('after_welcome').html_safe %>
+  <% if organization_snippet_body('after_welcome').present? %>
+    <%= organization_snippet_body('after_welcome').html_safe %>
   <% end %>
   <p>
     <% if registered_by_owner? %>
@@ -104,8 +104,8 @@
   </p>
 <% end %>
 
-<% if organization && organization.mail_snippet_body("security").present? %>
-  <%= organization.mail_snippet_body("security").html_safe %>
+<% if organization_snippet_body("security").present? %>
+  <%= organization_snippet_body("security").html_safe %>
 <% else %>
   <% unless bike.status_impounded? %>
     <div>
