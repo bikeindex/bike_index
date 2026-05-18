@@ -9,6 +9,14 @@ import { collapse } from 'utils/collapse_utils'
 export default class extends Controller {
   static targets = ['toggle', 'panel', 'kindSelect']
 
+  connect () {
+    // The panel may be rendered already-open (multi_update=true) — in that
+    // case sync the checkbox enabled state, since open() never runs.
+    if (!this.panelTarget.classList.contains('tw:hidden')) {
+      this.refreshChecks()
+    }
+  }
+
   open (event) {
     event.preventDefault()
     collapse('hide', this.toggleTarget)

@@ -47,6 +47,8 @@
         <%= render(UI::Button::Component.new(
           text: translation(".update_multiple_records").downcase,
           color: :link,
+          # tw:hidden! is important, to beat UI::Button's tw:inline-flex
+          html_class: ("tw:hidden!" if multi_update_open?),
           data: {"org--impound-update-multi-target": "toggle", action: "org--impound-update-multi#open"}
         )) %>
       </div>
@@ -57,7 +59,7 @@
   <%= form_for ImpoundRecordUpdate.new, url: organization_impound_record_path("multi_update", organization_id: @current_organization), action: "update", method: :patch, data: {controller: "table-multi-checkbox"} do |f| %>
     <div
       id="makeMultiUpdate"
-      class="tw:hidden"
+      class="<%= "tw:hidden" unless multi_update_open? %>"
       data-org--impound-update-multi-target="panel"
     >
       <div class="row">
@@ -133,7 +135,7 @@
     </div>
 
     <div class="full-screen-table">
-      <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status)) %>
+      <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, multiselect_visible: multi_update_open?)) %>
     </div>
   <% end %>
 </div>

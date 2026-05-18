@@ -83,10 +83,14 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(registered.impound_record_updates.pluck(:kind)).to eq ["retrieved_by_owner"]
     expect(unregistered.impound_record_updates).to be_empty
 
-    # Now apply a note update to the unregistered record — a kind it allows.
-    click_button "update multiple records"
+    # redirect_back keeps multi_update=true, so the index reloads with the
+    # panel server-rendered already-open — the toggle button is gone.
+    expect(page).to have_current_path(/multi_update=true/)
+    expect(page).to have_no_button("update multiple records")
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
+    expect(page).to have_css("input[type=checkbox][name='ids[#{unregistered.id}]']", visible: true)
 
+    # Now apply a note update to the unregistered record — a kind it allows.
     # org--impound-update reveals the field for the selected kind
     expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden)
     select "Transferred To Owner", from: "impound_record_update_kind"

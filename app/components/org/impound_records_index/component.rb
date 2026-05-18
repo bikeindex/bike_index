@@ -20,6 +20,10 @@ module Org
 
       private
 
+      def multi_update_open?
+        params[:multi_update].to_s == "true"
+      end
+
       def kinds_for_select
         # This gets us the correct kinds for the current impound_record
         # e.g. no retrieved_by_owner for unregistered_parking_notification
