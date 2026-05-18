@@ -20,12 +20,23 @@ export default class extends Controller {
   connect () {
     // remove the query field that is for users that don't have JS
     this.nonjsfieldsTargets.forEach(el => { if (el) el.remove() })
+
+    // Strip stale select2 DOM/classes from cached Turbo snapshot: leaving
+    // select2-hidden-accessible makes select2 read outerWidth=1px on re-init.
+    const $input = $(this.inputTarget)
+    $input.siblings('.select2-container').remove()
+    $input
+      .removeClass('select2-hidden-accessible')
+      .removeAttr('aria-hidden')
+      .removeAttr('data-select2-id')
+      .removeData('select2')
+
     // show the combobox
     this.inputTarget.classList.remove('tw:hidden')
 
     // TODO: should we update to remove preload from jquery?
     // Does this need to check that jquery is initialized?
-    this.initializeHeaderSearch($(this.inputTarget), this.apiUrlValue)
+    this.initializeHeaderSearch($input, this.apiUrlValue)
   }
 
   escapeHtml (text) {

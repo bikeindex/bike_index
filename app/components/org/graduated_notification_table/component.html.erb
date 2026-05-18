@@ -8,7 +8,7 @@
       <small class="only-dev-visible"><%= graduated_notification.id %></small>
     <% end %>
 
-    <%= link_to organization_graduated_notification_path(component.link_id(graduated_notification).to_param, organization_id: graduated_notification.organization_id), class: "localizeTime preciseTime" do %>
+    <%= link_to organization_graduated_notification_path(component.link_id(graduated_notification).to_param, organization_id: graduated_notification.organization_id), class: "localizeTime preciseTime", data: {turbo_frame: "_top"} do %>
       <%= l(graduated_notification.created_at, format: :convert_time) %>
     <% end %>
   <% end %>
@@ -34,13 +34,13 @@
 
   <% table.column(label: @separate_secondary_notifications ? "Bike" : "Bike(s)") do |graduated_notification| %>
     <% if graduated_notification.bike.present? %>
-      <%= link_to helpers.organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: component.org_param(graduated_notification)) %>
+      <%= link_to helpers.organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: component.org_param(graduated_notification)), data: {turbo_frame: "_top"} %>
     <% end %>
 
     <% unless separate_secondary %>
       <% graduated_notification.associated_notifications.each do |associated_notification| %>
         <small class="d-block" style="padding-left: 0.5rem; line-height: 1.5">
-          <%= link_to helpers.organized_bike_text(associated_notification.bike), bike_path(associated_notification.bike, organization_id: component.org_param(associated_notification)) %>
+          <%= link_to helpers.organized_bike_text(associated_notification.bike), bike_path(associated_notification.bike, organization_id: component.org_param(associated_notification)), data: {turbo_frame: "_top"} %>
         </small>
       <% end %>
     <% end %>
@@ -58,7 +58,7 @@
 
       <% unless skip_email_search %>
         <small>
-          <%= link_to "🔎", url_for(sortable_search_params.merge(search_email: graduated_notification.email)) %>
+          <%= link_to "🔎", url_for(sortable_search_params.merge(search_email: graduated_notification.email)), data: {turbo_frame: "_top"} %>
         </small>
       <% end %>
     <% end %>

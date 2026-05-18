@@ -24,8 +24,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     find(".alert-success .close").click
-    # Wait for the dismissed flash to finish fading out — otherwise the
-    # fixed-position alert can intercept the org submenu/nav clicks below.
+    # Wait for the flash to finish dismissing -- otherwise it overlaps and
+    # intercepts the click on the nav link below
     expect(page).to have_no_css(".alert-success")
     find("#passive_organization_submenu").click
     within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }

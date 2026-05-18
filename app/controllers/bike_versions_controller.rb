@@ -40,12 +40,10 @@ class BikeVersionsController < ApplicationController
     end
     if @bike_version.update(permitted_params.except(:start_at, :end_at))
       flash[:success] = "#{@bike.type.titleize} version updated"
-      redirect_to(edit_bike_version_path(@bike_version, edit_template: params[:edit_template])) && return
     else
-      @edit_template = nil
-      flash[:error] = "Unable to update"
-      render :edit_template
+      flash[:error] = "Unable to update: #{@bike_version.errors.full_messages.to_sentence}"
     end
+    redirect_to(edit_bike_version_path(@bike_version, edit_template: params[:edit_template]))
   end
 
   def destroy

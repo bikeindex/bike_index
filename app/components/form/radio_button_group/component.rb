@@ -49,7 +49,7 @@ module Form
             class: "tw:sr-only",
             form: @form,
             data: @data) +
-            option[:label].html_safe
+            tag.span(option[:label].html_safe)
         end
       end
     end

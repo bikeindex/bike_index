@@ -24,20 +24,26 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      expect(assigns(:render_results)).to be_falsey
+
+      get "#{base_url}?search_no_js=true"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
+      expect(assigns(:render_results)).to be_truthy
       expect(assigns(:search_status)).to eq "current"
       expect(assigns(:separate_secondary_notifications)).to be_falsey
       expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_bike_graduated.id])
 
-      get "#{base_url}?search_status=all"
+      get "#{base_url}?search_no_js=true&search_status=all"
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_bike_graduated.id, graduated_notification_remaining.id])
 
-      get "#{base_url}?search_email=testly%40univer"
+      get "#{base_url}?search_no_js=true&search_email=testly%40univer"
       expect(response.status).to eq(200)
       expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id])
 
-      get "#{base_url}?search_email=testly%40univer&search_secondary=true"
+      get "#{base_url}?search_no_js=true&search_email=testly%40univer&search_secondary=true"
       expect(response.status).to eq(200)
       expect(assigns(:separate_secondary_notifications)).to be_truthy
       expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id])
@@ -51,7 +57,7 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
-      expect(assigns(:search_status)).to eq "current"
+      expect(assigns(:render_results)).to be_falsey
     end
   end
 
