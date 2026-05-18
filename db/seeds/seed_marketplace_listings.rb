@@ -23,6 +23,7 @@ end
 def seed_marketplace_bike(creator:, seller:, manufacturer_id:, primary_activity:)
   b_param = BParam.create!(creator: seller, params: {bike: {
     cycle_type: "bike", propulsion_type: "foot-pedal", manufacturer_id:,
+    primary_activity_id: primary_activity.id,
     serial_number: (0...10).map { rand(65..90).chr }.join,
     primary_frame_color_id: Color.pluck(:id).sample,
     rear_tire_narrow: "true", handlebar_type: HandlebarType.slugs.first,
@@ -30,7 +31,6 @@ def seed_marketplace_bike(creator:, seller:, manufacturer_id:, primary_activity:
   }})
   bike = creator.create_bike(b_param)
   raise "Marketplace bike error: #{b_param.bike_errors}" if bike.errors.any?
-  bike.update!(primary_activity:)
   bike
 end
 
@@ -52,17 +52,6 @@ listings = 10.times.map do |i|
   bike = seed_marketplace_bike(creator:, seller:, manufacturer_id: frame_maker_ids.sample, primary_activity: primary_activities.sample)
   seed_marketplace_listing(bike:, seller:, location: listing_locations[i % listing_locations.length],
     amount_cents: (250 + i * 175) * 100, condition: conditions[i % conditions.length])
-end
-
-# Bike creation enqueues async callback jobs that re-evaluate listing
-# publishability; a Sidekiq worker processing them mid-seed can briefly revert a
-# freshly-created listing to draft. Retry publication until every listing settles.
-listing_ids = listings.map(&:id)
-10.times do
-  drafts = MarketplaceListing.where(id: listing_ids).where.not(status: :for_sale)
-  break if drafts.none?
-  drafts.each { |listing| listing.update(status: :for_sale) }
-  sleep 0.5
 end
 
 puts "  Created #{listings.count} marketplace listings (#{listings.count(&:seller_member?)} promoted)"
