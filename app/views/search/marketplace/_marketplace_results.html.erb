@@ -8,7 +8,7 @@
 
 <% if @promoted_bikes.present? %>
   <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
-    <h2 class="tw:mb-4 tw:text-2xl tw:text-slate-800">Promoted</h2>
+    <h2 class="tw:mb-4 tw:text-2xl tw:text-slate-800">Bike Index member listings</h2>
 
     <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind)) do %>
       <% @promoted_bikes.each do |bike| %>
