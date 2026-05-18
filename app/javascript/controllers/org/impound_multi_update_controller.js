@@ -11,7 +11,7 @@ export default class extends Controller {
 
   open (event) {
     event.preventDefault()
-    this.toggleTarget.classList.add('tw:hidden')
+    collapse('hide', this.toggleTarget)
     collapse('show', this.panelTarget)
     this.cells.forEach(cell => cell.classList.remove('tw:hidden'))
     this.applyKind()
