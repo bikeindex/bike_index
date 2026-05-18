@@ -171,6 +171,17 @@ RSpec.describe BikeVersionsController, type: :request do
       expect(bike_version.start_at.to_i).to be_within(1).of 1524938400
       expect(bike_version.end_at.to_i).to be_within(1).of 1632852000
     end
+    context "invalid params" do
+      it "redirects to edit with the error" do
+        patch "#{base_url}/#{bike_version.id}", params: {
+          edit_template: "bike_details",
+          bike_version: valid_update_params.merge(name: "")
+        }
+        expect(flash[:error]).to match("Unable to update")
+        expect(response).to redirect_to("/bike_versions/#{bike_version.id}/edit/bike_details")
+        expect(bike_version.reload.name).to_not eq ""
+      end
+    end
     context "update visibility" do
       it "updates visibility" do
         expect(bike_version.reload.visibility).to eq "visible_not_related"
