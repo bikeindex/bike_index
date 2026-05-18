@@ -42,9 +42,8 @@ class BikeVersionsController < ApplicationController
       flash[:success] = "#{@bike.type.titleize} version updated"
       redirect_to(edit_bike_version_path(@bike_version, edit_template: params[:edit_template])) && return
     else
-      @edit_template = nil
-      flash[:error] = "Unable to update"
-      render :edit_template
+      flash[:error] = "Unable to update: #{@bike_version.errors.full_messages.to_sentence}"
+      redirect_to(edit_bike_version_path(@bike_version, edit_template: params[:edit_template])) && return
     end
   end
 
