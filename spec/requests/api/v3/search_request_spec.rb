@@ -195,14 +195,13 @@ RSpec.describe "Search API V3", type: :request do
 
     it "throttles after exceeding the API limit, returns JSON" do
       expect(Rack::Attack::API_MAX_REQUESTS).to eq 15
-      # Send 2x the limit so throttling is guaranteed even if a
-      # period boundary resets the counter mid-test.
-      (Rack::Attack::API_MAX_REQUESTS * 2).times do
+      throttled = rack_attack_throttled_response(limit: Rack::Attack::API_MAX_REQUESTS) do
         get "/api/v3/search", params: {stolenness: "non", format: :json}
+        response
       end
-      expect(response).to have_http_status(:too_many_requests)
-      expect(response.content_type).to include("application/json")
-      expect(JSON.parse(response.body)).to eq("error" => "Too Many Requests")
+      expect(throttled).to have_http_status(:too_many_requests)
+      expect(throttled.content_type).to include("application/json")
+      expect(JSON.parse(throttled.body)).to eq("error" => "Too Many Requests")
     end
   end
 
