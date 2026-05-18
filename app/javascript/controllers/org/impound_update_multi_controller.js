@@ -18,6 +18,10 @@ export default class extends Controller {
     // Revealing the column changes which cell is last-visible — let the
     // ui--table controller re-apply edge rounding/borders.
     window.dispatchEvent(new Event('ui-table:refresh'))
+    // Reflect the opened state in the URL without adding a history entry
+    const url = new URL(window.location)
+    url.searchParams.set('multi_update', 'true')
+    window.history.replaceState(window.history.state, '', url)
   }
 
   // Enable only the checkboxes whose row supports the selected kind

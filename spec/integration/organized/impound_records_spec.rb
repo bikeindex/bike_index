@@ -70,6 +70,8 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     # inside it, so its visibility is the signal the Stimulus controller has run.
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
     expect(page).to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
+    # Opening reflects in the URL (via replaceState — no new history entry)
+    expect(page).to have_current_path(/multi_update=true/)
 
     # Default kind retrieved_by_owner: only registered's checkbox is enabled.
     expect(checkbox_for(unregistered)).to be_disabled
