@@ -1,4 +1,12 @@
-<div data-controller="org--impound-update-multi">
+<% multi_update_open_label = translation(".hide_update").downcase %>
+<% multi_update_closed_label = translation(".update_multiple_records").downcase %>
+
+<div
+  data-controller="org--impound-update-multi"
+  data-org--impound-update-multi-open-label-value="<%= multi_update_open_label %>"
+  data-org--impound-update-multi-closed-label-value="<%= multi_update_closed_label %>"
+  data-org--impound-update-multi-disabled-title-value="<%= translation(".cannot_update_with_kind") %>"
+>
   <div class="row mt-4 mb-4">
     <div class="col-sm-9">
       <%= number_with_delimiter(@pagy.count) %>
@@ -31,11 +39,9 @@
     <div class="col-lg-3">
       <div class="text-right">
         <%= render(UI::Button::Component.new(
-          text: translation(".update_multiple_records").downcase,
+          text: multi_update_open? ? multi_update_open_label : multi_update_closed_label,
           color: :link,
-          # tw:hidden! is important, to beat UI::Button's tw:inline-flex
-          html_class: ("tw:hidden!" if multi_update_open?),
-          data: {"org--impound-update-multi-target": "toggle", action: "org--impound-update-multi#open"}
+          data: {"org--impound-update-multi-target": "toggle", action: "org--impound-update-multi#toggle"}
         )) %>
       </div>
     </div>

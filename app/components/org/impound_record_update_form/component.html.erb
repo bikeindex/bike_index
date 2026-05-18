@@ -30,6 +30,15 @@
             id="impoundRecordUpdateForm"
             data-controller="org--impound-update"
           >
+            <% if @multi %>
+              <div
+                class="tw:hidden"
+                data-org--impound-update-multi-target="error"
+              >
+                <%= render(UI::Alert::Component.new(text: "Select at least one record to update", kind: :error)) %>
+              </div>
+            <% end %>
+
             <% if @approved_impound_claim.present? %>
               <div
                 class="tw:hidden"
@@ -73,7 +82,7 @@
               </div>
 
               <div class="col-xs-12 mt-2">
-                <%= submit_tag "Update impound record", class: "btn btn-success btn-md-lg" %>
+                <%= submit_tag(@multi ? "Update impound records" : "Update impound record", class: "btn btn-success btn-md-lg") %>
               </div>
             </div>
           </div>

@@ -6,7 +6,7 @@ export default class extends Controller {
 
   toggleAll (event) {
     event.preventDefault()
-    // Skip disabled checkboxes (e.g. impound rows that don't allow the selected kind)
+    // Disabled checkboxes can't be selected
     const anyUnchecked = this.checkboxTargets.some(cb => !cb.disabled && !cb.checked)
     this.checkboxTargets.forEach(cb => { if (!cb.disabled) cb.checked = anyUnchecked })
   }

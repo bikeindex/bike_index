@@ -24,10 +24,15 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
 
   # Headless Chrome on CI sometimes loses the click on these freshly-enabled
   # checkboxes (set/check/native.click all flaked), so set the property
-  # directly. The form posts the value regardless of how the box got checked.
+  # directly (and fire change, as a real click would). The form posts the
+  # value regardless of how the box got checked.
   def check_for_update(impound_record)
     expect(checkbox_for(impound_record)).not_to be_disabled
-    page.execute_script("document.getElementById('ids_#{impound_record.id}').checked = true")
+    page.execute_script(<<~JS)
+      const el = document.getElementById('ids_#{impound_record.id}')
+      el.checked = true
+      el.dispatchEvent(new Event('change', {bubbles: true}))
+    JS
     expect(checkbox_for(impound_record)).to be_checked
   end
 
@@ -73,7 +78,14 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     # Default kind retrieved_by_owner: only registered's checkbox is enabled.
     expect(checkbox_for(unregistered)).to be_disabled
 
+    # Submitting with nothing checked shows an error and doesn't submit
+    within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
+    expect(page).to have_css("[role=alert]", text: /select at least one record/i)
+    expect(unregistered.impound_record_updates).to be_empty
+
+    # Checking a row hides the error again
     check_for_update(registered)
+    expect(page).to have_no_css("[role=alert]", text: /select at least one record/i)
     within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
 
     expect(page).to have_content("Updated 1 impound record", wait: 10)
@@ -81,9 +93,15 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(unregistered.impound_record_updates).to be_empty
 
     # redirect_back keeps multi_update=true, so the index reloads with the
-    # panel server-rendered already-open — the toggle button is gone.
+    # panel server-rendered open — the toggle now reads "hide update".
     expect(page).to have_current_path(/multi_update=true/)
-    expect(page).to have_no_button("update multiple records")
+    expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
+
+    # "hide update" collapses the panel; clicking the toggle again reopens it
+    click_button "hide update"
+    expect(page).to have_select("impound_record_update_kind", visible: :hidden, wait: 5)
+    expect(page).not_to have_current_path(/multi_update=true/)
+    click_button "update multiple records"
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
     expect(page).to have_css("input[type=checkbox][name='ids[#{unregistered.id}]']", visible: true)
 
