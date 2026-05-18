@@ -1,31 +1,69 @@
 # Seed marketplace listings for the marketplace index.
 # "Promoted" listings are those whose seller has an active membership -
 # they're partitioned to the top of /search/marketplace under a "Promoted" header.
-require "factory_bot_rails"
-FactoryBot.reload
+admin = User.find_by_email("admin@bikeindex.org")
+creator = BikeServices::Creator.new
+frame_maker_ids = Manufacturer.frame_makers.pluck(:id)
+primary_activities = PrimaryActivity.where(family: false).to_a
 
-def seed_marketplace_bike
-  FactoryBot.create(:bike, :with_ownership_claimed,
-    manufacturer: Manufacturer.frame_makers.sample,
-    primary_activity: PrimaryActivity.where(family: false).order("RANDOM()").first)
+listing_locations = [
+  {street: "One Shields Ave", city: "Davis", postal_code: "95616", latitude: 38.5449065, longitude: -121.7405167, region_record: State.find_by_abbreviation("CA")},
+  {street: "1300 W 14th Pl", city: "Chicago", postal_code: "60608", latitude: 41.8624488, longitude: -87.6591502, region_record: State.find_by_abbreviation("IL")},
+  {street: "100 W 1st St", city: "Los Angeles", postal_code: "90012", latitude: 34.05223, longitude: -118.24368, region_record: State.find_by_abbreviation("CA")},
+  {street: "55 Water St", city: "New York", postal_code: "10041", latitude: 40.7035731, longitude: -74.0093871, region_record: State.find_by_abbreviation("NY")}
+]
+
+def seed_marketplace_seller(email:, name:)
+  user = User.create!(name:, email:, password: "pleaseplease12",
+    password_confirmation: "pleaseplease12", terms_of_service: true)
+  user.confirm(user.confirmation_token)
+  user
 end
 
-# --- 6 standard for-sale listings ---
-standard_locations = %i[davis chicago los_angeles new_york amsterdam davis]
-standard_locations.each_with_index do |address_in, i|
-  FactoryBot.create(:marketplace_listing, :for_sale,
-    item: seed_marketplace_bike, address_in:, amount_cents: (250 + i * 125) * 100)
+def seed_marketplace_bike(creator:, seller:, manufacturer_id:, primary_activity:)
+  b_param = BParam.create!(creator: seller, params: {bike: {
+    cycle_type: "bike", propulsion_type: "foot-pedal", manufacturer_id:,
+    serial_number: (0...10).map { rand(65..90).chr }.join,
+    primary_frame_color_id: Color.pluck(:id).sample,
+    rear_tire_narrow: "true", handlebar_type: HandlebarType.slugs.first,
+    owner_email: seller.email
+  }})
+  bike = creator.create_bike(b_param)
+  raise "Marketplace bike error: #{b_param.bike_errors}" if bike.errors.any?
+  bike.update!(primary_activity:)
+  bike
 end
-puts "  Created #{standard_locations.count} standard marketplace listings"
 
-# --- 4 promoted listings (seller has an active membership) ---
-promoted_locations = %i[chicago los_angeles new_york davis]
-promoted_locations.each_with_index do |address_in, i|
-  seller = FactoryBot.create(:user_confirmed)
-  FactoryBot.create(:membership, user: seller)
-  FactoryBot.create(:marketplace_listing, :for_sale,
-    seller:, item: seed_marketplace_bike, address_in:, amount_cents: (900 + i * 200) * 100)
+def seed_marketplace_listing(bike:, seller:, location:, amount_cents:, condition:)
+  address_record = AddressRecord.new(location.merge(kind: :marketplace_listing,
+    country: Country.united_states, user: seller, bike:, skip_geocoding: true))
+  MarketplaceListing.create!(item: bike, seller:, status: :for_sale,
+    condition:, amount_cents:, address_record:)
 end
-puts "  Created #{promoted_locations.count} promoted marketplace listings"
 
+conditions = MarketplaceListing::CONDITION_ENUM.keys
+
+# --- 6 standard listings + 4 promoted (seller has an active membership) ---
+listings = 10.times.map do |i|
+  promoted = i >= 6
+  prefix = promoted ? "member" : "seller"
+  seller = seed_marketplace_seller(email: "marketplace-#{prefix}-#{i}@bikeindex.org", name: "Marketplace #{prefix.capitalize} #{i + 1}")
+  Membership.create!(user: seller, creator: admin, level: :basic, start_at: Time.current - 1.hour) if promoted
+  bike = seed_marketplace_bike(creator:, seller:, manufacturer_id: frame_maker_ids.sample, primary_activity: primary_activities.sample)
+  seed_marketplace_listing(bike:, seller:, location: listing_locations[i % listing_locations.length],
+    amount_cents: (250 + i * 175) * 100, condition: conditions[i % conditions.length])
+end
+
+# Bike creation enqueues async callback jobs that re-evaluate listing
+# publishability; a Sidekiq worker processing them mid-seed can briefly revert a
+# freshly-created listing to draft. Retry publication until every listing settles.
+listing_ids = listings.map(&:id)
+10.times do
+  drafts = MarketplaceListing.where(id: listing_ids).where.not(status: :for_sale)
+  break if drafts.none?
+  drafts.each { |listing| listing.update(status: :for_sale) }
+  sleep 0.5
+end
+
+puts "  Created #{listings.count} marketplace listings (#{listings.count(&:seller_member?)} promoted)"
 puts "Marketplace listings seeded successfully!"
