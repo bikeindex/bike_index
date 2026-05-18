@@ -14,6 +14,7 @@
 #  longitude         :float
 #  price_negotiable  :boolean          default(FALSE)
 #  published_at      :datetime
+#  seller_member     :boolean          default(FALSE), not null
 #  status            :integer
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
@@ -29,6 +30,7 @@
 #  index_marketplace_listings_on_buyer_id           (buyer_id)
 #  index_marketplace_listings_on_item               (item_type,item_id)
 #  index_marketplace_listings_on_seller_id          (seller_id)
+#  index_marketplace_listings_on_seller_member      (seller_member) WHERE seller_member
 #
 class MarketplaceListing < ApplicationRecord
   include AddressRecorded
