@@ -104,4 +104,21 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(last_update.kind).to eq "note"
     expect(last_update.notes).to eq "multi-update note"
   end
+
+  it "loads results via turbo and filters by unregisteredness" do
+    # Results load into the turbo-frame via the search--form auto-submit
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 2, wait: 10)
+    # search_no_js should NOT be in the URL (removed by the JS controller)
+    expect(page).not_to have_current_path(/search_no_js/)
+
+    # Unregisteredness dropdown link advances the URL (data-turbo-action="advance")
+    # and updates the frame in place
+    within("turbo-frame#impound_records_results_frame") do
+      all("[data-ui--dropdown-target='button']").last.click
+    end
+    click_link "Only unregistered"
+
+    expect(page).to have_current_path(/search_unregisteredness=only_unregistered/, wait: 10)
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 1)
+  end
 end

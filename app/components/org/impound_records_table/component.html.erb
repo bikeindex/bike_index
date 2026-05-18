@@ -13,7 +13,7 @@
   <% end %>
 
   <% table.column(sortable: "created_at") do |impound_record| %>
-    <%= link_to organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id), class: "localizeTime preciseTime" do %>
+    <%= link_to organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id), class: "localizeTime preciseTime", data: {turbo_frame: "_top"} do %>
       <%= l(impound_record.created_at, format: :convert_time) %>
     <% end %>
   <% end %>
@@ -33,7 +33,7 @@
   <% unless @skip_bike %>
     <% table.column(label: "Bike") do |impound_record| %>
       <% if impound_record.bike.present? %>
-        <%= link_to helpers.organized_bike_text(impound_record.bike), bike_path(impound_record.bike, organization_id: current_organization.id) %>
+        <%= link_to helpers.organized_bike_text(impound_record.bike), bike_path(impound_record.bike, organization_id: current_organization.id), data: {turbo_frame: "_top"} %>
         <% unless impound_record.bike.no_serial? %>
           <small>
             <%= helpers.render_serial_display(impound_record.bike, helpers.current_user) %>
