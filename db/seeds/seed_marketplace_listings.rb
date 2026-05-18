@@ -4,7 +4,7 @@
 admin = User.find_by_email("admin@bikeindex.org")
 creator = BikeServices::Creator.new
 frame_maker_ids = Manufacturer.frame_makers.pluck(:id)
-primary_activities = PrimaryActivity.where(family: false).to_a
+primary_activity_ids = PrimaryActivity.where(family: false).pluck(:id)
 
 listing_locations = [
   {street: "One Shields Ave", city: "Davis", postal_code: "95616", latitude: 38.5449065, longitude: -121.7405167, region_record: State.find_by_abbreviation("CA")},
@@ -20,13 +20,12 @@ def seed_marketplace_seller(email:, name:)
   user
 end
 
-def seed_marketplace_bike(creator:, seller:, manufacturer_id:, primary_activity:)
+def seed_marketplace_bike(creator:, seller:, manufacturer_id:, primary_activity_id:)
   b_param = BParam.create!(creator: seller, params: {bike: {
-    cycle_type: "bike", propulsion_type: "foot-pedal", manufacturer_id:,
-    primary_activity_id: primary_activity.id,
+    cycle_type: "bike", propulsion_type: "foot-pedal", manufacturer_id:, primary_activity_id:,
     serial_number: (0...10).map { rand(65..90).chr }.join,
     primary_frame_color_id: Color.pluck(:id).sample,
-    rear_tire_narrow: "true", handlebar_type: HandlebarType.slugs.first,
+    rear_tire_narrow: [true, false].sample, handlebar_type: HandlebarType.slugs.sample,
     owner_email: seller.email
   }})
   bike = creator.create_bike(b_param)
@@ -35,8 +34,8 @@ def seed_marketplace_bike(creator:, seller:, manufacturer_id:, primary_activity:
 end
 
 def seed_marketplace_listing(bike:, seller:, location:, amount_cents:, condition:)
-  address_record = AddressRecord.new(location.merge(kind: :marketplace_listing,
-    country: Country.united_states, user: seller, bike:, skip_geocoding: true))
+  address_record = AddressRecord.new(**location, kind: :marketplace_listing,
+    country: Country.united_states, user: seller, bike:, skip_geocoding: true)
   MarketplaceListing.create!(item: bike, seller:, status: :for_sale,
     condition:, amount_cents:, address_record:)
 end
@@ -49,7 +48,7 @@ listings = 10.times.map do |i|
   prefix = promoted ? "member" : "seller"
   seller = seed_marketplace_seller(email: "marketplace-#{prefix}-#{i}@bikeindex.org", name: "Marketplace #{prefix.capitalize} #{i + 1}")
   Membership.create!(user: seller, creator: admin, level: :basic, start_at: Time.current - 1.hour) if promoted
-  bike = seed_marketplace_bike(creator:, seller:, manufacturer_id: frame_maker_ids.sample, primary_activity: primary_activities.sample)
+  bike = seed_marketplace_bike(creator:, seller:, manufacturer_id: frame_maker_ids.sample, primary_activity_id: primary_activity_ids.sample)
   seed_marketplace_listing(bike:, seller:, location: listing_locations[i % listing_locations.length],
     amount_cents: (250 + i * 175) * 100, condition: conditions[i % conditions.length])
 end
