@@ -21,7 +21,7 @@ module Org
       private
 
       def multi_update_open?
-        params[:multi_update].to_s == "true"
+        Binxtils::InputNormalizer.boolean(params[:multi_update])
       end
 
       def kinds_for_select
