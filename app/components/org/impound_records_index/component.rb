@@ -20,6 +20,10 @@ module Org
 
       private
 
+      def multi_update_open?
+        Binxtils::InputNormalizer.boolean(params[:multi_update])
+      end
+
       def skip_resolved
         ImpoundRecord.active_statuses.include?(@search_status)
       end

@@ -38,9 +38,9 @@ RSpec.describe Org::ImpoundRecordsTable::Component, type: :component do
     expect(component).to have_content("last updator")
     expect(component).to have_content("Impounded from")
     expect(component).to have_link(href: Rails.application.routes.url_helpers.organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id))
-    expect(component).to have_css("#selectAllSelector")
-    expect(component).to have_css("td.multiselect-cell.canupdate-note")
-    expect(component).to have_css("input[type='checkbox'][name=\"ids[#{impound_record.id}]\"]")
+    expect(component).to have_css("a[data-action='click->table-multi-checkbox#toggleAll']")
+    expect(component).to have_css("td.multi-update-cell")
+    expect(component).to have_css("input[type='checkbox'][name=\"ids[#{impound_record.id}]\"][data-update-kinds~='note']")
   end
 
   context "with skip_status and render_resolved_at" do
@@ -81,8 +81,8 @@ RSpec.describe Org::ImpoundRecordsTable::Component, type: :component do
     let(:skip_multiselect) { true }
 
     it "omits the multiselect column" do
-      expect(component).not_to have_css("#selectAllSelector")
-      expect(component).not_to have_css(".multiselect-cell")
+      expect(component).not_to have_css("a[data-action='click->table-multi-checkbox#toggleAll']")
+      expect(component).not_to have_css(".multi-update-cell")
     end
   end
 end

@@ -2,12 +2,11 @@
 
 require "rails_helper"
 
-# Verifies the multi-update behavior wired up in application.js: the per-row
-# `canupdate-<kind>` classes drive which checkboxes get enabled/disabled when
-# the kind dropdown changes. Lives at the integration layer because the JS
-# selectors target `.multiselect-cell.canupdate-X input` on the rendered
-# `<td>`s, so the Org::ImpoundRecordsTable component has to keep those classes
-# on the cell elements themselves (not on a wrapper).
+# Verifies the impound multi-update behavior: `org--impound-update-multi` reads
+# the per-row `data-update-kinds` off each checkbox to enable/disable them when
+# the kind dropdown changes, and `org--impound-update` reveals the field for
+# the selected kind. Lives at the integration layer because both controllers
+# react to the rendered DOM.
 RSpec.describe "Organized impound records multi-update", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
@@ -21,10 +20,6 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
 
   def checkbox_for(impound_record)
     find("input[type=checkbox][name='ids[#{impound_record.id}]']", visible: :all)
-  end
-
-  def cell_for(impound_record)
-    checkbox_for(impound_record).find(:xpath, "ancestor::td[1]", visible: :all)
   end
 
   # Headless Chrome on CI sometimes loses the click on these freshly-enabled
@@ -43,35 +38,37 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     find(".alert-success .close").click
+    # Wait for the dismissed flash to finish fading out — otherwise the
+    # fixed-position alert can intercept the org submenu/nav clicks below.
+    expect(page).to have_no_css(".alert-success")
     find("#passive_organization_submenu").click
     within(".current-organization-submenu") { click_link "Impounded Bikes" }
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
   end
 
-  it "renders per-row canupdate classes and applies multi-updates for matching records" do
+  it "renders per-row update kinds and applies multi-updates for matching records" do
     expect(page).to have_css("table tbody tr", count: 2, wait: 10)
 
-    registered_cell = cell_for(registered)
-    unregistered_cell = cell_for(unregistered)
+    registered_kinds = checkbox_for(registered)["data-update-kinds"].split
+    unregistered_kinds = checkbox_for(unregistered)["data-update-kinds"].split
 
     # Every record allows note/removed_from_bike_index/transferred_to_new_owner;
     # only the registered bike allows retrieved_by_owner.
-    %w[note removed_from_bike_index transferred_to_new_owner].each do |kind|
-      expect(registered_cell[:class]).to include("canupdate-#{kind}")
-      expect(unregistered_cell[:class]).to include("canupdate-#{kind}")
-    end
-    expect(registered_cell[:class]).to include("canupdate-retrieved_by_owner")
-    expect(unregistered_cell[:class]).not_to include("canupdate-retrieved_by_owner")
+    expect(registered_kinds).to include("note", "removed_from_bike_index", "transferred_to_new_owner", "retrieved_by_owner")
+    expect(unregistered_kinds).to include("note", "removed_from_bike_index", "transferred_to_new_owner")
+    expect(unregistered_kinds).not_to include("retrieved_by_owner")
 
     # Cells are hidden until the user opts into multi-update.
     expect(page).not_to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
 
-    click_link "update multiple records"
+    click_button "update multiple records"
 
     # Wait for the makeMultiUpdate panel to be expanded — the kind <select> is
-    # inside it, so its visibility is the signal the Bootstrap collapse has run.
+    # inside it, so its visibility is the signal the Stimulus controller has run.
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
     expect(page).to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
+    # Opening reflects in the URL (via replaceState — no new history entry)
+    expect(page).to have_current_path(/multi_update=true/)
 
     # Default kind retrieved_by_owner: only registered's checkbox is enabled.
     expect(checkbox_for(unregistered)).to be_disabled
@@ -83,10 +80,21 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(registered.impound_record_updates.pluck(:kind)).to eq ["retrieved_by_owner"]
     expect(unregistered.impound_record_updates).to be_empty
 
-    # Now apply a note update to the unregistered record — a kind it allows.
-    click_link "update multiple records"
+    # redirect_back keeps multi_update=true, so the index reloads with the
+    # panel server-rendered already-open — the toggle button is gone.
+    expect(page).to have_current_path(/multi_update=true/)
+    expect(page).to have_no_button("update multiple records")
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
+    expect(page).to have_css("input[type=checkbox][name='ids[#{unregistered.id}]']", visible: true)
+
+    # Now apply a note update to the unregistered record — a kind it allows.
+    # org--impound-update reveals the field for the selected kind
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden)
+    select "Transferred To Owner", from: "impound_record_update_kind"
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: true)
     select "Add Internal Note", from: "impound_record_update_kind"
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden)
+
     check_for_update(unregistered)
     fill_in "impound_record_update[notes]", with: "multi-update note"
     within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
