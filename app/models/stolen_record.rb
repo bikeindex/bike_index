@@ -51,10 +51,8 @@
 #
 # Indexes
 #
-#  index_stolen_records_on_bike_id                         (bike_id)
-#  index_stolen_records_on_latitude_and_longitude          (latitude,longitude)
-#  index_stolen_records_on_organization_stolen_message_id  (organization_stolen_message_id)
-#  index_stolen_records_on_recovering_user_id              (recovering_user_id)
+#  index_stolen_records_on_bike_id                 (bike_id)
+#  index_stolen_records_on_latitude_and_longitude  (latitude,longitude)
 #
 class StolenRecord < ApplicationRecord
   include ActiveModel::Dirty

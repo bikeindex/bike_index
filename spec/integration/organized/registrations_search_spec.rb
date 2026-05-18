@@ -15,10 +15,18 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Ensure gear types exist so bike show page doesn't write during readonly mode
     RearGearType.fixed
     FrontGearType.fixed
+    # Pin below the md breakpoint (768px) so the sidebar is hidden and the
+    # mobile org dropdown is the only menu path. Chrome's --window-size flag
+    # is unreliable in headless mode, so resize explicitly.
+    page.current_window.resize_to(720, 2000)
     visit new_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
+    find(".alert-success .close").click
+    find("#passive_organization_submenu").click
+    within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
+    expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/, wait: 10)
   end
 
   def settings_selector
@@ -318,7 +326,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end
 
     it "searches multiple serials, shows results, and caches rows by updated_at" do
-      visit multi_serial_path
+      find("#passive_organization_submenu").click
+      within(".current-organization-submenu") { click_link "Multi search" }
+      expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
 
       expect(page).to have_content(/multiple serial search/i)
       expect(page).to have_css("[data-controller~='org--multi-search']", wait: 5)

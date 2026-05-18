@@ -33,7 +33,8 @@ module API
               organization_id: membership.organization_id,
               organization_access_token: membership.organization.access_token,
               organization_logo_url: (membership.organization.avatar_url if membership.organization.avatar?),
-              user_is_organization_admin: membership.role == "admin"
+              user_is_organization_admin: membership.role == "admin",
+              menu: OrganizedServices::UserMenuItems.for(organization: membership.organization, current_user:)
             }
           end
 

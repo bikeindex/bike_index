@@ -4,17 +4,17 @@ description: >-
   Create or update a pull request for the current branch. Trigger when the user
   asks to create/open/make a PR, or to edit/update/rewrite/fix the PR
   description, body, or summary — for both new PRs (`gh pr create`) and
-  existing ones (`gh pr edit --body-file`). For frontend diffs, captures
-  desktop+mobile screenshots with Playwright MCP and embeds them under a
-  `## Screenshots` section. Use for any verb that lands on a PR's text
-  content: "open a PR", "make a PR", "update the PR description", "rewrite
-  the PR body", "fix the description".
+  existing ones (`gh pr edit --body-file`). For frontend diffs, delegates to
+  the `frontend-screenshots` skill to capture desktop+mobile screenshots and
+  embeds them under a `## Screenshots` section. Use for any verb that lands on
+  a PR's text content: "open a PR", "make a PR", "update the PR description",
+  "rewrite the PR body", "fix the description".
 allowed-tools: Bash, Read, Glob, Grep
 ---
 
 # Pull request workflow
 
-Create or update a pull request for the current branch. If the diff contains frontend changes, capture desktop and mobile screenshots of the affected pages with Playwright and embed them in the PR body under a `## Screenshots` section.
+Create or update a pull request for the current branch. If the diff contains frontend changes, delegate screenshot capture to the `frontend-screenshots` skill and embed the results in the PR body under a `## Screenshots` section.
 
 The workflow is ordered so the always-runs phase (steps 1–3) happens first, then the screenshot phase (steps 4–7) runs only when needed. Each step ends with the conditions under which you stop and return.
 
@@ -22,7 +22,7 @@ The workflow is ordered so the always-runs phase (steps 1–3) happens first, th
 
 ### 1. Gather branch state
 
-Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right CONDUCTOR_PORT fallback. Then run in parallel:
+Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback. Then run in parallel:
 - `git status` (no `-uall`)
 - `git diff main...HEAD --stat`
 - `git diff main...HEAD --name-only`
@@ -64,14 +64,14 @@ Always pass the body via `--body-file` (not inline `--body`) to preserve formatt
 
 **Stop here and return the PR URL** unless step 4's gate says screenshots are needed.
 
-### 4. Decide whether screenshots are needed
+### 4. Decide whether screenshots are needed and which URLs to capture
 
 Only continue past this step when there's a real reason to capture. Otherwise return the PR URL.
 
 - New PR + `FRONTEND=false` → done.
 - New PR + `FRONTEND=true` → continue; capture every affected page.
 - Existing PR + `FRONTEND=false` → done.
-- Existing PR + `FRONTEND=true` → continue only if the captures in the existing body are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit step 5 to those pages. If nothing has moved, done.
+- Existing PR + `FRONTEND=true` → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit step 5 to those pages. If nothing has moved, done.
 
 From the changed files, infer the affected routes. Heuristics:
 - A view at `app/views/bikes/show.html.erb` → `/bikes/:id` (pick a representative id from the dev db, e.g. `Bike.last.id`)
@@ -80,62 +80,75 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
-**Never start or stop `bin/dev` for the user.** The dev server is the user's process. Starting your own copy can land you on a different DB; stopping theirs interrupts work.
+### 5. Capture branch screenshots
 
-Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** (`bin/dev` from their own terminal), then resume once they confirm. Do not background-launch it yourself, even temporarily.
+Invoke the `frontend-screenshots` skill with the `(url-path, page-slug)` pairs from step 4. It handles dev-server check, sign-in, the seeded-user identity gate, viewport sizing, and per-PNG sanity checks. It returns local paths under `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`.
 
-### 5. Capture screenshots
+If `frontend-screenshots` returns failures it couldn't diagnose, surface them and stop — don't post partial screenshots.
 
-Use Playwright MCP (`mcp__playwright__*`) to capture desktop and mobile screenshots. The MCP browser session persists across calls, so dev-server sign-in is a one-time manual step.
-
-Paths: `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Before capturing, remove stale shots: `rm -f tmp/pr_screenshots/<branch>-<page>-*.png`. `<page-slug>` is a short identifier (e.g. `bike-show`, `admin-strava-activities`).
-
-Capture in two passes so each viewport is resized only once:
-
-1. `browser_resize` → 1440×900. For each page, `browser_navigate` to `$BASE_URL<url-path>` then `browser_take_screenshot` to `...-desktop.png`.
-2. `browser_resize` → 390×844 (mobile viewport). For each page, `browser_navigate` to the same URL then `browser_take_screenshot` to `...-mobile.png`.
-
-If a navigation lands on `/session/new`, ask the user to sign in via the visible Playwright MCP browser window, then continue.
-
-After capture, sanity-check each PNG. A file under ~5KB usually means the page errored; also check `browser_console_messages` for uncaught JS errors. Diagnose:
-
-1. `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"` to get the HTTP status.
-2. `curl -s "$BASE_URL/<path>" | head -200` to see the response body (usually a Rails error page with the exception and top of the backtrace).
-3. `tail -200 log/development.log` for the full backtrace and any SQL involved.
-4. Based on what you find: route missing → re-check the path; auth/redirect → pick a URL that doesn't require login or sign in; missing fixture → pick a different id or seed it; genuine bug in the diff → fix it or tell the user.
-
-Only stop and surface to the user once you understand the cause and either (a) have a fix to propose, (b) need input they must provide (e.g. which URL to screenshot instead), or (c) concluded it's a real bug in the PR.
-
-### 6. Upload screenshots and get inline URLs
+### 6. Upload branch screenshots and get inline URLs
 
 Invoke the `github-upload-image-to-pr` skill to upload each PNG from step 5 to the PR's comment textarea — GitHub mints persistent `user-attachments/assets/` URLs that render inline in the browser (release assets would force a download on click). The skill clears the textarea without submitting the comment.
 
-Collect the returned URLs, keyed by which file they correspond to (desktop vs. mobile, per page).
+Collect the returned URLs, keyed by `(page-slug, viewport)`.
 
-### 7. Append the Screenshots section to the PR body
+### 6.5 Capture and upload the same URLs on `main`
 
-Append this to the existing body and `gh pr edit <num> --body-file <tmp-body-file>` again:
+Capture the **base-branch** version of every screenshot from step 5 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you reached step 5 at all, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
+
+Skip per-page only when the URL didn't exist on `main` (a brand-new route or page added in this PR) — there's nothing to compare to.
+
+Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against `main` (its step 6 — git checkout dance, captures into `...-main-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs.
+
+### 7. Post the Screenshots section as the first PR comment
+
+Post the screenshots as a **PR comment**, not in the PR body. This keeps the description tight and skimmable — reviewers see the human-written summary first, with screenshots one scroll down. It also avoids re-editing the body (and its notification noise) every time screenshots are recaptured.
+
+On a fresh PR, this comment is naturally the first one. On an update, find the existing screenshots comment (the one authored by you whose body starts with `## Screenshots`) and edit it in place rather than posting a new one:
+
+```bash
+SCREENSHOT_COMMENT_ID=$(gh api repos/{owner}/{repo}/issues/{PR_NUMBER}/comments \
+  --jq '.[] | select(.body | startswith("## Screenshots")) | .id' | head -1)
+```
+
+- If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment <num> --body-file <tmp-comment-file>`.
+- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body=@<tmp-comment-file>`.
+
+**Headers are always `| Desktop | Mobile |`** — that stays the same regardless of whether there's a main comparison. The main shots and branch shots stack as additional rows, with a small indicator row between them when both are present.
+
+Default (with main comparison):
 
 ```markdown
-
 ## Screenshots
 
 ### <url-path>
 
 | Desktop | Mobile |
 | --- | --- |
-| <img src="<desktop-user-attachments-url>" width="600"> | <img src="<mobile-user-attachments-url>" width="300"> |
+| <img src="<main-desktop-url>" width="500"> | <img src="<main-mobile-url>" width="250"> |
+| main 👆 | this branch 👇 |
+| <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
+```
+
+Brand-new page (URL didn't exist on `main` — see step 6.5), no comparison row:
+
+```markdown
+### <url-path>
+
+| Desktop | Mobile |
+| --- | --- |
+| <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
 ```
 
 Rules:
-- Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own 1-row table — desktop on the left, mobile on the right.
-- Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells.
+- Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own table.
+- **Headers are always `| Desktop | Mobile |`** — never `| main | this branch |` or any per-PR variation. Reviewers should see the same column meaning across every PR.
+- Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 
-When updating an existing body, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
+When updating an existing screenshots comment, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
 
 Return the PR URL.
 
 ## Notes
 
-- If Playwright MCP or the upload skill fails, report the failure clearly and leave the PR without screenshots — don't block PR creation on screenshot tooling.
-- If Playwright MCP tools aren't registered (`mcp__playwright__*` missing), tell the user to install: `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart the session.
+- If `frontend-screenshots` or `github-upload-image-to-pr` fails, report the failure clearly and leave the PR without screenshots — don't block PR creation on screenshot tooling.

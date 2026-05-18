@@ -50,20 +50,20 @@ module UI
         if bordered
           classes << "tw:border-b tw:border-l tw:border-t tw:border-gray-200 tw:dark:border-gray-600"
         end
-        classes << @classes if @classes
+        classes << @classes unless @classes.respond_to?(:call) || @classes.nil?
         classes << @header_classes if @header_classes
         classes.join(" ")
       end
 
-      def td_classes(bordered:)
+      def td_classes(bordered:, record: nil)
         classes = ["tw:px-1 tw:py-1"]
         classes << if bordered
           "tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700"
         else
           "tw:border-b tw:border-gray-100 tw:dark:border-gray-700"
         end
-        classes << @classes if @classes
-        classes.join(" ")
+        classes << (@classes.respond_to?(:call) ? @classes.call(record) : @classes) if @classes
+        classes.compact.join(" ")
       end
 
       private
