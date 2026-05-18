@@ -91,7 +91,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(response).to have_http_status(:success)
           expect(assigns(:promoted_bikes).map(&:id)).to eq([promoted_item.id])
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
-          expect(response.body).to include("Promoted")
+          expect(response.body).to include("Bike Index member listings")
 
           # End the membership and run AfterUserChangeJob to refresh the cached seller_member
           membership.update(status: :ended, end_at: Time.current - 1.day)
@@ -102,7 +102,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(response).to have_http_status(:success)
           expect(assigns(:promoted_bikes)).to eq([])
           expect(assigns(:bikes).pluck(:id)).to match_array([item.id, promoted_item.id])
-          expect(response.body).not_to include("Promoted")
+          expect(response.body).not_to include("Bike Index member listings")
         end
 
         context "with more promoted listings than fit on a page" do
@@ -132,11 +132,11 @@ RSpec.describe Search::MarketplaceController, type: :request do
             expect(assigns(:bikes).pluck(:id)).to eq([item.id, *extra_standard_items.first(11).map(&:id)])
             expect(assigns(:pagy).next).to eq 2
 
-            # Page 2 has no Promoted section, just remaining standard listings
+            # Page 2 has no member listings section, just remaining standard listings
             get "#{base_url}?page=2", as: :turbo_stream
             expect(assigns(:promoted_bikes)).to be_nil
             expect(assigns(:bikes).pluck(:id)).to eq(extra_standard_items.last(2).map(&:id))
-            expect(response.body).not_to include(">Promoted</h2>")
+            expect(response.body).not_to include("Bike Index member listings")
           end
         end
       end
