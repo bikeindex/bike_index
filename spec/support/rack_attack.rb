@@ -6,10 +6,15 @@
 Rack::Attack.enabled = false
 
 RSpec.shared_context :rack_attack do
+  include ActiveSupport::Testing::TimeHelpers
+
   around do |example|
     Rack::Attack.cache.store.clear
     Rack::Attack.enabled = true
-    example.run
+    # Rack::Attack's throttle window is wall-clock-aligned; freeze time so all
+    # requests in the example land in one window (a rollover mid-test would
+    # otherwise reset the counter and miss the limit).
+    freeze_time { example.run }
   ensure
     Rack::Attack.enabled = false
     Rack::Attack.cache.store.clear
