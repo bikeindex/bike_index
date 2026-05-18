@@ -188,6 +188,20 @@ RSpec.describe FindOrCreateModelAuditJob, type: :job do
         end
       end
     end
+    context "concurrent job created a matching model_audit" do
+      let!(:model_audit) { FactoryBot.create(:model_audit, manufacturer: manufacturer, frame_model: frame_model1) }
+      it "uses the existing model_audit rather than raising" do
+        Sidekiq::Job.clear_all
+        # Simulate find_for returning blank, then a concurrent job creating the matching model_audit
+        # before this job reaches ModelAudit.create!
+        allow(ModelAudit).to receive(:find_for).and_return(nil, model_audit)
+        expect {
+          instance.perform(bike1.id)
+        }.to change(ModelAudit, :count).by 0
+        expect(bike1.reload.model_audit_id).to eq model_audit.id
+        expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to eq([model_audit.id])
+      end
+    end
     context "not matching model_audit" do
       let(:model_audit) { FactoryBot.create(:model_audit) }
       # This test replicates what would happen if a user updated a bike and it no longer matched the vehicle
