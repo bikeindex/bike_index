@@ -110,7 +110,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
     it "adds the matching option when enter is pressed" do
       find(".hw-combobox__input").set("Burg")
-      expect(page).to have_css(".hw-combobox__option", text: "Burgundy", wait: 30)
+      # Wait for filtering to settle to the single match before pressing enter
+      expect(page).to have_css(".hw-combobox__option", text: "Burgundy", count: 1, wait: 30)
+      expect(page).to have_no_css(".hw-combobox__option", text: "Black")
 
       # Enter with a matching option selects it rather than adding free text
       find(".hw-combobox__input").send_keys(:return)

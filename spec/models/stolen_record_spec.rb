@@ -322,7 +322,8 @@ RSpec.describe StolenRecord, type: :model do
     context "timestamp" do
       let(:date) { (Time.current - 1.hour).to_i }
       it "it sets the year to last year" do
-        expect(result).to be_within(1).of(Time.current - 1.hour)
+        # Compare against the input timestamp, not a fresh Time.current (which races)
+        expect(result).to be_within(1).of(Time.at(date))
       end
     end
   end

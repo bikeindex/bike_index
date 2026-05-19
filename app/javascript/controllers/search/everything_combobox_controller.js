@@ -137,8 +137,12 @@ export default class extends Controller {
 
   // The active option if the user navigated to one, otherwise the first match
   matchingOption () {
+    const query = this.inputElement.value.trim().toLowerCase()
     const options = Array.from(this.element.querySelectorAll('.hw-combobox__option'))
       .filter(option => !option.hidden && option.offsetParent !== null)
+      // The listbox can still show stale results from a previous query, so
+      // only consider options whose text actually contains what was typed
+      .filter(option => (option.getAttribute('data-autocompletable-as') || '').toLowerCase().includes(query))
 
     return options.find(option => option.getAttribute('aria-selected') === 'true') || options[0]
   }
