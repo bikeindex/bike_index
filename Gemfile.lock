@@ -391,6 +391,11 @@ GEM
       actioncable (>= 6.0.0)
       listen (>= 3.0.0)
       railties (>= 6.0.0)
+    hotwire_combobox (0.4.1)
+      platform_agent (>= 1.0.1)
+      rails (>= 7.0.7.2)
+      stimulus-rails (>= 1.2)
+      turbo-rails (>= 1.2)
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     http (4.4.1)
@@ -573,6 +578,9 @@ GEM
       activesupport (>= 6.1)
     pghero (3.8.0)
       activerecord (>= 7.2)
+    platform_agent (1.0.1)
+      activesupport (>= 5.2.0)
+      useragent (~> 0.16.3)
     postmark (1.25.1)
       json
     postmark-rails (0.22.1)
@@ -958,6 +966,7 @@ DEPENDENCIES
   herb
   honeybadger
   hotwire-livereload (~> 1.4.1)
+  hotwire_combobox
   i18n-country-translations
   i18n-js
   i18n-tasks

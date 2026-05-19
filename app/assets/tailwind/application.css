@@ -1,6 +1,7 @@
 /* Declare CSS layers so that legacy is overridden by tailwind utility classes */
 @layer theme, base, legacy, components, utilities;
 @import "tailwindcss" prefix(tw);
+@import "./combobox.css";
 @config "../../../config/tailwind.config.js";
 
 @theme {
