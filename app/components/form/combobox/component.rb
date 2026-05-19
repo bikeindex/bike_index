@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module UI
+module Form
   module Combobox
     # Accessible autocomplete/combobox built on the hotwire_combobox gem.
     #
