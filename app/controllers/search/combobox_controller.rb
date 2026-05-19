@@ -7,11 +7,16 @@ module Search
     PER_PAGE = 15
 
     def options
-      @search_obj_name = params[:search_obj_name].presence || "Registrations"
-      @matches = Autocomplete::Matcher.search(autocomplete_params)
-      @next_page = (@matches.length >= PER_PAGE) ? current_page + 1 : nil
+      matches = Autocomplete::Matcher.search(autocomplete_params)
+      next_page = (matches.length >= PER_PAGE) ? current_page + 1 : nil
 
-      render :options
+      render turbo_stream: view_context.render(
+        Search::EverythingCombobox::Options::Component.new(
+          matches:,
+          search_obj_name: params[:search_obj_name].presence || "Registrations",
+          next_page:
+        )
+      )
     end
 
     def chips
