@@ -138,6 +138,9 @@ export default class extends Controller {
       if (!queriedCategories.includes('p')) categories += ',propulsion'
     }
 
+    if (categories === this.appliedCategories) return
+    this.appliedCategories = categories
+
     window.searchBarCategories = categories
     this.updateAsyncSrc(categories)
   }

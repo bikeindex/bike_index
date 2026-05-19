@@ -9,7 +9,7 @@ module Search
     def options
       @search_obj_name = params[:search_obj_name].presence || "Registrations"
       @matches = Autocomplete::Matcher.search(autocomplete_params)
-      @next_page = (@matches.length >= per_page) ? current_page + 1 : nil
+      @next_page = (@matches.length >= PER_PAGE) ? current_page + 1 : nil
 
       render :options
     end
@@ -20,7 +20,7 @@ module Search
       options = BikeSearchable.selected_query_items_options(interpreted_params)
 
       chips = options.map do |option|
-        display, value = option.is_a?(String) ? [option, option] : [option["text"], option["search_id"]]
+        display, value = BikeSearchable.query_item_display_value(option)
         helpers.hw_combobox_selection_chip(display:, value:, for_id: params[:for_id])
       end
 
@@ -30,11 +30,7 @@ module Search
     private
 
     def autocomplete_params
-      params.permit(:q, :page, :per_page, :categories, :cache)
-    end
-
-    def per_page
-      params[:per_page].presence&.to_i || PER_PAGE
+      params.permit(:q, :page, :categories, :cache).merge(per_page: PER_PAGE)
     end
 
     def current_page

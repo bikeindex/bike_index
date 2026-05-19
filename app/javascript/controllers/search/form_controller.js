@@ -51,7 +51,7 @@ export default class extends Controller {
 
   disconnect () {
     // Clean up event listener when controller disconnects
-    document.removeEventListener('turbo:frame-render', this.frameRenderHandler)
+    document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.submitIfEmptyResults)
   }
 
