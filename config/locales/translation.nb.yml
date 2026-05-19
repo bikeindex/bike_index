@@ -5812,6 +5812,8 @@ nb:
         per_page: Per_side
         status_records: "%{status} poster"
         update_multiple_records: Oppdater flere poster
+        cannot_update_with_kind: Denne oppføringen kan ikke oppdateres med «{kind}»
+        hide_update: Skjul oppdatering
       bike_access_panel:
         access_panel: Tilgangspanel
         added_to_track_parking_notification: Denne %{bike_type} er ikke registrert

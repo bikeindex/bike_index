@@ -19,6 +19,8 @@ RSpec.describe Org::ImpoundRecordUpdateForm::Component, type: :component do
       expect(component).to have_css("select#impound_record_update_kind")
       # retrieved_by_owner is the default selected kind
       expect(component).to have_css("select#impound_record_update_kind option[selected]", text: "Owner Retrieved Bike")
+      # transferred_to_new_owner requires a new owner email
+      expect(component).to have_css("input[name='impound_record_update[transfer_email]'][required]", visible: :all)
     end
 
     it "posts to the multi_update path" do

@@ -55,7 +55,7 @@
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
         %th.table-checkbox-select
-          %button{ type: "button", class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", data: { action: "click->table-multi-checkbox#toggleAll" } }
+          %button{ type: "button", class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", title: "Toggle all checked", aria: { label: "Toggle all checked" }, data: { action: "click->table-multi-checkbox#toggleAll" } }
             = check_mark
         %th
           Date indexed

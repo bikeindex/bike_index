@@ -11,6 +11,7 @@ module Organized
       @per_page = permitted_per_page
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+      @multi_update_open = Binxtils::InputNormalizer.boolean(params[:multi_update])
 
       @pagy, @impound_records = pagy(:countish, available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
         .includes(:user, :bike, :location), limit: @per_page, page: permitted_page)
