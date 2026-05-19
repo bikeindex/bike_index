@@ -14,7 +14,11 @@ export default class extends Controller {
   applyKind () {
     const kind = this.kindSelectTarget.value
     this.kindFieldTargets.forEach(field => {
-      field.classList.toggle('tw:hidden', field.dataset.kind !== kind)
+      const active = field.dataset.kind === kind
+      field.classList.toggle('tw:hidden', !active)
+      // Disable inputs in inactive fields — a hidden `required` field can't be
+      // focused and would block submission, and stale values shouldn't post.
+      field.querySelectorAll('input, select').forEach(input => { input.disabled = !active })
     })
   }
 }

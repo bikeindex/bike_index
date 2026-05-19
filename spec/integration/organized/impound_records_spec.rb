@@ -122,17 +122,22 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(page).not_to have_current_path(/multi_update=true/)
     click_button "update multiple records"
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
+    # registered is resolved now, so only the unregistered row remains
+    expect(page).to have_css("table tbody tr", count: 1)
     expect(page).to have_css("input[type=checkbox][name='ids[#{unregistered.id}]']", visible: true)
 
     # Now apply a note update to the unregistered record — a kind it allows.
-    # org--impound-update reveals the field for the selected kind
-    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden)
+    # org--impound-update reveals the field for the selected kind, and disables
+    # it while hidden so the required transfer_email doesn't block other kinds.
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden, disabled: true)
     select "Transferred To Owner", from: "impound_record_update_kind"
-    expect(page).to have_field("impound_record_update[transfer_email]", visible: true)
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: true, disabled: false)
     select "Add Internal Note", from: "impound_record_update_kind"
-    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden)
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden, disabled: true)
 
-    check_for_update(unregistered)
+    # Select-all checks every enabled row — just the unregistered one here
+    click_button "Toggle all checked"
+    expect(checkbox_for(unregistered)).to be_checked
     fill_in "impound_record_update[notes]", with: "multi-update note"
     within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
 
