@@ -21,8 +21,6 @@ module Org
 
       private
 
-      def multi_update_open? = @multi_update_open
-
       def skip_resolved
         ImpoundRecord.active_statuses.include?(@search_status)
       end
