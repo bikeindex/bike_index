@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "time_localizer.js", :js, type: :system do
   let(:time_zone) { "America/Chicago" }
   let(:preview_path) { "/rails/view_components/ui/time_localizer/component/default?time_zone=#{CGI.escape(time_zone)}" }
-  let(:current_time_in_zone) { Binxtils::TimeParser.parse(Time.current, time_zone, in_time_zone: true) }
+  let(:current_time_in_zone) { Time.current.in_time_zone(time_zone) }
 
   def fix_format(str)
     str.strip.gsub("  ", " ") # required because dumb spaces in strftime
