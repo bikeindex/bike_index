@@ -106,12 +106,13 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(page).to have_css("input[type=checkbox][name='ids[#{unregistered.id}]']", visible: true)
 
     # Now apply a note update to the unregistered record — a kind it allows.
-    # org--impound-update reveals the field for the selected kind
-    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden)
+    # org--impound-update reveals the field for the selected kind, and disables
+    # it while hidden so the required transfer_email doesn't block other kinds.
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden, disabled: true)
     select "Transferred To Owner", from: "impound_record_update_kind"
-    expect(page).to have_field("impound_record_update[transfer_email]", visible: true)
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: true, disabled: false)
     select "Add Internal Note", from: "impound_record_update_kind"
-    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden)
+    expect(page).to have_field("impound_record_update[transfer_email]", visible: :hidden, disabled: true)
 
     check_for_update(unregistered)
     fill_in "impound_record_update[notes]", with: "multi-update note"
