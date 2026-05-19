@@ -115,7 +115,7 @@ gem "tailwindcss-rails" # Use Tailwind CSS [https://github.com/rails/tailwindcss
 gem "view_component" # view components!
 gem "lookbook" # view_component preview
 gem "inline_svg" # render SVGs inline and give them classes
-gem "hotwire_combobox" # accessible combobox for the search query items field
+gem "hotwire_combobox" # accessible autocomplete/combobox
 
 group :production do
   gem "skylight" # Performance monitoring

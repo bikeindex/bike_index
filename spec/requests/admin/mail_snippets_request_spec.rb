@@ -22,20 +22,43 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
     end
   end
 
+  def parsed_body
+    Capybara.string(response.body)
+  end
+
   describe "new" do
-    it "renders" do
+    it "renders the kind and organization comboboxes" do
       get "#{base_url}/new"
       expect(response.status).to eq(200)
       expect(response).to render_template(:new)
+
+      expect(parsed_body).to have_css("fieldset.hw-combobox[data-controller='hw-combobox']", count: 2)
+      expect(parsed_body).to have_css("input[type=hidden][name='mail_snippet[kind]']", visible: :all)
+      expect(parsed_body).to have_css("input[type=hidden][name='mail_snippet[organization_id]']", visible: :all)
     end
   end
 
   describe "edit" do
-    let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
-    it "renders" do
+    let(:mail_snippet) { FactoryBot.create(:mail_snippet, kind: :custom) }
+
+    it "renders with the kind combobox prefilled" do
       get "#{base_url}/#{mail_snippet.id}/edit"
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
+
+      kind_display = "#{MailSnippet.kind_humanized("custom")} - in #{MailSnippet.organization_email_for("custom")} emails"
+      expect(parsed_body).to have_css("[data-hw-combobox-prefilled-display-value='#{kind_display}']")
+      expect(parsed_body).to have_css("input[type=hidden][name='mail_snippet[kind]'][value='#{MailSnippet::KIND_ENUM[:custom]}']", visible: :all)
+    end
+
+    context "with a stolen_notification_oauth snippet" do
+      let(:mail_snippet) { FactoryBot.create(:mail_snippet, kind: :stolen_notification_oauth) }
+
+      it "renders the doorkeeper_app_id combobox" do
+        get "#{base_url}/#{mail_snippet.id}/edit"
+        expect(response.status).to eq(200)
+        expect(parsed_body).to have_css("input[type=hidden][name='mail_snippet[doorkeeper_app_id]']", visible: :all)
+      end
     end
   end
 

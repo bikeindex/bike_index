@@ -23,18 +23,15 @@
 = render(Alerts::ObjectErrors::Component.new(object:@mail_snippet))
 
 - def select_display(k); "#{MailSnippet.kind_humanized(k)} - in #{MailSnippet.organization_email_for(k)} emails" end
-.form-group.fancy-select.unfancy
-  = f.label :kind
-  = f.select :kind, MailSnippet.kinds.map { |k| [select_display(k), k] }, {required: true}, class: "form-control"
+.form-group
+  = render UI::Combobox::Component.new(name: :kind, form: f, label: MailSnippet.human_attribute_name(:kind), required: true, options: MailSnippet::KIND_ENUM.map { |name, value| {display: select_display(name.to_s), value:} })
 
 - if @mail_snippet.kind == "stolen_notification_oauth"
-  .form-group.fancy-select.unfancy
-    = f.label :doorkeeper_app_id
-    = f.collection_select(:doorkeeper_app_id, Doorkeeper::Application.where(can_send_stolen_notifications: true), :id, :name, {prompt: "Choose Doorkeeper App"}, {class: "form-control"})
+  .form-group
+    = render UI::Combobox::Component.new(name: :doorkeeper_app_id, form: f, label: MailSnippet.human_attribute_name(:doorkeeper_app_id), placeholder: "Choose Doorkeeper App", options: Doorkeeper::Application.where(can_send_stolen_notifications: true).map { |app| {display: app.name, value: app.id} })
 - else
-  .form-group.fancy-select.unfancy
-    = f.label :organization_id
-    = f.collection_select(:organization_id, @organizations, :id, :name, {prompt: "Choose organization"}, {class: "form-control"})
+  .form-group
+    = render UI::Combobox::Component.new(name: :organization_id, form: f, label: MailSnippet.human_attribute_name(:organization_id), placeholder: "Choose organization", options: @organizations.map { |org| {display: org.name, value: org.id} })
 
 .form-group
   = f.label :subject

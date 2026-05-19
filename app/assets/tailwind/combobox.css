@@ -1,0 +1,49 @@
+/*
+ * Bike Index theme overrides for the UI::Combobox (hotwire_combobox gem).
+ *
+ * The gem's base stylesheet is loaded separately via `hw_combobox_style_tag`
+ * in the layout <head> — this file ONLY re-themes it. The theme is applied by
+ * redefining the gem's `--hw-*` custom properties on `.hw-combobox` itself
+ * (closer than the gem's `:root`, so it wins regardless of stylesheet order)
+ * to match Bike Index inputs (see `.twinput`), plus a `body.dark` block for
+ * dark mode.
+ */
+
+.hw-combobox {
+  --hw-active-bg-color: #f3f4f6; /* gray-100 */
+  --hw-border-color: #d1d5db; /* gray-300 */
+  --hw-component-bg-color: #ffffff;
+  --hw-option-bg-color: #ffffff;
+  --hw-group-bg-color: #ffffff;
+  --hw-group-color: #6b7280; /* gray-500 */
+  --hw-focus-color: #60a5fa; /* blue-400 */
+  --hw-dialog-label-color: #111827; /* gray-900 */
+  --hw-text-color: #111827; /* gray-900 */
+
+  --hw-border-radius: 0.25rem; /* matches .twinput's rounded-sm */
+  --hw-combobox-width: 100%;
+  --hw-combobox-width--multiple: 100%;
+
+  color: var(--hw-text-color);
+  width: 100%;
+}
+
+body.dark .hw-combobox {
+  --hw-active-bg-color: #4b5563; /* gray-600 */
+  --hw-border-color: #4b5563; /* gray-600 */
+  --hw-component-bg-color: #374151; /* gray-700 */
+  --hw-option-bg-color: #374151; /* gray-700 */
+  --hw-group-bg-color: #374151; /* gray-700 */
+  --hw-group-color: #9ca3af; /* gray-400 */
+  --hw-focus-color: #3b82f6; /* blue-500 */
+  --hw-dialog-label-color: #e5e7eb; /* gray-200 */
+  --hw-text-color: #e5e7eb; /* gray-200 */
+}
+
+/* The gem leaves the small-viewport <dialog> at the browser default (white);
+   theme it so dark mode isn't a white box of light text. */
+.hw-combobox__dialog,
+.hw-combobox__dialog__input {
+  background-color: var(--hw-component-bg-color);
+  color: var(--hw-text-color);
+}
