@@ -5,6 +5,8 @@ en:
       impound_records_index:
         all_bikes: All bikes
         all_statuses: All statuses
+        cannot_update_with_kind: This record can't be updated with '{kind}'
+        hide_update: Hide update
         impound_records: Impound_records
         interpreted_params: Interpreted_params
         only_unregistered: Only unregistered
