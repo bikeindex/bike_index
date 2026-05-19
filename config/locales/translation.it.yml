@@ -4679,17 +4679,13 @@ it:
           other:
         all_bikes:
         all_statuses:
-        for_table_rows_with_checks:
         impound_records:
-        internal_note:
         interpreted_params:
-        new_owner_email:
         only_unregistered:
         only_user_registered:
         pagy:
         per_page:
         status_records:
-        update_impound_record:
         update_multiple_records:
       bike_access_panel:
         access_panel:
