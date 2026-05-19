@@ -5,7 +5,7 @@ module Org
     class Component < ApplicationComponent
       include Binxtils::SortableHelper
 
-      def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, time_range:, available_statuses:, current_organization:)
+      def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, time_range:, available_statuses:, current_organization:, multi_update_open: false)
         @pagy = pagy
         @impound_records = impound_records
         @search_status = search_status
@@ -13,13 +13,12 @@ module Org
         @time_range = time_range
         @available_statuses = available_statuses
         @current_organization = current_organization
+        @multi_update_open = multi_update_open
       end
 
       private
 
-      def multi_update_open?
-        Binxtils::InputNormalizer.boolean(params[:multi_update])
-      end
+      def multi_update_open? = @multi_update_open
 
       def skip_resolved
         ImpoundRecord.active_statuses.include?(@search_status)
