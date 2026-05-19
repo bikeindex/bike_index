@@ -1,52 +1,33 @@
-<div
-  class="tw:w-full"
-  data-controller="search--everything-combobox"
-  data-search--everything-combobox-api-url-value="<%= API_URL %>"
-  <% if @search_obj_name %>
-    data-search--everything-combobox-search-obj-name-value="<%= @search_obj_name %>"
-  <% end %>
-  data-search--everything-combobox-search-for-value="<%= translation(".search_for") %>"
-  data-search--everything-combobox-search-only-for-value="<%= translation(".search_only_for") %>"
-  data-search--everything-combobox-that-are-value="<%= translation(".that_are") %>"
-  data-search--everything-combobox-made-by-value="<%= translation(".made_by") %>"
-  data-search--everything-combobox-only-for-value="<%= translation(".only_for") %>"
->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/select2@4.0.8/dist/css/select2.min.css"
-  >
+<div class="tw:w-full" data-controller="search--everything-combobox">
+  <%= helpers.hw_combobox_style_tag %>
 
   <style>
     <%#
-      Styles specific to the EverythingCombobox items
+      Styles specific to the EverythingCombobox - keep the combobox full width
+      and render the autocomplete option formatting (matches the prior select2 markup)
     %>
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-      background: rgba(228,228,228,0.2);
-    }
-    .select2-results__options .sch_s {
-      display: inline-block;
+    .hw-combobox,
+    .hw-combobox__main__wrapper {
+      --hw-combobox-width: 100%;
+      --hw-combobox-width--multiple: 100%;
+      width: 100%;
     }
 
-    .select2-results__options .sch_m,
-    .select2-results__options .sch_ {
+    .hw-combobox__option .sch_ {
       color: #ccc;
     }
 
-    .select2-results__options .sch_special {
-      border-bottom: 1px solid #ddd;
-    }
-
-    .select2-results__options .sch_c {
+    .hw-combobox__option .sch_c {
       color: #bbb;
       display: inline-block;
     }
 
-    .select2-results__options .sclr {
+    .hw-combobox__option .sclr {
       border-radius: 3px;
       display: inline-block;
       width: 24px;
       height: 24px;
-      border: 1px solid rgba(255,255,255,0.5);
+      border: 1px solid rgba(0, 0, 0, 0.2);
       line-height: 0.8em;
       margin: 0 6px -6px;
       font-size: 0.5em;
@@ -55,25 +36,37 @@
     }
   </style>
 
-  <%= label_tag :query_items,
-  translation(".query_items_description"),
-  class: "twlabel tw:sr-only" %>
+  <%# The combobox is hidden until the stimulus controller connects, so users %>
+  <%# without JS get the plain query field below instead %>
+  <div class="tw:hidden" data-search--everything-combobox-target="combobox">
+    <%= helpers.hw_combobox_tag(
+      :query_items_combobox,
+      async_src,
+      multiselect_chip_src: chips_src,
+      free_text: true,
+      preload: true,
+      autocomplete: :list,
+      value: selected_value,
+      label: translation(".query_items_description"),
+      placeholder: translation(".search_descriptions"),
+    ) do |combobox| %>
+      <% combobox.customize_label class: "tw:sr-only" %>
 
-  <%= select_tag :query_items,
-  options_for_select(@opt_vals, selected: @opt_vals.map(&:last)),
-  :placeholder => translation(".search_descriptions"),
-  :class => "tw:w-full tw:hidden fieldResetsCounts", # note: resetting counts is actually handled by select2 callback, not class
-  :multiple => true,
-  "data-search--everything-combobox-target" => "input" %>
+      <%# The combobox keeps its own comma-joined value here; the stimulus %>
+      <%# controller mirrors it into query_items[] fields, so disable submission %>
+      <% combobox.customize_hidden_field disabled: true %>
+    <% end %>
+  </div>
 
+  <%# Non-JS fallback: removed by the stimulus controller once it connects %>
   <%= label_tag :query,
   translation(".search_descriptions"),
-  :class => "twlabel tw:sr-only",
-  "data-search--everything-combobox-target" => "nonjsfields" %>
+  class: "twlabel tw:sr-only",
+  data: {"search--everything-combobox-target" => "nonjsfields"} %>
 
   <%= text_field_tag :query,
   @query,
-  :placeholder => translation(".search_descriptions"),
-  :class => "twinput",
-  "data-search--everything-combobox-target" => "nonjsfields" %>
+  placeholder: translation(".search_descriptions"),
+  class: "twinput",
+  data: {"search--everything-combobox-target" => "nonjsfields"} %>
 </div>

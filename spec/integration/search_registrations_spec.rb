@@ -45,11 +45,10 @@ RSpec.describe "Bike search", :js, type: :system do
     # Select "All registrations" stolenness
     choose("stolenness_all", allow_label_click: true, visible: :all)
 
-    # Search for Blue via the Select2 combobox
-    find(".select2-container").click
-    find(".select2-search__field").set("Blue")
-    expect(page).to have_content("that are", wait: 5)
-    find(".select2-results__option", text: "Blue", match: :first).click
+    # Search for Blue via the combobox
+    find(".hw-combobox__input").set("Blue")
+    expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
+    find(".hw-combobox__option", text: "Blue", match: :first).click
 
     # Submit search
     find("#search-button").click
@@ -72,8 +71,8 @@ RSpec.describe "Bike search", :js, type: :system do
 
     click_first_bike_and_go_back
 
-    # Remove the color filter by clearing the Select2, then search again
-    find(".select2-selection__choice__remove").click
+    # Remove the color filter by clearing the combobox, then search again
+    find(".hw-combobox__chip__remover").click
     find("#search-button").click
 
     # Now both NYC stolen bikes appear

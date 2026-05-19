@@ -1,201 +1,127 @@
 import { Controller } from '@hotwired/stimulus'
-import 'jquery'
-import 'select2'
 
-/* global $ */
+/* global MutationObserver, URL */
 
 // Connects to data-controller='search--everything-combobox'
+//
+// Wraps the hotwire_combobox that powers the search query items field. The
+// combobox keeps a single comma-joined hidden field; this controller mirrors
+// that value into query_items[] fields (what the server expects), keeps
+// window.searchBarCategories in sync so autocomplete results stay relevant,
+// and submits the form on enter.
 export default class extends Controller {
-  static targets = ['input', 'nonjsfields']
-  static values = {
-    apiUrl: String,
-    searchObjName: { type: String, default: 'Registrations' },
-    searchFor: { type: String, default: 'Search for' },
-    searchOnlyFor: { type: String, default: 'Search only for' },
-    thatAre: { type: String, default: 'that are' },
-    madeBy: { type: String, default: 'made by' },
-    onlyFor: { type: String, default: 'only for' }
-  }
+  static targets = ['combobox', 'nonjsfields']
 
   connect () {
-    // remove the query field that is for users that don't have JS
-    this.nonjsfieldsTargets.forEach(el => { if (el) el.remove() })
+    // Remove the plain query field shown to users without JS
+    this.nonjsfieldsTargets.forEach(el => el.remove())
 
-    // Strip stale select2 DOM/classes from cached Turbo snapshot: leaving
-    // select2-hidden-accessible makes select2 read outerWidth=1px on re-init.
-    const $input = $(this.inputTarget)
-    $input.siblings('.select2-container').remove()
-    $input
-      .removeClass('select2-hidden-accessible')
-      .removeAttr('aria-hidden')
-      .removeAttr('data-select2-id')
-      .removeData('select2')
+    this.fieldElement = this.element.querySelector('.hw-combobox')
+    this.hiddenField = this.element.querySelector('input[data-hw-combobox-target="hiddenField"]')
 
-    // show the combobox
-    this.inputTarget.classList.remove('tw:hidden')
+    // Hold the query_items[] fields that actually get submitted
+    this.queryItems = document.createElement('div')
+    this.queryItems.hidden = true
+    this.element.appendChild(this.queryItems)
 
-    // TODO: should we update to remove preload from jquery?
-    // Does this need to check that jquery is initialized?
-    this.initializeHeaderSearch($input, this.apiUrlValue)
+    // Reveal the combobox now that JS is handling it
+    if (this.hasComboboxTarget) this.comboboxTarget.classList.remove('tw:hidden')
+
+    this.syncQueryItems()
+
+    this.element.addEventListener('hw-combobox:selection', this.afterChange)
+    this.element.addEventListener('hw-combobox:removal', this.afterChange)
+
+    this.inputElement = this.element.querySelector('.hw-combobox__input')
+    // Capture phase so the typed query is read before the combobox clears it
+    this.inputElement?.addEventListener('keydown', this.submitOnEnter, true)
+
+    // The combobox hides its chips before Turbo caches the page; the search
+    // form lives outside the results frame and never reconnects to restore
+    // them, so keep the chips visible ourselves.
+    this.showChips()
+    this.chipObserver = new MutationObserver(this.showChips)
+    this.chipObserver.observe(this.element, { attributeFilter: ['hidden'], subtree: true })
   }
 
-  escapeHtml (text) {
-    const div = document.createElement('div')
-    div.textContent = text
-    return div.innerHTML
+  disconnect () {
+    this.element.removeEventListener('hw-combobox:selection', this.afterChange)
+    this.element.removeEventListener('hw-combobox:removal', this.afterChange)
+    this.inputElement?.removeEventListener('keydown', this.submitOnEnter, true)
+    this.chipObserver?.disconnect()
   }
 
-  initializeHeaderSearch ($queryField, url) {
-    const perPage = 15
-    // TODO: Find this dynamically? Set it at a higher level?
-    const searchFormSelector = '#Search_Form'
+  showChips = () => {
+    this.element.querySelectorAll('[data-hw-combobox-chip][hidden]').forEach(chip => { chip.hidden = false })
+  }
 
-    const processedResults = this.processedResults // Custom data processor
-    const translations = {
-      searchObjName: this.searchObjNameValue,
-      searchFor: this.searchForValue,
-      searchOnlyFor: this.searchOnlyForValue,
-      thatAre: this.thatAreValue,
-      madeBy: this.madeByValue,
-      onlyFor: this.onlyForValue
-    }
-    const formatSearchText = (item) => this.formatSearchText(item, translations) // Custom formatter
-
-    const $descSearch = $queryField.select2({
-      allowClear: true,
-      tags: true,
-      multiple: true,
-      openOnEnter: false,
-      tokenSeparators: [','],
-      placeholder: $queryField.attr('placeholder'), // Pull placeholder from HTML
-      // dropdownParent: $(searchFormSelector), // Append to search for for easier css access
-      templateResult: formatSearchText, // let custom formatter work
-      templateSelection: (item) => this.escapeHtml(item.text), // Escape selected item text
-      // selectOnClose: true // Turned off in PR#2325
-      escapeMarkup: function (markup) { return markup }, // Allow our fancy display of options
-      ajax: {
-        url,
-        dataType: 'json',
-        delay: 150,
-        data: function (params) {
-          return {
-            q: params.term,
-            page: params.page,
-            per_page: perPage,
-            categories: window.searchBarCategories
-          }
-        },
-        processResults: function (data, page) {
-          return {
-            results: processedResults(data.matches),
-            pagination: {
-              // If exactly perPage matches there's likely at another page
-              more: data.matches.length === perPage
-            }
-          }
-        },
-        cache: true
-      }
-    })
-
-    // Submit on enter. Requires select2 be appended to bike-search form (as it is)
-    // window.bike_search_submit = true
-    $(`${searchFormSelector} .select2-selection`).on('keyup', function (e) {
-      // Only trigger submit on enter if:
-      //  - Enter key pressed last (13)
-      //  - Escape key pressed last (27)
-      //  - no keys have been pressed (selected with the mouse, instantiated true)
-      if (e.keyCode === 27) {
-        window.bike_search_submit = true
-        return true
-      }
-      if (e.keyCode !== 13) {
-        window.bike_search_submit = false
-        return false
-      }
-
-      if (window.bike_search_submit) {
-        $descSearch.select2('close') // Because form is submitted, hide select box
-        document.querySelector(searchFormSelector).requestSubmit()
-      } else {
-        window.bike_search_submit = true
-      }
-    })
-
-    // Every time the select changes, check the categories
-    $queryField.on('change', (e) => {
-      this.setCategories($queryField)
-
-      // trigger the kind controller actions if it's around
+  // The selection event fires before the combobox writes the new value to its
+  // hidden field, so defer a tick to read the up-to-date value.
+  afterChange = () => {
+    Promise.resolve().then(() => {
+      this.syncQueryItems()
       window.kindControllerUpdateAfterComboboxChange?.()
+      // Keep focus in the field after a mouse selection so enter still submits
+      this.inputElement?.focus()
     })
   }
 
-  processedResults (items) {
-    return items.map(function (item) {
-      if (typeof item === 'string') return { id: item, text: item }
-      return {
-        id: item.search_id,
-        text: item.text,
-        category: item.category,
-        display: item.display
-      }
-    })
+  syncQueryItems () {
+    const values = (this.hiddenField?.value || '').split(',').filter(value => value.length)
+
+    this.queryItems.replaceChildren(...values.map(value => {
+      const input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = 'query_items[]'
+      input.value = value
+      return input
+    }))
+
+    this.setCategories(values)
   }
 
-  formatSearchText (item, translations) {
-    if (item.loading) return this.escapeHtml(item.text)
-    const text = this.escapeHtml(item.text)
-    if (item.category === 'propulsion') return '<span>' + translations.searchFor + ' <strong>' + text + '</strong> only</span>'
-    if (item.category === 'cycle_type') return '<span>' + translations.searchOnlyFor + ' <strong>' + text + '</strong></span>'
+  // Don't autocomplete manufacturers if a manufacturer is already selected, etc.
+  setCategories (values) {
+    const queriedCategories = values
+      .filter(value => /^(v|m)_/.test(value))
+      .map(value => value.split('_')[0])
 
-    const getPrefix = () => {
-      if (item.category === 'colors') {
-        const p = "<span class='sch_'>" + translations.searchObjName + ' ' + translations.thatAre + ' </span>'
-        if (item.display) {
-          return p + "<span class='sclr' style='background: " + this.escapeHtml(item.display) + ";'></span>"
-        } else {
-          return p + "<span class='sclr'>stckrs</span>"
-        }
-      } else if (item.category === 'cycle_type') {
-        return "<span class='sch_'>" + translations.onlyFor + '</span>'
-      } else if (item.category === 'cmp_mnfg' || item.category === 'frame_mnfg') {
-        return "<span class='sch_'>" + translations.searchObjName + ' ' + translations.madeBy + '</span>'
-      } else {
-        return translations.searchFor
-      }
+    let categories = ''
+    if (queriedCategories.length > 0) {
+      categories = 'colors'
+
+      if (!queriedCategories.includes('v')) categories += ',cycle_type'
+      if (!queriedCategories.includes('m')) categories += ',frame_mnfg,cmp_mnfg'
+      if (!queriedCategories.includes('p')) categories += ',propulsion'
     }
 
-    return getPrefix() + " <span class='label'>" + text + '</span>'
+    window.searchBarCategories = categories
+    this.updateAsyncSrc(categories)
   }
 
-  // Don't include manufacturers if a manufacturer is selected
-  setCategories ($queryField) {
-    let query = $queryField.val()
-    if (!query) query = [] // Assign query to an array if it's blank
+  // Push the categories filter onto the combobox's async autocomplete URL
+  updateAsyncSrc (categories) {
+    if (!this.fieldElement) return
 
-    const queriedCategories = query.filter(function (x) {
-      return /^(v|m)_/.test(x)
-    }).map(function (i) {
-      return i.split('_')[0]
-    })
+    const attribute = 'data-hw-combobox-async-src-value'
+    const url = new URL(this.fieldElement.getAttribute(attribute), window.location.origin)
 
-    if (queriedCategories.length === 0) {
-      window.searchBarCategories = ''
+    if (categories) {
+      url.searchParams.set('categories', categories)
     } else {
-      window.searchBarCategories = 'colors'
-
-      if (!queriedCategories.includes('v')) {
-        window.searchBarCategories += ',cycle_type'
-      }
-
-      if (!queriedCategories.includes('m')) {
-        window.searchBarCategories += ',frame_mnfg,cmp_mnfg'
-      }
-
-      if (!queriedCategories.includes('p')) {
-        window.searchBarCategories += ',propulsion'
-      }
+      url.searchParams.delete('categories')
     }
+
+    this.fieldElement.setAttribute(attribute, url.pathname + url.search)
+  }
+
+  submitOnEnter = (event) => {
+    if (event.key !== 'Enter') return
+    // A typed query is left for the combobox to turn into a chip; enter on an
+    // empty input submits the search (matches the prior select2 behavior)
+    if (this.inputElement.value.trim() !== '') return
+
+    event.preventDefault()
+    this.element.closest('form')?.requestSubmit()
   }
 }
