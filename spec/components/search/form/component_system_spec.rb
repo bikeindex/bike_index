@@ -108,6 +108,15 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         .to match_hash_indifferently(target_params)
     end
 
+    it "adds the matching option when enter is pressed" do
+      find(".hw-combobox__input").set("Burg")
+      expect(page).to have_css(".hw-combobox__option", text: "Burgundy", wait: 30)
+
+      # Enter with a matching option selects it rather than adding free text
+      find(".hw-combobox__input").send_keys(:return)
+      expect(combobox_values).to eq([burgundy.search_id])
+    end
+
     it "escapes HTML in autocomplete results" do
       # An autocomplete entry whose name contains markup must render as text
       FactoryBot.create(:color, name: "Reddish<img src=x onerror=\"document.body.dataset.xss=1\">")

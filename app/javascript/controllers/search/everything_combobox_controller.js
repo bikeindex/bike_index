@@ -33,8 +33,8 @@ export default class extends Controller {
     this.element.addEventListener('hw-combobox:removal', this.afterChange)
 
     this.inputElement = this.element.querySelector('.hw-combobox__input')
-    // Capture phase so the typed query is read before the combobox clears it
-    this.inputElement?.addEventListener('keydown', this.submitOnEnter, true)
+    // Capture phase so we can act before the combobox handles enter itself
+    this.inputElement?.addEventListener('keydown', this.onEnterKey, true)
 
     // The combobox hides its chips before Turbo caches the page; the search
     // form lives outside the results frame and never reconnects to restore
@@ -47,7 +47,7 @@ export default class extends Controller {
   disconnect () {
     this.element.removeEventListener('hw-combobox:selection', this.afterChange)
     this.element.removeEventListener('hw-combobox:removal', this.afterChange)
-    this.inputElement?.removeEventListener('keydown', this.submitOnEnter, true)
+    this.inputElement?.removeEventListener('keydown', this.onEnterKey, true)
     this.chipObserver?.disconnect()
   }
 
@@ -115,13 +115,31 @@ export default class extends Controller {
     this.fieldElement.setAttribute(attribute, url.pathname + url.search)
   }
 
-  submitOnEnter = (event) => {
+  onEnterKey = (event) => {
     if (event.key !== 'Enter') return
-    // A typed query is left for the combobox to turn into a chip; enter on an
-    // empty input submits the search (matches the prior select2 behavior)
-    if (this.inputElement.value.trim() !== '') return
 
-    event.preventDefault()
-    this.element.closest('form')?.requestSubmit()
+    // Enter on an empty input submits the search
+    if (this.inputElement.value.trim() === '') {
+      event.preventDefault()
+      this.element.closest('form')?.requestSubmit()
+      return
+    }
+
+    // With a typed query, prefer a matching autocomplete option over free text.
+    // If nothing matches, fall through and let the combobox add it as free text.
+    const option = this.matchingOption()
+    if (option) {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      option.click()
+    }
+  }
+
+  // The active option if the user navigated to one, otherwise the first match
+  matchingOption () {
+    const options = Array.from(this.element.querySelectorAll('.hw-combobox__option'))
+      .filter(option => !option.hidden && option.offsetParent !== null)
+
+    return options.find(option => option.getAttribute('aria-selected') === 'true') || options[0]
   }
 }
