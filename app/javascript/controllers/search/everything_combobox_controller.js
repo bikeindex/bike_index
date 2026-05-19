@@ -10,7 +10,7 @@ import { Controller } from '@hotwired/stimulus'
 // window.searchBarCategories in sync so autocomplete results stay relevant,
 // submits the form on enter, and keeps the dropdown from overlaying the form.
 export default class extends Controller {
-  static targets = ['combobox', 'nonjsfields']
+  static targets = ['combobox', 'nonjsfields', 'queryItems']
 
   connect () {
     // Remove the plain query field shown to users without JS
@@ -19,10 +19,17 @@ export default class extends Controller {
     this.fieldElement = this.element.querySelector('.hw-combobox')
     this.hiddenField = this.element.querySelector('input[data-hw-combobox-target="hiddenField"]')
 
-    // Hold the query_items[] fields that actually get submitted
-    this.queryItems = document.createElement('div')
-    this.queryItems.hidden = true
-    this.element.appendChild(this.queryItems)
+    // Holds the query_items[] fields that actually get submitted. Reuse the
+    // existing container if there is one - a Turbo-cached snapshot already
+    // carries it, so creating a new one would orphan its stale inputs.
+    if (this.hasQueryItemsTarget) {
+      this.queryItems = this.queryItemsTarget
+    } else {
+      this.queryItems = document.createElement('div')
+      this.queryItems.hidden = true
+      this.queryItems.setAttribute('data-search--everything-combobox-target', 'queryItems')
+      this.element.appendChild(this.queryItems)
+    }
 
     // Reveal the combobox now that JS is handling it
     if (this.hasComboboxTarget) this.comboboxTarget.classList.remove('tw:hidden')
