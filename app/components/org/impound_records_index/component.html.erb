@@ -12,81 +12,60 @@
   <% end %>
 </div>
 
-<div class="row mt-4 mb-4">
-  <div class="col-sm-9">
-    <%= number_with_delimiter(@pagy.count) %>
-    <%= translation(".matching_impound_record", count: @pagy.count) %>
+<% multi_update_open_label = translation(".hide_update").downcase %>
+<% multi_update_closed_label = translation(".update_multiple_records").downcase %>
 
-    <em><%= helpers.humanized_time_range(@time_range) %></em>
+<div
+  data-controller="org--impound-update-multi"
+  data-org--impound-update-multi-open-label-value="<%= multi_update_open_label %>"
+  data-org--impound-update-multi-closed-label-value="<%= multi_update_closed_label %>"
+  data-org--impound-update-multi-disabled-title-value="<%= translation(".cannot_update_with_kind") %>"
+>
+  <div class="row mt-4 mb-4">
+    <div class="col-sm-9">
+      <%= number_with_delimiter(@pagy.count) %>
+      <%= translation(".matching_impound_record", count: @pagy.count) %>
 
-    <div class="dropdown d-inline-block ml-2">
-      <a
-        class="dropdown-toggle btn btn-outline-primary <%= 'active' unless @search_status == 'current' %>"
-        href="#"
-        role="button"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
-        <%= status_dropdown_text %>
-      </a>
+      <em><%= helpers.humanized_time_range(@time_range) %></em>
 
-      <div class="dropdown-menu">
-        <% @available_statuses.each do |status| %>
-          <% status_active = @search_status == status %>
-          <% status_link_params = sortable_search_params.merge(organization_id: @current_organization.id, search_status: (status_active ? nil : status)) %>
+      <div class="tw:ml-2 tw:inline-block">
+        <%= render(UI::Dropdown::Component.new(name: status_dropdown_text, button_color: :primary, active: @search_status != "current")) do |dropdown| %>
+          <% @available_statuses.each do |status| %>
+            <% status_active = @search_status == status %>
+            <% status_link_params = sortable_search_params.merge(organization_id: @current_organization.id, search_status: (status_active ? nil : status)) %>
+            <% dropdown.with_entry_item { link_to display_status_for(status), organization_impound_records_path(status_link_params), class: ("active" if status_active) } %>
 
-          <%= link_to display_status_for(status), organization_impound_records_path(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}" %>
-
-          <% if status == "all" %>
-            <%# Add a divider before all %>
-            <div class="dropdown-divider"></div>
+            <%# Divider after "all" %>
+            <% dropdown.with_entry_divider if status == "all" %>
           <% end %>
+        <% end %>
+      </div>
+
+      <div class="tw:ml-2 tw:inline-block">
+        <%= render(UI::Dropdown::Component.new(name: unregisteredness_dropdown_text, button_size: :sm, active: @search_unregisteredness != "all")) do |dropdown| %>
+          <% dropdown.with_entry_item { link_to translation(".all_bikes"), organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: ("active" if @search_unregisteredness == "all") } %>
+          <% dropdown.with_entry_item { link_to translation(".only_unregistered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: ("active" if @search_unregisteredness == "only_unregistered") } %>
+          <% dropdown.with_entry_item { link_to translation(".only_user_registered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: ("active" if @search_unregisteredness == "only_registered") } %>
         <% end %>
       </div>
     </div>
 
-    <div class="dropdown d-inline-block ml-2">
-      <a
-        class="dropdown-toggle btn btn-sm btn-outline-secondary <%= 'active' unless @search_unregisteredness == 'all' %>"
-        href="#"
-        role="button"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
-        <%= unregisteredness_dropdown_text %>
-      </a>
-
-      <div class="dropdown-menu">
-        <%= link_to translation(".all_bikes"), organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: "dropdown-item #{@search_unregisteredness == 'all' ? 'active' : ''}" %>
-        <%= link_to translation(".only_unregistered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: "dropdown-item #{@search_unregisteredness == 'only_unregistered' ? 'active' : ''}" %>
-        <%= link_to translation(".only_user_registered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: "dropdown-item #{@search_unregisteredness == 'only_registered' ? 'active' : ''}" %>
+    <div class="col-lg-3">
+      <div class="text-right">
+        <%= render(UI::Button::Component.new(
+          text: @multi_update_open ? multi_update_open_label : multi_update_closed_label,
+          color: :link,
+          data: {"org--impound-update-multi-target": "toggle", action: "org--impound-update-multi#toggle"}
+        )) %>
       </div>
     </div>
   </div>
 
-  <div class="col-lg-3">
-    <div class="text-right">
-      <a
-        class="gray-link"
-        id="toggleMultiUpdate"
-        href="#makeMultiUpdate"
-        data-toggle="collapse"
-        data-target="#makeMultiUpdate"
-      >
-        <%= translation(".update_multiple_records").downcase %>
-      </a>
-    </div>
-  </div>
+  <%# The form wraps the table too, so checked rows submit with it %>
+  <%= render(Org::ImpoundRecordUpdateForm::Component.new(current_organization: @current_organization, multi_update_open: @multi_update_open)) do %>
+    <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, multiselect_visible: @multi_update_open)) %>
+  <% end %>
 </div>
-
-<%# The form wraps the table too, so checked rows submit with it %>
-<%= render(Org::ImpoundRecordUpdateForm::Component.new(current_organization: @current_organization)) do %>
-  <div class="full-screen-table">
-    <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status)) %>
-  </div>
-<% end %>
 
 <div class="pt-4 pb-4">
   <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>

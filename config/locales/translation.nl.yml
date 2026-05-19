@@ -5965,6 +5965,8 @@ nl:
         per_page: Per pagina
         status_records: "%{status} records"
         update_multiple_records: Meerdere records bijwerken
+        cannot_update_with_kind: Dit record kan niet worden bijgewerkt met '{kind}'.
+        hide_update: Update verbergen
       bike_access_panel:
         access_panel: Toegangspaneel
         added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd

@@ -4687,6 +4687,8 @@ it:
         per_page:
         status_records:
         update_multiple_records:
+        cannot_update_with_kind:
+        hide_update:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:

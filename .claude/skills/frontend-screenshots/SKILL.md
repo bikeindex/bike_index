@@ -69,3 +69,7 @@ When the caller wants before/after, repeat the capture loop against `main`. **On
 3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout main`, repeat capture into `...-main-...` filenames, `git checkout $BRANCH`.
 
 The seeded DB persists across checkouts, so the existing session usually still works.
+
+## Clean up
+
+Once every screenshot is captured, quit Chrome with `browser_close`. Leaving it running holds the shared browser profile lock, so the next `browser_navigate` (this skill or another) fails with "Browser is already in use". Always close it before returning, even if the capture failed partway.
