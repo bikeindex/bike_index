@@ -68,7 +68,7 @@ When the caller wants before/after, repeat the capture loop against `main`.
 2. Diff `db/migrate/` between the branch and `main`; abort if it changed — a branch-only migration leaves the DB schema ahead of `main`'s code, so `main` pages can error.
 3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout main`, repeat capture into `...-main-...` filenames, `git checkout $BRANCH`.
 
-A `Gemfile.lock` diff is **not** a reason to abort. The running dev server keeps the gems it booted with — `git checkout main` doesn't re-bundle — and `main`'s code almost never references a gem the branch added, so `main` pages render fine. (`bin/dev`'s watchers do rebuild Tailwind/JS on checkout; give them a few seconds before capturing.) The PNG sanity-check below still catches a genuinely broken `main` page.
+A `Gemfile.lock` diff is **not** a reason to abort.
 
 The seeded DB persists across checkouts, so the existing session usually still works.
 
