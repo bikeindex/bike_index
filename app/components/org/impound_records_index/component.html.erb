@@ -63,9 +63,7 @@
 
   <%# The form wraps the table too, so checked rows submit with it %>
   <%= render(Org::ImpoundRecordUpdateForm::Component.new(current_organization: @current_organization, multi_update_open: multi_update_open?)) do %>
-    <div class="full-screen-table">
-      <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, multiselect_visible: multi_update_open?)) %>
-    </div>
+    <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, multiselect_visible: multi_update_open?)) %>
   <% end %>
 </div>
 
