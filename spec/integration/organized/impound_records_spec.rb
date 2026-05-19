@@ -2,12 +2,12 @@
 
 require "rails_helper"
 
-# Verifies the impound multi-update behavior: `org--impound-update-multi` reads
-# the per-row `data-update-kinds` off each checkbox to enable/disable them when
-# the kind dropdown changes, and `org--impound-update` reveals the field for
-# the selected kind. Lives at the integration layer because both controllers
-# react to the rendered DOM.
-RSpec.describe "Organized impound records multi-update", :js, type: :system do
+# Verifies the impound records index browser behavior: results load into a
+# turbo-frame, the dropdown/location filters drive it, and the multi-update
+# flow (`org--impound-update-multi` + `org--impound-update`) reacts to the
+# rendered DOM. Lives at the integration layer because the controllers react
+# to the rendered DOM.
+RSpec.describe "Organized impound records index", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:base_url) { "/o/#{organization.to_param}/impound_records" }
@@ -51,8 +51,27 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
   end
 
-  it "renders per-row update kinds and applies multi-updates for matching records" do
-    expect(page).to have_css("table tbody tr", count: 2, wait: 10)
+  it "loads results via turbo, filters by unregisteredness, then applies multi-updates" do
+    # Results load into the turbo-frame via the search--form auto-submit
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 2, wait: 10)
+    # search_no_js should NOT be in the URL (removed by the JS controller)
+    expect(page).not_to have_current_path(/search_no_js/)
+
+    # Unregisteredness dropdown link advances the URL (data-turbo-action="advance")
+    # and updates the frame in place
+    within("turbo-frame#impound_records_results_frame") do
+      all("[data-ui--dropdown-target='button']").last.click
+    end
+    click_link "Only unregistered"
+
+    expect(page).to have_current_path(/search_unregisteredness=only_unregistered/, wait: 10)
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 1)
+
+    # Back navigation restores the unfiltered listing (the search--form
+    # controller re-points the results frame at the restored URL on popstate).
+    page.go_back
+    expect(page).not_to have_current_path(/search_unregisteredness/, wait: 10)
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 2, wait: 10)
 
     registered_kinds = checkbox_for(registered)["data-update-kinds"].split
     unregistered_kinds = checkbox_for(unregistered)["data-update-kinds"].split
@@ -123,27 +142,44 @@ RSpec.describe "Organized impound records multi-update", :js, type: :system do
     expect(last_update.notes).to eq "multi-update note"
   end
 
-  it "loads results via turbo and filters by unregisteredness" do
-    # Results load into the turbo-frame via the search--form auto-submit
-    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 2, wait: 10)
-    # search_no_js should NOT be in the URL (removed by the JS controller)
-    expect(page).not_to have_current_path(/search_no_js/)
+  context "location search" do
+    include_context :geocoder_default_location
+    include_context :geocoder_stubbed_bounding_box
 
-    # Unregisteredness dropdown link advances the URL (data-turbo-action="advance")
-    # and updates the frame in place
-    within("turbo-frame#impound_records_results_frame") do
-      all("[data-ui--dropdown-target='button']").last.click
+    # Both are impounded "now" from fixed addresses; only the NYC one falls
+    # inside the stubbed New York bounding box.
+    let!(:impounded_nyc) do
+      FactoryBot.create(:impound_record_with_organization, organization:, user:, created_at: 2.hours.ago,
+        display_id_integer: 9001,
+        impounded_from_address_record: FactoryBot.create(:address_record, :new_york, kind: :impounded_from))
     end
-    click_link "Only unregistered"
+    let!(:impounded_la) do
+      FactoryBot.create(:impound_record_with_organization, organization:, user:, created_at: 2.hours.ago,
+        display_id_integer: 9002,
+        impounded_from_address_record: FactoryBot.create(:address_record, :los_angeles, kind: :impounded_from))
+    end
 
-    expect(page).to have_current_path(/search_unregisteredness=only_unregistered/, wait: 10)
-    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 1)
+    it "filters by the 'impounded within … miles of' location fields" do
+      # The describe-level `before` navigates before this context's records
+      # exist (context let! runs after the outer before), so reload the page.
+      visit base_url
+      expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
 
-    # Back navigation restores the unfiltered listing. Relies on the no-store
-    # Cache-Control header keeping the page out of the browser bfcache, so
-    # back-nav re-renders instead of restoring the frozen filtered frame.
-    page.go_back
-    expect(page).not_to have_current_path(/search_unregisteredness/, wait: 10)
-    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 2, wait: 10)
+      # The proximity + location fields submit with the search form via turbo
+      fill_in "search_proximity", with: "50"
+      fill_in "search_location", with: "New York"
+      find("#search-button").click
+
+      expect(page).to have_current_path(/search_location=New\+York/, wait: 10)
+      expect(page).to have_current_path(/search_proximity=50/)
+
+      # Only the NYC-impounded record is inside the bounding box; the
+      # locationless registered/unregistered records and the LA one drop out.
+      within("turbo-frame#impound_records_results_frame") do
+        expect(page).to have_css("table tbody tr", count: 1)
+        expect(page).to have_content("9001")
+        expect(page).not_to have_content("9002")
+      end
+    end
   end
 end
