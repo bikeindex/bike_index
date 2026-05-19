@@ -1,18 +1,10 @@
 <div class="tw:w-full" data-controller="search--everything-combobox">
-  <%= helpers.hw_combobox_style_tag %>
-
   <style>
     <%#
-      Styles specific to the EverythingCombobox - keep the combobox full width
-      and render the autocomplete option formatting (matches the prior select2 markup)
+      Autocomplete option formatting specific to the EverythingCombobox
+      (matches the prior select2 markup). Base + theme styles for the combobox
+      come from hw_combobox_style_tag (layout) and combobox.css.
     %>
-    .hw-combobox,
-    .hw-combobox__main__wrapper {
-      --hw-combobox-width: 100%;
-      --hw-combobox-width--multiple: 100%;
-      width: 100%;
-    }
-
     .hw-combobox__option .sch_ {
       color: #ccc;
     }
