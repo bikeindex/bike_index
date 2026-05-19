@@ -5804,18 +5804,16 @@ nb:
           other: samsvarende beslaglagte poster
         all_bikes: Alle sykler
         all_statuses: Alle statuser
-        for_table_rows_with_checks: For tabellrader med sjekker
         impound_records: Beslagleggelse av poster
-        internal_note: Intern merknad
         interpreted_params: Interpreted_params
-        new_owner_email: Ny eier-e-postadresse
         only_unregistered: Kun uregistrerte
         only_user_registered: Kun bruker registrert
         pagy: Pagy
         per_page: Per_side
         status_records: "%{status} poster"
-        update_impound_record: Oppdater beslagsregister
         update_multiple_records: Oppdater flere poster
+        cannot_update_with_kind: Denne oppføringen kan ikke oppdateres med «{kind}»
+        hide_update: Skjul oppdatering
       bike_access_panel:
         access_panel: Tilgangspanel
         added_to_track_parking_notification: Denne %{bike_type} er ikke registrert

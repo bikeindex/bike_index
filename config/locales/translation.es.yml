@@ -4597,18 +4597,16 @@ es:
           other:
         all_bikes:
         all_statuses:
-        for_table_rows_with_checks:
         impound_records:
-        internal_note:
         interpreted_params:
-        new_owner_email:
         only_unregistered:
         only_user_registered:
         pagy:
         per_page:
         status_records:
-        update_impound_record:
         update_multiple_records:
+        cannot_update_with_kind:
+        hide_update:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:

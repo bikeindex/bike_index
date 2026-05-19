@@ -313,4 +313,152 @@ http_interactions:
       encoding: UTF-8
       string: ''
   recorded_at: Sat, 17 May 2025 20:57:16 GMT
-recorded_with: VCR 6.3.1
+- request:
+    method: head
+    uri: http://bikehub.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Mon, 18 May 2026 23:38:29 GMT
+      Content-Type:
+      - text/html
+      Content-Length:
+      - '162'
+      Connection:
+      - keep-alive
+      Location:
+      - https://www.bikehub.com/
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Mon, 18 May 2026 23:38:29 GMT
+- request:
+    method: head
+    uri: https://www.bikehub.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Mon, 18 May 2026 23:38:29 GMT
+      Content-Type:
+      - text/html;charset=UTF-8
+      Content-Length:
+      - '54769'
+      Connection:
+      - keep-alive
+      Cache-Control:
+      - private
+      X-Se-Debug:
+      - prd-win-lucee-5|M6427
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Mon, 18 May 2026 23:38:29 GMT
+- request:
+    method: head
+    uri: http://bikehub.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Mon, 18 May 2026 23:38:29 GMT
+      Content-Type:
+      - text/html
+      Content-Length:
+      - '162'
+      Connection:
+      - keep-alive
+      Location:
+      - https://www.bikehub.com/
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Mon, 18 May 2026 23:38:29 GMT
+- request:
+    method: head
+    uri: https://www.bikehub.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Mon, 18 May 2026 23:38:30 GMT
+      Content-Type:
+      - text/html;charset=UTF-8
+      Content-Length:
+      - '54769'
+      Connection:
+      - keep-alive
+      Cache-Control:
+      - private
+      X-Se-Debug:
+      - prd-win-lucee-5|M6427
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Mon, 18 May 2026 23:38:30 GMT
+recorded_with: VCR 6.4.0
