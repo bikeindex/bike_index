@@ -31,12 +31,13 @@
   <%# The combobox is hidden until the stimulus controller connects, so users %>
   <%# without JS get the plain query field below instead %>
   <div class="tw:hidden" data-search--everything-combobox-target="combobox">
+    <%# No preload: options load on type, so every search page isn't loading %>
+    <%# autocomplete results on connect %>
     <%= helpers.hw_combobox_tag(
       :query_items_combobox,
       async_src,
       multiselect_chip_src: chips_src,
       free_text: true,
-      preload: true,
       autocomplete: :list,
       value: selected_value,
       label: translation(".query_items_description"),
