@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-/* global MutationObserver, URL */
+/* global MutationObserver, URL, clearTimeout, setTimeout */
 
 // Connects to data-controller='search--everything-combobox'
 //
@@ -8,7 +8,7 @@ import { Controller } from '@hotwired/stimulus'
 // combobox keeps a single comma-joined hidden field; this controller mirrors
 // that value into query_items[] fields (what the server expects), keeps
 // window.searchBarCategories in sync so autocomplete results stay relevant,
-// and submits the form on enter.
+// submits the form on enter, and keeps the dropdown from overlaying the form.
 export default class extends Controller {
   static targets = ['combobox', 'nonjsfields']
 
@@ -36,23 +36,59 @@ export default class extends Controller {
     // Capture phase so we can act before the combobox handles enter itself
     this.inputElement?.addEventListener('keydown', this.onEnterKey, true)
 
-    // The combobox hides its chips before Turbo caches the page; the search
-    // form lives outside the results frame and never reconnects to restore
-    // them, so keep the chips visible ourselves.
+    // Track whether a user gesture is in progress, so we can tell a deliberate
+    // open from the async dropdown reopen the combobox does after a selection
+    this.element.addEventListener('click', this.markUserEvent, true)
+    this.element.addEventListener('keydown', this.markUserEvent, true)
+
+    // One observer for two jobs:
+    // - keep chips visible (the combobox hides them before Turbo caches the
+    //   page, but the search form never reconnects to restore them)
+    // - close the dropdown when it reopens itself after a selection, so it
+    //   doesn't overlay the rest of the form
     this.showChips()
-    this.chipObserver = new MutationObserver(this.showChips)
-    this.chipObserver.observe(this.element, { attributeFilter: ['hidden'], subtree: true })
+    this.observer = new MutationObserver(this.handleMutations)
+    this.observer.observe(this.element, {
+      attributeFilter: ['hidden', 'data-hw-combobox-expanded-value'],
+      subtree: true
+    })
   }
 
   disconnect () {
     this.element.removeEventListener('hw-combobox:selection', this.afterChange)
     this.element.removeEventListener('hw-combobox:removal', this.afterChange)
     this.inputElement?.removeEventListener('keydown', this.onEnterKey, true)
-    this.chipObserver?.disconnect()
+    this.element.removeEventListener('click', this.markUserEvent, true)
+    this.element.removeEventListener('keydown', this.markUserEvent, true)
+    this.observer?.disconnect()
+    clearTimeout(this.userEventTimer)
+  }
+
+  handleMutations = (records) => {
+    this.showChips()
+    records.forEach(record => {
+      if (record.attributeName === 'data-hw-combobox-expanded-value') {
+        this.suppressAutoReopen(record.target)
+      }
+    })
   }
 
   showChips = () => {
     this.element.querySelectorAll('[data-hw-combobox-chip][hidden]').forEach(chip => { chip.hidden = false })
+  }
+
+  markUserEvent = () => {
+    this.inUserEvent = true
+    clearTimeout(this.userEventTimer)
+    this.userEventTimer = setTimeout(() => { this.inUserEvent = false }, 0)
+  }
+
+  // The async multiselect reopens the dropdown after a selection; if it opened
+  // without a user gesture, close it so it doesn't cover the rest of the form.
+  suppressAutoReopen (combobox) {
+    if (!this.inUserEvent && combobox.getAttribute('data-hw-combobox-expanded-value') === 'true') {
+      combobox.setAttribute('data-hw-combobox-expanded-value', 'false')
+    }
   }
 
   // The selection event fires before the combobox writes the new value to its
