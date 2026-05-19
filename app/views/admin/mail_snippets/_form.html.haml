@@ -24,14 +24,14 @@
 
 - def select_display(k); "#{MailSnippet.kind_humanized(k)} - in #{MailSnippet.organization_email_for(k)} emails" end
 .form-group
-  = render UI::Combobox::Component.new(name: :kind, form: f, label: MailSnippet.human_attribute_name(:kind), required: true, options: MailSnippet::KIND_ENUM.map { |name, value| {display: select_display(name.to_s), value:} })
+  = render Form::Combobox::Component.new(name: :kind, form: f, label: MailSnippet.human_attribute_name(:kind), required: true, options: MailSnippet::KIND_ENUM.map { |name, value| {display: select_display(name.to_s), value:} })
 
 - if @mail_snippet.kind == "stolen_notification_oauth"
   .form-group
-    = render UI::Combobox::Component.new(name: :doorkeeper_app_id, form: f, label: MailSnippet.human_attribute_name(:doorkeeper_app_id), placeholder: "Choose Doorkeeper App", options: Doorkeeper::Application.where(can_send_stolen_notifications: true).map { |app| {display: app.name, value: app.id} })
+    = render Form::Combobox::Component.new(name: :doorkeeper_app_id, form: f, label: MailSnippet.human_attribute_name(:doorkeeper_app_id), placeholder: "Choose Doorkeeper App", options: Doorkeeper::Application.where(can_send_stolen_notifications: true).map { |app| {display: app.name, value: app.id} })
 - else
   .form-group
-    = render UI::Combobox::Component.new(name: :organization_id, form: f, label: MailSnippet.human_attribute_name(:organization_id), placeholder: "Choose organization", options: @organizations.map { |org| {display: org.name, value: org.id} })
+    = render Form::Combobox::Component.new(name: :organization_id, form: f, label: MailSnippet.human_attribute_name(:organization_id), placeholder: "Choose organization", options: @organizations.map { |org| {display: org.name, value: org.id} })
 
 .form-group
   = f.label :subject

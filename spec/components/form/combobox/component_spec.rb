@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe UI::Combobox::Component, type: :component do
+RSpec.describe Form::Combobox::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {name: "manufacturer", options: combobox_options}.merge(extra) }

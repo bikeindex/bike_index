@@ -1,5 +1,5 @@
 /*
- * Bike Index theme overrides for the UI::Combobox (hotwire_combobox gem).
+ * Bike Index theme overrides for the Form::Combobox (hotwire_combobox gem).
  *
  * The gem's base stylesheet is loaded separately via `hw_combobox_style_tag`
  * in the layout <head> — this file ONLY re-themes it. The theme is applied by

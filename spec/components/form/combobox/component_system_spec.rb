@@ -2,9 +2,9 @@
 
 require "rails_helper"
 
-RSpec.describe UI::Combobox::Component, :js, type: :system do
+RSpec.describe Form::Combobox::Component, :js, type: :system do
   it "opens, filters, selects, and closes" do
-    visit "/rails/view_components/ui/combobox/component/default"
+    visit "/rails/view_components/form/combobox/component/default"
 
     expect(page).to have_css('[aria-expanded="false"]')
     expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)

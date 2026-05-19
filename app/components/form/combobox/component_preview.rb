@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-module UI
+module Form
   module Combobox
     class ComponentPreview < ApplicationComponentPreview
       # @!group Variants
 
       # Plain string options
       def default
-        render(UI::Combobox::Component.new(
+        render(Form::Combobox::Component.new(
           name: "manufacturer",
           label: "Manufacturer",
           options: %w[Trek Giant Specialized Cannondale Surly Bianchi]
@@ -16,7 +16,7 @@ module UI
 
       # Hash options with separate display and submitted value
       def with_values
-        render(UI::Combobox::Component.new(
+        render(Form::Combobox::Component.new(
           name: "color",
           label: "Color",
           options: [
@@ -29,7 +29,7 @@ module UI
 
       # Pre-selected value, listbox open on load
       def preselected
-        render(UI::Combobox::Component.new(
+        render(Form::Combobox::Component.new(
           name: "manufacturer",
           label: "Manufacturer",
           value: "Surly",
@@ -40,7 +40,7 @@ module UI
 
       # Allows submitting a value that is not in the options list
       def free_text
-        render(UI::Combobox::Component.new(
+        render(Form::Combobox::Component.new(
           name: "manufacturer",
           label: "Manufacturer (or type your own)",
           free_text: true,
