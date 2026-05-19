@@ -669,10 +669,9 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification.reload.user_id).to be_blank
         expect(graduated_notification.email).to_not eq user2.email
 
-        # created_at in the future: after the bike_organization (so it resolves)
-        # and post-integration, so email_success? takes the notifications branch
+        # Post-integration created_at — set in the future so email_success? takes the notifications branch
         graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization,
-          created_at: Time.current + 1.hour)
+          created_at: GraduatedNotification::PRE_NOTIFICATION_INTEGRATION + 1.second)
         expect(graduated_notification2).to be_valid
         allow(graduated_notification2).to receive(:processable?) { true }
         expect(graduated_notification2.user_id).to eq user2.id
