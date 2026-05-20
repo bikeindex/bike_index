@@ -1,0 +1,29 @@
+<%#
+  render_flash is passed only by index.turbo_stream.erb: the multi-update
+  form redirects back here and the frame is replaced via turbo_stream, so the
+  flash must live inside the frame to survive. On a full page load the layout
+  renders the flash instead.
+%>
+
+<% if local_assigns[:render_flash] %>
+  <div class="bootstrapstyle primary-alert-block">
+    <% flash.each do |name, msg| %>
+      <%= render partial: "/shared/alert", locals: {body: msg, type: name} %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @render_chart %>
+  <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_impound_records), time_range: @time_range, stacked: true)) %>
+<% end %>
+
+<%= render(Org::ImpoundRecordsIndex::Component.new(
+  pagy: @pagy,
+  impound_records: @impound_records,
+  search_status: @search_status,
+  search_unregisteredness: @search_unregisteredness,
+  time_range: @time_range,
+  available_statuses: available_statuses,
+  current_organization: current_organization,
+  multi_update_open: @multi_update_open
+)) %>

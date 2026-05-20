@@ -36,6 +36,10 @@ export default class extends Controller {
     // before the frame element is parsed, leaving #loadedWithoutResults in
     // place with no auto-submit.
     document.addEventListener('turbo:load', this.submitIfEmptyResults)
+    // Same-document back/forward (a filter link advanced the URL without a
+    // full page load) leaves the results frame's src stale. Re-point it at the
+    // restored URL so the frame matches the address bar.
+    window.addEventListener('popstate', this.reloadFrameFromUrl)
   }
 
   // if the frame was loaded without results, submit the form
@@ -49,10 +53,19 @@ export default class extends Controller {
     this.formTarget.requestSubmit()
   }
 
+  // Only fires for same-document history navigation; cross-document back/forward
+  // re-renders the page and submitIfEmptyResults handles it instead.
+  reloadFrameFromUrl = () => {
+    if (this.frameElement?.getAttribute('src')) {
+      this.frameElement.setAttribute('src', window.location.href)
+    }
+  }
+
   disconnect () {
     // Clean up event listener when controller disconnects
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.submitIfEmptyResults)
+    window.removeEventListener('popstate', this.reloadFrameFromUrl)
   }
 
   setupFormFieldListeners () {

@@ -1,32 +1,65 @@
+<%#
+  no-cache: the results turbo-frame is populated by JS after load (the
+  search--form auto-submit, or a search form submit). Turbo's cached page
+  snapshot would restore that frame stale/empty on back navigation, and the
+  search--form popstate fix only recovers link-driven (src-bearing) frames,
+  not the form-submit case. Opting out of the snapshot cache makes back/
+  forward re-fetch the page so the frame reloads fresh.
+%>
+
+<% content_for :header do %>
+  <meta name="turbo-cache-control" content="no-cache">
+<% end %>
+
 <div class="organized-page-header mb-4">
   <h1 class="uncap"><%= t(".impound_records") %></h1>
 </div>
 
-<% if @render_chart %>
-  <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_impound_records), time_range: @time_range, stacked: true)) %>
-<% end %>
+<%#
+  Preserve search_status in the form's default hidden field (@interpreted_params
+  doesn't include it). Reads params, not @search_status, which is unset on
+  non-turbo renders.
+%>
+<% form_interpreted_params = @interpreted_params.merge(search_status: params[:search_status]).compact %>
 
-<div class="text-right mb-2 mt-4">
-  <a
-    class="btn btn-sm less-strong btn-outline-secondary <%= 'active' if @render_chart %>"
-    href="<%= organization_impound_records_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)) %>"
-  >
-    <%= t(".render_chart") %>
-  </a>
+<div class="mt-4">
+  <%= render(Search::FormOrganized::Component.new(
+    target_search_path: organization_impound_records_path(organization_id: current_organization.to_param),
+    target_frame: :impound_records_results_frame,
+    interpreted_params: form_interpreted_params
+  )) do %>
+    <% if params[:search_unregisteredness].present? %>
+      <%= hidden_field_tag :search_unregisteredness, params[:search_unregisteredness] %>
+    <% end %>
+
+    <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-2">
+      <em class="tw:text-sm tw:text-gray-500">impounded within</em>
+      <%= number_field_tag :search_proximity, @search_proximity, class: "twinput tw:w-20", step: 0.01 %>
+      <em class="tw:text-sm tw:text-gray-500">miles of</em>
+      <%= text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "twinput tw:flex-1" %>
+    </div>
+  <% end %>
 </div>
 
-<%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
+<%= turbo_frame_tag :impound_records_results_frame do %>
+  <div class="tw:mt-4">
+    <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
+  </div>
 
-<%= render(Org::ImpoundRecordsIndex::Component.new(
-  pagy: @pagy,
-  impound_records: @impound_records,
-  search_status: @search_status,
-  search_unregisteredness: @search_unregisteredness,
-  time_range: @time_range,
-  available_statuses: available_statuses,
-  current_organization: current_organization,
-  search_proximity: @search_proximity,
-  search_location: params[:search_location],
-  interpreted_params: @interpreted_params,
-  multi_update_open: @multi_update_open
-)) %>
+  <div class="text-right mb-2 mt-4">
+    <%= link_to t(".render_chart"),
+      organization_impound_records_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)),
+      class: "btn btn-sm less-strong btn-outline-secondary #{"active" if @render_chart}",
+      data: {turbo_action: "advance"} %>
+  </div>
+
+  <% if @render_results %>
+    <%= render partial: "results" %>
+  <% else %>
+    <span id="loadedWithoutResults" class="tw:hidden"></span>
+  <% end %>
+<% end %>
+
+<div id="hiddenLoadingSpinner" class="tw:hidden">
+  <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
+</div>
