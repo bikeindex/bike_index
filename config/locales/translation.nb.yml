@@ -5619,9 +5619,9 @@ nb:
         doesnt_look_like_serial: Dette ser ikke ut som et serienummer. Serienumre
           er vanligvis 6+ bokstaver og tall, plassert under kranklageret.
         search_for_serial_number: Søk etter serienummer
-        search_owner_email: Søk etter eierens e-postadresse
         submit: sende inn
         search_notes: Søk i notater
+        search_owner_email_and_name: Søk eierens e-postadresse og navn
     search_results:
       bike_box:
         location: plassering

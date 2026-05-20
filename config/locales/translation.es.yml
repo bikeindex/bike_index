@@ -4434,9 +4434,9 @@ es:
       form_organized:
         doesnt_look_like_serial:
         search_for_serial_number:
-        search_owner_email:
         submit:
         search_notes:
+        search_owner_email_and_name:
     search_results:
       bike_box:
         location:
