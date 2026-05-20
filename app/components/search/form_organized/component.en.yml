@@ -8,5 +8,5 @@ en:
           numbers, located under the bottom bracket.
         search_for_serial_number: Search for serial number
         search_notes: Search notes
-        search_owner_email: Search owner email
+        search_owner_email_and_name: Search owner email and name
         submit: submit

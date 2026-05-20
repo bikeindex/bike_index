@@ -5767,9 +5767,9 @@ nl:
         doesnt_look_like_serial: Dit lijkt geen serienummer. Serienummers bestaan
           meestal uit 6 of meer letters en cijfers en bevinden zich onder de trapas.
         search_for_serial_number: Zoek naar framenummer
-        search_owner_email: Zoek eigenaar e-mail
         submit: Voorleggen
         search_notes: Zoeknotities
+        search_owner_email_and_name: Zoek eigenaar e-mail
     search_results:
       bike_box:
         location: Plaats
