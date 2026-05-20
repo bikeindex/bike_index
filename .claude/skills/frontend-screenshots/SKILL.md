@@ -70,7 +70,7 @@ When the caller wants before/after, repeat the capture loop against `main`.
 
 1. `git status` — abort if there are uncommitted changes.
 2. Diff `db/migrate/` between the branch and `main`; abort if it changed — a branch-only migration leaves the DB schema ahead of `main`'s code, so `main` pages can error.
-3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout main`, repeat capture into `...-main-...` filenames, `git checkout $BRANCH`.
+3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout origin/main` (detached — `git checkout main` fails if a sibling worktree holds the `main` branch; detached HEAD at `origin/main` is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files, repeat capture into `...-main-...` filenames, then `git checkout $BRANCH`.
 
 A `Gemfile.lock` diff is **not** a reason to abort.
 
