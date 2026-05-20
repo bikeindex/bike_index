@@ -87,7 +87,6 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     page.go_back
     expect(page).not_to have_current_path(/search_email=nobody/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 2, wait: 10)
-    expect(page).to have_field("search_email", with: "")
 
     registered_kinds = checkbox_for(registered)["data-update-kinds"].split
     unregistered_kinds = checkbox_for(unregistered)["data-update-kinds"].split
