@@ -1,17 +1,3 @@
-<div class="mt-4">
-  <%= render(Search::FormOrganized::Component.new(
-    target_search_path: organization_impound_records_path(organization_id: @current_organization.to_param),
-    interpreted_params: @interpreted_params
-  )) do %>
-    <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-2">
-      <em class="tw:text-sm tw:text-gray-500">impounded within</em>
-      <%= number_field_tag :search_proximity, @search_proximity, class: "twinput tw:w-20", step: 0.01 %>
-      <em class="tw:text-sm tw:text-gray-500">miles of</em>
-      <%= text_field_tag :search_location, @search_location, placeholder: "anywhere", class: "twinput tw:flex-1" %>
-    </div>
-  <% end %>
-</div>
-
 <% multi_update_open_label = translation(".hide_update").downcase %>
 <% multi_update_closed_label = translation(".update_multiple_records").downcase %>
 
@@ -33,7 +19,7 @@
           <% @available_statuses.each do |status| %>
             <% status_active = @search_status == status %>
             <% status_link_params = sortable_search_params.merge(organization_id: @current_organization.id, search_status: (status_active ? nil : status)) %>
-            <% dropdown.with_entry_item { link_to display_status_for(status), organization_impound_records_path(status_link_params), class: ("active" if status_active) } %>
+            <% dropdown.with_entry_item { link_to display_status_for(status), organization_impound_records_path(status_link_params), class: ("active" if status_active), data: {turbo_action: "advance"} } %>
 
             <%# Divider after "all" %>
             <% dropdown.with_entry_divider if status == "all" %>
@@ -43,9 +29,9 @@
 
       <div class="tw:ml-2 tw:inline-block">
         <%= render(UI::Dropdown::Component.new(name: unregisteredness_dropdown_text, button_size: :sm, active: @search_unregisteredness != "all")) do |dropdown| %>
-          <% dropdown.with_entry_item { link_to translation(".all_bikes"), organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: ("active" if @search_unregisteredness == "all") } %>
-          <% dropdown.with_entry_item { link_to translation(".only_unregistered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: ("active" if @search_unregisteredness == "only_unregistered") } %>
-          <% dropdown.with_entry_item { link_to translation(".only_user_registered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: ("active" if @search_unregisteredness == "only_registered") } %>
+          <% dropdown.with_entry_item { link_to translation(".all_bikes"), organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: ("active" if @search_unregisteredness == "all"), data: {turbo_action: "advance"} } %>
+          <% dropdown.with_entry_item { link_to translation(".only_unregistered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: ("active" if @search_unregisteredness == "only_unregistered"), data: {turbo_action: "advance"} } %>
+          <% dropdown.with_entry_item { link_to translation(".only_user_registered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: ("active" if @search_unregisteredness == "only_registered"), data: {turbo_action: "advance"} } %>
         <% end %>
       </div>
     </div>
