@@ -38,7 +38,8 @@
 <% def select_display(kind); "#{MailSnippet.kind_humanized(kind)} - in #{MailSnippet.organization_email_for(kind)} emails" end %>
 
 <div class="form-group">
-  <%= render Form::Combobox::Component.new(name: :kind, form: f, label: MailSnippet.human_attribute_name(:kind), required: true, options: MailSnippet::KIND_ENUM.map { |name, value| {display: select_display(name.to_s), value:} }) %>
+  <%# kind is an integer-backed enum: options/value must be the enum *labels* — kind= rejects the integer-as-string a form submits, and an explicit value: overrides hotwire_combobox's enum branch (which would emit kind_before_type_cast) %>
+  <%= render Form::Combobox::Component.new(name: :kind, form: f, value: @mail_snippet.kind, label: MailSnippet.human_attribute_name(:kind), required: true, options: MailSnippet.kinds.map { |kind| {display: select_display(kind), value: kind} }) %>
 </div>
 
 <% if @mail_snippet.kind == "stolen_notification_oauth" %>

@@ -40,6 +40,12 @@ body.dark .hw-combobox {
   --hw-text-color: #e5e7eb; /* gray-200 */
 }
 
+/* The chevron / × handle is clickable (toggle open / clear) — the gem doesn't
+   set a cursor, so it inherits text from the input. */
+.hw-combobox__handle {
+  cursor: pointer;
+}
+
 /* The gem leaves the small-viewport <dialog> at the browser default (white);
    theme it so dark mode isn't a white box of light text. */
 .hw-combobox__dialog,
