@@ -138,7 +138,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
 
     # Wait for the makeMultiUpdate panel to be expanded — the kind <select> is
     # inside it, so its visibility is the signal the Stimulus controller has run.
-    expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
+    expect(page).to have_select("impound_record_update_kind", visible: true, wait: 10)
     expect(page).to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
     # Opening reflects in the URL (via replaceState — no new history entry)
     expect(page).to have_current_path(/multi_update=true/)

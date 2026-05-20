@@ -1,0 +1,56 @@
+<%# TODO: maybe make this only show up for relevant ones %>
+
+<% if @mail_snippet.organization_message? %>
+  <%= render(UI::Alert::Component.new(kind: :error, header: "This is an Organization Message Snippet!")) do %>
+    <em class="small d-block mt-2">
+      This should actually be
+      <%= link_to "edited though the organization!", edit_mail_snippet_path_for(@mail_snippet) %>
+    </em>
+  <% end %>
+<% end %>
+
+<%= render(UI::Alert::Component.new(kind: :info, header: "NOTE: Organization Message snippets are actually the entire email.")) do %>
+  <p class="mb-0 tw:mt-2">
+    Organization Messages are editable through the organization's page and
+    should probably be edited there (rather than here). Those kinds:
+    <small class="d-block mt-2"><%= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ") %></small>
+  </p>
+<% end %>
+
+<% if @mail_snippet.organization.present? %>
+  <ul class="mb-3 tw:list-inside tw:list-disc tw:px-2">
+    <li>
+      View
+      <%= link_to "#{@mail_snippet.organization.short_name}'s email interface", organization_emails_path(organization_id: @mail_snippet.organization_id) %>
+    </li>
+
+    <% unless @mail_snippet.which_organization_email == "all" %>
+      <li>
+        View
+        <%= link_to "#{@mail_snippet.organization.short_name}'s #{@mail_snippet.which_organization_email} edit page", edit_organization_email_path(@mail_snippet.which_organization_email, organization_id: @mail_snippet.organization_id) %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= render(Alerts::ObjectErrors::Component.new(object: @mail_snippet)) %>
+
+<% def select_display(kind); "#{MailSnippet.kind_humanized(kind)} - in #{MailSnippet.organization_email_for(kind)} emails" end %>
+
+<div class="form-group">
+  <%# kind is an integer-backed enum: options/value must be the enum *labels* — kind= rejects the integer-as-string a form submits, and an explicit value: overrides hotwire_combobox's enum branch (which would emit kind_before_type_cast) %>
+  <%= render Form::Combobox::Component.new(name: :kind, form: f, value: @mail_snippet.kind, label: MailSnippet.human_attribute_name(:kind), required: true, options: MailSnippet.kinds.map { |kind| {display: select_display(kind), value: kind} }) %>
+</div>
+
+<% if @mail_snippet.kind == "stolen_notification_oauth" %>
+  <div class="form-group">
+    <%= render Form::Combobox::Component.new(name: :doorkeeper_app_id, form: f, label: MailSnippet.human_attribute_name(:doorkeeper_app_id), placeholder: "Choose Doorkeeper App", options: Doorkeeper::Application.where(can_send_stolen_notifications: true).map { |app| {display: app.name, value: app.id} }) %>
+  </div>
+<% else %>
+  <div class="form-group">
+    <%= render Form::Combobox::Component.new(name: :organization_id, form: f, label: MailSnippet.human_attribute_name(:organization_id), placeholder: "Choose organization", options: @organizations.map { |org| {display: org.name, value: org.id} }) %>
+  </div>
+<% end %>
+
+<%= render(Form::Group::Component.new(form_builder: f, attribute: :subject)) %>
+<%= render(Form::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, html_options: {placeholder: "Body", rows: 5})) %>
