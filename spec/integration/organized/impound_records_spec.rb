@@ -73,6 +73,22 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(page).not_to have_current_path(/search_unregisteredness/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 2, wait: 10)
 
+    # Search form submit + direct back-nav: regression guard for the stale
+    # turbo-frame state the no-cache meta prevents. The form submit updates the
+    # frame via turbo_stream; back-nav must restore it fresh from the server,
+    # not from a cached snapshot (whose frame the popstate fix can't recover).
+    fill_in "search_email", with: "nobody@example.com"
+    find("#search-button").click
+
+    expect(page).to have_current_path(/search_email=nobody/, wait: 10)
+    expect(page).to have_css("turbo-frame#impound_records_results_frame", wait: 10)
+    expect(page).to have_no_css("turbo-frame#impound_records_results_frame table tbody tr")
+
+    page.go_back
+    expect(page).not_to have_current_path(/search_email=nobody/, wait: 10)
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 2, wait: 10)
+    expect(page).to have_field("search_email", with: "")
+
     registered_kinds = checkbox_for(registered)["data-update-kinds"].split
     unregistered_kinds = checkbox_for(unregistered)["data-update-kinds"].split
 

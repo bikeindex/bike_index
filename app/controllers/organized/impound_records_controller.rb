@@ -13,6 +13,8 @@ module Organized
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
       @multi_update_open = Binxtils::InputNormalizer.boolean(params[:multi_update])
+      @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
+        min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
 
       if @render_results
         @pagy, @impound_records = pagy(:countish, available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
@@ -104,8 +106,6 @@ module Organized
         a_impound_records = a_impound_records.where(bike_id: params[:search_bike_id])
       end
 
-      @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
-        min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
       if params[:search_location].present?
         bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity)
         if bounding_box.present?

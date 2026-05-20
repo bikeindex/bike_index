@@ -1,6 +1,10 @@
 <%#
-  no-cache: form lives outside the frame, so turbo_action="advance" submits
-  snapshot form/URL mismatch — back-nav restores the broken state.
+  no-cache: the results turbo-frame is populated by JS after load (the
+  search--form auto-submit, or a search form submit). Turbo's cached page
+  snapshot would restore that frame stale/empty on back navigation, and the
+  search--form popstate fix only recovers link-driven (src-bearing) frames,
+  not the form-submit case. Opting out of the snapshot cache makes back/
+  forward re-fetch the page so the frame reloads fresh.
 %>
 
 <% content_for :header do %>
@@ -30,7 +34,7 @@
 
     <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-2">
       <em class="tw:text-sm tw:text-gray-500">impounded within</em>
-      <%= number_field_tag :search_proximity, params[:search_proximity], class: "twinput tw:w-20", step: 0.01 %>
+      <%= number_field_tag :search_proximity, @search_proximity, class: "twinput tw:w-20", step: 0.01 %>
       <em class="tw:text-sm tw:text-gray-500">miles of</em>
       <%= text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "twinput tw:flex-1" %>
     </div>
