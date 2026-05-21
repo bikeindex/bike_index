@@ -63,10 +63,6 @@ module Organized
       %w[created_at display_id_integer updated_at user_id resolved_at location_id]
     end
 
-    def chart_only?
-      @render_chart && Binxtils::InputNormalizer.boolean(params[:chart_only])
-    end
-
     def available_statuses
       # current ordered the way we want to display
       return @available_statuses if defined?(@available_statuses)

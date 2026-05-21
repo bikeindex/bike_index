@@ -41,10 +41,6 @@ module Organized
       %w[created_at processed_at email marked_remaining_at]
     end
 
-    def chart_only?
-      @render_chart && Binxtils::InputNormalizer.boolean(params[:chart_only])
-    end
-
     def user_search_params_present?
       %i[search_email user_id].any? { |k| params[k].present? }
     end

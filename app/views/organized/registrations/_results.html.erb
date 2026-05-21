@@ -1,6 +1,6 @@
-<% if @render_chart %>
+<% if @render_chart && @available_bikes.present? %>
   <%= render(UI::Chart::AsyncFrame::Component.new(
-    id: :organized_bikes_chart_frame,
+    id: :registrations_chart_frame,
     src: organization_registrations_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1"))
   )) %>
 <% end %>

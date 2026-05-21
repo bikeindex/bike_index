@@ -149,10 +149,6 @@ module Organized
       current_organization.enabled?("csv_exports") && Binxtils::InputNormalizer.boolean(params[:create_export])
     end
 
-    def chart_only?
-      @render_chart && Binxtils::InputNormalizer.boolean(params[:chart_only])
-    end
-
     def create_export_and_redirect
       if no_org_search_params? && no_interpreted_params?
         flash[:error] = "No bikes selected. This export will contain all your bikes"
