@@ -23,6 +23,9 @@ module Organized
         if create_export?
           search_organization_bikes
           create_export_and_redirect
+        elsif chart_only?
+          search_organization_bikes
+          render UI::ChartAsyncFrame::Component.new(id: :registrations_chart_frame, chart: registrations_chart), layout: false
         elsif @render_results
           search_organization_bikes
           respond_to do |format|
@@ -65,6 +68,20 @@ module Organized
 
     def sortable_columns
       SORTABLE_COLUMNS
+    end
+
+    def registrations_chart
+      return nil if @available_bikes.blank?
+
+      UI::Chart::Component.new(
+        series: UI::Chart::Component.time_range_counts(
+          collection: @available_bikes.unscope(:order),
+          time_range: @time_range,
+          column: "bikes.created_at"
+        ),
+        time_range: @time_range,
+        stacked: true
+      )
     end
 
     def organization_bikes
@@ -115,6 +132,8 @@ module Organized
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
+      return if chart_only?
+
       @pagy, @bikes = pagy(:countish, @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)

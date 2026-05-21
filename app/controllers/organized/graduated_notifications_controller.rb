@@ -13,7 +13,9 @@ module Organized
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
-      if @render_results
+      if chart_only?
+        render UI::ChartAsyncFrame::Component.new(id: :graduated_notifications_chart_frame, chart: graduated_notifications_chart), layout: false
+      elsif @render_results
         @pagy, @graduated_notifications = pagy(:countish, available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
           .includes(:user, :bike, :secondary_notifications), limit: @per_page, page: permitted_page)
         respond_to do |format|
@@ -36,6 +38,20 @@ module Organized
 
     def sortable_columns
       %w[created_at processed_at email marked_remaining_at]
+    end
+
+    def graduated_notifications_chart
+      return nil if available_graduated_notifications.blank?
+
+      UI::Chart::Component.new(
+        series: UI::Chart::Component.time_range_counts(
+          collection: available_graduated_notifications.unscope(:order),
+          time_range: @time_range,
+          column: "graduated_notifications.created_at"
+        ),
+        time_range: @time_range,
+        stacked: true
+      )
     end
 
     def user_search_params_present?
