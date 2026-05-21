@@ -1,4 +1,4 @@
-<%= turbo_frame_tag :graduated_notifications_chart_frame do %>
+<%= render(UI::Chart::AsyncFrame::Component.new(id: :graduated_notifications_chart_frame)) do %>
   <% if @available_graduated_notifications.present? %>
     <%= render(UI::Chart::Component.new(
       series: time_range_counts(collection: @available_graduated_notifications.unscope(:order), column: "graduated_notifications.created_at"),

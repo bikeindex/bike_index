@@ -1,10 +1,8 @@
 <% if @render_chart %>
-  <%= turbo_frame_tag :graduated_notifications_chart_frame,
-    src: organization_graduated_notifications_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1")),
-    loading: :lazy,
-    class: "tw:flex tw:min-h-[300px] tw:items-center tw:justify-center" do %>
-    <%= render UI::LoadingSpinner::Component.new(text: t(".loading_chart")) %>
-  <% end %>
+  <%= render(UI::Chart::AsyncFrame::Component.new(
+    id: :graduated_notifications_chart_frame,
+    src: organization_graduated_notifications_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1"))
+  )) %>
 <% end %>
 
 <div class="row mt-4 mb-4">

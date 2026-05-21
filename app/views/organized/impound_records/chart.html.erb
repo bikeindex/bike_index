@@ -1,4 +1,4 @@
-<%= turbo_frame_tag :impound_records_chart_frame do %>
+<%= render(UI::Chart::AsyncFrame::Component.new(id: :impound_records_chart_frame)) do %>
   <% if available_impound_records.present? %>
     <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_impound_records), time_range: @time_range, stacked: true)) %>
   <% end %>
