@@ -23,6 +23,9 @@ module Organized
         if create_export?
           search_organization_bikes
           create_export_and_redirect
+        elsif chart_only?
+          search_organization_bikes
+          render :chart, layout: false
         elsif @render_results
           search_organization_bikes
           respond_to do |format|
@@ -115,6 +118,8 @@ module Organized
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
+      return if chart_only?
+
       @pagy, @bikes = pagy(:countish, @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
@@ -142,6 +147,10 @@ module Organized
 
     def create_export?
       current_organization.enabled?("csv_exports") && Binxtils::InputNormalizer.boolean(params[:create_export])
+    end
+
+    def chart_only?
+      @render_chart && Binxtils::InputNormalizer.boolean(params[:chart_only])
     end
 
     def create_export_and_redirect

@@ -1,9 +1,9 @@
-<% if @render_chart && @available_graduated_notifications.present? %>
-  <%= render(UI::Chart::Component.new(
-    series: time_range_counts(collection: @available_graduated_notifications.unscope(:order), column: "graduated_notifications.created_at"),
-    time_range: @time_range,
-    stacked: true
-  )) %>
+<% if @render_chart %>
+  <%= turbo_frame_tag :graduated_notifications_chart_frame,
+    src: organization_graduated_notifications_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1")),
+    loading: :lazy do %>
+    <%= render UI::LoadingSpinner::Component.new(text: t(".loading_chart", default: "Loading chart...")) %>
+  <% end %>
 <% end %>
 
 <div class="row mt-4 mb-4">
