@@ -25,7 +25,7 @@ module Organized
           create_export_and_redirect
         elsif chart_only?
           search_organization_bikes
-          render :chart, layout: false
+          render UI::ChartAsyncFrame::Component.new(id: :registrations_chart_frame, chart: registrations_chart), layout: false
         elsif @render_results
           search_organization_bikes
           respond_to do |format|
@@ -68,6 +68,20 @@ module Organized
 
     def sortable_columns
       SORTABLE_COLUMNS
+    end
+
+    def registrations_chart
+      return nil if @available_bikes.blank?
+
+      UI::Chart::Component.new(
+        series: UI::Chart::Component.time_range_counts(
+          collection: @available_bikes.unscope(:order),
+          time_range: @time_range,
+          column: "bikes.created_at"
+        ),
+        time_range: @time_range,
+        stacked: true
+      )
     end
 
     def organization_bikes

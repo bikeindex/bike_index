@@ -17,8 +17,7 @@ module Organized
         min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
 
       if chart_only?
-        available_impound_records
-        render :chart, layout: false
+        render UI::ChartAsyncFrame::Component.new(id: :impound_records_chart_frame, chart: impound_records_chart), layout: false
       elsif @render_results
         @pagy, @impound_records = pagy(:countish, available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
           .includes(:user, :bike, :location), limit: @per_page, page: permitted_page)
@@ -61,6 +60,16 @@ module Organized
 
     def sortable_columns
       %w[created_at display_id_integer updated_at user_id resolved_at location_id]
+    end
+
+    def impound_records_chart
+      return nil if available_impound_records.blank?
+
+      UI::Chart::Component.new(
+        series: UI::Chart::Component.time_range_counts(collection: available_impound_records, time_range: @time_range),
+        time_range: @time_range,
+        stacked: true
+      )
     end
 
     def available_statuses

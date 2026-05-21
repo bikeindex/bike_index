@@ -26,7 +26,6 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
 
       get "#{base_url}?render_chart=true&chart_only=1"
       expect(response.status).to eq(200)
-      expect(response).to render_template(:chart)
       expect(assigns(:impound_records)).to be_nil
       expect(assigns(:pagy)).to be_nil
       expect(response.body).to include("impound_records_chart_frame")

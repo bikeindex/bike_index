@@ -9,9 +9,10 @@ module UI
     class Component < ApplicationComponent
       WRAPPER_CLASSES = "tw:flex tw:min-h-[300px] tw:items-center tw:justify-center"
 
-      def initialize(id:, src: nil)
+      def initialize(id:, src: nil, chart: nil)
         @id = id
         @src = src
+        @chart = chart
       end
 
       def call
@@ -20,7 +21,9 @@ module UI
             render(UI::LoadingSpinner::Component.new(text: translation(".loading_chart")))
           end
         else
-          helpers.turbo_frame_tag(@id, class: WRAPPER_CLASSES) { content }
+          helpers.turbo_frame_tag(@id, class: WRAPPER_CLASSES) do
+            render(@chart) if @chart
+          end
         end
       end
     end

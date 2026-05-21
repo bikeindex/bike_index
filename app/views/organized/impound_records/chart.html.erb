@@ -1,5 +1,0 @@
-<%= render(UI::ChartAsyncFrame::Component.new(id: :impound_records_chart_frame)) do %>
-  <% if available_impound_records.present? %>
-    <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_impound_records), time_range: @time_range, stacked: true)) %>
-  <% end %>
-<% end %>
