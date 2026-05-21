@@ -4436,7 +4436,7 @@ es:
         search_for_serial_number:
         submit:
         search_notes:
-        search_owner_email_and_name:
+        search_owner_email_or_name:
     search_results:
       bike_box:
         location:

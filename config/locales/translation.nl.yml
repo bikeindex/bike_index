@@ -5769,7 +5769,7 @@ nl:
         search_for_serial_number: Zoek naar framenummer
         submit: Voorleggen
         search_notes: Zoeknotities
-        search_owner_email_and_name: Zoek eigenaar e-mail
+        search_owner_email_or_name: Zoek naar het e-mailadres of de naam van de eigenaar.
     search_results:
       bike_box:
         location: Plaats
