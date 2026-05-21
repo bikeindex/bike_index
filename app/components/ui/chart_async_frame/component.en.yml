@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    ui:
+      chart_async_frame:
+        loading_chart: Loading chart...

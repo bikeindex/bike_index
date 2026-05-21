@@ -1,4 +1,4 @@
-<%= render(UI::Chart::AsyncFrame::Component.new(id: :registrations_chart_frame)) do %>
+<%= render(UI::ChartAsyncFrame::Component.new(id: :registrations_chart_frame)) do %>
   <% if @available_bikes.present? %>
     <%= render(UI::Chart::Component.new(
       series: time_range_counts(collection: @available_bikes.unscope(:order), column: "bikes.created_at"),

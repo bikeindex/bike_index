@@ -1642,9 +1642,6 @@ en:
           one: activity synced
           other: activities synced
     ui:
-      chart:
-        async_frame:
-          loading_chart: Loading chart...
       definition_list:
         row:
           no_value: none
