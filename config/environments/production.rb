@@ -128,6 +128,10 @@ Rails.application.configure do
     }
   end
 
+  # Inbound mail (bugs@) via Postmark inbound webhook.
+  # Set RAILS_INBOUND_EMAIL_PASSWORD to authenticate the webhook.
+  config.action_mailbox.ingress = :postmark
+
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]
 end

@@ -63,6 +63,7 @@ module AdminHelper
       {title: "Graphs", path: admin_graphs_path, match_controller: true},
       {title: "Paints", path: admin_paints_path, match_controller: true},
       {title: "Feedback & Messages", path: admin_feedbacks_path, match_controller: true},
+      {title: "Bug Reports", path: admin_bug_reports_path, match_controller: true},
       {title: "Social Accounts", path: admin_social_accounts_path, match_controller: true},
       {title: "Social Posts", path: admin_social_posts_path, match_controller: true},
       {title: "Stickers", path: admin_bike_stickers_path, match_controller: true},

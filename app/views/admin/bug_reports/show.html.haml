@@ -1,0 +1,54 @@
+.admin-subnav
+  .col
+    %h1
+      Bug report
+      %small.less-strong= link_to "&larr; all bug reports".html_safe, admin_bug_reports_path
+
+.row
+  .col-sm-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Received
+          %td
+            %span.localizeTime.preciseTime
+              = l(@bug_report.received_at || @bug_report.created_at, format: :convert_time)
+        %tr
+          %td From
+          %td
+            - if @bug_report.from_name.present?
+              = @bug_report.from_name
+            %span.less-strong
+              = mail_to @bug_report.from_address
+        %tr
+          %td Subject
+          %td= @bug_report.display_subject
+        %tr
+          %td Images
+          %td= number_display(@bug_report.images.count)
+        - if @bug_report.inbound_email_id.present?
+          %tr
+            %td Inbound email
+            %td
+              %small.less-strong
+                ActionMailbox::InboundEmail ##{@bug_report.inbound_email_id}
+
+  .col-sm-6
+    .card
+      .card-body
+        %h5.card-title Body
+        %pre.card-text= @bug_report.body
+
+- if @bug_report.images.attached?
+  .row.mt-4
+    .col
+      %h3 Images
+      .d-flex.flex-wrap
+        - @bug_report.images.each do |image|
+          .mr-3.mb-3
+            - if image.image?
+              = link_to(url_for(image), target: "_blank", rel: "noopener") do
+                = image_tag url_for(image.representation(resize_to_limit: [400, 400])), class: "img-thumbnail", style: "max-height: 300px;"
+            %div.small.less-strong
+              = image.filename
+              = number_to_human_size(image.byte_size)

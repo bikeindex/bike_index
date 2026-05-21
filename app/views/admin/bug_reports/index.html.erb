@@ -1,0 +1,32 @@
+<% rendered_chart = capture do %>
+  <% series = [{name: "Bug reports", data: UI::Chart::Component.time_range_counts(collection: BugReport.where(created_at: @time_range), time_range: @time_range, column: "created_at")}] %>
+  <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <%= form_tag url_for, method: :get do %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+
+    <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
+      <div class="mt-2 mr-2">
+        <%= text_field_tag :search_email, params[:search_email], placeholder: "Search sender email", class: "form-control" %>
+      </div>
+
+      <div class="mt-2">
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "/admin/bug_reports/table", locals: {bug_reports: @bug_reports, render_sortable: true} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  collection: @bug_reports,
+  viewing: "Bug reports",
+  rendered_chart:,
+  admin_search_form:,
+  table_view:
+)) %>

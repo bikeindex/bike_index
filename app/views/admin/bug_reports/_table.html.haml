@@ -1,0 +1,29 @@
+- render_sortable ||= false
+
+.full-screen-table
+  %table.table.table-bordered.table-striped.table-sm
+    %thead.thead-light
+      %tr
+        %th
+          = sortable "received_at", render_sortable: render_sortable
+        %th
+          = sortable "from_address", "From", render_sortable: render_sortable
+        %th Subject
+        %th Images
+        %th.w-25 Body
+    %tbody
+      - bug_reports.each do |bug_report|
+        %tr
+          %td
+            %a.localizeTime{ href: admin_bug_report_url(bug_report) }
+              = l(bug_report.received_at || bug_report.created_at, format: :convert_time)
+          %td
+            = bug_report.from_name.presence
+            %span.less-strong
+              = bug_report.from_address
+          %td
+            = link_to bug_report.display_subject, admin_bug_report_path(bug_report)
+          %td
+            = number_display(bug_report.images.count)
+          %td
+            = bug_report.body.to_s.truncate(120)
