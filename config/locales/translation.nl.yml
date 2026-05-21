@@ -5682,6 +5682,8 @@ nl:
         to: Naar
         update: Bijwerken
         year: jaar
+      chart_async_frame:
+        loading_chart: Grafiek laden...
     org:
       location_address_fields:
         address: Adres
