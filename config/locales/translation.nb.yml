@@ -5529,6 +5529,8 @@ nb:
         to: Til
         update: Oppdater
         year: år
+      chart_async_frame:
+        loading_chart: Laster inn diagrammet ...
     org:
       location_address_fields:
         address: Adresse

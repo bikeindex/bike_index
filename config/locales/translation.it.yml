@@ -4404,6 +4404,8 @@ it:
         to: A
         update: Aggiorna
         year: anno
+      chart_async_frame:
+        loading_chart:
     org:
       location_address_fields:
         address: Indirizzo
