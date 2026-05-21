@@ -411,9 +411,11 @@ GEM
     http_parser.rb (0.6.0)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    i18n-country-translations (1.4.1)
-      i18n (>= 0.9.3, < 2)
-      railties (>= 5.0)
+    i18n-country-translations (2.3.1)
+      i18n (>= 0.9.3, < 3)
+      i18n-country-translations-data (~> 1.1)
+      railties (>= 7.2, < 9)
+    i18n-country-translations-data (1.1.0)
     i18n-js (3.5.0)
       i18n (>= 0.6.6)
     i18n-tasks (1.1.2)
@@ -909,7 +911,7 @@ GEM
       nokogiri (~> 1.8)
     yaml (0.4.0)
     yard (0.9.38)
-    zeitwerk (2.7.5)
+    zeitwerk (2.8.1)
 
 PLATFORMS
   arm64-darwin
