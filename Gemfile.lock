@@ -292,6 +292,7 @@ GEM
     faraday_middleware (1.2.1)
       faraday (~> 1.0)
     fast_blank (1.0.1)
+    ffi (1.17.3-aarch64-linux-gnu)
     ffi (1.17.3-arm64-darwin)
     ffi (1.17.3-x86_64-linux-gnu)
     ffi-compiler (1.0.1)
@@ -342,6 +343,9 @@ GEM
       text (>= 1.3.0)
     globalid (1.3.0)
       activesupport (>= 6.1)
+    google-protobuf (4.34.0-aarch64-linux-gnu)
+      bigdecimal
+      rake (~> 13.3)
     google-protobuf (4.34.0-arm64-darwin)
       bigdecimal
       rake (~> 13.3)
@@ -380,6 +384,7 @@ GEM
       thor
       tilt
     hashdiff (1.1.2)
+    herb (0.10.1-aarch64-linux-gnu)
     herb (0.10.1-arm64-darwin)
     herb (0.10.1-x86_64-linux-gnu)
     highline (3.1.2)
@@ -546,6 +551,8 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.5)
+    nokogiri (1.19.3-aarch64-linux-gnu)
+      racc (~> 1.4)
     nokogiri (1.19.3-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.19.3-x86_64-linux-gnu)
@@ -573,6 +580,7 @@ GEM
     parser (3.3.10.2)
       ast (~> 2.4.1)
       racc
+    pg (1.6.3-aarch64-linux)
     pg (1.6.3-arm64-darwin)
     pg (1.6.3-x86_64-linux)
     pg_search (2.3.7)
@@ -777,6 +785,8 @@ GEM
     sanitize (7.0.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.16.8)
+    sass-embedded (1.85.0-aarch64-linux-gnu)
+      google-protobuf (~> 4.29)
     sass-embedded (1.85.0-arm64-darwin)
       google-protobuf (~> 4.29)
     sass-embedded (1.85.0-x86_64-linux-gnu)
@@ -843,6 +853,7 @@ GEM
     tailwindcss-rails (4.4.0)
       railties (>= 7.0.0)
       tailwindcss-ruby (~> 4.0)
+    tailwindcss-ruby (4.1.16-aarch64-linux-gnu)
     tailwindcss-ruby (4.1.16-arm64-darwin)
     tailwindcss-ruby (4.1.16-x86_64-linux-gnu)
     temple (0.10.4)
@@ -915,6 +926,7 @@ GEM
     zeitwerk (2.8.1)
 
 PLATFORMS
+  aarch64-linux
   arm64-darwin
   x86_64-linux-gnu
 
