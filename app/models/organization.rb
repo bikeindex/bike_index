@@ -67,6 +67,8 @@ class Organization < ApplicationRecord
     bike_depot: 9
   }.freeze
 
+  USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS = [36, 1].freeze # SBR and BikeIndex
+
   POS_KIND_ENUM = {
     no_pos: 0,
     other_pos: 1,
@@ -328,7 +330,7 @@ class Organization < ApplicationRecord
   # For now - just using paid
   def user_registration_all_bikes?
     paid? && !official_manufacturer? &&
-      [36, 1].exclude?(id) # Exclude SBR and BikeIndex
+      USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS.exclude?(id)
   end
 
   def paid_money?
