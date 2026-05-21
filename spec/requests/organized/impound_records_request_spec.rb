@@ -23,6 +23,12 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(assigns(:render_results)).to be_truthy
       expect(assigns(:impound_records).count).to eq 0
       expect(assigns(:available_statuses)).to eq available_statuses
+
+      get "#{base_url}?render_chart=true&chart_only=1"
+      expect(response.status).to eq(200)
+      expect(assigns(:impound_records)).to be_nil
+      expect(assigns(:pagy)).to be_nil
+      expect(response.body).to include("impound_records_chart_frame")
     end
     context "multiple impound_records" do
       let!(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike2) }

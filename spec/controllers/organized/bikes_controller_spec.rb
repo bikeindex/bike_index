@@ -66,7 +66,7 @@ RSpec.describe Organized::BikesController, type: :controller do
         Sidekiq::Testing.inline! do
           expect {
             post :create, params: {bike: attrs, organization_id: organization.to_param}
-          }.to change(Bike, :count).by 1
+          }.to change(Bike.unscoped, :count).by 1
         end
 
         b_param = BParam.reorder(:created_at).last
@@ -75,7 +75,9 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(b_param.creation_organization_id).to eq organization.id
         expect(b_param.bike["serial_number"]).to eq attrs[:serial_number]
 
-        bike = b_param.created_bike
+        bike = Bike.unscoped.find(b_param.created_bike_id)
+        # Assert bike isn't filtered out of Bike.current (i.e. default_scope)
+        expect(bike).to have_attributes(example: false, user_hidden: false, deleted_at: nil, likely_spam: false)
         expect(bike.status).to eq "status_with_owner"
         expect(bike.serial_number).to eq attrs[:serial_number]
         expect(bike.id).to eq b_param.created_bike_id

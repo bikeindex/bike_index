@@ -33,7 +33,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     visit graduated_notifications_path
     # Results load via turbo auto-submit
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
-    expect(page).to have_css("tbody tr", count: 2)
+    expect(page).to have_css("tbody tr", count: 2, wait: 10)
     expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
 
     # search_no_js should NOT be in the URL (removed by JS controller)
@@ -43,7 +43,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     within("tbody tr", text: "alice@example.com") { click_link "🔎" }
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
-    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(page).to have_field("search_email", with: "alice@example.com")
     expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
     expect(page).to have_content("alice@example.com")
@@ -52,7 +52,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     # Back navigation restores the unfiltered listing
     page.go_back
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
-    expect(page).to have_css("tbody tr", count: 2)
+    expect(page).to have_css("tbody tr", count: 2, wait: 10)
     expect(page).to have_field("search_email", with: "")
     expect(page).not_to have_current_path(/search_email=alice/)
     # combobox search: type a query, pick the autocomplete option, submit
@@ -69,14 +69,14 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     page.go_back
     expect(page).not_to have_current_path(/query_items/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
-    expect(page).to have_css("tbody tr", count: 2)
+    expect(page).to have_css("tbody tr", count: 2, wait: 10)
 
     # Form submit + direct back-nav: regression guard for turbo-cache spinner state
     fill_in "search_email", with: "alice@example.com"
     find("#search-button").click
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
-    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
     # turbo-frame survives the turbo_stream response (catches replace-vs-update regression)
@@ -85,7 +85,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     page.go_back
     expect(page).not_to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
-    expect(page).to have_css("tbody tr", count: 2)
+    expect(page).to have_css("tbody tr", count: 2, wait: 10)
     expect(page).to have_field("search_email", with: "")
 
     # Re-apply alice filter for click-row/back-nav steps
@@ -93,7 +93,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     find("#search-button").click
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
-    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
 
     within("tbody tr") { first("a.preciseTime").click }
 
@@ -106,7 +106,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     page.go_back
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
-    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(page).to have_field("search_email", with: "alice@example.com")
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
@@ -121,7 +121,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     page.go_back
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
-    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(page).to have_field("search_email", with: "alice@example.com")
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
@@ -141,7 +141,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
 
     expect(page).to have_current_path(/search_status=marked_remaining/, wait: 10)
     expect(page).to have_button(text: /marked not graduated/i)
-    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(page).to have_content("carol@example.com")
     expect(page).not_to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
@@ -151,7 +151,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_current_path(/search_status=marked_remaining/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_button(text: /marked not graduated/i)
-    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(page).to have_content("carol@example.com")
     expect(page).not_to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")

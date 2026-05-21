@@ -1,6 +1,8 @@
 module StolenBike
   class AfterStolenRecordSaveJob < ApplicationJob
-    sidekiq_options retry: false
+    # Retries because Images::StolenProcessor fetches remote images and can
+    # hit transient Net::ReadTimeout. The rest of the job is idempotent.
+    sidekiq_options retry: 3
 
     def perform(stolen_record_id, force_regenerate_images = false, public_image_id = nil)
       stolen_record = StolenRecord.unscoped.find_by_id(stolen_record_id)
