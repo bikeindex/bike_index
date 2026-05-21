@@ -1,7 +1,8 @@
-<% if @render_chart && @available_graduated_notifications.present? %>
+<% if @render_chart %>
   <%= render(UI::ChartAsyncFrame::Component.new(
     id: :graduated_notifications_chart_frame,
-    src: organization_graduated_notifications_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1"))
+    src: organization_graduated_notifications_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1")),
+    collection: @available_graduated_notifications
   )) %>
 <% end %>
 
