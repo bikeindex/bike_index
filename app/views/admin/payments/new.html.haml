@@ -7,7 +7,8 @@
   .row
     .col-md-6
       .form-group
-        = render Form::Combobox::Component.new(name: :payment_method, form: f, label: Payment.human_attribute_name(:payment_method), options: Payment.admin_creatable_payment_methods.map { |m| [m.humanize, m] })
+        -# payment_method is an integer-backed enum: pass enum *labels* as option values and an explicit value: to override hotwire_combobox's enum branch (which would emit payment_method_before_type_cast)
+        = render Form::Combobox::Component.new(name: :payment_method, form: f, value: @payment.payment_method, label: Payment.human_attribute_name(:payment_method), options: Payment.admin_creatable_payment_methods.map { |m| [m.humanize, m] })
     .col-md-6
       .form-group
         - f.object.created_at = Binxtils::TimeParser.round(f.object.created_at || Time.current)

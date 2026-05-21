@@ -16,7 +16,8 @@
   .row
     .col-md-4.col-lg-3
       .form-group
-        = render Form::Combobox::Component.new(name: :cycle_type, form: f, label: "Cycle type", required: true, options: CycleType.select_options)
+        -# cycle_type is an integer-backed enum: pass enum *labels* as option values and an explicit value: to override hotwire_combobox's enum branch (which would emit cycle_type_before_type_cast)
+        = render Form::Combobox::Component.new(name: :cycle_type, form: f, value: @bike.cycle_type, label: "Cycle type", required: true, options: CycleType.select_options)
     .col-6.col-md-4.col-lg-5
       .form-group
         = f.label :serial_number
