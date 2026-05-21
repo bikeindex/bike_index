@@ -5621,7 +5621,7 @@ nb:
         search_for_serial_number: Søk etter serienummer
         submit: sende inn
         search_notes: Søk i notater
-        search_owner_email_and_name: Søk eierens e-postadresse og navn
+        search_owner_email_or_name: Søk etter eierens e-postadresse eller navn
     search_results:
       bike_box:
         location: plassering
