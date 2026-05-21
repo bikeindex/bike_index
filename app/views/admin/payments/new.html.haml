@@ -6,9 +6,8 @@
 
   .row
     .col-md-6
-      .form-group.fancy-select.unfancy
-        = f.label :payment_method
-        = f.select :payment_method, Payment.admin_creatable_payment_methods.map { |m| [m.humanize, m] }, {}, class: "form-control"
+      .form-group
+        = render Form::Combobox::Component.new(name: :payment_method, form: f, label: Payment.human_attribute_name(:payment_method), options: Payment.admin_creatable_payment_methods.map { |m| [m.humanize, m] })
     .col-md-6
       .form-group
         - f.object.created_at = Binxtils::TimeParser.round(f.object.created_at || Time.current)
@@ -26,12 +25,10 @@
         = f.label :email, "Email of user who created payment"
         = f.email_field :email, class: "form-control"
     .col-md-6
-      - organizations = Organization.all
-      .form-group.fancy-select.unfancy
-        = f.label :organization_id, class: "control-label"
-        = collection_select(:payment, :organization_id, organizations, :id, :name, {include_blank: true, prompt: "Choose organization"})
+      .form-group
+        = render Form::Combobox::Component.new(name: :organization_id, form: f, label: Payment.human_attribute_name(:organization_id), placeholder: "Choose organization", include_blank: true, options: Organization.all.pluck(:name, :id))
     .col-md-6
-      .form-group.fancy-select.unfancy
+      .form-group
         = f.label :referral_source, class: "control-label"
         = f.text_field :referral_source, class: "form-control"
     .col-md-6.mt-4
