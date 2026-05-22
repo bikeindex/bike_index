@@ -18,6 +18,7 @@ gem "rails"
 # Things to improve/extend Rails
 gem "puma" # App server
 gem "thruster", require: false # HTTP/2, asset caching, X-Sendfile for Puma (used by review-app Dockerfile)
+gem "rack-timeout", require: "rack/timeout/base" # Bound per-request wall-clock time so one slow request can't hold a Puma worker
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg" # Postgres

@@ -16,7 +16,9 @@ module Organized
       @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
         min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
 
-      if @render_results
+      if chart_only?
+        render UI::ChartAsyncFrame::Component.new(id: :impound_records_chart_frame, chart: impound_records_chart), layout: false
+      elsif @render_results
         @pagy, @impound_records = pagy(:countish, available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
           .includes(:user, :bike, :location), limit: @per_page, page: permitted_page)
         respond_to do |format|
@@ -58,6 +60,16 @@ module Organized
 
     def sortable_columns
       %w[created_at display_id_integer updated_at user_id resolved_at location_id]
+    end
+
+    def impound_records_chart
+      return nil if available_impound_records.blank?
+
+      UI::Chart::Component.new(
+        series: UI::Chart::Component.time_range_counts(collection: available_impound_records, time_range: @time_range),
+        time_range: @time_range,
+        stacked: true
+      )
     end
 
     def available_statuses
