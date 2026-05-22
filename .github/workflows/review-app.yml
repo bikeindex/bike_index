@@ -171,19 +171,18 @@ jobs:
           ruby-version: "4.0.2"
       - name: Install Kamal
         run: gem install kamal -v "~> 2.0"
-      - name: Write SSH key
-        env:
-          KEY: ${{ secrets.REVIEW_APP_SSH_KEY }}
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.REVIEW_APP_SSH_KEY }}
+      - name: Trust review host
         run: |
           mkdir -p ~/.ssh
-          echo "$KEY" > ~/.ssh/id_review
-          chmod 600 ~/.ssh/id_review
           ssh-keyscan -H ${{ vars.REVIEW_APP_HOST }} >> ~/.ssh/known_hosts
+      - name: Stage CI secrets file
+        run: cp .kamal/secrets-ci .kamal/secrets
       - name: Deploy
-        run: |
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_review
-          bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}" "${{ needs.build.outputs.image_tag }}"
+        run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}" "${{ needs.build.outputs.image_tag }}"
       - name: Add review-app label
         env:
           GH_TOKEN: ${{ github.token }}
@@ -238,19 +237,18 @@ jobs:
           ruby-version: "4.0.2"
       - name: Install Kamal
         run: gem install kamal -v "~> 2.0"
-      - name: Write SSH key
-        env:
-          KEY: ${{ secrets.REVIEW_APP_SSH_KEY }}
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.REVIEW_APP_SSH_KEY }}
+      - name: Trust review host
         run: |
           mkdir -p ~/.ssh
-          echo "$KEY" > ~/.ssh/id_review
-          chmod 600 ~/.ssh/id_review
           ssh-keyscan -H ${{ vars.REVIEW_APP_HOST }} >> ~/.ssh/known_hosts
+      - name: Stage CI secrets file
+        run: cp .kamal/secrets-ci .kamal/secrets
       - name: Destroy
-        run: |
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_review
-          bin/review-app destroy "${{ needs.resolve.outputs.pr_number }}"
+        run: bin/review-app destroy "${{ needs.resolve.outputs.pr_number }}"
       - name: Remove review-app label
         env:
           GH_TOKEN: ${{ github.token }}
