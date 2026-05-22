@@ -3,27 +3,22 @@
 module ReviewAppBanner
   # Yellow banner shown across the top of every page on review-app deploys, so
   # there's no chance of confusing a review environment with production.
-  # Self-gated via `render?`; defaults read from `ENV["REVIEW_APP"]` and
-  # `ENV["REVIEW_APP_PR_NUMBER"]` so the layout just calls `render(...)`.
+  # Callers pass `ENV["REVIEW_APP"]` and `ENV["REVIEW_APP_PR_NUMBER"]`; the
+  # component renders only when `review_app` is present.
   class Component < ApplicationComponent
-    def initialize(
-      present: ENV["REVIEW_APP"].present?,
-      pr_number: ENV["REVIEW_APP_PR_NUMBER"].presence
-    )
-      @present = present
+    def initialize(review_app:, pr_number: nil)
+      @review_app = review_app
       @pr_number = pr_number
     end
 
     def render?
-      @present
+      @review_app.present?
     end
 
     private
 
-    attr_reader :pr_number
-
     def pr_url
-      "https://github.com/bikeindex/bike_index/pull/#{pr_number}"
+      "https://github.com/bikeindex/bike_index/pull/#{@pr_number}"
     end
   end
 end
