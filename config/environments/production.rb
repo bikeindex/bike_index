@@ -107,12 +107,8 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.action_mailer.default_url_options = if ENV["BASE_URL"].present?
-    uri = URI.parse(ENV["BASE_URL"])
-    {protocol: uri.scheme, host: uri.host}
-  else
-    {protocol: "https", host: "bikeindex.org"}
-  end
+  base_url = URI.parse(ENV.fetch("BASE_URL"))
+  config.action_mailer.default_url_options = {protocol: base_url.scheme, host: base_url.host}
   routes.default_url_options = config.action_mailer.default_url_options
 
   if ENV["SENDGRID_ENABLED"] == "true"
