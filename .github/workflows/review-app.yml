@@ -1,0 +1,250 @@
+name: Review App
+
+# Deploys / destroys per-PR review apps via Kamal to the shared review host.
+# See docs/review-apps.md for one-time host setup.
+#
+# Triggers:
+#   - workflow_dispatch    : operator clicks "Run workflow" in Actions UI
+#   - pull_request closed  : auto-destroy if the 'review-app' label is set
+#   - pull_request sync    : auto-redeploy on every push if the 'review-app' label
+#                            is set AND the PR is from this repo (not a fork)
+#
+# For fork PRs, the 'pull_request' events are intentionally gated by the same-repo
+# check below — forks must be deployed manually via workflow_dispatch by a maintainer
+# who has reviewed the diff. This is the "manual approval gate on first run" from
+# the plan: GitHub's standard model is that fork PRs don't get secrets.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Pull request number"
+        required: true
+        type: string
+      action:
+        description: "deploy or destroy"
+        required: true
+        type: choice
+        default: deploy
+        options: [deploy, destroy]
+  pull_request:
+    types: [synchronize, closed]
+
+permissions:
+  contents: read
+  packages: write       # push to GHCR
+  pull-requests: write  # add/remove labels and comment
+
+concurrency:
+  # One in-flight deploy per PR. New pushes cancel queued (but not in-flight) work.
+  group: review-app-${{ github.event.inputs.pr_number || github.event.pull_request.number }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  REVIEW_LABEL: review-app
+
+jobs:
+  resolve:
+    name: Resolve PR
+    runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.set.outputs.pr_number }}
+      head_sha:  ${{ steps.set.outputs.head_sha }}
+      action:    ${{ steps.set.outputs.action }}
+      proceed:   ${{ steps.set.outputs.proceed }}
+    steps:
+      - name: Resolve PR + action from the trigger
+        id: set
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PR: ${{ github.event.inputs.pr_number }}
+          INPUT_ACTION: ${{ github.event.inputs.action }}
+          PR_NUMBER_EVENT: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA_EVENT: ${{ github.event.pull_request.head.sha }}
+          PR_HEAD_REPO_EVENT: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_ACTION_EVENT: ${{ github.event.action }}
+          PR_LABELS_JSON: ${{ toJson(github.event.pull_request.labels.*.name) }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            pr="$INPUT_PR"
+            action="$INPUT_ACTION"
+            head_sha=$(gh pr view "$pr" --repo "$REPO" --json headRefOid -q .headRefOid)
+            proceed=true
+          else
+            pr="$PR_NUMBER_EVENT"
+            head_sha="$PR_HEAD_SHA_EVENT"
+            # synchronize → deploy; closed → destroy
+            if [[ "$PR_ACTION_EVENT" == "closed" ]]; then
+              action="destroy"
+            else
+              action="deploy"
+            fi
+            # Gate on label
+            has_label=$(echo "$PR_LABELS_JSON" | jq -r 'index("'"$REVIEW_LABEL"'")' || true)
+            if [[ "$has_label" == "null" || -z "$has_label" ]]; then
+              echo "PR #$pr lacks the '$REVIEW_LABEL' label; skipping."
+              proceed=false
+            elif [[ "$PR_HEAD_REPO_EVENT" != "$REPO" ]]; then
+              echo "PR #$pr is from a fork ($PR_HEAD_REPO_EVENT); skipping auto-trigger."
+              proceed=false
+            else
+              proceed=true
+            fi
+          fi
+          echo "pr_number=$pr"   >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+          echo "action=$action"  >> "$GITHUB_OUTPUT"
+          echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build image
+    needs: resolve
+    if: needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.action == 'deploy'
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.tag.outputs.image_tag }}
+    steps:
+      - name: Compute image tag
+        id: tag
+        run: echo "image_tag=pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}" >> "$GITHUB_OUTPUT"
+      - name: Checkout PR head
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.resolve.outputs.head_sha }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.image_tag }}
+          cache-from: type=gha,scope=review-app
+          cache-to: type=gha,mode=max,scope=review-app
+
+  deploy:
+    name: Deploy ${{ needs.resolve.outputs.pr_number }}
+    needs: [resolve, build]
+    if: needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.action == 'deploy'
+    runs-on: ubuntu-latest
+    environment: review-app
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.resolve.outputs.head_sha }}
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0.2"
+      - name: Install Kamal
+        run: gem install kamal -v "~> 2.0"
+      - name: Write SSH key
+        env:
+          KEY: ${{ secrets.REVIEW_APP_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$KEY" > ~/.ssh/id_review
+          chmod 600 ~/.ssh/id_review
+          ssh-keyscan -H ${{ vars.REVIEW_APP_HOST }} >> ~/.ssh/known_hosts
+      - name: Deploy
+        env:
+          SSH_AUTH_SOCK: ""
+          # Kamal SSH
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
+          # Per-app secrets — all defined under the `review-app` GitHub Environment
+          POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+          POSTGRESQL_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+          ANALYTICS_DB_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+          SECRET_KEY_BASE: ${{ secrets.REVIEW_APP_SECRET_KEY_BASE }}
+          SESSION_SECRET: ${{ secrets.REVIEW_APP_SESSION_SECRET }}
+          VERIFICATION_SECRET: ${{ secrets.REVIEW_APP_VERIFICATION_SECRET }}
+          STRIPE_PUBLISHABLE_KEY: ${{ secrets.REVIEW_APP_STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.REVIEW_APP_STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.REVIEW_APP_STRIPE_WEBHOOK_SECRET }}
+          POSTMARK_API_TOKEN: ${{ secrets.REVIEW_APP_POSTMARK_API_TOKEN }}
+          GOOGLE_MAPS: ${{ secrets.REVIEW_APP_GOOGLE_MAPS }}
+          GOOGLE_MAPS_STATIC: ${{ secrets.REVIEW_APP_GOOGLE_MAPS_STATIC }}
+          GOOGLE_GEOCODER: ${{ secrets.REVIEW_APP_GOOGLE_GEOCODER }}
+          MAPBOX_GEOCODER: ${{ secrets.REVIEW_APP_MAPBOX_GEOCODER }}
+          MAPBOX_MAPPING: ${{ secrets.REVIEW_APP_MAPBOX_MAPPING }}
+          R2_ENDPOINT: ${{ secrets.REVIEW_APP_R2_ENDPOINT }}
+          R2_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_ACCESS_KEY }}
+          R2_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_ACCESS_KEY_SECRET }}
+          CLOUDFLARE_TOKEN: ${{ secrets.REVIEW_APP_CLOUDFLARE_TOKEN }}
+          HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
+          # Kamal SSH config
+          KAMAL_SSH_KEY_DATA: ${{ secrets.REVIEW_APP_SSH_KEY }}
+        run: |
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_review
+          bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}" "${{ needs.build.outputs.image_tag }}"
+      - name: Add review-app label
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
+      - name: Comment URL on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url="https://pr-${{ needs.resolve.outputs.pr_number }}.review.bikeindex.org"
+          body=":rocket: Review app deployed at $url"
+          gh pr comment "${{ needs.resolve.outputs.pr_number }}" --body "$body" || true
+
+  destroy:
+    name: Destroy ${{ needs.resolve.outputs.pr_number }}
+    needs: resolve
+    if: needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.action == 'destroy'
+    runs-on: ubuntu-latest
+    environment: review-app
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.resolve.outputs.head_sha }}
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0.2"
+      - name: Install Kamal
+        run: gem install kamal -v "~> 2.0"
+      - name: Write SSH key
+        env:
+          KEY: ${{ secrets.REVIEW_APP_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$KEY" > ~/.ssh/id_review
+          chmod 600 ~/.ssh/id_review
+          ssh-keyscan -H ${{ vars.REVIEW_APP_HOST }} >> ~/.ssh/known_hosts
+      - name: Destroy
+        env:
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
+          POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+          POSTGRESQL_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+          ANALYTICS_DB_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+          # Kamal needs an IMAGE_TAG to evaluate the ERB config even on destroy;
+          # any tag works since we're only running `kamal app remove`.
+          IMAGE_TAG: "destroy"
+        run: |
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_review
+          bin/review-app destroy "${{ needs.resolve.outputs.pr_number }}"
+      - name: Remove review-app label
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --remove-label "$REVIEW_LABEL" || true

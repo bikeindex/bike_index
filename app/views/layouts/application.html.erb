@@ -47,6 +47,7 @@
   </head>
 
   <body id="<%= page_id %>" class="<%= body_class %>">
+    <%= render partial: "/shared/review_app_banner" %>
     <%# Cache navbar to speed stuff up, on per-user, per-page %>
     <% cache(["main_navbar4", page_id, current_user_or_unconfirmed_user, passive_organization]) do %>
       <nav class="primary-header-nav">

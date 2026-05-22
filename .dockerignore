@@ -1,0 +1,40 @@
+.git
+.gitignore
+.github
+.dockerignore
+Dockerfile
+
+.env*
+!.env.example
+
+# Local dev artifacts
+log/*
+!log/.keep
+tmp/*
+!tmp/.keep
+storage/*
+!storage/.keep
+node_modules
+public/assets
+public/packs
+public/packs-test
+app/assets/builds/*
+!app/assets/builds/.keep
+
+# Editor + OS
+.DS_Store
+.idea
+.vscode
+*.swp
+
+# Test artifacts
+coverage
+spec/examples.txt
+spec/tmp
+
+# Misc
+.claude
+.context
+.cloud66
+.conductor
+.kamal
