@@ -1,5 +1,10 @@
 <% if ENV["REVIEW_APP"].present? %>
-  <div class="tw:bg-yellow-300 tw:text-black tw:text-center tw:py-2 tw:px-4 tw:font-semibold tw:border-b tw:border-yellow-500">
+  <div
+    class="
+      tw:border-b tw:border-yellow-500 tw:bg-yellow-300 tw:px-4 tw:py-2
+      tw:text-center tw:font-semibold tw:text-black
+    "
+  >
     Review app
     <% if ENV["REVIEW_APP_PR_NUMBER"].present? %>
       &mdash;
@@ -8,7 +13,9 @@
         href="https://github.com/bikeindex/bike_index/pull/<%= ENV["REVIEW_APP_PR_NUMBER"] %>"
         target="_blank"
         rel="noopener"
-      >PR #<%= ENV["REVIEW_APP_PR_NUMBER"] %></a>
+      >
+        PR #<%= ENV["REVIEW_APP_PR_NUMBER"] %>
+      </a>
     <% end %>
     &middot; not production, data is ephemeral
   </div>
