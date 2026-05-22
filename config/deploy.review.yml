@@ -1,108 +1,97 @@
-# Kamal config for PR review apps.
+# Kamal config for per-PR review apps.
 #
-# Usage (called from .github/workflows/review-app.yml and from bin/review-app):
+# Usage (called from .github/workflows/review-app.yml and bin/review-app):
 #
 #   export REVIEW_APP_PR_NUMBER=123
 #   export REVIEW_APP_HOST=review.bikeindex.org
 #   export IMAGE_TAG=pr-123-<sha>
-#   kamal deploy --config-file config/deploy.review.yml
+#   bin/kamal deploy --config-file config/deploy.review.yml \
+#                    --secrets-file .kamal/secrets-ci
 #
-# Multi-tenancy: each PR uses a unique `service:` name, so containers coexist on
-# the same host. kamal-proxy routes by Host header. The wildcard cert is mounted
-# from the host into the proxy container.
+# Multi-tenancy: each PR gets a unique service name (`bike-index-pr-<N>`) so
+# containers coexist on the host. Postgres + Redis are *shared* accessories
+# (`service: shared-db`, `service: shared-redis`) — booted once during host
+# setup; every PR's app connects to them using a per-PR role + database.
 #
-# This file is NOT used by production (Cloud66). It exists solely for review apps.
+# bin/docker-entrypoint creates the per-PR Postgres role on first boot and runs
+# `db:prepare`, which creates both the primary and analytics databases.
+#
+# Wildcard TLS: the operator boots kamal-proxy once with the wildcard cert
+# paths (see docs/review-apps.md); each app just declares `ssl: true` and the
+# proxy serves the wildcard for any pr-<N>.review.bikeindex.org hostname.
+#
+# This file is NOT used by production (Cloud66).
 
-<% pr      = ENV.fetch("REVIEW_APP_PR_NUMBER") %>
-<% host    = ENV.fetch("REVIEW_APP_HOST") %>
-<% tag     = ENV.fetch("IMAGE_TAG") %>
-<% slug    = "pr-#{pr}" %>
-<% appname = "bike-index-#{slug}" %>
+<% pr        = ENV.fetch("REVIEW_APP_PR_NUMBER") %>
+<% host      = ENV.fetch("REVIEW_APP_HOST") %>
+<% tag       = ENV.fetch("IMAGE_TAG") %>
+<% slug      = "pr-#{pr}" %>
+<% db_suffix = slug.tr("-", "_") %>
+<% appname   = "bike-index-#{slug}" %>
+<% role      = "bike_index_#{db_suffix}" %>
 
 service: <%= appname %>
 image: ghcr.io/bikeindex/bike_index
 
+image_tag: <%= tag %>
+
 servers:
   web:
-    hosts:
-      - <%= host %>
-    labels:
-      review-app: "<%= slug %>"
+    - <%= host %>
   worker:
     hosts:
       - <%= host %>
     cmd: bundle exec sidekiq -c 2
-    labels:
-      review-app: "<%= slug %>"
-
-registry:
-  server: ghcr.io
-  username:
-    - KAMAL_REGISTRY_USERNAME
-  password:
-    - KAMAL_REGISTRY_PASSWORD
-
-builder:
-  arch: amd64
-  # CI builds and pushes the image; Kamal pulls by tag.
-  context: "."
-
-# Pin the tag CI built so each PR deploys its exact SHA.
-# Kamal uses this when the `image:` doesn't include a tag.
-image_tag: <%= tag %>
 
 proxy:
   ssl: true
   host: <%= slug %>.review.bikeindex.org
-  app_port: 3000
-  # Use the operator-supplied wildcard cert instead of auto-LE per hostname.
-  # Paths are inside the kamal-proxy container; the host directory is mounted
-  # via the `volumes:` block on the proxy below. Verify these option names against
-  # your installed Kamal version during one-time setup — older Kamal 2.x used
-  # `ssl_certificate_path` / `ssl_certificate_key_path`, newer releases may differ.
-  ssl_certificate_path: /etc/ssl/review.bikeindex.org/fullchain.pem
-  ssl_certificate_key_path: /etc/ssl/review.bikeindex.org/privkey.pem
+  app_port: 80
   healthcheck:
     path: /up
     interval: 5
     timeout: 60
 
-# Mount the wildcard cert into the kamal-proxy container.
-# kamal-proxy is a global accessory in Kamal 2.x; this stanza ensures the
-# host directory is available inside it. Confirm syntax against installed Kamal version.
-proxy_volumes:
-  - "/etc/ssl/review.bikeindex.org:/etc/ssl/review.bikeindex.org:ro"
+registry:
+  server: ghcr.io
+  username: bikeindex
+  password:
+    - KAMAL_REGISTRY_PASSWORD
 
 env:
   clear:
-    RAILS_ENV: production
-    RAILS_LOG_TO_STDOUT: "1"
-    RAILS_SERVE_STATIC_FILES: "1"
     REVIEW_APP: "1"
     REVIEW_APP_PR_NUMBER: "<%= pr %>"
     BASE_URL: "https://<%= slug %>.review.bikeindex.org"
-    POSTGRESQL_ADDRESS: bike-index-review-postgres
-    POSTGRESQL_USERNAME: bikeindex
-    POSTGRESQL_DATABASE: bike_index_review_<%= slug.tr("-", "_") %>_primary
-    POSTGRESQL_PRIMARY_REPLICA_ADDRESS: bike-index-review-postgres
-    ANALYTICS_DB_DATABASE: bike_index_review_<%= slug.tr("-", "_") %>_analytics
-    ANALYTICS_DB_USERNAME: bikeindex
+
+    # Postgres (shared-db accessory; per-PR role + databases)
+    POSTGRESQL_ADDRESS: shared-db
+    POSTGRESQL_USERNAME: <%= role %>
+    POSTGRESQL_DATABASE: bike_index_review_<%= db_suffix %>_primary
+    POSTGRESQL_PRIMARY_REPLICA_ADDRESS: shared-db
+    ANALYTICS_DB_USERNAME: <%= role %>
+    ANALYTICS_DB_DATABASE: bike_index_review_<%= db_suffix %>_analytics
     ANALYTICS_DB_PORT: "5432"
-    # Per-PR Redis logical DB number is set by bin/review-app at deploy time
-    # and passed in via the REVIEW_APP_REDIS_DB env var (see workflow).
-    REDIS_URL: "redis://bike-index-review-redis:6379/<%= ENV.fetch('REVIEW_APP_REDIS_DB', '1') %>"
-    REDIS_CACHE_URL: "redis://bike-index-review-redis:6379/<%= ENV.fetch('REVIEW_APP_REDIS_DB', '1') %>"
-    REDIS_RACK_ATTACK_URL: "redis://bike-index-review-redis:6379/<%= ENV.fetch('REVIEW_APP_REDIS_DB', '1') %>"
+
+    # Redis (shared-redis accessory; logical DB per PR)
+    REDIS_URL: "redis://shared-redis:6379/<%= ENV.fetch('REVIEW_APP_REDIS_DB', '1') %>"
+    REDIS_CACHE_URL: "redis://shared-redis:6379/<%= ENV.fetch('REVIEW_APP_REDIS_DB', '1') %>"
+    REDIS_RACK_ATTACK_URL: "redis://shared-redis:6379/<%= ENV.fetch('REVIEW_APP_REDIS_DB', '1') %>"
+
+    # Runtime
+    RAILS_LOG_TO_STDOUT: "1"
+    RAILS_SERVE_STATIC_FILES: "1"
     WEB_CONCURRENCY: "1"
     RAILS_MAX_THREADS: "3"
     DB_POOL: "5"
+
   secret:
-    - SECRET_KEY_BASE
-    - VERIFICATION_SECRET
-    - SESSION_SECRET
+    - POSTGRES_PASSWORD
     - POSTGRESQL_PASSWORD
     - ANALYTICS_DB_PASSWORD
-    # External services — sandbox or stubbed values; see .github/workflows/review-app.yml
+    - SECRET_KEY_BASE
+    - SESSION_SECRET
+    - VERIFICATION_SECRET
     - STRIPE_PUBLISHABLE_KEY
     - STRIPE_SECRET_KEY
     - STRIPE_WEBHOOK_SECRET
@@ -118,32 +107,44 @@ env:
     - CLOUDFLARE_TOKEN
     - HONEYBADGER_API_KEY
 
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell:   app exec --interactive --reuse "bash"
+  logs:    app logs -f
+  dbc:     app exec --interactive --reuse "bin/rails dbconsole --include-password"
+
+# Per-PR active storage volume (review apps mostly use R2, but ActiveStorage's
+# local service writes here if anything falls through).
+volumes:
+  - "<%= appname %>_storage:/rails/storage"
+
+asset_path: /rails/public/assets
+
+builder:
+  arch: amd64
+  # CI builds + pushes the image; Kamal just pulls. No remote builder needed.
+
+# Shared accessories — booted once during host setup, reused by every PR's app.
+# WARNING: do not run `kamal accessory stop/remove` from a review-app deploy —
+# it would tear down the shared infra and all in-flight PRs.
 accessories:
-  postgres:
-    image: postgres:16
+  db:
+    service: shared-db
+    image: postgres:17
     host: <%= host %>
-    port: "127.0.0.1:5432:5432"
     env:
-      clear:
-        POSTGRES_USER: bikeindex
-        POSTGRES_DB: bikeindex
       secret:
         - POSTGRES_PASSWORD
     directories:
-      - data:/var/lib/postgresql/data
+      - shared_db_data:/var/lib/postgresql/data
     options:
       restart: always
   redis:
+    service: shared-redis
     image: redis:7
     host: <%= host %>
-    port: "127.0.0.1:6379:6379"
     cmd: "redis-server --databases 32 --maxmemory 512mb --maxmemory-policy allkeys-lru"
     directories:
-      - data:/data
+      - shared_redis_data:/data
     options:
       restart: always
-
-# Run rails commands on a per-PR container. Used by bin/review-app to run
-# db:schema:load / db:seed on first deploy and db:migrate on subsequent deploys.
-servers_web_options:
-  ulimit: "nofile=65536:65536"

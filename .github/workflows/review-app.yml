@@ -11,8 +11,7 @@ name: Review App
 #
 # For fork PRs, the 'pull_request' events are intentionally gated by the same-repo
 # check below — forks must be deployed manually via workflow_dispatch by a maintainer
-# who has reviewed the diff. This is the "manual approval gate on first run" from
-# the plan: GitHub's standard model is that fork PRs don't get secrets.
+# who has reviewed the diff.
 
 on:
   workflow_dispatch:
@@ -36,7 +35,7 @@ permissions:
   pull-requests: write  # add/remove labels and comment
 
 concurrency:
-  # One in-flight deploy per PR. New pushes cancel queued (but not in-flight) work.
+  # One in-flight deploy per PR.
   group: review-app-${{ github.event.inputs.pr_number || github.event.pull_request.number }}
   cancel-in-progress: false
 
@@ -78,13 +77,11 @@ jobs:
           else
             pr="$PR_NUMBER_EVENT"
             head_sha="$PR_HEAD_SHA_EVENT"
-            # synchronize → deploy; closed → destroy
             if [[ "$PR_ACTION_EVENT" == "closed" ]]; then
               action="destroy"
             else
               action="deploy"
             fi
-            # Gate on label
             has_label=$(echo "$PR_LABELS_JSON" | jq -r 'index("'"$REVIEW_LABEL"'")' || true)
             if [[ "$has_label" == "null" || -z "$has_label" ]]; then
               echo "PR #$pr lacks the '$REVIEW_LABEL' label; skipping."
@@ -139,6 +136,30 @@ jobs:
     if: needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.action == 'deploy'
     runs-on: ubuntu-latest
     environment: review-app
+    # All env vars on the deploy step feed `.kamal/secrets-ci` via Dotenv variable
+    # substitution. Kamal substitutes `$POSTGRES_PASSWORD` etc. from the calling
+    # process env at deploy time.
+    env: &deploy_env
+      REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+      SECRET_KEY_BASE: ${{ secrets.REVIEW_APP_SECRET_KEY_BASE }}
+      SESSION_SECRET: ${{ secrets.REVIEW_APP_SESSION_SECRET }}
+      VERIFICATION_SECRET: ${{ secrets.REVIEW_APP_VERIFICATION_SECRET }}
+      STRIPE_PUBLISHABLE_KEY: ${{ secrets.REVIEW_APP_STRIPE_PUBLISHABLE_KEY }}
+      STRIPE_SECRET_KEY: ${{ secrets.REVIEW_APP_STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.REVIEW_APP_STRIPE_WEBHOOK_SECRET }}
+      POSTMARK_API_TOKEN: ${{ secrets.REVIEW_APP_POSTMARK_API_TOKEN }}
+      GOOGLE_MAPS: ${{ secrets.REVIEW_APP_GOOGLE_MAPS }}
+      GOOGLE_MAPS_STATIC: ${{ secrets.REVIEW_APP_GOOGLE_MAPS_STATIC }}
+      GOOGLE_GEOCODER: ${{ secrets.REVIEW_APP_GOOGLE_GEOCODER }}
+      MAPBOX_GEOCODER: ${{ secrets.REVIEW_APP_MAPBOX_GEOCODER }}
+      MAPBOX_MAPPING: ${{ secrets.REVIEW_APP_MAPBOX_MAPPING }}
+      R2_ENDPOINT: ${{ secrets.REVIEW_APP_R2_ENDPOINT }}
+      R2_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_ACCESS_KEY }}
+      R2_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_ACCESS_KEY_SECRET }}
+      CLOUDFLARE_TOKEN: ${{ secrets.REVIEW_APP_CLOUDFLARE_TOKEN }}
+      HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
     steps:
       - name: Checkout PR head
         uses: actions/checkout@v6
@@ -159,35 +180,6 @@ jobs:
           chmod 600 ~/.ssh/id_review
           ssh-keyscan -H ${{ vars.REVIEW_APP_HOST }} >> ~/.ssh/known_hosts
       - name: Deploy
-        env:
-          SSH_AUTH_SOCK: ""
-          # Kamal SSH
-          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
-          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-          REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
-          # Per-app secrets — all defined under the `review-app` GitHub Environment
-          POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
-          POSTGRESQL_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
-          ANALYTICS_DB_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
-          SECRET_KEY_BASE: ${{ secrets.REVIEW_APP_SECRET_KEY_BASE }}
-          SESSION_SECRET: ${{ secrets.REVIEW_APP_SESSION_SECRET }}
-          VERIFICATION_SECRET: ${{ secrets.REVIEW_APP_VERIFICATION_SECRET }}
-          STRIPE_PUBLISHABLE_KEY: ${{ secrets.REVIEW_APP_STRIPE_PUBLISHABLE_KEY }}
-          STRIPE_SECRET_KEY: ${{ secrets.REVIEW_APP_STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.REVIEW_APP_STRIPE_WEBHOOK_SECRET }}
-          POSTMARK_API_TOKEN: ${{ secrets.REVIEW_APP_POSTMARK_API_TOKEN }}
-          GOOGLE_MAPS: ${{ secrets.REVIEW_APP_GOOGLE_MAPS }}
-          GOOGLE_MAPS_STATIC: ${{ secrets.REVIEW_APP_GOOGLE_MAPS_STATIC }}
-          GOOGLE_GEOCODER: ${{ secrets.REVIEW_APP_GOOGLE_GEOCODER }}
-          MAPBOX_GEOCODER: ${{ secrets.REVIEW_APP_MAPBOX_GEOCODER }}
-          MAPBOX_MAPPING: ${{ secrets.REVIEW_APP_MAPBOX_MAPPING }}
-          R2_ENDPOINT: ${{ secrets.REVIEW_APP_R2_ENDPOINT }}
-          R2_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_ACCESS_KEY }}
-          R2_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_ACCESS_KEY_SECRET }}
-          CLOUDFLARE_TOKEN: ${{ secrets.REVIEW_APP_CLOUDFLARE_TOKEN }}
-          HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
-          # Kamal SSH config
-          KAMAL_SSH_KEY_DATA: ${{ secrets.REVIEW_APP_SSH_KEY }}
         run: |
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_review
@@ -210,6 +202,31 @@ jobs:
     if: needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.action == 'destroy'
     runs-on: ubuntu-latest
     environment: review-app
+    env:
+      # Same secret bundle as deploy — secrets-ci references them at substitution time
+      # even though `app remove` doesn't need most of them. Cheap to pass; avoids
+      # silent empty-string substitutions causing odd failures.
+      REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+      SECRET_KEY_BASE: ${{ secrets.REVIEW_APP_SECRET_KEY_BASE }}
+      SESSION_SECRET: ${{ secrets.REVIEW_APP_SESSION_SECRET }}
+      VERIFICATION_SECRET: ${{ secrets.REVIEW_APP_VERIFICATION_SECRET }}
+      STRIPE_PUBLISHABLE_KEY: ${{ secrets.REVIEW_APP_STRIPE_PUBLISHABLE_KEY }}
+      STRIPE_SECRET_KEY: ${{ secrets.REVIEW_APP_STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.REVIEW_APP_STRIPE_WEBHOOK_SECRET }}
+      POSTMARK_API_TOKEN: ${{ secrets.REVIEW_APP_POSTMARK_API_TOKEN }}
+      GOOGLE_MAPS: ${{ secrets.REVIEW_APP_GOOGLE_MAPS }}
+      GOOGLE_MAPS_STATIC: ${{ secrets.REVIEW_APP_GOOGLE_MAPS_STATIC }}
+      GOOGLE_GEOCODER: ${{ secrets.REVIEW_APP_GOOGLE_GEOCODER }}
+      MAPBOX_GEOCODER: ${{ secrets.REVIEW_APP_MAPBOX_GEOCODER }}
+      MAPBOX_MAPPING: ${{ secrets.REVIEW_APP_MAPBOX_MAPPING }}
+      R2_ENDPOINT: ${{ secrets.REVIEW_APP_R2_ENDPOINT }}
+      R2_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_ACCESS_KEY }}
+      R2_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_ACCESS_KEY_SECRET }}
+      CLOUDFLARE_TOKEN: ${{ secrets.REVIEW_APP_CLOUDFLARE_TOKEN }}
+      HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
+      IMAGE_TAG: "destroy"
     steps:
       - name: Checkout PR head
         uses: actions/checkout@v6
@@ -230,16 +247,6 @@ jobs:
           chmod 600 ~/.ssh/id_review
           ssh-keyscan -H ${{ vars.REVIEW_APP_HOST }} >> ~/.ssh/known_hosts
       - name: Destroy
-        env:
-          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
-          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-          REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
-          POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
-          POSTGRESQL_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
-          ANALYTICS_DB_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
-          # Kamal needs an IMAGE_TAG to evaluate the ERB config even on destroy;
-          # any tag works since we're only running `kamal app remove`.
-          IMAGE_TAG: "destroy"
         run: |
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_review

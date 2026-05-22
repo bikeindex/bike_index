@@ -2,23 +2,20 @@
 # Helper for deploying / destroying per-PR review apps.
 #
 # Called by .github/workflows/review-app.yml. Can also be run locally if you
-# have kamal + the right SSH access.
+# have kamal installed and SSH access to the review host.
 #
-#   bin/review-app deploy  <pr_number>   [<image_tag>]
+#   bin/review-app deploy  <pr_number> [<image_tag>]
 #   bin/review-app destroy <pr_number>
 #
-# Required env (set by the workflow or your shell):
-#   REVIEW_APP_HOST            - SSH-reachable host running the review-app stack
-#   REVIEW_APP_REGISTRY_TOKEN  - GHCR token for pulling the image
-#   POSTGRES_PASSWORD          - admin password for the postgres accessory
-#   KAMAL_REGISTRY_PASSWORD    - same as REVIEW_APP_REGISTRY_TOKEN, passed through
-#
-# Plus all per-app secrets named in config/deploy.review.yml's `env.secret:` block.
+# `deploy` is idempotent — runs the same path whether it's first deploy or
+# subsequent. bin/docker-entrypoint creates the per-PR Postgres role on first
+# boot and `db:prepare` handles schema/seed-or-migrate.
 
 set -euo pipefail
 
-KAMAL_CONFIG="${KAMAL_CONFIG:-config/deploy.review.yml}"
-REDIS_DATABASES="${REDIS_DATABASES:-31}"  # postgres accessory boots redis with --databases 32; 0 reserved
+CONFIG="${KAMAL_CONFIG:-config/deploy.review.yml}"
+SECRETS="${KAMAL_SECRETS:-.kamal/secrets-ci}"
+REDIS_DATABASES="${REDIS_DATABASES:-31}"  # shared-redis boots with --databases 32; 0 reserved
 
 usage() {
   cat <<USAGE
@@ -26,10 +23,9 @@ Usage:
   bin/review-app deploy  <pr_number> [<image_tag>]
   bin/review-app destroy <pr_number>
 
-Env vars required:
-  REVIEW_APP_HOST, KAMAL_REGISTRY_USERNAME, KAMAL_REGISTRY_PASSWORD,
-  POSTGRES_PASSWORD, POSTGRESQL_PASSWORD, ANALYTICS_DB_PASSWORD,
-  SECRET_KEY_BASE, SESSION_SECRET, VERIFICATION_SECRET (and other per-app secrets)
+Required env (set by the workflow or your shell):
+  REVIEW_APP_HOST, KAMAL_REGISTRY_PASSWORD, POSTGRES_PASSWORD,
+  and the rest of the secrets named in .kamal/secrets-ci.
 USAGE
   exit 1
 }
@@ -37,107 +33,62 @@ USAGE
 [[ $# -lt 2 ]] && usage
 action="$1"
 pr_number="$2"
-image_tag="${3:-}"
-
+image_tag="${3:-${IMAGE_TAG:-}}"
 [[ "$pr_number" =~ ^[0-9]+$ ]] || { echo "pr_number must be numeric"; exit 1; }
 
 slug="pr-${pr_number}"
 db_suffix="${slug//-/_}"
+role="bike_index_${db_suffix}"
 primary_db="bike_index_review_${db_suffix}_primary"
 analytics_db="bike_index_review_${db_suffix}_analytics"
 
-# Redis logical DB allocation: simple mod-N mapping.
-# With >REDIS_DATABASES concurrent review apps OR two PR numbers congruent mod N,
-# two apps share a Redis namespace (cache + Sidekiq queues mix). Acceptable for v1 —
-# realistic mitigation if it bites: bump `--databases` in the redis accessory cmd
-# (config/deploy.review.yml) and raise REDIS_DATABASES.
+# Simple mod-N Redis logical DB allocation. With >REDIS_DATABASES concurrent
+# PRs OR two PR numbers congruent mod N, two apps share a Redis namespace
+# (cache + Sidekiq queues mix). Acceptable for v1; mitigation is to bump
+# `--databases` on the shared-redis accessory and raise REDIS_DATABASES.
 redis_db=$(( (pr_number % REDIS_DATABASES) + 1 ))
 
 export REVIEW_APP_PR_NUMBER="$pr_number"
 export REVIEW_APP_HOST="${REVIEW_APP_HOST:?REVIEW_APP_HOST is required}"
 export REVIEW_APP_REDIS_DB="$redis_db"
 
-psql_on_host() {
-  local sql="$1"
-  # Connect to the default postgres DB to run admin SQL.
-  kamal accessory exec postgres --reuse \
-    "psql -U bikeindex -d postgres -v ON_ERROR_STOP=1 -c \"${sql//\"/\\\"}\"" \
-    --config-file "$KAMAL_CONFIG"
-}
-
-ensure_databases() {
-  echo "==> Ensuring databases exist: $primary_db, $analytics_db"
-  # `CREATE DATABASE ... IF NOT EXISTS` doesn't exist in Postgres; check via SELECT.
-  for db in "$primary_db" "$analytics_db"; do
-    exists=$(kamal accessory exec postgres --reuse \
-      "psql -U bikeindex -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='$db'\"" \
-      --config-file "$KAMAL_CONFIG" | tr -d '[:space:]' || true)
-    if [[ "$exists" != "1" ]]; then
-      echo "    creating $db"
-      psql_on_host "CREATE DATABASE $db OWNER bikeindex"
-    else
-      echo "    $db already exists"
-    fi
-  done
-}
-
-drop_databases() {
-  echo "==> Dropping databases: $primary_db, $analytics_db"
-  for db in "$primary_db" "$analytics_db"; do
-    psql_on_host "DROP DATABASE IF EXISTS $db WITH (FORCE)" || true
-  done
-}
-
-flush_redis_db() {
-  echo "==> Flushing redis logical DB $redis_db"
-  kamal accessory exec redis --reuse \
-    "redis-cli -n $redis_db FLUSHDB" \
-    --config-file "$KAMAL_CONFIG" || true
-}
-
-first_deploy() {
-  # First deploy iff the per-PR primary DB has no schema_migrations rows yet.
-  local count
-  count=$(kamal accessory exec postgres --reuse \
-    "psql -U bikeindex -d $primary_db -tAc \"SELECT count(*) FROM schema_migrations\" 2>/dev/null || echo 0" \
-    --config-file "$KAMAL_CONFIG" | tr -d '[:space:]' || echo 0)
-  [[ "$count" == "0" ]]
-}
-
-kamal_deploy() {
-  if [[ -n "$image_tag" ]]; then
-    export IMAGE_TAG="$image_tag"
-  else
-    export IMAGE_TAG="${IMAGE_TAG:?image_tag required (3rd arg or IMAGE_TAG env)}"
-  fi
-  echo "==> Deploying $slug at image tag $IMAGE_TAG"
-  kamal deploy --config-file "$KAMAL_CONFIG"
-}
-
-run_db_setup() {
-  if first_deploy; then
-    echo "==> First deploy detected: loading schema and seeding"
-    kamal app exec --reuse "bin/rails db:schema:load db:seed" --config-file "$KAMAL_CONFIG"
-  else
-    echo "==> Subsequent deploy: running db:migrate"
-    kamal app exec --reuse "bin/rails db:migrate" --config-file "$KAMAL_CONFIG"
-  fi
-}
+kamal() { command kamal "$@" --config-file "$CONFIG"; }
 
 case "$action" in
   deploy)
-    ensure_databases
-    kamal_deploy
-    run_db_setup
+    : "${image_tag:?image_tag required (3rd arg or IMAGE_TAG env)}"
+    export IMAGE_TAG="$image_tag"
+    echo "==> Deploying $slug at image tag $IMAGE_TAG"
+    kamal deploy --secrets-file "$SECRETS"
     echo "==> Done. URL: https://${slug}.review.bikeindex.org"
     ;;
+
   destroy)
     echo "==> Destroying review app $slug"
-    kamal app remove --config-file "$KAMAL_CONFIG" || true
-    drop_databases
-    flush_redis_db
+    # IMAGE_TAG is required by the ERB even though we're tearing down.
+    export IMAGE_TAG="${image_tag:-destroy}"
+
+    kamal app remove --secrets-file "$SECRETS" || true
+
+    echo "==> Dropping per-PR databases ($primary_db, $analytics_db) and role ($role)"
+    for sql in \
+      "DROP DATABASE IF EXISTS ${primary_db} WITH (FORCE)" \
+      "DROP DATABASE IF EXISTS ${analytics_db} WITH (FORCE)" \
+      "DROP ROLE IF EXISTS ${role}"
+    do
+      kamal accessory exec db --reuse \
+        "psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c \"${sql}\"" \
+        --secrets-file "$SECRETS" || true
+    done
+
+    echo "==> Flushing redis logical DB $redis_db"
+    kamal accessory exec redis --reuse \
+      "redis-cli -n ${redis_db} FLUSHDB" \
+      --secrets-file "$SECRETS" || true
+
     echo "==> Done."
     ;;
+
   *)
     usage
     ;;

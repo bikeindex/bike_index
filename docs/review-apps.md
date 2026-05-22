@@ -1,8 +1,6 @@
 # Review apps
 
-Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single shared host. Each PR gets its own primary + analytics Postgres databases, its own Sidekiq worker, and a subdomain like `pr-123.review.bikeindex.org`.
-
-Production runs on Cloud66; this stack is **only** for ephemeral review apps. None of the files in this feature are read by production.
+Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single shared host. Each PR gets its own subdomain (`pr-N.review.bikeindex.org`), its own Postgres role + databases (primary + analytics), and its own Sidekiq worker. Production runs on Cloud66; none of these files affect production.
 
 ## How to trigger one
 
@@ -10,18 +8,14 @@ Production runs on Cloud66; this stack is **only** for ephemeral review apps. No
 2. Click "Run workflow", enter the PR number, choose `deploy`.
 3. When the workflow finishes, it comments on the PR with the URL and adds the `review-app` label.
 
-After the initial deploy, every push to that PR's branch will automatically redeploy (`pull_request: synchronize`) as long as the `review-app` label is present and the PR is from this repo (forks must be redeployed manually).
+After the initial deploy, every push auto-redeploys (`pull_request: synchronize`) as long as the `review-app` label is present and the PR is from this repo (forks must be redeployed manually). Closing the PR auto-destroys. To destroy without closing, re-run the workflow with `destroy`.
 
-Closing the PR auto-destroys the review app and removes the label. To destroy without closing, run the workflow with `destroy`.
+## One-time host setup
 
-## One-time host setup (operator)
-
-The workflow assumes a single host is already provisioned with the Kamal stack and accessories running. This is done **once**, by hand, not by the workflow.
+The workflow assumes a single host is already provisioned with shared accessories running. This is done **once**, by hand, not by the workflow.
 
 ### 1. Provision a VM
-- Linux (Ubuntu 24.04 LTS recommended), 4 vCPU / 8 GB RAM as a starting point.
-- Open ports 22, 80, 443 from the internet.
-- Install Docker (per Kamal's [requirements](https://kamal-deploy.org/docs/installation/)).
+Ubuntu 24.04, 4 vCPU / 8 GB RAM as a starting point. Open ports 22, 80, 443.
 
 ### 2. DNS
 Point a wildcard A record at the host:
@@ -30,65 +24,100 @@ Point a wildcard A record at the host:
 ```
 
 ### 3. Wildcard TLS cert
-Place the wildcard cert + key at:
+Place the wildcard cert + key on the host (path of your choice, e.g.):
 ```
 /etc/ssl/review.bikeindex.org/fullchain.pem
 /etc/ssl/review.bikeindex.org/privkey.pem
 ```
-Set up renewal there (e.g. certbot DNS-01) with a post-renew hook that calls `kamal proxy reboot` so the proxy picks up the new cert.
+Set up renewal there with a post-renew hook that runs `kamal proxy reboot` (so the proxy reloads the new cert files).
 
-### 4. SSH key
-- Add an SSH public key for the deploy user (e.g. `kamal`) to the host's `authorized_keys`.
-- Add the matching **private key** to the GitHub repo as a secret named `REVIEW_APP_SSH_KEY` (in the `review-app` GitHub Environment — see step 7).
-- Add the host's address to the repo as a **variable** (not secret) named `REVIEW_APP_HOST`.
+### 4. Run the Ansible provisioning playbook
+Hardens the host with Docker, Fail2ban, UFW (allows 22/80/443), NTP, swap, and disables password SSH. From `provisioning/`:
 
-### 5. Boot the accessories
-From a local clone with `kamal` installed (`gem install kamal -v '~> 2.0'`):
+```bash
+cp hosts.ini.example hosts.ini
+# edit hosts.ini: replace <host1> with the host IP
+
+ansible-galaxy install -r requirements.yml
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini playbook.yml
 ```
-export REVIEW_APP_PR_NUMBER=0           # dummy; required by the ERB
+
+See `provisioning/README.md` for details.
+
+### 5. Boot kamal-proxy with the wildcard cert
+The kamal-proxy is global on the host. Boot it once with the wildcard cert paths:
+
+```bash
+kamal proxy boot \
+  --certificate-path /etc/ssl/review.bikeindex.org/fullchain.pem \
+  --private-key-path /etc/ssl/review.bikeindex.org/privkey.pem
+```
+
+After this, every PR's app can simply declare `ssl: true` in its proxy config — the proxy serves the wildcard for any `pr-N.review.bikeindex.org`.
+
+### 6. Boot shared accessories
+From a local clone with kamal installed (`gem install kamal -v '~> 2.0'`):
+
+```bash
+export REVIEW_APP_PR_NUMBER=0          # dummy value just to satisfy the ERB
 export REVIEW_APP_HOST=review.bikeindex.org
-export IMAGE_TAG=bootstrap              # dummy
-export POSTGRES_PASSWORD=<choose one>
+export IMAGE_TAG=bootstrap             # dummy
+export POSTGRES_PASSWORD=<choose one and save in 1Password / your secret store>
 
-kamal accessory boot postgres --config-file config/deploy.review.yml
-kamal accessory boot redis    --config-file config/deploy.review.yml
+kamal accessory boot db    --config-file config/deploy.review.yml
+kamal accessory boot redis --config-file config/deploy.review.yml
 ```
 
-### 6. First-time Kamal setup
-The proxy is global per host and gets configured on the first `kamal deploy`. Verify it picks up the wildcard cert paths in `config/deploy.review.yml` — if your installed Kamal version's option names differ from `ssl_certificate_path` / `ssl_certificate_key_path`, adjust the file and re-deploy. (Kamal's exact proxy syntax for custom certs has changed across 2.x point releases.)
+These create the `shared-db` (Postgres 17) and `shared-redis` (Redis 7) containers. Every PR's app connects to them under a per-PR role + database, created on the fly by `bin/docker-entrypoint`.
 
-### 7. GitHub secrets
-Create a `review-app` Environment in the repo settings and add the following.
+### 7. SSH key + GitHub config
+- Add an SSH public key for a deploy user to the host's `authorized_keys`.
+- Create a `review-app` GitHub Environment.
+- Add this **variable** to the environment:
+  - `REVIEW_APP_HOST` — host address (e.g. `review.bikeindex.org`)
+- Add these **secrets** to the environment:
+  - `REVIEW_APP_SSH_KEY` — the matching private key
+  - `REVIEW_APP_POSTGRES_PASSWORD` — the password from step 6
+  - `REVIEW_APP_SECRET_KEY_BASE`, `REVIEW_APP_SESSION_SECRET`, `REVIEW_APP_VERIFICATION_SECRET` — review-app values (do NOT reuse production)
+  - `REVIEW_APP_STRIPE_PUBLISHABLE_KEY`, `REVIEW_APP_STRIPE_SECRET_KEY`, `REVIEW_APP_STRIPE_WEBHOOK_SECRET` — Stripe **test mode**
+  - `REVIEW_APP_POSTMARK_API_TOKEN` — Postmark sandbox stream
+  - `REVIEW_APP_GOOGLE_MAPS`, `REVIEW_APP_GOOGLE_MAPS_STATIC`, `REVIEW_APP_GOOGLE_GEOCODER`, `REVIEW_APP_MAPBOX_GEOCODER`, `REVIEW_APP_MAPBOX_MAPPING`
+  - `REVIEW_APP_R2_ENDPOINT`, `REVIEW_APP_R2_ACCESS_KEY`, `REVIEW_APP_R2_ACCESS_KEY_SECRET` — R2 creds scoped to a `review-app/` prefix (separate IAM token from prod)
+  - `REVIEW_APP_CLOUDFLARE_TOKEN`
+  - `REVIEW_APP_HONEYBADGER_API_KEY` — optional; the post-deploy hook no-ops if unset
 
-**Variables:**
-- `REVIEW_APP_HOST` — SSH/HTTP address of the host (e.g. `review.bikeindex.org`)
+Other Bike Index env vars (Twitter, Twilio, Facebook, etc.) intentionally fall through to empty for review apps; those integrations stay stubbed.
 
-**Secrets:**
-- `REVIEW_APP_SSH_KEY` — private key for the deploy user
-- `REVIEW_APP_POSTGRES_PASSWORD` — password set in step 5 (used for the shared role + per-app DB connections)
-- `REVIEW_APP_SECRET_KEY_BASE`, `REVIEW_APP_SESSION_SECRET`, `REVIEW_APP_VERIFICATION_SECRET` — review-app values (do NOT reuse production)
-- `REVIEW_APP_STRIPE_PUBLISHABLE_KEY`, `REVIEW_APP_STRIPE_SECRET_KEY`, `REVIEW_APP_STRIPE_WEBHOOK_SECRET` — Stripe **test mode** keys
-- `REVIEW_APP_POSTMARK_API_TOKEN` — Postmark **sandbox** stream token
-- `REVIEW_APP_GOOGLE_MAPS`, `REVIEW_APP_GOOGLE_MAPS_STATIC`, `REVIEW_APP_GOOGLE_GEOCODER`, `REVIEW_APP_MAPBOX_GEOCODER`, `REVIEW_APP_MAPBOX_MAPPING` — review-app keys (may be the same as dev)
-- `REVIEW_APP_R2_ENDPOINT`, `REVIEW_APP_R2_ACCESS_KEY`, `REVIEW_APP_R2_ACCESS_KEY_SECRET` — R2 creds scoped to a `review-app/` key prefix (separate IAM token from prod)
-- `REVIEW_APP_CLOUDFLARE_TOKEN`
-- `REVIEW_APP_HONEYBADGER_API_KEY` — optional; can be a dummy if HB isn't wanted for review apps
+## How a deploy works
 
-Other env vars in `.env` that aren't listed here (Twitter, Twilio, Facebook, etc.) intentionally fall through to empty — those integrations are stubbed for review apps.
+1. Workflow runner builds the Docker image (`Dockerfile`) and pushes to GHCR as `pr-<N>-<sha>`.
+2. Workflow runs `bin/review-app deploy <pr> <tag>`, which SSHes to the host via Kamal and:
+   - Boots the per-PR `bike-index-pr-<N>-web` + `bike-index-pr-<N>-worker` containers
+   - On first boot, `bin/docker-entrypoint` creates the Postgres role `bike_index_pr_<N>` and runs `db:prepare`, which creates both `bike_index_review_pr_<N>_primary` and `bike_index_review_pr_<N>_analytics` and seeds them
+   - On subsequent boots, `db:prepare` runs migrations only
+3. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
+4. Workflow adds the `review-app` label and comments the URL on the PR.
+
+Destroy reverses it: `kamal app remove`, then drops both databases + the role, then `FLUSHDB`s the assigned Redis logical DB.
 
 ## Files involved
 
 | File | Purpose |
 |---|---|
-| `Dockerfile` + `.dockerignore` | Production-style image used only by review apps |
+| `Dockerfile`, `.dockerignore` | Production-style image (Thruster + Puma + Sidekiq). Used only by review apps. |
+| `bin/docker-entrypoint` | Creates per-PR Postgres role + runs `db:prepare` on first boot |
+| `bin/thrust` | Thruster binstub used by the image's `CMD` |
+| `bin/review-app` | Deploy / destroy orchestration script |
 | `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
-| `bin/review-app` | Deploy / destroy helper (db create-or-drop, kamal deploy/remove, redis flush) |
-| `.github/workflows/review-app.yml` | The single workflow that handles all four trigger paths |
+| `.kamal/secrets-ci` | Dotenv-format passthrough for GitHub Actions secrets |
+| `.kamal/hooks/post-deploy` | Honeybadger deploy notification (no-op if `HONEYBADGER_API_KEY` unset) |
+| `.github/workflows/review-app.yml` | The single workflow handling all four trigger paths |
+| `provisioning/` | Ansible playbook for one-time host hardening |
 | `app/views/shared/_review_app_banner.html.erb` | Banner shown when `ENV["REVIEW_APP"]` is set |
 
 ## Known limits
 
-- **Redis DB allocation is mod-31.** Two PRs whose numbers are congruent mod 31 share a Redis logical DB — caches and Sidekiq queues mix. Acceptable for v1; the mitigation is to bump `--databases` in the redis accessory and `REDIS_DATABASES` in `bin/review-app`.
-- **Storage is shared.** All review apps write to the same R2 bucket (under a `review-app/` prefix). Uploads work but aren't isolated between apps.
-- **No background-job worker scaling.** Each review app runs a single Sidekiq worker with concurrency=2. Enough for demo workflows; not enough to stress-test queue behavior.
+- **Redis DB allocation is mod-31.** Two PRs whose numbers are congruent mod 31 share a Redis logical DB — caches and Sidekiq queues mix. Acceptable for v1; mitigation if it bites: bump `--databases` in `config/deploy.review.yml`'s redis accessory `cmd:` and raise `REDIS_DATABASES` in `bin/review-app`.
+- **Storage is shared.** All review apps write to the same R2 bucket under a `review-app/` prefix.
+- **One Sidekiq worker per app at concurrency=2.** Enough for demo workflows; not enough to stress-test queue behavior.
 - **Forks aren't auto-deployed.** A maintainer must trigger fork PR deploys manually via `workflow_dispatch` after reviewing the diff.

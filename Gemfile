@@ -17,6 +17,7 @@ gem "rails"
 
 # Things to improve/extend Rails
 gem "puma" # App server
+gem "thruster", require: false # HTTP/2, asset caching, X-Sendfile for Puma (used by review-app Dockerfile)
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg" # Postgres

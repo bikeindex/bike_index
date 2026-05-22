@@ -1,0 +1,46 @@
+---
+# See: https://docs.docker.com/engine/install/ubuntu/
+
+- name: Ensure old versions of Docker are not installed
+  ansible.builtin.apt:
+    name:
+      - containerd
+      - docker
+      - docker-compose
+      - docker-compose-v2
+      - docker-doc
+      - docker-engine
+      - docker.io
+      - podman-docker
+      - runc
+    state: absent
+
+- name: Create directory for Docker GPG key
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Add Docker GPG apt key
+  ansible.builtin.get_url:
+    url: "https://download.docker.com/linux/ubuntu/gpg"
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+    force: false
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+    filename: docker
+    update_cache: true
+
+- name: Install Docker packages
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+  notify:
+    - Restart docker

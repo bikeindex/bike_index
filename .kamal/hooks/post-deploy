@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Notify Honeybadger of the deploy. Only runs when HONEYBADGER_API_KEY is set —
+# review apps may omit it, in which case this is a no-op.
+[ -z "$HONEYBADGER_API_KEY" ] && exit 0
+
+# Use --skip-rails-load to avoid booting the Rails environment,
+# which requires REDIS_URL and other env vars not available in CI.
+bundle exec honeybadger deploy \
+  --skip-rails-load \
+  --api-key "$HONEYBADGER_API_KEY" \
+  --repository https://github.com/bikeindex/bike_index \
+  --revision "$KAMAL_VERSION" \
+  --environment "${KAMAL_DESTINATION:-production}" \
+  --user "$KAMAL_PERFORMER"

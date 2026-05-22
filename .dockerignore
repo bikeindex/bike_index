@@ -1,40 +1,59 @@
-.git
-.gitignore
-.github
-.dockerignore
-Dockerfile
+# See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
 
-.env*
-!.env.example
+# Ignore git directory.
+/.git/
+/.gitignore
 
-# Local dev artifacts
-log/*
-!log/.keep
-tmp/*
-!tmp/.keep
-storage/*
-!storage/.keep
-node_modules
-public/assets
-public/packs
-public/packs-test
-app/assets/builds/*
-!app/assets/builds/.keep
+# Ignore bundler config.
+/.bundle
 
-# Editor + OS
-.DS_Store
-.idea
-.vscode
-*.swp
+# Ignore all environment files.
+/.env*
 
-# Test artifacts
-coverage
-spec/examples.txt
-spec/tmp
+# Ignore all default key files.
+/config/master.key
+/config/credentials/*.key
 
-# Misc
-.claude
-.context
-.cloud66
-.conductor
-.kamal
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Ignore pidfiles, but keep the directory.
+/tmp/pids/*
+!/tmp/pids/.keep
+
+# Ignore storage (uploaded files in development and any SQLite databases).
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+
+# Ignore assets.
+/node_modules/
+/app/assets/builds/*
+!/app/assets/builds/.keep
+/public/assets
+
+# Ignore CI service files.
+/.github
+
+# Ignore Kamal files.
+/config/deploy*.yml
+/.kamal
+
+# Ignore Cloud66 deploy hooks (not used by Kamal-based review apps).
+/.cloud66
+
+# Ignore Conductor + Claude workspaces.
+/.context
+/.conductor
+/.claude
+
+# Ignore development files
+/.devcontainer
+
+# Ignore Docker-related files
+/.dockerignore
+/Dockerfile*

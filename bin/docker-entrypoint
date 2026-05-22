@@ -1,0 +1,18 @@
+#!/bin/bash -e
+
+# If running the rails server, provision the app's database role and run migrations.
+# Bike Index uses two databases (primary + analytics) under the same role;
+# `db:prepare` handles both via Rails multi-database support.
+if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  if [ -n "$POSTGRES_PASSWORD" ] && [ -n "$POSTGRESQL_ADDRESS" ] && [ -n "$POSTGRESQL_USERNAME" ]; then
+    echo "Ensuring database role '$POSTGRESQL_USERNAME' exists..."
+    PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRESQL_ADDRESS" -U postgres -tc \
+      "SELECT 1 FROM pg_roles WHERE rolname='$POSTGRESQL_USERNAME'" | grep -q 1 || \
+      PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRESQL_ADDRESS" -U postgres -c \
+      "CREATE ROLE $POSTGRESQL_USERNAME WITH LOGIN PASSWORD '$POSTGRESQL_PASSWORD' CREATEDB;"
+  fi
+
+  ./bin/rails db:prepare
+fi
+
+exec "${@}"
