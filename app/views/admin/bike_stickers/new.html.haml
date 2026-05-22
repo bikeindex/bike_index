@@ -55,9 +55,8 @@
 
   .row.mt-4
     .col-md-6.col-lg-3
-      .form-group.fancy-select.unfancy
-        = f.label :organization_id
-        = f.collection_select(:organization_id, @organizations, :id, :name, {prompt: "Choose organization"}, {class: "form-control", required: true})
+      .form-group
+        = render Form::Combobox::Component.new(name: :organization_id, form: f, label: BikeStickerBatch.human_attribute_name(:organization_id), placeholder: "Choose organization", required: true, include_blank: true, options: @organizations.pluck(:name, :id))
     .col-md-6.col-lg-9
       .form-group
         = f.label :notes, "Notes"
