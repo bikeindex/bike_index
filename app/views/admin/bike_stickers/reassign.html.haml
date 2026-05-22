@@ -28,10 +28,9 @@
           .row.mt-4
             - if @bike_sticker1.present?
               .col-12
-                .form-group.fancy-select.unfancy
-                  - opt_vals = BikeStickerBatch.includes(:organization).order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id]  }
-                  = label_tag :search_bike_sticker_batch_id, "Sticker Batch"
-                  = select_tag :search_bike_sticker_batch_id, options_for_select(opt_vals, selected: @bike_sticker_batch&.id), placeholder: "Select batch", class: 'form-control', include_blank: true
+                .form-group
+                  - opt_vals = BikeStickerBatch.includes(:organization).order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id] }
+                  = render Form::Combobox::Component.new(name: :search_bike_sticker_batch_id, label: "Sticker Batch", placeholder: "Select batch", value: @bike_sticker_batch&.id, include_blank: true, options: opt_vals)
             .col-sm-6
               .form-group
                 = label_tag :search_sticker1, "Starting Sticker code"
@@ -41,10 +40,9 @@
                 = label_tag :search_sticker2, "Ending Sticker code"
                 = text_field_tag :search_sticker2, params[:search_sticker2], class: "form-control"
             .col-12
-              .form-group.fancy-select.unfancy
-                = label_tag :organization, "Organization to assign stickers to"
+              .form-group
                 - org_opt_vals = Organization.approved.name_ordered.pluck(:name, :id)
-                = select_tag(:organization_id, options_for_select(org_opt_vals, selected: current_organization&.id), include_blank: true, placeholder: "Select organization", class: 'form-control')
+                = render Form::Combobox::Component.new(name: :organization_id, label: "Organization to assign stickers to", placeholder: "Select organization", value: current_organization&.id, include_blank: true, options: org_opt_vals)
           .form-group.mt-2
             = submit_tag 'Select', name: 'select', class: 'btn btn-primary ml-2'
 

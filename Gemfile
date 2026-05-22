@@ -17,6 +17,7 @@ gem "rails"
 
 # Things to improve/extend Rails
 gem "puma" # App server
+gem "rack-timeout", require: "rack/timeout/base" # Bound per-request wall-clock time so one slow request can't hold a Puma worker
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg" # Postgres
@@ -115,6 +116,7 @@ gem "tailwindcss-rails" # Use Tailwind CSS [https://github.com/rails/tailwindcss
 gem "view_component" # view components!
 gem "lookbook" # view_component preview
 gem "inline_svg" # render SVGs inline and give them classes
+gem "hotwire_combobox" # accessible autocomplete/combobox
 
 group :production do
   gem "skylight" # Performance monitoring

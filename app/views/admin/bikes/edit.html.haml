@@ -15,9 +15,9 @@
 
   .row
     .col-md-4.col-lg-3
-      .form-group.fancy-select.unfancy
-        = f.label :cycle_type, "Cycle type"
-        = select(:bike, :cycle_type, CycleType.select_options, { required: true })
+      .form-group
+        -# cycle_type is an integer-backed enum: pass enum *labels* as option values and an explicit value: to override hotwire_combobox's enum branch (which would emit cycle_type_before_type_cast)
+        = render Form::Combobox::Component.new(name: :cycle_type, form: f, value: @bike.cycle_type, label: "Cycle type", required: true, options: CycleType.select_options)
     .col-6.col-md-4.col-lg-5
       .form-group
         = f.label :serial_number
@@ -31,12 +31,12 @@
         = f.label :made_without_serial
   .row
     .col-6.col-md-4.col-lg-3
-      .form-group.fancy-select.unfancy
-        = f.label :manufacturer_id do
+      .form-group
+        - manufacturer_label = capture do
           Manufacturer
           %em.small
             = link_to "mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name), class: "less-strong"
-        = collection_select(:bike, :manufacturer_id, Manufacturer.frame_makers, :id, :name, {}, { required: true, class: "form-control" })
+        = render Form::Combobox::Component.new(name: :manufacturer_id, form: f, label: manufacturer_label, required: true, options: Manufacturer.frame_makers.pluck(:name, :id))
     .col-6.col-md-4.col-lg-3
       .form-group
         = f.label :manufacturer_other do
@@ -52,9 +52,8 @@
         = f.label :year
         = f.text_field :year, class: "form-control"
     .col-6.col-md-4.col-lg-3
-      .form-group.fancy-select.unfancy
-        = f.label :primary_frame_color_id
-        = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, { prompt: "Choose color" }, { required: true, class: "form-control" })
+      .form-group
+        = render Form::Combobox::Component.new(name: :primary_frame_color_id, form: f, label: Bike.human_attribute_name(:primary_frame_color_id), placeholder: "Choose color", required: true, include_blank: true, options: Color.all.pluck(:name, :id))
     .col-md-4.col-lg-3
       .form-group
         = f.label :frame_model
@@ -79,9 +78,8 @@
         = f.email_field :owner_email, required: true, class: "form-control"
     - if @organizations.present?
       .col-md-4.col-lg-3
-        .form-group.fancy-select.unfancy
-          = f.label :creation_organization_id
-          = f.collection_select(:creation_organization_id, @organizations, :id, :name, { prompt: "Choose organization" }, { class: "form-control" })
+        .form-group
+          = render Form::Combobox::Component.new(name: :creation_organization_id, form: f, label: Bike.human_attribute_name(:creation_organization_id), placeholder: "Choose organization", include_blank: true, options: @organizations.pluck(:name, :id))
       .col-md-4.col-lg-3
         .form-group.fancy-select.unfancy
           = f.label :bike_organization_ids, 'Current orgs'
@@ -99,15 +97,13 @@
       .row.mt-4
         .col-md-4
           .row
-            #stolen-bike-location.form-group.fancy-select.unfancy.col-6
+            #stolen-bike-location.form-group.col-6
               #country_select_container
-                = label :country, "Country"
-                = s.select(:country_id, Country.select_options, prompt: "Choose country")
+                = render Form::Combobox::Component.new(name: :country_id, form: s, label: "Country", placeholder: "Choose country", include_blank: true, options: Country.select_options)
                 %p.d-none
                   = Country.united_states_id
-            .form-group.fancy-select.unfancy.col-6
-              = s.label :state, "State"
-              = s.collection_select(:region_record_id, State.united_states, :id, :name, include_blank: true, prompt: "State")
+            .form-group.col-6
+              = render Form::Combobox::Component.new(name: :region_record_id, form: s, label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id))
           .form-group
             = label :street, "Intersection or address"
             = s.text_field :street, placeholder: "Intersection or address", class: "form-control"

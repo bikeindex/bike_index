@@ -9,6 +9,7 @@
     <%= tag.meta name: "honeybadger-api-key", content: ENV["HONEYBADGER_FRONTEND_API_KEY"] %>
     <%= tag.meta name: "honeybadger-environment", content: Rails.env %>
     <%= stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload" %>
+    <%= hw_combobox_style_tag %>
 
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700"

@@ -71,7 +71,7 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def large_img
-    object.image_url(:large).presence || object.stock_photo_url
+    image_url.presence || object.stock_photo_url
   end
 
   def url
@@ -79,7 +79,7 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def is_stock_img
-    object.image_url.blank? && object.stock_photo_url.present?
+    image_url.blank? && object.stock_photo_url.present?
   end
 
   def stolen_location
@@ -101,6 +101,12 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   private
+
+  # Memoized — Bike#image_url issues a public_images SQL query per call.
+  def image_url
+    return @image_url if defined?(@image_url)
+    @image_url = object.image_url(:large)
+  end
 
   def current_stolen_record
     object.current_stolen_record

@@ -15,8 +15,20 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      expect(assigns(:render_results)).to be_falsey
+
+      get "#{base_url}?search_no_js=true"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
+      expect(assigns(:render_results)).to be_truthy
       expect(assigns(:impound_records).count).to eq 0
       expect(assigns(:available_statuses)).to eq available_statuses
+
+      get "#{base_url}?render_chart=true&chart_only=1"
+      expect(response.status).to eq(200)
+      expect(assigns(:impound_records)).to be_nil
+      expect(assigns(:pagy)).to be_nil
+      expect(response.body).to include("impound_records_chart_frame")
     end
     context "multiple impound_records" do
       let!(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike2) }
@@ -35,22 +47,22 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record).to be_present
         ProcessImpoundUpdatesJob.new.perform(impound_record.id)
         expect(current_organization.impound_records.bikes.count).to eq 2
-        get base_url
+        get "#{base_url}?search_no_js=true"
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(assigns(:search_status)).to eq "current"
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record2.id])
         expect(assigns(:available_statuses)).to eq(available_statuses + ["expired"])
 
-        get "#{base_url}?search_email=&serial=yar1s"
+        get "#{base_url}?search_no_js=true&search_email=&serial=yar1s"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record2.id])
 
-        get "#{base_url}?search_email=someemail%40things"
+        get "#{base_url}?search_no_js=true&search_email=someemail%40things"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id])
 
-        get "#{base_url}?search_email=someemail%40things&search_status=all"
+        get "#{base_url}?search_no_js=true&search_email=someemail%40things&search_status=all"
         expect(response.status).to eq(200)
         expect(assigns(:search_status)).to eq "all"
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record_retrieved.id])
@@ -78,23 +90,23 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(impound_record_nyc.address_record.city).to eq "Los Angeles"
         expect(impound_record_la.reload.impounded_from_address_record.city).to eq "Los Angeles"
 
-        get base_url
+        get "#{base_url}?search_no_js=true"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record_nyc.id, impound_record_la.id])
         expect(assigns(:search_proximity)).to eq 1
 
-        get "#{base_url}?search_location=New+York"
+        get "#{base_url}?search_no_js=true&search_location=New+York"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record_nyc.id])
         expect(assigns(:search_proximity)).to eq 1
 
-        get "#{base_url}?search_location=New+York&search_proximity=50"
+        get "#{base_url}?search_no_js=true&search_location=New+York&search_proximity=50"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
         expect(assigns(:search_proximity)).to eq 50
 
         # with below minimum distance (0.01)
-        get "#{base_url}?search_location=New+York&search_proximity=0.001"
+        get "#{base_url}?search_no_js=true&search_location=New+York&search_proximity=0.001"
         expect(response.status).to eq(200)
         expect(assigns(:search_proximity)).to eq(0.01)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
@@ -104,7 +116,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         let(:bounding_box) { [66.00, -84.22, 67.000, (0.0 / 0)] }
 
         it "includes a flash notice for unknown location" do
-          get "#{base_url}?search_location=xkcd_unknown"
+          get "#{base_url}?search_no_js=true&search_location=xkcd_unknown"
           expect(response.status).to eq(200)
           expect(flash[:notice]).to match(/location/)
           expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record_nyc.id, impound_record_la.id])

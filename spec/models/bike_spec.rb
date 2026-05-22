@@ -1705,6 +1705,14 @@ RSpec.describe Bike, type: :model do
         expect(bike.image_url).to eq public_image.image_url
         expect(bike.image_url(:medium)).to eq public_image.image_url(:medium)
       end
+      # On Fog storage, CarrierWave's Uploader#blank? issues an S3 HEAD per call
+      # (via Fog::File#exists? → directory.files.head). image_url is invoked twice
+      # per bike in BikeV2Serializer (is_stock_img + large_img); on a 100-row API
+      # search page that's >=200 sequential HEADs and triggered Rack::Timeout.
+      it "does not call blank? on the uploader" do
+        expect_any_instance_of(ImageUploader).not_to receive(:blank?)
+        bike.reload.image_url
+      end
       it "with REMOTE_IMAGE_FALLBACK_URLS true return URL" do
         stub_const("BikeAttributable::REMOTE_IMAGE_FALLBACK_URLS", true)
         expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_truthy
