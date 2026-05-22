@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    review_app_banner:
+      label: Review app
+      pr_link: "PR #%{number}"
+      disclaimer: not production, data is ephemeral
