@@ -2,12 +2,20 @@
 
 module ReviewAppBanner
   # Yellow banner shown across the top of every page on review-app deploys, so
-  # there's no chance of confusing a review environment with production. The
-  # layout decides whether to render it (gated on `ENV["REVIEW_APP"]`); this
-  # component just takes a PR number and renders the strip.
+  # there's no chance of confusing a review environment with production.
+  # Self-gated via `render?`; defaults read from `ENV["REVIEW_APP"]` and
+  # `ENV["REVIEW_APP_PR_NUMBER"]` so the layout just calls `render(...)`.
   class Component < ApplicationComponent
-    def initialize(pr_number: nil)
+    def initialize(
+      present: ENV["REVIEW_APP"].present?,
+      pr_number: ENV["REVIEW_APP_PR_NUMBER"].presence
+    )
+      @present = present
       @pr_number = pr_number
+    end
+
+    def render?
+      @present
     end
 
     private
