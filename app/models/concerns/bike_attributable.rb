@@ -209,6 +209,7 @@ module BikeAttributable
     return nil if image_col&.path.blank? && !REMOTE_IMAGE_FALLBACK_URLS
 
     image_url = image_col&.send(:url, size)
+    # image_col.blank? and image_url.present? indicates it's a remote file in local development
     if REMOTE_IMAGE_FALLBACK_URLS && image_col.blank? && image_url.present?
       # Create a image_url using the aws path
       "https://files.bikeindex.org" + image_url.gsub(ENV["BASE_URL"], "")
