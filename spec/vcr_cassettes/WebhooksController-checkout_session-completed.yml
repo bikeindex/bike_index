@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.stripe.com/v1/subscriptions/sub_0Qv3uJm0T0GBfX0v77OTe6ii
+    uri: https://api.stripe.com/v1/subscriptions/sub_0Tb1okm0T0GBfX0vIuafkiOk
     body:
       encoding: US-ASCII
       string: ''
@@ -23,11 +23,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 24 Mar 2025 17:51:45 GMT
+      - Mon, 25 May 2026 20:01:05 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '4737'
+      - '4900'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -46,15 +46,17 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=DsMLaRXQScjEamO0AtNgydPfqGY6HTJyvp4IT13ab-K6qlZdYPgKsYt5YIso_XOC11hnehF-YkH4_qsl
-      Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to="coop"
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=DEXjmZedDz-DVk3xbY-MBRZUgdAsUYwoyEkjMtwHT0ssgKtZ1uKI09ezGIKCCLjMyY1dMRP9BpV9Veoe;
+        report-to csp
       Report-To:
-      - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report"}],"include_subdomains":true}'
+      - '{"group":"csp","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/csp-report-v2?q=DEXjmZedDz-DVk3xbY-MBRZUgdAsUYwoyEkjMtwHT0ssgKtZ1uKI09ezGIKCCLjMyY1dMRP9BpV9Veoe&t=1"}],"include_subdomains":true}'
       Reporting-Endpoints:
-      - coop="https://q.stripe.com/coop-report"
+      - csp="https://q.stripe.com/csp-report-v2?q=DEXjmZedDz-DVk3xbY-MBRZUgdAsUYwoyEkjMtwHT0ssgKtZ1uKI09ezGIKCCLjMyY1dMRP9BpV9Veoe&t=1"
       Request-Id:
-      - req_hbaTnQ5cIERagf
+      - req_9BV0KJc6cATC6k
+      Stripe-Notice:
+      - You are using an outdated API version (2025-01-27.acacia). We recommend upgrading
+        to the latest API version, 2026-04-22.dahlia. See https://docs.stripe.com/upgrades
       Stripe-Version:
       - 2025-01-27.acacia
       Vary:
@@ -64,14 +66,14 @@ http_interactions:
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       X-Wc:
-      - AB
+      - 3c3
       Strict-Transport-Security:
       - max-age=63072000; includeSubDomains; preload
     body:
       encoding: UTF-8
       string: |-
         {
-          "id": "sub_0Qv3uJm0T0GBfX0v77OTe6ii",
+          "id": "sub_0Tb1okm0T0GBfX0vIuafkiOk",
           "object": "subscription",
           "application": null,
           "application_fee_percent": null,
@@ -80,31 +82,36 @@ http_interactions:
             "enabled": false,
             "liability": null
           },
-          "billing_cycle_anchor": 1740173835,
+          "billing_cycle_anchor": 1779728250,
           "billing_cycle_anchor_config": null,
+          "billing_mode": {
+            "flexible": null,
+            "type": "classic"
+          },
           "billing_thresholds": null,
-          "cancel_at": 1742593035,
-          "cancel_at_period_end": true,
-          "canceled_at": 1740268103,
+          "cancel_at": null,
+          "cancel_at_period_end": false,
+          "canceled_at": null,
           "cancellation_details": {
             "comment": null,
-            "feedback": "unused",
-            "reason": "cancellation_requested"
+            "feedback": null,
+            "reason": null
           },
           "collection_method": "charge_automatically",
-          "created": 1740173835,
+          "created": 1779728250,
           "currency": "usd",
-          "current_period_end": 1742593035,
-          "current_period_start": 1740173835,
-          "customer": "cus_RohIc4uZhMPzxN",
+          "current_period_end": 1782406650,
+          "current_period_start": 1779728250,
+          "customer": "cus_UaCDYAUdXDhFPp",
+          "customer_account": null,
           "days_until_due": null,
-          "default_payment_method": "pm_0Qv3uJm0T0GBfX0vDotRCAkA",
+          "default_payment_method": "pm_0Tb1ojm0T0GBfX0vXbWUlWOG",
           "default_source": null,
           "default_tax_rates": [],
           "description": null,
           "discount": null,
           "discounts": [],
-          "ended_at": 1742593035,
+          "ended_at": null,
           "invoice_settings": {
             "account_tax_ids": null,
             "issuer": {
@@ -115,12 +122,12 @@ http_interactions:
             "object": "list",
             "data": [
               {
-                "id": "si_RohIR483d0K1ok",
+                "id": "si_UaCDwTeUKitejy",
                 "object": "subscription_item",
                 "billing_thresholds": null,
-                "created": 1740173836,
-                "current_period_end": 1742593035,
-                "current_period_start": 1740173835,
+                "created": 1779728251,
+                "current_period_end": 1782406650,
+                "current_period_start": 1779728250,
                 "discounts": [],
                 "metadata": {},
                 "plan": {
@@ -174,16 +181,19 @@ http_interactions:
                   "unit_amount_decimal": "999"
                 },
                 "quantity": 1,
-                "subscription": "sub_0Qv3uJm0T0GBfX0v77OTe6ii",
+                "subscription": "sub_0Tb1okm0T0GBfX0vIuafkiOk",
                 "tax_rates": []
               }
             ],
             "has_more": false,
             "total_count": 1,
-            "url": "/v1/subscription_items?subscription=sub_0Qv3uJm0T0GBfX0v77OTe6ii"
+            "url": "/v1/subscription_items?subscription=sub_0Tb1okm0T0GBfX0vIuafkiOk"
           },
-          "latest_invoice": "in_0Qv3uJm0T0GBfX0vXLZmSpZb",
+          "latest_invoice": "in_0Tb1okm0T0GBfX0vqF7bzRyM",
           "livemode": false,
+          "managed_payments": {
+            "enabled": false
+          },
           "metadata": {},
           "next_pending_invoice_item_invoice": null,
           "on_behalf_of": null,
@@ -198,7 +208,10 @@ http_interactions:
               },
               "customer_balance": null,
               "konbini": null,
+              "payto": null,
+              "pix": null,
               "sepa_debit": null,
+              "upi": null,
               "us_bank_account": null
             },
             "payment_method_types": null,
@@ -231,8 +244,8 @@ http_interactions:
           },
           "quantity": 1,
           "schedule": null,
-          "start_date": 1740173835,
-          "status": "canceled",
+          "start_date": 1779728250,
+          "status": "active",
           "test_clock": null,
           "transfer_data": null,
           "trial_end": null,
@@ -243,10 +256,10 @@ http_interactions:
           },
           "trial_start": null
         }
-  recorded_at: Mon, 24 May 2025 17:51:44 GMT
+  recorded_at: Mon, 25 May 2026 20:01:05 GMT
 - request:
     method: get
-    uri: https://api.stripe.com/v1/subscriptions/sub_0Qv3uJm0T0GBfX0v77OTe6ii
+    uri: https://api.stripe.com/v1/subscriptions/sub_0Tb1okm0T0GBfX0vIuafkiOk
     body:
       encoding: US-ASCII
       string: ''
@@ -267,11 +280,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 24 Mar 2025 17:53:18 GMT
+      - Mon, 25 May 2026 20:04:32 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '4737'
+      - '4900'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -286,19 +299,21 @@ http_interactions:
       Access-Control-Max-Age:
       - '300'
       Cache-Control:
-      - no-cache, no-store
+      - no-cache, no-store,no-cache, no-store
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=VG7xhM_kxlEargwXzH5kBxpxZCTD1JkXMPDosSFxmfyIu2FMewZi0ee-tMtGgCeIJNEX8hatwa1-GsMZ
-      Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to="coop"
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=HycJZ0ffwGQTVGYZdExQN5PcTg-0pfCLYGxUToslOQrOnrmqo7pkORefrWTBmJVcls-x8AvOZN4MuzF1;
+        report-to csp
       Report-To:
-      - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report"}],"include_subdomains":true}'
+      - '{"group":"csp","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/csp-report-v2?q=HycJZ0ffwGQTVGYZdExQN5PcTg-0pfCLYGxUToslOQrOnrmqo7pkORefrWTBmJVcls-x8AvOZN4MuzF1&t=1"}],"include_subdomains":true}'
       Reporting-Endpoints:
-      - coop="https://q.stripe.com/coop-report"
+      - csp="https://q.stripe.com/csp-report-v2?q=HycJZ0ffwGQTVGYZdExQN5PcTg-0pfCLYGxUToslOQrOnrmqo7pkORefrWTBmJVcls-x8AvOZN4MuzF1&t=1"
       Request-Id:
-      - req_bCxYeBH3rOdEnA
+      - req_14q0VrfmWbY8mO
+      Stripe-Notice:
+      - You are using an outdated API version (2025-01-27.acacia). We recommend upgrading
+        to the latest API version, 2026-04-22.dahlia. See https://docs.stripe.com/upgrades
       Stripe-Version:
       - 2025-01-27.acacia
       Vary:
@@ -308,14 +323,14 @@ http_interactions:
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       X-Wc:
-      - AB
+      - 3c3
       Strict-Transport-Security:
       - max-age=63072000; includeSubDomains; preload
     body:
       encoding: UTF-8
       string: |-
         {
-          "id": "sub_0Qv3uJm0T0GBfX0v77OTe6ii",
+          "id": "sub_0Tb1okm0T0GBfX0vIuafkiOk",
           "object": "subscription",
           "application": null,
           "application_fee_percent": null,
@@ -324,31 +339,36 @@ http_interactions:
             "enabled": false,
             "liability": null
           },
-          "billing_cycle_anchor": 1740173835,
+          "billing_cycle_anchor": 1779728250,
           "billing_cycle_anchor_config": null,
+          "billing_mode": {
+            "flexible": null,
+            "type": "classic"
+          },
           "billing_thresholds": null,
-          "cancel_at": 1742593035,
-          "cancel_at_period_end": true,
-          "canceled_at": 1740268103,
+          "cancel_at": null,
+          "cancel_at_period_end": false,
+          "canceled_at": null,
           "cancellation_details": {
             "comment": null,
-            "feedback": "unused",
-            "reason": "cancellation_requested"
+            "feedback": null,
+            "reason": null
           },
           "collection_method": "charge_automatically",
-          "created": 1740173835,
+          "created": 1779728250,
           "currency": "usd",
-          "current_period_end": 1742593035,
-          "current_period_start": 1740173835,
-          "customer": "cus_RohIc4uZhMPzxN",
+          "current_period_end": 1782406650,
+          "current_period_start": 1779728250,
+          "customer": "cus_UaCDYAUdXDhFPp",
+          "customer_account": null,
           "days_until_due": null,
-          "default_payment_method": "pm_0Qv3uJm0T0GBfX0vDotRCAkA",
+          "default_payment_method": "pm_0Tb1ojm0T0GBfX0vXbWUlWOG",
           "default_source": null,
           "default_tax_rates": [],
           "description": null,
           "discount": null,
           "discounts": [],
-          "ended_at": 1742593035,
+          "ended_at": null,
           "invoice_settings": {
             "account_tax_ids": null,
             "issuer": {
@@ -359,12 +379,12 @@ http_interactions:
             "object": "list",
             "data": [
               {
-                "id": "si_RohIR483d0K1ok",
+                "id": "si_UaCDwTeUKitejy",
                 "object": "subscription_item",
                 "billing_thresholds": null,
-                "created": 1740173836,
-                "current_period_end": 1742593035,
-                "current_period_start": 1740173835,
+                "created": 1779728251,
+                "current_period_end": 1782406650,
+                "current_period_start": 1779728250,
                 "discounts": [],
                 "metadata": {},
                 "plan": {
@@ -418,16 +438,19 @@ http_interactions:
                   "unit_amount_decimal": "999"
                 },
                 "quantity": 1,
-                "subscription": "sub_0Qv3uJm0T0GBfX0v77OTe6ii",
+                "subscription": "sub_0Tb1okm0T0GBfX0vIuafkiOk",
                 "tax_rates": []
               }
             ],
             "has_more": false,
             "total_count": 1,
-            "url": "/v1/subscription_items?subscription=sub_0Qv3uJm0T0GBfX0v77OTe6ii"
+            "url": "/v1/subscription_items?subscription=sub_0Tb1okm0T0GBfX0vIuafkiOk"
           },
-          "latest_invoice": "in_0Qv3uJm0T0GBfX0vXLZmSpZb",
+          "latest_invoice": "in_0Tb1okm0T0GBfX0vqF7bzRyM",
           "livemode": false,
+          "managed_payments": {
+            "enabled": false
+          },
           "metadata": {},
           "next_pending_invoice_item_invoice": null,
           "on_behalf_of": null,
@@ -442,7 +465,10 @@ http_interactions:
               },
               "customer_balance": null,
               "konbini": null,
+              "payto": null,
+              "pix": null,
               "sepa_debit": null,
+              "upi": null,
               "us_bank_account": null
             },
             "payment_method_types": null,
@@ -475,8 +501,8 @@ http_interactions:
           },
           "quantity": 1,
           "schedule": null,
-          "start_date": 1740173835,
-          "status": "canceled",
+          "start_date": 1779728250,
+          "status": "active",
           "test_clock": null,
           "transfer_data": null,
           "trial_end": null,
@@ -487,5 +513,5 @@ http_interactions:
           },
           "trial_start": null
         }
-  recorded_at: Mon, 24 May 2025 17:53:18 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 25 May 2026 20:04:32 GMT
+recorded_with: VCR 6.4.0
