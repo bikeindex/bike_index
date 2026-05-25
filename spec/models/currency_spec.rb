@@ -27,14 +27,17 @@ RSpec.describe Currency, type: :model do
 
   describe "CAD" do
     let(:slug) { :cad }
-    let(:target) { {name: "CAD", symbol: "$", slug:} }
+    let(:target) { {name: "CAD", symbol: "$", slug:, id: 1} }
 
     it "creates with slug" do
       expect(Currency.new(slug)).to have_attributes(target)
     end
 
     it "creates with name" do
-      expect(Currency.new("CAD")).to have_attributes(target)
+      currency = Currency.new("CAD")
+      # pp currency.slice(:name, :symbol, :slug)
+      expect(currency.to_h).to eq(target)
+      expect(Currency.friendly_find("cad").to_h).to eq target
     end
 
     it "creates from instance" do
