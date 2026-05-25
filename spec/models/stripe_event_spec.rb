@@ -19,6 +19,7 @@ RSpec.describe StripeEvent, type: :model do
       # 2. Go to /memberships/new and purchase a plus membership
       # 3. Go to Stripe workbench webhooks
       # 4. Copy in the webhook fixtures
+      # Update webhooks_request_spec with anything that changed in the fixtures
       let(:webhook_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-checkout.session.completed.json"))) }
       let(:start_at) { Time.at(1779728250) } # has to be updated when fixture is updated
       let(:email) { "test@example.bikeindex.org" } # Also update if using a different email
