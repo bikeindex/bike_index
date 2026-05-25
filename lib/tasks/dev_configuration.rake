@@ -6,15 +6,15 @@ class RakeDevConfiguration
   require "fileutils"
   class << self
     def toggle_letter_opener
-      file = "tmp/enable-letter_opener.txt"
+      file = "tmp/skip-letter_opener.txt"
       FileUtils.mkdir_p("tmp")
 
       if File.exist?(file)
         delete_toggle_file(file)
-        puts "letter_opener is now disabled."
+        puts "letter_opener is now enabled"
       else
         create_toggle_file(file)
-        puts "letter_opener is now enabled."
+        puts "letter_opener is disabled."
       end
 
       FileUtils.touch "tmp/restart.txt"
