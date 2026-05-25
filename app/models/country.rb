@@ -16,7 +16,6 @@ class Country < ApplicationRecord
   CANADA_ID = Rails.env.test? ? nil : 38
 
   has_many :stolen_records
-  has_many :locations
 
   validates_presence_of :name
   validates_uniqueness_of :name, :iso
