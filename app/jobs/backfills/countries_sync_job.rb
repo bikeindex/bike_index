@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Backfills
-  class CountryNetherlandsAntillesToCuracaoJob < ApplicationJob
+  class CountriesSyncJob < ApplicationJob
     sidekiq_options queue: "low_priority", retry: false
 
     TABLES = [AddressRecord, ExternalRegistryBike, ParkingNotification, SocialAccount].freeze

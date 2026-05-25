@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Backfills::CountryNetherlandsAntillesToCuracaoJob, type: :job do
+RSpec.describe Backfills::CountriesSyncJob, type: :job do
   let(:instance) { described_class.new }
 
   describe "perform" do
