@@ -14,14 +14,16 @@ RSpec.describe StripeEvent, type: :model do
     let!(:stripe_price) { FactoryBot.create(:stripe_price_plus) }
 
     context "subscription stripe_checkout completed" do
+      # want to
       let(:webhook_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-checkout.session.completed.json"))) }
-      let(:start_at) { Time.at(1740173835) } # has to be updated when fixture is updated
+      let(:start_at) { Time.at(1779728250) } # has to be updated when fixture is updated
+      let(:email) { "test@example.bikeindex.org" } # Also update if using a different email
       let(:target_subscription) do
         {
-          email: "seth@bikeindex.org",
-          stripe_status: "canceled",
+          email:,
+          stripe_status: "active",
           stripe_price_stripe_id: stripe_price.stripe_id,
-          end_at: Time.parse("2025-03-21 16:37:15 -0500"),
+          end_at: nil,
           membership_level: "plus",
           interval: "monthly",
           test?: true
@@ -83,7 +85,7 @@ RSpec.describe StripeEvent, type: :model do
       end
 
       context "with user matching email" do
-        let!(:user) { FactoryBot.create(:user_confirmed, email: "seth@bikeindex.org") }
+        let!(:user) { FactoryBot.create(:user_confirmed, email:) }
         let(:target_membership) do
           {level: "plus", status: "ended", user_id: user.id, end_at: Time.parse("2025-03-21 16:37:15 -0500")}
         end
@@ -111,7 +113,7 @@ RSpec.describe StripeEvent, type: :model do
 
         context "with a matching payment" do
           let(:stripe_subscription) { StripeSubscription.create(user:) }
-          let(:checkout_id) { "cs_test_a14VdEixSrpFjwqkENSaSEdr8THKAu5Q6wCe8tE1qJaeBB6NEAsjpYvgg4" }
+          let(:checkout_id) { "cs_test_a1XzIICn9NZ2p5RoNzP8GLCSMog4c2noU1G4d4V8sgs3MVjZxEYysztFHl" }
           let!(:payment) do
             stripe_subscription.payments.create(
               stripe_subscription.send(:payment_attrs).merge(stripe_id: checkout_id)

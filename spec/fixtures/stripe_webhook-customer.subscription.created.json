@@ -1,11 +1,11 @@
 {
-  "id": "evt_0Qv3uNm0T0GBfX0viWMFYvVg",
+  "id": "evt_0Tb1oqm0T0GBfX0vz0T3oeLq",
   "object": "event",
   "api_version": "2025-01-27.acacia",
-  "created": 1740173836,
+  "created": 1779728252,
   "data": {
     "object": {
-      "id": "sub_0Qv3uJm0T0GBfX0v77OTe6ii",
+      "id": "sub_0Tb1okm0T0GBfX0vIuafkiOk",
       "object": "subscription",
       "application": null,
       "application_fee_percent": null,
@@ -14,8 +14,12 @@
         "enabled": false,
         "liability": null
       },
-      "billing_cycle_anchor": 1740173835,
+      "billing_cycle_anchor": 1779728250,
       "billing_cycle_anchor_config": null,
+      "billing_mode": {
+        "flexible": null,
+        "type": "classic"
+      },
       "billing_thresholds": null,
       "cancel_at": null,
       "cancel_at_period_end": false,
@@ -26,20 +30,19 @@
         "reason": null
       },
       "collection_method": "charge_automatically",
-      "created": 1740173835,
+      "created": 1779728250,
       "currency": "usd",
-      "current_period_end": 1742593035,
-      "current_period_start": 1740173835,
-      "customer": "cus_RohIc4uZhMPzxN",
+      "current_period_end": 1782406650,
+      "current_period_start": 1779728250,
+      "customer": "cus_UaCDYAUdXDhFPp",
+      "customer_account": null,
       "days_until_due": null,
       "default_payment_method": null,
       "default_source": null,
-      "default_tax_rates": [
-      ],
+      "default_tax_rates": [],
       "description": null,
       "discount": null,
-      "discounts": [
-      ],
+      "discounts": [],
       "ended_at": null,
       "invoice_settings": {
         "account_tax_ids": null,
@@ -51,14 +54,14 @@
         "object": "list",
         "data": [
           {
-            "id": "si_RohIR483d0K1ok",
+            "id": "si_UaCDwTeUKitejy",
             "object": "subscription_item",
             "billing_thresholds": null,
-            "created": 1740173836,
-            "discounts": [
-            ],
-            "metadata": {
-            },
+            "created": 1779728251,
+            "current_period_end": 1782406650,
+            "current_period_start": 1779728250,
+            "discounts": [],
+            "metadata": {},
             "plan": {
               "id": "price_0Qs5s1m0T0GBfX0visCJi4lq",
               "object": "plan",
@@ -72,8 +75,7 @@
               "interval": "month",
               "interval_count": 1,
               "livemode": false,
-              "metadata": {
-              },
+              "metadata": {},
               "meter": null,
               "nickname": null,
               "product": "prod_Rld8cRL9WZDT4c",
@@ -92,8 +94,7 @@
               "custom_unit_amount": null,
               "livemode": false,
               "lookup_key": null,
-              "metadata": {
-              },
+              "metadata": {},
               "nickname": null,
               "product": "prod_Rld8cRL9WZDT4c",
               "recurring": {
@@ -112,19 +113,20 @@
               "unit_amount_decimal": "999"
             },
             "quantity": 1,
-            "subscription": "sub_0Qv3uJm0T0GBfX0v77OTe6ii",
-            "tax_rates": [
-            ]
+            "subscription": "sub_0Tb1okm0T0GBfX0vIuafkiOk",
+            "tax_rates": []
           }
         ],
         "has_more": false,
         "total_count": 1,
-        "url": "/v1/subscription_items?subscription=sub_0Qv3uJm0T0GBfX0v77OTe6ii"
+        "url": "/v1/subscription_items?subscription=sub_0Tb1okm0T0GBfX0vIuafkiOk"
       },
-      "latest_invoice": "in_0Qv3uJm0T0GBfX0vXLZmSpZb",
+      "latest_invoice": "in_0Tb1okm0T0GBfX0vqF7bzRyM",
       "livemode": false,
-      "metadata": {
+      "managed_payments": {
+        "enabled": false
       },
+      "metadata": {},
       "next_pending_invoice_item_invoice": null,
       "on_behalf_of": null,
       "pause_collection": null,
@@ -138,7 +140,10 @@
           },
           "customer_balance": null,
           "konbini": null,
+          "payto": null,
+          "pix": null,
           "sepa_debit": null,
+          "upi": null,
           "us_bank_account": null
         },
         "payment_method_types": null,
@@ -160,8 +165,7 @@
         "interval": "month",
         "interval_count": 1,
         "livemode": false,
-        "metadata": {
-        },
+        "metadata": {},
         "meter": null,
         "nickname": null,
         "product": "prod_Rld8cRL9WZDT4c",
@@ -172,7 +176,7 @@
       },
       "quantity": 1,
       "schedule": null,
-      "start_date": 1740173835,
+      "start_date": 1779728250,
       "status": "incomplete",
       "test_clock": null,
       "transfer_data": null,
@@ -188,8 +192,8 @@
   "livemode": false,
   "pending_webhooks": 1,
   "request": {
-    "id": "req_yqOhGjYWV5WqLh",
-    "idempotency_key": "4b6c27f6-f965-422c-8f47-5e8a20c1ffd4"
+    "id": null,
+    "idempotency_key": "4b72df15-df99-44e4-82db-3d5da9704017"
   },
   "type": "customer.subscription.created"
 }
