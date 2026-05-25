@@ -45,4 +45,8 @@ class Currency
   def select_option
     "#{SYMBOLS[slug.to_sym]} (#{self.class.slug_translation(slug)})"
   end
+
+  def to_h
+    {name:, slug:, symbol:, id:}
+  end
 end
