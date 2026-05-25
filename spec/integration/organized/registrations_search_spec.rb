@@ -23,12 +23,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
-    # Remove the login flash via JS so it doesn't intercept the nav click
-    # below. The close-button click + fade-out animation has raced Capybara's
-    # default wait on slow CI runners.
-    expect(page).to have_css(".alert-success")
-    page.execute_script("document.querySelectorAll('.alert-success').forEach(el => el.remove())")
-    expect(page).to have_no_css(".alert-success")
+    find(".alert-success .close").click
+    # Wait for the flash to finish dismissing -- otherwise it overlaps and
+    # intercepts the click on the nav link below. The Bootstrap fade-out can
+    # exceed Capybara's default 2s wait on slow CI runners.
+    expect(page).to have_no_css(".alert-success", wait: 10)
     find("#passive_organization_submenu").click
     within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
     expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/, wait: 10)
