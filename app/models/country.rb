@@ -22,8 +22,8 @@ class Country < ApplicationRecord
 
   class << self
     def select_options
-      pluck(:id, :iso).map do |id, iso|
-        [I18n.t(iso, scope: :countries), id]
+      pluck(:id, :iso, :name).map do |id, iso, name|
+        [I18n.t(iso, scope: :countries, default: name), id]
       end
     end
 
