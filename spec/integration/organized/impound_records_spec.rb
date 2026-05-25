@@ -131,6 +131,11 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     end
     page.go_back
 
+    # Wait for the back-nav frame restoration to complete before opening the
+    # multi-update panel — otherwise the visibility toggle can run before the
+    # restored rows arrive and miss them.
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
+
     # Cells are hidden until the user opts into multi-update.
     expect(page).not_to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
 
