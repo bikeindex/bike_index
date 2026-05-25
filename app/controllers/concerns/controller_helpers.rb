@@ -48,7 +48,7 @@ module ControllerHelpers
 
   # TODO: make this actually use the request location
   def current_currency
-    Currency.default
+    currency_from_params || Currency.default
   end
 
   def current_country_id
@@ -421,6 +421,10 @@ module ControllerHelpers
 
   def bikehub_website_url(path = nil)
     "#{valid_partner_domain || "https://bikehub.com"}/#{path}"
+  end
+
+  def currency_from_params
+    Currency.friendly_find(params.permit(:currency)[:currency])
   end
 
   def valid_partner_domain
