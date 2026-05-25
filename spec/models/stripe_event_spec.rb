@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe StripeEvent, type: :model do
-  let(:re_record_interval) { 12.months }
+  let(:cassette_options) { {match_requests_on: [:method], re_record_interval: 12.months} }
 
   describe "update_bike_index_record!" do
     let(:event_mock) do
@@ -14,14 +14,21 @@ RSpec.describe StripeEvent, type: :model do
     let!(:stripe_price) { FactoryBot.create(:stripe_price_plus) }
 
     context "subscription stripe_checkout completed" do
+      # Need to re-record Stripe cassettes?
+      # 1. Run Stripe::UpdatePricesJob.new.perform in console to add the Stripe dev prices
+      # 2. Go to /memberships/new and purchase a plus membership
+      # 3. Go to Stripe workbench webhooks
+      # 4. Copy in the webhook fixtures
+      # Update webhooks_request_spec with anything that changed in the fixtures
       let(:webhook_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-checkout.session.completed.json"))) }
-      let(:start_at) { Time.at(1740173835) } # has to be updated when fixture is updated
+      let(:start_at) { Time.at(1779728250) } # has to be updated when fixture is updated
+      let(:email) { "test@example.bikeindex.org" } # Also update if using a different email
       let(:target_subscription) do
         {
-          email: "seth@bikeindex.org",
-          stripe_status: "canceled",
+          email:,
+          stripe_status: "active",
           stripe_price_stripe_id: stripe_price.stripe_id,
-          end_at: Time.parse("2025-03-21 16:37:15 -0500"),
+          end_at: nil,
           membership_level: "plus",
           interval: "monthly",
           test?: true
@@ -51,7 +58,7 @@ RSpec.describe StripeEvent, type: :model do
         expect(stripe_event).to be_valid
         expect(stripe_event.checkout?).to be_truthy
 
-        VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+        VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
           expect do
             stripe_event.update_bike_index_record!
           end.to change(StripeSubscription, :count).by 1
@@ -69,10 +76,10 @@ RSpec.describe StripeEvent, type: :model do
       context "called twice" do
         it "only creates the things once" do
           expect do
-            VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+            VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
               stripe_event.update_bike_index_record!
             end
-            VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+            VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
               stripe_event.update_bike_index_record!
             end
           end.to change(StripeSubscription, :count).by(1)
@@ -83,13 +90,13 @@ RSpec.describe StripeEvent, type: :model do
       end
 
       context "with user matching email" do
-        let!(:user) { FactoryBot.create(:user_confirmed, email: "seth@bikeindex.org") }
+        let!(:user) { FactoryBot.create(:user_confirmed, email:) }
         let(:target_membership) do
-          {level: "plus", status: "ended", user_id: user.id, end_at: Time.parse("2025-03-21 16:37:15 -0500")}
+          {level: "plus", status: "active", user_id: user.id}
         end
 
         it "assigns things to the user and creates a membership" do
-          VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
             expect do
               stripe_event.update_bike_index_record!
             end.to change(StripeSubscription, :count).by 1
@@ -111,7 +118,7 @@ RSpec.describe StripeEvent, type: :model do
 
         context "with a matching payment" do
           let(:stripe_subscription) { StripeSubscription.create(user:) }
-          let(:checkout_id) { "cs_test_a14VdEixSrpFjwqkENSaSEdr8THKAu5Q6wCe8tE1qJaeBB6NEAsjpYvgg4" }
+          let(:checkout_id) { "cs_test_a1XzIICn9NZ2p5RoNzP8GLCSMog4c2noU1G4d4V8sgs3MVjZxEYysztFHl" }
           let!(:payment) do
             stripe_subscription.payments.create(
               stripe_subscription.send(:payment_attrs).merge(stripe_id: checkout_id)
@@ -121,7 +128,7 @@ RSpec.describe StripeEvent, type: :model do
             Sidekiq::Job.drain_all
             ActionMailer::Base.deliveries = []
 
-            VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+            VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
               expect do
                 stripe_event.update_bike_index_record!
               end.to change(StripeSubscription, :count).by 0
@@ -134,26 +141,76 @@ RSpec.describe StripeEvent, type: :model do
           end
         end
       end
+
+      context "subscription deleted" do
+        # Optionally, update this fixture by:
+        # Cancel the subscription via the Stripe dashboard and update the customer.subscription.deleted webhook fixture
+        let(:webhook_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-customer.subscription.deleted.json"))) }
+        let!(:user) { FactoryBot.create(:user_confirmed, email:) }
+        # Stripe subscription ID is required so the existing subscription is updated
+        let(:stripe_id) { "sub_0Tb1okm0T0GBfX0vIuafkiOk" }
+        let(:end_at) { Time.at(1779739560) } # Update if fixture is updated
+        let!(:stripe_subscription) { FactoryBot.create(:stripe_subscription, user:, stripe_id:) }
+        let(:target_subscription) do
+          {
+            email:,
+            user_id: user.id,
+            stripe_status: "canceled",
+            stripe_price_stripe_id: stripe_price.stripe_id,
+            membership_level: "plus",
+            interval: "monthly",
+            test?: true,
+            stripe_id:
+          }
+        end
+        it "updates the subscription" do
+          expect do
+            stripe_event.update_bike_index_record!
+          end.to change(StripeSubscription, :count).by 0
+
+          stripe_subscription = StripeSubscription.last
+          expect(stripe_subscription).to have_attributes target_subscription
+
+          expect(stripe_subscription.payments.count).to eq 0
+          expect(stripe_subscription.membership_id).to be_present
+          expect(stripe_subscription.start_at).to be_within(1).of start_at
+          expect(stripe_subscription.end_at).to be_within(1).of end_at
+
+          membership = stripe_subscription.membership
+          expect(membership.user_id).to eq user.id
+          expect(membership.start_at).to be_within(1).of stripe_subscription.start_at
+          expect(membership.end_at).to be_within(1).of stripe_subscription.end_at
+          expect(membership.status).to eq "ended"
+        end
+      end
     end
 
-    context "subscription updated" do
+    context "subscription updated (currency CAD)" do
+      # Update these cassettes
+      # 0. Sign in as a new user
+      # 1. Go to /membership/new?currency=cad and purchase a membership
+      # 2. update the subscription.updated-cad fixture
+      # 3. Get the payment (via /admin/paments and find in console), then run payment.update_from_stripe!
+      # 4. Do payment.stripe_subscription.update_from_stripe! as well
+      # 5. Verify that the user gets redirected to Stripe when you visit /membership/edit
+      # 6. Cancel the membership
+      let(:start_at) { Time.at(1779743428) }
+      let!(:stripe_price) { FactoryBot.create(:stripe_price, interval: "monthly", amount_cents: 499, currency: "cad", stripe_id: "price_0Qs5rim0T0GBfX0vJClxbae3") }
+      let(:email) { "canada@bikeindex.org" }
       context "currency CAD" do
-        let!(:stripe_price) { FactoryBot.create(:stripe_price, interval: "yearly", amount_cents: 4999, currency: "cad", stripe_id: "price_0Qs61bm0T0GBfX0vjadfNRv8") }
         let(:webhook_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-customer.subscription.updated-cad.json"))) }
 
         it "uses currency" do
-          VCR.use_cassette("StripeEvent-update_bike_index-canadian", match_requests_on: [:method], re_record_interval: re_record_interval) do
-            expect do
-              stripe_event.update_bike_index_record!
-            end.to change(StripeSubscription, :count).by 1
-          end
+          expect do
+            stripe_event.update_bike_index_record!
+          end.to change(StripeSubscription, :count).by 1
 
           stripe_subscription = StripeSubscription.last
           expect(stripe_subscription.stripe_price_stripe_id).to eq stripe_price.stripe_id
           expect(stripe_subscription.stripe_status).to eq "active"
           expect(stripe_subscription.user_id).to be_blank
           expect(stripe_subscription.membership_id).to be_blank
-          expect(stripe_subscription.start_at).to be_within(1).of Time.at(1740271007)
+          expect(stripe_subscription.start_at).to be_within(1).of start_at
           expect(stripe_subscription.end_at).to be_blank
           expect(stripe_subscription.payments.count).to eq 0
         end
@@ -161,42 +218,45 @@ RSpec.describe StripeEvent, type: :model do
 
       context "subscription canceled" do
         let(:webhook_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-customer.subscription.updated-canceled.json"))) }
-        let!(:user) { FactoryBot.create(:user_confirmed, email: "seth@bikeindex.org") }
-        let(:stripe_id) { "sub_0Qv3uJm0T0GBfX0v77OTe6ii" }
+        let!(:user) { FactoryBot.create(:user_confirmed, email:) }
+        let(:stripe_id) { "sub_0Tb5lYm0T0GBfX0vaZSYvmP7" }
+        let(:end_at) { Time.at(1782421828) } # cancel_at from the fixture
         let!(:stripe_subscription) { FactoryBot.create(:stripe_subscription, user:, stripe_id:) }
         let(:target_subscription) do
           {
-            email: "seth@bikeindex.org",
+            email:,
             user_id: user.id,
             stripe_status: "active",
             stripe_price_stripe_id: stripe_price.stripe_id,
-            membership_level: "plus",
+            membership_level: "basic",
             interval: "monthly",
+            currency_enum: "cad",
             test?: true,
             stripe_id: # sanity check. Manually set, needs to be pulled from the cassette
           }
         end
+        # When you initially record, the cancellation is in the future
+        let(:target_status) { (Time.current > end_at) ? "ended" : "active" }
         it "updates the subscription" do
           # Don't re-record to prevent having to update tests
-          VCR.use_cassette("StripeEvent-update_bike_index-cancel", match_requests_on: [:method]) do
-            expect do
-              stripe_event.update_bike_index_record!
-            end.to change(StripeSubscription, :count).by 0
-          end
+          expect do
+            stripe_event.update_bike_index_record!
+          end.to change(StripeSubscription, :count).by 0
 
           stripe_subscription = StripeSubscription.last
           expect(stripe_subscription).to have_attributes target_subscription
 
           expect(stripe_subscription.payments.count).to eq 0
           expect(stripe_subscription.membership_id).to be_present
-          expect(stripe_subscription.start_at).to be_within(1).of Time.at(1740173835)
-          expect(stripe_subscription.end_at).to be_within(1).of Time.at(1742593035)
+          expect(stripe_subscription.start_at).to be_within(1).of start_at
+
+          expect(stripe_subscription.end_at).to be_within(1).of end_at
 
           membership = stripe_subscription.membership
           expect(membership.user_id).to eq user.id
           expect(membership.start_at).to be_within(1).of stripe_subscription.start_at
           expect(membership.end_at).to be_within(1).of stripe_subscription.end_at
-          expect(membership.status).to eq "ended"
+          expect(membership.status).to eq target_status
         end
       end
     end
