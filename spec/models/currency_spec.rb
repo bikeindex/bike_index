@@ -34,9 +34,7 @@ RSpec.describe Currency, type: :model do
     end
 
     it "creates with name" do
-      currency = Currency.new("CAD")
-      # pp currency.slice(:name, :symbol, :slug)
-      expect(currency.to_h).to eq(target)
+      expect(Currency.new("CAD").to_h).to eq(target)
       expect(Currency.friendly_find("cad").to_h).to eq target
     end
 
