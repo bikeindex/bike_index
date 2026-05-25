@@ -29,6 +29,7 @@
 <% unless skip_to_see %>
   <p>
     <% sign_up = t(".sign_up") %>
-    <%= t(".to_see_your_bike_sign_up_html", bike_type: bike.type, sign_up_link: link_to(sign_up, new_user_url)) %>
+    <% sign_up_url = new_user_url(email: ownership.owner_email, return_to: bike_path(bike, t: ownership.token, email: ownership.owner_email)) %>
+    <%= t(".to_see_your_bike_sign_up_html", bike_type: bike.type, sign_up_link: link_to(sign_up, sign_up_url)) %>
   </p>
 <% end %>

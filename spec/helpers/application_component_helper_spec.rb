@@ -75,6 +75,25 @@ RSpec.describe ApplicationComponentHelper, type: :helper do
       end
     end
 
+    context "with current_currency CAD" do
+      let(:payment) { Payment.new(amount_cents: 25000, currency: "CAD") }
+      let(:target) { '<span><span title="CAD">$</span><span class="">250</span></span>' }
+      before { allow(view).to receive(:current_currency) { Currency.new(:cad) } }
+
+      it "suppresses the suffix when :if_not_default matches current_currency" do
+        expect(helper.amount_display(payment, currency_name_suffix: :if_not_default)).to eq target
+      end
+
+      context "with USD payment" do
+        let(:payment) { Payment.new(amount_cents: 150000) }
+        let(:target) { '<span><span title="USD">$</span><span class="">1,500</span><span class="tw:text-[66%]"> USD</span></span>' }
+
+        it "renders the suffix when payment currency differs from current_currency" do
+          expect(helper.amount_display(payment, currency_name_suffix: :if_not_default)).to eq target
+        end
+      end
+    end
+
     context "with zero amount" do
       let(:payment) { Payment.new(amount_cents: 0) }
 

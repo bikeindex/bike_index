@@ -93,14 +93,13 @@
       = f.label :direct_unclaimed_notifications do
         Send emails directly to unclaimed bike owners
         %small.less-strong don't require org to forward
-    .form-group.fancy-select.unfancy.no-restore-on-backspace
-      = f.label :parent_organization_id do
+    .form-group
+      - parent_org_label = capture do
         Parent organization
         %small.less-strong
           %strong.text-danger (probably) do not add parents!
           Parents must be part of the same organization
-
-      = f.collection_select(:parent_organization_id, Organization.with_enabled_feature_slugs("child_organizations"), :id, :name, {prompt: "Choose organization", required: false}, class: "form-control")
+      = render Form::Combobox::Component.new(name: :parent_organization_id, form: f, label: parent_org_label, placeholder: "Choose organization", include_blank: true, options: Organization.with_enabled_feature_slugs("child_organizations").pluck(:name, :id))
       %small
         %strong Use the "regional" feature instead.
         %em To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.
@@ -123,11 +122,11 @@
     - if @organization.id.present?
       - emails = @organization.users.pluck(:email)
       - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
-      .form-group.fancy-select.unfancy
-        = f.label :embedable_user_email do
+      .form-group
+        - embedable_label = capture do
           Auto user email
           %small.less-strong embed registration email
-        = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
+        = render Form::Combobox::Component.new(name: :embedable_user_email, form: f, label: embedable_label, placeholder: "Select email", value: @embedable_email, include_blank: true, options: emails)
         %small.less-strong
           - if @organization.organization_roles.count == 0
             You can use #{ENV['AUTO_ORG_MEMBER']} if
@@ -141,9 +140,8 @@
             if checked, we will start email their customers theft surveys
 
     - if @organization.official_manufacturer?
-      .form-group.fancy-select.unfancy
-        = f.label :manufacturer
-        = collection_select(:organization, :manufacturer_id, Manufacturer.frame_makers, :id, :name, {}, {required: true, class: "form-control"})
+      .form-group
+        = render Form::Combobox::Component.new(name: :manufacturer_id, form: f, label: Organization.human_attribute_name(:manufacturer), required: true, options: Manufacturer.frame_makers.pluck(:name, :id))
         %small
           %strong This organization has <code>Official manufacturer organization</code> enabled.
           Select a manufacturer to give them manufacturer access.

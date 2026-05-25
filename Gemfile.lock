@@ -462,8 +462,8 @@ GEM
     language_server-protocol (3.17.0.5)
     launchy (2.5.2)
       addressable (~> 2.8)
-    letter_opener (1.8.1)
-      launchy (>= 2.2, < 3)
+    letter_opener (1.10.0)
+      launchy (>= 2.2, < 4)
     lint_roller (1.1.0)
     listen (3.10.0)
       logger
@@ -616,7 +616,7 @@ GEM
       date
       stringio
     public_suffix (7.0.5)
-    puma (7.1.0)
+    puma (8.0.1)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.2.6)
