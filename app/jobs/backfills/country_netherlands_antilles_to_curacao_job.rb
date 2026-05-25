@@ -7,6 +7,21 @@ module Backfills
     TABLES = [AddressRecord, ExternalRegistryBike, ParkingNotification, SocialAccount].freeze
 
     def perform
+      sync_names
+      migrate_netherlands_antilles
+    end
+
+    private
+
+    def sync_names
+      StatesAndCountries.countries.each do |attrs|
+        country = Country.find_by(iso: attrs[:iso])
+        next if country.nil? || country.name == attrs[:name]
+        country.update!(name: attrs[:name])
+      end
+    end
+
+    def migrate_netherlands_antilles
       antilles = Country.find_by(iso: "AN")
       return if antilles.nil?
 

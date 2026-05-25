@@ -10,6 +10,19 @@ RSpec.describe Backfills::CountryNetherlandsAntillesToCuracaoJob, type: :job do
       end
     end
 
+    context "with a country whose name has drifted from StatesAndCountries" do
+      let!(:stale_macedonia) { Country.create!(name: "Macedonia, The Former Yugoslav Republic of", iso: "MK") }
+      let!(:stale_swaziland) { Country.create!(name: "Swaziland", iso: "SZ") }
+      let!(:already_synced) { Country.create!(name: "Germany", iso: "DE") }
+
+      it "updates names to match StatesAndCountries (by iso) and leaves synced rows alone" do
+        expect { instance.perform }
+          .to change { stale_macedonia.reload.name }.to("North Macedonia")
+          .and change { stale_swaziland.reload.name }.to("Eswatini")
+        expect(already_synced.reload.name).to eq("Germany")
+      end
+    end
+
     context "with Netherlands Antilles country and referencing rows" do
       let!(:antilles) { Country.create!(name: "Netherlands Antilles", iso: "AN") }
       let!(:stolen_record) { FactoryBot.create(:stolen_record, country_id: antilles.id) }
