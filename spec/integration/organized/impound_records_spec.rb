@@ -59,7 +59,8 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     find(".alert-success .close").click
     # Wait for the dismissed flash to finish fading out — otherwise the
     # fixed-position alert can intercept the org submenu/nav clicks below.
-    expect(page).to have_no_css(".alert-success")
+    # The Bootstrap fade-out can exceed Capybara's default 2s wait on slow CI.
+    expect(page).to have_no_css(".alert-success", wait: 10)
     find("#passive_organization_submenu").click
     within(".current-organization-submenu") { click_link "Impounded Bikes" }
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
@@ -130,6 +131,11 @@ RSpec.describe "Organized impound records index", :js, type: :system do
       expect(page).not_to have_content("9002")
     end
     page.go_back
+
+    # Wait for the back-nav frame restoration to complete before opening the
+    # multi-update panel — otherwise the visibility toggle can run before the
+    # restored rows arrive and miss them.
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
 
     # Cells are hidden until the user opts into multi-update.
     expect(page).not_to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
