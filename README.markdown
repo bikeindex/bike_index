@@ -45,7 +45,7 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
 | Toggle in development | command                       | default  |
 | ---------             | -------                       | -------  |
 | Caching               | `bundle exec rails dev:cache` | disabled |
-| [letter_opener][]     | `bin/rake dev:letter_opener`  | enabled  |
+| [letter_opener][]     | `bin/rake dev:letter_opener`  | disabled |
 | logging with lograge  | `bin/rake dev:lograge`        | enabled  |
 
 [letter_opener]: https://github.com/ryanb/letter_opener
