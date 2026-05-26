@@ -42,7 +42,7 @@ module Search
             id: "hw_search_for_option",
             value: @q,
             display: @q,
-            content: safe_join([translation(".search_for"), " ", tag.span(@q, class: "label")])
+            content: safe_join([tag.span(translation(".search_for"), class: "sch_"), " ", tag.span(@q, class: "label")])
           }
         end
 
@@ -51,9 +51,16 @@ module Search
 
           case match["category"]
           when "propulsion"
-            tag.span safe_join([translation(".search_for"), " ", tag.strong(text), " only"])
+            tag.span safe_join([
+              tag.span(translation(".search_for"), class: "sch_"), " ",
+              tag.strong(text),
+              tag.span(" only", class: "sch_")
+            ])
           when "cycle_type"
-            tag.span safe_join([translation(".search_only_for"), " ", tag.strong(text)])
+            tag.span safe_join([
+              tag.span(translation(".search_only_for"), class: "sch_"), " ",
+              tag.strong(text)
+            ])
           else
             safe_join([option_prefix(match), " ", tag.span(text, class: "label")])
           end
@@ -72,7 +79,7 @@ module Search
           when "cmp_mnfg", "frame_mnfg"
             tag.span("#{@search_obj_name} #{translation(".made_by")}", class: "sch_")
           else
-            translation(".search_for")
+            tag.span(translation(".search_for"), class: "sch_")
           end
         end
 
