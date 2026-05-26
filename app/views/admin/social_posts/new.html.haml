@@ -17,12 +17,12 @@
       .card-body
         .row
           .col-md-6
-            .form-group.fancy-select.unfancy
-              = f.label :social_account_id do
+            .form-group
+              - account_label = capture do
                 Account
                 %small.less-strong
                   will send the original post
-              = f.collection_select(:social_account_id, SocialAccount.all, :id, :screen_name, { prompt: "Choose  " }, { class: "form-control" })
+              = render Form::Combobox::Component.new(name: :social_account_id, form: f, label: account_label, placeholder: "Choose  ", include_blank: true, options: SocialAccount.all.pluck(:screen_name, :id))
               .form-group.avatar-upload
                 = f.label :image, 'Post photo', class: 'control-label'
                 .avatar-img

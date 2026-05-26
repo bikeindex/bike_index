@@ -41,6 +41,15 @@ RSpec.describe BikeV2Serializer do
       expect(serializer.as_json(root: false)).to eq target
     end
 
+    # Regression: each Bike#image_url issues a public_images SQL query, and
+    # the serializer used to invoke it twice per bike — at per_page=100 on
+    # /api/v3/search that blew Rack::Timeout.
+    it "calls Bike#image_url once per serialization" do
+      bike.reload
+      expect(bike).to receive(:image_url).once.and_call_original
+      serializer.as_json(root: false)
+    end
+
     context "stolen bike" do
       let(:bike) { FactoryBot.create(:stolen_bike_in_nyc, :with_ownership) }
       let(:target_stolen) do
