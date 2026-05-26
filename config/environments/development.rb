@@ -41,12 +41,12 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.default_url_options = {host: "localhost", port: ENV.fetch("DEV_PORT", 3042).to_i}
   routes.default_url_options = config.action_mailer.default_url_options
-  if Rails.root.join("tmp", "skip-letter_opener.txt").exist?
-    config.action_mailer.perform_deliveries = false
-    config.action_mailer.delivery_method = :smtp
-  else
+  if Rails.root.join("tmp", "enable-letter_opener.txt").exist?
     config.action_mailer.perform_deliveries = true
     config.action_mailer.delivery_method = :letter_opener
+  else
+    config.action_mailer.perform_deliveries = false
+    config.action_mailer.delivery_method = :smtp
   end
 
   # Print deprecation notices to the Rails logger.
