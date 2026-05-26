@@ -15,15 +15,16 @@ Capybara.configure do |config|
   config.javascript_driver = :chrome_headless
 end
 
-# Pin Capybara's app server to a predictable host:port derived from DEV_PORT
-# so it doesn't collide with a developer's running `bin/dev` (which binds
-# DEV_PORT itself). Without a pinned port, Capybara picks a random one and
-# any compiled asset that bakes `<%= ENV['BASE_URL'] %>` into its content
-# (e.g. `revised/components/manufacturers_select.coffee.erb`'s autocomplete
-# URL) points at a host the browser can't reach.
+# Pin Capybara's app server to a predictable host:port. Defaults to
+# DEV_PORT + 2000 so it doesn't collide with a developer's running
+# `bin/dev` (which binds DEV_PORT itself); override with CAPYBARA_PORT
+# when the test infrastructure needs to know the port up front (e.g. CI's
+# `assets:precompile` step needs a matching BASE_URL so any ERB-baked
+# asset URL resolves to the same host the browser will hit).
+CAPYBARA_PORT = (ENV["CAPYBARA_PORT"] || ENV.fetch("DEV_PORT", "3042").to_i + 2000).to_i
 Capybara.server_host = "localhost"
-Capybara.server_port = ENV.fetch("DEV_PORT", "3042").to_i + 2000
-Capybara.app_host = "http://#{Capybara.server_host}:#{Capybara.server_port}"
+Capybara.server_port = CAPYBARA_PORT
+Capybara.app_host = "http://#{Capybara.server_host}:#{CAPYBARA_PORT}"
 Capybara.always_include_port = true
 
 # Keep BASE_URL aligned with Capybara's server for `:js` specs so any
