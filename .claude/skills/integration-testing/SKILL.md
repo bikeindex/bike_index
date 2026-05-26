@@ -2,18 +2,17 @@
 name: integration-testing
 description: >-
   Bike Index conventions for browser specs (`type: :system, :js`)
-  — **always drive the spec through the real user-facing UI path**
-  (no FactoryBot shortcuts for setup the user would actually perform,
-  no `execute_script` bypasses for tricky widgets), every example
-  pays a Selenium boot cost so bias hard toward fewer, denser examples
-  that walk through state via clicks, prefer named-element matchers
-  over CSS selectors, and combine same-setup work into one `it` even
-  when scenarios feel independent. **Consult this skill any time you
-  create or modify a `:js, type: :system` spec** — that includes
-  everything under `spec/integration/` AND component system specs at
-  `spec/components/**/*_system_spec.rb`; the rules apply equally to
-  both. Read alongside the `rspec-testing` skill for the project's
-  general `context`/`let` style.
+  — **drive every step through the real UI** (no FactoryBot or
+  `execute_script` shortcuts to skip what a user would do), every
+  example pays a Selenium boot cost so bias toward fewer, denser
+  examples that walk through state via clicks, prefer named-element
+  matchers over CSS selectors, and combine same-setup work into one
+  `it` even when scenarios feel independent. **Consult this skill
+  any time you create or modify a `:js, type: :system` spec** —
+  that includes everything under `spec/integration/` AND component
+  system specs at `spec/components/**/*_system_spec.rb`. Read
+  alongside the `rspec-testing` skill for the project's general
+  `context`/`let` style.
 ---
 
 # Integration testing in Bike Index
@@ -24,19 +23,11 @@ The general `context`/`let` style and "what to test" rules are in the [`rspec-te
 
 ## Always follow the real user path
 
-This is the cardinal rule. The whole reason a system spec exists — over a cheaper request/model spec — is to verify the user-facing flow end-to-end. **If a user does it in the UI, the spec does it in the UI.** No FactoryBot shortcuts for state the user would build by clicking. No `execute_script` to drive widgets the user would type into. No visiting pre-baked URLs to skip a screen the user would navigate through.
+If a user does it in the UI, the spec does it in the UI — every step, including setup. `FactoryBot.create(:bike, …)` to skip a complicated form turns the spec back into a model test and passes silently when the form is broken.
 
-**This applies to every step the example claims to cover**, including setup. If your spec describes "user signs in, registers a bike, follows the email link, signs up," then sign-in is a form submission, registration is the full bike form (manufacturer autocomplete and all), the email link is extracted from the actual delivered mail, and signup is the real form. Don't `FactoryBot.create(:bike, …)` to skip the bike form — the spec stops being an integration test the moment any of those steps becomes a model-layer shortcut.
+If the UI path is hard or flaky, that's a real signal — usually a production bug (stale asset cache, missing seed data, wrong API URL). Fix the root cause; don't `execute_script` or factory around it.
 
-**If the user path is hard to drive, that's a signal, not an excuse.** Common temptations and the right response:
-
-- "Selectize/select2/autocomplete is flaky from Capybara" → drive the widget through its real UI (click, type, wait for the option, click it). If the dropdown never populates, debug *why* — the underlying bug is usually real (stale asset cache, missing seed data, wrong API URL, etc.) and worth fixing for production too.
-- "Setting up this state through the UI takes 20 lines of clicking" → that's the integration spec working as intended; combine it with other assertions into one example (see "One `it` per setup") so the cost is paid once.
-- "Just this one step via FactoryBot, then the rest through the UI" → no. The hybrid spec gives false confidence: it passes when the UI step is broken, because the UI step never ran.
-
-When you find yourself reaching for an `execute_script` to set a value, a `FactoryBot.create` to skip a screen, or a constructed URL to jump past a redirect — stop, identify what's blocking the real path, and fix that instead. Production code bugs surfaced by integration specs are the integration spec doing its job.
-
-The only legitimate exceptions are infrastructure the user wouldn't perform — seeding base reference data (color/cycle-type lookup tables that exist in production from migrations), creating an admin account that exists outside the user-facing flow, or stubbing genuinely external services (third-party APIs, Stripe, geocoders). When in doubt, ask: "would a real user have done this step before reaching the part I'm testing?" If yes, do it in the UI.
+Legitimate exceptions: reference data that exists in production via migrations, admin accounts outside the user flow, and stubs for genuinely external services (third-party APIs, Stripe, geocoders).
 
 ## One `it` per setup; many assertions per `it`
 
