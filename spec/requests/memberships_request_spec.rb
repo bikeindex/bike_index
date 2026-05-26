@@ -22,6 +22,15 @@ RSpec.describe MembershipsController, type: :request do
           expect(assigns(:referral_source)).to eq "EMAIL_CAMPAIGN_2025_03_09_04_39"
         end
       end
+      context "with currency=cad" do
+        it "renders with CAD" do
+          get "#{base_url}/new?currency=cad"
+          expect(response.code).to eq("200")
+          expect(response).to render_template("new")
+          expect(flash).to_not be_present
+          expect(response.body).to match(/name="currency"[^>]*value="cad"/)
+        end
+      end
     end
     context "with user" do
       include_context :request_spec_logged_in_as_user
