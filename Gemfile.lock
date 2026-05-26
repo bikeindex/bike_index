@@ -235,8 +235,8 @@ GEM
     down (5.4.2)
       addressable (~> 2.8)
     drb (2.2.3)
-    dry-configurable (1.3.0)
-      dry-core (~> 1.1)
+    dry-configurable (1.4.0)
+      dry-core (~> 1.0)
       zeitwerk (~> 2.6)
     dry-core (1.2.0)
       concurrent-ruby (~> 1.0)
@@ -348,8 +348,8 @@ GEM
     google-protobuf (4.34.0-x86_64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
-    grape (3.1.1)
-      activesupport (>= 7.1)
+    grape (3.2.1)
+      activesupport (>= 7.2)
       dry-configurable
       dry-types (>= 1.1)
       mustermann-grape (~> 1.1.0)
@@ -530,8 +530,7 @@ GEM
     msgpack (1.8.0)
     multi_json (1.20.1)
     multipart-post (2.4.1)
-    mustermann (3.0.4)
-      ruby2_keywords (~> 0.0.1)
+    mustermann (4.0.0)
     mustermann-grape (1.1.0)
       mustermann (>= 1.0.0)
     naught (1.1.0)
@@ -912,7 +911,7 @@ GEM
       nokogiri (~> 1.8)
     yaml (0.4.0)
     yard (0.9.38)
-    zeitwerk (2.8.1)
+    zeitwerk (2.8.2)
 
 PLATFORMS
   arm64-darwin
