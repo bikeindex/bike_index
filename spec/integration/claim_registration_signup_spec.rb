@@ -2,31 +2,24 @@
 
 require "rails_helper"
 
+# This spec covers the claim-via-email signup path: a signed-in user has a bike
+# registered to someone else's email, the recipient follows the link from the
+# claim email and signs up, and the bike is auto-claimed without requiring a
+# separate confirmation-email round-trip. The bike-creation form itself is
+# covered by spec/requests/bikes/create_request_spec.rb.
 RSpec.describe "Claim registration signup", :js, type: :system do
   let(:registrar) { FactoryBot.create(:user_confirmed) }
   let(:claimer_email) { "claimer@example.com" }
-  let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
-  let!(:black) { Color.black }
+  let(:bike) { FactoryBot.create(:bike, creator: registrar, owner_email: claimer_email) }
+  let!(:ownership) { FactoryBot.create(:ownership, bike:, creator: registrar, owner_email: claimer_email) }
 
   before do
-    Autocomplete::Loader.clear_redis
-    Autocomplete::Loader.load_all(%w[Manufacturer])
-    # Avoid ReadOnlyError on the bike show page in test mode
+    # Avoid ReadOnlyError when the bike show page touches gear types
     RearGearType.fixed
     FrontGearType.fixed
   end
 
-  def selectize_for(field_id)
-    find("##{field_id}", visible: :all).find(:xpath, "./following-sibling::div[contains(@class, 'selectize-control')][1]")
-  end
-
-  def pick_selectize_option(field_id, text)
-    container = selectize_for(field_id)
-    container.find(".selectize-input").click
-    container.find(".selectize-dropdown-content .option", text: text, wait: 5).click
-  end
-
-  it "registers a bike to another email, signs out, and the recipient signs up via the claim email link" do
+  it "auto-confirms and claims after the recipient follows the email link and signs up" do
     # Sign in as the registrar
     visit new_session_path
     fill_in "Email", with: registrar.email
@@ -34,36 +27,16 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     click_button "Log in"
     expect(page).to have_content("Logged in", wait: 5)
 
-    # Register a bike to a different owner email
-    visit "/bikes/new"
-    fill_in "Serial number", with: "ABC123XYZ"
-
-    # Manufacturer field is a text input enhanced by selectize + remote autocomplete
-    manufacturer_box = selectize_for("bike_manufacturer_id")
-    manufacturer_box.find(".selectize-input").click
-    manufacturer_box.find(".selectize-input input").set("Surly")
-    expect(page).to have_css(".selectize-dropdown-content .option", text: "Surly", wait: 5)
-    find(".selectize-dropdown-content .option", text: "Surly").click
-
-    pick_selectize_option("bike_primary_frame_color_id", "Black")
-    fill_in "Owner email", with: claimer_email
-
-    expect {
-      click_button "Register"
-      expect(page).to have_content("successfully added", wait: 10)
-    }.to change(Email::OwnershipInvitationJob.jobs, :count).by(1)
-
-    bike = Bike.last
-    ownership = bike.current_ownership
     expect(ownership.owner_email).to eq claimer_email
-    expect(ownership.creator_id).to eq registrar.id
     expect(ownership.claimed?).to be_falsey
     expect(ownership.token).to be_present
 
-    # Deliver the claim email and grab the "Claim the bike" link out of the body.
-    # That link points to the bike show page with the ownership token; visiting it
-    # primes session[:claim_token_email] so the subsequent signup auto-confirms.
-    Email::OwnershipInvitationJob.drain
+    # Send the claim email and grab the "Claim the bike" link out of the body.
+    # That link points to the bike show page with the ownership token; visiting
+    # it primes session[:claim_token_email] so the subsequent signup auto-confirms.
+    expect {
+      Email::OwnershipInvitationJob.new.perform(ownership.id)
+    }.to change(ActionMailer::Base.deliveries, :count).by(1)
     mail = ActionMailer::Base.deliveries.last
     expect(mail.to).to include claimer_email
     body = mail.html_part&.body&.decoded || mail.body.decoded
