@@ -28,7 +28,7 @@ class PublicImage < ApplicationRecord
     photo_of_receipt: 6
   }.freeze
 
-  mount_uploader :image, ImageUploader # Not processed in background, because they are uploaded directly
+  mount_uploader :image, PublicImageUploader # Not processed in background, because they are uploaded directly
 
   enum :kind, KIND_ENUM
 

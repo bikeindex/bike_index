@@ -557,7 +557,7 @@ GEM
     oj (3.16.16)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
-    openssl (4.0.0)
+    openssl (4.0.2)
     ostruct (0.6.3)
     pagy (43.2.1)
       json

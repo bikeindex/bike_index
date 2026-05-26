@@ -52,8 +52,12 @@ export class CollapseUtils {
    * @param {number} duration - Animation duration in milliseconds
    */
   static show (element, duration) {
-    // Return early if already visible
-    if (this.isVisible(element)) return
+    // Cancel any in-flight hide() finalizer so it doesn't stamp tw:hidden! on us.
+    this._cancelFinalizer(element)
+    // Bail if already fully shown — but isVisible alone isn't enough: a hide()
+    // mid-transition still has display:block/visibility:visible until its finalizer
+    // adds tw:hidden!, yet tw:scale-y-0 means the element is collapsed to 0.
+    if (this.isVisible(element) && !element.classList.contains('tw:scale-y-0')) return
     // Remove the hidden
     element.classList.remove('tw:hidden!', 'tw:hidden')
     // First, ensure the hidden attributes are set
@@ -67,8 +71,9 @@ export class CollapseUtils {
     element.style.height = `${element.scrollHeight}px`
 
     // After transition is complete, remove explicit height (clean up afterward)
-    setTimeout(() => {
+    element._collapseFinalizer = setTimeout(() => {
       element.style.height = ''
+      element._collapseFinalizer = null
     }, duration)
   }
 
@@ -78,6 +83,7 @@ export class CollapseUtils {
    * @param {number} duration - Animation duration in milliseconds
    */
   static hide (element, duration) {
+    this._cancelFinalizer(element)
     // Return early if already hidden
     if (!this.isVisible(element)) return
 
@@ -91,9 +97,17 @@ export class CollapseUtils {
     element.style.height = '0px'
 
     // After transition completes, add display: none to remove element from the flow
-    setTimeout(() => {
+    element._collapseFinalizer = setTimeout(() => {
       element.classList.add('tw:hidden!')
+      element._collapseFinalizer = null
     }, duration)
+  }
+
+  static _cancelFinalizer (element) {
+    if (element._collapseFinalizer) {
+      clearTimeout(element._collapseFinalizer)
+      element._collapseFinalizer = null
+    }
   }
 
   /**
