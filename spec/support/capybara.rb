@@ -26,14 +26,10 @@ Capybara.server_port = ENV.fetch("DEV_PORT", "3042").to_i + 2000
 Capybara.app_host = "http://#{Capybara.server_host}:#{Capybara.server_port}"
 Capybara.always_include_port = true
 
-# Align BASE_URL with Capybara's port so any ERB-interpolated asset URL
-# (`<%= ENV['BASE_URL'] %>...`) that gets dynamically compiled during the
-# test run targets the Capybara server. Overrides the "http://test.host"
-# default set in rails_helper.
-ENV["BASE_URL"] = Capybara.app_host
-
 # Keep BASE_URL aligned with Capybara's server for `:js` specs so any
-# `*_url` helper rendered during the example matches the page origin.
+# `*_url` helper rendered during the example -- or ERB-interpolated asset
+# (`<%= ENV['BASE_URL'] %>...`) that gets sprockets-compiled on demand --
+# targets the Capybara server.
 RSpec.configure do |config|
   config.around(:each, :js) do |example|
     original_base_url = ENV["BASE_URL"]
