@@ -115,6 +115,14 @@ RSpec.describe Membership, type: :model do
         expect(active_membership.reload.status).to eq "ended"
         expect(FactoryBot.build(:membership, user:, creator: nil)).to be_valid
       end
+
+      it "allows a new active membership when the sibling has its own stripe_subscription" do
+        # Unusual but legitimate: each membership tied to its own subscription.
+        FactoryBot.create(:stripe_subscription, user:, stripe_status: "active",
+          stripe_id: "sub_sibling", membership: active_membership)
+        expect(active_membership.reload.stripe_subscriptions.count).to eq 1
+        expect(FactoryBot.build(:membership, user:, creator: nil)).to be_valid
+      end
     end
   end
 
