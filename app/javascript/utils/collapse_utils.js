@@ -54,6 +54,10 @@ export class CollapseUtils {
   static show (element, duration) {
     // Cancel any in-flight hide() finalizer so it doesn't stamp tw:hidden! on us.
     this._cancelFinalizer(element)
+    // Bail if already fully shown — but isVisible alone isn't enough: a hide()
+    // mid-transition still has display:block/visibility:visible until its finalizer
+    // adds tw:hidden!, yet tw:scale-y-0 means the element is collapsed to 0.
+    if (this.isVisible(element) && !element.classList.contains('tw:scale-y-0')) return
     // Remove the hidden
     element.classList.remove('tw:hidden!', 'tw:hidden')
     // First, ensure the hidden attributes are set
@@ -80,6 +84,8 @@ export class CollapseUtils {
    */
   static hide (element, duration) {
     this._cancelFinalizer(element)
+    // Return early if already hidden
+    if (!this.isVisible(element)) return
 
     // Always add transition classes (moving toward a more generalizable collapse method)
     element.classList.add('tw:transition-all', `tw:duration-${duration}`)
