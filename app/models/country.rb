@@ -16,15 +16,14 @@ class Country < ApplicationRecord
   CANADA_ID = Rails.env.test? ? nil : 38
 
   has_many :stolen_records
-  has_many :locations
 
   validates_presence_of :name
   validates_uniqueness_of :name, :iso
 
   class << self
     def select_options
-      pluck(:id, :iso).map do |id, iso|
-        [I18n.t(iso, scope: :countries), id]
+      pluck(:id, :iso, :name).map do |id, iso, name|
+        [I18n.t(iso, scope: :countries, default: name), id]
       end
     end
 
