@@ -108,7 +108,7 @@ module BikeServices
 
     def matching_serial
       if @params[:serial].present?
-        @bikes = Bike.where("serial_normalized @@ ?", @normer.normalized)
+        @bikes = Bike.where("to_tsvector('simple', serial_normalized) @@ plainto_tsquery('simple', ?)", @normer.normalized)
       end
       @bikes
     end
