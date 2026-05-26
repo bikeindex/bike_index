@@ -35,6 +35,8 @@ class Membership < ApplicationRecord
 
   validate :no_current_stripe_subscription_admin_managed
   validates :user, presence: true, on: :create
+  validates :user_id, uniqueness: {conditions: -> { where(status: %w[pending active]) }},
+    if: -> { user_id.present? && (pending? || active?) }
 
   attr_accessor :user_email, :set_interval
   delegate :stripe_id, :stripe_portal_session, :stripe_admin_url,
