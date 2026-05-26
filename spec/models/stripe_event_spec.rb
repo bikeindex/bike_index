@@ -190,7 +190,7 @@ RSpec.describe StripeEvent, type: :model do
       # 0. Sign in as a new user
       # 1. Go to /membership/new?currency=cad and purchase a membership
       # 2. update the subscription.updated-cad fixture
-      # 3. Get the payment (via /admin/paments and find in console), then run payment.update_from_stripe!
+      # 3. Get the payment (via /admin/payments and find in console), then run payment.update_from_stripe!
       # 4. Do payment.stripe_subscription.update_from_stripe! as well
       # 5. Verify that the user gets redirected to Stripe when you visit /membership/edit
       # 6. Cancel the membership

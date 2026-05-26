@@ -1,7 +1,7 @@
 %h1 New Organizaton
 
 
-= form_for [:admin, @organization] do |f|
+= form_for [:admin, @organization], html: {data: {controller: "admin--organization-form"}} do |f|
   = render partial: 'form', locals: { f: f }
 
   .row
