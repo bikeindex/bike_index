@@ -49,8 +49,10 @@ body.dark .hw-combobox {
 /* Wrap long option labels onto multiple lines instead of truncating with the
    gem's default ellipsis - matters most on mobile, where the dropdown is
    viewport-width and "Registrations made by Black Diamond Equipment" etc.
-   otherwise get cut off mid-name. */
-.hw-combobox__option {
+   otherwise get cut off mid-name. The descendant selector bumps specificity
+   over the gem's `.hw-combobox__option { white-space: nowrap }` (gem CSS is
+   loaded after Tailwind via hw_combobox_style_tag in the component body). */
+.hw-combobox .hw-combobox__option {
   white-space: normal;
   overflow-wrap: anywhere;
 }
