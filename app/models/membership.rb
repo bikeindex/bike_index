@@ -35,8 +35,8 @@ class Membership < ApplicationRecord
 
   validate :no_current_stripe_subscription_admin_managed
   validates :user, presence: true, on: :create
-  validates :user_id, uniqueness: {conditions: -> { where(status: %w[pending active]) }},
-    if: -> { user_id.present? && (pending? || active?) }
+  validates :user_id, uniqueness: {conditions: -> { not_ended }},
+    if: -> { user_id.present? && not_ended? }
 
   attr_accessor :user_email, :set_interval
   delegate :stripe_id, :stripe_portal_session, :stripe_admin_url,
@@ -61,7 +61,7 @@ class Membership < ApplicationRecord
     return @current_stripe_subscription if defined?(@current_stripe_subscription)
 
     subscriptions = stripe_subscriptions.order(:id)
-    @current_stripe_subscription = subscriptions.active.first || subscriptions.last
+  @current_stripe_subscription = subscriptions.active.first || subscriptions.last
   end
 
   def level_humanized
@@ -74,6 +74,10 @@ class Membership < ApplicationRecord
 
   def stripe_managed?
     !admin_managed?
+  end
+
+  def not_ended?
+    !ended?
   end
 
   def update_from_stripe!
