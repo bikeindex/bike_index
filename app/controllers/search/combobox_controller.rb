@@ -14,7 +14,8 @@ module Search
         Search::EverythingCombobox::Options::Component.new(
           matches:,
           search_obj_name: params[:search_obj_name].presence || "Registrations",
-          next_page:
+          next_page:,
+          q: params[:q]
         )
       )
     end

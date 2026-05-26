@@ -34,6 +34,28 @@ RSpec.describe Search::EverythingCombobox::Options::Component, type: :component 
     end
   end
 
+  context "with a query" do
+    let(:matches) { [{"search_id" => "c_1", "text" => "Blue", "category" => "colors", "display" => "#00f"}] }
+    let(:rendered) { render_inline(described_class.new(matches:, search_obj_name: "Registrations", next_page: nil, q: "blu")) }
+
+    it "appends a 'Search for' synthetic option after the real matches" do
+      options = rendered.css(".hw-combobox__option")
+      expect(options.size).to eq 2
+      expect(options.last.attr("id")).to eq "hw_search_for_option"
+      expect(options.last.text).to include("Search for")
+      expect(options.last.css(".label").text).to eq "blu"
+    end
+
+    context "on a non-first page" do
+      it "omits the synthetic option" do
+        rendered = with_request_url("/search/combobox/options?page=2") do
+          render_inline(described_class.new(matches:, search_obj_name: "Registrations", next_page: nil, q: "blu"))
+        end
+        expect(rendered.css("#hw_search_for_option")).to be_empty
+      end
+    end
+  end
+
   it "escapes HTML in the match text" do
     payload = '<img src=x onerror="document.body.dataset.xss=1">'
     rendered = render_inline(described_class.new(

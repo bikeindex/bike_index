@@ -5,13 +5,15 @@ RSpec.describe Search::ComboboxController, type: :request do
     let!(:color) { FactoryBot.create(:color, name: "Burgundy", display: "#900") }
     before { Autocomplete::Loader.load_all(%w[Color]) }
 
-    it "renders matching autocomplete options" do
+    it "renders matching autocomplete options plus the 'Search for' synthetic" do
       get "/search/combobox/options", params: {q: "burg", for_id: "test"}, as: :turbo_stream
 
       expect(response.code).to eq("200")
       expect(response.body).to match(/hw-combobox__option/)
       expect(response.body).to include("Burgundy")
       expect(response.body).to include(color.search_id)
+      expect(response.body).to include("Search for")
+      expect(response.body).to include("hw_search_for_option")
     end
 
     context "with a search_obj_name" do
@@ -24,12 +26,13 @@ RSpec.describe Search::ComboboxController, type: :request do
       end
     end
 
-    context "without matches" do
-      it "renders an empty listbox" do
+    context "without matching items" do
+      it "still renders the 'Search for' synthetic option" do
         get "/search/combobox/options", params: {q: "nonesuch", for_id: "test"}, as: :turbo_stream
 
         expect(response.code).to eq("200")
-        expect(response.body).to_not match(/hw-combobox__option/)
+        expect(response.body).to include("Search for")
+        expect(response.body).to include("nonesuch")
       end
     end
   end
