@@ -143,9 +143,12 @@ jobs:
             tmp/cache/assets
             app/assets/builds
             public/assets
-          key: ${{ runner.os }}-assets-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/tailwind.config.js', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
+          # CAPYBARA_PORT is in the key because the precompile step bakes
+          # `ENV['BASE_URL']` (derived from it) into ERB-templated assets;
+          # a cached bundle from a different port would serve a stale URL.
+          key: ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/tailwind.config.js', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-assets-
+            ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-
       - name: build assets
         if: steps.assets-cache.outputs.cache-hit != 'true'
         # BASE_URL must match the host:port that Capybara binds to in tests
