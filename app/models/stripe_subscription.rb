@@ -177,17 +177,14 @@ class StripeSubscription < ApplicationRecord
     user&.memberships&.stripe_managed&.not_ended&.order(:id)
   end
 
-  # When concurrent webhooks race, a user can end up with multiple stripe_managed pending/active
-  # Memberships where one (or none) is wired to a StripeSubscription and the rest are orphans.
-  # Repoint orphan payments to the canonical row, then delete the orphans. If multiple memberships
-  # have their own StripeSubscriptions, that's an unusual but legitimate state — leave it alone.
+  # Delete stripe_managed pending/active Memberships that have no StripeSubscription wired to them
+  # (race-window orphans). Linked Memberships are always preserved; orphan payments get repointed
+  # to a canonical linked row (lowest-id), or to the lowest-id remaining membership if none linked.
   def remove_user_membership_orphans
     return if user.blank?
 
-    linked = user_not_ended_memberships.joins(:stripe_subscriptions).distinct
-    return if linked.count > 1
-
-    canonical = linked.first || user_not_ended_memberships.first
+    canonical = user_not_ended_memberships.joins(:stripe_subscriptions).distinct.first ||
+      user_not_ended_memberships.first
     return if canonical.blank?
 
     orphan_ids = user_not_ended_memberships
