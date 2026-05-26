@@ -3,6 +3,10 @@ module Admin
     include Binxtils::SortableTable
 
     before_action :find_organization, only: [:show, :edit, :update, :destroy]
+    # Override the page_id so the vendored admin bundle's `#admin_organizations_(new|edit)`
+    # dispatcher doesn't instantiate its hard-coded AdminEdit class — replaced by
+    # `app/javascript/controllers/admin/organization_form_controller.js`.
+    before_action(only: [:new, :edit]) { @page_id = "admin_organization_form" }
 
     def index
       @per_page = permitted_per_page
