@@ -144,6 +144,12 @@ jobs:
             ${{ runner.os }}-assets-
       - name: build assets
         if: steps.assets-cache.outputs.cache-hit != 'true'
+        # BASE_URL must match the host:port that Capybara binds to in tests
+        # (see spec/support/capybara.rb -- DEV_PORT + 2000). Any asset that
+        # bakes ENV['BASE_URL'] into its compiled output otherwise points at
+        # a host the test browser can't reach.
+        env:
+          BASE_URL: http://localhost:5042
         run: bin/rails assets:precompile --trace
       - name: Save precompiled assets cache
         if: matrix.ci_node_index == 0 && steps.assets-cache.outputs.cache-hit != 'true'
