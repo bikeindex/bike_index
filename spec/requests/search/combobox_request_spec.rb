@@ -35,6 +35,27 @@ RSpec.describe Search::ComboboxController, type: :request do
         expect(response.body).to include("nonesuch")
       end
     end
+
+    context "with manufacturers of differing priority" do
+      let!(:high) { FactoryBot.create(:manufacturer, name: "Acme Bikes") }
+      let!(:low) { FactoryBot.create(:manufacturer, name: "Acme Components") }
+      let!(:bike) { FactoryBot.create(:bike, manufacturer: high) }
+
+      before do
+        # bike creation doesn't trigger Manufacturer#before_save, so reload + update
+        # to recompute calculated_priority with the new b_count
+        Manufacturer.find(high.id).update(updated_at: Time.current)
+        Autocomplete::Loader.load_all(%w[Manufacturer])
+      end
+
+      it "orders by Manufacturer#calculated_priority" do
+        expect(Manufacturer.find(high.id).priority).to be > Manufacturer.find(low.id).priority
+
+        get "/search/combobox/options", params: {q: "acme", for_id: "test"}, as: :turbo_stream
+
+        expect(response.body.index("m_#{high.id}")).to be < response.body.index("m_#{low.id}")
+      end
+    end
   end
 
   describe "chips" do
