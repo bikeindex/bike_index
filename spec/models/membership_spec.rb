@@ -102,26 +102,34 @@ RSpec.describe Membership, type: :model do
     describe "user_id uniqueness while pending or active" do
       let(:user) { FactoryBot.create(:user_confirmed) }
       let!(:active_membership) { FactoryBot.create(:membership, user:, creator: nil) }
+      let(:new_membership) { FactoryBot.build(:membership, user:, creator: nil) }
 
       it "blocks a second active membership for the same user" do
         expect(active_membership.status).to eq "active"
-        new_membership = FactoryBot.build(:membership, user:, creator: nil)
         expect(new_membership).not_to be_valid
         expect(new_membership.errors.full_messages.to_s).to match(/already/i)
       end
 
-      it "allows a new active membership once the existing one has ended" do
-        active_membership.update!(start_at: 1.year.ago, end_at: 1.minute.ago)
-        expect(active_membership.reload.status).to eq "ended"
-        expect(FactoryBot.build(:membership, user:, creator: nil)).to be_valid
+      context "with the existing membership ended" do
+        before { active_membership.update!(start_at: 1.year.ago, end_at: 1.minute.ago) }
+
+        it "allows a new active membership" do
+          expect(active_membership.reload.status).to eq "ended"
+          expect(new_membership).to be_valid
+        end
       end
 
-      it "allows a new active membership when the sibling has its own stripe_subscription" do
+      context "with the existing membership linked to its own stripe_subscription" do
         # Unusual but legitimate: each membership tied to its own subscription.
-        FactoryBot.create(:stripe_subscription, user:, stripe_status: "active",
-          stripe_id: "sub_sibling", membership: active_membership)
-        expect(active_membership.reload.stripe_subscriptions.count).to eq 1
-        expect(FactoryBot.build(:membership, user:, creator: nil)).to be_valid
+        before do
+          FactoryBot.create(:stripe_subscription, user:, stripe_status: "active",
+            stripe_id: "sub_sibling", membership: active_membership)
+        end
+
+        it "allows a new active membership" do
+          expect(active_membership.reload.stripe_subscriptions.count).to eq 1
+          expect(new_membership).to be_valid
+        end
       end
     end
   end
