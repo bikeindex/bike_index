@@ -93,17 +93,20 @@
       = f.label :direct_unclaimed_notifications do
         Send emails directly to unclaimed bike owners
         %small.less-strong don't require org to forward
-    -# Stays as a selectize fancy-select: the vendored admin bundle's AdminEdit
-    -# controller calls `$('#organization_parent_organization_id').selectize().enable()`
-    -# on construction. When the field is a hw_combobox <input>, that bare call
-    -# freshly selectizes it inside the combobox shell and breaks the UI.
-    .form-group.fancy-select.unfancy.no-restore-on-backspace
-      = f.label :parent_organization_id do
+    -# The vendored admin bundle's AdminEdit controller hard-codes
+    -# `$('#organization_parent_organization_id').selectize().enable()` at
+    -# construction. We point the combobox at a different id and render a
+    -# hidden <select> at the legacy id so that bare .selectize() lands
+    -# harmlessly. Remove the stub once AdminEdit is rewritten in Stimulus.
+    .tw:hidden{"aria-hidden" => "true"}
+      %select#organization_parent_organization_id
+    .form-group
+      - parent_org_label = capture do
         Parent organization
         %small.less-strong
           %strong.text-danger (probably) do not add parents!
           Parents must be part of the same organization
-      = f.collection_select(:parent_organization_id, Organization.with_enabled_feature_slugs("child_organizations"), :id, :name, {prompt: "Choose organization", required: false}, class: "form-control")
+      = render Form::Combobox::Component.new(name: :parent_organization_id, id: "organization_parent_organization_id_combobox", form: f, label: parent_org_label, placeholder: "Choose organization", include_blank: true, options: Organization.with_enabled_feature_slugs("child_organizations").pluck(:name, :id))
       %small
         %strong Use the "regional" feature instead.
         %em To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.
