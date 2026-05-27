@@ -20,10 +20,10 @@ GIT
 
 GIT
   remote: https://github.com/mailchimp/mailchimp-marketing-ruby.git
-  revision: 2cd67937bff16b42d38e0b0a918b4f2014c1a98c
+  revision: dd4fd7adeb10cae5afbb0a4e8c332ae23345bb8b
   specs:
-    MailchimpMarketing (3.0.48)
-      excon (~> 0.76.0)
+    MailchimpMarketing (3.0.80)
+      excon (>= 0.76.0, < 1)
       json (~> 2.1, >= 2.1.0)
 
 GEM
@@ -259,7 +259,7 @@ GEM
     equalizer (0.0.11)
     erb (6.0.4)
     erubi (1.13.1)
-    excon (0.76.0)
+    excon (0.112.0)
     execjs (2.7.0)
     factory_bot (6.2.1)
       activesupport (>= 5.0.0)
