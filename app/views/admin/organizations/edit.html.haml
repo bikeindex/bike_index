@@ -1,6 +1,6 @@
 = render partial: "/admin/organizations/display_header", locals: {}
 
-= form_for [:admin, @organization] do |f|
+= form_for [:admin, @organization], html: {data: {controller: "admin--organization-form"}} do |f|
   = render partial: 'form', locals: { f: f }
   .row.mt-4#admin-locations-fields
     = f.fields_for :locations do |builder|

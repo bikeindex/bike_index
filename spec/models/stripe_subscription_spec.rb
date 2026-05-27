@@ -152,5 +152,87 @@ RSpec.describe StripeSubscription, type: :model do
         end
       end
     end
+
+    context "with multiple active stripe_managed memberships for the user" do
+      # Simulates the race-window state: two active stripe_managed memberships exist
+      # (the uniqueness validation has to be bypassed to reproduce it).
+      let(:stripe_subscription) { FactoryBot.create(:stripe_subscription, membership: nil, user:, stripe_status:) }
+      let!(:lower_membership) { FactoryBot.create(:membership, user:, creator: nil, start_at: Time.current - 2.hours) }
+      let!(:higher_membership) do
+        m = FactoryBot.build(:membership, user:, creator: nil, start_at: Time.current - 1.hour)
+        m.status = "active" # validate: false skips set_calculated_attributes
+        m.save(validate: false)
+        m
+      end
+
+      it "collapses to the lower-PK membership and links the stripe_subscription to it" do
+        expect(higher_membership.id).to be > lower_membership.id
+        expect(stripe_subscription.reload.membership_id).to be_blank
+
+        expect { stripe_subscription.update_membership! }.to change(Membership, :count).by(-1)
+
+        expect(stripe_subscription.reload.membership_id).to eq lower_membership.id
+        expect(Membership.where(id: higher_membership.id)).to be_empty
+      end
+    end
+
+    context "with two memberships that each have their own stripe_subscription" do
+      # Shouldn't happen via the normal flow, but if existing prod data has it, the cleanup
+      # must not collapse them — each membership is legitimate, tied to a distinct subscription.
+      let!(:other_subscription) do
+        FactoryBot.create(:stripe_subscription, user:, stripe_status: "active", stripe_id: "sub_other")
+      end
+      let!(:other_membership) { other_subscription.membership }
+      let!(:stripe_subscription) do
+        m = FactoryBot.build(:membership, user:, creator: nil, start_at: Time.current - 1.hour)
+        m.status = "active"
+        m.save(validate: false)
+        FactoryBot.create(:stripe_subscription, user:, stripe_status: "active", stripe_id: "sub_main", membership: m)
+      end
+
+      it "preserves both memberships and does not merge them" do
+        expect(user.memberships.stripe_managed.count).to eq 2
+
+        expect { stripe_subscription.update_membership! }.not_to change(Membership, :count)
+
+        expect(Membership.where(id: other_membership.id)).to exist
+        expect(Membership.where(id: stripe_subscription.membership_id)).to exist
+        expect(stripe_subscription.reload.membership_id).not_to eq other_membership.id
+      end
+    end
+  end
+
+  describe "create_or_update_from_stripe!" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:stripe_price) { FactoryBot.create(:stripe_price_plus) }
+    let!(:linked_subscription) do
+      FactoryBot.create(:stripe_subscription, user:, stripe_price:, stripe_status: "active",
+        stripe_id: "sub_canonical", start_at: Time.current - 1.day)
+    end
+    let(:linked_membership) { linked_subscription.membership }
+    let!(:orphan_membership) do
+      m = FactoryBot.build(:membership, user:, creator: nil, start_at: Time.current - 2.days)
+      m.status = "active"
+      m.save(validate: false)
+      m
+    end
+    let(:stripe_obj) do
+      OpenStruct.new(id: linked_subscription.stripe_id, customer: user.stripe_id, status: "active",
+        plan: {"id" => stripe_price.stripe_id}, start_date: linked_subscription.start_at.to_i,
+        ended_at: nil, cancel_at: nil)
+    end
+
+    it "removes orphan stripe_managed memberships and repoints their payments" do
+      orphan_payment = FactoryBot.create(:payment, user:, membership: orphan_membership)
+      expect(user.memberships.stripe_managed.count).to eq 2
+
+      expect {
+        StripeSubscription.create_or_update_from_stripe!(stripe_subscription_obj: stripe_obj)
+      }.to change(Membership, :count).by(-1)
+
+      expect(Membership.where(id: orphan_membership.id)).to be_empty
+      expect(Membership.where(id: linked_membership.id)).to exist
+      expect(orphan_payment.reload.membership_id).to eq linked_membership.id
+    end
   end
 end

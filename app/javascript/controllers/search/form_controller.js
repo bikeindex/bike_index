@@ -36,6 +36,10 @@ export default class extends Controller {
     // before the frame element is parsed, leaving #loadedWithoutResults in
     // place with no auto-submit.
     document.addEventListener('turbo:load', this.submitIfEmptyResults)
+    // Same-document back/forward (a filter link advanced the URL without a
+    // full page load) leaves the results frame's src stale. Re-point it at the
+    // restored URL so the frame matches the address bar.
+    window.addEventListener('popstate', this.reloadFrameFromUrl)
   }
 
   // if the frame was loaded without results, submit the form
@@ -49,10 +53,19 @@ export default class extends Controller {
     this.formTarget.requestSubmit()
   }
 
+  // Only fires for same-document history navigation; cross-document back/forward
+  // re-renders the page and submitIfEmptyResults handles it instead.
+  reloadFrameFromUrl = () => {
+    if (this.frameElement?.getAttribute('src')) {
+      this.frameElement.setAttribute('src', window.location.href)
+    }
+  }
+
   disconnect () {
     // Clean up event listener when controller disconnects
-    document.removeEventListener('turbo:frame-render', this.frameRenderHandler)
+    document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.submitIfEmptyResults)
+    window.removeEventListener('popstate', this.reloadFrameFromUrl)
   }
 
   setupFormFieldListeners () {
@@ -95,7 +108,9 @@ export default class extends Controller {
   syncHiddenFieldsFromUrl () {
     const params = new URLSearchParams(window.location.search)
     this.formTarget.querySelectorAll('input[type="hidden"]').forEach(input => {
-      if (!input.name || !params.has(input.name)) return
+      // Skip array fields (eg query_items[]) - the combobox owns those, and
+      // URLSearchParams.get would collapse them all to the first value
+      if (!input.name || input.name.endsWith('[]') || !params.has(input.name)) return
       const newValue = params.get(input.name)
       if (input.value !== newValue) input.value = newValue
     })

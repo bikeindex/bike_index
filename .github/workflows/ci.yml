@@ -88,6 +88,10 @@ jobs:
       KNAPSACK_PRO_CI_NODE_TOTAL: ${{ matrix.ci_node_total }}
       KNAPSACK_PRO_CI_NODE_INDEX: ${{ matrix.ci_node_index }}
       KNAPSACK_PRO_LOG_LEVEL: warn
+      # Capybara binds to this port in `:js` specs (spec/support/capybara.rb).
+      # Set explicitly so the assets:precompile step below can bake a matching
+      # ENV['BASE_URL'] into any ERB-templated asset.
+      CAPYBARA_PORT: 5042
     steps:
       - name: Get CPU cores
         id: cpu-info
@@ -139,11 +143,19 @@ jobs:
             tmp/cache/assets
             app/assets/builds
             public/assets
-          key: ${{ runner.os }}-assets-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/tailwind.config.js', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
+          # CAPYBARA_PORT is in the key because the precompile step bakes
+          # `ENV['BASE_URL']` (derived from it) into ERB-templated assets;
+          # a cached bundle from a different port would serve a stale URL.
+          key: ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/tailwind.config.js', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-assets-
+            ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-
       - name: build assets
         if: steps.assets-cache.outputs.cache-hit != 'true'
+        # BASE_URL must match the host:port that Capybara binds to in tests
+        # so any ERB-baked asset URL resolves to the same host the browser
+        # will hit (see spec/support/capybara.rb).
+        env:
+          BASE_URL: http://localhost:${{ env.CAPYBARA_PORT }}
         run: bin/rails assets:precompile --trace
       - name: Save precompiled assets cache
         if: matrix.ci_node_index == 0 && steps.assets-cache.outputs.cache-hit != 'true'

@@ -14,6 +14,16 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
     }
   end
 
+  def parsed_body
+    Capybara.string(response.body)
+  end
+
+  # The value the rendered kind combobox actually submits — must be an enum
+  # label, since kind= rejects the integer-as-string a form would otherwise send
+  def rendered_kind_value
+    parsed_body.find("input[name='mail_snippet[kind]']", visible: :all).value
+  end
+
   describe "index" do
     it "renders" do
       get base_url
@@ -23,19 +33,53 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
   end
 
   describe "new" do
-    it "renders" do
+    it "renders the kind and organization comboboxes" do
       get "#{base_url}/new"
       expect(response.status).to eq(200)
       expect(response).to render_template(:new)
+
+      expect(parsed_body).to have_css("fieldset.hw-combobox[data-controller='hw-combobox']", count: 2)
+      expect(parsed_body).to have_css("input[type=hidden][name='mail_snippet[organization_id]']", visible: :all)
+      # kind options carry enum labels, not the integer values kind= rejects
+      expect(parsed_body).to have_css("[role='option'][data-value='custom']", visible: :all)
+      expect(parsed_body).not_to have_css("[role='option'][data-value='0']", visible: :all)
+      expect(rendered_kind_value).to eq "custom"
     end
   end
 
   describe "edit" do
-    let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
-    it "renders" do
+    let(:mail_snippet) { FactoryBot.create(:mail_snippet, kind: :custom) }
+
+    it "renders with the kind combobox prefilled" do
       get "#{base_url}/#{mail_snippet.id}/edit"
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
+
+      kind_display = "#{MailSnippet.kind_humanized("custom")} - in #{MailSnippet.organization_email_for("custom")} emails"
+      expect(parsed_body).to have_css("[data-hw-combobox-prefilled-display-value='#{kind_display}']")
+      expect(rendered_kind_value).to eq "custom"
+    end
+
+    context "with a stolen_notification_oauth snippet" do
+      let(:mail_snippet) { FactoryBot.create(:mail_snippet, kind: :stolen_notification_oauth) }
+
+      it "renders the doorkeeper_app_id combobox" do
+        get "#{base_url}/#{mail_snippet.id}/edit"
+        expect(response.status).to eq(200)
+        expect(parsed_body).to have_css("input[type=hidden][name='mail_snippet[doorkeeper_app_id]']", visible: :all)
+      end
+    end
+  end
+
+  describe "create" do
+    it "creates, submitting the kind value the combobox renders" do
+      get "#{base_url}/new"
+      params = valid_params.merge(kind: rendered_kind_value)
+
+      expect { post base_url, params: {mail_snippet: params} }
+        .to change(MailSnippet, :count).by(1)
+      expect(flash[:errors]).to be_blank
+      expect(MailSnippet.last).to have_attributes params
     end
   end
 
@@ -43,13 +87,18 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
     include_context :with_paper_trail
 
     let!(:mail_snippet) { FactoryBot.create(:mail_snippet) }
-    it "updates" do
-      patch "#{base_url}/#{mail_snippet.id}", params: {mail_snippet: valid_params}
+    it "updates, submitting the kind value the combobox renders" do
+      get "#{base_url}/#{mail_snippet.id}/edit"
+      # Post the exact kind the rendered combobox carries — a hand-built label
+      # would mask the hidden field emitting a value kind= rejects
+      params = valid_params.merge(kind: rendered_kind_value)
+
+      patch "#{base_url}/#{mail_snippet.id}", params: {mail_snippet: params}
 
       expect(response).to redirect_to(edit_admin_mail_snippet_path(mail_snippet.to_param))
       expect(flash[:errors]).to be_blank
       mail_snippet.reload
-      expect(mail_snippet).to have_attributes valid_params
+      expect(mail_snippet).to have_attributes params
       version = mail_snippet.versions.last
       expect(version.event).to eq "update"
       expect(version.whodunnit).to eq current_user.id.to_s

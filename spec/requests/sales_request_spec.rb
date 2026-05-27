@@ -64,6 +64,14 @@ RSpec.describe SalesController, type: :request do
         expect(assigns(:sale)).to be_present
       end
     end
+    context "with currency=cad" do
+      it "renders with CAD" do
+        get "#{base_url}/new?marketplace_message_id=#{marketplace_message.id}&currency=cad"
+        expect(response).to render_template(:new)
+        expect(flash).to be_blank
+        expect(controller.current_currency.slug).to eq :cad
+      end
+    end
 
     context "without a current_user" do
       let(:current_user) { nil }

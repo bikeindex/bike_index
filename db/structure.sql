@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -6093,6 +6094,13 @@ CREATE INDEX index_bikes_on_serial_normalized_no_space_trgm ON public.bikes USIN
 
 
 --
+-- Name: index_bikes_on_serial_normalized_tsvector; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_serial_normalized_tsvector ON public.bikes USING gin (to_tsvector('simple'::regconfig, (serial_normalized)::text)) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
 -- Name: index_bikes_on_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7172,6 +7180,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260525162548'),
 ('20260518093158'),
 ('20260514182008'),
 ('20260514085900'),

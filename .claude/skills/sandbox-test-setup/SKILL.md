@@ -46,10 +46,13 @@ export PATH="/Users/seth/.local/share/mise/installs/ruby/4.0.2/bin:$PATH"
 Then run specs the normal way:
 
 ```bash
-eval "$(ruby bin/env --export)"
-export RAILS_ENV=test
 bundle exec rspec spec/path/to/file_spec.rb
 ```
+
+(No need to `eval "$(ruby bin/env --export)"` first — `config/boot.rb` loads
+`bin/env` for every Ruby entry point, so `WORKSPACE_ID` / `DEV_PORT` /
+`BASE_URL` / `REDIS_URL` are already set inside the process. Only export
+them into the shell when the shell itself reads them, e.g. `curl "$BASE_URL/..."`.)
 
 If `rails_helper` aborts complaining about a pending migration, run
 `bundle exec rails db:create db:migrate` first

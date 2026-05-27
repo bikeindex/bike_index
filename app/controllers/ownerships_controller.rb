@@ -1,5 +1,6 @@
 class OwnershipsController < ApplicationController
   before_action :find_ownership
+  before_action :confirm_user_from_claim_token
   before_action :authenticate_user_and_set_flash
 
   def show

@@ -161,7 +161,7 @@ GEM
       racc
     buftok (0.2.0)
     builder (3.3.0)
-    bullet (8.1.0)
+    bullet (8.1.1)
       activesupport (>= 3.0.0)
       uniform_notifier (~> 1.11)
     byebug (13.0.0)
@@ -235,8 +235,8 @@ GEM
     down (5.4.2)
       addressable (~> 2.8)
     drb (2.2.3)
-    dry-configurable (1.3.0)
-      dry-core (~> 1.1)
+    dry-configurable (1.4.0)
+      dry-core (~> 1.0)
       zeitwerk (~> 2.6)
     dry-core (1.2.0)
       concurrent-ruby (~> 1.0)
@@ -348,8 +348,8 @@ GEM
     google-protobuf (4.34.0-x86_64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
-    grape (3.1.1)
-      activesupport (>= 7.1)
+    grape (3.2.1)
+      activesupport (>= 7.2)
       dry-configurable
       dry-types (>= 1.1)
       mustermann-grape (~> 1.1.0)
@@ -391,6 +391,11 @@ GEM
       actioncable (>= 6.0.0)
       listen (>= 3.0.0)
       railties (>= 6.0.0)
+    hotwire_combobox (0.4.1)
+      platform_agent (>= 1.0.1)
+      rails (>= 7.0.7.2)
+      stimulus-rails (>= 1.2)
+      turbo-rails (>= 1.2)
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     http (4.4.1)
@@ -406,9 +411,11 @@ GEM
     http_parser.rb (0.6.0)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    i18n-country-translations (1.4.1)
-      i18n (>= 0.9.3, < 2)
-      railties (>= 5.0)
+    i18n-country-translations (2.3.1)
+      i18n (>= 0.9.3, < 3)
+      i18n-country-translations-data (~> 1.1)
+      railties (>= 7.2, < 9)
+    i18n-country-translations-data (1.1.0)
     i18n-js (3.5.0)
       i18n (>= 0.6.6)
     i18n-tasks (1.1.2)
@@ -455,8 +462,8 @@ GEM
     language_server-protocol (3.17.0.5)
     launchy (2.5.2)
       addressable (~> 2.8)
-    letter_opener (1.8.1)
-      launchy (>= 2.2, < 3)
+    letter_opener (1.10.0)
+      launchy (>= 2.2, < 4)
     lint_roller (1.1.0)
     listen (3.10.0)
       logger
@@ -523,8 +530,7 @@ GEM
     msgpack (1.8.0)
     multi_json (1.20.1)
     multipart-post (2.4.1)
-    mustermann (3.0.4)
-      ruby2_keywords (~> 0.0.1)
+    mustermann (4.0.0)
     mustermann-grape (1.1.0)
       mustermann (>= 1.0.0)
     naught (1.1.0)
@@ -550,7 +556,7 @@ GEM
     oj (3.16.16)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
-    openssl (4.0.0)
+    openssl (4.0.2)
     ostruct (0.6.3)
     pagy (43.2.1)
       json
@@ -573,6 +579,9 @@ GEM
       activesupport (>= 6.1)
     pghero (3.8.0)
       activerecord (>= 7.2)
+    platform_agent (1.0.1)
+      activesupport (>= 5.2.0)
+      useragent (~> 0.16.3)
     postmark (1.25.1)
       json
     postmark-rails (0.22.1)
@@ -606,7 +615,7 @@ GEM
       date
       stringio
     public_suffix (7.0.5)
-    puma (7.1.0)
+    puma (8.0.1)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.2.6)
@@ -623,6 +632,7 @@ GEM
       rack (>= 3.0.0)
     rack-test (2.2.0)
       rack (>= 1.3)
+    rack-timeout (0.7.0)
     rack-utf8_sanitizer (1.11.1)
       rack (>= 1.0, < 4.0)
     rackup (2.3.1)
@@ -901,7 +911,7 @@ GEM
       nokogiri (~> 1.8)
     yaml (0.4.0)
     yard (0.9.38)
-    zeitwerk (2.7.5)
+    zeitwerk (2.8.2)
 
 PLATFORMS
   arm64-darwin
@@ -958,6 +968,7 @@ DEPENDENCIES
   herb
   honeybadger
   hotwire-livereload (~> 1.4.1)
+  hotwire_combobox
   i18n-country-translations
   i18n-js
   i18n-tasks
@@ -992,6 +1003,7 @@ DEPENDENCIES
   puma
   rack-attack
   rack-mini-profiler
+  rack-timeout
   rack-utf8_sanitizer
   rails
   rails-controller-testing

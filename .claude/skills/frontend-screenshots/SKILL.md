@@ -5,9 +5,11 @@ description: >-
   local `bin/dev` server via Playwright MCP, with a seeded-user identity gate
   that keeps PII out of uploaded images. Use whenever a task needs screenshots
   of local pages — PR documentation, bug repros, before/after comparisons
-  across branches, design review, demos — even when the user just says "grab
-  a screenshot" or "show me what this looks like" without naming Playwright.
-  Inputs: `(url-path, page-slug)` pairs. Output: local PNG paths.
+  across branches, design review, demos — including mid-interaction states
+  like an open dropdown, a modal showing, a form mid-fill, or a hover. Use it
+  even when the user just says "grab a screenshot" or "show me what this looks
+  like" without naming Playwright. Inputs: `(url-path, page-slug)` pairs,
+  optionally with per-URL interaction steps. Output: local PNG paths.
 allowed-tools: Bash, Read
 ---
 
@@ -58,15 +60,19 @@ Two viewports — resize once each, then walk every URL:
 
 **Settle before the screenshot.** Stimulus + Chartkick render after document load; either `browser_wait_for` on a known element or pause ~500ms–1s. Otherwise charts capture mid-draw.
 
+**Mid-interaction states are in scope.** When the caller asks for a dropdown open, a modal showing, a hover state, a partially-filled form, etc., drive Playwright between settle and the screenshot — `browser_click`, `browser_type`, `browser_press_key`, `browser_hover`, then wait for the UI to reach the target state (`browser_wait_for` on a marker element, or check via `browser_evaluate`) before `browser_take_screenshot`. Treat the interaction sequence as part of the page-slug — e.g. capture `combobox-open` after clicking + typing, distinct from a static `search-registrations` page-load shot. For cross-branch comparisons, run the *same* interaction sequence on each branch so the screenshots actually compare like-for-like.
+
 Sanity-check each PNG: under ~5 KB usually means the page errored. Pull `browser_console_messages` and look only for **uncaught exceptions from app code** (Stimulus registration failures, `TypeError`s in `app/javascript/**`) — Webpacker logs, asset 404s, third-party deprecation warnings are noise. To diagnose a failed capture: HTTP status via `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"`, response body via `curl -s "$BASE_URL/<path>" | head -200`, full backtrace via `tail -200 log/development.log`.
 
 ## Cross-branch comparison (optional)
 
-When the caller wants before/after, repeat the capture loop against `main`. **Only safe for view/CSS/Stimulus diffs** — if the branch has new `db/migrate/` files or `Gemfile.lock` changes, `git checkout main` leaves the running dev server inconsistent. Abort the main capture and tell the caller.
+When the caller wants before/after, repeat the capture loop against `main`.
 
 1. `git status` — abort if there are uncommitted changes.
-2. Diff `db/migrate/` and `Gemfile.lock` between the branch and `main`; abort if either changed.
-3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout main`, repeat capture into `...-main-...` filenames, `git checkout $BRANCH`.
+2. Diff `db/migrate/` between the branch and `main`; abort if it changed — a branch-only migration leaves the DB schema ahead of `main`'s code, so `main` pages can error.
+3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout origin/main` (detached — `git checkout main` fails if a sibling worktree holds the `main` branch; detached HEAD at `origin/main` is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files, repeat capture into `...-main-...` filenames, then `git checkout $BRANCH`.
+
+A `Gemfile.lock` diff is **not** a reason to abort.
 
 The seeded DB persists across checkouts, so the existing session usually still works.
 

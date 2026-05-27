@@ -2,16 +2,17 @@
 name: integration-testing
 description: >-
   Bike Index conventions for browser specs (`type: :system, :js`)
-  — every example pays a Selenium boot cost, so bias hard toward fewer,
-  denser examples that walk through state via clicks, prefer
-  named-element matchers over CSS selectors or `execute_script`, and
-  combine same-setup work into one `it` even when scenarios feel
-  independent. **Consult this skill any time you create or modify a
-  `:js, type: :system` spec** — that includes everything under
-  `spec/integration/` AND component system specs at
-  `spec/components/**/*_system_spec.rb`; the rules apply equally to
-  both. Read alongside the `rspec-testing` skill for the project's
-  general `context`/`let` style.
+  — **drive every step through the real UI** (no FactoryBot or
+  `execute_script` shortcuts to skip what a user would do), every
+  example pays a Selenium boot cost so bias toward fewer, denser
+  examples that walk through state via clicks, prefer named-element
+  matchers over CSS selectors, and combine same-setup work into one
+  `it` even when scenarios feel independent. **Consult this skill
+  any time you create or modify a `:js, type: :system` spec** —
+  that includes everything under `spec/integration/` AND component
+  system specs at `spec/components/**/*_system_spec.rb`. Read
+  alongside the `rspec-testing` skill for the project's general
+  `context`/`let` style.
 ---
 
 # Integration testing in Bike Index
@@ -19,6 +20,14 @@ description: >-
 Browser specs (`type: :system, :js`) live in two places: feature flows under `spec/integration/` and component-level interaction specs at `spec/components/**/*_system_spec.rb`. Both run full Chrome sessions via Capybara/Selenium and pay a real Selenium boot cost per example, so the same conventions apply to both: optimize for fewer, denser examples and high-level Capybara helpers.
 
 The general `context`/`let` style and "what to test" rules are in the [`rspec-testing`](../rspec-testing/SKILL.md) skill — the rules below extend it for the system-spec case.
+
+## Always follow the real user path
+
+If a user does it in the UI, the spec does it in the UI — every step, including setup. `FactoryBot.create(:bike, …)` to skip a complicated form turns the spec back into a model test and passes silently when the form is broken.
+
+If the UI path is hard or flaky, that's a real signal — usually a production bug (stale asset cache, missing seed data, wrong API URL). Fix the root cause; don't `execute_script` or factory around it.
+
+Legitimate exceptions: reference data that exists in production via migrations, admin accounts outside the user flow, and stubs for genuinely external services (third-party APIs, Stripe, geocoders).
 
 ## One `it` per setup; many assertions per `it`
 

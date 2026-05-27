@@ -42,5 +42,9 @@ module Organized
       flash[:error] = translation(:raise_do_not_have_access, scope: [:controllers, :organized, :base])
       redirect_to(organization_root_path) && return
     end
+
+    def chart_only?
+      @render_chart && Binxtils::InputNormalizer.boolean(params[:chart_only])
+    end
   end
 end

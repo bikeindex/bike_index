@@ -25,8 +25,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_button "Log in"
     find(".alert-success .close").click
     # Wait for the flash to finish dismissing -- otherwise it overlaps and
-    # intercepts the click on the nav link below
-    expect(page).to have_no_css(".alert-success")
+    # intercepts the click on the nav link below. The Bootstrap fade-out can
+    # exceed Capybara's default 2s wait on slow CI runners.
+    expect(page).to have_no_css(".alert-success", wait: 10)
     find("#passive_organization_submenu").click
     within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
     expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/, wait: 10)
@@ -217,6 +218,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_link "Render chart"
     expect(page).to have_current_path(/render_chart=true/, wait: 10)
     expect(page).to have_css("table", wait: 10)
+    # Chart loads async via a lazy turbo-frame; wait for the chartkick element
+    # before checking the inline init data.
+    expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-']", wait: 10)
     # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket is empty (null)
     expect(page.html).to include(%(["#{la_date_key}",1]))
     expect(page.html).to include(%(["#{cdt_date_key}",null]))
