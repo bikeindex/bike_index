@@ -36,21 +36,9 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "paper_trail/frameworks/rspec"
 
-# Include capybara for view component system specs
-require "capybara/rails"
-require "capybara/rspec"
-Capybara.register_driver :chrome_headless do |app|
-  options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument("--headless")
-  options.add_argument("--window-size=1920,1080")
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
-end
-# Configure Capybara
-Capybara.configure do |config|
-  config.default_driver = :chrome_headless
-  config.javascript_driver = :chrome_headless
-end
-
+# Capybara setup (driver registration, server host/port, :js BASE_URL hook)
+# lives in spec/support/capybara.rb so it can pin Capybara's port to DEV_PORT
+# before any system spec boots the server.
 require "view_component/test_helpers"
 require "view_component/system_test_helpers"
 require "axe-rspec"
@@ -110,7 +98,7 @@ VCR.configure do |config|
     record: :new_episodes,
     match_requests_on: [:method, :host, :path]
   }
-  config.ignore_hosts("127.0.0.1", "0.0.0.0") # for capybara selenium
+  config.ignore_hosts("127.0.0.1", "0.0.0.0", "localhost") # for capybara selenium
 
   %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
     MAXMIND_KEY SENDGRID_EMAIL_VALIDATION_KEY LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET
@@ -249,17 +237,6 @@ end
 CarrierWave.configure do |config|
   config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
   config.enable_processing = false
-end
-
-# Set BASE_URL to match Capybara's server for JS specs so html_url links work
-RSpec.configure do |config|
-  config.around(:each, :js) do |example|
-    original_base_url = ENV["BASE_URL"]
-    ENV["BASE_URL"] = "http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"
-    example.run
-  ensure
-    ENV["BASE_URL"] = original_base_url
-  end
 end
 
 # Override capybara methods to support tailwind selectors
