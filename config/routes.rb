@@ -155,6 +155,9 @@ Rails.application.routes.draw do
 
   namespace :search do
     get "/", to: redirect("/search/registrations")
+    # Autocomplete + selection chips for the search query items combobox
+    get "combobox/options", to: "combobox#options", as: :combobox_options
+    post "combobox/chips", to: "combobox#chips", as: :combobox_chips
     resources :registrations, only: %i[index] do
       collection do
         get :similar_serials

@@ -57,6 +57,11 @@ module BikeSearchable
       items.flatten.compact
     end
 
+    # Maps a selected_query_items_options entry to a combobox [display, value] pair
+    def query_item_display_value(option)
+      option.is_a?(String) ? [option, option] : [option["text"], option["search_id"]]
+    end
+
     # returns nil OR [location, [lat, lng]] OR [location, nil]
     def search_location(location, ip_address = nil)
       location = location.to_s.strip

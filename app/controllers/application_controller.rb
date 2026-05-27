@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
 
+  before_action :normalize_page_param
   before_action :set_paper_trail_whodunnit
   around_action :set_locale
   rescue_from Money::Bank::UnknownRate, with: :localization_failure
@@ -48,6 +49,13 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  # Drop a non-scalar `page` (eg the `page[$eq]=2` injection probe) - pagination
+  # helpers expect a scalar and otherwise raise on `.to_i`
+  def normalize_page_param
+    page = params[:page]
+    params.delete(:page) if page.present? && !page.is_a?(String) && !page.is_a?(Integer)
+  end
 
   def user_for_paper_trail
     current_user&.id

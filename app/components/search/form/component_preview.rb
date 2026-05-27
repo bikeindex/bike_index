@@ -3,7 +3,7 @@
 module Search
   module Form
     class ComponentPreview < ApplicationComponentPreview
-      # TODO: It would be nice to group these, but the IDs collide and select2 breaks
+      # TODO: It would be nice to group these, but the IDs collide and the combobox breaks
       def default
         render(Search::Form::Component.new(**default_options(preview_name: "default")))
       end

@@ -63,7 +63,7 @@ export default class extends Controller {
 
   disconnect () {
     // Clean up event listener when controller disconnects
-    document.removeEventListener('turbo:frame-render', this.frameRenderHandler)
+    document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.submitIfEmptyResults)
     window.removeEventListener('popstate', this.reloadFrameFromUrl)
   }
@@ -108,7 +108,9 @@ export default class extends Controller {
   syncHiddenFieldsFromUrl () {
     const params = new URLSearchParams(window.location.search)
     this.formTarget.querySelectorAll('input[type="hidden"]').forEach(input => {
-      if (!input.name || !params.has(input.name)) return
+      // Skip array fields (eg query_items[]) - the combobox owns those, and
+      // URLSearchParams.get would collapse them all to the first value
+      if (!input.name || input.name.endsWith('[]') || !params.has(input.name)) return
       const newValue = params.get(input.name)
       if (input.value !== newValue) input.value = newValue
     })
