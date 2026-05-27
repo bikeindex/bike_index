@@ -1357,19 +1357,12 @@ nl:
         except_values: heeft een waarde niet toegestaan
         same_as: is niet hetzelfde als %{parameter}
         invalid_response: Ongeldig antwoord
-        empty_message_body: lege berichttekst geleverd met %{body_format} inhoudstype
-        too_many_multipart_files: het aantal geüploade bestanden overschreed de geconfigureerde
-          limiet van het systeem (%{limit})
         length: wordt verwacht een lengte te hebben binnen %{min} en %{max}
         length_is: wordt verwacht een lengte te hebben die exact gelijk is aan %{is}
         length_min: wordt verwacht een lengte te hebben die groter is dan of gelijk
           is aan %{min}
         length_max: wordt verwacht een lengte te hebben die kleiner is dan of gelijk
           is aan %{max}
-        conflicting_types: query-parameters bevatten conflicterende typen
-        invalid_parameters: query-parameters bevatten ongeldige opmaak of bytevolgorde
-        too_deep_parameters: queryparameters worden recursief genest over de opgegeven
-          limiet (%{limit})
         unknown_auth_strategy: 'onbekende autorisatiestrategie: %{strategy}'
         unknown_params_builder: 'onbekende params_builder: %{params_builder_type}'
   flash:
