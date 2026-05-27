@@ -1172,8 +1172,6 @@ es:
         invalid_message_body:
           problem:
           resolution:
-        empty_message_body:
-        too_many_multipart_files:
         invalid_accept_header:
           problem:
           resolution:
@@ -1185,9 +1183,6 @@ es:
         length_is:
         length_min:
         length_max:
-        conflicting_types:
-        invalid_parameters:
-        too_deep_parameters:
         unknown_auth_strategy:
         unknown_params_builder:
   flash:
