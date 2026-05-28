@@ -56,6 +56,10 @@ class ScheduledJob < ApplicationJob
     }
   end
 
+  def skip_scheduling?
+    skip_job?
+  end
+
   def record_scheduler_started
     self.class.write_history("last_started")
   end

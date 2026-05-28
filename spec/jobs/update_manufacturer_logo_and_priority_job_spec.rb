@@ -57,6 +57,20 @@ RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
     expect(manufacturer.reload.priority).to eq 0
   end
 
+  context "when API_KEY is blank" do
+    before { stub_const("UpdateManufacturerLogoAndPriorityJob::API_KEY", "") }
+
+    it "still updates priority but does not fetch a logo" do
+      manufacturer = FactoryBot.create(:manufacturer, website: "https://trekbikes.com")
+      manufacturer.update_column :priority, 14
+      described_class.new.perform(manufacturer.id)
+      manufacturer.reload
+      expect(manufacturer.logo).to_not be_present
+      expect(manufacturer.logo_source).to be_nil
+      expect(manufacturer.priority).to eq 0
+    end
+  end
+
   context "manufacturer has logo" do
     it "no-ops" do
       local_image = File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))
