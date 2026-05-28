@@ -4,6 +4,18 @@
   </div>
 </div>
 
+<% env_skipped_jobs = ScheduledJobRunner.scheduled_jobs.select { |klass| Binxtils::InputNormalizer.boolean(ENV.fetch(klass.skip_env_var, nil)) } %>
+
+<% if env_skipped_jobs.any? %>
+  <%= render UI::Alert::Component.new(kind: :warning, header: "Skipped via SIDEKIQ_SKIP_*") do %>
+    <ul class="tw:mb-0">
+      <% env_skipped_jobs.each do |klass| %>
+        <li><code><%= klass %></code></li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>
+
 <div class="full-screen-table mt-4">
   <table class="table table-striped table-bordered table-sm">
     <thead class="thead-light">
