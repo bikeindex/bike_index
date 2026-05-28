@@ -4,13 +4,13 @@
   </div>
 </div>
 
-<% env_skipped_jobs = ScheduledJobRunner.scheduled_jobs.select { |klass| Binxtils::InputNormalizer.boolean(ENV.fetch(klass.skip_env_var, nil)) } %>
+<% env_skipped_jobs = ENV.keys.grep(/\ASIDEKIQ_SKIP_/).select { |k| Binxtils::InputNormalizer.boolean(ENV.fetch(k, nil)) } %>
 
 <% if env_skipped_jobs.any? %>
-  <%= render UI::Alert::Component.new(kind: :warning, header: "Skipped via SIDEKIQ_SKIP_*") do %>
+  <%= render UI::Alert::Component.new(kind: :warning, header: "Skipped via ENV SIDEKIQ_SKIP_*") do %>
     <ul class="tw:mb-0">
-      <% env_skipped_jobs.each do |klass| %>
-        <li><code><%= klass %></code></li>
+      <% env_skipped_jobs.each do |env_key| %>
+        <li><code><%= env_key.sub(/\ASIDEKIQ_SKIP_/, "").downcase.camelize %></code></li>
       <% end %>
     </ul>
   <% end %>

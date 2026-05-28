@@ -73,7 +73,7 @@ RSpec.describe Admin::DashboardController, type: :request do
         get "/admin/scheduled_jobs"
         expect(response.code).to eq "200"
         expect(response).to render_template(:scheduled_jobs)
-        expect(response.body).to_not include("Skipped via SIDEKIQ_SKIP")
+        expect(response.body).to_not include("Skipped via ENV SIDEKIQ_SKIP")
       end
 
       context "with a SIDEKIQ_SKIP_* env var set" do
@@ -82,7 +82,7 @@ RSpec.describe Admin::DashboardController, type: :request do
         it "lists the skipped job in a warning alert" do
           get "/admin/scheduled_jobs"
           expect(response.code).to eq "200"
-          expect(response.body).to include("Skipped via SIDEKIQ_SKIP")
+          expect(response.body).to include("Skipped via ENV SIDEKIQ_SKIP")
           expect(response.body).to include("<code>FetchProject529BikesJob</code>")
         end
       end
