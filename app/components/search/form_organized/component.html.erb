@@ -57,8 +57,7 @@
 
       <div class="tw:w-20">
         <%= button_tag(type: translation(".submit"),
-          class: "twbtn-blue tw:w-full tw:h-full#{" tw:disabled:cursor-wait" if turbo?}",
-          data: turbo? ? {"search--form-target" => "button"} : {}) do %>
+          class: "twbtn-blue tw:w-full tw:h-full#{" tw:disabled:cursor-wait" if turbo?}") do %>
           <%= helpers.inline_svg_tag "icons/searcher.svg",
           id: "search-button",
           class: "tw:text-white",
