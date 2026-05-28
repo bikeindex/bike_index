@@ -74,6 +74,9 @@ env:
     POSTGRESQL_ADDRESS: shared-db
     POSTGRESQL_USERNAME: <%= role %>
     POSTGRESQL_DATABASE: bike_index_review_<%= db_suffix %>_primary
+    # Analytics lives on the same shared-db accessory (dropped alongside the
+    # primary in bin/review-app destroy).
+    POSTGRESQL_ANALYTICS_ADDRESS: shared-db
     ANALYTICS_DB_USERNAME: <%= role %>
     ANALYTICS_DB_DATABASE: bike_index_review_<%= db_suffix %>_analytics
     ANALYTICS_DB_PORT: "5432"
