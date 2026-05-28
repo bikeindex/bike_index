@@ -181,6 +181,30 @@
         </p>
       <% end %>
 
+      <% if @search_description.present? %>
+        <p>
+          Viewing only bikes <strong>with description matching</strong>
+          <code><%= @search_description %></code>
+          <%= link_to "view any description", url_for(sortable_search_params.merge(search_description: nil)), class: "gray-link small" %>
+        </p>
+      <% end %>
+
+      <% if @search_person.present? %>
+        <p>
+          Viewing only bikes <strong>matching person</strong>
+          <code><%= @search_person %></code>
+          <%= link_to "view any person", url_for(sortable_search_params.merge(search_person: nil)), class: "gray-link small" %>
+        </p>
+      <% end %>
+
+      <% if @search_notes.present? %>
+        <p>
+          Viewing only bikes <strong>with notes matching</strong>
+          <code><%= @search_notes %></code>
+          <%= link_to "view any notes", url_for(sortable_search_params.merge(search_notes: nil)), class: "gray-link small" %>
+        </p>
+      <% end %>
+
       <% if params[:serial].present? %>
         <p>
           Viewing only bikes <strong>with normalized serials matching</strong>
@@ -222,21 +246,21 @@
           <%= render partial: "/admin/bikes/search_statuses" %>
         <% end %>
 
+        <div class="form-group mb-2">
+          <%= text_field_tag :search_description, params[:search_description], placeholder: "Search by description", class: "form-control w-100" %>
+        </div>
+
         <div class="form-inline">
           <div class="form-group ml-auto mr-1 mb-2">
             <%= text_field_tag :serial, params[:serial], placeholder: "Find by serial", class: "form-control" %>
           </div>
 
           <div class="form-group mr-1 mb-2">
-            <%= text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control" %>
+            <%= text_field_tag :search_person, params[:search_person], placeholder: "Name / Student ID / Email", class: "form-control" %>
           </div>
 
           <div class="form-group mr-1 mb-2">
-            <% if @search_domain.present? %>
-              <%= text_field_tag :search_domain, @search_domain, placeholder: "Search bikes by domain", class: "form-control" %>
-            <% else %>
-              <%= text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control" %>
-            <% end %>
+            <%= text_field_tag :search_notes, params[:search_notes], placeholder: "Search notes", class: "form-control" %>
           </div>
 
           <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
