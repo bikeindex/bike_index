@@ -16,7 +16,7 @@ This project uses RSpec. All business logic should be tested.
 ## What to test (and what not to)
 
 - Tests should either: help make the code correct now, or prevent bugs in the future. Don't add tests that don't do one of those things.
-- Use **request specs**, not controller specs. Everything making the same request should be in a single test.
+- Use **request specs**, not controller specs — request specs go through the full middleware/routing stack, so they catch breakage controller specs can't see. Everything making the same request should be in a single test.
 - Avoid testing private methods.
 - Avoid mocking objects.
   - If making external requests, use VCR. Don't manually write VCR cassettes — record them by running the tests.
