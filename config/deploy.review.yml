@@ -68,11 +68,12 @@ env:
     REVIEW_APP_PR_NUMBER: "<%= pr %>"
     BASE_URL: "https://<%= slug %>.review.bikeindex.org"
 
-    # Postgres (shared-db accessory; per-PR role + databases)
+    # Postgres (shared-db accessory; per-PR role + databases). The staging
+    # primary_replica points at the same database as the primary, so no
+    # separate replica address is needed (see config/database.yml).
     POSTGRESQL_ADDRESS: shared-db
     POSTGRESQL_USERNAME: <%= role %>
     POSTGRESQL_DATABASE: bike_index_review_<%= db_suffix %>_primary
-    POSTGRESQL_PRIMARY_REPLICA_ADDRESS: shared-db
     ANALYTICS_DB_USERNAME: <%= role %>
     ANALYTICS_DB_DATABASE: bike_index_review_<%= db_suffix %>_analytics
     ANALYTICS_DB_PORT: "5432"
