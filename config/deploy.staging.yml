@@ -1,0 +1,141 @@
+# Kamal config for the persistent staging environment.
+#
+# Staging copies production (same Dockerfile, RAILS_ENV=production) but
+# DISABLES email delivery — see config/environments/production.rb. Use this for
+# pre-release smoke tests where touching real inboxes would be unsafe.
+#
+# Usage (called from .github/workflows/staging.yml and bin/staging):
+#
+#   export STAGING_HOST=staging.bikeindex.org
+#   export IMAGE_TAG=staging-<sha>
+#   bin/kamal deploy --config-file config/deploy.staging.yml \
+#                    --secrets-file .kamal/secrets-ci
+#
+# Single-tenant: one persistent service (`bike-index-staging`) with dedicated
+# Postgres + Redis accessories (`staging-db`, `staging-redis`). These are
+# distinct from the review-app shared accessories so the two can coexist on
+# the same host if desired.
+#
+# bin/docker-entrypoint creates the Postgres role on first boot and runs
+# `db:prepare`, which creates both the primary and analytics databases.
+#
+# This file is NOT used by production (Cloud66).
+
+<% host = ENV.fetch("STAGING_HOST") %>
+<% tag  = ENV.fetch("IMAGE_TAG") %>
+
+service: bike-index-staging
+image: ghcr.io/bikeindex/bike_index
+
+image_tag: <%= tag %>
+
+servers:
+  web:
+    - <%= host %>
+  worker:
+    hosts:
+      - <%= host %>
+    cmd: bundle exec sidekiq -c 2
+
+proxy:
+  ssl: true
+  host: staging.bikeindex.org
+  app_port: 80
+  healthcheck:
+    path: /up
+    interval: 5
+    timeout: 60
+
+registry:
+  server: ghcr.io
+  username: bikeindex
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+env:
+  clear:
+    STAGING: "1"
+    DISABLE_EMAIL_DELIVERY: "true"
+    BASE_URL: "https://staging.bikeindex.org"
+
+    # Postgres (staging-db accessory; dedicated role + databases)
+    POSTGRESQL_ADDRESS: staging-db
+    POSTGRESQL_USERNAME: bike_index_staging
+    POSTGRESQL_DATABASE: bike_index_staging_primary
+    POSTGRESQL_PRIMARY_REPLICA_ADDRESS: staging-db
+    ANALYTICS_DB_USERNAME: bike_index_staging
+    ANALYTICS_DB_DATABASE: bike_index_staging_analytics
+    ANALYTICS_DB_PORT: "5432"
+
+    # Redis (staging-redis accessory; logical DB 0 — single-tenant)
+    REDIS_URL: "redis://staging-redis:6379/0"
+    REDIS_CACHE_URL: "redis://staging-redis:6379/0"
+    REDIS_RACK_ATTACK_URL: "redis://staging-redis:6379/0"
+
+    # Runtime
+    RAILS_LOG_TO_STDOUT: "1"
+    RAILS_SERVE_STATIC_FILES: "1"
+    WEB_CONCURRENCY: "1"
+    RAILS_MAX_THREADS: "3"
+    DB_POOL: "5"
+
+  secret:
+    - POSTGRES_PASSWORD
+    - POSTGRESQL_PASSWORD
+    - ANALYTICS_DB_PASSWORD
+    - SECRET_KEY_BASE
+    - SESSION_SECRET
+    - VERIFICATION_SECRET
+    - STRIPE_PUBLISHABLE_KEY
+    - STRIPE_SECRET_KEY
+    - STRIPE_WEBHOOK_SECRET
+    - POSTMARK_API_TOKEN
+    - GOOGLE_MAPS
+    - GOOGLE_MAPS_STATIC
+    - GOOGLE_GEOCODER
+    - MAPBOX_GEOCODER
+    - MAPBOX_MAPPING
+    - R2_ENDPOINT
+    - R2_ACCESS_KEY
+    - R2_ACCESS_KEY_SECRET
+    - CLOUDFLARE_TOKEN
+    - HONEYBADGER_API_KEY
+
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell:   app exec --interactive --reuse "bash"
+  logs:    app logs -f
+  dbc:     app exec --interactive --reuse "bin/rails dbconsole --include-password"
+
+volumes:
+  - "bike-index-staging_storage:/rails/storage"
+
+asset_path: /rails/public/assets
+
+builder:
+  arch: amd64
+  # CI builds + pushes the image; Kamal just pulls. No remote builder needed.
+
+# Dedicated staging accessories — named distinctly from review-app accessories
+# (`shared-db`, `shared-redis`) so both stacks can run on the same host.
+accessories:
+  db:
+    service: staging-db
+    image: postgres:17
+    host: <%= host %>
+    env:
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - staging_db_data:/var/lib/postgresql/data
+    options:
+      restart: always
+  redis:
+    service: staging-redis
+    image: redis:7
+    host: <%= host %>
+    cmd: "redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru"
+    directories:
+      - staging_redis_data:/data
+    options:
+      restart: always

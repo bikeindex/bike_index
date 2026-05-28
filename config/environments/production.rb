@@ -111,7 +111,11 @@ Rails.application.configure do
   config.action_mailer.default_url_options = {protocol: base_url.scheme, host: base_url.host}
   routes.default_url_options = config.action_mailer.default_url_options
 
-  if ENV["SENDGRID_ENABLED"] == "true"
+  # Staging copies production but must never send real email — see config/deploy.staging.yml.
+  if ENV["DISABLE_EMAIL_DELIVERY"] == "true"
+    config.action_mailer.delivery_method = :test
+    config.action_mailer.perform_deliveries = false
+  elsif ENV["SENDGRID_ENABLED"] == "true"
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
       address: "smtp.sendgrid.net",
