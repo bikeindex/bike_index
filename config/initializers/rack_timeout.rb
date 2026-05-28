@@ -1,4 +1,4 @@
-if Rails.env.production?
+if Rails.env.production? || Rails.env.staging?
   Rails.application.config.middleware.insert_after(
     ActionDispatch::RequestId, Rack::Timeout, service_timeout: 30, wait_timeout: 10
   )

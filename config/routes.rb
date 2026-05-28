@@ -2,16 +2,10 @@
 
 require "sidekiq/web"
 
-# Loaded here (not just config/environments/production.rb) so that booting
-# with STAGING=1 in non-production envs — e.g. exercising the route locally —
-# doesn't NameError on LetterOpenerWeb. require: false in the Gemfile keeps it
-# out of normal boots.
-require "letter_opener_web" if ENV["STAGING"] == "1"
-
 Rails.application.routes.draw do
   mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
   mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
-  if ENV["STAGING"] == "1"
+  if Rails.env.staging?
     mount LetterOpenerWeb::Engine, at: "/letter_opener", constraints: DeveloperRestriction
   end
 
@@ -447,5 +441,5 @@ Rails.application.routes.draw do
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
 
-  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge
+  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
 end

@@ -125,9 +125,9 @@ group :production do
 end
 
 group :staging do
-  # Web UI for inspecting messages routed by the staging mailer
-  # (config/environments/production.rb gates this on DISABLE_EMAIL_DELIVERY).
-  gem "letter_opener_web", "~> 3.0", require: false
+  # Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
+  # Rails auto-loads this via Bundler.require(*Rails.groups) when RAILS_ENV=staging.
+  gem "letter_opener_web", "~> 3.0"
 end
 
 group :development do
