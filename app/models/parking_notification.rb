@@ -86,13 +86,6 @@ class ParkingNotification < ActiveRecord::Base
   scope :initial_records, -> { where(initial_record_id: nil) }
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
   scope :with_impound_record, -> { where.not(impound_record_id: nil) }
-  scope :pre_notification_integration, -> { where("parking_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION) }
-  scope :email_success, -> {
-    left_outer_joins(:notifications)
-      .pre_notification_integration
-      .or(left_outer_joins(:notifications).merge(Notification.delivery_success))
-      .distinct
-  }
   scope :send_email, -> { where.not(unregistered_bike: true) }
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
   scope :not_unregistered_bike, -> { where(unregistered_bike: false) }
