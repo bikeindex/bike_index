@@ -10,6 +10,8 @@ class UpdateManufacturerLogoAndPriorityJob < ScheduledJob
   end
 
   def self.logo_url(manufacturer)
+    return if API_KEY.blank?
+
     host = website_host(manufacturer.website)
     return if host.blank?
 
