@@ -8,7 +8,6 @@
 #  id                    :integer          not null, primary key
 #  accuracy              :float
 #  city                  :string
-#  delivery_status       :string
 #  image                 :text
 #  image_processing      :boolean          default(FALSE), not null
 #  internal_notes        :text
@@ -54,6 +53,9 @@ class ParkingNotification < ActiveRecord::Base
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
   MAX_PER_PAGE = 250
+  # Cutoff for when parking_notifications started routing email delivery through Notification records.
+  # Records created before this time have no associated Notification — assume they emailed successfully.
+  PRE_NOTIFICATION_INTEGRATION = Time.at(1779000000).freeze
   enum :kind, KIND_ENUM
   enum :status, STATUS_ENUM
   enum :retrieved_kind, RETRIEVED_KIND_ENUM
@@ -63,6 +65,7 @@ class ParkingNotification < ActiveRecord::Base
   belongs_to :impound_record
   belongs_to :initial_record, class_name: "ParkingNotification"
   belongs_to :retrieved_by, class_name: "User"
+  has_many :notifications, as: :notifiable
   has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
@@ -83,7 +86,13 @@ class ParkingNotification < ActiveRecord::Base
   scope :initial_records, -> { where(initial_record_id: nil) }
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
   scope :with_impound_record, -> { where.not(impound_record_id: nil) }
-  scope :email_success, -> { where(delivery_status: "email_success") }
+  scope :pre_notification_integration, -> { where("parking_notifications.created_at < ?", PRE_NOTIFICATION_INTEGRATION) }
+  scope :email_success, -> {
+    left_outer_joins(:notifications)
+      .pre_notification_integration
+      .or(left_outer_joins(:notifications).merge(Notification.delivery_success))
+      .distinct
+  }
   scope :send_email, -> { where.not(unregistered_bike: true) }
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
   scope :not_unregistered_bike, -> { where(unregistered_bike: false) }
@@ -174,7 +183,20 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def email_success?
-    delivery_status == "email_success"
+    return true if pre_notification_integration?
+
+    notifications.delivery_success.exists?
+  end
+
+  def deliver_email
+    return if email_success?
+
+    notification = notifications.first ||
+      Notification.create(kind: "parking_notification", notifiable: self,
+        user_id: bike&.user_id, message_channel_target: email, bike_id:)
+    notification.track_email_delivery do
+      OrganizedMailer.parking_notification(self).deliver_now
+    end
   end
 
   def initial_record?
@@ -346,7 +368,7 @@ class ParkingNotification < ActiveRecord::Base
       return self unless active?
 
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
-        "location_from_address", "retrieval_link_token", "delivery_status")
+        "location_from_address", "retrieval_link_token")
         .merge(new_attrs)
       attrs["initial_record_id"] ||= id
       ParkingNotification.create!(attrs)
@@ -396,6 +418,10 @@ class ParkingNotification < ActiveRecord::Base
     return nil unless impound_notification? || resolved_notification.present?
 
     resolved_notification&.resolved_at || Time.current
+  end
+
+  def pre_notification_integration?
+    created_at.present? && created_at < PRE_NOTIFICATION_INTEGRATION
   end
 
   def calculated_status
