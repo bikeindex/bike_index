@@ -192,6 +192,28 @@ module Admin
         bikes = bikes.matching_domain(@search_domain)
       end
 
+      if params[:search_description].present?
+        @search_description = params[:search_description]
+        bikes = bikes.where("bikes.description ILIKE ?", "%#{@search_description.strip}%")
+      end
+
+      if params[:search_person].present?
+        @search_person = params[:search_person]
+        q = "%#{@search_person.strip}%"
+        bikes = bikes.joins(:current_ownership)
+          .where(
+            "bikes.owner_email ILIKE :q OR ownerships.owner_name ILIKE :q OR ownerships.registration_info::text ILIKE :q",
+            q:
+          ).references(:current_ownership)
+      end
+
+      if params[:search_notes].present?
+        @search_notes = params[:search_notes]
+        bikes = bikes.joins(:bike_organization_notes)
+          .where("bike_organization_notes.body ILIKE ?", "%#{@search_notes.strip}%")
+          .distinct
+      end
+
       if params[:serial].present?
         @serial_normalized = SerialNormalizer.normalized_and_corrected(params[:serial])
         bikes = bikes.matching_serial(@serial_normalized)
