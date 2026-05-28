@@ -155,7 +155,7 @@
     @apply tw:opacity-0 tw:pointer-events-none;
   }
   .search-results-frame-wrapper > .search-loading-overlay {
-    @apply tw:hidden tw:absolute tw:top-0 tw:left-0 tw:right-0 tw:pointer-events-none tw:z-10;
+    @apply tw:hidden tw:absolute tw:top-0 tw:left-0 tw:right-0 tw:pointer-events-none tw:z-1;
   }
   .search-results-frame-wrapper:has(> turbo-frame[busy]) {
     @apply tw:min-h-48;
