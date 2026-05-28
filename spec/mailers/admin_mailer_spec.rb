@@ -9,8 +9,8 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(mail.to).to eq(["contact@bikeindex.org"])
       expect(mail.reply_to).to eq([feedback.email])
       expect(mail.tag).to eq("admin")
-      expect(mail.body.encoded).to match "supported by"
-      expect(mail.deliver_now.text_part.body.to_s).to include(feedback.body).and include("supported by")
+      expect(mail.body.encoded).to_not match "supported by"
+      expect(mail.deliver_now.text_part.body.to_s).to include(feedback.body)
     end
   end
 
