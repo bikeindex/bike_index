@@ -83,7 +83,7 @@ RSpec.describe Admin::DashboardController, type: :request do
           get "/admin/scheduled_jobs"
           expect(response.code).to eq "200"
           expect(response.body).to include("Skipped via ENV SIDEKIQ_SKIP")
-          expect(response.body).to include("<code>FetchProject529BikesJob</code>")
+          expect(response.body).to match(%r{<code>\s*FetchProject529BikesJob\s*</code>})
         end
       end
     end
