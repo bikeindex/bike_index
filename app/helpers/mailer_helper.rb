@@ -4,7 +4,7 @@ module MailerHelper
   end
 
   def render_supporters?(organization = nil)
-    return false if @email_preview
+    return false
 
     if organization.present?
       return false if organization.bike_shop? || organization.paid_money?
