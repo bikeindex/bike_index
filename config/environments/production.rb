@@ -112,9 +112,10 @@ Rails.application.configure do
   routes.default_url_options = config.action_mailer.default_url_options
 
   # Staging copies production but must never send real email — see config/deploy.staging.yml.
+  # Messages are captured by letter_opener_web and viewable at /letter_opener.
   if ENV["DISABLE_EMAIL_DELIVERY"] == "true"
-    config.action_mailer.delivery_method = :test
-    config.action_mailer.perform_deliveries = false
+    require "letter_opener_web"
+    config.action_mailer.delivery_method = :letter_opener_web
   elsif ENV["SENDGRID_ENABLED"] == "true"
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {

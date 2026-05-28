@@ -124,6 +124,12 @@ group :production do
   gem "honeybadger" # Error monitoring
 end
 
+group :staging do
+  # Web UI for inspecting messages routed by the staging mailer
+  # (config/environments/production.rb gates this on DISABLE_EMAIL_DELIVERY).
+  gem "letter_opener_web", "~> 3.0", require: false
+end
+
 group :development do
   gem "bullet"
   # Extra faraday response logging. Used in exchange rate api client and external registry

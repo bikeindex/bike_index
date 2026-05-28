@@ -2,9 +2,16 @@
 
 require "sidekiq/web"
 
+if ENV["STAGING"] == "1"
+  require "letter_opener_web"
+end
+
 Rails.application.routes.draw do
   mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
   mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
+  if ENV["STAGING"] == "1"
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
 
   use_doorkeeper do
     controllers applications: "oauth/applications"
