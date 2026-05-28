@@ -17,15 +17,21 @@ RSpec.describe ReviewAppBanner::Component, type: :component do
       expect(component.text).to include("not production")
     end
 
+    it "links to the letter_opener inbox" do
+      inbox = component.css("a[href='/letter_opener']").first
+      expect(inbox).to be_present
+      expect(inbox.text).to include("email inbox")
+    end
+
     it "omits the PR link when no pr_number is given" do
-      expect(component.css("a")).to be_empty
+      expect(component.css("a[href^='https://github.com']")).to be_empty
     end
 
     context "with a pr_number" do
       let(:pr_number) { 1234 }
 
       it "links to the PR on github.com/bikeindex/bike_index" do
-        link = component.css("a").first
+        link = component.css("a[href^='https://github.com']").first
         expect(link[:href]).to eq("https://github.com/bikeindex/bike_index/pull/1234")
         expect(link.text).to include("PR #1234")
       end
