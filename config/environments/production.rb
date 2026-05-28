@@ -111,8 +111,9 @@ Rails.application.configure do
   config.action_mailer.default_url_options = {protocol: base_url.scheme, host: base_url.host}
   routes.default_url_options = config.action_mailer.default_url_options
 
-  # Staging copies production but must never send real email — see config/deploy.staging.yml.
-  # Messages are captured by letter_opener_web and viewable at /letter_opener.
+  # Review apps double as our staging environment — see config/deploy.review.yml.
+  # DISABLE_EMAIL_DELIVERY routes ActionMailer through letter_opener_web; messages
+  # are viewable at /letter_opener (gated by DeveloperRestriction).
   if ENV["DISABLE_EMAIL_DELIVERY"] == "true"
     require "letter_opener_web"
     config.action_mailer.delivery_method = :letter_opener_web

@@ -62,6 +62,12 @@ env:
   clear:
     REVIEW_APP: "1"
     REVIEW_APP_PR_NUMBER: "<%= pr %>"
+    # Review apps are the only staging environment we have; treat them as such.
+    # STAGING=1 + DISABLE_EMAIL_DELIVERY=true route ActionMailer through
+    # letter_opener_web (mounted at /letter_opener behind DeveloperRestriction
+    # — see config/routes.rb + config/environments/production.rb).
+    STAGING: "1"
+    DISABLE_EMAIL_DELIVERY: "true"
     BASE_URL: "https://<%= slug %>.review.bikeindex.org"
 
     # Postgres (shared-db accessory; per-PR role + databases)

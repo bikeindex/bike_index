@@ -2,6 +2,8 @@
 
 Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single shared host. Each PR gets its own subdomain (`pr-N.review.bikeindex.org`), its own Postgres role + databases (primary + analytics), and its own Sidekiq worker. Production runs on Cloud66; none of these files affect production.
 
+Review apps are also our **staging environment** — `STAGING=1` and `DISABLE_EMAIL_DELIVERY=true` are set on every review app, so ActionMailer routes through [`letter_opener_web`](https://github.com/fgrehm/letter_opener_web) instead of Postmark. Captured messages are viewable at `pr-N.review.bikeindex.org/letter_opener`, gated by `DeveloperRestriction` (same as `/sidekiq` and `/pghero`). The inbox lives at `tmp/letter_opener/` inside the container and is wiped on every Kamal deploy.
+
 ## How to trigger one
 
 1. Open the [Review App workflow](https://github.com/bikeindex/bike_index/actions/workflows/review-app.yml) in Actions.
@@ -80,7 +82,7 @@ These create the `shared-db` (Postgres 17) and `shared-redis` (Redis 7) containe
   - `REVIEW_APP_POSTGRES_PASSWORD` — the password from step 6
   - `REVIEW_APP_SECRET_KEY_BASE`, `REVIEW_APP_SESSION_SECRET`, `REVIEW_APP_VERIFICATION_SECRET` — review-app values (do NOT reuse production)
   - `REVIEW_APP_STRIPE_PUBLISHABLE_KEY`, `REVIEW_APP_STRIPE_SECRET_KEY`, `REVIEW_APP_STRIPE_WEBHOOK_SECRET` — Stripe **test mode**
-  - `REVIEW_APP_POSTMARK_API_TOKEN` — Postmark sandbox stream
+  - `REVIEW_APP_POSTMARK_API_TOKEN` — Postmark sandbox stream (defense in depth; ActionMailer is already routed to letter_opener_web)
   - `REVIEW_APP_GOOGLE_MAPS`, `REVIEW_APP_GOOGLE_MAPS_STATIC`, `REVIEW_APP_GOOGLE_GEOCODER`, `REVIEW_APP_MAPBOX_GEOCODER`, `REVIEW_APP_MAPBOX_MAPPING`
   - `REVIEW_APP_R2_ENDPOINT`, `REVIEW_APP_R2_ACCESS_KEY`, `REVIEW_APP_R2_ACCESS_KEY_SECRET` — R2 creds scoped to a `review-app/` prefix (separate IAM token from prod)
   - `REVIEW_APP_CLOUDFLARE_TOKEN`
