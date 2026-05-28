@@ -24,13 +24,9 @@ RSpec.describe OrganizedMailer, type: :mailer do
     end
   end
 
-  def expect_render_supporters(should_render, mail)
-    snippet_to_match = "supported by"
-    if should_render
-      expect(mail.body.encoded).to match snippet_to_match
-    else
-      expect(mail.body.encoded).to_not match snippet_to_match
-    end
+  def expect_render_supporters(_should_render, mail)
+    # Disabled in PR#3616 - supporters block never renders, so should_render is ignored
+    expect(mail.body.encoded).to_not match "supported by"
   end
 
   describe "partial_registration" do
