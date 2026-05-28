@@ -40,7 +40,7 @@ If a URL redirects to `/session/new` or `/session/magic_link`, drive the form vi
 
 **Picking an org slug.** When the URL is org-scoped (`/o/<slug>/...`) and the caller didn't specify a slug, default to `hogwarts`
 
-**Verify identity before capturing.** The dev DB can contain real-looking data (see `feedback_no_programmatic_auth_for_screenshots.md`). Check:
+**Verify identity before capturing.** The dev DB can contain real-looking data, so a non-seed user signed into the persistent profile is a PII risk on upload. Check:
 
 ```js
 document.getElementById('navUserSettingLink')?.dataset.email
