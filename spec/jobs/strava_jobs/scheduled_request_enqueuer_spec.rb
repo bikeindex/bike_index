@@ -14,6 +14,24 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
     expect(described_class.frequency).to eq(59.seconds)
   end
 
+  describe "skip_scheduling?" do
+    it "is false when STRAVA_KEY is set" do
+      expect(ENV["STRAVA_KEY"]).to be_present
+      expect(instance.skip_scheduling?).to be_falsey
+    end
+
+    context "when STRAVA_KEY is blank" do
+      before do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with("STRAVA_KEY").and_return(nil)
+      end
+
+      it "is true" do
+        expect(instance.skip_scheduling?).to be_truthy
+      end
+    end
+  end
+
   describe "perform" do
     before { Sidekiq::Job.clear_all }
     it "does nothing when no pending requests" do
