@@ -11,7 +11,7 @@ module Search
       next_page = (matches.length >= PER_PAGE) ? current_page + 1 : nil
 
       render turbo_stream: view_context.render(
-        Search::EverythingCombobox::Options::Component.new(
+        Search::EverythingComboboxOptions::Component.new(
           matches:,
           search_obj_name: params[:search_obj_name].presence || "Registrations",
           next_page:,
