@@ -10,7 +10,11 @@
   <%= render UI::Alert::Component.new(kind: :warning, header: "Skipped via ENV SIDEKIQ_SKIP_*") do %>
     <ul class="tw:mb-0">
       <% env_skipped_jobs.each do |env_key| %>
-        <li><code><%= env_key.sub(/\ASIDEKIQ_SKIP_/, "").downcase.camelize %></code></li>
+        <li>
+          <code>
+            <%= env_key.sub(/\ASIDEKIQ_SKIP_/, "").downcase.camelize %>
+          </code>
+        </li>
       <% end %>
     </ul>
   <% end %>
