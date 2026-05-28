@@ -84,7 +84,6 @@ These create the `shared-db` (Postgres 17) and `shared-redis` (Redis 7) containe
   - `REVIEW_APP_STRIPE_PUBLISHABLE_KEY`, `REVIEW_APP_STRIPE_SECRET_KEY`, `REVIEW_APP_STRIPE_WEBHOOK_SECRET` — Stripe **test mode**
   - `REVIEW_APP_GOOGLE_MAPS`, `REVIEW_APP_GOOGLE_MAPS_STATIC`, `REVIEW_APP_GOOGLE_GEOCODER`, `REVIEW_APP_MAPBOX_GEOCODER`, `REVIEW_APP_MAPBOX_MAPPING`
   - `REVIEW_APP_R2_DEV_ENDPOINT`, `REVIEW_APP_R2_DEV_ACCESS_KEY`, `REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET` — creds for the `bikeindex-dev` R2 bucket (`cloudflare_dev` service in `config/storage.yml`). Staging review apps share this bucket; do NOT reuse the production R2 token.
-  - `REVIEW_APP_CLOUDFLARE_TOKEN`
   - `REVIEW_APP_HONEYBADGER_API_KEY` — optional; the post-deploy hook no-ops if unset
 
 Other Bike Index env vars (Twitter, Twilio, Facebook, etc.) intentionally fall through to empty for review apps; those integrations stay stubbed.
