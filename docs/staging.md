@@ -70,7 +70,7 @@ These create the `staging-db` (Postgres 17) and `staging-redis` (Redis 7) contai
 
 Staging seeds and operates on data shapes that mirror production. Sending real email from staging risks contacting real registered owners, organizations, and stolen-bike reporters. Routing delivery through `letter_opener_web` means the entire mailer code path still runs (templates render, jobs enqueue, view assertions hold), but messages land in an in-app inbox at `/letter_opener` instead of shipping.
 
-If you need to inspect what staging *would* have sent, open https://staging.bikeindex.org/letter_opener. To deliver real email from staging temporarily, set `DISABLE_EMAIL_DELIVERY=false` in the Kamal config and redeploy — but **never** do this against a production-cloned dataset without scrubbing first.
+If you need to inspect what staging *would* have sent, open https://staging.bikeindex.org/letter_opener — gated by `DeveloperRestriction`, same as `/sidekiq` and `/pghero`. The inbox lives at `tmp/letter_opener/` inside the container and is wiped on every Kamal deploy; if you need a message to outlive a redeploy, grab it from the UI before pushing. To deliver real email from staging temporarily, set `DISABLE_EMAIL_DELIVERY=false` in the Kamal config and redeploy — but **never** do this against a production-cloned dataset without scrubbing first.
 
 ## Files involved
 

@@ -75,7 +75,7 @@ jobs:
     # All env vars on the deploy step feed `.kamal/secrets-ci` via Dotenv variable
     # substitution. Kamal substitutes `$POSTGRES_PASSWORD` etc. from the calling
     # process env at deploy time.
-    env: &deploy_env
+    env:
       STAGING_HOST: ${{ vars.STAGING_HOST }}
       KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       POSTGRES_PASSWORD: ${{ secrets.STAGING_POSTGRES_PASSWORD }}
