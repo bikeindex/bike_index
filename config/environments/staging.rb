@@ -51,8 +51,9 @@ Rails.application.configure do
   # yet still be able to expire them through the digest params.
   config.assets.digest = true
 
-  # Store uploaded files on the local file system (see config/storage.yml for options)
-  config.active_storage.service = :cloudflare_production
+  # Store uploads in the dev R2 bucket so staging review apps don't touch
+  # production assets (see config/storage.yml).
+  config.active_storage.service = :cloudflare_dev
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true
