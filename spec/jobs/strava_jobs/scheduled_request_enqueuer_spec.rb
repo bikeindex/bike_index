@@ -21,10 +21,7 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
     end
 
     context "when STRAVA_KEY is blank" do
-      before do
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[]).with("STRAVA_KEY").and_return(nil)
-      end
+      before { stub_const("ENV", ENV.to_hash.merge("STRAVA_KEY" => nil)) }
 
       it "is true" do
         expect(instance.skip_scheduling?).to be_truthy

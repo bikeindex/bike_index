@@ -13,10 +13,7 @@ RSpec.describe ScheduledSearchForExternalRegistryBikesJob, type: :job do
     end
 
     context "when VERLOREN_OF_GEVONDEN_BASE_URL is blank" do
-      before do
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[]).with("VERLOREN_OF_GEVONDEN_BASE_URL").and_return(nil)
-      end
+      before { stub_const("ENV", ENV.to_hash.merge("VERLOREN_OF_GEVONDEN_BASE_URL" => nil)) }
 
       it "is true" do
         expect(instance.skip_scheduling?).to be_truthy

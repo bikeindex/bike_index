@@ -27,10 +27,7 @@ RSpec.describe ScheduledJobRunner, type: :lib do
     end
 
     context "when SIDEKIQ_SKIP_SCHEDULED_JOB_RUNNER is set" do
-      before do
-        allow(ENV).to receive(:fetch).and_call_original
-        allow(ENV).to receive(:fetch).with("SIDEKIQ_SKIP_SCHEDULED_JOB_RUNNER", nil).and_return("true")
-      end
+      before { stub_const("ENV", ENV.to_hash.merge("SIDEKIQ_SKIP_SCHEDULED_JOB_RUNNER" => "true")) }
 
       it "is true, and perform does not enqueue workers or record history" do
         clear_scheduled_history
