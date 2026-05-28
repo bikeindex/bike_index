@@ -6092,6 +6092,13 @@ CREATE INDEX index_bikes_on_serial_normalized_no_space_trgm ON public.bikes USIN
 
 
 --
+-- Name: index_bikes_on_serial_normalized_tsvector; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_serial_normalized_tsvector ON public.bikes USING gin (to_tsvector('simple'::regconfig, (serial_normalized)::text)) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
 -- Name: index_bikes_on_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7164,6 +7171,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260525162548'),
 ('20260514182008'),
 ('20260514085900'),
 ('20260430122735'),

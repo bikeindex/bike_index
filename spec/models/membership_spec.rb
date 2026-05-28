@@ -74,12 +74,10 @@ RSpec.describe Membership, type: :model do
           membership_existing.update_columns(end_at: nil, status: "active")
           expect(membership_new.reload.period_active?).to be_truthy
           expect(membership_new.id).to be > membership_existing.id
-          membership_existing.reload.save
-          expect(membership_existing.reload.save).to be_truthy
-          membership_existing.update(end_at: Time.current + 1.minute)
-          expect(membership_existing.reload.end_at).to be_within(1).of Time.current + 1.minute
+          expect(membership_existing.reload.save).to be_falsey
+          expect(membership_existing.errors.full_messages.to_s).to match(/already/i)
 
-          # Nothing has happened here
+          # membership_new is untouched
           expect(membership_new.reload.end_at).to be_nil
         end
       end
@@ -98,6 +96,40 @@ RSpec.describe Membership, type: :model do
         expect(membership_existing).to be_valid
         user.destroy
         expect(membership_existing.reload).to be_valid
+      end
+    end
+
+    describe "user_id uniqueness while pending or active" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      let!(:active_membership) { FactoryBot.create(:membership, user:, creator: nil) }
+      let(:new_membership) { FactoryBot.build(:membership, user:, creator: nil) }
+
+      it "blocks a second active membership for the same user" do
+        expect(active_membership.status).to eq "active"
+        expect(new_membership).not_to be_valid
+        expect(new_membership.errors.full_messages.to_s).to match(/already/i)
+      end
+
+      context "with the existing membership ended" do
+        before { active_membership.update!(start_at: 1.year.ago, end_at: 1.minute.ago) }
+
+        it "allows a new active membership" do
+          expect(active_membership.reload.status).to eq "ended"
+          expect(new_membership).to be_valid
+        end
+      end
+
+      context "with the existing membership linked to its own stripe_subscription" do
+        # Unusual but legitimate: each membership tied to its own subscription.
+        before do
+          FactoryBot.create(:stripe_subscription, user:, stripe_status: "active",
+            stripe_id: "sub_sibling", membership: active_membership)
+        end
+
+        it "allows a new active membership" do
+          expect(active_membership.reload.stripe_subscriptions.count).to eq 1
+          expect(new_membership).to be_valid
+        end
       end
     end
   end

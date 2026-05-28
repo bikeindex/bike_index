@@ -2,7 +2,8 @@ module Admin
   class OrganizationsController < Admin::BaseController
     include Binxtils::SortableTable
 
-    before_action :find_organization, only: [:show, :edit, :update, :destroy]
+    before_action :find_organization, only: %i[show edit update destroy]
+    before_action :set_admin_form_page_id, only: %i[new edit]
 
     def index
       @per_page = permitted_per_page
@@ -205,6 +206,13 @@ module Admin
       return true if @organization.present?
 
       raise ActiveRecord::RecordNotFound # Because this should have been raised
+    end
+
+    # Override the page_id so the vendored admin bundle's `#admin_organizations_(new|edit)`
+    # dispatcher doesn't instantiate its hard-coded AdminEdit class — replaced by
+    # `app/javascript/controllers/admin/organization_form_controller.js`.
+    def set_admin_form_page_id
+      @page_id = "admin_organization_form"
     end
   end
 end

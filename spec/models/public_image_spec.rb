@@ -21,8 +21,8 @@ RSpec.describe PublicImage, type: :model do
   end
 
   describe "large images that exceed the size restriction" do
-    before { ImageUploader.enable_processing = true }
-    after { ImageUploader.enable_processing = false }
+    before { PublicImageUploader.enable_processing = true }
+    after { PublicImageUploader.enable_processing = false }
 
     it "are not created" do
       large_image = File.open(Rails.root.join("spec", "fixtures", "hugeimg.png"))

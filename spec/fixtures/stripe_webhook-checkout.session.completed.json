@@ -1,13 +1,15 @@
 {
-  "id": "evt_0Qv3uNm0T0GBfX0v3935IdAR",
+  "id": "evt_0Tb1opm0T0GBfX0veedyxQTJ",
   "object": "event",
   "api_version": "2025-01-27.acacia",
-  "created": 1740173839,
+  "created": 1779728255,
   "data": {
     "object": {
-      "id": "cs_test_a14VdEixSrpFjwqkENSaSEdr8THKAu5Q6wCe8tE1qJaeBB6NEAsjpYvgg4",
+      "id": "cs_test_a1XzIICn9NZ2p5RoNzP8GLCSMog4c2noU1G4d4V8sgs3MVjZxEYysztFHl",
       "object": "checkout.session",
-      "adaptive_pricing": null,
+      "adaptive_pricing": {
+        "enabled": true
+      },
       "after_expiration": null,
       "allow_promotion_codes": null,
       "amount_subtotal": 999,
@@ -15,57 +17,76 @@
       "automatic_tax": {
         "enabled": false,
         "liability": null,
+        "provider": null,
         "status": null
       },
       "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Bike Index Test",
+        "font_family": "default",
+        "icon": {
+          "type": "url",
+          "url": "https://stripe-camo.global.ssl.fastly.net/b4482d0007d24b441c7905466ea522c2ee3dcc6a8eff7f58350343a828cf242e/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f7374726970652d75706c6f6164732f616363745f324b736e6d3054304742665830767950554978456d65726368616e742d69636f6e2d3436393534342d42696b65496e6465784c6f676f2e706e67/6d65726368616e745f69643d616363745f324b736e6d30543047426658307679505549784526636c69656e743d5041594d454e545f50414745"
+        },
+        "logo": null
+      },
       "cancel_url": "http://localhost:3042/membership/new",
       "client_reference_id": null,
       "client_secret": null,
       "collected_information": {
+        "business_name": null,
+        "individual_name": null,
         "shipping_details": null
       },
       "consent": null,
       "consent_collection": null,
-      "created": 1740173800,
+      "created": 1779728205,
       "currency": "usd",
       "currency_conversion": null,
-      "custom_fields": [
-      ],
+      "custom_fields": [],
       "custom_text": {
         "after_submit": null,
         "shipping_address": null,
         "submit": null,
         "terms_of_service_acceptance": null
       },
-      "customer": "cus_RohIc4uZhMPzxN",
+      "customer": "cus_UaCDYAUdXDhFPp",
+      "customer_account": null,
       "customer_creation": "always",
       "customer_details": {
         "address": {
           "city": null,
-          "country": "US",
+          "country": null,
           "line1": null,
           "line2": null,
-          "postal_code": "94110",
+          "postal_code": null,
           "state": null
         },
-        "email": "seth@bikeindex.org",
-        "name": "Seth Herr",
+        "business_name": null,
+        "email": "test@example.bikeindex.org",
+        "individual_name": null,
+        "name": "",
         "phone": null,
         "tax_exempt": "none",
-        "tax_ids": [
-        ]
+        "tax_ids": []
       },
-      "customer_email": "seth@bikeindex.org",
-      "discounts": [
-      ],
-      "expires_at": 1740260200,
-      "invoice": "in_0Qv3uJm0T0GBfX0vXLZmSpZb",
+      "customer_email": "test@example.bikeindex.org",
+      "discounts": [],
+      "expires_at": 1779814604,
+      "integration_identifier": null,
+      "invoice": "in_0Tb1okm0T0GBfX0vqF7bzRyM",
       "invoice_creation": null,
       "livemode": false,
       "locale": null,
-      "metadata": {
+      "managed_payments": {
+        "enabled": false
       },
+      "metadata": {},
       "mode": "subscription",
+      "origin_context": null,
       "payment_intent": null,
       "payment_link": null,
       "payment_method_collection": "always",
@@ -83,6 +104,7 @@
         "cashapp"
       ],
       "payment_status": "paid",
+      "permissions": null,
       "phone_number_collection": {
         "enabled": false
       },
@@ -91,16 +113,15 @@
         "allow_redisplay_filters": [
           "always"
         ],
-        "payment_method_remove": null,
+        "payment_method_remove": "disabled",
         "payment_method_save": null
       },
       "setup_intent": null,
       "shipping_address_collection": null,
-      "shipping_options": [
-      ],
+      "shipping_options": [],
       "status": "complete",
       "submit_type": null,
-      "subscription": "sub_0Qv3uJm0T0GBfX0v77OTe6ii",
+      "subscription": "sub_0Tb1okm0T0GBfX0vIuafkiOk",
       "success_url": "http://localhost:3042/membership/success?session_id={CHECKOUT_SESSION_ID}",
       "total_details": {
         "amount_discount": 0,
@@ -109,6 +130,7 @@
       },
       "ui_mode": "hosted",
       "url": null,
+      "wallet_options": null,
       "shipping_cost": null,
       "shipping_details": null
     }

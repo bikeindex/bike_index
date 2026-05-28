@@ -9,9 +9,8 @@
     = form_for [:admin, @organization_role] do |f|
       = render(Alerts::ObjectErrors::Component.new(object: @organization_role))
 
-      .form-group.fancy-select.unfancy
-        = f.label :organization
-        = collection_select :organization_role, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control"
+      .form-group
+        = render Form::Combobox::Component.new(name: :organization_id, form: f, label: OrganizationRole.human_attribute_name(:organization), placeholder: "Please select an organization", required: true, include_blank: true, options: @organizations.pluck(:name, :id))
 
       .form-group
         = f.label :invited_email

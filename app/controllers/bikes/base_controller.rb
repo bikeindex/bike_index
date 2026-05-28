@@ -149,6 +149,7 @@ module Bikes
       # First, deal with claim_token
       if params[:t].present? && @bike.current_ownership.token == params[:t]
         @claim_message = @bike.current_ownership&.claim_message
+        session[:claim_token_email] = @bike.current_ownership.owner_email
       end
       # Then deal with parking notification and graduated notification tokens
       @token = params[:parking_notification_retrieved].presence || params[:graduated_notification_remaining].presence

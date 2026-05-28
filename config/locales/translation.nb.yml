@@ -1190,9 +1190,6 @@ nb:
           problem: meldingsteksten samsvarer ikke med det deklarerte formatet
           resolution: når du spesifiserer %{body_format} som innholdstype, må du sende
             gyldig %{body_format} i forespørselens "body"
-        empty_message_body: tom meldingstekst levert med %{body_format} innholdstype
-        too_many_multipart_files: antall opplastede filer overskred systemets konfigurerte
-          grense (%{limit})
         invalid_accept_header:
           problem: ugyldig aksept-overskrift
           resolution: "%{message}"
@@ -1204,10 +1201,6 @@ nb:
         length_is: forventes å ha lengde nøyaktig lik %{is}
         length_min: forventes å ha lengde større enn eller lik %{min}
         length_max: forventes å ha lengde mindre enn eller lik %{max}
-        conflicting_types: spørreparametere inneholder motstridende typer
-        invalid_parameters: Spørreparameterne inneholder ugyldig format eller bytesekvens
-        too_deep_parameters: Spørreparametere nestes rekursivt over den angitte grensen
-          (%{limit})
         unknown_auth_strategy: 'ukjent autentiseringsstrategi: %{strategy}'
         unknown_params_builder: 'ukjent params_builder: %{params_builder_type}'
   flash:
