@@ -1,10 +1,10 @@
 class ApplicationController < ActionController::Base
   include ControllerHelpers
   include Binxtils::SetPeriod
-
-  self.default_earliest_time = Time.at(1134972000).freeze # Earliest bike created at
   include Turbo::Redirection
   include Pagy::Method
+
+  self.default_earliest_time = Time.at(1134972000).freeze # Earliest bike created at
 
   protect_from_forgery
 
