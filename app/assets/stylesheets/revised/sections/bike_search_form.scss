@@ -222,34 +222,3 @@
     text-align: left;
   }
 }
-
-// Turbo sets [busy] on the results frame during requests. Dim the existing
-// results and overlay a spinner; min-height gives the spinner a place to land
-// on the initial auto-submit when the frame is still empty.
-.search-results-frame-wrapper {
-  position: relative;
-
-  > turbo-frame[busy] {
-    opacity: 0.5;
-    pointer-events: none;
-    transition: opacity 0.15s;
-  }
-
-  > .search-loading-overlay {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    pointer-events: none;
-    z-index: 10;
-  }
-
-  &:has(> turbo-frame[busy]) {
-    min-height: 12rem;
-
-    > .search-loading-overlay {
-      display: block;
-    }
-  }
-}
