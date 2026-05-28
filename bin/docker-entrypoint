@@ -6,10 +6,21 @@
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   if [ -n "$POSTGRES_PASSWORD" ] && [ -n "$POSTGRESQL_ADDRESS" ] && [ -n "$POSTGRESQL_USERNAME" ]; then
     echo "Ensuring database role '$POSTGRESQL_USERNAME' exists..."
-    PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRESQL_ADDRESS" -U postgres -tc \
-      "SELECT 1 FROM pg_roles WHERE rolname='$POSTGRESQL_USERNAME'" | grep -q 1 || \
-      PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRESQL_ADDRESS" -U postgres -c \
-      "CREATE ROLE $POSTGRESQL_USERNAME WITH LOGIN PASSWORD '$POSTGRESQL_PASSWORD' CREATEDB;"
+    # Single round-trip, race-free check + create. `:"var"` / `:'var'` are psql
+    # variable substitutions that safely quote as identifier / literal; passing
+    # them through format()'s %I / %L escapes any quotes in the password.
+    PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRESQL_ADDRESS" -U postgres \
+      -v ON_ERROR_STOP=1 \
+      -v username="$POSTGRESQL_USERNAME" \
+      -v password="$POSTGRESQL_PASSWORD" <<'SQL'
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'username') THEN
+    EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L CREATEDB', :'username', :'password');
+  END IF;
+END
+$$;
+SQL
   fi
 
   ./bin/rails db:prepare

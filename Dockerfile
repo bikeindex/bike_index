@@ -73,4 +73,7 @@ COPY --chown=rails:rails --from=build /rails /rails
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 EXPOSE 80
+# bin/docker-entrypoint keys role-creation + db:prepare off the last two args
+# being `./bin/rails server` — if you change CMD (e.g. to bin/jobs), update the
+# entrypoint's guard too or per-PR Postgres roles will stop being provisioned.
 CMD ["./bin/thrust", "./bin/rails", "server"]

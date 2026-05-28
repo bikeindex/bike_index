@@ -113,7 +113,7 @@ Destroy reverses it: `kamal app remove`, then drops both databases + the role, t
 | `.kamal/hooks/post-deploy` | Honeybadger deploy notification (no-op if `HONEYBADGER_API_KEY` unset) |
 | `.github/workflows/review-app.yml` | The single workflow handling all four trigger paths |
 | `provisioning/` | Ansible playbook for one-time host hardening |
-| `app/views/shared/_review_app_banner.html.erb` | Banner shown when `ENV["REVIEW_APP"]` is set |
+| `app/components/review_app_banner/` | ViewComponent rendered in the application layout when `ENV["REVIEW_APP"]` is set |
 
 ## Known limits
 
