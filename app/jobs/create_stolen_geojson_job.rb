@@ -27,7 +27,7 @@ class CreateStolenGeojsonJob < ScheduledJob
     # Note: this file url uses Cloudflare's transform function to add CORS headers
     Spreadsheets::TsvCreator.new.send_to_uploader(output)
     # Expire cache so we get the newest one!
-    Integrations::Cloudflare.new.expire_cache(self.class.file_url)
+    Integrations::Cloudflare.expire_cache(self.class.file_url)
   end
 
   def geojson_bike_features
