@@ -4,11 +4,11 @@ module MailerHelper
   end
 
   def render_supporters?(organization = nil)
-    return false
-
-    if organization.present?
-      return false if organization.bike_shop? || organization.paid_money?
-    end
-    true
+    false
+    # Disabled in PR#3616
+    # if organization.present?
+    #   return false if organization.bike_shop? || organization.paid_money?
+    # end
+    # true
   end
 end
