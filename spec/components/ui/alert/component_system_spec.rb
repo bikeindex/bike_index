@@ -12,7 +12,7 @@ RSpec.describe UI::Alert::Component, :js, type: :system do
       visit(preview_path)
 
       expect(page).to have_content "Dismissable error"
-      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+      expect_axe_clean
 
       find('button[aria-label="Close"]').click
 
