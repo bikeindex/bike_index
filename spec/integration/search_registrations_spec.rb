@@ -59,15 +59,6 @@ RSpec.describe "Bike search", :js, type: :system do
 
     click_first_bike_and_go_back
 
-    # Going back again lands on the initial search page. Its results must
-    # reload rather than restoring a Turbo snapshot whose frame is stuck in the
-    # [busy] loading state (results hidden under the spinner overlay) - the
-    # "everything fails after going back from a search" regression.
-    page.go_back
-    expect(page).to have_css(".bike-box-item", wait: 10)
-    page.go_forward
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-
     # Switch to proximity search for NYC
     choose("stolenness_proximity", allow_label_click: true, visible: :all)
     fill_in "distance", with: "200"
@@ -88,5 +79,31 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
 
     click_first_bike_and_go_back
+  end
+
+  it "reloads results when going back to the initial search page" do
+    visit "/"
+    visit "/search/registrations"
+    expect(page).to have_css(".bike-box-item", wait: 10)
+
+    # Search Blue, then view a result
+    choose("stolenness_all", allow_label_click: true, visible: :all)
+    find(".hw-combobox__input").set("Blue")
+    expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
+    find(".hw-combobox__option", text: "Blue", match: :first).click
+    find("#search-button").click
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+
+    first(".bike-box-item .title-link a").click
+    expect(page).to have_css("h1.bike-title", wait: 10)
+
+    # Back to the Blue results, then back again to the initial search page. Its
+    # results must reload rather than restoring a Turbo snapshot whose frame is
+    # stuck in the [busy] loading state (results hidden under the spinner
+    # overlay) - the "everything fails after going back from a search" bug.
+    page.go_back
+    expect(page).to have_css(".bike-box-item", wait: 10)
+    page.go_back
+    expect(page).to have_css(".bike-box-item", wait: 10)
   end
 end
