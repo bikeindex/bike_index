@@ -104,10 +104,10 @@ gh auth login --scopes write:packages  # KAMAL_REGISTRY_PASSWORD=$(gh auth token
 ```
 POSTGRES_PASSWORD            SECRET_KEY_BASE              SESSION_SECRET
 VERIFICATION_SECRET          STRIPE_PUBLISHABLE_KEY       STRIPE_SECRET_KEY
-STRIPE_WEBHOOK_SECRET        POSTMARK_API_TOKEN           GOOGLE_MAPS
-GOOGLE_MAPS_STATIC           GOOGLE_GEOCODER              MAPBOX_GEOCODER
-MAPBOX_MAPPING               R2_ENDPOINT                  R2_ACCESS_KEY
-R2_ACCESS_KEY_SECRET         CLOUDFLARE_TOKEN             HONEYBADGER_API_KEY
+STRIPE_WEBHOOK_SECRET        GOOGLE_MAPS                  GOOGLE_MAPS_STATIC
+GOOGLE_GEOCODER              MAPBOX_GEOCODER              MAPBOX_MAPPING
+R2_DEV_ENDPOINT              R2_DEV_ACCESS_KEY            R2_DEV_ACCESS_KEY_SECRET
+HONEYBADGER_API_KEY
 ```
 
 These are the same review-app-scoped values stored as `REVIEW_APP_*` GitHub Environment secrets (see step 7 above) — keep them in sync.
