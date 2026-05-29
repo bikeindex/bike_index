@@ -18,16 +18,13 @@ export default class extends Controller {
     const noJsElement = this.element.querySelector('#search_no_js')
     if (noJsElement) noJsElement.remove()
 
-    this.clearStaleFrameBusy()
-    this.submitIfEmptyResults()
+    this.refreshResults()
 
     // Add timeLocalizer and watch for turbo-frame renders
     if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
-    // Re-check after Turbo navigations: on back/forward, connect() can fire
-    // before the frame element is parsed, leaving #loadedWithoutResults in
-    // place with no auto-submit. Clear stale [busy] before the empty-results
-    // check so it can re-run the auto-submit if needed.
+    // Re-run refreshResults after Turbo navigations: on back/forward, connect()
+    // can fire before the frame is parsed, leaving the auto-submit un-run.
     document.addEventListener('turbo:load', this.handleTurboLoad)
     // Track whether a cross-document Turbo visit (eg a back/forward restoration)
     // is rendering, so reloadFrameFromUrl can stay out of its way. Cleared on any
@@ -93,6 +90,12 @@ export default class extends Controller {
 
   handleTurboLoad = () => {
     this.turboVisitInProgress = false
+    this.refreshResults()
+  }
+
+  // Clear any stale loading state, then auto-submit if the loaded/restored frame
+  // has no results yet. Runs on initial connect and after every Turbo page load.
+  refreshResults () {
     this.clearStaleFrameBusy()
     this.submitIfEmptyResults()
   }
