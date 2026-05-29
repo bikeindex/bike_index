@@ -9,7 +9,7 @@ require_relative "production"
 
 Rails.application.configure do
   # Capture every message in letter_opener_web instead of sending. The inbox is
-  # mounted at /letter_opener in config/routes.rb (behind DeveloperRestriction).
+  # mounted at /letter_opener in config/routes.rb (unrestricted — staging has no PII).
   # letter_opener_web is auto-required by Bundler via the :staging group.
   config.action_mailer.delivery_method = :letter_opener_web
 

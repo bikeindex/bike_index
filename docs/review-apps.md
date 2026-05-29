@@ -2,7 +2,7 @@
 
 Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single shared host. Each PR gets its own subdomain (`pr-N.review.bikeindex.org`), its own Postgres role + databases (primary + analytics), and its own Sidekiq worker. Production runs on Cloud66; none of these files affect production.
 
-Review apps run the **staging Rails environment** (`RAILS_ENV=staging`), a near-duplicate of production defined in `config/environments/staging.rb` — keep the two in sync when production changes. The intentional divergence: ActionMailer routes through [`letter_opener_web`](https://github.com/fgrehm/letter_opener_web) (gem lives in the `:staging` Bundler group, auto-loaded via `Bundler.require(*Rails.groups)` so real production never pulls it in). Captured messages are viewable at `pr-N.review.bikeindex.org/letter_opener`, gated by `DeveloperRestriction` (same as `/sidekiq` and `/pghero`). The inbox lives at `tmp/letter_opener/` inside the container and is wiped on every Kamal deploy.
+Review apps run the **staging Rails environment** (`RAILS_ENV=staging`), a near-duplicate of production defined in `config/environments/staging.rb` — keep the two in sync when production changes. The intentional divergence: ActionMailer routes through [`letter_opener_web`](https://github.com/fgrehm/letter_opener_web) (gem lives in the `:staging` Bundler group, auto-loaded via `Bundler.require(*Rails.groups)` so real production never pulls it in). Captured messages are viewable at `pr-N.review.bikeindex.org/letter_opener` — unrestricted, since review apps run on seeded data + sandbox integrations and contain no PII. The inbox lives at `tmp/letter_opener/` inside the container and is wiped on every Kamal deploy.
 
 ## How to trigger one
 
