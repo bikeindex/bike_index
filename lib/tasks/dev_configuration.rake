@@ -50,7 +50,7 @@ end
 namespace :dev do
   # desc "Toggle caching" - already a rake action, no need to add our own
 
-  desc "Toggle letter_opener gem, which automatically opens sent emails in a browser window"
+  desc "Toggle letter_opener_web gem, which makes sent emails viewable at /letter_opener"
   task letter_opener: :environment do
     RakeDevConfiguration.toggle_letter_opener
   end

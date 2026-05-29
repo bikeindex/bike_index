@@ -43,7 +43,7 @@ Rails.application.configure do
   routes.default_url_options = config.action_mailer.default_url_options
   if Rails.root.join("tmp", "enable-letter_opener.txt").exist?
     config.action_mailer.perform_deliveries = true
-    config.action_mailer.delivery_method = :letter_opener
+    config.action_mailer.delivery_method = :letter_opener_web
   else
     config.action_mailer.perform_deliveries = false
     config.action_mailer.delivery_method = :smtp

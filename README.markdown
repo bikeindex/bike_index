@@ -48,7 +48,9 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
 | [letter_opener][]     | `bin/rake dev:letter_opener`  | disabled |
 | logging with lograge  | `bin/rake dev:lograge`        | enabled  |
 
-[letter_opener]: https://github.com/ryanb/letter_opener
+When letter_opener is enabled, sent emails are viewable at [localhost:3042/letter_opener](http://localhost:3042/letter_opener).
+
+[letter_opener]: https://github.com/fgrehm/letter_opener_web
 
 ## Localization
 
