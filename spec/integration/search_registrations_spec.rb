@@ -137,7 +137,10 @@ RSpec.describe "Bike search", :js, type: :system do
     page.go_back
     expect(page).to have_css(".bike-box-item", wait: 10)
     page.go_forward
-    expect(page).to have_css(".bike-box-item", wait: 10)
+    # Results must match the restored URL, not a stale snapshot showing every
+    # color (only the two Blue bikes, no Red).
     expect(page).to have_current_path(/query_items/, wait: 10)
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page).to have_no_content("Red")
   end
 end
