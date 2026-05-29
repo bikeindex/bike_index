@@ -191,6 +191,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_current_path(/search_email=bob/, wait: 10)
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_field("search_email", with: "bob@example.com")
+    # Wait for the results frame to settle before reading hrefs, otherwise
+    # rendered_bike_ids can read a row that's being replaced mid-render
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
 
     # Chart test must run before the custom-range click below: that submission
@@ -240,6 +243,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
     page.execute_script("document.querySelector(\"[data-controller~='ui--period-select'] button[type='submit']\").click()")
     expect(page).to have_current_path(/period=custom/, wait: 10)
+    # Wait for the results frame to settle before reading hrefs, otherwise
+    # rendered_bike_ids can read a row that's being replaced mid-render
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
   end
 
