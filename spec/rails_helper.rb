@@ -84,7 +84,14 @@ RSpec.configure do |config|
   config.include Capybara::RSpecMatchers, type: :component
   config.include HtmlContentHelpers, type: :component
   config.before(:each, :browser, type: :system) { driven_by(:selenium) }
-  config.before(:each, :js, type: :system) { driven_by(:selenium_chrome_headless) }
+  config.before(:each, :js, type: :system) do
+    driven_by(:selenium_chrome_headless)
+    # `be_axe_clean` runs axe-core through Selenium's execute_async_script, which
+    # is bound by the WebDriver script timeout (30s by default). Analyzing a heavy
+    # page (e.g. the strava_search SPA) on a loaded CI runner can exceed that and
+    # surface as a flaky ScriptTimeoutError, so give axe extra headroom.
+    Capybara.current_session.driver.browser.manage.timeouts.script_timeout = 90
+  end
 end
 
 require "vcr"
