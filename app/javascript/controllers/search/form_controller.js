@@ -29,26 +29,44 @@ export default class extends Controller {
     // place with no auto-submit. Clear stale [busy] before the empty-results
     // check so it can re-run the auto-submit if needed.
     document.addEventListener('turbo:load', this.handleTurboLoad)
+    // Track whether a cross-document Turbo visit (eg a back/forward restoration)
+    // is rendering, so reloadFrameFromUrl can stay out of its way. Cleared on any
+    // render below so the flag can never stick on.
+    document.addEventListener('turbo:visit', this.markTurboVisit)
     // Same-document back/forward (a filter link advanced the URL without a
     // full page load) leaves the results frame's src stale. Re-point it at the
     // restored URL so the frame matches the address bar.
     window.addEventListener('popstate', this.reloadFrameFromUrl)
   }
 
+  markTurboVisit = () => { this.turboVisitInProgress = true }
+
   // if the frame was loaded without results, submit the form
   submitIfEmptyResults = () => {
+    // connect() and the turbo:load listener both call this, and on a
+    // back/forward restoration both fire before the auto-submit re-renders the
+    // frame - so #loadedWithoutResults is still present on the second call. Guard
+    // against a duplicate requestSubmit, which Turbo aborts (uncaught AbortError).
+    if (this.autoSubmitPending) return
     if (!this.frameElement?.querySelector('#loadedWithoutResults')) return
+    this.autoSubmitPending = true
     // Use replace for the initial auto-submit so it doesn't add a duplicate history entry
     this.formTarget.setAttribute('data-turbo-action', 'replace')
     this.frameElement.addEventListener('turbo:frame-render', () => {
       this.formTarget.setAttribute('data-turbo-action', 'advance')
+      this.autoSubmitPending = false
     }, { once: true })
     this.formTarget.requestSubmit()
   }
 
-  // Only fires for same-document history navigation; cross-document back/forward
-  // re-renders the page and submitIfEmptyResults handles it instead.
+  // Re-point the results frame at the restored URL after same-document history
+  // navigation (a filter link advanced the URL without a full page load),
+  // leaving the frame's src stale. A cross-document restoration instead starts a
+  // Turbo visit that re-renders the whole page (and the turbo:load handler
+  // re-runs the auto-submit), so re-pointing here would start a frame fetch the
+  // body swap immediately aborts (uncaught AbortError) - skip it in that case.
   reloadFrameFromUrl = () => {
+    if (this.turboVisitInProgress) return
     if (this.frameElement?.getAttribute('src')) {
       this.frameElement.setAttribute('src', window.location.href)
     }
@@ -57,10 +75,12 @@ export default class extends Controller {
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.handleTurboLoad)
+    document.removeEventListener('turbo:visit', this.markTurboVisit)
     window.removeEventListener('popstate', this.reloadFrameFromUrl)
   }
 
   handleTurboLoad = () => {
+    this.turboVisitInProgress = false
     this.clearStaleFrameBusy()
     this.submitIfEmptyResults()
   }
@@ -78,6 +98,7 @@ export default class extends Controller {
   }
 
   handleFrameRender = () => {
+    this.turboVisitInProgress = false
     // Run the time localization command on frame render
     if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
       window.timeLocalizer.localize()
