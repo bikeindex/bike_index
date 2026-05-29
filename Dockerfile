@@ -26,7 +26,10 @@ RUN apt-get update -qq && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-ENV RAILS_ENV="production" \
+# This image only ships to review apps, which run RAILS_ENV=staging
+# (see config/deploy.review.yml + config/environments/staging.rb). Building in
+# staging keeps build-time (asset precompile, bootsnap) and run-time consistent.
+ENV RAILS_ENV="staging" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_WITHOUT="development:test" \
