@@ -88,6 +88,37 @@ These create the `shared-db` (Postgres 17) and `shared-redis` (Redis 7) containe
 
 Other Bike Index env vars (Twitter, Twilio, Facebook, etc.) intentionally fall through to empty for review apps; those integrations stay stubbed.
 
+## Local deploys
+
+You normally trigger review apps from the workflow, but you can also run `bin/review-app` locally if you have kamal installed and SSH access to the host. Secrets come from 1Password via Kamal's adapter:
+
+```bash
+# One-time
+brew install --cask 1password-cli
+op signin                              # creates the `bike-index` account shortname
+gh auth login --scopes write:packages  # KAMAL_REGISTRY_PASSWORD=$(gh auth token)
+```
+
+`.kamal/secrets` pulls from the **`Kamal/BikeIndex Review`** item in the `bike-index` 1Password account. The item must have a field per secret name referenced in the file:
+
+```
+POSTGRES_PASSWORD            SECRET_KEY_BASE              SESSION_SECRET
+VERIFICATION_SECRET          STRIPE_PUBLISHABLE_KEY       STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET        POSTMARK_API_TOKEN           GOOGLE_MAPS
+GOOGLE_MAPS_STATIC           GOOGLE_GEOCODER              MAPBOX_GEOCODER
+MAPBOX_MAPPING               R2_ENDPOINT                  R2_ACCESS_KEY
+R2_ACCESS_KEY_SECRET         CLOUDFLARE_TOKEN             HONEYBADGER_API_KEY
+```
+
+These are the same review-app-scoped values stored as `REVIEW_APP_*` GitHub Environment secrets (see step 7 above) — keep them in sync.
+
+Then:
+
+```bash
+export REVIEW_APP_HOST=review.bikeindex.org
+bin/review-app deploy <pr_number> <image_tag>
+```
+
 ## How a deploy works
 
 1. Workflow runner builds the Docker image (`Dockerfile`) and pushes to GHCR as `pr-<N>-<sha>`.
@@ -109,7 +140,8 @@ Destroy reverses it: `kamal app remove`, then drops both databases + the role, t
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
 | `bin/review-app` | Deploy / destroy orchestration script |
 | `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
-| `.kamal/secrets-ci` | Dotenv-format passthrough for GitHub Actions secrets |
+| `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
+| `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
 | `.kamal/hooks/post-deploy` | Honeybadger deploy notification (no-op if `HONEYBADGER_API_KEY` unset) |
 | `.github/workflows/review-app.yml` | The single workflow handling all four trigger paths |
 | `provisioning/` | Ansible playbook for one-time host hardening |

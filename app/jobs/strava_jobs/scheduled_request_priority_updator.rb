@@ -35,6 +35,10 @@ module StravaJobs
       end
     end
 
+    def skip_scheduling?
+      super || ENV["STRAVA_KEY"].blank?
+    end
+
     def perform(strava_integration_id = nil)
       if strava_integration_id.present?
         update_priorities_for_integration(strava_integration_id)
