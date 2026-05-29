@@ -82,7 +82,9 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     expect(page).to have_link("sign up", wait: 5)
     click_link "sign up"
 
-    expect(find_field("Email").value).to eq claimer_email
+    # Retrying matcher (not find_field(...).value, which reads once) so the
+    # assertion waits for the signup page to finish loading after the click.
+    expect(page).to have_field("Email", with: claimer_email)
     fill_in "Name", with: "New Claimer"
     fill_in "Password", with: "testthisthing7$"
     check "user_terms_of_service"

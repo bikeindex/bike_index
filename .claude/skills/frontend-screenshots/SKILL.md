@@ -24,7 +24,7 @@ Drive Playwright MCP to capture viewport screenshots of pages served by `bin/dev
 ## Preflight
 
 - `eval "$(ruby bin/env --export)"` so `$BASE_URL` is set.
-- `curl -fs "$BASE_URL/" >/dev/null` — if not up, start `bin/dev` yourself in the background (`run_in_background: true`) from the workspace directory and wait for `$BASE_URL/` to become reachable before continuing. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so the bin/dev you start binds to the same port and DB the user expects.
+- `curl -fs "$BASE_URL/" >/dev/null` — if it isn't, **stop and ask the user to start it**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so the bin/dev the user starts will bind to the same port and DB this skill expects.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
 
 ## Sign in (with the PII gate)
@@ -40,7 +40,7 @@ If a URL redirects to `/session/new` or `/session/magic_link`, drive the form vi
 
 **Picking an org slug.** When the URL is org-scoped (`/o/<slug>/...`) and the caller didn't specify a slug, default to `hogwarts`
 
-**Verify identity before capturing.** The dev DB can contain real-looking data (see `feedback_no_programmatic_auth_for_screenshots.md`). Check:
+**Verify identity before capturing.** The dev DB can contain real-looking data, so a non-seed user signed into the persistent profile is a PII risk on upload. Check:
 
 ```js
 document.getElementById('navUserSettingLink')?.dataset.email

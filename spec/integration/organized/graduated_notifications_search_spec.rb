@@ -72,9 +72,12 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame", wait: 10)
 
     page.go_back
-    expect(page).not_to have_current_path(/query_items/, wait: 10)
+    # Back navigation restores the default (unfiltered) search
+    expect(page).to have_current_path(/stolenness=all/, wait: 10)
+    expect(page).not_to have_current_path(/query_items/)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
+    expect(page).to have_field("search_email", with: "")
 
     # Form submit + direct back-nav: regression guard for turbo-cache spinner state
     fill_in "search_email", with: "alice@example.com"

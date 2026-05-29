@@ -17,7 +17,7 @@ description: >-
 
 # Integration testing in Bike Index
 
-Browser specs (`type: :system, :js`) live in two places: feature flows under `spec/integration/` and component-level interaction specs at `spec/components/**/*_system_spec.rb`. Both run full Chrome sessions via Capybara/Selenium and pay a real Selenium boot cost per example, so the same conventions apply to both: optimize for fewer, denser examples and high-level Capybara helpers.
+Browser specs (`type: :system, :js`) live in two places: feature flows under `spec/integration/` and component-level interaction specs at `spec/components/**/*_system_spec.rb`. Both run full Chrome sessions via Capybara/Selenium and pay a real Selenium boot cost per example, so the same conventions apply to both: optimize for fewer, denser examples and high-level Capybara helpers. Always tag new specs with `:js, type: :system`.
 
 The general `context`/`let` style and "what to test" rules are in the [`rspec-testing`](../rspec-testing/SKILL.md) skill — the rules below extend it for the system-spec case.
 
@@ -143,6 +143,8 @@ expect(page).to have_css('button[aria-pressed="true"]')
 page.execute_script("document.querySelector('.search-btn').click()")
 ```
 
+When repeated assertions get noisy, define small DSL-style helpers in the file (`def listing_for(item)`, `def thumbnail_selector(...)`) — they read better than scattered selectors and keep you out of `page.execute_script`.
+
 ## ActionCable broadcasts: do the real thing
 
 The test cable adapter is `:async`, so broadcasts in the test process do round-trip to the browser. **Don't synthesize `turbo:morph-element` events with `execute_script` to fake an ActionCable refresh** — call the real broadcaster (`Component.broadcast_replace_to`, `broadcast_refresh_later_to`, etc.) and let Capybara's wait do the synchronization.
@@ -157,7 +159,3 @@ CI builds `app/assets/builds/tailwind.css` automatically; your local sandbox doe
 
 See the [`frontend-conventions`](../frontend-conventions/SKILL.md) skill for the `tw:` prefix and other styling rules.
 
-## Other conventions
-
-- Always include `:js, type: :system`.
-- Define a few small DSL-style helpers in the file (`def listing_for(item)`, `def thumbnail_selector(...)`) when they make assertions readable. Don't reach for `page.execute_script` to replace what a helper method could do in Ruby.
