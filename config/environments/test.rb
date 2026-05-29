@@ -4,6 +4,10 @@ Rails.application.configure do
   # While tests run files are not watched, reloading is not necessary.
   config.enable_reloading = false
 
+  # capybara-lockstep: let the browser-side helper know when the server is still
+  # processing a request, so :js specs wait for in-flight work before proceeding.
+  config.middleware.insert_before 0, Capybara::Lockstep::Middleware if defined?(Capybara::Lockstep::Middleware)
+
   # Don't log things in test
   config.active_record.verbose_query_logs = false
   config.active_record.query_log_tags_enabled = false

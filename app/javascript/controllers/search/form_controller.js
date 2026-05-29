@@ -47,23 +47,25 @@ export default class extends Controller {
 
   // if the frame was loaded without results, submit the form
   submitIfEmptyResults = () => {
-    // connect() and the turbo:load listener both call this, and on a
-    // back/forward restoration both fire before the auto-submit re-renders the
-    // frame - so #loadedWithoutResults is still present on the second call. Guard
-    // against a duplicate requestSubmit, which Turbo aborts (uncaught AbortError).
-    if (this.autoSubmitPending) return
+    // connect() and the turbo:load listener can both fire before the first
+    // auto-submit's frame renders - so #loadedWithoutResults is still present on
+    // the second call. Without this guard the duplicate requestSubmit is aborted
+    // by Turbo (uncaught AbortError) and, once the first render flips
+    // data-turbo-action to 'advance', pushes a history entry so the back button
+    // no longer leaves the search page. Skip while a submit is already in flight.
+    if (this.autoSubmitting) return
     if (!this.frameElement?.querySelector('#loadedWithoutResults')) return
     // Wait until the combobox has removed its non-JS `query` field (it fires
     // search--combobox:connected when done). Submitting first serializes the
     // empty `query` field instead of query_items[], so the URL drops the
     // selected items and stops matching the form.
     if (this.element.querySelector('[data-search--everything-combobox-target="nonjsfields"]')) return
-    this.autoSubmitPending = true
+    this.autoSubmitting = true
     // Use replace for the initial auto-submit so it doesn't add a duplicate history entry
     this.formTarget.setAttribute('data-turbo-action', 'replace')
     this.frameElement.addEventListener('turbo:frame-render', () => {
       this.formTarget.setAttribute('data-turbo-action', 'advance')
-      this.autoSubmitPending = false
+      this.autoSubmitting = false
     }, { once: true })
     this.formTarget.requestSubmit()
   }
