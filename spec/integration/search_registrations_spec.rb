@@ -137,4 +137,29 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
   end
+
+  it "keeps the URL and combobox in sync going forward after back" do
+    visit "/"
+    visit "/search/registrations"
+    expect(page).to have_css(".bike-box-item", wait: 10)
+    choose("stolenness_all", allow_label_click: true, visible: :all)
+
+    find(".hw-combobox__input").set("Blue")
+    expect(page).to have_css(".hw-combobox__option", text: "Blue", wait: 5)
+    find(".hw-combobox__option", text: "Blue", match: :first).click
+    find("#search-button").click
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page).to have_current_path(/query_items/, wait: 10)
+
+    page.go_back
+    expect(page).to have_css(".bike-box-item", wait: 10)
+
+    # Forward must restore the selected query_items[] in the URL. The auto-submit
+    # has to wait for the combobox to swap its non-JS query field for
+    # query_items[]; otherwise it submits the empty `query` field and the URL
+    # drops the items, no longer matching the form.
+    page.go_forward
+    expect(page).to have_css(".bike-box-item", wait: 10)
+    expect(page).to have_current_path(/query_items/, wait: 10)
+  end
 end

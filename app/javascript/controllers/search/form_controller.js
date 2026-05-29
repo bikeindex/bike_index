@@ -33,6 +33,10 @@ export default class extends Controller {
     // is rendering, so reloadFrameFromUrl can stay out of its way. Cleared on any
     // render below so the flag can never stick on.
     document.addEventListener('turbo:visit', this.markTurboVisit)
+    // The combobox swaps its non-JS query field for query_items[] on connect,
+    // and it connects after this controller. Retry the auto-submit once it's
+    // ready, otherwise a restored page submits the empty `query` field instead.
+    document.addEventListener('search--combobox:connected', this.submitIfEmptyResults)
     // Same-document back/forward (a filter link advanced the URL without a
     // full page load) leaves the results frame's src stale. Re-point it at the
     // restored URL so the frame matches the address bar.
@@ -49,6 +53,11 @@ export default class extends Controller {
     // against a duplicate requestSubmit, which Turbo aborts (uncaught AbortError).
     if (this.autoSubmitPending) return
     if (!this.frameElement?.querySelector('#loadedWithoutResults')) return
+    // Wait until the combobox has removed its non-JS `query` field (it fires
+    // search--combobox:connected when done). Submitting first serializes the
+    // empty `query` field instead of query_items[], so the URL drops the
+    // selected items and stops matching the form.
+    if (this.element.querySelector('[data-search--everything-combobox-target="nonjsfields"]')) return
     this.autoSubmitPending = true
     // Use replace for the initial auto-submit so it doesn't add a duplicate history entry
     this.formTarget.setAttribute('data-turbo-action', 'replace')
@@ -76,6 +85,7 @@ export default class extends Controller {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.handleTurboLoad)
     document.removeEventListener('turbo:visit', this.markTurboVisit)
+    document.removeEventListener('search--combobox:connected', this.submitIfEmptyResults)
     window.removeEventListener('popstate', this.reloadFrameFromUrl)
   }
 
