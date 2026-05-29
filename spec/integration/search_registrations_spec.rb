@@ -28,6 +28,13 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
+  def search_color_and_submit(color)
+    find(".hw-combobox__input").set(color)
+    expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
+    find(".hw-combobox__option", text: color, match: :first).click
+    find("#search-button").click
+  end
+
   it "filters by color and location" do
     # Visit a different page first to establish history, then navigate to search
     visit "/"
@@ -42,16 +49,9 @@ RSpec.describe "Bike search", :js, type: :system do
     page.go_forward
     expect(page).to have_css(".bike-box-item", wait: 10)
 
-    # Select "All registrations" stolenness
+    # Select "All registrations" stolenness, then search Blue via the combobox
     choose("stolenness_all", allow_label_click: true, visible: :all)
-
-    # Search for Blue via the combobox
-    find(".hw-combobox__input").set("Blue")
-    expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
-    find(".hw-combobox__option", text: "Blue", match: :first).click
-
-    # Submit search
-    find("#search-button").click
+    search_color_and_submit("Blue")
 
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     expect(page).to have_content("Blue")
@@ -86,23 +86,16 @@ RSpec.describe "Bike search", :js, type: :system do
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
 
-    # Search Blue, then view a result
+    # Search Blue, view a result, then return to the Blue results
     choose("stolenness_all", allow_label_click: true, visible: :all)
-    find(".hw-combobox__input").set("Blue")
-    expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
-    find(".hw-combobox__option", text: "Blue", match: :first).click
-    find("#search-button").click
+    search_color_and_submit("Blue")
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    click_first_bike_and_go_back
 
-    first(".bike-box-item .title-link a").click
-    expect(page).to have_css("h1.bike-title", wait: 10)
-
-    # Back to the Blue results, then back again to the initial search page. Its
-    # results must reload rather than restoring a Turbo snapshot whose frame is
-    # stuck in the [busy] loading state (results hidden under the spinner
-    # overlay) - the "everything fails after going back from a search" bug.
-    page.go_back
-    expect(page).to have_css(".bike-box-item", wait: 10)
+    # Back again to the initial search page. Its results must reload rather than
+    # restoring a Turbo snapshot whose frame is stuck in the [busy] loading state
+    # (results hidden under the spinner overlay) - the "everything fails after
+    # going back from a search" bug.
     page.go_back
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
@@ -117,17 +110,11 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
     choose("stolenness_all", allow_label_click: true, visible: :all)
 
-    find(".hw-combobox__input").set("Red")
-    expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
-    find(".hw-combobox__option", text: "Red", match: :first).click
-    find("#search-button").click
+    search_color_and_submit("Red")
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
 
     find(".hw-combobox__chip__remover").click
-    find(".hw-combobox__input").set("Blue")
-    expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
-    find(".hw-combobox__option", text: "Blue", match: :first).click
-    find("#search-button").click
+    search_color_and_submit("Blue")
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
 
     page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
@@ -143,10 +130,7 @@ RSpec.describe "Bike search", :js, type: :system do
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
     choose("stolenness_all", allow_label_click: true, visible: :all)
-    find(".hw-combobox__input").set("Blue")
-    expect(page).to have_css(".hw-combobox__option", text: "Blue", wait: 5)
-    find(".hw-combobox__option", text: "Blue", match: :first).click
-    find("#search-button").click
+    search_color_and_submit("Blue")
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     expect(page).to have_current_path(/query_items/, wait: 10)
 
