@@ -9,7 +9,7 @@ RSpec.describe PageBlock::ChooseMembership::Component, :js, type: :system do
     visit(preview_path)
 
     expect(page).to have_content(/\$4.99\s+per\s+month/)
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
 
     # Click yearly toggle
     choose "Yearly"

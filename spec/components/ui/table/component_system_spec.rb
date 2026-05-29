@@ -7,6 +7,6 @@ RSpec.describe UI::Table::Component, :js, type: :system do
     visit("/rails/view_components/ui/table/component/sortable_with_cache")
 
     expect(page).to have_css("table")
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
   end
 end

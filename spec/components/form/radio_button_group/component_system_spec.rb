@@ -14,7 +14,7 @@ RSpec.describe Form::RadioButtonGroup::Component, :js, type: :system do
       expect(page).to have_content "Active"
       expect(page).to have_content "Inactive"
       expect(page).to have_css "input[name='search_status'][value=''][checked]", visible: :all
-      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+      expect_axe_clean
 
       find("label", text: "Active").click
       expect(page).to have_css "input[name='search_status'][value='active']:checked", visible: :all

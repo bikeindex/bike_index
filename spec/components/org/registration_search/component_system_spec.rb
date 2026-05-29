@@ -15,7 +15,7 @@ RSpec.describe Org::RegistrationSearch::Component, :js, type: :system do
   end
 
   it "toggles settings panel visibility" do
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
     settings_selector = "[data-org--registration-search-target='settings']"
     expect(page).not_to have_css(settings_selector, visible: true, wait: 2)
 

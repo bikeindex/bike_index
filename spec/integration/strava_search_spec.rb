@@ -27,12 +27,6 @@ RSpec.describe "Strava search", :js, type: :system do
     # Verify the React app has mounted and rendered content into #root
     expect(page).to have_css("#root *", wait: 10)
     expect(page).to have_title("Strava search")
-
-    # capybara-lockstep's page instrumentation intermittently hangs axe-core's
-    # execute_async_script, surfacing as a flaky ScriptTimeoutError. Skip lockstep
-    # while the accessibility audit runs (other :js specs keep it enabled).
-    Capybara::Lockstep.with_mode(:off) do
-      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
-    end
+    expect_axe_clean
   end
 end
