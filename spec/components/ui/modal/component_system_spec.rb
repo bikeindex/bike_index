@@ -6,12 +6,12 @@ RSpec.describe UI::Modal::Component, :js, type: :system do
   it "opens and closes modal" do
     visit("/rails/view_components/ui/modal/component/default")
 
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
 
     click_button "Open Settings"
 
     expect(page).to have_text("Modal body content")
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
 
     find('button[aria-label="Close"]').click
 
