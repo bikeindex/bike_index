@@ -124,11 +124,9 @@ group :production do
   gem "honeybadger" # Error monitoring
 end
 
-group :staging do
-  # Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
-  # Rails auto-loads this via Bundler.require(*Rails.groups) when RAILS_ENV=staging.
-  gem "letter_opener_web", "~> 3.0"
-end
+# Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
+# Loaded in development (local dev) and staging (review apps — see config/deploy.review.yml).
+gem "letter_opener_web", "~> 3.0", groups: [:development, :staging]
 
 group :development do
   gem "bullet"
@@ -137,7 +135,6 @@ group :development do
   # gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
   gem "guard", require: false
   gem "guard-rspec", require: false
-  gem "letter_opener"
   gem "rerun" # restart sidekiq processes in development on app change
   gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"

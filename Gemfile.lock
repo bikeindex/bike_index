@@ -985,7 +985,6 @@ DEPENDENCIES
   inline_svg
   knapsack_pro
   kramdown
-  letter_opener
   letter_opener_web (~> 3.0)
   lograge
   logstash-event

@@ -5,7 +5,11 @@ require "sidekiq/web"
 Rails.application.routes.draw do
   mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
   mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
-  if Rails.env.staging?
+  # letter_opener_web inbox: unrestricted in local dev; DeveloperRestriction in staging
+  # because review apps are internet-facing (see config/deploy.review.yml).
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  elsif Rails.env.staging?
     mount LetterOpenerWeb::Engine, at: "/letter_opener", constraints: DeveloperRestriction
   end
 
