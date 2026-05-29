@@ -16,5 +16,7 @@
       <%= translation(".pr_link", number: @pr_number) %>
     </a>
   <% end %>
+  &middot;
+  <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:underline" %>
   &middot; <%= translation(".disclaimer") %>
 </div>

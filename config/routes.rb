@@ -5,6 +5,9 @@ require "sidekiq/web"
 Rails.application.routes.draw do
   mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
   mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
+  if Rails.env.staging?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener", constraints: DeveloperRestriction
+  end
 
   use_doorkeeper do
     controllers applications: "oauth/applications"
@@ -438,5 +441,5 @@ Rails.application.routes.draw do
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
 
-  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge
+  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
 end

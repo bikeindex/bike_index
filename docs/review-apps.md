@@ -2,6 +2,8 @@
 
 Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single shared host. Each PR gets its own subdomain (`pr-N.review.bikeindex.org`), its own Postgres role + databases (primary + analytics), and its own Sidekiq worker. Production runs on Cloud66; none of these files affect production.
 
+Review apps run the **staging Rails environment** (`RAILS_ENV=staging`), a near-duplicate of production defined in `config/environments/staging.rb` — keep the two in sync when production changes. The intentional divergence: ActionMailer routes through [`letter_opener_web`](https://github.com/fgrehm/letter_opener_web) (gem lives in the `:staging` Bundler group, auto-loaded via `Bundler.require(*Rails.groups)` so real production never pulls it in). Captured messages are viewable at `pr-N.review.bikeindex.org/letter_opener`, gated by `DeveloperRestriction` (same as `/sidekiq` and `/pghero`). The inbox lives at `tmp/letter_opener/` inside the container and is wiped on every Kamal deploy.
+
 ## How to trigger one
 
 1. Open the [Review App workflow](https://github.com/bikeindex/bike_index/actions/workflows/review-app.yml) in Actions.
@@ -80,10 +82,8 @@ These create the `shared-db` (Postgres 17) and `shared-redis` (Redis 7) containe
   - `REVIEW_APP_POSTGRES_PASSWORD` — the password from step 6
   - `REVIEW_APP_SECRET_KEY_BASE`, `REVIEW_APP_SESSION_SECRET`, `REVIEW_APP_VERIFICATION_SECRET` — review-app values (do NOT reuse production)
   - `REVIEW_APP_STRIPE_PUBLISHABLE_KEY`, `REVIEW_APP_STRIPE_SECRET_KEY`, `REVIEW_APP_STRIPE_WEBHOOK_SECRET` — Stripe **test mode**
-  - `REVIEW_APP_POSTMARK_API_TOKEN` — Postmark sandbox stream
   - `REVIEW_APP_GOOGLE_MAPS`, `REVIEW_APP_GOOGLE_MAPS_STATIC`, `REVIEW_APP_GOOGLE_GEOCODER`, `REVIEW_APP_MAPBOX_GEOCODER`, `REVIEW_APP_MAPBOX_MAPPING`
-  - `REVIEW_APP_R2_ENDPOINT`, `REVIEW_APP_R2_ACCESS_KEY`, `REVIEW_APP_R2_ACCESS_KEY_SECRET` — R2 creds scoped to a `review-app/` prefix (separate IAM token from prod)
-  - `REVIEW_APP_CLOUDFLARE_TOKEN`
+  - `REVIEW_APP_R2_DEV_ENDPOINT`, `REVIEW_APP_R2_DEV_ACCESS_KEY`, `REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET` — creds for the `bikeindex-dev` R2 bucket (`cloudflare_dev` service in `config/storage.yml`). Staging review apps share this bucket; do NOT reuse the production R2 token.
   - `REVIEW_APP_HONEYBADGER_API_KEY` — optional; the post-deploy hook no-ops if unset
 
 Other Bike Index env vars (Twitter, Twilio, Facebook, etc.) intentionally fall through to empty for review apps; those integrations stay stubbed.
@@ -104,10 +104,10 @@ gh auth login --scopes write:packages  # KAMAL_REGISTRY_PASSWORD=$(gh auth token
 ```
 POSTGRES_PASSWORD            SECRET_KEY_BASE              SESSION_SECRET
 VERIFICATION_SECRET          STRIPE_PUBLISHABLE_KEY       STRIPE_SECRET_KEY
-STRIPE_WEBHOOK_SECRET        POSTMARK_API_TOKEN           GOOGLE_MAPS
-GOOGLE_MAPS_STATIC           GOOGLE_GEOCODER              MAPBOX_GEOCODER
-MAPBOX_MAPPING               R2_ENDPOINT                  R2_ACCESS_KEY
-R2_ACCESS_KEY_SECRET         CLOUDFLARE_TOKEN             HONEYBADGER_API_KEY
+STRIPE_WEBHOOK_SECRET        GOOGLE_MAPS                  GOOGLE_MAPS_STATIC
+GOOGLE_GEOCODER              MAPBOX_GEOCODER              MAPBOX_MAPPING
+R2_DEV_ENDPOINT              R2_DEV_ACCESS_KEY            R2_DEV_ACCESS_KEY_SECRET
+HONEYBADGER_API_KEY
 ```
 
 These are the same review-app-scoped values stored as `REVIEW_APP_*` GitHub Environment secrets (see step 7 above) — keep them in sync.

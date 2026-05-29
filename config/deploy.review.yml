@@ -60,15 +60,23 @@ registry:
 
 env:
   clear:
+    # Review apps run the dedicated staging Rails environment, which mirrors
+    # production except ActionMailer routes through letter_opener_web. See
+    # config/environments/staging.rb and config/routes.rb.
+    RAILS_ENV: staging
     REVIEW_APP: "1"
     REVIEW_APP_PR_NUMBER: "<%= pr %>"
     BASE_URL: "https://<%= slug %>.review.bikeindex.org"
 
-    # Postgres (shared-db accessory; per-PR role + databases)
+    # Postgres (shared-db accessory; per-PR role + databases). The staging
+    # primary_replica points at the same database as the primary, so no
+    # separate replica address is needed (see config/database.yml).
     POSTGRESQL_ADDRESS: shared-db
     POSTGRESQL_USERNAME: <%= role %>
     POSTGRESQL_DATABASE: bike_index_review_<%= db_suffix %>_primary
-    POSTGRESQL_PRIMARY_REPLICA_ADDRESS: shared-db
+    # Analytics lives on the same shared-db accessory (dropped alongside the
+    # primary in bin/review-app destroy).
+    POSTGRESQL_ANALYTICS_ADDRESS: shared-db
     ANALYTICS_DB_USERNAME: <%= role %>
     ANALYTICS_DB_DATABASE: bike_index_review_<%= db_suffix %>_analytics
     ANALYTICS_DB_PORT: "5432"
@@ -95,16 +103,14 @@ env:
     - STRIPE_PUBLISHABLE_KEY
     - STRIPE_SECRET_KEY
     - STRIPE_WEBHOOK_SECRET
-    - POSTMARK_API_TOKEN
     - GOOGLE_MAPS
     - GOOGLE_MAPS_STATIC
     - GOOGLE_GEOCODER
     - MAPBOX_GEOCODER
     - MAPBOX_MAPPING
-    - R2_ENDPOINT
-    - R2_ACCESS_KEY
-    - R2_ACCESS_KEY_SECRET
-    - CLOUDFLARE_TOKEN
+    - R2_DEV_ENDPOINT
+    - R2_DEV_ACCESS_KEY
+    - R2_DEV_ACCESS_KEY_SECRET
     - HONEYBADGER_API_KEY
 
 aliases:

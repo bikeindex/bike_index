@@ -124,6 +124,12 @@ group :production do
   gem "honeybadger" # Error monitoring
 end
 
+group :staging do
+  # Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
+  # Rails auto-loads this via Bundler.require(*Rails.groups) when RAILS_ENV=staging.
+  gem "letter_opener_web", "~> 3.0"
+end
+
 group :development do
   gem "bullet"
   # Extra faraday response logging. Used in exchange rate api client and external registry
