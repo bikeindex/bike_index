@@ -107,13 +107,16 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
-  it "auto-submits only once when going back to a re-fetched search page" do
+  it "keeps back/forward navigation in sync without double-submitting" do
+    # Two searches in a row, then back to the first - the user's repro. connect()
+    # and the turbo:load handler both run the empty-results auto-submit on that
+    # back; it must fire at most once - without the guard the duplicate
+    # requestSubmit is aborted by Turbo (the uncaught AbortError in the console).
     visit "/"
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
     choose("stolenness_all", allow_label_click: true, visible: :all)
 
-    # Two searches in a row, then back to the first - the user's repro.
     find(".hw-combobox__input").set("Red")
     expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
     find(".hw-combobox__option", text: "Red", match: :first).click
@@ -127,23 +130,19 @@ RSpec.describe "Bike search", :js, type: :system do
     find("#search-button").click
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
 
-    # On back, connect() and the turbo:load handler both run the empty-results
-    # auto-submit. Whether the restoration re-fetches (auto-submit runs) or
-    # restores a cached snapshot (no auto-submit) varies, but it must never fire
-    # the auto-submit twice: without the guard the duplicate requestSubmit is
-    # aborted by Turbo (the uncaught AbortError in the console).
     page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
     page.go_back
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
-  end
 
-  it "keeps the URL and combobox in sync going forward after back" do
+    # Now a fresh search, then back and forward. Forward must restore the selected
+    # query_items[] in the URL: the auto-submit waits for the combobox to swap its
+    # non-JS query field for query_items[]; otherwise it submits the empty `query`
+    # field and the URL drops the items, no longer matching the form.
     visit "/"
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
     choose("stolenness_all", allow_label_click: true, visible: :all)
-
     find(".hw-combobox__input").set("Blue")
     expect(page).to have_css(".hw-combobox__option", text: "Blue", wait: 5)
     find(".hw-combobox__option", text: "Blue", match: :first).click
@@ -153,11 +152,6 @@ RSpec.describe "Bike search", :js, type: :system do
 
     page.go_back
     expect(page).to have_css(".bike-box-item", wait: 10)
-
-    # Forward must restore the selected query_items[] in the URL. The auto-submit
-    # has to wait for the combobox to swap its non-JS query field for
-    # query_items[]; otherwise it submits the empty `query` field and the URL
-    # drops the items, no longer matching the form.
     page.go_forward
     expect(page).to have_css(".bike-box-item", wait: 10)
     expect(page).to have_current_path(/query_items/, wait: 10)
