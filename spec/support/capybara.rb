@@ -2,9 +2,12 @@
 
 require "capybara/rails"
 require "capybara/rspec"
+require "capybara-lockstep"
 
 Capybara.register_driver :chrome_headless do |app|
-  options = Selenium::WebDriver::Chrome::Options.new
+  # unhandled_prompt_behavior: "ignore" keeps capybara-lockstep from stalling on
+  # a JS dialog (alert/confirm/prompt) that a spec hasn't explicitly accepted.
+  options = Selenium::WebDriver::Chrome::Options.new(unhandled_prompt_behavior: "ignore")
   options.add_argument("--headless")
   options.add_argument("--window-size=1920,1080")
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)

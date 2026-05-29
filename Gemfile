@@ -130,7 +130,7 @@ group :development do
   # gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
   gem "guard", require: false
   gem "guard-rspec", require: false
-  gem "letter_opener"
+  gem "letter_opener_web"
   gem "rerun" # restart sidekiq processes in development on app change
   gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
@@ -170,6 +170,7 @@ group :test do
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry flaky test failures on CI
   gem "capybara" # For view components
+  gem "capybara-lockstep" # Sync Capybara with in-flight JS/AJAX to reduce flaky :js specs
   gem "selenium-webdriver" # For capybara
   gem "chunky_png" # used to test that generated images match their targets
   gem "axe-core-rspec" # Accessibility testing
