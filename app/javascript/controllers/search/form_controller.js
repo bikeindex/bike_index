@@ -18,6 +18,7 @@ export default class extends Controller {
     const noJsElement = this.element.querySelector('#search_no_js')
     if (noJsElement) noJsElement.remove()
 
+    this.clearStaleFrameBusy()
     this.submitIfEmptyResults()
 
     // Add timeLocalizer and watch for turbo-frame renders
@@ -25,8 +26,9 @@ export default class extends Controller {
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     // Re-check after Turbo navigations: on back/forward, connect() can fire
     // before the frame element is parsed, leaving #loadedWithoutResults in
-    // place with no auto-submit.
-    document.addEventListener('turbo:load', this.submitIfEmptyResults)
+    // place with no auto-submit. Clear stale [busy] before the empty-results
+    // check so it can re-run the auto-submit if needed.
+    document.addEventListener('turbo:load', this.handleTurboLoad)
     // Same-document back/forward (a filter link advanced the URL without a
     // full page load) leaves the results frame's src stale. Re-point it at the
     // restored URL so the frame matches the address bar.
@@ -54,8 +56,25 @@ export default class extends Controller {
 
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
-    document.removeEventListener('turbo:load', this.submitIfEmptyResults)
+    document.removeEventListener('turbo:load', this.handleTurboLoad)
     window.removeEventListener('popstate', this.reloadFrameFromUrl)
+  }
+
+  handleTurboLoad = () => {
+    this.clearStaleFrameBusy()
+    this.submitIfEmptyResults()
+  }
+
+  // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward
+  // snapshot can be cached mid-search and restored with busy stuck on - which
+  // leaves the results frame hidden under the loading overlay forever. A real
+  // search is a frame navigation (never fires turbo:load), so on load/connect
+  // any busy on a [complete] frame is stale and safe to clear.
+  clearStaleFrameBusy () {
+    const frame = this.frameElement
+    if (!frame?.hasAttribute('complete')) return
+    frame.removeAttribute('busy')
+    frame.removeAttribute('aria-busy')
   }
 
   handleFrameRender = () => {

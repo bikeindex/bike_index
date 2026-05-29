@@ -59,6 +59,15 @@ RSpec.describe "Bike search", :js, type: :system do
 
     click_first_bike_and_go_back
 
+    # Going back again lands on the initial search page. Its results must
+    # reload rather than restoring a Turbo snapshot whose frame is stuck in the
+    # [busy] loading state (results hidden under the spinner overlay) - the
+    # "everything fails after going back from a search" regression.
+    page.go_back
+    expect(page).to have_css(".bike-box-item", wait: 10)
+    page.go_forward
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+
     # Switch to proximity search for NYC
     choose("stolenness_proximity", allow_label_click: true, visible: :all)
     fill_in "distance", with: "200"
