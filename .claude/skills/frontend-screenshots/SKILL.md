@@ -24,7 +24,7 @@ Drive Playwright MCP to capture viewport screenshots of pages served by `bin/dev
 ## Preflight
 
 - `eval "$(ruby bin/env --export)"` so `$BASE_URL` is set.
-- `curl -fs "$BASE_URL/" >/dev/null` — if not up, start `bin/dev` yourself in the background (`run_in_background: true`) from the workspace directory and wait for `$BASE_URL/` to become reachable before continuing. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so the bin/dev you start binds to the same port and DB the user expects.
+- `curl -fs "$BASE_URL/" >/dev/null` — if it isn't, **stop and ask the user to start it**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so the bin/dev the user starts will bind to the same port and DB this skill expects.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
 
 ## Sign in (with the PII gate)

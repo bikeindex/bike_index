@@ -39,6 +39,25 @@ let!(:bike_transferred) do
 end
 ```
 
+## Stubbing ENV
+
+Never partial-mock `ENV` with `allow(ENV).to receive(:[]).and_call_original` — it makes every subsequent `ENV[...]` lookup go through RSpec's message router, which is slow and easy to break by forgetting a `.with(...)` branch.
+
+Use `stub_const` against a merged hash instead:
+
+### Good
+
+```ruby
+stub_const("ENV", ENV.to_hash.merge("STRIPE_SECRET_KEY" => "sk_test_123"))
+```
+
+### Bad
+
+```ruby
+allow(ENV).to receive(:[]).and_call_original
+allow(ENV).to receive(:[]).with("STRIPE_SECRET_KEY").and_return("sk_test_123")
+```
+
 ## Always fix failing tests
 
 Fix every failing test, even ones that were already failing on `main`. Confirming a failure pre-dates your branch (via `git stash` or checking out `main`) explains *what* broke — not whether you fix it. You fix it.
