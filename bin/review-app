@@ -11,8 +11,10 @@
 # subsequent. bin/docker-entrypoint creates the per-PR Postgres role on first
 # boot and `db:prepare` handles schema/seed-or-migrate.
 #
-# Kamal reads .kamal/secrets by default. CI populates it by copying
-# .kamal/secrets-ci over the top before invoking this script.
+# Kamal reads .kamal/secrets by default. Locally that file pulls from 1Password
+# (account `bike-index`, item `Kamal/BikeIndex Review`) and uses `gh auth token`
+# for the GHCR password. CI copies .kamal/secrets-ci over the top first, so CI
+# deploys read GitHub Actions env-var passthrough instead.
 
 set -euo pipefail
 
@@ -25,9 +27,12 @@ Usage:
   bin/review-app deploy  <pr_number> [<image_tag>]
   bin/review-app destroy <pr_number>
 
-Required env (set by the workflow or your shell):
-  REVIEW_APP_HOST, KAMAL_REGISTRY_PASSWORD, POSTGRES_PASSWORD,
-  and the rest of the secrets named in .kamal/secrets-ci.
+Required env:
+  REVIEW_APP_HOST — always
+
+Secrets come from .kamal/secrets:
+  - Locally: 1Password (account bike-index, item Kamal/BikeIndex Review) + gh auth token
+  - In CI: the workflow copies .kamal/secrets-ci over .kamal/secrets first
 USAGE
   exit 1
 }
