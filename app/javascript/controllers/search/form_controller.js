@@ -35,11 +35,19 @@ export default class extends Controller {
 
   // if the frame was loaded without results, submit the form
   submitIfEmptyResults = () => {
+    // connect() and the turbo:load listener can both fire before the first
+    // auto-submit's frame renders. Without this guard the second call submits
+    // again, and once the first render flips data-turbo-action to 'advance' the
+    // duplicate submit pushes a history entry - so the back button no longer
+    // leaves the search page. Skip while an auto-submit is already in flight.
+    if (this.autoSubmitting) return
     if (!this.frameElement?.querySelector('#loadedWithoutResults')) return
+    this.autoSubmitting = true
     // Use replace for the initial auto-submit so it doesn't add a duplicate history entry
     this.formTarget.setAttribute('data-turbo-action', 'replace')
     this.frameElement.addEventListener('turbo:frame-render', () => {
       this.formTarget.setAttribute('data-turbo-action', 'advance')
+      this.autoSubmitting = false
     }, { once: true })
     this.formTarget.requestSubmit()
   }
