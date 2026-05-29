@@ -170,6 +170,7 @@ group :test do
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry flaky test failures on CI
   gem "capybara" # For view components
+  gem "capybara-lockstep" # Sync Capybara with in-flight JS/AJAX to reduce flaky :js specs
   gem "selenium-webdriver" # For capybara
   gem "chunky_png" # used to test that generated images match their targets
   gem "axe-core-rspec" # Accessibility testing
