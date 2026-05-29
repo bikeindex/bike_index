@@ -59,6 +59,12 @@ export default class extends Controller {
       attributeFilter: ['hidden', 'data-hw-combobox-expanded-value'],
       subtree: true
     })
+
+    // Let the search form know its query fields are ready: the non-JS `query`
+    // field is gone and query_items[] is populated. Its empty-results
+    // auto-submit waits for this so a restored page submits query_items[]
+    // instead of the stale `query` field (which made the URL drop the items).
+    document.dispatchEvent(new CustomEvent('search--combobox:connected'))
   }
 
   disconnect () {
