@@ -8,13 +8,19 @@
 </div>
 
 <div class="search-results-frame-wrapper">
-  <%= turbo_frame_tag :marketplace_results_frame do %>
+  <%#
+    When the results aren't rendered inline (the JS shell), give the frame a src
+    so Turbo eager-loads the results in a separate request once it connects
+  %>
+
+  <%= turbo_frame_tag :marketplace_results_frame,
+    src: (request.original_fullpath unless @render_results) do %>
     <% if @render_results %>
       <%= turbo_frame_tag "page_#{@pagy.page}" do %>
         <%= render partial: "marketplace_results" %>
       <% end %>
     <% else %>
-      <span id="loadedWithoutResults" class="tw:hidden"></span>
+      <%= render UI::LoadingSpinner::Component.new(text: t(".loading_results")) %>
     <% end %>
   <% end %>
 

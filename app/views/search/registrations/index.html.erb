@@ -14,7 +14,7 @@
   %>
 
   <%= turbo_frame_tag :search_registrations_results_frame,
-    src: (search_registrations_path(request.query_parameters) unless @render_results) do %>
+    src: (request.original_fullpath unless @render_results) do %>
     <% if @render_results %>
       <%= render partial: "results" %>
     <% else %>

@@ -67,7 +67,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
   end
 
   it "loads results via turbo, filters by unregisteredness, then applies multi-updates" do
-    # Results load into the turbo-frame via the search--form auto-submit
+    # Results load into the turbo-frame via its eager src
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
     # search_no_js should NOT be in the URL (removed by the JS controller)
     expect(page).not_to have_current_path(/search_no_js/)

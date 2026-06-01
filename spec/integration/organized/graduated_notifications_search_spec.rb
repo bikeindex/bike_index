@@ -36,7 +36,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
 
   it "searches by email via turbo, then opens the notification" do
     visit graduated_notifications_path
-    # Results load via turbo auto-submit
+    # Results load via the eager turbo-frame (src fetched once the frame connects)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
     expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
@@ -72,8 +72,10 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame", wait: 10)
 
     page.go_back
-    # Back navigation restores the default (unfiltered) search
-    expect(page).to have_current_path(/stolenness=all/, wait: 10)
+    # Back navigation restores the default (unfiltered) search. The eager
+    # turbo-frame loads results without rewriting the address bar, so the
+    # default search sits at the bare path rather than a serialized query.
+    expect(page).to have_current_path(graduated_notifications_path, wait: 10)
     expect(page).not_to have_current_path(/query_items/)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
