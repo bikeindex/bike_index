@@ -20,8 +20,8 @@ export default class extends Controller {
 
     // The results frame eager-loads its own contents via its `src` (set
     // server-side once the page shell has rendered), so there's nothing to
-    // submit here - just clear any stale loading state from a restored snapshot.
-    this.clearStaleFrameBusy()
+    // submit here - just reconcile a restored snapshot with the address bar.
+    this.refreshResults()
 
     // Add timeLocalizer and watch for turbo-frame renders
     if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
@@ -61,7 +61,27 @@ export default class extends Controller {
 
   handleTurboLoad = () => {
     this.turboVisitInProgress = false
+    this.refreshResults()
+  }
+
+  // Clear any stale loading state, then bring the results frame in line with the
+  // address bar. Runs on initial connect and after every Turbo page load.
+  refreshResults () {
     this.clearStaleFrameBusy()
+    this.reloadFrameIfUrlStale()
+  }
+
+  // A back/forward restoration can leave the results frame showing a snapshot for
+  // a different query than the address bar (Turbo restores snapshots loosely by
+  // path). Reload straight from the URL so results match; this loads from the
+  // address bar, not the form, so it's immune to combobox/form restore races.
+  reloadFrameIfUrlStale () {
+    const frame = this.frameElement
+    const src = frame?.getAttribute('src')
+    if (!src) return
+    if (new URL(src, window.location.origin).search !== window.location.search) {
+      frame.setAttribute('src', window.location.href)
+    }
   }
 
   // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward
