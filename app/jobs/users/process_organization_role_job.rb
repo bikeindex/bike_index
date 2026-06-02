@@ -29,7 +29,7 @@ module Users
       user_id ||= User.fuzzy_confirmed_or_unconfirmed_email_find(organization_role.invited_email)&.id
       return false unless user_id.present?
 
-      organization_role.update(user_id: user_id)
+      organization_role.update(user_id:, skip_processing: true)
       organization_role.reload
       User.find_by_id(user_id)&.update(updated_at: Time.current)
     end
@@ -54,7 +54,7 @@ module Users
       user.save!
       user.confirm(user.confirmation_token)
       # We don't want to send users emails in this situation.
-      organization_role.update(user_id: user.id, email_invitation_sent_at: Time.current)
+      organization_role.update(user_id: user.id, email_invitation_sent_at: Time.current, skip_processing: true)
       organization_role.reload
     end
 

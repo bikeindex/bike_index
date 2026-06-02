@@ -141,6 +141,23 @@ RSpec.describe Users::ProcessOrganizationRoleJob, type: :job do
           expect(user.organization_roles.count).to eq 1
         end
       end
+
+      context "user with email exists but is not yet assigned" do
+        let!(:user) { FactoryBot.create(:user_confirmed, email: "existing@example.com") }
+        let(:organization_role) { FactoryBot.create(:organization_role, invited_email: "existing@example.com", user: nil) }
+        it "sends one email and does not enqueue a duplicate processing job" do
+          Sidekiq::Job.clear_all
+          expect(organization_role.user).to be_blank
+          # assigning the user must not re-enqueue ProcessOrganizationRoleJob (which would race and double-send)
+          expect {
+            instance.perform(organization_role.id)
+          }.to_not change(described_class.jobs, :count)
+          organization_role.reload
+          expect(organization_role.user).to eq user
+          expect(organization_role.email_invitation_sent_at).to be_present
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+        end
+      end
     end
   end
 end
