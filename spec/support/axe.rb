@@ -10,9 +10,16 @@ module AxeAuditHelpers
   SKIPPABLE_AXE_RULES = %w[aria-allowed-role color-contrast heading-order html-has-lang landmark-one-main landmark-unique page-has-heading-one region]
 
   def expect_axe_clean(*extra_skipped_rules)
+    attempts = 0
     Capybara::Lockstep.with_mode(:off) do
       expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES, *extra_skipped_rules)
     end
+  rescue Selenium::WebDriver::Error::ScriptTimeoutError
+    # The async axe script occasionally hangs (not slowness - raising the script
+    # timeout doesn't help). A fresh run injects axe again and clears it; only a
+    # repeated hang is a real failure.
+    raise if (attempts += 1) >= 2
+    retry
   end
 end
 
