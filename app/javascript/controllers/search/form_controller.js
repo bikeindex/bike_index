@@ -93,11 +93,26 @@ export default class extends Controller {
     this.refreshResults()
   }
 
-  // Clear any stale loading state, then auto-submit if the loaded/restored frame
-  // has no results yet. Runs on initial connect and after every Turbo page load.
+  // Clear any stale loading state, then bring the results frame in line with the
+  // address bar. Runs on initial connect and after every Turbo page load.
   refreshResults () {
     this.clearStaleFrameBusy()
     this.submitIfEmptyResults()
+    this.reloadFrameIfUrlStale()
+  }
+
+  // A back/forward restoration can leave the results frame showing a snapshot for
+  // a different query than the address bar (Turbo restores snapshots loosely by
+  // path) - the empty-results auto-submit skips it because the frame isn't empty.
+  // Reload straight from the URL so results match; this loads from the address
+  // bar, not the form, so it's immune to combobox/form restore races.
+  reloadFrameIfUrlStale () {
+    const frame = this.frameElement
+    const src = frame?.getAttribute('src')
+    if (!src || frame.querySelector('#loadedWithoutResults')) return
+    if (new URL(src, window.location.origin).search !== window.location.search) {
+      frame.setAttribute('src', window.location.href)
+    }
   }
 
   // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward
