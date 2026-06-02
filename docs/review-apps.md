@@ -10,7 +10,16 @@ Review apps run the **staging Rails environment** (`RAILS_ENV=staging`), a near-
 2. Click "Run workflow", enter the PR number, choose `deploy`.
 3. When the workflow finishes, it comments on the PR with the URL and adds the `review-app` label.
 
-After the initial deploy, every push auto-redeploys (`pull_request: synchronize`) as long as the `review-app` label is present and the PR is from this repo (forks must be redeployed manually). Closing the PR auto-destroys. To destroy without closing, re-run the workflow with `destroy`.
+### The `review-app` label is the gate
+
+Auto-deploy on push is gated by the `review-app` label, and the label is applied **by a successful deploy** — not by hand. So the first deploy must come from `workflow_dispatch` (step above): a PR with no label is skipped by the `pull_request: synchronize` trigger, so there's nothing to bootstrap it but a manual run. That deploy step adds the label, which then arms auto-redeploy for the rest of the PR's life.
+
+Once the label is present:
+- **Every push auto-redeploys** (`pull_request: synchronize`), as long as the PR is from this repo — forks are skipped and must be redeployed manually via `workflow_dispatch` (a maintainer reviews the diff first).
+- **Closing the PR auto-destroys** (`pull_request: closed`) and removes the label.
+- To destroy without closing, re-run the workflow with `destroy` — this also removes the label, so pushes stop auto-deploying until you `workflow_dispatch` a `deploy` again.
+
+Because only `synchronize` and `closed` are wired up, toggling the label by hand does nothing on its own: removing it disables the *next* push's auto-redeploy, and adding it has no effect until the next push.
 
 ## One-time host setup
 
@@ -121,8 +130,10 @@ bin/review-app deploy <pr_number> <image_tag>
 
 ## How a deploy works
 
-1. Workflow runner builds the Docker image (`Dockerfile`) and pushes to GHCR as `pr-<N>-<sha>`.
-2. Workflow runs `bin/review-app deploy <pr> <tag>`, which SSHes to the host via Kamal and:
+The workflow has two jobs: `resolve` (figures out the PR number + whether the trigger should `deploy` or `destroy`) and `update` (does the work, branching on that decision via step-level `if:`). The build/push steps only run on the deploy path.
+
+1. The `update` job builds the Docker image (`Dockerfile`) and pushes to GHCR as `pr-<N>-<sha>`.
+2. It then runs `bin/review-app deploy <pr> <tag>`, which SSHes to the host via Kamal and:
    - Boots the per-PR `bike-index-pr-<N>-web` + `bike-index-pr-<N>-worker` containers
    - On first boot, `bin/docker-entrypoint` creates the Postgres role `bike_index_pr_<N>` and runs `db:prepare`, which creates both `bike_index_review_pr_<N>_primary` and `bike_index_review_pr_<N>_analytics` and seeds them
    - On subsequent boots, `db:prepare` runs migrations only
