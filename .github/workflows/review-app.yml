@@ -98,111 +98,17 @@ jobs:
           echo "action=$action"  >> "$GITHUB_OUTPUT"
           echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
 
-  build:
-    name: Build image
+  update:
+    name: Update ${{ needs.resolve.outputs.pr_number }}
     needs: resolve
-    if: needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.action == 'deploy'
-    runs-on: ubuntu-latest
-    outputs:
-      image_tag: ${{ steps.tag.outputs.image_tag }}
-    steps:
-      - name: Compute image tag
-        id: tag
-        run: echo "image_tag=pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}" >> "$GITHUB_OUTPUT"
-      - name: Checkout PR head
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ needs.resolve.outputs.head_sha }}
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.image_tag }}
-          cache-from: type=gha,scope=review-app
-          cache-to: type=gha,mode=max,scope=review-app
-
-  deploy:
-    name: Deploy ${{ needs.resolve.outputs.pr_number }}
-    needs: [resolve, build]
-    if: needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.action == 'deploy'
+    if: needs.resolve.outputs.proceed == 'true'
     runs-on: ubuntu-latest
     environment: review-app
-    # All env vars on the deploy step feed `.kamal/secrets-ci` via Dotenv variable
-    # substitution. Kamal substitutes `$POSTGRES_PASSWORD` etc. from the calling
-    # process env at deploy time.
-    env: &deploy_env
-      REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
-      KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-      POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
-      SECRET_KEY_BASE: ${{ secrets.REVIEW_APP_SECRET_KEY_BASE }}
-      SESSION_SECRET: ${{ secrets.REVIEW_APP_SESSION_SECRET }}
-      VERIFICATION_SECRET: ${{ secrets.REVIEW_APP_VERIFICATION_SECRET }}
-      STRIPE_PUBLISHABLE_KEY: ${{ secrets.REVIEW_APP_STRIPE_PUBLISHABLE_KEY }}
-      STRIPE_SECRET_KEY: ${{ secrets.REVIEW_APP_STRIPE_SECRET_KEY }}
-      STRIPE_WEBHOOK_SECRET: ${{ secrets.REVIEW_APP_STRIPE_WEBHOOK_SECRET }}
-      GOOGLE_MAPS: ${{ secrets.REVIEW_APP_GOOGLE_MAPS }}
-      GOOGLE_MAPS_STATIC: ${{ secrets.REVIEW_APP_GOOGLE_MAPS_STATIC }}
-      GOOGLE_GEOCODER: ${{ secrets.REVIEW_APP_GOOGLE_GEOCODER }}
-      MAPBOX_GEOCODER: ${{ secrets.REVIEW_APP_MAPBOX_GEOCODER }}
-      MAPBOX_MAPPING: ${{ secrets.REVIEW_APP_MAPBOX_MAPPING }}
-      R2_DEV_ENDPOINT: ${{ secrets.REVIEW_APP_R2_DEV_ENDPOINT }}
-      R2_DEV_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY }}
-      R2_DEV_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET }}
-      HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
-    steps:
-      - name: Checkout PR head
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ needs.resolve.outputs.head_sha }}
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "4.0.2"
-      - name: Install Kamal
-        run: gem install kamal -v "~> 2.0"
-      - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.10.0
-        with:
-          ssh-private-key: ${{ secrets.REVIEW_APP_SSH_KEY }}
-      - name: Trust review host
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ vars.REVIEW_APP_HOST }} >> ~/.ssh/known_hosts
-      - name: Stage CI secrets file
-        run: cp .kamal/secrets-ci .kamal/secrets
-      - name: Deploy
-        run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}" "${{ needs.build.outputs.image_tag }}"
-      - name: Add review-app label
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
-      - name: Comment URL on PR
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          url="https://pr-${{ needs.resolve.outputs.pr_number }}.review.bikeindex.org"
-          body=":rocket: Review app deployed at $url"
-          gh pr comment "${{ needs.resolve.outputs.pr_number }}" --body "$body" || true
-
-  destroy:
-    name: Destroy ${{ needs.resolve.outputs.pr_number }}
-    needs: resolve
-    if: needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.action == 'destroy'
-    runs-on: ubuntu-latest
-    environment: review-app
+    # All env vars feed `.kamal/secrets-ci` via Dotenv variable substitution. Kamal
+    # substitutes `$POSTGRES_PASSWORD` etc. from the calling process env. Destroy
+    # needs the same bundle even though `app remove` uses little of it — avoids
+    # silent empty-string substitutions causing odd failures.
     env:
-      # Same secret bundle as deploy — secrets-ci references them at substitution time
-      # even though `app remove` doesn't need most of them. Cheap to pass; avoids
-      # silent empty-string substitutions causing odd failures.
       REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
       KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
@@ -221,6 +127,7 @@ jobs:
       R2_DEV_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY }}
       R2_DEV_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET }}
       HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
+      # Used by the destroy path's ERB; deploy passes the real tag as a CLI arg.
       IMAGE_TAG: "destroy"
     steps:
       - name: Checkout PR head
@@ -243,9 +150,53 @@ jobs:
           ssh-keyscan -H ${{ vars.REVIEW_APP_HOST }} >> ~/.ssh/known_hosts
       - name: Stage CI secrets file
         run: cp .kamal/secrets-ci .kamal/secrets
+
+      # --- deploy path: build + push the image, then deploy ---
+      - name: Compute image tag
+        if: needs.resolve.outputs.action == 'deploy'
+        id: tag
+        run: echo "image_tag=pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}" >> "$GITHUB_OUTPUT"
+      - name: Set up Docker Buildx
+        if: needs.resolve.outputs.action == 'deploy'
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        if: needs.resolve.outputs.action == 'deploy'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        if: needs.resolve.outputs.action == 'deploy'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.image_tag }}
+          cache-from: type=gha,scope=review-app
+          cache-to: type=gha,mode=max,scope=review-app
+      - name: Deploy
+        if: needs.resolve.outputs.action == 'deploy'
+        run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}" "${{ steps.tag.outputs.image_tag }}"
+      - name: Add review-app label
+        if: needs.resolve.outputs.action == 'deploy'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
+      - name: Comment URL on PR
+        if: needs.resolve.outputs.action == 'deploy'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url="https://pr-${{ needs.resolve.outputs.pr_number }}.review.bikeindex.org"
+          body=":rocket: Review app deployed at $url"
+          gh pr comment "${{ needs.resolve.outputs.pr_number }}" --body "$body" || true
+
       - name: Destroy
+        if: needs.resolve.outputs.action == 'destroy'
         run: bin/review-app destroy "${{ needs.resolve.outputs.pr_number }}"
       - name: Remove review-app label
+        if: needs.resolve.outputs.action == 'destroy'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --remove-label "$REVIEW_LABEL" || true
