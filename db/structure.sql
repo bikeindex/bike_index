@@ -3127,7 +3127,8 @@ CREATE TABLE public.public_images (
     updated_at timestamp without time zone NOT NULL,
     is_private boolean DEFAULT false NOT NULL,
     external_image_url text,
-    kind integer DEFAULT 0
+    kind integer DEFAULT 0,
+    image_processing boolean DEFAULT false NOT NULL
 );
 
 
@@ -7171,6 +7172,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260602232218'),
 ('20260525162548'),
 ('20260514182008'),
 ('20260514085900'),

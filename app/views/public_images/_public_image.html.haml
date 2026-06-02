@@ -14,7 +14,10 @@
     .processing
       = t(".processing")
     - if image.image?
-      %img{ src: image.image_url(:small) }
+      %img{ src: image.image_url(:small),
+            data: { controller: "public-image-thumbnail",
+                    public_image_thumbnail_src_value: image.image_url(:small),
+                    action: "error->public-image-thumbnail#retry load->public-image-thumbnail#loaded" } }
     - else
       %em.missing-image
         = t(".missing_image")

@@ -6,6 +6,7 @@
 #  id                 :integer          not null, primary key
 #  external_image_url :text
 #  image              :string(255)
+#  image_processing   :boolean          default(FALSE), not null
 #  imageable_type     :string(255)
 #  is_private         :boolean          default(FALSE), not null
 #  kind               :integer          default("photo_uncategorized")
