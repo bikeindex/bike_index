@@ -74,7 +74,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
     it "submits after selecting a color" do
       expect(combobox_values).to eq([])
-      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+      expect_axe_clean
       expect(page_text(page.text)).to_not match("miles of")
 
       find("label", text: "Stolen in search area").click

@@ -66,7 +66,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # Member listings header is visible and the 2 promoted bikes appear above the standard listings
     expect(page).to have_css("h2", text: "Bike Index member listings")
     expect(visible_bike_ids.first(2)).to match_array(promoted_bike_ids)
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
     # Verify the lazy-loading frame for page 2 exists (3 standard listings remain)
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
     scroll_to_lazy_load

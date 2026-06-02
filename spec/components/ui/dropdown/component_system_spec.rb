@@ -8,7 +8,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       visit "/rails/view_components/ui/dropdown/component/default"
 
       expect(page).to have_css('[aria-expanded="false"]')
-      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+      expect_axe_clean
 
       click_button("Menu ▾")
 
@@ -17,7 +17,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       expect(page).to have_text("Settings")
       expect(page).to have_text("Logout")
       expect(page).to have_css('li[role="menuitem"]:nth-child(2) + li[role="separator"] + li[role="menuitem"]')
-      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+      expect_axe_clean
 
       send_keys(:escape)
 
@@ -38,7 +38,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       visit "/rails/view_components/ui/dropdown/component/custom_button"
 
       expect(page).to have_css('[aria-expanded="false"]')
-      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+      expect_axe_clean
 
       click_button("seth herr ▾")
 
@@ -46,7 +46,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       expect(page).to have_text("Last synced: 2 minutes ago")
       expect(page).to have_text("Settings")
       expect(page).to have_text("Sync")
-      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+      expect_axe_clean
 
       send_keys(:escape)
 

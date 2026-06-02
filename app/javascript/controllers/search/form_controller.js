@@ -18,30 +18,55 @@ export default class extends Controller {
     const noJsElement = this.element.querySelector('#search_no_js')
     if (noJsElement) noJsElement.remove()
 
-    this.submitIfEmptyResults()
+    this.refreshResults()
 
     // Add timeLocalizer and watch for turbo-frame renders
     if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
-    // Re-check after Turbo navigations: on back/forward, connect() can fire
-    // before the frame element is parsed, leaving #loadedWithoutResults in
-    // place with no auto-submit.
-    document.addEventListener('turbo:load', this.submitIfEmptyResults)
+    // Re-run refreshResults after Turbo navigations: on back/forward, connect()
+    // can fire before the frame is parsed, leaving the auto-submit un-run.
+    document.addEventListener('turbo:load', this.handleTurboLoad)
+    // Track whether a cross-document Turbo visit (eg a back/forward restoration)
+    // is rendering, so reloadFrameFromUrl can stay out of its way. Cleared on any
+    // render below so the flag can never stick on.
+    document.addEventListener('turbo:visit', this.markTurboVisit)
+    // The combobox swaps its non-JS query field for query_items[] on connect,
+    // and it connects after this controller. Retry the auto-submit once it's
+    // ready, otherwise a restored page submits the empty `query` field instead.
+    document.addEventListener('search--combobox:connected', this.submitIfEmptyResults)
     // Same-document back/forward (a filter link advanced the URL without a
     // full page load) leaves the results frame's src stale. Re-point it at the
     // restored URL so the frame matches the address bar.
     window.addEventListener('popstate', this.reloadFrameFromUrl)
   }
 
+  markTurboVisit = () => { this.turboVisitInProgress = true }
+
   // if the frame was loaded without results, submit the form
   submitIfEmptyResults = () => {
     // connect() and the turbo:load listener can both fire before the first
-    // auto-submit's frame renders. Without this guard the second call submits
-    // again, and once the first render flips data-turbo-action to 'advance' the
-    // duplicate submit pushes a history entry - so the back button no longer
-    // leaves the search page. Skip while an auto-submit is already in flight.
+    // auto-submit's frame renders - so #loadedWithoutResults is still present on
+    // the second call. Without this guard the duplicate requestSubmit is aborted
+    // by Turbo (uncaught AbortError) and, once the first render flips
+    // data-turbo-action to 'advance', pushes a history entry so the back button
+    // no longer leaves the search page. Skip while a submit is already in flight.
     if (this.autoSubmitting) return
     if (!this.frameElement?.querySelector('#loadedWithoutResults')) return
+    // A restored back/forward entry already carries its committed search in the
+    // address bar, but its snapshot can come back as the bare shell with the
+    // form at server defaults. Re-submitting that form serializes the defaults
+    // and clobbers the URL (eg dropping query_items[], resetting stolenness).
+    // Load results straight from the URL instead - immune to the form/combobox
+    // restore race, and it leaves the restored history entry untouched.
+    if (window.location.search) {
+      this.frameElement.setAttribute('src', window.location.href)
+      return
+    }
+    // Wait until the combobox has removed its non-JS `query` field (it fires
+    // search--combobox:connected when done). Submitting first serializes the
+    // empty `query` field instead of query_items[], so the URL drops the
+    // selected items and stops matching the form.
+    if (this.element.querySelector('[data-search--everything-combobox-target="nonjsfields"]')) return
     this.autoSubmitting = true
     // Use replace for the initial auto-submit so it doesn't add a duplicate history entry
     this.formTarget.setAttribute('data-turbo-action', 'replace')
@@ -52,9 +77,14 @@ export default class extends Controller {
     this.formTarget.requestSubmit()
   }
 
-  // Only fires for same-document history navigation; cross-document back/forward
-  // re-renders the page and submitIfEmptyResults handles it instead.
+  // Re-point the results frame at the restored URL after same-document history
+  // navigation (a filter link advanced the URL without a full page load),
+  // leaving the frame's src stale. A cross-document restoration instead starts a
+  // Turbo visit that re-renders the whole page (and the turbo:load handler
+  // re-runs the auto-submit), so re-pointing here would start a frame fetch the
+  // body swap immediately aborts (uncaught AbortError) - skip it in that case.
   reloadFrameFromUrl = () => {
+    if (this.turboVisitInProgress) return
     if (this.frameElement?.getAttribute('src')) {
       this.frameElement.setAttribute('src', window.location.href)
     }
@@ -62,11 +92,53 @@ export default class extends Controller {
 
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
-    document.removeEventListener('turbo:load', this.submitIfEmptyResults)
+    document.removeEventListener('turbo:load', this.handleTurboLoad)
+    document.removeEventListener('turbo:visit', this.markTurboVisit)
+    document.removeEventListener('search--combobox:connected', this.submitIfEmptyResults)
     window.removeEventListener('popstate', this.reloadFrameFromUrl)
   }
 
+  handleTurboLoad = () => {
+    this.turboVisitInProgress = false
+    this.refreshResults()
+  }
+
+  // Clear any stale loading state, then bring the results frame in line with the
+  // address bar. Runs on initial connect and after every Turbo page load.
+  refreshResults () {
+    this.clearStaleFrameBusy()
+    this.submitIfEmptyResults()
+    this.reloadFrameIfUrlStale()
+  }
+
+  // A back/forward restoration can leave the results frame showing a snapshot for
+  // a different query than the address bar (Turbo restores snapshots loosely by
+  // path) - the empty-results auto-submit skips it because the frame isn't empty.
+  // Reload straight from the URL so results match; this loads from the address
+  // bar, not the form, so it's immune to combobox/form restore races.
+  reloadFrameIfUrlStale () {
+    const frame = this.frameElement
+    const src = frame?.getAttribute('src')
+    if (!src || frame.querySelector('#loadedWithoutResults')) return
+    if (new URL(src, window.location.origin).search !== window.location.search) {
+      frame.setAttribute('src', window.location.href)
+    }
+  }
+
+  // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward
+  // snapshot can be cached mid-search and restored with busy stuck on - which
+  // leaves the results frame hidden under the loading overlay forever. A real
+  // search is a frame navigation (never fires turbo:load), so on load/connect
+  // any busy on a [complete] frame is stale and safe to clear.
+  clearStaleFrameBusy () {
+    const frame = this.frameElement
+    if (!frame?.hasAttribute('complete')) return
+    frame.removeAttribute('busy')
+    frame.removeAttribute('aria-busy')
+  }
+
   handleFrameRender = () => {
+    this.turboVisitInProgress = false
     // Run the time localization command on frame render
     if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
       window.timeLocalizer.localize()
