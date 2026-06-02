@@ -78,14 +78,14 @@ case "$action" in
     kamal app remove || true
 
     echo "==> Dropping per-PR databases ($primary_db, $analytics_db) and role ($role)"
-    for sql in \
-      "DROP DATABASE IF EXISTS ${primary_db} WITH (FORCE)" \
-      "DROP DATABASE IF EXISTS ${analytics_db} WITH (FORCE)" \
-      "DROP ROLE IF EXISTS ${role}"
-    do
-      kamal accessory exec db --reuse \
-        "psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c \"${sql}\"" || true
-    done
+    # One SSH round-trip, ordered so the databases drop before the role that owns
+    # them. Best-effort (|| true) with no ON_ERROR_STOP, so a failed DROP (e.g. a
+    # db that was never created) doesn't skip the rest.
+    kamal accessory exec db --reuse \
+      "psql -U postgres -d postgres \
+        -c 'DROP DATABASE IF EXISTS ${primary_db} WITH (FORCE)' \
+        -c 'DROP DATABASE IF EXISTS ${analytics_db} WITH (FORCE)' \
+        -c 'DROP ROLE IF EXISTS ${role}'" || true
 
     echo "==> Flushing redis logical DB $redis_db"
     kamal accessory exec redis --reuse \
