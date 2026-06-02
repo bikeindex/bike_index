@@ -668,197 +668,173 @@
     <% unless @bike.status_impounded? %>
       <% parking_notification_open = params[:parking_notification].present? %>
       <div
-        data-controller="org--parking-notification"
-        data-org--parking-notification-united-states-id-value="<%= Country.united_states_id %>"
+        class="text-center collapse <%= "in" unless parking_notification_open %>"
+        id="openNewParkingNotification"
       >
-        <div
-          class="text-center <%= "tw:hidden!" if parking_notification_open %>"
-          data-org--parking-notification-target="openButton"
-        >
-          <a
-            class="btn btn-primary btn-lg"
-            href="#"
-            data-action="click->org--parking-notification#open"
-          >
-            New parking notification
-          </a>
-        </div>
+        <a class="btn btn-primary btn-lg" href="#newParkingNotificationFields">
+          New parking notification
+        </a>
+      </div>
+      <div
+        id="newParkingNotificationFields"
+        class="collapse <%= "in" if parking_notification_open %>"
+      >
+        <hr>
+        <% parking_notification_present = @parking_notification.present? %>
+        <% @parking_notification ||= ParkingNotification.new(bike_id: @bike.id, organization: @organization, use_entered_address: false) %>
 
-        <div
-          class="<%= "tw:hidden!" unless parking_notification_open %>"
-          data-org--parking-notification-target="fields"
-        >
-          <hr>
-          <% parking_notification_present = @parking_notification.present? %>
-          <% @parking_notification ||= ParkingNotification.new(bike_id: @bike.id, organization: @organization, use_entered_address: false) %>
+        <% unless parking_notification_present %>
+          <%# We only want to assign is_repeat if creating a new parking notification %>
+          <% @parking_notification.is_repeat = @parking_notification.likely_repeat? %>
+          <% @parking_notification.set_location_from_organization %>
+        <% end %>
 
-          <% unless parking_notification_present %>
-            <%# We only want to assign is_repeat if creating a new parking notification %>
-            <% @parking_notification.is_repeat = @parking_notification.likely_repeat? %>
-            <% @parking_notification.set_location_from_organization %>
-          <% end %>
+        <% @parking_notification.kind ||= @parking_notification.potential_initial_record&.kind || ParkingNotification.kinds.first %>
 
-          <% @parking_notification.kind ||= @parking_notification.potential_initial_record&.kind || ParkingNotification.kinds.first %>
+        <%= form_for @parking_notification, url: organization_parking_notifications_path(organization_id: @organization) do |f| %>
+          <%= f.hidden_field :bike_id %>
+          <%= f.hidden_field :latitude, class: "parkingLocation-latitude" %>
+          <%= f.hidden_field :longitude, class: "parkingLocation-longitude" %>
+          <%= f.hidden_field :accuracy, class: "parkingLocation-accuracy" %>
 
-          <%= form_for @parking_notification, url: organization_parking_notifications_path(organization_id: @organization) do |f| %>
-            <%= f.hidden_field :bike_id %>
-            <%= f.hidden_field :latitude, data: {"org--parking-notification-target": "latitude"} %>
-            <%= f.hidden_field :longitude, data: {"org--parking-notification-target": "longitude"} %>
-            <%= f.hidden_field :accuracy, data: {"org--parking-notification-target": "accuracy"} %>
+          <div class="mt-4 text-center">
+            <% if @parking_notification.can_be_repeat? %>
+              <div
+                class="btn-group"
+                role="group"
+                aria-label="Repeat notice"
+                data-toggle="buttons"
+              >
+                <label class="btn btn-secondary <%= "active" unless @parking_notification.is_repeat %>">
+                  <%= f.radio_button :is_repeat, false %> First notice
+                </label>
 
-            <div class="mt-4 text-center">
-              <% if @parking_notification.can_be_repeat? %>
-                <div
-                  class="btn-group"
-                  role="group"
-                  aria-label="Repeat notice"
-                  data-toggle="buttons"
-                >
-                  <label class="btn btn-secondary <%= "active" unless @parking_notification.is_repeat %>">
-                    <%= f.radio_button :is_repeat, false %> First notice
-                  </label>
-
-                  <label class="btn btn-secondary <%= "active" if @parking_notification.is_repeat %>" <%= "disabled" unless @parking_notification.can_be_repeat? %>> <%# herb:disable erb-no-output-in-attribute-position %>
-                    <%= f.radio_button :is_repeat, true %>
-                    <%# We have to add 1 on the repeat because this hasn't been created yet %>
-                    Repeat
-                    #<%= @parking_notification.earlier_bike_notifications.count %>
-                    of earlier notification
-                  </label>
-                </div>
-              <% end %>
-            </div>
-
-            <div class="row mt-4">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <%= f.label :message, "Optional message to send to user" %>
-                  <%= f.text_area :message, placeholder: "Optional", class: "form-control" %>
-                </div>
+                <label class="btn btn-secondary <%= "active" if @parking_notification.is_repeat %>" <%= "disabled" unless @parking_notification.can_be_repeat? %>> <%# herb:disable erb-no-output-in-attribute-position %>
+                  <%= f.radio_button :is_repeat, true %>
+                  <%# We have to add 1 on the repeat because this hasn't been created yet %>
+                  Repeat
+                  #<%= @parking_notification.earlier_bike_notifications.count %>
+                  of earlier notification
+                </label>
               </div>
+            <% end %>
+          </div>
 
-              <div class="col-md-6">
-                <div class="form-group">
-                  <p style="margin-bottom: 0;">Notification because</p>
-
-                  <% ParkingNotification.kinds.each do |kind| %>
-                    <label class="radio-inline mr-2">
-                      <%= f.radio_button :kind, kind %>
-                      <%= ParkingNotification.kinds_humanized[kind.to_sym] %>
-                    </label>
-                  <% end %>
-                </div>
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <div class="form-group">
+                <%= f.label :message, "Optional message to send to user" %>
+                <%= f.text_area :message, placeholder: "Optional", class: "form-control" %>
               </div>
             </div>
 
-            <div class="row">
-              <div class="col-sm-6 mt-4">
-                <div class="avatar-upload-wrapper">
-                  <label class="file">
-                    <%= f.file_field :image, class: "avatar-upload-field", accept: ImageUploader.permitted_extensions.join(","), data: {action: "change->org--parking-notification#updateFileName"} %>
+            <div class="col-md-6">
+              <div class="form-group">
+                <p style="margin-bottom: 0;">Notification because</p>
 
-                    <span class="file-custom">
-                      <span
-                        class="file-upload-text"
-                        data-org--parking-notification-target="fileName"
-                      >
-                        Choose file
-                      </span>
-                    </span>
+                <% ParkingNotification.kinds.each do |kind| %>
+                  <label class="radio-inline mr-2">
+                    <%= f.radio_button :kind, kind %>
+                    <%= ParkingNotification.kinds_humanized[kind.to_sym] %>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+          </div>
 
-                    <%= f.hidden_field :image_cache %>
+          <div class="row">
+            <div class="col-sm-6 mt-4">
+              <div class="avatar-upload-wrapper">
+                <label class="file">
+                  <%= f.file_field :image, class: "avatar-upload-field", accept: ImageUploader.permitted_extensions.join(",") %>
+
+                  <span class="file-custom">
+                    <span class="file-upload-text">Choose file</span>
+                  </span>
+
+                  <%= f.hidden_field :image_cache %>
+                </label>
+              </div>
+            </div>
+
+            <div class="col-sm-6 mt-4">
+              <%= submit_tag "Create parking notification!", class: "btn btn-success parkingLocation-submit-btn", disabled: true %>
+            </div>
+          </div>
+
+          <div class="row mt-4">
+            <div class="col-md-6" id="choseLocationMethod">
+              <span
+                class="
+                  less-strong waitingOnLocationText hideOnLocationFind
+                  collapse in
+                "
+              >
+                <%= translation(".waiting_on_device_location") %>
+              </span>
+
+              <div class="use-entered-address-radios showOnLocationFind collapse mb-2">
+                <div class="radio">
+                  <label>
+                    <%= f.radio_button :use_entered_address, false %> Use
+                    current location
+                  </label>
+                </div>
+
+                <div class="radio">
+                  <label>
+                    <%= f.radio_button :use_entered_address, true %> Enter
+                    address manually
                   </label>
                 </div>
               </div>
 
-              <div class="col-sm-6 mt-4">
-                <%= submit_tag "Create parking notification!", class: "btn btn-success", disabled: true, data: {"org--parking-notification-target": "submit"} %>
-              </div>
-            </div>
-
-            <div class="row mt-4">
-              <div class="col-md-6" id="choseLocationMethod">
-                <span
-                  class="less-strong"
-                  data-org--parking-notification-target="waiting"
-                >
-                  <%= translation(".waiting_on_device_location") %>
-                </span>
-
-                <div
-                  class="use-entered-address-radios mb-2 tw:hidden!"
-                  data-org--parking-notification-target="locationRadios"
-                  data-action="change->org--parking-notification#toggleAddress"
-                >
-                  <div class="radio">
-                    <label>
-                      <%= f.radio_button :use_entered_address, false %> Use
-                      current location
-                    </label>
-                  </div>
-
-                  <div class="radio">
-                    <label>
-                      <%= f.radio_button :use_entered_address, true, data: {"org--parking-notification-target": "manualRadio"} %>
-                      Enter address manually
-                    </label>
-                  </div>
+              <div class="form-group address-group related-fields collapse">
+                <div class="ifManualRequired">
+                  <%= f.text_field :street, placeholder: translation(".address_or_intersection"), class: "form-control" %>
                 </div>
 
-                <div
-                  class="form-group address-group related-fields tw:hidden!"
-                  data-org--parking-notification-target="addressGroup"
-                >
-                  <div class="ifManualRequired">
-                    <%= f.text_field :street, placeholder: translation(".address_or_intersection"), class: "form-control" %>
+                <div class="ifManualRequired">
+                  <%= f.text_field :city, placeholder: translation(".city"), class: "form-control" %>
+                </div>
+
+                <div class="row countrystatezip">
+                  <div class="col-sm-4 fancy-select unfancy no-restore-on-backspace hidden-other <%= "unhidden" if @parking_notification.country_id == Country.united_states_id %>">
+                    <%= f.collection_select(:region_record_id, State.united_states, :id, :name, {include_blank: true, prompt: translation(".state")}, {class: "form-control"}) %>
                   </div>
 
-                  <div class="ifManualRequired">
-                    <%= f.text_field :city, placeholder: translation(".city"), class: "form-control" %>
+                  <div class="col-sm-4 shown-other <%= "unhidden" unless @parking_notification.country_id == Country.united_states_id %>">
+                    <%= f.text_field :region_string, placeholder: translation(".region"), class: "form-control" %>
                   </div>
 
-                  <div class="row countrystatezip">
-                    <div
-                      class="col-sm-4 fancy-select unfancy no-restore-on-backspace hidden-other <%= "unhidden" if @parking_notification.country_id == Country.united_states_id %>"
-                      data-org--parking-notification-target="stateSelect"
-                    >
-                      <%= f.collection_select(:region_record_id, State.united_states, :id, :name, {include_blank: true, prompt: translation(".state")}, {class: "form-control"}) %>
-                    </div>
+                  <div class="col-sm-4">
+                    <%= f.text_field :postal_code, placeholder: translation(".zipcode"), class: "form-control" %>
+                  </div>
 
-                    <div
-                      class="col-sm-4 shown-other <%= "unhidden" unless @parking_notification.country_id == Country.united_states_id %>"
-                      data-org--parking-notification-target="regionText"
-                    >
-                      <%= f.text_field :region_string, placeholder: translation(".region"), class: "form-control" %>
-                    </div>
-
-                    <div class="col-sm-4">
-                      <%= f.text_field :postal_code, placeholder: translation(".zipcode"), class: "form-control" %>
-                    </div>
-
-                    <div
-                      class="
-                        col-sm-4 fancy-select unfancy
-                        no-restore-on-backspace ifManualRequired
-                      "
-                    >
-                      <%= f.select(:country_id, Country.select_options,
+                  <div
+                    class="
+                      col-sm-4 fancy-select unfancy no-restore-on-backspace
+                      ifManualRequired
+                    "
+                    id="us_id_data"
+                    data-usid="<%= Country.united_states_id %>"
+                  >
+                    <%= f.select(:country_id, Country.select_options,
                         {prompt: translation(".choose_country")},
-                        {class: "country-select-input form-control", data: {action: "change->org--parking-notification#toggleCountry"}}) %>
-                    </div>
+                        {class: "country-select-input form-control"}) %>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div class="col-md-6">
-                <div class="form-group less-strong">
-                  <%= f.label :internal_notes, translation(".parking_notification_notes_html", org_name: @organization.short_name).html_safe %>
-                  <%= f.text_area :internal_notes, class: "form-control" %>
-                </div>
+            <div class="col-md-6">
+              <div class="form-group less-strong">
+                <%= f.label :internal_notes, translation(".parking_notification_notes_html", org_name: @organization.short_name).html_safe %>
+                <%= f.text_area :internal_notes, class: "form-control" %>
               </div>
             </div>
-          <% end %>
-        </div>
+          </div>
+        <% end %>
       </div>
     <% end %>
   </div>

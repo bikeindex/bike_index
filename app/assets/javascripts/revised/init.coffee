@@ -175,7 +175,20 @@ renderDonationModal = ->
     $("#donationModal").on 'hide.bs.modal', ->
       localStorage.setItem("hideDonationModal", "true")
 
-$(document).ready ->
+bikeIndexInitialized = false
+
+initializeBikeIndex = ->
+  # Turbo (enabled per-element, e.g. the search form) swaps <body> without firing
+  # $(document).ready, so the per-page scripts wouldn't re-bind after a Turbo visit
+  # or snapshot restore - hence binding to turbo:load as well. On the initial load
+  # both $(document).ready and turbo:load fire, so guard against double-initializing.
+  # turbo:before-render fires on every Turbo visit/restore (but not the initial load),
+  # so it clears the guard and the following turbo:load re-initializes. A plain
+  # variable (not a DOM attribute) is used so Turbo's cached snapshots can't carry a
+  # stale "initialized" marker. $(document).ready still covers pages that don't load
+  # Turbo (e.g. the doorkeeper layout).
+  return if bikeIndexInitialized
+  bikeIndexInitialized = true
   enableEscapeForModals()
   window.BikeIndex.Init = new BikeIndex.Init
   if document.getElementById('binx_registration_widget')
@@ -185,3 +198,7 @@ $(document).ready ->
     renderDonationModal()
   # Remove ads, for now
   # window.adDisplayer = new window.AdDisplayer
+
+$(document).ready initializeBikeIndex
+$(document).on "turbo:load", initializeBikeIndex
+$(document).on "turbo:before-render", -> bikeIndexInitialized = false
