@@ -101,10 +101,9 @@ RSpec.describe "Bike search", :js, type: :system do
   end
 
   it "keeps back/forward navigation in sync without double-submitting" do
-    # Two searches in a row, then back to the first - the user's repro. connect()
-    # and the turbo:load handler both run the empty-results auto-submit on that
-    # back; it must fire at most once - without the guard the duplicate
-    # requestSubmit is aborted by Turbo (the uncaught AbortError in the console).
+    # Two searches in a row, then back to the first. Going back reconciles the
+    # eager frame from the URL rather than submitting the form, so the back
+    # navigation must not kick off an extra search submit.
     visit "/"
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
@@ -122,10 +121,10 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
 
-    # Now a fresh search, then back and forward. Forward must restore the selected
-    # query_items[] in the URL: the auto-submit waits for the combobox to swap its
-    # non-JS query field for query_items[]; otherwise it submits the empty `query`
-    # field and the URL drops the items, no longer matching the form.
+    # A fresh search, then view a result and return. The restored search must
+    # show results matching its URL - the two Blue bikes, not a stale snapshot of
+    # every color - which reloadFrameIfUrlStale guarantees by reloading the eager
+    # frame from the address bar when a restored snapshot doesn't match.
     visit "/"
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
@@ -134,11 +133,7 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     expect(page).to have_current_path(/query_items/, wait: 10)
 
-    page.go_back
-    expect(page).to have_css(".bike-box-item", wait: 10)
-    page.go_forward
-    # Results must match the restored URL, not a stale snapshot showing every
-    # color (only the two Blue bikes, no Red).
+    click_first_bike_and_go_back
     expect(page).to have_current_path(/query_items/, wait: 10)
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     expect(page).to have_no_content("Red")
