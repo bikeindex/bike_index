@@ -27,40 +27,14 @@ export default class extends Controller {
     if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:load', this.handleTurboLoad)
-    // Track whether a cross-document Turbo visit (eg a back/forward restoration)
-    // is rendering, so reloadFrameFromUrl can stay out of its way. Cleared on any
-    // render below so the flag can never stick on.
-    document.addEventListener('turbo:visit', this.markTurboVisit)
-    // Same-document back/forward (a filter link advanced the URL without a
-    // full page load) leaves the results frame's src stale. Re-point it at the
-    // restored URL so the frame matches the address bar.
-    window.addEventListener('popstate', this.reloadFrameFromUrl)
-  }
-
-  markTurboVisit = () => { this.turboVisitInProgress = true }
-
-  // Re-point the results frame at the restored URL after same-document history
-  // navigation (a filter link advanced the URL without a full page load),
-  // leaving the frame's src stale. A cross-document restoration instead starts a
-  // Turbo visit that re-renders the whole page (and re-eager-loads the frame), so
-  // re-pointing here would start a frame fetch the body swap immediately aborts
-  // (uncaught AbortError) - skip it in that case.
-  reloadFrameFromUrl = () => {
-    if (this.turboVisitInProgress) return
-    if (this.frameElement?.getAttribute('src')) {
-      this.frameElement.setAttribute('src', window.location.href)
-    }
   }
 
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.handleTurboLoad)
-    document.removeEventListener('turbo:visit', this.markTurboVisit)
-    window.removeEventListener('popstate', this.reloadFrameFromUrl)
   }
 
   handleTurboLoad = () => {
-    this.turboVisitInProgress = false
     this.refreshResults()
   }
 
@@ -97,7 +71,6 @@ export default class extends Controller {
   }
 
   handleFrameRender = () => {
-    this.turboVisitInProgress = false
     // Run the time localization command on frame render
     if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
       window.timeLocalizer.localize()
