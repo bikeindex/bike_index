@@ -77,10 +77,12 @@ class PublicImage < ApplicationRecord
       return Images::ExternalUrlStoreJob.perform_async(id)
     end
 
-    imageable&.update(updated_at: Time.current)
-    return true unless bike?
+    # For bikes, AfterBikeSaveJob resaves the bike in the background (resave_bike: true).
+    # Updating here too would redundantly run the location recalc synchronously, which can
+    # blow the request timeout (Rack::Timeout) when it triggers a geocode.
+    return CallbackJob::AfterBikeSaveJob.perform_async(imageable_id, false, true) if bike?
 
-    CallbackJob::AfterBikeSaveJob.perform_async(imageable_id, false, true)
+    imageable&.update(updated_at: Time.current)
   end
 
   # Because the way we load the file is different if it's remote or local
