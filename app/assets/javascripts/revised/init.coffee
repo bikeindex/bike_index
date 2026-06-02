@@ -70,6 +70,12 @@ class BikeIndex.Init extends BikeIndex
       bike_versions_index: BikeIndex.BikesIndex
 
       orgpublic_impounded_bikes_index: BikeIndex.BikesIndex
+      # Reachable via a same-id _top Turbo visit (the 🔎 email re-search in
+      # org/graduated_notification_table), which initializeBikeIndex skips because the
+      # page id is unchanged. That's only safe while BikesIndex is inert here -
+      # BikeSearchBar binds #bikes_search_form / #stolenness_tabs / #location, which
+      # this Stimulus-driven page doesn't render. If those hooks ever appear here,
+      # the 🔎 path won't rebind them; make the page script idempotent instead.
       organized_graduated_notifications_index: BikeIndex.BikesIndex
       my_accounts_edit: BikeIndex.UsersEdit
       users_new: BikeIndex.UsersNew
