@@ -24,7 +24,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     tooltips = all("[role='tooltip']", visible: :all)
     expect(tooltips.size).to be >= 2
     expect(tooltips.map { |t| t[:id] }.uniq.size).to eq tooltips.size
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
 
     tooltip = tooltips.first
     trigger = find("[aria-describedby='#{tooltip[:id]}']")
@@ -105,6 +105,6 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     visit "#{preview_url}?_display=#{CGI.escape({theme: "dark"}.to_json)}"
 
     expect(page).to have_css("[role='tooltip']", visible: :all)
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
   end
 end

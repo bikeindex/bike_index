@@ -9,7 +9,7 @@ RSpec.describe UI::Badge::Component, :js, type: :system do
     tooltip = find("[role='tooltip']", visible: :all)
     expect(tooltip.text(:all)).to eq "Notice"
     expect(tooltip).not_to be_visible
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
 
     trigger = find("[aria-describedby='#{tooltip[:id]}']")
     expect(trigger).to have_text "N"
