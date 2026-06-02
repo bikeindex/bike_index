@@ -113,16 +113,20 @@ RSpec.describe Users::ProcessOrganizationRoleJob, type: :job do
 
     context "email not sent" do
       let(:organization_role) { FactoryBot.create(:organization_role) }
-      it "sends the email" do
+      it "sends the email and records a notification" do
         expect(organization_role.claimed?).to be_falsey
         expect(organization_role.email_invitation_sent_at).to be_blank
         expect {
-          instance.perform(organization_role.id)
-        }.to_not change(User, :count)
+          expect { instance.perform(organization_role.id) }.to_not change(User, :count)
+        }.to change(Notification, :count).by(1)
         organization_role.reload
         expect(organization_role.claimed?).to be_falsey
         expect(organization_role.email_invitation_sent_at).to be_present
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+        notification = organization_role.notifications.first
+        expect(notification.kind).to eq "organization_invitation"
+        expect(notification.message_channel_target).to eq organization_role.invited_email
+        expect(notification.delivery_success?).to be_truthy
       end
       context "user with email exists" do
         let!(:user) { FactoryBot.build(:user_confirmed, email: organization_role.invited_email) }
@@ -156,6 +160,7 @@ RSpec.describe Users::ProcessOrganizationRoleJob, type: :job do
           expect(organization_role.user).to eq user
           expect(organization_role.email_invitation_sent_at).to be_present
           expect(ActionMailer::Base.deliveries.count).to eq 1
+          expect(organization_role.notifications.pluck(:kind)).to eq(["organization_invitation"])
         end
       end
     end
