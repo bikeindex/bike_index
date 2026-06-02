@@ -15,14 +15,18 @@ WORKDIR /rails
 # - imagemagick: mini_magick
 # - libjemalloc2: memory savings under load
 # - curl: health checks
+# - cron: the `cron` server role in config/deploy.review.yml
+# - ripgrep: the read_logged_searches rake task (rg) — matches Cloud66's deploy hook
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
+      cron \
       curl \
       imagemagick \
       libjemalloc2 \
       libvips \
       libyaml-0-2 \
-      postgresql-client && \
+      postgresql-client \
+      ripgrep && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 

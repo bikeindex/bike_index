@@ -1,0 +1,15 @@
+# Crontab for the review-app `cron` server role (config/deploy.review.yml).
+#
+# Loaded into the cron container via:
+#   (env && cat config/crontab) | crontab - && cron -f
+#
+# The `env` prefix copies the container's env vars (RAILS_ENV, the Postgres /
+# Redis addresses, secrets) into the crontab so jobs inherit them — cron
+# otherwise runs jobs with a bare environment. Each job still cd's into /rails
+# for the right working directory, and redirects output to PID 1's stdout/stderr
+# so it shows up in `kamal logs`.
+#
+# This file is only used by Kamal review apps, never by production (Cloud66).
+*/1  * * * * cd /rails && bundle exec rake run_scheduler              > /proc/1/fd/1 2>&1
+*/5  * * * * cd /rails && bundle exec rake pghero:capture_query_stats > /proc/1/fd/1 2>&1
+*/30 * * * * cd /rails && bundle exec rake read_logged_searches       > /proc/1/fd/1 2>&1

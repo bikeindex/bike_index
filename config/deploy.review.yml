@@ -42,6 +42,18 @@ servers:
     hosts:
       - <%= host %>
     cmd: bundle exec sidekiq -c 2
+  # Native Kamal cron (https://kamal-deploy.org/docs/configuration/cron/): a
+  # per-PR container that loads config/crontab and runs the cron daemon. The
+  # `env` prefix copies the container env into the crontab so jobs inherit the
+  # DB/Redis/secret vars. Runs as root because the cron daemon needs it — the
+  # image's default `rails` user can't run cron. The entrypoint's db:prepare is
+  # keyed to `./bin/rails server`, so this role skips it.
+  cron:
+    hosts:
+      - <%= host %>
+    cmd: bash -c "(env && cat config/crontab) | crontab - && cron -f"
+    options:
+      user: root
 
 proxy:
   ssl: true

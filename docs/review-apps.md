@@ -142,6 +142,16 @@ The workflow has two jobs: `resolve` (figures out the PR number + whether the tr
 
 Destroy reverses it: `kamal app remove`, then drops both databases + the role, then `FLUSHDB`s the assigned Redis logical DB.
 
+### Scheduled tasks (cron)
+
+Each review app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.org/docs/configuration/cron/)) that runs `config/crontab` via the standard Linux cron daemon. It reuses the app image, runs as `root` (the daemon needs it; the image's default `rails` user can't run cron), and is torn down with the rest of the app on destroy. The `env` prefix in its command copies the container's env vars into the crontab so jobs inherit the per-PR DB/Redis/secret config. Current jobs:
+
+| Schedule | Task |
+|---|---|
+| `*/1 * * * *` | `run_scheduler` — enqueues due `ScheduledJobRunner` work |
+| `*/5 * * * *` | `pghero:capture_query_stats` |
+| `*/30 * * * *` | `read_logged_searches` (needs `ripgrep`, installed in the image) |
+
 ## Files involved
 
 | File | Purpose |
@@ -151,6 +161,7 @@ Destroy reverses it: `kamal app remove`, then drops both databases + the role, t
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
 | `bin/review-app` | Deploy / destroy orchestration script |
 | `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
+| `config/crontab` | Scheduled rake tasks run by the `cron` server role |
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
 | `.kamal/hooks/post-deploy` | Honeybadger deploy notification (no-op if `HONEYBADGER_API_KEY` unset) |
