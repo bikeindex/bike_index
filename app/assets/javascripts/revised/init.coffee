@@ -175,30 +175,41 @@ renderDonationModal = ->
     $("#donationModal").on 'hide.bs.modal', ->
       localStorage.setItem("hideDonationModal", "true")
 
-bikeIndexInitialized = false
+# `new BikeIndex.Init` reassigns window.BikeIndex.Init to the instance, which clobbers
+# the class - capture the class (to reconstruct) and keep the instance (its
+# loadPageScript is reused on Turbo navigations below).
+BikeIndexInitClass = BikeIndex.Init
+bikeIndexInit = null
+lastInitializedPageId = null
 
 initializeBikeIndex = ->
-  # Turbo (enabled per-element, e.g. the search form) swaps <body> without firing
-  # $(document).ready, so the per-page scripts wouldn't re-bind after a Turbo visit
-  # or snapshot restore - hence binding to turbo:load as well. On the initial load
-  # both $(document).ready and turbo:load fire, so guard against double-initializing.
-  # turbo:before-render fires on every Turbo visit/restore (but not the initial load),
-  # so it clears the guard and the following turbo:load re-initializes. A plain
-  # variable (not a DOM attribute) is used so Turbo's cached snapshots can't carry a
-  # stale "initialized" marker. $(document).ready still covers pages that don't load
-  # Turbo (e.g. the doorkeeper layout).
-  return if bikeIndexInitialized
-  bikeIndexInitialized = true
-  enableEscapeForModals()
-  window.BikeIndex.Init = new BikeIndex.Init
-  if document.getElementById('binx_registration_widget')
-    new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
-  warnIfUnsupportedBrowser()
-  if $("#donationModal").length
-    renderDonationModal()
-  # Remove ads, for now
-  # window.adDisplayer = new window.AdDisplayer
+  # Turbo swaps <body> on a visit/restore without firing $(document).ready, so the
+  # legacy per-page script wouldn't re-bind (e.g. the bike show "New parking
+  # notification" button stopped opening when reached via Turbo) - hence also running
+  # on turbo:load. Guard by page id (a plain variable, so Turbo's cached snapshots
+  # can't carry a stale marker, and a full reload's fresh JS context resets it):
+  #   - same id: an intra-page Turbo update (e.g. an organized search/filter) - skip,
+  #     the existing bindings and modern Stimulus controllers still apply.
+  #   - first run: full app init.
+  #   - id changed via Turbo: only re-bind that page's script. Re-running the whole
+  #     init would re-bind the nav/organized/fancy-select handlers and fight the
+  #     Stimulus controllers on Turbo-driven pages.
+  pageId = document.body.id
+  return if pageId == lastInitializedPageId
+  if bikeIndexInit?
+    bikeIndexInit.loadPageScript(pageId)
+  else
+    enableEscapeForModals()
+    bikeIndexInit = new BikeIndexInitClass
+    window.BikeIndex.Init = bikeIndexInit
+    if document.getElementById('binx_registration_widget')
+      new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
+    warnIfUnsupportedBrowser()
+    if $("#donationModal").length
+      renderDonationModal()
+    # Remove ads, for now
+    # window.adDisplayer = new window.AdDisplayer
+  lastInitializedPageId = pageId
 
 $(document).ready initializeBikeIndex
 $(document).on "turbo:load", initializeBikeIndex
-$(document).on "turbo:before-render", -> bikeIndexInitialized = false
