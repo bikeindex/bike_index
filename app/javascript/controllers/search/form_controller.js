@@ -52,6 +52,16 @@ export default class extends Controller {
     // no longer leaves the search page. Skip while a submit is already in flight.
     if (this.autoSubmitting) return
     if (!this.frameElement?.querySelector('#loadedWithoutResults')) return
+    // A restored back/forward entry already carries its committed search in the
+    // address bar, but its snapshot can come back as the bare shell with the
+    // form at server defaults. Re-submitting that form serializes the defaults
+    // and clobbers the URL (eg dropping query_items[], resetting stolenness).
+    // Load results straight from the URL instead - immune to the form/combobox
+    // restore race, and it leaves the restored history entry untouched.
+    if (window.location.search) {
+      this.frameElement.setAttribute('src', window.location.href)
+      return
+    }
     // Wait until the combobox has removed its non-JS `query` field (it fires
     // search--combobox:connected when done). Submitting first serializes the
     // empty `query` field instead of query_items[], so the URL drops the
