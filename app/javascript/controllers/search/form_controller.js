@@ -52,6 +52,16 @@ export default class extends Controller {
     // no longer leaves the search page. Skip while a submit is already in flight.
     if (this.autoSubmitting) return
     if (!this.frameElement?.querySelector('#loadedWithoutResults')) return
+    // A restored back/forward entry already carries its committed search in the
+    // address bar, but its snapshot can come back as the bare shell with the
+    // form at server defaults. Re-submitting that form serializes the defaults
+    // and clobbers the URL (eg dropping query_items[], resetting stolenness).
+    // Load results straight from the URL instead - immune to the form/combobox
+    // restore race, and it leaves the restored history entry untouched.
+    if (window.location.search) {
+      this.frameElement.setAttribute('src', window.location.href)
+      return
+    }
     // Wait until the combobox has removed its non-JS `query` field (it fires
     // search--combobox:connected when done). Submitting first serializes the
     // empty `query` field instead of query_items[], so the URL drops the
@@ -93,11 +103,26 @@ export default class extends Controller {
     this.refreshResults()
   }
 
-  // Clear any stale loading state, then auto-submit if the loaded/restored frame
-  // has no results yet. Runs on initial connect and after every Turbo page load.
+  // Clear any stale loading state, then bring the results frame in line with the
+  // address bar. Runs on initial connect and after every Turbo page load.
   refreshResults () {
     this.clearStaleFrameBusy()
     this.submitIfEmptyResults()
+    this.reloadFrameIfUrlStale()
+  }
+
+  // A back/forward restoration can leave the results frame showing a snapshot for
+  // a different query than the address bar (Turbo restores snapshots loosely by
+  // path) - the empty-results auto-submit skips it because the frame isn't empty.
+  // Reload straight from the URL so results match; this loads from the address
+  // bar, not the form, so it's immune to combobox/form restore races.
+  reloadFrameIfUrlStale () {
+    const frame = this.frameElement
+    const src = frame?.getAttribute('src')
+    if (!src || frame.querySelector('#loadedWithoutResults')) return
+    if (new URL(src, window.location.origin).search !== window.location.search) {
+      frame.setAttribute('src', window.location.href)
+    }
   }
 
   // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward
