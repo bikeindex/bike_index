@@ -55,7 +55,9 @@ class ParkingNotification < ActiveRecord::Base
   MAX_PER_PAGE = 250
   # Cutoff for when parking_notifications started routing email delivery through Notification records.
   # Records created before this time have no associated Notification — assume they emailed successfully.
-  PRE_NOTIFICATION_INTEGRATION = Time.at(1779000000).freeze
+  # Set to ~the deploy date: too early and already-sent rows (no Notification) report email_success?
+  # false and risk re-sending; too late and brand-new rows skip sending because they look already-sent.
+  PRE_NOTIFICATION_INTEGRATION = Time.at(1780444800).freeze # 2026-06-03
   enum :kind, KIND_ENUM
   enum :status, STATUS_ENUM
   enum :retrieved_kind, RETRIEVED_KIND_ENUM
