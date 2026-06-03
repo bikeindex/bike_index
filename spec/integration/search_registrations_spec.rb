@@ -100,49 +100,45 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
-  it "keeps back navigation in sync without double-submitting" do
-    # Two searches in a row, then back to the first. Going back reconciles the
-    # eager frame from the URL rather than submitting the form, so the back
-    # navigation must not kick off an extra search submit.
+  it "keeps back/forward navigation in sync without double-submitting" do
+    # The real user flow: two searches, then retrace with the browser's back and
+    # forward buttons. Back lands on the first search and forward returns to the
+    # second; reloadFrameIfUrlStale reloads the eager frame from the address bar
+    # so each restored page matches its URL.
     visit "/"
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
     choose("stolenness_all", allow_label_click: true, visible: :all)
 
+    # Two searches in a row, ending on Blue. ("Primary colors: …" scopes the
+    # assertions to the bike results - the footer has a "Bike Index Blue Sky"
+    # link, so a bare have_no_content("Blue") would always fail.)
     search_color_and_submit("Red")
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page).to have_content("Primary colors: Red")
 
     find(".hw-combobox__chip__remover").click
     search_color_and_submit("Blue")
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page).to have_content("Primary colors: Blue")
+    expect(page).to have_no_content("Primary colors: Red")
 
+    # Back to the Red search. Going back reconciles the eager frame from the URL
+    # rather than re-submitting the form, so it must not kick off an extra submit.
     page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
     page.go_back
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page).to have_content("Primary colors: Red")
+    expect(page).to have_no_content("Primary colors: Blue")
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
-  end
 
-  it "restores the searched URL and results on forward navigation" do
-    # Arrive at a committed Blue search the way a user following a shared link or
-    # bookmark would - a plain page load - then go back and forward. (A rapid
-    # programmatic form submit followed by immediate go_back/go_forward races
-    # WebDriver's history navigation and flakes; a real user's link-then-back-
-    # forward, exercised here, is reliable and covers the same restoration.)
-    visit "/"
-    visit search_registrations_path(query_items: [blue.search_id], stolenness: "all")
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_content("Blue")
-    expect(page).not_to have_content("Red")
-
-    page.go_back
-    expect(page).to have_current_path("/", wait: 10)
-
-    # Forward must restore the searched URL with matching results - the two Blue
-    # bikes, not a stale snapshot of every color - which reloadFrameIfUrlStale
-    # guarantees by reloading the eager frame from the address bar.
+    # Forward to the Blue search. The restored frame must match the URL - the two
+    # Blue bikes, not a stale Red snapshot - via reloadFrameIfUrlStale reloading
+    # the eager frame from the address bar.
     page.go_forward
     expect(page).to have_current_path(/query_items/, wait: 10)
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_no_content("Red")
+    expect(page).to have_content("Primary colors: Blue")
+    expect(page).to have_no_content("Primary colors: Red")
   end
 end
