@@ -20,7 +20,13 @@
         <%= render partial: "marketplace_results" %>
       <% end %>
     <% else %>
-      <%= render UI::LoadingSpinner::Component.new(text: t(".loading_results")) %>
+      <%#
+        Hidden until JS reveals it - without JS the eager src never loads, so a
+        no-JS user would otherwise be stuck on a spinner that never resolves
+      %>
+      <div hidden data-search-loading>
+        <%= render UI::LoadingSpinner::Component.new(text: t(".loading_results")) %>
+      </div>
     <% end %>
   <% end %>
 

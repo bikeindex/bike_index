@@ -18,6 +18,11 @@ export default class extends Controller {
     const noJsElement = this.element.querySelector('#search_no_js')
     if (noJsElement) noJsElement.remove()
 
+    // Reveal the results frame's loading placeholder. It ships hidden so a no-JS
+    // user never sees a spinner that can't resolve (the eager src needs JS); now
+    // that JS is running, the eager fetch will load results, so show it.
+    this.frameElement?.querySelector('[data-search-loading]')?.removeAttribute('hidden')
+
     // The results frame eager-loads its own contents via its `src` (set
     // server-side once the page shell has rendered), so there's nothing to
     // submit here - just reconcile a restored snapshot with the address bar.

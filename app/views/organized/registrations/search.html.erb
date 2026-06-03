@@ -56,7 +56,13 @@
       <% if @render_results %>
         <%= render partial: "results" %>
       <% else %>
-        <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
+        <%#
+          Hidden until JS reveals it - without JS the eager src never loads, so
+          a no-JS user would otherwise be stuck on a spinner that never resolves
+        %>
+        <div hidden data-search-loading>
+          <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
+        </div>
       <% end %>
     <% end %>
 

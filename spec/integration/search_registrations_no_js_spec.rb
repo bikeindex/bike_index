@@ -36,6 +36,11 @@ RSpec.describe "Registration search without JavaScript", type: :system do
     expect(page).to have_css("turbo-frame#search_registrations_results_frame[src]", visible: :all)
     expect(page).to have_no_css(".bike-box-item")
 
+    # The loading spinner ships hidden and is only revealed by JS - so a no-JS
+    # user is never stuck staring at a spinner the eager src can never resolve.
+    expect(page).to have_css("[data-search-loading]", visible: :hidden)
+    expect(page).to have_no_css("[data-search-loading]", visible: true)
+
     # Submitting renders results synchronously. Default stolenness is "stolen", so
     # only the three stolen bikes match
     submit_search
