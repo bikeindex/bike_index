@@ -110,35 +110,35 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
     choose("stolenness_all", allow_label_click: true, visible: :all)
 
-    # Two searches in a row, ending on Blue. ("Primary colors: …" scopes the
-    # assertions to the bike results - the footer has a "Bike Index Blue Sky"
-    # link, so a bare have_no_content("Blue") would always fail.)
+    # Two searches in a row, ending on Blue. Each search is reflected by the
+    # combobox selection chip (the search form's restored state, not the bikes).
     search_color_and_submit("Red")
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_content("Primary colors: Red")
+    expect(page).to have_css(".hw-combobox__chip", text: "Red")
 
     find(".hw-combobox__chip__remover").click
     search_color_and_submit("Blue")
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_content("Primary colors: Blue")
-    expect(page).to have_no_content("Primary colors: Red")
+    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
+    expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
 
     # Back to the Red search. Going back reconciles the eager frame from the URL
-    # rather than re-submitting the form, so it must not kick off an extra submit.
+    # rather than re-submitting the form, so it must not kick off an extra submit -
+    # and the combobox chip must restore to Red, matching the address bar.
     page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
     page.go_back
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_content("Primary colors: Red")
-    expect(page).to have_no_content("Primary colors: Blue")
+    expect(page).to have_css(".hw-combobox__chip", text: "Red")
+    expect(page).to have_no_css(".hw-combobox__chip", text: "Blue")
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
 
-    # Forward to the Blue search. The restored frame must match the URL - the two
-    # Blue bikes, not a stale Red snapshot - via reloadFrameIfUrlStale reloading
-    # the eager frame from the address bar.
+    # Forward to the Blue search. The restored form must match the address bar -
+    # the combobox chip back to Blue, not a stale Red - via the eager frame
+    # reloading from the URL.
     page.go_forward
     expect(page).to have_current_path(/query_items/, wait: 10)
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_content("Primary colors: Blue")
-    expect(page).to have_no_content("Primary colors: Red")
+    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
+    expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
   end
 end
