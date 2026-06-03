@@ -1,60 +1,49 @@
-%h1= t(".bike_index_image_assets")
+= content_for :header do
+  = stylesheet_link_tag "kelsey_styles", "data-turbo-track" => "reload"
 
-%ul.serial-pictures
-  %li
-    %a.serial-image.blackbg{ href: image_path('resources/logo_bordered.svg') }
-      = image_tag('resources/logo_bordered.svg', alt: t('.logo_with_blue_shield'))
-    %p
-      - svg_link = link_to 'svg', image_path('resources/logo_bordered.svg')
-      - png_link = link_to 'png', image_path('resources/logo_bordered.png')
-      = t(".logo_with_links_html", text: t('.logo_with_blue_shield'), svg_link: svg_link, png_link: png_link)
-      %br
-      %small.less-strong
-        = t(".black_background_shown_here")
-  %li
-    %a.serial-image{ href: image_path('resources/logo_striped.svg') }
-      = image_tag('resources/logo_striped_short.svg', alt: t('.logo_with_stripes'))
-    %p
-      - svg_link = link_to 'svg', image_path('resources/logo_striped.svg')
-      - png_link = link_to 'png', image_path('resources/logo_striped.png')
-      = t(".logo_with_links_html", text: t('.logo_with_stripes'), svg_link: svg_link, png_link: png_link)
-  %li
-    %a.serial-image{ href: image_path('resources/logo.svg') }
-      = image_tag('resources/logo.svg', alt: t('.single_color_logo'))
-    %p
-      - svg_link = link_to 'svg', image_path('resources/logo.svg')
-      - png_link = link_to 'png', image_path('resources/logo.png')
-      = t(".logo_with_links_html", text: t('.single_color_logo'), svg_link: svg_link, png_link: png_link)
+.kelsey_styles
+  %section.le-hero-section
+    %div.le-bike-tiles-grid{"data-controller" => "landing-pages--bike-tiles", "data-landing-pages--bike-tiles-target" => "grid", "data-landing-pages--bike-tiles-images-value" => @bike_tile_images.to_json}
+    .le-hero-content
+      %h1 Resources & Marketing Materials
+      %p.le-hero-tagline
+        Bike Index is meant to be usable and expandable by everyone. We're way into the open source.
+      .le-hero-buttons
+        = link_to "Design Resources", "#design-resources", class: "le-btn-primary"
+        = link_to "Development Resources", "#dev-resources", class: "le-btn-primary"
 
-  %li
-    %a.serial-image.blackbg{ href: image_path('resources/logo_white.svg') }
-      = image_tag('resources/logo_white.svg', alt: t('.single_color_logo_in_white'))
-    %p
-      - svg_link = link_to 'svg', image_path('resources/logo_white.svg')
-      - png_link = link_to 'png', image_path('resources/logo_white.png')
-      = t(".logo_with_links_html", text: t('.single_color_logo_in_white'), svg_link: svg_link, png_link: png_link)
-      %br
-      %small.less-strong
-        = t(".image_has_no_background")
+  %section#design-resources.resources-section
+    .container
+      %h2 Design Resources
+      %p.resources-intro Free downloadable resources to help promote Bike Index in your community.
+      .resources-grid
+        - @design_resources.each do |resource|
+          .resource-card
+            .resource-thumbnail
+              = image_tag resource[:thumbnail], alt: resource[:title]
+            .resource-content
+              %h3= resource[:title]
+              %p= resource[:description]
+              = link_to resource[:button_text], resource[:file], class: "resource-btn", download: ""
 
-  %li
-    %a.serial-image.blackbg{ href: image_path('resources/logo_backgrounded.svg') }
-      = image_tag('resources/logo_backgrounded.svg', alt: t('.logo_with_cutout'))
-    %p
-      - svg_link = link_to 'svg', image_path('resources/logo_backgrounded.svg')
-      - png_link = link_to 'png', image_path('resources/logo_backgrounded.png')
-      = t(".logo_with_links_html", text: t('.logo_with_cutout'), svg_link: svg_link, png_link: png_link)
-      %br
-      %small.less-strong
-        = t(".black_background_shown_here")
-  %li
-    %a.serial-image{ href: image_path('resources/logo_backgrounded_black.svg') }
-      = image_tag('resources/logo_backgrounded_black.svg', alt: t('.logo_with_cutout_black'))
-    %p
-      - svg_link = link_to 'svg', image_path('resources/logo_backgrounded_black.svg')
-      - png_link = link_to 'png', image_path('resources/logo_backgrounded_black.png')
-      = t(".logo_with_links_html", text: t('.logo_with_cutout_black'), svg_link: svg_link, png_link: png_link)
+  %section#dev-resources.resources-section.dev-resources-section
+    .container
+      %h2 Development Resources
+      %p.resources-intro Build on top of Bike Index with our open source code and APIs.
+      .dev-resources-list
+        - @dev_resources.each do |resource|
+          .dev-resource-item
+            .dev-resource-content
+              %h3= resource[:title]
+              %p= resource[:description]
+              = link_to "#{resource[:link_text]} →", resource[:url], class: "dev-resource-link", target: "_blank", rel: "noopener noreferrer"
 
-%h5
-  - resources_link = link_to "Dev and Design resources", dev_and_design_path
-  = t(".check_out_resources_html", resources_link: resources_link)
+  %section.le-cta-section
+    .container
+      %h2 Questions about using these resources?
+      %p.le-cta-subtitle
+        We're here to help you spread the word about Bike Index in your community.
+      %p.le-nonprofit-message
+        We're a 501(c)(3) non-profit. Our mission is bike theft recovery, not profit.
+      .le-cta-buttons
+        = link_to "Get in Touch", "mailto:contact@bikeindex.org", class: "le-btn-primary"
