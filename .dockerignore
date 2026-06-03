@@ -1,5 +1,0 @@
-.git
-log/*
-tmp/*
-node_modules
-.env.local
