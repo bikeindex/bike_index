@@ -30,4 +30,5 @@
 :marketplace_message_blocked: 32
 :newsletter: 31
 :graduated_notification: 33
-:parking_notification: 34
+:organization_invitation: 34
+:parking_notification: 35

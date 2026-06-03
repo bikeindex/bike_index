@@ -26,26 +26,26 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   end
 
   def scroll_to_lazy_load
-    # Scroll the lazy-loading frame into view
+    # Scroll the lazy-loading frame into view to trigger its IntersectionObserver.
+    # Use an instant scroll (not "smooth") so the observer fires deterministically
+    # in headless Chrome; capybara-lockstep then holds the next assertion until the
+    # frame's in-flight fetch completes, so no manual sleep is needed.
     page.execute_script(<<~JS)
       const lazyFrame = document.querySelector('turbo-frame#page_2[loading="lazy"]');
       if (lazyFrame) {
-        lazyFrame.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        lazyFrame.scrollIntoView({ block: "end" });
       }
     JS
-
-    # Wait a moment for the scroll and IntersectionObserver to trigger
-    sleep 1
   end
 
-  it "automatically loads the next page when scrolling to bottom", :flaky do
+  it "automatically loads the next page when scrolling to bottom" do
     expect(manufacturer1.reload.id).to eq 1003 # sanity check - otherwise the search won't work
     expect(manufacturer2.reload.id).to eq 764 # sanity check - otherwise the search won't work
     visit marketplace_url
 
     # Wait for the initial results to load
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
     # Get the initial bike IDs visible on page 1
     initial_bikes = page.all("[data-test-id^='vehicle-thumbnail-linkspan-']").map do |el|
       el["data-test-id"].split("-").last

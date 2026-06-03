@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Search::EverythingCombobox::Options::Component, type: :component do
+RSpec.describe Search::EverythingComboboxOptions::Component, type: :component do
   let(:rendered) { render_inline(described_class.new(matches:, search_obj_name: "Registrations", next_page: nil)) }
 
   context "with a color match" do

@@ -27,6 +27,11 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
+    # Dismiss the post-login flash and wait for it to clear, so the next
+    # navigation isn't racing the redirect. The Bootstrap fade-out can exceed
+    # Capybara's default 2s wait on slow CI runners.
+    find(".alert-success .close").click
+    expect(page).to have_no_css(".alert-success", wait: 10)
   end
 
   it "searches by email via turbo, then opens the notification" do
@@ -67,9 +72,12 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame", wait: 10)
 
     page.go_back
-    expect(page).not_to have_current_path(/query_items/, wait: 10)
+    # Back navigation restores the default (unfiltered) search
+    expect(page).to have_current_path(/stolenness=all/, wait: 10)
+    expect(page).not_to have_current_path(/query_items/)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
+    expect(page).to have_field("search_email", with: "")
 
     # Form submit + direct back-nav: regression guard for turbo-cache spinner state
     fill_in "search_email", with: "alice@example.com"

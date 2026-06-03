@@ -48,7 +48,6 @@ module Search
 
       @page = permitted_page(max: MAX_INDEX_PAGE)
       @search_kind = :registration
-      @result_view = params[:search_result_view] || :bike_boxes
       @result_view = SearchResults::Container::Component.permitted_result_view(params[:search_result_view])
     end
 

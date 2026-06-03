@@ -374,6 +374,8 @@ Rails.application.routes.draw do
 
   mount Lookbook::Engine, at: "/lookbook"
 
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
+
   get "/400", to: "errors#bad_request", via: :all
   get "/401", to: "errors#unauthorized", via: :all
   get "/404", to: "errors#not_found", via: :all

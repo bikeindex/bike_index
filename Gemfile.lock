@@ -155,7 +155,7 @@ GEM
       loofah
       rails
       rails-html-sanitizer
-    bootsnap (1.24.1)
+    bootsnap (1.24.5)
       msgpack (~> 1.2)
     brakeman (8.0.4)
       racc
@@ -175,6 +175,9 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
+    capybara-lockstep (2.3.1)
+      activesupport (>= 7.0)
+      capybara (>= 3.0)
     carrierwave (3.1.2)
       activemodel (>= 6.0.0)
       activesupport (>= 6.0.0)
@@ -452,7 +455,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (2.19.5)
+    json (2.19.7)
     jwt (3.2.0)
       base64
     knapsack_pro (9.2.2)
@@ -464,6 +467,11 @@ GEM
       addressable (~> 2.8)
     letter_opener (1.10.0)
       launchy (>= 2.2, < 4)
+    letter_opener_web (3.0.0)
+      actionmailer (>= 6.1)
+      letter_opener (~> 1.9)
+      railties (>= 6.1)
+      rexml
     lint_roller (1.1.0)
     listen (3.10.0)
       logger
@@ -527,7 +535,7 @@ GEM
       monetize (~> 1.9)
       money (~> 6.13)
       railties (>= 3.0)
-    msgpack (1.8.0)
+    msgpack (1.8.1)
     multi_json (1.20.1)
     multipart-post (2.4.1)
     mustermann (4.0.0)
@@ -790,12 +798,12 @@ GEM
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
     shellany (0.0.1)
-    sidekiq (8.1.4)
+    sidekiq (8.1.6)
       connection_pool (>= 3.0.0)
       json (>= 2.16.0)
       logger (>= 1.7.0)
       rack (>= 3.2.0)
-      redis-client (>= 0.26.0)
+      redis-client (>= 0.29.0)
     sidekiq-failures (1.1.0)
       sidekiq (>= 4.0.0)
     sidekiq-logstash (3.3.0)
@@ -822,7 +830,7 @@ GEM
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
     ssrf_filter (1.3.0)
-    stackprof (0.2.27)
+    stackprof (0.2.28)
     standard (1.54.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -933,6 +941,7 @@ DEPENDENCIES
   brakeman
   bullet
   capybara
+  capybara-lockstep
   carrierwave (~> 3.1)
   carrierwave_backgrounder!
   chartkick
@@ -978,7 +987,7 @@ DEPENDENCIES
   inline_svg
   knapsack_pro
   kramdown
-  letter_opener
+  letter_opener_web
   lograge
   logstash-event
   lookbook

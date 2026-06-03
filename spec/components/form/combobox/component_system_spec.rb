@@ -6,15 +6,17 @@ RSpec.describe Form::Combobox::Component, :js, type: :system do
   it "opens, filters, selects, and closes" do
     visit "/rails/view_components/form/combobox/component/default"
 
-    expect(page).to have_css('[aria-expanded="false"]')
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    # `aria-expanded` is set by the combobox Stimulus controller on connect, not
+    # in the server-rendered HTML -- wait out the first JS connect on slow CI.
+    expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+    expect_axe_clean
 
     # Opens the listbox on click
     find_field("Manufacturer").click
 
     expect(page).to have_css('[aria-expanded="true"]')
     expect(page).to have_css('[role="option"]', count: 6)
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
 
     # Filters the options as you type
     fill_in "Manufacturer", with: "an"

@@ -52,6 +52,10 @@ module StravaJobs
       end
     end
 
+    def skip_scheduling?
+      super || ENV["STRAVA_KEY"].blank?
+    end
+
     def perform(skip_perform_in = false)
       return if skip_job?
       return unless self.class.rate_limit_allows_batch?

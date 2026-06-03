@@ -36,6 +36,7 @@ class OrganizationRole < ApplicationRecord
   belongs_to :user
   belongs_to :organization
   belongs_to :sender, class_name: "User"
+  has_many :notifications, as: :notifiable
 
   validates_presence_of :role, :organization_id, :invited_email
 

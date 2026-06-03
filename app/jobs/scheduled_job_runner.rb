@@ -73,6 +73,8 @@ class ScheduledJobRunner < ScheduledJob
   end
 
   def perform
+    return if skip_scheduling?
+
     record_scheduler_started
     self.class.scheduled_non_scheduler_workers.each do |worker|
       worker.perform_async if worker.should_enqueue?
