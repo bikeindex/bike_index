@@ -120,19 +120,18 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
-  it "restores the search and results on back navigation, without re-submitting" do
-    # Search Red, then Blue, then go back to the Red search. On back, both must
-    # reconcile to the restored URL: the results frame (reloadFrameIfUrlStale
-    # reloads it from the address bar - asserted via the bikes' colors inside the
-    # frame, which differ from Blue's; both searches return 2 bikes, so the count
-    # alone wouldn't catch a stale frame) and the search form (restored by Turbo's
-    # page snapshot - asserted via the combobox chip). Going back must also not
+  # :flaky retry: programmatic go_forward to a form-submitted (turbo advance)
+  # history entry intermittently no-ops in WebDriver (the URL stays on the back
+  # entry). It's a harness artifact - a real browser does back/forward reliably -
+  # so retry on CI. Back navigation is reliable on its own.
+  it "keeps back/forward navigation in sync without double-submitting", :flaky do
+    # Search Red, then Blue, then retrace with the browser's back and forward
+    # buttons. On each step both must reconcile to the restored URL: the results
+    # frame (reloadFrameIfUrlStale reloads it from the address bar - asserted via
+    # the bikes' colors inside the frame; Red and Blue both return 2 bikes, so the
+    # count alone wouldn't catch a stale frame) and the search form (restored by
+    # Turbo's page snapshot - asserted via the combobox chip). Back must also not
     # re-submit the form.
-    #
-    # Only back is exercised: programmatic go_forward to a form-submitted (turbo
-    # advance) history entry intermittently no-ops in WebDriver, so it can't be
-    # asserted reliably. Forward to a full page load is covered in the example
-    # above (go_back to "/", then go_forward).
     visit "/"
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
@@ -148,6 +147,7 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".hw-combobox__chip", text: "Blue")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
 
+    # Back to the Red search - frame and form reconcile to Red, no extra submit.
     page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
     page.go_back
     expect(page).to have_current_path(/query_items/, wait: 10)
@@ -155,5 +155,11 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".hw-combobox__chip", text: "Red")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Blue")
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
+
+    # Forward to the Blue search - frame and form reconcile back to Blue.
+    page.go_forward
+    expect_results_frame_color("Blue", "Red")
+    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
+    expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
   end
 end
