@@ -35,6 +35,23 @@ RSpec.describe "Bike search", :js, type: :system do
     find("#search-button").click
   end
 
+  # Assert the results *inside the eager turbo-frame* match a color search, so it
+  # proves the frame itself reconciled to the URL (reloadFrameIfUrlStale) - unlike
+  # the combobox chip, which lives in the form outside the frame and is restored
+  # by Turbo's page snapshot. Red and Blue both return 2 bikes, so the colors,
+  # not the count, are what distinguish the frame's contents.
+  def expect_results_frame_color(shown, hidden)
+    # Count-based, not have_content/have_no_content: the frame reloads through
+    # transient states on back/forward, and a bare have_content("...Red") /
+    # have_no_content("...Blue") can each pass on a transient frame (Red still
+    # showing before the reload, Blue not loaded yet). Requiring exactly 2 of the
+    # shown color and 0 of the hidden only holds once the frame has settled.
+    within("turbo-frame#search_registrations_results_frame") do
+      expect(page).to have_css(".bike-box-item", text: "Primary colors: #{shown}", count: 2, wait: 10)
+      expect(page).to have_css(".bike-box-item", text: "Primary colors: #{hidden}", count: 0, wait: 10)
+    end
+  end
+
   it "filters by color and location" do
     # Visit a different page first to establish history, then navigate to search
     visit "/"
@@ -103,45 +120,40 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
-  it "keeps back/forward navigation in sync without double-submitting" do
-    # The real user flow: two searches, then retrace with the browser's back and
-    # forward buttons. Back lands on the first search and forward returns to the
-    # second; reloadFrameIfUrlStale reloads the eager frame from the address bar
-    # so each restored page matches its URL.
+  it "restores the search and results on back navigation, without re-submitting" do
+    # Search Red, then Blue, then go back to the Red search. On back, both must
+    # reconcile to the restored URL: the results frame (reloadFrameIfUrlStale
+    # reloads it from the address bar - asserted via the bikes' colors inside the
+    # frame, which differ from Blue's; both searches return 2 bikes, so the count
+    # alone wouldn't catch a stale frame) and the search form (restored by Turbo's
+    # page snapshot - asserted via the combobox chip). Going back must also not
+    # re-submit the form.
+    #
+    # Only back is exercised: programmatic go_forward to a form-submitted (turbo
+    # advance) history entry intermittently no-ops in WebDriver, so it can't be
+    # asserted reliably. Forward to a full page load is covered in the example
+    # above (go_back to "/", then go_forward).
     visit "/"
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
     choose("stolenness_all", allow_label_click: true, visible: :all)
 
-    # Two searches in a row, ending on Blue. Each search is reflected by the
-    # combobox selection chip (the search form's restored state, not the bikes).
     search_color_and_submit("Red")
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect_results_frame_color("Red", "Blue")
     expect(page).to have_css(".hw-combobox__chip", text: "Red")
 
     find(".hw-combobox__chip__remover").click
     search_color_and_submit("Blue")
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect_results_frame_color("Blue", "Red")
     expect(page).to have_css(".hw-combobox__chip", text: "Blue")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
 
-    # Back to the Red search. Going back reconciles the eager frame from the URL
-    # rather than re-submitting the form, so it must not kick off an extra submit -
-    # and the combobox chip must restore to Red, matching the address bar.
     page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
     page.go_back
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page).to have_current_path(/query_items/, wait: 10)
+    expect_results_frame_color("Red", "Blue")
     expect(page).to have_css(".hw-combobox__chip", text: "Red")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Blue")
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
-
-    # Forward to the Blue search. The restored form must match the address bar -
-    # the combobox chip back to Blue, not a stale Red - via the eager frame
-    # reloading from the URL.
-    page.go_forward
-    expect(page).to have_current_path(/query_items/, wait: 10)
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
-    expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
   end
 end
