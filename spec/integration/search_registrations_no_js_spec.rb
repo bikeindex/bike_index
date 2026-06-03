@@ -5,8 +5,8 @@ require "rails_helper"
 # Without the :js tag these run on the rack_test driver, which never executes
 # JavaScript - exercising the non-JS fallback: the combobox stays hidden behind
 # its plain `query`/`serial` text fields, and the `search_no_js` hidden field is
-# never stripped, so the server renders results synchronously instead of into the
-# lazily-loaded turbo frame.
+# never stripped, so submitting renders results synchronously instead of into the
+# eager turbo frame (whose `src` is never fetched without JS).
 RSpec.describe "Registration search without JavaScript", type: :system do
   include_context :geocoder_stubbed_bounding_box
   include_context :geocoder_default_location
@@ -31,9 +31,9 @@ RSpec.describe "Registration search without JavaScript", type: :system do
   it "renders results server-side and filters via standard form submission" do
     visit "/search/registrations"
 
-    # The stimulus auto-submit never fires, so the page initially shows the form
-    # with no results loaded into the turbo frame
-    expect(page).to have_css("#loadedWithoutResults", visible: :all)
+    # Without JS the eager frame's src is never fetched, so the page initially
+    # shows the form with the results frame still empty (no results rendered).
+    expect(page).to have_css("turbo-frame#search_registrations_results_frame[src]", visible: :all)
     expect(page).to have_no_css(".bike-box-item")
 
     # Submitting renders results synchronously. Default stolenness is "stolen", so
