@@ -46,7 +46,9 @@ Avoid all of that by **closing the browser first** so the lock is released *befo
 
 ## Fallback: "Browser is already in use" even after closing
 
-This only happens when a **prior crashed session** left an orphaned headless Chrome still holding the lock. Inspect first, then kill **only** the MCP-scoped headless processes — never bare "Chrome", which would take down the user's real browser ([[feedback_never_kill_non_mcp_chrome]]):
+This happens when another process is still holding the lock — usually a **prior crashed session's** orphaned headless Chrome, but it can also be a **second, currently-active Claude Code session** running its own headless Playwright against the same shared profile. That second possibility is why you must never kill on your own judgment here.
+
+Inspect first — never bare "Chrome", which would take down the user's real browser ([[feedback_never_kill_non_mcp_chrome]]):
 
 ```bash
 # Inspect — the actual Chrome browser process has `--headless` BEFORE the
@@ -56,7 +58,9 @@ This only happens when a **prior crashed session** left an orphaned headless Chr
 pgrep -fl "mcp-chrome-shared" | grep -- "--headless"
 ```
 
-Confirm each line is a `Google Chrome`, `node`, or `playwright-mcp` process tied to `mcp-chrome-shared`, then `kill <those PIDs>`. Killing the MCP processes drops the connection, so reconnect via `/mcp` afterward (this is the one case where you pay an extra reconnect).
+**Stop and ask the user before killing anything.** These processes are scoped to `mcp-chrome-shared`, which is *shared across every Claude Code session on this machine* — the lock-holder might be a live Playwright session in another window, not a dead orphan, and killing it would crash that session's browser mid-task. Show the user the inspected PID list and ask them to confirm these are stale/abandoned before you `kill <those PIDs>`. Only proceed on explicit confirmation.
+
+Killing the MCP processes drops this session's connection too, so reconnect via `/mcp` afterward (this is the one case where you pay an extra reconnect).
 
 ## Mid-task
 
