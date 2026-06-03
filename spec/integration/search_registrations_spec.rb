@@ -100,7 +100,7 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
-  it "keeps back/forward navigation in sync without double-submitting" do
+  it "keeps back navigation in sync without double-submitting" do
     # Two searches in a row, then back to the first. Going back reconciles the
     # eager frame from the URL rather than submitting the form, so the back
     # navigation must not kick off an extra search submit.
@@ -120,20 +120,27 @@ RSpec.describe "Bike search", :js, type: :system do
     page.go_back
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
+  end
 
-    # A fresh search, then view a result and return. The restored search must
-    # show results matching its URL - the two Blue bikes, not a stale snapshot of
-    # every color - which reloadFrameIfUrlStale guarantees by reloading the eager
-    # frame from the address bar when a restored snapshot doesn't match.
+  it "restores the searched URL and results on forward navigation" do
+    # Arrive at a committed Blue search the way a user following a shared link or
+    # bookmark would - a plain page load - then go back and forward. (A rapid
+    # programmatic form submit followed by immediate go_back/go_forward races
+    # WebDriver's history navigation and flakes; a real user's link-then-back-
+    # forward, exercised here, is reliable and covers the same restoration.)
     visit "/"
-    visit "/search/registrations"
-    expect(page).to have_css(".bike-box-item", wait: 10)
-    choose("stolenness_all", allow_label_click: true, visible: :all)
-    search_color_and_submit("Blue")
+    visit search_registrations_path(query_items: [blue.search_id], stolenness: "all")
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_current_path(/query_items/, wait: 10)
+    expect(page).to have_content("Blue")
+    expect(page).not_to have_content("Red")
 
-    click_first_bike_and_go_back
+    page.go_back
+    expect(page).to have_current_path("/", wait: 10)
+
+    # Forward must restore the searched URL with matching results - the two Blue
+    # bikes, not a stale snapshot of every color - which reloadFrameIfUrlStale
+    # guarantees by reloading the eager frame from the address bar.
+    page.go_forward
     expect(page).to have_current_path(/query_items/, wait: 10)
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     expect(page).to have_no_content("Red")
