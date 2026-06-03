@@ -54,7 +54,10 @@ RSpec.describe "Bike search", :js, type: :system do
     search_color_and_submit("Blue")
 
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_content("Blue")
+    # The applied Blue filter shows as the combobox chip. (have_content("Blue")
+    # would also match the footer's "Bike Index Blue Sky" link, so it can't tell
+    # whether the filter actually took.)
+    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
     expect(page).not_to have_content("Red")
 
     click_first_bike_and_go_back
@@ -67,7 +70,7 @@ RSpec.describe "Bike search", :js, type: :system do
 
     # Only the blue NYC bike (proximity + color filter still active)
     expect(page).to have_css(".bike-box-item", count: 1, wait: 10)
-    expect(page).to have_content("Blue")
+    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
 
     click_first_bike_and_go_back
 
