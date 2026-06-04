@@ -36,17 +36,9 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     find("input[type=checkbox][name='ids[#{impound_record.id}]']", visible: :all)
   end
 
-  # Headless Chrome on CI sometimes loses the click on these freshly-enabled
-  # checkboxes (set/check/native.click all flaked), so set the property
-  # directly (and fire change, as a real click would). The form posts the
-  # value regardless of how the box got checked.
   def check_for_update(impound_record)
     expect(checkbox_for(impound_record)).not_to be_disabled
-    page.execute_script(<<~JS)
-      const el = document.getElementById('ids_#{impound_record.id}')
-      el.checked = true
-      el.dispatchEvent(new Event('change', {bubbles: true}))
-    JS
+    check "ids[#{impound_record.id}]"
     expect(checkbox_for(impound_record)).to be_checked
   end
 
