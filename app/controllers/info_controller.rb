@@ -51,7 +51,7 @@ class InfoController < ApplicationController
   def resources
   end
 
-  def image_resources
+  def dev_and_design
     @bike_tile_images = (0..16).map { |i|
       helpers.image_url("kelsey/bike_tiles/bike-entry_00#{i.to_s.rjust(2, "0")}.png")
     }
@@ -99,9 +99,6 @@ class InfoController < ApplicationController
 
   def support_the_bike_index
     redirect_to_donation_or_payment
-  end
-
-  def dev_and_design
   end
 
   def how_not_to_buy_stolen

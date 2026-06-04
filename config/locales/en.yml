@@ -2493,44 +2493,6 @@ en:
         It is the most widely used and successful bicycle registration service in
         the world with over %{bikes_count} cataloged bikes, %{partners_count} community
         partners and tens of thousands of daily searches.
-    dev_and_design:
-      bike_index_logos_html: "%{link} - vector and png Bike Index logos"
-      bike_shop_card: Bike shop card
-      bike_shop_card_pdf_url: https://files.bikeindex.org/stored/Bike-Index-Shop-Card.pdf
-      bike_shop_cards_html: '%{link} - design is for notecard size (5.5" x 4.25")'
-      design_resources: Design resources
-      development_resources: Development resources
-      display_widget_html: "%{link} (must be logged in - also, has no usage instructions...)"
-      flyers_html: >-
-        %{link} - Print color & double-sided (<em>do not</em> rescale, have printer
-        print as close to the edges as it can)
-      image_assets: Image assets
-      meant_to_be_usable: >-
-        Bike Index is meant to be usable and expandable by everyone. We're way into
-        the open source.
-      nearby_stolen_widget: Nearby stolen widget
-      nearby_stolen_widget_html: "%{link} (on GitHub)"
-      oauth_apps_html: "%{link} (must be logged in)"
-      oauth_authorized_apps_html: "%{link} (must be logged in)"
-      on_github: on GitHub
-      open_source_html: Bike Index itself is open source - check it out %{link}.
-      our_api_documentation: Our API documentation
-      trifold_flyer: Trifold Flyer
-      trifold_flyer_pdf_url: https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf
-    image_resources:
-      bike_index_image_assets: Bike Index image assets
-      black_background_shown_here: Black background shown here for visibility
-      check_out_resources_html: Check out %{resources_link} for additional design
-        resources
-      image_has_no_background: image has no background, shown here with black for
-        visibility
-      logo_with_blue_shield: Logo with blue shield and white text
-      logo_with_cutout: Logo with background cutout
-      logo_with_cutout_black: Logo with black background cutout
-      logo_with_links_html: "%{text} (%{svg_link}, %{png_link})"
-      logo_with_stripes: Logo with stripes
-      single_color_logo: Single color logo
-      single_color_logo_in_white: Single color logo in white
     lightspeed:
       a_few_things_to_note: 'A few things to note:'
       a_listing_on_bike_index_will_be_created: >-
@@ -5051,8 +5013,7 @@ en:
       community_groups: Community Groups
       copyright_html: "%{current_year} &copy; Bike Index, a 501(c)(3) nonprofit -
         EIN 81-4296194"
-      design_logos: Design & Logos
-      dev_resources: Dev Resources
+      dev_and_design_resources: Dev & Design Resources
       donate: Donate
       faq: FAQ
       help: Help

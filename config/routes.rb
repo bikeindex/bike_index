@@ -357,7 +357,7 @@ Rails.application.routes.draw do
   resources :stolen_bike_listings, only: %i[index]
 
   %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
-    protect_your_bike serials about where vendor_terms resources image_resources privacy terms security
+    protect_your_bike serials about where vendor_terms resources privacy terms security
     how_not_to_buy_stolen dev_and_design lightspeed membership].freeze.each do |page|
     get page, controller: "info", action: page
   end
@@ -368,6 +368,7 @@ Rails.application.routes.draw do
   resources :info, only: %i[show]
 
   %w[stolen_bikes roadmap spokecard how_it_works].freeze.each { |p| get p, to: redirect("/resources") }
+  get "image_resources", to: redirect("/dev_and_design")
 
   get "strava_search", to: "strava_search#index"
   post "strava_search/token", to: "strava_search#create_token", as: :strava_search_token
