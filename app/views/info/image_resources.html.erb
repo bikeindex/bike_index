@@ -4,10 +4,21 @@
 
 <div class="kelsey_styles">
   <section class="le-hero-section">
-    <div class="le-bike-tiles-grid" data-controller="landing-pages--bike-tiles" data-landing-pages--bike-tiles-target="grid" data-landing-pages--bike-tiles-images-value="<%= @bike_tile_images.to_json %>"></div>
+    <div
+      class="le-bike-tiles-grid"
+      data-controller="landing-pages--bike-tiles"
+      data-landing-pages--bike-tiles-target="grid"
+      data-landing-pages--bike-tiles-images-value="<%= @bike_tile_images.to_json %>"
+    ></div>
+
     <div class="le-hero-content">
       <h1>Resources & Marketing Materials</h1>
-      <p class="le-hero-tagline">Bike Index is meant to be usable and expandable by everyone. We're way into the open source.</p>
+
+      <p class="le-hero-tagline">
+        Bike Index is meant to be usable and expandable by everyone. We're way
+        into the open source.
+      </p>
+
       <div class="le-hero-buttons">
         <%= link_to "Design Resources", "#design-resources", class: "le-btn-primary" %>
         <%= link_to "Development Resources", "#dev-resources", class: "le-btn-primary" %>
@@ -18,15 +29,22 @@
   <section id="design-resources" class="resources-section">
     <div class="container">
       <h2>Design Resources</h2>
-      <p class="resources-intro">Free downloadable resources to help promote Bike Index in your community.</p>
+
+      <p class="resources-intro">
+        Free downloadable resources to help promote Bike Index in your
+        community.
+      </p>
+
       <div class="resources-grid">
         <% @design_resources.each do |resource| %>
           <div class="resource-card">
             <div class="resource-thumbnail">
               <%= image_tag resource[:thumbnail], alt: resource[:title] %>
             </div>
+
             <div class="resource-content">
               <h3><%= resource[:title] %></h3>
+
               <p><%= resource[:description] %></p>
               <%= link_to resource[:button_text], resource[:file], class: "resource-btn", download: "" %>
             </div>
@@ -39,12 +57,17 @@
   <section id="dev-resources" class="resources-section dev-resources-section">
     <div class="container">
       <h2>Development Resources</h2>
-      <p class="resources-intro">Build on top of Bike Index with our open source code and APIs.</p>
+
+      <p class="resources-intro">
+        Build on top of Bike Index with our open source code and APIs.
+      </p>
+
       <div class="dev-resources-list">
         <% @dev_resources.each do |resource| %>
           <div class="dev-resource-item">
             <div class="dev-resource-content">
               <h3><%= resource[:title] %></h3>
+
               <p><%= resource[:description] %></p>
               <%= link_to "#{resource[:link_text]} →", resource[:url], class: "dev-resource-link", target: "_blank", rel: "noopener noreferrer" %>
             </div>
@@ -57,8 +80,17 @@
   <section class="le-cta-section">
     <div class="container">
       <h2>Questions about using these resources?</h2>
-      <p class="le-cta-subtitle">We're here to help you spread the word about Bike Index in your community.</p>
-      <p class="le-nonprofit-message">We're a 501(c)(3) non-profit. Our mission is bike theft recovery, not profit.</p>
+
+      <p class="le-cta-subtitle">
+        We're here to help you spread the word about Bike Index in your
+        community.
+      </p>
+
+      <p class="le-nonprofit-message">
+        We're a 501(c)(3) non-profit. Our mission is bike theft recovery, not
+        profit.
+      </p>
+
       <div class="le-cta-buttons">
         <%= link_to "Get in Touch", "mailto:contact@bikeindex.org", class: "le-btn-primary" %>
       </div>
