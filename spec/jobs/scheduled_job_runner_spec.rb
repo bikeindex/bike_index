@@ -19,6 +19,29 @@ RSpec.describe ScheduledJobRunner, type: :lib do
     expect(described_class.scheduled_jobs.count).to be > 5
   end
 
+  describe "skip_scheduling?" do
+    let(:instance) { described_class.new }
+
+    it "is false by default" do
+      expect(instance.skip_scheduling?).to be_falsey
+    end
+
+    context "when SIDEKIQ_SKIP_SCHEDULED_JOB_RUNNER is set" do
+      before { stub_const("ENV", ENV.to_hash.merge("SIDEKIQ_SKIP_SCHEDULED_JOB_RUNNER" => "true")) }
+
+      it "is true, and perform does not enqueue workers or record history" do
+        clear_scheduled_history
+        Sidekiq::Job.clear_all
+        expect(instance.skip_scheduling?).to be_truthy
+        instance.perform
+        expect(described_class.last_started).to be_blank
+        described_class.scheduled_non_scheduler_workers.each do |worker|
+          expect(worker.jobs.count).to eq 0
+        end
+      end
+    end
+  end
+
   describe "perform" do
     it "schedules all the workers" do
       clear_scheduled_history

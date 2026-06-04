@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-# Override the default db:migrate task, so that parallel test databases are created by default
-# Skip on CI, because CI doesn't use parallel tests
-if Rails.env.development? && ENV["SKIP_PARALLEL_MIGRATIONS"].blank?
+# Override the default db:migrate task, so that parallel test databases are migrated too.
+# Opt-in only: set PARALLEL_MIGRATIONS to enable (e.g. PARALLEL_MIGRATIONS=true bin/rake db:migrate).
+# Off by default, since parallel test databases aren't always needed and CI doesn't use them.
+if Rails.env.development? && ENV["PARALLEL_MIGRATIONS"].present?
   # number parallel databases correctly
   ENV["PARALLEL_TEST_FIRST_IS_1"] = "true"
 

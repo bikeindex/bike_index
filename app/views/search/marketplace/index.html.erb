@@ -7,16 +7,18 @@
     price_max_amount: @price_max_amount, result_view: @result_view, search_obj_name: @search_obj_name) %>
 </div>
 
-<%= turbo_frame_tag :marketplace_results_frame do %>
-  <% if @render_results %>
-    <%= turbo_frame_tag "page_#{@pagy.page}" do %>
-      <%= render partial: "marketplace_results" %>
+<div class="search-results-frame-wrapper">
+  <%= turbo_frame_tag :marketplace_results_frame do %>
+    <% if @render_results %>
+      <%= turbo_frame_tag "page_#{@pagy.page}" do %>
+        <%= render partial: "marketplace_results" %>
+      <% end %>
+    <% else %>
+      <span id="loadedWithoutResults" class="tw:hidden"></span>
     <% end %>
-  <% else %>
-    <span id="loadedWithoutResults" class="tw:hidden"></span>
   <% end %>
-<% end %>
 
-<div id="hiddenLoadingSpinner" class="tw:hidden">
-  <%= render UI::LoadingSpinner::Component.new(text: t(".loading_results")) %>
+  <div class="search-loading-overlay">
+    <%= render UI::LoadingSpinner::Component.new(text: t(".loading_results")) %>
+  </div>
 </div>

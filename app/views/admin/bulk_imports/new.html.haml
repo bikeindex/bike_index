@@ -7,9 +7,8 @@
     = form_for [:admin, @bulk_import] do |f|
       = render(Alerts::ObjectErrors::Component.new(object: @bulk_import))
 
-      .form-group.fancy-select.unfancy
-        = f.label :organization_id
-        = f.collection_select(:organization_id, Organization.all, :id, :name, { prompt: "Choose organization", required: true }, class: "form-control")
+      .form-group
+        = render Form::Combobox::Component.new(name: :organization_id, form: f, label: BulkImport.human_attribute_name(:organization_id), placeholder: "Choose organization", required: true, include_blank: true, options: Organization.all.pluck(:name, :id))
       .form-group
         .input-group
           .custom-file

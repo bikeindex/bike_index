@@ -15,30 +15,29 @@ RSpec.describe Search::Form::Component, :js, type: :system do
   end
 
   describe "EverythingCombobox", :flaky do
-    # NOTE: these tests are specific to Select2, unfortunately
-    # It requires hacks to target specific selectors because Select2 doesn't use accessible elements
-    # ... but the behavior should be the same for any updated combobox plugin
+    # The combobox autocomplete is served locally by Search::ComboboxController,
+    # so load the autocomplete data the combobox queries against.
+    let!(:black) { FactoryBot.create(:color, name: "Black", display: "#000") }
+    let!(:burgundy) { FactoryBot.create(:color, name: "Burgundy", display: "#900") }
 
     before do
-      # Stub the API_URL to use the production urls, for more accurate testing
-      stub_const("Search::EverythingCombobox::Component::API_URL", "https://bikeindex.org/api/autocomplete")
+      Autocomplete::Loader.load_all(%w[Color])
       visit(preview_path)
       # Clear localStorage
       page.execute_script("window.localStorage.clear()")
     end
 
-    def open_select2_dropdown
-      find(".select2-container").click
-      # Wait for select2 to load - production API can be slow in CI
-      expect(page).to have_no_content("Searching", wait: 30)
-      expect(page).to have_content("Registrations that are Black")
+    # The query_items[] fields the combobox mirrors its value into - these are
+    # what actually get submitted with the form
+    def combobox_values
+      all("input[name='query_items[]']", visible: :all).map(&:value)
     end
 
-    def select2_third_option
-      page.send_keys :arrow_down
-      page.send_keys :arrow_down
-      page.send_keys :arrow_down
-      page.send_keys :return
+    # Type a query into the combobox, then click the matching autocomplete option
+    def combobox_select(query, option_text)
+      find(".hw-combobox__input").set(query)
+      expect(page).to have_css(".hw-combobox__option", text: option_text, wait: 30)
+      find(".hw-combobox__option", text: option_text, match: :first).click
     end
 
     def expect_count(kind_scope, value = :greater_than_zero)
@@ -73,18 +72,15 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       expect(local_storage).to match_hash_indifferently({location_key => location, distance_key => distance})
     end
 
-    it "submits when enter is pressed twice" do
-      expect(find("#query_items", visible: false).value).to be_blank
-      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    it "submits after selecting a color" do
+      expect(combobox_values).to eq([])
+      expect_axe_clean
       expect(page_text(page.text)).to_not match("miles of")
 
       find("label", text: "Stolen in search area").click
 
-      open_select2_dropdown
-      select2_third_option
-
-      # NOTE: Since this uses production data, values are consistent
-      expect(find("#query_items", visible: false).value).to eq(["c_5"])
+      combobox_select("Burg", "Burgundy")
+      expect(combobox_values).to eq([burgundy.search_id])
 
       distance = "251"
       location = "Portland, OR"
@@ -93,7 +89,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       find("#location").set(location)
       expect(page_text(page.text)).to match("miles of")
 
-      page.send_keys(:return)
+      # Enter on the empty combobox input submits the search
+      find(".hw-combobox__input").send_keys(:return)
       expect(page).to have_current_path(/\?/, wait: 5)
 
       expect_localstorage_location(location:, distance:)
@@ -101,90 +98,53 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       target_params = {
         distance: [distance],
         location: [location],
-        "query_items[]": ["c_5"],
-        query: "",
-        button: [""],
+        "query_items[]": [burgundy.search_id],
         stolenness: ["proximity"],
         serial: [""]
       }
 
       # For some reason query doesn't show up
-      expect(page_query_params(current_url).except("query"))
-        .to match_hash_indifferently(target_params.except(:query))
-
-      # TODO: test for entering location: you, location: anywhere
+      expect(page_query_params(current_url).slice(*target_params.keys.map(&:to_s)))
+        .to match_hash_indifferently(target_params)
     end
 
-    it "sanitizes XSS in autocomplete results" do
-      # Mock autocomplete API to return a payload that sets a DOM attribute if executed
-      page.execute_script(<<~JS)
-        var origAjax = $.ajax;
-        $.ajax = function(settings) {
-          if (settings.url && settings.url.includes('autocomplete')) {
-            var d = $.Deferred();
-            setTimeout(function() {
-              d.resolve({
-                matches: [{
-                  search_id: 'xss_test',
-                  text: '<img src=x onerror="document.body.dataset.xss=1">',
-                  category: 'colors',
-                  display: null
-                }]
-              });
-            }, 50);
-            return d.promise();
-          }
-          return origAjax.apply(this, arguments);
-        };
-      JS
+    it "adds the matching option when enter is pressed" do
+      find(".hw-combobox__input").set("Burg")
+      # Wait for filtering to settle to the single match before pressing enter
+      expect(page).to have_css(".hw-combobox__option", text: "Burgundy", count: 1, wait: 30)
+      expect(page).to have_no_css(".hw-combobox__option", text: "Black")
 
-      find(".select2-container").click
-      expect(page).to have_css(".select2-results__option", wait: 5)
-
-      # Select the malicious option to also test selection rendering
-      find(".select2-results__option").click
-
-      expect(page.evaluate_script("document.body.dataset.xss")).to be_nil
+      # Enter with a matching option selects it rather than adding free text
+      find(".hw-combobox__input").send_keys(:return)
+      expect(combobox_values).to eq([burgundy.search_id])
     end
 
-    it "scrolls through paginated options" do
+    it "escapes HTML in autocomplete results" do
+      # An autocomplete entry whose name contains markup must render as text
+      FactoryBot.create(:color, name: "Reddish<img src=x onerror=\"document.body.dataset.xss=1\">")
+      Autocomplete::Loader.load_all(%w[Color])
       visit(preview_path)
 
-      expect(find("#query_items", visible: false).value).to be_blank
-      open_select2_dropdown
-      # Scroll down, verify it loads more
-      page.execute_script(<<-JS)
-        const container = document.querySelector('.select2-results__options');
-        const interval = setInterval(() => {
-          container.scrollTop += 100;
-          const element = Array.from(container.querySelectorAll('li')).find(el => el.textContent.includes('Registrations made by All City'));
-          if (element && element.getBoundingClientRect().top >= 0 && element.getBoundingClientRect().bottom <= window.innerHeight) {
-            clearInterval(interval);
-          }
-        }, 100);
-      JS
+      find(".hw-combobox__input").set("Reddish")
+      expect(page).to have_css(".hw-combobox__option", wait: 10)
+
+      expect(page.evaluate_script("document.body.dataset.xss")).to be_nil
     end
 
     context "chicago_tall_bike" do
       let(:preview_path) { "/rails/view_components/search/form/component/chicago_tall_bike" }
       let(:kind_scopes) { %w[proximity stolen non for_sale] }
       include_context :geocoder_real
-      # Maybe TODO: get real results for counts
-      # let(:production_count_url) { "https://bikeindex.org/api/v3/search/count" }
-      # allow_any_instance_of(Search::KindSelectFields::Component).to receive(:api_count_url).and_return(production_count_url)
-      it "renders the counts", vcr: {cassette_name: :search_form_component_chicago_tall_bike} do
-        expect(find("#query_items", visible: false).value).to eq(["v_9"])
 
-        # TODO: Why doesn't this show up?
-        # expect(page_text(page.text)).to match("miles of")
+      it "renders the counts", vcr: {cassette_name: :search_form_component_chicago_tall_bike} do
+        # v_9 (a cycle type) is preselected via the preview's query_items
+        expect(combobox_values).to eq(["v_9"])
 
         kind_scopes.each { |kind_scope| expect_count(kind_scope, 0) }
 
-        open_select2_dropdown
-        select2_third_option
+        combobox_select("Black", "Black")
 
-        # NOTE: Since this uses production data, values are consistent
-        expect(find("#query_items", visible: false).value).to match_array(%w[v_9 c_5])
+        expect(combobox_values).to match_array(["v_9", black.search_id])
 
         proximity_text = find("[data-test-id=\"Search::KindOption-proximity\"]").text
 
@@ -197,7 +157,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       let(:kind_scopes) { %w[for_sale for_sale_proximity] }
       let(:preview_path) { "/rails/view_components/search/form/component/for_sale" }
       it "renders and updates" do
-        expect(find("#query_items", visible: false).value).to eq([])
+        expect(combobox_values).to eq([])
         expect(page_text(page.text)).not_to match("miles of")
         expect(find("#primary_activity", visible: false).value).to eq ""
 
@@ -222,7 +182,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         let(:primary_activity) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Biking)") }
 
         it "renders and updates" do
-          expect(find("#query_items", visible: false).value).to eq([])
+          expect(combobox_values).to eq([])
           expect(page_text(page.text)).to match("miles of")
           expect(find("#primary_activity", visible: false).value).to eq primary_activity.id.to_s
 

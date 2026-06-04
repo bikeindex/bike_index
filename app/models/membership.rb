@@ -35,6 +35,10 @@ class Membership < ApplicationRecord
 
   validate :no_current_stripe_subscription_admin_managed
   validates :user, presence: true, on: :create
+  # Only treat unlinked not_ended siblings as conflicts — if a sibling has its own
+  # stripe_subscription it's a (rare, weird, but legitimate) separate membership, not a dup.
+  validates :user_id, uniqueness: {conditions: -> { not_ended.where.missing(:stripe_subscriptions) }},
+    if: -> { user_id.present? && not_ended? }
 
   attr_accessor :user_email, :set_interval
   delegate :stripe_id, :stripe_portal_session, :stripe_admin_url,
@@ -72,6 +76,10 @@ class Membership < ApplicationRecord
 
   def stripe_managed?
     !admin_managed?
+  end
+
+  def not_ended?
+    !ended?
   end
 
   def update_from_stripe!

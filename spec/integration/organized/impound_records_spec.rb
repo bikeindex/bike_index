@@ -36,17 +36,9 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     find("input[type=checkbox][name='ids[#{impound_record.id}]']", visible: :all)
   end
 
-  # Headless Chrome on CI sometimes loses the click on these freshly-enabled
-  # checkboxes (set/check/native.click all flaked), so set the property
-  # directly (and fire change, as a real click would). The form posts the
-  # value regardless of how the box got checked.
   def check_for_update(impound_record)
     expect(checkbox_for(impound_record)).not_to be_disabled
-    page.execute_script(<<~JS)
-      const el = document.getElementById('ids_#{impound_record.id}')
-      el.checked = true
-      el.dispatchEvent(new Event('change', {bubbles: true}))
-    JS
+    check "ids[#{impound_record.id}]"
     expect(checkbox_for(impound_record)).to be_checked
   end
 
@@ -59,7 +51,8 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     find(".alert-success .close").click
     # Wait for the dismissed flash to finish fading out — otherwise the
     # fixed-position alert can intercept the org submenu/nav clicks below.
-    expect(page).to have_no_css(".alert-success")
+    # The Bootstrap fade-out can exceed Capybara's default 2s wait on slow CI.
+    expect(page).to have_no_css(".alert-success", wait: 10)
     find("#passive_organization_submenu").click
     within(".current-organization-submenu") { click_link "Impounded Bikes" }
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
@@ -130,6 +123,9 @@ RSpec.describe "Organized impound records index", :js, type: :system do
       expect(page).not_to have_content("9002")
     end
     page.go_back
+
+    # Back navigation restores the unfiltered listing (all 4 rows)
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
 
     # Cells are hidden until the user opts into multi-update.
     expect(page).not_to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)

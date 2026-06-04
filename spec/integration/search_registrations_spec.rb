@@ -28,13 +28,20 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
+  def search_color_and_submit(color)
+    find(".hw-combobox__input").set(color)
+    expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
+    find(".hw-combobox__option", text: color, match: :first).click
+    find("#search-button").click
+  end
+
   it "filters by color and location" do
     # Visit a different page first to establish history, then navigate to search
     visit "/"
     visit "/search/registrations"
 
     expect(page).to have_css(".bike-box-item", wait: 10)
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+    expect_axe_clean
 
     # Initial load doesn't add a duplicate history entry, so back button returns to previous page
     page.go_back
@@ -42,17 +49,9 @@ RSpec.describe "Bike search", :js, type: :system do
     page.go_forward
     expect(page).to have_css(".bike-box-item", wait: 10)
 
-    # Select "All registrations" stolenness
+    # Select "All registrations" stolenness, then search Blue via the combobox
     choose("stolenness_all", allow_label_click: true, visible: :all)
-
-    # Search for Blue via the Select2 combobox
-    find(".select2-container").click
-    find(".select2-search__field").set("Blue")
-    expect(page).to have_content("that are", wait: 5)
-    find(".select2-results__option", text: "Blue", match: :first).click
-
-    # Submit search
-    find("#search-button").click
+    search_color_and_submit("Blue")
 
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     expect(page).to have_content("Blue")
@@ -72,13 +71,80 @@ RSpec.describe "Bike search", :js, type: :system do
 
     click_first_bike_and_go_back
 
-    # Remove the color filter by clearing the Select2, then search again
-    find(".select2-selection__choice__remove").click
+    # Remove the color filter by clearing the combobox, then search again
+    find(".hw-combobox__chip__remover").click
     find("#search-button").click
 
     # Now both NYC stolen bikes appear
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
 
     click_first_bike_and_go_back
+  end
+
+  it "reloads results when going back to the initial search page" do
+    visit "/"
+    visit "/search/registrations"
+    expect(page).to have_css(".bike-box-item", wait: 10)
+
+    # Search Blue, view a result, then return to the Blue results
+    choose("stolenness_all", allow_label_click: true, visible: :all)
+    search_color_and_submit("Blue")
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    click_first_bike_and_go_back
+
+    # Back again to the initial search page. Its results must reload rather than
+    # restoring a Turbo snapshot whose frame is stuck in the [busy] loading state
+    # (results hidden under the spinner overlay) - the "everything fails after
+    # going back from a search" bug.
+    page.go_back
+    expect(page).to have_css(".bike-box-item", wait: 10)
+  end
+
+  # :flaky retry covers a rare residual settle-timing race in the JS auto-submit
+  # restoration path - an in-flight default submit can clobber the restored URL
+  # before the assertions run. The eager turbo-frame src work removes the
+  # auto-submit machinery entirely; until then, retry on CI.
+  it "keeps back/forward navigation in sync without double-submitting", :flaky do
+    # Two searches in a row, then back to the first - the user's repro. connect()
+    # and the turbo:load handler both run the empty-results auto-submit on that
+    # back; it must fire at most once - without the guard the duplicate
+    # requestSubmit is aborted by Turbo (the uncaught AbortError in the console).
+    visit "/"
+    visit "/search/registrations"
+    expect(page).to have_css(".bike-box-item", wait: 10)
+    choose("stolenness_all", allow_label_click: true, visible: :all)
+
+    search_color_and_submit("Red")
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+
+    find(".hw-combobox__chip__remover").click
+    search_color_and_submit("Blue")
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+
+    page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
+    page.go_back
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page.evaluate_script("window.__submitStarts")).to be <= 1
+
+    # Now a fresh search, then back and forward. Forward must restore the selected
+    # query_items[] in the URL: the auto-submit waits for the combobox to swap its
+    # non-JS query field for query_items[]; otherwise it submits the empty `query`
+    # field and the URL drops the items, no longer matching the form.
+    visit "/"
+    visit "/search/registrations"
+    expect(page).to have_css(".bike-box-item", wait: 10)
+    choose("stolenness_all", allow_label_click: true, visible: :all)
+    search_color_and_submit("Blue")
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page).to have_current_path(/query_items/, wait: 10)
+
+    page.go_back
+    expect(page).to have_css(".bike-box-item", wait: 10)
+    page.go_forward
+    # Results must match the restored URL, not a stale snapshot showing every
+    # color (only the two Blue bikes, no Red).
+    expect(page).to have_current_path(/query_items/, wait: 10)
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page).to have_no_content("Red")
   end
 end

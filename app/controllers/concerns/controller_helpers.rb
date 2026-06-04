@@ -48,7 +48,7 @@ module ControllerHelpers
 
   # TODO: make this actually use the request location
   def current_currency
-    Currency.default
+    currency_from_params || Currency.default
   end
 
   def current_country_id
@@ -81,6 +81,18 @@ module ControllerHelpers
 
     store_return_to
     authenticate_user(flash_type:) && return
+  end
+
+  # Auto-confirms an unconfirmed user whose email matches an ownership owner_email validated
+  # via the claim token on Bikes::BaseController#find_token. Clicking that link is proof
+  # of email access, equivalent to confirming via the confirmation email.
+  def confirm_user_from_claim_token(user = current_user)
+    return unless user&.unconfirmed?
+    claim_email = session.delete(:claim_token_email)
+    return if claim_email.blank?
+    return unless user.email.to_s.downcase == claim_email.to_s.downcase
+
+    user.confirm(user.confirmation_token)
   end
 
   def authenticate_user(translation_key: nil, translation_args: {}, flash_type: :error)
@@ -409,6 +421,10 @@ module ControllerHelpers
 
   def bikehub_website_url(path = nil)
     "#{valid_partner_domain || "https://bikehub.com"}/#{path}"
+  end
+
+  def currency_from_params
+    Currency.friendly_find(params.permit(:currency)[:currency])
   end
 
   def valid_partner_domain

@@ -205,7 +205,8 @@ module BikeAttributable
     end
 
     image_col = public_images.limit(1).first&.image
-    return nil if image_col.blank? && !REMOTE_IMAGE_FALLBACK_URLS
+    # NOTE: avoid image_col.blank? — on Fog storage it issues an S3 HEAD per call (timed out the API search).
+    return nil if image_col&.path.blank? && !REMOTE_IMAGE_FALLBACK_URLS
 
     image_url = image_col&.send(:url, size)
     # image_col.blank? and image_url.present? indicates it's a remote file in local development
