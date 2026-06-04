@@ -69,7 +69,8 @@
               <h3><%= resource[:title] %></h3>
 
               <p><%= resource[:description] %></p>
-              <%= link_to "#{resource[:link_text]} →", resource[:url], class: "dev-resource-link", target: "_blank", rel: "noopener noreferrer" %>
+              <% external_options = resource[:external] ? {target: "_blank", rel: "noopener noreferrer"} : {} %>
+              <%= link_to "#{resource[:link_text]} →", resource[:url], {class: "dev-resource-link"}.merge(external_options) %>
             </div>
           </div>
         <% end %>

@@ -64,12 +64,12 @@ class InfoController < ApplicationController
       {thumbnail: "kelsey/resources/graphics-pack.png", title: "Graphics Pack", description: "Complete collection of illustrated graphics and visual assets for your projects and presentations.", button_text: "Download Graphics Pack", file: "/resources/graphics-pack.zip"}
     ]
     @dev_resources = [
-      {title: "Bike Index on GitHub", description: "Bike Index itself is open source — check it out on GitHub.", link_text: "View on GitHub", url: "https://github.com/bikeindex/bike_index"},
-      {title: "API Documentation", description: "Complete documentation for the Bike Index API.", link_text: "View API Docs", url: documentation_index_url},
-      {title: "Nearby Stolen Widget", description: "Display nearby stolen bikes on your website.", link_text: "View Widget on GitHub", url: "https://github.com/bikeindex/stolen_bike_widget"},
-      {title: "Personal Bike Display Widget", description: "Show your registered bikes on your personal website (requires login).", link_text: "Get Widget Code", url: "https://bikeindex.org/user_embeds"},
-      {title: "OAuth Applications You've Made", description: "Manage OAuth applications you've created (requires login).", link_text: "Manage Applications", url: "https://bikeindex.org/oauth/applications"},
-      {title: "OAuth Applications You've Authorized", description: "View and manage OAuth applications you've authorized (requires login).", link_text: "View Authorized Apps", url: "https://bikeindex.org/oauth/authorized_applications"}
+      {title: "Bike Index on GitHub", description: "Bike Index itself is open source — check it out on GitHub.", link_text: "View on GitHub", url: "https://github.com/bikeindex/bike_index", external: true},
+      {title: "API Documentation", description: "Complete documentation for the Bike Index API.", link_text: "View API Docs", url: documentation_index_path},
+      {title: "Nearby Stolen Widget", description: "Display nearby stolen bikes on your website.", link_text: "View Widget on GitHub", url: "https://github.com/bikeindex/stolen_bike_widget", external: true},
+      {title: "Personal Bike Display Widget", description: "Show your registered bikes on your personal website (requires login).", link_text: "Get Widget Code", url: current_user ? user_embed_path(current_user) : new_user_path(return_to: dev_and_design_path)},
+      {title: "OAuth Applications You've Made", description: "Manage OAuth applications you've created (requires login).", link_text: "Manage Applications", url: oauth_applications_path},
+      {title: "OAuth Applications You've Authorized", description: "View and manage OAuth applications you've authorized (requires login).", link_text: "View Authorized Apps", url: oauth_authorized_applications_path}
     ]
   end
 
