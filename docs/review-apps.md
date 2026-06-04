@@ -130,7 +130,16 @@ bin/review-app deploy <pr_number> <image_tag>
 
 ## How a deploy works
 
-The workflow has two jobs: `resolve` (figures out the PR number + whether the trigger should `deploy` or `destroy`) and `update` (does the work, branching on that decision via step-level `if:`). The build/push steps only run on the deploy path.
+The workflow always runs the same two jobs — `resolve` (works out the PR number and whether to `deploy` or `destroy`) then `update` (does the work, branching on that decision via step-level `if:`). There's deliberately **one `update` job, not a separate deploy job and destroy job**, so each commit shows a single status check instead of one running + one skipped. The four ways it can be triggered all funnel through those two jobs:
+
+| Trigger | Action | `update` does |
+|---|---|---|
+| `workflow_dispatch` → deploy | `deploy` | build image, deploy, add `review-app` label |
+| `workflow_dispatch` → destroy | `destroy` | tear down, remove label |
+| `pull_request: synchronize` (labeled, same-repo) | `deploy` | build image, deploy |
+| `pull_request: closed` (labeled) | `destroy` | tear down, remove label |
+
+Forks and unlabeled PRs are filtered out in `resolve` (it sets `proceed=false`, and `update` is skipped). On the **deploy** path:
 
 1. The `update` job builds the Docker image (`Dockerfile`) and pushes to GHCR as `pr-<N>-<sha>`.
 2. It then runs `bin/review-app deploy <pr> <tag>`, which SSHes to the host via Kamal and:
@@ -165,7 +174,7 @@ Each review app gets a `cron` container (a Kamal [`servers` role](https://kamal-
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
 | `.kamal/hooks/post-deploy` | Honeybadger deploy notification (no-op if `HONEYBADGER_API_KEY` unset) |
-| `.github/workflows/review-app.yml` | The single workflow handling all four trigger paths |
+| `.github/workflows/review-app.yml` | `resolve` + `update` jobs handling all four triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `provisioning/` | Ansible playbook for one-time host hardening |
 | `app/components/review_app_banner/` | ViewComponent rendered in the application layout when `ENV["REVIEW_APP"]` is set |
 
