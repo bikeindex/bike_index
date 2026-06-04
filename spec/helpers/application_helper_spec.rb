@@ -161,7 +161,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     describe "info controller" do
       before { allow(view).to receive(:controller_name) { "info" } }
-      %w[about protect_your_bike where serials resources].each do |action|
+      %w[about protect_your_bike where serials].each do |action|
         context action do
           it "returns content_skeleton" do
             allow(view).to receive(:action_name) { action }
@@ -175,7 +175,7 @@ RSpec.describe ApplicationHelper, type: :helper do
           expect(helper.current_page_skeleton).to be_nil
         end
       end
-      %w[terms vendor_terms security privacy dev_and_design].each do |action|
+      %w[terms vendor_terms security privacy resources].each do |action|
         context action do
           it "returns nil" do
             allow(view).to receive(:action_name) { action }
@@ -353,10 +353,10 @@ RSpec.describe ApplicationHelper, type: :helper do
         expect(helper.body_class).to be_nil
       end
     end
-    context "info controller dev_and_design" do
+    context "info controller resources" do
       before do
         allow(view).to receive(:controller_name) { "info" }
-        allow(view).to receive(:action_name) { "dev_and_design" }
+        allow(view).to receive(:action_name) { "resources" }
       end
       it "returns kelsey_landing-page-body" do
         expect(helper.body_class).to eq "kelsey_landing-page-body"
@@ -368,8 +368,8 @@ RSpec.describe ApplicationHelper, type: :helper do
     context "info controller" do
       it "returns info active_page" do
         allow(view).to receive(:controller_name).and_return("info")
-        allow(view).to receive(:action_name).and_return("dev_and_design")
-        expect(helper.content_page_type).to eq "dev_and_design"
+        allow(view).to receive(:action_name).and_return("serials")
+        expect(helper.content_page_type).to eq "serials"
       end
     end
     context "news controller" do

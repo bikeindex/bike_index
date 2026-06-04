@@ -49,7 +49,7 @@ RSpec.describe InfoController, type: :request do
 
   describe "static pages" do
     pages = %w[about protect_your_bike serials resources security
-      dev_and_design donate terms vendor_terms privacy lightspeed]
+      donate terms vendor_terms privacy lightspeed]
     context "no user" do
       pages.each do |page|
         context "#{page} with revised_layout enabled" do
@@ -85,10 +85,12 @@ RSpec.describe InfoController, type: :request do
         end
       end
     end
-    context "image_resources" do
-      it "redirects to dev_and_design" do
-        get "/image_resources"
-        expect(response).to redirect_to "/dev_and_design"
+    %w[image_resources dev_and_design].each do |page|
+      context page do
+        it "redirects to resources" do
+          get "/#{page}"
+          expect(response).to redirect_to "/resources"
+        end
       end
     end
   end
