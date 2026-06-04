@@ -1,0 +1,20 @@
+<header class="page-header">
+  <h1>Your authorized applications</h1>
+</header>
+<main role="main">
+  <div class="full-screen-table">
+    <%= render(UI::Table::Component.new(records: @applications)) do |table| %>
+      <% table.column(label: "Application") do |application| %>
+        <%= application.name %>
+      <% end %>
+
+      <% table.column(label: "Created At") do |application| %>
+        <%= render UI::Time::Component.new(time: application.created_at) %>
+      <% end %>
+
+      <% table.column do |application| %>
+        <%= render "delete_form", application: %>
+      <% end %>
+    <% end %>
+  </div>
+</main>
