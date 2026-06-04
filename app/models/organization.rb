@@ -251,7 +251,7 @@ class Organization < ApplicationRecord
     end
 
     def example
-      Organization.find_by_id(92) || Organization.create(name: "Example organization")
+      Organization.find_by(name: "Example organization") || Organization.create(name: "Example organization")
     end
   end
   # never geocode, use default_location lat/long
