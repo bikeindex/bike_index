@@ -8,15 +8,6 @@ module ApplicationHelper
     super([key, locale: I18n.locale], options, &block)
   end
 
-  # Opt the current page out of Turbo's snapshot cache. Use on search pages
-  # whose form sits outside the results turbo-frame and submits with
-  # turbo_action="advance": a restored snapshot can leave the frame's results
-  # stale/empty against the address-bar URL, so back/forward must re-fetch the
-  # page and reload the frame fresh from the server.
-  def turbo_disable_snapshot_cache
-    content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") }
-  end
-
   def notification_delivery_display(status)
     text = if status == "delivery_success"
       check_mark

@@ -29,4 +29,8 @@ RSpec.describe Search::ResultsFrame::Component, type: :component do
       expect(component).to have_css(".search-loading-overlay")
     end
   end
+
+  # `disable_snapshot_cache: true` writes the no-cache <meta> to content_for(:header),
+  # which is view-context-scoped and not observable through render_inline. It's
+  # covered at the integration layer (organized/impound_records_spec).
 end

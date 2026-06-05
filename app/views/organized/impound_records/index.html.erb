@@ -1,5 +1,3 @@
-<% turbo_disable_snapshot_cache %>
-
 <div class="organized-page-header mb-4">
   <h1 class="uncap"><%= t(".impound_records") %></h1>
 </div>
@@ -34,7 +32,8 @@
 <% end %>
 
 <%= render Search::ResultsFrame::Component.new(frame_id: :impound_records_results_frame,
-  render_results: @render_results, current_path: request.original_fullpath) do %>
+  render_results: @render_results, current_path: request.original_fullpath,
+  disable_snapshot_cache: true) do %>
   <div class="tw:mt-4">
     <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
   </div>
