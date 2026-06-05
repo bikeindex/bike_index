@@ -36,13 +36,16 @@
 %>
 <% form_interpreted_params = @interpreted_params.merge(search_status: params[:search_status], search_secondary: params[:search_secondary]).compact %>
 
-<div class="mt-4">
-  <%= render(Search::FormOrganized::Component.new(
-    target_search_path: organization_graduated_notifications_path(organization_id: current_organization.to_param),
-    target_frame: :graduated_notifications_results_frame,
-    interpreted_params: form_interpreted_params
-  )) %>
-</div>
+<%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
+<% unless turbo_frame_request? %>
+  <div class="mt-4">
+    <%= render(Search::FormOrganized::Component.new(
+      target_search_path: organization_graduated_notifications_path(organization_id: current_organization.to_param),
+      target_frame: :graduated_notifications_results_frame,
+      interpreted_params: form_interpreted_params
+    )) %>
+  </div>
+<% end %>
 
 <div class="search-results-frame-wrapper">
   <%#
