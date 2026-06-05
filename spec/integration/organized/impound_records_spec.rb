@@ -67,7 +67,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
   end
 
   it "loads results via turbo, filters by unregisteredness, then applies multi-updates" do
-    # Results load into the turbo-frame via the search--form auto-submit
+    # Results load into the turbo-frame via its eager src
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
     # search_no_js should NOT be in the URL (removed by the JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
@@ -82,16 +82,17 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(page).to have_current_path(/search_unregisteredness=only_unregistered/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 1)
 
-    # Back navigation restores the unfiltered listing (the search--form
-    # controller re-points the results frame at the restored URL on popstate).
+    # Back navigation restores the unfiltered listing. The page opts out of
+    # Turbo's snapshot cache (no-cache meta), so back/forward re-fetch it and the
+    # results frame reloads fresh from the server.
     page.go_back
     expect(page).not_to have_current_path(/search_unregisteredness/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
 
     # Search form submit + direct back-nav: regression guard for the stale
     # turbo-frame state the no-cache meta prevents. The form submit updates the
-    # frame via turbo_stream; back-nav must restore it fresh from the server,
-    # not from a cached snapshot (whose frame the popstate fix can't recover).
+    # frame via turbo_stream; back-nav must restore it fresh from the server, not
+    # from a cached snapshot whose frame would be stale.
     fill_in "search_email", with: "nobody@example.com"
     find("#search-button").click
 
