@@ -126,12 +126,16 @@ RSpec.describe "Bike search", :js, type: :system do
   # so retry on CI. Back navigation is reliable on its own.
   it "keeps back/forward navigation in sync without double-submitting", :flaky do
     # Search Red, then Blue, then retrace with the browser's back and forward
-    # buttons. On each step both must reconcile to the restored URL: the results
-    # frame (reloadFrameIfUrlStale reloads it from the address bar - asserted via
-    # the bikes' colors inside the frame; Red and Blue both return 2 bikes, so the
-    # count alone wouldn't catch a stale frame) and the search form (restored by
-    # Turbo's page snapshot - asserted via the combobox chip). Back must also not
-    # re-submit the form.
+    # buttons. Each step must leave the frame and form matching the restored URL:
+    # the frame is checked by the bikes' colors inside it (both searches return 2
+    # bikes, so a bare count wouldn't catch a wrong-color frame), the form by the
+    # combobox chip. Back must also not re-submit the form.
+    #
+    # This guards the end state, not a specific mechanism. Turbo's snapshot
+    # restoration keeps the frame correct here on its own - it stays green even
+    # with reloadFrameIfUrlStale stubbed out - so this is not a test of that
+    # reconciler. reloadFrameIfUrlStale is a fallback for genuinely stale
+    # snapshots, invoked on turbo:load (which does fire on these restorations).
     visit "/"
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
