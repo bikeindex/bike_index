@@ -1936,6 +1936,8 @@ nl:
     public_images:
       create:
         cannot_create: Whoops! We kunnen je dat beeld niet laten maken.
+        image_too_large: Die afbeelding is te groot. Upload een afbeelding die kleiner
+          is dan %{size}.
       destroy:
         cannot_delete: Whoops! Hoe heb je dat gedaan? Kan afbeeldingen van e-mailfragmenten
           niet verwijderen.
