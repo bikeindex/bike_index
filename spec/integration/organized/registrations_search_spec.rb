@@ -58,7 +58,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Visit a different page first to establish history, then navigate to bikes
     visit "/"
     visit bikes_path
-    # Results load via turbo auto-submit (search--form controller)
+    # Results load via the eager turbo-frame (src fetched once the frame connects)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
     expect_axe_clean("select-name")
@@ -114,7 +114,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("tbody tr", minimum: 1)
 
     # Verify that it preserves turbo-frame after search submissions
-    # Initial auto-submit loads results via turbo_stream
+    # Results load via the eager turbo-frame
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     # turbo-frame element must still exist after turbo_stream.update
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame")

@@ -23,21 +23,30 @@
   data-org--registration-search-column-toggle-default-columns-value="<%= registration_search_settings.initially_checked_columns.to_json %>"
   data-org--registration-search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
 >
-  <div class="mb-4">
-    <%= render(Search::FormOrganized::Component.new(
-      target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
-      target_frame: :organized_bikes_results_frame,
-      interpreted_params: form_interpreted_params,
-      settings_component: registration_search_settings
-    )) do %>
-      <% if @bike_sticker.present? %>
-        <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
+  <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
+  <% unless turbo_frame_request? %>
+    <div class="mb-4">
+      <%= render(Search::FormOrganized::Component.new(
+        target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
+        target_frame: :organized_bikes_results_frame,
+        interpreted_params: form_interpreted_params,
+        settings_component: registration_search_settings
+      )) do %>
+        <% if @bike_sticker.present? %>
+          <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
+        <% end %>
       <% end %>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
 
   <div class="search-results-frame-wrapper">
-    <%= turbo_frame_tag :organized_bikes_results_frame do %>
+    <%#
+      When the results aren't rendered inline (the JS shell), give the frame a src
+      so Turbo eager-loads the results in a separate request once it connects
+    %>
+
+    <%= turbo_frame_tag :organized_bikes_results_frame,
+      src: (request.original_fullpath unless @render_results) do %>
       <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
 
       <div class="tw:mt-2 tw:text-right">
@@ -50,7 +59,13 @@
       <% if @render_results %>
         <%= render partial: "results" %>
       <% else %>
-        <span id="loadedWithoutResults" class="tw:hidden"></span>
+        <%#
+          Hidden until JS reveals it - without JS the eager src never loads, so
+          a no-JS user would otherwise be stuck on a spinner that never resolves
+        %>
+        <div hidden data-search-loading>
+          <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
+        </div>
       <% end %>
     <% end %>
 

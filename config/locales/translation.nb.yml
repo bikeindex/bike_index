@@ -2339,6 +2339,8 @@ nb:
     public_images:
       create:
         cannot_create: Oops! Vi kan ikke la deg lage det bildet.
+        image_too_large: Bildet er for stort. Vennligst last opp et bilde som er mindre
+          enn %{size}.
       destroy:
         cannot_delete: Oops! Hvordan gjorde du det? Kan ikke slette bilder av e-postutdrag.
         image_deleted: Bildet ble slettet
