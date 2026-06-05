@@ -6,13 +6,16 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   let(:seller) { FactoryBot.create(:user, :with_address_record) }
   let!(:manufacturer1) { FactoryBot.create(:manufacturer, name: "Yuba", id: 1003, frame_maker: true) }
   let!(:manufacturer2) { FactoryBot.create(:manufacturer, name: "Salsa", id: 764, frame_maker: true) }
+  let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Mountain biking") }
+  let!(:other_primary_activity) { FactoryBot.create(:primary_activity, name: "Road cycling") }
 
   before do
     # Create enough listings to span multiple pages (12 per page)
 
     15.times do |i|
-      item = FactoryBot.create(:bike, :with_primary_activity,
-        manufacturer: (i % 2 == 0) ? manufacturer1 : manufacturer2)
+      item = FactoryBot.create(:bike,
+        manufacturer: (i % 2 == 0) ? manufacturer1 : manufacturer2,
+        primary_activity: (i < 6) ? primary_activity : other_primary_activity)
       listing = FactoryBot.create(:marketplace_listing, :for_sale,
         address_record: seller.address_record,
         seller:,
@@ -107,5 +110,20 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 8)
     # Should NOT have a lazy-loading frame for page 2
     expect(page).not_to have_css("turbo-frame#page_2")
+  end
+
+  it "filters listings by primary activity" do
+    visit_marketplace_via_nav
+    # Wait for the initial results to load - all 15 listings span multiple pages
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+
+    # Narrow to the 6 listings with the "Mountain biking" primary activity
+    select "Mountain biking", from: "primary_activity"
+    find("#search-button").click
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+    # Only 6 results, so there's nothing to lazy-load on a second page
+    expect(page).not_to have_css("turbo-frame#page_2")
+    # The selection persists after the search
+    expect(page).to have_select("primary_activity", selected: "Mountain biking")
   end
 end
