@@ -1,10 +1,9 @@
 <%#
-  no-cache: the results turbo-frame is populated by JS after load (the
-  search--form auto-submit, or a search form submit). Turbo's cached page
-  snapshot would restore that frame stale/empty on back navigation, and the
-  search--form popstate fix only recovers link-driven (src-bearing) frames,
-  not the form-submit case. Opting out of the snapshot cache makes back/
-  forward re-fetch the page so the frame reloads fresh.
+  no-cache: the results turbo-frame loads asynchronously - eager via its src on
+  first render, then replaced by form submits and filter-link navigations.
+  Turbo's cached page snapshot would restore that frame stale/empty on back
+  navigation, so opt out of the snapshot cache to make back/forward re-fetch the
+  page and reload the frame fresh from the server.
 %>
 
 <% content_for :header do %>

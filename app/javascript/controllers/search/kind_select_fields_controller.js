@@ -17,8 +17,10 @@ export default class extends Controller {
 
     // Add function to window so it can be called by select2 callback
     window.kindControllerUpdateAfterComboboxChange = this.updateAfterComboboxChange.bind(this)
-    // if in component preview (lookbook), run kind counts on load
-    if (window.inComponentPreview) { this.setKindCounts() }
+    // Load counts on connect. The eager turbo-frame flow no longer submits the
+    // form on initial render (which used to fire setKindCounts via
+    // turbo:submit-end), so fetch them here. Also covers component preview.
+    this.setKindCounts()
   }
 
   disconnect () {

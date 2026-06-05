@@ -1,8 +1,10 @@
 <%# TODO: add translations %>
 
 <%#
-  no-cache: form lives outside the frame, so turbo_action="advance" submits
-  snapshot form/URL mismatch — back-nav restores the broken state.
+  no-cache: the form lives outside the results frame and submits with
+  turbo_action="advance", so a restored snapshot can leave the frame's results
+  mismatched against the address-bar URL. Opt out of the snapshot cache so
+  back/forward re-fetch the page and reload the frame fresh from the server.
 %>
 
 <% content_for :header do %>

@@ -101,18 +101,30 @@ RSpec.describe "Bike search", :js, type: :system do
     click_first_bike_and_go_back
   end
 
-  it "reloads results when going back to the initial search page" do
-    visit "/"
+  it "populates the kind counts after each search and reloads results on back-nav" do
     visit "/search/registrations"
     expect(page).to have_css(".bike-box-item", wait: 10)
 
-    # Search Blue, view a result, then return to the Blue results
+    # Counts come from /api/v3/search/count, fetched on each form submit
+    # (turbo:submit-end -> setKindCounts). Both blue bikes are stolen, so a Blue
+    # search fills the "stolen" kind count with (2).
     choose("stolenness_all", allow_label_click: true, visible: :all)
+    search_color_and_submit("Blue")
+    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page).to have_css("[data-count-target='stolen']", text: "(2)", wait: 10)
+
+    # Searching Red re-fetches: only one red bike is stolen, so the count updates to (1).
+    find(".hw-combobox__chip__remover").click
+    search_color_and_submit("Red")
+    expect(page).to have_css("[data-count-target='stolen']", text: "(1)", wait: 10)
+
+    # Search Blue again, view a result, then return to the Blue results.
+    find(".hw-combobox__chip__remover").click
     search_color_and_submit("Blue")
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
     click_first_bike_and_go_back
 
-    # Back again to the initial search page. Its results must reload rather than
+    # Back again to an earlier search. Its results must reload rather than
     # restoring a Turbo snapshot whose frame is stuck in the [busy] loading state
     # (results hidden under the spinner overlay) - the "everything fails after
     # going back from a search" bug.

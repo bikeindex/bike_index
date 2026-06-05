@@ -38,6 +38,16 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     JS
   end
 
+  it "loads the kind counts on initial render" do
+    visit marketplace_url
+
+    # Counts populate from /search/marketplace/counts once the search--kind-select-fields
+    # controller connects - no form submit required. The eager turbo-frame flow no
+    # longer auto-submits on load, so this guards that initial render still fills them.
+    # All 15 published listings are for_sale, so the for_sale count shows (15).
+    expect(page).to have_css("[data-count-target='for_sale']", text: "(15)", wait: 10)
+  end
+
   it "automatically loads the next page when scrolling to bottom" do
     expect(manufacturer1.reload.id).to eq 1003 # sanity check - otherwise the search won't work
     expect(manufacturer2.reload.id).to eq 764 # sanity check - otherwise the search won't work
