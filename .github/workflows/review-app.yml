@@ -98,6 +98,10 @@ jobs:
           echo "action=$action"  >> "$GITHUB_OUTPUT"
           echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
 
+  # Deploy and destroy deliberately share ONE job, branching via step-level `if:`
+  # on the resolved action. Keep it that way: GitHub renders one check-run per
+  # job, so splitting this into separate deploy/destroy jobs makes every commit
+  # show one running + one skipped check. See docs/review-apps.md "How a deploy works".
   update:
     name: Update ${{ needs.resolve.outputs.pr_number }}
     needs: resolve
