@@ -118,47 +118,17 @@ RSpec.describe "Bike search", :js, type: :system do
     click_first_bike_and_go_back
   end
 
-  it "populates the kind counts after each search and reloads results on back-nav" do
-    visit_search_via_nav
-    expect(page).to have_css(".bike-box-item", wait: 10)
-
-    # Counts come from /api/v3/search/count, fetched on each form submit
-    # (turbo:submit-end -> setKindCounts). Both blue bikes are stolen, so a Blue
-    # search fills the "stolen" kind count with (2).
-    choose("stolenness_all", allow_label_click: true, visible: :all)
-    search_color_and_submit("Blue")
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_css("[data-count-target='stolen']", text: "(2)", wait: 10)
-
-    # Searching Red re-fetches: only one red bike is stolen, so the count updates to (1).
-    find(".hw-combobox__chip__remover").click
-    search_color_and_submit("Red")
-    expect(page).to have_css("[data-count-target='stolen']", text: "(1)", wait: 10)
-
-    # Search Blue again, view a result, then return to the Blue results.
-    find(".hw-combobox__chip__remover").click
-    search_color_and_submit("Blue")
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    click_first_bike_and_go_back
-
-    # Back again to an earlier search. Its results must reload rather than
-    # restoring a Turbo snapshot whose frame is stuck in the [busy] loading state
-    # (results hidden under the spinner overlay) - the "everything fails after
-    # going back from a search" bug.
-    page.go_back
-    expect(page).to have_css(".bike-box-item", wait: 10)
-  end
-
   # :flaky retry: even on a shallow stack, a programmatic go_forward to a
   # form-submitted (turbo advance) history entry can still intermittently no-op
   # in WebDriver (the URL stays on the back entry). It's a harness artifact - a
   # real browser does back/forward reliably - so retry on CI.
-  it "keeps back/forward navigation in sync without double-submitting", :flaky do
+  it "keeps results, counts, and form in sync across search and back/forward", :flaky do
     # Search Red, then Blue, then retrace with the browser's back and forward
-    # buttons. Each step must leave the frame and form matching the restored URL:
-    # the frame is checked by the bikes' colors inside it (both searches return 2
-    # bikes, so a bare count wouldn't catch a wrong-color frame), the form by the
-    # combobox chip. Back must also not re-submit the form.
+    # buttons. Each step must leave the frame, form, and kind counts matching the
+    # restored URL: the frame by the bikes' colors inside it (both searches return
+    # 2 bikes, so a bare count wouldn't catch a wrong-color frame), the form by the
+    # combobox chip, and the counts by the stolen tally (Red has 1 stolen bike,
+    # Blue has 2). Back must also not re-submit the form.
     #
     # This guards the end state, not a specific mechanism. Turbo's snapshot
     # restoration keeps the frame correct here on its own - it stays green even
@@ -173,35 +143,43 @@ RSpec.describe "Bike search", :js, type: :system do
     reset_browser_history
     choose("stolenness_all", allow_label_click: true, visible: :all)
 
+    # Each search re-fetches the kind counts (turbo:submit-end -> setKindCounts):
+    # one red bike is stolen, so the stolen count is (1).
     search_color_and_submit("Red")
     expect_results_frame_color("Red", "Blue")
     expect(page).to have_css(".hw-combobox__chip", text: "Red")
+    expect(page).to have_css("[data-count-target='stolen']", text: "(1)", wait: 10)
 
+    # Both blue bikes are stolen, so searching Blue updates the count to (2).
     find(".hw-combobox__chip__remover").click
     search_color_and_submit("Blue")
     expect_results_frame_color("Blue", "Red")
     expect(page).to have_css(".hw-combobox__chip", text: "Blue")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
+    expect(page).to have_css("[data-count-target='stolen']", text: "(2)", wait: 10)
 
-    # Back to the Red search - frame and form reconcile to Red, no extra submit.
+    # Back to the Red search - frame, form, and counts reconcile to Red, no extra
+    # submit. The count also guards the dedupe marker: restoring the cached
+    # snapshot must show this query's counts, not a stale or blank carry-over.
     page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
     page.go_back
     expect(page).to have_current_path(/query_items/, wait: 10)
     expect_results_frame_color("Red", "Blue")
     expect(page).to have_css(".hw-combobox__chip", text: "Red")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Blue")
-    # The kind counts reconcile to the restored query too - only one red bike is
-    # stolen. Guards the dedupe marker: restoring the cached snapshot must still
-    # show this query's counts, not a stale or blank carry-over.
     expect(page).to have_css("[data-count-target='stolen']", text: "(1)", wait: 10)
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
 
-    # Forward to the Blue search - frame and form reconcile back to Blue.
+    # Forward to the Blue search - frame, form, and counts reconcile back to Blue.
     page.go_forward
     expect_results_frame_color("Blue", "Red")
     expect(page).to have_css(".hw-combobox__chip", text: "Blue")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
-    # Both blue bikes are stolen, so the count reconciles back to (2).
     expect(page).to have_css("[data-count-target='stolen']", text: "(2)", wait: 10)
+
+    # Viewing a result and returning must reload the frame, not restore a Turbo
+    # snapshot stuck in the [busy] loading state (results hidden under the spinner
+    # overlay) - the "everything fails after going back from a search" bug.
+    click_first_bike_and_go_back
   end
 end
