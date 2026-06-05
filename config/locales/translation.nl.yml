@@ -4374,8 +4374,7 @@ nl:
       community_groups: Community's
       copyright_html: "%{current_year} & kopiëren; Bike Index, een 501 (c) (3) non-profit
         - EIN 81-4296194"
-      design_logos: Ontwerp & logo's
-      dev_resources: Dev Bronnen
+      dev_and_design_resources: Dev & Ontwerp Bronnen
       donate: Schenken
       faq: FAQ
       help: Helpen

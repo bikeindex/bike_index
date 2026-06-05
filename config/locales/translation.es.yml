@@ -3875,8 +3875,7 @@ es:
       community_groups: Grupos comunitarios
       copyright_html: "%{current_year} &copy; Bike Index, una organización sin ánimo
         de lucro 501(c)(3) - EIN 81-4296194"
-      design_logos: Diseño y logotipos
-      dev_resources: Recursos de desarrollo
+      dev_and_design_resources: Recursos de desarrollo y diseño
       donate: Donar
       faq: PREGUNTAS FRECUENTES
       help: Ayuda

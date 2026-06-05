@@ -5006,8 +5006,7 @@ nb:
       community_groups: Fellesskapsgrupper
       copyright_html: "%{current_year} © Bike Index, en 501(c)(3) nonprofit - EIN
         81-4296194"
-      design_logos: Design og logoer
-      dev_resources: Utviklerressurser
+      dev_and_design_resources: Utvikler- og designressurser
       donate: Donere
       faq: FAQ
       help: Hjelp
