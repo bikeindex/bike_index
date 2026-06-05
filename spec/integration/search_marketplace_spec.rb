@@ -101,10 +101,13 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # And then search "Yuba" without price filter
     # Which will return 8 bikes - so the page won't have the ability to scroll. Verify that it works correctly
     fill_in "price_max_amount", with: ""
-    find(".hw-combobox__input").set("Yuba")
-    # Wait for the combobox autocomplete to load
-    expect(page).to have_css(".hw-combobox__option", text: "Listings made by Yuba", wait: 5)
-    find(".hw-combobox__option", text: "Listings made by Yuba", match: :first).click
+    # Scope to the everything-combobox - the primary_activity field is also a combobox
+    within("[data-controller~='search--everything-combobox']") do
+      find(".hw-combobox__input").set("Yuba")
+      # Wait for the combobox autocomplete to load
+      expect(page).to have_css(".hw-combobox__option", text: "Listings made by Yuba", wait: 5)
+      find(".hw-combobox__option", text: "Listings made by Yuba", match: :first).click
+    end
     find("#search-button").click
     # Should load new results
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 8)
@@ -117,13 +120,18 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # Wait for the initial results to load - all 15 listings span multiple pages
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
 
-    # Narrow to the 6 listings with the "Mountain biking" primary activity
-    select "Mountain biking", from: "primary_activity"
+    # Narrow to the 6 listings with the "Mountain biking" primary activity by
+    # typing into the combobox and clicking its matching autocomplete option
+    find("#primary_activity").set("Mountain")
+    expect(page).to have_css(".hw-combobox__option", text: "Mountain biking", wait: 5)
+    find(".hw-combobox__option", text: "Mountain biking", match: :first).click
     find("#search-button").click
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
     # Only 6 results, so there's nothing to lazy-load on a second page
     expect(page).not_to have_css("turbo-frame#page_2")
-    # The selection persists after the search
-    expect(page).to have_select("primary_activity", selected: "Mountain biking")
+    # The selection persists after the search - the hidden field carries the id,
+    # the visible input shows the display name
+    expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
+    expect(find("#primary_activity").value).to eq "Mountain biking"
   end
 end
