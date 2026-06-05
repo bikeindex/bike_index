@@ -17,18 +17,24 @@ class Rack::Attack
   SKIP_THROTTLE_PREFIXES = %w[/api /oauth /assets].freeze
   API_PATH_PREFIXES = %w[/api /oauth].freeze
 
+  # Search autocomplete and kind-count endpoints are XHR/data calls fired
+  # repeatedly during normal searching (per-keystroke autocomplete, kind counts) -
+  # not page navigations. Throttle them like the API (generous per-IP budget)
+  # rather than against the strict per-page limit, which active searching trips.
+  SEARCH_DATA_PREFIXES = %w[/search/combobox /search/marketplace/counts].freeze
+
   cache.store = ActiveSupport::Cache::RedisCacheStore.new(
     url: Bikeindex::Application.config.redis_rack_attack_url
   )
 
-  # API and OAuth: 150 per 30 seconds per IP
+  # API, OAuth, and search data (autocomplete/counts): 150 per 30 seconds per IP
   throttle("api/ip", limit: API_MAX_REQUESTS, period: 30.seconds) do |request|
-    request.ip if request.path.start_with?(*API_PATH_PREFIXES)
+    request.ip if request.path.start_with?(*API_PATH_PREFIXES, *SEARCH_DATA_PREFIXES)
   end
 
-  # Global rate limit per IP (non-API, non-OAuth, non-assets)
+  # Global rate limit per IP (non-API, non-OAuth, non-assets, non-search-data)
   throttle("requests/ip", limit: MAX_REQUESTS_PER_TWENTY, period: 20.seconds) do |request|
-    request.ip unless request.path.start_with?(*SKIP_THROTTLE_PREFIXES)
+    request.ip unless request.path.start_with?(*SKIP_THROTTLE_PREFIXES, *SEARCH_DATA_PREFIXES)
   end
 
   # Sign-in: 10 per minute per IP
