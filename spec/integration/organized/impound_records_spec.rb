@@ -38,7 +38,15 @@ RSpec.describe "Organized impound records index", :js, type: :system do
 
   def check_for_update(impound_record)
     expect(checkbox_for(impound_record)).not_to be_disabled
-    check "ids[#{impound_record.id}]"
+    # The error alert collapsing open above the table shifts this row down for a
+    # moment, so a check dispatched mid-animation lands at the old spot and
+    # misses. `check` is idempotent, so retry until it registers -- like a user
+    # clicking again -- bounded by Capybara's wait time.
+    deadline = Time.current + Capybara.default_max_wait_time
+    loop do
+      check "ids[#{impound_record.id}]"
+      break if checkbox_for(impound_record).checked? || Time.current > deadline
+    end
     expect(checkbox_for(impound_record)).to be_checked
   end
 
