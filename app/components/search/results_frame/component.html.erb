@@ -1,0 +1,15 @@
+<div class="search-results-frame-wrapper">
+  <%= helpers.turbo_frame_tag @frame_id, src: @src do %>
+    <% if @render_results %>
+      <%= content %>
+    <% else %>
+      <div hidden data-search-loading>
+        <%= render UI::LoadingSpinner::Component.new(text: @loading_text) %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="search-loading-overlay">
+    <%= render UI::LoadingSpinner::Component.new(text: @loading_text) %>
+  </div>
+</div>

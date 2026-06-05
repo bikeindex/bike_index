@@ -33,39 +33,18 @@
   </div>
 <% end %>
 
-<div class="search-results-frame-wrapper">
-  <%#
-    When the results aren't rendered inline (the JS shell), give the frame a src
-    so Turbo eager-loads the results in a separate request once it connects
-  %>
-
-  <%= turbo_frame_tag :impound_records_results_frame,
-    src: (request.original_fullpath unless @render_results) do %>
-    <div class="tw:mt-4">
-      <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
-    </div>
-
-    <div class="text-right mb-2 mt-4">
-      <%= link_to t(".render_chart"),
-        organization_impound_records_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)),
-        class: "btn btn-sm less-strong btn-outline-secondary #{"active" if @render_chart}",
-        data: {turbo_action: "advance"} %>
-    </div>
-
-    <% if @render_results %>
-      <%= render partial: "results" %>
-    <% else %>
-      <%#
-        Hidden until JS reveals it - without JS the eager src never loads, so a
-        no-JS user would otherwise be stuck on a spinner that never resolves
-      %>
-      <div hidden data-search-loading>
-        <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
-      </div>
-    <% end %>
-  <% end %>
-
-  <div class="search-loading-overlay">
-    <%= render UI::LoadingSpinner::Component.new(text: "Loading results...") %>
+<%= render Search::ResultsFrame::Component.new(frame_id: :impound_records_results_frame,
+  render_results: @render_results, current_path: request.original_fullpath) do %>
+  <div class="tw:mt-4">
+    <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
   </div>
-</div>
+
+  <div class="text-right mb-2 mt-4">
+    <%= link_to t(".render_chart"),
+      organization_impound_records_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)),
+      class: "btn btn-sm less-strong btn-outline-secondary #{"active" if @render_chart}",
+      data: {turbo_action: "advance"} %>
+  </div>
+
+  <%= render partial: "results" %>
+<% end %>
