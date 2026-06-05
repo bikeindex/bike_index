@@ -1,14 +1,4 @@
-<%#
-  no-cache: the results turbo-frame loads asynchronously - eager via its src on
-  first render, then replaced by form submits and filter-link navigations.
-  Turbo's cached page snapshot would restore that frame stale/empty on back
-  navigation, so opt out of the snapshot cache to make back/forward re-fetch the
-  page and reload the frame fresh from the server.
-%>
-
-<% content_for :header do %>
-  <meta name="turbo-cache-control" content="no-cache">
-<% end %>
+<% turbo_disable_snapshot_cache %>
 
 <div class="organized-page-header mb-4">
   <h1 class="uncap"><%= t(".impound_records") %></h1>

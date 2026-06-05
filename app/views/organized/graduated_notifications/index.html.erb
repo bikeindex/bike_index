@@ -1,15 +1,6 @@
 <%# TODO: add translations %>
 
-<%#
-  no-cache: the form lives outside the results frame and submits with
-  turbo_action="advance", so a restored snapshot can leave the frame's results
-  mismatched against the address-bar URL. Opt out of the snapshot cache so
-  back/forward re-fetch the page and reload the frame fresh from the server.
-%>
-
-<% content_for :header do %>
-  <meta name="turbo-cache-control" content="no-cache">
-<% end %>
+<% turbo_disable_snapshot_cache %>
 
 <div class="organized-page-header">
   <h1>Graduated notifications</h1>
