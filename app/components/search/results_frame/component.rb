@@ -10,18 +10,16 @@ module Search
     # for the no-JS path instead of one that can never resolve. The caller's
     # block is the frame body, rendered once the results are present.
     #
-    # Pass `disable_snapshot_cache: true` when the page's form lives outside the
-    # frame and submits with turbo_action="advance": a restored snapshot can
-    # leave the frame's results stale against the address-bar URL, so the page
-    # opts out of Turbo's snapshot cache and back/forward re-fetch fresh.
+    # The form lives outside the frame and submits with turbo_action="advance",
+    # so a restored snapshot can leave the frame's results stale against the
+    # address-bar URL. Every search page opts out of Turbo's snapshot cache (via
+    # the no-cache meta) so back/forward re-fetch the page and reload fresh.
     class Component < ApplicationComponent
-      def initialize(frame_id:, render_results:, current_path:, loading_text: "Loading results...",
-        disable_snapshot_cache: false)
+      def initialize(frame_id:, render_results:, current_path:, loading_text: "Loading results...")
         @frame_id = frame_id
         @render_results = render_results
         @src = (current_path unless render_results)
         @loading_text = loading_text
-        @disable_snapshot_cache = disable_snapshot_cache
       end
     end
   end

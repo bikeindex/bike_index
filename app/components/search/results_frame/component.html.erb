@@ -1,6 +1,4 @@
-<% if @disable_snapshot_cache %>
-  <% helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
-<% end %>
+<% helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
 
 <div class="search-results-frame-wrapper">
   <%= helpers.turbo_frame_tag @frame_id, src: @src do %>
