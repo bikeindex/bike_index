@@ -111,17 +111,11 @@ export default class extends Controller {
   }
 
   setKindCounts () {
+    // console.log('setting kind counts')
+
     const queryString = this.searchQuery
     if (this.doNotFetchCounts(queryString)) {
       return this.resetKindCounts()
-    }
-
-    // Skip if the rendered counts already reflect this query - eg Turbo
-    // reconnecting the controller against a cached snapshot whose counts are
-    // already filled in. The marker lives on the element so it rides along in the
-    // cached DOM; resetKindCounts clears it whenever the counts are blanked.
-    if (this.element.dataset.countsQuery === queryString) {
-      return this.setResetFieldListeners()
     }
 
     fetch(`${this.apiCountUrlValue}?${queryString}`, {
@@ -129,10 +123,7 @@ export default class extends Controller {
       headers: { 'Content-Type': 'application/json' }
     })
       .then(response => response.json())
-      .then(data => {
-        this.element.dataset.countsQuery = queryString
-        this.insertTabCounts(data)
-      })
+      .then(data => { this.insertTabCounts(data) })
 
     this.setResetFieldListeners()
   }
@@ -154,9 +145,7 @@ export default class extends Controller {
   }
 
   resetKindCounts () {
-    // Counts are being blanked, so drop the dedupe marker - the next fetch for
-    // this query must run again rather than being skipped as already-rendered.
-    delete this.element.dataset.countsQuery
+    // console.log('resetting counts')
 
     // dataCountTargets looks like: ['non', 'stolen', 'proximity', 'for_sale']
     const dataCountTargets = [...this.element.querySelectorAll('[data-count-target]')]
