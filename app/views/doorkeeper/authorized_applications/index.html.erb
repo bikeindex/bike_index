@@ -1,6 +1,7 @@
 <header class="page-header">
   <h1>Your authorized applications</h1>
 </header>
+
 <main role="main">
   <div class="full-screen-table">
     <%= render(UI::Table::Component.new(records: @applications)) do |table| %>
