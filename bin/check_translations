@@ -50,8 +50,11 @@ else
   if [ -n "$CI" ]; then
     output "${YELLOW}" "On CI — creating translation sync PR"
 
-    # Check for existing open translation sync PRs
-    existing_pr=$(gh pr list --head "translations-sync" --state open --json number --jq '.[0].number' 2>/dev/null || true)
+    # Check for existing open translation sync PRs.
+    # Branches are named translations-sync-<timestamp>, so we can't use
+    # `gh pr list --head` (it requires an exact branch name) — match the prefix instead.
+    existing_pr=$(gh pr list --state open --json number,headRefName \
+      --jq 'map(select(.headRefName | startswith("translations-sync")))[0].number' 2>/dev/null || true)
     if [ -n "$existing_pr" ]; then
       output "${YELLOW}" "Translation sync PR already exists: #${existing_pr} — skipping PR creation"
       exit 1
