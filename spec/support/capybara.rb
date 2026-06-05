@@ -16,12 +16,6 @@ end
 Capybara.configure do |config|
   config.default_driver = :chrome_headless
   config.javascript_driver = :chrome_headless
-  # Make CSS transitions/animations instant in the browser. capybara-lockstep
-  # syncs JS/AJAX but not CSS transitions, so an element animating into place
-  # (e.g. a collapse('show') panel that pushes a table down) can move while
-  # Capybara dispatches a click at its pre-animation coords, and the click
-  # misses. Instant transitions remove that whole class of flake.
-  config.disable_animation = true
 end
 
 # Pin Capybara's app server to a predictable host:port. Defaults to
