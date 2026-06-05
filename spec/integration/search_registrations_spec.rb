@@ -142,10 +142,10 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
-  # :flaky retry: programmatic go_forward to a form-submitted (turbo advance)
-  # history entry intermittently no-ops in WebDriver (the URL stays on the back
-  # entry). It's a harness artifact - a real browser does back/forward reliably -
-  # so retry on CI. Back navigation is reliable on its own.
+  # :flaky retry: even on a shallow stack, a programmatic go_forward to a
+  # form-submitted (turbo advance) history entry can still intermittently no-op
+  # in WebDriver (the URL stays on the back entry). It's a harness artifact - a
+  # real browser does back/forward reliably - so retry on CI.
   it "keeps back/forward navigation in sync without double-submitting", :flaky do
     # Search Red, then Blue, then retrace with the browser's back and forward
     # buttons. Each step must leave the frame and form matching the restored URL:
@@ -158,33 +158,42 @@ RSpec.describe "Bike search", :js, type: :system do
     # with reloadFrameIfUrlStale stubbed out - so this is not a test of that
     # reconciler. reloadFrameIfUrlStale is a fallback for genuinely stale
     # snapshots, invoked on turbo:load (which does fire on these restorations).
-    visit_search_via_nav
-    expect(page).to have_css(".bike-box-item", wait: 10)
-    choose("stolenness_all", allow_label_click: true, visible: :all)
+    #
+    # Run in a fresh window: Capybara never resets browser history between
+    # examples, so it accumulates across the suite, and WebDriver back/forward
+    # only behave reliably on a shallow stack - a deep one lands go_back/
+    # go_forward on a stale entry from an earlier example (the foreign
+    # stolenness=stolen URL this used to flake on). A new window starts with
+    # empty history, keeping this example's stack short.
+    within_window(open_new_window) do
+      visit_search_via_nav
+      expect(page).to have_css(".bike-box-item", wait: 10)
+      choose("stolenness_all", allow_label_click: true, visible: :all)
 
-    search_color_and_submit("Red")
-    expect_results_frame_color("Red", "Blue")
-    expect(page).to have_css(".hw-combobox__chip", text: "Red")
+      search_color_and_submit("Red")
+      expect_results_frame_color("Red", "Blue")
+      expect(page).to have_css(".hw-combobox__chip", text: "Red")
 
-    find(".hw-combobox__chip__remover").click
-    search_color_and_submit("Blue")
-    expect_results_frame_color("Blue", "Red")
-    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
-    expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
+      find(".hw-combobox__chip__remover").click
+      search_color_and_submit("Blue")
+      expect_results_frame_color("Blue", "Red")
+      expect(page).to have_css(".hw-combobox__chip", text: "Blue")
+      expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
 
-    # Back to the Red search - frame and form reconcile to Red, no extra submit.
-    page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
-    page.go_back
-    expect(page).to have_current_path(/query_items/, wait: 10)
-    expect_results_frame_color("Red", "Blue")
-    expect(page).to have_css(".hw-combobox__chip", text: "Red")
-    expect(page).to have_no_css(".hw-combobox__chip", text: "Blue")
-    expect(page.evaluate_script("window.__submitStarts")).to be <= 1
+      # Back to the Red search - frame and form reconcile to Red, no extra submit.
+      page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
+      page.go_back
+      expect(page).to have_current_path(/query_items/, wait: 10)
+      expect_results_frame_color("Red", "Blue")
+      expect(page).to have_css(".hw-combobox__chip", text: "Red")
+      expect(page).to have_no_css(".hw-combobox__chip", text: "Blue")
+      expect(page.evaluate_script("window.__submitStarts")).to be <= 1
 
-    # Forward to the Blue search - frame and form reconcile back to Blue.
-    page.go_forward
-    expect_results_frame_color("Blue", "Red")
-    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
-    expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
+      # Forward to the Blue search - frame and form reconcile back to Blue.
+      page.go_forward
+      expect_results_frame_color("Blue", "Red")
+      expect(page).to have_css(".hw-combobox__chip", text: "Blue")
+      expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
+    end
   end
 end
