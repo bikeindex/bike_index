@@ -35,6 +35,18 @@ RSpec.describe "Bike search", :js, type: :system do
     find("#search-button").click
   end
 
+  # Reach the search page the way a user does: from the homepage, click the
+  # "Search" nav link. Establishing history this way also lets back-nav return to
+  # the homepage. The nav renders the link twice (responsive mobile + desktop
+  # copies); only one shows at a time, so match the first.
+  def visit_search_via_nav
+    # Widen to a desktop viewport so the nav links show inline instead of behind
+    # the mobile hamburger menu.
+    page.current_window.resize_to(1280, 900)
+    visit "/"
+    click_link "Search", exact: true, match: :first
+  end
+
   # Assert the results *inside the eager turbo-frame* match a color search, so it
   # proves the frame itself reconciled to the URL (reloadFrameIfUrlStale) - unlike
   # the combobox chip, which lives in the form outside the frame and is restored
@@ -53,9 +65,7 @@ RSpec.describe "Bike search", :js, type: :system do
   end
 
   it "filters by color and location" do
-    # Visit a different page first to establish history, then navigate to search
-    visit "/"
-    visit "/search/registrations"
+    visit_search_via_nav
 
     expect(page).to have_css(".bike-box-item", wait: 10)
     expect_axe_clean
@@ -102,7 +112,7 @@ RSpec.describe "Bike search", :js, type: :system do
   end
 
   it "populates the kind counts after each search and reloads results on back-nav" do
-    visit "/search/registrations"
+    visit_search_via_nav
     expect(page).to have_css(".bike-box-item", wait: 10)
 
     # Counts come from /api/v3/search/count, fetched on each form submit
@@ -148,8 +158,7 @@ RSpec.describe "Bike search", :js, type: :system do
     # with reloadFrameIfUrlStale stubbed out - so this is not a test of that
     # reconciler. reloadFrameIfUrlStale is a fallback for genuinely stale
     # snapshots, invoked on turbo:load (which does fire on these restorations).
-    visit "/"
-    visit "/search/registrations"
+    visit_search_via_nav
     expect(page).to have_css(".bike-box-item", wait: 10)
     choose("stolenness_all", allow_label_click: true, visible: :all)
 

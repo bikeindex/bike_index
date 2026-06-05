@@ -29,7 +29,11 @@ RSpec.describe "Registration search without JavaScript", type: :system do
   end
 
   it "renders results server-side and filters via standard form submission" do
-    visit "/search/registrations"
+    # Reach the search page the way a user does - from the homepage nav. The
+    # "Search" link carries stolenness=all (default_bike_search_path), so all
+    # registrations start in scope.
+    visit "/"
+    click_link "Search", exact: true, match: :first
 
     # Without JS the eager frame's src is never fetched, so the page initially
     # shows the form with the results frame still empty (no results rendered).
@@ -41,15 +45,15 @@ RSpec.describe "Registration search without JavaScript", type: :system do
     expect(page).to have_css("[data-search-loading]", visible: :hidden)
     expect(page).to have_no_css("[data-search-loading]", visible: true)
 
-    # Submitting renders results synchronously. Default stolenness is "stolen", so
-    # only the three stolen bikes match
-    submit_search
-    expect(page).to have_css(".bike-box-item", count: 3)
-
-    # Widen to all registrations - the non-stolen bike now appears too
-    choose "stolenness_all", visible: :all
+    # Submitting renders results synchronously. The nav link pre-selected "all"
+    # registrations, so all four bikes match
     submit_search
     expect(page).to have_css(".bike-box-item", count: 4)
+
+    # Narrow to stolen only - the non-stolen bike drops out
+    choose "stolenness_stolen", visible: :all
+    submit_search
+    expect(page).to have_css(".bike-box-item", count: 3)
 
     # Proximity search around NYC drops the LA bike (outside the stubbed bounding box)
     choose "stolenness_proximity", visible: :all
