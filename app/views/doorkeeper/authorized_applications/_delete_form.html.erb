@@ -1,0 +1,3 @@
+<%= form_tag oauth_authorized_application_path(application), method: :delete, onsubmit: "return confirm('Are you sure?')" do %>
+  <%= render UI::Button::Component.new(text: "Revoke", color: :error, kind: :submit) %>
+<% end %>

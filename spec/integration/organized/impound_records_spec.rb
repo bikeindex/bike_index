@@ -36,17 +36,17 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     find("input[type=checkbox][name='ids[#{impound_record.id}]']", visible: :all)
   end
 
-  # Headless Chrome on CI sometimes loses the click on these freshly-enabled
-  # checkboxes (set/check/native.click all flaked), so set the property
-  # directly (and fire change, as a real click would). The form posts the
-  # value regardless of how the box got checked.
   def check_for_update(impound_record)
     expect(checkbox_for(impound_record)).not_to be_disabled
-    page.execute_script(<<~JS)
-      const el = document.getElementById('ids_#{impound_record.id}')
-      el.checked = true
-      el.dispatchEvent(new Event('change', {bubbles: true}))
-    JS
+    # The error alert collapsing open above the table shifts this row down for a
+    # moment, so a check dispatched mid-animation lands at the old spot and
+    # misses. `check` is idempotent, so retry until it registers -- like a user
+    # clicking again -- bounded by Capybara's wait time.
+    deadline = Time.current + Capybara.default_max_wait_time
+    loop do
+      check "ids[#{impound_record.id}]"
+      break if checkbox_for(impound_record).checked? || Time.current > deadline
+    end
     expect(checkbox_for(impound_record)).to be_checked
   end
 

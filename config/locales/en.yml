@@ -1937,6 +1937,8 @@ en:
     public_images:
       create:
         cannot_create: Whoops! We can't let you create that image.
+        image_too_large: That image is too large. Please upload an image smaller than
+          %{size}.
       destroy:
         cannot_delete: Whoops! How'd you do that? Can't delete mail snippet images.
         image_deleted: Image was successfully deleted

@@ -2223,6 +2223,7 @@ it:
     public_images:
       create:
         cannot_create:
+        image_too_large:
       destroy:
         cannot_delete:
         image_deleted:

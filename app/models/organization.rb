@@ -251,7 +251,9 @@ class Organization < ApplicationRecord
     end
 
     def example
-      Organization.find_by_id(92) || Organization.create(name: "Example organization")
+      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
+      found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
+      found || Organization.create(name: "Example Bike Shop")
     end
   end
   # never geocode, use default_location lat/long
