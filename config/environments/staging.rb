@@ -17,6 +17,14 @@ Rails.application.configure do
   # assets (see config/storage.yml).
   config.active_storage.service = :cloudflare_dev
 
+  # Enable ActionMailer previews (/rails/mailers, linked from the admin Mailers
+  # dropdown) on review apps — production-default is off. preview_paths must be
+  # set explicitly: Rails only auto-adds spec/mailers/previews in development.
+  # Safe here: staging runs seeded data with no PII (same rationale as the
+  # unrestricted /letter_opener mount in config/routes.rb).
+  config.action_mailer.show_previews = true
+  config.action_mailer.preview_paths = ["#{Rails.root}/spec/mailers/previews"]
+
   # production.rb sends the log to stdout (for `kamal logs`) when
   # RAILS_LOG_TO_STDOUT is set. Also write it to log/staging.log so the
   # read_logged_searches cron job (config/crontab) has a file to rg. Both sinks
