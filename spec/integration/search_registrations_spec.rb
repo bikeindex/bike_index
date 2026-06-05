@@ -190,6 +190,10 @@ RSpec.describe "Bike search", :js, type: :system do
     expect_results_frame_color("Red", "Blue")
     expect(page).to have_css(".hw-combobox__chip", text: "Red")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Blue")
+    # The kind counts reconcile to the restored query too - only one red bike is
+    # stolen. Guards the dedupe marker: restoring the cached snapshot must still
+    # show this query's counts, not a stale or blank carry-over.
+    expect(page).to have_css("[data-count-target='stolen']", text: "(1)", wait: 10)
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
 
     # Forward to the Blue search - frame and form reconcile back to Blue.
@@ -197,5 +201,7 @@ RSpec.describe "Bike search", :js, type: :system do
     expect_results_frame_color("Blue", "Red")
     expect(page).to have_css(".hw-combobox__chip", text: "Blue")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
+    # Both blue bikes are stolen, so the count reconciles back to (2).
+    expect(page).to have_css("[data-count-target='stolen']", text: "(2)", wait: 10)
   end
 end
