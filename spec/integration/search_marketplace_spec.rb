@@ -6,13 +6,16 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   let(:seller) { FactoryBot.create(:user, :with_address_record) }
   let!(:manufacturer1) { FactoryBot.create(:manufacturer, name: "Yuba", id: 1003, frame_maker: true) }
   let!(:manufacturer2) { FactoryBot.create(:manufacturer, name: "Salsa", id: 764, frame_maker: true) }
+  let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Mountain biking") }
+  let!(:other_primary_activity) { FactoryBot.create(:primary_activity, name: "Road cycling") }
 
   before do
     # Create enough listings to span multiple pages (12 per page)
 
     15.times do |i|
-      item = FactoryBot.create(:bike, :with_primary_activity,
-        manufacturer: (i % 2 == 0) ? manufacturer1 : manufacturer2)
+      item = FactoryBot.create(:bike,
+        manufacturer: (i % 2 == 0) ? manufacturer1 : manufacturer2,
+        primary_activity: (i < 6) ? primary_activity : other_primary_activity)
       listing = FactoryBot.create(:marketplace_listing, :for_sale,
         address_record: seller.address_record,
         seller:,
@@ -46,6 +49,23 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     page.current_window.resize_to(1280, 900)
     visit "/"
     click_link "Marketplace", exact: true, match: :first
+  end
+
+  # Filter by a primary activity through the combobox: type its name, click the
+  # matching option, then submit. Works whether the combobox starts empty or
+  # already has a selection (set replaces the existing text).
+  def search_primary_activity(display_name)
+    find("#primary_activity").set(display_name)
+    expect(page).to have_css(".hw-combobox__option", text: display_name, wait: 5)
+    find(".hw-combobox__option", text: display_name, match: :first).click
+    find("#search-button").click
+  end
+
+  # Clear the browser's back/forward stack. Capybara never resets history between
+  # examples, so it accumulates across the suite, and WebDriver back/forward only
+  # behave reliably on a shallow stack.
+  def reset_browser_history
+    page.driver.browser.execute_cdp("Page.resetNavigationHistory")
   end
 
   it "loads the kind counts on initial render" do
@@ -98,14 +118,69 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # And then search "Yuba" without price filter
     # Which will return 8 bikes - so the page won't have the ability to scroll. Verify that it works correctly
     fill_in "price_max_amount", with: ""
-    find(".hw-combobox__input").set("Yuba")
-    # Wait for the combobox autocomplete to load
-    expect(page).to have_css(".hw-combobox__option", text: "Listings made by Yuba", wait: 5)
-    find(".hw-combobox__option", text: "Listings made by Yuba", match: :first).click
+    # Scope to the everything-combobox - the primary_activity field is also a combobox
+    within("[data-controller~='search--everything-combobox']") do
+      find(".hw-combobox__input").set("Yuba")
+      # Wait for the combobox autocomplete to load
+      expect(page).to have_css(".hw-combobox__option", text: "Listings made by Yuba", wait: 5)
+      find(".hw-combobox__option", text: "Listings made by Yuba", match: :first).click
+    end
     find("#search-button").click
     # Should load new results
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 8)
     # Should NOT have a lazy-loading frame for page 2
     expect(page).not_to have_css("turbo-frame#page_2")
+
+    # Finally, clear the Yuba filter the way a user would - by removing its
+    # combobox chip - then filter by the "Mountain biking" primary activity
+    within("[data-controller~='search--everything-combobox']") do
+      find("[aria-label='Remove Yuba']").click
+    end
+    search_primary_activity("Mountain biking")
+    # 6 of the 15 listings have the "Mountain biking" primary activity (a count of
+    # 6 also confirms Yuba was cleared - otherwise the two filters would intersect)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+    # Only 6 results, so there's nothing to lazy-load on a second page
+    expect(page).not_to have_css("turbo-frame#page_2")
+    # The selection persists after the search - the hidden field carries the id,
+    # the visible input shows the display name
+    expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
+    expect(find("#primary_activity").value).to eq "Mountain biking"
+  end
+
+  # :flaky retry: a programmatic go_forward to a form-submitted (turbo advance)
+  # history entry can intermittently no-op in WebDriver (the URL stays on the back
+  # entry). It's a harness artifact - a real browser does back/forward reliably -
+  # so retry on CI.
+  it "keeps results and the primary_activity form in sync across back/forward", :flaky do
+    visit_marketplace_via_nav
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+    # Drop history accumulated by earlier examples so go_back/go_forward operate on
+    # this example's own short stack, not a stale foreign entry.
+    reset_browser_history
+
+    # Filter by "Mountain biking" (6 listings), then "Road cycling" (9 listings).
+    # The two counts differ, so a settled count proves which search the frame holds.
+    search_primary_activity("Mountain biking")
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+    expect(find("#primary_activity").value).to eq "Mountain biking"
+
+    search_primary_activity("Road cycling")
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 9)
+    expect(find("#primary_activity").value).to eq "Road cycling"
+
+    # Back to the Mountain biking search - results and the combobox reconcile to it
+    page.go_back
+    expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/, wait: 10)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+    expect(find("#primary_activity").value).to eq "Mountain biking"
+    expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
+
+    # Forward to the Road cycling search - everything reconciles back to it
+    page.go_forward
+    expect(page).to have_current_path(/primary_activity=#{other_primary_activity.id}/, wait: 10)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 9)
+    expect(find("#primary_activity").value).to eq "Road cycling"
+    expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq other_primary_activity.id.to_s
   end
 end
