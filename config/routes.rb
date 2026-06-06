@@ -357,8 +357,8 @@ Rails.application.routes.draw do
   resources :stolen_bike_listings, only: %i[index]
 
   %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
-    protect_your_bike serials about where vendor_terms resources image_resources privacy terms security
-    how_not_to_buy_stolen dev_and_design lightspeed membership].freeze.each do |page|
+    protect_your_bike serials about where vendor_terms resources privacy terms security
+    how_not_to_buy_stolen lightspeed membership].freeze.each do |page|
     get page, controller: "info", action: page
   end
   get "why-donate", to: "info#why_donate", as: "why_donate"
@@ -367,7 +367,8 @@ Rails.application.routes.draw do
   get "/info/how-to-get-your-stolen-bike-back", controller: "info", action: "show", id: "how-to-get-your-stolen-bike-back", as: :get_your_stolen_bike_back
   resources :info, only: %i[show]
 
-  %w[stolen_bikes roadmap spokecard how_it_works].freeze.each { |p| get p, to: redirect("/resources") }
+  %w[stolen_bikes roadmap spokecard how_it_works image_resources dev_and_design].freeze
+    .each { |p| get p, to: redirect("/resources") }
 
   get "strava_search", to: "strava_search#index"
   post "strava_search/token", to: "strava_search#create_token", as: :strava_search_token

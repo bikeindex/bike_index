@@ -67,6 +67,8 @@ RSpec.describe "Organized impound records index", :js, type: :system do
   end
 
   it "loads results via turbo, filters by unregisteredness, then applies multi-updates" do
+    # The results-frame component opts the page out of Turbo's snapshot cache
+    expect(page).to have_css('meta[name="turbo-cache-control"][content="no-cache"]', visible: :all)
     # Results load into the turbo-frame via its eager src
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
     # search_no_js should NOT be in the URL (removed by the JS controller)
