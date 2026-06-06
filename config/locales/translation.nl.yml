@@ -5450,6 +5450,9 @@ nl:
         submit: Voorleggen
         search_notes: Zoeknotities
         search_owner_email_or_name: Zoek naar het e-mailadres of de naam van de eigenaar.
+      results_frame:
+        rate_limited: Te veel zoekopdrachten te snel achter elkaar — je hebt een limiet
+          bereikt. Wacht even en probeer het opnieuw.
     search_results:
       bike_box:
         location: Plaats

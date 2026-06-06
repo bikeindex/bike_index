@@ -144,11 +144,19 @@ export default class extends Controller {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })
-      .then(response => response.json())
-      .then(data => {
-        this.element.dataset.countsQuery = queryString
-        this.insertTabCounts(data)
+      .then(response => {
+        // Counts share the per-IP API throttle; surface a 429 instead of
+        // silently leaving the tab counts blank.
+        if (response.status === 429) {
+          window.dispatchEvent(new CustomEvent('search:rate-limited'))
+          return this.resetKindCounts()
+        }
+        return response.json().then(data => {
+          this.element.dataset.countsQuery = queryString
+          this.insertTabCounts(data)
+        })
       })
+      .catch(() => this.resetKindCounts())
 
     this.setResetFieldListeners()
   }
