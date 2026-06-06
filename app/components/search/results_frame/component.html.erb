@@ -1,9 +1,12 @@
 <% helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
 
 <div class="search-results-frame-wrapper">
-  <%# Revealed by search--form when a search request (results frame or kind
-      counts) comes back 429-throttled, so a rate limit surfaces instead of a
-      stuck spinner or silently blank counts. Hidden again on the next render. %>
+  <%#
+    Revealed by search--form when a search request (results frame or kind
+    counts) comes back 429-throttled, so a rate limit surfaces instead of a
+    stuck spinner or silently blank counts. Hidden again on the next render.
+  %>
+
   <div hidden data-search-rate-limited>
     <%= render UI::Alert::Component.new(text: translation(".rate_limited"), kind: :warning) %>
   </div>
