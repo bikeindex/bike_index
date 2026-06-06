@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    search:
+      results_frame:
+        rate_limited: Too many searches too fast — you're being rate limited. Wait a moment, then try again.
