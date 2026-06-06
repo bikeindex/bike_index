@@ -11,7 +11,12 @@ module Users
 
       auto_generate_user_for_organization(organization_role)
       if organization_role.send_invitation_email?
-        OrganizedMailer.organization_invitation(organization_role).deliver_now
+        notification = organization_role.notifications.where(kind: "organization_invitation").first ||
+          Notification.create(kind: "organization_invitation", notifiable: organization_role,
+            user_id: organization_role.user_id, message_channel_target: organization_role.invited_email)
+        notification.track_email_delivery do
+          OrganizedMailer.organization_invitation(organization_role).deliver_now
+        end
         organization_role.update(email_invitation_sent_at: Time.current, skip_processing: true)
       end
 
@@ -29,7 +34,7 @@ module Users
       user_id ||= User.fuzzy_confirmed_or_unconfirmed_email_find(organization_role.invited_email)&.id
       return false unless user_id.present?
 
-      organization_role.update(user_id: user_id)
+      organization_role.update(user_id:, skip_processing: true)
       organization_role.reload
       User.find_by_id(user_id)&.update(updated_at: Time.current)
     end
@@ -54,7 +59,7 @@ module Users
       user.save!
       user.confirm(user.confirmation_token)
       # We don't want to send users emails in this situation.
-      organization_role.update(user_id: user.id, email_invitation_sent_at: Time.current)
+      organization_role.update(user_id: user.id, email_invitation_sent_at: Time.current, skip_processing: true)
       organization_role.reload
     end
 

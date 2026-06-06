@@ -259,6 +259,21 @@ RSpec.describe Search::MarketplaceController, type: :request do
         expect(json_result).to match_hash_indifferently({for_sale: 1, for_sale_proximity: 0})
       end
 
+      describe "rack_attack" do
+        include_context :rack_attack
+
+        # Counts is an XHR data endpoint fired on every search, so it rides the
+        # generous API limit rather than the strict per-page request limit.
+        it "throttles at the API limit, not the lower per-page limit" do
+          expect(Rack::Attack::API_MAX_REQUESTS).to be > Rack::Attack::MAX_REQUESTS_PER_TWENTY
+          throttled = rack_attack_throttled_response(limit: Rack::Attack::API_MAX_REQUESTS) do
+            get "#{base_url}/counts"
+            response
+          end
+          expect(throttled).to have_http_status(:too_many_requests)
+        end
+      end
+
       context "with listings" do
         let(:target_result) { {for_sale: 2, for_sale_proximity: 1} }
         include_context :geocoder_real

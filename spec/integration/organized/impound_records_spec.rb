@@ -36,17 +36,17 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     find("input[type=checkbox][name='ids[#{impound_record.id}]']", visible: :all)
   end
 
-  # Headless Chrome on CI sometimes loses the click on these freshly-enabled
-  # checkboxes (set/check/native.click all flaked), so set the property
-  # directly (and fire change, as a real click would). The form posts the
-  # value regardless of how the box got checked.
   def check_for_update(impound_record)
     expect(checkbox_for(impound_record)).not_to be_disabled
-    page.execute_script(<<~JS)
-      const el = document.getElementById('ids_#{impound_record.id}')
-      el.checked = true
-      el.dispatchEvent(new Event('change', {bubbles: true}))
-    JS
+    # The error alert collapsing open above the table shifts this row down for a
+    # moment, so a check dispatched mid-animation lands at the old spot and
+    # misses. `check` is idempotent, so retry until it registers -- like a user
+    # clicking again -- bounded by Capybara's wait time.
+    deadline = Time.current + Capybara.default_max_wait_time
+    loop do
+      check "ids[#{impound_record.id}]"
+      break if checkbox_for(impound_record).checked? || Time.current > deadline
+    end
     expect(checkbox_for(impound_record)).to be_checked
   end
 
@@ -67,7 +67,9 @@ RSpec.describe "Organized impound records index", :js, type: :system do
   end
 
   it "loads results via turbo, filters by unregisteredness, then applies multi-updates" do
-    # Results load into the turbo-frame via the search--form auto-submit
+    # The results-frame component opts the page out of Turbo's snapshot cache
+    expect(page).to have_css('meta[name="turbo-cache-control"][content="no-cache"]', visible: :all)
+    # Results load into the turbo-frame via its eager src
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
     # search_no_js should NOT be in the URL (removed by the JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
@@ -82,16 +84,17 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(page).to have_current_path(/search_unregisteredness=only_unregistered/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 1)
 
-    # Back navigation restores the unfiltered listing (the search--form
-    # controller re-points the results frame at the restored URL on popstate).
+    # Back navigation restores the unfiltered listing. The page opts out of
+    # Turbo's snapshot cache (no-cache meta), so back/forward re-fetch it and the
+    # results frame reloads fresh from the server.
     page.go_back
     expect(page).not_to have_current_path(/search_unregisteredness/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
 
     # Search form submit + direct back-nav: regression guard for the stale
     # turbo-frame state the no-cache meta prevents. The form submit updates the
-    # frame via turbo_stream; back-nav must restore it fresh from the server,
-    # not from a cached snapshot (whose frame the popstate fix can't recover).
+    # frame via turbo_stream; back-nav must restore it fresh from the server, not
+    # from a cached snapshot whose frame would be stale.
     fill_in "search_email", with: "nobody@example.com"
     find("#search-button").click
 

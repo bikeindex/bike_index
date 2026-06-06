@@ -1936,6 +1936,8 @@ nl:
     public_images:
       create:
         cannot_create: Whoops! We kunnen je dat beeld niet laten maken.
+        image_too_large: Die afbeelding is te groot. Upload een afbeelding die kleiner
+          is dan %{size}.
       destroy:
         cannot_delete: Whoops! Hoe heb je dat gedaan? Kan afbeeldingen van e-mailfragmenten
           niet verwijderen.
@@ -2463,29 +2465,6 @@ nl:
         dat andere mensen fietsen als vervoermiddel gebruiken. Hij brengt veel kennis
         van de wielerwereld met zich mee en zorgt ervoor dat achter de schermen bij
         Bike Index alles blijft draaien."
-    dev_and_design:
-      bike_index_logos_html: "%{link} - logo's van vector- en png-fietsindex"
-      bike_shop_card: Fietswinkel kaart
-      bike_shop_card_pdf_url: https://files.bikeindex.org/stored/Bike-Index-Shop-Card.pdf
-      bike_shop_cards_html: '%{link} - ontwerp is voor notecard-formaat (5,5 "x 4,25")'
-      design_resources: Ontwerpbronnen
-      development_resources: Ontwikkelingsbronnen
-      display_widget_html: "%{link} (moet zijn aangemeld - heeft ook geen gebruiksinstructies
-        ...)"
-      flyers_html: "%{link} - Afdrukkleur en dubbelzijdig ( <em>niet</em> opnieuw
-        schalen, laat de printer zo dicht mogelijk bij de randen afdrukken)"
-      image_assets: Afbeelding activa
-      meant_to_be_usable: Bike Index is voor iedereen bruikbaar en uitbreidbaar. We
-        zijn ver in de open source.
-      nearby_stolen_widget: Nabijgelegen gestolen widget
-      nearby_stolen_widget_html: "%{link} (op GitHub)"
-      oauth_apps_html: "%{link} (moet zijn ingelogd)"
-      oauth_authorized_apps_html: "%{link} (moet zijn ingelogd)"
-      on_github: op GitHub
-      open_source_html: Bike Index zelf is open source - bekijk het %{link}.
-      our_api_documentation: Onze API-documentatie
-      trifold_flyer: Driebladige Flyer
-      trifold_flyer_pdf_url: https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf
     privacy:
       available_here: beschikbaar Hier
       changes: wijzigingen
@@ -3124,19 +3103,6 @@ nl:
         informatie en andere zaken bevat hierin uiteengezet en waarin wordt uitgelegd
         hoe en voor welke doeleinden we de informatie die u ons verstrekt verzamelen,
         gebruiken, bewaren, openbaar maken en beveiligen.
-    image_resources:
-      bike_index_image_assets: Bike Index afbeelding activa
-      black_background_shown_here: Zwarte achtergrond hier getoond voor zichtbaarheid
-      check_out_resources_html: Bekijk %{resources_link} voor extra ontwerpbronnen
-      image_has_no_background: afbeelding heeft geen achtergrond, hier weergegeven
-        met zwart voor zichtbaarheid
-      logo_with_cutout: Logo met achtergrondknipsel
-      logo_with_stripes: Logo met strepen
-      single_color_logo: Eén kleur logo
-      single_color_logo_in_white: Wit logo in één kleur
-      logo_with_blue_shield: Logo met blauw schild en witte tekst
-      logo_with_cutout_black: Logo met zwarte achtergrond uitsparing
-      logo_with_links_html: "%{text} (%{svg_link}, %{png_link})"
     lightspeed:
       a_few_things_to_note: 'Een paar dingen om op te merken:'
       a_listing_on_bike_index_will_be_created: Zodra uw Lightspeed Retail-account
@@ -3245,24 +3211,6 @@ nl:
       use_a_ulock_that_costs_at_least_40: Gebruik een u-lock die minstens € 40 kost.
       checkout_out_bestbikelock_html: "- ga naar %{link} voor aanbevelingen over de
         beste sloten."
-    resources:
-      api_documentation: API-documentatie
-      bike_index_resources: Bike Index middelen
-      check_out_our_link_html: Bekijk onze %{link}.
-      did_you_know_every_bike_html: Wist je dat elke fiets een uniek, identificerend
-        nummer heeft? %{link}.
-      get_bike_index_html: Download fietsindex %{link}.
-      how_not_to_buy_a_stolen_bike: Hoe koop je geen gestolen fiets in 4 eenvoudige
-        stappen?
-      infographic_html: "<strong>Infographic</strong> : %{link}"
-      learn_about_serial_numbers_here: Lees hier meer over framenummers
-      logos_and_design_assets: logo's en ontwerpelementen
-      map_of_bike_thefts: kaart van fietsdiefstallen
-      the_manufacturers: de fabrikanten
-      view_the_list_of_all_html: Bekijk de lijst met alle %{link} die we kennen.
-      we_have_an_open_api_check_out_html: We hebben een open API - bekijk onze %{link}.
-      were_open_source_view_this_app_html: We zijn open source, bekijk deze app (en
-        andere dingen) op %{github_link}.
     serials:
       a_serial_number_located_on_a_html: Een framenummer op een <em>achterste uitval</em>
         . Sommige BMX-fietsen en enkele Schwinn-fietsen plaatsen de serie op de achterste
@@ -4374,8 +4322,6 @@ nl:
       community_groups: Community's
       copyright_html: "%{current_year} & kopiëren; Bike Index, een 501 (c) (3) non-profit
         - EIN 81-4296194"
-      design_logos: Ontwerp & logo's
-      dev_resources: Dev Bronnen
       donate: Schenken
       faq: FAQ
       help: Helpen
@@ -4397,6 +4343,7 @@ nl:
       how_to_get_your_stolen_bike_back: Haal je gestolen fiets terug
       press_inquiries: Persvragen
       strava_search: Zoeken en bijwerken op Strava
+      dev_and_design_resources: Ontwikkelings- en ontwerpbronnen
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:

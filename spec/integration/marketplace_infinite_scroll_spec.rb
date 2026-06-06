@@ -6,7 +6,6 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   let(:seller) { FactoryBot.create(:user, :with_address_record) }
   let(:paid_seller) { FactoryBot.create(:user, :with_address_record) }
   let!(:membership) { FactoryBot.create(:membership, user: paid_seller) }
-  let(:marketplace_url) { "/search/marketplace" }
   let!(:manufacturer1) { FactoryBot.create(:manufacturer, name: "Yuba", id: 1003, frame_maker: true) }
   let!(:manufacturer2) { FactoryBot.create(:manufacturer, name: "Salsa", id: 764, frame_maker: true) }
   let!(:promoted_listings) do
@@ -55,11 +54,32 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     page.all("[data-test-id^='vehicle-thumbnail-linkspan-']").map { |el| el["data-test-id"].split("-").last.to_i }
   end
 
+  # Reach the marketplace the way a user does: from the homepage, click the
+  # "Marketplace" nav link. The nav renders it twice (responsive mobile + desktop
+  # copies); only one shows at a time, so match the first.
+  def visit_marketplace_via_nav
+    # Widen to a desktop viewport so the nav links show inline instead of behind
+    # the mobile hamburger menu.
+    page.current_window.resize_to(1280, 900)
+    visit "/"
+    click_link "Marketplace", exact: true, match: :first
+  end
+
+  it "loads the kind counts on initial render" do
+    visit_marketplace_via_nav
+
+    # Counts populate from /search/marketplace/counts once the search--kind-select-fields
+    # controller connects - no form submit required. The eager turbo-frame flow no
+    # longer auto-submits on load, so this guards that initial render still fills them.
+    # All 17 listings (15 standard + 2 promoted) are for_sale, so the for_sale count shows (17).
+    expect(page).to have_css("[data-count-target='for_sale']", text: "(17)", wait: 10)
+  end
+
   it "automatically loads the next page when scrolling to bottom" do
     expect(manufacturer1.reload.id).to eq 1003 # sanity check - otherwise the search won't work
     expect(manufacturer2.reload.id).to eq 764 # sanity check - otherwise the search won't work
     promoted_bike_ids = promoted_listings.map(&:item_id)
-    visit marketplace_url
+    visit_marketplace_via_nav
 
     # 2 promoted + 12 standard = 14 thumbnails on page 1
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 14)

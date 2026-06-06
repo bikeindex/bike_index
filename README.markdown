@@ -81,6 +81,8 @@ We use [`turbo_tests`](https://github.com/serpapi/turbo_tests) to run the test s
 
 - Run Guard with parallelism `bin/guard -G Guardfile_parallel`
 
+- Parallel test databases are **not** migrated by default. After running migrations, sync them with `bin/rake parallel:prepare` (see above), or opt into automatic parallel migrations on `db:migrate` with `PARALLEL_MIGRATIONS=true bin/rake db:migrate`.
+
 ## Code Hygiene
 
 We use the following tools to automate code formatting and linting:
