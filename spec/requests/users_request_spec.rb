@@ -466,6 +466,20 @@ RSpec.describe UsersController, type: :request do
       expect(response.status).to eq 404
     end
 
+    it "404s if the user is banned" do
+      user.update(show_bikes: true, banned: true)
+      get "#{base_url}/#{user.username}"
+      expect(response.status).to eq 404
+    end
+
+    it "404s if the user is email banned" do
+      user.update(show_bikes: true)
+      FactoryBot.create(:email_ban, user:)
+      expect(user.reload.email_banned?).to be_truthy
+      get "#{base_url}/#{user.username}"
+      expect(response.status).to eq 404
+    end
+
     it "redirects to user home url if the user exists but doesn't want to show their page" do
       user.show_bikes = false
       user.save
