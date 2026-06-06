@@ -5303,6 +5303,9 @@ nb:
         submit: sende inn
         search_notes: Søk i notater
         search_owner_email_or_name: Søk etter eierens e-postadresse eller navn
+      results_frame:
+        rate_limited: For mange søk for raskt – du er frekvensbegrenset. Vent et øyeblikk,
+          og prøv på nytt.
     search_results:
       bike_box:
         location: plassering
