@@ -4207,6 +4207,8 @@ it:
         submit:
         search_notes:
         search_owner_email_or_name:
+      results_frame:
+        rate_limited:
     search_results:
       bike_box:
         location: Luogo
