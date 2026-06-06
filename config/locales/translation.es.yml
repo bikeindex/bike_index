@@ -3848,8 +3848,8 @@ es:
       vendor_terms: condiciones de venta
       where_we_are: Dónde estamos
       who_we_serve: A quién servimos
-      strava_search:
-      dev_and_design_resources:
+      strava_search: Búsqueda y actualización de Strava
+      dev_and_design_resources: Recursos de desarrollo y diseño
     form_well_footer_save:
       save_changes:
     header_nav:
