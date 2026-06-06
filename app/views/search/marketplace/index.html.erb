@@ -17,30 +17,10 @@
   </div>
 <% end %>
 
-<div class="search-results-frame-wrapper">
-  <%#
-    When the results aren't rendered inline (the JS shell), give the frame a src
-    so Turbo eager-loads the results in a separate request once it connects
-  %>
-
-  <%= turbo_frame_tag :marketplace_results_frame,
-    src: (request.original_fullpath unless @render_results) do %>
-    <% if @render_results %>
-      <%= turbo_frame_tag "page_#{@pagy.page}" do %>
-        <%= render partial: "marketplace_results" %>
-      <% end %>
-    <% else %>
-      <%#
-        Hidden until JS reveals it - without JS the eager src never loads, so a
-        no-JS user would otherwise be stuck on a spinner that never resolves
-      %>
-      <div hidden data-search-loading>
-        <%= render UI::LoadingSpinner::Component.new(text: t(".loading_results")) %>
-      </div>
-    <% end %>
+<%= render Search::ResultsFrame::Component.new(frame_id: :marketplace_results_frame,
+  render_results: @render_results, current_path: request.original_fullpath,
+  loading_text: t(".loading_results")) do %>
+  <%= turbo_frame_tag "page_#{@pagy.page}" do %>
+    <%= render partial: "marketplace_results" %>
   <% end %>
-
-  <div class="search-loading-overlay">
-    <%= render UI::LoadingSpinner::Component.new(text: t(".loading_results")) %>
-  </div>
-</div>
+<% end %>
