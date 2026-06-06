@@ -113,19 +113,18 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 8)
     # Should NOT have a lazy-loading frame for page 2
     expect(page).not_to have_css("turbo-frame#page_2")
-  end
 
-  it "filters listings by primary activity" do
-    visit_marketplace_via_nav
-    # Wait for the initial results to load - all 15 listings span multiple pages
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
-
-    # Narrow to the 6 listings with the "Mountain biking" primary activity by
-    # typing into the combobox and clicking its matching autocomplete option
+    # Finally, clear the Yuba filter the way a user would - by removing its
+    # combobox chip - then filter by the "Mountain biking" primary activity
+    within("[data-controller~='search--everything-combobox']") do
+      find("[aria-label='Remove Yuba']").click
+    end
     find("#primary_activity").set("Mountain")
     expect(page).to have_css(".hw-combobox__option", text: "Mountain biking", wait: 5)
     find(".hw-combobox__option", text: "Mountain biking", match: :first).click
     find("#search-button").click
+    # 6 of the 15 listings have the "Mountain biking" primary activity (a count of
+    # 6 also confirms Yuba was cleared - otherwise the two filters would intersect)
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
     # Only 6 results, so there's nothing to lazy-load on a second page
     expect(page).not_to have_css("turbo-frame#page_2")
