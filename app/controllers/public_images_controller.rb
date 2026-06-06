@@ -10,6 +10,10 @@ class PublicImagesController < ApplicationController
   end
 
   def create
+    if request.content_length.to_i > PublicImageUploader::MAX_FILE_SIZE
+      max_size = ActiveSupport::NumberHelper.number_to_human_size(PublicImageUploader::MAX_FILE_SIZE)
+      render(json: {error: translation(:image_too_large, size: max_size)}, status: 413) && return
+    end
     @public_image = PublicImage.new(permitted_parameters)
     if params[:bike_id].present?
       @public_image.imageable = @bike

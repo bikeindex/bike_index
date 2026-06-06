@@ -17,8 +17,10 @@ export default class extends Controller {
 
     // Add function to window so it can be called by select2 callback
     window.kindControllerUpdateAfterComboboxChange = this.updateAfterComboboxChange.bind(this)
-    // if in component preview (lookbook), run kind counts on load
-    if (window.inComponentPreview) { this.setKindCounts() }
+    // Load counts on connect. The eager turbo-frame flow no longer submits the
+    // form on initial render (which used to fire setKindCounts via
+    // turbo:submit-end), so fetch them here. Also covers component preview.
+    this.setKindCounts()
   }
 
   disconnect () {
@@ -111,19 +113,36 @@ export default class extends Controller {
   }
 
   setKindCounts () {
-    // console.log('setting kind counts')
-
     const queryString = this.searchQuery
     if (this.doNotFetchCounts(queryString)) {
       return this.resetKindCounts()
+    }
+
+    // Skip if the rendered counts already reflect this query - eg Turbo
+    // reconnecting the controller against a cached snapshot whose counts are
+    // already filled in. The marker lives on the element so it rides along in the
+    // cached DOM; resetKindCounts clears it whenever the counts are blanked.
+    if (this.element.dataset.countsQuery === queryString) {
+      return this.setResetFieldListeners()
     }
 
     fetch(`${this.apiCountUrlValue}?${queryString}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })
-      .then(response => response.json())
-      .then(data => { this.insertTabCounts(data) })
+      .then(response => {
+        // Counts share the per-IP API throttle; surface a 429 instead of
+        // silently leaving the tab counts blank.
+        if (response.status === 429) {
+          window.dispatchEvent(new CustomEvent('search:rate-limited'))
+          return this.resetKindCounts()
+        }
+        return response.json().then(data => {
+          this.element.dataset.countsQuery = queryString
+          this.insertTabCounts(data)
+        })
+      })
+      .catch(() => this.resetKindCounts())
 
     this.setResetFieldListeners()
   }
@@ -145,7 +164,9 @@ export default class extends Controller {
   }
 
   resetKindCounts () {
-    // console.log('resetting counts')
+    // Counts are being blanked, so drop the dedupe marker - the next fetch for
+    // this query must run again rather than being skipped as already-rendered.
+    delete this.element.dataset.countsQuery
 
     // dataCountTargets looks like: ['non', 'stolen', 'proximity', 'for_sale']
     const dataCountTargets = [...this.element.querySelectorAll('[data-count-target]')]

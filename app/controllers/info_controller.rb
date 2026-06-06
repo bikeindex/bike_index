@@ -51,9 +51,6 @@ class InfoController < ApplicationController
   def resources
   end
 
-  def image_resources
-  end
-
   def membership
     @blog = Blog.friendly_find(Blog.membership_slug)
     @page_id = "news_show" # Override to make styles same as news
@@ -80,9 +77,6 @@ class InfoController < ApplicationController
 
   def support_the_bike_index
     redirect_to_donation_or_payment
-  end
-
-  def dev_and_design
   end
 
   def how_not_to_buy_stolen

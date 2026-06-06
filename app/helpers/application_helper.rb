@@ -50,7 +50,7 @@ module ApplicationHelper
     when "edits", "theft_alerts", "recovery"
       "edit_bike_skeleton"
     when "info"
-      "content_skeleton" unless %w[terms security vendor_terms privacy support_the_index].include?(action_name)
+      "content_skeleton" unless %w[terms security vendor_terms privacy support_the_index resources].include?(action_name)
     when "welcome"
       "content_skeleton" if %w[goodbye].include?(action_name)
     when "organizations"
@@ -76,6 +76,8 @@ module ApplicationHelper
       else
         "landing-page-body"
       end
+    elsif controller_name == "info" && action_name == "resources"
+      "kelsey_landing-page-body"
     elsif current_page_skeleton == "organized_skeleton"
       "organized-body"
     end

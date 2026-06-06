@@ -82,4 +82,20 @@ RSpec.describe Search::ComboboxController, type: :request do
       end
     end
   end
+
+  describe "rack_attack" do
+    include_context :rack_attack
+
+    # The per-keystroke autocomplete is the heaviest search endpoint, so it rides
+    # the generous API limit rather than the strict per-page request limit, which
+    # active typing would otherwise trip.
+    it "throttles at the API limit, not the lower per-page limit" do
+      expect(Rack::Attack::API_MAX_REQUESTS).to be > Rack::Attack::MAX_REQUESTS_PER_TWENTY
+      throttled = rack_attack_throttled_response(limit: Rack::Attack::API_MAX_REQUESTS) do
+        get "/search/combobox/options", params: {q: "x", for_id: "test"}, as: :turbo_stream
+        response
+      end
+      expect(throttled).to have_http_status(:too_many_requests)
+    end
+  end
 end
