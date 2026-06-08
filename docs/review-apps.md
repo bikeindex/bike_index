@@ -26,23 +26,16 @@ Because only `synchronize` and `closed` are wired up, toggling the label by hand
 The workflow assumes a single host is already provisioned with shared accessories running. This is done **once**, by hand, not by the workflow.
 
 ### 1. Provision a VM
-Ubuntu 24.04, 4 vCPU / 8 GB RAM as a starting point. Open ports 22, 80, 443.
+Ubuntu 24.04, Premium AMD/Intel (NVMe). 2 vCPU / 4 GB is enough to start; bump if you run many concurrent PRs. Open ports 22, 80, 443. (Bike Index runs this as a DigitalOcean droplet in `sfo3`, alongside production.)
 
 ### 2. DNS
-Point a wildcard A record at the host:
+Point a **wildcard** A record at the host:
 ```
 *.review.bikeindex.org   A   <host-ip>
 ```
+This covers both the per-PR app hostnames (`pr-N.review.bikeindex.org`) and the SSH deploy target (`REVIEW_APP_HOST`, e.g. `host.review.bikeindex.org`) — any name under the wildcard resolves to the host, so no separate record is needed.
 
-### 3. Wildcard TLS cert
-Place the wildcard cert + key on the host (path of your choice, e.g.):
-```
-/etc/ssl/review.bikeindex.org/fullchain.pem
-/etc/ssl/review.bikeindex.org/privkey.pem
-```
-Set up renewal there with a post-renew hook that runs `kamal proxy reboot` (so the proxy reloads the new cert files).
-
-### 4. Run the Ansible provisioning playbook
+### 3. Run the Ansible provisioning playbook
 Hardens the host with Docker, Fail2ban, UFW (allows 22/80/443), NTP, swap, and disables password SSH. From `provisioning/`:
 
 ```bash
@@ -55,25 +48,23 @@ ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini playbook.yml
 
 See `provisioning/README.md` for details.
 
-### 5. Boot kamal-proxy with the wildcard cert
-The kamal-proxy is global on the host. Boot it once with the wildcard cert paths:
+### 4. Boot kamal-proxy
+The kamal-proxy is global on the host. Boot it once:
 
 ```bash
-kamal proxy boot \
-  --certificate-path /etc/ssl/review.bikeindex.org/fullchain.pem \
-  --private-key-path /etc/ssl/review.bikeindex.org/privkey.pem
+export REVIEW_APP_PR_NUMBER=0          # dummy, just to satisfy the ERB
+export REVIEW_APP_HOST=host.review.bikeindex.org
+kamal proxy boot --config-file config/deploy.review.yml
 ```
 
-After this, every PR's app can simply declare `ssl: true` in its proxy config — the proxy serves the wildcard for any `pr-N.review.bikeindex.org`.
+**TLS is automatic — there is no cert to manage.** Each PR's proxy config declares `ssl: true`, so kamal-proxy obtains a per-host Let's Encrypt certificate (HTTP-01 challenge over port 80) the first time `pr-N.review.bikeindex.org` is deployed, and renews it itself. No wildcard cert, certbot, or DNS-01 is involved — the wildcard DNS record (step 2) plus the open port 80 are all that's required. (Let's Encrypt's limit of 50 certs/week per registered domain is ample for review apps.)
 
-### 6. Boot shared accessories
-From a local clone with kamal installed (`gem install kamal -v '~> 2.0'`):
+### 5. Boot shared accessories
+From a local clone with kamal installed (`gem install kamal -v '~> 2.0'`). Secrets are read from `.kamal/secrets`, which pulls from 1Password — so set up the `Kamal/BikeIndex Review` item first (see [Local deploys](#local-deploys)):
 
 ```bash
-export REVIEW_APP_PR_NUMBER=0          # dummy value just to satisfy the ERB
-export REVIEW_APP_HOST=review.bikeindex.org
-export IMAGE_TAG=bootstrap             # dummy
-export POSTGRES_PASSWORD=<choose one and save in 1Password / your secret store>
+export REVIEW_APP_PR_NUMBER=0          # dummy, just to satisfy the ERB
+export REVIEW_APP_HOST=host.review.bikeindex.org
 
 kamal accessory boot db    --config-file config/deploy.review.yml
 kamal accessory boot redis --config-file config/deploy.review.yml
@@ -81,14 +72,14 @@ kamal accessory boot redis --config-file config/deploy.review.yml
 
 These create the `shared-db` (Postgres 17) and `shared-redis` (Redis 7) containers. Every PR's app connects to them under a per-PR role + database, created on the fly by `bin/docker-entrypoint`.
 
-### 7. SSH key + GitHub config
-- Add an SSH public key for a deploy user to the host's `authorized_keys`.
+### 6. SSH key + GitHub config
+- Add an SSH public key for a deploy user to the host's `authorized_keys` (on DigitalOcean, attach the key at droplet-create time).
 - Create a `review-app` GitHub Environment.
 - Add this **variable** to the environment:
-  - `REVIEW_APP_HOST` — host address (e.g. `review.bikeindex.org`)
+  - `REVIEW_APP_HOST` — SSH host address of the shared review-apps droplet (e.g. `host.review.bikeindex.org`). Any name under the `*.review.bikeindex.org` wildcard works; it's only the deploy target, not a public app URL.
 - Add these **secrets** to the environment:
   - `REVIEW_APP_SSH_KEY` — the matching private key
-  - `REVIEW_APP_POSTGRES_PASSWORD` — the password from step 6
+  - `REVIEW_APP_POSTGRES_PASSWORD` — same value as the 1Password item's `POSTGRES_PASSWORD`
   - `REVIEW_APP_SECRET_KEY_BASE`, `REVIEW_APP_SESSION_SECRET`, `REVIEW_APP_VERIFICATION_SECRET` — review-app values (do NOT reuse production)
   - `REVIEW_APP_STRIPE_PUBLISHABLE_KEY`, `REVIEW_APP_STRIPE_SECRET_KEY`, `REVIEW_APP_STRIPE_WEBHOOK_SECRET` — Stripe **test mode**
   - `REVIEW_APP_GOOGLE_MAPS`, `REVIEW_APP_GOOGLE_MAPS_STATIC`, `REVIEW_APP_GOOGLE_GEOCODER`, `REVIEW_APP_MAPBOX_GEOCODER`, `REVIEW_APP_MAPBOX_MAPPING`
@@ -105,6 +96,8 @@ You normally trigger review apps from the workflow, but you can also run `bin/re
 # One-time
 brew install --cask 1password-cli
 op signin                              # creates the `bike-index` account shortname
+# (or enable Developer → "Integrate with 1Password CLI" in the desktop app, which
+#  authenticates `op` across shells — needed for kamal's adapter to work non-interactively)
 gh auth login --scopes write:packages  # KAMAL_REGISTRY_PASSWORD=$(gh auth token)
 ```
 
@@ -124,7 +117,7 @@ These are the same review-app-scoped values stored as `REVIEW_APP_*` GitHub Envi
 Then:
 
 ```bash
-export REVIEW_APP_HOST=review.bikeindex.org
+export REVIEW_APP_HOST=host.review.bikeindex.org
 bin/review-app deploy <pr_number> <image_tag>
 ```
 

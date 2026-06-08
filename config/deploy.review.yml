@@ -3,9 +3,9 @@
 # Usage (called from .github/workflows/review-app.yml and bin/review-app):
 #
 #   export REVIEW_APP_PR_NUMBER=123
-#   export REVIEW_APP_HOST=review.bikeindex.org
-#   export IMAGE_TAG=pr-123-<sha>
-#   bin/kamal deploy --config-file config/deploy.review.yml \
+#   export REVIEW_APP_HOST=host.review.bikeindex.org
+#   bin/kamal deploy --version pr-123-<sha> \
+#                    --config-file config/deploy.review.yml \
 #                    --secrets-file .kamal/secrets-ci
 #
 # Multi-tenancy: each PR gets a unique service name (`bike-index-pr-<N>`) so
@@ -16,15 +16,14 @@
 # bin/docker-entrypoint creates the per-PR Postgres role on first boot and runs
 # `db:prepare`, which creates both the primary and analytics databases.
 #
-# Wildcard TLS: the operator boots kamal-proxy once with the wildcard cert
-# paths (see docs/review-apps.md); each app just declares `ssl: true` and the
-# proxy serves the wildcard for any pr-<N>.review.bikeindex.org hostname.
+# TLS: each app declares `ssl: true`, so kamal-proxy obtains a per-host Let's
+# Encrypt cert (HTTP-01 over port 80) on first deploy and renews it itself.
+# No wildcard cert / certbot / DNS-01 — see docs/review-apps.md.
 #
 # This file is NOT used by production (Cloud66).
 
 <% pr        = ENV.fetch("REVIEW_APP_PR_NUMBER") %>
 <% host      = ENV.fetch("REVIEW_APP_HOST") %>
-<% tag       = ENV.fetch("IMAGE_TAG") %>
 <% slug      = "pr-#{pr}" %>
 <% db_suffix = slug.tr("-", "_") %>
 <% appname   = "bike-index-#{slug}" %>
@@ -32,8 +31,6 @@
 
 service: <%= appname %>
 image: ghcr.io/bikeindex/bike_index
-
-image_tag: <%= tag %>
 
 servers:
   web:
@@ -155,8 +152,6 @@ accessories:
         - POSTGRES_PASSWORD
     directories:
       - shared_db_data:/var/lib/postgresql/data
-    options:
-      restart: always
   redis:
     service: shared-redis
     image: redis:7
@@ -164,5 +159,3 @@ accessories:
     cmd: "redis-server --databases 32 --maxmemory 512mb --maxmemory-policy allkeys-lru"
     directories:
       - shared_redis_data:/data
-    options:
-      restart: always

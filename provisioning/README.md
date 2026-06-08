@@ -1,6 +1,6 @@
 # Server provisioning
 
-An [Ansible](https://www.ansible.com/) playbook that prepares a fresh Ubuntu server for [Kamal](https://kamal-deploy.org/) deploys. Run this once against a new droplet before `bin/kamal setup`.
+An [Ansible](https://www.ansible.com/) playbook that prepares a fresh Ubuntu server for [Kamal](https://kamal-deploy.org/) deploys. Run this once against a new droplet before booting kamal-proxy and the shared accessories (see `docs/review-apps.md` → "One-time host setup").
 
 Vendored from [guillaumebriday/kamal-ansible-manager](https://github.com/guillaumebriday/kamal-ansible-manager) (MIT, see `LICENSE`). The Scaleway provisioning role has been removed — this template deploys to DigitalOcean.
 

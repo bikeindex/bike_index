@@ -64,17 +64,14 @@ kamal() { command kamal "$@" --config-file "$CONFIG"; }
 case "$action" in
   deploy)
     : "${image_tag:?image_tag required (3rd arg or IMAGE_TAG env)}"
-    export IMAGE_TAG="$image_tag"
-    echo "==> Deploying $slug at image tag $IMAGE_TAG"
-    kamal deploy
+    echo "==> Deploying $slug at image tag $image_tag"
+    # kamal 2.x takes the image tag as --version (there is no `image_tag:` config key).
+    kamal deploy --version "$image_tag"
     echo "==> Done. URL: https://${slug}.review.bikeindex.org"
     ;;
 
   destroy)
     echo "==> Destroying review app $slug"
-    # IMAGE_TAG is required by the ERB even though we're tearing down.
-    export IMAGE_TAG="${image_tag:-destroy}"
-
     kamal app remove || true
 
     echo "==> Dropping per-PR databases ($primary_db, $analytics_db) and role ($role)"
