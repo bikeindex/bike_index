@@ -119,9 +119,8 @@ jobs:
       SECRET_KEY_BASE: ${{ secrets.REVIEW_APP_SECRET_KEY_BASE }}
       SESSION_SECRET: ${{ secrets.REVIEW_APP_SESSION_SECRET }}
       VERIFICATION_SECRET: ${{ secrets.REVIEW_APP_VERIFICATION_SECRET }}
-      STRIPE_PUBLISHABLE_KEY: ${{ secrets.REVIEW_APP_STRIPE_PUBLISHABLE_KEY }}
-      STRIPE_SECRET_KEY: ${{ secrets.REVIEW_APP_STRIPE_SECRET_KEY }}
-      STRIPE_WEBHOOK_SECRET: ${{ secrets.REVIEW_APP_STRIPE_WEBHOOK_SECRET }}
+      # Stripe (test-mode) comes from the committed .env (dotenv in staging), not
+      # a GitHub secret — see config/environments/staging.rb + Gemfile.
       GOOGLE_MAPS: ${{ secrets.REVIEW_APP_GOOGLE_MAPS }}
       GOOGLE_MAPS_STATIC: ${{ secrets.REVIEW_APP_GOOGLE_MAPS_STATIC }}
       GOOGLE_GEOCODER: ${{ secrets.REVIEW_APP_GOOGLE_GEOCODER }}
@@ -131,8 +130,6 @@ jobs:
       R2_DEV_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY }}
       R2_DEV_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET }}
       HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
-      # Used by the destroy path's ERB; deploy passes the real tag as a CLI arg.
-      IMAGE_TAG: "destroy"
     steps:
       - name: Checkout PR head
         uses: actions/checkout@v6
