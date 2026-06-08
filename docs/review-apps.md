@@ -81,12 +81,11 @@ These create the `shared-db` (Postgres 17) and `shared-redis` (Redis 7) containe
   - `REVIEW_APP_SSH_KEY` — the matching private key
   - `REVIEW_APP_POSTGRES_PASSWORD` — same value as the 1Password item's `POSTGRES_PASSWORD`
   - `REVIEW_APP_SECRET_KEY_BASE`, `REVIEW_APP_SESSION_SECRET`, `REVIEW_APP_VERIFICATION_SECRET` — review-app values (do NOT reuse production)
-  - `REVIEW_APP_STRIPE_PUBLISHABLE_KEY`, `REVIEW_APP_STRIPE_SECRET_KEY`, `REVIEW_APP_STRIPE_WEBHOOK_SECRET` — Stripe **test mode**
   - `REVIEW_APP_GOOGLE_MAPS`, `REVIEW_APP_GOOGLE_MAPS_STATIC`, `REVIEW_APP_GOOGLE_GEOCODER`, `REVIEW_APP_MAPBOX_GEOCODER`, `REVIEW_APP_MAPBOX_MAPPING`
   - `REVIEW_APP_R2_DEV_ENDPOINT`, `REVIEW_APP_R2_DEV_ACCESS_KEY`, `REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET` — creds for the `bikeindex-dev` R2 bucket (`cloudflare_dev` service in `config/storage.yml`). Staging review apps share this bucket; do NOT reuse the production R2 token.
   - `REVIEW_APP_HONEYBADGER_API_KEY` — optional; the post-deploy hook no-ops if unset
 
-Other Bike Index env vars (Twitter, Twilio, Facebook, etc.) intentionally fall through to empty for review apps; those integrations stay stubbed.
+Review apps also load the committed **`.env`** at boot — `dotenv-rails` is in the `:staging` Bundler group (see `Gemfile`), so it runs in the staging environment. `.env` supplies dev/sandbox values for third-party integrations: **Stripe (test-mode)**, plus Twitter, Twilio, Facebook, Strava, Mailchimp, etc. — so those run against sandbox creds rather than falling through to empty. **kamal's `env:` always wins**: dotenv never overrides a var kamal already sets, so the per-app/managed secrets above take precedence and `.env` only fills in what kamal doesn't set. That's why **Stripe is intentionally absent from the kamal/1Password/GitHub lists** — it comes from `.env`. (Google/Mapbox/R2 stay kamal-managed, so their 1Password values must be real, not placeholders, or those integrations break.)
 
 ## Local deploys
 
@@ -105,8 +104,7 @@ gh auth login --scopes write:packages  # KAMAL_REGISTRY_PASSWORD=$(gh auth token
 
 ```
 POSTGRES_PASSWORD            SECRET_KEY_BASE              SESSION_SECRET
-VERIFICATION_SECRET          STRIPE_PUBLISHABLE_KEY       STRIPE_SECRET_KEY
-STRIPE_WEBHOOK_SECRET        GOOGLE_MAPS                  GOOGLE_MAPS_STATIC
+VERIFICATION_SECRET          GOOGLE_MAPS                  GOOGLE_MAPS_STATIC
 GOOGLE_GEOCODER              MAPBOX_GEOCODER              MAPBOX_MAPPING
 R2_DEV_ENDPOINT              R2_DEV_ACCESS_KEY            R2_DEV_ACCESS_KEY_SECRET
 HONEYBADGER_API_KEY

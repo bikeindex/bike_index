@@ -109,9 +109,8 @@ env:
     - SECRET_KEY_BASE
     - SESSION_SECRET
     - VERIFICATION_SECRET
-    - STRIPE_PUBLISHABLE_KEY
-    - STRIPE_SECRET_KEY
-    - STRIPE_WEBHOOK_SECRET
+    # Stripe (test-mode) is NOT here — it comes from the committed .env via
+    # dotenv in staging (see config/environments/staging.rb + Gemfile).
     - GOOGLE_MAPS
     - GOOGLE_MAPS_STATIC
     - GOOGLE_GEOCODER

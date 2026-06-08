@@ -17,7 +17,6 @@ gem "rails"
 
 # Things to improve/extend Rails
 gem "puma" # App server
-gem "thruster", require: false # HTTP/2, asset caching, X-Sendfile for Puma (used by review-app Dockerfile)
 gem "rack-timeout", require: "rack/timeout/base" # Bound per-request wall-clock time so one slow request can't hold a Puma worker
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
@@ -124,9 +123,12 @@ group :production do
   gem "honeybadger" # Error monitoring
 end
 
-# Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
-# Loaded in development (local dev) and staging (review apps — see config/deploy.review.yml).
-gem "letter_opener_web", "~> 3.0", groups: [:development, :staging]
+group :staging, :development do
+  gem "thruster", require: false # HTTP/2, asset caching, X-Sendfile for Puma (used by review-app Dockerfile)
+  # Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
+  # Loaded in development (local dev) and staging (review apps — see config/deploy.review.yml).
+  gem "letter_opener_web", "~> 3.0"
+end
 
 group :development do
   gem "bullet"
@@ -142,11 +144,17 @@ group :development do
   gem "benchmark"
 end
 
+# dotenv-rails is also loaded in :staging so review apps pick up the committed
+# .env dev/sandbox values at boot (see config/environments/staging.rb). dotenv
+# never overrides a var kamal already sets, so per-app/managed secrets win.
+group :development, :test, :staging do
+  gem "dotenv-rails"
+end
+
 group :development, :test do
   gem "brakeman", require: false
   gem "ruby-lsp" # Ruby language server (used by editor integrations)
   gem "database_cleaner"
-  gem "dotenv-rails"
   gem "factory_bot_rails"
   gem "foreman"
   gem "turbo_tests" # parallel tests

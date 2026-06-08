@@ -7,8 +7,10 @@
 # Ignore bundler config.
 /.bundle
 
-# Ignore all environment files.
-/.env*
+# Ignore local environment overrides only. The committed .env ships dev/sandbox
+# values that review apps load via dotenv in staging (see config/environments/
+# staging.rb + Gemfile); it must stay in the image build context.
+/.env*.local
 
 # Ignore all default key files.
 /config/master.key

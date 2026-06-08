@@ -231,10 +231,10 @@ GEM
       railties (>= 5)
     doorkeeper-i18n (5.2.2)
       doorkeeper (>= 5.2)
-    dotenv (2.7.6)
-    dotenv-rails (2.7.6)
-      dotenv (= 2.7.6)
-      railties (>= 3.2)
+    dotenv (3.2.0)
+    dotenv-rails (3.2.0)
+      dotenv (= 3.2.0)
+      railties (>= 6.1)
     down (5.4.2)
       addressable (~> 2.8)
     drb (2.2.3)
@@ -455,7 +455,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (2.19.7)
+    json (2.19.8)
     jwt (3.2.0)
       base64
     knapsack_pro (9.2.2)
@@ -619,7 +619,7 @@ GEM
       pry (>= 0.13, < 0.17)
     pry-rails (0.3.11)
       pry (>= 0.13.0)
-    psych (5.3.1)
+    psych (5.4.0)
       date
       stringio
     public_suffix (7.0.5)
