@@ -14,6 +14,10 @@ export default class extends Controller {
     this.updateForSaleLink()
     this.form?.addEventListener('change', this.updateForSaleLink.bind(this))
     this.form?.addEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
+    // Plain filter comboboxes (eg primary_activity) don't fire a native change
+    // event, so reset the counts when their selection changes
+    this.form?.addEventListener('hw-combobox:selection', this.onComboboxSelection)
+    this.form?.addEventListener('hw-combobox:removal', this.onComboboxSelection)
 
     // Add function to window so it can be called by select2 callback
     window.kindControllerUpdateAfterComboboxChange = this.updateAfterComboboxChange.bind(this)
@@ -29,6 +33,16 @@ export default class extends Controller {
     this.form?.removeEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
     // Remove reset count function from window
     window.kindControllerUpdateAfterComboboxChange = null
+    this.form?.removeEventListener('hw-combobox:selection', this.onComboboxSelection)
+    this.form?.removeEventListener('hw-combobox:removal', this.onComboboxSelection)
+  }
+
+  // The everything-combobox manages its own reset after mirroring its values
+  // into query_items[], so only the plain filter comboboxes route through here
+  onComboboxSelection = (event) => {
+    if (event.target.closest('[data-controller~="search--everything-combobox"]')) { return }
+
+    this.updateAfterComboboxChange()
   }
 
   get form () {
@@ -130,11 +144,19 @@ export default class extends Controller {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })
-      .then(response => response.json())
-      .then(data => {
-        this.element.dataset.countsQuery = queryString
-        this.insertTabCounts(data)
+      .then(response => {
+        // Counts share the per-IP API throttle; surface a 429 instead of
+        // silently leaving the tab counts blank.
+        if (response.status === 429) {
+          window.dispatchEvent(new CustomEvent('search:rate-limited'))
+          return this.resetKindCounts()
+        }
+        return response.json().then(data => {
+          this.element.dataset.countsQuery = queryString
+          this.insertTabCounts(data)
+        })
       })
+      .catch(() => this.resetKindCounts())
 
     this.setResetFieldListeners()
   }

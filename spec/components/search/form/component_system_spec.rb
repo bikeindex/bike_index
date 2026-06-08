@@ -159,7 +159,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       it "renders and updates" do
         expect(combobox_values).to eq([])
         expect(page_text(page.text)).not_to match("miles of")
-        expect(find("#primary_activity", visible: false).value).to eq ""
+        expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq ""
 
         %w[for_sale for_sale_proximity].each { |kind_scope| expect_count(kind_scope, 0) }
 
@@ -184,7 +184,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         it "renders and updates" do
           expect(combobox_values).to eq([])
           expect(page_text(page.text)).to match("miles of")
-          expect(find("#primary_activity", visible: false).value).to eq primary_activity.id.to_s
+          expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
 
           kind_scopes.each { |kind_scope| expect_count(kind_scope, 0) }
         end

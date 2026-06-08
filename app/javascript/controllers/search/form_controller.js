@@ -32,11 +32,18 @@ export default class extends Controller {
     if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:load', this.handleTurboLoad)
+    // Surface throttling: the eager results frame and the kind-count fetch can
+    // both come back 429 during active searching. Catch the frame's response
+    // here; the count fetch signals via the search:rate-limited window event.
+    document.addEventListener('turbo:before-fetch-response', this.handleFetchResponse)
+    window.addEventListener('search:rate-limited', this.showRateLimited)
   }
 
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.handleTurboLoad)
+    document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
+    window.removeEventListener('search:rate-limited', this.showRateLimited)
   }
 
   handleTurboLoad = () => {
@@ -76,11 +83,37 @@ export default class extends Controller {
   }
 
   handleFrameRender = () => {
+    // A frame render means results came back, so clear any rate-limit notice
+    this.hideRateLimited()
     // Run the time localization command on frame render
     if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
       window.timeLocalizer.localize()
     }
     this.syncHiddenFieldsFromUrl()
+  }
+
+  // The results frame eager-loads via its src; on a 429 Turbo just logs and
+  // leaves the spinner spinning. Take over the response so the user sees why.
+  handleFetchResponse = (event) => {
+    if (event.detail?.fetchResponse?.response?.status !== 429) return
+
+    event.preventDefault() // stop Turbo's default handling of the throttled response
+    this.showRateLimited()
+
+    // Drop the in-frame loading placeholder so it doesn't spin forever
+    this.frameElement?.querySelector('[data-search-loading]')?.setAttribute('hidden', '')
+  }
+
+  get rateLimitedElement () {
+    return document.querySelector('[data-search-rate-limited]')
+  }
+
+  showRateLimited = () => {
+    this.rateLimitedElement?.removeAttribute('hidden')
+  }
+
+  hideRateLimited () {
+    this.rateLimitedElement?.setAttribute('hidden', '')
   }
 
   // The form sits outside the results frame, so frame-nav period clicks advance
