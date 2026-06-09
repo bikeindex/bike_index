@@ -3,8 +3,8 @@
 module Backfills
   # Backfills a delivery_success Notification for each parking_notification that recorded a successful
   # send in the legacy delivery_status column, so the column can be dropped in a follow-up PR.
-  # Only "email_success" is a reliable positive signal; nil and "bike_unregistered" are treated as unsent.
-  # Creates the Notification directly — does not send email or update user_email.
+  # enqueue_workers selects the "email_success" rows (nil and "bike_unregistered" are treated as unsent),
+  # so perform just creates the Notification — directly, without sending email or updating user_email.
   class ParkingNotificationNotificationJob < ApplicationJob
     sidekiq_options queue: "low_priority", retry: false
 
@@ -12,9 +12,7 @@ module Backfills
       return enqueue_workers if id.blank?
 
       parking_notification = ParkingNotification.find(id)
-      return unless parking_notification.has_attribute?(:delivery_status)
       return if parking_notification.notifications.any?
-      return unless parking_notification.delivery_status == "email_success"
 
       Notification.create!(kind: "parking_notification",
         notifiable: parking_notification,
@@ -27,10 +25,8 @@ module Backfills
     private
 
     def enqueue_workers
-      return unless ParkingNotification.column_names.include?("delivery_status")
-
-      ParkingNotification.where(delivery_status: "email_success")
-        .find_each { |parking_notification| self.class.perform_async(parking_notification.id) }
+      ParkingNotification.where(delivery_status: "email_success").pluck(:id)
+        .each { |id| self.class.perform_async(id) }
     end
   end
 end
