@@ -3,11 +3,23 @@
   <%= organization_snippet_body('welcome').html_safe %>
 <% end %>
 
-<table class="finished-registration-shell" width="100%" cellpadding="0" cellspacing="0" border="0">
+<table
+  class="finished-registration-shell"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+>
   <tbody>
     <tr>
       <td>
-        <table class="finished-registration-hero" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table
+          class="finished-registration-hero"
+          width="100%"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+        >
           <tbody>
             <tr>
               <td class="hero-image-cell">
@@ -16,6 +28,7 @@
                   class: "hero-image" %>
               </td>
             </tr>
+
             <tr>
               <td class="hero-copy">
                 <p class="hero-eyebrow"><%= hero_eyebrow %></p>
@@ -26,7 +39,12 @@
         </table>
 
         <div class="finished-registration-card finished-registration-intro">
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <table
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+          >
             <tbody>
               <tr>
                 <td class="intro-art-cell">
@@ -34,8 +52,12 @@
                     alt: translation("registered_animation"),
                     class: "intro-art" %>
                 </td>
+
                 <td class="intro-copy-cell">
-                  <h1 class="<%= 'uncap' unless bike.status_stolen? || bike.status_impounded? || claim_message? %>"><%= intro_heading %></h1>
+                  <h1 class="<%= 'uncap' unless bike.status_stolen? || bike.status_impounded? || claim_message? %>">
+                    <%= intro_heading %>
+                  </h1>
+
                   <p class="intro-body"><%= intro_body %></p>
                 </td>
               </tr>
@@ -51,7 +73,11 @@
           <% else %>
             <p><%= detail_message %></p>
             <% unless claimed? %>
-              <p class="finished-registration-kicker"><strong><%= translation("youre_almost_done_registering") %></strong></p>
+              <p class="finished-registration-kicker">
+                <strong>
+                  <%= translation("youre_almost_done_registering") %>
+                </strong>
+              </p>
             <% end %>
           <% end %>
         </div>
@@ -99,7 +125,10 @@
           <% unless claimed? %>
             <div class="finished-registration-cta">
               <%= link_to claim_cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
-              <p><%= translation("sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: bike.type) %></p>
+
+              <p>
+                <%= translation("sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: bike.type) %>
+              </p>
             </div>
           <% end %>
         </div>
@@ -108,14 +137,25 @@
           <%= organization_snippet_body("security").html_safe %>
         <% elsif show_default_security_section? %>
           <div class="finished-registration-card finished-registration-security">
-            <h2><%= translation("protect_your_bike_by_following_these_lock") %></h2>
+            <h2>
+              <%= translation("protect_your_bike_by_following_these_lock") %>
+            </h2>
 
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="finished-registration-locking-row">
+            <table
+              width="100%"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+              class="finished-registration-locking-row"
+            >
               <tbody>
                 <tr>
                   <td class="locking-copy">
-                    <h3><%= translation("use_a_ulock") %> <%= translation("cable_locks_should_never_be_used") %></h3>
+                    <h3>
+                      <%= translation("use_a_ulock") %> <%= translation("cable_locks_should_never_be_used") %>
+                    </h3>
                   </td>
+
                   <td class="locking-art">
                     <%= image_tag template_asset_url("assets-howtolock-fighter.png"),
                       alt: translation("ulock_illustration"),
@@ -125,13 +165,22 @@
               </tbody>
             </table>
 
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="finished-registration-locking-row">
+            <table
+              width="100%"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+              class="finished-registration-locking-row"
+            >
               <tbody>
                 <tr>
                   <td class="locking-copy locking-copy-wide">
-                    <p><%= translation("secure_both_wheels_either_with_two_ulocks") %> <%= translation("before_locking_check") %></p>
+                    <p>
+                      <%= translation("secure_both_wheels_either_with_two_ulocks") %> <%= translation("before_locking_check") %>
+                    </p>
                   </td>
                 </tr>
+
                 <tr>
                   <td class="locking-main-art">
                     <%= image_tag template_asset_url("assets-howtolock-main.png"),
@@ -143,7 +192,13 @@
               </tbody>
             </table>
 
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="finished-registration-pro-tip">
+            <table
+              width="100%"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+              class="finished-registration-pro-tip"
+            >
               <tbody>
                 <tr>
                   <td class="pro-tip-copy">
@@ -153,6 +208,7 @@
                       <%= link_to translation("protecting_your_bike_here"), protect_your_bike_url %>.
                     </p>
                   </td>
+
                   <td class="pro-tip-art">
                     <%= image_tag template_asset_url("assets-howtolock-protip.png"),
                       alt: translation("pro_tip_illustration"),
@@ -167,21 +223,33 @@
         <% if show_whats_next_section? %>
           <div class="finished-registration-card finished-registration-next-steps">
             <h2><%= translation("whats_next") %></h2>
-            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+
+            <table
+              width="100%"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+            >
               <tbody>
                 <tr>
                   <td class="next-step">
                     <%= image_tag template_asset_url("theft-victims.gif"),
                       alt: translation("theft_victims_illustration"),
                       class: "next-step-art" %>
+
                     <h3><%= translation("what_if_my_bike_gets_stolen") %></h3>
                     <p><%= translation("stolen_guidance") %></p>
                   </td>
+
                   <td class="next-step">
                     <%= image_tag template_asset_url("marketplace.gif"),
                       alt: translation("marketplace_illustration"),
                       class: "next-step-art" %>
-                    <h3><%= translation("keep_your_registration_updated") %></h3>
+
+                    <h3>
+                      <%= translation("keep_your_registration_updated") %>
+                    </h3>
+
                     <p><%= translation("updated_registration_guidance") %></p>
                   </td>
                 </tr>
@@ -207,7 +275,13 @@
               <% end %>
             </div>
 
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="finished-registration-comics">
+            <table
+              width="100%"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+              class="finished-registration-comics"
+            >
               <tbody>
                 <tr>
                   <td class="comic-cell">
@@ -215,11 +289,13 @@
                       alt: translation("bike_love_one"),
                       class: "comic-image" %>
                   </td>
+
                   <td class="comic-cell">
                     <%= image_tag template_asset_url("comic-assets_bike-love-2.png"),
                       alt: translation("bike_love_two"),
                       class: "comic-image" %>
                   </td>
+
                   <td class="comic-cell">
                     <%= image_tag template_asset_url("comic-assets_bike-love-3.png"),
                       alt: translation("bike_love_three"),
@@ -247,7 +323,8 @@
           <h5>
             <% if render_template_footer_donation? %>
               <%= translation("help_prevent_theft_footer") %>
-              <%= link_to translation("make_a_donation_footer"), support_the_index_url %>.
+              <%= link_to translation("make_a_donation_footer"), support_the_index_url %>
+              .
             <% end %>
           </h5>
         </div>
