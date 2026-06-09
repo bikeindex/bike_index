@@ -25,4 +25,16 @@ Rails.application.configure do
   # /letter_opener mount in config/routes.rb).
   config.action_mailer.show_previews = true
   config.action_mailer.preview_paths = ["#{Rails.root}/spec/mailers/previews"]
+
+  # production.rb sends the log to stdout (for `kamal logs`) when
+  # RAILS_LOG_TO_STDOUT is set. Also write it to log/staging.log so the
+  # read_logged_searches cron job (config/crontab) has a file to rg. Both sinks
+  # use the inherited formatter so the lines keep the `I, [timestamp]` prefix
+  # LogSearcher::Reader matches.
+  if ENV["RAILS_LOG_TO_STDOUT"].present?
+    config.logger = ActiveSupport::BroadcastLogger.new(
+      ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout)),
+      ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new(Rails.root.join("log/#{Rails.env}.log")))
+    ).tap { it.formatter = config.log_formatter }
+  end
 end
