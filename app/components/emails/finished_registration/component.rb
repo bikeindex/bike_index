@@ -21,6 +21,94 @@ module Emails
 
       private
 
+      def claim_message?
+        @ownership.claim_message.present?
+      end
+
+      def claimed?
+        @ownership.claimed?
+      end
+
+      def show_after_welcome_snippet?
+        organization_snippet_body("after_welcome").present?
+      end
+
+      def show_security_snippet?
+        organization_snippet_body("security").present?
+      end
+
+      def show_default_security_section?
+        !show_security_snippet? && !bike.status_impounded?
+      end
+
+      def show_whats_next_section?
+        claimed? && !claim_message? && !bike.status_stolen_or_impounded?
+      end
+
+      def show_template_promo_section?
+        !bike.status_impounded?
+      end
+
+      def hero_title
+        return translation("welcome_to_bike_index") if new_user?
+        return translation("your_registration_is_active") if claimed?
+
+        translation("confirm_your_registration")
+      end
+
+      def hero_eyebrow
+        return translation("found_bike_registered") if bike.status_impounded?
+        return translation("recovery_support") if bike.status_stolen?
+
+        translation("registration_complete")
+      end
+
+      def intro_heading
+        return translation("thanks_for_adding_this_bike_type_you_found", bike_type: bike.type) if bike.status_impounded?
+        return translation("bike_type_thieves_are_jerks", bike_type: bike.type) if bike.status_stolen?
+        return translation("claim_your_bike_type", bike_type: bike.type) if claim_message?
+
+        if organization.present?
+          translation("bike_register_with_bike_index_and_org", bike_type: bike.type, org_name: organization.short_name)
+        else
+          translation("bike_register_with_bike_index", bike_type: bike.type)
+        end
+      end
+
+      def intro_body
+        return translation("were_sorry_your_bike_type_was_stolen", bike_type: bike.type) if bike.status_stolen?
+        return translation("found_bike_intro") if bike.status_impounded?
+        return translation("registration_complete_message") if claimed?
+
+        translation("registration_confirm_message")
+      end
+
+      def detail_message
+        return if claim_message?
+
+        if registered_by_owner?
+          translation("you_added_a_bike_type_on_bike_index", bike_type: bike_type_for_message)
+        elsif new_bike?
+          "<strong>#{org_name}</strong> #{translation("org_added_a_bike", bike_type: bike_type_for_message)}".html_safe
+        else
+          "<strong>#{org_name}</strong> #{translation("org_sent_a_bike", bike_type: bike_type_for_message)}".html_safe
+        end
+      end
+
+      def claim_cta_text
+        return translation("claim_the_bike_type", bike_type: bike.type) if registered_by_owner?
+
+        translation("confirm_this_bike_type", bike_type: bike.type)
+      end
+
+      def template_asset_url(name)
+        image_url("email_assets/finished_registration/#{name}")
+      end
+
+      def render_template_footer_donation?
+        helpers.render_donation?(organization)
+      end
+
       def organization_snippet_body(kind)
         @organization_snippet_bodies ||= Hash.new { |h, k| h[k] = organization&.mail_snippet_body(k, time: email_sent_at) }
         @organization_snippet_bodies[kind]

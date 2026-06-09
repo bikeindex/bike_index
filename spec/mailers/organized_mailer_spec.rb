@@ -241,6 +241,18 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.deliver_now.text_part.body.to_s).to include(bike.current_stolen_record.find_or_create_recovery_link_token)
         end
       end
+      context "impounded" do
+        let(:bike) { FactoryBot.create(:impounded_bike, :with_ownership_claimed) }
+        let(:ownership) { bike.current_ownership }
+        it "renders email with found bike messaging" do
+          expect(bike.status_impounded?).to be_truthy
+          expect(mail.subject).to eq("Bike Index registration successful")
+          expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+          expect(mail.tag).to eq "finished_registration"
+          expect(mail.deliver_now.text_part.body.to_s).to include("Thanks for adding this #{bike.type} you found to Bike Index")
+          expect(mail.deliver_now.text_part.body.to_s).to include("Give us a heads up")
+        end
+      end
     end
     context "organized snippets" do
       let(:welcome_mail_snippet) do
