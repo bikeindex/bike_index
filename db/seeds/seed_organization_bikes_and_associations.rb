@@ -105,8 +105,7 @@ end
     region_record_id: ca_state&.id,
     country_id: us&.id,
     skip_geocoding: true,
-    message: "Repeat notification - impounding bike from #{loc[:street]}",
-    delivery_status: "email_success"
+    message: "Repeat notification - impounding bike from #{loc[:street]}"
   )
   pn.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
   ProcessParkingNotificationJob.new.perform(pn.id)
