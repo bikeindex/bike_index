@@ -146,9 +146,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.REVIEW_APP_SSH_KEY }}
       - name: Trust review host
+        # Scan the hostname AND its resolved IP, un-hashed: kamal's net-ssh verifies
+        # the key against both (check_host_ip is on by default), so a hashed,
+        # hostname-only known_hosts entry triggers Net::SSH::HostKeyMismatch.
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ vars.REVIEW_APP_HOST }} >> ~/.ssh/known_hosts
+          host='${{ vars.REVIEW_APP_HOST }}'
+          ip="$(getent hosts "$host" | awk 'NR==1 { print $1 }')"
+          ssh-keyscan "$host" $ip >> ~/.ssh/known_hosts
       - name: Stage CI secrets file
         run: cp .kamal/secrets-ci .kamal/secrets
 
