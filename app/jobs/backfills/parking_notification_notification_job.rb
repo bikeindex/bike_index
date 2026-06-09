@@ -8,8 +8,6 @@ module Backfills
   class ParkingNotificationNotificationJob < ApplicationJob
     sidekiq_options queue: "low_priority", retry: false
 
-    PRE_TRACKING_ERROR = "Failed pre-notification tracking"
-
     def self.enqueue_workers(end_time = Time.current)
       ParkingNotification.send_email.where("parking_notifications.created_at < ?", end_time)
         .pluck(:id).each { |id| perform_async(id) }
@@ -27,7 +25,7 @@ module Backfills
         user_id: parking_notification.bike&.user_id,
         message_channel_target: parking_notification.email,
         delivery_status: success ? "delivery_success" : "delivery_failure",
-        delivery_error: success ? nil : PRE_TRACKING_ERROR)
+        delivery_error: success ? nil : ParkingNotification::PRE_TRACKING_ERROR)
     end
   end
 end
