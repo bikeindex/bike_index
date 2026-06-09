@@ -3,9 +3,7 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
-  # Liveness endpoint (200 once the app boots) for proxy/load-balancer health
-  # checks. Must be defined before the `*unmatched_route` catch-all below, which
-  # would otherwise 404 it in production/staging.
+  # Liveness endpoint (200 if the app boots). Used by the review-app kamal-proxy health check
   get "up", to: "rails/health#show", as: :rails_health_check
 
   mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
