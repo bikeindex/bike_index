@@ -157,7 +157,16 @@ jobs:
       - name: Stage CI secrets file
         run: cp .kamal/secrets-ci .kamal/secrets
 
-      # --- deploy path: build + push the image, then deploy ---
+      # --- deploy path: label the PR, build + push the image, then deploy ---
+      # Label on deploy *attempt*, not success: the label marks intent ("this PR
+      # gets a review app") and arms auto-redeploy. Adding it up front means a
+      # failed build/deploy still arms it — push a fix and `pull_request: synchronize`
+      # retries automatically, instead of needing another manual workflow_dispatch.
+      - name: Add review-app label
+        if: needs.resolve.outputs.action == 'deploy'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
       - name: Compute image tag
         if: needs.resolve.outputs.action == 'deploy'
         id: tag
@@ -184,11 +193,6 @@ jobs:
       - name: Deploy
         if: needs.resolve.outputs.action == 'deploy'
         run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}" "${{ steps.tag.outputs.image_tag }}"
-      - name: Add review-app label
-        if: needs.resolve.outputs.action == 'deploy'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
       - name: Comment URL on PR
         if: needs.resolve.outputs.action == 'deploy'
         env:

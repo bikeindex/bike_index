@@ -12,7 +12,7 @@ Review apps run the **staging Rails environment** (`RAILS_ENV=staging`), a near-
 
 ### The `review-app` label is the gate
 
-Auto-deploy on push is gated by the `review-app` label, and the label is applied **by a successful deploy** — not by hand. So the first deploy must come from `workflow_dispatch` (step above): a PR with no label is skipped by the `pull_request: synchronize` trigger, so there's nothing to bootstrap it but a manual run. That deploy step adds the label, which then arms auto-redeploy for the rest of the PR's life.
+Auto-deploy on push is gated by the `review-app` label, which the workflow applies **when a deploy is attempted** — up front, before the build — not by hand and not contingent on success. So the first deploy must come from `workflow_dispatch` (step above): a PR with no label is skipped by the `pull_request: synchronize` trigger, so there's nothing to bootstrap it but a manual run. That run labels the PR as soon as it starts deploying — **even if the build or deploy then fails** — which arms auto-redeploy for the rest of the PR's life. So after a failed first deploy you just push a fix and `pull_request: synchronize` retries automatically; no second manual dispatch needed.
 
 Once the label is present:
 - **Every push auto-redeploys** (`pull_request: synchronize`), as long as the PR is from this repo — forks are skipped and must be redeployed manually via `workflow_dispatch` (a maintainer reviews the diff first).
@@ -125,7 +125,7 @@ The workflow always runs the same two jobs — `resolve` (works out the PR numbe
 
 | Trigger | Action | `update` does |
 |---|---|---|
-| `workflow_dispatch` → deploy | `deploy` | build image, deploy, add `review-app` label |
+| `workflow_dispatch` → deploy | `deploy` | add `review-app` label, build image, deploy |
 | `workflow_dispatch` → destroy | `destroy` | tear down, remove label, delete PR images from GHCR |
 | `pull_request: synchronize` (labeled, same-repo) | `deploy` | build image, deploy |
 | `pull_request: closed` (labeled) | `destroy` | tear down, remove label, delete PR images from GHCR |
