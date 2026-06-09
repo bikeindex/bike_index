@@ -20,6 +20,16 @@ SELECT format('CREATE ROLE %I LOGIN PASSWORD %L CREATEDB', :'username', :'passwo
 WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'username')
 \gexec
 SQL
+
+    # pg_stat_statements is a superuser-only extension, so the non-superuser
+    # per-PR role can't run db/structure.sql's `CREATE EXTENSION ... pg_stat_statements`.
+    # Install it once into template1 (as the postgres superuser) so each per-PR
+    # database created from template1 inherits it and that CREATE EXTENSION
+    # IF NOT EXISTS is a no-op. (For pghero to actually collect stats, the
+    # shared-db accessory also needs shared_preload_libraries=pg_stat_statements.)
+    PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRESQL_ADDRESS" -U postgres \
+      -v ON_ERROR_STOP=1 -d template1 \
+      -c 'CREATE EXTENSION IF NOT EXISTS pg_stat_statements'
   fi
 
   ./bin/rails db:prepare
