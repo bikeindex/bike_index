@@ -822,6 +822,10 @@ GEM
     sixarm_ruby_unaccent (1.2.0)
     skylight (7.1.1)
       activesupport (>= 7.2.0)
+    solid_cache (1.0.10)
+      activejob (>= 7.2)
+      activerecord (>= 7.2)
+      railties (>= 7.2)
     sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
       rack (>= 2.2.4, < 4)
@@ -1040,6 +1044,7 @@ DEPENDENCIES
   simplecov_json_formatter
   sitemap_generator (~> 6)
   skylight
+  solid_cache
   sprockets-rails
   stackprof
   standard

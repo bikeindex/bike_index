@@ -21,6 +21,7 @@ gem "rack-timeout", require: "rack/timeout/base" # Bound per-request wall-clock 
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg" # Postgres
+gem "solid_cache" # Database-backed Rails.cache; transitioning off Redis
 gem "paper_trail" # audit logging
 gem "paranoia" # soft delete
 gem "pg_search"

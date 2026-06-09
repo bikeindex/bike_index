@@ -29,6 +29,10 @@ development:
     <<: *default_local
     database: bikeindex_analytics_development<%= "_#{ENV["WORKSPACE_ID"]}" if ENV["WORKSPACE_ID"] %>
     migrations_paths: db/analytics_migrate
+  cache:
+    <<: *default_local
+    database: bikeindex_cache_development<%= "_#{ENV["WORKSPACE_ID"]}" if ENV["WORKSPACE_ID"] %>
+    migrations_paths: db/cache_migrate
 
 
 # Warning: The database defined as "test" will be erased and
@@ -47,6 +51,10 @@ test:
     <<: *default_local
     database: bikeindex_analytics_test<%= "_#{ENV["WORKSPACE_ID"]}" if ENV["WORKSPACE_ID"] %><%= ENV["TEST_ENV_NUMBER"] %>
     migrations_paths: db/analytics_migrate
+  cache:
+    <<: *default_local
+    database: bikeindex_cache_test<%= "_#{ENV["WORKSPACE_ID"]}" if ENV["WORKSPACE_ID"] %><%= ENV["TEST_ENV_NUMBER"] %>
+    migrations_paths: db/cache_migrate
 
 production:
   primary:
@@ -74,3 +82,11 @@ production:
     username: "<%= ENV['ANALYTICS_DB_USERNAME'] %>"
     password: "<%= ENV['ANALYTICS_DB_PASSWORD'] %>"
     port: "<%= ENV['ANALYTICS_DB_PORT'] %>"
+
+  cache:
+    <<: *default
+    migrations_paths: db/cache_migrate
+    host: "<%= ENV.fetch('POSTGRESQL_CACHE_ADDRESS') { ENV['POSTGRESQL_ADDRESS'] } %>"
+    database: "<%= ENV.fetch('CACHE_DB_DATABASE') { 'bike_index_cache_production' } %>"
+    username: "<%= ENV.fetch('CACHE_DB_USERNAME') { ENV['POSTGRESQL_USERNAME'] } %>"
+    password: "<%= ENV.fetch('CACHE_DB_PASSWORD') { ENV['POSTGRESQL_PASSWORD'] } %>"

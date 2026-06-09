@@ -15,6 +15,7 @@ require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
 require_relative "../lib/ip_spoof_attack_filter"
+require_relative "../lib/bikeindex/cache_store"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.

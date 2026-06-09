@@ -1,0 +1,16 @@
+default: &default
+  database: cache
+  store_options:
+    # Cap the number of rows; older entries are trimmed asynchronously.
+    max_age: <%= 60.days.to_i %>
+    max_size: <%= 1.gigabyte %>
+    namespace: <%= "bikeindex-#{Rails.env}" %>
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
