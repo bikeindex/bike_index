@@ -5,31 +5,30 @@
 # `db:prepare` handles both via Rails multi-database support.
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   if [ -n "$POSTGRES_PASSWORD" ] && [ -n "$POSTGRESQL_ADDRESS" ] && [ -n "$POSTGRESQL_USERNAME" ]; then
-    echo "Ensuring database role '$POSTGRESQL_USERNAME' exists..."
-    # Check + create in one psql round-trip. psql substitutes :'var' (quoted
-    # literal) only OUTSIDE dollar-quoted blocks, so build the CREATE ROLE in a
-    # plain SELECT and run it with \gexec — a DO $$...$$ body would pass :'var'
-    # through literally and error. format()'s %I/%L quote the role name as an
-    # identifier and the password as a literal. The SELECT yields the statement
-    # only when the role is absent, so an existing role is a no-op.
+    echo "Ensuring database role '$POSTGRESQL_USERNAME' exists (SUPERUSER)..."
+    # The per-PR role is a SUPERUSER. It loads production's db/structure.sql,
+    # which creates AND comments the superuser-only pg_stat_statements extension
+    # (COMMENT ON EXTENSION requires ownership and has no IF NOT EXISTS), and it
+    # must own its tables for migrations/seeds. The shared review-app Postgres is
+    # sandbox-only, ephemeral, no-PII, and separate from production (Cloud66), so
+    # review apps not being isolated from each other on it is acceptable. See
+    # docs/review-apps.md "Known limits".
+    #
+    # psql substitutes :'var' (quoted literal) only OUTSIDE dollar-quoted blocks,
+    # so build the statements in plain SELECTs and run them with \gexec; format()'s
+    # %I/%L quote the role name as an identifier and the password as a literal. The
+    # CREATE runs only when the role is absent; the ALTER always runs, so a role
+    # left over from an earlier (non-superuser) deploy is upgraded in place.
     PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRESQL_ADDRESS" -U postgres \
       -v ON_ERROR_STOP=1 \
       -v username="$POSTGRESQL_USERNAME" \
       -v password="$POSTGRESQL_PASSWORD" <<'SQL'
-SELECT format('CREATE ROLE %I LOGIN PASSWORD %L CREATEDB', :'username', :'password')
+SELECT format('CREATE ROLE %I LOGIN PASSWORD %L', :'username', :'password')
 WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'username')
 \gexec
+SELECT format('ALTER ROLE %I LOGIN SUPERUSER CREATEDB', :'username')
+\gexec
 SQL
-
-    # pg_stat_statements is a superuser-only extension, so the non-superuser
-    # per-PR role can't run db/structure.sql's `CREATE EXTENSION ... pg_stat_statements`.
-    # Install it once into template1 (as the postgres superuser) so each per-PR
-    # database created from template1 inherits it and that CREATE EXTENSION
-    # IF NOT EXISTS is a no-op. (For pghero to actually collect stats, the
-    # shared-db accessory also needs shared_preload_libraries=pg_stat_statements.)
-    PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRESQL_ADDRESS" -U postgres \
-      -v ON_ERROR_STOP=1 -d template1 \
-      -c 'CREATE EXTENSION IF NOT EXISTS pg_stat_statements'
   fi
 
   ./bin/rails db:prepare
