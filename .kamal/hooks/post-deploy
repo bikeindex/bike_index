@@ -1,7 +1,9 @@
 #!/bin/sh
 
-# Notify Honeybadger of the deploy. Only runs when HONEYBADGER_API_KEY is set —
-# review apps may omit it, in which case this is a no-op.
+# Best-effort Honeybadger deploy notification. This must NEVER fail the deploy:
+# review apps may omit HONEYBADGER_API_KEY (no-op), and the honeybadger gem isn't
+# available where this hook runs in CI (the workflow installs only kamal, not the
+# app bundle), so `bundle exec honeybadger` would be "command not found".
 [ -z "$HONEYBADGER_API_KEY" ] && exit 0
 
 # Use --skip-rails-load to avoid booting the Rails environment,
@@ -12,4 +14,6 @@ bundle exec honeybadger deploy \
   --repository https://github.com/bikeindex/bike_index \
   --revision "$KAMAL_VERSION" \
   --environment "${KAMAL_DESTINATION:-production}" \
-  --user "$KAMAL_PERFORMER"
+  --user "$KAMAL_PERFORMER" \
+  || echo "Honeybadger deploy notification skipped/failed (non-fatal)"
+exit 0
