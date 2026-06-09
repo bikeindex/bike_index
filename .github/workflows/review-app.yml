@@ -130,6 +130,7 @@ jobs:
       R2_DEV_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY }}
       R2_DEV_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET }}
       HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
+      HONEYBADGER_FRONTEND_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_FRONTEND_API_KEY }}
     steps:
       - name: Checkout PR head
         uses: actions/checkout@v6
@@ -204,14 +205,6 @@ jobs:
       - name: Deploy
         if: needs.resolve.outputs.action == 'deploy'
         run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}" "${{ steps.tag.outputs.image_tag }}"
-      - name: Comment URL on PR
-        if: needs.resolve.outputs.action == 'deploy'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          url="https://pr-${{ needs.resolve.outputs.pr_number }}.review.bikeindex.org"
-          body=":rocket: Review app deployed at $url"
-          gh pr comment "${{ needs.resolve.outputs.pr_number }}" --body "$body" || true
 
       - name: Destroy
         if: needs.resolve.outputs.action == 'destroy'

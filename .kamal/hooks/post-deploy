@@ -1,24 +1,17 @@
 #!/bin/sh
 
-# Best-effort Honeybadger deploy notification. This must NEVER fail the deploy:
-# review apps may omit HONEYBADGER_API_KEY (no-op), and the honeybadger gem isn't
-# available where this hook runs in CI (the workflow installs only kamal, not the
-# app bundle), so `bundle exec honeybadger` would be "command not found".
+# Best-effort Honeybadger deploy notification via the `trigger_honeybadger_deploy`
+# rake task (notifies the Rails backend + frontend [+ CSP] projects). This must
+# NEVER fail the deploy.
+#
+# NOTE: the task loads the Rails env (`:environment`) and reads `git rev-parse
+# HEAD`, so it needs both the app bundle AND a git checkout. On a LOCAL deploy
+# both are present and it runs. On the CI runner the app bundle isn't installed
+# (the workflow installs only kamal), so `bundle exec rake` is "command not
+# found" and the `|| echo` below makes it a non-fatal no-op. To notify on CI
+# deploys, the workflow would need to `bundle install` first.
 [ -z "$HONEYBADGER_API_KEY" ] && exit 0
 
-# Use --skip-rails-load to avoid booting the Rails environment,
-# which requires REDIS_URL and other env vars not available in CI.
-#
-# Environment is staging: review apps run RAILS_ENV=staging. KAMAL_DESTINATION is
-# only set by kamal when deploying with -d/--destination; we deploy with
-# --config-file config/deploy.review.yml (no destination), so it's always empty
-# and the default below is what's used.
-bundle exec honeybadger deploy \
-  --skip-rails-load \
-  --api-key "$HONEYBADGER_API_KEY" \
-  --repository https://github.com/bikeindex/bike_index \
-  --revision "$KAMAL_VERSION" \
-  --environment "${KAMAL_DESTINATION:-staging}" \
-  --user "$KAMAL_PERFORMER" \
+bundle exec rake trigger_honeybadger_deploy \
   || echo "Honeybadger deploy notification skipped/failed (non-fatal)"
 exit 0

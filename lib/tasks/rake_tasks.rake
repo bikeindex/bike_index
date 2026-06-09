@@ -54,14 +54,14 @@ task trigger_honeybadger_deploy: :environment do
   Honeybadger.track_deployment(environment:, revision:, local_username:, repository:)
 
   raise "Missing HONEYBADGER_FRONTEND_API_KEY" if ENV["HONEYBADGER_FRONTEND_API_KEY"].blank?
-  if envinronment == "production" && ENV["HONEYBADGER_CSP_API_KEY"].blank?
+  if environment == "production" && ENV["HONEYBADGER_CSP_API_KEY"].blank?
     # Don't raise for missing CSP key on staging
     raise "Missing HONEYBADGER_CSP_API_KEY"
   end
 
   require "net/http"
   require "uri"
-  [ENV["HONEYBADGER_CSP_API_KEY"], ENV["HONEYBADGER_FRONTEND_API_KEY"]].each do |api_key|
+  [ENV["HONEYBADGER_CSP_API_KEY"], ENV["HONEYBADGER_FRONTEND_API_KEY"]].compact_blank.each do |api_key|
     uri = URI("https://api.honeybadger.io/v1/deploys")
     uri.query = URI.encode_www_form(
       "deploy[environment]" => environment,
