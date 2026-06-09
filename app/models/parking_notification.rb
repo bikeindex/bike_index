@@ -185,17 +185,6 @@ class ParkingNotification < ActiveRecord::Base
     notifications.delivery_success.exists?
   end
 
-  def send_notification_if_should
-    return if email_success? || !send_email?
-
-    notification = notifications.first ||
-      Notification.create(kind: "parking_notification", notifiable: self,
-        user_id: bike&.user_id, message_channel_target: email, bike_id:)
-    notification.track_email_delivery do
-      OrganizedMailer.parking_notification(self).deliver_now
-    end
-  end
-
   def initial_record?
     initial_record_id.blank?
   end
