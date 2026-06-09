@@ -62,9 +62,18 @@ class ProcessParkingNotificationJob < ApplicationJob
       end
     end
 
-    return true unless parking_notification.send_email? && parking_notification.delivery_status.blank?
+    send_notification_if_should(parking_notification)
+  end
 
-    OrganizedMailer.parking_notification(parking_notification).deliver_now
-    parking_notification.update_attribute :delivery_status, "email_success" # I'm not sure how to make this more representative
+  def send_notification_if_should(parking_notification)
+    return if parking_notification.email_success? || !parking_notification.send_email?
+
+    notification = parking_notification.notifications.first ||
+      Notification.create(kind: "parking_notification", notifiable: parking_notification,
+        user_id: parking_notification.bike&.user_id, message_channel_target: parking_notification.email,
+        bike_id: parking_notification.bike_id)
+    notification.track_email_delivery do
+      OrganizedMailer.parking_notification(parking_notification).deliver_now
+    end
   end
 end
