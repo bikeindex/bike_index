@@ -47,7 +47,9 @@ desc "Notify Honeybadger of a deploy - Rails, frontend and CSP"
 task trigger_honeybadger_deploy: :environment do
   raise "Missing HONEYBADGER_API_KEY" if ENV["HONEYBADGER_API_KEY"].blank?
 
-  revision = `git rev-parse HEAD`.strip
+  # DEPLOY_SHA is set when run via kamal app exec in the deployed container (which
+  # has no .git); fall back to git for bundled/local runs.
+  revision = ENV["DEPLOY_SHA"].presence || `git rev-parse HEAD`.strip
   environment = Rails.env
   repository = "git@github.com:bikeindex/bike_index.git"
   local_username = `whoami`.strip

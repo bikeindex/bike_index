@@ -1,31 +1,19 @@
 #!/bin/sh
 
-# Notify Honeybadger of the deploy by POSTing to the deploys API directly. This
-# needs no app bundle, so it works on the CI runner (which has only kamal + the
-# checkout) as well as locally — `honeybadger deploy`, the trigger_honeybadger_deploy
-# rake task, and Honeybadger.track_deployment are all just wrappers around this
-# same POST. (The rake task stays for bundled contexts: production / local.)
+# Notify Honeybadger of the deploy by running the `trigger_honeybadger_deploy`
+# rake task INSIDE the freshly-deployed container, via `kamal app exec`. The
+# container is the only place with all three of: the gem bundle, a bootable Rails
+# runtime (DB/Redis configured), and the HONEYBADGER_* keys — the CI runner and
+# the local host each lack one. So kamal on the runner needs no bundle; it just
+# `docker exec`s the task. (`kamal app exec` takes no deploy lock, so this is safe
+# from a post-deploy hook.)
 #
-# Best-effort: NEVER fail the deploy. Each project key is optional; empty ones
-# (e.g. CSP on staging) are skipped. The keys come from the deploy env
-# (.kamal/secrets / .kamal/secrets-ci in CI).
-[ -z "$HONEYBADGER_API_KEY" ] && exit 0
-
+# The container has no .git, so the revision is computed here (the runner/local
+# host does have the checkout) and passed in as DEPLOY_SHA. Best-effort: this must
+# NEVER fail the deploy.
 revision="$(git rev-parse HEAD 2>/dev/null || echo "$KAMAL_VERSION")"
-environment="${KAMAL_DESTINATION:-staging}"
 
-notify() { # $1 = a Honeybadger project API key (no-op if empty)
-  [ -z "$1" ] && return 0
-  curl -fsS -m 10 -o /dev/null "https://api.honeybadger.io/v1/deploys" \
-    --data-urlencode "api_key=$1" \
-    --data-urlencode "deploy[environment]=$environment" \
-    --data-urlencode "deploy[revision]=$revision" \
-    --data-urlencode "deploy[repository]=git@github.com:bikeindex/bike_index.git" \
-    --data-urlencode "deploy[local_username]=${KAMAL_PERFORMER:-kamal}" \
-    || echo "Honeybadger deploy notification failed for a project (non-fatal)"
-}
-
-notify "$HONEYBADGER_API_KEY"           # Rails backend
-notify "$HONEYBADGER_FRONTEND_API_KEY"  # frontend JS
-notify "$HONEYBADGER_CSP_API_KEY"       # CSP (usually unset on staging)
+kamal app exec --reuse --config-file config/deploy.review.yml \
+  "DEPLOY_SHA=$revision bin/rails trigger_honeybadger_deploy" \
+  || echo "Honeybadger deploy notification skipped/failed (non-fatal)"
 exit 0
