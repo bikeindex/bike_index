@@ -62,6 +62,6 @@ class ProcessParkingNotificationJob < ApplicationJob
       end
     end
 
-    parking_notification.deliver_email if parking_notification.send_email?
+    parking_notification.send_notification_if_should
   end
 end

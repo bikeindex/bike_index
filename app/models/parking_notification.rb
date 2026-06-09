@@ -182,8 +182,8 @@ class ParkingNotification < ActiveRecord::Base
     notifications.delivery_success.exists?
   end
 
-  def deliver_email
-    return if email_success?
+  def send_notification_if_should
+    return if email_success? || !send_email?
 
     notification = notifications.first ||
       Notification.create(kind: "parking_notification", notifiable: self,
