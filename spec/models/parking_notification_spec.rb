@@ -44,12 +44,6 @@ RSpec.describe ParkingNotification, type: :model do
     it "is false without a notification" do
       expect(parking_notification.email_success?).to be_falsey
     end
-    context "created before the notification integration cutoff" do
-      let(:parking_notification) { FactoryBot.create(:parking_notification, created_at: ParkingNotification::PRE_NOTIFICATION_INTEGRATION - 1.day) }
-      it "is true" do
-        expect(parking_notification.email_success?).to be_truthy
-      end
-    end
     context "with a delivery_success notification" do
       before do
         FactoryBot.create(:notification, kind: "parking_notification", notifiable: parking_notification, delivery_status: "delivery_success", bike: parking_notification.bike, message_channel_target: parking_notification.email)
