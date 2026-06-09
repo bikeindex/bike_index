@@ -132,10 +132,10 @@ The workflow always runs the same two jobs — `resolve` (works out the PR numbe
 
 Forks and unlabeled PRs are filtered out in `resolve` (it sets `proceed=false`, and `update` is skipped). On the **deploy** path:
 
-1. The `update` job builds the Docker image (`Dockerfile`) and pushes to GHCR as `pr-<N>-<sha>`.
-2. It then runs `bin/review-app deploy <pr> <tag>`, which SSHes to the host via Kamal and:
-   - Boots the per-PR `bike-index-pr-<N>-web` + `bike-index-pr-<N>-worker` containers
-   - On first boot, `bin/docker-entrypoint` creates the Postgres role `bike_index_pr_<N>` and runs `db:prepare`, which creates both `bike_index_review_pr_<N>_primary` and `bike_index_review_pr_<N>_analytics` and seeds them
+1. The `update` job builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label on the deployed image and normally adds it itself when it builds).
+2. It then runs `bin/review-app deploy <pr> <tag>`, which calls `kamal deploy --version <tag> --skip-push` — kamal **pulls** the CI-built image (it does not rebuild, which would clone the repo + the private `app/services/facebook` submodule) and:
+   - Boots the per-PR `bike-index-pr-<N>-web`, `-worker`, and `-cron` containers
+   - On first boot, `bin/docker-entrypoint` creates the Postgres **superuser** role `bike_index_pr_<N>` and runs `db:prepare`, which creates `bike_index_review_pr_<N>_primary` + `_analytics` and **seeds** them. Seeding (manufacturer-CSV import, sample bikes, …) runs before Puma starts, so first boot is slow — hence `deploy_timeout: 240` in the config; redeploys (databases already exist) skip seeding and boot fast.
    - On subsequent boots, `db:prepare` runs migrations only
 3. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
 4. Workflow adds the `review-app` label and comments the URL on the PR.
@@ -157,14 +157,14 @@ Each review app gets a `cron` container (a Kamal [`servers` role](https://kamal-
 | File | Purpose |
 |---|---|
 | `Dockerfile`, `.dockerignore` | Production-style image (Thruster + Puma + Sidekiq). Used only by review apps. |
-| `bin/docker-entrypoint` | Creates per-PR Postgres role + runs `db:prepare` on first boot |
+| `bin/docker-entrypoint` | Creates the per-PR Postgres **superuser** role + runs `db:prepare` (schema + seed) on first boot |
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
 | `bin/review-app` | Deploy / destroy orchestration script |
 | `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
 | `config/crontab` | Scheduled rake tasks run by the `cron` server role |
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
-| `.kamal/hooks/post-deploy` | Honeybadger deploy notification (no-op if `HONEYBADGER_API_KEY` unset) |
+| `.kamal/hooks/post-deploy` | Best-effort Honeybadger deploy notification (reports the `staging` env); never fails the deploy — no-ops if `HONEYBADGER_API_KEY` is unset or the gem isn't present (e.g. CI) |
 | `.github/workflows/review-app.yml` | `resolve` + `update` jobs handling all four triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `provisioning/` | Ansible playbook for one-time host hardening |
 | `app/components/review_app_banner/` | ViewComponent rendered in the application layout when `ENV["REVIEW_APP"]` is set |

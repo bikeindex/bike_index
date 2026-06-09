@@ -8,12 +8,17 @@
 
 # Use --skip-rails-load to avoid booting the Rails environment,
 # which requires REDIS_URL and other env vars not available in CI.
+#
+# Environment is staging: review apps run RAILS_ENV=staging. KAMAL_DESTINATION is
+# only set by kamal when deploying with -d/--destination; we deploy with
+# --config-file config/deploy.review.yml (no destination), so it's always empty
+# and the default below is what's used.
 bundle exec honeybadger deploy \
   --skip-rails-load \
   --api-key "$HONEYBADGER_API_KEY" \
   --repository https://github.com/bikeindex/bike_index \
   --revision "$KAMAL_VERSION" \
-  --environment "${KAMAL_DESTINATION:-production}" \
+  --environment "${KAMAL_DESTINATION:-staging}" \
   --user "$KAMAL_PERFORMER" \
   || echo "Honeybadger deploy notification skipped/failed (non-fatal)"
 exit 0
