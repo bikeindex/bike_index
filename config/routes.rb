@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   # Liveness endpoint (200 once the app boots) for proxy/load-balancer health
   # checks. Must be defined before the `*unmatched_route` catch-all below, which
   # would otherwise 404 it in production/staging.
-  get "up" => "rails/health#show", as: :rails_health_check
+  get "up", to: "rails/health#show", as: :rails_health_check
 
   mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
   mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
