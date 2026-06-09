@@ -98,6 +98,8 @@ $alert-warning-color: #ffc107;
 }
 
 .finished-registration-shell {
+  width: 100%;
+  table-layout: fixed;
   margin-top: $vertical-height;
 }
 
@@ -113,6 +115,7 @@ $alert-warning-color: #ffc107;
   .hero-image {
     display: block;
     width: 100%;
+    max-width: 100%;
     height: auto;
   }
 
