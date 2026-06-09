@@ -126,9 +126,9 @@ The workflow always runs the same two jobs — `resolve` (works out the PR numbe
 | Trigger | Action | `update` does |
 |---|---|---|
 | `workflow_dispatch` → deploy | `deploy` | build image, deploy, add `review-app` label |
-| `workflow_dispatch` → destroy | `destroy` | tear down, remove label |
+| `workflow_dispatch` → destroy | `destroy` | tear down, remove label, delete PR images from GHCR |
 | `pull_request: synchronize` (labeled, same-repo) | `deploy` | build image, deploy |
-| `pull_request: closed` (labeled) | `destroy` | tear down, remove label |
+| `pull_request: closed` (labeled) | `destroy` | tear down, remove label, delete PR images from GHCR |
 
 Forks and unlabeled PRs are filtered out in `resolve` (it sets `proceed=false`, and `update` is skipped). On the **deploy** path:
 
@@ -140,7 +140,7 @@ Forks and unlabeled PRs are filtered out in `resolve` (it sets `proceed=false`, 
 3. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
 4. Workflow adds the `review-app` label and comments the URL on the PR.
 
-Destroy reverses it: `kamal app remove`, then drops both databases + the role, then `FLUSHDB`s the assigned Redis logical DB.
+Destroy reverses it: `kamal app remove`, then drops both databases + the role, then `FLUSHDB`s the assigned Redis logical DB. It also deletes every `pr-<N>-<sha>` image version from GHCR (each push built one) so closed PRs don't accumulate images — best-effort, via the `packages: write` token.
 
 ### Scheduled tasks (cron)
 

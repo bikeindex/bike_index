@@ -123,11 +123,21 @@ group :production do
   gem "honeybadger" # Error monitoring
 end
 
-group :staging, :development do
+group :staging do
   gem "thruster", require: false # HTTP/2, asset caching, X-Sendfile for Puma (used by review-app Dockerfile)
+end
+
+group :staging, :development do
   # Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
   # Loaded in development (local dev) and staging (review apps — see config/deploy.review.yml).
   gem "letter_opener_web", "~> 3.0"
+end
+
+# dotenv-rails is also loaded in :staging so review apps pick up the committed
+# .env dev/sandbox values at boot (see config/environments/staging.rb). dotenv
+# never overrides a var kamal already sets, so per-app/managed secrets win.
+group :development, :test, :staging do
+  gem "dotenv-rails"
 end
 
 group :development do
@@ -142,13 +152,6 @@ group :development do
   gem "terminal-notifier"
   gem "annotaterb" # Add comments with the attributes to Rails Model
   gem "benchmark"
-end
-
-# dotenv-rails is also loaded in :staging so review apps pick up the committed
-# .env dev/sandbox values at boot (see config/environments/staging.rb). dotenv
-# never overrides a var kamal already sets, so per-app/managed secrets win.
-group :development, :test, :staging do
-  gem "dotenv-rails"
 end
 
 group :development, :test do

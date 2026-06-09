@@ -201,3 +201,29 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --remove-label "$REVIEW_LABEL" || true
+      # Each push built a `pr-<N>-<sha>` image; delete every version for this PR so
+      # closed/destroyed PRs don't accumulate images in GHCR. Matches on the trailing
+      # dash so `pr-12-` never catches `pr-123-`. Best-effort: a delete failure (e.g.
+      # already gone) shouldn't fail the destroy.
+      - name: Delete PR images from GHCR
+        if: needs.resolve.outputs.action == 'destroy'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY%%/*}"
+          package="${GITHUB_REPOSITORY##*/}"
+          prefix="pr-${PR_NUMBER}-"
+          ids=$(gh api --paginate \
+            "/orgs/${owner}/packages/container/${package}/versions" \
+            --jq "[.[] | select(any(.metadata.container.tags[]; startswith(\"${prefix}\"))) | .id] | .[]")
+          if [[ -z "$ids" ]]; then
+            echo "No GHCR image versions tagged ${prefix}* to delete."
+            exit 0
+          fi
+          for id in $ids; do
+            echo "Deleting GHCR image version $id"
+            gh api --method DELETE \
+              "/orgs/${owner}/packages/container/${package}/versions/${id}" || true
+          done
