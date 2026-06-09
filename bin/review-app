@@ -66,7 +66,11 @@ case "$action" in
     : "${image_tag:?image_tag required (3rd arg or IMAGE_TAG env)}"
     echo "==> Deploying $slug at image tag $image_tag"
     # kamal 2.x takes the image tag as --version (there is no `image_tag:` config key).
-    kamal deploy --version "$image_tag"
+    # --skip-push: the image is already built + pushed (by CI's docker/build-push
+    # step), so kamal just pulls it. This also avoids kamal cloning the repo
+    # --recurse-submodules, which fails on the private app/services/facebook
+    # submodule. See the builder note in config/deploy.review.yml.
+    kamal deploy --version "$image_tag" --skip-push
     echo "==> Done. URL: https://${slug}.review.bikeindex.org"
     ;;
 

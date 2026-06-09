@@ -16,6 +16,12 @@
 /config/master.key
 /config/credentials/*.key
 
+# Private submodule (sethherr/facebook_ads_integration). Never ship its code to
+# review apps, even from a local build where it's checked out. Facebook::AdsIntegration
+# is referenced lazily (string constantize in theft_alert.rb + inside job method
+# bodies), so the app boots fine without it; only theft-alert FB ads no-op.
+/app/services/facebook
+
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*
