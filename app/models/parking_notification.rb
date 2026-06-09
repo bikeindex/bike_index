@@ -8,6 +8,7 @@
 #  id                    :integer          not null, primary key
 #  accuracy              :float
 #  city                  :string
+#  delivery_status       :string
 #  image                 :text
 #  image_processing      :boolean          default(FALSE), not null
 #  internal_notes        :text
@@ -53,11 +54,6 @@ class ParkingNotification < ActiveRecord::Base
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
   MAX_PER_PAGE = 250
-  # Cutoff for when parking_notifications started routing email delivery through Notification records.
-  # Records created before this time have no associated Notification — assume they emailed successfully.
-  # Set to ~the deploy date: too early and already-sent rows (no Notification) report email_success?
-  # false and risk re-sending; too late and brand-new rows skip sending because they look already-sent.
-  PRE_NOTIFICATION_INTEGRATION = Time.at(1780444800).freeze # 2026-06-03
   enum :kind, KIND_ENUM
   enum :status, STATUS_ENUM
   enum :retrieved_kind, RETRIEVED_KIND_ENUM
@@ -177,8 +173,11 @@ class ParkingNotification < ActiveRecord::Base
     !active?
   end
 
+  # Dual-path during the delivery_status -> Notification migration: the legacy column (while it exists)
+  # records pre-migration sends; new sends are tracked via Notification. Once the column is dropped
+  # (follow-up PR), has_attribute? is false and this relies solely on Notifications.
   def email_success?
-    return true if pre_notification_integration?
+    return true if has_attribute?(:delivery_status) && delivery_status == "email_success"
 
     notifications.delivery_success.exists?
   end
@@ -363,7 +362,7 @@ class ParkingNotification < ActiveRecord::Base
       return self unless active?
 
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
-        "location_from_address", "retrieval_link_token")
+        "location_from_address", "retrieval_link_token", "delivery_status")
         .merge(new_attrs)
       attrs["initial_record_id"] ||= id
       ParkingNotification.create!(attrs)
@@ -413,10 +412,6 @@ class ParkingNotification < ActiveRecord::Base
     return nil unless impound_notification? || resolved_notification.present?
 
     resolved_notification&.resolved_at || Time.current
-  end
-
-  def pre_notification_integration?
-    created_at.present? && created_at < PRE_NOTIFICATION_INTEGRATION
   end
 
   def calculated_status
