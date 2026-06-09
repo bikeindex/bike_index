@@ -17,6 +17,9 @@ WORKDIR /rails
 # - curl: health checks
 # - cron: the `cron` server role in config/deploy.review.yml
 # - ripgrep: the read_logged_searches rake task (rg) — matches Cloud66's deploy hook
+# - nodejs: JS runtime for execjs. coffee-rails (deprecated, still in the default
+#   group) needs a runtime to load at boot — both during assets:precompile in the
+#   build stage and at server boot in the final stage. Cloud66 provides node too.
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
       cron \
@@ -25,6 +28,7 @@ RUN apt-get update -qq && \
       libjemalloc2 \
       libvips \
       libyaml-0-2 \
+      nodejs \
       postgresql-client \
       ripgrep && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
