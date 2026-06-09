@@ -231,10 +231,10 @@ GEM
       railties (>= 5)
     doorkeeper-i18n (5.2.2)
       doorkeeper (>= 5.2)
-    dotenv (2.7.6)
-    dotenv-rails (2.7.6)
-      dotenv (= 2.7.6)
-      railties (>= 3.2)
+    dotenv (3.2.0)
+    dotenv-rails (3.2.0)
+      dotenv (= 3.2.0)
+      railties (>= 6.1)
     down (5.4.2)
       addressable (~> 2.8)
     drb (2.2.3)
@@ -987,7 +987,7 @@ DEPENDENCIES
   inline_svg
   knapsack_pro
   kramdown
-  letter_opener_web
+  letter_opener_web (~> 3.0)
   lograge
   logstash-event
   lookbook

@@ -130,7 +130,7 @@ group :development do
   # gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
   gem "guard", require: false
   gem "guard-rspec", require: false
-  gem "letter_opener_web"
+  gem "letter_opener_web", "~> 3.0"
   gem "rerun" # restart sidekiq processes in development on app change
   gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
