@@ -35,6 +35,13 @@ service: <%= appname %>
 # double it to ghcr.io/ghcr.io/...
 image: bikeindex/bike_index
 
+# A fresh PR's first boot runs the full db:prepare (schema + seed: manufacturer
+# CSV import, 25 bikes, components, …) in bin/docker-entrypoint before Puma
+# starts, so the container needs longer than kamal's 30s default to pass the
+# /up health check. Redeploys (databases already exist) skip seeding and become
+# healthy quickly, so this only matters on first boot.
+deploy_timeout: 240
+
 servers:
   web:
     - <%= host %>

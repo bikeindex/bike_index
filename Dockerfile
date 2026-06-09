@@ -20,6 +20,8 @@ WORKDIR /rails
 # - nodejs: JS runtime for execjs. coffee-rails (deprecated, still in the default
 #   group) needs a runtime to load at boot — both during assets:precompile in the
 #   build stage and at server boot in the final stage. Cloud66 provides node too.
+# - wget: db/seeds runs `rake setup:import_manufacturers_csv` etc., which download
+#   CSVs via wget (lib/tasks/setup_tasks.rake) during db:prepare's seed step.
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
       cron \
@@ -30,7 +32,8 @@ RUN apt-get update -qq && \
       libyaml-0-2 \
       nodejs \
       postgresql-client \
-      ripgrep && \
+      ripgrep \
+      wget && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
