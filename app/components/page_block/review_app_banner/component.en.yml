@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    page_block:
+      review_app_banner:
+        disclaimer: not production, data is ephemeral
+        label: Review app
+        letter_opener_link: email outbox
+        letter_opener_tooltip: View the email sent by this review app
+        pr_link: 'PR #%{number}'
