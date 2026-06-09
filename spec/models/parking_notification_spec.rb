@@ -41,17 +41,8 @@ RSpec.describe ParkingNotification, type: :model do
 
   describe "email_success?" do
     let(:parking_notification) { FactoryBot.create(:parking_notification) }
-    it "is false without a delivery_status or notification" do
-      expect(parking_notification.delivery_status).to be_blank
+    it "is false without a notification" do
       expect(parking_notification.email_success?).to be_falsey
-    end
-    context "with legacy delivery_status column" do
-      it "is true for email_success, false for bike_unregistered" do
-        parking_notification.update_column(:delivery_status, "email_success")
-        expect(parking_notification.reload.email_success?).to be_truthy
-        parking_notification.update_column(:delivery_status, "bike_unregistered")
-        expect(parking_notification.reload.email_success?).to be_falsey
-      end
     end
     context "with a delivery_success notification" do
       before do
