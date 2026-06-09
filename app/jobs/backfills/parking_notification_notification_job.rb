@@ -1,31 +1,36 @@
 # frozen_string_literal: true
 
 module Backfills
-  # Backfills a delivery_success Notification for each parking_notification that recorded a successful
-  # send in the legacy delivery_status column, so the column can be dropped in a follow-up PR.
-  # enqueue_workers selects the "email_success" rows (nil and "bike_unregistered" are treated as unsent),
-  # so perform just creates the Notification — directly, without sending email or updating user_email.
+  # Backfills a Notification for each emailable parking_notification, recording the legacy delivery
+  # outcome so the delivery_status column can be dropped in a follow-up PR. "email_success" becomes a
+  # delivery_success Notification; anything else becomes delivery_failure with a marker delivery_error.
+  # Creates the Notification directly — does not send email or update user_email.
   class ParkingNotificationNotificationJob < ApplicationJob
     sidekiq_options queue: "low_priority", retry: false
+
+    PRE_TRACKING_ERROR = "Failed pre-notification tracking"
 
     def perform(id = nil)
       return enqueue_workers if id.blank?
 
       parking_notification = ParkingNotification.find(id)
       return if parking_notification.notifications.any?
+      return unless parking_notification.send_email?
 
+      success = parking_notification.delivery_status == "email_success"
       Notification.create!(kind: "parking_notification",
         notifiable: parking_notification,
         bike_id: parking_notification.bike_id,
         user_id: parking_notification.bike&.user_id,
         message_channel_target: parking_notification.email,
-        delivery_status: "delivery_success")
+        delivery_status: success ? "delivery_success" : "delivery_failure",
+        delivery_error: success ? nil : PRE_TRACKING_ERROR)
     end
 
     private
 
     def enqueue_workers
-      ParkingNotification.where(delivery_status: "email_success").pluck(:id)
+      ParkingNotification.send_email.pluck(:id)
         .each { |id| self.class.perform_async(id) }
     end
   end
