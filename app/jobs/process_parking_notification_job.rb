@@ -62,6 +62,18 @@ class ProcessParkingNotificationJob < ApplicationJob
       end
     end
 
-    parking_notification.send_notification_if_should
+    send_notification_if_should(parking_notification)
+  end
+
+  def send_notification_if_should(parking_notification)
+    return if parking_notification.email_success? || !parking_notification.send_email?
+
+    notification = parking_notification.notifications.first ||
+      Notification.create(kind: "parking_notification", notifiable: parking_notification,
+        user_id: parking_notification.bike&.user_id, message_channel_target: parking_notification.email,
+        bike_id: parking_notification.bike_id)
+    notification.track_email_delivery do
+      OrganizedMailer.parking_notification(parking_notification).deliver_now
+    end
   end
 end

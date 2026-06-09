@@ -93,6 +93,7 @@ class ParkingNotification < ActiveRecord::Base
   scope :not_unregistered_bike, -> { where(unregistered_bike: false) }
   scope :first_notification, -> { where(repeat_number: 0) }
   scope :not_replaced, -> { where.not(status: "replaced") }
+  scope :email_success, -> { joins(:notifications).merge(Notification.delivery_success).distinct }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -181,17 +182,6 @@ class ParkingNotification < ActiveRecord::Base
     return true if pre_notification_integration?
 
     notifications.delivery_success.exists?
-  end
-
-  def send_notification_if_should
-    return if email_success? || !send_email?
-
-    notification = notifications.first ||
-      Notification.create(kind: "parking_notification", notifiable: self,
-        user_id: bike&.user_id, message_channel_target: email, bike_id:)
-    notification.track_email_delivery do
-      OrganizedMailer.parking_notification(self).deliver_now
-    end
   end
 
   def initial_record?
