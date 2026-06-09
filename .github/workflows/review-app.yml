@@ -166,7 +166,14 @@ jobs:
         if: needs.resolve.outputs.action == 'deploy'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
+        # Create the label first — `gh pr edit --add-label` errors if it doesn't
+        # exist in the repo, and a bare `|| true` would silently leave the PR
+        # unlabeled (so auto-redeploy never arms). `gh label create` is idempotent
+        # via `|| true` when it already exists.
+        run: |
+          gh label create "$REVIEW_LABEL" --repo "$GITHUB_REPOSITORY" \
+            --color 0E8A16 --description "Per-PR Kamal review app is deployed" 2>/dev/null || true
+          gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
       - name: Compute image tag
         if: needs.resolve.outputs.action == 'deploy'
         id: tag
