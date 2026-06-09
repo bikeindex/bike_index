@@ -8,7 +8,6 @@
 #  id                    :integer          not null, primary key
 #  accuracy              :float
 #  city                  :string
-#  delivery_status       :string
 #  image                 :text
 #  image_processing      :boolean          default(FALSE), not null
 #  internal_notes        :text
@@ -176,12 +175,7 @@ class ParkingNotification < ActiveRecord::Base
     !active?
   end
 
-  # Dual-path during the delivery_status -> Notification migration: the legacy column (while it exists)
-  # records pre-migration sends; new sends are tracked via Notification. Once the column is dropped
-  # (follow-up PR), has_attribute? is false and this relies solely on Notifications.
   def email_success?
-    return true if has_attribute?(:delivery_status) && delivery_status == "email_success"
-
     notifications.delivery_success.exists?
   end
 
@@ -354,7 +348,7 @@ class ParkingNotification < ActiveRecord::Base
       return self unless active?
 
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
-        "location_from_address", "retrieval_link_token", "delivery_status")
+        "location_from_address", "retrieval_link_token")
         .merge(new_attrs)
       attrs["initial_record_id"] ||= id
       ParkingNotification.create!(attrs)
