@@ -16,7 +16,13 @@
       <%= translation(".pr_link", number: @pr_number) %>
     </a>
   <% end %>
-  &middot; <%= translation(".disclaimer") %>
-  &middot;
+  &middot; <%= translation(".disclaimer") %> &middot;
   <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:font-normal tw:underline" %>
+  <%= render(UI::Tooltip::Component.new(text: translation(".letter_opener_tooltip"))) do |tooltip| %>
+    <% tooltip.with_tooltip_button(
+      class: "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
+        "tw:bg-yellow-500 tw:text-black tw:hover:bg-yellow-600 tw:text-2xs tw:font-bold tw:cursor-help " \
+        "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+    ) { "?" } %>
+  <% end %>
 </div>

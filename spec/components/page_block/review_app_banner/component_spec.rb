@@ -17,10 +17,11 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       expect(component.text).to include("not production")
     end
 
-    it "links to the letter_opener inbox" do
-      inbox = component.css("a[href='/letter_opener']").first
-      expect(inbox).to be_present
-      expect(inbox.text).to include("email inbox")
+    it "links to the letter_opener outbox with a tooltip" do
+      outbox = component.css("a[href='/letter_opener']").first
+      expect(outbox).to be_present
+      expect(outbox.text).to include("email outbox")
+      expect(component.css("[role='tooltip']").text).to include("View the email sent by this review app")
     end
 
     it "omits the PR link when no pr_number is given" do
