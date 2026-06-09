@@ -35,10 +35,44 @@ RSpec.describe "Bike search", :js, type: :system do
     find("#search-button").click
   end
 
-  it "filters by color and location" do
-    # Visit a different page first to establish history, then navigate to search
+  # Reach the search page the way a user does: from the homepage, click the
+  # "Search" nav link. Establishing history this way also lets back-nav return to
+  # the homepage. The nav renders the link twice (responsive mobile + desktop
+  # copies); only one shows at a time, so match the first.
+  def visit_search_via_nav
+    # Widen to a desktop viewport so the nav links show inline instead of behind
+    # the mobile hamburger menu.
+    page.current_window.resize_to(1280, 900)
     visit "/"
-    visit "/search/registrations"
+    click_link "Search", exact: true, match: :first
+  end
+
+  # Clear the browser's back/forward stack. Capybara never resets history between
+  # examples, so it accumulates across the suite, and WebDriver back/forward only
+  # behave reliably on a shallow stack.
+  def reset_browser_history
+    page.driver.browser.execute_cdp("Page.resetNavigationHistory")
+  end
+
+  # Assert the results *inside the eager turbo-frame* match a color search, so it
+  # proves the frame itself reconciled to the URL (reloadFrameIfUrlStale) - unlike
+  # the combobox chip, which lives in the form outside the frame and is restored
+  # by Turbo's page snapshot. Red and Blue both return 2 bikes, so the colors,
+  # not the count, are what distinguish the frame's contents.
+  def expect_results_frame_color(shown, hidden)
+    # Count-based, not have_content/have_no_content: the frame reloads through
+    # transient states on back/forward, and a bare have_content("...Red") /
+    # have_no_content("...Blue") can each pass on a transient frame (Red still
+    # showing before the reload, Blue not loaded yet). Requiring exactly 2 of the
+    # shown color and 0 of the hidden only holds once the frame has settled.
+    within("turbo-frame#search_registrations_results_frame") do
+      expect(page).to have_css(".bike-box-item", text: "Primary colors: #{shown}", count: 2, wait: 10)
+      expect(page).to have_css(".bike-box-item", text: "Primary colors: #{hidden}", count: 0, wait: 10)
+    end
+  end
+
+  it "filters by color and location" do
+    visit_search_via_nav
 
     expect(page).to have_css(".bike-box-item", wait: 10)
     expect_axe_clean
@@ -54,7 +88,10 @@ RSpec.describe "Bike search", :js, type: :system do
     search_color_and_submit("Blue")
 
     expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_content("Blue")
+    # The applied Blue filter shows as the combobox chip. (have_content("Blue")
+    # would also match the footer's "Bike Index Blue Sky" link, so it can't tell
+    # whether the filter actually took.)
+    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
     expect(page).not_to have_content("Red")
 
     click_first_bike_and_go_back
@@ -67,7 +104,7 @@ RSpec.describe "Bike search", :js, type: :system do
 
     # Only the blue NYC bike (proximity + color filter still active)
     expect(page).to have_css(".bike-box-item", count: 1, wait: 10)
-    expect(page).to have_content("Blue")
+    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
 
     click_first_bike_and_go_back
 
@@ -81,70 +118,68 @@ RSpec.describe "Bike search", :js, type: :system do
     click_first_bike_and_go_back
   end
 
-  it "reloads results when going back to the initial search page" do
-    visit "/"
-    visit "/search/registrations"
+  # :flaky retry: even on a shallow stack, a programmatic go_forward to a
+  # form-submitted (turbo advance) history entry can still intermittently no-op
+  # in WebDriver (the URL stays on the back entry). It's a harness artifact - a
+  # real browser does back/forward reliably - so retry on CI.
+  it "keeps results, counts, and form in sync across search and back/forward", :flaky do
+    # Search Red, then Blue, then retrace with the browser's back and forward
+    # buttons. Each step must leave the frame, form, and kind counts matching the
+    # restored URL: the frame by the bikes' colors inside it (both searches return
+    # 2 bikes, so a bare count wouldn't catch a wrong-color frame), the form by the
+    # combobox chip, and the counts by the stolen tally (Red has 1 stolen bike,
+    # Blue has 2). Back must also not re-submit the form.
+    #
+    # This guards the end state, not a specific mechanism. Turbo's snapshot
+    # restoration keeps the frame correct here on its own - it stays green even
+    # with reloadFrameIfUrlStale stubbed out - so this is not a test of that
+    # reconciler. reloadFrameIfUrlStale is a fallback for genuinely stale
+    # snapshots, invoked on turbo:load (which does fire on these restorations).
+    visit_search_via_nav
     expect(page).to have_css(".bike-box-item", wait: 10)
-
-    # Search Blue, view a result, then return to the Blue results
-    choose("stolenness_all", allow_label_click: true, visible: :all)
-    search_color_and_submit("Blue")
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    click_first_bike_and_go_back
-
-    # Back again to the initial search page. Its results must reload rather than
-    # restoring a Turbo snapshot whose frame is stuck in the [busy] loading state
-    # (results hidden under the spinner overlay) - the "everything fails after
-    # going back from a search" bug.
-    page.go_back
-    expect(page).to have_css(".bike-box-item", wait: 10)
-  end
-
-  # :flaky retry covers a rare residual settle-timing race in the JS auto-submit
-  # restoration path - an in-flight default submit can clobber the restored URL
-  # before the assertions run. The eager turbo-frame src work removes the
-  # auto-submit machinery entirely; until then, retry on CI.
-  it "keeps back/forward navigation in sync without double-submitting", :flaky do
-    # Two searches in a row, then back to the first - the user's repro. connect()
-    # and the turbo:load handler both run the empty-results auto-submit on that
-    # back; it must fire at most once - without the guard the duplicate
-    # requestSubmit is aborted by Turbo (the uncaught AbortError in the console).
-    visit "/"
-    visit "/search/registrations"
-    expect(page).to have_css(".bike-box-item", wait: 10)
+    # Drop history accumulated by earlier examples so go_back/go_forward below
+    # operate on this example's own short stack, not a stale foreign entry (the
+    # leftover stolenness=stolen URL this used to flake on).
+    reset_browser_history
     choose("stolenness_all", allow_label_click: true, visible: :all)
 
+    # Each search re-fetches the kind counts (turbo:submit-end -> setKindCounts):
+    # one red bike is stolen, so the stolen count is (1).
     search_color_and_submit("Red")
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect_results_frame_color("Red", "Blue")
+    expect(page).to have_css(".hw-combobox__chip", text: "Red")
+    expect(page).to have_css("[data-count-target='stolen']", text: "(1)", wait: 10)
 
+    # Both blue bikes are stolen, so searching Blue updates the count to (2).
     find(".hw-combobox__chip__remover").click
     search_color_and_submit("Blue")
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect_results_frame_color("Blue", "Red")
+    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
+    expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
+    expect(page).to have_css("[data-count-target='stolen']", text: "(2)", wait: 10)
 
+    # Back to the Red search - frame, form, and counts reconcile to Red, no extra
+    # submit. The count also guards the dedupe marker: restoring the cached
+    # snapshot must show this query's counts, not a stale or blank carry-over.
     page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
     page.go_back
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
+    expect(page).to have_current_path(/query_items/, wait: 10)
+    expect_results_frame_color("Red", "Blue")
+    expect(page).to have_css(".hw-combobox__chip", text: "Red")
+    expect(page).to have_no_css(".hw-combobox__chip", text: "Blue")
+    expect(page).to have_css("[data-count-target='stolen']", text: "(1)", wait: 10)
     expect(page.evaluate_script("window.__submitStarts")).to be <= 1
 
-    # Now a fresh search, then back and forward. Forward must restore the selected
-    # query_items[] in the URL: the auto-submit waits for the combobox to swap its
-    # non-JS query field for query_items[]; otherwise it submits the empty `query`
-    # field and the URL drops the items, no longer matching the form.
-    visit "/"
-    visit "/search/registrations"
-    expect(page).to have_css(".bike-box-item", wait: 10)
-    choose("stolenness_all", allow_label_click: true, visible: :all)
-    search_color_and_submit("Blue")
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_current_path(/query_items/, wait: 10)
-
-    page.go_back
-    expect(page).to have_css(".bike-box-item", wait: 10)
+    # Forward to the Blue search - frame, form, and counts reconcile back to Blue.
     page.go_forward
-    # Results must match the restored URL, not a stale snapshot showing every
-    # color (only the two Blue bikes, no Red).
-    expect(page).to have_current_path(/query_items/, wait: 10)
-    expect(page).to have_css(".bike-box-item", count: 2, wait: 10)
-    expect(page).to have_no_content("Red")
+    expect_results_frame_color("Blue", "Red")
+    expect(page).to have_css(".hw-combobox__chip", text: "Blue")
+    expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
+    expect(page).to have_css("[data-count-target='stolen']", text: "(2)", wait: 10)
+
+    # Viewing a result and returning must reload the frame, not restore a Turbo
+    # snapshot stuck in the [busy] loading state (results hidden under the spinner
+    # overlay) - the "everything fails after going back from a search" bug.
+    click_first_bike_and_go_back
   end
 end

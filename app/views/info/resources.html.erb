@@ -1,0 +1,5 @@
+<% content_for :header do %>
+  <%= stylesheet_link_tag "kelsey_styles", "data-turbo-track" => "reload" %>
+<% end %>
+
+<%= render(PageBlock::Resources::Component.new(current_user:)) %>

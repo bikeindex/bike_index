@@ -4,6 +4,12 @@
  *= require kelsey/landing_pages
  */
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 :root {
   --redesign-blue-500: #3397dc;
   --redesign-blue-800: #016ec2;

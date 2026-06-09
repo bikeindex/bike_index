@@ -2223,6 +2223,7 @@ it:
     public_images:
       create:
         cannot_create:
+        image_too_large:
       destroy:
         cannot_delete:
         image_deleted:
@@ -2464,38 +2465,6 @@ it:
       simple_efficient_effective:
       the_team:
       widely_used:
-    dev_and_design:
-      bike_index_logos_html:
-      bike_shop_card:
-      bike_shop_card_pdf_url:
-      bike_shop_cards_html:
-      design_resources:
-      development_resources:
-      display_widget_html:
-      flyers_html:
-      image_assets:
-      meant_to_be_usable:
-      nearby_stolen_widget:
-      nearby_stolen_widget_html:
-      oauth_apps_html:
-      oauth_authorized_apps_html:
-      on_github:
-      open_source_html:
-      our_api_documentation:
-      trifold_flyer:
-      trifold_flyer_pdf_url:
-    image_resources:
-      bike_index_image_assets:
-      black_background_shown_here:
-      check_out_resources_html:
-      image_has_no_background:
-      logo_with_cutout:
-      logo_with_stripes:
-      single_color_logo:
-      single_color_logo_in_white:
-      logo_with_blue_shield:
-      logo_with_cutout_black:
-      logo_with_links_html:
     lightspeed:
       a_few_things_to_note:
       a_listing_on_bike_index_will_be_created:
@@ -2567,21 +2536,6 @@ it:
       the_frame_is_locked_to_an_immovable_objec:
       tug_on_whatever_youre_about_to_lock_to_ma:
       use_a_ulock_that_costs_at_least_40:
-    resources:
-      api_documentation:
-      bike_index_resources:
-      check_out_our_link_html:
-      did_you_know_every_bike_html:
-      get_bike_index_html:
-      how_not_to_buy_a_stolen_bike:
-      infographic_html:
-      learn_about_serial_numbers_here:
-      logos_and_design_assets:
-      map_of_bike_thefts:
-      the_manufacturers:
-      view_the_list_of_all_html:
-      we_have_an_open_api_check_out_html:
-      were_open_source_view_this_app_html:
     serials:
       a_serial_number_located_on_a_html:
       a_serial_number_on_the_underside_html:
@@ -3911,8 +3865,6 @@ it:
       cities:
       community_groups:
       copyright_html:
-      design_logos:
-      dev_resources:
       donate:
       faq:
       help:
@@ -3933,6 +3885,7 @@ it:
       where_we_are:
       who_we_serve:
       strava_search:
+      dev_and_design_resources:
     form_well_footer_save:
       save_changes:
     header_nav:
@@ -4254,6 +4207,8 @@ it:
         submit:
         search_notes:
         search_owner_email_or_name:
+      results_frame:
+        rate_limited:
     search_results:
       bike_box:
         location: Luogo
