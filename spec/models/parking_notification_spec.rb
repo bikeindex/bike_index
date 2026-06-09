@@ -63,6 +63,24 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe ".email_success" do
+    let!(:via_notification) do
+      pn = FactoryBot.create(:parking_notification)
+      FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+      pn
+    end
+    let!(:failed) do
+      pn = FactoryBot.create(:parking_notification)
+      FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_failure", bike: pn.bike, message_channel_target: pn.email)
+      pn
+    end
+    let!(:unsent) { FactoryBot.create(:parking_notification) }
+
+    it "matches only parking_notifications with a delivery_success notification" do
+      expect(ParkingNotification.email_success.pluck(:id)).to eq([via_notification.id])
+    end
+  end
+
   describe "reply_to_email" do
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization) }
