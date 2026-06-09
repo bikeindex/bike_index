@@ -53,6 +53,8 @@ class ParkingNotification < ActiveRecord::Base
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
   MAX_PER_PAGE = 250
+  # Marker delivery_error for notifications backfilled from the legacy delivery_status column
+  PRE_TRACKING_ERROR = "Failed pre-notification tracking"
   enum :kind, KIND_ENUM
   enum :status, STATUS_ENUM
   enum :retrieved_kind, RETRIEVED_KIND_ENUM
