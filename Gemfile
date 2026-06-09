@@ -120,6 +120,9 @@ gem "hotwire_combobox" # accessible autocomplete/combobox
 
 group :production do
   gem "skylight" # Performance monitoring
+end
+
+group :staging, :production do
   gem "honeybadger" # Error monitoring
 end
 
