@@ -123,6 +123,12 @@ group :production do
   gem "honeybadger" # Error monitoring
 end
 
+group :staging, :development do
+  # Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
+  # Loaded in development and staging (config/environments/staging.rb).
+  gem "letter_opener_web", "~> 3.0"
+end
+
 group :development do
   gem "bullet"
   # Extra faraday response logging. Used in exchange rate api client and external registry
@@ -130,7 +136,6 @@ group :development do
   # gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
   gem "guard", require: false
   gem "guard-rspec", require: false
-  gem "letter_opener_web", "~> 3.0"
   gem "rerun" # restart sidekiq processes in development on app change
   gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
@@ -138,11 +143,16 @@ group :development do
   gem "benchmark"
 end
 
+# dotenv-rails is also loaded in :staging so a staging boot picks up committed
+# .env values; dotenv never overrides a var already set in the environment.
+group :development, :test, :staging do
+  gem "dotenv-rails"
+end
+
 group :development, :test do
   gem "brakeman", require: false
   gem "ruby-lsp" # Ruby language server (used by editor integrations)
   gem "database_cleaner"
-  gem "dotenv-rails"
   gem "factory_bot_rails"
   gem "foreman"
   gem "turbo_tests" # parallel tests

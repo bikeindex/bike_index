@@ -1,4 +1,4 @@
-domain = if Rails.env.production?
+domain = if Rails.env.production? || Rails.env.staging?
   "bikeindex.org"
 elsif Rails.env.test?
   nil
@@ -7,7 +7,7 @@ else
 end
 
 # Include port in session key to prevent collisions across dev workspaces
-key = if Rails.env.production?
+key = if Rails.env.production? || Rails.env.staging?
   "_bikeindex_session"
 else
   port = ENV.fetch("DEV_PORT", 3042)
