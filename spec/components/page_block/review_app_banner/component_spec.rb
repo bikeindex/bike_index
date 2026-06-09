@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe ReviewAppBanner::Component, type: :component do
+RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   it "doesn't render when review_app is blank" do
     expect(described_class.new(review_app: nil).render?).to be_falsey
     expect(described_class.new(review_app: "").render?).to be_falsey

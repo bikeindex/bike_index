@@ -1,7 +1,7 @@
 <div
   class="
-    tw:border-b tw:border-yellow-500 tw:bg-yellow-300 tw:px-4 tw:py-2
-    tw:text-center tw:font-semibold tw:text-black
+    tw:border-b tw:border-yellow-300 tw:bg-yellow-100 tw:px-4 tw:py-2
+    tw:text-center tw:text-sm tw:text-black
   "
 >
   <%= translation(".label") %>
@@ -16,7 +16,7 @@
       <%= translation(".pr_link", number: @pr_number) %>
     </a>
   <% end %>
+  &middot; <%= translation(".disclaimer") %>
   &middot;
   <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:underline" %>
-  &middot; <%= translation(".disclaimer") %>
 </div>
