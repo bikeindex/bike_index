@@ -36,8 +36,9 @@ RSpec.describe OrganizedServices::EmailPreview do
 
       context "with a parking_notification_id param" do
         let!(:parking_notification) do
-          FactoryBot.create(:parking_notification, organization: organization, kind: "parked_incorrectly_notification",
-            delivery_status: "email_success")
+          pn = FactoryBot.create(:parking_notification, organization: organization, kind: "parked_incorrectly_notification")
+          FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+          pn
         end
         let(:params) { ActionController::Parameters.new(parking_notification_id: parking_notification.id) }
         let(:kind) { "parked_incorrectly_notification" }
