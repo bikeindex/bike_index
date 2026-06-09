@@ -10,9 +10,12 @@ module Backfills
 
     PRE_TRACKING_ERROR = "Failed pre-notification tracking"
 
-    def perform(id = nil)
-      return enqueue_workers if id.blank?
+    def self.enqueue_workers(end_time = Time.current)
+      ParkingNotification.send_email.where("parking_notifications.created_at < ?", end_time)
+        .pluck(:id).each { |id| perform_async(id) }
+    end
 
+    def perform(id)
       parking_notification = ParkingNotification.find(id)
       return if parking_notification.notifications.any?
       return unless parking_notification.send_email?
@@ -25,13 +28,6 @@ module Backfills
         message_channel_target: parking_notification.email,
         delivery_status: success ? "delivery_success" : "delivery_failure",
         delivery_error: success ? nil : PRE_TRACKING_ERROR)
-    end
-
-    private
-
-    def enqueue_workers
-      ParkingNotification.send_email.pluck(:id)
-        .each { |id| self.class.perform_async(id) }
     end
   end
 end

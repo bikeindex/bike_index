@@ -51,15 +51,22 @@ RSpec.describe Backfills::ParkingNotificationNotificationJob, type: :job do
     end
   end
 
-  describe "enqueue_workers" do
-    let!(:registered) { FactoryBot.create(:parking_notification) }
-    let!(:unregistered) { FactoryBot.create(:parking_notification_unregistered) }
+  describe ".enqueue_workers" do
+    let!(:registered) { FactoryBot.create(:parking_notification, created_at: Time.current - 1.hour) }
+    let!(:unregistered) { FactoryBot.create(:parking_notification_unregistered, created_at: Time.current - 1.hour) }
+    let!(:too_recent) { FactoryBot.create(:parking_notification, created_at: Time.current + 1.hour) }
 
-    it "enqueues only the emailable records" do
+    it "enqueues emailable records created before the time" do
       expect {
-        instance.perform
+        described_class.enqueue_workers
       }.to change(described_class.jobs, :size).by(1)
       expect(described_class.jobs.map { |j| j["args"] }).to eq([[registered.id]])
+    end
+
+    it "respects an explicit end_time" do
+      expect {
+        described_class.enqueue_workers(Time.current - 2.hours)
+      }.not_to change(described_class.jobs, :size)
     end
   end
 end
