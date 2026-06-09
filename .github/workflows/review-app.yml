@@ -188,6 +188,10 @@ jobs:
           context: .
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.image_tag }}
+          # kamal verifies the deployed image carries a `service` label matching the
+          # config's service name (bike-index-pr-<N>). kamal adds it when it builds;
+          # since CI builds here and deploys with --skip-push, set it explicitly.
+          labels: service=bike-index-pr-${{ needs.resolve.outputs.pr_number }}
           cache-from: type=gha,scope=review-app
           cache-to: type=gha,mode=max,scope=review-app
       - name: Deploy

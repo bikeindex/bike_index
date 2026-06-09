@@ -30,7 +30,10 @@
 <% role      = "bike_index_#{db_suffix}" %>
 
 service: <%= appname %>
-image: ghcr.io/bikeindex/bike_index
+# NOTE: no registry host here — kamal prepends `registry.server` (configuration.rb
+# `repository = [registry.server, image].join("/")`). Including ghcr.io would
+# double it to ghcr.io/ghcr.io/...
+image: bikeindex/bike_index
 
 servers:
   web:
