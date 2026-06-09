@@ -76,9 +76,9 @@ production:
     port: "<%= ENV['ANALYTICS_DB_PORT'] %>"
 
 # Staging mirrors production except the primary database name is taken from
-# POSTGRESQL_DATABASE so each review app's per-PR Postgres database can be
-# addressed without colliding under the shared accessory. The replica points at
-# the same database as the primary (review apps run a single Postgres, like dev).
+# POSTGRESQL_DATABASE so the staging database can be addressed independently. The
+# replica points at the same database as the primary (staging runs a single
+# Postgres, like development).
 staging:
   primary:
     <<: *default

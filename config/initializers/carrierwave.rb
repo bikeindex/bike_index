@@ -38,8 +38,8 @@ CarrierWave.configure do |config|
   config.storage = :file
   config.asset_host = ENV["BASE_URL"]
 
-  # Real production only — staging review apps don't provision S3_* env
-  # vars (uploads fall through to local file storage; ActiveStorage uses R2).
+  # Real production only — staging doesn't provision S3_* env vars (uploads
+  # fall through to local file storage; ActiveStorage uses R2).
   if Rails.env.production?
     # config.fog_provider "fog/aws" # Once carrierwave is updated
     config.storage = :fog
