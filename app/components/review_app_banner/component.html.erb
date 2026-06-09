@@ -1,0 +1,22 @@
+<div
+  class="
+    tw:border-b tw:border-yellow-500 tw:bg-yellow-300 tw:px-4 tw:py-2
+    tw:text-center tw:font-semibold tw:text-black
+  "
+>
+  <%= translation(".label") %>
+  <% if @pr_number %>
+    &mdash;
+    <a
+      class="tw:underline"
+      href="<%= pr_url %>"
+      target="_blank"
+      rel="noopener"
+    >
+      <%= translation(".pr_link", number: @pr_number) %>
+    </a>
+  <% end %>
+  &middot;
+  <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:underline" %>
+  &middot; <%= translation(".disclaimer") %>
+</div>
