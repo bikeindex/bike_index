@@ -5512,6 +5512,12 @@ nl:
         sync_running_in_background: De synchronisatie is op de achtergrond bezig.
           Deze pagina wordt automatisch bijgewerkt.
         syncing_activities: Activiteiten synchroniseren...
+      review_app_banner:
+        disclaimer: Geen productie, data is vluchtig.
+        label: Review-app
+        letter_opener_link: e-mail outbox
+        letter_opener_tooltip: Bekijk de e-mail die door deze review-app is verzonden.
+        pr_link: 'PR #%{number}'
     emails:
       partials:
         bike_box:

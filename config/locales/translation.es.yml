@@ -4180,6 +4180,12 @@ es:
         sync_error_description:
         sync_running_in_background:
         syncing_activities:
+      review_app_banner:
+        disclaimer:
+        label:
+        letter_opener_link:
+        letter_opener_tooltip:
+        pr_link:
     emails:
       partials:
         bike_box:
