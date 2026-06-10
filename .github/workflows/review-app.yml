@@ -268,6 +268,21 @@ jobs:
         if: needs.resolve.outputs.action == 'deploy'
         # bin/review-app reads the job-level IMAGE_TAG env.
         run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}"
+      # A successful deploy makes the `report` job's failure comment stale —
+      # delete it so the PR doesn't keep showing a resolved failure. Only
+      # reached when every step above succeeded (no `if: failure()` here).
+      - name: Remove stale deploy-failure comment
+        if: needs.resolve.outputs.action == 'deploy'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
+        run: |
+          cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+            --jq '[.[] | select(.body | startswith("<!-- review-app-failure -->")) | .id][0] // empty')
+          if [ -n "$cid" ]; then
+            echo "Deleting stale failure comment $cid"
+            gh api --method DELETE "repos/$GITHUB_REPOSITORY/issues/comments/$cid" || true
+          fi
 
       - name: Destroy
         if: needs.resolve.outputs.action == 'destroy'
@@ -303,3 +318,37 @@ jobs:
             gh api --method DELETE \
               "/orgs/${owner}/packages/container/${package}/versions/${id}" || true
           done
+
+  # Failed builds/deploys would otherwise be invisible on the PR: these runs
+  # are workflow_dispatch-triggered, and their check runs never appear in the
+  # PR's check rollup. Comment the failure instead — edited in place on repeat
+  # failures (matched via the marker), deleted by `update` on the next
+  # successful deploy. A build cancelled by a newer push is not a failure.
+  report:
+    name: Report failure on PR
+    needs: [resolve, build, update]
+    if: >-
+      !cancelled() && needs.resolve.outputs.proceed == 'true' &&
+      contains(needs.*.result, 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment failure on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
+          ACTION: ${{ needs.resolve.outputs.action }}
+          HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          body="<!-- review-app-failure -->
+          🚨 **Review app ${ACTION} failed** for \`${HEAD_SHA:0:7}\` — [run logs](${RUN_URL})
+
+          Push a fix to retry automatically, or re-run the Review App workflow manually."
+          cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+            --jq '[.[] | select(.body | startswith("<!-- review-app-failure -->")) | .id][0] // empty')
+          if [ -n "$cid" ]; then
+            echo "Updating existing failure comment $cid"
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$cid" -f body="$body"
+          else
+            gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "$body"
+          fi

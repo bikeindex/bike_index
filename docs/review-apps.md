@@ -141,6 +141,8 @@ Unlabeled PR closes are filtered out in `resolve`'s job-level `if:`; fork PRs ar
 
 Destroy reverses it: `kamal app remove`, then drops both databases + the role, then `FLUSHDB`s the assigned Redis logical DB. It also deletes every `pr-<N>-<sha>` image version from GHCR (each push built one) so closed PRs don't accumulate images — best-effort, via the `packages: write` token.
 
+**Failures comment on the PR.** These runs are workflow_dispatch-triggered, so their check runs never appear in the PR's check rollup — a failed build or deploy would otherwise be invisible outside the Actions tab. The `report` job comments the failure on the PR (edited in place on repeat failures), and the next successful deploy deletes the comment.
+
 ### Scheduled tasks (cron)
 
 Each review app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.org/docs/configuration/cron/)) that runs `config/crontab` via the standard Linux cron daemon. It reuses the app image, runs as `root` (the daemon needs it; the image's default `rails` user can't run cron), and is torn down with the rest of the app on destroy. The `env` prefix in its command copies the container's env vars into the crontab so jobs inherit the per-PR DB/Redis/secret config. Current jobs:
@@ -164,7 +166,7 @@ Each review app gets a `cron` container (a Kamal [`servers` role](https://kamal-
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
 | `.kamal/hooks/post-deploy` | Best-effort Honeybadger deploy notification (reports the `staging` env); never fails the deploy — no-ops if `HONEYBADGER_API_KEY` is unset or the gem isn't present (e.g. CI) |
-| `.github/workflows/review-app.yml` | `resolve` + `build` + `update` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
+| `.github/workflows/review-app.yml` | `resolve` + `build` + `update` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `provisioning/` | Ansible playbook for one-time host hardening |
 | `app/components/page_block/review_app_banner/` | ViewComponent rendered in the application layout when `ENV["REVIEW_APP"]` is set |
 
