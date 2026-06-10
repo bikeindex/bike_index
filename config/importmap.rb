@@ -9,13 +9,11 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 # pin "flowbite", to: "https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.turbo.min.js"
 pin "luxon", to: "https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/es6/luxon.js"
 pin "@bikeindex/time-localizer", to: "https://cdn.jsdelivr.net/npm/@bikeindex/time-localizer@0.2.1/dist/index.js"
-pin "@floating-ui/dom", to: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.3/+esm"
-# jsDelivr's +esm bundle externalizes its sub-deps with root-absolute paths
-# (/npm/...), which browsers resolve against our origin and 404. Remap them
-# back to the CDN. Keep versions in sync with @floating-ui/dom above.
-pin "/npm/@floating-ui/core@1.7.3/+esm", to: "https://cdn.jsdelivr.net/npm/@floating-ui/core@1.7.3/+esm"
-pin "/npm/@floating-ui/utils@0.2.10/+esm", to: "https://cdn.jsdelivr.net/npm/@floating-ui/utils@0.2.10/+esm"
-pin "/npm/@floating-ui/utils@0.2.10/dom/+esm", to: "https://cdn.jsdelivr.net/npm/@floating-ui/utils@0.2.10/dom/+esm"
+# Vendored (not CDN-pinned): loads on every page via the dropdown/tooltip
+# controllers, so we self-host. jsDelivr's +esm splits sub-deps into
+# root-absolute /npm/ imports that 404 against our origin; the vendored
+# file is esm.sh's self-contained bundle. See the file header to re-generate.
+pin "@floating-ui/dom", to: "@floating-ui--dom.js"
 
 # jQuery is required for select2, which is used by search. It should not be used!
 # ideally we transition off it soon!
