@@ -13,6 +13,7 @@ export default class extends Controller {
     if (this.hasSearchAllTarget && params.get('search_all') === '1') {
       this.searchAllTarget.checked = true
     }
+    this.syncSearchAll()
     const serialsParam = params.get('serials')
     if (serialsParam) {
       this.textareaTarget.value = serialsParam
@@ -25,6 +26,7 @@ export default class extends Controller {
     if (this.searchKindValue === value) return
     this.searchKindValue = value
     this.updatePlaceholderAndButton()
+    this.syncSearchAll()
     this.resultsTarget.innerHTML = ''
     this.serialChipsTarget.innerHTML = ''
 
@@ -40,6 +42,18 @@ export default class extends Controller {
     } else {
       this.textareaTarget.placeholder = 'Enter multiple serial numbers, separated by commas or new lines'
       this.buttonTarget.textContent = 'Search serials'
+    }
+  }
+
+  // Sticker search always spans every organization, so lock "search all" on while it's active
+  syncSearchAll () {
+    if (!this.hasSearchAllTarget) return
+    if (this.searchKindValue === 'stickers') {
+      this.searchAllTarget.checked = true
+      this.searchAllTarget.disabled = true
+    } else if (this.searchAllTarget.disabled) {
+      this.searchAllTarget.checked = false
+      this.searchAllTarget.disabled = false
     }
   }
 

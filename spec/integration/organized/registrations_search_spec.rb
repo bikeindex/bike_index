@@ -391,11 +391,17 @@ RSpec.describe "Organized registrations search", :js, type: :system do
         expect(page).to have_field("Serials", visible: :all)
         expect(page).to have_field("Registration Stickers", visible: :all)
 
+        # "Search all" starts interactive (serial search can scope to just the org)
+        expect(page).to have_field("search_all", checked: false, disabled: false)
+
         # Switch to sticker search
         choose "Registration Stickers", allow_label_click: true, visible: :all
 
         expect(page).to have_current_path(/search_kind=stickers/, wait: 5)
         expect(page).to have_field("serials", placeholder: /sticker codes/i)
+
+        # Sticker search always spans every org, so "search all" is forced on and locked
+        expect(page).to have_field("search_all", checked: true, disabled: true)
 
         find("textarea#serials").set("STKR200, STKR100, STKR300")
         click_button "Search stickers"
@@ -410,6 +416,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
         # Switch back to serials
         choose "Serials", allow_label_click: true, visible: :all
         expect(page).not_to have_current_path(/search_kind=stickers/)
+
+        # "Search all" is interactive again on serial search
+        expect(page).to have_field("search_all", checked: false, disabled: false)
 
         # Previous results cleared
         expect(page).not_to have_css(".multi-search-serial-result")
