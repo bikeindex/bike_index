@@ -420,8 +420,6 @@ class StolenRecord < ApplicationRecord
 
   private
 
-  # Map legacy country: option to render_country: for backward compatibility
-
   # The read replica can't make database changes, but can enqueue the worker - which will make the changes
   def enqueue_worker(location_changed = false)
     StolenBike::AfterStolenRecordSaveJob.perform_async(id, location_changed)

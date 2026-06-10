@@ -362,7 +362,7 @@ class Bike < ApplicationRecord
     # and/or country. `city`, `region` and `country` are accepted as strings /
     # symbols of the name or abbreviation, and are matched conjointly.
     def currently_stolen_in(city: nil, region: nil, country: nil)
-      location = {city: city, region_record: region, country: country}.select { |_, v| v.present? }
+      location = {city:, region_record: region, country:}.select { |_, v| v.present? }
       location[:region_record] &&= State.find_by("name = ? OR abbreviation = ?", region, region)
       location[:country] &&= Country.find_by("name = ? OR iso = ?", country, country)
       return none if location.values.any?(&:blank?)

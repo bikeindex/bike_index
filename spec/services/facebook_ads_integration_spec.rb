@@ -59,7 +59,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       describe "create_campaign" do
         let(:theft_alert) { TheftAlert.new(id: 12) }
         it "creates a campaign" do
-          expect(theft_alert.address_string).to eq "10000 138 st, Edmonton, T5N 2H7, CA"
+          expect(theft_alert.address_string).to eq "10000 138 st, Edmonton, T5N 2H7, Canada"
           VCR.use_cassette("facebook/ads_integration-create_campaign", match_requests_on: [:method]) do
             campaign = instance.create_campaign(theft_alert)
             expect(campaign).to be_present
