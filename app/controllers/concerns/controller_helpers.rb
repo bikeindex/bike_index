@@ -425,10 +425,6 @@ module ControllerHelpers
     "#{valid_partner_domain || "https://parkit.bikehub.com"}/#{path}"
   end
 
-  def bikehub_website_url(path = nil)
-    "#{valid_partner_domain || "https://bikehub.com"}/#{path}"
-  end
-
   def currency_from_params
     Currency.friendly_find(params.permit(:currency)[:currency])
   end
