@@ -105,6 +105,17 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(response.body).not_to include("Bike Index member listings")
         end
 
+        it "does not render the empty-state when only member listings match" do
+          expect(promoted_listing.reload.seller_member).to be true
+          # The price ceiling drops the $1000 standard listing but keeps the $700 member listing
+          get "#{base_url}?price_max_amount=800", as: :turbo_stream
+          expect(response).to have_http_status(:success)
+          expect(assigns(:promoted_bikes).map(&:id)).to eq([promoted_item.id])
+          expect(assigns(:bikes).pluck(:id)).to eq([])
+          expect(response.body).to include("Bike Index member listings")
+          expect(response.body).not_to include("exactly matched")
+        end
+
         context "with more promoted listings than fit on a page" do
           let!(:extra_promoted_listings) do
             Array.new(13) do |i|

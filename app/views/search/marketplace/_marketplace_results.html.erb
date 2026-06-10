@@ -22,15 +22,18 @@
   </div>
 <% end %>
 
-<div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
-  <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind, no_results: t("search.registrations.results.no_matched", search_obj_name: @search_obj_name))) do %>
-    <% @bikes.each do |bike| %>
-      <% cache(["search_results", @search_kind, @result_view, bike]) do %>
-        <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
+<%# Skip the standard list (and its empty-state) when member listings already matched the search %>
+<% if @bikes.present? || @promoted_bikes.blank? %>
+  <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
+    <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind, no_results: t("search.registrations.results.no_matched", search_obj_name: @search_obj_name))) do %>
+      <% @bikes.each do |bike| %>
+        <% cache(["search_results", @search_kind, @result_view, bike]) do %>
+          <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
+        <% end %>
       <% end %>
     <% end %>
-  <% end %>
-</div>
+  </div>
+<% end %>
 
 <% if @pagy.next %>
   <%= turbo_frame_tag "page_#{@pagy.next}", src: search_marketplace_path(page: @pagy.next, **params.except(:page, :controller, :action).permit!), loading: :lazy do %>
