@@ -43,11 +43,12 @@ pr_number="$2"
 image_tag="${3:-${IMAGE_TAG:-}}"
 [[ "$pr_number" =~ ^[0-9]+$ ]] || { echo "pr_number must be numeric"; exit 1; }
 
+# Role/database names must stay in lockstep with config/deploy.review.yml's
+# env section — destroy drops whatever names are derived here.
 slug="pr-${pr_number}"
-db_suffix="${slug//-/_}"
-role="bike_index_${db_suffix}"
-primary_db="bike_index_review_${db_suffix}_primary"
-analytics_db="bike_index_review_${db_suffix}_analytics"
+role="bike_index_pr_${pr_number}"
+primary_db="bike_index_review_pr_${pr_number}_primary"
+analytics_db="bike_index_review_pr_${pr_number}_analytics"
 
 # Simple mod-N Redis logical DB allocation. With >REDIS_DATABASES concurrent
 # PRs OR two PR numbers congruent mod N, two apps share a Redis namespace

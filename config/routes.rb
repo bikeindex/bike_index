@@ -8,11 +8,9 @@ Rails.application.routes.draw do
 
   mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
   mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
-  # letter_opener_web inbox in dev + staging. Unrestricted — staging runs seeded
-  # data with no PII.
-  if Rails.env.development? || Rails.env.staging?
-    mount LetterOpenerWeb::Engine, at: "/letter_opener"
-  end
+  # letter_opener_web inbox — the gem's Bundler group (:development, :staging)
+  # decides where it's mounted. Unrestricted — staging runs seeded data with no PII.
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if defined?(LetterOpenerWeb)
 
   use_doorkeeper do
     controllers applications: "oauth/applications"

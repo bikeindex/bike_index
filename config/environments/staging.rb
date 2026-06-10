@@ -27,20 +27,19 @@ Rails.application.configure do
   config.action_mailer.preview_paths = ["#{Rails.root}/spec/mailers/previews"]
 
   # production.rb sends the log to stdout (for `kamal logs`) when
-  # RAILS_LOG_TO_STDOUT is set. Also write it to log/staging.log so the
-  # read_logged_searches cron job (config/crontab) has a file to rg. Set the
-  # formatter on each logger BEFORE wrapping it in TaggedLogging (mirroring
-  # production.rb) so the lines keep the `I, [timestamp]` prefix LogSearcher::Reader
-  # matches AND tagged logging keeps working (config.log_tags = [:request_id]).
-  # Setting the formatter on the BroadcastLogger afterward clobbers the tagged
-  # formatters, so every request's push_tags raises NoMethodError.
+  # RAILS_LOG_TO_STDOUT is set — under that same condition, broadcast it to
+  # log/staging.log too, so the read_logged_searches cron job (config/crontab)
+  # has a file to rg. Set the formatter BEFORE wrapping in TaggedLogging (as
+  # production.rb does for the stdout logger we reuse here) so the lines keep
+  # the `I, [timestamp]` prefix LogSearcher::Reader matches AND tagged logging
+  # keeps working (config.log_tags = [:request_id]). Setting the formatter on
+  # the BroadcastLogger afterward clobbers the tagged formatters, so every
+  # request's push_tags raises NoMethodError.
   if ENV["RAILS_LOG_TO_STDOUT"].present?
-    stdout_logger = ActiveSupport::Logger.new($stdout)
-    stdout_logger.formatter = config.log_formatter
     file_logger = ActiveSupport::Logger.new(Rails.root.join("log/#{Rails.env}.log"))
     file_logger.formatter = config.log_formatter
     config.logger = ActiveSupport::BroadcastLogger.new(
-      ActiveSupport::TaggedLogging.new(stdout_logger),
+      config.logger, # production.rb's tagged stdout logger
       ActiveSupport::TaggedLogging.new(file_logger)
     )
   end
