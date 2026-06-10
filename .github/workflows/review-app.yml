@@ -107,7 +107,11 @@ jobs:
     needs: resolve
     if: needs.resolve.outputs.proceed == 'true'
     runs-on: ubuntu-latest
-    environment: review-app
+    environment:
+      name: review-app
+      # Surfaces the "View deployment" button on the PR + Environments pane.
+      # Only on deploy — destroy has no live URL.
+      url: ${{ needs.resolve.outputs.action == 'deploy' && format('https://pr-{0}.review.bikeindex.org', needs.resolve.outputs.pr_number) || '' }}
     # All env vars feed `.kamal/secrets-ci` via Dotenv variable substitution. Kamal
     # substitutes `$POSTGRES_PASSWORD` etc. from the calling process env. Destroy
     # needs the same bundle even though `app remove` uses little of it — avoids
