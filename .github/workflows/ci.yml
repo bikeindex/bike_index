@@ -13,26 +13,25 @@ permissions:
   pull-requests: write
 
 jobs:
-  # Fires follow-on workflows from CI's single `on: push` run instead of giving
-  # each one its own `pull_request` trigger full of conditionally-skipped jobs:
-  #   - review-app.yml used `synchronize` + a label gate — 3 skipped check runs
-  #     on every push to every unlabeled PR
-  #   - strava_search_ci.yml ran a paths-filter job on every PR — one passed +
-  #     one skipped check even when nothing strava-related changed
+  # Dispatches review-app deploys from CI's single `on: push` run instead of a
+  # `pull_request: synchronize` trigger + label gate in review-app.yml, which
+  # left 3 skipped check runs on every push to every unlabeled PR. (This was
+  # tried for strava_search CI too — workflow_dispatch runs attach to the
+  # commit but never appear in the PR's check rollup, so it uses a native
+  # `paths:` filter instead; see strava_search_ci.yml. Review-app deploys
+  # aren't PR checks, so invisibility-in-the-rollup doesn't matter here.)
   # GITHUB_TOKEN can't fire event-driven triggers, but explicit
   # workflow_dispatch API calls are allowed (`actions: write` above).
   dispatch:
-    name: "Dispatch - review app & strava_search conditional triggering"
+    name: "Dispatch - review app conditional triggering"
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      # Both steps retry their gh calls: gh has no built-in retry, and sporadic
-      # GitHub API auth failures (e.g. the 2026-06-10 incident) shouldn't fail
-      # the job on the first blip. retry()'s progress goes to stderr — stdout
-      # would be captured by the $(command substitution)s below.
-      #
-      # Auto-redeploy the review app for PRs carrying the 'review-app' label.
+      # retry: gh has no built-in retry, and sporadic GitHub API auth failures
+      # (e.g. the 2026-06-10 incident) shouldn't fail the job on the first
+      # blip. retry()'s progress goes to stderr — stdout would be captured by
+      # the $(command substitution) below.
       - name: Dispatch review-app deploy (labeled PRs only)
         run: |
           retry() { local n=1; until "$@"; do [ $n -ge 3 ] && return 1; echo "attempt $n failed; retrying in 15s..." >&2; n=$((n+1)); sleep 15; done; }
@@ -44,28 +43,6 @@ jobs:
               --ref "$GITHUB_REF_NAME" -f pr_number="$pr" -f action=deploy
           else
             echo "No open PR with the 'review-app' label for branch '$GITHUB_REF_NAME' -> NOT dispatching review-app deploy"
-          fi
-      # The compare API diffs against the merge-base with main (three-dot
-      # semantics), so no checkout is needed. Caveat: it returns at most 300
-      # changed files — a mega-branch whose strava files fall past that cap
-      # would miss the dispatch. Skipped on main: strava CI never ran there
-      # before either (its old trigger was pull_request-only).
-      # `success() || failure()`: still attempt this dispatch when the
-      # review-app one failed (the job still concludes failure).
-      - name: Dispatch strava_search CI (when its files changed)
-        if: (success() || failure()) && github.ref_name != 'main'
-        run: |
-          retry() { local n=1; until "$@"; do [ $n -ge 3 ] && return 1; echo "attempt $n failed; retrying in 15s..." >&2; n=$((n+1)); sleep 15; done; }
-          changed=$(retry gh api "repos/$GITHUB_REPOSITORY/compare/main...$GITHUB_SHA" \
-            --jq '.files[].filename')
-          strava_changed=$(echo "$changed" | grep -E '^(vendor/strava_search/|public/strava_search/|\.github/workflows/strava_search_ci\.yml$)' || true)
-          if [ -n "$strava_changed" ]; then
-            echo "strava_search files changed vs main -> dispatching Strava Search CI:"
-            echo "$strava_changed"
-            retry gh workflow run strava_search_ci.yml --repo "$GITHUB_REPOSITORY" \
-              --ref "$GITHUB_REF_NAME"
-          else
-            echo "No strava_search changes among the $(echo "$changed" | grep -c .) files changed vs main -> NOT dispatching Strava Search CI"
           fi
 
   lint_and_scan:
