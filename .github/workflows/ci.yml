@@ -13,20 +13,22 @@ permissions:
   pull-requests: write
 
 jobs:
-  lint_and_scan:
+  # Fires follow-on workflows from CI's single `on: push` run instead of giving
+  # each one its own `pull_request` trigger full of conditionally-skipped jobs:
+  #   - review-app.yml used `synchronize` + a label gate — 3 skipped check runs
+  #     on every push to every unlabeled PR
+  #   - strava_search_ci.yml ran a paths-filter job on every PR — one passed +
+  #     one skipped check even when nothing strava-related changed
+  # GITHUB_TOKEN can't fire event-driven triggers, but explicit
+  # workflow_dispatch API calls are allowed (`actions: write` above).
+  dispatch:
+    name: "Dispatch - review app deploy & strava_search CI"
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       # Auto-redeploy the review app for PRs carrying the 'review-app' label.
-      # Dispatching from here instead of a `pull_request: synchronize` trigger
-      # in review-app.yml means unlabeled PRs (most of them) collect zero
-      # skipped review-app check runs on every push. A step inside this
-      # always-running job adds no check run of its own; it sits before
-      # checkout so the deploy dispatches within seconds of the push.
-      # GITHUB_TOKEN can't fire event-driven triggers, but explicit
-      # workflow_dispatch API calls are allowed (`actions: write` above).
-      - name: Auto-deploy review app (labeled PRs only)
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Dispatch review-app deploy (labeled PRs only)
         run: |
           pr=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$GITHUB_REF_NAME" \
             --state open --label review-app --json number --jq '.[0].number')
@@ -35,6 +37,25 @@ jobs:
             gh workflow run review-app.yml --repo "$GITHUB_REPOSITORY" \
               --ref "$GITHUB_REF_NAME" -f pr_number="$pr" -f action=deploy
           fi
+      # The compare API diffs against the merge-base with main (three-dot
+      # semantics), so no checkout is needed. Caveat: it returns at most 300
+      # changed files — a mega-branch whose strava files fall past that cap
+      # would miss the dispatch. Skipped on main: strava CI never ran there
+      # before either (its old trigger was pull_request-only).
+      - name: Dispatch strava_search CI (when its files changed)
+        if: github.ref_name != 'main'
+        run: |
+          changed=$(gh api "repos/$GITHUB_REPOSITORY/compare/main...$GITHUB_SHA" \
+            --jq '.files[].filename')
+          if echo "$changed" | grep -qE '^(vendor/strava_search/|public/strava_search/|\.github/workflows/strava_search_ci\.yml$)'; then
+            echo "strava_search files changed; dispatching Strava Search CI"
+            gh workflow run strava_search_ci.yml --repo "$GITHUB_REPOSITORY" \
+              --ref "$GITHUB_REF_NAME"
+          fi
+
+  lint_and_scan:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout code
         uses: actions/checkout@v6
 

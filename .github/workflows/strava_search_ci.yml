@@ -1,33 +1,21 @@
 name: Strava Search CI
 
+# Dispatched by ci.yml's "Dispatch" job when files under vendor/strava_search/,
+# public/strava_search/, or this workflow change (vs the merge-base with main —
+# keep ci.yml's path regex in sync when adding paths here). No `pull_request`
+# trigger: the old always-on paths-filter job put one passed + one skipped
+# check run on every PR even when nothing strava-related changed.
+
 on:
-  pull_request:
+  workflow_dispatch:
 
 defaults:
   run:
     working-directory: vendor/strava_search
 
 jobs:
-  changes:
-    name: Check for changes, trigger strava_search CI if there are
-    runs-on: ubuntu-latest
-    outputs:
-      strava_search: ${{ steps.filter.outputs.strava_search }}
-    steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v4
-        id: filter
-        with:
-          filters: |
-            strava_search:
-              - 'vendor/strava_search/**'
-              - 'public/strava_search/**'
-              - '.github/workflows/strava_search_ci.yml'
-
   ci:
     name: Lint, Type Check, Test & Build
-    needs: [changes]
-    if: needs.changes.outputs.strava_search == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

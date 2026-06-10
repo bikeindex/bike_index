@@ -6,7 +6,7 @@ name: Review App
 # Triggers:
 #   - workflow_dispatch   : operator clicks "Run workflow" in Actions UI, OR
 #                           ci.yml dispatches a deploy on push when the PR has
-#                           the 'review-app' label (lint_and_scan's first step)
+#                           the 'review-app' label (ci.yml's `dispatch` job)
 #   - pull_request closed : auto-destroy if the 'review-app' label is set
 #
 # There is deliberately NO `pull_request: synchronize` trigger: it fires for
