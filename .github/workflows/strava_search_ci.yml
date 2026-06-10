@@ -1,14 +1,9 @@
 name: Strava Search CI
 
-# Runs only when strava_search files change, via the native `paths:` trigger
-# filter — the filtering happens before a run is created, so PRs that don't
-# touch these paths get no run and no check at all. Approaches that didn't
-# work, for the record:
-#   - an always-on dorny/paths-filter job: one passed + one skipped check on
-#     every PR, even with no strava changes
-#   - dispatching from ci.yml via workflow_dispatch: runs fine and attaches to
-#     the commit, but workflow_dispatch check suites never appear in the PR's
-#     check rollup, so the check was invisible where it matters
+# Runs only when strava_search files change — the native `paths:` filter acts
+# before a run is created, so non-matching PRs get no run and no check at all.
+# (An always-on paths-filter job left a passed + a skipped check on every PR,
+# and CI-dispatched workflow_dispatch runs never appear in the PR check rollup.)
 # NOTE: don't make this a required status check in branch protection —
 # paths-filtered workflows create no run on non-matching PRs, which would
 # leave the required check "expected" forever.

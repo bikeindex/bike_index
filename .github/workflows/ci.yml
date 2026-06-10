@@ -13,13 +13,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  # Dispatches review-app deploys from CI's single `on: push` run instead of a
-  # `pull_request: synchronize` trigger + label gate in review-app.yml, which
-  # left 3 skipped check runs on every push to every unlabeled PR. (This was
-  # tried for strava_search CI too — workflow_dispatch runs attach to the
-  # commit but never appear in the PR's check rollup, so it uses a native
-  # `paths:` filter instead; see strava_search_ci.yml. Review-app deploys
-  # aren't PR checks, so invisibility-in-the-rollup doesn't matter here.)
+  # Dispatches review-app deploys from CI's single `on: push` run — a
+  # `pull_request: synchronize` trigger + label gate in review-app.yml would
+  # leave skipped check runs on every push to every unlabeled PR.
   # GITHUB_TOKEN can't fire event-driven triggers, but explicit
   # workflow_dispatch API calls are allowed (`actions: write` above).
   dispatch:
@@ -28,9 +24,8 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      # retry: gh has no built-in retry, and sporadic GitHub API auth failures
-      # (e.g. the 2026-06-10 incident) shouldn't fail the job on the first
-      # blip. retry()'s progress goes to stderr — stdout would be captured by
+      # retry: gh has no built-in retry, and a sporadic API failure shouldn't
+      # fail the job. Progress goes to stderr — stdout would be captured by
       # the $(command substitution) below.
       - name: Dispatch review-app deploy (labeled PRs only)
         run: |
@@ -145,9 +140,8 @@ jobs:
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
       # install system dependencies. libfuse2t64 is for setup-imagemagick's
-      # AppImage below — installing it here (cached) instead of letting the
-      # action apt-get it uncached saves ~4s per job, which is why this step
-      # runs first.
+      # AppImage below — cached here (hence this step runs first) instead of
+      # the action's uncached apt-get install.
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: google-chrome-stable curl gettext libfuse2t64 libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep

@@ -9,15 +9,13 @@ name: Review App
 #                           the 'review-app' label (ci.yml's `dispatch` job)
 #   - pull_request closed : auto-destroy if the 'review-app' label is set
 #
-# There is deliberately NO `pull_request: synchronize` trigger: it fires for
-# every push to every PR, and label-gating it at the job level would leave a
-# stack of skipped check runs on each unlabeled push. ci.yml's dispatch step
-# does the label gating instead, so this workflow only runs (and only shows
-# checks) when it has work to do.
+# There is deliberately NO `pull_request: synchronize` trigger — label-gating
+# it leaves skipped check runs on every push to every unlabeled PR. ci.yml's
+# `dispatch` job gates on the label instead, so this workflow only runs (and
+# only shows checks) when it has work to do.
 #
-# Fork PRs never auto-deploy: their pushes don't run ci.yml in this repo, so
-# nothing dispatches — a maintainer deploys manually via workflow_dispatch
-# after reviewing the diff.
+# Fork PRs never auto-deploy (their pushes don't run ci.yml in this repo); a
+# maintainer reviews the diff, then deploys via workflow_dispatch.
 
 on:
   workflow_dispatch:
@@ -117,11 +115,9 @@ jobs:
     env:
       IMAGE_TAG: pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}
     steps:
-      # Label on deploy *attempt*, not success: the label marks intent ("this PR
-      # gets a review app") and arms auto-redeploy (ci.yml's dispatch step keys
-      # off it). Adding it up front means a failed build/deploy still arms it —
-      # push a fix and CI re-dispatches automatically, instead of needing
-      # another manual workflow_dispatch. Idempotent on re-deploys.
+      # Label on deploy *attempt*, not success: the label marks intent and arms
+      # auto-redeploy (ci.yml's dispatch job keys off it) — after a failed
+      # build/deploy, pushing a fix re-dispatches without another manual run.
       - name: Add review-app label
         env:
           GH_TOKEN: ${{ github.token }}
@@ -140,15 +136,12 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v4
-      # Sprockets' incremental cache (the Dockerfile's `--mount=type=cache` on
-      # /rails/tmp/cache/assets) doesn't survive ephemeral runners by itself;
-      # cache-dance injects it into the buildx builder before the build and
-      # extracts it back out (in its post step) for actions/cache to save.
-      # Deliberately NOT the CI assets cache (ci.yml): that bundle bakes
-      # `BASE_URL=localhost:<port>` into ERB assets, while this precompile runs
-      # with no BASE_URL — sprockets' cache wouldn't notice the difference, so
-      # sharing keys would serve stale URLs. On a restore-keys partial hit,
-      # sprockets recompiles only changed assets.
+      # Sprockets' incremental cache (the Dockerfile's `--mount=type=cache`)
+      # doesn't survive ephemeral runners by itself; cache-dance injects it
+      # into the buildx builder and extracts it after the build for
+      # actions/cache. Deliberately NOT ci.yml's assets cache: that bundle
+      # bakes `BASE_URL=localhost:<port>` into ERB assets and sprockets' cache
+      # wouldn't notice the difference, so sharing keys would serve stale URLs.
       - name: Restore sprockets asset cache
         id: sprockets-cache
         uses: actions/cache@v5
@@ -182,13 +175,10 @@ jobs:
           # config's service name (bike-index-pr-<N>). kamal adds it when it builds;
           # since CI builds here and deploys with --skip-push, set it explicitly.
           labels: service=bike-index-pr-${{ needs.resolve.outputs.pr_number }}
-          # Layer cache lives in GHCR (`:buildcache` tag), not type=gha: the GHA
-          # cache's 10GB/repo limit is mostly consumed by CI's asset/gem caches,
-          # so the review-app scope kept getting evicted and every deploy re-ran
-          # `bundle install` + full asset precompile. GHCR has no such quota, and
-          # mode=max exports dedupe against layers already in the registry. The
-          # destroy-path GHCR cleanup below only matches `pr-<N>-*` tags, so the
-          # cache tag is never swept up by it.
+          # Layer cache lives in GHCR (`:buildcache` tag), not type=gha — CI's
+          # asset/gem caches mostly consume the GHA 10GB quota, so this scope
+          # kept getting evicted. The destroy-path GHCR cleanup below only
+          # matches `pr-<N>-*` tags and never sweeps the cache tag.
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
 
@@ -271,9 +261,8 @@ jobs:
         if: needs.resolve.outputs.action == 'deploy'
         # bin/review-app reads the job-level IMAGE_TAG env.
         run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}"
-      # A successful deploy makes the `report` job's failure comment stale —
-      # delete it so the PR doesn't keep showing a resolved failure. Only
-      # reached when every step above succeeded (no `if: failure()` here).
+      # A successful deploy (this step is only reached when everything above
+      # passed) deletes the `report` job's now-stale failure comment.
       - name: Remove stale deploy-failure comment
         if: needs.resolve.outputs.action == 'deploy'
         env:
