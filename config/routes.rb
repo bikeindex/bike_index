@@ -3,8 +3,16 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
+  # Liveness endpoint (200 if the app boots). Used by the review-app kamal-proxy health check
+  get "up", to: "rails/health#show", as: :rails_health_check
+
   mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
   mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
+  # letter_opener_web inbox in dev + staging. Unrestricted — staging runs seeded
+  # data with no PII.
+  if Rails.env.development? || Rails.env.staging?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
 
   use_doorkeeper do
     controllers applications: "oauth/applications"
@@ -375,8 +383,6 @@ Rails.application.routes.draw do
 
   mount Lookbook::Engine, at: "/lookbook"
 
-  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
-
   get "/400", to: "errors#bad_request", via: :all
   get "/401", to: "errors#unauthorized", via: :all
   get "/404", to: "errors#not_found", via: :all
@@ -441,5 +447,5 @@ Rails.application.routes.draw do
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
 
-  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge
+  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
 end
