@@ -1,11 +1,7 @@
 module.exports = {
-  content: [
-    './public/*.html',
-    './app/helpers/**/*.rb',
-    './app/javascript/**/*.js',
-    './app/views/**/*.{erb,haml,html}',
-    './app/components/**/*.{erb,haml,html,rb}'
-  ],
+  // No `content` key: tailwind v4 resolves legacy-config globs relative to
+  // this file's directory (config/), so these never matched anything. Sources
+  // are declared via @source in app/assets/tailwind/application.css instead.
   darkMode: 'selector',
   theme: {
     extend: {

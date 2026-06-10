@@ -1,6 +1,16 @@
 /* Declare CSS layers so that legacy is overridden by tailwind utility classes */
 @layer theme, base, legacy, components, utilities;
-@import "tailwindcss" prefix(tw);
+/* source(none) + explicit @source: without it, tailwind v4 auto-scans the
+ * entire repo (~3k files — vendor/, public/, spec/, …) for class candidates,
+ * which was ~45s of every CI assets:precompile. Paths are relative to THIS
+ * file. The legacy config's `content` globs can't do this job — @config
+ * resolves them relative to config/, where they match nothing. */
+@import "tailwindcss" prefix(tw) source(none);
+@source "../../views";
+@source "../../components";
+@source "../../helpers";
+@source "../../javascript";
+@source "../../../public/*.html";
 @import "./combobox.css";
 @config "../../../config/tailwind.config.js";
 
