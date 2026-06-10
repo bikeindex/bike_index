@@ -18,10 +18,8 @@ threads min_threads_count, max_threads_count
 # Jobs do not work on JRuby or Windows (both of which do not support
 # processes).
 #
-# Clustered + preload_app! gives copy-on-write memory savings when deployed. Set
-# WEB_CONCURRENCY=0 for single mode (no fork) — required locally so Mata's live-reload
-# file-watcher thread and SSE registry share the request-serving process. bin/env
-# defaults WEB_CONCURRENCY to 0 in local development.
+# Clustered + preload_app! gives copy-on-write memory savings when deployed.
+# bin/env defaults WEB_CONCURRENCY to 0 in local development.
 worker_count = ENV.fetch("WEB_CONCURRENCY", 3).to_i
 if worker_count.positive?
   workers worker_count
