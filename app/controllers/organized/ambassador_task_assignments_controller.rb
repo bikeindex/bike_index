@@ -4,7 +4,7 @@ module Organized
     skip_before_action :ensure_not_ambassador_organization!
 
     def update
-      ambassador_task_assignment = AmbassadorTaskAssignment.find(params[:id])
+      ambassador_task_assignment = current_user.ambassador_task_assignments.find(params[:id])
       completed_at = (params[:completed] == "true") ? Time.current : nil
 
       if ambassador_task_assignment.update(completed_at: completed_at)
