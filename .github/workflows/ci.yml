@@ -190,27 +190,83 @@ jobs:
           name: test-results-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}
           path: tmp/rspec-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}.xml
 
-  # Commenting out for now - it doesn't work for forked pull requests,
-  # Which means forked PRs always fail
-  # Also - I want to fix the thousands separator
-  # github.com/EnricoMi/publish-unit-test-result-action/issues/698
-  #
-  # aggregate_test_results:
-  #   name: "Test Report"
-  #   runs-on: ubuntu-latest
-  #   needs: test
-  #   if: always()
-  #   steps:
-  #     - name: Download all test results
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         pattern: test-results-*
-  #         path: test-results
+  # One consolidated check for the whole test matrix: merges every node's junit
+  # XML into a single GITHUB_STEP_SUMMARY table (with failure details) and fails
+  # if any node failed. Point branch protection at THIS check — its name stays
+  # stable if the matrix is resized. Unlike check-run-publishing actions
+  # (EnricoMi/publish-unit-test-result-action was tried previously), it needs no
+  # write permissions, so forked PRs work; per-failure PR annotations already
+  # come from RSpec::Github::Formatter in bin/knapsack_pro_tests.
+  test_results:
+    name: "Test results"
+    runs-on: ubuntu-latest
+    needs: test
+    if: always()
+    steps:
+      - name: Download per-node junit results
+        uses: actions/download-artifact@v8
+        with:
+          pattern: test-results-*
+          path: test-results
+          merge-multiple: true
+      - name: Summarize matrix results
+        env:
+          TEST_RESULT: ${{ needs.test.result }}
+        run: |
+          python3 - <<'PY'
+          import glob, os, sys
+          import xml.etree.ElementTree as ET
 
-  #     - name: Publish combined test results
-  #       id: test-results
-  #       uses: EnricoMi/publish-unit-test-result-action@v2
-  #       with:
-  #         files: test-results/**/*.xml
-  #         json_thousands_separator: "," # Can't get this to work :/
-  #         comment_mode: off
+          rows, failures = [], []
+          totals = {"tests": 0, "failures": 0, "errors": 0, "skipped": 0}
+          slowest = 0.0
+          files = sorted(glob.glob("test-results/rspec-*.xml"))
+          for path in files:
+              root = ET.parse(path).getroot()
+              suite = root if root.tag == "testsuite" else root.find("testsuite")
+              node = path.removeprefix("test-results/rspec-").removesuffix(".xml")
+              counts = {key: int(suite.get(key) or 0) for key in totals}
+              seconds = float(suite.get("time") or 0)
+              slowest = max(slowest, seconds)
+              rows.append("| %s | %d | %d | %d | %d | %.0fs |" % (node, *counts.values(), seconds))
+              for key in totals:
+                  totals[key] += counts[key]
+              for case in suite.iter("testcase"):
+                  problem = case.find("failure")
+                  if problem is None:
+                      problem = case.find("error")
+                  if problem is not None:
+                      # RspecJunitFormatter puts the message + full backtrace in the
+                      # element text; the message attribute is just the first part.
+                      detail = (problem.text or problem.get("message") or "").strip()
+                      headline = (problem.get("message") or detail).splitlines()
+                      failures.append((case.get("name"), node, headline[0][:200] if headline else "", detail))
+
+          problems = []
+          if totals["failures"] or totals["errors"]:
+              problems.append("%d failed example(s)" % (totals["failures"] + totals["errors"]))
+          if not files:
+              problems.append("no junit files found")
+          if os.environ["TEST_RESULT"] != "success":
+              problems.append("test matrix concluded: %s" % os.environ["TEST_RESULT"])
+
+          lines = ["## RSpec " + ("❌" if problems else "✅"), ""]
+          lines += ["| node | tests | failures | errors | skipped | time |",
+                    "| --- | --- | --- | --- | --- | --- |"]
+          lines += rows
+          lines.append("| **total (%d nodes)** | **%d** | **%d** | **%d** | **%d** | %.0fs slowest |"
+                       % (len(files), *totals.values(), slowest))
+          if failures:
+              lines += ["", "### Failures (%d)" % len(failures), ""]
+              for name, node, headline, detail in failures:
+                  lines += ["<details><summary><code>%s</code> (node %s) — %s</summary>" % (name, node, headline),
+                            "", "```", detail, "```", "</details>", ""]
+          if problems:
+              lines += ["", "**" + "; ".join(problems) + "**"]
+
+          output = "\n".join(lines) + "\n"
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as handle:
+              handle.write(output)
+          print(output)
+          sys.exit(1 if problems else 0)
+          PY
