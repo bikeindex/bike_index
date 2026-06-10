@@ -45,10 +45,11 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
 | Toggle in development | command                       | default  |
 | ---------             | -------                       | -------  |
 | Caching               | `bundle exec rails dev:cache` | disabled |
-| [letter_opener][]     | `bin/rake dev:letter_opener`  | enabled  |
 | logging with lograge  | `bin/rake dev:lograge`        | enabled  |
 
-[letter_opener]: https://github.com/ryanb/letter_opener
+Sent emails are captured by [letter_opener_web][] and viewable at [localhost:3042/letter_opener](http://localhost:3042/letter_opener).
+
+[letter_opener_web]: https://github.com/fgrehm/letter_opener_web
 
 ## Localization
 
@@ -79,6 +80,8 @@ We use [`turbo_tests`](https://github.com/serpapi/turbo_tests) to run the test s
 - Run specific files or test directories with `bin/turbo_tests <FILES_OR_FOLDERS>`
 
 - Run Guard with parallelism `bin/guard -G Guardfile_parallel`
+
+- Parallel test databases are **not** migrated by default. After running migrations, sync them with `bin/rake parallel:prepare` (see above), or opt into automatic parallel migrations on `db:migrate` with `PARALLEL_MIGRATIONS=true bin/rake db:migrate`.
 
 ## Code Hygiene
 

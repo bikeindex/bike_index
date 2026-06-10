@@ -85,9 +85,32 @@ export default class extends Controller {
     this.sortAndFilterResults()
     // Trigger column toggle to apply stored column visibility to new tables
     this.element.dispatchEvent(new Event('turbo:frame-render', { bubbles: true }))
+    this.alignTableColumns()
     window.timeLocalizer?.localize()
     this.buttonTarget.disabled = false
     this.searching = false
+  }
+
+  alignTableColumns () {
+    const tables = Array.from(this.resultsTarget.querySelectorAll('.org-registration-search-component table.ui-table'))
+    if (tables.length < 2) return
+
+    tables.forEach(table => {
+      table.querySelectorAll('thead th').forEach(th => { th.style.minWidth = '' })
+    })
+
+    const maxWidths = []
+    tables.forEach(table => {
+      table.querySelectorAll('thead th').forEach((th, i) => {
+        if (th.offsetWidth > (maxWidths[i] || 0)) maxWidths[i] = th.offsetWidth
+      })
+    })
+
+    tables.forEach(table => {
+      table.querySelectorAll('thead th').forEach((th, i) => {
+        if (maxWidths[i]) th.style.minWidth = `${maxWidths[i]}px`
+      })
+    })
   }
 
   renderPlaceholderChips (serials) {

@@ -1,6 +1,7 @@
 /* Declare CSS layers so that legacy is overridden by tailwind utility classes */
 @layer theme, base, legacy, components, utilities;
 @import "tailwindcss" prefix(tw);
+@import "./combobox.css";
 @config "../../../config/tailwind.config.js";
 
 @theme {
@@ -71,7 +72,7 @@
   }
 
   .twdropdown {
-    @apply tw:flex-col tw:list-none tw:py-0;
+    @apply tw:flex-col tw:list-none tw:py-0 tw:mb-0;
   }
 
   .twdropdown li[role="menuitem"]:first-child > a {
@@ -143,6 +144,25 @@
   .ui-table-bordered thead tr th:last-child {
     @apply tw:ui-table-bordered-th-last;
   }
+
+  /* Turbo sets [busy] on the results frame during requests. Hide the existing
+     results and overlay a spinner; min-height gives the spinner a place to
+     land on the initial auto-submit when the frame is still empty. */
+  .search-results-frame-wrapper {
+    @apply tw:relative;
+  }
+  .search-results-frame-wrapper > turbo-frame[busy] {
+    @apply tw:opacity-0 tw:pointer-events-none;
+  }
+  .search-results-frame-wrapper > .search-loading-overlay {
+    @apply tw:hidden tw:absolute tw:top-0 tw:left-0 tw:right-0 tw:pointer-events-none tw:z-1;
+  }
+  .search-results-frame-wrapper:has(> turbo-frame[busy]) {
+    @apply tw:min-h-48;
+  }
+  .search-results-frame-wrapper:has(> turbo-frame[busy]) > .search-loading-overlay {
+    @apply tw:block;
+  }
 }
 
 /* Create utility classes for the sides of the table so that it can be applied in JS when columns are hidden */
@@ -161,11 +181,6 @@
 
 @utility base-font {
   @apply tw:antialiased tw:font-sans tw:text-gray-900 tw:dark:text-gray-400;
-}
-
-/* Unlayered so it wins over the size utilities (`tw:px-2.5`) injected by UI::Button */
-.period-select-standard {
-  @apply tw:px-1.5 tw:sm:px-2.5;
 }
 
 @layer base {

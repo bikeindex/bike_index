@@ -68,5 +68,10 @@ class FindOrCreateModelAuditJob < ApplicationJob
       frame_model: frame_model,
       propulsion_type: propulsion_type,
       cycle_type: cycle_type)
+  rescue ActiveRecord::RecordInvalid => e
+    # A concurrent job may have created the matching ModelAudit between find_for and create!
+    raise e unless e.record.errors.of_kind?(:frame_model, :taken)
+
+    ModelAudit.find_for(bike)
   end
 end

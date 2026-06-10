@@ -1,0 +1,111 @@
+<%= form_for @impound_record_update, url: form_url, method: :patch, data: form_data do |f| %>
+  <% card = capture do %>
+    <div class="card">
+      <div class="card-block">
+        <div class="card-title">
+          <h3 class="uncap">
+            <% if @multi %>
+              Update multiple records
+              <br>
+              <em class="small less-strong">For table rows with checks</em>
+            <% else %>
+              Update impound record
+            <% end %>
+          </h3>
+
+          <% if !@multi && @approved_impound_claim.blank? && unregistered_bike? %>
+            <p style="margin: -12px 0 24px; line-height: 1.5;">
+              <span class="text-warning">Unregistered bikes</span> cannot be
+              updated with
+              <em><%= ImpoundRecordUpdate.kinds_humanized[:retrieved_by_owner] %></em>
+              
+              <br>
+              <small>Use either <em>transferred to a new owner</em> or <em>removed from Bike Index</em>.</small>
+            </p>
+          <% end %>
+        </div>
+
+        <div class="card-body">
+          <div
+            id="impoundRecordUpdateForm"
+            data-controller="org--impound-update"
+          >
+            <% if @multi %>
+              <div
+                class="tw:hidden"
+                data-org--impound-update-multi-target="error"
+              >
+                <%= render(UI::Alert::Component.new(text: "Select at least one record to update", kind: :error)) %>
+              </div>
+            <% end %>
+
+            <% if @approved_impound_claim.present? %>
+              <div
+                class="tw:hidden"
+                data-org--impound-update-target="kindField"
+                data-kind="retrieved_by_owner"
+              >
+                <p class="mb-4" style="line-height: 1.25em;">
+                  Click <em>Update</em> to record this retrieved by the
+                  <%= link_to "approved claim", organization_impound_claim_path(@approved_impound_claim.id, organization_id: @current_organization.id) %>
+                </p>
+              </div>
+            <% end %>
+
+            <div class="row">
+              <div class="col-sm-6 mb-2" id="kindUpdate">
+                <%= f.select :kind, options_for_select(kinds_for_select, selected_kind), {}, class: "form-control", data: kind_select_data %>
+              </div>
+
+              <% if locations_enabled? %>
+                <div
+                  class="col-sm-6 mb-2 tw:hidden"
+                  data-org--impound-update-target="kindField"
+                  data-kind="move_location"
+                >
+                  <%= f.select :location_id, location_options, {}, class: "form-control" %>
+                </div>
+              <% end %>
+
+              <div
+                class="col-sm-6 mb-2 tw:hidden"
+                data-org--impound-update-target="kindField"
+                data-kind="transferred_to_new_owner"
+              >
+                <%= f.email_field :transfer_email, placeholder: "New owner email", required: true, class: "form-control" %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xs-12">
+                <%= f.text_area :notes, placeholder: "Internal note", class: "form-control" %>
+              </div>
+
+              <div class="col-xs-12 mt-2">
+                <%= submit_tag(@multi ? "Update impound records" : "Update impound record", class: "btn btn-success btn-md-lg") %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @multi %>
+    <div
+      id="makeMultiUpdate"
+      class="<%= "tw:hidden" unless @multi_update_open %>"
+      data-org--impound-update-multi-target="panel"
+    >
+      <div class="row">
+        <div class="mt-4 mb-4 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
+          <%= card %>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <%= card %>
+  <% end %>
+
+  <%= content %>
+<% end %>

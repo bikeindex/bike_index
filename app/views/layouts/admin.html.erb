@@ -20,6 +20,7 @@
     <script src="/vendored_assets/application_standalone.js"></script>
 
     <%= stylesheet_link_tag "tailwind", "admin", "data-turbo-track": "reload" %>
+    <%= hw_combobox_style_tag %>
     <%= javascript_importmap_tags %>
 
     <%# = hotwire_livereload_tags if Rails.env.development? %>
@@ -65,7 +66,7 @@
             <%= active_link "Stolen", admin_stolen_bikes_path, role: "button", class: "nav-link", match_controller: true %>
           </li>
 
-          <% if Rails.env.development? %>
+          <% if Rails.env.development? || Rails.env.staging? %>
             <li class="dropdown nav-item">
               <a class="dropdown-toggle nav-link" data-toggle="dropdown">
                 Mailers
@@ -76,6 +77,7 @@
                 <%= link_to "Admin", '/rails/mailers/admin_mailer' , role: "button", class: "btn btn-light dropdown-item" %>
                 <%= link_to "Donation", '/rails/mailers/donation_mailer' , role: "button", class: "btn btn-light dropdown-item" %>
                 <%= link_to "Customer", '/rails/mailers/customer_mailer' , role: "button", class: "btn btn-light dropdown-item" %>
+                <%= link_to "Letter opener (view sent mail)", letter_opener_web_path, role: "button", class: "btn btn-light dropdown-item" %>
               </div>
             </li>
           <% end %>

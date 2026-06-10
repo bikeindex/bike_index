@@ -160,12 +160,11 @@ RSpec.describe UsersController, type: :request do
     include_context :rack_attack
 
     it "returns 429 after exceeding the limit" do
-      5.times do
+      throttled = rack_attack_throttled_response(limit: 5) do
         post "#{base_url}/resend_confirmation_email", params: {email: "a@b.com"}
-        expect(response.status).to_not eq 429
+        response
       end
-      post "#{base_url}/resend_confirmation_email", params: {email: "a@b.com"}
-      expect(response).to have_http_status(:too_many_requests)
+      expect(throttled).to have_http_status(:too_many_requests)
     end
   end
 
@@ -173,12 +172,11 @@ RSpec.describe UsersController, type: :request do
     include_context :rack_attack
 
     it "returns 429 after exceeding the limit" do
-      5.times do
+      throttled = rack_attack_throttled_response(limit: 5) do
         post "#{base_url}/send_password_reset_email", params: {email: "a@b.com"}
-        expect(response.status).to_not eq 429
+        response
       end
-      post "#{base_url}/send_password_reset_email", params: {email: "a@b.com"}
-      expect(response).to have_http_status(:too_many_requests)
+      expect(throttled).to have_http_status(:too_many_requests)
     end
   end
 
@@ -462,27 +460,48 @@ RSpec.describe UsersController, type: :request do
   end
 
   describe "show" do
-    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:user) { FactoryBot.create(:user_confirmed, show_bikes:) }
+    let(:show_bikes) { false }
+
     it "404s if the user doesn't exist" do
       get "#{base_url}/fake_user-extra-stuff"
       expect(response.status).to eq 404
     end
 
-    it "redirects to user home url if the user exists but doesn't want to show their page" do
-      user.show_bikes = false
-      user.save
-      get "#{base_url}/#{user.username}"
-      expect(response).to redirect_to my_account_url
+    context "user doesn't show their page" do
+      it "redirects to user home url" do
+        get "#{base_url}/#{user.username}"
+        expect(response).to redirect_to my_account_url
+      end
     end
 
-    it "shows the page if the user exists and wants to show their page" do
-      user.update(show_bikes: true)
-      get "#{base_url}/#{user.username}?page=1&per_page=1"
-      expect(response).to render_template :show
-      expect(assigns(:per_page)).to eq 1
-      # Test some header tag properties
-      html_response = response.body
-      expect(html_response).to match(/<title>#{user.name}</)
+    context "user shows their page" do
+      let(:show_bikes) { true }
+
+      it "renders" do
+        get "#{base_url}/#{user.username}?page=1&per_page=1"
+        expect(response).to render_template :show
+        expect(assigns(:per_page)).to eq 1
+        # Test some header tag properties
+        expect(response.body).to match(/<title>#{user.name}</)
+      end
+
+      context "banned user" do
+        let(:user) { FactoryBot.create(:user_confirmed, show_bikes:, banned: true) }
+        it "404s" do
+          get "#{base_url}/#{user.username}"
+          expect(response.status).to eq 404
+        end
+      end
+
+      context "email banned user" do
+        let!(:email_ban) { FactoryBot.create(:email_ban, user:) }
+        it "404s" do
+          expect(user.reload.email_banned?).to be_truthy
+          get "#{base_url}/#{user.username}"
+          expect(response.status).to eq 404
+        end
+      end
     end
   end
 

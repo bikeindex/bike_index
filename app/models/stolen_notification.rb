@@ -17,10 +17,6 @@
 #  receiver_id       :integer
 #  sender_id         :integer
 #
-# Indexes
-#
-#  index_stolen_notifications_on_doorkeeper_app_id  (doorkeeper_app_id)
-#
 class StolenNotification < ApplicationRecord
   KIND_ENUM = {
     stolen_permitted: 0,

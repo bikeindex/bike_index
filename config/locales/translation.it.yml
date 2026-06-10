@@ -1187,8 +1187,6 @@ it:
         invalid_message_body:
           problem:
           resolution:
-        empty_message_body:
-        too_many_multipart_files:
         invalid_accept_header:
           problem:
           resolution:
@@ -1200,9 +1198,6 @@ it:
         length_is:
         length_min:
         length_max:
-        conflicting_types:
-        invalid_parameters:
-        too_deep_parameters:
         unknown_auth_strategy:
         unknown_params_builder:
   flash:
@@ -1339,266 +1334,6 @@ it:
     reserved_interpolations:
       details_title:
       none:
-  countries:
-    AC:
-    AD:
-    AE:
-    AF:
-    AG:
-    AI:
-    AL:
-    AM:
-    AN:
-    AO:
-    AQ:
-    AR:
-    AS:
-    AT:
-    AU:
-    AW:
-    AX:
-    AZ:
-    BA:
-    BB:
-    BD:
-    BE:
-    BF:
-    BG:
-    BH:
-    BI:
-    BJ:
-    BL:
-    BM:
-    BN:
-    BO:
-    BQ:
-    BR:
-    BS:
-    BT:
-    BV:
-    BW:
-    BY:
-    BZ:
-    CA:
-    CC:
-    CD:
-    CF:
-    CG:
-    CH:
-    CI:
-    CK:
-    CL:
-    CM:
-    CN:
-    CO:
-    CP:
-    CR:
-    CU:
-    CV:
-    CW:
-    CX:
-    CY:
-    CZ:
-    DE:
-    DG:
-    DJ:
-    DK:
-    DM:
-    DO:
-    DZ:
-    EA:
-    EC:
-    EE:
-    EG:
-    EH:
-    ER:
-    ES:
-    ET:
-    EU:
-    FI:
-    FJ:
-    FK:
-    FM:
-    FO:
-    FR:
-    GA:
-    GB:
-    GD:
-    GE:
-    GF:
-    GG:
-    GH:
-    GI:
-    GL:
-    GM:
-    GN:
-    GP:
-    GQ:
-    GR:
-    GS:
-    GT:
-    GU:
-    GW:
-    GY:
-    HK:
-    HM:
-    HN:
-    HR:
-    HT:
-    HU:
-    IC:
-    ID:
-    IE:
-    IL:
-    IM:
-    IN:
-    IO:
-    IQ:
-    IR:
-    IS:
-    IT:
-    JE:
-    JM:
-    JO:
-    JP:
-    KE:
-    KG:
-    KH:
-    KI:
-    KM:
-    KN:
-    KP:
-    KR:
-    KW:
-    KY:
-    KZ:
-    LA:
-    LB:
-    LC:
-    LI:
-    LK:
-    LR:
-    LS:
-    LT:
-    LU:
-    LV:
-    LY:
-    MA:
-    MC:
-    MD:
-    ME:
-    MF:
-    MG:
-    MH:
-    MK:
-    ML:
-    MM:
-    MN:
-    MO:
-    MP:
-    MQ:
-    MR:
-    MS:
-    MT:
-    MU:
-    MV:
-    MW:
-    MX:
-    MY:
-    MZ:
-    NA:
-    NC:
-    NE:
-    NF:
-    NG:
-    NI:
-    NL:
-    'NO':
-    NP:
-    NR:
-    NU:
-    NZ:
-    OM:
-    PA:
-    PE:
-    PF:
-    PG:
-    PH:
-    PK:
-    PL:
-    PM:
-    PN:
-    PR:
-    PS:
-    PT:
-    PW:
-    PY:
-    QA:
-    QO:
-    RE:
-    RO:
-    RS:
-    RU:
-    RW:
-    SA:
-    SB:
-    SC:
-    SD:
-    SE:
-    SG:
-    SH:
-    SI:
-    SJ:
-    SK:
-    SL:
-    SM:
-    SN:
-    SO:
-    SR:
-    SS:
-    ST:
-    SV:
-    SX:
-    SY:
-    SZ:
-    TA:
-    TC:
-    TD:
-    TF:
-    TG:
-    TH:
-    TJ:
-    TK:
-    TL:
-    TM:
-    TN:
-    TO:
-    TR:
-    TT:
-    TV:
-    TW:
-    TZ:
-    UA:
-    UG:
-    UM:
-    US:
-    UY:
-    UZ:
-    VA:
-    VC:
-    VE:
-    VG:
-    VI:
-    VN:
-    VU:
-    WF:
-    WS:
-    XK:
-    YE:
-    YT:
-    ZA:
-    ZM:
-    ZW:
   doorkeeper:
     applications:
       confirmations:
@@ -2488,6 +2223,7 @@ it:
     public_images:
       create:
         cannot_create:
+        image_too_large:
       destroy:
         cannot_delete:
         image_deleted:
@@ -2729,38 +2465,6 @@ it:
       simple_efficient_effective:
       the_team:
       widely_used:
-    dev_and_design:
-      bike_index_logos_html:
-      bike_shop_card:
-      bike_shop_card_pdf_url:
-      bike_shop_cards_html:
-      design_resources:
-      development_resources:
-      display_widget_html:
-      flyers_html:
-      image_assets:
-      meant_to_be_usable:
-      nearby_stolen_widget:
-      nearby_stolen_widget_html:
-      oauth_apps_html:
-      oauth_authorized_apps_html:
-      on_github:
-      open_source_html:
-      our_api_documentation:
-      trifold_flyer:
-      trifold_flyer_pdf_url:
-    image_resources:
-      bike_index_image_assets:
-      black_background_shown_here:
-      check_out_resources_html:
-      image_has_no_background:
-      logo_with_cutout:
-      logo_with_stripes:
-      single_color_logo:
-      single_color_logo_in_white:
-      logo_with_blue_shield:
-      logo_with_cutout_black:
-      logo_with_links_html:
     lightspeed:
       a_few_things_to_note:
       a_listing_on_bike_index_will_be_created:
@@ -2832,21 +2536,6 @@ it:
       the_frame_is_locked_to_an_immovable_objec:
       tug_on_whatever_youre_about_to_lock_to_ma:
       use_a_ulock_that_costs_at_least_40:
-    resources:
-      api_documentation:
-      bike_index_resources:
-      check_out_our_link_html:
-      did_you_know_every_bike_html:
-      get_bike_index_html:
-      how_not_to_buy_a_stolen_bike:
-      infographic_html:
-      learn_about_serial_numbers_here:
-      logos_and_design_assets:
-      map_of_bike_thefts:
-      the_manufacturers:
-      view_the_list_of_all_html:
-      we_have_an_open_api_check_out_html:
-      were_open_source_view_this_app_html:
     serials:
       a_serial_number_located_on_a_html:
       a_serial_number_on_the_underside_html:
@@ -4176,8 +3865,6 @@ it:
       cities:
       community_groups:
       copyright_html:
-      design_logos:
-      dev_resources:
       donate:
       faq:
       help:
@@ -4198,6 +3885,7 @@ it:
       where_we_are:
       who_we_serve:
       strava_search:
+      dev_and_design_resources:
     form_well_footer_save:
       save_changes:
     header_nav:
@@ -4516,9 +4204,11 @@ it:
       form_organized:
         doesnt_look_like_serial:
         search_for_serial_number:
-        search_owner_email:
         submit:
         search_notes:
+        search_owner_email_or_name:
+      results_frame:
+        rate_limited:
     search_results:
       bike_box:
         location: Luogo
@@ -4572,6 +4262,12 @@ it:
         sync_error_description:
         sync_running_in_background:
         syncing_activities:
+      review_app_banner:
+        disclaimer:
+        label:
+        letter_opener_link:
+        letter_opener_tooltip:
+        pr_link:
     emails:
       partials:
         bike_box:
@@ -4664,6 +4360,8 @@ it:
         to: A
         update: Aggiorna
         year: anno
+      chart_async_frame:
+        loading_chart:
     org:
       location_address_fields:
         address: Indirizzo
@@ -4679,18 +4377,16 @@ it:
           other:
         all_bikes:
         all_statuses:
-        for_table_rows_with_checks:
         impound_records:
-        internal_note:
         interpreted_params:
-        new_owner_email:
         only_unregistered:
         only_user_registered:
         pagy:
         per_page:
         status_records:
-        update_impound_record:
         update_multiple_records:
+        cannot_update_with_kind:
+        hide_update:
       bike_access_panel:
         access_panel:
         added_to_track_parking_notification:

@@ -77,11 +77,8 @@ module Search
         @interpreted_params[:primary_activity].present?
       end
 
-      def primary_activity_select_opts
-        options_for_select(
-          PrimaryActivity.by_priority.map { |pa| [pa.display_name_search, pa.id] },
-          selected: @interpreted_params[:primary_activity]
-        )
+      def primary_activity_combobox_options
+        PrimaryActivity.by_priority.map { |pa| {display: pa.display_name_search, value: pa.id} }
       end
     end
   end

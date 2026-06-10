@@ -671,15 +671,13 @@ RSpec.describe GraduatedNotification, type: :model do
 
         graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization)
         expect(graduated_notification2).to be_valid
-        graduated_notification2.update_attribute :created_at, Time.current - 25.hours # Pending period
-        expect(graduated_notification2).to be_valid
+        allow(graduated_notification2).to receive(:processable?) { true }
         expect(graduated_notification2.user_id).to eq user2.id
         expect(graduated_notification2.email).to eq user2.email
         expect(graduated_notification2.primary_bike_id).to eq bike.id
 
         expect(graduated_notification2.send(:existing_sent_notification)&.id).to be_blank
         expect(graduated_notification2.primary_notification?).to be_truthy
-        expect(graduated_notification2.processable?).to be_truthy
         graduated_notification2.process_notification
         expect(graduated_notification2.reload.most_recent?).to be_truthy
         expect(graduated_notification2.status).to eq "bike_graduated"

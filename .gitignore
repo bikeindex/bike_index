@@ -45,6 +45,9 @@ manufacturer.tsv
 # Ignore special configuration env file
 .env.*
 
+# Per-checkout workspace ID (set by bin/workspace_setup)
+.workspace_id
+
 # Ignore asset stuff
 /public/packs
 /public/packs-test
@@ -75,6 +78,14 @@ vendor/strava_search/storybook-static/
 
 # Ignore local Claude Code settings
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
 
 # Ignore Playwright MCP session cache (snapshots, console logs)
 .playwright-mcp/
+
+# Ignore skill workspaces (skill-creator eval/optimization artifacts) and their pycache
+.claude/skills/*-workspace/
+.claude/skills/**/__pycache__/
+
+# Local Ansible inventory; commit provisioning/hosts.ini.example instead
+provisioning/hosts.ini

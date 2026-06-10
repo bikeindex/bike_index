@@ -2,8 +2,13 @@ name: CI
 
 on:
   push:
+  # Allows bin/check_translations to trigger CI on the translations-sync branch.
+  # Pushes made with the default GITHUB_TOKEN don't fire `on: push`, so the
+  # automated translations PR otherwise gets no checks.
+  workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -73,8 +78,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ci_node_total: [4]
-        ci_node_index: [0, 1, 2, 3]
+        ci_node_total: [5]
+        ci_node_index: [0, 1, 2, 3, 4]
     env:
       REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
@@ -83,11 +88,14 @@ jobs:
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
       TRANSLATION_BRANCH: main
       RETRY_FLAKY: true
-      SKIP_PARALLEL_MIGRATIONS: true
       KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC: ${{ secrets.KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC }}
       KNAPSACK_PRO_CI_NODE_TOTAL: ${{ matrix.ci_node_total }}
       KNAPSACK_PRO_CI_NODE_INDEX: ${{ matrix.ci_node_index }}
       KNAPSACK_PRO_LOG_LEVEL: warn
+      # Capybara binds to this port in `:js` specs (spec/support/capybara.rb).
+      # Set explicitly so the assets:precompile step below can bake a matching
+      # ENV['BASE_URL'] into any ERB-templated asset.
+      CAPYBARA_PORT: 5042
     steps:
       - name: Get CPU cores
         id: cpu-info
@@ -113,17 +121,60 @@ jobs:
       - run: bundle install
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
-      - name: Test bin/setup # Test bin/setup - only run on 1 node, knapsack should balance
-        if: matrix.ci_node_index == 0
-        run: bin/setup
       - name: Sync translations (only on main by default)
         if: matrix.ci_node_index == 1
         env:
           GH_TOKEN: ${{ github.token }}
         run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
-      # Install JS dependencies
+      # Cache compiled assets + sprockets' incremental cache.
+      # Key hashes every input the three asset tools read:
+      #   - sprockets: app/assets/images, javascripts, config/manifest.js, Gemfile.lock (gem versions)
+      #   - dartsass-rails: app/assets/stylesheets, config/initializers/dartsass.rb
+      #   - tailwindcss-rails: app/assets/tailwind, config/tailwind.config.js,
+      #     and everything tailwind scans (views/components/helpers/javascript)
+      # On a partial-key restore, sprockets' tmp/cache makes the rebuild near-instant
+      # for unchanged inputs, so the loose restore-keys fallback is worth keeping.
+      #
+      # Split into restore/save: all matrix jobs restore, but only ci_node_index == 0
+      # writes the cache. With the combined actions/cache@v4 action, parallel jobs race
+      # on reserveCache and *all* of them lose ("another job may be creating this cache"),
+      # so the cache never gets populated.
+      - name: Restore precompiled assets cache
+        id: assets-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            tmp/cache/assets
+            app/assets/builds
+            public/assets
+          # CAPYBARA_PORT is in the key because the precompile step bakes
+          # `ENV['BASE_URL']` (derived from it) into ERB-templated assets;
+          # a cached bundle from a different port would serve a stale URL.
+          key: ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/tailwind.config.js', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-
       - name: build assets
+        if: steps.assets-cache.outputs.cache-hit != 'true'
+        # BASE_URL must match the host:port that Capybara binds to in tests
+        # so any ERB-baked asset URL resolves to the same host the browser
+        # will hit (see spec/support/capybara.rb).
+        env:
+          BASE_URL: http://localhost:${{ env.CAPYBARA_PORT }}
         run: bin/rails assets:precompile --trace
+      - name: Save precompiled assets cache
+        if: matrix.ci_node_index == 0 && steps.assets-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            tmp/cache/assets
+            app/assets/builds
+            public/assets
+          key: ${{ steps.assets-cache.outputs.cache-primary-key }}
+      # Test bin/setup (verifies e.g. seeds work) - only run on 1 node, knapsack should balance
+      # Done after asset compilation and caching to save time on that
+      - name: Test bin/setup
+        if: matrix.ci_node_index == 0
+        run: bin/setup
       # Run tests
       - name: Run tests
         env:

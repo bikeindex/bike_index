@@ -154,6 +154,21 @@ RSpec.describe Email::ConfirmationJob, type: :job do
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
       end
     end
+    context "with bikehub.com domain" do
+      let!(:user_prior) { FactoryBot.create(:user, email: "some+thing@bikehub.com", created_at:) }
+      let(:created_at) { Time.current - 12.hours }
+      let!(:user) { FactoryBot.create(:user, email: "some@bikehub.com") }
+      it "creates" do
+        expect(User.unscoped.count).to eq 2
+        expect(EmailBan.send(:email_plus_duplicate_matches, user.email).pluck(:id)).to match_array([user_prior.id])
+        expect do
+          VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+            Email::ConfirmationJob.new.perform(user.id)
+          end
+        end.to change(Notification, :count).by 1
+        expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+      end
+    end
 
     context "before period" do
       let(:created_at) { Time.current - 14.days }

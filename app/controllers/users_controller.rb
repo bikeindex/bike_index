@@ -97,7 +97,7 @@ class UsersController < ApplicationController
 
   def show
     user = User.find_by_username(params[:id])
-    unless user
+    if user.nil? || user.banned? || user.email_banned?
       raise ActionController::RoutingError.new("Not Found")
     end
 

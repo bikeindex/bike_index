@@ -7,7 +7,9 @@
         <button
           type="button"
           class="twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0"
-          data-action="click->table-multi-delete#toggleAll"
+          title="Toggle all checked"
+          aria-label="Toggle all checked"
+          data-action="click->table-multi-checkbox#toggleAll"
         >
           <%= check_mark %>
         </button>
@@ -33,7 +35,7 @@
 
         <tr>
           <td class="display-multi-check table-checkbox-select">
-            <%= check_box_tag "sr_selected[#{stolen_record.id}]", stolen_record.id, false, data: {"table-multi-delete-target" => "checkbox"} %>
+            <%= check_box_tag "sr_selected[#{stolen_record.id}]", stolen_record.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
           </td>
 
           <td>

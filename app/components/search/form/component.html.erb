@@ -36,13 +36,18 @@
             "
           >
             <% if render_primary_activity_field? %>
-              <%= label_tag :primary_activity,
-              translation(".search_for_primary_activity"),
-              class: "twlabel tw:sr-only" %>
-              <%= select_tag :primary_activity,
-              primary_activity_select_opts,
-              prompt: translation(".search_for_primary_activity"),
-              class: "twinput tw:md:max-w-xl fieldResetsCounts" %>
+              <div class="tw:w-full tw:md:max-w-xl">
+                <%= render(::Form::Combobox::Component.new(
+                  name: :primary_activity,
+                  id: "primary_activity",
+                  options: primary_activity_combobox_options,
+                  value: @interpreted_params[:primary_activity],
+                  include_blank: true,
+                  placeholder: translation(".search_for_primary_activity"),
+                  label: translation(".search_for_primary_activity"),
+                  label_class: "tw:sr-only",
+                )) %>
+              </div>
             <% end %>
 
             <% if render_price_field? %>
@@ -83,8 +88,7 @@
 
       <div class="tw:w-20">
         <%= button_tag(type: translation(".submit"),
-            class: "twbtn-blue tw:w-full tw:h-full tw:disabled:cursor-wait",
-            "data-search--form-target" => "button") do %>
+            class: "twbtn-blue tw:w-full tw:h-full tw:disabled:cursor-wait") do %>
           <%= helpers.inline_svg_tag "icons/searcher.svg",
             id: "search-button",
             class: "tw:text-white",

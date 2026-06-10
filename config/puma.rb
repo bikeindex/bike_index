@@ -1,3 +1,7 @@
+# Raise from the systemd default of 1024; insufficient for our DB pool + Redis clients + Excon sockets under load
+soft, hard = Process.getrlimit(:NOFILE)
+Process.setrlimit(:NOFILE, [65536, hard].min, hard) if soft < 65536
+
 # Puma can serve each request in a thread from an internal thread pool.
 # The `threads` method setting takes two numbers: a minimum and maximum.
 # Any libraries that use thread pools should be configured to match

@@ -239,6 +239,12 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(assigns(:bikes).pluck(:id)).to eq([])
       end
     end
+    context "unsupported format" do
+      it "returns 406 for json" do
+        get "#{base_url}.json", params: {period: "custom", start_time: "2025-04-01", end_time: "2026-04-30", per_page: "1"}
+        expect(response.status).to eq(406)
+      end
+    end
   end
 
   describe "multi_search" do

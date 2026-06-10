@@ -80,6 +80,9 @@
 <% if Rails.env.development? %>
   <%# don't include an svg version in development, we only want to show the dev icon %>
   <link rel="icon" href="/favicon_dev.ico">
+<% elsif ENV["REVIEW_APP"].present? %>
+  <%# review apps get the dev favicon's shield glyph on green so tabs are easy to spot %>
+  <link rel="icon" href="/favicon_review.ico">
 <% else %>
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">

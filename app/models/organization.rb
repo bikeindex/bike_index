@@ -67,6 +67,8 @@ class Organization < ApplicationRecord
     bike_depot: 9
   }.freeze
 
+  USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS = [36, 1].freeze # SBR and BikeIndex
+
   POS_KIND_ENUM = {
     no_pos: 0,
     other_pos: 1,
@@ -249,7 +251,9 @@ class Organization < ApplicationRecord
     end
 
     def example
-      Organization.find_by_id(92) || Organization.create(name: "Example organization")
+      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
+      found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
+      found || Organization.create(name: "Example Bike Shop")
     end
   end
   # never geocode, use default_location lat/long
@@ -328,7 +332,7 @@ class Organization < ApplicationRecord
   # For now - just using paid
   def user_registration_all_bikes?
     paid? && !official_manufacturer? &&
-      [36, 1].exclude?(id) # Exclude SBR and BikeIndex
+      USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS.exclude?(id)
   end
 
   def paid_money?
@@ -429,11 +433,10 @@ class Organization < ApplicationRecord
       .where(organization_manufacturers: {can_view_counts: true, manufacturer_id: manufacturer_id})
   end
 
-  def mail_snippet_body(snippet_kind)
+  def mail_snippet_body(snippet_kind, time: nil)
     return nil unless MailSnippet.organization_snippet_kinds.include?(snippet_kind)
 
-    snippet = mail_snippets.enabled.where(kind: snippet_kind).first
-    snippet&.body
+    MailSnippet.for_organization(organization_id: id, kind: snippet_kind, time:)&.body
   end
 
   def current_organization_status

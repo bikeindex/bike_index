@@ -39,6 +39,39 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe "email_success?" do
+    let(:parking_notification) { FactoryBot.create(:parking_notification) }
+    it "is false without a notification" do
+      expect(parking_notification.email_success?).to be_falsey
+    end
+    context "with a delivery_success notification" do
+      before do
+        FactoryBot.create(:notification, kind: "parking_notification", notifiable: parking_notification, delivery_status: "delivery_success", bike: parking_notification.bike, message_channel_target: parking_notification.email)
+      end
+      it "is true" do
+        expect(parking_notification.email_success?).to be_truthy
+      end
+    end
+  end
+
+  describe ".email_success" do
+    let!(:via_notification) do
+      pn = FactoryBot.create(:parking_notification)
+      FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+      pn
+    end
+    let!(:failed) do
+      pn = FactoryBot.create(:parking_notification)
+      FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_failure", bike: pn.bike, message_channel_target: pn.email)
+      pn
+    end
+    let!(:unsent) { FactoryBot.create(:parking_notification) }
+
+    it "matches only parking_notifications with a delivery_success notification" do
+      expect(ParkingNotification.email_success.pluck(:id)).to eq([via_notification.id])
+    end
+  end
+
   describe "reply_to_email" do
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization) }
@@ -409,13 +442,14 @@ RSpec.describe ParkingNotification, type: :model do
     end
     context "mark_retrieved of replaced notification" do
       let(:parking_notification2) do
-        FactoryBot.create(:parking_notification,
+        pn = FactoryBot.create(:parking_notification,
           bike: parking_notification.bike,
           organization: parking_notification.organization,
           user: parking_notification.user,
           created_at: Time.current - 1.week,
-          initial_record: parking_notification,
-          delivery_status: "email_success")
+          initial_record: parking_notification)
+        FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+        pn
       end
       it "retrieves" do
         ProcessParkingNotificationJob.new.perform(parking_notification2.id)

@@ -345,7 +345,8 @@ RSpec.describe BikeServices::Creator do
           expect(parking_notification.internal_notes).to eq "some details about the abandoned thing"
           expect(parking_notification.accuracy).to eq 12.0
           expect(parking_notification.unregistered_bike).to be_truthy
-          expect(parking_notification.delivery_status).to be_blank
+          expect(parking_notification.email_success?).to be_falsey
+          expect(parking_notification.notifications).to be_empty
           # It shouldn't have sent any email
           expect(ActionMailer::Base.deliveries.count).to eq 0
         end

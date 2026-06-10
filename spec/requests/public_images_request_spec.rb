@@ -6,6 +6,18 @@ RSpec.describe PublicImagesController, type: :request do
 
   describe "create" do
     let(:current_user) { FactoryBot.create(:superuser) }
+    context "image larger than MAX_FILE_SIZE" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+      let!(:current_user) { bike.current_ownership.creator }
+      it "responds payload_too_large and does not create" do
+        stub_const("PublicImageUploader::MAX_FILE_SIZE", 1)
+        expect {
+          post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
+        }.to_not change(PublicImage, :count)
+        expect(response).to have_http_status(413)
+        expect(response.parsed_body["error"]).to match(/too large/i)
+      end
+    end
     context "bike" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
       let!(:current_user) { bike.current_ownership.creator }

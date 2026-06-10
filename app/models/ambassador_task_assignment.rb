@@ -12,8 +12,7 @@
 #
 # Indexes
 #
-#  index_ambassador_task_assignments_on_ambassador_task_id  (ambassador_task_id)
-#  unique_assignment_to_ambassador                          (user_id,ambassador_task_id) UNIQUE
+#  unique_assignment_to_ambassador  (user_id,ambassador_task_id) UNIQUE
 #
 # Foreign Keys
 #
@@ -92,9 +91,9 @@ class AmbassadorTaskAssignment < ApplicationRecord
       SQL
 
       filter_to_sql_clause = {
-        organization_id: ->(filter_val) { "AND organizations.id = #{filter_val} " },
-        ambassador_task_id: ->(filter_val) { "AND ambassador_tasks.id = #{filter_val} " },
-        ambassador_id: ->(filter_val) { "AND users.id = #{filter_val} " }
+        organization_id: ->(filter_val) { "AND organizations.id = #{filter_val.to_i} " },
+        ambassador_task_id: ->(filter_val) { "AND ambassador_tasks.id = #{filter_val.to_i} " },
+        ambassador_id: ->(filter_val) { "AND users.id = #{filter_val.to_i} " }
       }
       sql << filters
         .map { |col, val| filter_to_sql_clause[col]&.call(val) }

@@ -19,12 +19,12 @@
 
         <div class="tw:mt-2 tw:flex tw:flex-col tw:gap-2 tw:lg:flex-row">
           <%= label_tag :search_email,
-          translation(".search_owner_email"),
+          translation(".search_owner_email_or_name"),
           class: "twlabel tw:sr-only" %>
 
           <%= text_field_tag :search_email,
           params[:search_email],
-          placeholder: translation(".search_owner_email"),
+          placeholder: translation(".search_owner_email_or_name"),
           class: "twinput tw:flex-1 fieldResetsCounts" %>
 
           <% if render_serial_field? %>
@@ -57,8 +57,7 @@
 
       <div class="tw:w-20">
         <%= button_tag(type: translation(".submit"),
-          class: "twbtn-blue tw:w-full tw:h-full#{" tw:disabled:cursor-wait" if turbo?}",
-          data: turbo? ? {"search--form-target" => "button"} : {}) do %>
+          class: "twbtn-blue tw:w-full tw:h-full#{" tw:disabled:cursor-wait" if turbo?}") do %>
           <%= helpers.inline_svg_tag "icons/searcher.svg",
           id: "search-button",
           class: "tw:text-white",

@@ -1,7 +1,7 @@
 development:
   adapter: redis
   url: <%= ENV.fetch("REDIS_URL") %>
-  channel_prefix: bikeindex_<%= ENV.fetch("CONDUCTOR_WORKSPACE", "development") %>
+  channel_prefix: bikeindex_<%= ENV.fetch("WORKSPACE_ID", "development") %>
 
 test:
   adapter: async
@@ -10,3 +10,8 @@ production:
   adapter: redis
   url: <%= ENV.fetch("REDIS_URL") %>
   channel_prefix: bikeindex_production
+
+staging:
+  adapter: redis
+  url: <%= ENV.fetch("REDIS_URL") %>
+  channel_prefix: bikeindex_staging

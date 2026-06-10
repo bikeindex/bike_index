@@ -1,0 +1,73 @@
+<% current_organization = @current_organization %>
+
+<%= render(UI::Table::Component.new(records: @impound_records, render_sortable: @render_sortable)) do |table| %>
+  <% table.column(sortable: "display_id_integer", label: "ID") do |impound_record| %>
+    <%= impound_record.display_id %>
+  <% end %>
+
+  <% table.column(sortable: "created_at") do |impound_record| %>
+    <%= link_to organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id), class: "localizeTime preciseTime", data: {turbo_frame: "_top"} do %>
+      <%= l(impound_record.created_at, format: :convert_time) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "updated_at") do |impound_record| %>
+    <span class="localizeTime preciseTime">
+      <%= l(impound_record.updated_at, format: :convert_time) %>
+    </span>
+  <% end %>
+
+  <% unless @skip_location %>
+    <% table.column(sortable: "location_id") do |impound_record| %>
+      <small><%= impound_record.location&.name %></small>
+    <% end %>
+  <% end %>
+
+  <% unless @skip_bike %>
+    <% table.column(label: "Bike") do |impound_record| %>
+      <% if impound_record.bike.present? %>
+        <%= link_to helpers.organized_bike_text(impound_record.bike), bike_path(impound_record.bike, organization_id: current_organization.id), data: {turbo_frame: "_top"} %>
+        <% unless impound_record.bike.no_serial? %>
+          <small>
+            <%= helpers.render_serial_display(impound_record.bike, helpers.current_user) %>
+          </small>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% unless @skip_status %>
+    <% table.column(label: "Status") do |impound_record| %>
+      <em>
+        <%= helpers.status_display(impound_record.status_humanized_short) %>
+      </em>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "user_id", label: "last updator") do |impound_record| %>
+    <%= impound_record.user&.display_name&.truncate(20) %>
+  <% end %>
+
+  <% if @render_resolved_at %>
+    <% table.column(sortable: "resolved_at") do |impound_record| %>
+      <% if impound_record.resolved_at.present? %>
+        <span class="localizeTime preciseTime">
+          <%= l(impound_record.resolved_at, format: :convert_time) %>
+        </span>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Impounded from") do |impound_record| %>
+    <small>
+      <%= render(UI::AddressDisplay::Component.new(address_record: impound_record.impounded_from_address_record, visible_attribute: :street, kind: :single_line)) %>
+    </small>
+  <% end %>
+
+  <% unless @skip_multiselect %>
+    <% select_all = button_tag(check_mark, type: "button", title: "Toggle all checked", aria: {label: "Toggle all checked"}, class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", data: {action: "click->table-multi-checkbox#toggleAll click->org--impound-update-multi#hideErrorIfChecked"}) %>
+    <% table.column(label: select_all, classes: multiselect_cell_classes) do |impound_record| %>
+      <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id, false, data: {"table-multi-checkbox-target" => "checkbox", "update-kinds" => impound_record.update_multi_kinds.join(" "), action: "change->org--impound-update-multi#hideErrorIfChecked"} %>
+    <% end %>
+  <% end %>
+<% end %>

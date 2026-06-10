@@ -102,6 +102,63 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(response.status).to eq 404
           end
         end
+        context "with mail_snippet changes after the notification was sent" do
+          include_context :with_paper_trail
+
+          let!(:mail_snippet) do
+            FactoryBot.create(:mail_snippet,
+              kind: "parked_incorrectly_notification",
+              organization: current_organization,
+              is_enabled: true,
+              body: "snippet body when sent")
+          end
+          let!(:header_snippet) do
+            FactoryBot.create(:mail_snippet,
+              kind: "header",
+              organization: current_organization,
+              is_enabled: true,
+              body: "header when sent")
+          end
+          let!(:sent_parking_notification) do
+            pn = FactoryBot.create(:parking_notification,
+              organization: current_organization,
+              kind: "parked_incorrectly_notification",
+              created_at: 1.hour.ago)
+            FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+            pn
+          end
+          let!(:unsent_parking_notification) do
+            FactoryBot.create(:parking_notification,
+              organization: current_organization,
+              kind: "parked_incorrectly_notification")
+          end
+
+          before do
+            mail_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+            mail_snippet.update!(body: "snippet body now")
+            header_snippet.versions.first.update_columns(created_at: 2.hours.ago)
+            header_snippet.destroy!
+          end
+
+          it "renders snippets as they were at sent time (including destroyed ones), and current snippets for unsent notifications" do
+            expect(sent_parking_notification.sent_at).to be_present
+            expect(unsent_parking_notification.sent_at).to be_nil
+            expect(mail_snippet.reload.body).to eq "snippet body now"
+            expect(MailSnippet.where(kind: "header", organization: current_organization)).to be_empty
+
+            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: sent_parking_notification.id, versioned: true}
+            expect(response.status).to eq(200)
+            expect(response.body).to include("snippet body when sent")
+            expect(response.body).to include("header when sent")
+            expect(response.body).to_not include("snippet body now")
+
+            get "#{base_url}/parked_incorrectly_notification", params: {parking_notification_id: unsent_parking_notification.id, versioned: true}
+            expect(response.status).to eq(200)
+            expect(response.body).to include("snippet body now")
+            expect(response.body).to_not include("snippet body when sent")
+            expect(response.body).to_not include("header when sent")
+          end
+        end
       end
       context "no bikes" do
         it "renders" do
@@ -152,6 +209,42 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response.body).to include("Protect your bike by following these locking guidelines")
           expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
+        end
+
+        context "with mail_snippet changes after the ownership was created" do
+          include_context :with_paper_trail
+
+          let!(:welcome_snippet) do
+            FactoryBot.create(:mail_snippet, kind: "welcome", organization: current_organization,
+              is_enabled: true, body: "welcome when sent")
+          end
+          let!(:after_welcome_snippet) do
+            FactoryBot.create(:mail_snippet, kind: "after_welcome", organization: current_organization,
+              is_enabled: true, body: "after_welcome when sent")
+          end
+          let!(:security_snippet) do
+            FactoryBot.create(:mail_snippet, kind: "security", organization: current_organization,
+              is_enabled: true, body: "security when sent")
+          end
+
+          before do
+            bike.current_ownership.update_columns(created_at: 1.hour.ago)
+            [welcome_snippet, after_welcome_snippet, security_snippet].each do |snippet|
+              snippet.versions.first.update_columns(created_at: 2.hours.ago)
+              snippet.update!(body: "#{snippet.kind} now")
+            end
+          end
+
+          it "renders snippets as they were at ownership.created_at" do
+            get "#{base_url}/finished_registration"
+            expect(response.status).to eq(200)
+            expect(response.body).to include("welcome when sent")
+            expect(response.body).to include("after_welcome when sent")
+            expect(response.body).to include("security when sent")
+            expect(response.body).to_not include("welcome now")
+            expect(response.body).to_not include("after_welcome now")
+            expect(response.body).to_not include("security now")
+          end
         end
       end
       context "partial_registration" do

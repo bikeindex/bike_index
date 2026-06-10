@@ -1,0 +1,92 @@
+<div class="admin-subnav">
+  <div class="col-12">
+    <h1>Scheduled jobs</h1>
+  </div>
+</div>
+
+<% env_skipped_jobs = ENV.keys.grep(/\ASIDEKIQ_SKIP_/).select { |k| Binxtils::InputNormalizer.boolean(ENV.fetch(k, nil)) } %>
+
+<% if env_skipped_jobs.any? %>
+  <%= render UI::Alert::Component.new(kind: :warning, header: "Skipped via ENV SIDEKIQ_SKIP_*") do %>
+    <ul class="tw:mb-0">
+      <% env_skipped_jobs.each do |env_key| %>
+        <li>
+          <code>
+            <%= env_key.sub(/\ASIDEKIQ_SKIP_/, "").downcase.camelize %>
+          </code>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>
+
+<div class="full-screen-table mt-4">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <% if display_dev_info? %>
+        <th class="only-dev-visible"></th>
+      <% end %>
+
+      <th>Job</th>
+      <th>Frequency</th>
+      <th>Next run</th>
+      <th>Last started</th>
+      <th>Last finished</th>
+      <th>Duration</th>
+    </thead>
+
+    <tbody>
+      <% ScheduledJobRunner.scheduled_jobs.sort_by { |klass| klass.name.downcase }.each do |klass| %>
+        <% last_started = klass.last_started && Time.parse(klass.last_started) %>
+
+        <tr>
+          <% if display_dev_info? %>
+            <td>
+              <code class="small"><%= klass %></code>
+            </td>
+          <% end %>
+
+          <td>
+            <%= klass.to_s.gsub(/\Ascheduled/i, "").gsub(/worker\z/i, "").underscore.humanize %>
+          </td>
+
+          <td>
+            <%= period_in_words(klass.frequency) %>
+          </td>
+
+          <td>
+            <% if klass.new.skip_scheduling? %>
+              <%= render UI::Alert::Component.new(text: "Skipped", kind: :warning, margin_classes: "") %>
+            <% elsif last_started.blank? || (last_started + klass.frequency) < Time.current %>
+              <span class="less-strong">now</span>
+            <% else %>
+              <%= period_in_words((last_started + klass.frequency) - Time.current) %>
+            <% end %>
+          </td>
+
+          <td>
+            <% if klass.last_finished.present? %>
+              <span class="localizeTime preciseTime">
+                <%= l Time.parse(klass.last_finished), format: :convert_time %>
+              </span>
+            <% end %>
+          </td>
+
+          <td>
+            <% if last_started.present? %>
+              <span class="localizeTime preciseTime">
+                <%= l last_started, format: :convert_time %>
+              </span>
+            <% end %>
+          </td>
+
+          <td>
+            <% if klass.last_finished.present? && last_started.present? %>
+              <%= period_in_words(Time.parse(klass.last_finished) - last_started) %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

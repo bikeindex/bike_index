@@ -15,10 +15,22 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Ensure gear types exist so bike show page doesn't write during readonly mode
     RearGearType.fixed
     FrontGearType.fixed
+    # Pin below the md breakpoint (768px) so the sidebar is hidden and the
+    # mobile org dropdown is the only menu path. Chrome's --window-size flag
+    # is unreliable in headless mode, so resize explicitly.
+    page.current_window.resize_to(720, 2000)
     visit new_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
+    find(".alert-success .close").click
+    # Wait for the flash to finish dismissing -- otherwise it overlaps and
+    # intercepts the click on the nav link below. The Bootstrap fade-out can
+    # exceed Capybara's default 2s wait on slow CI runners.
+    expect(page).to have_no_css(".alert-success", wait: 10)
+    find("#passive_organization_submenu").click
+    within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
+    expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/, wait: 10)
   end
 
   def settings_selector
@@ -46,10 +58,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Visit a different page first to establish history, then navigate to bikes
     visit "/"
     visit bikes_path
-    # Results load via turbo auto-submit (search--form controller)
+    # Results load via the eager turbo-frame (src fetched once the frame connects)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES, "select-name")
+    expect_axe_clean("select-name")
 
     # search_no_js should NOT be in the URL (removed by JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
@@ -102,7 +114,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("tbody tr", minimum: 1)
 
     # Verify that it preserves turbo-frame after search submissions
-    # Initial auto-submit loads results via turbo_stream
+    # Results load via the eager turbo-frame
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     # turbo-frame element must still exist after turbo_stream.update
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
@@ -179,6 +191,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_current_path(/search_email=bob/, wait: 10)
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_field("search_email", with: "bob@example.com")
+    # Wait for the results frame to settle before reading hrefs, otherwise
+    # rendered_bike_ids can read a row that's being replaced mid-render
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
 
     # Chart test must run before the custom-range click below: that submission
@@ -206,6 +221,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_link "Render chart"
     expect(page).to have_current_path(/render_chart=true/, wait: 10)
     expect(page).to have_css("table", wait: 10)
+    # Chart loads async via a lazy turbo-frame; wait for the chartkick element
+    # before checking the inline init data.
+    expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-']", wait: 10)
     # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket is empty (null)
     expect(page.html).to include(%(["#{la_date_key}",1]))
     expect(page.html).to include(%(["#{cdt_date_key}",null]))
@@ -225,6 +243,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
     page.execute_script("document.querySelector(\"[data-controller~='ui--period-select'] button[type='submit']\").click()")
     expect(page).to have_current_path(/period=custom/, wait: 10)
+    # Wait for the results frame to settle before reading hrefs, otherwise
+    # rendered_bike_ids can read a row that's being replaced mid-render
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
   end
 
@@ -318,7 +339,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end
 
     it "searches multiple serials, shows results, and caches rows by updated_at" do
-      visit multi_serial_path
+      find("#passive_organization_submenu").click
+      within(".current-organization-submenu") { click_link "Multi search" }
+      expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
 
       expect(page).to have_content(/multi search/i)
       expect(page).to have_css("[data-controller~='org--multi-search']", wait: 5)

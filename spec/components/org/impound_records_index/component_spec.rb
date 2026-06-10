@@ -29,15 +29,11 @@ RSpec.describe Org::ImpoundRecordsIndex::Component, type: :component do
       search_unregisteredness: "all",
       time_range: (Time.current - 1.year)..Time.current,
       available_statuses: %w[current all],
-      current_organization: organization,
-      search_proximity: nil,
-      search_location: nil,
-      interpreted_params: {}
+      current_organization: organization
     }
   end
 
   it "renders" do
-    expect(component).to have_css("form")
     expect(component).to have_content(/0\s+matching impound records/)
   end
 end

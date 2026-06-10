@@ -5,7 +5,6 @@ module UI
     class ComponentPreview < ApplicationComponentPreview
       # @!group Variants
 
-      # @label default (drop_direction: bottom_end)
       def default
         render(UI::Dropdown::Component.new(name: "Menu")) do |dropdown|
           dropdown.with_entry_item { content_tag(:a, "Profile", href: "#") }
@@ -26,10 +25,6 @@ module UI
           dropdown.with_entry_item { icon_link("⚙", "Settings") }
           dropdown.with_entry_item { icon_link("↻", "Sync (active)", active: true) }
         end
-      end
-
-      def placements
-        {template: "ui/dropdown/component_preview/placements"}
       end
 
       # @!endgroup

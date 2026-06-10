@@ -33,9 +33,14 @@ module UI
           href: period_url(period_key),
           size: :sm,
           active: @period == period_key,
-          class: "period-select-standard",
+          class: period_button_class,
           data: {period: period_key, turbo_action: "advance"}
         )
+      end
+
+      def period_button_class
+        base = "tw:px-1.5! tw:sm:px-2.5! tw:transition-opacity tw:duration-500"
+        (@period == "custom") ? "#{base} tw:opacity-60" : base
       end
 
       def period_url(period)

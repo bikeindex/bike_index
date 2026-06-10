@@ -1,0 +1,67 @@
+# See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
+
+# Ignore git directory.
+/.git/
+/.gitignore
+
+# Ignore bundler config.
+/.bundle
+
+# Ignore local environment overrides only. The committed .env ships dev/sandbox
+# values that review apps load via dotenv in staging (see config/environments/
+# staging.rb + Gemfile); it must stay in the image build context.
+/.env*.local
+
+# Ignore all default key files.
+/config/master.key
+/config/credentials/*.key
+
+# Private submodule (sethherr/facebook_ads_integration). Never ship its code to
+# review apps, even from a local build where it's checked out. Facebook::AdsIntegration
+# is referenced lazily (string constantize in theft_alert.rb + inside job method
+# bodies), so the app boots fine without it; only theft-alert FB ads no-op.
+/app/services/facebook
+
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Ignore pidfiles, but keep the directory.
+/tmp/pids/*
+!/tmp/pids/.keep
+
+# Ignore storage (uploaded files in development and any SQLite databases).
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+
+# Ignore assets.
+/node_modules/
+/app/assets/builds/*
+!/app/assets/builds/.keep
+/public/assets
+
+# Ignore CI service files.
+/.github
+
+# Ignore Kamal files.
+/config/deploy*.yml
+/.kamal
+
+# Ignore Cloud66 deploy hooks (not used by Kamal-based review apps).
+/.cloud66
+
+# Ignore Conductor + Claude workspaces.
+/.context
+/.conductor
+/.claude
+
+# Ignore development files
+/.devcontainer
+
+# Ignore Docker-related files
+/.dockerignore
+/Dockerfile*

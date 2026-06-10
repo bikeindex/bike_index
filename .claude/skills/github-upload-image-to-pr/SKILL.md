@@ -40,7 +40,7 @@ cp /path/to/CleanShot*keyword*.png /tmp/screenshot.png
 
 Use `ToolSearch` with a query like `"browser navigate upload"` to confirm `mcp__playwright__*` tools are registered.
 
-Playwright MCP attaches to or spawns a browser with a fresh profile, so **the user will need to sign into github.com the first time** in the spawned window. The session then persists across reuse.
+Playwright MCP reuses a persistent profile (`--user-data-dir`), so the github.com session persists across reuse once signed in. If GitHub logs the user out and you hit a 404 / login screen mid-task, see [references/headless-relogin.md](references/headless-relogin.md) — full login can't be driven headlessly.
 
 ### If Playwright MCP is not installed
 
@@ -132,25 +132,34 @@ Use the **standard textarea selector** from step 6, then assign `ta.value = ""`:
 
 ## Step 8: Embed images in the PR
 
-In both options below, substitute whichever form (markdown `![](...)` or HTML `<img ...>`) GitHub returned in step 6 — preserve it verbatim instead of rewrapping.
+Substitute whichever form (markdown `![](...)` or HTML `<img ...>`) GitHub returned in step 6 — preserve it verbatim instead of rewrapping.
 
-**Option A — Update PR description** (append images to existing body):
+**Post as a comment** (the default). A comment keeps the description tight and skimmable, and avoids re-editing the body (and its notification noise) on every recapture.
+
+If a screenshots comment already exists (one authored by you whose body starts with `## Screenshots`), edit it in place instead of posting a new one:
+```bash
+SCREENSHOT_COMMENT_ID=$(gh api repos/{owner}/{repo}/issues/{PR_NUMBER}/comments \
+  --jq '.[] | select(.body | startswith("## Screenshots")) | .id' | head -1)
+```
+
+Write the comment body to a temp file:
+```
+## Screenshots
+
+<image markup from step 6>
+```
+
+- If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment {PR_NUMBER} --body-file <tmp-comment-file>`.
+- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body=@<tmp-comment-file>`.
+
+Only edit the PR description instead when the user explicitly asks for it:
 ```bash
 EXISTING_BODY=$(gh pr view {PR_NUMBER} --json body -q .body)
 
 gh pr edit {PR_NUMBER} --body "$(printf '%s\n\n## Screenshots\n\n%s' "$EXISTING_BODY" "<image markup from step 6>")"
 ```
 
-If `$EXISTING_BODY` already contains a `## Screenshots` heading (e.g., on re-runs), this will create a duplicate section. Check first with `grep -q "^## Screenshots" <<< "$EXISTING_BODY"` and either replace the existing section or post as a comment (Option B) instead.
-
-**Option B — Post as a new comment**:
-```bash
-gh pr comment {PR_NUMBER} --body "## Screenshots
-
-<image markup from step 6>"
-```
-
-Use Option A by default unless the user explicitly asks for a comment, or if the PR description is already long and a comment would be cleaner.
+If `$EXISTING_BODY` already contains a `## Screenshots` heading (e.g., on re-runs), this will create a duplicate section. Check first with `grep -q "^## Screenshots" <<< "$EXISTING_BODY"` and either replace the existing section or post as a comment instead.
 
 ## Step 9: Verify the result
 
@@ -165,7 +174,7 @@ Reload the page in the Playwright browser and take a screenshot to confirm the i
 
 | Issue | Solution |
 |-------|----------|
-| Not logged in | SSO screen may appear — take snapshot, find "Continue" button, click it |
+| Not logged in | SSO screen may appear — take snapshot, find "Continue" button, click it. Full GitHub login can't be done headless — see [references/headless-relogin.md](references/headless-relogin.md) |
 | File path with special characters (e.g., Unicode narrow spaces from CleanShot) | Copy file to `/tmp/` with a simple name: `cp /path/CleanShot*keyword*.png /tmp/screenshot.png` |
 | File upload fails | Ensure the file path is absolute |
 | Textarea doesn't contain URLs yet | Wait 3–5 seconds after upload before running JS eval; retry once if needed |

@@ -113,25 +113,23 @@ RSpec.describe SessionsController, type: :request do
       include_context :rack_attack
 
       it "returns 429 after exceeding IP limit" do
-        users = Array.new(10) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
-        users.each do |sign_in_user|
+        # A fresh user per request keeps each email under the per-email
+        # throttle, so only the per-IP throttle (retry-after 60) can trip.
+        throttled = rack_attack_throttled_response(limit: 10) do
+          sign_in_user = FactoryBot.create(:user_confirmed, password:, password_confirmation: password)
           post "/session", params: {session: {email: sign_in_user.email, password:}}
-          expect(response.status).to_not eq 429
+          response
         end
-        post "/session", params: {session: {email: user.email, password:}}
-        expect(response).to have_http_status(:too_many_requests)
-        expect(response.headers["retry-after"]).to eq "60"
-        expect(response.body).to eq "Too Many Requests"
+        expect(throttled.headers["retry-after"]).to eq "60"
+        expect(throttled.body).to eq "Too Many Requests"
       end
 
       it "returns 429 after exceeding per-email limit" do
-        5.times do
+        throttled = rack_attack_throttled_response(limit: 5) do
           post "/session", params: {session: {email: user.email, password:}}
-          expect(response.status).to_not eq 429
+          response
         end
-        post "/session", params: {session: {email: user.email, password:}}
-        expect(response).to have_http_status(:too_many_requests)
-        expect(response.headers["retry-after"]).to eq "20"
+        expect(throttled.headers["retry-after"]).to eq "20"
       end
     end
   end
@@ -140,12 +138,11 @@ RSpec.describe SessionsController, type: :request do
     include_context :rack_attack
 
     it "returns 429 after exceeding the limit" do
-      5.times do
+      throttled = rack_attack_throttled_response(limit: 5) do
         post "/session/create_magic_link"
-        expect(response.status).to_not eq 429
+        response
       end
-      post "/session/create_magic_link"
-      expect(response).to have_http_status(:too_many_requests)
+      expect(throttled).to have_http_status(:too_many_requests)
     end
   end
 end

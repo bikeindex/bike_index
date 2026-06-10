@@ -50,8 +50,11 @@ else
   if [ -n "$CI" ]; then
     output "${YELLOW}" "On CI — creating translation sync PR"
 
-    # Check for existing open translation sync PRs
-    existing_pr=$(gh pr list --head "translations-sync" --state open --json number --jq '.[0].number' 2>/dev/null || true)
+    # Check for existing open translation sync PRs.
+    # Branches are named translations-sync-<timestamp>, so we can't use
+    # `gh pr list --head` (it requires an exact branch name) — match the prefix instead.
+    existing_pr=$(gh pr list --state open --json number,headRefName \
+      --jq 'map(select(.headRefName | startswith("translations-sync")))[0].number' 2>/dev/null || true)
     if [ -n "$existing_pr" ]; then
       output "${YELLOW}" "Translation sync PR already exists: #${existing_pr} — skipping PR creation"
       exit 1
@@ -73,6 +76,12 @@ else
       --body "" \
       --base main \
       --head "$branch_name"
+
+    # Pushes made with the default GITHUB_TOKEN don't trigger workflows, so the
+    # branch we just pushed won't run `on: push` CI. Dispatch it explicitly so
+    # the PR gets checks. (ci.yml must declare `workflow_dispatch`.)
+    output "${YELLOW}" "Dispatching CI on ${branch_name}"
+    gh workflow run ci.yml --ref "$branch_name"
 
     output "${YELLOW}" "PR created. Build will fail until the PR is merged."
   fi

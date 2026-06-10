@@ -1,6 +1,6 @@
 unless Rails.env.test?
   Geocoder.configure(
-    cache: Redis.new(url: Bikeindex::Application.config.redis_cache_url),
+    cache: Geocoder::CacheStore::Generic.new(Rails.cache, {}),
     lookup: :google,
     use_https: true,
     api_key: ENV["GOOGLE_GEOCODER"],

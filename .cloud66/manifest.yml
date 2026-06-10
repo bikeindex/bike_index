@@ -1,7 +1,4 @@
 production:
-  postgresql:
-    configuration:
-      version: 16
   rails:
     configuration:
-      node_version: "20.18.2"
+      node_version: "24.15.0"

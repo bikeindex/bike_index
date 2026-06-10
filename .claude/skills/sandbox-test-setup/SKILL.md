@@ -1,47 +1,89 @@
 ---
 name: sandbox-test-setup
 description: >-
-  Bike Index sandbox setup for running Ruby specs in Claude Code's web
-  sandbox. The Gemfile pins `ruby "4.0.2"` and the lockfile pins
-  `BUNDLED WITH 4.0.0.beta2`, so don't fall back to a 3.x ruby — no
-  prebuilt 4.0.2 binary is reachable (`cache.ruby-lang.org` is
-  firewalled, `ruby/ruby-builder`'s toolcache tops out at 3.5.0-preview1)
-  so build it from the GitHub source tag, ~8–10 min on a 4-core sandbox.
-  Also covers postgres/redis, the tailwind build, the Chrome-matching
-  ChromeDriver, and the local CDN proxy needed for `:js, type: :system`
-  specs (jsdelivr is firewalled, registry.npmjs.org isn't). Trigger
-  whenever a session needs to run RSpec, the user reports
-  `Bundler::RubyVersionMismatch` / `command not found: rspec` /
-  `tailwind.css is not present` / chromedriver version-mismatch errors,
-  or before attempting any system spec.
+  Bike Index Ruby + RSpec environment setup. Two environments:
+  **(A) local macOS Conductor workspace** (`/Users/…/conductor/workspaces/…`) —
+  Ruby 4.0.2 is installed via mise but Claude Code's shell sometimes
+  spawns subprocesses without the mise shim, so bare `ruby`/`bundle`
+  falls back to system 2.6 and fails with `Could not find 'bundler'
+  (4.0.0.beta2)`. Fix is a PATH prefix, not a reinstall.
+  **(B) Claude Code's Linux web sandbox** (`/home/user/bike_index`) —
+  Ruby 4.0.2 must be built from source (~8–10 min, `cache.ruby-lang.org`
+  firewalled); also postgres/redis, tailwind build, Chrome-matching
+  ChromeDriver, and a local jsdelivr proxy for `:js, type: :system`
+  specs. Trigger whenever a session runs RSpec/bundle/`bin/lint`, or
+  the user reports `Bundler::RubyVersionMismatch` /
+  `Could not find 'bundler' (4.0.0.beta2)` /
+  `command not found: rspec` / `tailwind.css is not present` /
+  chromedriver version-mismatch.
 ---
 
-# Running Ruby + RSpec in the Claude Code sandbox
+# Running Ruby + RSpec for Bike Index
 
-The bike_index Gemfile pins `ruby "4.0.2"` and `Gemfile.lock` pins
-`BUNDLED WITH 4.0.0.beta2`. We actually need Ruby 4.0.2 — don't fall
-back to 3.x and patch the Gemfile, because Bundler 4.x's resolver
-behaves differently and you'll waste time chasing fake regressions.
+Pick the section matching the environment: macOS paths under
+`/Users/…/conductor/workspaces/…` use **Local macOS**; Linux paths
+under `/home/user/bike_index` use **Claude Code web sandbox**.
 
-The catch: no prebuilt 4.0.2 binary is reachable from the sandbox.
-`cache.ruby-lang.org` returns 403 from the egress proxy, and
-`ruby/ruby-builder`'s toolcache release currently tops out at
-`3.5.0-preview1`. Build it from the GitHub source tag instead — the
-build below takes about 8–10 minutes on a 4-core sandbox.
+## Local macOS (Conductor workspace)
 
-Once `/opt/ruby-4.0.2/x64/` exists, **don't touch the Gemfile**.
+Ruby 4.0.2 is installed via [mise](https://mise.jdx.dev/), but Claude
+Code's shell sometimes spawns subprocesses without the mise shim on
+PATH — bare `ruby` then resolves to `/usr/bin/ruby` (2.6) and `bundle`
+fails with `Could not find 'bundler' (4.0.0.beta2)`. **The Ruby is
+installed; the PATH just isn't right** — don't reinstall, don't edit
+the Gemfile.
+
+Check first; only prefix PATH if `ruby -v` doesn't already print 4.0.2
+(`mise exec -- ruby`/`bundle` are unreliable in this harness — they
+can still resolve to system 2.6, so use the direct prefix):
+
+```bash
+ruby -v
+# If it's not 4.0.2:
+export PATH="/Users/seth/.local/share/mise/installs/ruby/4.0.2/bin:$PATH"
+```
+
+Then run specs the normal way:
+
+```bash
+bundle exec rspec spec/path/to/file_spec.rb
+```
+
+(No need to `eval "$(ruby bin/env --export)"` first — `config/boot.rb` loads
+`bin/env` for every Ruby entry point, so `WORKSPACE_ID` / `DEV_PORT` /
+`BASE_URL` / `REDIS_URL` are already set inside the process. Only export
+them into the shell when the shell itself reads them, e.g. `curl "$BASE_URL/..."`.)
+
+If `rails_helper` aborts complaining about a pending migration, run
+`bundle exec rails db:create db:migrate` first
+(`ActiveRecord::Migration.maintain_test_schema!`).
+
+Lint with `bin/lint` (same PATH prefix if needed). Postgres, redis,
+and the jsdelivr proxy are handled by your local dev environment —
+skip the rest of this skill **except** Tailwind build below, which
+can still bite a fresh Conductor workspace where `bin/dev` hasn't
+run.
+
+## Claude Code web sandbox
+
+The Gemfile pins `ruby "4.0.2"` and `Gemfile.lock` pins
+`BUNDLED WITH 4.0.0.beta2`. No prebuilt 4.0.2 binary is reachable
+(`cache.ruby-lang.org` is 403'd, `ruby/ruby-builder`'s toolcache tops
+out at `3.5.0-preview1`), so build from the GitHub source tag — about
+8–10 min on a 4-core sandbox. Don't fall back to 3.x and patch the
+Gemfile; Bundler 4.x's resolver behaves differently and you'll waste
+time chasing fake regressions. Once `/opt/ruby-4.0.2/x64/` exists,
 `bundle install` works as-is.
 
 ## One-shot Ruby 4.0.2 build
 
 Skip if `/opt/ruby-4.0.2/x64/bin/ruby --version` already prints 4.0.2.
-GitHub source tarballs lack a pre-generated `configure` script, so we
-run `autogen.sh` first. The `make install` step also has to download
-about 30 bundled gems via `BASERUBY` — `Downloader::RubyGems` hardcodes
-`ssl_ca_cert` to its bundled certs, which don't include the sandbox's
-egress-proxy CA, so we pre-stage every bundled gem with `curl` (curl
-honours `/etc/ssl/certs/ca-certificates.crt`) before running
-`make install`.
+Two quirks the bash block handles: (1) GitHub source tarballs lack a
+pre-generated `configure`, so `autogen.sh` runs first; (2) `make install`
+fetches ~30 bundled gems via `BASERUBY`, whose hardcoded CA bundle
+doesn't include the sandbox egress-proxy CA — so we pre-stage every
+bundled gem with `curl` (which honours
+`/etc/ssl/certs/ca-certificates.crt`) before `make install`.
 
 ```bash
 # 1. Source — GitHub tag tarball (cache.ruby-lang.org is blocked)
@@ -77,61 +119,51 @@ mkdir -p /opt/hostedtoolcache/Ruby/4.0.2
   ln -s /opt/ruby-4.0.2/x64 /opt/hostedtoolcache/Ruby/4.0.2/x64
 
 cd /home/user/bike_index
-```
-
-Confirm it works:
-
-```bash
-/opt/ruby-4.0.2/x64/bin/ruby --version
-# => ruby 4.0.2 ... [x86_64-linux]
+/opt/ruby-4.0.2/x64/bin/ruby --version   # => ruby 4.0.2 ... [x86_64-linux]
 ```
 
 ## Toolchain on PATH
 
 The Playwright Chromium directory has a build number that changes
-between sandbox images, so glob it instead of hardcoding:
+between sandbox images, so glob it instead of hardcoding. `service`
+lives only on `/usr/sbin`.
 
 ```bash
 CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
 export PATH="/opt/ruby-4.0.2/x64/bin:$CHROME_DIR:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
 export LD_LIBRARY_PATH="/opt/ruby-4.0.2/x64/lib:$LD_LIBRARY_PATH"
-
-bundle install   # no Gemfile edits needed
+bundle install
 ```
 
 ## Services + DB
 
-`service` lives only on `/usr/sbin` — already in the PATH above. Start
-postgres and redis once per session:
+Start postgres and redis once per session (redis logs a benign ulimit
+warning). Create the `rails` superuser + test DBs once per machine.
+`CI=1` makes `database.yml` use the rails/password creds at 127.0.0.1.
 
 ```bash
-service postgresql start    # done
-service redis-server start  # done (prints a benign ulimit warning)
-```
+service postgresql start
+service redis-server start
 
-Create the `rails` superuser and test databases once per machine:
-
-```bash
+# Once per machine:
 sudo -u postgres psql -c "CREATE USER rails WITH SUPERUSER PASSWORD 'password';"
 sudo -u postgres psql -c "CREATE DATABASE bikeindex_test OWNER rails;"
 sudo -u postgres psql -c "CREATE DATABASE bikeindex_analytics_test OWNER rails;"
-```
 
-Then prepare the schema (CI=1 makes `database.yml` use the
-rails/password creds at 127.0.0.1):
-
-```bash
 eval "$(ruby bin/env --export)"
 export RAILS_ENV=test CI=1
 bundle exec rails db:migrate db:test:prepare
 ```
 
-## Asset pipeline (Sprockets) — request specs that render the layout
+## Tailwind build (both environments)
 
 The application layout calls `stylesheet_link_tag 'tailwind'`. Without
-`app/assets/builds/tailwind.css`, request specs that hit `format: :html`
-fail with `Sprockets::Rails::Helper::AssetNotFound`. **Don't write the
-failure off as "pre-existing" — build Tailwind:**
+`app/assets/builds/tailwind.css`, specs that render the layout (request
+specs hitting `format: :html`, or any `:js, type: :system` spec) fail
+with `Sprockets::Rails::Helper::AssetNotFound`. This applies to both
+the sandbox AND a fresh Conductor workspace where `bin/dev` /
+`tailwindcss:build` haven't run yet. **Don't write the failure off as
+"pre-existing" — build Tailwind:**
 
 ```bash
 bundle exec rails tailwindcss:build
@@ -142,12 +174,9 @@ layout-rendering request specs, not just system specs.)
 
 ## Running plain specs
 
-```bash
-export PATH="/opt/ruby-4.0.2/x64/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
-export LD_LIBRARY_PATH="/opt/ruby-4.0.2/x64/lib:$LD_LIBRARY_PATH"
-eval "$(ruby bin/env --export)"
-export RAILS_ENV=test CI=1
+After Toolchain + Services + DB above:
 
+```bash
 bundle exec rspec spec/models spec/requests spec/jobs
 ```
 
@@ -160,11 +189,9 @@ Two extra hurdles in the sandbox:
 - Chrome binary lives at `/opt/pw-browsers/chromium-*/chrome-linux/chrome`
   — the `chromium-NNNN` directory has a Playwright build number that
   changes between sandbox images, so glob it.
-- `/opt/node22/bin/chromedriver` is too new (it tracks current stable,
+- `/opt/node22/bin/chromedriver` is too new (it tracks current stable;
   Chrome here is whatever Playwright bundled). Pull the matching driver
-  from Google's CfT bucket — `storage.googleapis.com` is allowed and
-  every CfT release publishes its driver under the exact Chrome version
-  string:
+  from Google's CfT bucket — `storage.googleapis.com` is allowed:
   ```bash
   CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
   CHROME_VER=$("$CHROME_DIR/chrome" --version | grep -oE "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+")
@@ -173,25 +200,21 @@ Two extra hurdles in the sandbox:
   unzip -o -q /tmp/chromedriver.zip -d /tmp
   cp /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
   ```
-  Add `"$CHROME_DIR"` to PATH (already in the export above).
 - Capybara's default `:selenium_chrome_headless` doesn't pass
-  `--no-sandbox` or a unique `--user-data-dir`, both required when Chrome
-  runs as root inside a container. `spec/support/local_chrome.rb`
+  `--no-sandbox` or a unique `--user-data-dir`, both required when
+  Chrome runs as root in a container. `spec/support/local_chrome.rb`
   re-registers the driver with the right flags, gated on
-  `LOCAL_CHROME_OVERRIDE=1` so CI and dev machines are unaffected. Set
-  the env var when running system specs in this sandbox; nothing else
-  to do.
+  `LOCAL_CHROME_OVERRIDE=1`. Just set that env var when running system
+  specs.
 
 ### 2. `cdn.jsdelivr.net` is firewalled
 
-bike_index's importmap pins `jquery`, `select2`, `luxon`,
-`@bikeindex/time-localizer`, `@floating-ui/dom`, and `@honeybadger-io/js`
-from `https://cdn.jsdelivr.net`. Without them, the marketplace search
-form never auto-submits and pages render empty. The proxy returns 403
-for jsdelivr but allows `registry.npmjs.org`. Fetch the packages from
-npm and serve them locally over TLS at the same path layout jsdelivr
-uses. Versions below mirror the current `config/importmap.rb` — bump
-them when that file changes.
+The importmap pins six modules (jquery, select2, luxon,
+@bikeindex/time-localizer, @floating-ui/dom, @honeybadger-io/js) from
+`cdn.jsdelivr.net` (403'd) — without them, pages render empty. Fetch
+from `registry.npmjs.org` (allowed) and serve locally over TLS at the
+same path layout. Versions below mirror `config/importmap.rb`; bump
+when that changes.
 
 ```bash
 mkdir -p /tmp/cdn
@@ -240,34 +263,24 @@ The `--host-resolver-rules` argument (in the override above) routes
 `cdn.jsdelivr.net` → this local server, and `--ignore-certificate-errors`
 trusts the self-signed cert.
 
-## End-to-end: a green spec run from a fresh shell
+## End-to-end recap
+
+Assumes Ruby 4.0.2 is already built. Combines the steps above:
 
 ```bash
-# 1. Build Ruby 4.0.2 if missing (see "One-shot Ruby 4.0.2 build" above)
-[ -x /opt/ruby-4.0.2/x64/bin/ruby ] || { echo "Build Ruby first"; exit 1; }
-
-# 2. Toolchain
 CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
 export PATH="/opt/ruby-4.0.2/x64/bin:$CHROME_DIR:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
 export LD_LIBRARY_PATH="/opt/ruby-4.0.2/x64/lib:$LD_LIBRARY_PATH"
-
-# 3. Services
-service postgresql start
-service redis-server start
-
-# 4. App env (no Gemfile edits needed)
+service postgresql start && service redis-server start
 cd /home/user/bike_index
 bundle install
 eval "$(ruby bin/env --export)"
 export RAILS_ENV=test CI=1
 bundle exec rails db:migrate db:test:prepare
-bundle exec rails tailwindcss:build  # only if specs render the layout
+bundle exec rails tailwindcss:build           # only if specs render the layout
 
-# 5a. Plain specs
-bundle exec rspec spec/models spec/requests spec/jobs
-
-# 5b. System specs — start the CDN proxy first (see section above), then:
-LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration
+bundle exec rspec spec/models spec/requests   # plain
+LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration   # system; CDN proxy must be running
 ```
 
 ## Sandbox network: what's allowed vs. blocked

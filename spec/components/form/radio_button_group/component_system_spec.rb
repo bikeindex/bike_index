@@ -14,13 +14,24 @@ RSpec.describe Form::RadioButtonGroup::Component, :js, type: :system do
       expect(page).to have_content "Active"
       expect(page).to have_content "Inactive"
       expect(page).to have_css "input[name='search_status'][value=''][checked]", visible: :all
-      expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES)
+      expect_axe_clean
 
       find("label", text: "Active").click
       expect(page).to have_css "input[name='search_status'][value='active']:checked", visible: :all
 
       find("label", text: "Inactive").click
       expect(page).to have_css "input[name='search_status'][value='inactive']:checked", visible: :all
+    end
+  end
+
+  context "with_html_labels" do
+    it "keeps spaces around inline markup" do
+      visit("#{base_path}with_html_labels")
+
+      # The label is inline-flex, so each text run/element is a separate flex
+      # item — without a wrapper the whitespace between them gets collapsed.
+      expect(find("label", text: "only not impounded")).to be_present
+      expect(find("label", text: "only impounded")).to be_present
     end
   end
 
