@@ -402,7 +402,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
         # Sticker search always spans every org, so "search all" is forced on and locked
         expect(page).to have_field("search_all", checked: true, disabled: true)
-        expect(page).to have_css("label[title='Sticker search always searches all bikes']", text: /search all bikes/i)
+
+        # The locked checkbox gets an info tooltip explaining why; it appears on hover
+        expect(page).to have_css("button[aria-label='Sticker search always searches all bikes']")
+        find("button[aria-label='Sticker search always searches all bikes']").hover
+        expect(page).to have_css("[role=tooltip]", text: "Sticker search always searches all bikes")
 
         find("textarea#serials").set("STKR200, STKR100, STKR300")
         click_button "Search stickers"
@@ -418,9 +422,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
         choose "Serials", allow_label_click: true, visible: :all
         expect(page).not_to have_current_path(/search_kind=stickers/)
 
-        # "Search all" is interactive again on serial search, with the sticker tooltip removed
+        # "Search all" is interactive again on serial search, with the sticker tooltip hidden
         expect(page).to have_field("search_all", checked: false, disabled: false)
-        expect(page).not_to have_css("label[title]", text: /search all bikes/i)
+        expect(page).not_to have_css("button[aria-label='Sticker search always searches all bikes']")
 
         # Previous results cleared
         expect(page).not_to have_css(".multi-search-serial-result")

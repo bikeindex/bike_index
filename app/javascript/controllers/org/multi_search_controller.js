@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--multi-search'
 export default class extends Controller {
-  static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll']
+  static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll', 'searchAllHint']
   static values = { url: String, stickerUrl: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
@@ -48,15 +48,14 @@ export default class extends Controller {
   // Sticker search always spans every organization, so lock "search all" on while it's active
   syncSearchAll () {
     if (!this.hasSearchAllTarget) return
-    const label = this.searchAllTarget.closest('label')
     if (this.searchKindValue === 'stickers') {
       this.searchAllTarget.checked = true
       this.searchAllTarget.disabled = true
-      if (label) label.title = 'Sticker search always searches all bikes'
+      if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.remove('tw:hidden')
     } else if (this.searchAllTarget.disabled) {
       this.searchAllTarget.checked = false
       this.searchAllTarget.disabled = false
-      if (label) label.removeAttribute('title')
+      if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.add('tw:hidden')
     }
   }
 
