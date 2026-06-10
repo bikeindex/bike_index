@@ -20,6 +20,7 @@ This project uses RSpec. All business logic should be tested.
 - Avoid testing private methods.
 - Avoid mocking objects.
   - If making external requests, use VCR. Don't manually write VCR cassettes — record them by running the tests.
+  - Cassettes that get modified when you run specs locally are re-recordings, not unrelated churn — they're supposed to update regularly. Commit them with your branch; don't revert them to "keep the PR focused".
 - Don't use `tap` to bundle factory creation with follow-up setup. Create the record in `let`/`let!`, then do the follow-up work on its own line (a separate statement, or a `before` block). One thing per line reads better and keeps the factory call clean.
 
 ### Good
