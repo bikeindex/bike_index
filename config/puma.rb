@@ -18,14 +18,15 @@ threads min_threads_count, max_threads_count
 # Jobs do not work on JRuby or Windows (both of which do not support
 # processes).
 #
-workers ENV.fetch("WEB_CONCURRENCY", 4)
-
-# Use the `preload_app!` method when specifying a `workers` number.
-# This directive tells Puma to first boot the application and load code
-# before forking the application. This takes advantage of Copy On Write
-# process behavior so workers use less memory.
-#
-preload_app!
+# Clustered + preload_app! gives copy-on-write memory savings when deployed.
+# bin/env defaults WEB_CONCURRENCY to 0 in local development.
+worker_count = ENV.fetch("WEB_CONCURRENCY", 3).to_i
+if worker_count.positive?
+  workers worker_count
+  preload_app!
+else
+  workers 0
+end
 
 # Set the directory to Cloud 66 specific environment variable so that puma can follow symlinks to new code on redeployment
 #
