@@ -2229,6 +2229,8 @@ nb:
     organizations:
       create:
         organization_created: Organisasjon opprettet vellykket!
+        must_create_an_account_first: Du må registrere deg for en konto på Bike Index
+          før du kan opprette en organisasjon.
       find_organization:
         not_found: Vi beklager, den organisasjonen er ikke på Bike Index ennå. Send
           e-post til contact@bikeindex.org hvis dette virker som en feil.

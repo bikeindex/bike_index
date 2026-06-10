@@ -72,7 +72,12 @@ RUN bundle exec bootsnap precompile -j 1 app/ lib/
 # Precompile assets. Bike Index doesn't use RAILS_MASTER_KEY (no credentials.yml.enc),
 # so a dummy SECRET_KEY_BASE is enough. REDIS_URL is set because some initializers
 # touch the Redis config at boot.
-RUN SECRET_KEY_BASE=dummy REDIS_URL="redis://localhost:6379" ./bin/rails assets:precompile
+# Sprockets' incremental cache is a BuildKit cache mount — persisted across CI
+# runs by buildkit-cache-dance (review-app.yml), so only changed assets
+# recompile, and never part of the shipped layer. tmp/cache/bootsnap stays
+# in-layer on purpose: shipping it is the point of the bootsnap steps above.
+RUN --mount=type=cache,target=/rails/tmp/cache/assets \
+    SECRET_KEY_BASE=dummy REDIS_URL="redis://localhost:6379" ./bin/rails assets:precompile
 
 # Final stage
 FROM base
