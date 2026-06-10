@@ -10,6 +10,12 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin "luxon", to: "https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/es6/luxon.js"
 pin "@bikeindex/time-localizer", to: "https://cdn.jsdelivr.net/npm/@bikeindex/time-localizer@0.2.1/dist/index.js"
 pin "@floating-ui/dom", to: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.3/+esm"
+# jsDelivr's +esm bundle externalizes its sub-deps with root-absolute paths
+# (/npm/...), which browsers resolve against our origin and 404. Remap them
+# back to the CDN. Keep versions in sync with @floating-ui/dom above.
+pin "/npm/@floating-ui/core@1.7.3/+esm", to: "https://cdn.jsdelivr.net/npm/@floating-ui/core@1.7.3/+esm"
+pin "/npm/@floating-ui/utils@0.2.10/+esm", to: "https://cdn.jsdelivr.net/npm/@floating-ui/utils@0.2.10/+esm"
+pin "/npm/@floating-ui/utils@0.2.10/dom/+esm", to: "https://cdn.jsdelivr.net/npm/@floating-ui/utils@0.2.10/dom/+esm"
 
 # jQuery is required for select2, which is used by search. It should not be used!
 # ideally we transition off it soon!
