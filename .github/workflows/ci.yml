@@ -16,6 +16,25 @@ jobs:
   lint_and_scan:
     runs-on: ubuntu-latest
     steps:
+      # Auto-redeploy the review app for PRs carrying the 'review-app' label.
+      # Dispatching from here instead of a `pull_request: synchronize` trigger
+      # in review-app.yml means unlabeled PRs (most of them) collect zero
+      # skipped review-app check runs on every push. A step inside this
+      # always-running job adds no check run of its own; it sits before
+      # checkout so the deploy dispatches within seconds of the push.
+      # GITHUB_TOKEN can't fire event-driven triggers, but explicit
+      # workflow_dispatch API calls are allowed (`actions: write` above).
+      - name: Auto-deploy review app (labeled PRs only)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pr=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$GITHUB_REF_NAME" \
+            --state open --label review-app --json number --jq '.[0].number')
+          if [ -n "$pr" ]; then
+            echo "Dispatching review-app deploy for PR #$pr"
+            gh workflow run review-app.yml --repo "$GITHUB_REPOSITORY" \
+              --ref "$GITHUB_REF_NAME" -f pr_number="$pr" -f action=deploy
+          fi
       - name: Checkout code
         uses: actions/checkout@v6
 

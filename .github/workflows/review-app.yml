@@ -4,14 +4,20 @@ name: Review App
 # See docs/review-apps.md for one-time host setup.
 #
 # Triggers:
-#   - workflow_dispatch    : operator clicks "Run workflow" in Actions UI
-#   - pull_request closed  : auto-destroy if the 'review-app' label is set
-#   - pull_request sync    : auto-redeploy on every push if the 'review-app' label
-#                            is set AND the PR is from this repo (not a fork)
+#   - workflow_dispatch   : operator clicks "Run workflow" in Actions UI, OR
+#                           ci.yml dispatches a deploy on push when the PR has
+#                           the 'review-app' label (lint_and_scan's first step)
+#   - pull_request closed : auto-destroy if the 'review-app' label is set
 #
-# For fork PRs, the 'pull_request' events are intentionally gated by the same-repo
-# check below — forks must be deployed manually via workflow_dispatch by a maintainer
-# who has reviewed the diff.
+# There is deliberately NO `pull_request: synchronize` trigger: it fires for
+# every push to every PR, and label-gating it at the job level would leave a
+# stack of skipped check runs on each unlabeled push. ci.yml's dispatch step
+# does the label gating instead, so this workflow only runs (and only shows
+# checks) when it has work to do.
+#
+# Fork PRs never auto-deploy: their pushes don't run ci.yml in this repo, so
+# nothing dispatches — a maintainer deploys manually via workflow_dispatch
+# after reviewing the diff.
 
 on:
   workflow_dispatch:
@@ -27,7 +33,7 @@ on:
         default: deploy
         options: [deploy, destroy]
   pull_request:
-    types: [synchronize, closed]
+    types: [closed]
 
 permissions:
   contents: read
@@ -47,9 +53,9 @@ env:
 jobs:
   resolve:
     name: Resolve PR
-    # Skip the runner entirely for unlabeled PR events (every push to every PR
-    # fires `synchronize`). The label literal can't reference env.REVIEW_LABEL —
-    # the env context isn't available in job-level `if`.
+    # Skip the runner entirely for unlabeled PR events (`closed` fires for
+    # every PR). The label literal can't reference env.REVIEW_LABEL — the env
+    # context isn't available in job-level `if`.
     if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'review-app')
     runs-on: ubuntu-latest
     outputs:
@@ -68,7 +74,6 @@ jobs:
           PR_NUMBER_EVENT: ${{ github.event.pull_request.number }}
           PR_HEAD_SHA_EVENT: ${{ github.event.pull_request.head.sha }}
           PR_HEAD_REPO_EVENT: ${{ github.event.pull_request.head.repo.full_name }}
-          PR_ACTION_EVENT: ${{ github.event.action }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
@@ -80,11 +85,7 @@ jobs:
           else
             pr="$PR_NUMBER_EVENT"
             head_sha="$PR_HEAD_SHA_EVENT"
-            if [[ "$PR_ACTION_EVENT" == "closed" ]]; then
-              action="destroy"
-            else
-              action="deploy"
-            fi
+            action="destroy"  # `closed` is the only pull_request trigger
             # Label presence is enforced by this job's `if:`.
             if [[ "$PR_HEAD_REPO_EVENT" != "$REPO" ]]; then
               echo "PR #$pr is from a fork ($PR_HEAD_REPO_EVENT); skipping auto-trigger."
@@ -114,13 +115,11 @@ jobs:
       IMAGE_TAG: pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}
     steps:
       # Label on deploy *attempt*, not success: the label marks intent ("this PR
-      # gets a review app") and arms auto-redeploy. Adding it up front means a
-      # failed build/deploy still arms it — push a fix and `pull_request: synchronize`
-      # retries automatically, instead of needing another manual workflow_dispatch.
-      # Only on workflow_dispatch — synchronize runs only fire when the label
-      # already exists (the resolve job's `if:`).
+      # gets a review app") and arms auto-redeploy (ci.yml's dispatch step keys
+      # off it). Adding it up front means a failed build/deploy still arms it —
+      # push a fix and CI re-dispatches automatically, instead of needing
+      # another manual workflow_dispatch. Idempotent on re-deploys.
       - name: Add review-app label
-        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
         # Create the label first — `gh pr edit --add-label` errors if it doesn't
