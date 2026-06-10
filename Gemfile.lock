@@ -390,10 +390,6 @@ GEM
     honeybadger (6.6.2)
       logger
       ostruct
-    hotwire-livereload (1.4.1)
-      actioncable (>= 6.0.0)
-      listen (>= 3.0.0)
-      railties (>= 6.0.0)
     hotwire_combobox (0.4.1)
       platform_agent (>= 1.0.1)
       rails (>= 7.0.7.2)
@@ -509,6 +505,9 @@ GEM
       net-pop
       net-smtp
     marcel (1.0.4)
+    mata (0.9.0)
+      listen (~> 3.0)
+      rack (>= 3.0)
     matrix (0.4.2)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -977,7 +976,6 @@ DEPENDENCIES
   haml
   herb
   honeybadger
-  hotwire-livereload (~> 1.4.1)
   hotwire_combobox
   i18n-country-translations
   i18n-js
@@ -992,6 +990,7 @@ DEPENDENCIES
   lograge
   logstash-event
   lookbook
+  mata
   memory_profiler
   mini_magick
   money-rails (~> 1.11)
