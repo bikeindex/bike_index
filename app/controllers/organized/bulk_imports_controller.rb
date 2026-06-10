@@ -88,11 +88,11 @@ module Organized
 
       if params[:organization_id] == "ascend"
         @ascend_import = true
-        return true if request.headers["Authorization"] == BulkImport.ascend_api_token
+        return true if secure_compare?(request.headers["Authorization"], BulkImport.ascend_api_token)
       else
         ensure_current_organization!
         @current_user = current_organization.auto_user # Crazy override to make current user work
-        return true if request.headers["Authorization"] == current_organization.access_token
+        return true if secure_compare?(request.headers["Authorization"], current_organization.access_token)
       end
       render(json: {error: "Not permitted"}, status: 401) && return
     end

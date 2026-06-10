@@ -42,6 +42,12 @@ module ControllerHelpers
     @forwarded_ip_address ||= IpAddressParser.forwarded_address(request)
   end
 
+  # Constant-time token check. Blank expected returns false, so an unset ENV
+  # token can't match a missing param
+  def secure_compare?(value, expected)
+    expected.present? && ActiveSupport::SecurityUtils.secure_compare(value.to_s, expected)
+  end
+
   def request_location_hash
     @request_location_hash ||= IpAddressParser.location_hash(request)
   end
