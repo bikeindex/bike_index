@@ -20,6 +20,9 @@ on:
       - 'vendor/strava_search/**'
       - 'public/strava_search/**'
       - '.github/workflows/strava_search_ci.yml'
+      # setup-node reads node-version-file: '.tool-versions' below — a Node
+      # bump changes the build environment, so it must trigger a run too.
+      - '.tool-versions'
 
 defaults:
   run:
