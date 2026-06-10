@@ -8,7 +8,7 @@ pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 # pin "flowbite", to: "https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.turbo.min.js"
 pin "luxon", to: "https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/es6/luxon.js"
-pin "@bikeindex/time-localizer", to: "https://cdn.jsdelivr.net/npm/@bikeindex/time-localizer@0.2.1/dist/index.js"
+pin "@bikeindex/time-localizer", to: "https://cdn.jsdelivr.net/npm/@bikeindex/time-localizer@0.3.0/dist/index.js"
 # Vendored (not CDN-pinned): loads on every page via the dropdown/tooltip
 # controllers, so we self-host. jsDelivr's +esm splits sub-deps into
 # root-absolute /npm/ imports that 404 against our origin; the vendored
