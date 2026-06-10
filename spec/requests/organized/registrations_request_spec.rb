@@ -334,6 +334,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       get "#{base_url}/multi_search_sticker_response", headers: turbo_headers
       expect(response.status).to eq(400)
     end
+
+    it "returns no bikes when the query normalizes to a blank code" do
+      # bike and other_bike both have claimed stickers; a query that normalizes to a blank code
+      # must not fall through to sticker_code_search's `all` and surface every organization's bikes
+      get "#{base_url}/multi_search_sticker_response", params: {query: "bikeindex.org/bikes/"}, headers: turbo_headers
+      expect(response.status).to eq(200)
+      expect(assigns(:bikes)).to be_empty
+    end
   end
 
   context "given an authenticated ambassador" do

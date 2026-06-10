@@ -70,8 +70,14 @@ module Organized
       return head(:bad_request) unless @query.present?
 
       @per_page = 10
-      bike_ids = BikeSticker.sticker_code_search(@query).where.not(bike_id: nil).select(:bike_id)
-      bikes = Bike.where(id: bike_ids)
+      # A blank normalized code makes sticker_code_search return `all`, so guard against it
+      # surfacing every organization's bikes
+      bikes = if BikeSticker.normalize_code(@query, leading_zeros: true).present?
+        bike_ids = BikeSticker.sticker_code_search(@query).where.not(bike_id: nil).select(:bike_id)
+        Bike.where(id: bike_ids)
+      else
+        Bike.none
+      end
       @pagy, @bikes = pagy(:countish, bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
     end
 
