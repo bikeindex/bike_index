@@ -1,0 +1,32 @@
+---
+- name: Update SSH configuration to be more secure
+  ansible.builtin.lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^(#)?{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }}"
+    state: present
+    validate: 'sshd -T -f %s'
+    mode: "0644"
+  loop:
+    - { key: "PasswordAuthentication", value: "no" }
+    - { key: "PermitRootLogin", value: "prohibit-password" }
+    - { key: "Port", value: "22" }
+    - { key: "UseDNS", value: "no" }
+    - { key: "PermitEmptyPasswords", value: "no" }
+    - { key: "ChallengeResponseAuthentication", value: "no" }
+    - { key: "GSSAPIAuthentication", value: "no" }
+    - { key: "X11Forwarding", value: "no" }
+  notify:
+    - Restart ssh
+
+- name: Update unattended-upgrades configuration to be more secure
+  ansible.builtin.lineinfile:
+    dest: "/etc/apt/apt.conf.d/50unattended-upgrades"
+    regexp: "^(\/\/)?{{ item.key }} "
+    line: "{{ item.key }} \"{{ item.value }}\";"
+    state: present
+    mode: "0644"
+  loop:
+    - { key: "Unattended-Upgrade::Automatic-Reboot", value: "{{ security_autoupdate_reboot }}" }
+    - { key: "Unattended-Upgrade::Automatic-Reboot-Time", value: "{{ security_autoupdate_reboot_time }}" }
+  when: security_autoupdate_reboot == "true"

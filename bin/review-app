@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# Helper for deploying / destroying per-PR review apps.
+#
+# Called by .github/workflows/review-app.yml. Can also be run locally if you
+# have kamal installed and SSH access to the review host.
+#
+#   bin/review-app deploy  <pr_number> [<image_tag>]
+#   bin/review-app destroy <pr_number>
+#
+# `deploy` is idempotent — runs the same path whether it's first deploy or
+# subsequent. bin/docker-entrypoint creates the per-PR Postgres role on first
+# boot and `db:prepare` handles schema/seed-or-migrate.
+#
+# Kamal reads .kamal/secrets by default. Locally that file pulls from 1Password
+# (account `bike-index`, item `Kamal/BikeIndex Review`) and uses `gh auth token`
+# for the GHCR password. CI copies .kamal/secrets-ci over the top first, so CI
+# deploys read GitHub Actions env-var passthrough instead.
+
+set -euo pipefail
+
+CONFIG="${KAMAL_CONFIG:-config/deploy.review.yml}"
+REDIS_DATABASES="${REDIS_DATABASES:-31}"  # shared-redis boots with --databases 32; 0 reserved
+
+usage() {
+  cat <<USAGE
+Usage:
+  bin/review-app deploy  <pr_number> [<image_tag>]
+  bin/review-app destroy <pr_number>
+
+Required env:
+  REVIEW_APP_HOST — always
+
+Secrets come from .kamal/secrets:
+  - Locally: 1Password (account bike-index, item Kamal/BikeIndex Review) + gh auth token
+  - In CI: the workflow copies .kamal/secrets-ci over .kamal/secrets first
+USAGE
+  exit 1
+}
+
+[[ $# -lt 2 ]] && usage
+action="$1"
+pr_number="$2"
+image_tag="${3:-${IMAGE_TAG:-}}"
+[[ "$pr_number" =~ ^[0-9]+$ ]] || { echo "pr_number must be numeric"; exit 1; }
+
+# Role/database names must stay in lockstep with config/deploy.review.yml's
+# env section — destroy drops whatever names are derived here.
+slug="pr-${pr_number}"
+role="bike_index_pr_${pr_number}"
+primary_db="bike_index_review_pr_${pr_number}_primary"
+analytics_db="bike_index_review_pr_${pr_number}_analytics"
+
+# Simple mod-N Redis logical DB allocation. With >REDIS_DATABASES concurrent
+# PRs OR two PR numbers congruent mod N, two apps share a Redis namespace
+# (cache + Sidekiq queues mix). Acceptable for v1; mitigation is to bump
+# `--databases` on the shared-redis accessory and raise REDIS_DATABASES.
+redis_db=$(( (pr_number % REDIS_DATABASES) + 1 ))
+
+export REVIEW_APP_PR_NUMBER="$pr_number"
+export REVIEW_APP_HOST="${REVIEW_APP_HOST:?REVIEW_APP_HOST is required}"
+export REVIEW_APP_REDIS_DB="$redis_db"
+
+kamal() { command kamal "$@" --config-file "$CONFIG"; }
+
+case "$action" in
+  deploy)
+    : "${image_tag:?image_tag required (3rd arg or IMAGE_TAG env)}"
+    echo "==> Deploying $slug at image tag $image_tag"
+    # kamal 2.x takes the image tag as --version (there is no `image_tag:` config key).
+    # --skip-push: the image is already built + pushed (by CI's docker/build-push
+    # step), so kamal just pulls it. This also avoids kamal cloning the repo
+    # --recurse-submodules, which fails on the private app/services/facebook
+    # submodule. See the builder note in config/deploy.review.yml.
+    kamal deploy --version "$image_tag" --skip-push
+    echo "==> Done. URL: https://${slug}.review.bikeindex.org"
+    ;;
+
+  destroy)
+    echo "==> Destroying review app $slug"
+    kamal app remove || true
+
+    echo "==> Dropping per-PR databases ($primary_db, $analytics_db) and role ($role)"
+    # One SSH round-trip, ordered so the databases drop before the role that owns
+    # them. Best-effort (|| true) with no ON_ERROR_STOP, so a failed DROP (e.g. a
+    # db that was never created) doesn't skip the rest.
+    kamal accessory exec db --reuse \
+      "psql -U postgres -d postgres \
+        -c 'DROP DATABASE IF EXISTS ${primary_db} WITH (FORCE)' \
+        -c 'DROP DATABASE IF EXISTS ${analytics_db} WITH (FORCE)' \
+        -c 'DROP ROLE IF EXISTS ${role}'" || true
+
+    echo "==> Flushing redis logical DB $redis_db"
+    kamal accessory exec redis --reuse \
+      "redis-cli -n ${redis_db} FLUSHDB" || true
+
+    echo "==> Done."
+    ;;
+
+  *)
+    usage
+    ;;
+esac

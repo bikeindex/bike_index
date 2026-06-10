@@ -66,7 +66,7 @@ production:
     variables:
       statement_timeout: 60000
 
-  analytics:
+  analytics: &analytics
     <<: *default
     migrations_paths: db/analytics_migrate
     host: "<%= ENV['POSTGRESQL_ANALYTICS_ADDRESS'] %>"
@@ -80,7 +80,7 @@ production:
 # replica points at the same database as the primary (staging runs a single
 # Postgres, like development).
 staging:
-  primary:
+  primary: &staging_primary
     <<: *default
     database: "<%= ENV['POSTGRESQL_DATABASE'] %>"
     host: "<%= ENV['POSTGRESQL_ADDRESS'] %>"
@@ -88,19 +88,8 @@ staging:
     password: "<%= ENV['POSTGRESQL_PASSWORD'] %>"
 
   primary_replica:
-    <<: *default
+    <<: *staging_primary
     # Using primary database, replica not actually replicating (as in development)
     replica: true
-    database: "<%= ENV['POSTGRESQL_DATABASE'] %>"
-    host: "<%= ENV['POSTGRESQL_ADDRESS'] %>"
-    username: "<%= ENV['POSTGRESQL_USERNAME'] %>"
-    password: "<%= ENV['POSTGRESQL_PASSWORD'] %>"
 
-  analytics:
-    <<: *default
-    migrations_paths: db/analytics_migrate
-    host: "<%= ENV['POSTGRESQL_ANALYTICS_ADDRESS'] %>"
-    database: "<%= ENV['ANALYTICS_DB_DATABASE'] %>"
-    username: "<%= ENV['ANALYTICS_DB_USERNAME'] %>"
-    password: "<%= ENV['ANALYTICS_DB_PASSWORD'] %>"
-    port: "<%= ENV['ANALYTICS_DB_PORT'] %>"
+  analytics: *analytics
