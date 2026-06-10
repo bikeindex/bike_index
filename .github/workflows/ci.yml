@@ -2,8 +2,13 @@ name: CI
 
 on:
   push:
+  # Allows bin/check_translations to trigger CI on the translations-sync branch.
+  # Pushes made with the default GITHUB_TOKEN don't fire `on: push`, so the
+  # automated translations PR otherwise gets no checks.
+  workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
