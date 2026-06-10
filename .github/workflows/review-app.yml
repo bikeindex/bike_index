@@ -47,6 +47,10 @@ env:
 jobs:
   resolve:
     name: Resolve PR
+    # Skip the runner entirely for unlabeled PR events (every push to every PR
+    # fires `synchronize`). The label literal can't reference env.REVIEW_LABEL —
+    # the env context isn't available in job-level `if`.
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'review-app')
     runs-on: ubuntu-latest
     outputs:
       pr_number: ${{ steps.set.outputs.pr_number }}
@@ -65,7 +69,6 @@ jobs:
           PR_HEAD_SHA_EVENT: ${{ github.event.pull_request.head.sha }}
           PR_HEAD_REPO_EVENT: ${{ github.event.pull_request.head.repo.full_name }}
           PR_ACTION_EVENT: ${{ github.event.action }}
-          PR_LABELS_JSON: ${{ toJson(github.event.pull_request.labels.*.name) }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
@@ -82,11 +85,8 @@ jobs:
             else
               action="deploy"
             fi
-            has_label=$(echo "$PR_LABELS_JSON" | jq -r 'index("'"$REVIEW_LABEL"'")' || true)
-            if [[ "$has_label" == "null" || -z "$has_label" ]]; then
-              echo "PR #$pr lacks the '$REVIEW_LABEL' label; skipping."
-              proceed=false
-            elif [[ "$PR_HEAD_REPO_EVENT" != "$REPO" ]]; then
+            # Label presence is enforced by this job's `if:`.
+            if [[ "$PR_HEAD_REPO_EVENT" != "$REPO" ]]; then
               echo "PR #$pr is from a fork ($PR_HEAD_REPO_EVENT); skipping auto-trigger."
               proceed=false
             else
@@ -117,6 +117,7 @@ jobs:
     # needs the same bundle even though `app remove` uses little of it — avoids
     # silent empty-string substitutions causing odd failures.
     env:
+      IMAGE_TAG: pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}
       REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
       KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
@@ -167,8 +168,10 @@ jobs:
       # gets a review app") and arms auto-redeploy. Adding it up front means a
       # failed build/deploy still arms it — push a fix and `pull_request: synchronize`
       # retries automatically, instead of needing another manual workflow_dispatch.
+      # Only on workflow_dispatch — synchronize runs only fire when the label
+      # already exists (the resolve job's `if:`).
       - name: Add review-app label
-        if: needs.resolve.outputs.action == 'deploy'
+        if: needs.resolve.outputs.action == 'deploy' && github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
         # Create the label first — `gh pr edit --add-label` errors if it doesn't
@@ -179,10 +182,6 @@ jobs:
           gh label create "$REVIEW_LABEL" --repo "$GITHUB_REPOSITORY" \
             --color 0E8A16 --description "Per-PR Kamal review app is deployed" 2>/dev/null || true
           gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
-      - name: Compute image tag
-        if: needs.resolve.outputs.action == 'deploy'
-        id: tag
-        run: echo "image_tag=pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}" >> "$GITHUB_OUTPUT"
       - name: Set up Docker Buildx
         if: needs.resolve.outputs.action == 'deploy'
         uses: docker/setup-buildx-action@v3
@@ -199,7 +198,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.image_tag }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           # kamal verifies the deployed image carries a `service` label matching the
           # config's service name (bike-index-pr-<N>). kamal adds it when it builds;
           # since CI builds here and deploys with --skip-push, set it explicitly.
@@ -208,7 +207,8 @@ jobs:
           cache-to: type=gha,mode=max,scope=review-app
       - name: Deploy
         if: needs.resolve.outputs.action == 'deploy'
-        run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}" "${{ steps.tag.outputs.image_tag }}"
+        # bin/review-app reads the job-level IMAGE_TAG env.
+        run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}"
 
       - name: Destroy
         if: needs.resolve.outputs.action == 'destroy'

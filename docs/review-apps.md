@@ -110,7 +110,7 @@ R2_DEV_ENDPOINT              R2_DEV_ACCESS_KEY            R2_DEV_ACCESS_KEY_SECR
 HONEYBADGER_API_KEY
 ```
 
-These are the same review-app-scoped values stored as `REVIEW_APP_*` GitHub Environment secrets (see step 7 above) — keep them in sync.
+These are the same review-app-scoped values stored as `REVIEW_APP_*` GitHub Environment secrets (see step 6 above) — keep them in sync.
 
 Then:
 
@@ -167,7 +167,7 @@ Each review app gets a `cron` container (a Kamal [`servers` role](https://kamal-
 | `.kamal/hooks/post-deploy` | Best-effort Honeybadger deploy notification (reports the `staging` env); never fails the deploy — no-ops if `HONEYBADGER_API_KEY` is unset or the gem isn't present (e.g. CI) |
 | `.github/workflows/review-app.yml` | `resolve` + `update` jobs handling all four triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `provisioning/` | Ansible playbook for one-time host hardening |
-| `app/components/review_app_banner/` | ViewComponent rendered in the application layout when `ENV["REVIEW_APP"]` is set |
+| `app/components/page_block/review_app_banner/` | ViewComponent rendered in the application layout when `ENV["REVIEW_APP"]` is set |
 
 ## Known limits
 

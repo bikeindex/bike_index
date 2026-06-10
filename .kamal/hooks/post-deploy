@@ -16,7 +16,9 @@
 # Best-effort: this must NEVER fail the deploy.
 revision="$(git rev-parse HEAD 2>/dev/null || echo "$KAMAL_VERSION")"
 
-kamal app exec --reuse --roles web --config-file config/deploy.review.yml \
+# KAMAL_CONFIG: same override knob as bin/review-app — this hook fires for every
+# kamal deploy in the repo, so don't bake in the review-apps config.
+kamal app exec --reuse --roles web --config-file "${KAMAL_CONFIG:-config/deploy.review.yml}" \
   "sh -c 'DEPLOY_SHA=$revision bin/rails trigger_honeybadger_deploy'" \
   || echo "Honeybadger deploy notification skipped/failed (non-fatal)"
 exit 0

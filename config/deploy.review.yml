@@ -4,9 +4,10 @@
 #
 #   export REVIEW_APP_PR_NUMBER=123
 #   export REVIEW_APP_HOST=host.review.bikeindex.org
-#   bin/kamal deploy --version pr-123-<sha> \
-#                    --config-file config/deploy.review.yml \
-#                    --secrets-file .kamal/secrets-ci
+#   kamal deploy --version pr-123-<sha> --config-file config/deploy.review.yml
+#
+# Secrets: kamal always reads .kamal/secrets. Locally that pulls from 1Password;
+# CI copies .kamal/secrets-ci over it first (see .github/workflows/review-app.yml).
 #
 # Multi-tenancy: each PR gets a unique service name (`bike-index-pr-<N>`) so
 # containers coexist on the host. Postgres + Redis are *shared* accessories
@@ -22,12 +23,14 @@
 #
 # This file is NOT used by production (Cloud66).
 
-<% pr        = ENV.fetch("REVIEW_APP_PR_NUMBER") %>
-<% host      = ENV.fetch("REVIEW_APP_HOST") %>
-<% slug      = "pr-#{pr}" %>
-<% db_suffix = slug.tr("-", "_") %>
-<% appname   = "bike-index-#{slug}" %>
-<% role      = "bike_index_#{db_suffix}" %>
+<%# The role/database naming scheme must stay in lockstep with bin/review-app,
+    which re-derives the same names to DROP them on destroy. %>
+<% pr      = ENV.fetch("REVIEW_APP_PR_NUMBER") %>
+<% host    = ENV.fetch("REVIEW_APP_HOST") %>
+<% slug    = "pr-#{pr}" %>
+<% appname = "bike-index-#{slug}" %>
+<% role    = "bike_index_pr_#{pr}" %>
+<% redis_url = "redis://shared-redis:6379/#{ENV.fetch("REVIEW_APP_REDIS_DB", "1")}" %>
 
 service: <%= appname %>
 # NOTE: no registry host here — kamal prepends `registry.server` (configuration.rb
@@ -92,18 +95,19 @@ env:
     # separate replica address is needed (see config/database.yml).
     POSTGRESQL_ADDRESS: shared-db
     POSTGRESQL_USERNAME: <%= role %>
-    POSTGRESQL_DATABASE: bike_index_review_<%= db_suffix %>_primary
+    POSTGRESQL_DATABASE: bike_index_review_pr_<%= pr %>_primary
     # Analytics lives on the same shared-db accessory (dropped alongside the
     # primary in bin/review-app destroy).
     POSTGRESQL_ANALYTICS_ADDRESS: shared-db
     ANALYTICS_DB_USERNAME: <%= role %>
-    ANALYTICS_DB_DATABASE: bike_index_review_<%= db_suffix %>_analytics
+    ANALYTICS_DB_DATABASE: bike_index_review_pr_<%= pr %>_analytics
     ANALYTICS_DB_PORT: "5432"
 
-    # Redis (shared-redis accessory; logical DB per PR)
-    REDIS_URL: "redis://shared-redis:6379/<%= ENV.fetch('REVIEW_APP_REDIS_DB', '1') %>"
-    REDIS_CACHE_URL: "redis://shared-redis:6379/<%= ENV.fetch('REVIEW_APP_REDIS_DB', '1') %>"
-    REDIS_RACK_ATTACK_URL: "redis://shared-redis:6379/<%= ENV.fetch('REVIEW_APP_REDIS_DB', '1') %>"
+    # Redis (shared-redis accessory; logical DB per PR). REDIS_CACHE_URL defaults
+    # to REDIS_URL (config/application.rb); RACK_ATTACK must be pinned because its
+    # default is cache-db+1 — another PR's logical DB under mod-N allocation.
+    REDIS_URL: "<%= redis_url %>"
+    REDIS_RACK_ATTACK_URL: "<%= redis_url %>"
 
     # Runtime
     RAILS_LOG_TO_STDOUT: "1"
