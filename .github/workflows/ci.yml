@@ -130,7 +130,7 @@ jobs:
       # Key hashes every input the three asset tools read:
       #   - sprockets: app/assets/images, javascripts, config/manifest.js, Gemfile.lock (gem versions)
       #   - dartsass-rails: app/assets/stylesheets, config/initializers/dartsass.rb
-      #   - tailwindcss-rails: app/assets/tailwind, config/tailwind.config.js,
+      #   - tailwindcss-rails: app/assets/tailwind (theme + @source globs live here),
       #     and everything tailwind scans (views/components/helpers/javascript)
       # On a partial-key restore, sprockets' tmp/cache makes the rebuild near-instant
       # for unchanged inputs, so the loose restore-keys fallback is worth keeping.
@@ -150,7 +150,7 @@ jobs:
           # CAPYBARA_PORT is in the key because the precompile step bakes
           # `ENV['BASE_URL']` (derived from it) into ERB-templated assets;
           # a cached bundle from a different port would serve a stale URL.
-          key: ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/tailwind.config.js', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
+          key: ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-
       - name: build assets
