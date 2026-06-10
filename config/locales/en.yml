@@ -1815,6 +1815,9 @@ en:
           not_your_application: That isn't your application
     organizations:
       create:
+        must_create_an_account_first: >-
+          You have to sign up for an account on Bike Index before you can create an
+          organization
         organization_created: Organization Created successfully!
       find_organization:
         not_found: >-

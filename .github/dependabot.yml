@@ -7,6 +7,12 @@ updates:
   open-pull-requests-limit: 1
   ignore:
     - dependency-name: hotwire-livereload # see #3418
+    - dependency-name: active_model_serializers # pinned ~> 0.8.3, newer versions are slower
+    - dependency-name: MailchimpMarketing
+    - dependency-name: stripe
+    - dependency-name: twitter
+    - dependency-name: coffee-rails # deprecated CoffeeScript
+    - dependency-name: carrierwave
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

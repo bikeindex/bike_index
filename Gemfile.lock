@@ -150,12 +150,12 @@ GEM
     bcrypt (3.1.22)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
-    binxtils (0.4.2)
+    binxtils (0.5.1)
       functionable
       loofah
       rails
       rails-html-sanitizer
-    bootsnap (1.24.5)
+    bootsnap (1.24.6)
       msgpack (~> 1.2)
     brakeman (8.0.4)
       racc
@@ -535,7 +535,7 @@ GEM
       monetize (~> 1.9)
       money (~> 6.13)
       railties (>= 3.0)
-    msgpack (1.8.1)
+    msgpack (1.8.3)
     multi_json (1.20.1)
     multipart-post (2.4.1)
     mustermann (4.0.0)
@@ -950,7 +950,6 @@ DEPENDENCIES
   chunky_png
   coderay
   coffee-rails
-  connection_pool (< 4)
   csv
   dartsass-rails
   database_cleaner

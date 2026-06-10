@@ -16,6 +16,22 @@ RSpec.describe UI::UserTextBlockDisplay::Component, type: :component do
     expect(component).to have_text text.strip
   end
 
+  it "renders without leading whitespace in the text block" do
+    inner_html = component.css("div").first.inner_html
+    expect(inner_html).to eq(text.strip)
+  end
+
+  it "includes the overflow class" do
+    expect(component.css("div").first["class"]).to include("tw:overflow-y-auto")
+  end
+
+  context "blank max_height_class" do
+    let(:options) { {text:, max_height_class: ""} }
+    it "omits the overflow class" do
+      expect(component.css("div").first["class"]).to_not include("tw:overflow-y-auto")
+    end
+  end
+
   context "no text" do
     let(:text) { "\n  " }
     it "does not render" do

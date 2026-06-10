@@ -694,6 +694,24 @@ RSpec.describe BulkImportJob, type: :job do
           }.to change(Bike, :count).by 0
         end
       end
+      context "impounded with invalid impounded_at" do
+        include_context :geocoder_default_location
+        let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
+        let(:organization) { impound_configuration.organization }
+        let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", kind: "impounded", organization: organization) }
+        let(:row) do
+          {manufacturer: "Surly", serial_number: "na", year: "2018", model: "Midnight Special",
+           impounded_at: "32:61:61", impounded_street: "1409 Martin Luther King Jr Way",
+           impounded_city: "Berkeley", impounded_state: "CA", impounded_zipcode: "94710", impounded_country: "US"}
+        end
+        it "doesn't raise, returns the bike with an impounded_at error" do
+          expect {
+            bike = instance.send(:register_bike, instance.send(:row_to_b_param_hash, row))
+            expect(bike.id).to_not be_present
+            expect(bike.cleaned_error_messages).to include("Impound records impounded at '32:61:61' is not a valid date")
+          }.to_not change(Bike, :count)
+        end
+      end
     end
 
     describe "rescue_blank_serials" do
