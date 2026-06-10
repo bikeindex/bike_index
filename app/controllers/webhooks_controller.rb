@@ -46,7 +46,7 @@ class WebhooksController < ApplicationController
   private
 
   def strava_verify_subscription
-    if params["hub.verify_token"] == STRAVA_WEBHOOK_VERIFY_TOKEN
+    if secure_compare?(params["hub.verify_token"], STRAVA_WEBHOOK_VERIFY_TOKEN)
       render json: {"hub.challenge" => params["hub.challenge"]}, status: :ok
     else
       head :forbidden

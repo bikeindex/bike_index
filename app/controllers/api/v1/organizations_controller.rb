@@ -12,7 +12,7 @@ module API
         @organization = Organization.friendly_find(params[:id])
         if @organization.blank?
           redirect_to(api_v1_not_found_url) && return
-        elsif params[:access_token] == @organization.access_token
+        elsif secure_compare?(params[:access_token], @organization.access_token)
           if Organization.pos_kinds.include?(params[:manual_pos_kind])
             m_kind = (params[:manual_pos_kind] == "no_pos") ? nil : params[:manual_pos_kind]
             # We really only want to update orgs when there is a change, otherwise it breaks where
@@ -37,8 +37,8 @@ module API
         redirect_to(api_v1_not_found_url) && return unless @organization.present?
 
         if params[:access_token].present?
-          return true if params[:access_token] == ENV["ORGANIZATIONS_API_ACCESS_TOKEN"]
-          return true if params[:access_token] == @organization.access_token
+          return true if secure_compare?(params[:access_token], ENV["ORGANIZATIONS_API_ACCESS_TOKEN"])
+          return true if secure_compare?(params[:access_token], @organization.access_token)
         end
         message = {"401": "Not permitted"}
         respond_with(message, status: :unauthorized) && return
