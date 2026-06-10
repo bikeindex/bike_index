@@ -14,11 +14,7 @@ end
 
 ENV["DEV_PORT"] ||= "3042"
 ENV["BASE_URL"] ||= "http://localhost:#{ENV["DEV_PORT"]}"
-
-# Run Puma in single mode (0 workers, no fork) so Mata live-reload works: its
-# file-watcher thread and SSE registry must live in the request-serving process.
-# Only loaded for dev/test (see config/boot.rb); deployed envs set their own count.
-ENV["WEB_CONCURRENCY"] ||= "0"
+ENV["WEB_CONCURRENCY"] ||= "0" # Run Puma in single mode (0 workers, no fork). required for Mata live-reload
 
 # Redis only has 16 databases (0-15). Reserve database 0 for the main checkout
 # (no WORKSPACE_ID) so workspace dev servers can't clobber its data (eg the

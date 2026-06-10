@@ -119,11 +119,12 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  # Live reload. bin/dev rebuilds Tailwind/JS into app/assets/builds, so skip
-  # that dir to avoid double reloads.
+  # Live reload via DOM morphing. Watch app/assets/builds (compiled CSS) so stylesheet
+  # edits reload with correct styles — morphing swaps the <link> and the browser refetches.
+  # JS is deliberately not watched: morphing can't re-execute modules, and editing JS only
+  # spams importmap warnings, so JS changes need a manual refresh.
   config.middleware.insert_before(
     ActionDispatch::Static, MataExceptLookbook,
-    watch: %w[app/views app/helpers app/components config/locales],
-    skip: %w[app/assets/builds]
+    watch: %w[app/views app/helpers app/components app/assets/builds config/locales]
   )
 end
