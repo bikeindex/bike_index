@@ -56,8 +56,11 @@ jobs:
     name: "Run tests"
     runs-on: ubuntu-latest
     services:
+      # Service images pull from AWS's public Docker Hub mirror — direct pulls
+      # from registry-1.docker.io intermittently time out on Actions runners
+      # (3 retries, then the job fails at "Initialize containers").
       postgres:
-        image: postgres:16-alpine
+        image: public.ecr.aws/docker/library/postgres:16-alpine
         ports:
           - 5432:5432
         env:
@@ -71,7 +74,7 @@ jobs:
           --health-interval 10s
           --health-retries 5
       redis:
-        image: redis
+        image: public.ecr.aws/docker/library/redis
         ports:
           - 6379:6379
         options: --entrypoint redis-server
