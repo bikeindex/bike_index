@@ -157,10 +157,6 @@ accessories:
     service: shared-db
     image: postgres:17
     host: <%= host %>
-    # pg_stat_statements must be preloaded at server start for pghero's
-    # query-stats capture (the extension itself is created per-database by
-    # structure.sql). Changing this requires `kamal accessory reboot db`.
-    cmd: "postgres -c shared_preload_libraries=pg_stat_statements"
     env:
       secret:
         - POSTGRES_PASSWORD
