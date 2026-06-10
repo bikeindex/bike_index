@@ -147,7 +147,7 @@ module Bikes
 
     def find_token
       # First, deal with claim_token
-      if params[:t].present? && @bike.current_ownership.token == params[:t]
+      if params[:t].present? && secure_compare?(params[:t], @bike.current_ownership.token)
         @claim_message = @bike.current_ownership&.claim_message
         session[:claim_token_email] = @bike.current_ownership.owner_email
       end

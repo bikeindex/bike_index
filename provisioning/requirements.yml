@@ -1,0 +1,7 @@
+---
+collections:
+  - community.general
+
+roles:
+  - name: geerlingguy.swap
+    src: geerlingguy.swap

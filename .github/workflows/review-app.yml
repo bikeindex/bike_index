@@ -1,0 +1,246 @@
+name: Review App
+
+# Deploys / destroys per-PR review apps via Kamal to the shared review host.
+# See docs/review-apps.md for one-time host setup.
+#
+# Triggers:
+#   - workflow_dispatch    : operator clicks "Run workflow" in Actions UI
+#   - pull_request closed  : auto-destroy if the 'review-app' label is set
+#   - pull_request sync    : auto-redeploy on every push if the 'review-app' label
+#                            is set AND the PR is from this repo (not a fork)
+#
+# For fork PRs, the 'pull_request' events are intentionally gated by the same-repo
+# check below — forks must be deployed manually via workflow_dispatch by a maintainer
+# who has reviewed the diff.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Pull request number"
+        required: true
+        type: string
+      action:
+        description: "deploy or destroy"
+        required: true
+        type: choice
+        default: deploy
+        options: [deploy, destroy]
+  pull_request:
+    types: [synchronize, closed]
+
+permissions:
+  contents: read
+  packages: write       # push to GHCR
+  pull-requests: write  # add/remove labels and comment
+
+concurrency:
+  # One in-flight deploy per PR.
+  group: review-app-${{ github.event.inputs.pr_number || github.event.pull_request.number }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  REVIEW_LABEL: review-app
+
+jobs:
+  resolve:
+    name: Resolve PR
+    # Skip the runner entirely for unlabeled PR events (every push to every PR
+    # fires `synchronize`). The label literal can't reference env.REVIEW_LABEL —
+    # the env context isn't available in job-level `if`.
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'review-app')
+    runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.set.outputs.pr_number }}
+      head_sha:  ${{ steps.set.outputs.head_sha }}
+      action:    ${{ steps.set.outputs.action }}
+      proceed:   ${{ steps.set.outputs.proceed }}
+    steps:
+      - name: Resolve PR + action from the trigger
+        id: set
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PR: ${{ github.event.inputs.pr_number }}
+          INPUT_ACTION: ${{ github.event.inputs.action }}
+          PR_NUMBER_EVENT: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA_EVENT: ${{ github.event.pull_request.head.sha }}
+          PR_HEAD_REPO_EVENT: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_ACTION_EVENT: ${{ github.event.action }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            pr="$INPUT_PR"
+            action="$INPUT_ACTION"
+            head_sha=$(gh pr view "$pr" --repo "$REPO" --json headRefOid -q .headRefOid)
+            proceed=true
+          else
+            pr="$PR_NUMBER_EVENT"
+            head_sha="$PR_HEAD_SHA_EVENT"
+            if [[ "$PR_ACTION_EVENT" == "closed" ]]; then
+              action="destroy"
+            else
+              action="deploy"
+            fi
+            # Label presence is enforced by this job's `if:`.
+            if [[ "$PR_HEAD_REPO_EVENT" != "$REPO" ]]; then
+              echo "PR #$pr is from a fork ($PR_HEAD_REPO_EVENT); skipping auto-trigger."
+              proceed=false
+            else
+              proceed=true
+            fi
+          fi
+          echo "pr_number=$pr"   >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+          echo "action=$action"  >> "$GITHUB_OUTPUT"
+          echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
+
+  # Deploy and destroy deliberately share ONE job, branching via step-level `if:`
+  # on the resolved action. Keep it that way: GitHub renders one check-run per
+  # job, so splitting this into separate deploy/destroy jobs makes every commit
+  # show one running + one skipped check. See docs/review-apps.md "How a deploy works".
+  update:
+    name: Update ${{ needs.resolve.outputs.pr_number }}
+    needs: resolve
+    if: needs.resolve.outputs.proceed == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: review-app
+      # Surfaces the "View deployment" button on the PR + Environments pane.
+      # Only on deploy — destroy has no live URL.
+      url: ${{ needs.resolve.outputs.action == 'deploy' && format('https://pr-{0}.review.bikeindex.org', needs.resolve.outputs.pr_number) || '' }}
+    # All env vars feed `.kamal/secrets-ci` via Dotenv variable substitution. Kamal
+    # substitutes `$POSTGRES_PASSWORD` etc. from the calling process env. Destroy
+    # needs the same bundle even though `app remove` uses little of it — avoids
+    # silent empty-string substitutions causing odd failures.
+    env:
+      IMAGE_TAG: pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}
+      REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+      SECRET_KEY_BASE: ${{ secrets.REVIEW_APP_SECRET_KEY_BASE }}
+      SESSION_SECRET: ${{ secrets.REVIEW_APP_SESSION_SECRET }}
+      VERIFICATION_SECRET: ${{ secrets.REVIEW_APP_VERIFICATION_SECRET }}
+      # Stripe (test-mode) comes from the committed .env (dotenv in staging), not
+      # a GitHub secret — see config/environments/staging.rb + Gemfile.
+      GOOGLE_MAPS: ${{ secrets.REVIEW_APP_GOOGLE_MAPS }}
+      GOOGLE_MAPS_STATIC: ${{ secrets.REVIEW_APP_GOOGLE_MAPS_STATIC }}
+      GOOGLE_GEOCODER: ${{ secrets.REVIEW_APP_GOOGLE_GEOCODER }}
+      MAPBOX_GEOCODER: ${{ secrets.REVIEW_APP_MAPBOX_GEOCODER }}
+      MAPBOX_MAPPING: ${{ secrets.REVIEW_APP_MAPBOX_MAPPING }}
+      R2_DEV_ENDPOINT: ${{ secrets.REVIEW_APP_R2_DEV_ENDPOINT }}
+      R2_DEV_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY }}
+      R2_DEV_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET }}
+      HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
+      HONEYBADGER_FRONTEND_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_FRONTEND_API_KEY }}
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.resolve.outputs.head_sha }}
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0.2"
+      - name: Install Kamal
+        run: gem install kamal -v "~> 2.0"
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.REVIEW_APP_SSH_KEY }}
+      - name: Trust review host
+        # Scan the hostname AND its resolved IP, un-hashed: kamal's net-ssh verifies
+        # the key against both (check_host_ip is on by default), so a hashed,
+        # hostname-only known_hosts entry triggers Net::SSH::HostKeyMismatch.
+        run: |
+          mkdir -p ~/.ssh
+          host='${{ vars.REVIEW_APP_HOST }}'
+          ip="$(getent hosts "$host" | awk 'NR==1 { print $1 }')"
+          ssh-keyscan "$host" $ip >> ~/.ssh/known_hosts
+      - name: Stage CI secrets file
+        run: cp .kamal/secrets-ci .kamal/secrets
+
+      # --- deploy path: label the PR, build + push the image, then deploy ---
+      # Label on deploy *attempt*, not success: the label marks intent ("this PR
+      # gets a review app") and arms auto-redeploy. Adding it up front means a
+      # failed build/deploy still arms it — push a fix and `pull_request: synchronize`
+      # retries automatically, instead of needing another manual workflow_dispatch.
+      # Only on workflow_dispatch — synchronize runs only fire when the label
+      # already exists (the resolve job's `if:`).
+      - name: Add review-app label
+        if: needs.resolve.outputs.action == 'deploy' && github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Create the label first — `gh pr edit --add-label` errors if it doesn't
+        # exist in the repo, and a bare `|| true` would silently leave the PR
+        # unlabeled (so auto-redeploy never arms). `gh label create` is idempotent
+        # via `|| true` when it already exists.
+        run: |
+          gh label create "$REVIEW_LABEL" --repo "$GITHUB_REPOSITORY" \
+            --color 0E8A16 --description "Per-PR Kamal review app is deployed" 2>/dev/null || true
+          gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
+      - name: Set up Docker Buildx
+        if: needs.resolve.outputs.action == 'deploy'
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        if: needs.resolve.outputs.action == 'deploy'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        if: needs.resolve.outputs.action == 'deploy'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          # kamal verifies the deployed image carries a `service` label matching the
+          # config's service name (bike-index-pr-<N>). kamal adds it when it builds;
+          # since CI builds here and deploys with --skip-push, set it explicitly.
+          labels: service=bike-index-pr-${{ needs.resolve.outputs.pr_number }}
+          cache-from: type=gha,scope=review-app
+          cache-to: type=gha,mode=max,scope=review-app
+      - name: Deploy
+        if: needs.resolve.outputs.action == 'deploy'
+        # bin/review-app reads the job-level IMAGE_TAG env.
+        run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}"
+
+      - name: Destroy
+        if: needs.resolve.outputs.action == 'destroy'
+        run: bin/review-app destroy "${{ needs.resolve.outputs.pr_number }}"
+      - name: Remove review-app label
+        if: needs.resolve.outputs.action == 'destroy'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --remove-label "$REVIEW_LABEL" || true
+      # Each push built a `pr-<N>-<sha>` image; delete every version for this PR so
+      # closed/destroyed PRs don't accumulate images in GHCR. Matches on the trailing
+      # dash so `pr-12-` never catches `pr-123-`. Best-effort: a delete failure (e.g.
+      # already gone) shouldn't fail the destroy.
+      - name: Delete PR images from GHCR
+        if: needs.resolve.outputs.action == 'destroy'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY%%/*}"
+          package="${GITHUB_REPOSITORY##*/}"
+          prefix="pr-${PR_NUMBER}-"
+          ids=$(gh api --paginate \
+            "/orgs/${owner}/packages/container/${package}/versions" \
+            --jq "[.[] | select(any(.metadata.container.tags[]; startswith(\"${prefix}\"))) | .id] | .[]")
+          if [[ -z "$ids" ]]; then
+            echo "No GHCR image versions tagged ${prefix}* to delete."
+            exit 0
+          fi
+          for id in $ids; do
+            echo "Deleting GHCR image version $id"
+            gh api --method DELETE \
+              "/orgs/${owner}/packages/container/${package}/versions/${id}" || true
+          done

@@ -231,10 +231,10 @@ GEM
       railties (>= 5)
     doorkeeper-i18n (5.2.2)
       doorkeeper (>= 5.2)
-    dotenv (2.7.6)
-    dotenv-rails (2.7.6)
-      dotenv (= 2.7.6)
-      railties (>= 3.2)
+    dotenv (3.2.0)
+    dotenv-rails (3.2.0)
+      dotenv (= 3.2.0)
+      railties (>= 6.1)
     down (5.4.2)
       addressable (~> 2.8)
     drb (2.2.3)
@@ -721,7 +721,7 @@ GEM
       chunky_png (~> 1.0)
       rqrcode_core (~> 2.0)
     rqrcode_core (2.1.0)
-    rspec (3.13.0)
+    rspec (3.13.2)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
       rspec-mocks (~> 3.13.0)
@@ -859,6 +859,8 @@ GEM
     text (1.3.1)
     thor (1.5.0)
     thread_safe (0.3.6)
+    thruster (0.1.21-arm64-darwin)
+    thruster (0.1.21-x86_64-linux)
     tilt (2.7.0)
     timeout (0.6.1)
     translation (1.41)
@@ -987,7 +989,7 @@ DEPENDENCIES
   inline_svg
   knapsack_pro
   kramdown
-  letter_opener_web
+  letter_opener_web (~> 3.0)
   lograge
   logstash-event
   lookbook
@@ -1047,6 +1049,7 @@ DEPENDENCIES
   stripe
   tailwindcss-rails
   terminal-notifier
+  thruster
   translation
   turbo-rails
   turbo_tests

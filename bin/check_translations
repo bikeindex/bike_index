@@ -77,6 +77,12 @@ else
       --base main \
       --head "$branch_name"
 
+    # Pushes made with the default GITHUB_TOKEN don't trigger workflows, so the
+    # branch we just pushed won't run `on: push` CI. Dispatch it explicitly so
+    # the PR gets checks. (ci.yml must declare `workflow_dispatch`.)
+    output "${YELLOW}" "Dispatching CI on ${branch_name}"
+    gh workflow run ci.yml --ref "$branch_name"
+
     output "${YELLOW}" "PR created. Build will fail until the PR is merged."
   fi
 

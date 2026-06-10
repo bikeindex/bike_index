@@ -5364,6 +5364,12 @@ nb:
         sync_running_in_background: Synkroniseringen kjører i bakgrunnen. Denne siden
           oppdateres automatisk.
         syncing_activities: Synkroniserer aktiviteter ...
+      review_app_banner:
+        disclaimer: ikke produksjon, data er flyktige
+        label: Anmeld appen
+        letter_opener_link: e-post utboks
+        letter_opener_tooltip: Se e-posten som ble sendt av denne anmeldelsesappen
+        pr_link: PR-nummer %{number}
     emails:
       partials:
         bike_box:
