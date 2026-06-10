@@ -1,13 +1,74 @@
 /* Declare CSS layers so that legacy is overridden by tailwind utility classes */
 @layer theme, base, legacy, components, utilities;
-@import "tailwindcss" prefix(tw);
+/* source(none) + explicit @source: without it, tailwind v4 auto-scans the
+ * entire repo (~3k files — vendor/, public/, spec/, …) for class candidates,
+ * which was ~45s of every CI assets:precompile. Paths are relative to THIS
+ * file. */
+@import "tailwindcss" prefix(tw) source(none);
+@source "../../views";
+@source "../../components";
+@source "../../helpers";
+@source "../../javascript";
+@source "../../../public/*.html";
 @import "./combobox.css";
-@config "../../../config/tailwind.config.js";
+
+/* Class-based dark mode (the legacy config's darkMode: 'selector'); a `.dark`
+ * ancestor activates tw:dark:* utilities. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: "Open Sans", sans-serif;
   --font-header: "Montserrat", sans-serif;
   --breakpoint-xs: 23rem; /* 368px (iphone mini is 375px) */
+
+  /* OG Bike Index brand palettes (formerly config/tailwind.config.js) */
+  --color-blue-50: #f2f8fd;
+  --color-blue-100: #e3effb;
+  --color-blue-200: #c1dff6;
+  --color-blue-300: #8ac5ef;
+  --color-blue-400: #4ca7e4;
+  --color-blue-500: #3498db; /* OG Bike Index blue */
+  --color-blue-600: #176fb2;
+  --color-blue-700: #145990;
+  --color-blue-800: #144c78;
+  --color-blue-900: #164064;
+  --color-blue-950: #0f2942;
+
+  --color-green-50: #f1fcf5;
+  --color-green-100: #defaea;
+  --color-green-200: #bef4d4;
+  --color-green-300: #8beab3;
+  --color-green-400: #52d689;
+  --color-green-500: #2ecc71; /* OG Bike Index green */
+  --color-green-600: #1d9c53;
+  --color-green-700: #1b7a43;
+  --color-green-800: #1a6139;
+  --color-green-900: #175031;
+  --color-green-950: #072c18;
+
+  --color-red-50: #fef3f2;
+  --color-red-100: #fde5e3;
+  --color-red-200: #fcd0cc;
+  --color-red-300: #f9b0a8;
+  --color-red-400: #f38276;
+  --color-red-500: #e74c3c; /* OG Bike Index red */
+  --color-red-600: #d53d2d;
+  --color-red-700: #b33022;
+  --color-red-800: #942b20;
+  --color-red-900: #7b2921;
+  --color-red-950: #43110c;
+
+  --color-slate-50: #f5f7fa; /* slate is pretty close to blue, but -- I still like it! */
+  --color-slate-100: #eaeff4;
+  --color-slate-200: #cfdce8;
+  --color-slate-300: #a6bfd3;
+  --color-slate-400: #759cbb;
+  --color-slate-500: #5480a3;
+  --color-slate-600: #416788;
+  --color-slate-700: #35526f;
+  --color-slate-800: #2f475d;
+  --color-slate-900: #2c3e50; /* OG Bike Index blue-dark */
+  --color-slate-950: #1d2834;
 }
 
 @layer components {

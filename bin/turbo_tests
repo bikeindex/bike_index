@@ -23,7 +23,7 @@ def assets_need_compilation?
   [
     "app/assets/stylesheets/**/*.scss",
     "app/assets/stylesheets/**/*.css",
-    "config/tailwind.config.js",
+    "app/assets/tailwind/**/*.css",
     "config/initializers/dartsass.rb"
   ].any? do |pattern|
     Dir.glob(pattern).any? { |f| File.mtime(f) > oldest_asset_time }

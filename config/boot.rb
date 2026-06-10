@@ -1,7 +1,8 @@
 ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
 
-# Set default environment variables (REDIS_URL, DEV_PORT, etc.) for dev/test
-unless ENV["RAILS_ENV"] == "production" || ENV["RACK_ENV"] == "production"
+# Set default environment variables (REDIS_URL, DEV_PORT, etc.) for dev/test only
+deployed = %w[production staging]
+unless deployed.include?(ENV["RAILS_ENV"]) || deployed.include?(ENV["RACK_ENV"])
   load File.expand_path("../bin/env", __dir__)
 end
 

@@ -1921,6 +1921,8 @@ nl:
     organizations:
       create:
         organization_created: Organisatie met succes gemaakt!
+        must_create_an_account_first: Je moet eerst een account aanmaken op Bike Index
+          voordat je een organisatie kunt creëren.
       find_organization:
         not_found: Het spijt ons, die organisatie staat nog niet op Bike Index. E-mail
           contact@bikeindex.org als dit op een fout lijkt.

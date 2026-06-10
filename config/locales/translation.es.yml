@@ -2095,6 +2095,7 @@ es:
     organizations:
       create:
         organization_created:
+        must_create_an_account_first:
       find_organization:
         not_found:
       lightspeed_interface:
