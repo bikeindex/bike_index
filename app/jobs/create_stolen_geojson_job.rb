@@ -16,7 +16,8 @@ class CreateStolenGeojsonJob < ScheduledJob
   end
 
   def file_prefix
-    Rails.env.test? ? "/spec/fixtures/tsv_creation/" : ""
+    # tmp/ is writable by the container's rails user; the app root (Rails.root) is not
+    Rails.env.test? ? "/spec/fixtures/tsv_creation/" : "tmp/"
   end
 
   def perform
