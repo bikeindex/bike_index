@@ -107,9 +107,7 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  # Fallback so assets:precompile works at Docker build time, where BASE_URL
-  # isn't set (only SECRET_KEY_BASE/REDIS_URL are). The value is irrelevant
-  # during precompile; real deploys set BASE_URL.
+  # Fallback for asset precompile, which boots without BASE_URL; deploys set it.
   base_url = URI.parse(ENV.fetch("BASE_URL", "https://bikeindex.org"))
   config.action_mailer.default_url_options = {protocol: base_url.scheme, host: base_url.host}
   routes.default_url_options = config.action_mailer.default_url_options
