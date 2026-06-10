@@ -3,7 +3,6 @@
 # they're partitioned to the top of /search/marketplace under a "Promoted" header.
 admin = User.find_by_email("admin@bikeindex.org")
 creator = BikeServices::Creator.new
-frame_maker_ids = Manufacturer.frame_makers.pluck(:id)
 primary_activity_ids = PrimaryActivity.where(family: false).pluck(:id)
 
 listing_locations = [
@@ -47,10 +46,10 @@ listings = 10.times.map do |i|
   prefix = promoted ? "member" : "seller"
   seller = seed_marketplace_seller(email: "marketplace-#{prefix}-#{i}@bikeindex.org", name: "Marketplace #{prefix.capitalize} #{i + 1}")
   Membership.create!(user: seller, creator: admin, level: :basic, start_at: Time.current - 1.hour) if promoted
-  bike = seed_marketplace_bike(creator:, seller:, manufacturer_id: frame_maker_ids.sample, primary_activity_id: primary_activity_ids.sample)
+  bike = seed_marketplace_bike(creator:, seller:, manufacturer_id: SeedHelpers.weighted_frame_maker_id, primary_activity_id: primary_activity_ids.sample)
   seed_marketplace_listing(bike:, seller:, location: listing_locations[i % listing_locations.length],
     amount_cents: (250 + i * 175) * 100, condition: conditions[i % conditions.length])
 end
 
-puts "  Created #{listings.count} marketplace listings (#{listings.count(&:seller_member?)} promoted)"
+puts "  Created #{listings.count} marketplace listings (#{listings.count { |listing| listing.seller.member? }} promoted)"
 puts "Marketplace listings seeded successfully!"
