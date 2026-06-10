@@ -12,7 +12,7 @@ author = User.find_by(email: "admin@bikeindex.org") || User.first
 
   Blog.create!(
     title:,
-    body: "Seeded \"#{title}\" content for review apps.",
+    body: "Seeded #{title} content for review apps.",
     user: author,
     info_kind: true, # kind: info — top-level info page, not a news post
     published: true
