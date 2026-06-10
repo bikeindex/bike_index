@@ -21,6 +21,6 @@ priority_manufacturer_names = [
 missing = priority_manufacturer_names.reject do |name|
   Manufacturer.friendly_find(name)&.update_column(:priority, 100)
 end
+raise "Priority manufacturers not found: #{missing.join(", ")}" if missing.any?
 
-puts "Set priority 100 on #{priority_manufacturer_names.length - missing.length} manufacturers"
-puts "  Priority manufacturers not found: #{missing.join(", ")}" if missing.any?
+puts "Set priority 100 on #{priority_manufacturer_names.length} manufacturers"
