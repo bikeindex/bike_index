@@ -48,12 +48,15 @@ export default class extends Controller {
   // Sticker search always spans every organization, so lock "search all" on while it's active
   syncSearchAll () {
     if (!this.hasSearchAllTarget) return
+    const label = this.searchAllTarget.closest('label')
     if (this.searchKindValue === 'stickers') {
       this.searchAllTarget.checked = true
       this.searchAllTarget.disabled = true
+      if (label) label.title = 'Sticker search always searches all bikes'
     } else if (this.searchAllTarget.disabled) {
       this.searchAllTarget.checked = false
       this.searchAllTarget.disabled = false
+      if (label) label.removeAttribute('title')
     }
   }
 
