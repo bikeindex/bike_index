@@ -14,6 +14,7 @@ end
 
 ENV["DEV_PORT"] ||= "3042"
 ENV["BASE_URL"] ||= "http://localhost:#{ENV["DEV_PORT"]}"
+ENV["WEB_CONCURRENCY"] ||= "0" # Run Puma in single mode (0 workers, no fork). required for Mata live-reload
 
 # Redis only has 16 databases (0-15). Reserve database 0 for the main checkout
 # (no WORKSPACE_ID) so workspace dev servers can't clobber its data (eg the
@@ -25,7 +26,7 @@ end
 
 # When called with --export, print shell export statements for bash scripts
 if ARGV.include?("--export")
-  %w[WORKSPACE_ID DEV_PORT BASE_URL REDIS_URL].each do |key|
+  %w[WORKSPACE_ID DEV_PORT BASE_URL REDIS_URL WEB_CONCURRENCY].each do |key|
     puts "export #{key}=#{ENV[key]}" if ENV[key]
   end
 end
