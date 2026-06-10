@@ -3,7 +3,9 @@ module Spreadsheets
     attr_reader :file_prefix
 
     def initialize
-      @file_prefix = Rails.env.test? ? "/spec/fixtures/tsv_creation/" : ""
+      # tmp/ is writable by the container's rails user; the app root (Rails.root) is
+      # not. These files are transient staging for send_to_uploader (see FileCacheMaintenanceJob).
+      @file_prefix = Rails.env.test? ? "/spec/fixtures/tsv_creation/" : "tmp/"
     end
 
     def manufacturers_header
