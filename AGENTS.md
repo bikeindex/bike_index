@@ -19,7 +19,7 @@ Ruby is formatted with the standard gem. Run `bin/lint` to automatically format 
 - Omit named arguments' values from hashes (ie prefer `{x:, y:}` instead of `{x: x, y: y}`)
 - Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
 - prefer un-abbreviated variable names
-- Keep comments pithy, and only where they add value (often none is needed). Write for a future reader, not as a changelog: explain *why* the code is the way it is, and omit what was only relevant to the change that introduced it (the failure you hit, the env vars in play at the time, what the line used to be)
+- Keep comments pithy and only where they add value — often none. Explain *why* for a future reader; don't narrate the change that introduced the code
 
 ## Testing
 
