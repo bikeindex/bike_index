@@ -50,8 +50,10 @@ jobs:
       # changed files — a mega-branch whose strava files fall past that cap
       # would miss the dispatch. Skipped on main: strava CI never ran there
       # before either (its old trigger was pull_request-only).
+      # `success() || failure()`: still attempt this dispatch when the
+      # review-app one failed (the job still concludes failure).
       - name: Dispatch strava_search CI (when its files changed)
-        if: github.ref_name != 'main'
+        if: (success() || failure()) && github.ref_name != 'main'
         run: |
           retry() { local n=1; until "$@"; do [ $n -ge 3 ] && return 1; echo "attempt $n failed; retrying in 15s..." >&2; n=$((n+1)); sleep 15; done; }
           changed=$(retry gh api "repos/$GITHUB_REPOSITORY/compare/main...$GITHUB_SHA" \
