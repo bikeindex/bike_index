@@ -121,7 +121,7 @@ bin/review-app deploy <pr_number> <image_tag>
 
 ## How a deploy works
 
-The workflow runs three jobs — `resolve` (works out the PR number and whether to `deploy` or `destroy`), `build` (adds the label, builds + pushes the image; deploys only), then `update` (does the work, branching on the resolved action via step-level `if:`). `build` is its own job so a newer push cancels a superseded build (`cancel-in-progress` concurrency); `update` deliberately handles **both deploy and destroy in one job** — separate jobs would show one running + one skipped check on every run — and serializes per PR *without* cancellation, because killing kamal mid-deploy can leave the deploy lock held on the host. The ways it can be triggered:
+The workflow runs four jobs — `resolve` (works out the PR number and whether to `deploy` or `destroy`), `build` (adds the label, builds + pushes the image; deploys only), `update` (does the work, branching on the resolved action via step-level `if:`), and `report` (failure-only; see below). `build` is its own job so a newer push cancels a superseded build (`cancel-in-progress` concurrency); `update` deliberately handles **both deploy and destroy in one job** — separate jobs would show one running + one skipped check on every run — and serializes per PR *without* cancellation, because killing kamal mid-deploy can leave the deploy lock held on the host. The ways it can be triggered:
 
 | Trigger | Action | what runs |
 |---|---|---|
@@ -131,7 +131,7 @@ The workflow runs three jobs — `resolve` (works out the PR number and whether 
 
 Unlabeled PR closes are filtered out in `resolve`'s job-level `if:`; fork PRs are additionally filtered by the same-repo check (`proceed=false`). On the **deploy** path:
 
-1. The `build` job builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label on the deployed image and normally adds it itself when it builds).
+1. The `build` job builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label on the deployed image and normally adds it itself when it builds). Warm builds are fast: docker layers cache in GHCR's `:buildcache` tag, and sprockets' incremental cache persists across runs via a BuildKit cache mount + buildkit-cache-dance (see the workflow comments).
 2. The `update` job then runs `bin/review-app deploy <pr> <tag>`, which calls `kamal deploy --version <tag> --skip-push` — kamal **pulls** the CI-built image (it does not rebuild, which would clone the repo + the private `app/services/facebook` submodule) and:
    - Boots the per-PR `bike-index-pr-<N>-web`, `-worker`, and `-cron` containers
    - On first boot, `bin/docker-entrypoint` creates the Postgres **superuser** role `bike_index_pr_<N>` and runs `db:prepare`, which creates `bike_index_review_pr_<N>_primary` + `_analytics` and **seeds** them. Seeding (manufacturer-CSV import, sample bikes, …) runs before Puma starts, so first boot is slow — hence `deploy_timeout: 240` in the config; redeploys (databases already exist) skip seeding and boot fast.
@@ -167,6 +167,7 @@ Each review app gets a `cron` container (a Kamal [`servers` role](https://kamal-
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
 | `.kamal/hooks/post-deploy` | Best-effort Honeybadger deploy notification (reports the `staging` env); never fails the deploy — no-ops if `HONEYBADGER_API_KEY` is unset or the gem isn't present (e.g. CI) |
 | `.github/workflows/review-app.yml` | `resolve` + `build` + `update` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
+| `.github/workflows/ci.yml` (`dispatch` job) | Auto-dispatches a deploy on every push to a labeled PR — the auto-redeploy half of the label gate |
 | `provisioning/` | Ansible playbook for one-time host hardening |
 | `app/components/page_block/review_app_banner/` | ViewComponent rendered in the application layout when `ENV["REVIEW_APP"]` is set |
 
@@ -176,4 +177,5 @@ Each review app gets a `cron` container (a Kamal [`servers` role](https://kamal-
 - **Storage is shared.** All review apps write to the same R2 bucket under a `review-app/` prefix.
 - **One Sidekiq worker per app at concurrency=2.** Enough for demo workflows; not enough to stress-test queue behavior.
 - **Forks aren't auto-deployed.** A maintainer must trigger fork PR deploys manually via `workflow_dispatch` after reviewing the diff.
+- **GHCR accumulates untagged versions.** Every build overwrites the `:buildcache` tag, leaving the previous cache manifest as an untagged package version, and destroyed PRs' image deletions can leave shared-blob leftovers. GHCR never garbage-collects on its own; if the `bike_index` container package grows large, prune untagged versions (e.g. `actions/delete-package-versions` or a manual sweep).
 - **Per-PR Postgres roles are SUPERUSER.** `bin/docker-entrypoint` creates each `bike_index_pr_<N>` role as a superuser. This is required to load production's `db/structure.sql`, which creates *and* `COMMENT`s the superuser-only `pg_stat_statements` extension (`COMMENT ON EXTENSION` needs ownership and has no `IF NOT EXISTS`), and to own its own tables for migrations/seeds. The tradeoff: review apps are **not isolated from each other** on the shared `shared-db` accessory (a superuser role could touch other PRs' databases). Acceptable because that Postgres is sandbox-only, ephemeral, holds no PII, and is entirely separate from production (Cloud66). A non-superuser design would require loading the schema as the `postgres` superuser and reassigning object ownership per role.
