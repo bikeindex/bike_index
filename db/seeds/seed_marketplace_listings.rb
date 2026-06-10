@@ -51,5 +51,5 @@ listings = 10.times.map do |i|
     amount_cents: (250 + i * 175) * 100, condition: conditions[i % conditions.length])
 end
 
-puts "  Created #{listings.count} marketplace listings (#{listings.count(&:seller_member?)} promoted)"
+puts "  Created #{listings.count} marketplace listings (#{listings.count { |listing| listing.seller.member? }} promoted)"
 puts "Marketplace listings seeded successfully!"
