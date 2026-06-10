@@ -42,7 +42,7 @@ owner_emails = %w[
 creator = BikeServices::Creator.new
 
 def org_bike_params(owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id, manufacturer_id: nil)
-  manufacturer_id ||= Manufacturer.frame_makers.pluck(:id).sample
+  manufacturer_id ||= SeedHelpers.weighted_frame_maker_id
   {
     cycle_type: "bike",
     propulsion_type: "foot-pedal",

@@ -9,7 +9,7 @@ ca_state = State.find_by_abbreviation("CA")
 creator = BikeServices::Creator.new
 
 def bike_params(owner_email:, manufacturer_id: nil)
-  manufacturer_id ||= Manufacturer.frame_makers.pluck(:id).sample
+  manufacturer_id ||= SeedHelpers.weighted_frame_maker_id
   {
     cycle_type: "bike",
     propulsion_type: "foot-pedal",
