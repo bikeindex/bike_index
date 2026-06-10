@@ -300,6 +300,24 @@ RSpec.describe ImpoundRecord, type: :model do
     end
   end
 
+  describe "impounded_at_with_timezone=" do
+    let(:impound_record) { FactoryBot.build(:impound_record, bike: bike, user: user, organization: organization) }
+    context "valid date" do
+      it "assigns impounded_at" do
+        impound_record.impounded_at_with_timezone = "2021-02-04"
+        expect(impound_record.impounded_at.to_date).to eq Date.parse("2021-02-04")
+        expect(impound_record).to be_valid
+      end
+    end
+    context "unparseable date" do
+      it "adds an error rather than raising" do
+        expect { impound_record.impounded_at_with_timezone = "32:61:61" }.to_not raise_error
+        expect(impound_record).to_not be_valid
+        expect(impound_record.errors[:impounded_at]).to eq(["'32:61:61' is not a valid date"])
+      end
+    end
+  end
+
   describe "resolved factory" do
     let!(:impound_record) { FactoryBot.create(:impound_record_resolved, status: "removed_from_bike_index") }
     it "creates with resolved issue" do
