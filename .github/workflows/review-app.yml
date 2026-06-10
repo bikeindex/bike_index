@@ -49,6 +49,9 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   REVIEW_LABEL: review-app
+  # Marks the `report` job's failure comment so it can be found again — edited
+  # in place on repeat failures, deleted by `update` after a successful deploy.
+  FAILURE_COMMENT_MARKER: "<!-- review-app-failure -->"
 
 jobs:
   resolve:
@@ -151,7 +154,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: sprockets-cache
-          key: review-app-sprockets-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/tailwind.config.js', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
+          key: review-app-sprockets-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
           restore-keys: |
             review-app-sprockets-
       - name: Inject sprockets cache into the docker build
@@ -278,7 +281,7 @@ jobs:
           PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
         run: |
           cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
-            --jq '[.[] | select(.body | startswith("<!-- review-app-failure -->")) | .id][0] // empty')
+            --jq "[.[] | select(.body | startswith(\"$FAILURE_COMMENT_MARKER\")) | .id][0] // empty")
           if [ -n "$cid" ]; then
             echo "Deleting stale failure comment $cid"
             gh api --method DELETE "repos/$GITHUB_REPOSITORY/issues/comments/$cid" || true
@@ -340,12 +343,12 @@ jobs:
           HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          body="<!-- review-app-failure -->
+          body="$FAILURE_COMMENT_MARKER
           🚨 **Review app ${ACTION} failed** for \`${HEAD_SHA:0:7}\` — [run logs](${RUN_URL})
 
           Push a fix to retry automatically, or re-run the Review App workflow manually."
           cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
-            --jq '[.[] | select(.body | startswith("<!-- review-app-failure -->")) | .id][0] // empty')
+            --jq "[.[] | select(.body | startswith(\"$FAILURE_COMMENT_MARKER\")) | .id][0] // empty")
           if [ -n "$cid" ]; then
             echo "Updating existing failure comment $cid"
             gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$cid" -f body="$body"
