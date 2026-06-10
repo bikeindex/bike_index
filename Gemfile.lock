@@ -950,7 +950,6 @@ DEPENDENCIES
   chunky_png
   coderay
   coffee-rails
-  connection_pool (< 4)
   csv
   dartsass-rails
   database_cleaner

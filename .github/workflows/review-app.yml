@@ -136,7 +136,7 @@ jobs:
           ref: ${{ needs.resolve.outputs.head_sha }}
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       # Sprockets' incremental cache (the Dockerfile's `--mount=type=cache` on
       # /rails/tmp/cache/assets) doesn't survive ephemeral runners by itself;
       # cache-dance injects it into the buildx builder before the build and
