@@ -34,9 +34,9 @@ module Org
 
       def view_all_path
         if sticker_search?
-          helpers.organization_stickers_path(organization_id: @organization.to_param, query: @query)
+          organization_stickers_path(organization_id: @organization.to_param, query: @query)
         else
-          helpers.organization_registrations_path(organization_id: @organization.to_param, search_serial: @query)
+          organization_registrations_path(organization_id: @organization.to_param, search_serial: @query)
         end
       end
     end
