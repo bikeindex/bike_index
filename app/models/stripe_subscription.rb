@@ -71,16 +71,16 @@ class StripeSubscription < ApplicationRecord
   def update_membership!
     return unless user_id.present?
 
-    if active?
-      end_active_user_admin_membership!
+    remove_user_membership_orphans
+    end_active_user_admin_membership! if active?
 
-      self.membership ||= user&.membership_active
-      self.membership&.level = membership_level
-    end
+    self.membership ||= user_not_ended_memberships&.first
+    self.membership&.level = membership_level if active?
+
     self.membership ||= Membership.new(user_id:, level: membership_level)
     self.membership&.update!(start_at:, end_at:)
 
-    if membership&.id&.present? && membership_id != membership.id
+    if membership&.id&.present? && membership_id_in_database != membership.id
       update(membership_id: membership.id)
       payments.where(membership_id: nil).each { |payment| payment.update(membership_id:) }
     end
@@ -171,5 +171,29 @@ class StripeSubscription < ApplicationRecord
 
     user.membership_active.update(end_at: start_at || Time.current)
     user.reload
+  end
+
+  def user_not_ended_memberships
+    user&.memberships&.stripe_managed&.not_ended&.order(:id)
+  end
+
+  # Delete stripe_managed pending/active Memberships that have no StripeSubscription wired to them
+  # (race-window orphans). Linked Memberships are always preserved; orphan payments get repointed
+  # to a canonical linked row (lowest-id), or to the lowest-id remaining membership if none linked.
+  def remove_user_membership_orphans
+    return if user.blank?
+
+    canonical = user_not_ended_memberships.joins(:stripe_subscriptions).distinct.first ||
+      user_not_ended_memberships.first
+    return if canonical.blank?
+
+    orphan_ids = user_not_ended_memberships
+      .where.missing(:stripe_subscriptions)
+      .where.not(id: canonical.id)
+      .pluck(:id)
+    return if orphan_ids.empty?
+
+    Payment.where(membership_id: orphan_ids).update_all(membership_id: canonical.id)
+    Membership.where(id: orphan_ids).destroy_all
   end
 end

@@ -14,6 +14,21 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     expect(described_class.frequency).to eq(50.minutes)
   end
 
+  describe "skip_scheduling?" do
+    it "is false when STRAVA_KEY is set" do
+      expect(ENV["STRAVA_KEY"]).to be_present
+      expect(instance.skip_scheduling?).to be_falsey
+    end
+
+    context "when STRAVA_KEY is blank" do
+      before { stub_const("ENV", ENV.to_hash.merge("STRAVA_KEY" => nil)) }
+
+      it "is true" do
+        expect(instance.skip_scheduling?).to be_truthy
+      end
+    end
+  end
+
   describe "min_updated_priority" do
     it "is above the max non-fetch_activity priority" do
       expect(described_class.min_updated_priority).to eq 6_000_000_000

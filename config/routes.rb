@@ -3,8 +3,14 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
+  # Liveness endpoint (200 if the app boots). Used by the review-app kamal-proxy health check
+  get "up", to: "rails/health#show", as: :rails_health_check
+
   mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
   mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
+  # letter_opener_web inbox — the gem's Bundler group (:development, :staging)
+  # decides where it's mounted. Unrestricted — staging runs seeded data with no PII.
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if defined?(LetterOpenerWeb)
 
   use_doorkeeper do
     controllers applications: "oauth/applications"
@@ -155,6 +161,9 @@ Rails.application.routes.draw do
 
   namespace :search do
     get "/", to: redirect("/search/registrations")
+    # Autocomplete + selection chips for the search query items combobox
+    get "combobox/options", to: "combobox#options", as: :combobox_options
+    post "combobox/chips", to: "combobox#chips", as: :combobox_chips
     resources :registrations, only: %i[index] do
       collection do
         get :similar_serials
@@ -354,8 +363,8 @@ Rails.application.routes.draw do
   resources :stolen_bike_listings, only: %i[index]
 
   %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
-    protect_your_bike serials about where vendor_terms resources image_resources privacy terms security
-    how_not_to_buy_stolen dev_and_design lightspeed membership].freeze.each do |page|
+    protect_your_bike serials about where vendor_terms resources privacy terms security
+    how_not_to_buy_stolen lightspeed membership].freeze.each do |page|
     get page, controller: "info", action: page
   end
   get "why-donate", to: "info#why_donate", as: "why_donate"
@@ -364,7 +373,8 @@ Rails.application.routes.draw do
   get "/info/how-to-get-your-stolen-bike-back", controller: "info", action: "show", id: "how-to-get-your-stolen-bike-back", as: :get_your_stolen_bike_back
   resources :info, only: %i[show]
 
-  %w[stolen_bikes roadmap spokecard how_it_works].freeze.each { |p| get p, to: redirect("/resources") }
+  %w[stolen_bikes roadmap spokecard how_it_works image_resources dev_and_design].freeze
+    .each { |p| get p, to: redirect("/resources") }
 
   get "strava_search", to: "strava_search#index"
   post "strava_search/token", to: "strava_search#create_token", as: :strava_search_token
@@ -435,5 +445,5 @@ Rails.application.routes.draw do
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
 
-  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge
+  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
 end

@@ -1,22 +1,26 @@
-<div class="tw:mx-auto tw:mb-6 tw:max-w-7xl tw:px-4">
-  <h1 class="tw:mb-4 tw:text-3xl tw:text-slate-800">Bike Index Marketplace</h1>
+<%#
+  Skip the search form/chrome on frame requests (eager src fetch + form-submit
+  searches): it's outside the results frame, so Turbo discards it - re-rendering
+  the combobox is wasted work on a hot path.
+%>
 
-  <%= render Search::Form::Component.new(target_search_path: search_marketplace_path,
-    target_frame: :marketplace_results_frame, interpreted_params: @interpreted_params,
-    currency: @currency, marketplace_scope: @marketplace_scope, price_min_amount: @price_min_amount,
-    price_max_amount: @price_max_amount, result_view: @result_view, search_obj_name: @search_obj_name) %>
-</div>
+<% unless turbo_frame_request? %>
+  <div class="tw:mx-auto tw:mb-6 tw:max-w-7xl tw:px-4">
+    <h1 class="tw:mb-4 tw:text-3xl tw:text-slate-800">
+      Bike Index Marketplace
+    </h1>
 
-<%= turbo_frame_tag :marketplace_results_frame do %>
-  <% if @render_results %>
-    <%= turbo_frame_tag "page_#{@pagy.page}" do %>
-      <%= render partial: "marketplace_results" %>
-    <% end %>
-  <% else %>
-    <span id="loadedWithoutResults" class="tw:hidden"></span>
-  <% end %>
+    <%= render Search::Form::Component.new(target_search_path: search_marketplace_path,
+      target_frame: :marketplace_results_frame, interpreted_params: @interpreted_params,
+      currency: @currency, marketplace_scope: @marketplace_scope, price_min_amount: @price_min_amount,
+      price_max_amount: @price_max_amount, result_view: @result_view, search_obj_name: @search_obj_name) %>
+  </div>
 <% end %>
 
-<div id="hiddenLoadingSpinner" class="tw:hidden">
-  <%= render UI::LoadingSpinner::Component.new(text: t(".loading_results")) %>
-</div>
+<%= render Search::ResultsFrame::Component.new(frame_id: :marketplace_results_frame,
+  render_results: @render_results, current_path: request.original_fullpath,
+  loading_text: t(".loading_results")) do %>
+  <%= turbo_frame_tag "page_#{@pagy.page}" do %>
+    <%= render partial: "marketplace_results" %>
+  <% end %>
+<% end %>

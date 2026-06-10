@@ -1,0 +1,7 @@
+[webservers:vars]
+ansible_become_method=su
+ansible_user=root
+
+[webservers]
+<host1>
+<host2>

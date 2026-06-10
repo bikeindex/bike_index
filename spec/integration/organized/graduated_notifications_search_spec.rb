@@ -20,18 +20,26 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     # Ensure gear types exist so the bike show page doesn't write during readonly mode
     RearGearType.fixed
     FrontGearType.fixed
+    # Populate autocomplete so the combobox can match "Black"
+    Color.black
+    Autocomplete::Loader.load_all(%w[Color])
     visit new_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
+    # Dismiss the post-login flash and wait for it to clear, so the next
+    # navigation isn't racing the redirect. The Bootstrap fade-out can exceed
+    # Capybara's default 2s wait on slow CI runners.
+    find(".alert-success .close").click
+    expect(page).to have_no_css(".alert-success", wait: 10)
   end
 
   it "searches by email via turbo, then opens the notification" do
     visit graduated_notifications_path
-    # Results load via turbo auto-submit
+    # Results load via the eager turbo-frame (src fetched once the frame connects)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
-    expect(page).to have_css(".select2-container", count: 1, wait: 10)
+    expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
 
     # search_no_js should NOT be in the URL (removed by JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
@@ -42,7 +50,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(page).to have_field("search_email", with: "alice@example.com")
-    expect(page).to have_css(".select2-container", count: 1, wait: 10)
+    expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
 
@@ -52,22 +60,26 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
     expect(page).to have_field("search_email", with: "")
     expect(page).not_to have_current_path(/search_email=alice/)
-    # select2 combobox search: type a query, pick the autocomplete option, submit
-    # (also catches turbo-cache stale-DOM regression — select2 must be usable)
-    expect(page).to have_css(".select2-container", count: 1, wait: 10)
-    find(".select2-container").click
-    find(".select2-search__field").set("Black")
-    expect(page).to have_css(".select2-results__option", text: "Black", wait: 10)
-    find(".select2-results__option", text: "Black", match: :first).click
+    # combobox search: type a query, pick the autocomplete option, submit
+    # (also catches turbo-cache stale-DOM regression — the combobox must be usable)
+    expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
+    find(".hw-combobox__input").set("Black")
+    expect(page).to have_css(".hw-combobox__option", text: "Black", wait: 10)
+    find(".hw-combobox__option", text: "Black", match: :first).click
     find("#search-button").click
 
     expect(page).to have_current_path(/query_items/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame", wait: 10)
 
     page.go_back
-    expect(page).not_to have_current_path(/query_items/, wait: 10)
+    # Back navigation restores the default (unfiltered) search. The eager
+    # turbo-frame loads results without rewriting the address bar, so the
+    # default search sits at the bare path rather than a serialized query.
+    expect(page).to have_current_path(graduated_notifications_path, wait: 10)
+    expect(page).not_to have_current_path(/query_items/)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
+    expect(page).to have_field("search_email", with: "")
 
     # Form submit + direct back-nav: regression guard for turbo-cache spinner state
     fill_in "search_email", with: "alice@example.com"
@@ -108,7 +120,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_field("search_email", with: "alice@example.com")
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
-    expect(page).to have_css(".select2-container", count: 1, wait: 10)
+    expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
 
     within("tbody tr") { find("a[href^='/bikes/']").click }
 
@@ -123,7 +135,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_field("search_email", with: "alice@example.com")
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
-    expect(page).to have_css(".select2-container", count: 1, wait: 10)
+    expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
 
     # Clear email filter for status-dropdown test
     fill_in "search_email", with: ""

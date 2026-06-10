@@ -91,6 +91,7 @@
 #  index_bikes_on_search_vector                    (search_vector) USING gin
 #  index_bikes_on_secondary_frame_color_id         (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL)
 #  index_bikes_on_serial_normalized_no_space_trgm  (serial_normalized_no_space) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
+#  index_bikes_on_serial_normalized_tsvector       (to_tsvector('simple'::regconfig, (serial_normalized)::text)) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
 #  index_bikes_on_status                           (status)
 #  index_bikes_on_tertiary_frame_color_id          (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL)
 #  index_bikes_on_user_hidden                      (user_hidden) WHERE (user_hidden IS NOT NULL)

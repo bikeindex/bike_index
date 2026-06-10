@@ -16,10 +16,11 @@ This project uses RSpec. All business logic should be tested.
 ## What to test (and what not to)
 
 - Tests should either: help make the code correct now, or prevent bugs in the future. Don't add tests that don't do one of those things.
-- Use **request specs**, not controller specs. Everything making the same request should be in a single test.
+- Use **request specs**, not controller specs — request specs go through the full middleware/routing stack, so they catch breakage controller specs can't see. Everything making the same request should be in a single test.
 - Avoid testing private methods.
 - Avoid mocking objects.
   - If making external requests, use VCR. Don't manually write VCR cassettes — record them by running the tests.
+  - Cassettes that get modified when you run specs locally are re-recordings, not unrelated churn — they're supposed to update regularly. Commit them with your branch; don't revert them to "keep the PR focused".
 - Don't use `tap` to bundle factory creation with follow-up setup. Create the record in `let`/`let!`, then do the follow-up work on its own line (a separate statement, or a `before` block). One thing per line reads better and keeps the factory call clean.
 
 ### Good
@@ -37,6 +38,25 @@ let!(:bike_transferred) do
     BikeServices::OwnershipTransferer.find_or_create(bike, updator: user, new_owner_email: "new@example.com")
   end
 end
+```
+
+## Stubbing ENV
+
+Never partial-mock `ENV` with `allow(ENV).to receive(:[]).and_call_original` — it makes every subsequent `ENV[...]` lookup go through RSpec's message router, which is slow and easy to break by forgetting a `.with(...)` branch.
+
+Use `stub_const` against a merged hash instead:
+
+### Good
+
+```ruby
+stub_const("ENV", ENV.to_hash.merge("STRIPE_SECRET_KEY" => "sk_test_123"))
+```
+
+### Bad
+
+```ruby
+allow(ENV).to receive(:[]).and_call_original
+allow(ENV).to receive(:[]).with("STRIPE_SECRET_KEY").and_return("sk_test_123")
 ```
 
 ## Always fix failing tests

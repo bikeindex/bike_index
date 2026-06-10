@@ -1,0 +1,12 @@
+---
+- name: Start ntp
+  ansible.builtin.service:
+    name: ntp
+    state: started
+    enabled: true
+
+- name: Start fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true

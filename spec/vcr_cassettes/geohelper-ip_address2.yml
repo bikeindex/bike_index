@@ -19,15 +19,13 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 05 Feb 2026 17:43:56 GMT
+      - Fri, 05 Jun 2026 17:59:29 GMT
       Content-Type:
       - text/plain; charset=ISO-8859-1
       Content-Length:
-      - '41'
+      - '36'
       Connection:
       - keep-alive
-      Cf-Ray:
-      - 9c9436839ab4c8de-SJC
       Access-Control-Allow-Origin:
       - "*"
       Cache-Control:
@@ -40,10 +38,12 @@ http_interactions:
       - max-age=31536000; includeSubDomains; preload
       Server:
       - cloudflare
+      Cf-Ray:
+      - a071124a984bc79e-SJC
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
       encoding: UTF-8
-      string: US,CA,San Francisco,37.750600,-122.412100
-  recorded_at: Thu, 05 Feb 2026 17:43:56 GMT
-recorded_with: VCR 6.3.1
+      string: US,CA,San Jose,37.320900,-121.912600
+  recorded_at: Fri, 05 Jun 2026 17:59:29 GMT
+recorded_with: VCR 6.4.0

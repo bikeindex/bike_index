@@ -1,0 +1,49 @@
+---
+- name: Ensure apt key is not present in trusted.gpg.d
+  ansible.builtin.file:
+    path: /etc/apt/trusted.gpg.d/docker.asc
+    state: absent
+
+- name: Ensure the repo referencing the previous trusted.gpg.d key is not present
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: absent
+    filename: "docker"
+    update_cache: true
+
+- name: Upgrade packages
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: true
+
+- name: Install packages
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - build-essential
+      - ca-certificates
+      - curl
+      - duf
+      - fail2ban
+      - git
+      - gnupg
+      - htop
+      - ntp
+      - ufw
+      - unattended-upgrades
+      - vim
+    state: latest
+    update_cache: true
+    autoremove: true
+    autoclean: true
+  notify:
+    - Start ntp
+    - Start fail2ban
+
+- name: Remove snap
+  ansible.builtin.apt:
+    name:
+      - snapd
+      - snap
+    state: absent
+    purge: true

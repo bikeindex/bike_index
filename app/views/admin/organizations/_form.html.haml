@@ -26,14 +26,14 @@
       = f.text_field :short_name, class: "form-control"
   .col-md-6
     .form-group
-      = f.label :ascend_name
-      = f.text_field :ascend_name, class: "form-control"
+      = f.label :ascend_name, data: {"admin--organization-form-target": "ambassadorLabel"}
+      = f.text_field :ascend_name, class: "form-control", data: {"admin--organization-form-target": "ambassadorField"}
 
 .row
   .col-md-6
     .form-group
-      = f.label :website
-      = f.text_field :website, class: "form-control"
+      = f.label :website, data: {"admin--organization-form-target": "ambassadorLabel"}
+      = f.text_field :website, class: "form-control", data: {"admin--organization-form-target": "ambassadorField"}
   .col-6.col-lg-3
     %fieldset{disabled: true}
       .form-group
@@ -53,10 +53,10 @@
           = @organization.previous_slug
 .row
   .col-md-6
-    .form-group#js-organization-type
+    .form-group
       = f.label :kind, "Organization Type"
       - select_opts = Organization.kinds.map { |k| [Organization.kind_humanized(k), k] }
-      = f.select :kind, options_for_select(select_opts, selected: @organization.kind), {}, class: "form-control"
+      = f.select :kind, options_for_select(select_opts, selected: @organization.kind), {}, class: "form-control", data: {"admin--organization-form-target": "kind", action: "change->admin--organization-form#toggleAmbassadorFields"}
       - if @organization.bike_shop?
         .form-group.mt-2
           = f.check_box :lightspeed_register_with_phone
@@ -66,11 +66,11 @@
 
 
     .form-group.mt-4
-      = f.check_box :show_on_map
-      = f.label :show_on_map
+      = f.check_box :show_on_map, data: {"admin--organization-form-target": "ambassadorField"}
+      = f.label :show_on_map, data: {"admin--organization-form-target": "ambassadorLabel"}
     .form-group
-      = f.check_box :lock_show_on_map
-      = f.label :lock_show_on_map do
+      = f.check_box :lock_show_on_map, data: {"admin--organization-form-target": "ambassadorField"}
+      = f.label :lock_show_on_map, data: {"admin--organization-form-target": "ambassadorLabel"} do
         Lock shown on map
         %small.less-strong
           restrict org from updating show on map above (e.g. they're known bad actors)
@@ -80,14 +80,14 @@
         High spam registrations
         %small.less-strong don't email suspicious registrations
     .form-group
-      = f.check_box :api_access_approved
-      = f.label :api_access_approved do
+      = f.check_box :api_access_approved, data: {"admin--organization-form-target": "ambassadorField"}
+      = f.label :api_access_approved, data: {"admin--organization-form-target": "ambassadorLabel"} do
         API V1 access approved
         %small.less-strong
           to be able to post updates via legacy API (rarely necessary)
     .form-group
-      = f.check_box :approved
-      = f.label :approved, 'Validated & approved'
+      = f.check_box :approved, data: {"admin--organization-form-target": "ambassadorField"}
+      = f.label :approved, 'Validated & approved', data: {"admin--organization-form-target": "ambassadorLabel"}
     .form-group
       = f.check_box :direct_unclaimed_notifications
       = f.label :direct_unclaimed_notifications do
@@ -99,7 +99,7 @@
         %small.less-strong
           %strong.text-danger (probably) do not add parents!
           Parents must be part of the same organization
-      = render Form::Combobox::Component.new(name: :parent_organization_id, form: f, label: parent_org_label, placeholder: "Choose organization", include_blank: true, options: Organization.with_enabled_feature_slugs("child_organizations").pluck(:name, :id))
+      = render Form::Combobox::Component.new(name: :parent_organization_id, form: f, label: parent_org_label, placeholder: "Choose organization", include_blank: true, options: Organization.with_enabled_feature_slugs("child_organizations").pluck(:name, :id), data: {"admin--organization-form-target": "ambassadorField"})
       %small
         %strong Use the "regional" feature instead.
         %em To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.
@@ -222,8 +222,8 @@
                 %small
                   <span class="text-success">Organization Stolen Message setting</span>, edit message in the #{link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)}
               - message_kind_opts = [["Association: Evey associated stolen bike sees message. Default for schools", "association"], ["Area: seen by bikes stolen in radius. Default for law enforcement, advocacy", "area"]]
-              = select_tag :organization_stolen_message_kind, options_for_select(message_kind_opts, selected: organization_stolen_message.kind), {class: "form-control"}
-              .form-group.mt-2.collapse#areaField
+              = select_tag :organization_stolen_message_kind, options_for_select(message_kind_opts, selected: organization_stolen_message.kind), {class: "form-control", data: {"admin--organization-form-target": "stolenMessageKind", action: "change->admin--organization-form#toggleStolenMessageArea"}}
+              .form-group.mt-2{class: ("tw:hidden!" if organization_stolen_message.kind != "area"), "data-admin--organization-form-target" => "stolenMessageArea"}
                 - if organization_stolen_message.search_radius_metric_units?
                   = f.label :organization_stolen_message_search_radius_kilometers do
                     Stolen Message radius (km)

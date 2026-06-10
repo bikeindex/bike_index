@@ -1190,9 +1190,6 @@ nb:
           problem: meldingsteksten samsvarer ikke med det deklarerte formatet
           resolution: når du spesifiserer %{body_format} som innholdstype, må du sende
             gyldig %{body_format} i forespørselens "body"
-        empty_message_body: tom meldingstekst levert med %{body_format} innholdstype
-        too_many_multipart_files: antall opplastede filer overskred systemets konfigurerte
-          grense (%{limit})
         invalid_accept_header:
           problem: ugyldig aksept-overskrift
           resolution: "%{message}"
@@ -1204,10 +1201,6 @@ nb:
         length_is: forventes å ha lengde nøyaktig lik %{is}
         length_min: forventes å ha lengde større enn eller lik %{min}
         length_max: forventes å ha lengde mindre enn eller lik %{max}
-        conflicting_types: spørreparametere inneholder motstridende typer
-        invalid_parameters: Spørreparameterne inneholder ugyldig format eller bytesekvens
-        too_deep_parameters: Spørreparametere nestes rekursivt over den angitte grensen
-          (%{limit})
         unknown_auth_strategy: 'ukjent autentiseringsstrategi: %{strategy}'
         unknown_params_builder: 'ukjent params_builder: %{params_builder_type}'
   flash:
@@ -2346,6 +2339,8 @@ nb:
     public_images:
       create:
         cannot_create: Oops! Vi kan ikke la deg lage det bildet.
+        image_too_large: Bildet er for stort. Vennligst last opp et bilde som er mindre
+          enn %{size}.
       destroy:
         cannot_delete: Oops! Hvordan gjorde du det? Kan ikke slette bilder av e-postutdrag.
         image_deleted: Bildet ble slettet
@@ -2705,41 +2700,6 @@ nb:
       widely_used: Det er den mest brukte og vellykkede sykkelregistreringstjenesten
         i verden med over %{bikes_count} katalogiserte sykler, %{partners_count} fellesskapspartnere
         og titusenvis av daglige søk.
-    dev_and_design:
-      bike_index_logos_html: "%{link} - vektor- og png-sykkelindekslogoer"
-      bike_shop_card: Sykkelbutikkkort
-      bike_shop_card_pdf_url: https://files.bikeindex.org/stored/Bike-Index-Shop-Card.pdf
-      bike_shop_cards_html: '%{link} - designet er for notatkortstørrelse (5,5" x
-        4,25")'
-      design_resources: Designressurser
-      development_resources: Utviklingsressurser
-      display_widget_html: "%{link} (må være pålogget - har også ingen bruksinstruksjoner...)"
-      flyers_html: "%{link} - Skriv ut i farger og tosidig ( <em>ikke</em> skalere
-        på nytt, ha skriverutskrift så nær kantene som mulig)"
-      image_assets: Bilderessurser
-      meant_to_be_usable: Bike Index er ment å være brukbar og utvidbar av alle. Vi
-        er på vei inn i åpen kildekode.
-      nearby_stolen_widget: Stjålet widget i nærheten
-      nearby_stolen_widget_html: "%{link} (på GitHub)"
-      oauth_apps_html: "%{link} (må være pålogget)"
-      oauth_authorized_apps_html: "%{link} (må være pålogget)"
-      on_github: på GitHub
-      open_source_html: Bike Index i seg selv er åpen kildekode - sjekk den ut %{link}.
-      our_api_documentation: Vår API-dokumentasjon
-      trifold_flyer: Trifold Flyer
-      trifold_flyer_pdf_url: https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf
-    image_resources:
-      bike_index_image_assets: Bike Index bildeelementer
-      black_background_shown_here: Svart bakgrunn vist her for synlighet
-      check_out_resources_html: Sjekk ut %{resources_link} for ytterligere designressurser
-      image_has_no_background: bildet har ingen bakgrunn, vist her med svart for synlighet
-      logo_with_cutout: Logo med bakgrunnsutskjæring
-      logo_with_stripes: Logo med striper
-      single_color_logo: Ensfarget logo
-      single_color_logo_in_white: Ensfarget logo i hvitt
-      logo_with_blue_shield: Logo med blått skjold og hvit tekst
-      logo_with_cutout_black: Logo med svart bakgrunnsutskjæring
-      logo_with_links_html: "%{text} (%{svg_link}, %{png_link})"
     lightspeed:
       a_few_things_to_note: 'Et par ting å merke seg:'
       a_listing_on_bike_index_will_be_created: Når Lightspeed Retail-kontoen din er
@@ -2911,24 +2871,6 @@ nb:
         for å sikre at det ikke lett kan fjernes. Spesielt stolper kan enkelt frigjøres
         ved å skru løs bolter, og noen er løse fra før av.
       use_a_ulock_that_costs_at_least_40: Bruk en U-lås som koster minst 500 kr
-    resources:
-      api_documentation: API-dokumentasjon
-      bike_index_resources: Ressurser for sykkelindeks
-      check_out_our_link_html: Sjekk ut vår %{link}.
-      did_you_know_every_bike_html: Visste du at hver sykkel har et unikt identifiserende
-        nummer? %{link}.
-      get_bike_index_html: Få sykkelindeks %{link}.
-      how_not_to_buy_a_stolen_bike: Hvordan ikke kjøpe en stjålet sykkel i 4 enkle
-        trinn
-      infographic_html: "<strong>Infografikk</strong> : %{link}"
-      learn_about_serial_numbers_here: Lær om serienumre her
-      logos_and_design_assets: logoer og designelementer
-      map_of_bike_thefts: kart over sykkeltyverier
-      the_manufacturers: produsentene
-      view_the_list_of_all_html: Se listen over alle %{link} vi vet om.
-      we_have_an_open_api_check_out_html: Vi har et åpent API - sjekk ut vår %{link}.
-      were_open_source_view_this_app_html: Vi er åpen kildekode, se denne appen (og
-        andre ting) på %{github_link}.
     serials:
       a_serial_number_located_on_a_html: Et serienummer plassert på en <em>bakre dropout</em>
         . Noen BMX-sykler og noen få Schwinn-sykler plasserer serien på den bakre
@@ -5013,8 +4955,6 @@ nb:
       community_groups: Fellesskapsgrupper
       copyright_html: "%{current_year} © Bike Index, en 501(c)(3) nonprofit - EIN
         81-4296194"
-      design_logos: Design og logoer
-      dev_resources: Utviklerressurser
       donate: Donere
       faq: FAQ
       help: Hjelp
@@ -5035,6 +4975,7 @@ nb:
       where_we_are: Hvor vi er
       who_we_serve: Hvem vi tjener
       strava_search: Strava-søk og -oppdatering
+      dev_and_design_resources: Utviklings- og designressurser
     form_well_footer_save:
       save_changes: Lagre endringer
     header_nav:
@@ -5362,6 +5303,9 @@ nb:
         submit: sende inn
         search_notes: Søk i notater
         search_owner_email_or_name: Søk etter eierens e-postadresse eller navn
+      results_frame:
+        rate_limited: For mange søk for raskt – du er frekvensbegrenset. Vent et øyeblikk,
+          og prøv på nytt.
     search_results:
       bike_box:
         location: plassering
@@ -5420,6 +5364,12 @@ nb:
         sync_running_in_background: Synkroniseringen kjører i bakgrunnen. Denne siden
           oppdateres automatisk.
         syncing_activities: Synkroniserer aktiviteter ...
+      review_app_banner:
+        disclaimer: ikke produksjon, data er flyktige
+        label: Anmeld appen
+        letter_opener_link: e-post utboks
+        letter_opener_tooltip: Se e-posten som ble sendt av denne anmeldelsesappen
+        pr_link: PR-nummer %{number}
     emails:
       partials:
         bike_box:

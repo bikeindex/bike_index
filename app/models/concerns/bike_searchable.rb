@@ -57,6 +57,11 @@ module BikeSearchable
       items.flatten.compact
     end
 
+    # Maps a selected_query_items_options entry to a combobox [display, value] pair
+    def query_item_display_value(option)
+      option.is_a?(String) ? [option, option] : [option["text"], option["search_id"]]
+    end
+
     # returns nil OR [location, [lat, lng]] OR [location, nil]
     def search_location(location, ip_address = nil)
       location = location.to_s.strip
@@ -251,8 +256,8 @@ module BikeSearchable
       return all unless serial.present?
 
       serial_no_space ||= SerialNormalizer.no_space(serial)
-      # Note: @@ is postgres fulltext search
-      where("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
+      # to_tsvector(...) @@ plainto_tsquery(...) matches index_bikes_on_serial_normalized_tsvector
+      where("to_tsvector('simple', serial_normalized) @@ plainto_tsquery('simple', ?) OR serial_normalized_no_space = ?", serial, serial_no_space)
     end
 
     # TODO: actually make private?
@@ -305,7 +310,7 @@ module BikeSearchable
     def not_matching_serial(serial, serial_no_space)
       return all unless serial.present?
 
-      where.not("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
+      where.not("to_tsvector('simple', serial_normalized) @@ plainto_tsquery('simple', ?) OR serial_normalized_no_space = ?", serial, serial_no_space)
     end
 
     # NOTE: THis query should exactly match serials_not_containing

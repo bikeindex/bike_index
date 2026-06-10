@@ -25,8 +25,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_button "Log in"
     find(".alert-success .close").click
     # Wait for the flash to finish dismissing -- otherwise it overlaps and
-    # intercepts the click on the nav link below
-    expect(page).to have_no_css(".alert-success")
+    # intercepts the click on the nav link below. The Bootstrap fade-out can
+    # exceed Capybara's default 2s wait on slow CI runners.
+    expect(page).to have_no_css(".alert-success", wait: 10)
     find("#passive_organization_submenu").click
     within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
     expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/, wait: 10)
@@ -57,10 +58,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Visit a different page first to establish history, then navigate to bikes
     visit "/"
     visit bikes_path
-    # Results load via turbo auto-submit (search--form controller)
+    # Results load via the eager turbo-frame (src fetched once the frame connects)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
-    expect(page).to be_axe_clean.skipping(*SKIPPABLE_AXE_RULES, "select-name")
+    expect_axe_clean("select-name")
 
     # search_no_js should NOT be in the URL (removed by JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
@@ -113,7 +114,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("tbody tr", minimum: 1)
 
     # Verify that it preserves turbo-frame after search submissions
-    # Initial auto-submit loads results via turbo_stream
+    # Results load via the eager turbo-frame
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     # turbo-frame element must still exist after turbo_stream.update
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
@@ -190,6 +191,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_current_path(/search_email=bob/, wait: 10)
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_field("search_email", with: "bob@example.com")
+    # Wait for the results frame to settle before reading hrefs, otherwise
+    # rendered_bike_ids can read a row that's being replaced mid-render
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
 
     # Chart test must run before the custom-range click below: that submission
@@ -239,6 +243,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
     page.execute_script("document.querySelector(\"[data-controller~='ui--period-select'] button[type='submit']\").click()")
     expect(page).to have_current_path(/period=custom/, wait: 10)
+    # Wait for the results frame to settle before reading hrefs, otherwise
+    # rendered_bike_ids can read a row that's being replaced mid-render
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
   end
 
