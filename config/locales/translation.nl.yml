@@ -4775,13 +4775,13 @@ nl:
       sticker_id: Sticker-ID
       student_id: Student-ID
       third_color: Derde kleur
-      this: deze
       unknown_serial: Onbekende serie
       unknown_year: Onbekend jaar
       unsure_or_unknown: Onzeker of onbekend
       when_was_it_stolen: Wanneer is het gestolen?
       where_was_it_stolen: Waar is het gestolen?
       zipcode: Postcode
+      electric_motorized: Elektrisch (gemotoriseerd)
   feedbacks:
     form:
       email_address: E-mailadres
