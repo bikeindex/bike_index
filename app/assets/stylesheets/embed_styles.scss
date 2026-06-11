@@ -5,12 +5,16 @@
 }
 
 // Ellipsize long items (e.g. cycle_type names) so selectize's focus input
-// isn't pushed onto an empty row below
+// isn't pushed onto an empty row below. The hanging indent from
+// custom_selects would clip the first character once overflow is hidden,
+// and a single-line item never wraps — reset it.
 .control-group .selectize-control.single .selectize-input > .item {
   max-width: calc(100% - 12px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-left: 0;
+  text-indent: 0;
 }
 
 @import "legacy_includes/_colors.scss";
@@ -19,6 +23,7 @@
 @import "legacy_includes/component-animations.scss";
 @import "legacy_includes/dropdowns.scss";
 @import "legacy_includes/embed_form_styles.scss";
+@import "revised/sections/custom_selects.scss";
 
 $newStolenColor: #d25627;
 
