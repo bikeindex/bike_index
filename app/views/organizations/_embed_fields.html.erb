@@ -12,24 +12,6 @@
 </script>
 
 <div class="input-group">
-  <div class="control-group special-select-single">
-    <%= f.label :cycle_type, t(".vehicle_type") %>
-
-    <div class="controls">
-      <%= f.select :cycle_type, CycleType.select_options(traditional_bike: true), {}, {required: true} %>
-    </div>
-  </div>
-
-  <div class="optional-checkbox">
-    <label id="motorizedWrapper" style="margin-top: 0.25em">
-      <%= check_box_tag :propulsion_type_motorized, true, @bike.motorized? %>
-      <strong>⚡️</strong>
-      <%= t(".electric_motorized") %>
-    </label>
-  </div>
-</div>
-
-<div class="input-group">
   <div class="control-group">
     <%= f.label :serial_number %>
 
@@ -371,6 +353,16 @@
 
   <div class="submit-registration">
     <%= submit_tag t(".register"), class: "button-submit" %>
+
+    <div class="vehicle-select">
+      <%= f.select :cycle_type, CycleType.select_options(traditional_bike: true), {}, {required: true} %>
+
+      <label id="motorizedWrapper">
+        <%= check_box_tag :propulsion_type_motorized, true, @bike.motorized? %>
+        <strong>⚡️</strong>
+        <%= t(".electric_motorized") %>
+      </label>
+    </div>
 
     <div class="please-wait-text less-strong"><%= t(".please_wait") %></div>
   </div>
