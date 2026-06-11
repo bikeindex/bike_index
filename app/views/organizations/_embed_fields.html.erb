@@ -354,7 +354,7 @@
   <div class="submit-registration">
     <%= submit_tag t(".register"), class: "button-submit" %>
 
-    <div class="vehicle-select">
+    <div class="vehicle-select special-select-single">
       <%= f.select :cycle_type, CycleType.select_options(traditional_bike: true), {}, {required: true} %>
 
       <label id="motorizedWrapper">
