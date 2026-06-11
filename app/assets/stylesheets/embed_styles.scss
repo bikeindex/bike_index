@@ -288,6 +288,7 @@ a {
   clear: both;
   padding-top: 1.25em;
 
+  // new_iframe still renders a cycle_type select in the submit row
   select {
     margin: 0;
   }
@@ -301,12 +302,6 @@ a {
     &[disabled]:hover {
       background: #cacaca !important;
     }
-  }
-
-  .what-you-register {
-    color: $grayLight;
-    display: inline-block;
-    margin: 0 0.5em;
   }
 
   .please-wait-text {
@@ -667,9 +662,11 @@ a {
 }
 
 // cursor classes required for #motorizedWrapper
-.cusor-pointer {
+.cusor-pointer,
+.cursor-pointer {
   cursor: pointer;
 }
-.cursor-not-allowed {
+.cursor-not-allowed,
+.optional-checkbox label.cursor-not-allowed {
   cursor: not-allowed;
 }

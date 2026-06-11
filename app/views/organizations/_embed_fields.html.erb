@@ -5,6 +5,30 @@
 <%= f.hidden_field :creation_organization_id %>
 <%= f.hidden_field :embeded, value: true %>
 
+<script>
+  window.cycleTypesPedals = <%= CycleType::PEDAL.to_json.html_safe %>;
+  window.cycleTypesAlwaysMotorized = <%= CycleType::ALWAYS_MOTORIZED.to_json.html_safe %>;
+  window.cycleTypesNeverMotorized = <%= CycleType::NEVER_MOTORIZED.to_json.html_safe %>;
+</script>
+
+<div class="input-group">
+  <div class="control-group special-select-single">
+    <%= f.label :cycle_type, t(".vehicle_type") %>
+
+    <div class="controls">
+      <%= f.select :cycle_type, CycleType.select_options(traditional_bike: true), {}, {required: true} %>
+    </div>
+  </div>
+
+  <div class="optional-checkbox">
+    <label id="motorizedWrapper" style="margin-top: 0.25em">
+      <%= check_box_tag :propulsion_type_motorized, true, @bike.motorized? %>
+      <strong>⚡️</strong>
+      <%= t(".electric_motorized") %>
+    </label>
+  </div>
+</div>
+
 <div class="input-group">
   <div class="control-group">
     <%= f.label :serial_number %>
@@ -347,8 +371,6 @@
 
   <div class="submit-registration">
     <%= submit_tag t(".register"), class: "button-submit" %>
-    <span class="what-you-register"><%= t(".this") %></span>
-    <%= select(:bike, :cycle_type, CycleType.select_options, { required: true }) %>
 
     <div class="please-wait-text less-strong"><%= t(".please_wait") %></div>
   </div>
