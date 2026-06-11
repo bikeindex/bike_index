@@ -15,7 +15,14 @@
     port: "{{ item.port }}"
     proto: "{{ item.proto }}"
   loop:
-    - rule: 'limit'
+    # 'allow', not 'limit': ufw's `limit` drops SSH connections once an IP opens
+    # 6+ in 30s, which a Kamal review-app deploy routinely does (web + worker +
+    # cron roles on this one host, plus the workflow's `ssh-keyscan host ip`).
+    # That tripped the limit and dropped connections mid-handshake ("Broken
+    # pipe"), failing the deploy's "Trust review host" step. SSH here is
+    # key-only (see roles/security: PasswordAuthentication no, root
+    # prohibit-password), so brute-force rate-limiting adds little.
+    - rule: 'allow'
       port: '22'
       proto: 'tcp'
     - rule: 'allow'
@@ -24,6 +31,16 @@
     - rule: 'allow'
       port: '443'
       proto: 'tcp'
+
+# Hosts provisioned before the limit->allow change above still carry the old
+# rate-limited SSH rule; UFW matches the first rule, so the allow above is
+# shadowed until this stale one is removed. Idempotent: a no-op once gone.
+- name: Remove legacy rate-limited SSH rule
+  community.general.ufw:
+    rule: 'limit'
+    port: '22'
+    proto: 'tcp'
+    delete: true
 
 - name: Enable ufw
   community.general.ufw:
