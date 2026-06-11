@@ -119,6 +119,33 @@ export REVIEW_APP_HOST=host.review.bikeindex.org
 bin/review-app deploy <pr_number> <image_tag>
 ```
 
+## Running kamal commands against a review app
+
+`bin/kamal_review` runs **any** kamal command against a single review app without
+exporting the `REVIEW_APP_*` vars its ERB config needs or passing `--config-file`
+every time. Its first argument names the review app — in any of these equivalent
+forms — and everything after it is passed straight through to kamal:
+
+```bash
+bin/kamal_review 3594                                  app logs -f
+bin/kamal_review pr-3594                               app exec --reuse "bin/rails console"
+bin/kamal_review pr-3594.review.bikeindex.org          app details
+bin/kamal_review https://pr-3594.review.bikeindex.org  app version
+```
+
+All four first-arguments resolve to PR `3594`. Run it with no argument (or an
+unrecognized one) to print usage. It uses the same host + secrets as
+`bin/review-app` — `REVIEW_APP_HOST` (default `host.review.bikeindex.org`) and
+`.kamal/secrets` — so the 1Password setup above is a prerequisite.
+
+The shared accessories (`db`, `redis`) aren't PR-specific, so the PR number is
+only there to satisfy the ERB when you operate on them — e.g. to reboot Postgres
+after changing its `shared_preload_libraries`:
+
+```bash
+bin/kamal_review 0 accessory reboot db
+```
+
 ## How a deploy works
 
 The workflow runs four jobs — `resolve` (works out the PR number and whether to `deploy` or `destroy`), `build` (adds the label, builds + pushes the image; deploys only), `update` (does the work, branching on the resolved action via step-level `if:`), and `report` (failure-only; see below). `build` is its own job so a newer push cancels a superseded build (`cancel-in-progress` concurrency); `update` deliberately handles **both deploy and destroy in one job** — separate jobs would show one running + one skipped check on every run — and serializes per PR *without* cancellation, because killing kamal mid-deploy can leave the deploy lock held on the host. The ways it can be triggered:
@@ -161,6 +188,7 @@ Each review app gets a `cron` container (a Kamal [`servers` role](https://kamal-
 | `bin/docker-entrypoint` | Creates the per-PR Postgres **superuser** role + runs `db:prepare` (schema + seed) on first boot |
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
 | `bin/review-app` | Deploy / destroy orchestration script |
+| `bin/kamal_review` | Run an arbitrary kamal command against one review app (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
 | `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
 | `config/crontab` | Scheduled rake tasks run by the `cron` server role |
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
