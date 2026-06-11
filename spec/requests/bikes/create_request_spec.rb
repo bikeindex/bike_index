@@ -473,6 +473,24 @@ RSpec.describe "BikesController#create", type: :request do
       expect(bike_sticker.bike&.id).to eq new_bike.id
       expect(bike_sticker.bike_sticker_updates.count).to eq 1
     end
+    context "electric (motorized) checkbox" do
+      it "creates a motorized bike" do
+        expect {
+          # The embed form submits propulsion_type_motorized as a top-level param
+          post base_url, params: {
+            bike: bike_params.except(:embeded_extended).merge(cycle_type: "bike"),
+            propulsion_type_motorized: "true"
+          }
+        }.to change(Bike, :count).by(1)
+
+        new_bike = b_param.reload.created_bike
+        expect(response).to redirect_to(embed_create_success_organization_path(organization.slug, bike_id: new_bike.id))
+        # for_vehicle coerces motorized to the cycle_type's default motorized propulsion
+        expect(new_bike).to have_attributes(cycle_type: "bike", propulsion_type: "pedal-assist")
+        expect(new_bike.motorized?).to be_truthy
+        expect(new_bike.current_ownership.origin).to eq "embed"
+      end
+    end
     context "no organization" do
       it "registers" do
         b_param.reload
