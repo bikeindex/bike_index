@@ -4,6 +4,15 @@
   width: 210px;
 }
 
+// Ellipsize long items (e.g. cycle_type names) so selectize's focus input
+// isn't pushed onto an empty row below
+.control-group .selectize-control.single .selectize-input > .item {
+  max-width: calc(100% - 12px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @import "legacy_includes/_colors.scss";
 @import "legacy_includes/_variables.scss";
 @import "legacy_includes/_mixins.scss";
