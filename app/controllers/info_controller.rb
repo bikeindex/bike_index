@@ -53,12 +53,14 @@ class InfoController < ApplicationController
 
   def membership
     @blog = Blog.friendly_find(Blog.membership_slug)
+    return blog_page_not_found if @blog.blank?
     @page_id = "news_show" # Override to make styles same as news
     render "show"
   end
 
   def why_donate
     @blog = Blog.friendly_find(Blog.why_donate_slug)
+    return blog_page_not_found if @blog.blank?
     render "/news/show"
   end
 
@@ -90,6 +92,13 @@ class InfoController < ApplicationController
   end
 
   private
+
+  # These pages render a seeded Blog; a freshly seeded app (e.g. a review app)
+  # may not have it yet, so degrade gracefully instead of 500ing on a nil @blog.
+  def blog_page_not_found
+    flash[:error] = "unable to find that page"
+    redirect_to(news_index_path)
+  end
 
   def redirect_to_donation_or_payment
     if params[:amount].present?
