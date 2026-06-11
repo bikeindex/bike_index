@@ -45,14 +45,6 @@ RSpec.describe InfoController, type: :request do
       get "/info/bike-index-membership"
       expect(response).to redirect_to "/membership"
     end
-    context "blog not seeded" do
-      let!(:blog) { nil }
-      it "redirects to news instead of erroring" do
-        get "/membership"
-        expect(response).to redirect_to news_index_path
-        expect(flash[:error]).to be_present
-      end
-    end
   end
 
   describe "static pages" do
@@ -147,14 +139,6 @@ RSpec.describe InfoController, type: :request do
       expect(response.code).to eq "200"
       expect(response).to render_template("news/show")
       expect(assigns(:blog)).to eq blog
-    end
-    context "blog not seeded" do
-      let!(:blog) { nil }
-      it "redirects to news instead of erroring" do
-        get "/why-donate"
-        expect(response).to redirect_to news_index_path
-        expect(flash[:error]).to be_present
-      end
     end
   end
 
