@@ -682,11 +682,9 @@ a {
 }
 
 // cursor classes required for #motorizedWrapper
-.cusor-pointer,
 .cursor-pointer {
   cursor: pointer;
 }
-.cursor-not-allowed,
-.optional-checkbox label.cursor-not-allowed {
+.cursor-not-allowed {
   cursor: not-allowed;
 }
