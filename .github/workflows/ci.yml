@@ -150,13 +150,10 @@ jobs:
           install-libfuse2: false
       - name: Ensure ImageMagick is available
         run: echo $(identify --version)
-      # Mint a token from the translations-sync GitHub App and have checkout persist
-      # it as the git credentials, so the sync branch is pushed as the App rather
-      # than the default GITHUB_TOKEN. Only an App-authenticated push fires
-      # `on: push` and attaches the required check runs to the PR; the default
-      # token is blocked from triggering those events. Skipped (falling back to
-      # the default checkout creds) until the App secrets exist, so main CI keeps
-      # passing in the meantime.
+      # Checkout persists this App token (below) as the git creds so the sync
+      # branch is pushed as the App — only a non-default-token push fires
+      # `on: push`, which is what attaches the required checks to the PR.
+      # Falls back to default creds until the App secrets exist.
       - name: Mint translations-sync token
         id: translations_token
         if: matrix.ci_node_index == 1 && github.ref == 'refs/heads/main' && env.TRANSLATIONS_SYNC_APP_ID != ''
