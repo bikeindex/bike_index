@@ -150,8 +150,24 @@ jobs:
           install-libfuse2: false
       - name: Ensure ImageMagick is available
         run: echo $(identify --version)
+      # Mint a token from the translations-sync GitHub App and have checkout persist
+      # it as the git credentials, so the sync branch is pushed as the App rather
+      # than the default GITHUB_TOKEN. Only an App-authenticated push fires
+      # `on: push` and attaches the required check runs to the PR; the default
+      # token is blocked from triggering those events. Skipped (falling back to
+      # the default checkout creds) until the App secrets exist, so main CI keeps
+      # passing in the meantime.
+      - name: Mint translations-sync token
+        id: translations_token
+        if: matrix.ci_node_index == 1 && github.ref == 'refs/heads/main' && env.TRANSLATIONS_SYNC_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
+          private-key: ${{ secrets.TRANSLATIONS_SYNC_APP_PRIVATE_KEY }}
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          token: ${{ steps.translations_token.outputs.token || github.token }}
       # Install Ruby dependencies
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
@@ -160,19 +176,6 @@ jobs:
       - run: bundle install
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
-      # Mint a token from the translations-sync GitHub App. Pushing the sync
-      # branch with this (rather than the default GITHUB_TOKEN) is what lets the
-      # subsequent push fire `on: push` and attach real, required check runs to
-      # the PR — the default token is blocked from triggering those events.
-      # Skipped (with a github.token fallback) until the App secrets exist, so
-      # main CI keeps passing in the meantime.
-      - name: Mint translations-sync token
-        id: translations_token
-        if: matrix.ci_node_index == 1 && github.ref == 'refs/heads/main' && env.TRANSLATIONS_SYNC_APP_ID != ''
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
-          private-key: ${{ secrets.TRANSLATIONS_SYNC_APP_PRIVATE_KEY }}
       - name: Sync translations (only on main by default)
         if: matrix.ci_node_index == 1
         env:

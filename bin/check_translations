@@ -70,12 +70,12 @@ else
     git add config/locales/
     git commit -m "translations sync"
 
-    # Push authenticated as $GH_TOKEN (the translations-sync GitHub App token in
-    # CI) rather than via the checkout's embedded GITHUB_TOKEN. A push from a
-    # non-default token fires `on: push`, so the branch gets the real CI run
-    # whose check runs attach to the PR and satisfy branch protection. A push
-    # with the default GITHUB_TOKEN would run no workflows at all.
-    git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$branch_name"
+    # In CI the checkout persists the translations-sync GitHub App token as the
+    # git credentials, so this push authenticates as the App, not the default
+    # GITHUB_TOKEN. Only an App-authenticated push fires `on: push`, giving the
+    # branch the CI run whose check runs attach to the PR and satisfy branch
+    # protection. A default-token push would run no workflows at all.
+    git push origin "$branch_name"
 
     gh pr create \
       --title "Automated translations sync from CI" \
