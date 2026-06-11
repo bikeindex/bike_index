@@ -3290,13 +3290,13 @@ it:
       sticker_id:
       student_id:
       third_color:
-      this:
       unknown_serial:
       unknown_year:
       unsure_or_unknown:
       when_was_it_stolen:
       where_was_it_stolen:
       zipcode: Codice postale
+      electric_motorized:
   organized:
     ambassador_dashboards:
       getting_started:
