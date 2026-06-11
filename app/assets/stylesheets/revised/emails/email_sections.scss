@@ -100,30 +100,31 @@
   }
 }
 
-$foot-padding: 0.5 * ($header-height - $font-size);
-
 .binx-footer {
-  background-color: $gray-darker;
-  padding: $foot-padding;
+  background-color: #715eb2;
+  padding: 2 * $vertical-height;
 
   h5,
   p {
-    color: $less-strong-font-color;
+    color: #fff;
     font-size: $font-size;
     text-align: center;
-    line-height: 1.2em;
+    line-height: 1.5em;
     width: 100%;
   }
 
   h5 {
+    margin: 0;
     font-weight: 600;
   }
 
   p {
     margin: 1.5rem 0 0;
     font-style: italic;
-    a {
-      color: #3a78a8; // equivalent to 0.7 opacity
-    }
+  }
+
+  a {
+    color: #fff;
+    text-decoration: underline;
   }
 }

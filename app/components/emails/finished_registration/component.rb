@@ -50,7 +50,6 @@ module Emails
       end
 
       def hero_title
-        return translation("welcome_to_bike_index") if new_user?
         return translation("your_registration_is_active") if claimed?
 
         translation("confirm_your_registration")
@@ -105,10 +104,6 @@ module Emails
         image_url("email_assets/finished_registration/#{name}")
       end
 
-      def render_template_footer_donation?
-        helpers.render_donation?(organization)
-      end
-
       def organization_snippet_body(kind)
         @organization_snippet_bodies ||= Hash.new { |h, k| h[k] = organization&.mail_snippet_body(k, time: email_sent_at) }
         @organization_snippet_bodies[kind]
@@ -136,10 +131,6 @@ module Emails
 
       def new_bike?
         @ownership.new_registration?
-      end
-
-      def new_user?
-        User.fuzzy_email_find(@ownership.owner_email).present?
       end
 
       def donation_message?

@@ -35,7 +35,6 @@ en:
         found_bike_registered: Found bike intake
         give_us_a_heads_up: Give us a heads up
         header_image_alt: Bike Index email header
-        help_prevent_theft_footer: Help prevent bike theft,
         hopefully_you_find_the_bike: Hopefully you find the %{bike_type} soon.
         hopefully_you_find_the_owner_prefix: Hopefully you find the owner soon.
         hopefully_you_find_the_owner_suffix: when you do!
@@ -43,7 +42,6 @@ en:
           We always recommend bringing your bike indoors or storing it in a secure
           location when possible, especially overnight.
         keep_your_registration_updated: Keep your registration updated
-        make_a_donation_footer: make a donation
         mark_your_bike_recovered: Mark your bike recovered
         marketplace_illustration: Marketplace illustration
         org_added_a_bike: added a %{bike_type} on Bike Index for you
@@ -83,7 +81,6 @@ en:
           as stolen to activate our recovery network.
         thanks_for_adding_this_bike_type_you_found: Thanks for adding this %{bike_type}
           you found to Bike Index
-        the_bike_index_team: The Bike Index Team
         theft_victims_illustration: Theft victims illustration
         ulock_illustration: U-Lock illustration
         updated_registration_guidance: >-
@@ -91,7 +88,6 @@ en:
           so the record stays accurate and useful.
         use_a_ulock: Use a U-Lock.
         view_your_bike: View your bike
-        welcome_to_bike_index: Welcome to Bike Index
         were_sorry_your_bike_type_was_stolen: We're sorry your %{bike_type} was stolen.
         what_if_my_bike_gets_stolen: What if my bike gets stolen?
         whats_next: What's next?

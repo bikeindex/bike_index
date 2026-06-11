@@ -306,28 +306,6 @@
             </table>
           </div>
         <% end %>
-
-        <div class="finished-registration-signoff">
-          <div class="hearts">
-            <span>&#9829;</span>
-            <span>&#9829;</span>
-            <span>&#9829;</span>
-            <span>&#9829;</span>
-            <span>&#9829;</span>
-          </div>
-
-          <h4><%= translation("the_bike_index_team") %></h4>
-        </div>
-
-        <div class="finished-registration-template-footer">
-          <h5>
-            <% if render_template_footer_donation? %>
-              <%= translation("help_prevent_theft_footer") %>
-              <%= link_to translation("make_a_donation_footer"), support_the_index_url %>
-              .
-            <% end %>
-          </h5>
-        </div>
       </td>
     </tr>
   </tbody>

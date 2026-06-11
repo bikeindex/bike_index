@@ -19,7 +19,8 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
     it "renders registration content and locking guidelines" do
       expect(ownership.claim_message).to be_blank
       expect(component).to have_content("Registration complete")
-      expect(component).to have_content("Welcome to Bike Index")
+      expect(component).to have_content("Your registration is active")
+      expect(component).to_not have_content("Welcome to Bike Index")
       expect(component).to have_content("Congrats on registering your bike with Bike Index")
       expect(component).to have_content("Bike details")
       expect(component).to have_content("Protect your bike by following these locking guidelines")
