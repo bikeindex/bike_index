@@ -843,3 +843,24 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Keyboard focus indicators (WCAG 2.4.7) */
+.kelsey_styles .le-btn-primary:focus-visible,
+.kelsey_styles .le-btn-secondary:focus-visible,
+.kelsey_styles .le-tab-button:focus-visible,
+.kelsey_styles .le-testimonial-arrow:focus-visible,
+.kelsey_styles .le-testimonial-dot:focus-visible {
+  outline: 3px solid var(--redesign-blue-500);
+  outline-offset: 2px;
+}
+
+/* Pause the auto-scrolling partners strip for keyboard focus and reduced-motion preference (WCAG 2.2.2) */
+.kelsey_styles .le-partners-grid:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kelsey_styles .le-partners-grid {
+    animation: none;
+  }
+}
