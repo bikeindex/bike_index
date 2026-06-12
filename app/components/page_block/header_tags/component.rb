@@ -209,7 +209,7 @@ module PageBlock
             bike.end_at.present? ? "to: #{date(bike.end_at)}" : nil
           ].compact.join(" ")
         elsif bike.status_stolen? && bike.current_stolen_record.present?
-          "#{status_prefix}: #{date(bike.current_stolen_record.date_stolen)}, from: #{bike.current_stolen_record.address(country: [:iso])}"
+          "#{status_prefix}: #{date(bike.current_stolen_record.date_stolen)}, from: #{bike.current_stolen_record.formatted_address_string(render_country: true)}"
         elsif bike.current_impound_record.present?
           "#{status_prefix}: #{date(bike.current_impound_record.impounded_at)}, in: #{bike.current_impound_record.formatted_address_string}"
         end

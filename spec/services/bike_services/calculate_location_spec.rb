@@ -76,12 +76,12 @@ RSpec.describe BikeServices::CalculateLocation do
       let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
       let(:stolen_record) { bike.current_stolen_record }
       let(:street_address) { "1300 W 14th Pl" }
-      let(:abbr_address) { "Chicago, IL 60608, US" }
+      let(:abbr_address) { "Chicago, IL 60608" }
       let(:full_address) { "#{street_address}, #{abbr_address}" }
       it "takes location from the current stolen record" do
         expect(stolen_record.street).to eq street_address
-        expect(stolen_record.address(force_show_address: true)).to eq(full_address)
-        expect(stolen_record.address).to eq(abbr_address)
+        expect(stolen_record.formatted_address_string(visible_attribute: :street)).to eq(full_address)
+        expect(stolen_record.formatted_address_string).to eq(abbr_address)
 
         bike.reload
         stolen_record.save
@@ -96,25 +96,25 @@ RSpec.describe BikeServices::CalculateLocation do
         # When displaying searches for stolen bikes, it's critical we honor the stolen record's data
         # ... or else unexpected things happen
         it "blanks the location on the bike" do
-          expect(stolen_record.address(force_show_address: true)).to eq(full_address)
+          expect(stolen_record.formatted_address_string(visible_attribute: :street)).to eq(full_address)
           expect(bike.to_coordinates.compact).to be_present
           bike.reload
           stolen_record.reload
           stolen_record.skip_geocoding = false
           Sidekiq::Testing.inline! do
-            stolen_record.attributes = {street: "", city: "", zipcode: ""}
+            stolen_record.attributes = {street: "", city: "", postal_code: ""}
             expect(stolen_record.should_be_geocoded?).to be_truthy
             stolen_record.save
             expect(stolen_record.street).to be_nil
             expect(stolen_record.city).to be_nil
-            expect(stolen_record.zipcode).to be_nil
+            expect(stolen_record.postal_code).to be_nil
           end
           stolen_record.reload
           bike.reload
           # Doesn't have coordinates, see geocodeable for additional information
           expect(stolen_record.to_coordinates.compact).to eq([])
-          expect(stolen_record.address_hash.compact).to eq({country: "US", state: "IL"}.as_json)
-          expect(stolen_record.address(force_show_address: true)).to eq "IL, US"
+          expect(stolen_record.address_hash.compact).to eq({region: "IL"})
+          expect(stolen_record.formatted_address_string(visible_attribute: :street)).to eq "IL"
 
           expect(bike.to_coordinates.compact).to eq([])
           expect(described_class.registration_address_source(bike)).to be_blank

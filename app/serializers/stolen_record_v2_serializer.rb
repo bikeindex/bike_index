@@ -21,7 +21,8 @@ class StolenRecordV2Serializer < ApplicationSerializer
   end
 
   def location
-    object.address
+    [object.formatted_address_string(render_country: false),
+      object.country_iso].reject(&:blank?).join(", ").presence
   end
 
   def latitude
