@@ -6,10 +6,7 @@ module Search
   class ComboboxController < ApplicationController
     PER_PAGE = 15
 
-    # Both actions only ever render turbo_stream (the hotwire_combobox partials
-    # exist solely in that format). Clients that drop the format param - e.g. a
-    # crawler following the pagination src with HTML-encoded "&amp;format=..." -
-    # would otherwise default to :html and raise ActionView::MissingTemplate.
+    # Both actions only ever render turbo_stream
     before_action { request.format = :turbo_stream }
 
     def options
