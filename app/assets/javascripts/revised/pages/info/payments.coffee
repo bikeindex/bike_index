@@ -7,7 +7,7 @@ class BikeIndex.Payments extends BikeIndex
     $('#new-payment-form').submit (e) =>
       return @submitDonation()
 
-    $('.amount-list a').click (e) =>
+    $('.amount-list button[data-amount]').click (e) =>
       @selectPaymentOption(e)
 
     # If the arbitrary amount is selected (and on keyboard movement), select the appropriate target

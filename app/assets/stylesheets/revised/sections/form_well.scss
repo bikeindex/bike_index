@@ -64,6 +64,8 @@
     @extend .form-circle-item;
 
     display: block;
+    background: none;
+    font-family: inherit;
     border: 2px solid $gray;
     position: absolute;
     right: 1.5em;

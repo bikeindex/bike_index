@@ -1,6 +1,3 @@
-<%# herb:linter ignore %>
-<%# Ignoring the file because I'm not sure how to apply herb:disable html-anchor-require-href with multiline tags %>
-
 <div class="container">
   <% if current_user.present? %>
     <div class="row choose-registration-items">
@@ -11,7 +8,7 @@
               <li>
                 <a
                   class="organization-choice choose-type"
-                  data-target="<%= new_bike_url(organization_id: organization_role.organization.id) %>"
+                  href="<%= new_bike_url(organization_id: organization_role.organization.id) %>"
                 >
                   <span class="add-selected"> &#10004 </span>
                   <%= t(".add_a_bike_through") %>
@@ -22,20 +19,14 @@
           <% end %>
 
           <li>
-            <a
-              class="purchase-choice choose-type"
-              data-target="<%= new_bike_url %>"
-            >
+            <a class="purchase-choice choose-type" href="<%= new_bike_url %>">
               <span class="add-selected"> &#10004 </span>
               <%= t(".add_your_own_bike") %>
             </a>
           </li>
 
           <li>
-            <a
-              class="choose-type"
-              data-target="<%= new_bike_url(status: "stolen") %>"
-            >
+            <a class="choose-type" href="<%= new_bike_url(status: "stolen") %>">
               <span class="add-selected"> &#10004 </span>
               <%= t(".add_a_stolen_bike") %>
             </a>
@@ -44,7 +35,7 @@
           <li>
             <a
               class="choose-type"
-              data-target="<%= new_bike_url(status: "impounded") %>"
+              href="<%= new_bike_url(status: "impounded") %>"
             >
               <span class="add-selected"> &#10004 </span>
               <%= t(".add_abandoned_bike_you_found") %>

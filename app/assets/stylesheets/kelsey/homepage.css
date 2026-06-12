@@ -733,3 +733,10 @@
     padding: 2rem 0 1.5rem;
   }
 }
+
+/* Keyboard focus indicators (WCAG 2.4.7) */
+.kelsey_styles .nav-arrow:focus-visible,
+.kelsey_styles .step-arrow:focus-visible {
+  outline: 3px solid var(--redesign-blue-500);
+  outline-offset: 2px;
+}

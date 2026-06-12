@@ -18,6 +18,18 @@ Severity: **High** = control is unusable by keyboard or unusable with a screen r
 core user path. **Medium** = degraded but workable, or affects secondary pages.
 **Low** = best-practice gap.
 
+**Status**: the keyboard-blocking and labeling issues below are fixed on this branch —
+donation amounts are real buttons, choose-registration cards are real links, the
+hamburger is a button with `aria-expanded`/Escape support, the `tabindex="-1"`s and
+popover/modal triggers in the bike forms are keyboard-operable, the landing-page tabs
+implement the ARIA tabs pattern with arrow keys, carousel arrows/dots have accessible
+names and pause on focus/reduced-motion, the layout has a skip link and `<main>`
+landmark, footer navs are labeled, the broken `aria-labelledby` references are fixed,
+zoom is re-enabled everywhere, and the listed missing `alt`s are filled in. Still open:
+the site-wide sweeps (heading hierarchy, color contrast, admin table header
+associations, placeholder-only admin inputs, remaining `href="#"` pseudo-buttons,
+selectize keyboard audit) and the legacy Bootstrap dropdown/modal focus management.
+
 ---
 
 ## VPAT conformance report (August 2025)

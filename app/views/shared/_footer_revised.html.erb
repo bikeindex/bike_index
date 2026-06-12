@@ -2,7 +2,7 @@
   <div class="primary-footer-nav">
     <div class="container">
       <div class="row">
-        <nav class="col-md-2 pull-right">
+        <nav class="col-md-2 pull-right" aria-label="<%= t(".bike_index") %>">
           <h4><%= t(".bike_index") %></h4>
 
           <ul>
@@ -22,7 +22,7 @@
           </ul>
         </nav>
 
-        <nav class="col-md-2 pull-right">
+        <nav class="col-md-2 pull-right" aria-label="<%= t(".support_us") %>">
           <h4><%= t(".support_us") %></h4>
 
           <ul>
@@ -35,7 +35,7 @@
           </ul>
         </nav>
 
-        <nav class="col-md-2 pull-right">
+        <nav class="col-md-2 pull-right" aria-label="<%= t(".resources") %>">
           <h4><%= t(".resources") %></h4>
 
           <ul>
@@ -65,7 +65,7 @@
           </ul>
         </nav>
 
-        <nav class="col-md-2 pull-right">
+        <nav class="col-md-2 pull-right" aria-label="<%= t(".who_we_serve") %>">
           <h4><%= t(".who_we_serve") %></h4>
 
           <ul>
@@ -91,9 +91,9 @@
           </ul>
         </nav>
 
-        <nav class="col-md-2 pull-right"></nav>
+        <div class="col-md-2 pull-right"></div>
 
-        <nav class="col-md-2 social-nav">
+        <nav class="col-md-2 social-nav" aria-label="<%= t(".social_media") %>">
           <ul>
             <li>
               <%# = link_to "https://twitter.com/BikeIndex" do %>
@@ -132,7 +132,7 @@
     </div>
   </div>
 
-  <nav class="terms-and-stuff">
+  <nav class="terms-and-stuff" aria-label="<%= t(".legal") %>">
     <div class="container">
       <div class="row">
         <div class="col-md-6 text-left">
