@@ -26,6 +26,7 @@ class OrganizedMailer < ApplicationMailer
   def finished_registration(ownership)
     bike = Bike.unscoped.find(ownership.bike_id)
     @organization = ownership.organization
+    @skip_header = true
     component = Emails::FinishedRegistration::Component.new(ownership:, bike:)
     subject = I18n.t("organized_mailer.finished#{finished_registration_type(bike, ownership)}_registration.subject", **default_subject_vars(bike:))
     tag = __callee__
