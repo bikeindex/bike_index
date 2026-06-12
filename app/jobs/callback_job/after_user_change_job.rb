@@ -38,6 +38,9 @@ module CallbackJob
 
       user.user_ban.delete if user.user_ban.present? && !user.banned?
 
+      user.marketplace_listings.current.where.not(seller_member: user.member?)
+        .update_all(seller_member: user.member?)
+
       process_bikes(user) unless skip_bike_update
     end
 

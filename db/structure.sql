@@ -2234,7 +2234,8 @@ CREATE TABLE public.marketplace_listings (
     updated_at timestamp(6) without time zone NOT NULL,
     price_negotiable boolean DEFAULT false,
     description text,
-    sale_id bigint
+    sale_id bigint,
+    seller_member boolean DEFAULT false NOT NULL
 );
 
 
@@ -6483,6 +6484,13 @@ CREATE INDEX index_marketplace_listings_on_seller_id ON public.marketplace_listi
 
 
 --
+-- Name: index_marketplace_listings_on_seller_member; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_seller_member ON public.marketplace_listings USING btree (seller_member) WHERE seller_member;
+
+
+--
 -- Name: index_marketplace_messages_on_initial_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7172,6 +7180,7 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260528152450'),
 ('20260525162548'),
+('20260518093158'),
 ('20260514182008'),
 ('20260514085900'),
 ('20260430122735'),
