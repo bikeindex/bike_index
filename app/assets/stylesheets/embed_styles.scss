@@ -1,15 +1,11 @@
 @import "legacy_includes/selectize_bootstrap3.scss";
-
-.control-group .selectize-control {
-  width: 210px;
-}
-
 @import "legacy_includes/_colors.scss";
 @import "legacy_includes/_variables.scss";
 @import "legacy_includes/_mixins.scss";
 @import "legacy_includes/component-animations.scss";
 @import "legacy_includes/dropdowns.scss";
 @import "legacy_includes/embed_form_styles.scss";
+@import "revised/sections/custom_selects.scss";
 
 $newStolenColor: #d25627;
 
@@ -69,6 +65,19 @@ $newStolenColor: #d25627;
     font-size: 16px;
     min-height: 29px;
   }
+}
+
+// Ellipsize long items (e.g. cycle_type names) so selectize's focus input
+// isn't pushed onto an empty row below. The hanging indent from
+// custom_selects would clip the first character once overflow is hidden,
+// and a single-line item never wraps — reset it.
+.selectize-control.single .selectize-input > .item {
+  max-width: calc(100% - 12px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 0;
+  text-indent: 0;
 }
 
 label.strong {
@@ -290,6 +299,16 @@ a {
 
   select {
     margin: 0;
+    max-width: 100%;
+  }
+
+  .vehicle-select {
+    clear: both;
+    padding: 0.25em 0 0.5em;
+
+    label {
+      margin-left: 0.25em;
+    }
   }
 
   input.button-submit {
@@ -303,12 +322,6 @@ a {
     }
   }
 
-  .what-you-register {
-    color: $grayLight;
-    display: inline-block;
-    margin: 0 0.5em;
-  }
-
   .please-wait-text {
     clear: both;
     display: block;
@@ -319,7 +332,9 @@ a {
 }
 
 .select-jsonified .select2-container,
-.chosen-select .controls .select2-container {
+.chosen-select .controls .select2-container,
+.control-group .selectize-control,
+.vehicle-select .selectize-control {
   width: 210px;
 }
 
@@ -667,7 +682,7 @@ a {
 }
 
 // cursor classes required for #motorizedWrapper
-.cusor-pointer {
+.cursor-pointer {
   cursor: pointer;
 }
 .cursor-not-allowed {
