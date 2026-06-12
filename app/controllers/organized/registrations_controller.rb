@@ -4,8 +4,8 @@ module Organized
 
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
 
-    skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response]
-    around_action :set_reading_role, only: :multi_search_response
+    skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response, :multi_search_sticker_response]
+    around_action :set_reading_role, only: [:multi_search_response, :multi_search_sticker_response]
 
     def index
       return head(:not_acceptable) unless request.format.html? || request.format.turbo_stream?
@@ -62,6 +62,23 @@ module Organized
       @per_page = 10
       @pagy, @bikes = pagy(:countish, bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
       @close_serials = search_scope.search_close_serials(@interpreted_params).limit(25) if @bikes.none?
+    end
+
+    def multi_search_sticker_response
+      @query = params[:query].to_s.strip
+      @chip_id = params[:chip_id].to_s.strip.presence
+      return head(:bad_request) unless @query.present?
+
+      @per_page = 10
+      # A blank normalized code makes sticker_code_search return `all`, so guard against it
+      # surfacing every organization's bikes
+      bikes = if BikeSticker.normalize_code(@query, leading_zeros: true).present?
+        bike_ids = BikeSticker.sticker_code_search(@query).where.not(bike_id: nil).select(:bike_id)
+        Bike.where(id: bike_ids)
+      else
+        Bike.none
+      end
+      @pagy, @bikes = pagy(:countish, bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
     end
 
     private

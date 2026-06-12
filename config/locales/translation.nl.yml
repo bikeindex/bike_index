@@ -5851,6 +5851,7 @@ nl:
         no_matches_found: Geen overeenkomsten gevonden
         result_count_html: "— %{count} %{results}"
         serial_label: 'Serial:'
+        sticker_label:
         view_all: alles bekijken
     alerts:
       object_errors:

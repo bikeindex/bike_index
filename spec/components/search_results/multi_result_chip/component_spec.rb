@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
-  let(:component) { render_inline(described_class.new(serial:, chip_id:, result_count:, error:, error_message:)) }
+  let(:component) { render_inline(described_class.new(chip_id:, result_count:, serial:, error:, error_message:)) }
   let(:serial) { "SERIAL111" }
   let(:chip_id) { "chip_0" }
   let(:result_count) { 1 }
@@ -40,6 +40,26 @@ RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
 
     it "does not underline the serial span" do
       expect(component).not_to have_css("span.tw\\:underline")
+    end
+  end
+
+  context "with sticker instead of serial" do
+    let(:component) { render_inline(described_class.new(chip_id:, result_count:, sticker: "STKR100")) }
+
+    it "uses the sticker as the chip label" do
+      expect(component).to have_css("span#chip_0 a", text: "STKR100")
+    end
+  end
+
+  context "with neither serial nor sticker" do
+    it "raises ArgumentError" do
+      expect { described_class.new(chip_id:, result_count:) }.to raise_error(ArgumentError, /serial: or sticker:/)
+    end
+  end
+
+  context "with both serial and sticker" do
+    it "raises ArgumentError" do
+      expect { described_class.new(chip_id:, result_count:, serial: "S1", sticker: "K1") }.to raise_error(ArgumentError, /serial: or sticker:/)
     end
   end
 

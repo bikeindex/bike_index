@@ -4560,6 +4560,7 @@ it:
         no_matches_found:
         result_count_html:
         serial_label:
+        sticker_label:
         view_all:
     alerts:
       object_errors:

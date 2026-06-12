@@ -5,19 +5,19 @@ module SearchResults
     class ComponentPreview < ApplicationComponentPreview
       # @!group Results
       def one_result
-        render(Component.new(serial: "SERIAL111", chip_id: "chip_0", result_count: 1))
+        render(Component.new(chip_id: "chip_0", result_count: 1, serial: "SERIAL111"))
       end
 
       def many_results
-        render(Component.new(serial: "SERIAL222", chip_id: "chip_1", result_count: 3009))
+        render(Component.new(chip_id: "chip_1", result_count: 3009, serial: "SERIAL222"))
       end
 
       def no_results
-        render(Component.new(serial: "NONEXISTENT", chip_id: "chip_2", result_count: 0))
+        render(Component.new(chip_id: "chip_2", result_count: 0, serial: "NONEXISTENT"))
       end
 
       def error
-        render(Component.new(serial: "SERIAL333", chip_id: "chip_3", result_count: 0, error: true, error_message: "Server error 500"))
+        render(Component.new(chip_id: "chip_3", result_count: 0, serial: "SERIAL333", error: true, error_message: "Server error 500"))
       end
       # @!endgroup
     end

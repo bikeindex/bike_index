@@ -4,8 +4,8 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--multi-search'
 export default class extends Controller {
-  static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll']
-  static values = { url: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
+  static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll', 'searchAllHint']
+  static values = { url: String, stickerUrl: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
     if (this.searching) return
@@ -13,10 +13,49 @@ export default class extends Controller {
     if (this.hasSearchAllTarget && params.get('search_all') === '1') {
       this.searchAllTarget.checked = true
     }
+    this.syncSearchAll()
     const serialsParam = params.get('serials')
     if (serialsParam) {
       this.textareaTarget.value = serialsParam
       this.search(this.parseSerials(serialsParam))
+    }
+  }
+
+  switchKind (event) {
+    const value = event.target.value
+    if (this.searchKindValue === value) return
+    this.searchKindValue = value
+    this.updatePlaceholderAndButton()
+    this.syncSearchAll()
+    this.resultsTarget.innerHTML = ''
+    this.serialChipsTarget.innerHTML = ''
+
+    const url = new URL(window.location.pathname, window.location.origin)
+    url.searchParams.set('search_kind', value)
+    window.history.pushState({}, '', url)
+  }
+
+  updatePlaceholderAndButton () {
+    if (this.searchKindValue === 'stickers') {
+      this.textareaTarget.placeholder = 'Enter multiple sticker codes, separated by commas or new lines'
+      this.buttonTarget.textContent = 'Search stickers'
+    } else {
+      this.textareaTarget.placeholder = 'Enter multiple serial numbers, separated by commas or new lines'
+      this.buttonTarget.textContent = 'Search serials'
+    }
+  }
+
+  // Sticker search always spans every organization, so lock "search all" on while it's active
+  syncSearchAll () {
+    if (!this.hasSearchAllTarget) return
+    if (this.searchKindValue === 'stickers') {
+      this.searchAllTarget.checked = true
+      this.searchAllTarget.disabled = true
+      if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.remove('tw:hidden')
+    } else if (this.searchAllTarget.disabled) {
+      this.searchAllTarget.checked = false
+      this.searchAllTarget.disabled = false
+      if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.add('tw:hidden')
     }
   }
 
@@ -41,6 +80,9 @@ export default class extends Controller {
     this.searching = true
     const url = new URL(window.location.pathname, window.location.origin)
     url.searchParams.set('serials', serials.join(','))
+    if (this.searchKindValue === 'stickers') {
+      url.searchParams.set('search_kind', 'stickers')
+    }
     if (this.searchAll) {
       url.searchParams.set('search_all', '1')
     } else {
@@ -52,7 +94,7 @@ export default class extends Controller {
     this.renderPlaceholderChips(serials)
     this.buttonTarget.disabled = true
 
-    await Promise.all(serials.map((serial, index) => this.searchSerial(serial, index)))
+    await Promise.all(serials.map((serial, index) => this.searchItem(serial, index)))
 
     // Wait a frame for Turbo stream DOM updates to complete
     await new Promise(resolve => requestAnimationFrame(resolve))
@@ -119,6 +161,13 @@ export default class extends Controller {
       })
   }
 
+  async searchItem (query, index) {
+    if (this.searchKindValue === 'stickers') {
+      return this.searchSticker(query, index)
+    }
+    return this.searchSerial(query, index)
+  }
+
   async searchSerial (serial, index) {
     const url = new URL(this.urlValue, window.location.origin)
     url.searchParams.set('serial', serial)
@@ -137,6 +186,26 @@ export default class extends Controller {
       }
     } catch {
       this.showChipError(serial, index, 'Network error')
+    }
+  }
+
+  async searchSticker (query, index) {
+    const url = new URL(this.stickerUrlValue, window.location.origin)
+    url.searchParams.set('query', query)
+    url.searchParams.set('chip_id', `chip_${index}`)
+
+    try {
+      const response = await fetch(url, {
+        headers: { Accept: 'text/vnd.turbo-stream.html' }
+      })
+
+      if (response.ok) {
+        Turbo.renderStreamMessage(await response.text())
+      } else {
+        this.showChipError(query, index, `Server error ${response.status}`)
+      }
+    } catch {
+      this.showChipError(query, index, 'Network error')
     }
   }
 

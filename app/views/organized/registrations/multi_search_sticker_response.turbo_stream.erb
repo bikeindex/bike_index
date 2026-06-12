@@ -1,13 +1,12 @@
 <%= turbo_stream.append :multi_serial_results do %>
   <%= render Org::MultiSearchResults::Component.new(
     organization: current_organization,
-    query: @serial,
+    query: @query,
     chip_id: @chip_id,
     pagy: @pagy,
+    search_kind: "stickers",
     bikes: @bikes,
-    interpreted_params: @interpreted_params,
-    per_page: @per_page,
-    close_serials: @close_serials
+    per_page: @per_page
   ) %>
 <% end %>
 
@@ -16,7 +15,7 @@
     <%= render SearchResults::MultiResultChip::Component.new(
       chip_id: @chip_id,
       result_count: @pagy.count,
-      serial: @serial
+      sticker: @query
     ) %>
   <% end %>
 <% end %>

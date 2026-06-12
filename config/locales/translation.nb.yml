@@ -5695,6 +5695,7 @@ nb:
         no_matches_found: Ingen treff funnet
         result_count_html: "— %{count} %{results}"
         serial_label: 'Serie:'
+        sticker_label:
         view_all: se alle
     alerts:
       object_errors:
