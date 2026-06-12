@@ -157,7 +157,7 @@ jobs:
       - name: Mint translations-sync token
         id: translations_token
         if: matrix.ci_node_index == 1 && github.ref == 'refs/heads/main' && env.TRANSLATIONS_SYNC_APP_ID != ''
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
           private-key: ${{ secrets.TRANSLATIONS_SYNC_APP_PRIVATE_KEY }}
