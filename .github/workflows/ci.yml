@@ -2,10 +2,6 @@ name: CI
 
 on:
   push:
-  # Allows bin/check_translations to trigger CI on the translations-sync branch.
-  # Pushes made with the default GITHUB_TOKEN don't fire `on: push`, so the
-  # automated translations PR otherwise gets no checks.
-  workflow_dispatch:
 
 permissions:
   actions: write
@@ -126,6 +122,7 @@ jobs:
       COVERAGE: false # additional configuration is needed for parallelized tests
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
       TRANSLATION_BRANCH: main
+      TRANSLATIONS_SYNC_APP_ID: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
       RETRY_FLAKY: true
       KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC: ${{ secrets.KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC }}
       KNAPSACK_PRO_CI_NODE_TOTAL: ${{ matrix.ci_node_total }}
@@ -153,8 +150,21 @@ jobs:
           install-libfuse2: false
       - name: Ensure ImageMagick is available
         run: echo $(identify --version)
+      # Checkout persists this App token (below) as the git creds so the sync
+      # branch is pushed as the App — only a non-default-token push fires
+      # `on: push`, which is what attaches the required checks to the PR.
+      # Falls back to default creds until the App secrets exist.
+      - name: Mint translations-sync token
+        id: translations_token
+        if: matrix.ci_node_index == 1 && github.ref == 'refs/heads/main' && env.TRANSLATIONS_SYNC_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
+          private-key: ${{ secrets.TRANSLATIONS_SYNC_APP_PRIVATE_KEY }}
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          token: ${{ steps.translations_token.outputs.token || github.token }}
       # Install Ruby dependencies
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
@@ -166,7 +176,7 @@ jobs:
       - name: Sync translations (only on main by default)
         if: matrix.ci_node_index == 1
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.translations_token.outputs.token || github.token }}
         run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
       # Cache compiled assets + sprockets' incremental cache.
       # Key hashes every input the three asset tools read:

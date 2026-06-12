@@ -4234,13 +4234,13 @@ nb:
       sticker_id: Klistremerke-ID
       student_id: Student ID
       third_color: Tredje farge
-      this: dette
       unknown_serial: Ukjent serie
       unknown_year: Ukjent årstall
       unsure_or_unknown: Usikker eller ukjent
       when_was_it_stolen: Når ble den stjålet?
       where_was_it_stolen: Hvor ble det stjålet?
       zipcode: postnummer
+      electric_motorized: Elektrisk (motorisert)
   organized:
     ambassador_dashboards:
       getting_started:

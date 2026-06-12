@@ -4170,6 +4170,7 @@ en:
       description_of_the_theft: Description of the theft
       eg_if_we_tweet_about_or_someone_searches: e.g., if we tweet about or someone
         searches for its serial number
+      electric_motorized: Electric (motorized)
       email_address_owner: Owner's email address
       email_address_you: Your email address
       filing_a_police_report_is_important_html: >-
@@ -4200,7 +4201,6 @@ en:
       sticker_id: Sticker ID
       student_id: Student ID
       third_color: Third color
-      this: this
       unknown_serial: Unknown serial
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown

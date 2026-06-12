@@ -25,8 +25,10 @@ class ProcessImpoundUpdatesJob < ApplicationJob
       impound_record_update.update(processed: true, skip_update: true)
     end
     impound_record.reload.update(skip_update: true)
-    # Bump the parking notification to ensure it reflects current state (resolving if relevant)
-    impound_record.parking_notification&.update(updated_at: Time.current)
+    # Bump every parking notification on this record so each reflects the current state (resolving if
+    # relevant). They share impound_record_id, so has_one :parking_notification would pick one arbitrarily.
+    ParkingNotification.where(impound_record_id: impound_record.id)
+      .find_each { |parking_notification| parking_notification.update(updated_at: Time.current) }
     if claim_retrieved.present?
       merge_impound_claim(impound_record, claim_retrieved)
     else
