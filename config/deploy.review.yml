@@ -110,10 +110,13 @@ env:
     REDIS_RACK_ATTACK_URL: "<%= redis_url %>"
 
     # Scheduled jobs that can't work in review apps (run by config/crontab's
-    # run_scheduler). The exchange-rate API uses placeholder review-app secrets,
-    # so its response has no `rates` key (KeyError). Skipped via ApplicationJob's
-    # SIDEKIQ_SKIP_<job> mechanism.
+    # run_scheduler), skipped via ApplicationJob's SIDEKIQ_SKIP_<job> mechanism.
+    # - exchange-rate API uses placeholder review-app secrets, so its response
+    #   has no `rates` key (KeyError).
+    # - manufacturer-logo job reaches the external img.logo.dev, which the
+    #   review-app host can't connect to (Net::OpenTimeout).
     SIDEKIQ_SKIP_UPDATE_EXCHANGE_RATES_JOB: "1"
+    SIDEKIQ_SKIP_UPDATE_MANUFACTURER_LOGO_AND_PRIORITY_JOB: "1"
 
     # Runtime
     RAILS_LOG_TO_STDOUT: "1"

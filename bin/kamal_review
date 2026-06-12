@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Run an arbitrary kamal command against one review app, without exporting the
+# REVIEW_APP_* vars its ERB config needs or passing --config-file every time.
+#
+#   bin/kamal_review <review-app> <kamal args...>
+#
+# <review-app> identifies the PR and is accepted in any of these forms — all the
+# same app:
+#   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
+#
+# Everything after it is passed straight through to kamal, e.g.
+#   bin/kamal_review 3594    app logs -f
+#   bin/kamal_review pr-3594 app exec --reuse "bin/rails console"
+#
+# Host + secrets come from the same places bin/review-app uses (see
+# docs/review-apps.md): REVIEW_APP_HOST and .kamal/secrets (1Password).
+
+set -euo pipefail
+
+CONFIG="${KAMAL_CONFIG:-config/deploy.review.yml}"
+REDIS_DATABASES="${REDIS_DATABASES:-31}"  # shared-redis boots with --databases 32; 0 reserved
+
+usage() {
+  cat <<USAGE
+Usage: bin/kamal_review <review-app> <kamal args...>
+
+<review-app> is a PR, in any of these equivalent forms:
+  3594
+  pr-3594
+  pr-3594.review.bikeindex.org
+  https://pr-3594.review.bikeindex.org
+
+Examples:
+  bin/kamal_review 3594 app logs -f
+  bin/kamal_review pr-3594 app exec --reuse "bin/rails runner 'puts Bike.count'"
+  bin/kamal_review https://pr-3594.review.bikeindex.org app details
+
+Runs: kamal <kamal args...> --config-file ${CONFIG}
+Env:  REVIEW_APP_HOST (default host.review.bikeindex.org); secrets via .kamal/secrets.
+USAGE
+}
+
+# Pull the PR number out of any accepted form: drop the scheme, then any path,
+# then the .review.bikeindex.org domain, leaving the host label (pr-<n> or <n>);
+# drop the pr- prefix. Returns non-zero if what's left isn't a number.
+review_app_pr_number() {
+  local s
+  s="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
+  s="${s#http://}"
+  s="${s#https://}"
+  s="${s%%/*}"   # drop any /path
+  s="${s%%.*}"   # drop the .review.bikeindex.org domain
+  s="${s#pr-}"   # drop the pr- prefix
+  [[ "$s" =~ ^[0-9]+$ ]] || return 1
+  printf '%s' "$s"
+}
+
+[[ $# -eq 0 ]] && { usage >&2; exit 1; }
+case "$1" in
+  -h | --help | help) usage; exit 0 ;;
+esac
+
+if ! pr_number="$(review_app_pr_number "$1")"; then
+  echo "Error: '$1' is not a review app (expected e.g. 3594, pr-3594, or pr-3594.review.bikeindex.org)" >&2
+  echo >&2
+  usage >&2
+  exit 1
+fi
+shift
+
+export REVIEW_APP_PR_NUMBER="$pr_number"
+export REVIEW_APP_HOST="${REVIEW_APP_HOST:-host.review.bikeindex.org}"
+export REVIEW_APP_REDIS_DB="$(((pr_number % REDIS_DATABASES) + 1))"
+
+echo "==> [pr-${pr_number} on ${REVIEW_APP_HOST}] kamal $* --config-file ${CONFIG}" >&2
+exec kamal "$@" --config-file "$CONFIG"
