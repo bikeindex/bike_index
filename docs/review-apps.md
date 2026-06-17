@@ -1,6 +1,14 @@
 # Review apps
 
-Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single shared host. Each PR gets its own subdomain (`pr-N.review.bikeindex.org`), Postgres role + databases (primary + analytics), and Sidekiq worker. Production runs on Cloud66 — none of these files touch it.
+Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single shared host. Each PR gets its own subdomain (`pr-N.review.bikeindex.org`), Postgres role + databases (primary + analytics), and Sidekiq worker.
+
+Review apps run the **staging Rails environment** (`RAILS_ENV=staging`), a near-duplicate of production (`config/environments/staging.rb`
+
+
+
+## Additional context
+
+Production runs on Cloud66 — none of these files touch it.
 
 They run the **staging Rails environment** (`RAILS_ENV=staging`), a near-duplicate of production (`config/environments/staging.rb` — keep the two in sync). The divergences, all safe because review apps hold no PII (seeded data + sandbox integrations):
 
