@@ -53,11 +53,13 @@ RSpec.describe CspReportsController, type: :request do
     end
 
     context "malformed body" do
-      it "returns 204 without enqueuing" do
-        post "#{base_url}?#{query}", params: "not json",
-          headers: {"CONTENT_TYPE" => "application/csp-report"}
-        expect(response.status).to eq(204)
-        expect(ForwardCspReportJob.jobs.count).to eq 0
+      ["not json", "null", "123", {"csp-report" => 5}.to_json].each do |raw_body|
+        it "returns 204 without enqueuing for #{raw_body.inspect}" do
+          post "#{base_url}?#{query}", params: raw_body,
+            headers: {"CONTENT_TYPE" => "application/csp-report"}
+          expect(response.status).to eq(204)
+          expect(ForwardCspReportJob.jobs.count).to eq 0
+        end
       end
     end
   end

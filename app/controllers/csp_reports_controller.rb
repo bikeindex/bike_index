@@ -18,7 +18,7 @@ class CspReportsController < ApplicationController
   private
 
   def parsed_report
-    JSON.parse(request.raw_post)["csp-report"]
+    JSON.parse(request.raw_post).then { |h| h["csp-report"] if h.is_a?(Hash) && h["csp-report"].is_a?(Hash) }
   rescue JSON::ParserError, TypeError
     nil
   end
