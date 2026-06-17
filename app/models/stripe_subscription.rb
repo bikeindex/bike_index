@@ -75,10 +75,10 @@ class StripeSubscription < ApplicationRecord
     end_active_user_admin_membership! if active?
 
     self.membership ||= user_not_ended_memberships&.first
-    self.membership&.level = membership_level if active?
+    membership&.level = membership_level if active?
 
     self.membership ||= Membership.new(user_id:, level: membership_level)
-    self.membership&.update!(start_at:, end_at:)
+    membership&.update!(start_at:, end_at:)
 
     if membership&.id&.present? && membership_id_in_database != membership.id
       update(membership_id: membership.id)
