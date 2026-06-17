@@ -166,7 +166,7 @@ class MailchimpDatum < ApplicationRecord
       MailchimpValue.interest.friendly_find(key, list: list)&.slug || key
     end.compact
     self.data ||= {}
-    self.data["interests"] = (kept_interests + new_interests).compact.uniq.sort
+    data["interests"] = (kept_interests + new_interests).compact.uniq.sort
   end
 
   def mailchimp_merge_fields(list)
@@ -192,7 +192,7 @@ class MailchimpDatum < ApplicationRecord
       [MailchimpValue.merge_field.friendly_find(key, list: list)&.slug || key, value]
     end.compact.to_h
     self.data ||= {}
-    self.data["merge_fields"] = kept_merge_fields.merge(new_merge_fields)
+    data["merge_fields"] = kept_merge_fields.merge(new_merge_fields)
   end
 
   def mailchimp_tags(list)
@@ -213,7 +213,7 @@ class MailchimpDatum < ApplicationRecord
       MailchimpValue.tag.friendly_find(hash["name"], list: list)&.slug || hash["name"]
     end
     self.data ||= {}
-    self.data["tags"] = (new_tags + kept_tags).uniq.sort
+    data["tags"] = (new_tags + kept_tags).uniq.sort
   end
 
   def full_name
