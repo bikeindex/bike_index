@@ -88,6 +88,11 @@ chdir APP_ROOT do
   system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate"
 
   unless without_seeds
+    # Build stylesheets so seeding can render emails. Seeding delivers mailers
+    # without compilation Sprockets tries to compile email.scss and with sassc, but should use dartsass
+    puts "\n== Building stylesheets =="
+    system! "bin/rails dartsass:build"
+
     puts "\n== Seeding database =="
     system! "bin/rake db:seed"
 

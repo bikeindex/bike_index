@@ -314,8 +314,8 @@ class EmailDomain < ApplicationRecord
 
   def set_calculated_attributes
     self.data ||= {}
-    self.data["tld"] = self.class.tld_for(domain)
-    self.data["is_tld"] = data["tld"].length >= domain&.tr("@", "")&.length
+    data["tld"] = self.class.tld_for(domain)
+    data["is_tld"] = data["tld"].length >= domain&.tr("@", "")&.length
 
     if !no_auto_assign_status? && !ban_or_provisional?
       broader_status = broader_domain_bannable_status

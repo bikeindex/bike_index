@@ -242,6 +242,9 @@ $(document).ready ->
 
   new window.CheckEmail('#bike_owner_email')
 
+  # cycleTypes are only defined on pages rendering the embed_fields partial
+  new window.UpdatePropulsionType('bike') if window.cycleTypesAlwaysMotorized?
+
   if $("#new-unregistered-parking-notification").length
     initializeUnregisteredParkingNotification()
 

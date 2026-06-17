@@ -6,6 +6,9 @@ module Search
   class ComboboxController < ApplicationController
     PER_PAGE = 15
 
+    # Both actions only ever render turbo_stream
+    before_action { request.format = :turbo_stream }
+
     def options
       matches = Autocomplete::Matcher.search(autocomplete_params)
       next_page = (matches.length >= PER_PAGE) ? current_page + 1 : nil
