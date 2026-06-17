@@ -3805,8 +3805,11 @@ nb:
       help: Hjelp
       log_in: Logg Inn
       logout: Logg ut
+      menu: Meny
       register_a_new_bike: Registrer en ny sykkel
+      settings_menu: Innstillinger
       sign_up: Registrer deg
+      skip_to_main_content: Hopp til hovedinnhold
       stolen_bike: Stjålet sykkel?
       the_nonprofit_bike_registry: det ideelle sykkelregisteret
       user_settings: "%{user_email}-innstillinger"
@@ -4709,6 +4712,7 @@ nb:
       photo_stock: Arkivfoto
       photo_uncategorized: Bilde av din %{bike_type}
       processing: "... behandling"
+      remove_image: Fjern bilde
     show:
       are_you_sure: Er du sikker?
       back_to_images: Tilbake til offentlige bilder
@@ -4963,12 +4967,14 @@ nb:
       how_to_get_your_stolen_bike_back: Få tilbake den stjålne sykkelen
       language: Språk
       law_enforcement: Rettshåndhevelse
+      legal: Juridisk
       press_inquiries: Pressehenvendelser
       privacy_policy: Personvernerklæring
       protect_your_bike: Beskytt sykkelen din
       resources: Ressurser
       schools_and_universities: Skoler og universiteter
       security: Sikkerhet
+      social_media: Sosiale medier
       stolen_bike_recoveries: Gjenvinning av stjålne sykkel
       store: butikk
       support_us: Støtt oss
@@ -5053,6 +5059,8 @@ nb:
       use_lightspeed_retail_pos: Bruker du Lightspeed Retail POS?
       viewing_our_streamlined_page: Du ser for øyeblikket på vår strømlinjeformede
         Bike Shop-registreringsside, som er det vi anbefaler å bruke
+    shops_map:
+      map_of_partner_locations: Kart over partnerlokasjoner
     user_general_alert:
       add_location_theft_bike_title_html: Legg til stedet for tyveriet av din <strong>%{bike_title}</strong>
       add_photo_theft_bike_title_html: Legg til et bilde på <strong>%{bike_title}</strong>

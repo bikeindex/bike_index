@@ -3619,8 +3619,11 @@ nl:
       help: Helpen
       log_in: Log in
       logout: Afmelden
+      menu: Menu
       register_a_new_bike: Registreer een nieuwe fiets
+      settings_menu: Instellingen
       sign_up: Registreren
+      skip_to_main_content: Ga naar hoofdinhoud
       the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
       user_settings: "%{user_email} instellingen"
       view_org: Bekijk %{org_name}
@@ -4329,9 +4332,11 @@ nl:
       help: Helpen
       language: Taal
       law_enforcement: Politie
+      legal: Juridisch
       privacy_policy: Privacybeleid
       resources: Middelen
       schools_and_universities: Scholen en universiteiten
+      social_media: Sociale media
       stolen_bike_recoveries: Gestolen fietsherstel
       store: Winkel
       support_us: Steun ons
@@ -4417,6 +4422,8 @@ nl:
       multiple_serial_search_pane: Meervoudig serieel zoekvenster
       thank_you: Heel erg bedankt voor het gebruik van Bike Index!
       thanks_for_using_bike_index: Bedankt voor het gebruik van Bike Index!
+    shops_map:
+      map_of_partner_locations: Kaart met partnerlocaties
     user_general_alert:
       add_location_theft_bike_title_html: Voeg de locatie van de diefstal van uw <strong>%{bike_title}
         toe</strong>
@@ -4911,6 +4918,7 @@ nl:
       photo_of_user_with_bike: Jij met je %{bike_type}
       photo_stock: Stock foto
       photo_uncategorized: Foto van uw %{bike_type}
+      remove_image: Afbeelding verwijderen
     show:
       are_you_sure: Weet je het zeker?
       back_to_images: Terug naar openbare afbeeldingen
