@@ -59,6 +59,25 @@ RSpec.describe BikeServices::Searcher do
     end
   end
 
+  describe "by_proximity" do
+    let(:bike) { FactoryBot.create(:stolen_bike) }
+    let(:search) { BikeServices::Searcher.new(stolen: true, proximity: "New York, NY", proximity_radius: 100) }
+
+    before { bike } # ensure the stolen bike exists before searching
+
+    context "ungeocodable proximity" do
+      # An unresolvable proximity makes Geocoder return NaN coordinates, which
+      # GeocodeHelper.bounding_box collapses to an empty array - skip the proximity filter then
+      before { allow(Geocoder::Calculations).to receive(:bounding_box).and_return([Float::NAN] * 4) }
+
+      it "does not raise and returns the unfiltered bikes" do
+        search.instance_variable_set(:@bikes, Bike.where(id: bike.id))
+        expect { search.by_proximity }.not_to raise_error
+        expect(search.by_proximity.pluck(:id)).to eq([bike.id])
+      end
+    end
+  end
+
   describe "matching_serial" do
     it "finds matching bikes" do
       bike = FactoryBot.create(:bike, serial_number: "st00d-ffer")
