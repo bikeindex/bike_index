@@ -1,5 +1,13 @@
 require "active_support/core_ext/integer/time"
 
+# Mata live-reloads on any HTML response. Skip Lookbook, which reloads itself.
+class MataExceptLookbook < Mata
+  def call(environment)
+    return @app.call(environment) if environment["PATH_INFO"].start_with?("/lookbook")
+    super
+  end
+end
+
 Rails.application.configure do
   # In the development environment your application's code is reloaded any time
   # it changes. This slows down response time but is perfect for development
@@ -110,4 +118,13 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  # Live reload via DOM morphing. CSS edits morph (the <link> is swapped and the browser
+  # refetches); JS edits trigger a full page reload (the js-reload branch's client reloads
+  # the window when any changed file ends in .js, since morphing can't re-execute modules).
+  # app/assets/builds holds the compiled CSS output from the Tailwind/Sass watchers.
+  config.middleware.insert_before(
+    ActionDispatch::Static, MataExceptLookbook,
+    watch: %w[app/views app/helpers app/components app/javascript app/assets/builds config/locales]
+  )
 end

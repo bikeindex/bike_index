@@ -1,4 +1,13 @@
 GIT
+  remote: https://github.com/Rails-Designer/mata.git
+  revision: 8396b858fd075f1142da051d14073b848033b6d2
+  branch: js-reload
+  specs:
+    mata (0.8.0)
+      listen (~> 3.0)
+      rack (>= 3.0)
+
+GIT
   remote: https://github.com/bikeindex/carrierwave_backgrounder.git
   revision: 7b2b0e9bc43f2ec20f09db3fea7bbc5f167f52c7
   specs:
@@ -390,10 +399,6 @@ GEM
     honeybadger (6.6.2)
       logger
       ostruct
-    hotwire-livereload (1.4.1)
-      actioncable (>= 6.0.0)
-      listen (>= 3.0.0)
-      railties (>= 6.0.0)
     hotwire_combobox (0.4.1)
       platform_agent (>= 1.0.1)
       rails (>= 7.0.7.2)
@@ -977,7 +982,6 @@ DEPENDENCIES
   haml
   herb
   honeybadger
-  hotwire-livereload (~> 1.4.1)
   hotwire_combobox
   i18n-country-translations
   i18n-js
@@ -992,6 +996,7 @@ DEPENDENCIES
   lograge
   logstash-event
   lookbook
+  mata!
   memory_profiler
   mini_magick
   money-rails (~> 1.11)

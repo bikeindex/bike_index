@@ -150,7 +150,7 @@ group :development do
   gem "guard", require: false
   gem "guard-rspec", require: false
   gem "rerun" # restart sidekiq processes in development on app change
-  gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
+  gem "mata", github: "Rails-Designer/mata", branch: "js-reload" # Live reload via Rack middleware (SSE + idiomorph)
   gem "terminal-notifier"
   gem "annotaterb" # Add comments with the attributes to Rails Model
   gem "benchmark"
