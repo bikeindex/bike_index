@@ -85,6 +85,7 @@ RSpec.describe BikeV2ShowSerializer do
 
     it "returns the expected thing" do
       bike.reload
+      public_image.reload # version URLs reconstruct from the stored identifier (generation is backgrounded)
       expect(subject.as_json(root: false)).to eq target
     end
   end
