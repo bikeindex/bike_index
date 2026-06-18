@@ -169,10 +169,7 @@ module BikeServices
       stolen_ids = @bikes.pluck(:current_stolen_record_id)
       return unless stolen_ids.present?
 
-      if @params[:proximity_radius].present? && @params[:proximity_radius].to_i > 1
-        radius = @params[:proximity_radius].to_i
-      end
-      radius ||= 100
+      radius = GeocodeHelper.permitted_distance(@params[:proximity_radius])
       location = GeocodeHelper.address_string_for(@params[:proximity]) if @params[:reverse_geocode]
       box = GeocodeHelper.bounding_box(location || @params[:proximity], radius)
       if box.present?
