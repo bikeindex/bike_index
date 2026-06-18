@@ -3,10 +3,14 @@ class ForwardCspReportJob < ApplicationJob
 
   HONEYBADGER_URL = "https://api.honeybadger.io/v1/browser/csp"
 
-  def perform(body, query_string)
-    return if ENV["HONEYBADGER_CSP_API_KEY"].blank?
+  # The query is rebuilt here, not forwarded from the client, so the API key and
+  # user context never ride in the browser-facing CSP report_uri.
+  def perform(body, user_id)
+    api_key = ENV["HONEYBADGER_CSP_API_KEY"]
+    return if api_key.blank?
 
-    url = query_string.present? ? "#{HONEYBADGER_URL}?#{query_string}" : HONEYBADGER_URL
-    Faraday.post(url, body, "Content-Type" => "application/csp-report")
+    query = URI.encode_www_form(api_key:, report_only: false,
+      env: Rails.env, "context[user_id]": user_id.to_s)
+    Faraday.post("#{HONEYBADGER_URL}?#{query}", body, "Content-Type" => "application/csp-report")
   end
 end

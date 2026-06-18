@@ -80,9 +80,7 @@ Rails.application.configure do
       "https://m.facebook.com",
       "https://platform.twitter.com",
       "https://js.stripe.com"
-    policy.report_uri -> do
-      "/csp_reports?api_key=#{ENV["HONEYBADGER_CSP_API_KEY"]}&report_only=false&env=#{Rails.env}&context[user_id]=#{current_user&.id if respond_to?(:current_user)}"
-    end
+    policy.report_uri "/csp_reports"
   end
 
   config.content_security_policy_report_only = false

@@ -3,8 +3,10 @@
 class Rack::Attack
   MAX_REQUESTS_PER_TWENTY = ENV.fetch("RACK_ATTACK_MAX_LIMIT", 30).to_i
   API_MAX_REQUESTS = ENV.fetch("RACK_ATTACK_API_MAX_LIMIT", 150).to_i
+  CSP_REPORTS_MAX_REQUESTS = ENV.fetch("RACK_ATTACK_CSP_LIMIT", MAX_REQUESTS_PER_TWENTY).to_i
 
   SIGN_IN_PATH = "/session"
+  CSP_REPORTS_PATH = "/csp_reports"
 
   SENSITIVE_AUTH_PATHS = %w[
     /session/create_magic_link
@@ -32,9 +34,16 @@ class Rack::Attack
     request.ip if request.path.start_with?(*API_PATH_PREFIXES, *SEARCH_DATA_PREFIXES)
   end
 
-  # Global rate limit per IP (non-API, non-OAuth, non-assets, non-search-data)
+  # Global rate limit per IP (non-API, non-OAuth, non-assets, non-search-data, non-csp-reports)
   throttle("requests/ip", limit: MAX_REQUESTS_PER_TWENTY, period: 20.seconds) do |request|
-    request.ip unless request.path.start_with?(*SKIP_THROTTLE_PREFIXES, *SEARCH_DATA_PREFIXES)
+    request.ip unless request.path.start_with?(*SKIP_THROTTLE_PREFIXES, *SEARCH_DATA_PREFIXES, CSP_REPORTS_PATH)
+  end
+
+  # CSP violation reports are browser-automatic and filtered server-side, so a
+  # flood is harmless to drop. Cap them on their own per-IP bucket, kept out of
+  # the global throttle so reports can't consume a user's navigation budget.
+  throttle("csp_reports/ip", limit: CSP_REPORTS_MAX_REQUESTS, period: 1.minute) do |request|
+    request.ip if request.post? && request.path == CSP_REPORTS_PATH
   end
 
   # Sign-in: 10 per minute per IP
