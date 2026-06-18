@@ -60,10 +60,8 @@ RSpec.describe BikeServices::Searcher do
   end
 
   describe "by_proximity" do
-    let(:bike) { FactoryBot.create(:stolen_bike) }
+    let!(:bike) { FactoryBot.create(:stolen_bike) }
     let(:search) { BikeServices::Searcher.new(stolen: true, proximity: "New York, NY", proximity_radius: 100) }
-
-    before { bike } # ensure the stolen bike exists before searching
 
     context "ungeocodable proximity" do
       # An unresolvable proximity makes Geocoder return NaN coordinates, which
