@@ -68,7 +68,7 @@ class ExternalRegistryClient
       if response_json.is_a?(String)
         Rails.cache.delete(cache_key)
         self.backoff += 1
-        wait_time = [self.backoff * backoff_factor, backoff_max].min
+        wait_time = [backoff * backoff_factor, backoff_max].min
         sleep(wait_time)
         Rails.logger.info("Enqueued page #{page} for retry. Waiting #{wait_time}s...")
         retry_pages << page
@@ -97,7 +97,7 @@ class ExternalRegistryClient
       return if response.blank?
 
       self.total_results ||= response.dig("hits", "total").presence || 0
-      self.total_pages ||= (self.total_results / per_page.to_f).ceil
+      self.total_pages ||= (total_results / per_page.to_f).ceil
     end
 
     def add_page(page, response)

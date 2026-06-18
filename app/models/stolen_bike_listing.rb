@@ -171,7 +171,7 @@ class StolenBikeListing < ActiveRecord::Base
     # CSVs are hard. I encode double quotes and then decode them here
     self.listing_text = listing_text.gsub("&#34;", '"') if listing_text.present?
     self.data ||= {}
-    self.data["amount_cents_usd"] = calculated_amount_cents_usd
+    data["amount_cents_usd"] = calculated_amount_cents_usd
     clean_frame_size
   end
 end
