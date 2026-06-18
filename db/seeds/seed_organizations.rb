@@ -61,7 +61,7 @@ feature_name_and_slugs.each do |attrs|
   skip_ownership_email_feature_id = org_feature.id if attrs[:name] == "Skip ownership email"
 end
 
-# --- Hogwarts: all features except official_manufacturer and skip_ownership_email, with is_endless invoice ---
+# --- Hogwarts: all features except official_manufacturer, with is_endless invoice - and skip_ownership_email ---
 hogwarts = Organization.find_by_name("Hogwarts") || Organization.create!(name: "Hogwarts")
 hogwarts_invoice = Invoice.create(organization: hogwarts, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
 hogwarts_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_ownership_email_feature_id]
