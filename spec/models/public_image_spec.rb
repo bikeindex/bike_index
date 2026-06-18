@@ -25,7 +25,7 @@ RSpec.describe PublicImage, type: :model do
     after { PublicImageUploader.enable_processing = false }
 
     # Processing (including this dimension check) is deferred to
-    # CarrierWaveProcessJob via process_in_background. Setting process_image_upload
+    # PublicImageProcessJob via process_in_background. Setting process_image_upload
     # before assigning the image forces the synchronous processing path the job runs.
     it "are not created" do
       large_image = File.open(Rails.root.join("spec", "fixtures", "hugeimg.png"))

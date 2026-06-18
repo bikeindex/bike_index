@@ -29,7 +29,7 @@ class PublicImage < ApplicationRecord
   }.freeze
 
   mount_uploader :image, PublicImageUploader
-  process_in_background :image # Defer version generation so large uploads don't hit the 30s Rack::Timeout
+  process_in_background :image, PublicImageProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
   enum :kind, KIND_ENUM
 
