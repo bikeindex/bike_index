@@ -28,7 +28,8 @@ class PublicImage < ApplicationRecord
     photo_of_receipt: 6
   }.freeze
 
-  mount_uploader :image, PublicImageUploader # Not processed in background, because they are uploaded directly
+  mount_uploader :image, PublicImageUploader
+  process_in_background :image # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
   enum :kind, KIND_ENUM
 
