@@ -149,7 +149,7 @@ RSpec.describe BulkImport, type: :model do
   describe "open_file" do
     let(:bulk_import) { BulkImport.new }
     let(:url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv" }
-    let(:file_stub) { Struct.new(:url, keyword_init: true).new(url:) }
+    let(:file_stub) { Struct.new(:url).new(url:) }
     before do
       allow(bulk_import).to receive(:local_file?).and_return(false)
       allow(bulk_import).to receive(:file).and_return(file_stub)

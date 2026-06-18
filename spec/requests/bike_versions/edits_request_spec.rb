@@ -33,6 +33,17 @@ RSpec.describe BikeVersions::EditsController, type: :request do
     end
   end
 
+  context "user with strava gear" do
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :with_gear, user: current_user) }
+    it "renders the versions template without the strava gear section" do
+      expect(strava_integration.show_gear_link?).to be_truthy
+      get "#{base_url}/versions"
+      expect(response.code).to eq "200"
+      expect(response).to render_template("bikes_edit/versions")
+      expect(response.body).to_not match(/strava_gear_id/)
+    end
+  end
+
   context "no current_user" do
     let!(:bike_version) { FactoryBot.create(:bike_version) }
     it "redirects" do
