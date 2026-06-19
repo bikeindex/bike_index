@@ -180,6 +180,9 @@
 
 <% skip_facebook ||= controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" %>
 
+<%# Meta blocks these params (search_email is PII); the pixel auto-sends the URL query string, so don't load it when they're present %>
+<% skip_facebook ||= params.key?(:search_email) || params.key?(:proximity) %>
+
 <% unless skip_facebook %>
   <%# Facebook pixel %>
   <script>
