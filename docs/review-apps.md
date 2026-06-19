@@ -21,7 +21,7 @@ bin/kamal_review app details                          --app pr-3594.review.bikei
 bin/kamal_review app version                          --app https://pr-3594.review.bikeindex.org
 ```
 
-All four resolve to PR `3594`. It uses the same host + secrets as `bin/review-app` (`REVIEW_APP_HOST`, `.kamal/secrets`), so the 1Password setup above is a prerequisite. The shared accessories aren't PR-specific, so any PR number works when operating on them — and with no `--app` given it defaults to PR `0`, so reboot Postgres after changing its `shared_preload_libraries` with just:
+All four resolve to PR `3594`. (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The shared accessories aren't PR-specific, so any PR number works when operating on them — and with no `--app` given it defaults to PR `0`, so reboot Postgres after changing its `shared_preload_libraries` with just:
 
 ```bash
 bin/kamal_review accessory reboot db
@@ -62,7 +62,7 @@ Four jobs: `resolve` (PR number + deploy/destroy), `build` (label + build/push i
 Unlabeled PR closes are filtered by `resolve`'s job-level `if:`; fork PRs by the same-repo check (`proceed=false`). On **deploy**:
 
 1. `build` builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label). Warm builds are fast: docker layers cache in GHCR's `:buildcache`, and sprockets' cache persists via a BuildKit cache mount + buildkit-cache-dance.
-2. `update` runs `bin/review-app deploy <pr> <tag>` → `kamal deploy --version <tag> --skip-push`. Kamal **pulls** the CI image (no rebuild, which would clone the private `app/services/facebook` submodule) and:
+2. `update` runs `bin/kamal_review deploy --app <pr>` → `kamal deploy --version <tag> --skip-push` (tag from `IMAGE_TAG`). Kamal **pulls** the CI image (no rebuild, which would clone the private `app/services/facebook` submodule) and:
    - Boots the per-PR `-web`, `-worker`, `-cron` containers.
    - First boot: `bin/docker-entrypoint` creates the Postgres **superuser** role `bike_index_pr_<N>` and runs `db:prepare`, creating `bike_index_review_pr_<N>_primary` + `_analytics` and **seeding** them before Puma starts — slow, hence `deploy_timeout: 240`. Redeploys skip seeding and boot fast.
    - Later boots: `db:prepare` runs migrations only.
@@ -90,8 +90,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `Dockerfile`, `.dockerignore` | Production-style image (Thruster + Puma + Sidekiq). Used only by review apps. |
 | `bin/docker-entrypoint` | Creates the per-PR Postgres **superuser** role + runs `db:prepare` (schema + seed) on first boot |
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
-| `bin/review-app` | Deploy / destroy orchestration script |
-| `bin/kamal_review` | Run an arbitrary kamal command against one review app (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
+| `bin/kamal_review` | Run kamal against one review app — `deploy`/`destroy` lifecycle plus arbitrary passthrough commands (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
 | `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
 | `config/crontab` | Scheduled rake tasks run by the `cron` server role |
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
@@ -104,7 +103,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 
 ## Known limits
 
-- **Redis DB allocation is mod-31.** PRs congruent mod 31 share a logical DB — caches + Sidekiq queues mix. Mitigation: bump `--databases` in the redis accessory `cmd:` and raise `REDIS_DATABASES` in `bin/review-app`.
+- **Redis DB allocation is mod-31.** PRs congruent mod 31 share a logical DB — caches + Sidekiq queues mix. Mitigation: bump `--databases` in the redis accessory `cmd:` and raise `REDIS_DATABASES` in `bin/kamal_review`.
 - **Storage is shared.** All review apps write to the same R2 bucket under a `review-app/` prefix.
 - **One Sidekiq worker per app at concurrency=2.** Enough for demos, not for stress-testing queues.
 - **Forks aren't auto-deployed.** A maintainer triggers fork PRs manually via `workflow_dispatch` after reviewing the diff.
@@ -113,7 +112,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 
 ## Deploying locally
 
-You normally trigger from the workflow, but can run `bin/review-app` locally with kamal installed and SSH access. Secrets come from 1Password via Kamal's adapter:
+You normally trigger from the workflow, but can run `bin/kamal_review deploy` locally with kamal installed and SSH access. Secrets come from 1Password via Kamal's adapter:
 
 ```bash
 # One-time
@@ -138,7 +137,7 @@ These are the same values as the `REVIEW_APP_*` GitHub Environment secrets ([Ini
 
 ```bash
 export REVIEW_APP_HOST=host.review.bikeindex.org
-bin/review-app deploy <pr_number> <image_tag>
+bin/kamal_review deploy --app <pr_number> --version <image_tag>
 ```
 
 ----
