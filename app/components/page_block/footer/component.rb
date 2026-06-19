@@ -14,8 +14,6 @@ module PageBlock
 
       private
 
-      attr_reader :current_user
-
       # Meta blocks these params (search_email is PII); the pixel auto-sends the
       # URL query string, so don't load it when they're present
       def skip_facebook?

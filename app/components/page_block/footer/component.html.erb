@@ -76,7 +76,7 @@
               <%= helpers.active_link translation(".protect_your_bike"), protect_your_bike_path %>
             </li>
 
-            <% if Flipper.enabled?(:strava_integration, current_user) %>
+            <% if Flipper.enabled?(:strava_integration, @current_user) %>
               <li>
                 <%= helpers.active_link translation(".strava_search"), strava_search_path %>
               </li>
@@ -169,7 +169,7 @@
                   class: "form-control-sm",
                   onchange: "this.form.submit()") %>
 
-                <% if current_user.present? && current_user.preferred_language != I18n.locale %>
+                <% if @current_user.present? && @current_user.preferred_language != I18n.locale %>
                   <em class="below-input-help text-right">
                     <%= link_to translation(".change_preferred_language"), edit_my_account_path %>
                   </em>
@@ -184,7 +184,7 @@
         <div class="col-md-6 text-right">
           <p>
             <%= [link_to(translation(".privacy_policy"), privacy_url),
-              (current_user&.has_organization_role? ? link_to(translation(".vendor_terms"), vendor_terms_url) : nil),
+              (@current_user&.has_organization_role? ? link_to(translation(".vendor_terms"), vendor_terms_url) : nil),
             link_to(translation(".terms_and_conditions"), terms_url)].compact.to_sentence.html_safe %>
           </p>
 
