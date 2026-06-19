@@ -264,8 +264,7 @@
     <%# auto-sends the URL query string). In the cache key too, since page_id ignores query params. %>
     <% skip_facebook = controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" || params.key?(:search_email) || params.key?(:proximity) %>
 
-    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook:,
-      cache_key: ["footer_2", page_id, current_user_or_unconfirmed_user, passive_organization, skip_facebook]) %>
+    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook:, page_id:, passive_organization:) %>
 
     <script>
   I18n.defaultLocale = <%== I18n.default_locale.to_json %>

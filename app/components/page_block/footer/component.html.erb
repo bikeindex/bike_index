@@ -1,6 +1,5 @@
-<%# cache_if so callers that pass a cache_key get a cached footer (the layout does); doorkeeper passes none. %>
-<%# helpers. is required: bare cache_if uses ActionView's cache, skipping ApplicationHelper#cache's locale key. %>
-<% helpers.cache_if(@cache_key, @cache_key) do %>
+<%# helpers. is required: bare cache uses ActionView's cache, skipping ApplicationHelper#cache's locale key. %>
+<% helpers.cache(cache_key) do %>
   <footer class="primary-footer">
     <div class="primary-footer-nav">
       <div class="container">

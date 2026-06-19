@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe PageBlock::Footer::Component, type: :component do
-  let(:instance) { described_class.new(current_user: nil, skip_facebook:) }
+  let(:instance) { described_class.new(current_user: nil, skip_facebook:, page_id: "welcome_index") }
   let(:component) { with_request_url("/") { render_inline(instance) } }
   let(:skip_facebook) { false }
   let(:pixel_id) { PageBlock::Footer::Component::FACEBOOK_PIXEL_ID }
