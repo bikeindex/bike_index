@@ -260,8 +260,11 @@
       <%= render partial: "/shared/user_general_alert" %>
     <% end %>
 
-    <% cache(["footer_2", page_id, current_user_or_unconfirmed_user, passive_organization]) do %>
-      <%= render partial: "/shared/footer_revised" %>
+    <%# facebook_blocked_param varies the cache: page_id ignores query params, but the pixel must be skipped when they're present %>
+    <% facebook_blocked_param = params.key?(:search_email) || params.key?(:proximity) %>
+
+    <% cache(["footer_2", page_id, current_user_or_unconfirmed_user, passive_organization, facebook_blocked_param]) do %>
+      <%= render PageBlock::Footer::Component.new(controller_namespace:, controller_name:, current_user:, params:) %>
     <% end %>
 
     <script>

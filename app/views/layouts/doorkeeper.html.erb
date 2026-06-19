@@ -53,7 +53,7 @@
       <%= yield %>
     </div>
 
-    <%= render 'shared/footer_revised' %>
+    <%= render PageBlock::Footer::Component.new(controller_namespace:, controller_name:, current_user:, params:) %>
     <%= render "/shared/analytics" %>
   </body>
 </html>
