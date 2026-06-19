@@ -136,9 +136,10 @@ HONEYBADGER_API_KEY
 These are the same values as the `REVIEW_APP_*` GitHub Environment secrets ([Initial host setup step 6](#6-ssh-key--github-config)) — keep them in sync. Then:
 
 ```bash
-export REVIEW_APP_HOST=host.review.bikeindex.org
 bin/kamal_review deploy --app <pr_number> --version <image_tag>
 ```
+
+`REVIEW_APP_HOST` defaults to `host.review.bikeindex.org`; export it only to target a different host under the `*.review.bikeindex.org` wildcard.
 
 ----
 
