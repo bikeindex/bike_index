@@ -260,11 +260,12 @@
       <%= render partial: "/shared/user_general_alert" %>
     <% end %>
 
-    <%# facebook_blocked_param varies the cache: page_id ignores query params, but the pixel must be skipped when they're present %>
-    <% facebook_blocked_param = params.key?(:search_email) || params.key?(:proximity) %>
+    <%# Skip the Meta pixel on org/oauth pages and when blocked params are present (search_email is PII, and the pixel %>
+    <%# auto-sends the URL query string). Part of the cache key too, since page_id ignores query params. %>
+    <% skip_facebook = controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" || params.key?(:search_email) || params.key?(:proximity) %>
 
-    <% cache(["footer_2", page_id, current_user_or_unconfirmed_user, passive_organization, facebook_blocked_param]) do %>
-      <%= render PageBlock::Footer::Component.new(controller_namespace:, controller_name:, current_user:, params:) %>
+    <% cache(["footer_2", page_id, current_user_or_unconfirmed_user, passive_organization, skip_facebook]) do %>
+      <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook:) %>
     <% end %>
 
     <script>

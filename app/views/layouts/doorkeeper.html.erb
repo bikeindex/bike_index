@@ -53,7 +53,8 @@
       <%= yield %>
     </div>
 
-    <%= render PageBlock::Footer::Component.new(controller_namespace:, controller_name:, current_user:, params:) %>
+    <%# OAuth pages never load the marketing pixel %>
+    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook: true) %>
     <%= render "/shared/analytics" %>
   </body>
 </html>
