@@ -21,15 +21,8 @@ RSpec.describe PageBlock::Footer::Component, type: :component do
     end
   end
 
-  describe "caching" do
-    around do |example|
-      caching, store = ActionController::Base.perform_caching, Rails.cache
-      ActionController::Base.perform_caching = true
-      Rails.cache = ActiveSupport::Cache::MemoryStore.new
-      example.run
-      ActionController::Base.perform_caching = caching
-      Rails.cache = store
-    end
+  describe "caching", :caching do
+    include_context :caching_basic
 
     # The cached fragment must include the locale in its key, or a request in
     # one language serves the footer cached in another. See ApplicationComponent#cache.
