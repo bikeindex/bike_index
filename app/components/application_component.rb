@@ -20,6 +20,13 @@ class ApplicationComponent < ViewComponent::Base
 
   private
 
+  # Route caching through the view context so ApplicationHelper#cache adds the
+  # locale to the key. The cache helper mixed into ViewComponent::Base would
+  # otherwise skip the locale and bleed cached fragments across languages.
+  def cache(...)
+    helpers.cache(...)
+  end
+
   # Wrap `I18n.translate` for use in components, abstracting away
   # scope-setting.
   #

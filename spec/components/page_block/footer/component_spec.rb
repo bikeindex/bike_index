@@ -20,4 +20,24 @@ RSpec.describe PageBlock::Footer::Component, type: :component do
       expect(component.to_html).to_not include(pixel_id)
     end
   end
+
+  describe "caching" do
+    around do |example|
+      caching, store = ActionController::Base.perform_caching, Rails.cache
+      ActionController::Base.perform_caching = true
+      Rails.cache = ActiveSupport::Cache::MemoryStore.new
+      example.run
+      ActionController::Base.perform_caching = caching
+      Rails.cache = store
+    end
+
+    # The cached fragment must include the locale in its key, or a request in
+    # one language serves the footer cached in another. See ApplicationComponent#cache.
+    it "varies the cached fragment by locale" do
+      en = with_request_url("/") { render_inline(instance) }.to_html
+      nl = I18n.with_locale(:nl) { with_request_url("/") { render_inline(described_class.new(current_user: nil, skip_facebook:, page_id: "welcome_index")) } }.to_html
+      expect(en).to include("Privacy policy")
+      expect(nl).to_not include("Privacy policy")
+    end
+  end
 end
