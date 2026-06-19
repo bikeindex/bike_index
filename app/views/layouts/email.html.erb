@@ -53,12 +53,7 @@
             </tbody>
           </table>
         <% else %>
-          <%# Shared blue banner header — the same hero banner finished_registration uses, so every email shares one header design %>
-          <div class="binx-header-banner">
-            <%= image_tag image_url("email_assets/finished_registration/bike-index-email-header.png"),
-              alt: "Bike Index",
-              class: "binx-header-banner-image" %>
-          </div>
+          <%= render "layouts/email_banner_header" %>
         <% end %>
       <% end %>
 
