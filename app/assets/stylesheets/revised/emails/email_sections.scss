@@ -10,6 +10,17 @@
   padding: 2 * $vertical-height;
 }
 
+.binx-header-banner {
+  background-color: #fff;
+
+  .binx-header-banner-image {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
 .binx-header {
   background-color: $gray-darker;
 }
