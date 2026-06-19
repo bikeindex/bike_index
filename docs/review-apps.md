@@ -12,7 +12,7 @@ Review apps run the **staging Rails environment** `RAILS_ENV=staging`, a near-du
 
 ## Running kamal commands against a review app
 
-`bin/kamal_review` runs **any** kamal command against one review app without exporting the `REVIEW_APP_*` vars or repeating `--config-file`. Name the app with `--app` — any of these forms work — and everything else passes through to kamal:
+`bin/kamal_review` runs **any** kamal command against one review app (so you don't have to export the `REVIEW_APP_*` vars or include `--config-file`). Name the app with `--app` — any of these forms work — and everything else passes through to kamal:
 
 ```bash
 bin/kamal_review app logs -f                          --app 3594
