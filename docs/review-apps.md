@@ -12,19 +12,19 @@ Review apps run the **staging Rails environment** `RAILS_ENV=staging`, a near-du
 
 ## Running kamal commands against a review app
 
-`bin/kamal_review` runs **any** kamal command against one review app without exporting the `REVIEW_APP_*` vars or repeating `--config-file`. Its first arg names the app — any of these forms work — and the rest passes through to kamal:
+`bin/kamal_review` runs **any** kamal command against one review app without exporting the `REVIEW_APP_*` vars or repeating `--config-file`. Name the app with `--app` — any of these forms work — and everything else passes through to kamal:
 
 ```bash
-bin/kamal_review 3594                                  app logs -f
-bin/kamal_review pr-3594                               app exec --reuse "bin/rails console"
-bin/kamal_review pr-3594.review.bikeindex.org          app details
-bin/kamal_review https://pr-3594.review.bikeindex.org  app version
+bin/kamal_review app logs -f                          --app 3594
+bin/kamal_review app exec --reuse "bin/rails console" --app pr-3594
+bin/kamal_review app details                          --app pr-3594.review.bikeindex.org
+bin/kamal_review app version                          --app https://pr-3594.review.bikeindex.org
 ```
 
-All four resolve to PR `3594`. No/unrecognized arg prints usage. It uses the same host + secrets as `bin/review-app` (`REVIEW_APP_HOST`, `.kamal/secrets`), so the 1Password setup above is a prerequisite. The shared accessories aren't PR-specific, so any PR number works when operating on them — e.g. to reboot Postgres after changing its `shared_preload_libraries`:
+All four resolve to PR `3594`. It uses the same host + secrets as `bin/review-app` (`REVIEW_APP_HOST`, `.kamal/secrets`), so the 1Password setup above is a prerequisite. The shared accessories aren't PR-specific, so any PR number works when operating on them — and with no `--app` given it defaults to PR `0`, so reboot Postgres after changing its `shared_preload_libraries` with just:
 
 ```bash
-bin/kamal_review 0 accessory reboot db
+bin/kamal_review accessory reboot db
 ```
 
 ## What about production?

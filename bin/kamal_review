@@ -2,15 +2,17 @@
 # Run an arbitrary kamal command against one review app, without exporting the
 # REVIEW_APP_* vars its ERB config needs or passing --config-file every time.
 #
-#   bin/kamal_review <review-app> <kamal args...>
+#   bin/kamal_review <kamal args...> --app <review-app>
 #
-# <review-app> identifies the PR and is accepted in any of these forms — all the
-# same app:
+# --app identifies the PR and is accepted in any of these forms — all the same
+# app:
 #   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 #
-# Everything after it is passed straight through to kamal, e.g.
-#   bin/kamal_review 3594    app logs -f
-#   bin/kamal_review pr-3594 app exec --reuse "bin/rails console"
+# Everything else passes straight through to kamal. --app may go anywhere, and
+# defaults to PR 0 (the shared accessories aren't PR-specific) when omitted, e.g.
+#   bin/kamal_review app logs -f --app 3594
+#   bin/kamal_review app exec --reuse "bin/rails console" --app pr-3594
+#   bin/kamal_review accessory reboot db
 #
 # Host + secrets come from the same places bin/review-app uses (see
 # docs/review-apps.md): REVIEW_APP_HOST and .kamal/secrets (1Password).
@@ -22,18 +24,19 @@ REDIS_DATABASES="${REDIS_DATABASES:-31}"  # shared-redis boots with --databases 
 
 usage() {
   cat <<USAGE
-Usage: bin/kamal_review <review-app> <kamal args...>
+Usage: bin/kamal_review <kamal args...> --app <review-app>
 
-<review-app> is a PR, in any of these equivalent forms:
+--app is a PR, in any of these equivalent forms (defaults to 0 when omitted):
   3594
   pr-3594
   pr-3594.review.bikeindex.org
   https://pr-3594.review.bikeindex.org
 
 Examples:
-  bin/kamal_review 3594 app logs -f
-  bin/kamal_review pr-3594 app exec --reuse "bin/rails runner 'puts Bike.count'"
-  bin/kamal_review https://pr-3594.review.bikeindex.org app details
+  bin/kamal_review app logs -f --app 3594
+  bin/kamal_review app exec --reuse "bin/rails runner 'puts Bike.count'" --app pr-3594
+  bin/kamal_review app details --app https://pr-3594.review.bikeindex.org
+  bin/kamal_review accessory reboot db
 
 Runs: kamal <kamal args...> --config-file ${CONFIG}
 Env:  REVIEW_APP_HOST (default host.review.bikeindex.org); secrets via .kamal/secrets.
@@ -60,17 +63,29 @@ case "$1" in
   -h | --help | help) usage; exit 0 ;;
 esac
 
-if ! pr_number="$(review_app_pr_number "$1")"; then
-  echo "Error: '$1' is not a review app (expected e.g. 3594, pr-3594, or pr-3594.review.bikeindex.org)" >&2
+# Pull --app <id> / --app=<id> out of the args; everything else passes straight
+# through to kamal. Defaults to PR 0 (the shared accessories aren't PR-specific),
+# so `accessory reboot db` works with no --app given.
+app="0"
+kamal_args=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --app) app="${2:-}"; shift 2 ;;
+    --app=*) app="${1#--app=}"; shift ;;
+    *) kamal_args+=("$1"); shift ;;
+  esac
+done
+
+if ! pr_number="$(review_app_pr_number "$app")"; then
+  echo "Error: '$app' is not a review app (expected e.g. 3594, pr-3594, or pr-3594.review.bikeindex.org)" >&2
   echo >&2
   usage >&2
   exit 1
 fi
-shift
 
 export REVIEW_APP_PR_NUMBER="$pr_number"
 export REVIEW_APP_HOST="${REVIEW_APP_HOST:-host.review.bikeindex.org}"
 export REVIEW_APP_REDIS_DB="$(((pr_number % REDIS_DATABASES) + 1))"
 
-echo "==> [pr-${pr_number} on ${REVIEW_APP_HOST}] kamal $* --config-file ${CONFIG}" >&2
-exec kamal "$@" --config-file "$CONFIG"
+echo "==> [pr-${pr_number} on ${REVIEW_APP_HOST}] kamal ${kamal_args[*]} --config-file ${CONFIG}" >&2
+exec kamal "${kamal_args[@]}" --config-file "$CONFIG"
