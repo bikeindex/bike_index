@@ -25,7 +25,7 @@ RSpec.describe PageBlock::Footer::Component, type: :component do
     include_context :caching_basic
 
     # The cached fragment must include the locale in its key, or a request in
-    # one language serves the footer cached in another. See ApplicationComponent#cache.
+    # one language serves the footer cached in another. See ApplicationComponentHelper#cache.
     it "varies the cached fragment by locale" do
       en = with_request_url("/") { render_inline(instance) }.to_html
       nl = I18n.with_locale(:nl) { with_request_url("/") { render_inline(described_class.new(current_user: nil, skip_facebook:, page_id: "welcome_index")) } }.to_html
