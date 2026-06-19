@@ -32,7 +32,7 @@ class BikeIndex.Payments extends BikeIndex
     null
 
   selectPaymentOption: (e) ->
-    $target = $(e.target)
+    $target = $(e.currentTarget)
     e.preventDefault()
     $('.amount-list .active').removeClass('active')
     $target.addClass('active')
