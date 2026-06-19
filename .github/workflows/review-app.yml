@@ -130,7 +130,7 @@ jobs:
             --color 0E8A16 --description "Per-PR Kamal review app is deployed" 2>/dev/null || true
           gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
       - name: Checkout PR head
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.resolve.outputs.head_sha }}
       - name: Set up Docker Buildx
@@ -231,7 +231,7 @@ jobs:
       HONEYBADGER_FRONTEND_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_FRONTEND_API_KEY }}
     steps:
       - name: Checkout PR head
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.resolve.outputs.head_sha }}
       - name: Set up Ruby
