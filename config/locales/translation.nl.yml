@@ -4315,42 +4315,6 @@ nl:
       sign_up_a_shop_or_organization: Registreer een winkel of organisatie
       terms_and_conditions: Termen en voorwaarden
       vendor_terms: leveranciersvoorwaarden
-    footer_revised:
-      about: Over
-      ambassadors: Ambassadors
-      api_documentation: API-documentatie
-      bike_index: Bike Index
-      bike_manufacturer_list: Lijst met fietsfabrikanten
-      bike_shops: Fietsenwinkels
-      blog: Blog
-      cities: Steden
-      community_groups: Community's
-      copyright_html: "%{current_year} & kopiëren; Bike Index, een 501 (c) (3) non-profit
-        - EIN 81-4296194"
-      donate: Schenken
-      faq: FAQ
-      help: Helpen
-      language: Taal
-      law_enforcement: Politie
-      legal: Juridisch
-      privacy_policy: Privacybeleid
-      resources: Middelen
-      schools_and_universities: Scholen en universiteiten
-      social_media: Sociale media
-      stolen_bike_recoveries: Gestolen fietsherstel
-      store: Winkel
-      support_us: Steun ons
-      terms_and_conditions: Termen en voorwaarden
-      vendor_terms: leveranciersvoorwaarden
-      where_we_are: Waar we zijn
-      who_we_serve: Wie we dienen
-      change_preferred_language: voorkeurstaal wijzigen
-      security: veiligheid
-      protect_your_bike: Bescherm je fiets
-      how_to_get_your_stolen_bike_back: Haal je gestolen fiets terug
-      press_inquiries: Persvragen
-      strava_search: Zoeken en bijwerken op Strava
-      dev_and_design_resources: Ontwikkelings- en ontwerpbronnen
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:
@@ -5526,6 +5490,42 @@ nl:
         letter_opener_link: e-mail outbox
         letter_opener_tooltip: Bekijk de e-mail die door deze review-app is verzonden.
         pr_link: 'PR #%{number}'
+      footer:
+        about: Over
+        ambassadors: Ambassadors
+        api_documentation: API-documentatie
+        bike_index: Bike Index
+        bike_manufacturer_list: Lijst met fietsfabrikanten
+        bike_shops: Fietsenwinkels
+        blog: Blog
+        change_preferred_language: voorkeurstaal wijzigen
+        cities: Steden
+        community_groups: Community's
+        copyright_html: "%{current_year} & kopiëren; Bike Index, een 501 (c) (3) non-profit
+          - EIN 81-4296194"
+        dev_and_design_resources: Ontwikkelings- en ontwerpbronnen
+        donate: Schenken
+        faq: FAQ
+        help: Helpen
+        how_to_get_your_stolen_bike_back: Haal je gestolen fiets terug
+        language: Taal
+        law_enforcement: Politie
+        legal: Juridisch
+        press_inquiries: Persvragen
+        privacy_policy: Privacybeleid
+        protect_your_bike: Bescherm je fiets
+        resources: Middelen
+        schools_and_universities: Scholen en universiteiten
+        security: veiligheid
+        social_media: Sociale media
+        stolen_bike_recoveries: Gestolen fietsherstel
+        store: Winkel
+        strava_search: Zoeken en bijwerken op Strava
+        support_us: Steun ons
+        terms_and_conditions: Termen en voorwaarden
+        vendor_terms: leveranciersvoorwaarden
+        where_we_are: Waar we zijn
+        who_we_serve: Wie we dienen
     emails:
       partials:
         bike_box:

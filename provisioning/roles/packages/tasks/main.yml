@@ -40,6 +40,19 @@
     - Start ntp
     - Start fail2ban
 
+# SSH is key-only (PasswordAuthentication no — see the security role), so the
+# default sshd jail can only ban legitimate traffic: a Kamal deploy's burst of
+# connections or CI's ssh-keyscan. That intermittently blocks deploys. Disable
+# it, mirroring the firewall's `allow` (not `limit`) choice for the same reason.
+- name: Disable the fail2ban sshd jail (SSH is key-only)
+  ansible.builtin.copy:
+    dest: /etc/fail2ban/jail.local
+    mode: "0644"
+    content: |
+      [sshd]
+      enabled = false
+  notify: Restart fail2ban
+
 - name: Remove snap
   ansible.builtin.apt:
     name:
