@@ -1,124 +1,14 @@
 # Review apps
 
-Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single shared host. Each PR gets its own subdomain (`pr-N.review.bikeindex.org`), Postgres role + databases (primary + analytics), and Sidekiq worker. Production runs on Cloud66 — none of these files touch it.
+Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single shared host. Each PR gets its own subdomain (`pr-N.review.bikeindex.org`), Postgres role + databases (primary + analytics), and Sidekiq worker.
 
-They run the **staging Rails environment** (`RAILS_ENV=staging`), a near-duplicate of production (`config/environments/staging.rb` — keep the two in sync). The divergences, all safe because review apps hold no PII (seeded data + sandbox integrations):
-
-- ActionMailer routes through [`letter_opener_web`](https://github.com/fgrehm/letter_opener_web) — the gem is in the `:staging` Bundler group, so production never loads it. Inbox at `pr-N.review.bikeindex.org/letter_opener`, stored in `tmp/letter_opener/`, wiped on every deploy.
-- Mailer **previews** at `/rails/mailers` (off in production), linked from the admin **Mailers** dropdown.
-- The log broadcasts to both stdout (`kamal logs`) and `log/staging.log`, so the `read_logged_searches` cron has a file to read.
+Review apps run the **staging Rails environment** `RAILS_ENV=staging`, a near-duplicate of production (`config/environments/staging.rb` imports production.rb)
 
 ## How to trigger one
 
 1. Open the [Review App workflow](https://github.com/bikeindex/bike_index/actions/workflows/review-app.yml) in Actions.
-2. "Run workflow", enter the PR number, choose `deploy`.
+2. Click the "Run workflow" button, enter the PR number, choose `deploy`.
 3. The run adds the `review-app` label up front; when it finishes, the PR shows a "View deployment" button with the URL.
-
-### The `review-app` label is the gate
-
-The workflow adds the `review-app` label whenever a deploy is attempted — up front, before the build, regardless of outcome. So the **first** deploy must be a manual `workflow_dispatch` (unlabeled PRs are skipped by CI's dispatch step). That run labels the PR as it starts, arming auto-redeploy for the PR's life — so after a failed first deploy you just push a fix and CI re-dispatches.
-
-Once labeled:
-- **Push → auto-redeploys**: ci.yml's `dispatch` job dispatches this workflow. (No `pull_request: synchronize` trigger — it would leave a skipped review-app check on every push to every unlabeled PR. Forks don't run CI here, so they only deploy via manual `workflow_dispatch`, diff reviewed first.)
-- **Close PR → auto-destroys** (`pull_request: closed`), removing the label.
-- **Destroy without closing**: re-run with `destroy` (also removes the label).
-
-Only CI's on-push dispatch and `closed` are wired up, so toggling the label by hand does nothing until the next push.
-
-## One-time host setup
-
-Done **once, by hand** — the workflow assumes a provisioned host with shared accessories running.
-
-### 1. Provision a VM
-Ubuntu 24.04, Premium AMD/Intel (NVMe), 2 vCPU / 4 GB to start. Open ports 22, 80, 443. (Bike Index uses a DigitalOcean droplet in `sfo3`.)
-
-### 2. DNS
-Point a **wildcard** A record at the host:
-```
-*.review.bikeindex.org   A   <host-ip>
-```
-This covers both the per-PR hostnames and the SSH deploy target (`REVIEW_APP_HOST`, e.g. `host.review.bikeindex.org`) — any name under the wildcard resolves to the host.
-
-### 3. Run the Ansible provisioning playbook
-Hardens the host: Docker, Fail2ban, UFW (22/80/443), NTP, swap, key-only SSH. From `provisioning/`:
-
-```bash
-cp hosts.ini.example hosts.ini
-# edit hosts.ini: replace <host1> with the host IP
-
-ansible-galaxy install -r requirements.yml
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini playbook.yml
-```
-
-See `provisioning/README.md` for details.
-
-### 4. Boot kamal-proxy
-Global on the host; boot once:
-
-```bash
-export REVIEW_APP_PR_NUMBER=0          # dummy, just to satisfy the ERB
-export REVIEW_APP_HOST=host.review.bikeindex.org
-kamal proxy boot --config-file config/deploy.review.yml
-```
-
-**TLS is automatic — no cert to manage.** Each PR's `ssl: true` makes kamal-proxy obtain a per-host Let's Encrypt cert (HTTP-01 over port 80) on first deploy and renew it. No wildcard cert, certbot, or DNS-01 — just the wildcard DNS (step 2) and open port 80. (Let's Encrypt's 50 certs/week/domain is ample.)
-
-### 5. Boot shared accessories
-From a local clone with kamal installed (`gem install kamal -v '~> 2.0'`). Secrets read from `.kamal/secrets`, so set up the `Kamal/BikeIndex Review` 1Password item first (see [Local deploys](#local-deploys)):
-
-```bash
-export REVIEW_APP_PR_NUMBER=0          # dummy, just to satisfy the ERB
-export REVIEW_APP_HOST=host.review.bikeindex.org
-
-kamal accessory boot db    --config-file config/deploy.review.yml
-kamal accessory boot redis --config-file config/deploy.review.yml
-```
-
-Creates the `shared-db` (Postgres 17) and `shared-redis` (Redis 7) containers. Every PR's app connects under a per-PR role + database, created on the fly by `bin/docker-entrypoint`.
-
-### 6. SSH key + GitHub config
-- Add a deploy user's SSH public key to the host's `authorized_keys` (on DigitalOcean, attach it at droplet-create time).
-- Create a `review-app` GitHub Environment, then add:
-- **Variable** `REVIEW_APP_HOST` — SSH deploy target (e.g. `host.review.bikeindex.org`); any name under the wildcard works, it's not a public URL.
-- **Secrets:**
-  - `REVIEW_APP_SSH_KEY` — the matching private key
-  - `REVIEW_APP_POSTGRES_PASSWORD` — same as the 1Password item's `POSTGRES_PASSWORD`
-  - `REVIEW_APP_SECRET_KEY_BASE`, `REVIEW_APP_SESSION_SECRET`, `REVIEW_APP_VERIFICATION_SECRET` — review-app values (do NOT reuse production)
-  - `REVIEW_APP_GOOGLE_MAPS`, `REVIEW_APP_GOOGLE_MAPS_STATIC`, `REVIEW_APP_GOOGLE_GEOCODER`, `REVIEW_APP_MAPBOX_GEOCODER`, `REVIEW_APP_MAPBOX_MAPPING`
-  - `REVIEW_APP_R2_DEV_ENDPOINT`, `REVIEW_APP_R2_DEV_ACCESS_KEY`, `REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET` — creds for the `bikeindex-dev` R2 bucket (`cloudflare_dev` in `config/storage.yml`), shared by all review apps; do NOT reuse the production R2 token.
-  - `REVIEW_APP_HONEYBADGER_API_KEY` — optional; the post-deploy hook no-ops if unset
-
-Review apps also load the committed **`.env`** at boot (`dotenv-rails` is in the `:staging` group). It supplies dev/sandbox creds for third-party integrations — **Stripe (test-mode)**, Twitter, Twilio, Facebook, Strava, Mailchimp, … — so they don't fall through to empty. **kamal's `env:` wins**: dotenv never overrides a var kamal sets, so it only fills gaps. That's why **Stripe is intentionally absent** from the kamal/1Password/GitHub lists — it comes from `.env`. (Google/Mapbox/R2 stay kamal-managed, so their 1Password values must be real, not placeholders.)
-
-## Local deploys
-
-You normally trigger from the workflow, but can run `bin/review-app` locally with kamal installed and SSH access. Secrets come from 1Password via Kamal's adapter:
-
-```bash
-# One-time
-brew install --cask 1password-cli
-op signin                              # creates the `bike-index` account shortname
-# (or enable Developer → "Integrate with 1Password CLI" in the desktop app, which
-#  authenticates `op` across shells — needed for kamal's adapter to work non-interactively)
-gh auth login --scopes write:packages  # KAMAL_REGISTRY_PASSWORD=$(gh auth token)
-```
-
-`.kamal/secrets` pulls from the **`Kamal/BikeIndex Review`** item in the `bike-index` account, which needs a field per secret name in the file:
-
-```
-POSTGRES_PASSWORD            SECRET_KEY_BASE              SESSION_SECRET
-VERIFICATION_SECRET          GOOGLE_MAPS                  GOOGLE_MAPS_STATIC
-GOOGLE_GEOCODER              MAPBOX_GEOCODER              MAPBOX_MAPPING
-R2_DEV_ENDPOINT              R2_DEV_ACCESS_KEY            R2_DEV_ACCESS_KEY_SECRET
-HONEYBADGER_API_KEY
-```
-
-These are the same values as the `REVIEW_APP_*` GitHub Environment secrets (step 6) — keep them in sync. Then:
-
-```bash
-export REVIEW_APP_HOST=host.review.bikeindex.org
-bin/review-app deploy <pr_number> <image_tag>
-```
 
 ## Running kamal commands against a review app
 
@@ -136,6 +26,28 @@ All four resolve to PR `3594`. No/unrecognized arg prints usage. It uses the sam
 ```bash
 bin/kamal_review 0 accessory reboot db
 ```
+
+## What about production?
+
+Production runs on Cloud66. The differences vs production:
+
+- ActionMailer routes through [`letter_opener_web`](https://github.com/fgrehm/letter_opener_web) — the gem is in the `:staging` Bundler group, so production never loads it. Inbox at `pr-N.review.bikeindex.org/letter_opener`, stored in `tmp/letter_opener/`, wiped on every deploy.
+- Mailer **previews** at `/rails/mailers` (off in production), linked from the admin **Mailers** dropdown.
+- The log broadcasts to both stdout (`kamal logs`) and `log/staging.log`, so the `read_logged_searches` cron has a file to read.
+
+These make information public, but review apps hold no PII - just seeded data + sandbox integrations.
+
+### The `review-app` label is the gate
+
+The workflow adds the `review-app` label whenever a deploy is attempted — up front, before the build, regardless of outcome. So the **first** deploy must be a manual `workflow_dispatch` (unlabeled PRs are skipped by CI's dispatch step). That run labels the PR as it starts, arming auto-redeploy for the PR's life — so after a failed first deploy you just push a fix and CI re-dispatches.
+
+Once labeled:
+- **Push → auto-redeploys**: ci.yml's `dispatch` job dispatches this workflow. (No `pull_request: synchronize` trigger — it would leave a skipped review-app check on every push to every unlabeled PR.)
+  - A fork's push fires `on: push` in the fork, not here, so this repo's `dispatch` job never sees it — fork PRs only deploy via manual `workflow_dispatch`.
+- **Close PR → auto-destroys** (`pull_request: closed`), removing the label.
+- **Destroy without closing**: re-run with `destroy` (also removes the label).
+
+Only CI's on-push dispatch and `closed` are wired up, so toggling the label by hand does nothing until the next push.
 
 ## How a deploy works
 
@@ -198,3 +110,100 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 - **Forks aren't auto-deployed.** A maintainer triggers fork PRs manually via `workflow_dispatch` after reviewing the diff.
 - **GHCR accumulates untagged versions.** Each build overwrites `:buildcache`, orphaning the prior manifest; destroyed-PR deletions can leave shared-blob leftovers. GHCR never GCs itself — prune untagged versions if the package grows large.
 - **Per-PR Postgres roles are SUPERUSER.** Required to load `db/structure.sql`, which creates *and* `COMMENT`s the superuser-only `pg_stat_statements` extension (`COMMENT ON EXTENSION` needs ownership, no `IF NOT EXISTS`), and to own its tables. Tradeoff: review apps aren't isolated from each other on `shared-db`. Acceptable — that Postgres is sandbox-only, ephemeral, no PII, separate from production. A non-superuser design would load the schema as `postgres` and reassign ownership per role.
+
+## Deploying locally
+
+You normally trigger from the workflow, but can run `bin/review-app` locally with kamal installed and SSH access. Secrets come from 1Password via Kamal's adapter:
+
+```bash
+# One-time
+brew install --cask 1password-cli
+op signin                              # creates the `bike-index` account shortname
+# (or enable Developer → "Integrate with 1Password CLI" in the desktop app, which
+#  authenticates `op` across shells — needed for kamal's adapter to work non-interactively)
+gh auth login --scopes write:packages  # KAMAL_REGISTRY_PASSWORD=$(gh auth token)
+```
+
+`.kamal/secrets` pulls from the **`Kamal/BikeIndex Review`** item in the `bike-index` account, which needs a field per secret name in the file:
+
+```
+POSTGRES_PASSWORD            SECRET_KEY_BASE              SESSION_SECRET
+VERIFICATION_SECRET          GOOGLE_MAPS                  GOOGLE_MAPS_STATIC
+GOOGLE_GEOCODER              MAPBOX_GEOCODER              MAPBOX_MAPPING
+R2_DEV_ENDPOINT              R2_DEV_ACCESS_KEY            R2_DEV_ACCESS_KEY_SECRET
+HONEYBADGER_API_KEY
+```
+
+These are the same values as the `REVIEW_APP_*` GitHub Environment secrets ([Initial host setup step 6](#6-ssh-key--github-config)) — keep them in sync. Then:
+
+```bash
+export REVIEW_APP_HOST=host.review.bikeindex.org
+bin/review-app deploy <pr_number> <image_tag>
+```
+
+----
+
+## Initial host setup (one time)
+
+Done **once, by hand** — the workflow assumes a provisioned host with shared accessories running.
+
+### 1. Provision a VM
+Initially a DigitalOcean droplet in `sfo3` on Ubuntu 24.04, Premium AMD/Intel (NVMe), 2 vCPU / 4 GB.
+
+### 2. DNS
+Point a **wildcard** A record at the host:
+```
+*.review.bikeindex.org   A   <host-ip>
+```
+This covers both the per-PR hostnames and the SSH deploy target (`REVIEW_APP_HOST`, e.g. `host.review.bikeindex.org`) — any name under the wildcard resolves to the host.
+
+### 3. Run the Ansible provisioning playbook
+Hardens the host: Docker, Fail2ban, UFW (22/80/443), NTP, swap, key-only SSH. From `provisioning/`:
+
+```bash
+cp hosts.ini.example hosts.ini
+# edit hosts.ini: replace <host1> with the host IP
+
+ansible-galaxy install -r requirements.yml
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini playbook.yml
+```
+
+See `provisioning/README.md` for details.
+
+### 4. Boot kamal-proxy
+Global on the host; boot once:
+
+```bash
+export REVIEW_APP_PR_NUMBER=0          # dummy, just to satisfy the ERB
+export REVIEW_APP_HOST=host.review.bikeindex.org
+kamal proxy boot --config-file config/deploy.review.yml
+```
+
+**TLS is automatic — no cert to manage.** Each PR's `ssl: true` makes kamal-proxy obtain a per-host Let's Encrypt cert (HTTP-01 over port 80) on first deploy and renew it. No wildcard cert, certbot, or DNS-01 — just the wildcard DNS (step 2) and open port 80. (Let's Encrypt's 50 certs/week/domain is ample.)
+
+### 5. Boot shared accessories
+From a local clone with kamal installed (`gem install kamal -v '~> 2.0'`). Secrets read from `.kamal/secrets`, so set up the `Kamal/BikeIndex Review` 1Password item first (see [Local deploys](#local-deploys)):
+
+```bash
+export REVIEW_APP_PR_NUMBER=0          # dummy, just to satisfy the ERB
+export REVIEW_APP_HOST=host.review.bikeindex.org
+
+kamal accessory boot db    --config-file config/deploy.review.yml
+kamal accessory boot redis --config-file config/deploy.review.yml
+```
+
+Creates the `shared-db` (Postgres 17) and `shared-redis` (Redis 7) containers. Every PR's app connects under a per-PR role + database, created on the fly by `bin/docker-entrypoint`.
+
+### 6. SSH key + GitHub config
+- Add a deploy user's SSH public key to the host's `authorized_keys` (on DigitalOcean, attach it at droplet-create time).
+- Create a `review-app` GitHub Environment, then add:
+- **Variable** `REVIEW_APP_HOST` — SSH deploy target (e.g. `host.review.bikeindex.org`); any name under the wildcard works, it's not a public URL.
+- **Secrets:**
+  - `REVIEW_APP_SSH_KEY` — the matching private key
+  - `REVIEW_APP_POSTGRES_PASSWORD` — same as the 1Password item's `POSTGRES_PASSWORD`
+  - `REVIEW_APP_SECRET_KEY_BASE`, `REVIEW_APP_SESSION_SECRET`, `REVIEW_APP_VERIFICATION_SECRET` — review-app values (do NOT reuse production)
+  - `REVIEW_APP_GOOGLE_MAPS`, `REVIEW_APP_GOOGLE_MAPS_STATIC`, `REVIEW_APP_GOOGLE_GEOCODER`, `REVIEW_APP_MAPBOX_GEOCODER`, `REVIEW_APP_MAPBOX_MAPPING`
+  - `REVIEW_APP_R2_DEV_ENDPOINT`, `REVIEW_APP_R2_DEV_ACCESS_KEY`, `REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET` — creds for the `bikeindex-dev` R2 bucket (`cloudflare_dev` in `config/storage.yml`), shared by all review apps; do NOT reuse the production R2 token.
+  - `REVIEW_APP_HONEYBADGER_API_KEY` — optional; the post-deploy hook no-ops if unset
+
+Review apps also load the committed **`.env`** at boot (`dotenv-rails` is in the `:staging` group). It supplies dev/sandbox creds for third-party integrations — **Stripe (test-mode)**, Twitter, Twilio, Facebook, Strava, Mailchimp, … — so they don't fall through to empty. **kamal's `env:` wins**: dotenv never overrides a var kamal sets, so it only fills gaps. That's why **Stripe is intentionally absent** from the kamal/1Password/GitHub lists — it comes from `.env`. (Google/Mapbox/R2 stay kamal-managed, so their 1Password values must be real, not placeholders.)
