@@ -2877,8 +2877,11 @@ es:
       help: Ayuda
       log_in: conectarse
       logout: Cierre de sesión
+      menu: Menú
       register_a_new_bike: Registre su bicicleta
+      settings_menu: Ajustes
       sign_up: Inscríbete
+      skip_to_main_content: Saltar al contenido principal
       stolen_bike: "¿Bicicleta robada?"
       the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
       user_settings: "%{user_email} ajustes"
@@ -3638,6 +3641,7 @@ es:
       photo_stock:
       photo_uncategorized:
       processing:
+      remove_image: Eliminar imagen
     show:
       are_you_sure: "¿Estás seguro?"
       back_to_images:
@@ -3836,12 +3840,14 @@ es:
       how_to_get_your_stolen_bike_back: Recupera su bicicleta
       language: Idioma
       law_enforcement: Fuerzas y Cuerpos de Seguridad
+      legal: Legal
       press_inquiries: Consultas de prensa
       privacy_policy: Política de privacidad
       protect_your_bike: Registre su bicicleta
       resources: Recursos
       schools_and_universities: Escuelas y universidades
       security: Seguridad
+      social_media: Redes sociales
       stolen_bike_recoveries: Recuperación de bicicletas robadas
       store: Tienda
       support_us: Apóyanos

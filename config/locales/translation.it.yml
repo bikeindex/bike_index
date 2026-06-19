@@ -2917,8 +2917,11 @@ it:
       help:
       log_in:
       logout:
+      menu: Menu
       register_a_new_bike:
+      settings_menu: Impostazioni
       sign_up:
+      skip_to_main_content: Salta al contenuto principale
       stolen_bike:
       the_nonprofit_bike_registry:
       user_settings:
@@ -3677,6 +3680,7 @@ it:
       photo_stock:
       photo_uncategorized:
       processing:
+      remove_image: Rimuovi immagine
     show:
       are_you_sure: Sei sicuro?
       back_to_images:
@@ -3872,12 +3876,14 @@ it:
       how_to_get_your_stolen_bike_back:
       language:
       law_enforcement:
+      legal: Note legali
       press_inquiries:
       privacy_policy:
       protect_your_bike:
       resources:
       schools_and_universities:
       security:
+      social_media: Social media
       stolen_bike_recoveries:
       store:
       support_us:
