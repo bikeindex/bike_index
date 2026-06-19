@@ -259,8 +259,8 @@ jobs:
       # --- deploy path: the image was built + pushed by the `build` job ---
       - name: Deploy
         if: needs.resolve.outputs.action == 'deploy'
-        # bin/review-app reads the job-level IMAGE_TAG env.
-        run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}"
+        # bin/kamal_review reads the image tag from the job-level IMAGE_TAG env.
+        run: bin/kamal_review deploy --app "${{ needs.resolve.outputs.pr_number }}"
       # A successful deploy (this step is only reached when everything above
       # passed) deletes the `report` job's now-stale failure comment.
       - name: Remove stale deploy-failure comment
@@ -278,7 +278,7 @@ jobs:
 
       - name: Destroy
         if: needs.resolve.outputs.action == 'destroy'
-        run: bin/review-app destroy "${{ needs.resolve.outputs.pr_number }}"
+        run: bin/kamal_review destroy --app "${{ needs.resolve.outputs.pr_number }}"
       - name: Remove review-app label
         if: needs.resolve.outputs.action == 'destroy'
         env:
