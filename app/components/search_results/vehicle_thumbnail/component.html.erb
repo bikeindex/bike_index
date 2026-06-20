@@ -30,7 +30,7 @@
     </span>
 
     <% if render_member_badge? %>
-      <span class="tw:ml-auto tw:pl-2">
+      <span class="tw:ml-auto tw:pl-2 tw:whitespace-nowrap">
         <%= render(UI::Badge::Component.new(text: translation(".member"), color: :purple, size: :sm)) %>
       </span>
     <% end %>
