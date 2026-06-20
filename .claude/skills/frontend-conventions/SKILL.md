@@ -20,6 +20,8 @@ This project uses **Stimulus.js** for JavaScript interactivity and **Tailwind CS
 
 The `bin/dev` command handles building and updating Tailwind and JS.
 
+**Format ERB before committing.** After editing any `.html.erb`, run `bin/lint <file>` — it runs `herb-format`, which sorts `tw:` classes and reflows long `class` attributes onto multiple lines. CI's `lint_and_scan` job runs `herb-format --check` as a step separate from `standardrb`/`rubocop`, so hand-edited ERB that skips formatting fails CI even when the Ruby is clean.
+
 ## Tailwind classes and helpers
 
 - Tailwind classes have the prefix `tw:` (e.g. `tw:text-blue`, `tw:flex`, `tw:gap-4`).
