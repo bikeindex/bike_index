@@ -3619,11 +3619,8 @@ nl:
       help: Helpen
       log_in: Log in
       logout: Afmelden
-      menu: Menu
       register_a_new_bike: Registreer een nieuwe fiets
-      settings_menu: Instellingen
       sign_up: Registreren
-      skip_to_main_content: Ga naar hoofdinhoud
       the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
       user_settings: "%{user_email} instellingen"
       view_org: Bekijk %{org_name}
@@ -3632,6 +3629,9 @@ nl:
       marketplace_messages: Marktplaatsberichten
       your_registrations: Uw registraties
       marketplace: Marktplaats
+      menu: Menu
+      settings_menu: Instellingen
+      skip_to_main_content: Ga direct naar de hoofdinhoud
     application_bikehub:
       contact: contact
       home: Thuis
@@ -5510,14 +5510,12 @@ nl:
         how_to_get_your_stolen_bike_back: Haal je gestolen fiets terug
         language: Taal
         law_enforcement: Politie
-        legal: Juridisch
         press_inquiries: Persvragen
         privacy_policy: Privacybeleid
         protect_your_bike: Bescherm je fiets
         resources: Middelen
         schools_and_universities: Scholen en universiteiten
         security: veiligheid
-        social_media: Sociale media
         stolen_bike_recoveries: Gestolen fietsherstel
         store: Winkel
         strava_search: Zoeken en bijwerken op Strava
@@ -5526,6 +5524,8 @@ nl:
         vendor_terms: leveranciersvoorwaarden
         where_we_are: Waar we zijn
         who_we_serve: Wie we dienen
+        legal: Juridisch
+        social_media: Sociale media
     emails:
       partials:
         bike_box:

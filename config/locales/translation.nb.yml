@@ -3805,11 +3805,8 @@ nb:
       help: Hjelp
       log_in: Logg Inn
       logout: Logg ut
-      menu: Meny
       register_a_new_bike: Registrer en ny sykkel
-      settings_menu: Innstillinger
       sign_up: Registrer deg
-      skip_to_main_content: Hopp til hovedinnhold
       stolen_bike: Stjålet sykkel?
       the_nonprofit_bike_registry: det ideelle sykkelregisteret
       user_settings: "%{user_email}-innstillinger"
@@ -3818,6 +3815,9 @@ nb:
       marketplace_messages: Markedsplassmeldinger
       your_registrations: Dine registreringer
       marketplace: Markedsplass
+      menu: Meny
+      settings_menu: Innstillinger
+      skip_to_main_content: Hopp til hovedinnhold
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub-kontoer er drevet av Bike Index – det
         fremste sykkelregisteret.
@@ -5362,14 +5362,12 @@ nb:
         how_to_get_your_stolen_bike_back: Få tilbake den stjålne sykkelen
         language: Språk
         law_enforcement: Rettshåndhevelse
-        legal: Juridisk
         press_inquiries: Pressehenvendelser
         privacy_policy: Personvernerklæring
         protect_your_bike: Beskytt sykkelen din
         resources: Ressurser
         schools_and_universities: Skoler og universiteter
         security: Sikkerhet
-        social_media: Sosiale medier
         stolen_bike_recoveries: Gjenvinning av stjålne sykkel
         store: butikk
         strava_search: Strava-søk og -oppdatering
@@ -5378,6 +5376,8 @@ nb:
         vendor_terms: leverandørens vilkår
         where_we_are: Hvor vi er
         who_we_serve: Hvem vi tjener
+        legal: Juridisk
+        social_media: Sosiale medier
     emails:
       partials:
         bike_box:
