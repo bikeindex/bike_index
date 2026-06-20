@@ -85,7 +85,7 @@ RSpec.describe ScheduledJobRunner, type: :lib do
         .to eq("class" => described_class.name, "queue" => "high_priority", "retry" => false, "args" => [])
 
       described_class.perform_async
-      expect(comparable.call(queue.to_a.last)).to eq comparable.call(enqueued)
+      expect(comparable.call(queue.first)).to eq comparable.call(enqueued)
     end
 
     it "does not enqueue when one is already queued" do
