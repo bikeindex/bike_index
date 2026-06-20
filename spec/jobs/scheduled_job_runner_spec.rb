@@ -60,6 +60,43 @@ RSpec.describe ScheduledJobRunner, type: :lib do
     end
   end
 
+  describe "bin/run_scheduler" do
+    # The review-app cron runs this script instead of `rake run_scheduler` to skip
+    # booting Rails. It enqueues described_class via the Sidekiq client, so it must
+    # stay equivalent to perform_async and honor the enqueued? dedup guard.
+    let(:queue) { Sidekiq::Queue.new("high_priority") }
+    let(:comparable) { ->(job) { job.item.slice("class", "queue", "retry", "args") } }
+
+    def run_scheduler!
+      silence_warnings { load Rails.root.join("bin", "run_scheduler").to_s }
+    end
+
+    around { |example| Sidekiq::Testing.disable! { example.run } }
+    before { Sidekiq.redis { |r| r.del("queue:high_priority") } }
+    after { Sidekiq.redis { |r| r.del("queue:high_priority") } }
+
+    it "enqueues described_class, matching perform_async" do
+      run_scheduler!
+
+      expect(queue.size).to eq 1
+      enqueued = queue.first
+      expect(enqueued.klass).to eq described_class.name
+      expect(comparable.call(enqueued))
+        .to eq("class" => described_class.name, "queue" => "high_priority", "retry" => false, "args" => [])
+
+      described_class.perform_async
+      expect(comparable.call(queue.to_a.last)).to eq comparable.call(enqueued)
+    end
+
+    it "does not enqueue when one is already queued" do
+      described_class.perform_async
+      expect(described_class.should_enqueue?).to be_falsey
+
+      run_scheduler!
+      expect(queue.size).to eq 1
+    end
+  end
+
   describe "staggered scheduling" do
     it "fails if 3 things are scheduled the same frequency" do
       frequencies = described_class.scheduled_jobs

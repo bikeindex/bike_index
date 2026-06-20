@@ -16,16 +16,17 @@ require "bundler/setup"
 require "sidekiq"
 require "sidekiq/api"
 
-WORKER = "ScheduledJobRunner"
-QUEUE = "high_priority" # ScheduledJobRunner's sidekiq_options queue
-QUEUE_MAX = 200 # ScheduledJob.queue_maximum_addition_size
+# Locals, not constants, so spec/jobs/scheduled_job_runner_spec.rb can `load` this
+worker = "ScheduledJobRunner"
+queue_name = "high_priority" # ScheduledJobRunner's sidekiq_options queue
+queue_maximum = 200 # ScheduledJob.queue_maximum_addition_size
 
 Sidekiq.configure_client { |config| config.redis = {url: ENV.fetch("REDIS_URL")} }
 
 # Mirror of ScheduledJob.enqueued? via Sidekiq's public API
-queue = Sidekiq::Queue.new(QUEUE)
-already_queued = queue.size > QUEUE_MAX || queue.any? { |job| job.klass == WORKER }
+queue = Sidekiq::Queue.new(queue_name)
+already_queued = queue.size > queue_maximum || queue.any? { |job| job.klass == worker }
 
 unless already_queued
-  Sidekiq::Client.push("class" => WORKER, "queue" => QUEUE, "retry" => false, "args" => [])
+  Sidekiq::Client.push("class" => worker, "queue" => queue_name, "retry" => false, "args" => [])
 end
