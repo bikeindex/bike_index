@@ -3619,8 +3619,11 @@ nl:
       help: Helpen
       log_in: Log in
       logout: Afmelden
+      menu: Menu
       register_a_new_bike: Registreer een nieuwe fiets
+      settings_menu: Instellingen
       sign_up: Registreren
+      skip_to_main_content: Ga naar hoofdinhoud
       the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
       user_settings: "%{user_email} instellingen"
       view_org: Bekijk %{org_name}
@@ -4877,6 +4880,7 @@ nl:
       photo_of_user_with_bike: Jij met je %{bike_type}
       photo_stock: Stock foto
       photo_uncategorized: Foto van uw %{bike_type}
+      remove_image: Afbeelding verwijderen
     show:
       are_you_sure: Weet je het zeker?
       back_to_images: Terug naar openbare afbeeldingen
@@ -5506,12 +5510,14 @@ nl:
         how_to_get_your_stolen_bike_back: Haal je gestolen fiets terug
         language: Taal
         law_enforcement: Politie
+        legal: Juridisch
         press_inquiries: Persvragen
         privacy_policy: Privacybeleid
         protect_your_bike: Bescherm je fiets
         resources: Middelen
         schools_and_universities: Scholen en universiteiten
         security: veiligheid
+        social_media: Sociale media
         stolen_bike_recoveries: Gestolen fietsherstel
         store: Winkel
         strava_search: Zoeken en bijwerken op Strava
