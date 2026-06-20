@@ -109,8 +109,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
 
     # 2 promoted + 12 standard = 14 thumbnails on page 1
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 14)
-    # Member listings header is visible and the 2 promoted bikes appear above the standard listings
-    expect(page).to have_css("h2", text: "Bike Index member listings")
+    # The 2 promoted bikes show the member badge and appear above the standard listings
+    expect(page).to have_text("Bike Index member")
     expect(visible_bike_ids.first(2)).to match_array(promoted_bike_ids)
     expect_axe_clean
     # Verify the lazy-loading frame for page 2 exists (3 standard listings remain)
@@ -134,7 +134,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
 
     # And then search "Yuba" without price filter
     # Which will return 8 bikes - so the page won't have the ability to scroll. Verify that it works correctly
-    # The Salsa promoted listings shouldn't match, so the member listings section disappears
+    # The Salsa promoted listings shouldn't match, so the member badges disappear
     fill_in "price_max_amount", with: ""
     # Scope to the everything-combobox - the primary_activity field is also a combobox
     within("[data-controller~='search--everything-combobox']") do
@@ -146,7 +146,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     find("#search-button").click
     # Should load new results
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 8)
-    expect(page).not_to have_css("h2", text: "Bike Index member listings")
+    expect(page).not_to have_text("Bike Index member")
     # Should NOT have a lazy-loading frame for page 2
     expect(page).not_to have_css("turbo-frame#page_2")
 

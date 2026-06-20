@@ -8,13 +8,10 @@
 
 <% if @promoted_bikes.present? %>
   <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
-    <h2 class="tw:mb-4 tw:text-2xl tw:text-slate-800">
-      Bike Index member listings
-    </h2>
-
     <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind)) do %>
       <% @promoted_bikes.each do |bike| %>
-        <% cache(["search_results", @search_kind, @result_view, bike]) do %>
+        <%# :member keys these fragments apart from the standard list, so a bike that gains/loses member status re-renders (seller_member isn't part of the bike's cache_key) %>
+        <% cache(["search_results", @search_kind, @result_view, bike, :member]) do %>
           <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
         <% end %>
       <% end %>

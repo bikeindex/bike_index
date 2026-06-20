@@ -1,15 +1,20 @@
 <%= render(UI::Card::Component.new) do %>
-  <% if @marketplace_listing.seller_member? %>
-    <%= render(UI::Badge::Component.new(text: translation(".member_listing"), title: translation(".member_listing_tooltip"), color: :purple, size: :md)) %>
-  <% end %>
+  <%# Pill sits above the price on mobile; on desktop it right-aligns across from the price %>
+  <div class="tw:flex tw:flex-col tw:items-start tw:lg:flex-row tw:lg:items-center tw:lg:justify-between">
+    <h2 class="twtext-color! tw:my-2! tw:text-4xl! tw:font-normal">
+      <%= amount_display(@marketplace_listing, currency_name_suffix: true) %>
 
-  <h2 class="twtext-color! tw:my-2! tw:text-4xl! tw:font-normal">
-    <%= amount_display(@marketplace_listing, currency_name_suffix: true) %>
+      <span class="uncap tw:text-xl! tw:opacity-65">
+        <%= translation(".price_is_firm_#{@marketplace_listing.price_firm?}") %>
+      </span>
+    </h2>
 
-    <span class="uncap tw:text-xl! tw:opacity-65">
-      <%= translation(".price_is_firm_#{@marketplace_listing.price_firm?}") %>
-    </span>
-  </h2>
+    <% if @marketplace_listing.seller_member? %>
+      <span class="tw:order-first tw:lg:order-none">
+        <%= render(UI::Badge::Component.new(text: translation(".member_listing"), title: translation(".member_listing_tooltip"), color: :purple, size: :md)) %>
+      </span>
+    <% end %>
+  </div>
 
   <%= render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do %>
     <%= render(UI::DefinitionList::Row::Component.new(label: translation(".condition"))) do %>
