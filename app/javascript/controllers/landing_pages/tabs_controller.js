@@ -10,17 +10,17 @@ export default class extends Controller {
   }
 
   keydown (event) {
-    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
-
-    event.preventDefault()
     const buttons = this.buttonTargets
     const currentIndex = buttons.indexOf(event.currentTarget)
-    let nextIndex
-    if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + buttons.length) % buttons.length
-    else if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % buttons.length
-    else if (event.key === 'Home') nextIndex = 0
-    else nextIndex = buttons.length - 1
+    const nextIndex = {
+      ArrowLeft: (currentIndex - 1 + buttons.length) % buttons.length,
+      ArrowRight: (currentIndex + 1) % buttons.length,
+      Home: 0,
+      End: buttons.length - 1
+    }[event.key]
+    if (nextIndex === undefined) return
 
+    event.preventDefault()
     this.activate(buttons[nextIndex])
     buttons[nextIndex].focus()
   }

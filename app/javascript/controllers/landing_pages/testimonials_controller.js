@@ -7,26 +7,33 @@ export default class extends Controller {
   // Testimonials carousel functionality
   connect () {
     this.currentIndex = 0
-    // Create dots
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     this.createDots()
     // Auto-advance testimonials every 8 seconds, pause on hover or keyboard focus
     this.startAutoAdvance()
-    const wrapper = this.element.querySelector('.le-testimonials-carousel-wrapper')
-    wrapper.addEventListener('mouseenter', () => this.pauseAutoAdvance())
-    wrapper.addEventListener('mouseleave', () => this.startAutoAdvance())
-    this.element.addEventListener('focusin', () => this.pauseAutoAdvance())
-    this.element.addEventListener('focusout', (e) => {
+    this.pauseHandler = () => this.pauseAutoAdvance()
+    this.resumeHandler = () => this.startAutoAdvance()
+    this.focusOutHandler = (e) => {
       if (!this.element.contains(e.relatedTarget)) this.startAutoAdvance()
-    })
+    }
+    this.wrapper = this.element.querySelector('.le-testimonials-carousel-wrapper')
+    this.wrapper.addEventListener('mouseenter', this.pauseHandler)
+    this.wrapper.addEventListener('mouseleave', this.resumeHandler)
+    this.element.addEventListener('focusin', this.pauseHandler)
+    this.element.addEventListener('focusout', this.focusOutHandler)
   }
 
   disconnect () {
     clearInterval(this.autoAdvanceInterval)
+    this.wrapper.removeEventListener('mouseenter', this.pauseHandler)
+    this.wrapper.removeEventListener('mouseleave', this.resumeHandler)
+    this.element.removeEventListener('focusin', this.pauseHandler)
+    this.element.removeEventListener('focusout', this.focusOutHandler)
   }
 
   startAutoAdvance () {
     clearInterval(this.autoAdvanceInterval)
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (this.reducedMotion.matches) return
 
     this.autoAdvanceInterval = setInterval(() => this.next(), 8000)
   }
