@@ -121,7 +121,10 @@ if ENV["RETRY_FLAKY"]
 
     config.around(:each) do |ex|
       if ex.metadata[:flaky]
-        ex.run_with_retry retry: 2
+        # `flaky: true` retries twice; `flaky: <n>` overrides for examples whose
+        # harness race (eg WebDriver back/forward) occasionally outlasts two tries.
+        retries = ex.metadata[:flaky].is_a?(Integer) ? ex.metadata[:flaky] : 2
+        ex.run_with_retry retry: retries
       else
         ex.run
       end

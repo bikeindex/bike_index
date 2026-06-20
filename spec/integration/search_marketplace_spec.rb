@@ -38,7 +38,11 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
         amount_cents: 100_00 * i)
       listing.update(published_at: Time.current - i.seconds)
     end
-    # Load manufacturers into autocomplete Redis so the local API returns results
+    # Load manufacturers into autocomplete Redis so the local API returns results.
+    # Clear first: the autocomplete cache is shared across :js examples and never
+    # invalidated by load_all, so a stale cache from an earlier spec can hide this
+    # example's manufacturers behind the synthetic free-text option.
+    Autocomplete::Loader.clear_redis
     Autocomplete::Loader.load_all(%w[Manufacturer])
   end
 
