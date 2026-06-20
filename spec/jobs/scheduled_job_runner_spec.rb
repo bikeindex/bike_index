@@ -64,7 +64,7 @@ RSpec.describe ScheduledJobRunner, type: :lib do
     # bin/run_scheduled_job_runner is the cron entrypoint that enqueues described_class
     # via the Sidekiq client without booting Rails, so it must stay equivalent to
     # perform_async and honor the enqueued? dedup guard.
-    let(:queue) { Sidekiq::Queue.new("high_priority") }
+    let(:queue) { Sidekiq::Queue.new(described_class.sidekiq_options["queue"]) }
     let(:comparable) { ->(job) { job.item.slice("class", "queue", "retry", "args") } }
 
     def run_scheduled_job_runner!
@@ -72,8 +72,8 @@ RSpec.describe ScheduledJobRunner, type: :lib do
     end
 
     around { |example| Sidekiq::Testing.disable! { example.run } }
-    before { Sidekiq.redis { |r| r.del("queue:high_priority") } }
-    after { Sidekiq.redis { |r| r.del("queue:high_priority") } }
+    before { Sidekiq.redis { |r| r.del(described_class.redis_queue) } }
+    after { Sidekiq.redis { |r| r.del(described_class.redis_queue) } }
 
     it "enqueues described_class, matching perform_async" do
       run_scheduled_job_runner!
@@ -82,7 +82,7 @@ RSpec.describe ScheduledJobRunner, type: :lib do
       enqueued = queue.first
       expect(enqueued.klass).to eq described_class.name
       expect(comparable.call(enqueued))
-        .to eq("class" => described_class.name, "queue" => "high_priority", "retry" => false, "args" => [])
+        .to eq("class" => described_class.name, "queue" => described_class.sidekiq_options["queue"], "retry" => false, "args" => [])
 
       described_class.perform_async
       expect(comparable.call(queue.first)).to eq comparable.call(enqueued)
