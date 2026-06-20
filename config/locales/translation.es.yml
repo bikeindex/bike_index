@@ -2888,7 +2888,7 @@ es:
       your_registrations: Sus registros
       marketplace: Mercado
       menu: Menú
-      settings_menu:
+      settings_menu: Ajustes
       skip_to_main_content: Ir al contenido principal
     application_bikehub:
       accounts_powered_by_bike_index: Las cuentas de BikeHub están gestionadas por
@@ -4191,8 +4191,8 @@ es:
         vendor_terms: condiciones de venta
         where_we_are: Dónde estamos
         who_we_serve: A quién servimos
-        legal:
-        social_media:
+        legal: Legal
+        social_media: Redes sociales
     emails:
       partials:
         bike_box:

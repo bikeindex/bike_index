@@ -2928,7 +2928,7 @@ it:
       your_registrations: Le vostre registrazioni
       marketplace: Mercato
       menu: Menu
-      settings_menu:
+      settings_menu: Impostazioni
       skip_to_main_content: Vai al contenuto principale
     application_bikehub:
       accounts_powered_by_bike_index:
@@ -4273,8 +4273,8 @@ it:
         vendor_terms:
         where_we_are:
         who_we_serve:
-        legal:
-        social_media:
+        legal: Legale
+        social_media: Social media
     emails:
       partials:
         bike_box:
