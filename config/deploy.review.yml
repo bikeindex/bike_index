@@ -25,12 +25,15 @@
 
 <%# The role/database naming scheme must stay in lockstep with bin/kamal_review,
     which re-derives the same names to DROP them on destroy. %>
+<% require "json" %>
 <% pr      = ENV.fetch("REVIEW_APP_PR_NUMBER") %>
 <% host    = ENV.fetch("REVIEW_APP_HOST") %>
 <% slug    = "pr-#{pr}" %>
 <% appname = "bike-index-#{slug}" %>
 <% role    = "bike_index_pr_#{pr}" %>
 <% redis_url = "redis://shared-redis:6379/#{ENV.fetch("REVIEW_APP_REDIS_DB", "1")}" %>
+<%# .to_json quotes/escapes the title into a valid (double-quoted) YAML scalar. %>
+<% pr_title_json = ENV.fetch("REVIEW_APP_PR_TITLE", "").to_json %>
 
 service: <%= appname %>
 # NOTE: no registry host here — kamal prepends `registry.server` (configuration.rb
@@ -88,6 +91,9 @@ env:
     RAILS_ENV: staging
     REVIEW_APP: "1"
     REVIEW_APP_PR_NUMBER: "<%= pr %>"
+    # Empty unless the deployer exports REVIEW_APP_PR_TITLE (the workflow does);
+    # the banner then falls back to "PR #<number>".
+    REVIEW_APP_PR_TITLE: <%= pr_title_json %>
     BASE_URL: "https://<%= slug %>.review.bikeindex.org"
 
     # Postgres (shared-db accessory; per-PR role + databases). The staging
@@ -110,7 +116,7 @@ env:
     REDIS_RACK_ATTACK_URL: "<%= redis_url %>"
 
     # Scheduled jobs that can't work in review apps (run by config/crontab's
-    # run_scheduler), skipped via ApplicationJob's SIDEKIQ_SKIP_<job> mechanism.
+    # bin/run_scheduled_job_runner), skipped via ApplicationJob's SIDEKIQ_SKIP_<job> mechanism.
     # - exchange-rate API uses placeholder review-app secrets, so its response
     #   has no `rates` key (KeyError).
     # - manufacturer-logo job reaches the external img.logo.dev, which the
