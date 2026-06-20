@@ -11,11 +11,12 @@
 #
 # This file is only used by Kamal review apps, never by production (Cloud66).
 #
-# `flock -n` guards each job: every run is a fresh `bundle exec rake` (a full
-# ~115MB Rails boot), so if one runs long (e.g. the host is busy) the next
-# minute's run would start before it finishes and they pile up — enough stacked
-# boots OOM the host. The non-blocking lock makes an overlapping run exit
-# immediately instead.
-*/1  * * * * cd /rails && flock -n /tmp/run_scheduler.lock        bundle exec rake run_scheduler              > /proc/1/fd/1 2>&1
-*/5  * * * * cd /rails && flock -n /tmp/pghero.lock               bundle exec rake pghero:capture_query_stats > /proc/1/fd/1 2>&1
-*/30 * * * * cd /rails && flock -n /tmp/read_logged_searches.lock bundle exec rake read_logged_searches       > /proc/1/fd/1 2>&1
+# `flock -n` guards each job against overlap: if one runs long (host busy) the
+# next minute's run would otherwise start before it finishes and pile up. That's
+# critical for the `bundle exec rake` jobs — each is a fresh ~115MB Rails boot,
+# and enough stacked boots OOM the host. run_scheduled_job_runner avoids the boot
+# entirely (bin/run_scheduled_job_runner is a Rails-free Sidekiq client) but keeps
+# the lock anyway, since a non-blocking lock is free insurance against overlap.
+*/1  * * * * cd /rails && flock -n /tmp/run_scheduled_job_runner.lock bin/run_scheduled_job_runner                > /proc/1/fd/1 2>&1
+*/5  * * * * cd /rails && flock -n /tmp/pghero.lock                   bundle exec rake pghero:capture_query_stats > /proc/1/fd/1 2>&1
+*/30 * * * * cd /rails && flock -n /tmp/read_logged_searches.lock     bundle exec rake read_logged_searches       > /proc/1/fd/1 2>&1
