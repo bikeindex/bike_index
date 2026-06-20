@@ -6,31 +6,28 @@
 
 <% component_class = SearchResults::Container::Component.component_class_for_result_view(@result_view) %>
 
-<% if @promoted_bikes.present? %>
-  <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
-    <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind)) do %>
-      <% @promoted_bikes.each do |bike| %>
-        <%# :member keys these fragments apart from the standard list, so a bike that gains/loses member status re-renders (seller_member isn't part of the bike's cache_key) %>
-        <% cache(["search_results", @search_kind, @result_view, bike, :member]) do %>
-          <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </div>
-<% end %>
+<%#
+  Member listings sort first (carrying the badge), then standard listings, in
+  one grid so they flow continuously instead of breaking onto a new row. The
+  container's no_results shows only when both are empty.
+%>
 
-<%# Skip the standard list (and its empty-state) when member listings already matched the search %>
-<% if @bikes.present? || @promoted_bikes.blank? %>
-  <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
-    <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind, no_results: t("search.registrations.results.no_matched", search_obj_name: @search_obj_name))) do %>
-      <% @bikes.each do |bike| %>
-        <% cache(["search_results", @search_kind, @result_view, bike]) do %>
-          <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
-        <% end %>
+<div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
+  <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind, no_results: t("search.registrations.results.no_matched", search_obj_name: @search_obj_name))) do %>
+    <% @promoted_bikes&.each do |bike| %>
+      <%# :member keys these fragments apart from the standard list, so a bike that gains/loses member status re-renders (seller_member isn't part of the bike's cache_key) %>
+      <% cache(["search_results", @search_kind, @result_view, bike, :member]) do %>
+        <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
       <% end %>
     <% end %>
-  </div>
-<% end %>
+
+    <% @bikes.each do |bike| %>
+      <% cache(["search_results", @search_kind, @result_view, bike]) do %>
+        <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
 
 <% if @pagy.next %>
   <%= turbo_frame_tag "page_#{@pagy.next}", src: search_marketplace_path(page: @pagy.next, **params.except(:page, :controller, :action).permit!), loading: :lazy do %>
