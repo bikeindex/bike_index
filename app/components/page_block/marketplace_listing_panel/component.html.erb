@@ -1,6 +1,11 @@
 <%= render(UI::Card::Component.new) do %>
   <%# Pill sits above the price on mobile; on desktop it right-aligns across from the price %>
-  <div class="tw:flex tw:flex-col tw:items-start tw:lg:flex-row tw:lg:items-center tw:lg:justify-between">
+  <div
+    class="
+      tw:flex tw:flex-col tw:items-start tw:lg:flex-row tw:lg:items-center
+      tw:lg:justify-between
+    "
+  >
     <h2 class="twtext-color! tw:my-2! tw:text-4xl! tw:font-normal">
       <%= amount_display(@marketplace_listing, currency_name_suffix: true) %>
 
