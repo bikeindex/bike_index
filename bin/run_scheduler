@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+# Memory-cheap replacement for `rake run_scheduler`, used by the review-app cron
+# (config/crontab). Booting Rails every minute is fine on production's dedicated
+# Cloud66 box, but on the shared review-apps host every PR's cron container would
+# spike hundreds of MB once a minute — death by a thousand boots on a 4GB host.
+#
+# `run_scheduler` only enqueues ScheduledJobRunner when one isn't already queued.
+# Rather than reconstruct Sidekiq's payload by hand (fragile across upgrades), we
+# load just the Sidekiq client — not Rails — and use its public API. Sidekiq owns
+# the wire format; we only name the worker and queue.
+#
+# The 59s-frequency half of ScheduledJob.should_enqueue? is intentionally dropped:
+# with a 60s cron it's always true, and reading it would couple us to the private
+# history-hash layout. The dedup half (don't pile up / don't add past max) is kept.
+require "bundler/setup"
+require "sidekiq"
+require "sidekiq/api"
+
+WORKER = "ScheduledJobRunner"
+QUEUE = "high_priority" # ScheduledJobRunner's sidekiq_options queue
+QUEUE_MAX = 200 # ScheduledJob.queue_maximum_addition_size
+
+Sidekiq.configure_client { |config| config.redis = {url: ENV.fetch("REDIS_URL")} }
+
+# Mirror of ScheduledJob.enqueued? via Sidekiq's public API
+queue = Sidekiq::Queue.new(QUEUE)
+already_queued = queue.size > QUEUE_MAX || queue.any? { |job| job.klass == WORKER }
+
+unless already_queued
+  Sidekiq::Client.push("class" => WORKER, "queue" => QUEUE, "retry" => false, "args" => [])
+end
