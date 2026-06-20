@@ -230,10 +230,21 @@ jobs:
       HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
       HONEYBADGER_FRONTEND_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_FRONTEND_API_KEY }}
     steps:
-      - name: Checkout PR head
+      # Deploy runs the PR's own review-app tooling/config. Destroy instead checks
+      # out the default branch: it only tears down by PR number (needs none of the
+      # PR's code), and a PR predating a bin/kamal_review change — e.g. the destroy
+      # subcommand added in #3715 — would otherwise fail with
+      # "bin/kamal_review: No such file or directory" on its stale checkout.
+      - name: Checkout PR head (deploy)
+        if: needs.resolve.outputs.action == 'deploy'
         uses: actions/checkout@v6
         with:
           ref: ${{ needs.resolve.outputs.head_sha }}
+      - name: Checkout default branch (destroy)
+        if: needs.resolve.outputs.action == 'destroy'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -259,8 +270,8 @@ jobs:
       # --- deploy path: the image was built + pushed by the `build` job ---
       - name: Deploy
         if: needs.resolve.outputs.action == 'deploy'
-        # bin/review-app reads the job-level IMAGE_TAG env.
-        run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}"
+        # bin/kamal_review reads the image tag from the job-level IMAGE_TAG env.
+        run: bin/kamal_review deploy --app "${{ needs.resolve.outputs.pr_number }}"
       # A successful deploy (this step is only reached when everything above
       # passed) deletes the `report` job's now-stale failure comment.
       - name: Remove stale deploy-failure comment
@@ -278,7 +289,7 @@ jobs:
 
       - name: Destroy
         if: needs.resolve.outputs.action == 'destroy'
-        run: bin/review-app destroy "${{ needs.resolve.outputs.pr_number }}"
+        run: bin/kamal_review destroy --app "${{ needs.resolve.outputs.pr_number }}"
       - name: Remove review-app label
         if: needs.resolve.outputs.action == 'destroy'
         env:

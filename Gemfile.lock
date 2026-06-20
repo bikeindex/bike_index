@@ -198,7 +198,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    concurrent-ruby (1.3.6)
+    concurrent-ruby (1.3.7)
     connection_pool (3.0.2)
     countries (3.1.0)
       i18n_data (~> 0.11.0)
@@ -387,7 +387,7 @@ GEM
     herb (0.10.1-x86_64-linux-gnu)
     highline (3.1.2)
       reline
-    honeybadger (6.6.2)
+    honeybadger (6.9.0)
       logger
       ostruct
     hotwire-livereload (1.4.1)
@@ -412,9 +412,9 @@ GEM
     http-parser (1.2.3)
       ffi-compiler (>= 1.0, < 2.0)
     http_parser.rb (0.6.0)
-    i18n (1.14.8)
+    i18n (1.15.1)
       concurrent-ruby (~> 1.0)
-    i18n-country-translations (2.3.1)
+    i18n-country-translations (2.3.2)
       i18n (>= 0.9.3, < 3)
       i18n-country-translations-data (~> 1.1)
       railties (>= 7.2, < 9)
@@ -455,7 +455,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (2.19.8)
+    json (2.19.9)
     jwt (3.2.0)
       base64
     knapsack_pro (9.2.2)

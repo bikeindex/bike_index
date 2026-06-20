@@ -1,6 +1,7 @@
 class SessionsController < ApplicationController
   include Sessionable
 
+  before_action :force_html_response
   before_action :skip_if_signed_in, only: [:new, :magic_link]
 
   def new
