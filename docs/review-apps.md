@@ -182,7 +182,7 @@ kamal proxy boot --config-file config/deploy.review.yml
 **TLS is automatic — no cert to manage.** Each PR's `ssl: true` makes kamal-proxy obtain a per-host Let's Encrypt cert (HTTP-01 over port 80) on first deploy and renew it. No wildcard cert, certbot, or DNS-01 — just the wildcard DNS (step 2) and open port 80. (Let's Encrypt's 50 certs/week/domain is ample.)
 
 ### 5. Boot shared accessories
-From a local clone with kamal installed (`gem install kamal -v '~> 2.0'`). Secrets read from `.kamal/secrets`, so set up the `Kamal/BikeIndex Review` 1Password item first (see [Local deploys](#local-deploys)):
+From a local clone with kamal installed (`gem install kamal -v '~> 2.0'`). Secrets read from `.kamal/secrets`, so set up the `Kamal/BikeIndex Review` 1Password item first (see [Deploying locally](#deploying-locally)):
 
 ```bash
 export REVIEW_APP_PR_NUMBER=0          # dummy, just to satisfy the ERB
