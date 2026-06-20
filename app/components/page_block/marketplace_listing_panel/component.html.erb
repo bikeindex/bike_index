@@ -1,4 +1,8 @@
 <%= render(UI::Card::Component.new) do %>
+  <% if @marketplace_listing.seller_member? %>
+    <%= render(UI::Badge::Component.new(text: translation(".member_listing"), title: translation(".member_listing_tooltip"), color: :purple, size: :md)) %>
+  <% end %>
+
   <h2 class="twtext-color! tw:my-2! tw:text-4xl! tw:font-normal">
     <%= amount_display(@marketplace_listing, currency_name_suffix: true) %>
 

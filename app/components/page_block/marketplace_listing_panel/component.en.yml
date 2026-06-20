@@ -7,6 +7,8 @@ en:
         description: Description
         first_posted_at: Posted
         location: Location
+        member_listing: Bike Index member
+        member_listing_tooltip: This seller is a Bike Index member
         price_is_firm_false: price is negotiable
         price_is_firm_true: price is firm
         still_for_sale_at: Still selling at
