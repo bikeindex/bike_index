@@ -10,8 +10,6 @@ Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$RE
 
 Ruby is formatted with the standard gem. Run `bin/lint` to automatically format the code.
 
-**NEVER run `standardrb`/`standard` (or `rubocop`) yourself — always use `bin/lint`.**
-
 ### Code guidelines:
 
 - Code in a functional way. Avoid mutation (side effects) when you can.
