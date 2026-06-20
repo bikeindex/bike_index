@@ -264,19 +264,17 @@
 
     <%= render partial: "/layouts/revised_messages" %>
 
-    <% main_landmark_content = capture do %>
-      <% if current_page_skeleton.present? %>
-        <%= render partial: "/shared/#{current_page_skeleton}" %>
-      <% else %>
-        <%= yield %>
-      <% end %>
-    <% end %>
-
-    <%# The strava_search SPA renders its own <main>, so it opts out of this landmark to avoid nesting %>
-    <% if content_for?(:provides_own_main_landmark) %>
-      <div id="main-content"><%= main_landmark_content %></div>
+    <%# The strava_search SPA (where @strava_search_config is set) renders its own <main>, so skip this landmark to avoid nesting %>
+    <% if @strava_search_config %>
+      <%= yield %>
     <% else %>
-      <main id="main-content"><%= main_landmark_content %></main>
+      <main id="main-content">
+        <% if current_page_skeleton.present? %>
+          <%= render partial: "/shared/#{current_page_skeleton}" %>
+        <% else %>
+          <%= yield %>
+        <% end %>
+      </main>
     <% end %>
 
     <%# grab (and remove) the donation modal if it's there %>
