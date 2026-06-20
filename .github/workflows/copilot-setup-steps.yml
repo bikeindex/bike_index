@@ -52,5 +52,11 @@ jobs:
         with:
           bundler-cache: true
       - run: bundle install
+      # db:seed renders mailers (e.g. parking notifications) whose layout calls
+      # stylesheet_link_tag "email"; without compiled builds/*.css, Sprockets falls
+      # back to compiling the raw .scss with sassc, which isn't bundled (we use
+      # dartsass-rails). Precompile first so the built CSS exists.
+      - name: Precompile assets
+        run: bin/rails assets:precompile
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
