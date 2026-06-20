@@ -2887,9 +2887,9 @@ es:
       marketplace_messages:
       your_registrations: Sus registros
       marketplace: Mercado
-      menu:
+      menu: Menú
       settings_menu:
-      skip_to_main_content:
+      skip_to_main_content: Ir al contenido principal
     application_bikehub:
       accounts_powered_by_bike_index: Las cuentas de BikeHub están gestionadas por
         Bike Index, el principal registro de bicicletas.
