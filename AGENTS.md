@@ -8,7 +8,7 @@ Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$RE
 
 ## Code style
 
-Ruby is formatted with the standard gem. Run `bin/lint` to automatically format the code.
+Ruby is formatted with the standard gem; run `bin/lint` to automatically format the code. `bin/lint` also formats `.html.erb` (via `herb-format`) and JS — CI's `lint_and_scan` job checks each formatter separately, so **after editing `.html.erb`, run `bin/lint`** (pass the file, or no args). Running `standardrb`/`rubocop` alone does not format ERB, and hand-edited templates fail `herb-format --check` even when the Ruby is clean.
 
 ### Code guidelines:
 
