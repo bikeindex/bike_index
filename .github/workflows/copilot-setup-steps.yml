@@ -45,12 +45,18 @@ jobs:
           packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           version: 1.0
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       # Install Ruby dependencies
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
       - run: bundle install
+      # db:seed renders mailers (e.g. parking notifications) whose layout calls
+      # stylesheet_link_tag "email"; without compiled builds/*.css, Sprockets falls
+      # back to compiling the raw .scss with sassc, which isn't bundled (we use
+      # dartsass-rails). Precompile first so the built CSS exists.
+      - name: Precompile assets
+        run: bin/rails assets:precompile
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
