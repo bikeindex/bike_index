@@ -15,7 +15,7 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
 
     it "renders the label and disclaimer" do
       expect(component.text).to include("Review app")
-      expect(component.text).to include("not production")
+      expect(component.text).to include("data is ephemeral")
     end
 
     it "links to the letter_opener outbox with a tooltip" do
