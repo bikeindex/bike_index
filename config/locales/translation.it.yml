@@ -3290,13 +3290,13 @@ it:
       sticker_id:
       student_id:
       third_color:
-      this:
       unknown_serial:
       unknown_year:
       unsure_or_unknown:
       when_was_it_stolen:
       where_was_it_stolen:
       zipcode: Codice postale
+      electric_motorized:
   organized:
     ambassador_dashboards:
       getting_started:
@@ -3854,39 +3854,6 @@ it:
       sign_up_a_shop_or_organization:
       terms_and_conditions:
       vendor_terms:
-    footer_revised:
-      about:
-      ambassadors:
-      api_documentation:
-      bike_index:
-      bike_manufacturer_list:
-      bike_shops:
-      blog:
-      change_preferred_language:
-      cities:
-      community_groups:
-      copyright_html:
-      donate:
-      faq:
-      help:
-      how_to_get_your_stolen_bike_back:
-      language:
-      law_enforcement:
-      press_inquiries:
-      privacy_policy:
-      protect_your_bike:
-      resources:
-      schools_and_universities:
-      security:
-      stolen_bike_recoveries:
-      store:
-      support_us:
-      terms_and_conditions:
-      vendor_terms:
-      where_we_are:
-      who_we_serve:
-      strava_search:
-      dev_and_design_resources:
     form_well_footer_save:
       save_changes:
     header_nav:
@@ -4269,6 +4236,39 @@ it:
         letter_opener_link:
         letter_opener_tooltip:
         pr_link:
+      footer:
+        about:
+        ambassadors: Ambasciatori
+        api_documentation:
+        bike_index: Bike Index
+        bike_manufacturer_list:
+        bike_shops: Bicicletta
+        blog: Blog
+        change_preferred_language:
+        cities: Città
+        community_groups: Gruppi comunitari
+        copyright_html:
+        dev_and_design_resources:
+        donate:
+        faq:
+        help:
+        how_to_get_your_stolen_bike_back:
+        language:
+        law_enforcement:
+        press_inquiries:
+        privacy_policy:
+        protect_your_bike:
+        resources: Risorse
+        schools_and_universities:
+        security:
+        stolen_bike_recoveries:
+        store:
+        strava_search:
+        support_us:
+        terms_and_conditions: termini e condizioni
+        vendor_terms:
+        where_we_are:
+        who_we_serve:
     emails:
       partials:
         bike_box:

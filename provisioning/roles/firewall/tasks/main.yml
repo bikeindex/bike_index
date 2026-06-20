@@ -15,7 +15,9 @@
     port: "{{ item.port }}"
     proto: "{{ item.proto }}"
   loop:
-    - rule: 'limit'
+    # 'allow', not 'limit': ufw's `limit` drops an IP past 6 SSH conns/30s, which
+    # a Kamal deploy exceeds — broke the workflow's ssh-keyscan. SSH is key-only.
+    - rule: 'allow'
       port: '22'
       proto: 'tcp'
     - rule: 'allow'
@@ -24,6 +26,15 @@
     - rule: 'allow'
       port: '443'
       proto: 'tcp'
+
+# Drop the old `limit` rule on pre-existing hosts; UFW matches it first and
+# would shadow the `allow` above. No-op once gone.
+- name: Remove legacy rate-limited SSH rule
+  community.general.ufw:
+    rule: 'limit'
+    port: '22'
+    proto: 'tcp'
+    delete: true
 
 - name: Enable ufw
   community.general.ufw:

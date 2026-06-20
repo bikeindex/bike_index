@@ -4234,13 +4234,13 @@ nb:
       sticker_id: Klistremerke-ID
       student_id: Student ID
       third_color: Tredje farge
-      this: dette
       unknown_serial: Ukjent serie
       unknown_year: Ukjent årstall
       unsure_or_unknown: Usikker eller ukjent
       when_was_it_stolen: Når ble den stjålet?
       where_was_it_stolen: Hvor ble det stjålet?
       zipcode: postnummer
+      electric_motorized: Elektrisk (motorisert)
   organized:
     ambassador_dashboards:
       getting_started:
@@ -4944,40 +4944,6 @@ nb:
       sign_up_a_shop_or_organization: Registrer en butikk eller organisasjon
       terms_and_conditions: vilkår og betingelser
       vendor_terms: leverandørens vilkår
-    footer_revised:
-      about: Om
-      ambassadors: Ambassadører
-      api_documentation: API-dokumentasjon
-      bike_index: Sykkelindeks
-      bike_manufacturer_list: Sykkelprodusentliste
-      bike_shops: Sykkelbutikker
-      blog: Blogg
-      change_preferred_language: endre foretrukket språk
-      cities: Byer
-      community_groups: Fellesskapsgrupper
-      copyright_html: "%{current_year} © Bike Index, en 501(c)(3) nonprofit - EIN
-        81-4296194"
-      donate: Donere
-      faq: FAQ
-      help: Hjelp
-      how_to_get_your_stolen_bike_back: Få tilbake den stjålne sykkelen
-      language: Språk
-      law_enforcement: Rettshåndhevelse
-      press_inquiries: Pressehenvendelser
-      privacy_policy: Personvernerklæring
-      protect_your_bike: Beskytt sykkelen din
-      resources: Ressurser
-      schools_and_universities: Skoler og universiteter
-      security: Sikkerhet
-      stolen_bike_recoveries: Gjenvinning av stjålne sykkel
-      store: butikk
-      support_us: Støtt oss
-      terms_and_conditions: vilkår og betingelser
-      vendor_terms: leverandørens vilkår
-      where_we_are: Hvor vi er
-      who_we_serve: Hvem vi tjener
-      strava_search: Strava-søk og -oppdatering
-      dev_and_design_resources: Utviklings- og designressurser
     form_well_footer_save:
       save_changes: Lagre endringer
     header_nav:
@@ -5372,6 +5338,40 @@ nb:
         letter_opener_link: e-post utboks
         letter_opener_tooltip: Se e-posten som ble sendt av denne anmeldelsesappen
         pr_link: PR-nummer %{number}
+      footer:
+        about: Om
+        ambassadors: Ambassadører
+        api_documentation: API-dokumentasjon
+        bike_index: Sykkelindeks
+        bike_manufacturer_list: Sykkelprodusentliste
+        bike_shops: Sykkelbutikker
+        blog: Blogg
+        change_preferred_language: endre foretrukket språk
+        cities: Byer
+        community_groups: Fellesskapsgrupper
+        copyright_html: "%{current_year} © Bike Index, en 501(c)(3) nonprofit - EIN
+          81-4296194"
+        dev_and_design_resources: Utviklings- og designressurser
+        donate: Donere
+        faq: FAQ
+        help: Hjelp
+        how_to_get_your_stolen_bike_back: Få tilbake den stjålne sykkelen
+        language: Språk
+        law_enforcement: Rettshåndhevelse
+        press_inquiries: Pressehenvendelser
+        privacy_policy: Personvernerklæring
+        protect_your_bike: Beskytt sykkelen din
+        resources: Ressurser
+        schools_and_universities: Skoler og universiteter
+        security: Sikkerhet
+        stolen_bike_recoveries: Gjenvinning av stjålne sykkel
+        store: butikk
+        strava_search: Strava-søk og -oppdatering
+        support_us: Støtt oss
+        terms_and_conditions: vilkår og betingelser
+        vendor_terms: leverandørens vilkår
+        where_we_are: Hvor vi er
+        who_we_serve: Hvem vi tjener
     emails:
       partials:
         bike_box:

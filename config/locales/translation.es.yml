@@ -3251,13 +3251,13 @@ es:
       sticker_id:
       student_id:
       third_color:
-      this:
       unknown_serial:
       unknown_year:
       unsure_or_unknown:
       when_was_it_stolen:
       where_was_it_stolen:
       zipcode:
+      electric_motorized:
   organized:
     ambassador_dashboards:
       getting_started:
@@ -3817,40 +3817,6 @@ es:
       sign_up_a_shop_or_organization: Inscribir una tienda o organización
       terms_and_conditions: condiciones generales
       vendor_terms: condiciones de venta
-    footer_revised:
-      about: Acerca
-      ambassadors: Embajadores
-      api_documentation: Documentación API
-      bike_index: Bike Index
-      bike_manufacturer_list: Lista de fabricantes de bicicletas
-      bike_shops: Tiendas de bicicletas
-      blog: Blog
-      change_preferred_language: cambiar el idioma preferido
-      cities: Ciudades
-      community_groups: Grupos comunitarios
-      copyright_html: "%{current_year} &copy; Bike Index, una organización sin ánimo
-        de lucro 501(c)(3) - EIN 81-4296194"
-      donate: Donar
-      faq: PREGUNTAS FRECUENTES
-      help: Ayuda
-      how_to_get_your_stolen_bike_back: Recupera su bicicleta
-      language: Idioma
-      law_enforcement: Fuerzas y Cuerpos de Seguridad
-      press_inquiries: Consultas de prensa
-      privacy_policy: Política de privacidad
-      protect_your_bike: Registre su bicicleta
-      resources: Recursos
-      schools_and_universities: Escuelas y universidades
-      security: Seguridad
-      stolen_bike_recoveries: Recuperación de bicicletas robadas
-      store: Tienda
-      support_us: Apóyanos
-      terms_and_conditions: condiciones generales
-      vendor_terms: condiciones de venta
-      where_we_are: Dónde estamos
-      who_we_serve: A quién servimos
-      strava_search: Búsqueda y actualización de Strava
-      dev_and_design_resources: Recursos de desarrollo y diseño
     form_well_footer_save:
       save_changes:
     header_nav:
@@ -4187,6 +4153,40 @@ es:
         letter_opener_link:
         letter_opener_tooltip:
         pr_link:
+      footer:
+        about: Acerca
+        ambassadors: Embajadores
+        api_documentation: Documentación API
+        bike_index: Bike Index
+        bike_manufacturer_list: Lista de fabricantes de bicicletas
+        bike_shops: Tiendas de bicicletas
+        blog: Blog
+        change_preferred_language: cambiar el idioma preferido
+        cities: Ciudades
+        community_groups: Grupos comunitarios
+        copyright_html: "%{current_year} &copy; Bike Index, una organización sin ánimo
+          de lucro 501(c)(3) - EIN 81-4296194"
+        dev_and_design_resources: Recursos de desarrollo y diseño
+        donate: Donar
+        faq: PREGUNTAS FRECUENTES
+        help: Ayuda
+        how_to_get_your_stolen_bike_back: Recupera su bicicleta
+        language: Idioma
+        law_enforcement: Fuerzas y Cuerpos de Seguridad
+        press_inquiries: Consultas de prensa
+        privacy_policy: Política de privacidad
+        protect_your_bike: Registre su bicicleta
+        resources: Recursos
+        schools_and_universities: Escuelas y universidades
+        security: Seguridad
+        stolen_bike_recoveries: Recuperación de bicicletas robadas
+        store: Tienda
+        strava_search: Búsqueda y actualización de Strava
+        support_us: Apóyanos
+        terms_and_conditions: condiciones generales
+        vendor_terms: condiciones de venta
+        where_we_are: Dónde estamos
+        who_we_serve: A quién servimos
     emails:
       partials:
         bike_box:
