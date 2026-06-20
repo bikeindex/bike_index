@@ -79,11 +79,15 @@ jobs:
     name: "Run tests"
     runs-on: ubuntu-latest
     services:
-      # Service images pull from AWS's public Docker Hub mirror — direct pulls
-      # from registry-1.docker.io intermittently time out on Actions runners
-      # (3 retries, then the job fails at "Initialize containers").
+      # Service images pull from Google's pull-through cache of Docker Hub's
+      # official images. Anonymous pulls from Docker Hub (and from AWS's
+      # public.ecr.aws mirror) are rate-limited per source IP; Actions runners
+      # share egress IPs, so on a busy push the parallel shards exhaust the
+      # quota and the job fails at "Initialize containers" with
+      # "toomanyrequests: Rate exceeded". mirror.gcr.io serves the identical
+      # official images without imposing that limit, and needs no credentials.
       postgres:
-        image: public.ecr.aws/docker/library/postgres:16-alpine
+        image: mirror.gcr.io/library/postgres:16-alpine
         ports:
           - 5432:5432
         env:
@@ -106,7 +110,7 @@ jobs:
       redis:
         # 7-alpine: pinned to match the review-app host's redis:7 accessory, and
         # the alpine variant is a much smaller pull than debian-based latest.
-        image: public.ecr.aws/docker/library/redis:7-alpine
+        image: mirror.gcr.io/library/redis:7-alpine
         ports:
           - 6379:6379
         options: --entrypoint redis-server
