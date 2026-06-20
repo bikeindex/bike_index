@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -162,7 +162,7 @@ jobs:
           app-id: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
           private-key: ${{ secrets.TRANSLATIONS_SYNC_APP_PRIVATE_KEY }}
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ steps.translations_token.outputs.token || github.token }}
       # Install Ruby dependencies
