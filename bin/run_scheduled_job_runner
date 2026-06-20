@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
-# Memory-cheap replacement for `rake run_scheduler`, used by the review-app cron
-# (config/crontab). Booting Rails every minute is fine on production's dedicated
-# Cloud66 box, but on the shared review-apps host every PR's cron container would
-# spike hundreds of MB once a minute — death by a thousand boots on a 4GB host.
+# Cron entrypoint (every minute — see config/crontab) that enqueues
+# ScheduledJobRunner when one isn't already queued. Loading just the Sidekiq
+# client instead of all of Rails keeps each run cheap: a full Rails boot every
+# minute is needless memory pressure, and on the shared review-apps host stacked
+# boots OOM a 4GB box.
 #
-# `run_scheduler` only enqueues ScheduledJobRunner when one isn't already queued.
 # Rather than reconstruct Sidekiq's payload by hand (fragile across upgrades), we
-# load just the Sidekiq client — not Rails — and use its public API. Sidekiq owns
-# the wire format; we only name the worker and queue.
+# use its public client API. Sidekiq owns the wire format; we only name the
+# worker and queue.
 #
 # The 59s-frequency half of ScheduledJob.should_enqueue? is intentionally dropped:
 # with a 60s cron it's always true, and reading it would couple us to the private

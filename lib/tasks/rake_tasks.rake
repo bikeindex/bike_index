@@ -4,10 +4,6 @@ task enqueue_newsletter: :environment do
   end
 end
 
-task run_scheduler: :environment do
-  ScheduledJobRunner.perform_async if ScheduledJobRunner.should_enqueue?
-end
-
 task read_logged_searches: :environment do
   # Throw an error if ripgrep isn't installed
   abort("ripgrep (rg) is not installed") unless system("rg --version > /dev/null 2>&1")

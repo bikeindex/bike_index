@@ -110,7 +110,7 @@ env:
     REDIS_RACK_ATTACK_URL: "<%= redis_url %>"
 
     # Scheduled jobs that can't work in review apps (run by config/crontab's
-    # run_scheduler), skipped via ApplicationJob's SIDEKIQ_SKIP_<job> mechanism.
+    # bin/run_scheduled_job_runner), skipped via ApplicationJob's SIDEKIQ_SKIP_<job> mechanism.
     # - exchange-rate API uses placeholder review-app secrets, so its response
     #   has no `rates` key (KeyError).
     # - manufacturer-logo job reaches the external img.logo.dev, which the

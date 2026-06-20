@@ -60,15 +60,15 @@ RSpec.describe ScheduledJobRunner, type: :lib do
     end
   end
 
-  describe "bin/run_scheduler" do
-    # The review-app cron runs this script instead of `rake run_scheduler` to skip
-    # booting Rails. It enqueues described_class via the Sidekiq client, so it must
-    # stay equivalent to perform_async and honor the enqueued? dedup guard.
+  describe "bin/run_scheduled_job_runner" do
+    # bin/run_scheduled_job_runner is the cron entrypoint that enqueues described_class
+    # via the Sidekiq client without booting Rails, so it must stay equivalent to
+    # perform_async and honor the enqueued? dedup guard.
     let(:queue) { Sidekiq::Queue.new("high_priority") }
     let(:comparable) { ->(job) { job.item.slice("class", "queue", "retry", "args") } }
 
-    def run_scheduler!
-      silence_warnings { load Rails.root.join("bin", "run_scheduler").to_s }
+    def run_scheduled_job_runner!
+      silence_warnings { load Rails.root.join("bin", "run_scheduled_job_runner").to_s }
     end
 
     around { |example| Sidekiq::Testing.disable! { example.run } }
@@ -76,7 +76,7 @@ RSpec.describe ScheduledJobRunner, type: :lib do
     after { Sidekiq.redis { |r| r.del("queue:high_priority") } }
 
     it "enqueues described_class, matching perform_async" do
-      run_scheduler!
+      run_scheduled_job_runner!
 
       expect(queue.size).to eq 1
       enqueued = queue.first
@@ -92,7 +92,7 @@ RSpec.describe ScheduledJobRunner, type: :lib do
       described_class.perform_async
       expect(described_class.should_enqueue?).to be_falsey
 
-      run_scheduler!
+      run_scheduled_job_runner!
       expect(queue.size).to eq 1
     end
   end
