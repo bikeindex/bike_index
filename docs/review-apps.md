@@ -79,7 +79,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 
 | Schedule | Task |
 |---|---|
-| `*/1 * * * *` | `run_scheduler` — enqueues due `ScheduledJobRunner` work |
+| `*/1 * * * *` | `bin/run_scheduled_job_runner` — enqueues due `ScheduledJobRunner` work |
 | `*/5 * * * *` | `pghero:capture_query_stats` |
 | `*/30 * * * *` | `read_logged_searches` (needs `ripgrep`, installed in the image) |
 
