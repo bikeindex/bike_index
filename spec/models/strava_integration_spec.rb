@@ -163,6 +163,25 @@ RSpec.describe StravaIntegration, type: :model do
     end
   end
 
+  describe "update_from_stats" do
+    let(:strava_integration) { FactoryBot.create(:strava_integration, athlete_activity_count: 5) }
+    let(:stats) do
+      {"all_ride_totals" => {"count" => 100},
+       "all_run_totals" => {"count" => 40},
+       "all_swim_totals" => {"count" => 10}}
+    end
+
+    it "updates athlete_activity_count" do
+      strava_integration.update_from_stats(stats)
+      expect(strava_integration.reload.athlete_activity_count).to eq(150)
+    end
+
+    it "no-ops on blank stats" do
+      strava_integration.update_from_stats(nil)
+      expect(strava_integration.reload.athlete_activity_count).to eq(5)
+    end
+  end
+
   describe "gear_ids_to_request" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
