@@ -5276,8 +5276,6 @@ it:
       viewing_our_streamlined_page: Al momento stai visualizzando la nostra pagina
         di registrazione semplificata per i negozi di biciclette, che è quella che
         ti consigliamo di utilizzare
-    shops_map:
-      map_of_partner_locations: Mappa delle sedi dei partner
     user_general_alert:
       add_location_theft_bike_title_html: Aggiungere il luogo del furto del vostro
         <strong>%{bike_title}</strong>
@@ -5298,6 +5296,8 @@ it:
       bike: Bicicletta
       recovered_date: recuperato %{date}
       translated_from_english: tradotto dall'inglese
+    shops_map:
+      map_of_partner_locations: Mappa delle sedi dei partner
   stolen:
     index:
       ambassador: ambasciatore

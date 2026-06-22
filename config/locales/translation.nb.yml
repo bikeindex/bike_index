@@ -5023,8 +5023,6 @@ nb:
       use_lightspeed_retail_pos: Bruker du Lightspeed Retail POS?
       viewing_our_streamlined_page: Du ser for øyeblikket på vår strømlinjeformede
         Bike Shop-registreringsside, som er det vi anbefaler å bruke
-    shops_map:
-      map_of_partner_locations: Kart over partnerlokasjoner
     user_general_alert:
       add_location_theft_bike_title_html: Legg til stedet for tyveriet av din <strong>%{bike_title}</strong>
       add_photo_theft_bike_title_html: Legg til et bilde på <strong>%{bike_title}</strong>
@@ -5045,6 +5043,8 @@ nb:
       bike: Sykkel
       recovered_date: gjenopprettet %{date}
       translated_from_english: oversatt fra engelsk
+    shops_map:
+      map_of_partner_locations: Kart over partnerlokasjoner
   stolen:
     index:
       ambassador: ambassadør

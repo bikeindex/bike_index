@@ -5257,8 +5257,6 @@ es:
       use_lightspeed_retail_pos: "¿Utilizas el sistema POS Lightspeed Retail?"
       viewing_our_streamlined_page: Actualmente estás viendo nuestra página de registro
         simplificada de la tienda de bicicletas, que es la que recomendamos usar.
-    shops_map:
-      map_of_partner_locations: Mapa de ubicaciones de socios
     user_general_alert:
       add_location_theft_bike_title_html: Agregue la ubicación del robo de su <strong>%{bike_title}</strong>
       add_photo_theft_bike_title_html: Agrega una foto a tu <strong>%{bike_title}</strong>
@@ -5280,6 +5278,8 @@ es:
       bike: Bicicleta
       recovered_date: recuperado %{date}
       translated_from_english: traducido del inglés
+    shops_map:
+      map_of_partner_locations: Mapa de ubicaciones de socios
   stolen:
     index:
       ambassador: embajador
