@@ -76,15 +76,14 @@
 
     &:hover,
     &:active,
-    &.active,
-    &:focus-visible {
+    &.active {
       text-decoration: none;
       border-color: $link-color;
       color: $link-color;
     }
 
-    // It's a <button> now (keyboard-operable); the blue circle above is the
-    // focus indicator, so drop the native focus ring rather than double up.
+    // It's a <button> now (keyboard-operable), but main's ? showed no focus ring
+    // and no focus color change — suppress the native ring so it matches main.
     &:focus {
       outline: none;
     }
