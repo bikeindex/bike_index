@@ -2598,7 +2598,7 @@ button.close {
 .btn:focus,.btn-secondary:focus {
     outline: thin dotted #333;
     outline: 5px auto -webkit-focus-ring-color;
-    outline-offset: 0px
+    outline-offset: -2px
 }
 
 .btn.active,.active.btn-secondary,.btn:active,.btn-secondary:active {
