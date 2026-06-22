@@ -8,7 +8,7 @@ Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$RE
 
 ## Code style
 
-Ruby is formatted with the standard gem. Run `bin/lint` to automatically format the code.
+Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't use other formatters.
 
 ### Code guidelines:
 
@@ -19,6 +19,7 @@ Ruby is formatted with the standard gem. Run `bin/lint` to automatically format 
 - Omit named arguments' values from hashes (ie prefer `{x:, y:}` instead of `{x: x, y: y}`)
 - Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
 - prefer un-abbreviated variable names
+- Keep comments pithy — often they aren't necessary. Explain *why* for a future reader; don't narrate the change that introduced the code
 
 ## Testing
 

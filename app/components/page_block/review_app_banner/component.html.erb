@@ -1,0 +1,26 @@
+<%#
+  z-index sits above the navbar ($zindex-navbar-fixed: 1030) so the
+  letter_opener tooltip renders over it instead of behind when it flips down.
+%>
+
+<div
+  class="
+    tw:relative tw:z-[1040] tw:border-b tw:border-[#1e881e] tw:bg-[#40ff40]
+    tw:px-4 tw:py-2 tw:text-center tw:font-semibold tw:text-black
+  "
+>
+  <%= translation(".label") %>
+  <% if @pr_number %>
+    &middot;
+    <a class="tw:underline" href="<%= pr_url %>"><%= pr_link_text %></a>
+  <% end %>
+  &middot; <%= translation(".disclaimer") %> &middot;
+  <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:font-normal tw:underline" %>
+  <%= render(UI::Tooltip::Component.new(text: translation(".letter_opener_tooltip"))) do |tooltip| %>
+    <% tooltip.with_tooltip_button(
+      class: "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
+        "tw:bg-[#1e881e] tw:text-white tw:hover:bg-[#166016] tw:text-2xs tw:font-bold tw:cursor-help " \
+        "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+    ) { "?" } %>
+  <% end %>
+</div>

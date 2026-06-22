@@ -195,10 +195,14 @@ $mainmenu-open-zindex: 10;
       z-index: $mainmenu-open-zindex + 3;
       background-color: $black-off;
 
-      a {
+      button {
         font-size: 36px;
+        font-family: inherit;
+        line-height: inherit;
         display: block;
         cursor: pointer;
+        border: 0;
+        padding: 0;
         color: $gray;
         background: $primary-nav-background;
         transition: transform 100ms linear;

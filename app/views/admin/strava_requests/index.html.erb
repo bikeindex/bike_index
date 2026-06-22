@@ -54,14 +54,36 @@
       <%= link_to "All statuses", url_for(sortable_search_params.merge(search_response_status: nil)), class: "dropdown-item #{params[:search_response_status].present? ? '' : 'active'}" %>
       <%= link_to "Pending or successful", url_for(sortable_search_params.merge(search_response_status: "pending_or_success")), class: "dropdown-item #{params[:search_response_status] == 'pending_or_success' ? 'active' : ''}" %>
       <%= link_to "Not successful", url_for(sortable_search_params.merge(search_response_status: "not_successful")), class: "dropdown-item #{params[:search_response_status] == 'not_successful' ? 'active' : ''}" %>
-      <%= link_to "Only Binx response", url_for(sortable_search_params.merge(search_response_status: "only_binx_response")), class: "dropdown-item #{params[:search_response_status] == 'only_binx_response' ? 'active' : ''}" %>
-      <%= link_to "Only Strava Response (NOT Binx response)", url_for(sortable_search_params.merge(search_response_status: "only_strava_response")), class: "dropdown-item #{params[:search_response_status] == 'only_strava_response' ? 'active' : ''}" %>
+      <%= link_to "Errors and failures", url_for(sortable_search_params.merge(search_response_status: "errors_and_failures")), class: "dropdown-item #{params[:search_response_status] == 'errors_and_failures' ? 'active' : ''}" %>
 
       <div class="dropdown-divider"></div>
 
       <% StravaRequest::RESPONSE_STATUS_ENUM.each_key do |kind| %>
         <%= link_to kind.to_s.humanize, url_for(sortable_search_params.merge(search_response_status: kind)), class: "dropdown-item #{params[:search_response_status] == kind.to_s ? 'active' : ''}" %>
       <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown dropleft">
+    <a
+      class="nav-link dropdown-toggle <%= params[:search_responder].present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if params[:search_responder].blank? %>
+        Any responder
+      <% else %>
+        <%= params[:search_responder].humanize %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "Any responder", url_for(sortable_search_params.merge(search_responder: nil)), class: "dropdown-item #{params[:search_responder].present? ? '' : 'active'}" %>
+      <%= link_to "Only Binx response", url_for(sortable_search_params.merge(search_responder: "only_binx_response")), class: "dropdown-item #{params[:search_responder] == 'only_binx_response' ? 'active' : ''}" %>
+      <%= link_to "Only Strava Response", url_for(sortable_search_params.merge(search_responder: "only_strava_response")), class: "dropdown-item #{params[:search_responder] == 'only_strava_response' ? 'active' : ''}" %>
     </div>
   </li>
 <% end %>

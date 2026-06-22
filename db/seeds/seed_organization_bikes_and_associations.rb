@@ -42,7 +42,7 @@ owner_emails = %w[
 creator = BikeServices::Creator.new
 
 def org_bike_params(owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id, manufacturer_id: nil)
-  manufacturer_id ||= Manufacturer.frame_makers.pluck(:id).sample
+  manufacturer_id ||= SeedHelpers.weighted_frame_maker_id
   {
     cycle_type: "bike",
     propulsion_type: "foot-pedal",
@@ -105,8 +105,7 @@ end
     region_record_id: ca_state&.id,
     country_id: us&.id,
     skip_geocoding: true,
-    message: "Repeat notification - impounding bike from #{loc[:street]}",
-    delivery_status: "email_success"
+    message: "Repeat notification - impounding bike from #{loc[:street]}"
   )
   pn.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
   ProcessParkingNotificationJob.new.perform(pn.id)

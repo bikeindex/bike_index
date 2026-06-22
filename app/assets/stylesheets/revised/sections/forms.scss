@@ -29,13 +29,19 @@ a.optional-form-block {
   cursor: pointer;
   color: $gray;
 
-  &:hover {
+  // Keyboard focus matches hover (blue link + circle) instead of a native ring
+  &:hover,
+  &:focus-visible {
     color: $link-color;
     text-decoration: none;
 
     .context-display-help {
       color: $link-color;
     }
+  }
+
+  &:focus {
+    outline: none;
   }
 }
 

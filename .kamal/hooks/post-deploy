@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Notify Honeybadger of the deploy by running the `trigger_honeybadger_deploy`
+# rake task INSIDE the freshly-deployed container, via `kamal app exec`. The
+# container is the only place with all of: the gem bundle, a bootable Rails
+# runtime (DB/Redis), and the HONEYBADGER_* keys — so kamal on the runner needs
+# no bundle, it just `docker exec`s the task. (`kamal app exec` takes no deploy
+# lock, so this is safe to call from a post-deploy hook.)
+#
+# - `--roles web`: run once, not on every role (web/worker/cron).
+# - `sh -c '...'`: kamal docker-execs the command directly (no shell), so the
+#   inline DEPLOY_SHA assignment must run inside an explicit shell.
+# - DEPLOY_SHA: the container has no .git, so the revision is computed here (the
+#   runner / local host has the checkout) and passed in; the task falls back to
+#   git for bundled/local runs.
+# Best-effort: this must NEVER fail the deploy.
+revision="$(git rev-parse HEAD 2>/dev/null || echo "$KAMAL_VERSION")"
+
+# KAMAL_CONFIG: same override knob as bin/kamal_review — this hook fires for every
+# kamal deploy in the repo, so don't bake in the review-apps config.
+kamal app exec --reuse --roles web --config-file "${KAMAL_CONFIG:-config/deploy.review.yml}" \
+  "sh -c 'DEPLOY_SHA=$revision bin/rails trigger_honeybadger_deploy'" \
+  || echo "Honeybadger deploy notification skipped/failed (non-fatal)"
+exit 0

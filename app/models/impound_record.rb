@@ -49,6 +49,7 @@ class ImpoundRecord < ApplicationRecord
 
   validates_presence_of :user_id
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
+  validate :impounded_at_must_be_valid
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
@@ -122,10 +123,18 @@ class ImpoundRecord < ApplicationRecord
 
   def impounded_at_with_timezone=(val)
     self.impounded_at = Binxtils::TimeParser.parse(val, timezone)
+  rescue ArgumentError
+    @impounded_at_invalid = val
   end
 
   def impounded_at_with_timezone
     impounded_at
+  end
+
+  def impounded_at_must_be_valid
+    return if @impounded_at_invalid.blank?
+
+    errors.add(:impounded_at, "'#{@impounded_at_invalid}' is not a valid date")
   end
 
   # Non-organizations don't "impound" bikes, they "find" them

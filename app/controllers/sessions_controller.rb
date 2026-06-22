@@ -1,6 +1,7 @@
 class SessionsController < ApplicationController
   include Sessionable
 
+  before_action :force_html_response
   before_action :skip_if_signed_in, only: [:new, :magic_link]
 
   def new
@@ -65,7 +66,7 @@ class SessionsController < ApplicationController
   def destroy
     remove_session
     if params[:partner] == "bikehub"
-      redirect_to(bikehub_website_url, allow_other_host: true) && return
+      redirect_to(bikehub_url, allow_other_host: true) && return
     elsif params[:redirect_location].present?
       if params[:redirect_location].match?("new_user")
         redirect_to(new_user_path, notice: "Logged out!") && return

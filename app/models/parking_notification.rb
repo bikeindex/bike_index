@@ -8,7 +8,6 @@
 #  id                    :integer          not null, primary key
 #  accuracy              :float
 #  city                  :string
-#  delivery_status       :string
 #  image                 :text
 #  image_processing      :boolean          default(FALSE), not null
 #  internal_notes        :text
@@ -54,6 +53,8 @@ class ParkingNotification < ActiveRecord::Base
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
   MAX_PER_PAGE = 250
+  # Marker delivery_error for notifications backfilled from the legacy delivery_status column
+  PRE_TRACKING_ERROR = "Failed pre-notification tracking"
   enum :kind, KIND_ENUM
   enum :status, STATUS_ENUM
   enum :retrieved_kind, RETRIEVED_KIND_ENUM
@@ -63,6 +64,7 @@ class ParkingNotification < ActiveRecord::Base
   belongs_to :impound_record
   belongs_to :initial_record, class_name: "ParkingNotification"
   belongs_to :retrieved_by, class_name: "User"
+  has_many :notifications, as: :notifiable
   has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
@@ -83,12 +85,12 @@ class ParkingNotification < ActiveRecord::Base
   scope :initial_records, -> { where(initial_record_id: nil) }
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
   scope :with_impound_record, -> { where.not(impound_record_id: nil) }
-  scope :email_success, -> { where(delivery_status: "email_success") }
   scope :send_email, -> { where.not(unregistered_bike: true) }
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
   scope :not_unregistered_bike, -> { where(unregistered_bike: false) }
   scope :first_notification, -> { where(repeat_number: 0) }
   scope :not_replaced, -> { where.not(status: "replaced") }
+  scope :email_success, -> { joins(:notifications).merge(Notification.delivery_success).distinct }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -174,7 +176,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def email_success?
-    delivery_status == "email_success"
+    notifications.delivery_success.exists?
   end
 
   def initial_record?
@@ -346,7 +348,7 @@ class ParkingNotification < ActiveRecord::Base
       return self unless active?
 
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
-        "location_from_address", "retrieval_link_token", "delivery_status")
+        "location_from_address", "retrieval_link_token")
         .merge(new_attrs)
       attrs["initial_record_id"] ||= id
       ParkingNotification.create!(attrs)

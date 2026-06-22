@@ -5,6 +5,12 @@
 <%= f.hidden_field :creation_organization_id %>
 <%= f.hidden_field :embeded, value: true %>
 
+<script>
+  window.cycleTypesPedals = <%= CycleType::PEDAL.to_json.html_safe %>;
+  window.cycleTypesAlwaysMotorized = <%= CycleType::ALWAYS_MOTORIZED.to_json.html_safe %>;
+  window.cycleTypesNeverMotorized = <%= CycleType::NEVER_MOTORIZED.to_json.html_safe %>;
+</script>
+
 <div class="input-group">
   <div class="control-group">
     <%= f.label :serial_number %>
@@ -24,7 +30,7 @@
 
   <div class="optional-checkbox">
     <label style="margin-top: 0.25em">
-      <%= check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1 %>
+      <%= check_box_tag :has_no_serial, true, @bike.serial_unknown? %>
       <%= t(".unknown_serial") %>
     </label>
   </div>
@@ -67,7 +73,7 @@
 
   <div class="optional-checkbox">
     <label style="margin-top: 0.75em">
-      <input id="bike_unknown_year" type="checkbox" tabindex="-1">
+      <input id="bike_unknown_year" type="checkbox">
       <%= t(".unknown_year") %>
     </label>
   </div>
@@ -101,7 +107,6 @@
     data-target="#secondary-color"
     data-toggle="#rm-secondary"
     href="#"
-    tabindex="-1"
   >
     <%= t(".add_a_color") %>
   </a>
@@ -112,7 +117,6 @@
     data-target="#secondary-color"
     data-toggle="#add-secondary"
     href="#"
-    tabindex="-1"
   >
     <%= t(".remove_color") %>
   </a>
@@ -132,7 +136,6 @@
       data-target="#tertiary-color"
       data-toggle="#rm-tertiary"
       href="#"
-      tabindex="-1"
     >
       <%= t(".add_a_color") %>
     </a>
@@ -143,7 +146,6 @@
       data-target="#tertiary-color"
       data-toggle="#add-tertiary"
       href="#"
-      tabindex="-1"
     >
       <%= t(".remove_color") %>
     </a>
@@ -347,8 +349,16 @@
 
   <div class="submit-registration">
     <%= submit_tag t(".register"), class: "button-submit" %>
-    <span class="what-you-register"><%= t(".this") %></span>
-    <%= select(:bike, :cycle_type, CycleType.select_options, { required: true }) %>
+
+    <div class="vehicle-select special-select-single">
+      <%= f.select :cycle_type, CycleType.select_options(traditional_bike: true), {}, {required: true} %>
+
+      <label id="motorizedWrapper">
+        <%= check_box_tag :propulsion_type_motorized, true, @bike.motorized? %>
+        <strong>⚡️</strong>
+        <%= t(".electric_motorized") %>
+      </label>
+    </div>
 
     <div class="please-wait-text less-strong"><%= t(".please_wait") %></div>
   </div>

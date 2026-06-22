@@ -27,7 +27,7 @@ module API
       end
 
       def authenticate_notification_permission
-        unless params[:access_token] == ENV["NOTIFICATIONS_API_KEY"]
+        unless secure_compare?(params[:access_token], ENV["NOTIFICATIONS_API_KEY"])
           render(json: "Not authorized", status: :unauthorized) && return
         end
       end

@@ -15,6 +15,13 @@ RSpec.describe "Bike search", :js, type: :system do
   let!(:red_non_stolen_bike) { FactoryBot.create(:bike, primary_frame_color: red) }
 
   before do
+    # Clear first: the autocomplete cache (autc:test:*) lives in a Redis DB shared
+    # across :js examples and survives 600s, but load_all never invalidates it. A
+    # stale "red"/"blue" cache from an earlier spec makes the combobox return no
+    # color match, leaving only the synthetic "Search for X" free-text option -
+    # which search_color_and_submit then clicks, turning the search into a text
+    # query that matches nothing and renders an empty results frame.
+    Autocomplete::Loader.clear_redis
     Autocomplete::Loader.load_all(%w[Color])
     # Ensure gear types exist so bike show page doesn't write during readonly mode
     RearGearType.fixed
@@ -118,11 +125,13 @@ RSpec.describe "Bike search", :js, type: :system do
     click_first_bike_and_go_back
   end
 
-  # :flaky retry: even on a shallow stack, a programmatic go_forward to a
-  # form-submitted (turbo advance) history entry can still intermittently no-op
-  # in WebDriver (the URL stays on the back entry). It's a harness artifact - a
-  # real browser does back/forward reliably - so retry on CI.
-  it "keeps results, counts, and form in sync across search and back/forward", :flaky do
+  # flaky: 4 (4 attempts): every Turbo navigation here (form submit, go_back,
+  # go_forward) reloads the eager results frame, and under CI load that fetch can
+  # intermittently outlast the 10s wait - or a programmatic go_forward to a
+  # turbo-advance history entry can no-op in WebDriver (the URL stays on the back
+  # entry). Both are harness artifacts a real browser doesn't hit, and they can
+  # recur across attempts on a busy runner, so allow more retries than the default.
+  it "keeps results, counts, and form in sync across search and back/forward", flaky: 4 do
     # Search Red, then Blue, then retrace with the browser's back and forward
     # buttons. Each step must leave the frame, form, and kind counts matching the
     # restored URL: the frame by the bikes' colors inside it (both searches return

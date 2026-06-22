@@ -4,10 +4,6 @@ task enqueue_newsletter: :environment do
   end
 end
 
-task run_scheduler: :environment do
-  ScheduledJobRunner.perform_async if ScheduledJobRunner.should_enqueue?
-end
-
 task read_logged_searches: :environment do
   # Throw an error if ripgrep isn't installed
   abort("ripgrep (rg) is not installed") unless system("rg --version > /dev/null 2>&1")
@@ -47,18 +43,21 @@ desc "Notify Honeybadger of a deploy - Rails, frontend and CSP"
 task trigger_honeybadger_deploy: :environment do
   raise "Missing HONEYBADGER_API_KEY" if ENV["HONEYBADGER_API_KEY"].blank?
 
-  revision = `git rev-parse HEAD`.strip
+  # DEPLOY_SHA is set when run via kamal app exec in the deployed container (which
+  # has no .git); fall back to git for bundled/local runs.
+  revision = ENV["DEPLOY_SHA"].presence || `git rev-parse HEAD`.strip
   environment = Rails.env
   repository = "git@github.com:bikeindex/bike_index.git"
   local_username = `whoami`.strip
   Honeybadger.track_deployment(environment:, revision:, local_username:, repository:)
 
   raise "Missing HONEYBADGER_FRONTEND_API_KEY" if ENV["HONEYBADGER_FRONTEND_API_KEY"].blank?
-  raise "Missing HONEYBADGER_CSP_API_KEY" if ENV["HONEYBADGER_CSP_API_KEY"].blank?
+  # The CSP key is only required in production — staging deploys without one.
+  raise "Missing HONEYBADGER_CSP_API_KEY" if environment == "production" && ENV["HONEYBADGER_CSP_API_KEY"].blank?
 
   require "net/http"
   require "uri"
-  [ENV["HONEYBADGER_CSP_API_KEY"], ENV["HONEYBADGER_FRONTEND_API_KEY"]].each do |api_key|
+  [ENV["HONEYBADGER_CSP_API_KEY"], ENV["HONEYBADGER_FRONTEND_API_KEY"]].compact_blank.each do |api_key|
     uri = URI("https://api.honeybadger.io/v1/deploys")
     uri.query = URI.encode_www_form(
       "deploy[environment]" => environment,

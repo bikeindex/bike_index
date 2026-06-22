@@ -1,0 +1,62 @@
+---
+- name: Ensure apt key is not present in trusted.gpg.d
+  ansible.builtin.file:
+    path: /etc/apt/trusted.gpg.d/docker.asc
+    state: absent
+
+- name: Ensure the repo referencing the previous trusted.gpg.d key is not present
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: absent
+    filename: "docker"
+    update_cache: true
+
+- name: Upgrade packages
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: true
+
+- name: Install packages
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - build-essential
+      - ca-certificates
+      - curl
+      - duf
+      - fail2ban
+      - git
+      - gnupg
+      - htop
+      - ntp
+      - ufw
+      - unattended-upgrades
+      - vim
+    state: latest
+    update_cache: true
+    autoremove: true
+    autoclean: true
+  notify:
+    - Start ntp
+    - Start fail2ban
+
+# SSH is key-only (PasswordAuthentication no — see the security role), so the
+# default sshd jail can only ban legitimate traffic: a Kamal deploy's burst of
+# connections or CI's ssh-keyscan. That intermittently blocks deploys. Disable
+# it, mirroring the firewall's `allow` (not `limit`) choice for the same reason.
+- name: Disable the fail2ban sshd jail (SSH is key-only)
+  ansible.builtin.copy:
+    dest: /etc/fail2ban/jail.local
+    mode: "0644"
+    content: |
+      [sshd]
+      enabled = false
+  notify: Restart fail2ban
+
+- name: Remove snap
+  ansible.builtin.apt:
+    name:
+      - snapd
+      - snap
+    state: absent
+    purge: true

@@ -4,15 +4,43 @@ on:
   push:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
 jobs:
+  # Dispatches review-app deploys from CI's single `on: push` run — a
+  # `pull_request: synchronize` trigger + label gate in review-app.yml would
+  # leave skipped check runs on every push to every unlabeled PR.
+  # GITHUB_TOKEN can't fire event-driven triggers, but explicit
+  # workflow_dispatch API calls are allowed (`actions: write` above).
+  dispatch:
+    name: "Dispatch - review app conditional triggering"
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      # retry: gh has no built-in retry, and a sporadic API failure shouldn't
+      # fail the job. Progress goes to stderr — stdout would be captured by
+      # the $(command substitution) below.
+      - name: Dispatch review-app deploy (labeled PRs only)
+        run: |
+          retry() { local n=1; until "$@"; do [ $n -ge 3 ] && return 1; echo "attempt $n failed; retrying in 15s..." >&2; n=$((n+1)); sleep 15; done; }
+          pr=$(retry gh pr list --repo "$GITHUB_REPOSITORY" --head "$GITHUB_REF_NAME" \
+            --state open --label review-app --json number --jq '.[0].number')
+          if [ -n "$pr" ]; then
+            echo "PR #$pr is open with the 'review-app' label -> dispatching review-app deploy"
+            retry gh workflow run review-app.yml --repo "$GITHUB_REPOSITORY" \
+              --ref "$GITHUB_REF_NAME" -f pr_number="$pr" -f action=deploy
+          else
+            echo "No open PR with the 'review-app' label for branch '$GITHUB_REF_NAME' -> NOT dispatching review-app deploy"
+          fi
+
   lint_and_scan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -51,8 +79,15 @@ jobs:
     name: "Run tests"
     runs-on: ubuntu-latest
     services:
+      # Service images pull from Google's pull-through cache of Docker Hub's
+      # official images. Anonymous pulls from Docker Hub (and from AWS's
+      # public.ecr.aws mirror) are rate-limited per source IP; Actions runners
+      # share egress IPs, so on a busy push the parallel shards exhaust the
+      # quota and the job fails at "Initialize containers" with
+      # "toomanyrequests: Rate exceeded". mirror.gcr.io serves the identical
+      # official images without imposing that limit, and needs no credentials.
       postgres:
-        image: postgres:16-alpine
+        image: mirror.gcr.io/library/postgres:16-alpine
         ports:
           - 5432:5432
         env:
@@ -60,13 +95,22 @@ jobs:
           POSTGRES_PASSWORD: password
         # needed because the postgres container does not provide a healthcheck
         # tmpfs makes DB faster by using RAM
+        #
+        # health-interval 1s, not 10s: docker runs the FIRST check only after the
+        # interval elapses, so 10s meant every job idled ~10s+ waiting on a database
+        # that was ready in ~3s. pg_isready is cheap enough to poll every second.
+        # `-h 127.0.0.1` forces TCP — the entrypoint's temporary initdb-phase server
+        # listens only on the unix socket, so a plain pg_isready reports ready
+        # before the real server is up.
         options: >-
           --mount type=tmpfs,destination=/var/lib/postgresql/data
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-retries 5
+          --health-cmd "pg_isready -h 127.0.0.1"
+          --health-interval 1s
+          --health-retries 60
       redis:
-        image: redis
+        # 7-alpine: pinned to match the review-app host's redis:7 accessory, and
+        # the alpine variant is a much smaller pull than debian-based latest.
+        image: mirror.gcr.io/library/redis:7-alpine
         ports:
           - 6379:6379
         options: --entrypoint redis-server
@@ -82,6 +126,7 @@ jobs:
       COVERAGE: false # additional configuration is needed for parallelized tests
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
       TRANSLATION_BRANCH: main
+      TRANSLATIONS_SYNC_APP_ID: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
       RETRY_FLAKY: true
       KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC: ${{ secrets.KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC }}
       KNAPSACK_PRO_CI_NODE_TOTAL: ${{ matrix.ci_node_total }}
@@ -95,19 +140,35 @@ jobs:
       - name: Get CPU cores
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
+      # install system dependencies. libfuse2t64 is for setup-imagemagick's
+      # AppImage below — cached here (hence this step runs first) instead of
+      # the action's uncached apt-get install.
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: google-chrome-stable curl gettext libfuse2t64 libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          version: 1.3
       # install imagemagick separately, cache-apt-pkgs-action wasn't installing correctly
       - uses: mfinelli/setup-imagemagick@v6
         with:
           cache: true
-      # install system dependencies
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: google-chrome-stable curl gettext libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
-          version: 1.3
+          install-libfuse2: false
       - name: Ensure ImageMagick is available
         run: echo $(identify --version)
+      # Checkout persists this App token (below) as the git creds so the sync
+      # branch is pushed as the App — only a non-default-token push fires
+      # `on: push`, which is what attaches the required checks to the PR.
+      # Falls back to default creds until the App secrets exist.
+      - name: Mint translations-sync token
+        id: translations_token
+        if: matrix.ci_node_index == 1 && github.ref == 'refs/heads/main' && env.TRANSLATIONS_SYNC_APP_ID != ''
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
+          private-key: ${{ secrets.TRANSLATIONS_SYNC_APP_PRIVATE_KEY }}
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+        with:
+          token: ${{ steps.translations_token.outputs.token || github.token }}
       # Install Ruby dependencies
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
@@ -119,13 +180,13 @@ jobs:
       - name: Sync translations (only on main by default)
         if: matrix.ci_node_index == 1
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.translations_token.outputs.token || github.token }}
         run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
       # Cache compiled assets + sprockets' incremental cache.
       # Key hashes every input the three asset tools read:
       #   - sprockets: app/assets/images, javascripts, config/manifest.js, Gemfile.lock (gem versions)
       #   - dartsass-rails: app/assets/stylesheets, config/initializers/dartsass.rb
-      #   - tailwindcss-rails: app/assets/tailwind, config/tailwind.config.js,
+      #   - tailwindcss-rails: app/assets/tailwind (theme + @source globs live here),
       #     and everything tailwind scans (views/components/helpers/javascript)
       # On a partial-key restore, sprockets' tmp/cache makes the rebuild near-instant
       # for unchanged inputs, so the loose restore-keys fallback is worth keeping.
@@ -145,7 +206,7 @@ jobs:
           # CAPYBARA_PORT is in the key because the precompile step bakes
           # `ENV['BASE_URL']` (derived from it) into ERB-templated assets;
           # a cached bundle from a different port would serve a stale URL.
-          key: ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/tailwind.config.js', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
+          key: ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-assets-port${{ env.CAPYBARA_PORT }}-
       - name: build assets

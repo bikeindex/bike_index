@@ -1,37 +1,35 @@
 name: Strava Search CI
 
+# Runs only when strava_search files change — the native `paths:` filter acts
+# before a run is created, so non-matching PRs get no run and no check at all.
+# (An always-on paths-filter job left a passed + a skipped check on every PR,
+# and CI-dispatched workflow_dispatch runs never appear in the PR check rollup.)
+# NOTE: don't make this a required status check in branch protection —
+# paths-filtered workflows create no run on non-matching PRs, which would
+# leave the required check "expected" forever.
+
 on:
+  workflow_dispatch:
   pull_request:
+    paths:
+      - 'vendor/strava_search/**'
+      - 'public/strava_search/**'
+      - '.github/workflows/strava_search_ci.yml'
+      # setup-node reads node-version-file: '.tool-versions' below — a Node
+      # bump changes the build environment, so it must trigger a run too.
+      - '.tool-versions'
 
 defaults:
   run:
     working-directory: vendor/strava_search
 
 jobs:
-  changes:
-    name: Check for changes, trigger strava_search CI if there are
-    runs-on: ubuntu-latest
-    outputs:
-      strava_search: ${{ steps.filter.outputs.strava_search }}
-    steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v4
-        id: filter
-        with:
-          filters: |
-            strava_search:
-              - 'vendor/strava_search/**'
-              - 'public/strava_search/**'
-              - '.github/workflows/strava_search_ci.yml'
-
   ci:
     name: Lint, Type Check, Test & Build
-    needs: [changes]
-    if: needs.changes.outputs.strava_search == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v6

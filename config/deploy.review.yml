@@ -1,0 +1,194 @@
+# Kamal config for per-PR review apps.
+#
+# Usage (called from .github/workflows/review-app.yml and bin/kamal_review):
+#
+#   export REVIEW_APP_PR_NUMBER=123
+#   export REVIEW_APP_HOST=host.review.bikeindex.org
+#   kamal deploy --version pr-123-<sha> --config-file config/deploy.review.yml
+#
+# Secrets: kamal always reads .kamal/secrets. Locally that pulls from 1Password;
+# CI copies .kamal/secrets-ci over it first (see .github/workflows/review-app.yml).
+#
+# Multi-tenancy: each PR gets a unique service name (`bike-index-pr-<N>`) so
+# containers coexist on the host. Postgres + Redis are *shared* accessories
+# (`service: shared-db`, `service: shared-redis`) — booted once during host
+# setup; every PR's app connects to them using a per-PR role + database.
+#
+# bin/docker-entrypoint creates the per-PR Postgres role on first boot and runs
+# `db:prepare`, which creates both the primary and analytics databases.
+#
+# TLS: each app declares `ssl: true`, so kamal-proxy obtains a per-host Let's
+# Encrypt cert (HTTP-01 over port 80) on first deploy and renews it itself.
+# No wildcard cert / certbot / DNS-01 — see docs/review-apps.md.
+#
+# This file is NOT used by production (Cloud66).
+
+<%# The role/database naming scheme must stay in lockstep with bin/kamal_review,
+    which re-derives the same names to DROP them on destroy. %>
+<% require "json" %>
+<% pr      = ENV.fetch("REVIEW_APP_PR_NUMBER") %>
+<% host    = ENV.fetch("REVIEW_APP_HOST") %>
+<% slug    = "pr-#{pr}" %>
+<% appname = "bike-index-#{slug}" %>
+<% role    = "bike_index_pr_#{pr}" %>
+<% redis_url = "redis://shared-redis:6379/#{ENV.fetch("REVIEW_APP_REDIS_DB", "1")}" %>
+<%# .to_json quotes/escapes the title into a valid (double-quoted) YAML scalar. %>
+<% pr_title_json = ENV.fetch("REVIEW_APP_PR_TITLE", "").to_json %>
+
+service: <%= appname %>
+# NOTE: no registry host here — kamal prepends `registry.server` (configuration.rb
+# `repository = [registry.server, image].join("/")`). Including ghcr.io would
+# double it to ghcr.io/ghcr.io/...
+image: bikeindex/bike_index
+
+# A fresh PR's first boot runs the full db:prepare (schema + seed: manufacturer
+# CSV import, 25 bikes, components, …) in bin/docker-entrypoint before Puma
+# starts, so the container needs longer than kamal's 30s default to pass the
+# /up health check. Redeploys (databases already exist) skip seeding and become
+# healthy quickly, so this only matters on first boot.
+deploy_timeout: 240
+
+servers:
+  web:
+    - <%= host %>
+  worker:
+    hosts:
+      - <%= host %>
+    cmd: bundle exec sidekiq -c 2
+  # Native Kamal cron (https://kamal-deploy.org/docs/configuration/cron/): a
+  # per-PR container that loads config/crontab and runs the cron daemon. The
+  # `env` prefix copies the container env into the crontab so jobs inherit the
+  # DB/Redis/secret vars. Runs as root because the cron daemon needs it — the
+  # image's default `rails` user can't run cron. The entrypoint's db:prepare is
+  # keyed to `./bin/rails server`, so this role skips it.
+  cron:
+    hosts:
+      - <%= host %>
+    cmd: bash -c "(env && cat config/crontab) | crontab - && cron -f"
+    options:
+      user: root
+
+proxy:
+  ssl: true
+  host: <%= slug %>.review.bikeindex.org
+  app_port: 80
+  healthcheck:
+    path: /up
+    interval: 5
+    timeout: 60
+
+registry:
+  server: ghcr.io
+  username: bikeindex
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+env:
+  clear:
+    # Review apps run the dedicated staging Rails environment, which mirrors
+    # production except ActionMailer routes through letter_opener_web. See
+    # config/environments/staging.rb and config/routes.rb.
+    RAILS_ENV: staging
+    REVIEW_APP: "1"
+    REVIEW_APP_PR_NUMBER: "<%= pr %>"
+    # Empty unless the deployer exports REVIEW_APP_PR_TITLE (the workflow does);
+    # the banner then falls back to "PR #<number>".
+    REVIEW_APP_PR_TITLE: <%= pr_title_json %>
+    BASE_URL: "https://<%= slug %>.review.bikeindex.org"
+
+    # Postgres (shared-db accessory; per-PR role + databases). The staging
+    # primary_replica points at the same database as the primary, so no
+    # separate replica address is needed (see config/database.yml).
+    POSTGRESQL_ADDRESS: shared-db
+    POSTGRESQL_USERNAME: <%= role %>
+    POSTGRESQL_DATABASE: bike_index_review_pr_<%= pr %>_primary
+    # Analytics lives on the same shared-db accessory (dropped alongside the
+    # primary in bin/kamal_review destroy).
+    POSTGRESQL_ANALYTICS_ADDRESS: shared-db
+    ANALYTICS_DB_USERNAME: <%= role %>
+    ANALYTICS_DB_DATABASE: bike_index_review_pr_<%= pr %>_analytics
+    ANALYTICS_DB_PORT: "5432"
+
+    # Redis (shared-redis accessory; logical DB per PR). REDIS_CACHE_URL defaults
+    # to REDIS_URL (config/application.rb); RACK_ATTACK must be pinned because its
+    # default is cache-db+1 — another PR's logical DB under mod-N allocation.
+    REDIS_URL: "<%= redis_url %>"
+    REDIS_RACK_ATTACK_URL: "<%= redis_url %>"
+
+    # Scheduled jobs that can't work in review apps (run by config/crontab's
+    # bin/run_scheduled_job_runner), skipped via ApplicationJob's SIDEKIQ_SKIP_<job> mechanism.
+    # - exchange-rate API uses placeholder review-app secrets, so its response
+    #   has no `rates` key (KeyError).
+    # - manufacturer-logo job reaches the external img.logo.dev, which the
+    #   review-app host can't connect to (Net::OpenTimeout).
+    SIDEKIQ_SKIP_UPDATE_EXCHANGE_RATES_JOB: "1"
+    SIDEKIQ_SKIP_UPDATE_MANUFACTURER_LOGO_AND_PRIORITY_JOB: "1"
+
+    # Runtime
+    RAILS_LOG_TO_STDOUT: "1"
+    RAILS_SERVE_STATIC_FILES: "1"
+    WEB_CONCURRENCY: "1"
+    RAILS_MAX_THREADS: "3"
+    DB_POOL: "5"
+
+  secret:
+    - POSTGRES_PASSWORD
+    - POSTGRESQL_PASSWORD
+    - ANALYTICS_DB_PASSWORD
+    - SECRET_KEY_BASE
+    - SESSION_SECRET
+    - VERIFICATION_SECRET
+    # Stripe (test-mode) is NOT here — it comes from the committed .env via
+    # dotenv in staging (see config/environments/staging.rb + Gemfile).
+    - GOOGLE_MAPS
+    - GOOGLE_MAPS_STATIC
+    - GOOGLE_GEOCODER
+    - MAPBOX_GEOCODER
+    - MAPBOX_MAPPING
+    - R2_DEV_ENDPOINT
+    - R2_DEV_ACCESS_KEY
+    - R2_DEV_ACCESS_KEY_SECRET
+    - HONEYBADGER_API_KEY
+    - HONEYBADGER_FRONTEND_API_KEY
+
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell:   app exec --interactive --reuse "bash"
+  logs:    app logs -f
+  dbc:     app exec --interactive --reuse "bin/rails dbconsole --include-password"
+
+# Per-PR active storage volume (review apps mostly use R2, but ActiveStorage's
+# local service writes here if anything falls through).
+volumes:
+  - "<%= appname %>_storage:/rails/storage"
+
+asset_path: /rails/public/assets
+
+builder:
+  arch: amd64
+  # CI builds + pushes the image; Kamal just pulls. No remote builder needed.
+
+# Shared accessories — booted once during host setup, reused by every PR's app.
+# WARNING: do not run `kamal accessory stop/remove` from a review-app deploy —
+# it would tear down the shared infra and all in-flight PRs.
+accessories:
+  db:
+    service: shared-db
+    image: postgres:17
+    host: <%= host %>
+    # pg_stat_statements must be preloaded at server start for pghero's
+    # query-stats capture (the extension itself is created per-database by
+    # structure.sql). Changing this requires `kamal accessory reboot db`.
+    cmd: "postgres -c shared_preload_libraries=pg_stat_statements"
+    env:
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - shared_db_data:/var/lib/postgresql/data
+  redis:
+    service: shared-redis
+    image: redis:7
+    host: <%= host %>
+    cmd: "redis-server --databases 32 --maxmemory 512mb --maxmemory-policy allkeys-lru"
+    directories:
+      - shared_redis_data:/data

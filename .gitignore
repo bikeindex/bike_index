@@ -86,3 +86,6 @@ vendor/strava_search/storybook-static/
 # Ignore skill workspaces (skill-creator eval/optimization artifacts) and their pycache
 .claude/skills/*-workspace/
 .claude/skills/**/__pycache__/
+
+# Local Ansible inventory; commit .kamal/provisioning/hosts.ini.example instead
+.kamal/provisioning/hosts.ini

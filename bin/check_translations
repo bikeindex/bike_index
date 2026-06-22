@@ -69,6 +69,10 @@ else
     git stash pop || true
     git add config/locales/
     git commit -m "translations sync"
+
+    # In CI the checkout persists the App token as git creds, so this pushes as
+    # the App — a non-default-token push is what fires `on: push` and gives the
+    # PR its required checks. A default-token push triggers no workflows at all.
     git push origin "$branch_name"
 
     gh pr create \
@@ -77,7 +81,7 @@ else
       --base main \
       --head "$branch_name"
 
-    output "${YELLOW}" "PR created. Build will fail until the PR is merged."
+    output "${YELLOW}" "PR created with CI running. Build will fail until the PR is merged."
   fi
 
   exit 1

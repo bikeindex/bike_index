@@ -145,10 +145,13 @@ RSpec.describe WebhooksController, type: :request do
 
   describe "strava" do
     describe "GET strava (subscription verification)" do
+      # stub the constant rather than ENV - it's assigned at class load
+      before { stub_const("WebhooksController::STRAVA_WEBHOOK_VERIFY_TOKEN", "test-verify-token") }
+
       it "returns hub.challenge with valid verify_token" do
         get "/webhooks/strava", params: {
           "hub.mode" => "subscribe",
-          "hub.verify_token" => ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"],
+          "hub.verify_token" => "test-verify-token",
           "hub.challenge" => "test_challenge_abc"
         }
 

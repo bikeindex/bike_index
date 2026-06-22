@@ -120,11 +120,12 @@ RSpec.describe Organized::EmailsController, type: :request do
               body: "header when sent")
           end
           let!(:sent_parking_notification) do
-            FactoryBot.create(:parking_notification,
+            pn = FactoryBot.create(:parking_notification,
               organization: current_organization,
               kind: "parked_incorrectly_notification",
-              delivery_status: "email_success",
               created_at: 1.hour.ago)
+            FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+            pn
           end
           let!(:unsent_parking_notification) do
             FactoryBot.create(:parking_notification,

@@ -36,6 +36,19 @@ RSpec.describe Search::ComboboxController, type: :request do
       end
     end
 
+    context "without a turbo_stream format (mangled pagination src)" do
+      # A crawler following the HTML-encoded "&amp;format=turbo_stream" sends the
+      # format param as "amp;format", so the request would default to :html and
+      # raise ActionView::MissingTemplate for the turbo_stream-only gem partials.
+      it "still renders the turbo_stream response" do
+        get "/search/combobox/options", params: {q: "burg", for_id: "test"}
+
+        expect(response.code).to eq("200")
+        expect(response.media_type).to eq("text/vnd.turbo-stream.html")
+        expect(response.body).to include("Burgundy")
+      end
+    end
+
     context "with manufacturers of differing priority" do
       let!(:high) { FactoryBot.create(:manufacturer, name: "Acme Bikes") }
       let!(:low) { FactoryBot.create(:manufacturer, name: "Acme Components") }
