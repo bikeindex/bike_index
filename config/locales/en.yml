@@ -3722,9 +3722,12 @@ en:
       logout: Logout
       marketplace: Marketplace
       marketplace_messages: Marketplace messages
+      menu: Menu
       register_a_new_bike: Register a new bike
       search: Search
+      settings_menu: Settings
       sign_up: Sign up
+      skip_to_main_content: Skip to main content
       stolen_bike: Stolen bike?
       the_nonprofit_bike_registry: the non-profit bike registry
       user_settings: "%{user_email} settings"
@@ -4721,6 +4724,7 @@ en:
       photo_stock: Stock photo
       photo_uncategorized: Photo of your %{bike_type}
       processing: "... processing"
+      remove_image: Remove image
     show:
       are_you_sure: Are you sure?
       back_to_images: Back to public images

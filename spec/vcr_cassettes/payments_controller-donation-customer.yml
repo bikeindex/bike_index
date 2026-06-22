@@ -294,9 +294,9 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_jPzFuFS4XJOX7a","request_duration_ms":407}}'
+      - '{"last_request_metrics":{"request_id":"req_DvEgH7eR5j0Bmv","request_duration_ms":450}}'
       Idempotency-Key:
-      - bcef9016-0b22-4487-b29e-3a2155be9c72
+      - d2dea014-b70c-4e26-a216-828bd855a8e5
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -313,11 +313,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Tue, 28 Apr 2026 15:33:00 GMT
+      - Sat, 20 Jun 2026 22:05:05 GMT
       Content-Type:
       - application/json
-      Content-Length:
-      - '3996'
+      Transfer-Encoding:
+      - chunked
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -336,17 +336,21 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=VbHfLfgJs-T4GfT80dTlB33bw66-rIWseBvuW75wij_E0g_bbqIvJe5XmYchFKzSvKpRZa0s7tBqNeO3
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=KdjiuHlHSlIkqdA5U7o2sgSXV2qHQfI0JDvZZC10baVstyrl0ptHQ0MCIFMqSGjZnBJkfy56z7nfi59M;
+        report-to csp
       Idempotency-Key:
-      - bcef9016-0b22-4487-b29e-3a2155be9c72
+      - d2dea014-b70c-4e26-a216-828bd855a8e5
       Original-Request:
-      - req_ubn3p9z9i7PSb7
+      - req_qQ4KNit4RFO2BX
       Report-To:
-      - '{"group":"csp","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/csp-report-v2?q=VbHfLfgJs-T4GfT80dTlB33bw66-rIWseBvuW75wij_E0g_bbqIvJe5XmYchFKzSvKpRZa0s7tBqNeO3&t=1"}],"include_subdomains":true}'
+      - '{"group":"csp","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/csp-report-v2?q=KdjiuHlHSlIkqdA5U7o2sgSXV2qHQfI0JDvZZC10baVstyrl0ptHQ0MCIFMqSGjZnBJkfy56z7nfi59M&t=1"}],"include_subdomains":true}'
       Reporting-Endpoints:
-      - csp="https://q.stripe.com/csp-report-v2?q=VbHfLfgJs-T4GfT80dTlB33bw66-rIWseBvuW75wij_E0g_bbqIvJe5XmYchFKzSvKpRZa0s7tBqNeO3&t=1"
+      - csp="https://q.stripe.com/csp-report-v2?q=KdjiuHlHSlIkqdA5U7o2sgSXV2qHQfI0JDvZZC10baVstyrl0ptHQ0MCIFMqSGjZnBJkfy56z7nfi59M&t=1"
       Request-Id:
-      - req_ubn3p9z9i7PSb7
+      - req_qQ4KNit4RFO2BX
+      Stripe-Notice:
+      - You are using an outdated API version (2025-01-27.acacia). We recommend upgrading
+        to the latest API version, 2026-05-27.dahlia. See https://docs.stripe.com/upgrades
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -365,7 +369,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1YGb5WONjfWDLIo5y0GDgTQ4fBSCFj2axWt3SztB19q9voPB5gygJfuZK",
+          "id": "cs_test_a1SrYzqNdHTDGZxjMsv0WCc8PDs5jPrOZpTVEg2TlUZpeO2LIhKFo2cvey",
           "object": "checkout.session",
           "adaptive_pricing": {
             "enabled": true
@@ -403,7 +407,7 @@ http_interactions:
           },
           "consent": null,
           "consent_collection": null,
-          "created": 1777390380,
+          "created": 1781993105,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -428,7 +432,7 @@ http_interactions:
           },
           "customer_email": null,
           "discounts": [],
-          "expires_at": 1777476780,
+          "expires_at": 1782079504,
           "integration_identifier": null,
           "invoice": null,
           "invoice_creation": {
@@ -495,8 +499,8 @@ http_interactions:
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1YGb5WONjfWDLIo5y0GDgTQ4fBSCFj2axWt3SztB19q9voPB5gygJfuZK#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaX09BbE1nX0lWR2ZkUVxvNXY3RG0yaEtgJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1SrYzqNdHTDGZxjMsv0WCc8PDs5jPrOZpTVEg2TlUZpeO2LIhKFo2cvey#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaX09BbE1nX0lWR2ZkUVxvNXY3RG0yaEtgJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
           "wallet_options": null
         }
-  recorded_at: Tue, 28 Apr 2026 15:33:00 GMT
+  recorded_at: Sat, 20 Jun 2026 22:05:05 GMT
 recorded_with: VCR 6.4.0

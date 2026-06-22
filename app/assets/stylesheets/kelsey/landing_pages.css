@@ -843,3 +843,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Pause the auto-scrolling partners strip for keyboard focus and reduced-motion preference (WCAG 2.2.2) */
+.kelsey_styles .le-partners-grid:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kelsey_styles .le-partners-grid {
+    animation: none;
+  }
+}
