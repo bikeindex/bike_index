@@ -2611,8 +2611,9 @@ button.close {
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05)
 }
 
-// Keep keyboard focus visible on selected (.active) buttons, e.g. donation amounts
-.btn.active:focus,.active.btn-secondary:focus {
+// Keep keyboard focus visible on selected (.active) buttons, e.g. donation amounts.
+// :focus-visible (not :focus) so the ring shows on keyboard focus but not mouse click.
+.btn.active:focus-visible,.active.btn-secondary:focus-visible {
     outline: thin dotted #333;
     outline: 5px auto -webkit-focus-ring-color;
     outline-offset: -2px
