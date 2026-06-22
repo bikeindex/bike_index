@@ -303,7 +303,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
   end
 
-  describe "multi_search_sticker_response" do
+  describe "multi_search_response (sticker search)" do
     let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
     let(:other_bike) { FactoryBot.create(:bike) }
@@ -313,32 +313,32 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
     it "returns claimed-sticker bikes (own + cross-org with redaction), skips unclaimed, 400s without query" do
       # Own-org claimed sticker → bike returned
-      get "#{base_url}/multi_search_sticker_response", params: {query: "CA112"}, headers: turbo_headers
+      get "#{base_url}/multi_search_response", params: {search_kind: "stickers", query: "CA112"}, headers: turbo_headers
       expect(response.status).to eq(200)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
 
       # Unclaimed sticker → no bike
-      get "#{base_url}/multi_search_sticker_response", params: {query: "CA113"}, headers: turbo_headers
+      get "#{base_url}/multi_search_response", params: {search_kind: "stickers", query: "CA113"}, headers: turbo_headers
       expect(response.status).to eq(200)
       expect(assigns(:bikes)).to be_empty
 
       # Cross-org claimed sticker → bike surfaces, private fields redacted
-      get "#{base_url}/multi_search_sticker_response", params: {query: "ZZ999"}, headers: turbo_headers
+      get "#{base_url}/multi_search_response", params: {search_kind: "stickers", query: "ZZ999"}, headers: turbo_headers
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([other_bike.id])
       expect(response.body).to include("hidden, not registered with #{current_organization.short_name}")
       expect(response.body).not_to include(other_bike.owner_email)
 
       # Missing query → bad request
-      get "#{base_url}/multi_search_sticker_response", headers: turbo_headers
+      get "#{base_url}/multi_search_response", params: {search_kind: "stickers"}, headers: turbo_headers
       expect(response.status).to eq(400)
     end
 
     it "returns no bikes when the query normalizes to a blank code" do
       # bike and other_bike both have claimed stickers; a query that normalizes to a blank code
       # must not fall through to sticker_code_search's `all` and surface every organization's bikes
-      get "#{base_url}/multi_search_sticker_response", params: {query: "bikeindex.org/bikes/"}, headers: turbo_headers
+      get "#{base_url}/multi_search_response", params: {search_kind: "stickers", query: "bikeindex.org/bikes/"}, headers: turbo_headers
       expect(response.status).to eq(200)
       expect(assigns(:bikes)).to be_empty
     end

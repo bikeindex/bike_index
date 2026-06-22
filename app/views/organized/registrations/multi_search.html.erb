@@ -14,7 +14,6 @@
 <div
   data-controller="org--multi-search org--registration-search org--registration-search-column-toggle"
   data-org--multi-search-url-value="<%= multi_search_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
-  data-org--multi-search-sticker-url-value="<%= multi_search_sticker_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
   data-org--multi-search-search-kind-value="<%= search_kind %>"
   data-org--multi-search-empty-class-value="<%= UI::Badge::Component.badge_classes(color: :empty, size: :md) %>"
   data-org--multi-search-success-class-value="<%= UI::Badge::Component.badge_classes(color: :success, size: :md) %>"

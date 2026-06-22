@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--multi-search'
 export default class extends Controller {
   static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll', 'searchAllHint']
-  static values = { url: String, stickerUrl: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
+  static values = { url: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
     if (this.searching) return
@@ -190,9 +190,10 @@ export default class extends Controller {
   }
 
   async searchSticker (query, index) {
-    const url = new URL(this.stickerUrlValue, window.location.origin)
+    const url = new URL(this.urlValue, window.location.origin)
     url.searchParams.set('query', query)
     url.searchParams.set('chip_id', `chip_${index}`)
+    url.searchParams.set('search_kind', 'stickers')
 
     try {
       const response = await fetch(url, {
