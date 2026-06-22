@@ -51,18 +51,20 @@ feature_name_and_slugs = [
 
 feature_ids = []
 official_manufacturer_feature_id = nil
+skip_ownership_email_feature_id = nil
 
 feature_name_and_slugs.each do |attrs|
   org_feature = OrganizationFeature.find_by_name(attrs[:name]) ||
     OrganizationFeature.create(attrs.merge(amount_cents: 500_00))
   feature_ids << org_feature.id
   official_manufacturer_feature_id = org_feature.id if attrs[:name] == "Official manufacturer organization"
+  skip_ownership_email_feature_id = org_feature.id if attrs[:name] == "Skip ownership email"
 end
 
-# --- Hogwarts: all features except official_manufacturer, with is_endless invoice ---
+# --- Hogwarts: all features except official_manufacturer, with is_endless invoice - and skip_ownership_email ---
 hogwarts = Organization.find_by_name("Hogwarts") || Organization.create!(name: "Hogwarts")
 hogwarts_invoice = Invoice.create(organization: hogwarts, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
-hogwarts_feature_ids = feature_ids - [official_manufacturer_feature_id]
+hogwarts_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_ownership_email_feature_id]
 hogwarts_invoice.update(organization_feature_ids: hogwarts_feature_ids)
 OrganizationRole.create(organization_id: hogwarts.id, user_id: User.find_by_email("member@bikeindex.org").id, role: "member")
 

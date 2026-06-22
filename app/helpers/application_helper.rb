@@ -2,12 +2,6 @@ module ApplicationHelper
   include Binxtils::NavHelper
   include Binxtils::SortableHelper
 
-  # Override ActionView `cache` helper, adding the current locale to the cache
-  # key.
-  def cache(key = {}, options = {}, &block)
-    super([key, locale: I18n.locale], options, &block)
-  end
-
   def notification_delivery_display(status)
     text = if status == "delivery_success"
       check_mark

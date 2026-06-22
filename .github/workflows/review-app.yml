@@ -64,6 +64,7 @@ jobs:
       head_sha:  ${{ steps.set.outputs.head_sha }}
       action:    ${{ steps.set.outputs.action }}
       proceed:   ${{ steps.set.outputs.proceed }}
+      pr_title:  ${{ steps.set.outputs.pr_title }}
     steps:
       - name: Resolve PR + action from the trigger
         id: set
@@ -82,10 +83,12 @@ jobs:
             pr="$INPUT_PR"
             action="$INPUT_ACTION"
             head_sha=$(gh pr view "$pr" --repo "$REPO" --json headRefOid -q .headRefOid)
+            title=$(gh pr view "$pr" --repo "$REPO" --json title -q .title)
             proceed=true
           else
             pr="$PR_NUMBER_EVENT"
             head_sha="$PR_HEAD_SHA_EVENT"
+            title=""  # destroy doesn't render the banner, so no title needed
             action="destroy"  # `closed` is the only pull_request trigger
             # Label presence is enforced by this job's `if:`.
             if [[ "$PR_HEAD_REPO_EVENT" != "$REPO" ]]; then
@@ -99,6 +102,12 @@ jobs:
           echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
           echo "action=$action"  >> "$GITHUB_OUTPUT"
           echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
+          # Heredoc form — a PR title is arbitrary text (may contain `=`, `#`, …).
+          {
+            echo "pr_title<<__PR_TITLE_EOF__"
+            echo "$title"
+            echo "__PR_TITLE_EOF__"
+          } >> "$GITHUB_OUTPUT"
 
   # Builds + pushes the image for deploys. Separate from `update` so that a
   # newer push can cancel a superseded build via concurrency — the kamal deploy
@@ -130,7 +139,7 @@ jobs:
             --color 0E8A16 --description "Per-PR Kamal review app is deployed" 2>/dev/null || true
           gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
       - name: Checkout PR head
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.resolve.outputs.head_sha }}
       - name: Set up Docker Buildx
@@ -160,7 +169,7 @@ jobs:
             }
           skip-extraction: ${{ steps.sprockets-cache.outputs.cache-hit }}
       - name: Log in to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -212,6 +221,9 @@ jobs:
     env:
       IMAGE_TAG: pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}
       REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
+      # Baked into the container's env by config/deploy.review.yml so the banner
+      # shows the PR title (falls back to "PR #<number>" when empty).
+      REVIEW_APP_PR_TITLE: ${{ needs.resolve.outputs.pr_title }}
       KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
       SECRET_KEY_BASE: ${{ secrets.REVIEW_APP_SECRET_KEY_BASE }}
@@ -230,10 +242,21 @@ jobs:
       HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
       HONEYBADGER_FRONTEND_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_FRONTEND_API_KEY }}
     steps:
-      - name: Checkout PR head
-        uses: actions/checkout@v6
+      # Deploy runs the PR's own review-app tooling/config. Destroy instead checks
+      # out the default branch: it only tears down by PR number (needs none of the
+      # PR's code), and a PR predating a bin/kamal_review change — e.g. the destroy
+      # subcommand added in #3715 — would otherwise fail with
+      # "bin/kamal_review: No such file or directory" on its stale checkout.
+      - name: Checkout PR head (deploy)
+        if: needs.resolve.outputs.action == 'deploy'
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.resolve.outputs.head_sha }}
+      - name: Checkout default branch (destroy)
+        if: needs.resolve.outputs.action == 'destroy'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -259,8 +282,8 @@ jobs:
       # --- deploy path: the image was built + pushed by the `build` job ---
       - name: Deploy
         if: needs.resolve.outputs.action == 'deploy'
-        # bin/review-app reads the job-level IMAGE_TAG env.
-        run: bin/review-app deploy "${{ needs.resolve.outputs.pr_number }}"
+        # bin/kamal_review reads the image tag from the job-level IMAGE_TAG env.
+        run: bin/kamal_review deploy --app "${{ needs.resolve.outputs.pr_number }}"
       # A successful deploy (this step is only reached when everything above
       # passed) deletes the `report` job's now-stale failure comment.
       - name: Remove stale deploy-failure comment
@@ -278,7 +301,7 @@ jobs:
 
       - name: Destroy
         if: needs.resolve.outputs.action == 'destroy'
-        run: bin/review-app destroy "${{ needs.resolve.outputs.pr_number }}"
+        run: bin/kamal_review destroy --app "${{ needs.resolve.outputs.pr_number }}"
       - name: Remove review-app label
         if: needs.resolve.outputs.action == 'destroy'
         env:

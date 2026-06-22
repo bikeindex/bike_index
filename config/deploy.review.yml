@@ -1,6 +1,6 @@
 # Kamal config for per-PR review apps.
 #
-# Usage (called from .github/workflows/review-app.yml and bin/review-app):
+# Usage (called from .github/workflows/review-app.yml and bin/kamal_review):
 #
 #   export REVIEW_APP_PR_NUMBER=123
 #   export REVIEW_APP_HOST=host.review.bikeindex.org
@@ -23,14 +23,17 @@
 #
 # This file is NOT used by production (Cloud66).
 
-<%# The role/database naming scheme must stay in lockstep with bin/review-app,
+<%# The role/database naming scheme must stay in lockstep with bin/kamal_review,
     which re-derives the same names to DROP them on destroy. %>
+<% require "json" %>
 <% pr      = ENV.fetch("REVIEW_APP_PR_NUMBER") %>
 <% host    = ENV.fetch("REVIEW_APP_HOST") %>
 <% slug    = "pr-#{pr}" %>
 <% appname = "bike-index-#{slug}" %>
 <% role    = "bike_index_pr_#{pr}" %>
 <% redis_url = "redis://shared-redis:6379/#{ENV.fetch("REVIEW_APP_REDIS_DB", "1")}" %>
+<%# .to_json quotes/escapes the title into a valid (double-quoted) YAML scalar. %>
+<% pr_title_json = ENV.fetch("REVIEW_APP_PR_TITLE", "").to_json %>
 
 service: <%= appname %>
 # NOTE: no registry host here — kamal prepends `registry.server` (configuration.rb
@@ -88,6 +91,9 @@ env:
     RAILS_ENV: staging
     REVIEW_APP: "1"
     REVIEW_APP_PR_NUMBER: "<%= pr %>"
+    # Empty unless the deployer exports REVIEW_APP_PR_TITLE (the workflow does);
+    # the banner then falls back to "PR #<number>".
+    REVIEW_APP_PR_TITLE: <%= pr_title_json %>
     BASE_URL: "https://<%= slug %>.review.bikeindex.org"
 
     # Postgres (shared-db accessory; per-PR role + databases). The staging
@@ -97,7 +103,7 @@ env:
     POSTGRESQL_USERNAME: <%= role %>
     POSTGRESQL_DATABASE: bike_index_review_pr_<%= pr %>_primary
     # Analytics lives on the same shared-db accessory (dropped alongside the
-    # primary in bin/review-app destroy).
+    # primary in bin/kamal_review destroy).
     POSTGRESQL_ANALYTICS_ADDRESS: shared-db
     ANALYTICS_DB_USERNAME: <%= role %>
     ANALYTICS_DB_DATABASE: bike_index_review_pr_<%= pr %>_analytics
@@ -110,10 +116,13 @@ env:
     REDIS_RACK_ATTACK_URL: "<%= redis_url %>"
 
     # Scheduled jobs that can't work in review apps (run by config/crontab's
-    # run_scheduler). The exchange-rate API uses placeholder review-app secrets,
-    # so its response has no `rates` key (KeyError). Skipped via ApplicationJob's
-    # SIDEKIQ_SKIP_<job> mechanism.
+    # bin/run_scheduled_job_runner), skipped via ApplicationJob's SIDEKIQ_SKIP_<job> mechanism.
+    # - exchange-rate API uses placeholder review-app secrets, so its response
+    #   has no `rates` key (KeyError).
+    # - manufacturer-logo job reaches the external img.logo.dev, which the
+    #   review-app host can't connect to (Net::OpenTimeout).
     SIDEKIQ_SKIP_UPDATE_EXCHANGE_RATES_JOB: "1"
+    SIDEKIQ_SKIP_UPDATE_MANUFACTURER_LOGO_AND_PRIORITY_JOB: "1"
 
     # Runtime
     RAILS_LOG_TO_STDOUT: "1"

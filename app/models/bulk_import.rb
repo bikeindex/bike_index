@@ -145,7 +145,7 @@ class BulkImport < ApplicationRecord
 
   def no_duplicate=(val)
     self.data ||= {}
-    self.data["no_duplicate"] = Binxtils::InputNormalizer.boolean(val)
+    data["no_duplicate"] = Binxtils::InputNormalizer.boolean(val)
   end
 
   def no_duplicate

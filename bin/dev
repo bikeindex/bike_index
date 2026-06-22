@@ -1,11 +1,6 @@
 #!/bin/bash
-touch log/development.log
-> log/development.log # Clear out development log, otherwise it balloons
-> log/test.log # Clear out test log too
-touch log/bullet.log
-> log/test.log # Clear out bullet log
-# Clear out temp - mainly used by tests, preserve .txt toggle files (e.g. caching-dev.txt)
-find tmp -mindepth 1 -not -name '*.txt' -delete 2>/dev/null
+# Clear out logs (they balloon) and tmp (mainly used by tests)
+bin/rails log:clear tmp:clear
 
 # Start Redis in the background, if it isn't started already
 touch log/redis.log

@@ -3723,9 +3723,12 @@ en:
       logout: Logout
       marketplace: Marketplace
       marketplace_messages: Marketplace messages
+      menu: Menu
       register_a_new_bike: Register a new bike
       search: Search
+      settings_menu: Settings
       sign_up: Sign up
+      skip_to_main_content: Skip to main content
       stolen_bike: Stolen bike?
       the_nonprofit_bike_registry: the non-profit bike registry
       user_settings: "%{user_email} settings"
@@ -4171,6 +4174,7 @@ en:
       description_of_the_theft: Description of the theft
       eg_if_we_tweet_about_or_someone_searches: e.g., if we tweet about or someone
         searches for its serial number
+      electric_motorized: Electric (motorized)
       email_address_owner: Owner's email address
       email_address_you: Your email address
       filing_a_police_report_is_important_html: >-
@@ -4201,7 +4205,6 @@ en:
       sticker_id: Sticker ID
       student_id: Student ID
       third_color: Third color
-      this: this
       unknown_serial: Unknown serial
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
@@ -4722,6 +4725,7 @@ en:
       photo_stock: Stock photo
       photo_uncategorized: Photo of your %{bike_type}
       processing: "... processing"
+      remove_image: Remove image
     show:
       are_you_sure: Are you sure?
       back_to_images: Back to public images
@@ -4989,40 +4993,6 @@ en:
       sign_up_a_shop_or_organization: Sign up a shop or organization
       terms_and_conditions: terms and conditions
       vendor_terms: vendor terms
-    footer_revised:
-      about: About
-      ambassadors: Ambassadors
-      api_documentation: API documentation
-      bike_index: Bike Index
-      bike_manufacturer_list: Bike Manufacturer List
-      bike_shops: Bike Shops
-      blog: Blog
-      change_preferred_language: change preferred language
-      cities: Cities
-      community_groups: Community Groups
-      copyright_html: "%{current_year} &copy; Bike Index, a 501(c)(3) nonprofit -
-        EIN 81-4296194"
-      dev_and_design_resources: Dev & Design Resources
-      donate: Donate
-      faq: FAQ
-      help: Help
-      how_to_get_your_stolen_bike_back: Get your stolen bike back
-      language: Language
-      law_enforcement: Law Enforcement
-      press_inquiries: Press inquiries
-      privacy_policy: Privacy policy
-      protect_your_bike: Protect your bike
-      resources: Resources
-      schools_and_universities: Schools and Universities
-      security: Security
-      stolen_bike_recoveries: Stolen Bike Recoveries
-      store: Store
-      strava_search: Strava Search and update
-      support_us: Support Us
-      terms_and_conditions: terms and conditions
-      vendor_terms: vendor terms
-      where_we_are: Where We Are
-      who_we_serve: Who we serve
     form_well_footer_save:
       save_changes: Save changes
     header_nav:

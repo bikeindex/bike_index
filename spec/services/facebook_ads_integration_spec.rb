@@ -159,7 +159,12 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
             user: bike.user,
             facebook_data: facebook_data)
         end
-        let(:target_engagement) { {link_click: "10", unique_clicks: "22", page_engagement: "10", post_engagement: "10", landing_page_view: "6", omni_landing_page_view: "6"} }
+        let(:target_engagement) do
+          {:link_click => "22", :unique_clicks => "45", :page_engagement => "23", :post_engagement => "23",
+           :post_reaction => "1", :post_interaction_gross => "1", :post_interaction_net => "1",
+           :landing_page_view => "17", :omni_landing_page_view => "17",
+           "onsite_conversion.post_net_like" => "1"}
+        end
         it "updates and sets the data" do
           expect(theft_alert).to be_valid
           expect(theft_alert.id).to be_present
@@ -171,9 +176,9 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
             expect(theft_alert.facebook_updated_at).to be_within(2).of Time.current
             expect(theft_alert.facebook_data["effective_object_story_id"]).to eq effective_object_story_id
             expect(theft_alert.facebook_data["amount_cents"]).to eq amount_cents_facebook
-            expect(theft_alert.facebook_data["spend_cents"].to_i).to eq 911
-            expect(theft_alert.amount_cents_facebook_spent).to eq 911
-            expect(theft_alert.reach).to eq 6526
+            expect(theft_alert.facebook_data["spend_cents"].to_i).to eq 3778
+            expect(theft_alert.amount_cents_facebook_spent).to eq 3778
+            expect(theft_alert.reach).to eq 20_899
             expect(theft_alert.engagement).to match_hash_indifferently target_engagement
           end
         end
@@ -192,7 +197,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
               expect(theft_alert.facebook_data["effective_object_story_id"]).to eq facebook_data[:effective_object_story_id]
               expect(theft_alert.facebook_data["amount_cents"]).to eq amount_cents_facebook
               expect(theft_alert.facebook_data["spend_cents"]).to eq 3793.0
-              expect(theft_alert.reach).to eq 16_257
+              expect(theft_alert.reach).to eq 16_092
               expect(theft_alert.engagement).to be_present
             end
           end
