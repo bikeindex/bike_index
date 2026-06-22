@@ -53,6 +53,7 @@
   <%= tag.div(data: table_wrapper_data_attributes) do %>
     <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-bikes_4", render_sortable: true)) do |table| %>
       <% hidden_html = hidden_not_registered_tag %>
+      <% email_hidden = translation(".email_hidden") %>
 
       <% table.column(label: translation(".url"), classes: "hideableColumn url_cell") do |bike| %>
         <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
@@ -120,9 +121,7 @@
             <%= link_to "\u{1F50E}", organization_registrations_path(organization_id: organization.to_param, search_email: bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
           </small>
         <% else %>
-          <em class="tw:text-gray-400">
-            <%= t("components.org.registration_search.email_hidden") %>
-          </em>
+          <em class="tw:text-gray-400"><%= email_hidden %></em>
         <% end %>
       <% end %>
 
