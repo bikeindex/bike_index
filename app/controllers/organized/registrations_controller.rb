@@ -51,12 +51,13 @@ module Organized
     end
 
     def multi_search_response
-      @serial = params[:serial].to_s.strip
+      @query = params[:serial].to_s.strip
       @chip_id = params[:chip_id].to_s.strip.presence
-      return head(:bad_request) unless @serial.present?
+      return head(:bad_request) unless @query.present?
 
+      @search_kind = "serials"
       @search_all = Binxtils::InputNormalizer.boolean(params[:search_all])
-      @interpreted_params = BikeSearchable.searchable_interpreted_params({serial: @serial, stolenness: "all"}, ip: forwarded_ip_address)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params({serial: @query, stolenness: "all"}, ip: forwarded_ip_address)
       search_scope = @search_all ? Bike : current_organization.bikes
       bikes = search_scope.search(@interpreted_params)
       @per_page = 10
@@ -69,6 +70,7 @@ module Organized
       @chip_id = params[:chip_id].to_s.strip.presence
       return head(:bad_request) unless @query.present?
 
+      @search_kind = "stickers"
       @per_page = 10
       # A blank normalized code makes sticker_code_search return `all`, so guard against it
       # surfacing every organization's bikes
@@ -79,6 +81,7 @@ module Organized
         Bike.none
       end
       @pagy, @bikes = pagy(:countish, bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
+      render :multi_search_response
     end
 
     private
