@@ -18,7 +18,7 @@ It also removes [Snap](https://snapcraft.io/) and disables SSH password login.
 
 ## Usage
 
-From the `provisioning/` directory:
+From the `.kamal/provisioning/` directory:
 
 ```bash
 cp hosts.ini.example hosts.ini

@@ -98,7 +98,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `.kamal/hooks/post-deploy` | Best-effort Honeybadger deploy notification (`staging` env); never fails the deploy — no-ops if `HONEYBADGER_API_KEY` is unset or the gem is absent (e.g. CI) |
 | `.github/workflows/review-app.yml` | `resolve` + `build` + `update` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `.github/workflows/ci.yml` (`dispatch` job) | Auto-dispatches a deploy on every push to a labeled PR — the auto-redeploy half of the label gate |
-| `provisioning/` | Ansible playbook for one-time host hardening |
+| `.kamal/provisioning/` | Ansible playbook for one-time host hardening |
 | `app/components/page_block/review_app_banner/` | ViewComponent shown in the layout when `ENV["REVIEW_APP"]` is set |
 
 ## Known limits
@@ -158,7 +158,7 @@ Point a **wildcard** A record at the host:
 This covers both the per-PR hostnames and the SSH deploy target (`REVIEW_APP_HOST`, e.g. `host.review.bikeindex.org`) — any name under the wildcard resolves to the host.
 
 ### 3. Run the Ansible provisioning playbook
-Hardens the host: Docker, Fail2ban, UFW (22/80/443), NTP, swap, key-only SSH. From `provisioning/`:
+Hardens the host: Docker, Fail2ban, UFW (22/80/443), NTP, swap, key-only SSH. From `.kamal/provisioning/`:
 
 ```bash
 cp hosts.ini.example hosts.ini
@@ -168,7 +168,7 @@ ansible-galaxy install -r requirements.yml
 ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini playbook.yml
 ```
 
-See `provisioning/README.md` for details.
+See `.kamal/provisioning/README.md` for details.
 
 ### 4. Boot kamal-proxy
 Global on the host; boot once:
