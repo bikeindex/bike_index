@@ -170,6 +170,25 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
     end
 
+    context "with fetch_athlete_stats request" do
+      let(:strava_integration) do
+        FactoryBot.create(:strava_integration, :syncing, status: :pending,
+          strava_id: ENV["STRAVA_TEST_USER_ID"], athlete_activity_count: 5)
+      end
+      let!(:strava_request) do
+        FactoryBot.create(:strava_request, :fetch_athlete_stats, strava_integration:)
+      end
+
+      it "updates the athlete_activity_count from the stats response" do
+        VCR.use_cassette("strava-get_athlete_stats") do
+          instance.perform(strava_request.id)
+        end
+
+        expect(strava_request.reload.response_status).to eq("success")
+        expect(strava_integration.reload.athlete_activity_count).to eq(1817)
+      end
+    end
+
     context "with fetch_gear request" do
       let!(:strava_gear) do
         FactoryBot.create(:strava_gear, strava_integration:,
