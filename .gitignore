@@ -87,5 +87,5 @@ vendor/strava_search/storybook-static/
 .claude/skills/*-workspace/
 .claude/skills/**/__pycache__/
 
-# Local Ansible inventory; commit provisioning/hosts.ini.example instead
-provisioning/hosts.ini
+# Local Ansible inventory; commit .kamal/provisioning/hosts.ini.example instead
+.kamal/provisioning/hosts.ini

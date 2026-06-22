@@ -5074,6 +5074,8 @@ en:
       bike: Bike
       recovered_date: recovered %{date}
       translated_from_english: translated from English
+    shops_map:
+      map_of_partner_locations: Map of partner locations
     user_general_alert:
       add_location_theft_bike_title_html: Add the location of the theft of your <strong>%{bike_title}</strong>
       add_photo_theft_bike_title_html: Add a photo to your <strong>%{bike_title}</strong>

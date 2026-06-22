@@ -5043,6 +5043,8 @@ nb:
       bike: Sykkel
       recovered_date: gjenopprettet %{date}
       translated_from_english: oversatt fra engelsk
+    shops_map:
+      map_of_partner_locations: Kart over partnerlokasjoner
   stolen:
     index:
       ambassador: ambassadør

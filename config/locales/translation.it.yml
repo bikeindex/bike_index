@@ -5296,6 +5296,8 @@ it:
       bike: Bicicletta
       recovered_date: recuperato %{date}
       translated_from_english: tradotto dall'inglese
+    shops_map:
+      map_of_partner_locations: Mappa delle sedi dei partner
   stolen:
     index:
       ambassador: ambasciatore
