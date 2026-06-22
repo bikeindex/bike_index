@@ -561,7 +561,7 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     observer (0.1.2)
-    oj (3.17.3)
+    oj (3.16.16)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
     openssl (4.0.2)
@@ -997,7 +997,7 @@ DEPENDENCIES
   money-rails (~> 1.11)
   multi_json
   observer
-  oj
+  oj (= 3.16.16)
   openssl
   pagy
   paper_trail

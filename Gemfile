@@ -34,7 +34,7 @@ gem "secure_headers", "~> 7.2"
 # Speed, performance, etc
 gem "fast_blank"
 gem "active_model_serializers", "~> 0.8.3" # NOTE: more recent versions are slower, see discourse Gemfile
-gem "oj" # optimized json
+gem "oj", "3.16.16" # optimized json — pinned to pre-3.17 while investigating worker RSS leak (see #3722)
 gem "multi_json" # TODO: use this more
 gem "flamegraph", require: false
 gem "memory_profiler", require: false
