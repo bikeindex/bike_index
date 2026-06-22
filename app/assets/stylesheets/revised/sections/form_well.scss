@@ -82,10 +82,15 @@
       color: $link-color;
     }
 
-    // It's a <button> now (keyboard-operable), but main's ? showed no focus ring
-    // and no focus color change — suppress the native ring so it matches main.
+    // It's a <button> now (keyboard-operable). Drop the native focus ring and
+    // indicate keyboard focus with the blue circle only (border) — the ? glyph
+    // keeps its text color, matching main's blue-circle look.
     &:focus {
       outline: none;
+    }
+
+    &:focus-visible {
+      border-color: $link-color;
     }
   }
 
