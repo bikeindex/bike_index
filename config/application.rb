@@ -25,12 +25,10 @@ module Bikeindex
     config.redis_default_url = ENV["REDIS_URL"]
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
     # Prefer a separate Redis instance for Rack::Attack so cache eviction can't
-    # drop rate-limit keys. Falls back to the next database on the cache Redis,
-    # wrapping past 15 (Redis only has databases 0-15 by default; an out-of-range
-    # db makes RedisCacheStore silently drop every write).
+    # drop rate-limit keys. Falls back to the next database on the cache Redis.
     config.redis_rack_attack_url = ENV.fetch("REDIS_RACK_ATTACK_URL") do
       if config.redis_cache_url.match?(%r{/\d+\z})
-        config.redis_cache_url.sub(%r{/(\d+)\z}) { "/#{($1.to_i + 1) % 16}" }
+        config.redis_cache_url.sub(%r{/(\d+)\z}) { "/#{$1.to_i + 1}" }
       else
         "#{config.redis_cache_url}/1"
       end
