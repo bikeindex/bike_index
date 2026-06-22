@@ -43,6 +43,7 @@ module Admin
         strava_requests = case params[:search_response_status]
         when "pending_or_success" then strava_requests.where(response_status: StravaRequest::PENDING_OR_SUCCESS)
         when "not_successful" then strava_requests.where(response_status: StravaRequest::NOT_SUCCESSFUL)
+        when "not_successful_not_skipped" then strava_requests.not_successful_not_skipped
         else strava_requests.where(response_status: params[:search_response_status])
         end
       end
