@@ -21,12 +21,13 @@ RSpec.describe Admin::StravaRequestsController, type: :request do
       expect(assigns(:collection).pluck(:id)).to eq([strava_request.id])
     end
 
-    context "with search_response_status not_successful_not_skipped" do
+    context "with search_response_status errors_and_failures" do
       let!(:skipped_request) { FactoryBot.create(:strava_request, response_status: :skipped) }
+      let!(:binx_request) { FactoryBot.create(:strava_request, response_status: :binx_response) }
       let!(:error_request) { FactoryBot.create(:strava_request, response_status: :error) }
 
-      it "excludes successful and skipped" do
-        get base_url, params: {search_response_status: "not_successful_not_skipped"}
+      it "excludes successful, skipped, and binx_response" do
+        get base_url, params: {search_response_status: "errors_and_failures"}
         expect(response.status).to eq(200)
         expect(assigns(:collection).pluck(:id)).to eq([error_request.id])
       end

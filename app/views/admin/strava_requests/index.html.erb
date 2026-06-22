@@ -54,7 +54,7 @@
       <%= link_to "All statuses", url_for(sortable_search_params.merge(search_response_status: nil)), class: "dropdown-item #{params[:search_response_status].present? ? '' : 'active'}" %>
       <%= link_to "Pending or successful", url_for(sortable_search_params.merge(search_response_status: "pending_or_success")), class: "dropdown-item #{params[:search_response_status] == 'pending_or_success' ? 'active' : ''}" %>
       <%= link_to "Not successful", url_for(sortable_search_params.merge(search_response_status: "not_successful")), class: "dropdown-item #{params[:search_response_status] == 'not_successful' ? 'active' : ''}" %>
-      <%= link_to "Not successful, not skipped", url_for(sortable_search_params.merge(search_response_status: "not_successful_not_skipped")), class: "dropdown-item #{params[:search_response_status] == 'not_successful_not_skipped' ? 'active' : ''}" %>
+      <%= link_to "Errors and failures", url_for(sortable_search_params.merge(search_response_status: "errors_and_failures")), class: "dropdown-item #{params[:search_response_status] == 'errors_and_failures' ? 'active' : ''}" %>
 
       <div class="dropdown-divider"></div>
 
