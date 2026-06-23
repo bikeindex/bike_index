@@ -12,6 +12,8 @@ class ScheduledAutocompleteCheckJob < ScheduledJob
     raise "Missing Manufacturers!" if too_few_autocomplete_manufacturers?
   end
 
+  private
+
   def too_few_autocomplete_manufacturers?
     Autocomplete::Loader.frame_mnfg_count < Manufacturer.frame_makers.count
   end

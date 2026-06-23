@@ -16,9 +16,9 @@ RSpec.describe ScheduledAutocompleteCheckJob, type: :job do
     context "with too few autocomplete manufacturers" do
       before { Autocomplete::Loader.clear_redis }
       it "loads autocomplete inline and doesn't raise" do
-        expect(instance.too_few_autocomplete_manufacturers?).to be_truthy
-        instance.perform
-        expect(instance.too_few_autocomplete_manufacturers?).to be_falsey
+        expect(Autocomplete::Loader.frame_mnfg_count).to eq 0
+        expect { instance.perform }.not_to raise_error
+        expect(Autocomplete::Loader.frame_mnfg_count).to be > 0
       end
       context "when loading doesn't resolve the shortage" do
         # Simulate a load that fails to populate the autocomplete data
