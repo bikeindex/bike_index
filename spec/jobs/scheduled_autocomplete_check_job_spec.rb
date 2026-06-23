@@ -13,21 +13,24 @@ RSpec.describe ScheduledAutocompleteCheckJob, type: :job do
 
   describe "perform" do
     before { FactoryBot.create(:manufacturer) }
-    it "throws an error if there are no manufacturers" do
+    it "loads autocomplete inline and doesn't raise" do
       Autocomplete::Loader.clear_redis
-      Sidekiq::Job.clear_all
-      expect {
-        instance.perform
-      }.to raise_error(/manufacturer/i)
-      expect(AutocompleteLoaderJob.jobs.count).to eq 1
+      expect(instance.too_few_autocomplete_manufacturers?).to be_truthy
+      instance.perform
+      expect(instance.too_few_autocomplete_manufacturers?).to be_falsey
     end
-    context "with manufacturers" do
-      it "doesn't throw and error or enqueue" do
+    context "when loading doesn't resolve the shortage" do
+      it "raises" do
+        allow(instance).to receive(:too_few_autocomplete_manufacturers?) { true }
+        expect { instance.perform }.to raise_error(/manufacturer/i)
+      end
+    end
+    context "with enough manufacturers" do
+      it "doesn't load or raise" do
         Autocomplete::Loader.load_all(["Manufacturer"])
         expect(Autocomplete::Loader.frame_mnfg_count).to be > 0
-        Sidekiq::Job.clear_all
+        expect_any_instance_of(AutocompleteLoaderJob).not_to receive(:perform)
         instance.perform
-        expect(AutocompleteLoaderJob.jobs.count).to eq 0
       end
     end
   end

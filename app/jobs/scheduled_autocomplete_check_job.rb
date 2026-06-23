@@ -7,10 +7,10 @@ class ScheduledAutocompleteCheckJob < ScheduledJob
   end
 
   def perform
-    if too_few_autocomplete_manufacturers?
-      AutocompleteLoaderJob.perform_async
-      raise "Missing Manufacturers!"
-    end
+    return unless too_few_autocomplete_manufacturers?
+
+    AutocompleteLoaderJob.new.perform
+    raise "Missing Manufacturers!" if too_few_autocomplete_manufacturers?
   end
 
   def too_few_autocomplete_manufacturers?
