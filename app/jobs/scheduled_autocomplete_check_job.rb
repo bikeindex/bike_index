@@ -1,9 +1,9 @@
-# See PR#2483 - frequency can definitely be dropped a month or 2 after 2023-11
+# See PR#2483 for background
 class ScheduledAutocompleteCheckJob < ScheduledJob
   prepend ScheduledJobRecorder
 
   def self.frequency
-    4.minutes
+    1.day
   end
 
   def perform
