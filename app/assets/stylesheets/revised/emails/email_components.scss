@@ -104,7 +104,6 @@ $alert-warning-color: #ffc107;
 }
 
 .finished-registration-hero {
-  border: 1px solid $gray-light;
   border-collapse: collapse;
   background: #f5f3ef;
 
@@ -145,7 +144,6 @@ $alert-warning-color: #ffc107;
 .finished-registration-card {
   margin-top: (1.5 * $vertical-height);
   padding: (1.5 * $vertical-height);
-  border: 1px solid $gray-light;
   background: #fff;
 
   h2,
@@ -198,6 +196,7 @@ $alert-warning-color: #ffc107;
 
   .bike-display {
     margin-bottom: 0;
+    border: none;
   }
 }
 

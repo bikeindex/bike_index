@@ -75,38 +75,34 @@
         <% end %>
       </div>
 
-      <% unless @skip_postscript %>
-        <div class="binx-pstscpt">
-          <div class="hearts">
-            <span>&#9829;</span>
-            <span>&#9829;</span>
-            <span>&#9829;</span>
-            <span>&#9829;</span>
-            <span>&#9829;</span>
-          </div>
-
-          <h4><%= t(".the_bike_index_team") %></h4>
+      <div class="binx-pstscpt">
+        <div class="hearts">
+          <span>&#9829;</span>
+          <span>&#9829;</span>
+          <span>&#9829;</span>
+          <span>&#9829;</span>
+          <span>&#9829;</span>
         </div>
-      <% end %>
 
-      <% unless @skip_footer %>
-        <div class="binx-footer">
-          <h5>
-            <% if render_donation?(@organization) %>
-              <%= t(".help_prevent_theft") %>
-              <%= link_to(t(".make_a_donation"), support_the_index_url) %>
-            <% end %>
-          </h5>
+        <h4><%= t(".the_bike_index_team") %></h4>
+      </div>
 
-          <% if render_supporters?(@organization) %>
-            <p>
-              Bike Index is also supported by
-              <%= link_to "Ottalaus", "https://ottalausinc.ca/" %> and
-              <%= link_to "The Pro's Closet", "https://www.theproscloset.com/" %>.
-            </p>
+      <div class="binx-footer">
+        <h5>
+          <% if render_donation?(@organization) %>
+            <%= t(".help_prevent_theft") %>
+            <%= link_to(t(".make_a_donation"), support_the_index_url) %>
           <% end %>
-        </div>
-      <% end %>
+        </h5>
+
+        <% if render_supporters?(@organization) %>
+          <p>
+            Bike Index is also supported by
+            <%= link_to "Ottalaus", "https://ottalausinc.ca/" %> and
+            <%= link_to "The Pro's Closet", "https://www.theproscloset.com/" %>.
+          </p>
+        <% end %>
+      </div>
     </div>
   </body>
 </html>
