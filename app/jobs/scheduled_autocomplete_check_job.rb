@@ -1,4 +1,3 @@
-# See PR#2483 for background
 class ScheduledAutocompleteCheckJob < ScheduledJob
   prepend ScheduledJobRecorder
 
