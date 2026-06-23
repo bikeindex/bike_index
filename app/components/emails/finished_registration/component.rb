@@ -101,7 +101,7 @@ module Emails
       end
 
       def template_asset_url(name)
-        image_url("email_assets/finished_registration/#{name}")
+        "https://files.bikeindex.org/email_assets/#{name}"
       end
 
       def organization_snippet_body(kind)
