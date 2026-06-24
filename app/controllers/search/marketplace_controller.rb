@@ -14,6 +14,7 @@ module Search
 
       if @render_results
         sorted = searched_bikes.reorder("marketplace_listings.published_at DESC")
+        # Note: ALL matching promoted listings are rendered on the first page
         @promoted_bikes = sorted.merge(MarketplaceListing.promoted).to_a if @page == 1
 
         @pagy, @bikes = pagy(:countish, sorted.where.not(marketplace_listings: {id: MarketplaceListing.promoted}),
