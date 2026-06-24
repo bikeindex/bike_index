@@ -2,7 +2,7 @@
 # IF YOU UPDATE IT, YOUR CHANGES WILL BE LOST AT THE NEXT SYNC.
 #
 # To update this file, use this translation interface:
-# https://translation.io/bikeindex/bike_index/nl
+# https://translation.io/sethherr/bike_index/nl
 #
 ---
 nl:
@@ -3629,6 +3629,9 @@ nl:
       marketplace_messages: Marktplaatsberichten
       your_registrations: Uw registraties
       marketplace: Marktplaats
+      menu: Menu
+      settings_menu: Instellingen
+      skip_to_main_content: Ga direct naar de hoofdinhoud
     application_bikehub:
       contact: contact
       home: Thuis
@@ -4474,6 +4477,8 @@ nl:
       bike: Fiets
       recovered_date: hersteld %{date}
       translated_from_english: vertaald uit het Engels
+    shops_map:
+      map_of_partner_locations: Kaart met partnerlocaties
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -4877,6 +4882,7 @@ nl:
       photo_of_user_with_bike: Jij met je %{bike_type}
       photo_stock: Stock foto
       photo_uncategorized: Foto van uw %{bike_type}
+      remove_image: Afbeelding verwijderen
     show:
       are_you_sure: Weet je het zeker?
       back_to_images: Terug naar openbare afbeeldingen
@@ -5520,6 +5526,8 @@ nl:
         vendor_terms: leveranciersvoorwaarden
         where_we_are: Waar we zijn
         who_we_serve: Wie we dienen
+        legal: Juridisch
+        social_media: Sociale media
     emails:
       partials:
         bike_box:

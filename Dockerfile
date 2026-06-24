@@ -89,6 +89,13 @@ USER 1000:1000
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
 
+# Ensure the storage mountpoint exists owned by rails BEFORE the per-PR named
+# volume (config/deploy.review.yml) mounts over it. Docker copies this dir's
+# rails ownership into an empty volume on first mount; without it Docker creates
+# /rails/storage root-owned and letter_opener_web can't mkdir its inbox there
+# (Errno::EACCES, see config/environments/staging.rb).
+RUN mkdir -p /rails/storage
+
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 EXPOSE 80

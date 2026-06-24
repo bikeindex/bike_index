@@ -2,6 +2,7 @@ class BikeIndex.ChooseRegistration extends BikeIndex
   constructor: ->
     @SetInitialRegistrationType()
     $('a.choose-type').click (e) =>
+      e.preventDefault()
       @updateBikeLink(e)
 
   updateBikeLink: (e) ->
@@ -11,9 +12,9 @@ class BikeIndex.ChooseRegistration extends BikeIndex
     @chooseBikeLink($target)
 
   chooseBikeLink: ($target) ->
-    $('.choose-type').removeClass('current-choice')
-    $target.addClass('current-choice')
-    new_location = $target.attr('data-target')
+    $('.choose-type').removeClass('current-choice').removeAttr('aria-current')
+    $target.addClass('current-choice').attr('aria-current', 'true')
+    new_location = $target.attr('href')
     $('#add-bike').attr('href', new_location)
 
   SetInitialRegistrationType: ->

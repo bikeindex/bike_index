@@ -8,7 +8,7 @@ Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$RE
 
 ## Code style
 
-Ruby is formatted with the standard gem. Run `bin/lint` to automatically format the code.
+Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't use other formatters.
 
 ### Code guidelines:
 

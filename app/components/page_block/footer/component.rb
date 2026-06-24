@@ -15,7 +15,7 @@ module PageBlock
       private
 
       def cache_key
-        ["footer_2", @page_id, @current_user, @passive_organization, @skip_facebook]
+        ["footer_3", @page_id, @current_user, @passive_organization, @skip_facebook]
       end
     end
   end

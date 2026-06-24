@@ -2,7 +2,7 @@
 # IF YOU UPDATE IT, YOUR CHANGES WILL BE LOST AT THE NEXT SYNC.
 #
 # To update this file, use this translation interface:
-# https://translation.io/bikeindex/bike_index/nb
+# https://translation.io/sethherr/bike_index/nb
 #
 ---
 nb:
@@ -3815,6 +3815,9 @@ nb:
       marketplace_messages: Markedsplassmeldinger
       your_registrations: Dine registreringer
       marketplace: Markedsplass
+      menu: Meny
+      settings_menu: Innstillinger
+      skip_to_main_content: Hopp til hovedinnhold
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub-kontoer er drevet av Bike Index – det
         fremste sykkelregisteret.
@@ -4709,6 +4712,7 @@ nb:
       photo_stock: Arkivfoto
       photo_uncategorized: Bilde av din %{bike_type}
       processing: "... behandling"
+      remove_image: Fjern bilde
     show:
       are_you_sure: Er du sikker?
       back_to_images: Tilbake til offentlige bilder
@@ -5039,6 +5043,8 @@ nb:
       bike: Sykkel
       recovered_date: gjenopprettet %{date}
       translated_from_english: oversatt fra engelsk
+    shops_map:
+      map_of_partner_locations: Kart over partnerlokasjoner
   stolen:
     index:
       ambassador: ambassadør
@@ -5372,6 +5378,8 @@ nb:
         vendor_terms: leverandørens vilkår
         where_we_are: Hvor vi er
         who_we_serve: Hvem vi tjener
+        legal: Juridisk
+        social_media: Sosiale medier
     emails:
       partials:
         bike_box:
