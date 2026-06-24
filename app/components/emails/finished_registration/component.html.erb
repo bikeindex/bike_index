@@ -1,8 +1,3 @@
-<%# `MailSnippet`s are only available in english for now %>
-<% if organization_snippet_body('welcome').present? %>
-  <%= organization_snippet_body('welcome').html_safe %>
-<% end %>
-
 <table
   class="finished-registration-shell"
   width="100%"
@@ -28,15 +23,17 @@
                   class: "hero-image" %>
               </td>
             </tr>
-
-            <tr>
-              <td class="hero-copy">
-                <p class="hero-eyebrow"><%= hero_eyebrow %></p>
-                <h2><%= hero_title %></h2>
-              </td>
-            </tr>
           </tbody>
         </table>
+
+        <%# Org branding renders below the Bike Index header. MailSnippets are english-only for now %>
+        <% if organization_snippet_body('header').present? %>
+          <%= organization_snippet_body('header').html_safe %>
+        <% end %>
+
+        <% if organization_snippet_body('welcome').present? %>
+          <%= organization_snippet_body('welcome').html_safe %>
+        <% end %>
 
         <div class="finished-registration-card finished-registration-intro">
           <table

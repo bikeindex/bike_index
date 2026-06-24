@@ -18,8 +18,8 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
     let(:ownership) { FactoryBot.create(:ownership_claimed) }
     it "renders registration content and locking guidelines" do
       expect(ownership.claim_message).to be_blank
-      expect(component).to have_content("Registration complete")
-      expect(component).to have_content("Your registration is active")
+      expect(component).to_not have_content("Registration complete")
+      expect(component).to_not have_content("Your registration is active")
       expect(component).to_not have_content("Welcome to Bike Index")
       expect(component).to have_content("Congrats on registering your bike with Bike Index")
       expect(component).to have_content("Bike details")
@@ -49,7 +49,8 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
     it "renders stolen bike content" do
       expect(bike.status_stolen?).to be_truthy
       expect(ownership.claim_message).to be_blank
-      expect(component).to have_content("Recovery support")
+      expect(component).to_not have_content("Recovery support")
+      expect(component).to_not have_content("Registration complete")
       expect(component).to have_content("thieves are jerks")
       expect(component).to have_content("Hopefully you find the bike soon")
       expect(component).to have_content("Mark your bike recovered")
@@ -77,7 +78,8 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
 
     it "renders the confirm CTA" do
       expect(ownership.claimed?).to be_falsey
-      expect(component).to have_content("Confirm your registration")
+      expect(component).to_not have_content("Registration complete")
+      expect(component).to_not have_content("Confirm your registration")
       expect(component).to have_content("Claim your bike")
       expect(component).to have_link("Confirm this #{bike.type}")
       expect(component).to_not have_content("What's next?")
@@ -100,6 +102,12 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
     let(:ownership) { bike.current_ownership }
+    let!(:header_snippet) do
+      FactoryBot.create(:organization_mail_snippet,
+        kind: "header",
+        organization: organization,
+        body: "<p>HEADER SNIPPET</p>")
+    end
     let!(:welcome_snippet) do
       FactoryBot.create(:organization_mail_snippet,
         kind: "welcome",
@@ -120,11 +128,20 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
     end
 
     it "renders snippets and suppresses the default security block" do
+      expect(component).to have_content("HEADER SNIPPET")
       expect(component).to have_content("WELCOME SNIPPET")
       expect(component).to have_content("AFTER WELCOME SNIPPET")
       expect(component).to have_content("SECURITY SNIPPET")
       expect(component).to_not have_content("Protect your bike by following these locking guidelines")
       expect(component).to_not have_content("tempo-snippet")
+    end
+
+    it "renders the org header and welcome snippets below the Bike Index header" do
+      html = component.to_html
+      hero_index = html.index("bike-index-email-header.png")
+      expect(hero_index).to be_present
+      expect(html.index("HEADER SNIPPET")).to be > hero_index
+      expect(html.index("WELCOME SNIPPET")).to be > html.index("HEADER SNIPPET")
     end
   end
 end

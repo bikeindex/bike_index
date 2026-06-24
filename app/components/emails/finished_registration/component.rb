@@ -49,19 +49,6 @@ module Emails
         !bike.status_impounded?
       end
 
-      def hero_title
-        return translation("your_registration_is_active") if claimed?
-
-        translation("confirm_your_registration")
-      end
-
-      def hero_eyebrow
-        return translation("found_bike_registered") if bike.status_impounded?
-        return translation("recovery_support") if bike.status_stolen?
-
-        translation("registration_complete")
-      end
-
       def intro_heading
         return translation("thanks_for_adding_this_bike_type_you_found", bike_type: bike.type) if bike.status_impounded?
         return translation("bike_type_thieves_are_jerks", bike_type: bike.type) if bike.status_stolen?

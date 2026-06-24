@@ -64,7 +64,12 @@
         <% header_snippet = render_organization_snippets ? @organization.mail_snippet_body("header", time: @email_sent_at) : nil %>
         <% footer_snippet = render_organization_snippets ? @organization.mail_snippet_body("footer", time: @email_sent_at) : nil %>
 
-        <% if header_snippet.present? %>
+        <%#
+          When @skip_header is set the component renders the Bike Index header itself
+          and renders the org header snippet below it, keeping Bike Index above org branding
+        %>
+
+        <% if header_snippet.present? && !@skip_header %>
           <%= header_snippet.html_safe %>
         <% end %>
 
