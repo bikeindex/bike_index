@@ -58,7 +58,9 @@
                     <%= intro_heading %>
                   </h1>
 
-                  <p class="intro-body"><%= intro_body %></p>
+                  <% if intro_body.present? %>
+                    <p class="intro-body"><%= intro_body %></p>
+                  <% end %>
                 </td>
               </tr>
             </tbody>

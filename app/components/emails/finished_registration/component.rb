@@ -76,7 +76,7 @@ module Emails
 
       def intro_body
         return translation("were_sorry_your_bike_type_was_stolen", bike_type: bike.type) if bike.status_stolen?
-        return translation("found_bike_intro") if bike.status_impounded?
+        return if bike.status_impounded?
         return translation("registration_complete_message") if claimed?
 
         translation("registration_confirm_message")
