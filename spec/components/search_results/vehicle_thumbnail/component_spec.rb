@@ -37,6 +37,20 @@ RSpec.describe SearchResults::VehicleThumbnail::Component, type: :component do
 
       expect(component).to have_content marketplace_listing.amount
       expect(component).to have_content "Chicago, IL 60608"
+      expect(component).to_not have_text("Bike Index member")
+    end
+
+    context "when the seller is a member" do
+      # Membership is created while resolving seller so it exists before the listing
+      let(:seller) do
+        FactoryBot.create(:user, :with_address_record).tap { |u| FactoryBot.create(:membership, user: u) }
+      end
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, address_record:, seller:) }
+
+      it "renders the member badge" do
+        expect(marketplace_listing.reload.seller_member?).to be true
+        expect(component).to have_text("Bike Index member")
+      end
     end
   end
 end
