@@ -234,7 +234,9 @@ class MarketplaceListing < ApplicationRecord
     self.status ||= "draft"
     # Only track the seller's membership while the listing is current; once it's sold/removed the
     # cached value freezes, so a sold listing keeps the membership it had at the time of sale.
-    self.seller_member = seller&.member? || false if (seller_id_changed? || new_record?) && current?
+    if current?
+      self.seller_member = seller&.member? || false
+    end
 
     if status == "for_sale"
       if valid_publishable?

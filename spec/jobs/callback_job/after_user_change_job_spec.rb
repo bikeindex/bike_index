@@ -409,6 +409,19 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
     end
   end
 
+  describe "process_bikes" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+
+    it "bumps the user's bikes' updated_at, busting their search-result cache key" do
+      original_updated_at = bike.reload.updated_at
+      Sidekiq::Job.clear_all
+      instance.perform(user.id)
+      CallbackJob::AfterBikeSaveJob.drain
+      expect(bike.reload.updated_at).to be > original_updated_at
+    end
+  end
+
   describe "deleted user" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
