@@ -103,44 +103,6 @@ $alert-warning-color: #ffc107;
   margin-top: $vertical-height;
 }
 
-.finished-registration-hero {
-  border-collapse: collapse;
-  background: #f5f3ef;
-
-  td {
-    padding: 0;
-  }
-
-  .hero-image {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-  }
-
-  .hero-copy {
-    padding: (1.25 * $vertical-height) (2 * $vertical-height);
-    text-align: right;
-  }
-
-  .hero-eyebrow {
-    margin: 0 0 6px;
-    color: #016ec2;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  h2 {
-    margin: 0;
-    color: $gray-darker;
-    font-size: 28px;
-    line-height: 1.15;
-    text-transform: uppercase;
-  }
-}
-
 .finished-registration-card {
   margin-top: (1.5 * $vertical-height);
   padding: (1.5 * $vertical-height);

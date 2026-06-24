@@ -98,7 +98,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       it "renders email" do
         expect(mail.subject).to match "Confirm your Bike Index registration"
         expect(mail.tag).to eq "finished_registration"
-        expect(mail.body.encoded).to_not match "binx-header-banner" # uses its own hero banner, not the shared header
+        expect(mail.body.encoded).to match "binx-header-banner" # shared blue banner header
         expect_render_donation(true, mail)
         expect_render_supporters(true, mail)
         expect(mail.deliver_now.text_part.body.to_s).to include("Confirm this").and include("Protect your bike")

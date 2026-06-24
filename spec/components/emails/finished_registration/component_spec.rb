@@ -102,12 +102,6 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
     let(:ownership) { bike.current_ownership }
-    let!(:header_snippet) do
-      FactoryBot.create(:organization_mail_snippet,
-        kind: "header",
-        organization: organization,
-        body: "<p>HEADER SNIPPET</p>")
-    end
     let!(:welcome_snippet) do
       FactoryBot.create(:organization_mail_snippet,
         kind: "welcome",
@@ -128,20 +122,11 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
     end
 
     it "renders snippets and suppresses the default security block" do
-      expect(component).to have_content("HEADER SNIPPET")
       expect(component).to have_content("WELCOME SNIPPET")
       expect(component).to have_content("AFTER WELCOME SNIPPET")
       expect(component).to have_content("SECURITY SNIPPET")
       expect(component).to_not have_content("Protect your bike by following these locking guidelines")
       expect(component).to_not have_content("tempo-snippet")
-    end
-
-    it "renders the org header and welcome snippets below the Bike Index header" do
-      html = component.to_html
-      hero_index = html.index("bike-index-email-header.png")
-      expect(hero_index).to be_present
-      expect(html.index("HEADER SNIPPET")).to be > hero_index
-      expect(html.index("WELCOME SNIPPET")).to be > html.index("HEADER SNIPPET")
     end
   end
 end
