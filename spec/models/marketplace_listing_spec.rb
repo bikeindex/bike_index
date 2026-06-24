@@ -60,6 +60,31 @@ RSpec.describe MarketplaceListing, type: :model do
     end
   end
 
+  describe "seller_member" do
+    let(:member) { FactoryBot.create(:user_confirmed, :with_address_record) }
+    let!(:membership) { FactoryBot.create(:membership, user: member) }
+
+    it "caches the seller's membership on current listings, frozen once non-current" do
+      expect(member.reload.member?).to be true
+      listing = FactoryBot.create(:marketplace_listing, :for_sale, seller: member, address_record: member.address_record)
+      expect(listing.seller_member).to be true
+
+      # a current listing whose seller isn't a member is false
+      non_member_listing = FactoryBot.create(:marketplace_listing, :for_sale)
+      expect(non_member_listing.seller.member?).to be false
+      expect(non_member_listing.seller_member).to be false
+
+      # the cached value freezes when the listing leaves the current statuses
+      listing.update!(status: :sold, end_at: Time.current)
+      expect(listing.reload.seller_member).to be true
+    end
+
+    it "doesn't set seller_member on a listing created non-current" do
+      sold_listing = FactoryBot.create(:marketplace_listing, :sold, seller: member)
+      expect(sold_listing.reload).to have_attributes(status: "sold", seller_member: false)
+    end
+  end
+
   describe "find_or_build_current_for" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
     let(:user) { bike.user }

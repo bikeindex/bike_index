@@ -232,7 +232,9 @@ class MarketplaceListing < ApplicationRecord
   def set_calculated_attributes
     self.seller_id ||= item.user&.id
     self.status ||= "draft"
-    self.seller_member = seller&.member? || false if seller_id_changed? || new_record?
+    # Only track the seller's membership while the listing is current; once it's sold/removed the
+    # cached value freezes, so a sold listing keeps the membership it had at the time of sale.
+    self.seller_member = seller&.member? || false if (seller_id_changed? || new_record?) && current?
 
     if status == "for_sale"
       if valid_publishable?
