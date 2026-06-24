@@ -5440,6 +5440,7 @@ nl:
         removed_from: Verwijderd uit de fietsindex
       vehicle_thumbnail:
         registered_not_stolen: geregistreerd, niet gestolen
+        member: Lid van Bike Index
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
       multi_result_chip:
@@ -5453,6 +5454,8 @@ nl:
         price_is_firm_false: prijs is onderhandelbaar
         price_is_firm_true: prijs is vast
         still_for_sale_at: Nog steeds te koop bij
+        member_listing: Lid van Bike Index
+        member_listing_tooltip: Deze verkoper is lid van Bike Index.
       homepage_for_buttons:
         bike_shops: Fietsenwinkels
         cities: Steden
