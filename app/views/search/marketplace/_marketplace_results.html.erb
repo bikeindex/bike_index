@@ -4,16 +4,9 @@
   </div>
 <% end %>
 
-<% component_class = SearchResults::Container::Component.component_class_for_result_view(@result_view) %>
-
-<%#
-  Member listings (carrying the badge) sort first, then by recency, paginated
-  together in one grid. The container's no_results shows when there are none. A
-  membership change bumps the bike's updated_at (via AfterBikeSaveJob), so the
-  bike cache key busts on its own — member fragments don't need separate keying.
-%>
-
 <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
+  <% component_class = SearchResults::Container::Component.component_class_for_result_view(@result_view) %>
+
   <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind, no_results: t("search.registrations.results.no_matched", search_obj_name: @search_obj_name))) do %>
     <% @bikes.each do |bike| %>
       <% cache(["search_results", @search_kind, @result_view, bike]) do %>
