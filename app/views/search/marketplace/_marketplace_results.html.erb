@@ -7,16 +7,15 @@
 <% component_class = SearchResults::Container::Component.component_class_for_result_view(@result_view) %>
 
 <%#
-  Member listings sort first (carrying the badge), then standard listings, in
-  one grid so they flow continuously instead of breaking onto a new row. The
-  container's no_results shows only when both are empty. A membership change
-  bumps the bike's updated_at (via AfterBikeSaveJob), so the bike cache key
-  busts on its own — member fragments don't need separate keying.
+  Member listings (carrying the badge) sort first, then by recency, paginated
+  together in one grid. The container's no_results shows when there are none. A
+  membership change bumps the bike's updated_at (via AfterBikeSaveJob), so the
+  bike cache key busts on its own — member fragments don't need separate keying.
 %>
 
 <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
   <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind, no_results: t("search.registrations.results.no_matched", search_obj_name: @search_obj_name))) do %>
-    <% [*@promoted_bikes, *@bikes].each do |bike| %>
+    <% @bikes.each do |bike| %>
       <% cache(["search_results", @search_kind, @result_view, bike]) do %>
         <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
       <% end %>

@@ -13,11 +13,9 @@ module Search
       @is_marketplace = true
 
       if @render_results
-        sorted = searched_bikes.reorder("marketplace_listings.published_at DESC")
-        # Note: ALL matching promoted listings are rendered on the first page
-        @promoted_bikes = sorted.merge(MarketplaceListing.promoted).to_a if @page == 1
-
-        @pagy, @bikes = pagy(:countish, sorted.where.not(marketplace_listings: {id: MarketplaceListing.promoted}),
+        # Member listings (seller_member) sort first, then by recency, paginated together.
+        @pagy, @bikes = pagy(:countish,
+          searched_bikes.reorder("marketplace_listings.seller_member DESC, marketplace_listings.published_at DESC"),
           limit: 12, page: @page, max_pages: MAX_INDEX_PAGE)
       end
 

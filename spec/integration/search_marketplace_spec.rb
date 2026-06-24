@@ -107,13 +107,13 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     promoted_bike_ids = promoted_listings.map(&:item_id)
     visit_marketplace_via_nav
 
-    # 2 promoted + 12 standard = 14 thumbnails on page 1
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 14)
+    # Page 1 holds the first 12: the 2 members sort first, then standard listings
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
     # The 2 promoted bikes show the member badge and appear above the standard listings
     expect(page).to have_text("Bike Index member")
     expect(visible_bike_ids.first(2)).to match_array(promoted_bike_ids)
     expect_axe_clean
-    # Verify the lazy-loading frame for page 2 exists (3 standard listings remain)
+    # Verify the lazy-loading frame for page 2 exists (5 listings remain)
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
     scroll_to_lazy_load
     # All 17 listings now visible (2 promoted + 15 standard); promoted bikes are not duplicated
@@ -124,8 +124,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # and verify that infinite scroll still works
     fill_in "price_max_amount", with: "1300"
     find_field("price_max_amount").send_keys(:return)
-    # 2 promoted (both ≤ $1300) + 12 standard = 14 on page 1
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 14)
+    # Page 1 holds the first 12 (2 members ≤ $1300 sort first, then standard)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
     # Verify lazy frame exists
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
     scroll_to_lazy_load
@@ -173,8 +173,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # so retry on CI.
   it "keeps results and the primary_activity form in sync across back/forward", :flaky do
     visit_marketplace_via_nav
-    # 2 promoted + 12 standard on the unfiltered first page
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 14)
+    # First 12 on the unfiltered page (the 2 members sort first)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
     # Drop history accumulated by earlier examples so go_back/go_forward operate on
     # this example's own short stack, not a stale foreign entry.
     reset_browser_history
