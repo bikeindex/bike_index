@@ -197,7 +197,7 @@ jobs:
       # so the cache never gets populated.
       - name: Restore precompiled assets cache
         id: assets-cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: |
             tmp/cache/assets
@@ -219,7 +219,7 @@ jobs:
         run: bin/rails assets:precompile --trace
       - name: Save precompiled assets cache
         if: matrix.ci_node_index == 0 && steps.assets-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: |
             tmp/cache/assets

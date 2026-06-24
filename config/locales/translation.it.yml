@@ -5555,6 +5555,7 @@ it:
         removed_from: Rimosso dall'indice delle biciclette
       vehicle_thumbnail:
         registered_not_stolen: registrato, non rubato
+        member: Membro di Bike Index
       container:
         no_results: Nessuna registrazione corrisponde esattamente alla tua ricerca
       multi_result_chip:
@@ -5568,6 +5569,8 @@ it:
         price_is_firm_false: Il prezzo è negoziabile.
         price_is_firm_true: il prezzo non è negoziabile
         still_for_sale_at: Ancora in vendita a
+        member_listing: Membro di Bike Index
+        member_listing_tooltip: Questo venditore è un membro di Bike Index
       homepage_for_buttons:
         bike_shops: Bicicletta
         cities: Città

@@ -72,6 +72,86 @@ RSpec.describe Search::MarketplaceController, type: :request do
         end
       end
 
+      context "promoted listings" do
+        let(:paid_seller) { FactoryBot.create(:user, :with_address_record, address_in: :davis) }
+        let!(:membership) { FactoryBot.create(:membership, user: paid_seller) }
+        let(:promoted_item) { FactoryBot.create(:bike, :with_primary_activity) }
+        let!(:promoted_listing) do
+          FactoryBot.create(:marketplace_listing, :for_sale,
+            address_record: paid_seller.address_record, seller: paid_seller, item: promoted_item, amount_cents: 700_00)
+        end
+
+        it "sorts member listings first, dropping the badge when membership ends" do
+          expect(membership.reload.status).to eq "active"
+          expect(paid_seller.reload.member?).to be true
+          expect(seller.reload.member?).to be false
+          expect(promoted_listing.reload.seller_member).to be true
+
+          get base_url, as: :turbo_stream
+          expect(response).to have_http_status(:success)
+          expect(assigns(:bikes).pluck(:id)).to eq([promoted_item.id, item.id])
+          expect(response.body).to include("Bike Index member")
+
+          # End the membership and run AfterUserChangeJob to refresh the cached seller_member
+          membership.update(status: :ended, end_at: Time.current - 1.day)
+          CallbackJob::AfterUserChangeJob.new.perform(paid_seller.id)
+          expect(promoted_listing.reload.seller_member).to be false
+
+          get base_url, as: :turbo_stream
+          expect(response).to have_http_status(:success)
+          expect(assigns(:bikes).pluck(:id)).to match_array([item.id, promoted_item.id])
+          expect(response.body).not_to include("Bike Index member")
+        end
+
+        it "does not render the empty-state when only member listings match" do
+          expect(promoted_listing.reload.seller_member).to be true
+          # The price ceiling drops the $1000 standard listing but keeps the $700 member listing
+          get "#{base_url}?price_max_amount=800", as: :turbo_stream
+          expect(response).to have_http_status(:success)
+          expect(assigns(:bikes).pluck(:id)).to eq([promoted_item.id])
+          expect(response.body).to include("Bike Index member")
+          expect(response.body).not_to include("exactly matched")
+        end
+
+        context "with more member listings than fit on a page" do
+          let!(:extra_promoted_listings) do
+            Array.new(13) do |i|
+              extra_item = FactoryBot.create(:bike, :with_primary_activity)
+              FactoryBot.create(:marketplace_listing, :for_sale,
+                address_record: paid_seller.address_record, seller: paid_seller, item: extra_item,
+                amount_cents: 800_00,
+                published_at: Time.current - (i + 2).minutes)
+            end
+          end
+
+          it "sorts members first and paginates them, rather than piling all onto page 1" do
+            extra_standard_items = Array.new(13) do |i|
+              extra_item = FactoryBot.create(:bike, :with_primary_activity)
+              FactoryBot.create(:marketplace_listing, :for_sale,
+                address_record: seller.address_record, seller:, item: extra_item, amount_cents: 200_00,
+                published_at: Time.current - (i + 1).hours)
+              extra_item
+            end
+            member_ids = [promoted_item.id, *extra_promoted_listings.map(&:item_id)] # 14 members
+            standard_ids = [item.id, *extra_standard_items.map(&:id)] # 14 standard
+
+            get base_url, as: :turbo_stream
+            page1 = assigns(:bikes).pluck(:id)
+            # Page 1 is bounded to 12 and entirely members (members sort ahead of standard)
+            expect(page1.size).to eq 12
+            expect(page1 - member_ids).to eq([])
+            expect(assigns(:pagy).next).to eq 2
+
+            get "#{base_url}?page=2", as: :turbo_stream
+            page2 = assigns(:bikes).pluck(:id)
+            # The 2 remaining members lead page 2, then standard listings
+            expect(page2.first(2)).to match_array(member_ids - page1)
+            expect(standard_ids).to include(*page2[2..])
+            expect((page1 + page2).uniq.size).to eq(page1.size + page2.size)
+          end
+        end
+      end
+
       context "turbo_stream" do
         it "renders" do
           get base_url, as: :turbo_stream

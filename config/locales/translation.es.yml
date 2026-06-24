@@ -5542,6 +5542,7 @@ es:
         removed_from: Eliminado del índice de bicicletas
       vehicle_thumbnail:
         registered_not_stolen: Registrado, no robado.
+        member: Miembro de Bike Index
       container:
         no_results: No se encontraron registros que coincidieran exactamente con su
           búsqueda.
@@ -5556,6 +5557,8 @@ es:
         price_is_firm_false: El precio es negociable.
         price_is_firm_true: El precio es fijo.
         still_for_sale_at: Todavía se vende en
+        member_listing: Miembro de Bike Index
+        member_listing_tooltip: Este vendedor es miembro de Bike Index.
       homepage_for_buttons:
         bike_shops: Tiendas de bicicletas
         cities: Ciudades

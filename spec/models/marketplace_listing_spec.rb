@@ -43,6 +43,7 @@ RSpec.describe MarketplaceListing, type: :model do
         expect(marketplace_listing.published_at).to be_present
         expect(marketplace_listing.end_at).to be_present
         expect(marketplace_listing.buyer).to be_present
+        expect(marketplace_listing.seller_member).to be_falsey
       end
     end
     context "with_address_record" do
@@ -57,6 +58,38 @@ RSpec.describe MarketplaceListing, type: :model do
         expect(marketplace_listing.address_record.to_coordinates.map(&:round)).to eq([49, -123])
         expect(marketplace_listing.to_coordinates.map(&:round)).to eq([49, -123])
       end
+    end
+  end
+
+  describe "seller_member" do
+    let(:seller) { FactoryBot.create(:user_confirmed, :with_address_record) }
+    let!(:membership) { FactoryBot.create(:membership, user: seller) }
+    let(:listing) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, address_record: seller.address_record) }
+    let(:listing2) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, address_record: seller.address_record) }
+
+    it "caches the seller's membership on current listings, frozen once non-current" do
+      expect(membership.reload.status).to eq "active"
+      expect(seller.reload.member?).to be true
+      expect(listing.seller_member).to be true
+
+      # the cached value freezes when the listing leaves the current statuses
+      listing.update!(status: :sold, end_at: Time.current)
+      expect(listing.reload.seller_member).to be true
+
+      expect(listing2.reload.seller_member).to be true
+
+      # End the membership
+      membership.update(end_at: Time.current - 1.minute)
+      expect(membership.reload.status).to eq "ended"
+      expect(seller.reload.member?).to be false
+
+      # listing seller_member doesn't change, since it's already sold
+      listing.update(updated_at: Time.current)
+      expect(listing.reload.seller_member).to be true
+
+      # listing2 updates seller_member
+      listing2.update(updated_at: Time.current)
+      expect(listing2.reload.seller_member).to be false
     end
   end
 

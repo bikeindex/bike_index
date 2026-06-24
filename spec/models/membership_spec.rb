@@ -33,6 +33,31 @@ RSpec.describe Membership, type: :model do
     end
   end
 
+  describe "enqueue_after_user_change_job" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:creator) { FactoryBot.create(:superuser) }
+    it "enqueues AfterUserChangeJob only when the status changes, and performing it doesn't re-enqueue" do
+      Sidekiq::Job.clear_all
+      membership = FactoryBot.build(:membership, user:, creator:, start_at: Time.current - 1.hour)
+      expect { membership.save! }.to change(CallbackJob::AfterUserChangeJob.jobs, :count).by(1)
+      expect(membership.reload.status).to eq "active"
+      CallbackJob::AfterUserChangeJob.drain
+      expect(CallbackJob::AfterUserChangeJob.jobs.count).to eq 0 # performing it doesn't re-enqueue itself
+
+      expect {
+        membership.update!(status: :ended, end_at: Time.current - 1.day)
+      }.to change(CallbackJob::AfterUserChangeJob.jobs, :count).by(1)
+      expect(membership.status).to eq "ended"
+      CallbackJob::AfterUserChangeJob.drain
+      expect(CallbackJob::AfterUserChangeJob.jobs.count).to eq 0
+
+      # A save that doesn't change the status doesn't enqueue
+      expect {
+        membership.update!(level: :patron)
+      }.to_not change(CallbackJob::AfterUserChangeJob.jobs, :count)
+    end
+  end
+
   describe "user_email" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     it "finds the user" do
