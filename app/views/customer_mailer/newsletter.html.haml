@@ -7,11 +7,7 @@
 
   %body
     .binx-wrapper
-      %table.binx-header
-        %tbody
-          %td
-            -# Not including an alt tag because it renders in the text version
-            %img.bike-index-logo{src: "https://files.bikeindex.org/email_assets/logo.png", height: "70"}
+      = render "layouts/email_banner_header"
 
       .binx-body
         = @mail_snippet_body.html_safe

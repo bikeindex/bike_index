@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<!--
+  Individual User Registration Email Template v2 - MERGED / UNIFIED DESIGN
+  Bike Index - Welcome Email for Self-Registered Bikes
+
+  Unified design per 6/11 direction: the blue banner header from the INLINE
+  design (with the "Welcome to Bike Index" overlay removed, since we don't want
+  text over the header), and everything else from the EXPANDED design. This is
+  the single design that the shared email layout (app/views/layouts/email.html.erb)
+  and the finished_registration component implement.
+-->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>
+      Bike Index - Registration Complete
+    </title>
+    <link rel="stylesheet" href="email.expanded.css">
+    <style>
+      /* Additional styles for new template */
+      /* Blue banner header from the inline design (welcome-over-image text removed) */
+      .binx-header-banner {
+        background-color: #ffffff;
+      }
+      .binx-header-banner img {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        margin: 0;
+      }
+      .brand-purple-footer {
+        background-color: #715eb2;
+        padding: 33px;
+        text-align: center;
+      }
+      .brand-purple-footer h5,
+      .brand-purple-footer p,
+      .brand-purple-footer a {
+        color: #ffffff;
+        font-size: 16px;
+        text-align: center;
+        line-height: 1.5em;
+      }
+      .brand-purple-footer a {
+        text-decoration: underline;
+      }
+      .two-column-section {
+        width: 100%;
+        margin: 24px 0;
+      }
+      .two-column-section td {
+        width: 50%;
+        padding: 12px;
+        vertical-align: top;
+      }
+      .registration-intro {
+        display: table;
+        width: 100%;
+        margin: 24px 0;
+      }
+      .registration-intro-gif {
+        display: table-cell;
+        width: 200px;
+        vertical-align: top;
+        padding-right: 20px;
+      }
+      .registration-intro-gif img {
+        width: 180px;
+        max-width: 100%;
+        height: auto;
+      }
+      .registration-intro-text {
+        display: table-cell;
+        vertical-align: top;
+      }
+      .locking-section {
+        margin: 24px 0;
+      }
+      .locking-section h3 {
+        font-size: 18px;
+        color: #333333;
+        margin: 20px 0 10px 0;
+        font-weight: 600;
+        text-align: left;
+      }
+      .locking-section img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin: 16px auto;
+      }
+      .two-block-section {
+        display: table;
+        width: 100%;
+        margin: 20px 0;
+      }
+      .two-block-section .block-left,
+      .two-block-section .block-right {
+        display: table-cell;
+        width: 50%;
+        padding: 12px;
+        vertical-align: middle;
+      }
+      .two-block-section .block-left {
+        text-align: left;
+      }
+      .two-block-section .block-right {
+        text-align: center;
+      }
+      .two-block-section img {
+        max-width: 100%;
+        height: auto;
+      }
+      .whats-next-column {
+        text-align: center;
+      }
+      .whats-next-column img {
+        width: 150px;
+        max-width: 100%;
+        height: auto;
+        margin: 0 auto 16px;
+        display: block;
+      }
+      .whats-next-column h3 {
+        font-size: 18px;
+        color: #333333;
+        margin: 12px 0;
+        font-weight: 600;
+      }
+      .whats-next-column p {
+        font-size: 15px;
+        line-height: 1.5em;
+      }
+      .love-bikes-section {
+        text-align: center;
+        margin: 30px 0 20px;
+      }
+      .love-bikes-section img {
+        display: inline-block;
+        width: 100px;
+        height: auto;
+        margin: 0 8px;
+      }
+      .spread-word-section {
+        text-align: center;
+        margin: 30px 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+      }
+      .spread-word-section p {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+
+  <body bgcolor="#fff">
+    <div class="binx-wrapper">
+
+      <!-- Section 1: Blue banner header (from inline design; "Welcome to Bike Index" overlay removed — no text over the header) -->
+      <div class="binx-header-banner">
+        <img
+          src="email_assets/bike-index-email-header.png"
+          alt="Bike Index"
+        >
+      </div>
+
+      <!-- Section 2: Welcome and Registration Info -->
+      <div class="binx-body">
+        <h2>
+          Welcome to Bike Index
+        </h2>
+
+        <h1 class="uncap">
+          Congrats on registering your bike with Bike Index
+        </h1>
+
+        <div class="registration-intro">
+          <div class="registration-intro-gif">
+            <img
+              src="email_assets/bike-index-registered-single-loop.gif"
+              alt="Registered animation"
+            >
+          </div>
+          <div class="registration-intro-text">
+            <p>
+              Your bike is now part of the world's most effective bike registry.
+              You are protecting your bike and helping prevent bike theft in your
+              community!
+            </p>
+          </div>
+        </div>
+
+        <!-- Bike Display Box -->
+        <table class="bike-display">
+          <tbody>
+            <tr>
+              <td class="image-holder">
+                <a
+                  href=""
+                  data-pm-no-track="true"
+                >
+                  <img
+                    alt="Bike photo"
+                    src="email_assets/sample-bike.png"
+                  >
+                </a>
+              </td>
+
+              <td
+                class="info-holder"
+                valign="top"
+              >
+                <ul>
+                  <li>
+                    <strong>Make:</strong> Trek
+                  </li>
+
+                  <li>
+                    <strong>Model:</strong> FX 3 Disc
+                  </li>
+
+                  <li>
+                    <strong>Serial:</strong>
+                    <span class="serial-span">WTU123A456B789</span>
+                  </li>
+
+                  <li>
+                    <strong>Color:</strong> Black
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Section 3: Locking Guidelines -->
+      <div class="binx-body locking-section">
+        <hr>
+
+        <h2>
+          Protect your bike with these guidelines
+        </h2>
+
+        <h3>
+          Use a U-Lock. Cable locks should never be used as a primary means of
+          locking a bike in a city.
+        </h3>
+
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td align="center">
+              <img
+                src="email_assets/assets-howtolock-fighter.png"
+                alt="U-Lock illustration"
+              >
+            </td>
+          </tr>
+        </table>
+
+        <h3>
+          Secure both wheels - either with two U-locks, or one U-lock and one
+          heavy duty cable. Before locking, check that what you are locking to
+          can't be easily removed.
+        </h3>
+
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td align="center">
+              <img
+                src="email_assets/assets-howtolock-main.png"
+                alt="How to lock your bike"
+              >
+            </td>
+          </tr>
+        </table>
+
+        <div class="two-block-section">
+          <div class="block-left">
+            <p>
+              Read more about protecting your bike
+              <a href="https://bikeindex.org/protect_your_bike">here</a>.
+          </div>
+          <div class="block-right">
+            <img
+              src="email_assets/assets-howtolock-protip.png"
+              alt="Pro tip"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: What's Next -->
+      <div class="binx-body">
+        <hr>
+
+        <h2>
+          What's next?
+        </h2>
+
+        <table class="two-column-section" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td class="whats-next-column">
+              <img
+                src="email_assets/theft-victims.gif"
+                alt="Theft victims"
+              >
+              <h3>What if my bike gets stolen?</h3>
+              <p>
+                If your bike is ever stolen, log in to Bike Index immediately and
+                mark it as stolen to
+                <a href="https://bikeindex.org/stolen">activate</a> our recovery
+                network.
+              </p>
+            </td>
+            <td class="whats-next-column">
+              <img
+                src="email_assets/marketplace.gif"
+                alt="Marketplace"
+              >
+              <h3>What if I want to sell my bike?</h3>
+              <p>
+                If you move, sell, or make any changes to your bike, update your
+                registration on
+                <a href="https://bikeindex.org/search/marketplace">Bike Index</a>.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Section 5: Spread the Word & Love Bikes -->
+      <div class="binx-body">
+        <div class="spread-word-section">
+          <p>
+            <strong>Spread the word about Bike Index!</strong> Encourage your
+            friends and family to register their bikes too.
+          </p>
+
+          <a
+            href=""
+            class="binx-button"
+          >
+            View Your Bike
+          </a>
+        </div>
+
+        <div class="love-bikes-section">
+          <img
+            src="email_assets/comic-assets_bike-love-1.png"
+            alt="Bike love 1"
+          >
+          <img
+            src="email_assets/comic-assets_bike-love-2.png"
+            alt="Bike love 2"
+          >
+          <img
+            src="email_assets/comic-assets_bike-love-3.png"
+            alt="Bike love 3"
+          >
+        </div>
+      </div>
+
+      <!-- Hearts and Sign-off -->
+      <div class="binx-pstscpt">
+        <div class="hearts">
+          <span>♥</span>
+          <span>♥</span>
+          <span>♥</span>
+          <span>♥</span>
+          <span>♥</span>
+        </div>
+
+        <h4>
+          The Bike Index Team
+        </h4>
+      </div>
+
+      <!-- Section 6: Footer in Brand Purple -->
+      <div class="brand-purple-footer">
+        <h5>
+          Help prevent bike theft,
+          <a href="https://bikeindex.org/donate">make a donation</a>.
+        </h5>
+      </div>
+    </div>
+  </body>
+</html>
