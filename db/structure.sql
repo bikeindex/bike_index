@@ -73,6 +73,40 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: action_text_rich_texts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.action_text_rich_texts (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    body text,
+    record_type character varying NOT NULL,
+    record_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: action_text_rich_texts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.action_text_rich_texts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: action_text_rich_texts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.action_text_rich_texts_id_seq OWNED BY public.action_text_rich_texts.id;
+
+
+--
 -- Name: active_storage_attachments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3228,8 +3262,6 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 CREATE TABLE public.registration_sequence_pages (
     id bigint NOT NULL,
     registration_sequence_id bigint NOT NULL,
-    bullet_points text[] DEFAULT '{}'::text[],
-    bullet_points_html text[] DEFAULT '{}'::text[],
     listing_order integer,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -4278,6 +4310,13 @@ ALTER SEQUENCE public.wheel_sizes_id_seq OWNED BY public.wheel_sizes.id;
 
 
 --
+-- Name: action_text_rich_texts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.action_text_rich_texts ALTER COLUMN id SET DEFAULT nextval('public.action_text_rich_texts_id_seq'::regclass);
+
+
+--
 -- Name: active_storage_attachments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5010,6 +5049,14 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.wheel_sizes ALTER COLUMN id SET DEFAULT nextval('public.wheel_sizes_id_seq'::regclass);
+
+
+--
+-- Name: action_text_rich_texts action_text_rich_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.action_text_rich_texts
+    ADD CONSTRAINT action_text_rich_texts_pkey PRIMARY KEY (id);
 
 
 --
@@ -5858,6 +5905,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_action_text_rich_texts_uniqueness; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_action_text_rich_texts_uniqueness ON public.action_text_rich_texts USING btree (record_type, record_id, name);
 
 
 --
@@ -7311,6 +7365,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260625215350'),
 ('20260625120000'),
 ('20260528152450'),
 ('20260525162548'),

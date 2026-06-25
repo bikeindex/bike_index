@@ -1,3 +1,5 @@
+<% content_for(:header) { stylesheet_link_tag "lexxy", "data-turbo-track": "reload" } %>
+
 <div class="tw:mx-auto tw:max-w-3xl tw:py-6">
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
     <h1 class="tw:text-2xl tw:font-semibold">
@@ -11,9 +13,8 @@
   </div>
 
   <p class="tw:mb-6 tw:text-gray-600">
-    Each page shows an image and a list of bullet points written in Markdown.
-    Changes stay in this draft version until a Bike Index admin authorizes it to
-    go live.
+    Each page shows an image and rich text content. Changes stay in this draft
+    version until a Bike Index admin authorizes it to go live.
   </p>
 
   <%= form_with model: @draft,

@@ -1,4 +1,5 @@
 import '@hotwired/turbo-rails'
+import 'lexxy'
 
 // Import stimulus controllers
 import { Application } from '@hotwired/stimulus'
