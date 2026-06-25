@@ -5706,13 +5706,41 @@ it:
         thanks_for_adding_this_bike_type_you_found: Grazie per aver aggiunto questo
           %{bike_type} che hai trovato a Bike Index
         use_a_ulock: Utilizza un lucchetto a U.
-        welcome_to_bike_index: Benvenuti su Bike Index
         were_sorry_your_bike_type_was_stolen: Ci dispiace che il tuo %{bike_type}
           sia stato rubato.
         when_you_do: quando lo fai!
         you_added_a_bike_type_on_bike_index: Hai aggiunto un %{bike_type} su Bike
           Index
         youre_almost_done_registering: La registrazione è quasi completata!
+        bike_details: Dettagli della bicicletta
+        bike_love_one: Fumetto sull'amore per le biciclette
+        bike_love_three: Fumetto sull'amore per la bici numero tre
+        bike_love_two: Fumetto sull'amore per le biciclette numero due
+        claim_your_bike_type: Richiedi il tuo %{bike_type}
+        indoor_storage_tip: Consigliamo sempre di portare la bicicletta al chiuso
+          o di riporla in un luogo sicuro, soprattutto durante la notte.
+        keep_your_registration_updated: Mantieni aggiornata la tua registrazione
+        marketplace_illustration: Illustrazione di un mercato
+        pro_tip_illustration: Illustrazione di un consiglio utile
+        registered_animation: animazione registrata
+        registration_complete_message: La tua bicicletta ora fa parte del registro
+          di biciclette più efficace al mondo. Proteggi la tua bici e contribuisci
+          a prevenire i furti di biciclette nella tua comunità.
+        registration_confirm_message: Sei a un passo dall'attivare il registro biciclette
+          più efficace e proteggere la tua bicicletta nella tua comunità.
+        spread_the_word_body: Invita anche i tuoi amici e familiari a registrare le
+          loro biciclette.
+        spread_the_word_title: Diffondete la notizia su Bike Index!
+        stolen_guidance: Se la tua bicicletta viene rubata, accedi immediatamente
+          a Bike Index e segnalala come rubata per attivare la nostra rete di recupero.
+        theft_victims_illustration: Illustrazione di vittime di furto
+        ulock_illustration: Illustrazione di un lucchetto a U
+        updated_registration_guidance: Se cambi casa, vendi la tua moto o apporti
+          modifiche, aggiorna la registrazione in modo che i dati rimangano accurati
+          e utili.
+        view_your_bike: Visualizza la tua bici
+        what_if_my_bike_gets_stolen: E se mi rubassero la bicicletta?
+        whats_next: Cosa succederà ora?
       organization_invitation:
         hello: Ciao %{name},
         join_org: Unisciti a %{org_name}
