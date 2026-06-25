@@ -1,19 +1,18 @@
 require "rails_helper"
 
 RSpec.describe RegistrationSequencePage, type: :model do
-  describe "#htmlize_body" do
-    let(:page) { FactoryBot.create(:registration_sequence_page, body: "## Hi\n\n- one\n- two") }
+  describe "#normalize_bullet_points" do
+    let(:page) { FactoryBot.create(:registration_sequence_page, bullet_points: ["  one  ", "", "two", "  "]) }
 
-    it "renders body_html from Markdown on save" do
-      expect(page.body_html).to match(/<h2.*>Hi<\/h2>/)
-      expect(page.body_html).to include("<li>one</li>")
+    it "strips whitespace and drops blank bullets on save" do
+      expect(page.bullet_points).to eq(["one", "two"])
     end
 
-    context "blank body" do
-      let(:page) { FactoryBot.create(:registration_sequence_page, body: "") }
+    context "no bullet points" do
+      let(:page) { FactoryBot.create(:registration_sequence_page, bullet_points: []) }
 
-      it "leaves body_html nil" do
-        expect(page.body_html).to be_nil
+      it "stores an empty array" do
+        expect(page.bullet_points).to eq([])
       end
     end
   end

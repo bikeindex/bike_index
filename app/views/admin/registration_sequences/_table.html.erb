@@ -1,0 +1,60 @@
+<% render_sortable ||= false %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <th class="only-dev-visible small">
+        <%= sortable "updated_at", render_sortable: render_sortable %>
+      </th>
+
+      <th>
+        <%= sortable "organization_id", "Organization", render_sortable: render_sortable %>
+      </th>
+
+      <th>Status</th>
+      <th>Pages</th>
+      <th></th>
+    </thead>
+
+    <tbody
+      data-controller="update-cached-sortable-links"
+      data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
+    >
+      <% collection.each do |registration_sequence| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <%= link_to l(registration_sequence.created_at, format: :convert_time), admin_registration_sequence_path(registration_sequence), class: "localizeTime" %>
+
+              <span class="less-strong-right d-none d-md-block only-dev-visible">
+                <%= registration_sequence.id %>
+              </span>
+            </div>
+          </td>
+
+          <td class="only-dev-visible">
+            <small class="localizeTime">
+              <%= l registration_sequence.updated_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <td>
+            <%= render Admin::OrganizationCell::Component.new(organization: registration_sequence.organization, render_search: true) %>
+          </td>
+
+          <td><%= registration_sequence.status.titleize %></td>
+
+          <td>
+            <%= number_display(registration_sequence.registration_sequence_pages.size) %>
+          </td>
+
+          <td>
+            <%= link_to "Review", admin_registration_sequence_path(registration_sequence), class: "twlink" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

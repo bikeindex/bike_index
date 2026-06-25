@@ -1,0 +1,52 @@
+<div class="nested-page tw:rounded tw:border tw:border-gray-200 tw:p-4">
+  <div class="tw:flex tw:items-center tw:justify-between">
+    <div class="tw:w-32">
+      <%= @form_builder.label :listing_order, "Order", class: "twlabel" %>
+      <%= render Form::Input::Component.new(form_builder: @form_builder, attribute: :listing_order, kind: :number_field, html_options: {min: 0, class: "twinput tw:w-full"}) %>
+    </div>
+
+    <button
+      type="button"
+      data-action="nested-form#remove"
+      class="twlink tw:text-red-600"
+    >
+      Remove page
+    </button>
+  </div>
+
+  <div class="tw:mt-3">
+    <%= @form_builder.label :image, "Image", class: "twlabel" %>
+
+    <% if @form_builder.object.image.attached? %>
+      <%= image_tag @form_builder.object.image_url, class: "tw:mb-2 tw:w-48 tw:rounded" %>
+    <% end %>
+
+    <%= @form_builder.file_field :image, accept: "image/*", class: "twinput tw:w-full" %>
+  </div>
+
+  <div class="tw:mt-3" data-controller="nested-list">
+    <%= @form_builder.label :bullet_points, "Bullet points (Markdown)", class: "twlabel" %>
+
+    <div data-nested-list-target="list" class="tw:flex tw:flex-col tw:gap-2">
+      <input
+        type="hidden"
+        name="<%= @form_builder.object_name %>[bullet_points][]"
+        value=""
+      >
+
+      <% Array(@form_builder.object.bullet_points).each do |bullet| %>
+        <%= bullet_field(bullet) %>
+      <% end %>
+    </div>
+
+    <template data-nested-list-target="template">
+      <%= bullet_field("") %>
+    </template>
+
+    <div class="tw:mt-2">
+      <%= render UI::Button::Component.new(text: "Add bullet point", color: :secondary, size: :sm, data: {action: "nested-list#add"}) %>
+    </div>
+  </div>
+
+  <%= @form_builder.hidden_field :_destroy %>
+</div>

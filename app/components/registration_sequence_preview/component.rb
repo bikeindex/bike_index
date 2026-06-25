@@ -12,8 +12,8 @@ module RegistrationSequencePreview
       @registration_sequence.present?
     end
 
-    def page_body_html(page)
-      Binxtils::InputNormalizer.sanitize(page.body_html).html_safe
+    def bullet_html(bullet)
+      Binxtils::InputNormalizer.sanitize(Kramdown::Document.new(bullet).to_html).html_safe
     end
   end
 end

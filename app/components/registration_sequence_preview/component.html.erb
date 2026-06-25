@@ -1,5 +1,5 @@
 <div class="tw:flex tw:flex-col tw:gap-6">
-  <% @registration_sequence.pages.each do |page| %>
+  <% @registration_sequence.registration_sequence_pages.each do |page| %>
     <div
       class="
         tw:flex tw:flex-col tw:gap-4 tw:rounded tw:border tw:border-gray-200
@@ -10,9 +10,11 @@
         <%= image_tag page.image_url, class: "tw:w-full tw:rounded tw:object-cover tw:sm:w-64" %>
       <% end %>
 
-      <div class="tw:prose tw:max-w-none">
-        <%= page_body_html(page) %>
-      </div>
+      <ul class="tw:prose tw:max-w-none">
+        <% Array(page.bullet_points).each do |bullet| %>
+          <li><%= bullet_html(bullet) %></li>
+        <% end %>
+      </ul>
     </div>
   <% end %>
 </div>

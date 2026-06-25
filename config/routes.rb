@@ -437,9 +437,7 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
-    resource :registration_sequence, only: %i[show edit update] do
-      member { get :preview }
-    end
+    resources :registration_sequences, only: %i[index show edit update], param: :registration_sequence_id
   end
 
   # This is the public organizations section

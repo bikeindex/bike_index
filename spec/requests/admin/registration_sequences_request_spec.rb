@@ -10,11 +10,21 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
     let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
 
     describe "index" do
-      it "renders the pending drafts" do
+      it "renders" do
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
-        expect(assigns(:registration_sequences).pluck(:id)).to eq([draft.id])
+        expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+      end
+
+      context "with search_status" do
+        let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+
+        it "filters by status" do
+          get base_url, params: {search_status: "draft"}
+          expect(response.status).to eq(200)
+          expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+        end
       end
     end
 
@@ -27,15 +37,15 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
     end
 
     describe "update" do
-      let!(:live) { FactoryBot.create(:registration_sequence_live, :with_pages, organization:) }
+      let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
 
-      it "makes the draft live and archives the prior live" do
+      it "makes the draft active and archives the prior active" do
         patch "#{base_url}/#{draft.id}"
         expect(response).to redirect_to(admin_registration_sequences_path)
-        expect(draft.reload).to be_live
+        expect(draft.reload).to be_active
         expect(draft.approved_by).to eq(current_user)
-        expect(live.reload).to be_archived
-        expect(organization.registration_sequences.live.count).to eq(1)
+        expect(active.reload).to be_archived
+        expect(organization.registration_sequences.active.count).to eq(1)
       end
     end
   end

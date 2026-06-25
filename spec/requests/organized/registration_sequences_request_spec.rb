@@ -1,16 +1,36 @@
 require "rails_helper"
 
 RSpec.describe Organized::RegistrationSequencesController, type: :request do
-  let(:base_url) { "/o/#{current_organization.to_param}/registration_sequence" }
+  let(:base_url) { "/o/#{current_organization.to_param}/registration_sequences" }
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
 
-    describe "edit" do
+    describe "index" do
       it "renders and builds a draft from the template" do
         expect {
-          get "#{base_url}/edit"
+          get base_url
         }.to change { current_organization.registration_sequences.draft.count }.by(1)
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:index)
+      end
+    end
+
+    describe "show" do
+      let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+
+      it "renders the preview" do
+        get "#{base_url}/#{active.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+      end
+    end
+
+    describe "edit" do
+      let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
+
+      it "renders" do
+        get "#{base_url}/#{draft.id}/edit"
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
       end
@@ -18,25 +38,15 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
 
     describe "update" do
       let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
-      let(:page) { draft.pages.first }
+      let(:page) { draft.registration_sequence_pages.first }
 
-      it "updates the page body without changing status" do
-        patch base_url, params: {
-          registration_sequence: {pages_attributes: {"0" => {id: page.id, body: "## New\n\n- changed"}}}
+      it "updates the page bullet points without changing status" do
+        patch "#{base_url}/#{draft.id}", params: {
+          registration_sequence: {registration_sequence_pages_attributes: {"0" => {id: page.id, bullet_points: ["", "first", "second"]}}}
         }
-        expect(response).to redirect_to(edit_organization_registration_sequence_path(organization_id: current_organization.to_param))
-        expect(page.reload.body).to eq("## New\n\n- changed")
+        expect(response).to redirect_to(edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: draft.id))
+        expect(page.reload.bullet_points).to eq(["first", "second"])
         expect(draft.reload).to be_draft
-      end
-    end
-
-    describe "preview" do
-      let!(:live) { FactoryBot.create(:registration_sequence_live, :with_pages, organization: current_organization) }
-
-      it "renders the live version" do
-        get "#{base_url}/preview", params: {version: "live"}
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:preview)
       end
     end
   end
@@ -44,8 +54,8 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
   context "logged_in_as_organization_user" do
     include_context :request_spec_logged_in_as_organization_user
 
-    it "blocks non-admins from editing" do
-      get "#{base_url}/edit"
+    it "blocks non-admins" do
+      get base_url
       expect(response).to redirect_to(organization_root_path)
       expect(flash[:error]).to be_present
     end

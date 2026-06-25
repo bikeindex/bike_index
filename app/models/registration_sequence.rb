@@ -4,69 +4,64 @@
 # Database name: primary
 #
 #  id              :bigint           not null, primary key
-#  approved_at     :datetime
-#  status          :integer          default("draft"), not null
+#  end_at          :datetime
+#  start_at        :datetime
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  approved_by_id  :bigint
 #  organization_id :bigint
 #
-# A versioned, ordered set of registration pages for an organization. Org admins edit the
-# `draft`; a superuser authorizes it `live` via #make_live!, which archives the prior live so
-# exactly one stays live until the next is approved. The `template` row (no organization) holds
-# the default pages a new draft is seeded from.
+# Indexes
+#
+#  index_registration_sequences_on_organization_id  (organization_id)
+#  index_registration_sequences_one_active_per_org  (organization_id) UNIQUE WHERE ((start_at IS NOT NULL) AND (end_at IS NULL))
+#  index_registration_sequences_one_draft_per_org   (organization_id) UNIQUE WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL))
+#  index_registration_sequences_single_template     (((organization_id IS NULL))) UNIQUE WHERE (organization_id IS NULL)
+#
 class RegistrationSequence < ApplicationRecord
-  STATUS_ENUM = {draft: 0, live: 1, archived: 2, template: 3}.freeze
-
-  DEFAULT_PAGES = [
-    {
-      image_path: "app/assets/images/registration_sequence/register.png",
-      body: "## Register your bike\n\n- It only takes a minute\n- Add your serial number and a photo\n- Your registration is free, forever"
-    },
-    {
-      image_path: "app/assets/images/registration_sequence/protect.png",
-      body: "## If it's ever stolen\n\n- Mark it stolen in one click\n- We alert the community and local shops\n- Recovered bikes get reunited with their owners"
-    }
-  ].freeze
-
-  enum :status, STATUS_ENUM
+  STATUSES = %w[draft active archived template].freeze
 
   belongs_to :organization, optional: true
   belongs_to :approved_by, class_name: "User", optional: true
 
-  has_many :pages, -> { order(:listing_order) }, class_name: "RegistrationSequencePage",
+  has_many :registration_sequence_pages, -> { order(:listing_order) },
     dependent: :destroy, inverse_of: :registration_sequence
 
-  accepts_nested_attributes_for :pages, allow_destroy: true
+  accepts_nested_attributes_for :registration_sequence_pages, allow_destroy: true
+
+  scope :templates, -> { where(organization_id: nil) }
+  scope :draft, -> { where(start_at: nil).where.not(organization_id: nil) }
+  scope :active, -> { where.not(start_at: nil).where(end_at: nil) }
+  scope :archived, -> { where.not(start_at: nil).where.not(end_at: nil) }
 
   class << self
     def template
-      sequence = where(status: :template, organization_id: nil).first_or_create!
-      seed_default_pages(sequence) if sequence.pages.none?
-      sequence
+      templates.first_or_create!
     end
 
-    def live_for(organization)
-      where(organization:, status: :live).first
+    def active_for(organization)
+      active.find_by(organization:)
     end
 
     def draft_for(organization)
-      where(organization:, status: :draft).first || build_draft_for(organization)
+      draft.find_by(organization:) || build_draft_for(organization)
+    end
+
+    def for_status(status)
+      if STATUSES.include?(status.to_s)
+        public_send((status == "template") ? :templates : status)
+      else
+        all
+      end
     end
 
     private
 
-    def seed_default_pages(sequence)
-      DEFAULT_PAGES.each_with_index do |attributes, index|
-        sequence.pages.create!(body: attributes[:body], listing_order: index)
-      end
-    end
-
     def build_draft_for(organization)
       transaction do
-        draft = create!(organization:, status: :draft)
-        template.pages.each do |template_page|
-          page = draft.pages.create!(body: template_page.body, listing_order: template_page.listing_order)
+        draft = create!(organization:)
+        template.registration_sequence_pages.each do |template_page|
+          page = draft.registration_sequence_pages.create!(bullet_points: template_page.bullet_points, listing_order: template_page.listing_order)
           page.image.attach(template_page.image.blob) if template_page.image.attached?
         end
         draft
@@ -74,12 +69,27 @@ class RegistrationSequence < ApplicationRecord
     end
   end
 
-  def make_live!(approver)
-    return false unless draft? && pages.any?
+  def template? = organization_id.blank?
+
+  def draft? = organization_id.present? && start_at.blank?
+
+  def active? = start_at.present? && end_at.blank?
+
+  def archived? = start_at.present? && end_at.present?
+
+  def status
+    return "template" if template?
+    return "draft" if start_at.blank?
+
+    end_at.blank? ? "active" : "archived"
+  end
+
+  def make_active!(approver)
+    return false unless draft? && registration_sequence_pages.any?
 
     transaction do
-      self.class.live_for(organization)&.update!(status: :archived)
-      update!(status: :live, approved_by: approver, approved_at: Time.current)
+      self.class.active_for(organization)&.update!(end_at: Time.current)
+      update!(start_at: Time.current, approved_by: approver)
     end
   end
 end

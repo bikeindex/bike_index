@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -3228,8 +3229,7 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 CREATE TABLE public.registration_sequence_pages (
     id bigint NOT NULL,
     registration_sequence_id bigint NOT NULL,
-    body text,
-    body_html text,
+    bullet_points text[] DEFAULT '{}'::text[],
     listing_order integer,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -3262,9 +3262,9 @@ ALTER SEQUENCE public.registration_sequence_pages_id_seq OWNED BY public.registr
 CREATE TABLE public.registration_sequences (
     id bigint NOT NULL,
     organization_id bigint,
-    status integer DEFAULT 0 NOT NULL,
     approved_by_id bigint,
-    approved_at timestamp(6) without time zone,
+    start_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -6960,24 +6960,24 @@ CREATE INDEX index_registration_sequences_on_organization_id ON public.registrat
 
 
 --
+-- Name: index_registration_sequences_one_active_per_org; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_registration_sequences_one_active_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NOT NULL) AND (end_at IS NULL));
+
+
+--
 -- Name: index_registration_sequences_one_draft_per_org; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_registration_sequences_one_draft_per_org ON public.registration_sequences USING btree (organization_id) WHERE (status = 0);
-
-
---
--- Name: index_registration_sequences_one_live_per_org; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_registration_sequences_one_live_per_org ON public.registration_sequences USING btree (organization_id) WHERE (status = 1);
+CREATE UNIQUE INDEX index_registration_sequences_one_draft_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL));
 
 
 --
 -- Name: index_registration_sequences_single_template; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_registration_sequences_single_template ON public.registration_sequences USING btree (status) WHERE (status = 3);
+CREATE UNIQUE INDEX index_registration_sequences_single_template ON public.registration_sequences USING btree (((organization_id IS NULL))) WHERE (organization_id IS NULL);
 
 
 --

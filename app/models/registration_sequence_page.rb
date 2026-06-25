@@ -4,20 +4,22 @@
 # Database name: primary
 #
 #  id                       :bigint           not null, primary key
-#  body                     :text
-#  body_html                :text
+#  bullet_points            :text             default([]), is an Array
 #  listing_order            :integer
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  registration_sequence_id :bigint           not null
 #
-# A single page in a RegistrationSequence: one image plus a Markdown body (rendered to body_html).
+# Indexes
+#
+#  index_registration_sequence_pages_on_registration_sequence_id  (registration_sequence_id)
+#
 class RegistrationSequencePage < ApplicationRecord
-  belongs_to :registration_sequence, inverse_of: :pages
+  belongs_to :registration_sequence, inverse_of: :registration_sequence_pages
 
   has_one_attached :image
 
-  before_save :htmlize_body
+  before_validation :normalize_bullet_points
 
   def image_url
     BlobUrl.for(image.blob) if image.attached?
@@ -25,7 +27,7 @@ class RegistrationSequencePage < ApplicationRecord
 
   private
 
-  def htmlize_body
-    self.body_html = body.present? ? Kramdown::Document.new(body).to_html : nil
+  def normalize_bullet_points
+    self.bullet_points = Array(bullet_points).filter_map { |bullet| bullet.to_s.strip.presence }
   end
 end

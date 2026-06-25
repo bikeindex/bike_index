@@ -1,37 +1,31 @@
-<h1>Registration sequences awaiting approval</h1>
-
-<% if @registration_sequences.any? %>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Organization</th>
-        <th>Pages</th>
-        <th>Updated</th>
-        <th></th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <% @registration_sequences.each do |registration_sequence| %>
-        <tr>
-          <td><%= registration_sequence.organization&.name %></td>
-          <td><%= number_display(registration_sequence.pages.size) %></td>
-
-          <td>
-            <span class="convertTime">
-              <%= l registration_sequence.updated_at, format: :convert_time %>
-            </span>
-          </td>
-
-          <td>
-            <%= link_to "Review", admin_registration_sequence_path(registration_sequence), class: "twlink" %>
-          </td>
-        </tr>
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @status.present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @status.blank? %>
+        All statuses
+      <% else %>
+        <%= @status.titleize %>
+        only
       <% end %>
-    </tbody>
-  </table>
-<% else %>
-  <p class="tw:text-gray-600">
-    No upcoming registration sequences are awaiting approval.
-  </p>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All statuses", url_for(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@status.present? ? '' : 'active'}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% searchable_statuses.each do |kind| %>
+        <%= link_to "#{kind.titleize} only", url_for(sortable_search_params.merge(search_status: kind)), class: "dropdown-item #{@status == kind ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
 <% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, chart_collection: @render_chart && matching_registration_sequences)) %>

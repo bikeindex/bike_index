@@ -1,29 +1,8 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:py-6">
-  <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
-    <h1 class="tw:text-2xl tw:font-semibold">Registration sequence</h1>
+  <h1 class="tw:mb-6 tw:text-2xl tw:font-semibold">
+    Preview
+    <span class="tw:text-base tw:font-normal tw:text-gray-500">(<%= @registration_sequence.status %> version)</span>
+  </h1>
 
-    <%= link_to "Edit upcoming version",
-      edit_organization_registration_sequence_path(organization_id: current_organization.to_param),
-      class: "btn btn-primary" %>
-  </div>
-
-  <% if @live.present? %>
-    <p class="tw:mb-4 tw:text-gray-600">
-      This is the live version your registrants see.
-      <%= link_to "Preview", preview_organization_registration_sequence_path(organization_id: current_organization.to_param, version: "live"), class: "twlink" %>
-    </p>
-    <%= render RegistrationSequencePreview::Component.new(registration_sequence: @live) %>
-  <% else %>
-    <p class="tw:text-gray-600">
-      There is no live registration sequence yet. Edit the upcoming version,
-      then a Bike Index admin can authorize it to go live.
-    </p>
-  <% end %>
-
-  <% if @draft.present? %>
-    <p class="tw:mt-6 tw:text-gray-600">
-      You have an upcoming version awaiting approval.
-      <%= link_to "Preview upcoming", preview_organization_registration_sequence_path(organization_id: current_organization.to_param, version: "upcoming"), class: "twlink" %>
-    </p>
-  <% end %>
+  <%= render RegistrationSequencePreview::Component.new(registration_sequence: @registration_sequence) %>
 </div>
