@@ -27,9 +27,28 @@
     <%= @form_builder.file_field :image, accept: "image/*", class: "twinput tw:w-full" %>
   </div>
 
-  <div class="tw:mt-3">
-    <%= @form_builder.label :content, class: "twlabel" %>
-    <%= @form_builder.rich_text_area :content %>
+  <div class="tw:mt-3" data-controller="nested-form">
+    <%= @form_builder.label :bullet_points, "Bullet points", class: "twlabel" %>
+
+    <div data-nested-form-target="list" class="tw:flex tw:flex-col tw:gap-2">
+      <input
+        type="hidden"
+        name="<%= @form_builder.object_name %>[bullet_points][]"
+        value=""
+      >
+
+      <% Array(@form_builder.object.bullet_points).each do |bullet| %>
+        <%= bullet_field(bullet) %>
+      <% end %>
+    </div>
+
+    <template data-nested-form-target="template">
+      <%= bullet_field("") %>
+    </template>
+
+    <div class="tw:mt-2">
+      <%= render UI::Button::Component.new(text: "Add bullet point", color: :secondary, size: :sm, data: {action: "nested-form#add"}) %>
+    </div>
   </div>
 
   <%= @form_builder.hidden_field :_destroy %>

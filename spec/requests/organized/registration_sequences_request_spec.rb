@@ -57,12 +57,12 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
       let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
       let(:page) { draft.registration_sequence_pages.first }
 
-      it "updates the page content without changing status" do
+      it "updates the page bullet points without changing status" do
         patch "#{base_url}/#{draft.id}", params: {
-          registration_sequence: {registration_sequence_pages_attributes: {"0" => {id: page.id, content: "<div>changed copy</div>"}}}
+          registration_sequence: {registration_sequence_pages_attributes: {"0" => {id: page.id, bullet_points: ["", "<p>first</p>", "<p>second</p>"]}}}
         }
         expect(response).to redirect_to(edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: draft.id))
-        expect(page.reload.content.to_s).to include("changed copy")
+        expect(page.reload.bullet_points).to eq(["<p>first</p>", "<p>second</p>"])
         expect(draft.reload).to be_draft
       end
     end

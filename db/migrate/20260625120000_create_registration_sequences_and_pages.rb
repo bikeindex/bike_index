@@ -23,6 +23,7 @@ class CreateRegistrationSequencesAndPages < ActiveRecord::Migration[8.1]
 
     create_table :registration_sequence_pages do |t|
       t.references :registration_sequence, null: false, index: true
+      t.text :bullet_points, array: true, default: []
       t.integer :listing_order
 
       t.timestamps

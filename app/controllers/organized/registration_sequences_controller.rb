@@ -42,7 +42,7 @@ module Organized
 
     def permitted_parameters
       params.require(:registration_sequence)
-        .permit(registration_sequence_pages_attributes: %i[id image listing_order _destroy content])
+        .permit(registration_sequence_pages_attributes: [:id, :image, :listing_order, :_destroy, {bullet_points: []}])
     end
   end
 end

@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id                       :bigint           not null, primary key
+#  bullet_points            :text             default([]), is an Array
 #  listing_order            :integer
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
@@ -17,9 +18,20 @@ class RegistrationSequencePage < ApplicationRecord
   belongs_to :registration_sequence, inverse_of: :registration_sequence_pages
 
   has_one_attached :image
-  has_rich_text :content
+
+  # Each bullet is the HTML from a single-line Lexxy editor; sanitize and drop empties on save
+  before_validation :normalize_bullet_points
 
   def image_url
     BlobUrl.for(image.blob) if image.attached?
+  end
+
+  private
+
+  def normalize_bullet_points
+    self.bullet_points = Array(bullet_points).filter_map do |bullet|
+      html = ActionController::Base.helpers.sanitize(bullet.to_s)
+      html if ActionController::Base.helpers.strip_tags(html).present?
+    end
   end
 end
