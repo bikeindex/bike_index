@@ -21,7 +21,7 @@ class RegistrationSequencePage < ApplicationRecord
   has_one_attached :image
 
   before_validation :normalize_bullet_points
-  before_save :htmlize_bullet_points
+  before_save :htmlize_bullet_points, if: :will_save_change_to_bullet_points?
 
   def image_url
     BlobUrl.for(image.blob) if image.attached?

@@ -12,8 +12,7 @@ module Organized
 
     # Builds the draft (cloned from the template) the org edits
     def create
-      draft = RegistrationSequence.draft_for(current_organization)
-      redirect_to edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: draft.id)
+      redirect_to edit_draft_path(RegistrationSequence.draft_for(current_organization))
     end
 
     def edit
@@ -24,7 +23,7 @@ module Organized
       @draft = find_draft
       if @draft.update(permitted_parameters)
         flash[:success] = "Upcoming registration sequence updated"
-        redirect_to edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id)
+        redirect_to edit_draft_path(@draft)
       else
         flash[:error] = "Unable to update: #{@draft.errors.full_messages.to_sentence}"
         render :edit
@@ -35,6 +34,10 @@ module Organized
 
     def find_draft
       current_organization.registration_sequences.draft.find(params[:registration_sequence_id])
+    end
+
+    def edit_draft_path(draft)
+      edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: draft.id)
     end
 
     def permitted_parameters

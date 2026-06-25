@@ -19,7 +19,8 @@
 #  index_registration_sequences_single_template     (((organization_id IS NULL))) UNIQUE WHERE (organization_id IS NULL)
 #
 class RegistrationSequence < ApplicationRecord
-  STATUSES = %w[draft active archived template].freeze
+  STATUS_SCOPES = {"draft" => :draft, "active" => :active, "archived" => :archived, "template" => :templates}.freeze
+  STATUSES = STATUS_SCOPES.keys.freeze
 
   belongs_to :organization, optional: true
   belongs_to :approved_by, class_name: "User", optional: true
@@ -54,10 +55,8 @@ class RegistrationSequence < ApplicationRecord
     end
 
     def for_status(status)
-      status = status.to_s
-      return all unless STATUSES.include?(status)
-
-      public_send((status == "template") ? :templates : status)
+      scope = STATUS_SCOPES[status.to_s]
+      scope ? public_send(scope) : all
     end
 
     private
