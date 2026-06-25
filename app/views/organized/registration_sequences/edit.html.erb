@@ -19,7 +19,7 @@
 
   <%= form_with model: @draft,
     url: organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id),
-    method: :patch, html: {multipart: true}, data: {controller: "nested-form"} do |f| %>
+    method: :patch, html: {multipart: true}, data: {controller: "nested-form lexxy"} do |f| %>
     <div data-nested-form-target="list" class="tw:flex tw:flex-col tw:gap-4">
       <%= f.fields_for :registration_sequence_pages do |page_form| %>
         <%= render Org::RegistrationSequencePageFields::Component.new(form_builder: page_form) %>
