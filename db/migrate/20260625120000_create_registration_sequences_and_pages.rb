@@ -1,0 +1,29 @@
+class CreateRegistrationSequencesAndPages < ActiveRecord::Migration[8.1]
+  def change
+    create_table :registration_sequences do |t|
+      t.references :organization, index: true
+      t.integer :status, default: 0, null: false
+      t.bigint :approved_by_id
+      t.datetime :approved_at
+
+      t.timestamps
+    end
+
+    # At most one draft and one live per organization, and a single global template
+    add_index :registration_sequences, :organization_id, unique: true,
+      where: "status = 0", name: "index_registration_sequences_one_draft_per_org"
+    add_index :registration_sequences, :organization_id, unique: true,
+      where: "status = 1", name: "index_registration_sequences_one_live_per_org"
+    add_index :registration_sequences, :status, unique: true,
+      where: "status = 3", name: "index_registration_sequences_single_template"
+
+    create_table :registration_sequence_pages do |t|
+      t.references :registration_sequence, null: false, index: true
+      t.text :body
+      t.text :body_html
+      t.integer :listing_order
+
+      t.timestamps
+    end
+  end
+end

@@ -1,0 +1,46 @@
+<div class="tw:mx-auto tw:max-w-3xl tw:py-6">
+  <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
+    <h1 class="tw:text-2xl tw:font-semibold">
+      Edit upcoming registration sequence
+    </h1>
+
+    <div class="tw:flex tw:gap-3">
+      <%= link_to "Preview upcoming", preview_organization_registration_sequence_path(organization_id: current_organization.to_param, version: "upcoming"), class: "twlink", target: "_blank" %>
+      <%= link_to "View live", organization_registration_sequence_path(organization_id: current_organization.to_param), class: "twlink" %>
+    </div>
+  </div>
+
+  <p class="tw:mb-6 tw:text-gray-600">
+    Each page shows an image and a list of bullet points written in Markdown.
+    Changes stay in this upcoming version until a Bike Index admin authorizes it
+    to go live.
+  </p>
+
+  <%= form_with model: @draft,
+    url: organization_registration_sequence_path(organization_id: current_organization.to_param),
+    method: :patch, html: {multipart: true}, data: {controller: "nested-form"} do |f| %>
+    <div data-nested-form-target="list" class="tw:flex tw:flex-col tw:gap-4">
+      <%= f.fields_for :pages do |page_form| %>
+        <%= render "page_fields", f: page_form %>
+      <% end %>
+    </div>
+
+    <template data-nested-form-target="template">
+      <%= f.fields_for :pages, RegistrationSequencePage.new, child_index: "NEW_RECORD" do |page_form| %>
+        <%= render "page_fields", f: page_form %>
+      <% end %>
+    </template>
+
+    <div class="tw:mt-4 tw:flex tw:items-center tw:justify-between">
+      <button
+        type="button"
+        data-action="nested-form#add"
+        class="btn btn-secondary"
+      >
+        Add a page
+      </button>
+
+      <%= f.submit "Save upcoming version", class: "btn btn-success" %>
+    </div>
+  <% end %>
+</div>

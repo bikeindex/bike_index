@@ -268,6 +268,8 @@ Rails.application.routes.draw do
 
     resources :theft_alert_plans, only: %i[index edit update new create]
 
+    resources :registration_sequences, only: %i[index show update]
+
     resources :organizations do
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
@@ -435,6 +437,9 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
+    resource :registration_sequence, only: %i[show edit update] do
+      member { get :preview }
+    end
   end
 
   # This is the public organizations section

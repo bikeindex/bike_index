@@ -1,0 +1,37 @@
+<h1>Registration sequences awaiting approval</h1>
+
+<% if @registration_sequences.any? %>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Organization</th>
+        <th>Pages</th>
+        <th>Updated</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @registration_sequences.each do |registration_sequence| %>
+        <tr>
+          <td><%= registration_sequence.organization&.name %></td>
+          <td><%= number_display(registration_sequence.pages.size) %></td>
+
+          <td>
+            <span class="convertTime">
+              <%= l registration_sequence.updated_at, format: :convert_time %>
+            </span>
+          </td>
+
+          <td>
+            <%= link_to "Review", admin_registration_sequence_path(registration_sequence), class: "twlink" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="tw:text-gray-600">
+    No upcoming registration sequences are awaiting approval.
+  </p>
+<% end %>

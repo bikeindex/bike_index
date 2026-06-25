@@ -1,0 +1,29 @@
+<div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
+  <h1>
+    Registration sequence
+    <small class="less-strong"><%= @registration_sequence.organization&.name %></small>
+  </h1>
+
+  <%= button_to "Make this live", admin_registration_sequence_path(@registration_sequence),
+    method: :patch, class: "btn btn-success",
+    data: {confirm: "Make this the live registration sequence for #{@registration_sequence.organization&.name}?"} %>
+</div>
+
+<div class="tw:grid tw:gap-8 tw:lg:grid-cols-2">
+  <div>
+    <h2 class="tw:mb-3 tw:text-lg tw:font-semibold">Upcoming (pending)</h2>
+    <%= render RegistrationSequencePreview::Component.new(registration_sequence: @registration_sequence) %>
+  </div>
+
+  <div>
+    <h2 class="tw:mb-3 tw:text-lg tw:font-semibold">Current live</h2>
+
+    <% if @live.present? %>
+      <%= render RegistrationSequencePreview::Component.new(registration_sequence: @live) %>
+    <% else %>
+      <p class="tw:text-gray-600">
+        No live version yet — approving this will be the first.
+      </p>
+    <% end %>
+  </div>
+</div>

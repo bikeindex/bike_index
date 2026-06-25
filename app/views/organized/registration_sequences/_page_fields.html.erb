@@ -1,0 +1,33 @@
+<div class="nested-page tw:rounded tw:border tw:border-gray-200 tw:p-4">
+  <div class="tw:flex tw:items-center tw:justify-between">
+    <div class="tw:w-32">
+      <%= f.label :listing_order, "Order", class: "twlabel" %>
+      <%= f.number_field :listing_order, min: 0, class: "twinput tw:w-full" %>
+    </div>
+
+    <button
+      type="button"
+      data-action="nested-form#remove"
+      class="twlink tw:text-red-600"
+    >
+      Remove page
+    </button>
+  </div>
+
+  <div class="tw:mt-3">
+    <%= f.label :image, "Image", class: "twlabel" %>
+
+    <% if f.object.image.attached? %>
+      <%= image_tag f.object.image_url, class: "tw:mb-2 tw:w-48 tw:rounded" %>
+    <% end %>
+
+    <%= f.file_field :image, accept: "image/*", class: "twinput tw:w-full" %>
+  </div>
+
+  <div class="tw:mt-3">
+    <%= f.label :body, "Bullet points (Markdown)", class: "twlabel" %>
+    <%= f.text_area :body, rows: 6, class: "twinput tw:w-full tw:font-mono" %>
+  </div>
+
+  <%= f.hidden_field :_destroy %>
+</div>
