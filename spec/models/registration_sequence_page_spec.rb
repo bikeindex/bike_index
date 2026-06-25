@@ -16,4 +16,14 @@ RSpec.describe RegistrationSequencePage, type: :model do
       end
     end
   end
+
+  describe "#htmlize_bullet_points" do
+    let(:page) { FactoryBot.create(:registration_sequence_page, bullet_points: ["**bold** point", "plain"]) }
+
+    it "precomputes sanitized Markdown html per bullet on save" do
+      expect(page.bullet_points_html.size).to eq(2)
+      expect(page.bullet_points_html.first).to include("<strong>bold</strong>")
+      expect(page.bullet_points_html.last).to include("plain")
+    end
+  end
 end

@@ -1,4 +1,7 @@
-<div class="nested-page tw:rounded tw:border tw:border-gray-200 tw:p-4">
+<div
+  class="tw:rounded tw:border tw:border-gray-200 tw:p-4"
+  data-nested-form-item
+>
   <div class="tw:flex tw:items-center tw:justify-between">
     <div class="tw:w-32">
       <%= @form_builder.label :listing_order, "Order", class: "twlabel" %>
@@ -24,10 +27,10 @@
     <%= @form_builder.file_field :image, accept: "image/*", class: "twinput tw:w-full" %>
   </div>
 
-  <div class="tw:mt-3" data-controller="nested-list">
+  <div class="tw:mt-3" data-controller="nested-form">
     <%= @form_builder.label :bullet_points, "Bullet points (Markdown)", class: "twlabel" %>
 
-    <div data-nested-list-target="list" class="tw:flex tw:flex-col tw:gap-2">
+    <div data-nested-form-target="list" class="tw:flex tw:flex-col tw:gap-2">
       <input
         type="hidden"
         name="<%= @form_builder.object_name %>[bullet_points][]"
@@ -39,12 +42,12 @@
       <% end %>
     </div>
 
-    <template data-nested-list-target="template">
+    <template data-nested-form-target="template">
       <%= bullet_field("") %>
     </template>
 
     <div class="tw:mt-2">
-      <%= render UI::Button::Component.new(text: "Add bullet point", color: :secondary, size: :sm, data: {action: "nested-list#add"}) %>
+      <%= render UI::Button::Component.new(text: "Add bullet point", color: :secondary, size: :sm, data: {action: "nested-form#add"}) %>
     </div>
   </div>
 

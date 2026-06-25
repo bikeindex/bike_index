@@ -3230,6 +3230,7 @@ CREATE TABLE public.registration_sequence_pages (
     id bigint NOT NULL,
     registration_sequence_id bigint NOT NULL,
     bullet_points text[] DEFAULT '{}'::text[],
+    bullet_points_html text[] DEFAULT '{}'::text[],
     listing_order integer,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL

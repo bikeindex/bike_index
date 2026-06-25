@@ -2,9 +2,15 @@
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
     <h1 class="tw:text-2xl tw:font-semibold">Registration sequence</h1>
 
-    <%= render UI::ButtonLink::Component.new(text: "Edit draft version",
-      href: edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id),
-      color: :primary) %>
+    <% if @draft.present? %>
+      <%= render UI::ButtonLink::Component.new(text: "Edit draft version",
+        href: edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id),
+        color: :primary) %>
+    <% else %>
+      <%= form_with url: organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post do %>
+        <%= render UI::Button::Component.new(text: "Start a draft", color: :primary, kind: :submit) %>
+      <% end %>
+    <% end %>
   </div>
 
   <h2 class="tw:mb-2 tw:text-lg tw:font-semibold">Current</h2>
@@ -16,17 +22,19 @@
     </p>
   <% else %>
     <p class="tw:mb-6 tw:text-gray-600">
-      There is no active registration sequence yet. Edit the draft version, then
+      There is no active registration sequence yet.
+      <%= @draft.present? ? "Edit the draft version" : "Start a draft" %>, then
       contact Bike Index to make it live.
     </p>
   <% end %>
 
-  <h2 class="tw:mb-2 tw:text-lg tw:font-semibold">Draft</h2>
-
-  <p class="tw:mb-6 tw:text-gray-600">
-    Your draft awaiting approval.
-    <%= link_to "Preview draft", organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id), class: "twlink" %>
-  </p>
+  <% if @draft.present? %>
+    <h2 class="tw:mb-2 tw:text-lg tw:font-semibold">Draft</h2>
+    <p class="tw:mb-6 tw:text-gray-600">
+      Your draft awaiting approval.
+      <%= link_to "Preview draft", organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id), class: "twlink" %>
+    </p>
+  <% end %>
 
   <% if @previous.any? %>
     <h2 class="tw:mb-2 tw:text-lg tw:font-semibold">Previous</h2>

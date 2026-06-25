@@ -11,6 +11,17 @@ RSpec.describe RegistrationSequence, type: :model do
 
       expect { RegistrationSequence.template }.to_not change(RegistrationSequence, :count)
     end
+
+    context "when a concurrent request wins the create race" do
+      it "rescues RecordNotUnique and returns the existing template" do
+        existing = FactoryBot.create(:registration_sequence_template)
+        templates = RegistrationSequence.templates
+        allow(RegistrationSequence).to receive(:templates).and_return(templates)
+        allow(templates).to receive(:first_or_create!).and_raise(ActiveRecord::RecordNotUnique)
+
+        expect(RegistrationSequence.template).to eq(existing)
+      end
+    end
   end
 
   describe ".draft_for" do
@@ -32,6 +43,19 @@ RSpec.describe RegistrationSequence, type: :model do
 
       it "returns the existing draft without creating another" do
         expect { RegistrationSequence.draft_for(organization) }.to_not change(RegistrationSequence, :count)
+        expect(RegistrationSequence.draft_for(organization)).to eq(existing)
+      end
+    end
+
+    context "when a concurrent request wins the create race" do
+      let!(:existing) { FactoryBot.create(:registration_sequence, organization:) }
+
+      it "rescues RecordNotUnique and returns the existing draft" do
+        drafts = RegistrationSequence.draft
+        allow(RegistrationSequence).to receive(:draft).and_return(drafts)
+        allow(drafts).to receive(:find_by).with(organization:).and_return(nil)
+        allow(RegistrationSequence).to receive(:build_draft_for).and_raise(ActiveRecord::RecordNotUnique)
+
         expect(RegistrationSequence.draft_for(organization)).to eq(existing)
       end
     end

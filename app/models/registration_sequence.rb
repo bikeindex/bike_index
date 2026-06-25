@@ -35,8 +35,12 @@ class RegistrationSequence < ApplicationRecord
   scope :archived, -> { where.not(start_at: nil).where.not(end_at: nil) }
 
   class << self
+    # first_or_create! and build_draft_for are guarded only by partial unique indexes;
+    # a concurrent request can win the create race, so re-read the row it inserted.
     def template
       templates.first_or_create!
+    rescue ActiveRecord::RecordNotUnique
+      templates.first!
     end
 
     def active_for(organization)
@@ -45,14 +49,15 @@ class RegistrationSequence < ApplicationRecord
 
     def draft_for(organization)
       draft.find_by(organization:) || build_draft_for(organization)
+    rescue ActiveRecord::RecordNotUnique
+      draft.find_by!(organization:)
     end
 
     def for_status(status)
-      if STATUSES.include?(status.to_s)
-        public_send((status == "template") ? :templates : status)
-      else
-        all
-      end
+      status = status.to_s
+      return all unless STATUSES.include?(status)
+
+      public_send((status == "template") ? :templates : status)
     end
 
     private
@@ -79,9 +84,10 @@ class RegistrationSequence < ApplicationRecord
 
   def status
     return "template" if template?
-    return "draft" if start_at.blank?
+    return "active" if active?
+    return "archived" if archived?
 
-    end_at.blank? ? "active" : "archived"
+    "draft"
   end
 
   def make_active!(approver)

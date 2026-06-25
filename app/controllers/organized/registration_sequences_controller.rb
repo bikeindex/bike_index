@@ -1,7 +1,7 @@
 module Organized
   class RegistrationSequencesController < Organized::AdminController
     def index
-      @draft = RegistrationSequence.draft_for(current_organization)
+      @draft = current_organization.registration_sequences.draft.first
       @active = RegistrationSequence.active_for(current_organization)
       @previous = current_organization.registration_sequences.archived.order(end_at: :desc)
     end
@@ -10,12 +10,18 @@ module Organized
       @registration_sequence = current_organization.registration_sequences.find(params[:registration_sequence_id])
     end
 
+    # Builds the draft (cloned from the template) the org edits
+    def create
+      draft = RegistrationSequence.draft_for(current_organization)
+      redirect_to edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: draft.id)
+    end
+
     def edit
-      @draft = RegistrationSequence.draft_for(current_organization)
+      @draft = find_draft
     end
 
     def update
-      @draft = RegistrationSequence.draft_for(current_organization)
+      @draft = find_draft
       if @draft.update(permitted_parameters)
         flash[:success] = "Upcoming registration sequence updated"
         redirect_to edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id)
@@ -26,6 +32,10 @@ module Organized
     end
 
     private
+
+    def find_draft
+      current_organization.registration_sequences.draft.find(params[:registration_sequence_id])
+    end
 
     def permitted_parameters
       params.require(:registration_sequence)

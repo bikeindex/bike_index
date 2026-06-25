@@ -1,9 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='nested-form'
-// Adds and removes nested fields_for records. The template target holds blank fields whose
-// child_index placeholder is NEW_RECORD, replaced with a unique value on each insert. Removing
-// a persisted record flips its hidden _destroy input; a not-yet-saved record is just dropped.
+// Adds and removes repeated fields — both fields_for records (e.g. pages) and bare array inputs
+// (e.g. bullet points), and nests (a bullet list lives inside a page). add() clones the template,
+// replacing the NEW_RECORD child_index placeholder with a unique value (a no-op when absent).
+// remove() flips a persisted record's hidden _destroy input and hides the item; an item with no
+// _destroy input (e.g. an array entry) is just dropped.
 export default class extends Controller {
   static targets = ['list', 'template']
 
@@ -15,15 +17,15 @@ export default class extends Controller {
 
   remove (event) {
     event.preventDefault()
-    const wrapper = event.target.closest('.nested-page')
-    if (!wrapper) return
+    const item = event.target.closest('[data-nested-form-item]')
+    if (!item) return
 
-    const destroyInput = wrapper.querySelector('input[name*="_destroy"]')
+    const destroyInput = item.querySelector('input[name*="_destroy"]')
     if (destroyInput) {
       destroyInput.value = '1'
-      wrapper.style.display = 'none'
+      item.style.display = 'none'
     } else {
-      wrapper.remove()
+      item.remove()
     }
   }
 }
