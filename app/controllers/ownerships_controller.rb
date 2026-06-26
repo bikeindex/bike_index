@@ -4,7 +4,7 @@ class OwnershipsController < ApplicationController
   before_action :authenticate_user_and_set_flash
 
   def show
-    bike = Bike.unscoped.find(@ownership.bike_id)
+    bike = Bike.unscoped.find_id(@ownership.bike_id)
     if @ownership.claimable_by?(current_user)
       if @ownership.current
         @ownership.mark_claimed

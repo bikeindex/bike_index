@@ -149,7 +149,7 @@ module Admin
     end
 
     def find_bike
-      @bike = Bike.unscoped.find(params[:id])
+      @bike = Bike.unscoped.find_id(params[:id])
     end
 
     def matching_bikes
