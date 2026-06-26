@@ -83,7 +83,6 @@ class User < ApplicationRecord
   has_many :feedbacks
   has_many :impound_claims
   has_many :impound_records
-  has_many :integrations, dependent: :destroy
   has_many :locks, dependent: :destroy
   has_many :marketplace_listings, foreign_key: :seller_id
   has_many :marketplace_messages_received, class_name: "MarketplaceMessage", foreign_key: :receiver_id

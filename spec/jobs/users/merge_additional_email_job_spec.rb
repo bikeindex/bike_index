@@ -30,7 +30,6 @@ RSpec.describe Users::MergeAdditionalEmailJob, type: :job do
       let(:old_organization_role) { FactoryBot.create(:organization_role_claimed, user: old_user, organization: third_organization) }
       let(:new_organization_role) { FactoryBot.create(:organization_role_claimed, user: user, organization: third_organization) }
 
-      let(:integration) { FactoryBot.create(:integration, user: old_user, information: {"info" => {"email" => email, :name => "blargh"}}) }
       let(:lock) { FactoryBot.create(:lock, user: old_user) }
       let(:payment) { FactoryBot.create(:payment, user: old_user) }
       let(:user_phone) { FactoryBot.create(:user_phone, user: old_user) }
@@ -53,7 +52,6 @@ RSpec.describe Users::MergeAdditionalEmailJob, type: :job do
         oauth_application.update_attribute :owner_id, old_user.id
         expect(pre_created_ownership).to be_present
         expect(bike).to be_present
-        expect(integration).to be_present
         expect(lock).to be_present
         expect(payment).to be_present
         expect(customer_contact).to be_present
@@ -74,7 +72,6 @@ RSpec.describe Users::MergeAdditionalEmailJob, type: :job do
         second_organization.reload
         pre_created_ownership.reload
         old_user_ownership.reload
-        integration.reload
         lock.reload
         payment.reload
         customer_contact.reload
@@ -94,7 +91,6 @@ RSpec.describe Users::MergeAdditionalEmailJob, type: :job do
         expect(second_organization.auto_user).to eq user
         expect(ownership.user).to eq user
         expect(old_user_ownership.user).to eq user
-        expect(integration.user_id).to eq user.id
         expect(lock.user).to eq user
         expect(payment.user).to eq user
         expect(customer_contact.user).to eq user
