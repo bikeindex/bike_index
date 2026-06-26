@@ -1,0 +1,19 @@
+<div data-controller="nested-form">
+  <%= @form_builder.label @attribute, @label, class: "twlabel" %>
+
+  <div data-nested-form-target="list" class="tw:flex tw:flex-col tw:gap-2">
+    <input type="hidden" name="<%= field_name %>" value="">
+
+    <% values.each do |value| %>
+      <%= editor_field(value) %>
+    <% end %>
+  </div>
+
+  <template data-nested-form-target="template">
+    <%= editor_field("") %>
+  </template>
+
+  <div class="tw:mt-2">
+    <%= render UI::Button::Component.new(text: @add_label, color: :secondary, size: :sm, data: {action: "nested-form#add"}) %>
+  </div>
+</div>

@@ -9,27 +9,5 @@
     <%= @form_builder.file_field :image, accept: "image/*", class: "twinput tw:w-full" %>
   </div>
 
-  <div data-controller="nested-form">
-    <%= @form_builder.label :bullet_points, "Bullet points", class: "twlabel" %>
-
-    <div data-nested-form-target="list" class="tw:flex tw:flex-col tw:gap-2">
-      <input
-        type="hidden"
-        name="<%= @form_builder.object_name %>[bullet_points][]"
-        value=""
-      >
-
-      <% Array(@form_builder.object.bullet_points).each do |bullet| %>
-        <%= bullet_field(bullet) %>
-      <% end %>
-    </div>
-
-    <template data-nested-form-target="template">
-      <%= bullet_field("") %>
-    </template>
-
-    <div class="tw:mt-2">
-      <%= render UI::Button::Component.new(text: "Add bullet point", color: :secondary, size: :sm, data: {action: "nested-form#add"}) %>
-    </div>
-  </div>
+  <%= render Form::LexxyList::Component.new(form_builder: @form_builder, attribute: :bullet_points) %>
 </div>
