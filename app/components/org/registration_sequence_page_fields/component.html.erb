@@ -9,5 +9,5 @@
     <%= @form_builder.file_field :image, accept: "image/*", class: "twinput tw:w-full" %>
   </div>
 
-  <%= render Form::Input::TextEditor::Component.new(form_builder: @form_builder, attribute: :bullet_points) %>
+  <%= render Form::TextEditor::Component.new(form_builder: @form_builder, attribute: :bullet_points) %>
 </div>

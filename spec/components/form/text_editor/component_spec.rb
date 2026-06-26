@@ -2,13 +2,13 @@
 
 require "rails_helper"
 
-RSpec.describe Form::Input::TextEditor::Component, type: :component do
+RSpec.describe Form::TextEditor::Component, type: :component do
   let(:record) { RegistrationSequencePage.new(bullet_points: ["<p>one</p>"]) }
 
   def rendered_component(record)
     render_in_view_context do
       form_for record, url: "#", method: :patch do |f|
-        render(Form::Input::TextEditor::Component.new(form_builder: f, attribute: :bullet_points))
+        render(Form::TextEditor::Component.new(form_builder: f, attribute: :bullet_points))
       end
     end
   end
