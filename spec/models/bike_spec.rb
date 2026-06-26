@@ -67,13 +67,9 @@ RSpec.describe Bike, type: :model do
 
     describe "short_id" do
       let(:bike) { FactoryBot.create(:bike, id: 1000000) }
-      it "round-trips through integer_id" do
+      it "round-trips through ShortId" do
         expect(bike.short_id).to eq "LFLS"
-        expect(Bike.integer_id(bike.short_id)).to eq 1000000
-        expect(Bike.integer_id(bike.short_id.downcase)).to eq 1000000
-        # Plain numeric params stay decimal ids
-        expect(Bike.integer_id("123")).to eq "123"
-        expect(Bike.unscoped.find(Bike.integer_id(bike.short_id))).to eq bike
+        expect(Bike.unscoped.find(ShortId.decode(bike.short_id))).to eq bike
       end
     end
 

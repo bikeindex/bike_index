@@ -278,12 +278,6 @@ class Bike < ApplicationRecord
       where(id: bike_id).first
     end
 
-    # Resolve a /bikes/:id param, which may be a numeric id or a base36 short_id
-    def integer_id(param)
-      param = param.to_s
-      param.match?(/[a-z]/i) ? param.to_i(36) : param
-    end
-
     # This method only accepts numerical org ids
     def bike_sticker(organization_id = nil)
       return includes(:bike_stickers).where.not(bike_stickers: {bike_id: nil}) if organization_id.blank?
@@ -519,7 +513,7 @@ class Bike < ApplicationRecord
 
   # Compact alphanumeric alias for the id, usable in /bikes/:id URLs
   def short_id
-    id&.to_s(36)&.upcase
+    ShortId.encode(id)
   end
 
   # We may eventually remove the boolean. For now, we're just going with it.
