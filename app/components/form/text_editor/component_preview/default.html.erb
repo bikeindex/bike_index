@@ -1,0 +1,6 @@
+<%# data-controller="lexxy" lazily loads the editor bundle, which upgrades each <lexxy-editor> %>
+<div data-controller="lexxy">
+  <%= form_with(model: OrganizationFeature.new(feature_slugs: ["<p>First bullet</p>", "<p>Second bullet</p>"]), url: "#", builder: BikeIndexFormBuilder) do |f| %>
+    <%= render(Form::TextEditor::Component.new(form_builder: f, attribute: :feature_slugs)) %>
+  <% end %>
+</div>
