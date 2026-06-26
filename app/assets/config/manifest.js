@@ -10,6 +10,7 @@
 
 //= link lexxy.js
 //= link lexxy.css
+//= link lexxy_overrides.css
 //= link activestorage.esm.js
 
 //= link_tree ../../javascript

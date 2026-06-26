@@ -11,5 +11,5 @@
 </div>
 
 <% if @registration_sequence.organization.present? %>
-  <%= link_to "View on the organization", organization_registration_sequence_path(organization_id: @registration_sequence.organization.to_param, registration_sequence_id: @registration_sequence.id), class: "twlink" %>
+  <%= link_to "View on the organization", organization_registration_sequence_path(organization_id: @registration_sequence.organization.to_param, id: @registration_sequence.id), class: "twlink" %>
 <% end %>

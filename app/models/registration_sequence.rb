@@ -89,6 +89,13 @@ class RegistrationSequence < ApplicationRecord
     "draft"
   end
 
+  # Reorders pages to match the given ids (drag-and-drop on the show page)
+  def reorder_pages!(ordered_ids)
+    Array(ordered_ids).each_with_index do |page_id, index|
+      registration_sequence_pages.where(id: page_id).update_all(listing_order: index)
+    end
+  end
+
   def make_active!(approver)
     return false unless draft? && registration_sequence_pages.any?
 

@@ -21,12 +21,18 @@ class RegistrationSequencePage < ApplicationRecord
 
   # Each bullet is the HTML from a single-line Lexxy editor; sanitize and drop empties on save
   before_validation :normalize_bullet_points
+  before_create :set_listing_order
 
   def image_url
     BlobUrl.for(image.blob) if image.attached?
   end
 
   private
+
+  # Appended to the end; reordering is done by drag-and-drop on the sequence show page
+  def set_listing_order
+    self.listing_order ||= (registration_sequence&.registration_sequence_pages&.maximum(:listing_order) || -1) + 1
+  end
 
   def normalize_bullet_points
     self.bullet_points = Array(bullet_points).filter_map do |bullet|

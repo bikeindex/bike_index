@@ -437,7 +437,11 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
-    resources :registration_sequences, only: %i[index create show edit update], param: :registration_sequence_id
+    resources :registration_sequences, only: %i[index create show] do
+      resources :pages, only: %i[create edit update destroy], controller: "registration_sequence_pages" do
+        collection { patch :sort }
+      end
+    end
   end
 
   # This is the public organizations section

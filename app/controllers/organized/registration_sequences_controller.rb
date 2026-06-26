@@ -6,43 +6,15 @@ module Organized
       @previous = current_organization.registration_sequences.archived.order(end_at: :desc)
     end
 
+    # The show page manages the draft's pages (add / reorder / edit), or previews a non-draft
     def show
-      @registration_sequence = current_organization.registration_sequences.find(params[:registration_sequence_id])
+      @registration_sequence = current_organization.registration_sequences.find(params[:id])
     end
 
-    # Builds the draft (cloned from the template) the org edits
+    # Builds the draft (cloned from the template) the org manages
     def create
-      redirect_to edit_draft_path(RegistrationSequence.draft_for(current_organization))
-    end
-
-    def edit
-      @draft = find_draft
-    end
-
-    def update
-      @draft = find_draft
-      if @draft.update(permitted_parameters)
-        flash[:success] = "Upcoming registration sequence updated"
-        redirect_to edit_draft_path(@draft)
-      else
-        flash[:error] = "Unable to update: #{@draft.errors.full_messages.to_sentence}"
-        render :edit
-      end
-    end
-
-    private
-
-    def find_draft
-      current_organization.registration_sequences.draft.find(params[:registration_sequence_id])
-    end
-
-    def edit_draft_path(draft)
-      edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: draft.id)
-    end
-
-    def permitted_parameters
-      params.require(:registration_sequence)
-        .permit(registration_sequence_pages_attributes: [:id, :image, :listing_order, :_destroy, {bullet_points: []}])
+      draft = RegistrationSequence.draft_for(current_organization)
+      redirect_to organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id)
     end
   end
 end

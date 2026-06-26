@@ -1,8 +1,65 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:py-6">
-  <h1 class="tw:mb-6 tw:text-2xl tw:font-semibold">
-    Preview
-    <span class="tw:text-base tw:font-normal tw:text-gray-500">(<%= @registration_sequence.status %> version)</span>
-  </h1>
+  <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
+    <h1 class="tw:text-2xl tw:font-semibold">
+      Registration sequence
+      <span class="tw:text-base tw:font-normal tw:text-gray-500">(<%= @registration_sequence.status %>)</span>
+    </h1>
 
-  <%= render RegistrationSequencePreview::Component.new(registration_sequence: @registration_sequence) %>
+    <% if @registration_sequence.draft? %>
+      <%= form_with url: organization_registration_sequence_pages_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id), method: :post do %>
+        <%= render UI::Button::Component.new(text: "Add a page", color: :primary, kind: :submit) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if @registration_sequence.draft? %>
+    <p class="tw:mb-4 tw:text-gray-600">
+      Drag pages to reorder them; use Edit to change a page or Delete to remove
+      it.
+    </p>
+    <div
+      data-controller="sortable"
+      data-sortable-url-value="<%= sort_organization_registration_sequence_pages_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id) %>"
+      class="tw:flex tw:flex-col tw:gap-4"
+    >
+      <% @registration_sequence.registration_sequence_pages.each do |page| %>
+        <div
+          data-sortable-target="item"
+          data-page-id="<%= page.id %>"
+          draggable="true"
+          class="
+            tw:flex tw:items-start tw:gap-4 tw:rounded tw:border
+            tw:border-gray-200 tw:bg-white tw:p-4
+          "
+        >
+          <span
+            class="tw:cursor-grab tw:select-none tw:text-gray-400"
+            aria-hidden="true"
+          >
+            ⠿
+          </span>
+
+          <% if page.image.attached? %>
+            <%= image_tag page.image_url, class: "tw:w-24 tw:rounded tw:object-cover" %>
+          <% end %>
+
+          <ul class="tw:prose tw:max-w-none tw:flex-1">
+            <% Array(page.bullet_points).each do |bullet| %>
+              <li><%= bullet.html_safe %></li>
+            <% end %>
+          </ul>
+
+          <div class="tw:flex tw:flex-col tw:items-end tw:gap-2">
+            <%= link_to "Edit", edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), class: "twlink" %>
+
+            <%= form_with url: organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), method: :delete, data: {turbo_confirm: "Remove this page?"} do %>
+              <%= render UI::Button::Component.new(text: "Delete", color: :error, size: :sm, kind: :submit) %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render RegistrationSequencePreview::Component.new(registration_sequence: @registration_sequence) %>
+  <% end %>
 </div>

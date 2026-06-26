@@ -3,8 +3,8 @@
     <h1 class="tw:text-2xl tw:font-semibold">Registration sequence</h1>
 
     <% if @draft.present? %>
-      <%= render UI::ButtonLink::Component.new(text: "Edit draft version",
-        href: edit_organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id),
+      <%= render UI::ButtonLink::Component.new(text: "Manage draft pages",
+        href: organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id),
         color: :primary) %>
     <% else %>
       <%= form_with url: organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post do %>
@@ -18,12 +18,12 @@
   <% if @active.present? %>
     <p class="tw:mb-6 tw:text-gray-600">
       This is the active version your registrants see.
-      <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: @active.id), class: "twlink" %>
+      <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @active.id), class: "twlink" %>
     </p>
   <% else %>
     <p class="tw:mb-6 tw:text-gray-600">
       There is no active registration sequence yet.
-      <%= @draft.present? ? "Edit the draft version" : "Start a draft" %>, then
+      <%= @draft.present? ? "Manage the draft pages" : "Start a draft" %>, then
       contact Bike Index to make it live.
     </p>
   <% end %>
@@ -32,7 +32,7 @@
     <h2 class="tw:mb-2 tw:text-lg tw:font-semibold">Draft</h2>
     <p class="tw:mb-6 tw:text-gray-600">
       Your draft awaiting approval.
-      <%= link_to "Preview draft", organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id), class: "twlink" %>
+      <%= link_to "Manage pages", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), class: "twlink" %>
     </p>
   <% end %>
 
@@ -41,7 +41,7 @@
     <ul class="tw:list-none tw:text-gray-600">
       <% @previous.each do |registration_sequence| %>
         <li class="tw:mb-1">
-          <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, registration_sequence_id: registration_sequence.id), class: "twlink" %>
+          <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, id: registration_sequence.id), class: "twlink" %>
           ended
           <span class="localizeTime"><%= l registration_sequence.end_at, format: :convert_time %></span>
         </li>
