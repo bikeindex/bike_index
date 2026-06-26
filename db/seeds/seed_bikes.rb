@@ -135,4 +135,36 @@ puts "Creating 3 Cannondale bikes registered to Cannondale org..."
   puts "  Created Cannondale bike ##{i + 1}: #{bike.manufacturer.name}" unless bike.errors.any?
 end
 
+# --- Specific real bike: 1975 Viner Special Professional (bikeindex.org/bikes/108243) ---
+puts "Creating 1975 Viner Special Professional with photos..."
+viner_manufacturer = Manufacturer.friendly_find("Viner")
+orange = Color.friendly_find("Orange")
+
+viner_bike = seed_bike(
+  creator:, user:, label: "Viner bike",
+  params: {bike: {
+    cycle_type: "bike",
+    propulsion_type: "foot-pedal",
+    serial_number: "54",
+    manufacturer_id: viner_manufacturer.id,
+    primary_frame_color_id: orange&.id,
+    year: 1975,
+    frame_model: "Special Professional",
+    frame_material_slug: "steel",
+    frame_size: "54cm",
+    rear_tire_narrow: "true",
+    description: "Force except the ultegra cranks and trp brakes. Classy af",
+    owner_email: "user1@gmail.com"
+  }}
+)
+
+unless viner_bike.errors.any?
+  Dir[Rails.root.join("db/seeds/images/viner_108243_*.jpg")].sort.each_with_index do |path, i|
+    public_image = PublicImage.new(imageable: viner_bike, listing_order: i + 1)
+    File.open(path) { |file| public_image.image = file }
+    public_image.save!
+  end
+  puts "  Created Viner bike with #{viner_bike.public_images.count} images"
+end
+
 puts "Bikes seeded successfully!"
