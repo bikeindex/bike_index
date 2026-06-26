@@ -260,7 +260,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "4.0.2"
+          ruby-version: "4.0.5"
       - name: Install Kamal
         run: gem install kamal -v "~> 2.0"
       - name: Set up SSH agent
