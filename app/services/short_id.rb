@@ -12,13 +12,11 @@ module ShortId
   end
 
   # Resolve a short_id back to an id. The type prefix and its separator are
-  # both optional ("r/21J-HW", "r-21JHW", "r21jhw" all match), other separators
-  # are ignored, and plain numeric ids pass through unchanged so existing
-  # numeric URLs still work.
+  # both optional ("r/21J-HW", "r-21JHW", "r21jhw" all match) and other
+  # separators are ignored. A leftover with letters is base36; an all-digit
+  # leftover is a plain decimal id, so "35", "r/35", and "z" all find bike 35.
   def decode(type, short_id)
-    prefix = /\A#{PREFIXES.fetch(type)}\W*/i
-    prefixed = short_id.to_s.match?(prefix)
-    str = short_id.to_s.sub(prefix, "").gsub(/\W/, "")
-    (prefixed || str.match?(/[a-z]/i)) ? str.to_i(36) : str
+    str = short_id.to_s.sub(/\A#{PREFIXES.fetch(type)}\W*/i, "").gsub(/\W/, "")
+    str.match?(/[a-z]/i) ? str.to_i(36) : str
   end
 end

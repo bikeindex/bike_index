@@ -177,6 +177,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # Short_id forms the resources :id segment can't match (prefix + slash, dots).
+  # Before resources so it wins for "r/..." paths; its constraint leaves plain ids alone.
+  get "bikes/*id", to: "bikes#show", constraints: {id: /r\W.*/i}, format: false
   resources :bikes, except: %i[index edit] do
     collection { get :scanned }
     member do
