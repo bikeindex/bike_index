@@ -449,5 +449,9 @@ Rails.application.routes.draw do
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
 
+  # Short bike URLs: /r/<short_id> (and /R/...). The whole path is passed through
+  # so ShortId#decode strips the "r/" prefix itself, even when the body starts with "r".
+  get "*id", to: "bikes#show", constraints: {id: %r{[rR]/.*}}, format: false
+
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
 end

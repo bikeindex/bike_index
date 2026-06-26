@@ -29,6 +29,22 @@ RSpec.describe "BikesController#show", type: :request do
         expect(assigns(:bike)).to eq bike
       end
     end
+    it "finds the bike from the /r/ short URL" do
+      ["/r/z", "/R/Z", "/r/Z"].each do |path|
+        get path
+        expect(response).to render_template(:show)
+        expect(assigns(:bike)).to eq bike
+      end
+    end
+    context "short_id body starting with the prefix letter" do
+      let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:bike, id: 27)) }
+      it "does not double-strip the prefix" do
+        expect(bike.short_id).to eq "r/R"
+        get "/#{bike.short_id}"
+        expect(response).to render_template(:show)
+        expect(assigns(:bike)).to eq bike
+      end
+    end
   end
   context "likely_spam bike" do
     it "shows the bike" do
