@@ -25,6 +25,16 @@ RSpec.describe BikesController, type: :controller do
       expect(assigns(:bike)).to be_present
       expect(flash).to_not be_present
     end
+    context "short_id" do
+      it "shows the bike" do
+        expect(bike.short_id).to eq bike.id.to_s(36).upcase
+        get :show, params: {id: bike.short_id}
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:bike)).to eq bike
+        expect(flash).to_not be_present
+      end
+    end
     context "illegally set passive_organization" do
       include_context :logged_in_as_user
       it "renders, resets passive_organization_id" do

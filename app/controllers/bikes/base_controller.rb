@@ -44,7 +44,7 @@ module Bikes
         return
       end
       begin
-        @bike = Bike.unscoped.find(params[:bike_id] || params[:id])
+        @bike = Bike.unscoped.find(Bike.integer_id(params[:bike_id] || params[:id]))
       rescue ActiveRecord::StatementInvalid => e
         raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
       end
