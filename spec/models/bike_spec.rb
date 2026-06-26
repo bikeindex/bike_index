@@ -65,11 +65,12 @@ RSpec.describe Bike, type: :model do
       end
     end
 
-    describe "short_id" do
-      let(:bike) { FactoryBot.create(:bike, id: 1000000) }
-      it "round-trips through ShortId" do
-        expect(bike.short_id).to eq "LFLS"
-        expect(Bike.unscoped.find(ShortId.decode(bike.short_id))).to eq bike
+    describe "short_id and find_id" do
+      let(:bike) { FactoryBot.create(:bike, id: 3431156) }
+      it "round-trips through find_id" do
+        expect(bike.short_id).to eq "r/21J-HW"
+        expect(Bike.find_id(bike.short_id)).to eq bike
+        expect(Bike.find_id(bike.id)).to eq bike
       end
     end
 

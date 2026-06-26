@@ -27,7 +27,7 @@ RSpec.describe BikesController, type: :controller do
     end
     context "short_id" do
       it "shows the bike" do
-        expect(bike.short_id).to eq bike.id.to_s(36).upcase
+        expect(bike.short_id).to eq ShortId.encode(:bike, bike.id)
         get :show, params: {id: bike.short_id}
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)

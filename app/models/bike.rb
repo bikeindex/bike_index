@@ -262,6 +262,12 @@ class Bike < ApplicationRecord
         .distinct.references(:stolen_records)
     end
 
+    # Find by id, decoding a short_id (e.g. "r/21J-HW") when present. Prepend
+    # .unscoped to also find hidden/example/deleted bikes.
+    def find_id(id)
+      find(ShortId.decode(:bike, id))
+    end
+
     def friendly_find(bike_str)
       return nil unless bike_str.present?
 
@@ -511,9 +517,9 @@ class Bike < ApplicationRecord
     "#{ENV["BASE_URL"]}/bikes/#{id}"
   end
 
-  # Compact alphanumeric alias for the id, usable in /bikes/:id URLs
+  # Type-prefixed alphanumeric alias for the id, e.g. "r/21J-HW"
   def short_id
-    ShortId.encode(id)
+    ShortId.encode(:bike, id)
   end
 
   # We may eventually remove the boolean. For now, we're just going with it.

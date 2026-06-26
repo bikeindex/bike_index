@@ -2,20 +2,21 @@ require "rails_helper"
 
 RSpec.describe ShortId do
   describe "encode" do
-    it "returns the upcased base36 id" do
-      expect(ShortId.encode(1000000)).to eq "LFLS"
-      expect(ShortId.encode(nil)).to be_nil
+    it "returns the type-prefixed base36 id, grouped in threes" do
+      expect(ShortId.encode(:bike, 3431156)).to eq "r/21J-HW"
+      expect(ShortId.encode(:bike, nil)).to be_nil
     end
   end
 
   describe "decode" do
-    it "decodes a base36 short_id, case insensitively" do
-      expect(ShortId.decode("LFLS")).to eq 1000000
-      expect(ShortId.decode("lfls")).to eq 1000000
+    it "ignores the prefix, its separator, other separators, and case" do
+      ["r/21J-HW", "R/21JHW", "r/21J HW", "r/21J+HW", "r-21JHW", "r21jhw", "21J-HW", "21jhw"].each do |str|
+        expect(ShortId.decode(:bike, str)).to eq 3431156
+      end
     end
     it "leaves plain-digit params as decimal ids" do
-      expect(ShortId.decode("123")).to eq "123"
-      expect(ShortId.decode(123)).to eq "123"
+      expect(ShortId.decode(:bike, "123")).to eq "123"
+      expect(ShortId.decode(:bike, 123)).to eq "123"
     end
   end
 end

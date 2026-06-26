@@ -5,7 +5,7 @@ module API
       skip_before_action :verify_authenticity_token
 
       def create
-        bike = Bike.find(params[:notification_hash][:bike_id])
+        bike = Bike.find_id(params[:notification_hash][:bike_id])
         if params[:notification_hash][:notification_type].to_s.match("stolen_twitter_alerter").present?
           if bike.fetch_current_stolen_record.present?
             customer_contact = CustomerContact.new(body: "EMPTY",
