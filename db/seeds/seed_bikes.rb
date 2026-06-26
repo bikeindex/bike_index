@@ -142,20 +142,15 @@ orange = Color.friendly_find("Orange")
 
 viner_bike = seed_bike(
   creator:, user:, label: "Viner bike",
-  params: {bike: {
-    cycle_type: "bike",
-    propulsion_type: "foot-pedal",
+  params: {bike: bike_params(owner_email: "user1@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
     serial_number: "54",
-    manufacturer_id: viner_manufacturer.id,
     primary_frame_color_id: orange&.id,
     year: 1975,
     frame_model: "Special Professional",
     frame_material_slug: "steel",
     frame_size: "54cm",
-    rear_tire_narrow: "true",
-    description: "Force except the ultegra cranks and trp brakes. Classy af",
-    owner_email: "user1@gmail.com"
-  }}
+    description: "Force except the ultegra cranks and trp brakes. Classy af"
+  )}
 )
 
 unless viner_bike.errors.any?
@@ -165,6 +160,51 @@ unless viner_bike.errors.any?
     public_image.save!
   end
   puts "  Created Viner bike with #{viner_bike.public_images.count} images"
+end
+
+# --- Specific stolen bike: Trek Top Fuel 9.9 XX AXS in Oakland ---
+puts "Creating stolen Trek Top Fuel 9.9 in Oakland..."
+trek_manufacturer = Manufacturer.friendly_find("Trek")
+black = Color.friendly_find("Black")
+trek_location = {latitude: 37.8228, longitude: -122.2730, street: "1430 32nd St", city: "Oakland", zipcode: "94608"}
+
+trek_bike = seed_bike(
+  creator:, user:, label: "Stolen Trek bike",
+  params: {
+    bike: bike_params(owner_email: "user_2@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
+      serial_number: "WTU074C0521M",
+      primary_frame_color_id: black&.id,
+      year: 2024,
+      frame_model: "Top Fuel 9.9 XX AXS T-Type",
+      frame_material_slug: "composite",
+      rear_tire_narrow: "false",
+      description: "OCLV Mountain Carbon, 120mm travel, RockShox Pike Ultimate fork and Deluxe Ultimate shock, SRAM XX SL Eagle AXS T-Type, Bontrager Line Pro 30 carbon wheels.",
+      status: "status_stolen",
+      date_stolen: (Time.current - 14.days).to_s
+    ),
+    stolen_record: {
+      latitude: trek_location[:latitude].to_s,
+      longitude: trek_location[:longitude].to_s,
+      street: trek_location[:street],
+      city: trek_location[:city],
+      zipcode: trek_location[:zipcode],
+      state_id: ca_state&.id.to_s,
+      country_id: us&.id.to_s,
+      skip_geocoding: true,
+      estimated_value: "11000",
+      theft_description: "Locked outside on #{trek_location[:street]} and stolen overnight",
+      locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
+      lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
+    }
+  }
+)
+
+unless trek_bike.errors.any?
+  trek_bike.current_stolen_record&.update_columns(latitude: trek_location[:latitude], longitude: trek_location[:longitude])
+  trek_image = PublicImage.new(imageable: trek_bike, listing_order: 1)
+  File.open(Rails.root.join("db/seeds/images/trek_top_fuel.jpg")) { |file| trek_image.image = file }
+  trek_image.save!
+  puts "  Created stolen Trek at #{trek_location[:street]}, #{trek_location[:city]}"
 end
 
 puts "Bikes seeded successfully!"
