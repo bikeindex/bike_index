@@ -5,6 +5,7 @@ RSpec.describe ShortId do
     it "returns the type-prefixed base36 id, grouped in threes" do
       expect(ShortId.encode(:bike, 3431156)).to eq "r/21J-HW"
       expect(ShortId.encode(:bike_version, 3431156)).to eq "v/21J-HW"
+      expect(ShortId.encode(:marketplace_listing, 3431156)).to eq "m/21J-HW"
       expect(ShortId.encode(:bike, nil)).to be_nil
     end
   end

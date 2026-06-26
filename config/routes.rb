@@ -454,6 +454,8 @@ Rails.application.routes.draw do
   get "*id", to: "bikes#show", constraints: {id: %r{[rR]/.*}}, format: false
   # Short bike_version URLs: /v/<short_id> (and /V/...)
   get "*id", to: "bike_versions#show", constraints: {id: %r{[vV]/.*}}, format: false
+  # Short marketplace_listing URLs: /m/<short_id> (and /M/...)
+  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[mM]/.*}}, format: false
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
 end

@@ -117,6 +117,11 @@ class MarketplaceListing < ApplicationRecord
       where(seller_id: user_id).or(where(buyer_id: user_id))
     end
 
+    # Find by id, decoding a short_id (e.g. "m/21J-HW") when present
+    def find_id(id)
+      find(ShortId.decode(:marketplace_listing, id))
+    end
+
     private
 
     def item_address_record(item)
@@ -216,6 +221,11 @@ class MarketplaceListing < ApplicationRecord
     return true if passed_user.id == seller_id
 
     sold? && passed_user.id == buyer_id
+  end
+
+  # Type-prefixed alphanumeric alias for the id, e.g. "m/21J-HW"
+  def short_id
+    ShortId.encode(:marketplace_listing, id)
   end
 
   private
