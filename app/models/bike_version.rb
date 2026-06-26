@@ -58,6 +58,7 @@ class BikeVersion < ApplicationRecord
   include BikeSearchable
   include BikeAttributable
   include PgSearch::Model
+  include ShortIdable
 
   acts_as_paranoid without_default_scope: true
 
@@ -100,12 +101,6 @@ class BikeVersion < ApplicationRecord
   def self.bike_override_attributes
     %i[manufacturer_id manufacturer_other mnfg_name frame_model frame_material
       year frame_size frame_size_unit frame_size_number]
-  end
-
-  # Find by id, decoding a short_id (e.g. "v/21J-HW") when present. Prepend
-  # .unscoped to also find hidden/deleted versions.
-  def self.find_id(id)
-    find(ShortId.decode(:bike_version, id))
   end
 
   # Get it unscoped, because unregistered_bike notifications
@@ -191,11 +186,6 @@ class BikeVersion < ApplicationRecord
   # Prevent returning ip address, rather than the TLD URL
   def html_url
     "#{ENV["BASE_URL"]}/bike_versions/#{id}"
-  end
-
-  # Type-prefixed alphanumeric alias for the id, e.g. "v/21J-HW"
-  def short_id
-    ShortId.encode(:bike_version, id)
   end
 
   def authorized?(passed_user, no_superuser_override: false)

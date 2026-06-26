@@ -100,6 +100,7 @@ class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
   include BikeAttributable
+  include ShortIdable
   include AddressRecorded
   include AddressRecordedWithinBoundingBox
   include PgSearch::Model
@@ -260,12 +261,6 @@ class Bike < ApplicationRecord
       unscoped.includes(:stolen_records)
         .where("stolen_records.phone ILIKE ? OR stolen_records.secondary_phone ILIKE ?", q, q)
         .distinct.references(:stolen_records)
-    end
-
-    # Find by id, decoding a short_id (e.g. "r/21J-HW") when present. Prepend
-    # .unscoped to also find hidden/example/deleted bikes.
-    def find_id(id)
-      find(ShortId.decode(:bike, id))
     end
 
     def friendly_find(bike_str)
@@ -515,11 +510,6 @@ class Bike < ApplicationRecord
   # Prevent returning ip address, rather than the TLD URL
   def html_url
     "#{ENV["BASE_URL"]}/bikes/#{id}"
-  end
-
-  # Type-prefixed alphanumeric alias for the id, e.g. "r/21J-HW"
-  def short_id
-    ShortId.encode(:bike, id)
   end
 
   # We may eventually remove the boolean. For now, we're just going with it.

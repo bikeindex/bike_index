@@ -37,6 +37,7 @@ class MarketplaceListing < ApplicationRecord
   include AddressRecordedWithinBoundingBox
   include Amountable
   include Currencyable
+  include ShortIdable
 
   STATUS_ENUM = {draft: 0, for_sale: 1, sold: 2, removed: 3}.freeze
   CONDITION_ENUM = {new_in_box: 0, excellent: 1, good: 2, poor: 3, salvage: 4}.freeze
@@ -115,11 +116,6 @@ class MarketplaceListing < ApplicationRecord
     def for_user(user_or_id)
       user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
       where(seller_id: user_id).or(where(buyer_id: user_id))
-    end
-
-    # Find by id, decoding a short_id (e.g. "m/21J-HW") when present
-    def find_id(id)
-      find(ShortId.decode(:marketplace_listing, id))
     end
 
     private
@@ -221,11 +217,6 @@ class MarketplaceListing < ApplicationRecord
     return true if passed_user.id == seller_id
 
     sold? && passed_user.id == buyer_id
-  end
-
-  # Type-prefixed alphanumeric alias for the id, e.g. "m/21J-HW"
-  def short_id
-    ShortId.encode(:marketplace_listing, id)
   end
 
   private
