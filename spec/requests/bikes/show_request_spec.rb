@@ -21,16 +21,9 @@ RSpec.describe "BikesController#show", type: :request do
   end
   context "short_id" do
     let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:bike, id: 35)) }
-    it "finds the bike from any short_id form" do
+    it "finds the bike from any short_id form and the /r/ short URL" do
       expect(bike.short_id).to eq "r/Z"
-      ["35", "z", "r/z", "R/Z", "r/35", "R.Z-"].each do |id|
-        get "#{base_url}/#{id}"
-        expect(response).to render_template(:show)
-        expect(assigns(:bike)).to eq bike
-      end
-    end
-    it "finds the bike from the /r/ short URL" do
-      ["/r/z", "/R/Z", "/r/Z"].each do |path|
+      ["#{base_url}/35", "#{base_url}/z", "#{base_url}/r/z", "#{base_url}/R/Z", "#{base_url}/r/35", "#{base_url}/R.Z-", "/r/z", "/R/Z", "/r/Z"].each do |path|
         get path
         expect(response).to render_template(:show)
         expect(assigns(:bike)).to eq bike
