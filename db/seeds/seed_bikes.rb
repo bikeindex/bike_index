@@ -143,7 +143,6 @@ orange = Color.friendly_find("Orange")
 viner_bike = seed_bike(
   creator:, user:, label: "Viner bike",
   params: {bike: bike_params(owner_email: "user1@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
-    serial_number: "54",
     primary_frame_color_id: orange&.id,
     year: 1975,
     frame_model: "Special Professional",
@@ -153,14 +152,12 @@ viner_bike = seed_bike(
   )}
 )
 
-unless viner_bike.errors.any?
-  Dir[Rails.root.join("db/seeds/images/viner_108243_*.jpg")].sort.each_with_index do |path, i|
-    public_image = PublicImage.new(imageable: viner_bike, listing_order: i + 1)
-    File.open(path) { |file| public_image.image = file }
-    public_image.save!
-  end
-  puts "  Created Viner bike with #{viner_bike.public_images.count} images"
+Dir[Rails.root.join("db/seeds/images/viner_108243_*.jpg")].sort.each_with_index do |path, i|
+  public_image = PublicImage.new(imageable: viner_bike, listing_order: i + 1)
+  File.open(path) { |file| public_image.image = file }
+  public_image.save!
 end
+puts "  Created Viner bike with #{viner_bike.public_images.count} images"
 
 # --- Specific stolen bike: Trek Top Fuel 9.9 XX AXS in Oakland ---
 puts "Creating stolen Trek Top Fuel 9.9 in Oakland..."
@@ -168,11 +165,28 @@ trek_manufacturer = Manufacturer.friendly_find("Trek")
 black = Color.friendly_find("Black")
 trek_location = {latitude: 37.8228, longitude: -122.2730, street: "1430 32nd St", city: "Oakland", zipcode: "94608"}
 
+# Stock build spec from Trek's Top Fuel 9.9 XX AXS T-Type (29" / M-XL build)
+trek_components = [
+  {ctype: "fork", manufacturer: "RockShox", model: "Pike Ultimate", front: true, description: "DebonAir spring, Charger 3.1 RC2 damper, 44mm offset, Boost110, Maxle Stealth, 130mm travel"},
+  {ctype: "rear suspension", manufacturer: "RockShox", model: "Deluxe Ultimate RCT", description: "185mm x 50mm"},
+  {ctype: "wheel", manufacturer: "Bontrager", model: "Line Pro 30", front: true, description: "OCLV Mountain Carbon, Tubeless Ready, 6-bolt, Boost110, 15mm thru axle, 29\""},
+  {ctype: "wheel", manufacturer: "Bontrager", model: "Line Pro 30", rear: true, description: "OCLV Mountain Carbon, Tubeless Ready, Rapid Drive 108, 6-bolt, SRAM XD driver, Boost148, 12mm thru axle, 29\""},
+  {ctype: "tire", manufacturer: "Bontrager", model: "Montrose RSL XT", front: true, description: "Tubeless Ready, triple compound, aramid bead, 120 tpi, 29x2.40\""},
+  {ctype: "tire", manufacturer: "Bontrager", model: "Gunnison RSL XT", rear: true, description: "Tubeless Ready, triple compound, aramid bead, 120 tpi, 29x2.40\""},
+  {ctype: "chain", manufacturer: "SRAM", model: "XX Eagle", description: "T-Type, 12 speed"},
+  {ctype: "crankset", manufacturer: "SRAM", model: "XX Eagle", description: "DUB, 30T, T-Type, 55mm chainline, 170mm length"},
+  {ctype: "bottom bracket", manufacturer: "SRAM", model: "DUB MTB Wide", description: "73mm, BSA threaded"},
+  {ctype: "derailleur", manufacturer: "SRAM", model: "XX SL Eagle AXS", rear: true, description: "T-Type"},
+  {ctype: "brake", manufacturer: "SRAM", model: "Level Ultimate 4-piston hydraulic disc", front: true, rear: true},
+  {ctype: "saddle", manufacturer: "Verse", model: "Short Pro", description: "carbon rails, 145mm width"},
+  {ctype: "seatpost", manufacturer: "RockShox", model: "Reverb AXS", description: "170mm travel, wireless, 34.9mm, 480mm length"},
+  {ctype: "pedals", manufacturer: "Shimano", model: "XTR XC PD-M9200"}
+]
+
 trek_bike = seed_bike(
   creator:, user:, label: "Stolen Trek bike",
   params: {
     bike: bike_params(owner_email: "user_2@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
-      serial_number: "WTU074C0521M",
       primary_frame_color_id: black&.id,
       year: 2024,
       frame_model: "Top Fuel 9.9 XX AXS T-Type",
@@ -199,12 +213,24 @@ trek_bike = seed_bike(
   }
 )
 
-unless trek_bike.errors.any?
-  trek_bike.current_stolen_record&.update_columns(latitude: trek_location[:latitude], longitude: trek_location[:longitude])
-  trek_image = PublicImage.new(imageable: trek_bike, listing_order: 1)
-  File.open(Rails.root.join("db/seeds/images/trek_top_fuel.jpg")) { |file| trek_image.image = file }
-  trek_image.save!
-  puts "  Created stolen Trek at #{trek_location[:street]}, #{trek_location[:city]}"
+trek_bike.current_stolen_record&.update_columns(latitude: trek_location[:latitude], longitude: trek_location[:longitude])
+trek_image = PublicImage.new(imageable: trek_bike, listing_order: 1)
+File.open(Rails.root.join("db/seeds/images/trek_top_fuel.jpg")) { |file| trek_image.image = file }
+trek_image.save!
+trek_components.each do |component|
+  manufacturer = Manufacturer.friendly_find(component[:manufacturer])
+  trek_bike.components.create!(
+    ctype: Ctype.friendly_find(component[:ctype]),
+    manufacturer: manufacturer || Manufacturer.other,
+    manufacturer_other: manufacturer ? nil : component[:manufacturer],
+    component_model: component[:model],
+    description: component[:description],
+    front: component[:front],
+    rear: component[:rear],
+    is_stock: true,
+    setting_is_stock: true
+  )
 end
+puts "  Created stolen Trek at #{trek_location[:street]}, #{trek_location[:city]} with #{trek_bike.components.count} components"
 
 puts "Bikes seeded successfully!"
