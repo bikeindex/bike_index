@@ -2,7 +2,7 @@ module ShortId
   extend Functionable
 
   # Type prefix for each object kind, so a short_id self-identifies
-  PREFIXES = {bike: "r"}.freeze
+  PREFIXES = {bike: "r", bike_version: "v"}.freeze
 
   # Compact, type-prefixed alias for an id, e.g. ShortId.encode(:bike, 3431156) => "r/21J-HW"
   def encode(type, id)

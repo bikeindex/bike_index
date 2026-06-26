@@ -60,7 +60,7 @@ class BikeVersionsController < ApplicationController
 
   def find_bike_version
     begin
-      @bike_version = BikeVersion.unscoped.find(params[:id])
+      @bike_version = BikeVersion.unscoped.find_id(params[:id])
     rescue ActiveRecord::StatementInvalid => e
       raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
     end
