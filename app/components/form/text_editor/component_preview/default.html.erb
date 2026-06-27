@@ -1,6 +1,8 @@
-<%# Lexxy's stylesheet isn't yet wired into an app layout; load it here so the preview renders styled %>
+<%#
+  The gem's base stylesheet isn't yet wired into an app layout; load it here so the preview
+  renders styled. The compact overrides ship in tailwind.css (loaded by the layout).
+%>
 <%= stylesheet_link_tag "lexxy" %>
-<%= stylesheet_link_tag "lexxy_overrides" %>
 
 <%# data-controller="lexxy" lazily loads the editor bundle, which upgrades the <lexxy-editor> %>
 <div data-controller="lexxy">
