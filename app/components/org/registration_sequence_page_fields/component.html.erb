@@ -1,5 +1,15 @@
 <div class="tw:flex tw:flex-col tw:gap-4">
   <div>
+    <%= @form_builder.label :title, "Title", class: "twlabel" %>
+    <%= @form_builder.text_field :title, class: "twinput tw:w-full" %>
+  </div>
+
+  <div>
+    <%= @form_builder.label :subtitle, "Subtitle", class: "twlabel" %>
+    <%= @form_builder.text_area :subtitle, rows: 2, class: "twinput tw:w-full" %>
+  </div>
+
+  <div>
     <%= @form_builder.label :image, "Image", class: "twlabel" %>
 
     <% if @form_builder.object.image.attached? %>

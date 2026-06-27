@@ -10,11 +10,21 @@
         <%= image_tag page.image_url, class: "tw:w-full tw:rounded tw:object-cover tw:sm:w-64" %>
       <% end %>
 
-      <ul class="tw:prose tw:max-w-none">
-        <% Array(page.bullet_points).each do |bullet| %>
-          <li><%= bullet.html_safe %></li>
+      <div class="tw:flex-1">
+        <% if page.title.present? %>
+          <h3 class="tw:text-lg tw:font-semibold"><%= page.title %></h3>
         <% end %>
-      </ul>
+
+        <% if page.subtitle.present? %>
+          <p class="tw:mb-2 tw:text-gray-600"><%= page.subtitle %></p>
+        <% end %>
+
+        <ul class="tw:prose tw:max-w-none">
+          <% Array(page.bullet_points).each do |bullet| %>
+            <li><%= bullet.html_safe %></li>
+          <% end %>
+        </ul>
+      </div>
     </div>
   <% end %>
 </div>

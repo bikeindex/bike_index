@@ -6,6 +6,8 @@
 #  id                       :bigint           not null, primary key
 #  bullet_points            :text             default([]), is an Array
 #  listing_order            :integer
+#  subtitle                 :text
+#  title                    :string
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  registration_sequence_id :bigint           not null

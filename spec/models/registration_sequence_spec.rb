@@ -29,13 +29,16 @@ RSpec.describe RegistrationSequence, type: :model do
 
     it "builds a draft cloning the template pages" do
       template = RegistrationSequence.template
-      template.registration_sequence_pages.create!(bullet_points: ["<p>Hello</p>"], listing_order: 0)
+      template.registration_sequence_pages.create!(title: "Battery", subtitle: "Charge safely", bullet_points: ["<p>Hello</p>"], listing_order: 0)
 
       draft = RegistrationSequence.draft_for(organization)
 
       expect(draft).to be_draft
       expect(draft.organization).to eq(organization)
-      expect(draft.registration_sequence_pages.first.bullet_points).to eq(["<p>Hello</p>"])
+      page = draft.registration_sequence_pages.first
+      expect(page.title).to eq("Battery")
+      expect(page.subtitle).to eq("Charge safely")
+      expect(page.bullet_points).to eq(["<p>Hello</p>"])
     end
 
     context "with an existing draft" do

@@ -54,7 +54,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:registration_sequence_page).permit(:image, bullet_points: [])
+      params.require(:registration_sequence_page).permit(:title, :subtitle, :image, bullet_points: [])
     end
   end
 end

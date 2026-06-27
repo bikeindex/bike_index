@@ -65,7 +65,7 @@ class RegistrationSequence < ApplicationRecord
       transaction do
         draft = create!(organization:)
         template.registration_sequence_pages.each do |template_page|
-          page = draft.registration_sequence_pages.create!(bullet_points: template_page.bullet_points, listing_order: template_page.listing_order)
+          page = draft.registration_sequence_pages.create!(title: template_page.title, subtitle: template_page.subtitle, bullet_points: template_page.bullet_points, listing_order: template_page.listing_order)
           page.image.attach(template_page.image.blob) if template_page.image.attached?
         end
         draft

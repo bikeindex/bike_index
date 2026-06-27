@@ -43,11 +43,17 @@
             <%= image_tag page.image_url, class: "tw:w-24 tw:rounded tw:object-cover" %>
           <% end %>
 
-          <ul class="tw:prose tw:max-w-none tw:flex-1">
-            <% Array(page.bullet_points).each do |bullet| %>
-              <li><%= bullet.html_safe %></li>
+          <div class="tw:flex-1">
+            <% if page.title.present? %>
+              <h3 class="tw:font-semibold"><%= page.title %></h3>
             <% end %>
-          </ul>
+
+            <ul class="tw:prose tw:max-w-none">
+              <% Array(page.bullet_points).each do |bullet| %>
+                <li><%= bullet.html_safe %></li>
+              <% end %>
+            </ul>
+          </div>
 
           <div class="tw:flex tw:flex-col tw:items-end tw:gap-2">
             <%= link_to "Edit", edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), class: "twlink" %>

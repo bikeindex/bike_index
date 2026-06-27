@@ -29,12 +29,14 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
     describe "update" do
       let(:page) { draft.registration_sequence_pages.first }
 
-      it "updates the page bullet points and redirects to the sequence" do
+      it "updates the page title, subtitle and bullet points, and redirects to the sequence" do
         patch "#{base_url}/#{page.id}", params: {
-          registration_sequence_page: {bullet_points: ["", "<p>first</p>", "<p>second</p>"]}
+          registration_sequence_page: {title: "Battery & charging", subtitle: "Charge safely", bullet_points: ["", "<p>first</p>", "<p>second</p>"]}
         }
         expect(response).to redirect_to(sequence_path)
-        expect(page.reload.bullet_points).to eq(["<p>first</p>", "<p>second</p>"])
+        expect(page.reload.title).to eq("Battery & charging")
+        expect(page.subtitle).to eq("Charge safely")
+        expect(page.bullet_points).to eq(["<p>first</p>", "<p>second</p>"])
       end
     end
 

@@ -3262,6 +3262,8 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 CREATE TABLE public.registration_sequence_pages (
     id bigint NOT NULL,
     registration_sequence_id bigint NOT NULL,
+    title character varying,
+    subtitle text,
     bullet_points text[] DEFAULT '{}'::text[],
     listing_order integer,
     created_at timestamp(6) without time zone NOT NULL,
