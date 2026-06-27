@@ -28,8 +28,6 @@ class RegistrationSequence < ApplicationRecord
   has_many :registration_sequence_pages, -> { order(:listing_order) },
     dependent: :destroy, inverse_of: :registration_sequence
 
-  accepts_nested_attributes_for :registration_sequence_pages, allow_destroy: true
-
   scope :templates, -> { where(organization_id: nil) }
   scope :draft, -> { where(start_at: nil).where.not(organization_id: nil) }
   scope :active, -> { where.not(start_at: nil).where(end_at: nil) }

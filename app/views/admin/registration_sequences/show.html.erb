@@ -4,9 +4,11 @@
     <small class="less-strong"><%= @registration_sequence.organization&.name %></small>
   </h1>
 
-  <%= form_with url: admin_registration_sequence_path(@registration_sequence), method: :patch do %>
-    <%= render UI::Button::Component.new(text: "Make this active", color: :primary, kind: :submit,
-      data: {turbo_confirm: "Make this the active registration sequence for #{@registration_sequence.organization&.name}?"}) %>
+  <% if @registration_sequence.draft? %>
+    <%= form_with url: admin_registration_sequence_path(@registration_sequence), method: :patch do %>
+      <%= render UI::Button::Component.new(text: "Make this active", color: :primary, kind: :submit,
+        data: {turbo_confirm: "Make this the active registration sequence for #{@registration_sequence.organization&.name}?"}) %>
+    <% end %>
   <% end %>
 </div>
 
