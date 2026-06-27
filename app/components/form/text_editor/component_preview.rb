@@ -3,11 +3,16 @@
 module Form
   module TextEditor
     class ComponentPreview < ApplicationComponentPreview
-      # @!group Examples
+      # @!group Sizes
 
-      # Two pre-filled single-line Lexxy editors bound to an array attribute, with add/remove
+      # Normal size (the default)
       def default
-        {template: "form/text_editor/component_preview/default"}
+        {template: "form/text_editor/component_preview/default", locals: {size: :normal}}
+      end
+
+      # Compact size (size: :small)
+      def small
+        {template: "form/text_editor/component_preview/default", locals: {size: :small}}
       end
 
       # @!endgroup

@@ -1,9 +1,9 @@
-/* Compact the Lexxy editors used for registration-sequence bullet points: each is a
-   single-line bullet, so shrink the toolbar and the editing box well below the defaults
-   (8lh-tall content area, 2lh toolbar buttons). Sizes use em (predictable) rather than lh,
-   and line-height is tamed so inherited app line-heights don't bloat the controls.
-   Overrides only — the gem's lexxy stylesheet still provides the base styling. */
-lexxy-editor {
+/* Opt-in compact variant (Form::TextEditor::Component size: :small) for inline/single-line Lexxy
+   editors: shrink the toolbar and the editing box well below the defaults (8lh-tall content area,
+   2lh toolbar buttons). Sizes use em (predictable) rather than lh, and line-height is tamed so
+   inherited app line-heights don't bloat the controls. Overrides only — the gem's lexxy stylesheet
+   still provides the base styling, and editors without this class keep the normal size. */
+lexxy-editor.lexxy-editor--compact {
   font-size: 0.75rem;
   line-height: 1.4;
   border: 0;
@@ -13,11 +13,11 @@ lexxy-editor {
   --lexxy-editor-padding: 0.4ch;
 }
 
-lexxy-editor lexxy-toolbar {
+lexxy-editor.lexxy-editor--compact lexxy-toolbar {
   --lexxy-toolbar-icon-size: 0.85em;
   padding: 1px;
 }
 
-lexxy-editor .lexxy-editor__toolbar-button {
+lexxy-editor.lexxy-editor--compact .lexxy-editor__toolbar-button {
   block-size: 1.6em;
 }
