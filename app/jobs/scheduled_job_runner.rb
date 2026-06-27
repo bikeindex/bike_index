@@ -50,6 +50,7 @@ class ScheduledJobRunner < ScheduledJob
       ScheduledBikePossiblyFoundNotificationJob,
       ScheduledSearchForExternalRegistryBikesJob,
       ScheduledStoreLogSearchesJob,
+      Spreadsheets::ImporterJob,
       Spreadsheets::TsvCreatorJob,
       StolenBike::DeactivateExpiredTheftAlertJob,
       StolenBike::RemoveOrphanedImagesJob,
