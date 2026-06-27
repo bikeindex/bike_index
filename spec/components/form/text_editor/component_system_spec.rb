@@ -3,24 +3,18 @@
 require "rails_helper"
 
 RSpec.describe Form::TextEditor::Component, :js, type: :system do
-  it "upgrades the Lexxy editors and adds and removes them" do
+  it "upgrades the Lexxy editor, accepts input, and is accessible" do
     visit "/rails/view_components/form/text_editor/component/default"
 
-    # The preview seeds two bullets; Lexxy loads lazily and upgrades each
-    # <lexxy-editor> by injecting a toolbar -- wait that out on slow CI.
-    expect(page).to have_css("lexxy-editor lexxy-toolbar", count: 2, wait: 10)
-    expect(page).to have_button("Add feature slug")
+    # Lexxy loads lazily and upgrades the <lexxy-editor> by injecting a toolbar -- wait that out.
+    expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10)
     expect_axe_clean
 
-    # Adding appends a fresh editor that the custom element upgrades in turn
-    click_button "Add feature slug"
+    # The editor is a real contenteditable text box
+    editor = find("lexxy-editor [contenteditable='true']")
+    editor.click
+    editor.send_keys(" and then some")
 
-    expect(page).to have_css("lexxy-editor lexxy-toolbar", count: 3)
-    expect_axe_clean
-
-    # Removing a bare array entry drops it from the DOM
-    first(:button, "Remove").click
-
-    expect(page).to have_css("lexxy-editor lexxy-toolbar", count: 2)
+    expect(editor).to have_text("A rich-text description and then some")
   end
 end

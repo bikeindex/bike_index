@@ -1,19 +1,4 @@
-<div data-controller="nested-form">
+<div>
   <%= @form_builder.label @attribute, @label, class: "twlabel" %>
-
-  <div data-nested-form-target="list" class="tw:flex tw:flex-col tw:gap-2">
-    <input type="hidden" name="<%= field_name %>" value="">
-
-    <% values.each_with_index do |value, index| %>
-      <%= editor_field(value, editor_id(index)) %>
-    <% end %>
-  </div>
-
-  <template data-nested-form-target="template">
-    <%= editor_field("", editor_id("NEW_RECORD")) %>
-  </template>
-
-  <div class="tw:mt-2">
-    <%= render UI::Button::Component.new(text: @add_label, color: :secondary, size: :sm, data: {action: "nested-form#add"}) %>
-  </div>
+  <%= helpers.lexxy_rich_textarea_tag(field_name, value, id: field_id, "multi-line": "false", attachments: "false", class: "lexxy-content tw:w-full") %>
 </div>

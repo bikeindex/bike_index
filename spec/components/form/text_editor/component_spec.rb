@@ -3,21 +3,20 @@
 require "rails_helper"
 
 RSpec.describe Form::TextEditor::Component, type: :component do
-  let(:record) { OrganizationFeature.new(feature_slugs: ["<p>one</p>"]) }
+  let(:record) { OrganizationFeature.new(description: "<p>Hello</p>") }
 
   def rendered_component(record)
     render_in_view_context do
       form_for record, url: "#", method: :patch do |f|
-        render(Form::TextEditor::Component.new(form_builder: f, attribute: :feature_slugs))
+        render(Form::TextEditor::Component.new(form_builder: f, attribute: :description))
       end
     end
   end
 
   let(:component) { rendered_component(record) }
 
-  it "renders a single-line Lexxy editor bound to the array attribute plus an add button" do
-    expect(component).to have_css("[data-controller='nested-form']")
-    expect(component).to have_css("lexxy-editor[multi-line='false'][name='organization_feature[feature_slugs][]']")
-    expect(component).to have_button("Add feature slug")
+  it "renders a single Lexxy editor bound to the attribute, with an associated label" do
+    expect(component).to have_css("lexxy-editor[name='organization_feature[description]'][id='organization_feature_description']")
+    expect(component).to have_css("label[for='organization_feature_description']", text: "Description")
   end
 end
