@@ -26,4 +26,12 @@ namespace :setup do
     system("wget -q #{url} -O #{file_path}", exception: true)
     Spreadsheets::PrimaryActivities.import(file_path)
   end
+
+  desc "import components from GitHub"
+  task import_components_csv: :environment do
+    url = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data/components.csv"
+    file_path = Rails.root.join("tmp/components.csv")
+    system("wget -q #{url} -O #{file_path}", exception: true)
+    Spreadsheets::Components.import(file_path)
+  end
 end
