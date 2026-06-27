@@ -100,6 +100,7 @@ class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
   include BikeAttributable
+  include ShortIdable
   include AddressRecorded
   include AddressRecordedWithinBoundingBox
   include PgSearch::Model

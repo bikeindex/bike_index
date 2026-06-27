@@ -296,4 +296,13 @@ RSpec.describe MarketplaceListing, type: :model do
       end
     end
   end
+
+  describe "short_id and find_id" do
+    let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, id: 3431156) }
+    it "round-trips through find_id" do
+      expect(marketplace_listing.short_id).to eq "m/21J-HW"
+      expect(MarketplaceListing.find_id(marketplace_listing.short_id)).to eq marketplace_listing
+      expect(MarketplaceListing.find_id(marketplace_listing.id)).to eq marketplace_listing
+    end
+  end
 end

@@ -65,6 +65,15 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    describe "short_id and find_id" do
+      let(:bike) { FactoryBot.create(:bike, id: 3431156) }
+      it "round-trips through find_id" do
+        expect(bike.short_id).to eq "r/21J-HW"
+        expect(Bike.find_id(bike.short_id)).to eq bike
+        expect(Bike.find_id(bike.id)).to eq bike
+      end
+    end
+
     describe ".currently_stolen_in" do
       context "given no matching state or country" do
         it "returns none" do

@@ -5,7 +5,7 @@ module Email
     sidekiq_options queue: "notify", retry: 3
 
     def perform(bike_id, match_class, match_id)
-      bike = Bike.find(bike_id)
+      bike = Bike.find_id(bike_id)
       matched_bike = match_class.to_s.constantize.find(match_id)
 
       return if bike == matched_bike
