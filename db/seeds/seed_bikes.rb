@@ -163,6 +163,8 @@ puts "  Created Viner bike with #{viner_bike.public_images.count} images"
 puts "Creating stolen Trek Top Fuel 9.9 in Oakland..."
 trek_manufacturer = Manufacturer.friendly_find("Trek")
 black = Color.friendly_find("Black")
+trek_activity = PrimaryActivity.friendly_find("Trail / All-Mountain") # "MTB: Trail / All-Mountain"
+seven_hundred_c_id = WheelSize.id_for_bsd(622) # "700 C"
 trek_location = {latitude: 37.8228, longitude: -122.2730, street: "1430 32nd St", city: "Oakland", zipcode: "94608"}
 
 # Stock build spec from Trek's Top Fuel 9.9 XX AXS T-Type (29" / M-XL build)
@@ -191,7 +193,16 @@ trek_bike = seed_bike(
       year: 2024,
       frame_model: "Top Fuel 9.9 XX AXS T-Type",
       frame_material_slug: "composite",
+      handlebar_type: "flat",
+      primary_activity_id: trek_activity&.id,
+      frame_size: "m",
+      frame_size_unit: "ordinal",
       rear_tire_narrow: "false",
+      front_tire_narrow: "false",
+      front_gear_type_slug: "1",
+      rear_gear_type_slug: "12",
+      front_wheel_size_id: seven_hundred_c_id,
+      rear_wheel_size_id: seven_hundred_c_id,
       description: "OCLV Mountain Carbon, 120mm travel, RockShox Pike Ultimate fork and Deluxe Ultimate shock, SRAM XX SL Eagle AXS T-Type, Bontrager Line Pro 30 carbon wheels.",
       status: "status_stolen",
       date_stolen: (Time.current - 14.days).to_s
