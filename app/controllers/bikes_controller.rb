@@ -74,7 +74,7 @@ class BikesController < Bikes::BaseController
   end
 
   def spokecard
-    @qrcode = "#{bike_url(Bike.find(params[:id]))}.png"
+    @qrcode = "#{bike_url(Bike.find_id(params[:id]))}.png"
     render layout: false
   end
 
