@@ -37,7 +37,8 @@ module Spreadsheets
 
     def find_or_create_cgroup(name)
       name = name.presence || Cgroup.additional_parts.name
-      Cgroup.friendly_find(name) || Cgroup.create!(name:)
+      Cgroup.friendly_find(name) ||
+        Cgroup.create!(name:, priority: (Cgroup.maximum(:priority) || 0) + 1)
     end
 
     def row_for(ctype)
