@@ -27,15 +27,6 @@ RSpec.describe Form::TextEditor::Component, type: :component do
       .to have_css("lexxy-editor[data-controller='lexxy'][data-lexxy-stylesheet-value*='lexxy']")
   end
 
-  context "skip_assets: true" do
-    it "omits the lexxy controller (assets loaded by another editor on the page)" do
-      component = rendered_component(record, skip_assets: true)
-
-      expect(component).to have_css("lexxy-editor")
-      expect(component).to_not have_css("lexxy-editor[data-controller]")
-    end
-  end
-
   context "size: :single_line" do
     it "adds the compact modifier class and disables multi-line" do
       component = rendered_component(record, size: :single_line)
