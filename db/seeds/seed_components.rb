@@ -60,18 +60,18 @@ ctypes = [
   {name: "seatpost", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
   {name: "fender", has_multiple: true, cgroup_id: Cgroup.find_by_name("Additional parts").id},
   {name: "aero bars/extensions/bar ends", secondary_name: "Aero bars", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
-  {name: "Ebike battery", has_multiple: false, cgroup_id: Cgroup.find_by_name("Drivetrain and brakes").id},
-  {name: "Ebike motor", has_multiple: false, cgroup_id: Cgroup.find_by_name("Drivetrain and brakes").id},
-  {name: "Pannier", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "Ebike battery", secondary_name: "Electric Bike Battery", has_multiple: false, cgroup_id: Cgroup.find_by_name("Drivetrain and brakes").id},
+  {name: "Ebike motor", secondary_name: "Electric Bike motor", has_multiple: false, cgroup_id: Cgroup.find_by_name("Drivetrain and brakes").id},
+  {name: "Pannier", secondary_name: "Rack bag", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
   {name: "Frame bag", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
-  {name: "Cargo bike side rails", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "Cargo bike side rails", secondary_name: "Cargo bike Monkey bars", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
   {name: "Handlebar bag", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
-  {name: "seat bag", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
-  {name: "Top tube bag", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "seat bag", secondary_name: "saddle bag", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "Top tube bag", secondary_name: "bento box", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
   {name: "Child seat", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id}
 ]
 ctypes.each do |component_type|
-  ct = Ctype.create(name: component_type[:name], cgroup_id: component_type[:cgroup_id])
+  ct = Ctype.create(name: component_type[:name], secondary_name: component_type[:secondary_name], cgroup_id: component_type[:cgroup_id])
   if component_type[:has_multiple]
     ct.has_multiple = true
   end
