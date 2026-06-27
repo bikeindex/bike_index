@@ -137,7 +137,7 @@ jobs:
         run: |
           gh label create "$REVIEW_LABEL" --repo "$GITHUB_REPOSITORY" \
             --color 0E8A16 --description "Per-PR Kamal review app is deployed" 2>/dev/null || true
-          gh pr edit "${{ needs.resolve.outputs.pr_number }}" --add-label "$REVIEW_LABEL" || true
+          gh pr edit "${{ needs.resolve.outputs.pr_number }}" --repo "$GITHUB_REPOSITORY" --add-label "$REVIEW_LABEL" || true
       - name: Checkout PR head
         uses: actions/checkout@v7
         with:
@@ -306,7 +306,7 @@ jobs:
         if: needs.resolve.outputs.action == 'destroy'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --remove-label "$REVIEW_LABEL" || true
+        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --repo "$GITHUB_REPOSITORY" --remove-label "$REVIEW_LABEL" || true
       # Each push built a `pr-<N>-<sha>` image; delete every version for this PR so
       # closed/destroyed PRs don't accumulate images in GHCR. Matches on the trailing
       # dash so `pr-12-` never catches `pr-123-`. Best-effort: a delete failure (e.g.
