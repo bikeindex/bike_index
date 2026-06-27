@@ -81,8 +81,8 @@ RSpec.configure do |config|
   config.include ViewComponent::SystemTestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
   config.include HtmlContentHelpers, type: :component
-  config.before(:each, :browser, type: :system) { driven_by(:selenium) }
-  config.before(:each, :js, type: :system) { driven_by(:selenium_chrome_headless) }
+  config.before(:each, :browser, type: :system) { driven_by(:playwright) }
+  config.before(:each, :js, type: :system) { driven_by(:playwright) }
 end
 
 require "vcr"
@@ -96,7 +96,7 @@ VCR.configure do |config|
     record: :new_episodes,
     match_requests_on: [:method, :host, :path]
   }
-  config.ignore_hosts("127.0.0.1", "0.0.0.0", "localhost") # for capybara selenium
+  config.ignore_hosts("127.0.0.1", "0.0.0.0", "localhost") # for capybara's app server
 
   %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
     MAXMIND_KEY SENDGRID_EMAIL_VALIDATION_KEY LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET

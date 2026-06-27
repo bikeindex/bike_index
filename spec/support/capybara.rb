@@ -2,20 +2,37 @@
 
 require "capybara/rails"
 require "capybara/rspec"
-require "capybara-lockstep"
+require "capybara-playwright-driver"
 
-Capybara.register_driver :chrome_headless do |app|
-  # unhandled_prompt_behavior: "ignore" keeps capybara-lockstep from stalling on
-  # a JS dialog (alert/confirm/prompt) that a spec hasn't explicitly accepted.
-  options = Selenium::WebDriver::Chrome::Options.new(unhandled_prompt_behavior: "ignore")
-  options.add_argument("--headless")
-  options.add_argument("--window-size=1920,1080")
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+# axe-core-api's audit calls execute_async_script (Selenium exposed it natively
+# on the raw browser); the Playwright driver doesn't. Bridge it through the raw
+# Playwright page so the result comes back as a deep JSON clone -- the driver's
+# evaluate_async_script walks JSHandle properties, which mangles nested
+# string arrays (e.g. axe's rule `tags`).
+class PlaywrightDriver < Capybara::Playwright::Driver
+  def execute_async_script(script, *args)
+    with_playwright_page do |page|
+      page.evaluate(<<~JS, arg: args)
+        async (args) => await new Promise((resolve) => {
+          (function () { #{script} }).apply(null, [...args, resolve])
+        })
+      JS
+    end
+  end
+end
+
+Capybara.register_driver :playwright do |app|
+  # Playwright drives the `playwright` npm package (see package.json) and
+  # auto-waits for elements/navigation, so no separate lockstep sync is needed.
+  PlaywrightDriver.new(app,
+    browser_type: :chromium,
+    headless: true,
+    viewport: {width: 1920, height: 1080})
 end
 
 Capybara.configure do |config|
-  config.default_driver = :chrome_headless
-  config.javascript_driver = :chrome_headless
+  config.default_driver = :playwright
+  config.javascript_driver = :playwright
 end
 
 # Pin Capybara's app server to a predictable host:port. Defaults to

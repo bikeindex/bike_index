@@ -145,7 +145,7 @@ jobs:
       # the action's uncached apt-get install.
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: google-chrome-stable curl gettext libfuse2t64 libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          packages: curl gettext libfuse2t64 libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           version: 1.3
       # install imagemagick separately, cache-apt-pkgs-action wasn't installing correctly
       - uses: mfinelli/setup-imagemagick@v6
@@ -175,6 +175,21 @@ jobs:
         with:
           bundler-cache: true
       - run: bundle install
+      # :js system specs run through capybara-playwright-driver, which drives the
+      # `playwright` npm package and its bundled Chromium.
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          cache: 'npm'
+      - run: npm install
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
       - name: Sync translations (only on main by default)

@@ -166,9 +166,10 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
-    capybara-lockstep (2.3.1)
-      activesupport (>= 7.0)
-      capybara (>= 3.0)
+    capybara-playwright-driver (0.5.9)
+      addressable
+      capybara
+      playwright-ruby-client (>= 1.16.0)
     carrierwave (3.1.2)
       activemodel (>= 6.0.0)
       activesupport (>= 6.0.0)
@@ -577,6 +578,10 @@ GEM
     platform_agent (1.0.1)
       activesupport (>= 5.2.0)
       useragent (~> 0.16.3)
+    playwright-ruby-client (1.60.0)
+      base64
+      concurrent-ruby (>= 1.1.6)
+      mime-types (>= 3.0)
     postmark (1.25.1)
       json
     postmark-rails (0.22.1)
@@ -778,12 +783,6 @@ GEM
     secure_headers (7.2.0)
       cgi (>= 0.1)
     securerandom (0.4.1)
-    selenium-webdriver (4.35.0)
-      base64 (~> 0.2)
-      logger (~> 1.4)
-      rexml (~> 3.2, >= 3.2.5)
-      rubyzip (>= 1.2.2, < 4.0)
-      websocket (~> 1.0)
     shellany (0.0.1)
     sidekiq (8.1.6)
       connection_pool (>= 3.0.0)
@@ -895,7 +894,6 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    websocket (1.2.11)
     websocket-driver (0.8.1)
       base64
       websocket-extensions (>= 0.1.0)
@@ -926,7 +924,7 @@ DEPENDENCIES
   brakeman
   bullet
   capybara
-  capybara-lockstep
+  capybara-playwright-driver
   carrierwave (~> 3.1)
   carrierwave_backgrounder!
   chartkick
@@ -1016,7 +1014,6 @@ DEPENDENCIES
   ruby-lsp
   ruby-vips
   secure_headers (~> 7.2)
-  selenium-webdriver
   sidekiq
   sidekiq-failures
   sidekiq-logstash

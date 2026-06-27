@@ -35,7 +35,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
     # Type a query into the combobox, then click the matching autocomplete option
     def combobox_select(query, option_text)
-      find(".hw-combobox__input").set(query)
+      type_into(".hw-combobox__input", query)
       expect(page).to have_css(".hw-combobox__option", text: option_text, wait: 30)
       find(".hw-combobox__option", text: option_text, match: :first).click
     end
@@ -57,13 +57,15 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     end
 
     def expect_localstorage_location(location:, distance:)
-      local_storage = page.execute_script(<<~JS)
-        let storage = {};
-        for (let i = 0; i < localStorage.length; i++) {
-          let key = localStorage.key(i);
-          storage[key] = localStorage.getItem(key);
-        }
-        return storage;
+      local_storage = page.evaluate_script(<<~JS)
+        (() => {
+          let storage = {};
+          for (let i = 0; i < localStorage.length; i++) {
+            let key = localStorage.key(i);
+            storage[key] = localStorage.getItem(key);
+          }
+          return storage;
+        })()
       JS
 
       location_key = local_storage.find { |k, _| k.match?(/location/i) }&.first
@@ -109,7 +111,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     end
 
     it "adds the matching option when enter is pressed" do
-      find(".hw-combobox__input").set("Burg")
+      type_into(".hw-combobox__input", "Burg")
       # Wait for filtering to settle to the single match before pressing enter
       expect(page).to have_css(".hw-combobox__option", text: "Burgundy", count: 1, wait: 30)
       expect(page).to have_no_css(".hw-combobox__option", text: "Black")
@@ -125,7 +127,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       Autocomplete::Loader.load_all(%w[Color])
       visit(preview_path)
 
-      find(".hw-combobox__input").set("Reddish")
+      type_into(".hw-combobox__input", "Reddish")
       expect(page).to have_css(".hw-combobox__option", wait: 10)
 
       expect(page.evaluate_script("document.body.dataset.xss")).to be_nil
