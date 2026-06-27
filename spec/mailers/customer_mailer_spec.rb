@@ -199,6 +199,8 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from.count).to eq(1)
       expect(mail.from.first).to eq("gavin@bikeindex.org")
       expect(mail.body.encoded).to_not match "vendor terms"
+      expect(mail.body.encoded).to match "binx-header-banner" # shared blue banner header, not the old logo
+      expect(mail.body.encoded).to_not match "email_assets/logo.png"
       expect(mail.deliver_now.text_part.body.to_s).to include("Gavin Hoover and the Bike Index Team").and include("updated our privacy policy")
     end
   end
@@ -260,6 +262,8 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.to).to eq([user.email])
       expect(mail.tag).to eq "newsletter"
       expect(mail.body.encoded).to match "unsubscribe"
+      expect(mail.body.encoded).to match "binx-header-banner" # shared blue banner header, not the old logo
+      expect(mail.body.encoded).to_not match "email_assets/logo.png"
     end
   end
 

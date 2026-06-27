@@ -5441,11 +5441,39 @@ nb:
         thanks_for_adding_this_bike_type_you_found: Takk for at du la til denne %{bike_type}
           du fant til Bike Index
         use_a_ulock: Bruk en U-lås.
-        welcome_to_bike_index: Velkommen til Bike Index
         were_sorry_your_bike_type_was_stolen: Vi beklager at %{bike_type} ble stjålet.
         when_you_do: når du gjør det!
         you_added_a_bike_type_on_bike_index: Du la til en %{bike_type} på Bike Index
         youre_almost_done_registering: Du er nesten ferdig med registreringen!
+        bike_details: Sykkeldetaljer
+        bike_love_one: Sykkelkjærlighet tegneserie en
+        bike_love_three: Sykkelkjærlighet tegneserie tre
+        bike_love_two: Sykkelkjærlighetstegneserie to
+        claim_your_bike_type: Krev din %{bike_type}
+        indoor_storage_tip: Vi anbefaler alltid å ta med sykkelen innendørs eller
+          oppbevare den på et trygt sted når det er mulig, spesielt over natten.
+        keep_your_registration_updated: Hold registreringen din oppdatert
+        marketplace_illustration: Markedsplassillustrasjon
+        pro_tip_illustration: Illustrasjon av profftips
+        registered_animation: Registrert animasjon
+        registration_complete_message: Sykkelen din er nå en del av verdens mest effektive
+          sykkelregister. Du beskytter sykkelen din og bidrar til å forhindre sykkeltyveri
+          i lokalsamfunnet ditt.
+        registration_confirm_message: Du er ett skritt unna å aktivere det mest effektive
+          sykkelregisteret og beskytte sykkelen din i lokalsamfunnet ditt.
+        spread_the_word_body: Oppfordre venner og familie til å registrere syklene
+          sine også.
+        spread_the_word_title: Spre ordet om Bike Index!
+        stolen_guidance: Hvis sykkelen din noen gang blir stjålet, logg inn på Bike
+          Index umiddelbart og merk den som stjålet for å aktivere vårt gjenopprettingsnettverk.
+        theft_victims_illustration: Illustrasjon av tyveriofre
+        ulock_illustration: U-lås-illustrasjon
+        updated_registration_guidance: Hvis du flytter, selger eller gjør endringer
+          på sykkelen din, må du oppdatere registreringen slik at den forblir nøyaktig
+          og nyttig.
+        view_your_bike: Se sykkelen din
+        what_if_my_bike_gets_stolen: Hva om sykkelen min blir stjålet?
+        whats_next: Hva skjer nå?
       organization_invitation:
         hello: Hei %{name},
         join_org: Bli med %{org_name}

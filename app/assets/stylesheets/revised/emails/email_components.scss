@@ -96,3 +96,197 @@ $alert-warning-color: #ffc107;
   border: 2px solid $alert-warning-color;
   line-height: 1.5;
 }
+
+.finished-registration-card {
+  margin-top: (1.5 * $vertical-height);
+  padding: (1.5 * $vertical-height);
+  background: #fff;
+
+  h2,
+  h3 {
+    color: $gray-darker;
+  }
+}
+
+.finished-registration-intro {
+  h1 {
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .intro-art-cell {
+    width: 110px;
+    padding: 0 20px 0 0;
+    vertical-align: middle;
+  }
+
+  .intro-copy-cell {
+    vertical-align: middle;
+  }
+
+  .intro-art {
+    display: block;
+    width: 90px;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .intro-body,
+  p {
+    margin: 12px 0 0;
+  }
+}
+
+.finished-registration-kicker,
+.finished-registration-status-note {
+  font-size: 17px;
+}
+
+.finished-registration-bike-box {
+  h3 {
+    margin: 0 0 12px;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .bike-display {
+    margin-bottom: 0;
+    border: none;
+  }
+}
+
+.finished-registration-cta {
+  margin-top: (1.5 * $vertical-height);
+  text-align: center;
+
+  p {
+    margin: 12px 0 0;
+  }
+
+  &.subtle {
+    margin-top: $vertical-height;
+  }
+}
+
+.finished-registration-security {
+  h2,
+  > p {
+    text-align: center;
+  }
+
+  h2 {
+    margin: 0 0 (1.5 * $vertical-height);
+  }
+
+  .finished-registration-locking-row,
+  .finished-registration-pro-tip {
+    margin-top: $vertical-height;
+  }
+
+  .locking-copy,
+  .pro-tip-copy {
+    vertical-align: middle;
+  }
+
+  .locking-copy {
+    width: 55%;
+    padding-right: $vertical-height;
+  }
+
+  .locking-copy-wide {
+    width: 100%;
+    padding-right: 0;
+  }
+
+  .locking-art,
+  .pro-tip-art {
+    width: 45%;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .locking-main-art {
+    padding-top: 8px;
+    text-align: center;
+  }
+
+  .locking-inline-art,
+  .locking-main-image,
+  .pro-tip-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  .pro-tip-image {
+    max-width: 60%;
+  }
+}
+
+.finished-registration-next-steps {
+  h2 {
+    margin: 0 0 (1.5 * $vertical-height);
+    text-align: center;
+  }
+
+  .next-step {
+    width: 50%;
+    padding: 0 10px;
+    text-align: center;
+    vertical-align: top;
+  }
+
+  .next-step-art {
+    display: block;
+    width: 150px;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto 12px;
+  }
+
+  h3 {
+    margin: 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: 0;
+    font-size: 15px;
+  }
+}
+
+.finished-registration-promo {
+  .promo-callout {
+    margin: 0 0 (1.5 * $vertical-height);
+    padding: (1.5 * $vertical-height);
+    background: #f8f9fa;
+    text-align: center;
+
+    p {
+      margin: 0 0 16px;
+    }
+  }
+
+  .finished-registration-comics {
+    margin: 0 auto;
+  }
+
+  .comic-cell {
+    width: 33.333%;
+    padding: 0 8px;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .comic-image {
+    display: inline-block;
+    width: 100px;
+    max-width: 100%;
+    height: auto;
+  }
+}
