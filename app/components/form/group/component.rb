@@ -16,6 +16,11 @@ module Form
       def check_box?
         @kind.to_sym == :check_box
       end
+
+      # Render the passed content block in place of Form::Input (e.g. to wrap a Form::TextEditor)
+      def content_block?
+        @kind.to_sym == :content_block
+      end
     end
   end
 end

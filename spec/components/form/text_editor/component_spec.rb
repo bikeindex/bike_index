@@ -13,13 +13,27 @@ RSpec.describe Form::TextEditor::Component, type: :component do
     end
   end
 
-  it "renders a single normal-size Lexxy editor bound to the attribute, with an associated label" do
+  it "renders just the normal-size Lexxy editor box bound to the attribute (no label)" do
     component = rendered_component(record)
 
-    expect(component).to have_css("lexxy-editor[name='organization_feature[description]'][id='organization_feature_description']")
-    expect(component).to have_css("label[for='organization_feature_description']", text: "Description")
+    expect(component).to have_css("lexxy-editor[name='organization_feature[description]'][id='organization_feature_description'][multi-line='false']")
+    # The label is supplied by Form::Group, not this component
+    expect(component).to_not have_css("label")
     expect(component).to_not have_css("lexxy-editor.lexxy-editor--compact")
-    expect(component).to have_css("lexxy-editor[multi-line='false']")
+  end
+
+  it "adds the lexxy controller and stylesheet value by default" do
+    expect(rendered_component(record))
+      .to have_css("lexxy-editor[data-controller='lexxy'][data-lexxy-stylesheet-value*='lexxy']")
+  end
+
+  context "skip_assets: true" do
+    it "omits the lexxy controller (assets loaded by another editor on the page)" do
+      component = rendered_component(record, skip_assets: true)
+
+      expect(component).to have_css("lexxy-editor")
+      expect(component).to_not have_css("lexxy-editor[data-controller]")
+    end
   end
 
   context "size: :small" do

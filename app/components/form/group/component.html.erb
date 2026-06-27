@@ -6,6 +6,9 @@
       class: "twlabel tw:inline-flex tw:cursor-pointer tw:items-center tw:gap-2" %>
   <% else %>
     <%= @form_builder.label @attribute, @label_text, class: "twlabel" %>
-    <%= render(Form::Input::Component.new(form_builder: @form_builder, attribute: @attribute, kind: @kind, html_options: @html_options)) %>
+    <% unless content_block? %>
+      <%= render(Form::Input::Component.new(form_builder: @form_builder, attribute: @attribute, kind: @kind, html_options: @html_options)) %>
+    <% end %>
+    <%= content if content? %>
   <% end %>
 </div>
