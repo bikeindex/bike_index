@@ -354,8 +354,9 @@ RSpec.describe Organization, type: :model do
     context "paid" do
       let(:enabled_feature_slugs) { ["regional_bike_counts"] }
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-      # Ensure auto-increment is past the hardcoded excluded IDs (1 and 36)
-      before { FactoryBot.create_list(:organization, 2) if Organization.maximum(:id).to_i < 37 }
+      # Ensure auto-increment is past the hardcoded excluded IDs (1 and 36). Loop (not a single
+      # `if`) so a starting max id of 33-36 can't land the test org exactly on the excluded 36.
+      before { FactoryBot.create_list(:organization, 2) while Organization.maximum(:id).to_i < 37 }
       it "is truthy" do
         expect(organization.user_registration_all_bikes?).to be_truthy
       end
