@@ -37,6 +37,7 @@ permissions:
   contents: read
   packages: write       # push to GHCR
   pull-requests: write  # add/remove labels and comment
+  deployments: write    # create the PR-head deployment that surfaces the link
 
 # Concurrency is declared per-job, not per-workflow: the `build` job cancels
 # superseded builds (a stale image build is wasted work and safe to kill),
@@ -284,6 +285,37 @@ jobs:
         if: needs.resolve.outputs.action == 'deploy'
         # bin/kamal_review reads the image tag from the job-level IMAGE_TAG env.
         run: bin/kamal_review deploy --app "${{ needs.resolve.outputs.pr_number }}"
+      # The job-level `environment:` deployment attaches to the run's commit
+      # (github.sha), which surfaces the "View deployment" link on the PR only
+      # when that commit is the PR head — true for ci.yml auto-dispatches (they
+      # run on the PR branch) but NOT for a manual dispatch from another branch
+      # (e.g. main), where the deployment lands on that branch instead. Create a
+      # deployment on the PR head so the link appears regardless of the run ref.
+      - name: Link deployment to PR head
+        if: needs.resolve.outputs.action == 'deploy' && github.sha != needs.resolve.outputs.head_sha
+        uses: actions/github-script@v7
+        env:
+          HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
+          DEPLOY_URL: https://pr-${{ needs.resolve.outputs.pr_number }}.review.bikeindex.org
+        with:
+          script: |
+            const {data: deployment} = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: process.env.HEAD_SHA,
+              environment: "review-app",
+              auto_merge: false,
+              required_contexts: [],
+              transient_environment: true,
+              description: "Per-PR Kamal review app",
+            })
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.id,
+              state: "success",
+              environment_url: process.env.DEPLOY_URL,
+            })
       # A successful deploy (this step is only reached when everything above
       # passed) deletes the `report` job's now-stale failure comment.
       - name: Remove stale deploy-failure comment
