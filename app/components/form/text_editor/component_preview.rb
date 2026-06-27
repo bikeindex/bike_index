@@ -5,14 +5,14 @@ module Form
     class ComponentPreview < ApplicationComponentPreview
       # @!group Sizes
 
-      # Normal size (the default)
+      # Full multi-line editor (the default)
       def default
-        {template: "form/text_editor/component_preview/default", locals: {size: :normal}}
+        {template: "form/text_editor/component_preview/default", locals: {size: :default}}
       end
 
-      # Compact size (size: :small)
-      def small
-        {template: "form/text_editor/component_preview/default", locals: {size: :small}}
+      # Compact single-line editor (size: :single_line)
+      def single_line
+        {template: "form/text_editor/component_preview/default", locals: {size: :single_line}}
       end
 
       # @!endgroup

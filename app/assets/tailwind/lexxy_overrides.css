@@ -1,4 +1,4 @@
-/* Opt-in compact variant (Form::TextEditor::Component size: :small) for inline/single-line Lexxy
+/* Opt-in compact variant (Form::TextEditor::Component size: :single_line) for inline single-line Lexxy
    editors: shrink the toolbar and the editing box well below the defaults (8lh-tall content area,
    2lh toolbar buttons). Sizes use em (predictable) rather than lh, and line-height is tamed so
    inherited app line-heights don't bloat the controls. Overrides only — the gem's lexxy stylesheet

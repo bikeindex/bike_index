@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Form::TextEditor::Component, :js, type: :system do
-  it "upgrades the normal-size Lexxy editor, accepts input, and is accessible" do
+  it "upgrades the default Lexxy editor, accepts input, and is accessible" do
     visit "/rails/view_components/form/text_editor/component/default"
 
     # Lexxy loads lazily and upgrades the <lexxy-editor> by injecting a toolbar -- wait that out.
@@ -19,8 +19,8 @@ RSpec.describe Form::TextEditor::Component, :js, type: :system do
     expect(editor).to have_text("A rich-text description and then some")
   end
 
-  it "applies the size-scoped overrides to the compact variant (size: :small)" do
-    visit "/rails/view_components/form/text_editor/component/small"
+  it "applies the size-scoped overrides to the compact variant (size: :single_line)" do
+    visit "/rails/view_components/form/text_editor/component/single_line"
 
     expect(page).to have_css("lexxy-editor.lexxy-editor--compact lexxy-toolbar", wait: 10)
     expect_axe_clean
