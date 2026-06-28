@@ -8,6 +8,7 @@
       <th>Name</th>
       <th>Priority</th>
       <th>Component types</th>
+      <th>Updated</th>
     </thead>
 
     <tbody>
@@ -16,6 +17,10 @@
           <td><%= cgroup.name.titleize %></td>
           <td><%= number_display(cgroup.priority) %></td>
           <td><%= number_display(ctype_counts[cgroup.id] || 0) %></td>
+
+          <td class="localizeTime">
+            <%= l(cgroup.updated_at, format: :convert_time) %>
+          </td>
         </tr>
       <% end %>
     </tbody>

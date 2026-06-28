@@ -4,32 +4,14 @@
   </li>
 <% end %>
 
-<% table_view = capture do %>
-  <div class="col-12 mt-4">
-    <% if sortable_search_params? %>
-      <% if @with_websites %>
-        <p>
-          Manufacturers with <strong>websites</strong>
-          <%= link_to "view with and without websites", url_for(sortable_search_params.merge(search_with_websites: nil)), class: "gray-link small" %>
-        </p>
-      <% end %>
-      <% if @with_logos %>
-        <p>
-          Manufacturers with <strong>with logos</strong>
-          <%= link_to "view with and without logos", url_for(sortable_search_params.merge(search_with_logos: nil)), class: "gray-link small" %>
-        </p>
-      <% end %>
-      <h4 class="mt-4">
-        <%= number_display(@manufacturers.count) %> matching manufacturers
-      </h4>
-    <% else %>
-      <h4>
-        <%= number_display(@manufacturers.count) %> total,
-        <span class="less-strong"><%= number_display(Manufacturer.with_websites.count) %> with <%= link_to "websites", url_for(sortable_search_params.merge(search_with_websites: !@with_websites)) %>, <%= number_display(Manufacturer.with_logos.count) %> with <%= link_to "logos", url_for(sortable_search_params.merge(search_with_logos: !@with_logos)) %>.</span>
-      </h4>
-    <% end %>
-  </div>
+<% count_detail = capture do %>
+  &mdash; <%= number_display(Manufacturer.with_websites.count) %> with
+  <%= link_to "websites", url_for(sortable_search_params.merge(search_with_websites: !@with_websites)), class: ("active" if @with_websites) %>,
+  <%= number_display(Manufacturer.with_logos.count) %> with
+  <%= link_to "logos", url_for(sortable_search_params.merge(search_with_logos: !@with_logos)), class: ("active" if @with_logos) %>.
+<% end if request.query_parameters.blank? %>
 
+<% table_view = capture do %>
   <%= render partial: "/admin/manufacturers/table", locals: {collection: @manufacturers, render_sortable: true} %>
 
   <%= form_tag import_admin_manufacturers_path, multipart: true do %>
@@ -47,5 +29,6 @@
   viewing: "Manufacturers",
   nav_header_list_items:,
   table_view:,
+  count_detail:,
   skip_charting: true
 )) %>
