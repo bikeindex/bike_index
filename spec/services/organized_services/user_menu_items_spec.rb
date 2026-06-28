@@ -111,13 +111,26 @@ RSpec.describe OrganizedServices::UserMenuItems do
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
           link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),
-          link_item("Registration sequences", "/o/#{organization.to_param}/registration_sequences", active: :match_controller),
           link_item("#{organization.short_name} profile", "/o/#{organization.to_param}/manage"),
-          link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations")
+          link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations"),
+          link_item("Registration sequences", "/o/#{organization.to_param}/registration_sequences", active: :match_controller)
         ]
       end
 
       it { expect(items).to eq(target) }
+    end
+
+    context "with hot_sheet and registration_sequences enabled" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: %w[hot_sheet registration_sequences])
+      end
+      let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+
+      it "lists Registration sequences below the Hot Sheet configuration" do
+        labels = items.map { |i| i[:label] }
+        expect(labels.index("Registration sequences")).to be > labels.index("Stolen Bike Hot Sheet configuration")
+      end
     end
 
     context "with no organization" do
