@@ -1,0 +1,26 @@
+<div class="tw:flex tw:flex-col tw:gap-4">
+  <div>
+    <%= @form_builder.label :title, "Title", class: "twlabel" %>
+    <%= @form_builder.text_field :title, class: "twinput tw:w-full" %>
+  </div>
+
+  <div>
+    <%= @form_builder.label :subtitle, "Subtitle", class: "twlabel" %>
+    <%= @form_builder.text_area :subtitle, rows: 2, class: "twinput tw:w-full" %>
+  </div>
+
+  <div>
+    <%= @form_builder.label :image, "Image", class: "twlabel" %>
+
+    <% if @form_builder.object.image.attached? %>
+      <%= image_tag @form_builder.object.image_url, class: "tw:mb-2 tw:w-48 tw:rounded" %>
+    <% end %>
+
+    <%= @form_builder.file_field :image, accept: "image/*", class: "twinput tw:w-full" %>
+  </div>
+
+  <div>
+    <%= @form_builder.label :body, "Body", class: "twlabel" %>
+    <%= render Form::TextEditor::Component.new(form_builder: @form_builder, attribute: :body) %>
+  </div>
+</div>

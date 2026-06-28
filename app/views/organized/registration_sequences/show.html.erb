@@ -1,0 +1,13 @@
+<div class="tw:py-4">
+  <% if @registration_sequence.draft? %>
+    <%= render Org::RegistrationSequence::Edit::Component.new(registration_sequence: @registration_sequence) %>
+  <% else %>
+    <div class="tw:mb-6">
+      <h1 class="uncap tw:text-2xl tw:font-semibold">
+        Registration sequence
+        <span class="tw:text-base tw:font-normal tw:text-gray-500">(<%= @registration_sequence.status %>)</span>
+      </h1>
+    </div>
+    <%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence) %>
+  <% end %>
+</div>

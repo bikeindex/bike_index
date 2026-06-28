@@ -13,6 +13,7 @@ require File.expand_path("db/seeds/seed_bikes", Rails.root)
 require File.expand_path("db/seeds/seed_marketplace_listings", Rails.root)
 require File.expand_path("db/seeds/seed_organization_bikes_and_associations", Rails.root)
 require File.expand_path("db/seeds/seed_organized_emails", Rails.root)
+require File.expand_path("db/seeds/seed_registration_sequence_template", Rails.root)
 require File.expand_path("db/seeds/seed_counts", Rails.root)
 
 # Load the search autocomplete (Redis) from the seeded manufacturers/colors/etc.
