@@ -48,10 +48,11 @@ module Organized
     end
 
     def multi_search
+      @search_kind = normalized_search_kind
     end
 
     def multi_search_response
-      @search_kind = (params[:search_kind] == "stickers") ? "stickers" : "serials"
+      @search_kind = normalized_search_kind
       @query = (sticker_search? ? params[:query] : params[:serial]).to_s.strip
       @chip_id = params[:chip_id].to_s.strip.presence
       return head(:bad_request) unless @query.present?
@@ -63,6 +64,10 @@ module Organized
     end
 
     private
+
+    def normalized_search_kind
+      (params[:search_kind] == "stickers") ? "stickers" : "serials"
+    end
 
     def sticker_search?
       @search_kind == "stickers"
@@ -80,7 +85,7 @@ module Organized
     def sticker_search_bikes
       return Bike.none if BikeSticker.normalize_code(@query, leading_zeros: true).blank?
 
-      bike_ids = BikeSticker.sticker_code_search(@query).where.not(bike_id: nil).select(:bike_id)
+      bike_ids = BikeSticker.sticker_code_search(@query).claimed.select(:bike_id)
       Bike.where(id: bike_ids)
     end
 

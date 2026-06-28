@@ -3,7 +3,7 @@
   skip_search_and_filters: true
 ) %>
 
-<% search_kind = params[:search_kind] == "stickers" ? "stickers" : "serials" %>
+<% search_kind = @search_kind %>
 
 <% error_tooltip_template = capture do %>
   <%= render(UI::Tooltip::Component.new(text: "__MESSAGE__")) do %>

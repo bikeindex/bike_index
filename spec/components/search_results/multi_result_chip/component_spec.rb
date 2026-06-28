@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
-  let(:component) { render_inline(described_class.new(chip_id:, result_count:, serial:, error:, error_message:)) }
-  let(:serial) { "SERIAL111" }
+  let(:component) { render_inline(described_class.new(chip_id:, result_count:, label:, error:, error_message:)) }
+  let(:label) { "SERIAL111" }
   let(:chip_id) { "chip_0" }
   let(:result_count) { 1 }
   let(:error) { false }
@@ -43,23 +43,11 @@ RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
     end
   end
 
-  context "with sticker instead of serial" do
-    let(:component) { render_inline(described_class.new(chip_id:, result_count:, sticker: "STKR100")) }
+  context "with a sticker code label" do
+    let(:label) { "STKR100" }
 
-    it "uses the sticker as the chip label" do
+    it "uses the label as the chip text" do
       expect(component).to have_css("span#chip_0 a", text: "STKR100")
-    end
-  end
-
-  context "with neither serial nor sticker" do
-    it "raises ArgumentError" do
-      expect { described_class.new(chip_id:, result_count:) }.to raise_error(ArgumentError, /serial: or sticker:/)
-    end
-  end
-
-  context "with both serial and sticker" do
-    it "raises ArgumentError" do
-      expect { described_class.new(chip_id:, result_count:, serial: "S1", sticker: "K1") }.to raise_error(ArgumentError, /serial: or sticker:/)
     end
   end
 

@@ -162,38 +162,15 @@ export default class extends Controller {
   }
 
   async searchItem (query, index) {
-    if (this.searchKindValue === 'stickers') {
-      return this.searchSticker(query, index)
-    }
-    return this.searchSerial(query, index)
-  }
-
-  async searchSerial (serial, index) {
+    const stickers = this.searchKindValue === 'stickers'
     const url = new URL(this.urlValue, window.location.origin)
-    url.searchParams.set('serial', serial)
+    url.searchParams.set(stickers ? 'query' : 'serial', query)
     url.searchParams.set('chip_id', `chip_${index}`)
-    if (this.searchAll) url.searchParams.set('search_all', '1')
-
-    try {
-      const response = await fetch(url, {
-        headers: { Accept: 'text/vnd.turbo-stream.html' }
-      })
-
-      if (response.ok) {
-        Turbo.renderStreamMessage(await response.text())
-      } else {
-        this.showChipError(serial, index, `Server error ${response.status}`)
-      }
-    } catch {
-      this.showChipError(serial, index, 'Network error')
+    if (stickers) {
+      url.searchParams.set('search_kind', 'stickers')
+    } else if (this.searchAll) {
+      url.searchParams.set('search_all', '1')
     }
-  }
-
-  async searchSticker (query, index) {
-    const url = new URL(this.urlValue, window.location.origin)
-    url.searchParams.set('query', query)
-    url.searchParams.set('chip_id', `chip_${index}`)
-    url.searchParams.set('search_kind', 'stickers')
 
     try {
       const response = await fetch(url, {

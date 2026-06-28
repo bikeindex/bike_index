@@ -13,12 +13,11 @@
 <% end %>
 
 <% if @chip_id %>
-  <% chip_label = (@search_kind == "stickers") ? {sticker: @query} : {serial: @query} %>
   <%= turbo_stream.replace @chip_id do %>
     <%= render SearchResults::MultiResultChip::Component.new(
       chip_id: @chip_id,
       result_count: @pagy.count,
-      **chip_label
+      label: @query
     ) %>
   <% end %>
 <% end %>
