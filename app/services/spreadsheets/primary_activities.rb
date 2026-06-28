@@ -56,11 +56,12 @@ module Spreadsheets
       end
     end
 
-    # Find within scope and correct the stored name to match the CSV (e.g. casing), or create.
-    # Lookups are by slug, so a casing-only change still matches the existing row.
+    # Find within scope by exact slug (the inverse of create's slug generation) and correct the
+    # stored name to match the CSV (e.g. casing), or create. Keying off slug rather than the lenient
+    # friendly_find keeps re-imports idempotent and avoids renaming a substring-matched record.
     def upsert!(scope, name, **create_attrs)
       name = name.strip
-      existing = scope.friendly_find(name)
+      existing = scope.find_by(slug: Slugifyer.slugify(name))
       return PrimaryActivity.create!(name:, **create_attrs) unless existing
 
       existing.update!(name:) unless existing.name == name

@@ -1,4 +1,5 @@
 require "rails_helper"
+require "tempfile"
 
 RSpec.describe Spreadsheets::PrimaryActivities do
   let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Bike Polo", priority: 1) }
@@ -76,6 +77,21 @@ RSpec.describe Spreadsheets::PrimaryActivities do
 
         expect { described_class.import(csv_path) }.not_to change(PrimaryActivity, :count)
         expect(bike_polo.reload.name).to eq "Bike Polo"
+      end
+
+      it "matches on exact slug, not a substring, so it never renames a different activity" do
+        described_class.import(csv_path)
+        bike_polo = PrimaryActivity.flavor.top_level.friendly_find("Bike Polo")
+
+        # "Polo" is an ILIKE substring of "Bike Polo" but a distinct activity
+        Tempfile.create(["primary_activities", ".csv"], Rails.root.join("tmp")) do |file|
+          file.write("Flavor,Families\nPolo,\n")
+          file.flush
+          expect { described_class.import(file.path) }.to change(PrimaryActivity, :count).by(1)
+        end
+
+        expect(bike_polo.reload.name).to eq "Bike Polo"
+        expect(PrimaryActivity.flavor.top_level.find_by(slug: "polo")).to be_present
       end
     end
   end
