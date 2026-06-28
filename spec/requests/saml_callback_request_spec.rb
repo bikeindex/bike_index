@@ -165,4 +165,100 @@ RSpec.describe "SAML SSO login", type: :request do
       end
     end
   end
+
+  # IdP-initiated login lacks the InResponseTo binding, so it's gated behind a per-org
+  # opt-in and protected by one-time use of the assertion id.
+  describe "IdP-initiated login" do
+    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, :idp_initiated, organization:) }
+
+    def idp_initiated_response
+      signed_saml_response(audience: settings.sp_entity_id,
+        recipient: settings.assertion_consumer_service_url,
+        issuer: saml_configuration.idp_entity_id, email:)
+    end
+
+    it "provisions and signs in without a prior init" do
+      expect {
+        post "/sso/#{slug}/callback", params: {SAMLResponse: idp_initiated_response}
+      }.to change(User, :count).by(1)
+      expect(signed_in?).to be true
+    end
+
+    it "rejects a replayed assertion" do
+      saml_response = idp_initiated_response
+      post "/sso/#{slug}/callback", params: {SAMLResponse: saml_response}
+      expect(signed_in?).to be true
+
+      reset! # fresh session/cookies, same assertion
+      post "/sso/#{slug}/callback", params: {SAMLResponse: saml_response}
+      expect(response).to redirect_to(new_session_path)
+      expect(signed_in?).to be false
+    end
+
+    context "flag disabled" do
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+      it "is rejected" do
+        expect {
+          post "/sso/#{slug}/callback", params: {SAMLResponse: idp_initiated_response}
+        }.not_to change(User, :count)
+        expect(signed_in?).to be false
+      end
+    end
+  end
+
+  # Single Logout is inconsistently supported by IdPs; we sign out locally regardless and
+  # treat the IdP round-trip as best-effort.
+  describe "Single Logout" do
+    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, :with_slo, organization:) }
+
+    describe "GET /sso/:org_slug/logout (SP-initiated)" do
+      it "signs out locally and redirects to the IdP with a signed LogoutRequest" do
+        post_callback
+        expect(signed_in?).to be true
+
+        get "/sso/#{slug}/logout"
+        location = response.headers["Location"]
+        expect(location).to start_with(saml_configuration.idp_slo_target_url)
+        expect(location).to include("SAMLRequest=")
+        expect(location).to include("Signature=")
+        expect(signed_in?).to be false
+      end
+
+      context "SLO not configured" do
+        let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+        it "signs out locally and lands on goodbye" do
+          post_callback
+          get "/sso/#{slug}/logout"
+          expect(response).to redirect_to(goodbye_url)
+          expect(signed_in?).to be false
+        end
+      end
+    end
+
+    describe "GET /sso/:org_slug/slo (IdP-initiated)" do
+      it "validates the request, signs out, and responds to the IdP" do
+        post_callback
+        expect(signed_in?).to be true
+
+        get signed_idp_logout_request(destination: settings.single_logout_service_url,
+          idp_entity_id: saml_configuration.idp_entity_id)
+        location = response.headers["Location"]
+        expect(location).to start_with(saml_configuration.idp_slo_target_url)
+        expect(location).to include("SAMLResponse=")
+        expect(signed_in?).to be false
+      end
+
+      it "rejects an unsigned logout request without signing out" do
+        post_callback
+        get "/sso/#{slug}/slo", params: {SAMLRequest: "Zm9v"}
+        expect(response).to redirect_to(new_session_path)
+        expect(signed_in?).to be true
+      end
+
+      it "lands on goodbye for the IdP's LogoutResponse" do
+        get "/sso/#{slug}/slo", params: {SAMLResponse: "Zm9v"}
+        expect(response).to redirect_to(goodbye_url)
+      end
+    end
+  end
 end

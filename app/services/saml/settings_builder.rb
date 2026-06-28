@@ -66,6 +66,8 @@ module Saml
       settings.idp_entity_id = @saml_configuration.idp_entity_id
       settings.idp_sso_service_url = @saml_configuration.idp_sso_target_url
       settings.idp_slo_service_url = @saml_configuration.idp_slo_target_url
+      # ruby-saml keys redirect-binding query signing off idp_slo_service_binding
+      settings.idp_slo_service_binding = HTTP_REDIRECT
       settings.name_identifier_format = @saml_configuration.name_id_format.presence
 
       certs = @saml_configuration.idp_certificates
@@ -80,6 +82,8 @@ module Saml
       settings.soft = true # collect validation errors instead of raising
       settings.security[:want_assertions_signed] = true
       settings.security[:authn_requests_signed] = true
+      settings.security[:logout_requests_signed] = true
+      settings.security[:logout_responses_signed] = true
       settings.security[:digest_method] = XMLSecurity::Document::SHA256
       settings.security[:signature_method] = XMLSecurity::Document::RSA_SHA256
     end

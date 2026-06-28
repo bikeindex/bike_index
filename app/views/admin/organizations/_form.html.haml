@@ -275,6 +275,9 @@
                 .form-group.mt-2
                   = saml_f.label :idp_slo_target_url, "IdP SLO target URL (optional)"
                   = saml_f.text_field :idp_slo_target_url, class: "form-control"
+                .form-check.mt-2
+                  = saml_f.check_box :allow_idp_initiated, class: "form-check-input"
+                  = saml_f.label :allow_idp_initiated, "Allow IdP-initiated login (weaker replay protection — leave off unless required)", class: "form-check-label"
                 .form-group.mt-2
                   = saml_f.label :idp_cert, "IdP certificate (PEM or base64)"
                   = saml_f.text_area :idp_cert, class: "form-control", rows: 4

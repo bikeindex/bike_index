@@ -4,7 +4,9 @@
 # we layer on email extraction and the SsoIdentity link/provision policy.
 module Saml
   class AssertionProcessor
-    Result = Struct.new(:user, :error) do
+    # name_id/name_id_format/session_index are carried through so the controller can
+    # remember them for a later Single Logout request.
+    Result = Struct.new(:user, :name_id, :name_id_format, :session_index, :error) do
       def success?
         error.nil?
       end
@@ -14,10 +16,11 @@ module Saml
       new(...).call
     end
 
-    def initialize(saml_configuration:, raw_response:, request_id:)
+    def initialize(saml_configuration:, raw_response:, request_id:, idp_initiated: false)
       @saml_configuration = saml_configuration
       @raw_response = raw_response
       @request_id = request_id
+      @idp_initiated = idp_initiated
     end
 
     def call
@@ -25,6 +28,10 @@ module Saml
 
       response = parse_response
       return failure(response.errors.join("; ").presence || "invalid SAML response") unless response.is_valid?
+
+      # IdP-initiated logins carry no InResponseTo to replay-check against, so we enforce
+      # one-time use of the assertion id instead.
+      return failure("assertion has already been used") if @idp_initiated && !claim_assertion(response)
 
       name_id = response.name_id.presence
       return failure("assertion is missing a NameID") if name_id.blank?
@@ -36,12 +43,20 @@ module Saml
       return failure("no Bike Index account for #{email}") if user.blank?
 
       record_identity(user:, name_id:, email:, name_id_format: response.name_id_format)
-      Result.new(user:)
+      Result.new(user:, name_id:, name_id_format: response.name_id_format, session_index: response.sessionindex)
     rescue OneLogin::RubySaml::ValidationError => e
       failure(e.message)
     end
 
     private
+
+    # Returns false when this assertion id has already been seen (within the validity window).
+    def claim_assertion(response)
+      assertion_id = response.assertion_id.presence
+      return false if assertion_id.blank?
+
+      Rails.cache.write("saml/idp_initiated/#{assertion_id}", true, unless_exist: true, expires_in: 12.hours)
+    end
 
     def organization
       @saml_configuration.organization

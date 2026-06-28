@@ -21,7 +21,7 @@ module SamlHelpers
     Nokogiri::XML(inflated).root["ID"]
   end
 
-  def signed_saml_response(audience:, recipient:, in_response_to:, email:,
+  def signed_saml_response(audience:, recipient:, email:, in_response_to: nil,
     name_id: nil, issuer: "https://idp.example.edu/", not_on_or_after: nil,
     sign: true, tamper: false, email_attribute: EMAIL_OID)
     name_id ||= email
@@ -40,11 +40,32 @@ module SamlHelpers
     Base64.strict_encode64(wrapper.sub("SIGNED_ASSERTION", assertion))
   end
 
+  # A redirect-binding LogoutRequest signed with the IdP key, as an IdP would send for
+  # IdP-initiated Single Logout. Returns the path + query to GET against our /slo endpoint.
+  def signed_idp_logout_request(destination:, idp_entity_id:, name_id: "someone@example.edu")
+    settings = OneLogin::RubySaml::Settings.new
+    settings.idp_slo_service_url = destination
+    settings.idp_slo_service_binding = Saml::SettingsBuilder::HTTP_REDIRECT
+    settings.security[:logout_requests_signed] = true
+    settings.security[:signature_method] = XMLSecurity::Document::RSA_SHA256
+    settings.security[:digest_method] = XMLSecurity::Document::SHA256
+    settings.certificate = saml_idp_cert.to_pem
+    settings.private_key = saml_idp_key.to_pem
+    settings.sp_entity_id = idp_entity_id # becomes the LogoutRequest Issuer
+    settings.name_identifier_value = name_id
+    URI(OneLogin::RubySaml::Logoutrequest.new.create(settings)).request_uri
+  end
+
   private
 
   # Strip whitespace between tags (the signed assertion has none, so this leaves it byte-intact)
   def collapse(xml)
     xml.gsub(/>\s+</, "><").strip
+  end
+
+  # Unsolicited (IdP-initiated) responses carry no InResponseTo
+  def in_response_to_attribute(in_response_to)
+    in_response_to.present? ? %(InResponseTo="#{in_response_to}" ) : ""
   end
 
   def sign_saml_assertion(assertion_xml, assertion_id)
@@ -65,7 +86,7 @@ module SamlHelpers
         <saml:Subject>
           <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:emailAddress">#{name_id}</saml:NameID>
           <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
-            <saml:SubjectConfirmationData InResponseTo="#{in_response_to}" NotOnOrAfter="#{not_on_or_after}" Recipient="#{recipient}"/>
+            <saml:SubjectConfirmationData #{in_response_to_attribute(in_response_to)}NotOnOrAfter="#{not_on_or_after}" Recipient="#{recipient}"/>
           </saml:SubjectConfirmation>
         </saml:Subject>
         <saml:Conditions NotBefore="#{not_before}" NotOnOrAfter="#{not_on_or_after}">
@@ -86,7 +107,7 @@ module SamlHelpers
   def saml_response_xml(issuer:, destination:, in_response_to:, assertion:)
     now = Time.current.utc.iso8601
     <<~XML
-      <samlp:Response xmlns:samlp="#{SAMLP_NS}" xmlns:saml="#{SAML_NS}" ID="_#{SecureRandom.uuid}" Version="2.0" IssueInstant="#{now}" Destination="#{destination}" InResponseTo="#{in_response_to}">
+      <samlp:Response xmlns:samlp="#{SAMLP_NS}" xmlns:saml="#{SAML_NS}" ID="_#{SecureRandom.uuid}" Version="2.0" IssueInstant="#{now}" Destination="#{destination}" #{in_response_to_attribute(in_response_to)}>
         <saml:Issuer>#{issuer}</saml:Issuer>
         <samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>
         #{assertion}

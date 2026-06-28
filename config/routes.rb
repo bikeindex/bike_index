@@ -71,6 +71,8 @@ Rails.application.routes.draw do
   get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
   get "/sso/:org_slug/init", to: "saml#init", as: :saml_init
   post "/sso/:org_slug/callback", to: "saml#callback", as: :saml_callback
+  get "/sso/:org_slug/logout", to: "saml#logout", as: :saml_logout
+  get "/sso/:org_slug/slo", to: "saml#slo", as: :saml_slo
 
   resources :payments, only: %i[new create] do
     collection { get :success }
