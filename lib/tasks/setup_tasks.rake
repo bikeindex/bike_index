@@ -34,4 +34,9 @@ namespace :setup do
     system("wget -q #{url} -O #{file_path}", exception: true)
     Spreadsheets::Components.import(file_path)
   end
+
+  desc "refresh reference data (manufacturers, primary activities, components) from spreadsheets"
+  task import_spreadsheets: :environment do
+    Spreadsheets::ImporterJob.perform_async
+  end
 end
