@@ -25,6 +25,22 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end
+
+    context "with filters" do
+      let!(:with_website) { FactoryBot.create(:manufacturer, website: "http://stuff.com") }
+      let!(:without_website) { FactoryBot.create(:manufacturer, website: nil) }
+
+      it "filters by search_with_websites" do
+        get base_url, params: {search_with_websites: true}
+        expect(response.status).to eq(200)
+        expect(assigns(:manufacturers).pluck(:id)).to eq([with_website.id])
+      end
+
+      it "does not filter without the param" do
+        get base_url
+        expect(assigns(:manufacturers).pluck(:id)).to match_array([with_website.id, without_website.id])
+      end
+    end
   end
 
   describe "show" do
