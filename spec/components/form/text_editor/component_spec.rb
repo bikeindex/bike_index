@@ -28,10 +28,31 @@ RSpec.describe Form::TextEditor::Component, type: :component do
   end
 
   context "size: :single_line" do
-    it "adds the compact modifier class" do
+    it "adds the compact modifier class and defaults to the trimmed toolbar" do
       component = rendered_component(record, size: :single_line)
 
       expect(component).to have_css("lexxy-editor.lexxy-editor--compact")
+      # defaults to SINGLE_LINE_TOOLBAR_BUTTONS -- the omitted buttons get a hide class
+      expect(component).to have_css("lexxy-editor.lexxy-editor--hide-strikethrough.lexxy-editor--hide-table.lexxy-editor--hide-heading")
+      expect(component).to have_no_css("lexxy-editor.lexxy-editor--hide-bold")
+      expect(component).to have_no_css("lexxy-editor.lexxy-editor--hide-link")
+    end
+  end
+
+  context "with toolbar_buttons:" do
+    it "hides the buttons that aren't listed" do
+      component = rendered_component(record, toolbar_buttons: %i[bold italic])
+
+      expect(component).to have_css("lexxy-editor.lexxy-editor--hide-link.lexxy-editor--hide-undo")
+      expect(component).to have_no_css("lexxy-editor.lexxy-editor--hide-bold")
+      expect(component).to have_no_css("lexxy-editor.lexxy-editor--hide-italic")
+    end
+  end
+
+  context "with an unsupported size" do
+    it "raises ArgumentError" do
+      expect { described_class.new(form_builder: nil, attribute: :description, size: :enormous) }
+        .to raise_error(ArgumentError, /size must be one of/)
     end
   end
 end
