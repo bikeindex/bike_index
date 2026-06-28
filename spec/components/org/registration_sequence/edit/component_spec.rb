@@ -13,4 +13,11 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     expect(page).to have_css("[data-controller='sortable'] [data-sortable-target='item']", minimum: 1)
     expect(page).to have_link("Edit")
   end
+
+  it "makes only the grip draggable, not the whole row" do
+    render_inline(described_class.new(registration_sequence:))
+
+    expect(page).to have_css("[data-sortable-target='item'] [data-sortable-target='handle'][draggable='true']", minimum: 1)
+    expect(page).to have_no_css("[data-sortable-target='item'][draggable]")
+  end
 end

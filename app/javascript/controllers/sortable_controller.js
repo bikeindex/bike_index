@@ -1,27 +1,33 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='sortable'
-// Drag-and-drop reordering of [data-sortable-target=item] rows. On drop, PATCHes the moved row's
-// new position to its own data-url endpoint.
+// Drag-and-drop reordering of [data-sortable-target=item] rows, grabbed by their
+// [data-sortable-target=handle] grip. On drop, PATCHes the moved row's new position
+// to its own data-url endpoint.
 export default class extends Controller {
-  static targets = ['item']
+  static targets = ['item', 'handle']
 
   connect () {
     this.dragging = null
-    this.itemTargets.forEach((item) => this.bind(item))
+    this.handleTargets.forEach((handle) => this.bindHandle(handle))
+    this.itemTargets.forEach((item) => this.bindItem(item))
   }
 
-  bind (item) {
-    item.addEventListener('dragstart', () => {
+  bindHandle (handle) {
+    const item = handle.closest('[data-sortable-target="item"]')
+    handle.addEventListener('dragstart', () => {
       this.dragging = item
       item.classList.add('tw:opacity-50')
     })
-    item.addEventListener('dragend', () => {
+    handle.addEventListener('dragend', () => {
       item.classList.remove('tw:opacity-50')
       const moved = this.dragging
       this.dragging = null
       this.persist(moved)
     })
+  }
+
+  bindItem (item) {
     item.addEventListener('dragover', (event) => {
       event.preventDefault()
       if (!this.dragging) return
