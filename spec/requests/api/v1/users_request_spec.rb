@@ -117,6 +117,30 @@ RSpec.describe API::V1::UsersController, type: :request do
       end
     end
 
+    context "manufacturer_update_manufacturer is other" do
+      it "sets the manufacturer to other with the manual name" do
+        o = FactoryBot.create(:ownership)
+        Manufacturer.other
+        user = o.creator
+        bike = o.bike
+        update_manufacturer_request = {
+          request_type: "manufacturer_update_manufacturer",
+          user_id: user.id,
+          request_bike_id: bike.id,
+          request_reason: "Need to update manufacturer",
+          manufacturer_update_manufacturer: "other",
+          manufacturer_update_manufacturer_other: "Some obscure brand"
+        }
+        log_in(user)
+        post "#{base_url}/send_request", params: update_manufacturer_request
+        expect(response.code).to eq("200")
+        bike.reload
+        expect(bike.manufacturer).to eq Manufacturer.other
+        expect(bike.manufacturer_other).to eq "Some obscure brand"
+        expect(bike.mnfg_name).to eq "Some obscure brand"
+      end
+    end
+
     context "manufacturer_update_manufacturer present" do
       it "does not make nil manufacturer" do
         o = FactoryBot.create(:ownership)
