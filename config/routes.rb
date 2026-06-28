@@ -362,6 +362,8 @@ Rails.application.routes.draw do
   end
   get "manufacturers_tsv", to: "manufacturers#tsv" # TODO: can we delete this?
 
+  resources :components, only: %i[index]
+
   get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
   get "theft-ring", to: redirect("theft-rings")
   resources :stolen_bike_listings, only: %i[index]

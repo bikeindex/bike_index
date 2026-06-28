@@ -5995,6 +5995,7 @@ es:
         result_count_html: "— %{count} %{results}"
         serial_label: 'De serie:'
         view_all: ver todo
+        sticker_label: 'Etiqueta engomada:'
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} impidió que se guardara

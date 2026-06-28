@@ -41,6 +41,8 @@
 
 <%= render(current_header_component) %>
 
+<%= @header_content %>
+
 <% if show_chart? %>
   <% if @rendered_chart.nil? %>
     <%= default_chart %>

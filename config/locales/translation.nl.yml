@@ -5892,6 +5892,7 @@ nl:
         result_count_html: "— %{count} %{results}"
         serial_label: 'Serial:'
         view_all: alles bekijken
+        sticker_label: 'Sticker:'
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
