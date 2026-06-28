@@ -49,16 +49,13 @@ module Spreadsheets
       return if row[:flavor].blank?
 
       (family_ids || [nil]).each do |primary_activity_family_id|
-        # Top-level flavors store their own id as the family id (see PrimaryActivity#set_calculated_attributes),
-        # so a `primary_activity_family_id: nil` lookup never matches them — scope to top_level instead
+        # Top-level flavors self-reference their id, so nil never matches them
         scope = primary_activity_family_id ? PrimaryActivity.where(primary_activity_family_id:) : PrimaryActivity.flavor.top_level
         upsert!(scope, row[:flavor], primary_activity_family_id:, family: false)
       end
     end
 
-    # Find within scope by exact slug (the inverse of create's slug generation) and correct the
-    # stored name to match the CSV (e.g. casing), or create. Keying off slug rather than the lenient
-    # friendly_find keeps re-imports idempotent and avoids renaming a substring-matched record.
+    # Find by exact slug and correct the stored name, or create. Slug, not friendly_find, keeps re-imports idempotent
     def upsert!(scope, name, **create_attrs)
       name = name.strip
       existing = scope.find_by(slug: Slugifyer.slugify(name))
