@@ -206,6 +206,12 @@ module OrganizedServices
       items << link(translation(:manage_users),
         routes.organization_users_path(organization_id: organization.to_param), active: :match_controller)
 
+      if organization.enabled?("registration_sequences")
+        items << link(translation(:registration_sequences),
+          routes.organization_registration_sequences_path(organization_id: organization.to_param),
+          active: :match_controller)
+      end
+
       if organization.enabled?("impound_bikes")
         items << link(translation(:manage_impounding, org_name: organization.short_name),
           routes.edit_organization_manage_impounding_path(organization_id: organization.to_param))

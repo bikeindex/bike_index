@@ -97,6 +97,29 @@ RSpec.describe OrganizedServices::UserMenuItems do
       it { expect(items).to eq(target) }
     end
 
+    context "with registration_sequences enabled, as an org admin" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["registration_sequences"])
+      end
+      let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+      let(:target) do
+        [
+          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
+          {type: :disabled, label: "Incomplete registrations", secondary: true},
+          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          {type: :divider},
+          {type: :disabled, label: "Registration stickers", secondary: false},
+          link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),
+          link_item("Registration sequences", "/o/#{organization.to_param}/registration_sequences", active: :match_controller),
+          link_item("#{organization.short_name} profile", "/o/#{organization.to_param}/manage"),
+          link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations")
+        ]
+      end
+
+      it { expect(items).to eq(target) }
+    end
+
     context "with no organization" do
       it "returns an empty array" do
         expect(described_class.for(organization: nil, current_user: nil)).to eq([])
