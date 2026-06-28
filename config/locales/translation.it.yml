@@ -6007,8 +6007,8 @@ it:
         no_matches_found: Nessuna corrispondenza trovata
         result_count_html: "— %{count} %{results}"
         serial_label: 'Seriale:'
-        sticker_label:
         view_all: visualizza tutto
+        sticker_label: 'Adesivo:'
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} ha impedito il salvataggio
