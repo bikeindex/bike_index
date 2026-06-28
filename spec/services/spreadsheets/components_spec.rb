@@ -9,12 +9,11 @@ RSpec.describe Spreadsheets::Components do
         "Rim,,true,Wheels"]
     end
     it "generates" do
-      expect(Ctype.count).to eq 1
-      result = described_class.to_csv.split("\n")
+      # Scope to the ctype under test -- a leaked Ctype.other ("unknown") from another spec
+      # would otherwise add a row and make the global-table assertion flaky.
+      result = described_class.to_csv(Ctype.where(id: ctype.id)).split("\n")
 
-      expect(result.first).to eq target.first
-      expect(result.second).to eq target.second
-      expect(result.length).to eq target.length
+      expect(result).to eq target
     end
   end
 
