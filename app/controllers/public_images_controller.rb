@@ -96,7 +96,7 @@ class PublicImagesController < ApplicationController
       @bike = if params[:imageable_type] == "BikeVersion"
         BikeVersion.unscoped.find(params[:bike_id])
       else
-        Bike.unscoped.find(params[:bike_id])
+        Bike.unscoped.find_id(params[:bike_id])
       end
       return true if @bike.authorized?(current_user)
     end

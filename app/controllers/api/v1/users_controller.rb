@@ -22,7 +22,7 @@ module API
         reason = params[:request_reason]
         feedback_type = params[:request_type]
         if current_user.present? && reason.present? && bike_id.present? && feedback_type.present?
-          bike = Bike.find(bike_id)
+          bike = Bike.find_id(bike_id)
           if bike.authorized?(current_user)
             feedback = Feedback.new(email: current_user.email, body: reason, title: feedback_type.titleize.to_s, feedback_type: feedback_type)
             feedback.name = (current_user.name.present? && current_user.name) || "no name"

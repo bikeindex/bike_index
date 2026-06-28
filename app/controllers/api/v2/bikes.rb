@@ -97,7 +97,7 @@ module API
         end
 
         def find_bike
-          @bike = Bike.unscoped.find(params[:id])
+          @bike = Bike.unscoped.find_id(params[:id])
         end
 
         def owner_duplicate_bike(bikes: nil)

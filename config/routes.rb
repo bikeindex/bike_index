@@ -181,6 +181,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # Short_id forms the resources :id segment can't match (prefix + slash, dots).
+  # Before resources so it wins for "r/..." paths; its constraint leaves plain ids alone.
+  get "bikes/*id", to: "bikes#show", constraints: {id: /r\W.*/i}, format: false
   resources :bikes, except: %i[index edit] do
     collection { get :scanned }
     member do
@@ -449,6 +452,14 @@ Rails.application.routes.draw do
   # old search URLs to new search URLs
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
+
+  # Short bike URLs: /r/<short_id> (and /R/...). The whole path is passed through
+  # so ShortId#decode strips the "r/" prefix itself, even when the body starts with "r".
+  get "*id", to: "bikes#show", constraints: {id: %r{[rR]/.*}}, format: false
+  # Short bike_version URLs: /v/<short_id> (and /V/...)
+  get "*id", to: "bike_versions#show", constraints: {id: %r{[vV]/.*}}, format: false
+  # Short marketplace_listing URLs: /m/<short_id> (and /M/...)
+  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[mM]/.*}}, format: false
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
 end

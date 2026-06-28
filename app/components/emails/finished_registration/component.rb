@@ -97,7 +97,7 @@ module Emails
       end
 
       def bike
-        @bike ||= Bike.unscoped.find(@ownership.bike_id)
+        @bike ||= Bike.unscoped.find_id(@ownership.bike_id)
       end
 
       def user

@@ -63,7 +63,7 @@ class OrganizationsController < ApplicationController
 
   def embed_create_success
     find_organization
-    @bike = Bike.find(params[:bike_id])
+    @bike = Bike.find_id(params[:bike_id])
     render layout: "embed_layout"
   end
 

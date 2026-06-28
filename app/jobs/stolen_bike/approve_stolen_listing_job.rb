@@ -7,7 +7,7 @@ module StolenBike
     def perform(bike_id)
       return if TWEETING_DISABLED
 
-      bike = Bike.find(bike_id)
+      bike = Bike.find_id(bike_id)
       new_post = Integrations::SocialPoster.new(bike).create_post
       send_stolen_bike_alert_email(bike, new_post)
     end
