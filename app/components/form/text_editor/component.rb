@@ -23,6 +23,9 @@ module Form
         @attribute = attribute
         @size = size
         @toolbar_buttons = toolbar_buttons || (SINGLE_LINE_TOOLBAR_BUTTONS if size == :single_line)
+
+        unknown = (@toolbar_buttons || []) - TOOLBAR_BUTTONS
+        raise ArgumentError, "unknown toolbar_buttons: #{unknown.inspect}" if unknown.any?
       end
 
       def call

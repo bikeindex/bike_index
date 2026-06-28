@@ -55,4 +55,11 @@ RSpec.describe Form::TextEditor::Component, type: :component do
         .to raise_error(ArgumentError, /size must be one of/)
     end
   end
+
+  context "with an unknown toolbar_button" do
+    it "raises ArgumentError" do
+      expect { described_class.new(form_builder: nil, attribute: :description, toolbar_buttons: %i[bold sparkles]) }
+        .to raise_error(ArgumentError, /unknown toolbar_buttons.*sparkles/)
+    end
+  end
 end
