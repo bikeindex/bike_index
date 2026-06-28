@@ -7312,10 +7312,10 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260628120000'),
+('20260628175840'),
+('20260628175839'),
+('20260628175838'),
 ('20260626162049'),
-('20260625215350'),
-('20260625120000'),
 ('20260528152450'),
 ('20260525162548'),
 ('20260518093158'),
