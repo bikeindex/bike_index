@@ -21,3 +21,18 @@ lexxy-editor.lexxy-editor--compact lexxy-toolbar {
 lexxy-editor.lexxy-editor--compact .lexxy-editor__toolbar-button {
   block-size: 1.6em;
 }
+
+/* Trim the toolbar to bold, italic, link, and undo/redo. The gem renders a fixed button set
+   (lexxy.js LexicalToolbarElement.defaultTemplate) with no per-button config, so hide the rest;
+   commands stay reachable via hotkeys. Upload is already hidden by attachments: "false". */
+.lexxy-content lexxy-toolbar > [name="strikethrough"],
+.lexxy-content lexxy-toolbar > [name="quote"],
+.lexxy-content lexxy-toolbar > [name="heading"],
+.lexxy-content lexxy-toolbar > [name="code"],
+.lexxy-content lexxy-toolbar > [name="unordered-list"],
+.lexxy-content lexxy-toolbar > [name="ordered-list"],
+.lexxy-content lexxy-toolbar > [name="table"],
+.lexxy-content lexxy-toolbar > [name="divider"],
+.lexxy-content lexxy-toolbar > .lexxy-editor__toolbar-dropdown:has(> summary[name="highlight"]) {
+  display: none;
+}
