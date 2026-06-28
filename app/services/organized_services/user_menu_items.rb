@@ -50,6 +50,12 @@ module OrganizedServices
         active: :match_controller)
     end
 
+    def registration_sequences_link(organization)
+      link(translation(:registration_sequences),
+        routes.organization_registration_sequences_path(organization_id: organization.to_param),
+        active: :match_controller)
+    end
+
     #
     # private below here
     #

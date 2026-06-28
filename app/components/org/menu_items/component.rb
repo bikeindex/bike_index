@@ -46,6 +46,7 @@ module Org
       def with_route_overrides(items)
         items = [dashboard_link, divider, *items] if needs_dashboard_override?(items)
         items = insert_after_add_bike(items, bulk_import_link) if needs_bulk_import_override?(items)
+        items += [registration_sequences_link] if needs_registration_sequences_override?(items)
         items
       end
 
@@ -55,6 +56,10 @@ module Org
 
       def needs_bulk_import_override?(items)
         on_bulk_imports? && items.none? { |i| i[:type] == :link && i[:path] == bulk_import_link[:path] }
+      end
+
+      def needs_registration_sequences_override?(items)
+        on_registration_sequences? && items.none? { |i| i[:type] == :link && i[:path] == registration_sequences_link[:path] }
       end
 
       # Always emits a divider above `item` so the injected link is visually
@@ -71,6 +76,10 @@ module Org
 
       def bulk_import_link
         @bulk_import_link ||= OrganizedServices::UserMenuItems.bulk_import_link(@organization)
+      end
+
+      def registration_sequences_link
+        @registration_sequences_link ||= OrganizedServices::UserMenuItems.registration_sequences_link(@organization)
       end
 
       def divider
@@ -94,6 +103,10 @@ module Org
 
       def on_bulk_imports?
         routed_controller == "organized/bulk_imports"
+      end
+
+      def on_registration_sequences?
+        %w[organized/registration_sequences organized/registration_sequence_pages].include?(routed_controller)
       end
 
       def skip?(item)

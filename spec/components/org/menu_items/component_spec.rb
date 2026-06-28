@@ -87,5 +87,20 @@ RSpec.describe Org::MenuItems::Component, type: :component do
         expect(labels).not_to include("Bulk Imports", "Ascend Imports")
       end
     end
+
+    context "as a superuser, with the org lacking the registration_sequences feature" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+
+      it "injects the Registration sequences link when on the page" do
+        expect(organization.enabled?("registration_sequences")).to be false
+        component = with_request_url("/o/#{organization.to_param}/registration_sequences") { render_inline(instance) }
+        expect(component.css("a.nav-link").map { |a| a.text.strip }).to include("Registration sequences")
+      end
+
+      it "does not inject it on other pages" do
+        component = with_request_url("/o/#{organization.to_param}/registrations") { render_inline(instance) }
+        expect(component.css("a.nav-link").map { |a| a.text.strip }).not_to include("Registration sequences")
+      end
+    end
   end
 end
