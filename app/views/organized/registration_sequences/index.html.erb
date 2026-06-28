@@ -12,15 +12,15 @@
   <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Current</h2>
 
   <% if @active.present? %>
-    <p class="tw:mb-6 tw:text-gray-600">
+    <p class="tw:text-gray-600">
       This is the active version your registrants see.
       <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @active.id), class: "twlink" %>
     </p>
   <% else %>
-    <p class="tw:mb-6 tw:text-gray-600">
+    <p class="tw:text-gray-600">
       There is no active registration sequence.
     </p>
-    <p class="tw:mb-6 tw:text-gray-600">
+    <p class="tw:text-gray-600">
       Edit your draft sequence and contact Bike Index when you're ready to make
       it live.
     </p>
@@ -28,17 +28,18 @@
 
   <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Draft</h2>
 
-  <% if @draft.present? %>
-    <p class="tw:mb-6 tw:text-gray-600">
-      Your draft sequence.
-      <%= link_to "Edit sequence", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), class: "twlink" %>
-    </p>
-  <% else %>
-    <p class="tw:mb-2 tw:text-gray-600">
+  <p class="tw:text-gray-600">
+    <% if @draft.present? %>
+      Your draft sequence, last edited
+      <span class="localizeTime preciseTime">
+        <%= l @draft.updated_at, format: :convert_time %>
+      </span>
+    <% else %>
       You haven't started a draft sequence yet.
-    </p>
-    <%= button_to "Edit sequence", organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, class: "twlink", form_class: "tw:mb-6 tw:inline-block" %>
-  <% end %>
+    <% end %>
+  </p>
+
+  <%= button_to "Edit sequence", organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, class: "twlink", form_class: "tw:mb-6 tw:inline-block" %>
 
   <% if @previous.any? %>
     <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Previous</h2>
