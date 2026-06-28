@@ -19,7 +19,7 @@ module Form
       private
 
       def options
-        {"multi-line": (@size != :single_line).to_s, attachments: "false", class: editor_class, data: asset_data}
+        {attachments: "false", class: editor_class, data: asset_data}
       end
 
       def asset_data

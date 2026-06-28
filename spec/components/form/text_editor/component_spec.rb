@@ -16,7 +16,7 @@ RSpec.describe Form::TextEditor::Component, type: :component do
   it "renders just the default multi-line Lexxy editor box bound to the attribute (no label)" do
     component = rendered_component(record)
 
-    expect(component).to have_css("lexxy-editor[name='organization_feature[description]'][id='organization_feature_description'][multi-line='true']")
+    expect(component).to have_css("lexxy-editor[name='organization_feature[description]'][id='organization_feature_description']")
     # The label is supplied by Form::Group, not this component
     expect(component).to_not have_css("label")
     expect(component).to_not have_css("lexxy-editor.lexxy-editor--compact")
@@ -28,10 +28,10 @@ RSpec.describe Form::TextEditor::Component, type: :component do
   end
 
   context "size: :single_line" do
-    it "adds the compact modifier class and disables multi-line" do
+    it "adds the compact modifier class" do
       component = rendered_component(record, size: :single_line)
 
-      expect(component).to have_css("lexxy-editor.lexxy-editor--compact[multi-line='false']")
+      expect(component).to have_css("lexxy-editor.lexxy-editor--compact")
     end
   end
 end
