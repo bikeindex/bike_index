@@ -4,7 +4,7 @@
 # This Dockerfile is used only by review apps (and any future Kamal-based deploys).
 # Production runs on Cloud66 — not from this file.
 
-ARG RUBY_VERSION=4.0.2
+ARG RUBY_VERSION=4.0.5
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 WORKDIR /rails

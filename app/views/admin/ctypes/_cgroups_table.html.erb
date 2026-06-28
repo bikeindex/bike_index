@@ -1,0 +1,23 @@
+<%# locals: (cgroups:, ctype_counts:) %>
+
+<h3 class="tw:mt-4">Component groups</h3>
+
+<div class="full-screen-table mb-4">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th>Name</th>
+      <th>Priority</th>
+      <th>Component types</th>
+    </thead>
+
+    <tbody>
+      <% cgroups.each do |cgroup| %>
+        <tr>
+          <td><%= cgroup.name.titleize %></td>
+          <td><%= number_display(cgroup.priority) %></td>
+          <td><%= number_display(ctype_counts[cgroup.id] || 0) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -2,36 +2,33 @@
 
 module Form
   module TextEditor
-    # Editable list of single-line Lexxy editors bound to an array attribute (e.g. bullet_points).
-    # Each editor submits into "<object_name>[<attribute>][]"; add/remove is handled by the
-    # nested-form Stimulus controller. Lexxy must be loaded on the page (data-controller="lexxy").
+    # Bare Lexxy editor; pair with Form::Group (kind: :content_block) for a label -- both run through
+    # the form builder, so the label's `for` matches the editor id for a given attribute. Carries
+    # data-controller="lexxy", which loads the editor JS and stylesheet on demand.
     class Component < ApplicationComponent
-      def initialize(form_builder:, attribute:, label: nil, add_label: nil)
+      def initialize(form_builder:, attribute:, size: :default)
         @form_builder = form_builder
         @attribute = attribute
-        @label = label.nil? ? attribute.to_s.humanize : label
-        @add_label = add_label || "Add #{attribute.to_s.singularize.humanize.downcase}"
+        @size = size
+      end
+
+      def call
+        @form_builder.lexxy_rich_textarea(@attribute, options)
       end
 
       private
 
-      def field_name
-        "#{@form_builder.object_name}[#{@attribute}][]"
+      def options
+        {attachments: "false", class: editor_class, data: asset_data}
       end
 
-      def values
-        Array(@form_builder.object.public_send(@attribute))
+      def asset_data
+        {controller: "lexxy", lexxy_stylesheet_value: helpers.stylesheet_path("lexxy")}
       end
 
-      def editor_field(value)
-        content_tag(:div, class: "tw:flex tw:flex-col", data: {nested_form_item: ""}) do
-          safe_join([
-            helpers.lexxy_rich_textarea_tag(field_name, value, "multi-line": "false", attachments: "false", class: "lexxy-content tw:w-full"),
-            content_tag(:div, class: "tw:text-right") do
-              content_tag(:button, "Remove", type: "button", class: "twlink tw:text-red-600", data: {action: "nested-form#remove"})
-            end
-          ])
-        end
+      def editor_class
+        base = "lexxy-content tw:w-full"
+        (@size == :single_line) ? "#{base} lexxy-editor--compact" : base
       end
     end
   end

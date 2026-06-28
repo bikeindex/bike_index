@@ -135,4 +135,113 @@ puts "Creating 3 Cannondale bikes registered to Cannondale org..."
   puts "  Created Cannondale bike ##{i + 1}: #{bike.manufacturer.name}" unless bike.errors.any?
 end
 
+# --- Specific real bike: 1975 Viner Special Professional (bikeindex.org/bikes/108243) ---
+puts "Creating 1975 Viner Special Professional with photos..."
+viner_manufacturer = Manufacturer.friendly_find("Viner")
+orange = Color.friendly_find("Orange")
+
+viner_bike = seed_bike(
+  creator:, user:, label: "Viner bike",
+  params: {bike: bike_params(owner_email: "user1@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
+    primary_frame_color_id: orange&.id,
+    year: 1975,
+    frame_model: "Special Professional",
+    frame_material_slug: "steel",
+    frame_size: "54cm",
+    description: "Force except the ultegra cranks and trp brakes. Classy af"
+  )}
+)
+
+Dir[Rails.root.join("db/seeds/images/viner_108243_*.jpg")].sort.each_with_index do |path, i|
+  public_image = PublicImage.new(imageable: viner_bike, listing_order: i + 1)
+  File.open(path) { |file| public_image.image = file }
+  public_image.save!
+end
+puts "  Created Viner bike with #{viner_bike.public_images.count} images"
+
+# --- Specific stolen bike: Trek Top Fuel 9.9 XX AXS in Oakland ---
+puts "Creating stolen Trek Top Fuel 9.9 in Oakland..."
+trek_manufacturer = Manufacturer.friendly_find("Trek")
+black = Color.friendly_find("Black")
+trek_activity = PrimaryActivity.friendly_find("Trail / All-Mountain") # "MTB: Trail / All-Mountain"
+seven_hundred_c_id = WheelSize.id_for_bsd(622) # "700 C"
+trek_location = {latitude: 37.8228, longitude: -122.2730, street: "1430 32nd St", city: "Oakland", zipcode: "94608"}
+
+# Stock build spec from Trek's Top Fuel 9.9 XX AXS T-Type (29" / M-XL build)
+trek_components = [
+  {ctype: "fork", manufacturer: "RockShox", model: "Pike Ultimate", front: true, description: "DebonAir spring, Charger 3.1 RC2 damper, 44mm offset, Boost110, Maxle Stealth, 130mm travel"},
+  {ctype: "rear suspension", manufacturer: "RockShox", model: "Deluxe Ultimate RCT", description: "185mm x 50mm"},
+  {ctype: "wheel", manufacturer: "Bontrager", model: "Line Pro 30", front: true, description: "OCLV Mountain Carbon, Tubeless Ready, 6-bolt, Boost110, 15mm thru axle, 29\""},
+  {ctype: "wheel", manufacturer: "Bontrager", model: "Line Pro 30", rear: true, description: "OCLV Mountain Carbon, Tubeless Ready, Rapid Drive 108, 6-bolt, SRAM XD driver, Boost148, 12mm thru axle, 29\""},
+  {ctype: "tire", manufacturer: "Bontrager", model: "Montrose RSL XT", front: true, description: "Tubeless Ready, triple compound, aramid bead, 120 tpi, 29x2.40\""},
+  {ctype: "tire", manufacturer: "Bontrager", model: "Gunnison RSL XT", rear: true, description: "Tubeless Ready, triple compound, aramid bead, 120 tpi, 29x2.40\""},
+  {ctype: "chain", manufacturer: "SRAM", model: "XX Eagle", description: "T-Type, 12 speed"},
+  {ctype: "crankset", manufacturer: "SRAM", model: "XX Eagle", description: "DUB, 30T, T-Type, 55mm chainline, 170mm length"},
+  {ctype: "bottom bracket", manufacturer: "SRAM", model: "DUB MTB Wide", description: "73mm, BSA threaded"},
+  {ctype: "derailleur", manufacturer: "SRAM", model: "XX SL Eagle AXS", rear: true, description: "T-Type"},
+  {ctype: "brake", manufacturer: "SRAM", model: "Level Ultimate 4-piston hydraulic disc", front: true, rear: true},
+  {ctype: "saddle", manufacturer: "Verse", model: "Short Pro", description: "carbon rails, 145mm width"},
+  {ctype: "seatpost", manufacturer: "RockShox", model: "Reverb AXS", description: "170mm travel, wireless, 34.9mm, 480mm length"},
+  {ctype: "pedals", manufacturer: "Shimano", model: "XTR XC PD-M9200"}
+]
+
+trek_bike = seed_bike(
+  creator:, user:, label: "Stolen Trek bike",
+  params: {
+    bike: bike_params(owner_email: "user_2@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
+      primary_frame_color_id: black&.id,
+      year: 2024,
+      frame_model: "Top Fuel 9.9 XX AXS T-Type",
+      frame_material_slug: "composite",
+      handlebar_type: "flat",
+      primary_activity_id: trek_activity&.id,
+      frame_size: "m",
+      frame_size_unit: "ordinal",
+      rear_tire_narrow: "false",
+      front_tire_narrow: "false",
+      front_gear_type_slug: "1",
+      rear_gear_type_slug: "12",
+      front_wheel_size_id: seven_hundred_c_id,
+      rear_wheel_size_id: seven_hundred_c_id,
+      description: "OCLV Mountain Carbon, 120mm travel, RockShox Pike Ultimate fork and Deluxe Ultimate shock, SRAM XX SL Eagle AXS T-Type, Bontrager Line Pro 30 carbon wheels.",
+      status: "status_stolen",
+      date_stolen: (Time.current - 14.days).to_s
+    ),
+    stolen_record: {
+      latitude: trek_location[:latitude].to_s,
+      longitude: trek_location[:longitude].to_s,
+      street: trek_location[:street],
+      city: trek_location[:city],
+      zipcode: trek_location[:zipcode],
+      state_id: ca_state&.id.to_s,
+      country_id: us&.id.to_s,
+      skip_geocoding: true,
+      estimated_value: "11000",
+      theft_description: "Locked outside on #{trek_location[:street]} and stolen overnight",
+      locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
+      lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
+    }
+  }
+)
+
+trek_bike.current_stolen_record&.update_columns(latitude: trek_location[:latitude], longitude: trek_location[:longitude])
+trek_image = PublicImage.new(imageable: trek_bike, listing_order: 1)
+File.open(Rails.root.join("db/seeds/images/trek_top_fuel.jpg")) { |file| trek_image.image = file }
+trek_image.save!
+trek_components.each do |component|
+  manufacturer = Manufacturer.friendly_find(component[:manufacturer])
+  trek_bike.components.create!(
+    ctype: Ctype.friendly_find(component[:ctype]),
+    manufacturer: manufacturer || Manufacturer.other,
+    manufacturer_other: manufacturer ? nil : component[:manufacturer],
+    component_model: component[:model],
+    description: component[:description],
+    front: component[:front],
+    rear: component[:rear],
+    is_stock: true,
+    setting_is_stock: true
+  )
+end
+puts "  Created stolen Trek at #{trek_location[:street]}, #{trek_location[:city]} with #{trek_bike.components.count} components"
+
 puts "Bikes seeded successfully!"
