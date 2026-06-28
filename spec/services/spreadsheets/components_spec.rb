@@ -28,11 +28,13 @@ RSpec.describe Spreadsheets::Components do
   end
 
   describe "import methods" do
-    let(:csv) do
-      StringIO.new("name,secondary_name,has_multiple_locations,group\n" \
+    let(:csv_content) do
+      "name,secondary_name,has_multiple_locations,group\n" \
         "Stem,Gooseneck,false,Frame and Fork\n" \
-        "Pannier,,true,Cargo\n")
+        "Pannier,,true,Cargo\n"
     end
+    # fresh StringIO each call, since CSV.foreach consumes it
+    def import_csv = described_class.import(StringIO.new(csv_content))
     let!(:cgroup) { FactoryBot.create(:cgroup, name: "Frame and Fork") }
 
     def expect_target_ctypes
@@ -49,9 +51,22 @@ RSpec.describe Spreadsheets::Components do
     describe "import" do
       it "imports, reusing the existing cgroup and creating a new one" do
         expect do
-          expect { described_class.import(csv) }.to change(Ctype, :count).by 2
+          expect { import_csv }.to change(Ctype, :count).by 2
         end.to change(Cgroup, :count).by 1
         expect_target_ctypes
+      end
+
+      it "is idempotent and corrects casing on re-import" do
+        import_csv
+        # simulate older lowercased records: same slug, different stored name
+        Ctype.friendly_find("Stem").update_columns(name: "stem")
+        cgroup.update_columns(name: "Frame and fork")
+
+        expect do
+          expect { import_csv }.not_to change(Ctype, :count)
+        end.not_to change(Cgroup, :count)
+        expect(Ctype.friendly_find("Stem").name).to eq "Stem"
+        expect(cgroup.reload.name).to eq "Frame and Fork"
       end
     end
 

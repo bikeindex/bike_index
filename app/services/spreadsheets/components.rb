@@ -29,6 +29,7 @@ module Spreadsheets
 
     def update_or_create_for!(row)
       ctype = Ctype.friendly_find(row[:name]) || Ctype.new(name: row[:name])
+      ctype.name = row[:name] # correct casing on re-import; slug is set on create, so it's unchanged
       ctype.cgroup = find_or_create_cgroup(row[:group])
       ctype.secondary_name = row[:secondary_name]
       ctype.has_multiple = Binxtils::InputNormalizer.boolean(row[:has_multiple_locations])
@@ -37,8 +38,11 @@ module Spreadsheets
 
     def find_or_create_cgroup(name)
       name = name.presence || Cgroup.additional_parts.name
-      Cgroup.friendly_find(name) ||
-        Cgroup.create!(name:, priority: (Cgroup.maximum(:priority) || 0) + 1)
+      cgroup = Cgroup.friendly_find(name)
+      return Cgroup.create!(name:, priority: (Cgroup.maximum(:priority) || 0) + 1) unless cgroup
+
+      cgroup.update!(name:) unless cgroup.name == name
+      cgroup
     end
 
     def row_for(ctype)
