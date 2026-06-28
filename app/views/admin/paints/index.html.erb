@@ -8,7 +8,7 @@
   &mdash;
   <%= number_display(matching_paints.where("created_at >= ?", Time.current.beginning_of_day).count) %>
   today, <%= number_display(Paint.unlinked.count) %> unlinked
-<% end unless sortable_search_params? %>
+<% end if request.query_parameters.blank? %>
 
 <% admin_search_form = capture do %>
   <%= form_tag admin_paints_path, method: :get, class: "form-inline mt-4 mb-4 justify-content-md-end" do %>

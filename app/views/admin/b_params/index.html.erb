@@ -41,7 +41,7 @@
   &mdash;
   <%= number_display(matching_b_params.where("created_at > ?", Time.current - 24.hours).count) %>
   today
-<% end %>
+<% end if request.query_parameters.blank? %>
 
 <% admin_search_form = capture do %>
   <%= form_tag admin_b_params_path, method: :get, class: "form-inline mt-4 mb-4 justify-content-md-end" do %>
