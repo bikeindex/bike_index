@@ -24,7 +24,6 @@ module Users
       old_user.payments.update_all(user_id:)
       old_user.stripe_subscriptions.update_all(user_id:)
       old_user.memberships.update_all(user_id:)
-      old_user.integrations.update_all(user_id:)
       old_user.sent_stolen_notifications.update_all(sender_id: user_id)
       old_user.received_stolen_notifications.update_all(receiver_id: user_id)
       old_user.theft_alerts.update_all(user_id:)
@@ -48,6 +47,8 @@ module Users
       # No index, so update all
       BikeSticker.where(user_id: old_user.id).update_all(user_id:)
 
+      merge_strava_integration(user_email.user, old_user)
+
       if user_email.user.stripe_id.blank? && old_user.stripe_id.present?
         user_email.user.update(stripe_id: old_user.stripe_id)
       end
@@ -65,6 +66,15 @@ module Users
         AddressRecord.user.where(user_id: old_user_id).each { |i| i.update(user_id:) }
       end
       AddressRecord.not_user.where(user_id: old_user_id).each { |i| i.update(user_id:) }
+    end
+
+    # has_one with a unique index on (user_id) where not deleted - only move if the target has none,
+    # otherwise the old integration is soft-deleted with old_user via dependent: :destroy
+    def merge_strava_integration(user, old_user)
+      return if old_user.strava_integration.blank? || user.strava_integration.present?
+
+      old_user.strava_integration.update(user_id: user.id)
+      old_user.strava_integration.strava_requests.update_all(user_id: user.id)
     end
 
     def update_marketplace_messages(user_id, old_user_id)

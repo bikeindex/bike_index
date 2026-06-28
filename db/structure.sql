@@ -1830,40 +1830,6 @@ ALTER SEQUENCE public.impound_records_id_seq OWNED BY public.impound_records.id;
 
 
 --
--- Name: integrations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.integrations (
-    id integer NOT NULL,
-    user_id integer,
-    access_token text,
-    provider_name character varying(255),
-    information text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: integrations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.integrations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: integrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.integrations_id_seq OWNED BY public.integrations.id;
-
-
---
 -- Name: invoice_organization_features; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4628,13 +4594,6 @@ ALTER TABLE ONLY public.impound_records ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- Name: integrations id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.integrations ALTER COLUMN id SET DEFAULT nextval('public.integrations_id_seq'::regclass);
-
-
---
 -- Name: invoice_organization_features id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5420,14 +5379,6 @@ ALTER TABLE ONLY public.impound_record_updates
 
 ALTER TABLE ONLY public.impound_records
     ADD CONSTRAINT impound_records_pkey PRIMARY KEY (id);
-
-
---
--- Name: integrations integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.integrations
-    ADD CONSTRAINT integrations_pkey PRIMARY KEY (id);
 
 
 --
@@ -6555,13 +6506,6 @@ CREATE INDEX index_impound_records_on_user_id ON public.impound_records USING bt
 
 
 --
--- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_integrations_on_user_id ON public.integrations USING btree (user_id);
-
-
---
 -- Name: index_invoice_organization_features_on_invoice_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7369,6 +7313,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260628120000'),
+('20260626162049'),
 ('20260625215350'),
 ('20260625120000'),
 ('20260528152450'),
