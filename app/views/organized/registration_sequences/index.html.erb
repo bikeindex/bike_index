@@ -1,13 +1,7 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:py-6">
-  <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
-    <h1 class="uncap tw:text-2xl tw:font-semibold">Registration sequences</h1>
-
-    <% if @draft.present? %>
-      <%= render UI::ButtonLink::Component.new(text: "Manage draft pages",
-        href: organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id),
-        color: :primary) %>
-    <% end %>
-  </div>
+  <h1 class="uncap tw:mb-6 tw:text-2xl tw:font-semibold">
+    Registration sequences
+  </h1>
 
   <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Current</h2>
 
