@@ -1,5 +1,0 @@
-{
-  "setup": "bin/workspace_setup --without_seeds",
-  "server": "bin/dev",
-  "teardown": "bin/workspace_teardown"
-}
