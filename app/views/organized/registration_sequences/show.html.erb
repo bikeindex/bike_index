@@ -65,21 +65,7 @@
               <% end %>
             </div>
 
-            <div class="tw:flex tw:items-center tw:gap-3">
-              <%= link_to "Edit", edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), class: "tw:rounded-lg tw:border tw:border-gray-600 tw:px-3 tw:py-1.5 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-gray-800" %>
-
-              <%= form_with url: organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), method: :delete, data: {turbo_confirm: "Remove this page?"} do %>
-                <button
-                  type="submit"
-                  class="
-                    tw:text-sm tw:font-medium tw:text-red-400
-                    tw:hover:text-red-300
-                  "
-                >
-                  Delete
-                </button>
-              <% end %>
-            </div>
+            <%= link_to "Edit", edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), class: "tw:rounded-lg tw:border tw:border-gray-600 tw:px-3 tw:py-1.5 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-gray-800" %>
           </div>
         <% end %>
       </div>
