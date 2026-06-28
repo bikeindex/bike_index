@@ -6,10 +6,16 @@ module Form
     # the form builder, so the label's `for` matches the editor id for a given attribute. Carries
     # data-controller="lexxy", which loads the editor JS and stylesheet on demand.
     class Component < ApplicationComponent
-      def initialize(form_builder:, attribute:, size: :default)
+      # Lexxy renders a fixed toolbar (lexxy.js LexicalToolbarElement.defaultTemplate); pass
+      # toolbar_buttons: to show only a subset -- the rest are hidden via lexxy_overrides.css.
+      TOOLBAR_BUTTONS = %i[bold italic strikethrough highlight link quote heading code
+        unordered_list ordered_list table divider undo redo].freeze
+
+      def initialize(form_builder:, attribute:, size: :default, toolbar_buttons: nil)
         @form_builder = form_builder
         @attribute = attribute
         @size = size
+        @toolbar_buttons = toolbar_buttons
       end
 
       def call
@@ -27,8 +33,17 @@ module Form
       end
 
       def editor_class
-        base = "lexxy-content tw:w-full"
-        (@size == :single_line) ? "#{base} lexxy-editor--compact" : base
+        [
+          "lexxy-content tw:w-full",
+          ("lexxy-editor--compact" if @size == :single_line),
+          *hidden_button_classes
+        ].compact.join(" ")
+      end
+
+      def hidden_button_classes
+        return [] if @toolbar_buttons.nil?
+
+        (TOOLBAR_BUTTONS - @toolbar_buttons).map { "lexxy-editor--hide-#{it.to_s.tr("_", "-")}" }
       end
     end
   end

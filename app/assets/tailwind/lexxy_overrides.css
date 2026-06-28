@@ -22,17 +22,23 @@ lexxy-editor.lexxy-editor--compact .lexxy-editor__toolbar-button {
   block-size: 1.6em;
 }
 
-/* Trim the toolbar to bold, italic, link, and undo/redo. The gem renders a fixed button set
-   (lexxy.js LexicalToolbarElement.defaultTemplate) with no per-button config, so hide the rest;
+/* Per-instance toolbar trimming (Form::TextEditor::Component toolbar_buttons:). The gem renders a
+   fixed button set (lexxy.js LexicalToolbarElement.defaultTemplate) with no per-button config, so
+   the component adds a lexxy-editor--hide-<button> class for each button the caller omitted; hidden
    commands stay reachable via hotkeys. Upload is already hidden by attachments: "false". */
-.lexxy-content lexxy-toolbar > [name="strikethrough"],
-.lexxy-content lexxy-toolbar > [name="quote"],
-.lexxy-content lexxy-toolbar > [name="heading"],
-.lexxy-content lexxy-toolbar > [name="code"],
-.lexxy-content lexxy-toolbar > [name="unordered-list"],
-.lexxy-content lexxy-toolbar > [name="ordered-list"],
-.lexxy-content lexxy-toolbar > [name="table"],
-.lexxy-content lexxy-toolbar > [name="divider"],
-.lexxy-content lexxy-toolbar > .lexxy-editor__toolbar-dropdown:has(> summary[name="highlight"]) {
+.lexxy-editor--hide-bold lexxy-toolbar > [name="bold"],
+.lexxy-editor--hide-italic lexxy-toolbar > [name="italic"],
+.lexxy-editor--hide-strikethrough lexxy-toolbar > [name="strikethrough"],
+.lexxy-editor--hide-quote lexxy-toolbar > [name="quote"],
+.lexxy-editor--hide-heading lexxy-toolbar > [name="heading"],
+.lexxy-editor--hide-code lexxy-toolbar > [name="code"],
+.lexxy-editor--hide-unordered-list lexxy-toolbar > [name="unordered-list"],
+.lexxy-editor--hide-ordered-list lexxy-toolbar > [name="ordered-list"],
+.lexxy-editor--hide-table lexxy-toolbar > [name="table"],
+.lexxy-editor--hide-divider lexxy-toolbar > [name="divider"],
+.lexxy-editor--hide-undo lexxy-toolbar > [name="undo"],
+.lexxy-editor--hide-redo lexxy-toolbar > [name="redo"],
+.lexxy-editor--hide-link lexxy-toolbar > .lexxy-editor__toolbar-dropdown:has(> summary[name="link"]),
+.lexxy-editor--hide-highlight lexxy-toolbar > .lexxy-editor__toolbar-dropdown:has(> summary[name="highlight"]) {
   display: none;
 }
