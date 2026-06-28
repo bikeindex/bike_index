@@ -8,20 +8,23 @@ RSpec.describe Spreadsheets::ImporterJob, type: :job do
   describe "perform" do
     let(:csvs) do
       {
+        # Müller exercises multibyte UTF-8; Faraday hands back ASCII-8BIT bodies
         "manufacturers" => "name,alternate_name,website,makes_frames,ebike_only,open_year,close_year,logo_url\n" \
-          "Mualani,,https://example.com,true,false,2001,,\n",
+          "Müller,,https://example.com,true,false,2001,,\n",
         "primary_activities" => "flavor,families\nBike Polo,\n",
         "components" => "name,secondary_name,has_multiple_locations,group\nWheel,,true,Wheels\n"
       }
     end
     before do
-      allow_any_instance_of(described_class).to receive(:download) { |_, url| csvs.fetch(File.basename(url, ".csv")) }
+      allow_any_instance_of(described_class).to receive(:download) { |_, url|
+        csvs.fetch(File.basename(url, ".csv")).dup.force_encoding("ASCII-8BIT")
+      }
     end
 
     context "with no args" do
       it "imports every spreadsheet" do
         described_class.new.perform
-        expect(Manufacturer.friendly_find("Mualani")).to be_present
+        expect(Manufacturer.friendly_find("Müller")).to be_present
         expect(PrimaryActivity.friendly_find("Bike Polo")).to be_present
         expect(Ctype.friendly_find("Wheel")).to be_present
       end

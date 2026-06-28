@@ -7,7 +7,10 @@ module Spreadsheets
     def perform(name = nil)
       return IMPORTERS.each { |n| perform(n) } if name.blank?
 
-      Tempfile.create([name, ".csv"]) do |file|
+      # binmode: write the downloaded bytes verbatim. The CSVs are UTF-8 and Faraday
+      # returns ASCII-8BIT, which text mode tries to transcode (failing on CI, where
+      # the container has no UTF-8 locale).
+      Tempfile.create([name, ".csv"], binmode: true) do |file|
         file.write(download("#{RESOURCES_URL}/#{name}.csv"))
         file.flush
         Spreadsheets.const_get(name.camelize).import(file.path)
