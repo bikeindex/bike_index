@@ -70,15 +70,20 @@ RSpec.describe Spreadsheets::PrimaryActivities do
         expect(PrimaryActivity.all.map(&:display_name)).to match_array target_display_names
       end
 
-      it "names the offending activity when a create fails validation" do
+      it "self-heals slug drift on re-import (no collision)" do
         described_class.import(csv_path)
-        # Drift the slug so the slug lookup misses and the create collides on name uniqueness
+        # Drift the slug so the slug lookup misses; the exact-name fallback should still find it
         PrimaryActivity.flavor.top_level.friendly_find("Bike Polo").update_columns(slug: "drifted")
 
+        expect { described_class.import(csv_path) }.not_to change(PrimaryActivity, :count)
+      end
+
+      it "names the offending activity when a create fails validation" do
+        # A top-level flavor sharing a name with an existing family is a genuine conflict
         Tempfile.create(["primary_activities", ".csv"], Rails.root.join("tmp")) do |file|
-          file.write("Flavor,Families\nBike Polo,\n")
+          file.write("Flavor,Families\nRoad Biking,\n")
           file.flush
-          expect { described_class.import(file.path) }.to raise_error(/Bike Polo/)
+          expect { described_class.import(file.path) }.to raise_error(/Road Biking/)
         end
       end
 

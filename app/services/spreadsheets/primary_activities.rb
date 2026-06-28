@@ -55,10 +55,11 @@ module Spreadsheets
       end
     end
 
-    # Find by exact slug and correct the stored name, or create. Slug, not friendly_find, keeps re-imports idempotent
+    # Match by slug or exact name (not friendly_find's substring search), correct the stored name, or create
     def upsert!(scope, name, **create_attrs)
       name = name.strip
-      existing = scope.find_by(slug: Slugifyer.slugify(name))
+      existing = scope.find_by(slug: Slugifyer.slugify(name)) ||
+        scope.where("lower(name) = ?", name.downcase).first
       return PrimaryActivity.create!(name:, **create_attrs) unless existing
 
       existing.update!(name:) unless existing.name == name
