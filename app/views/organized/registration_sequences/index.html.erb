@@ -1,19 +1,15 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:py-6">
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
-    <h1 class="tw:text-2xl tw:font-semibold">Registration sequence</h1>
+    <h1 class="uncap tw:text-2xl tw:font-semibold">Registration sequences</h1>
 
     <% if @draft.present? %>
       <%= render UI::ButtonLink::Component.new(text: "Manage draft pages",
         href: organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id),
         color: :primary) %>
-    <% else %>
-      <%= form_with url: organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post do %>
-        <%= render UI::Button::Component.new(text: "Start a draft", color: :primary, kind: :submit) %>
-      <% end %>
     <% end %>
   </div>
 
-  <h2 class="tw:mb-2 tw:text-lg tw:font-semibold">Current</h2>
+  <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Current</h2>
 
   <% if @active.present? %>
     <p class="tw:mb-6 tw:text-gray-600">
@@ -22,22 +18,30 @@
     </p>
   <% else %>
     <p class="tw:mb-6 tw:text-gray-600">
-      There is no active registration sequence yet.
-      <%= @draft.present? ? "Manage the draft pages" : "Start a draft" %>, then
-      contact Bike Index to make it live.
+      There is no active registration sequence.
+    </p>
+    <p class="tw:mb-6 tw:text-gray-600">
+      Edit your draft sequence and contact Bike Index when you're ready to make
+      it live.
     </p>
   <% end %>
 
+  <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Draft</h2>
+
   <% if @draft.present? %>
-    <h2 class="tw:mb-2 tw:text-lg tw:font-semibold">Draft</h2>
     <p class="tw:mb-6 tw:text-gray-600">
-      Your draft awaiting approval.
-      <%= link_to "Manage pages", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), class: "twlink" %>
+      Your draft sequence.
+      <%= link_to "Edit sequence", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), class: "twlink" %>
     </p>
+  <% else %>
+    <p class="tw:mb-2 tw:text-gray-600">
+      You haven't started a draft sequence yet.
+    </p>
+    <%= button_to "Edit sequence", organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, class: "twlink", form_class: "tw:mb-6 tw:inline-block" %>
   <% end %>
 
   <% if @previous.any? %>
-    <h2 class="tw:mb-2 tw:text-lg tw:font-semibold">Previous</h2>
+    <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Previous</h2>
     <ul class="tw:list-none tw:text-gray-600">
       <% @previous.each do |registration_sequence| %>
         <li class="tw:mb-1">
