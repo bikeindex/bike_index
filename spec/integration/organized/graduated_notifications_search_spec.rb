@@ -34,10 +34,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_no_css(".alert-success", wait: 10)
   end
 
-  # flaky: a Turbo back/forward restoration body-swap can detach the search form
-  # mid-interaction under Playwright ("Element is not attached to the DOM"), like
-  # the other back/forward search specs. Rare and load-dependent; retry on CI.
-  it "searches by email via turbo, then opens the notification", flaky: 4 do
+  it "searches by email via turbo, then opens the notification" do
     visit graduated_notifications_path
     # Results load via the eager turbo-frame (src fetched once the frame connects)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)

@@ -30,6 +30,22 @@ module SystemSpecHelpers
     field.send_keys(text)
     field
   end
+
+  # capybara-playwright wraps click/find so a mid-action "Element is not attached
+  # to the DOM" (Turbo re-rendering the field) becomes a StaleReferenceError that
+  # Capybara auto-retries -- but its `set` path (fill_in) only rescues timeouts,
+  # so the raw Playwright::Error escapes. Re-find and re-fill on detach, which is
+  # what Capybara does for the wrapped actions.
+  def fill_in(*args, **options, &block)
+    attempts = 0
+    begin
+      super
+    rescue Playwright::Error => e
+      raise unless e.message.include?("not attached to the DOM") && (attempts += 1) <= 3
+      sleep 0.1
+      retry
+    end
+  end
 end
 
 RSpec.configure do |config|
