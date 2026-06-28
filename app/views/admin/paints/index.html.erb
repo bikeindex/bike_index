@@ -4,31 +4,18 @@
   </li>
 <% end %>
 
+<% count_detail = capture do %>
+  &mdash;
+  <%= number_display(matching_paints.where("created_at >= ?", Time.current.beginning_of_day).count) %>
+  today, <%= number_display(Paint.unlinked.count) %> unlinked
+<% end unless sortable_search_params? %>
+
 <% admin_search_form = capture do %>
-  <div class="row mt-4">
-    <div class="col-sm-7">
-      <p>
-        <%= number_display(matching_paints.count) %> matching paints
-        <em><%= humanized_time_range(@time_range) %></em>
-        <em>(<%= number_display(matching_paints.where("created_at >= ?", Time.current.beginning_of_day).count) %> today)</em>
-
-
-        <% unless sortable_search_params? %>
-          <strong>
-            <%= number_display(Paint.unlinked.count) %> are unlinked
-          </strong>
-        <% end %>
-      </p>
-    </div>
-
-    <div class="col-sm-5">
-      <%= form_tag admin_paints_path, method: :get, class: "form-inline" do %>
-        <%= render partial: "/shared/hidden_search_fields" %>
-        <%= text_field_tag :search_name, params[:name], placeholder: "Search paints by name", class: "form-control mr-2" %>
-        <%= submit_tag "Search", name: "search", class: "btn btn-success" %>
-      <% end %>
-    </div>
-  </div>
+  <%= form_tag admin_paints_path, method: :get, class: "form-inline mt-4 mb-4 justify-content-md-end" do %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+    <%= text_field_tag :search_name, params[:name], placeholder: "Search paints by name", class: "form-control mr-2" %>
+    <%= submit_tag "Search", name: "search", class: "btn btn-success" %>
+  <% end %>
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
@@ -36,5 +23,6 @@
   viewing: "Paints",
   chart_collection: @render_chart && matching_paints,
   nav_header_list_items:,
-  admin_search_form:
+  admin_search_form:,
+  count_detail:
 )) %>
