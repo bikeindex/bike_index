@@ -28,5 +28,11 @@ RSpec.describe Spreadsheets::ImporterJob, type: :job do
         end
       end
     end
+
+    context "with an unknown name" do
+      it "raises" do
+        expect { described_class.new.perform("bikes") }.to raise_error(ArgumentError, /Unknown importer/)
+      end
+    end
   end
 end
