@@ -14,6 +14,7 @@
 #  longitude         :float
 #  price_negotiable  :boolean          default(FALSE)
 #  published_at      :datetime
+#  seller_member     :boolean          default(FALSE), not null
 #  status            :integer
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
@@ -29,12 +30,14 @@
 #  index_marketplace_listings_on_buyer_id           (buyer_id)
 #  index_marketplace_listings_on_item               (item_type,item_id)
 #  index_marketplace_listings_on_seller_id          (seller_id)
+#  index_marketplace_listings_on_seller_member      (seller_member) WHERE seller_member
 #
 class MarketplaceListing < ApplicationRecord
   include AddressRecorded
   include AddressRecordedWithinBoundingBox
   include Amountable
   include Currencyable
+  include ShortIdable
 
   STATUS_ENUM = {draft: 0, for_sale: 1, sold: 2, removed: 3}.freeze
   CONDITION_ENUM = {new_in_box: 0, excellent: 1, good: 2, poor: 3, salvage: 4}.freeze
@@ -67,6 +70,7 @@ class MarketplaceListing < ApplicationRecord
 
   scope :current, -> { where(status: CURRENT_STATUSES) }
   scope :removed_or_sold, -> { where(status: %i[removed sold]) }
+  scope :promoted, -> { where(seller_member: true) }
 
   class << self
     # Only works for bikes currently...
@@ -229,6 +233,11 @@ class MarketplaceListing < ApplicationRecord
   def set_calculated_attributes
     self.seller_id ||= item.user&.id
     self.status ||= "draft"
+    # Only track the seller's membership while the listing is current; once it's sold/removed the
+    # cached value freezes, so a sold listing keeps the membership it had at the time of sale.
+    if current?
+      self.seller_member = seller&.member? || false
+    end
 
     if status == "for_sale"
       if valid_publishable?

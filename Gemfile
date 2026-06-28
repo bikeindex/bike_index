@@ -5,7 +5,7 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-ruby "4.0.2"
+ruby "4.0.5"
 
 # Gems that are no longer in standard library as of Ruby 3.4
 gem "csv"
@@ -63,6 +63,7 @@ gem "carrierwave", "~> 3.1" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
+gem "lexxy", "~> 0.1.26.beta" # Rich text editor (Action Text) for registration sequences
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "rqrcode", "3.2.0" # QR Code image generator

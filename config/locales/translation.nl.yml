@@ -5440,6 +5440,7 @@ nl:
         removed_from: Verwijderd uit de fietsindex
       vehicle_thumbnail:
         registered_not_stolen: geregistreerd, niet gestolen
+        member: Lid van Bike Index
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
       multi_result_chip:
@@ -5453,6 +5454,8 @@ nl:
         price_is_firm_false: prijs is onderhandelbaar
         price_is_firm_true: prijs is vast
         still_for_sale_at: Nog steeds te koop bij
+        member_listing: Lid van Bike Index
+        member_listing_tooltip: Deze verkoper is lid van Bike Index.
       homepage_for_buttons:
         bike_shops: Fietsenwinkels
         cities: Steden
@@ -5586,13 +5589,42 @@ nl:
         thanks_for_adding_this_bike_type_you_found: Bedankt voor het toevoegen van
           deze %{bike_type} die je aan Bike Index hebt gevonden
         use_a_ulock: Gebruik een U-Lock.
-        welcome_to_bike_index: Welkom bij Bike Index
         were_sorry_your_bike_type_was_stolen: Het spijt ons dat uw %{bike_type} is
           gestolen.
         when_you_do: wanneer je dat doet!
         you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
           Bike Index
         youre_almost_done_registering: Je bent bijna klaar met registreren!
+        bike_details: Fietsdetails
+        bike_love_one: Fietsliefde stripverhaal één
+        bike_love_three: Fietsliefde stripverhaal drie
+        bike_love_two: Fietsliefde stripverhaal twee
+        claim_your_bike_type: Claim je %{bike_type}
+        indoor_storage_tip: We raden altijd aan om je fiets, indien mogelijk, binnen
+          te zetten of op een veilige plek te stallen, vooral 's nachts.
+        keep_your_registration_updated: Houd uw registratie actueel.
+        marketplace_illustration: Illustratie van een marktplaats
+        pro_tip_illustration: Professionele tip (illustratie)
+        registered_animation: Geregistreerde animatie
+        registration_complete_message: Je fiets is nu opgenomen in 's werelds meest
+          effectieve fietsregister. Je beschermt je fiets en helpt fietsdiefstal in
+          je buurt te voorkomen.
+        registration_confirm_message: Je bent slechts één stap verwijderd van het
+          activeren van het meest effectieve fietsregister en het beschermen van je
+          fiets in jouw buurt.
+        spread_the_word_body: Moedig je vrienden en familie aan om hun fietsen ook
+          te registreren.
+        spread_the_word_title: Vertel het verder over Bike Index!
+        stolen_guidance: Als je fiets gestolen wordt, log dan direct in op Bike Index
+          en meld hem als gestolen om ons opsporingsnetwerk te activeren.
+        theft_victims_illustration: Illustratie van slachtoffers van diefstal
+        ulock_illustration: U-slot illustratie
+        updated_registration_guidance: Als u verhuist, uw fiets verkoopt of er andere
+          wijzigingen aan aanbrengt, zorg er dan voor dat de registratie is bijgewerkt,
+          zodat de gegevens correct en bruikbaar blijven.
+        view_your_bike: Bekijk je fiets
+        what_if_my_bike_gets_stolen: Wat als mijn fiets gestolen wordt?
+        whats_next: Wat volgt?
       organization_invitation:
         hello: Hallo %{name},
         join_org: Doe mee met %{org_name}

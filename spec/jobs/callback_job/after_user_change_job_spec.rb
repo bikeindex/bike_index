@@ -365,6 +365,63 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
     end
   end
 
+  describe "marketplace_listing seller_member" do
+    let(:user) { FactoryBot.create(:user_confirmed, :with_address_record) }
+    let(:current_listing) do
+      FactoryBot.create(:marketplace_listing, :for_sale, address_record: user.address_record, seller: user)
+    end
+    let(:sold_listing) do
+      FactoryBot.create(:marketplace_listing, :for_sale, address_record: user.address_record, seller: user)
+    end
+
+    context "when the seller is a member" do
+      let!(:membership) { FactoryBot.create(:membership, user:) }
+
+      it "keeps seller_member true on sold listings after the user stops being a member" do
+        expect(user.reload.member?).to be true
+        expect(current_listing.seller_member).to be true
+        sold_listing.update!(status: :sold, end_at: Time.current)
+        expect(sold_listing.reload).to have_attributes(status: "sold", seller_member: true)
+
+        membership.update!(status: :ended, end_at: Time.current - 1.day)
+        expect(user.reload.member?).to be false
+        instance.perform(user.id)
+
+        expect(current_listing.reload.seller_member).to be false
+        expect(sold_listing.reload.seller_member).to be true
+      end
+    end
+
+    context "when the seller is not yet a member" do
+      it "promotes only current listings once the user becomes a member" do
+        expect(user.reload.member?).to be false
+        sold_listing.update!(status: :sold, end_at: Time.current)
+        expect(current_listing.seller_member).to be false
+        expect(sold_listing.reload.seller_member).to be false
+
+        FactoryBot.create(:membership, user:)
+        expect(user.reload.member?).to be true
+        instance.perform(user.id)
+
+        expect(current_listing.reload.seller_member).to be true
+        expect(sold_listing.reload.seller_member).to be false
+      end
+    end
+  end
+
+  describe "process_bikes" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+
+    it "bumps the user's bikes' updated_at, busting their search-result cache key" do
+      original_updated_at = bike.reload.updated_at
+      Sidekiq::Job.clear_all
+      instance.perform(user.id)
+      CallbackJob::AfterBikeSaveJob.drain
+      expect(bike.reload.updated_at).to be > original_updated_at
+    end
+  end
+
   describe "deleted user" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }

@@ -1,12 +1,17 @@
 module Admin
   class CtypesController < Admin::BaseController
-    include Binxtils::SetPeriod
+    include Binxtils::SortableTable
 
-    before_action :set_period, only: %i[index]
     before_action :find_ctypes, only: [:edit, :update, :destroy]
 
     def index
-      @ctypes = Ctype.all
+      @cgroups = Cgroup.commonness
+      @ctype_counts = Ctype.group(:cgroup_id).count
+      @ctypes = if sort_column == "cgroup"
+        Ctype.includes(:cgroup).joins(:cgroup).reorder("cgroups.name #{sort_direction}")
+      else
+        Ctype.includes(:cgroup).reorder("ctypes.#{sort_column} #{sort_direction}")
+      end
     end
 
     def new
@@ -41,6 +46,12 @@ module Admin
     end
 
     protected
+
+    def sortable_columns
+      %w[name slug cgroup image created_at updated_at]
+    end
+
+    def default_direction = "asc"
 
     def permitted_parameters
       params.require(:ctype).permit(:name, :slug, :secondary_name, :image, :image_cache, :cgroup_id, :cgroup, :has_multiple, :cgroup_name)

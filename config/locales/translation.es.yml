@@ -5542,6 +5542,7 @@ es:
         removed_from: Eliminado del índice de bicicletas
       vehicle_thumbnail:
         registered_not_stolen: Registrado, no robado.
+        member: Miembro de Bike Index
       container:
         no_results: No se encontraron registros que coincidieran exactamente con su
           búsqueda.
@@ -5556,6 +5557,8 @@ es:
         price_is_firm_false: El precio es negociable.
         price_is_firm_true: El precio es fijo.
         still_for_sale_at: Todavía se vende en
+        member_listing: Miembro de Bike Index
+        member_listing_tooltip: Este vendedor es miembro de Bike Index.
       homepage_for_buttons:
         bike_shops: Tiendas de bicicletas
         cities: Ciudades
@@ -5691,12 +5694,41 @@ es:
         thanks_for_adding_this_bike_type_you_found: Gracias por añadir este %{bike_type}
           que encontraste al Índice de Bicicletas.
         use_a_ulock: Utilice un candado en U.
-        welcome_to_bike_index: Bienvenido a Bike Index
         were_sorry_your_bike_type_was_stolen: Lamentamos que su %{bike_type} haya
           sido robado.
         when_you_do: "¡Cuando lo hagas!"
         you_added_a_bike_type_on_bike_index: Has añadido un %{bike_type} en Bike Index
         youre_almost_done_registering: "¡Ya casi terminas de registrarte!"
+        bike_details: Detalles de la bicicleta
+        bike_love_one: Cómic de amor en bicicleta uno
+        bike_love_three: Cómic tres sobre el amor por las bicicletas
+        bike_love_two: Cómic dos sobre el amor por las bicicletas
+        claim_your_bike_type: Reclama tu %{bike_type}
+        indoor_storage_tip: Siempre recomendamos guardar la bicicleta en un lugar
+          cubierto o en un sitio seguro cuando sea posible, especialmente durante
+          la noche.
+        keep_your_registration_updated: Mantén tu registro actualizado
+        marketplace_illustration: Ilustración del mercado
+        pro_tip_illustration: Ilustración de consejo profesional
+        registered_animation: Animación registrada
+        registration_complete_message: Tu bicicleta ahora forma parte del registro
+          de bicicletas más eficaz del mundo. Estás protegiendo tu bicicleta y ayudando
+          a prevenir el robo de bicicletas en tu comunidad.
+        registration_confirm_message: Estás a un paso de activar el registro de bicicletas
+          más eficaz y proteger tu bicicleta en tu comunidad.
+        spread_the_word_body: Anima a tus amigos y familiares a que también registren
+          sus bicicletas.
+        spread_the_word_title: "¡Corre la voz sobre Bike Index!"
+        stolen_guidance: Si te roban la bicicleta, inicia sesión en Bike Index inmediatamente
+          y márcala como robada para activar nuestra red de recuperación.
+        theft_victims_illustration: Ilustración de víctimas de robo
+        ulock_illustration: Ilustración de un candado en U
+        updated_registration_guidance: Si te mudas, vendes o realizas cualquier modificación
+          en tu bicicleta, actualiza la matrícula para que el registro siga siendo
+          preciso y útil.
+        view_your_bike: Ver tu bicicleta
+        what_if_my_bike_gets_stolen: "¿Qué pasa si me roban la bicicleta?"
+        whats_next: "¿Qué sigue?"
       organization_invitation:
         hello: Hola %{name},
         join_org: Únete a %{org_name}
