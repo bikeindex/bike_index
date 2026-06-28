@@ -2,13 +2,13 @@
 
 require "rails_helper"
 
-RSpec.describe Org::RegistrationSequencePageFields::Component, type: :component do
+RSpec.describe Org::RegistrationSequence::PageEdit::Component, type: :component do
   let(:page) { RegistrationSequencePage.new(body: "<ul><li>first bullet</li></ul>") }
 
   def rendered_component(page)
     render_in_view_context do
       form_for page, url: "#", method: :patch do |f|
-        render(Org::RegistrationSequencePageFields::Component.new(form_builder: f))
+        render(Org::RegistrationSequence::PageEdit::Component.new(form_builder: f))
       end
     end
   end
