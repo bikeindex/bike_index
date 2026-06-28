@@ -85,10 +85,11 @@ class RegistrationSequence < ApplicationRecord
     "draft"
   end
 
-  # Reorders pages to match the given ids (drag-and-drop on the show page)
-  def reorder_pages!(ordered_ids)
-    Array(ordered_ids).each_with_index do |page_id, index|
-      registration_sequence_pages.where(id: page_id).update_all(listing_order: index)
+  # Moves page to position and re-sequences listing_order (drag-and-drop on the show page)
+  def reorder_page!(page, position)
+    others = registration_sequence_pages.where.not(id: page.id).order(:listing_order).to_a
+    others.insert(position.clamp(0, others.length), page).each_with_index do |reordered_page, index|
+      registration_sequence_pages.where(id: reordered_page.id).update_all(listing_order: index)
     end
   end
 

@@ -50,12 +50,12 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
       end
     end
 
-    describe "sort" do
-      it "reorders the pages to match page_ids" do
+    describe "update with a position" do
+      it "moves the page to the position and re-sequences" do
         ids = draft.registration_sequence_pages.pluck(:id)
-        patch "#{base_url}/sort", params: {page_ids: ids.reverse}
+        patch "#{base_url}/#{ids.last}", params: {position: 0}
         expect(response.status).to eq(200)
-        expect(draft.registration_sequence_pages.reload.pluck(:id)).to eq(ids.reverse)
+        expect(draft.registration_sequence_pages.reload.pluck(:id)).to eq([ids.last] + ids[0...-1])
       end
     end
 

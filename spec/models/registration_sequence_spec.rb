@@ -89,4 +89,23 @@ RSpec.describe RegistrationSequence, type: :model do
       end
     end
   end
+
+  describe "#reorder_page!" do
+    let(:draft) { FactoryBot.create(:registration_sequence) }
+    let!(:pages) { FactoryBot.create_list(:registration_sequence_page, 3, registration_sequence: draft) }
+
+    it "moves the page to the position and re-sequences listing_order from zero" do
+      draft.reorder_page!(pages.last, 0)
+
+      reordered = draft.registration_sequence_pages.reload
+      expect(reordered.pluck(:id)).to eq([pages[2].id, pages[0].id, pages[1].id])
+      expect(reordered.pluck(:listing_order)).to eq([0, 1, 2])
+    end
+
+    it "clamps an out-of-range position to the end" do
+      draft.reorder_page!(pages.first, 99)
+
+      expect(draft.registration_sequence_pages.reload.pluck(:id)).to eq([pages[1].id, pages[2].id, pages[0].id])
+    end
+  end
 end

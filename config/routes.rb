@@ -441,9 +441,7 @@ Rails.application.routes.draw do
     resource :manage_impounding
     resources :users, except: %i[show]
     resources :registration_sequences, only: %i[index create show] do
-      resources :pages, only: %i[create edit update destroy], controller: "registration_sequence_pages" do
-        collection { patch :sort }
-      end
+      resources :pages, only: %i[create edit update destroy], controller: "registration_sequence_pages"
     end
   end
 

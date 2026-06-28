@@ -13,8 +13,12 @@ module Organized
     def edit
     end
 
+    # A position reorders the page (drag-and-drop on the show page); otherwise it's a field edit
     def update
-      if @page.update(permitted_parameters)
+      if params[:position].present?
+        @draft.reorder_page!(@page, params[:position].to_i)
+        head :ok
+      elsif @page.update(permitted_parameters)
         flash[:success] = "Page updated"
         redirect_to sequence_path
       else
@@ -27,12 +31,6 @@ module Organized
       @page.destroy
       flash[:success] = "Page removed"
       redirect_to sequence_path
-    end
-
-    # Drag-and-drop reorder: page_ids is the new order
-    def sort
-      @draft.reorder_pages!(params[:page_ids])
-      head :ok
     end
 
     private

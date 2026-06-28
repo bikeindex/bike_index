@@ -1,11 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='sortable'
-// Drag-and-drop reordering of [data-sortable-target=item] rows. On drop, PATCHes the new order
-// (the items' data-page-id values) to the sortable-url endpoint.
+// Drag-and-drop reordering of [data-sortable-target=item] rows. On drop, PATCHes the moved row's
+// new position to its own data-url endpoint.
 export default class extends Controller {
   static targets = ['item']
-  static values = { url: String }
 
   connect () {
     this.dragging = null
@@ -19,8 +18,9 @@ export default class extends Controller {
     })
     item.addEventListener('dragend', () => {
       item.classList.remove('tw:opacity-50')
+      const moved = this.dragging
       this.dragging = null
-      this.persist()
+      this.persist(moved)
     })
     item.addEventListener('dragover', (event) => {
       event.preventDefault()
@@ -41,13 +41,13 @@ export default class extends Controller {
     }, { offset: Number.NEGATIVE_INFINITY, element: null }).element
   }
 
-  persist () {
-    const pageIds = this.itemTargets.map((item) => item.dataset.pageId)
+  persist (item) {
+    const position = this.itemTargets.indexOf(item)
     const token = document.querySelector('meta[name="csrf-token"]')?.content
-    fetch(this.urlValue, {
+    fetch(item.dataset.url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
-      body: JSON.stringify({ page_ids: pageIds })
+      body: JSON.stringify({ position })
     })
   }
 }

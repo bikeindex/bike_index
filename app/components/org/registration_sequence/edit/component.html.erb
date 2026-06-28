@@ -14,13 +14,12 @@
 <%= render UI::Card::Component.new do %>
   <div
     data-controller="sortable"
-    data-sortable-url-value="<%= sort_organization_registration_sequence_pages_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id) %>"
     class="tw:-my-1.5 tw:divide-y tw:divide-gray-200"
   >
     <% pages.each do |page| %>
       <div
         data-sortable-target="item"
-        data-page-id="<%= page.id %>"
+        data-url="<%= organization_registration_sequence_page_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id) %>"
         draggable="true"
         class="tw:flex tw:items-baseline tw:gap-4 tw:py-1.5"
       >
