@@ -94,7 +94,7 @@ class Component < ApplicationRecord
   end
 
   def component_group
-    return "Additional parts" unless ctype.present?
+    return "Additional Parts" unless ctype.present?
 
     ctype.cgroup.name
   end
