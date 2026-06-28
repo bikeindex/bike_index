@@ -1,14 +1,8 @@
 module Spreadsheets
-  class ImporterJob < ScheduledJob
-    prepend ScheduledJobRecorder
-
+  class ImporterJob < ApplicationJob
     RESOURCES_URL = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data".freeze
     # Each name is both the CSV filename and the importer module (e.g. Spreadsheets::Manufacturers)
     IMPORTERS = %w[manufacturers primary_activities components].freeze
-
-    def self.frequency
-      24.hours
-    end
 
     def perform(name = nil)
       return IMPORTERS.each { |n| self.class.perform_async(n) } if name.blank?

@@ -1,17 +1,14 @@
 require "rails_helper"
 
 RSpec.describe Spreadsheets::ImporterJob, type: :job do
-  include_context :scheduled_job
-  include_examples :scheduled_job_tests
+  before { Sidekiq::Job.clear_all }
 
-  it "is the correct queue and frequency" do
+  it "is the correct queue" do
     expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
-    expect(described_class.frequency).to eq 24.hours
   end
 
   describe "perform with no args" do
     it "enqueues a job for each importer" do
-      Sidekiq::Job.clear_all
       expect { described_class.new.perform }.to change(described_class.jobs, :size).by(3)
       expect(described_class.jobs.map { |j| j["args"] })
         .to match_array([["manufacturers"], ["primary_activities"], ["components"]])
