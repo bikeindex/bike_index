@@ -1,0 +1,133 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data/components.csv
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1870'
+      Cache-Control:
+      - max-age=300
+      Content-Security-Policy:
+      - default-src 'none'; style-src 'unsafe-inline'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Etag:
+      - W/"2ca0442fe23962c0338bc14cb081dd539364650bf406d449c7eb2362c0c14690"
+      Strict-Transport-Security:
+      - max-age=31536000
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - deny
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Github-Request-Id:
+      - 940E:8B718:2B02F0F:3094116:6A41722D
+      Accept-Ranges:
+      - bytes
+      Date:
+      - Sun, 28 Jun 2026 19:16:45 GMT
+      Via:
+      - 1.1 varnish
+      X-Served-By:
+      - cache-sjc1000111-SJC
+      X-Cache:
+      - HIT
+      X-Cache-Hits:
+      - '1'
+      X-Timer:
+      - S1782674205.140266,VS0,VE1
+      Vary:
+      - Authorization,Accept-Encoding
+      Access-Control-Allow-Origin:
+      - "*"
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      X-Fastly-Request-Id:
+      - 0beb881fbb0e5029334d718f7918dc76f277076e
+      Expires:
+      - Sun, 28 Jun 2026 19:21:45 GMT
+      Source-Age:
+      - '238'
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        name,secondary_name,has_multiple_locations,group
+        unknown,,false,Additional Parts
+        Water Bottle Cage,,false,Additional Parts
+        Stem,Gooseneck,false,Additional Parts
+        Bashguard/Chain Guide,,false,Drivetrain
+        Fairing,,false,Frame and Fork
+        Lights,,true,Additional Parts
+        Bell/Noisemaker,,false,Additional Parts
+        Basket,,true,Cargo
+        Chain Tensioners,Chain Tugs,false,Drivetrain
+        Derailleur,,false,Drivetrain
+        Training Wheels,,false,Wheels
+        Bottom Bracket,,false,Drivetrain
+        Brake,,true,Brakes
+        Hub Guard,,false,Additional Parts
+        Generator/Dynamo,,true,Wheels
+        Handlebar,,false,Additional Parts
+        Wheel,,true,Wheels
+        Saddle,,false,Additional Parts
+        Rim,,true,Wheels
+        Axle Nuts,,true,Wheels
+        Hub,,true,Wheels
+        Spokes,,true,Wheels
+        Tube,,true,Wheels
+        Tire,,true,Wheels
+        Brake Lever,,true,Brakes
+        Shift and Brake Lever,,true,Drivetrain
+        Brake Rotor,,true,Brakes
+        Brake Pad,,true,Brakes
+        Shifter,,true,Drivetrain
+        Fork,,false,Frame and Fork
+        Rear Suspension,,false,Frame and Fork
+        Headset,,false,Frame and Fork
+        Brake Cable,,false,Brakes
+        Shift Cable,,false,Drivetrain
+        Chain,,false,Drivetrain
+        Chainrings,,false,Drivetrain
+        Cog/Cassette/Freewheel,,false,Drivetrain
+        Crankset,,false,Drivetrain
+        Pedals,,false,Drivetrain
+        Computer,,false,Additional Parts
+        Pegs,,true,Additional Parts
+        Toe Clips,,false,Additional Parts
+        Grips/Tape,,false,Additional Parts
+        Seatpost Clamp,,false,Additional Parts
+        Detangler,,false,Brakes
+        Kickstand,,false,Additional Parts
+        Rack,,true,Cargo
+        Seatpost,,false,Additional Parts
+        Fender,,true,Additional Parts
+        Aero Bars/Extensions/Bar Ends,Aero Bars,false,Additional Parts
+        Ebike Battery,Electric Bike Battery,false,Drivetrain
+        Ebike Motor,Electric Bike Motor,false,Drivetrain
+        Pannier,Rack Bag,false,Cargo
+        Frame Bag,,false,Cargo
+        Cargo Bike Side Rails,Cargo Bike Monkey Bars,false,Cargo
+        Handlebar Bag,,false,Cargo
+        Seat Bag,Saddle Bag,false,Cargo
+        Top Tube Bag,Bento Box,false,Cargo
+        Child Seat,,false,Cargo
+  recorded_at: Sun, 28 Jun 2026 19:16:45 GMT
+recorded_with: VCR 6.4.0

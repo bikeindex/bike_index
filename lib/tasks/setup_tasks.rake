@@ -9,21 +9,9 @@ namespace :setup do
     UpdateCountsJob.new.perform
   end
 
-  desc "import manufacturers from GitHub"
-  task import_manufacturers_csv: :environment do
-    url = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data/manufacturers.csv"
-    file_path = Rails.root.join("tmp/manufacturers.csv")
-    system("wget -q #{url} -O #{file_path}", exception: true)
-    Spreadsheets::Manufacturers.import(file_path)
-  end
-
-  desc "import primary activities from GitHub"
-  # NOTE: Corrects the name of existing activities, but doesn't re-parent or remove them.
-  # For structural changes, probably do it manually via console
-  task import_primary_activities_csv: :environment do
-    url = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data/primary_activities.csv"
-    file_path = Rails.root.join("tmp/primary_activities.csv")
-    system("wget -q #{url} -O #{file_path}", exception: true)
-    Spreadsheets::PrimaryActivities.import(file_path)
+  desc "refresh reference data (manufacturers, primary activities, components) from bike_data GitHub spreadsheets"
+  task import_spreadsheets: :environment do
+    # Run inline rather than enqueue: seeding's later steps need this data present
+    Spreadsheets::ImporterJob.new.perform
   end
 end
