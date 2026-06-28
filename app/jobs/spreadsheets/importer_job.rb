@@ -6,6 +6,7 @@ module Spreadsheets
 
     def perform(name = nil)
       return IMPORTERS.each { |n| perform(n) } if name.blank?
+      raise ArgumentError, "Unknown importer: #{name.inspect} (expected one of #{IMPORTERS.join(", ")})" unless IMPORTERS.include?(name)
 
       # binmode: write the downloaded bytes verbatim. The CSVs are UTF-8 and Faraday
       # returns ASCII-8BIT, which text mode tries to transcode (failing on CI, where

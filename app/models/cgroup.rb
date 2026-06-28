@@ -23,6 +23,6 @@ class Cgroup < ApplicationRecord
 
   def self.additional_parts
     # friendly_find (slug-based) tolerates stored-casing drift
-    friendly_find("Additional Parts") || create(name: "Additional Parts", priority: 4)
+    friendly_find("Additional Parts") || create(name: "Additional Parts", priority: 6)
   end
 end
