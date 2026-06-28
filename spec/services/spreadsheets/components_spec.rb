@@ -28,7 +28,11 @@ RSpec.describe Spreadsheets::Components do
   end
 
   describe "import methods" do
-    let(:csv_path) { Rails.root.join("spec/fixtures/components-test-import.csv") }
+    let(:csv) do
+      StringIO.new("name,secondary_name,has_multiple_locations,group\n" \
+        "Stem,Gooseneck,false,Frame and Fork\n" \
+        "Pannier,,true,Cargo\n")
+    end
     let!(:cgroup) { FactoryBot.create(:cgroup, name: "Frame and Fork") }
 
     def expect_target_ctypes
@@ -45,7 +49,7 @@ RSpec.describe Spreadsheets::Components do
     describe "import" do
       it "imports, reusing the existing cgroup and creating a new one" do
         expect do
-          expect { described_class.import(csv_path) }.to change(Ctype, :count).by 2
+          expect { described_class.import(csv) }.to change(Ctype, :count).by 2
         end.to change(Cgroup, :count).by 1
         expect_target_ctypes
       end
