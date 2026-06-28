@@ -1,68 +1,6 @@
 <div class="tw:py-4">
   <% if @registration_sequence.draft? %>
-    <% pages = @registration_sequence.registration_sequence_pages.to_a %>
-    <div
-      class="
-        tw:overflow-hidden tw:rounded-xl tw:border tw:border-gray-200
-        tw:bg-white tw:shadow
-      "
-    >
-      <div
-        class="
-          tw:flex tw:items-baseline tw:justify-between tw:gap-4 tw:border-b
-          tw:border-gray-200 tw:px-5 tw:py-3
-        "
-      >
-        <h1 class="uncap tw:text-lg tw:font-semibold">
-          Registration sequence
-          <span class="tw:font-normal tw:text-gray-500">· <%= number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
-        </h1>
-
-        <%= form_with url: organization_registration_sequence_pages_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id), method: :post do %>
-          <%= render UI::Button::Component.new(color: :secondary, kind: :submit, html_class: "tw:whitespace-nowrap") do %>
-            <span aria-hidden="true">+</span> Add page
-          <% end %>
-        <% end %>
-      </div>
-
-      <div
-        data-controller="sortable"
-        data-sortable-url-value="<%= sort_organization_registration_sequence_pages_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id) %>"
-      >
-        <% pages.each do |page| %>
-          <div
-            data-sortable-target="item"
-            data-page-id="<%= page.id %>"
-            draggable="true"
-            class="
-              tw:flex tw:items-baseline tw:gap-4 tw:border-b
-              tw:border-gray-200 tw:px-5 tw:py-1.5 tw:last:border-b-0
-            "
-          >
-            <span
-              class="tw:cursor-grab tw:text-gray-400 tw:select-none"
-              aria-hidden="true"
-            >
-              ⠿
-            </span>
-
-            <div class="tw:min-w-0 tw:flex-1">
-              <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
-                <%= page.title %>
-              </h3>
-
-              <% if page.subtitle.present? %>
-                <p class="tw:mb-0 tw:text-sm tw:text-gray-600">
-                  <%= page.subtitle %>
-                </p>
-              <% end %>
-            </div>
-
-            <%= render UI::ButtonLink::Component.new(text: "Edit", href: edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), color: :secondary) %>
-          </div>
-        <% end %>
-      </div>
-    </div>
+    <%= render Org::RegistrationSequence::Edit::Component.new(registration_sequence: @registration_sequence) %>
   <% else %>
     <div class="tw:mb-6">
       <h1 class="uncap tw:text-2xl tw:font-semibold">
