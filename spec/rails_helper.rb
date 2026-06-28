@@ -81,8 +81,10 @@ RSpec.configure do |config|
   config.include ViewComponent::SystemTestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
   config.include HtmlContentHelpers, type: :component
-  config.before(:each, :browser, type: :system) { driven_by(:playwright) }
-  config.before(:each, :js, type: :system) { driven_by(:playwright) }
+  # Every system spec drives Playwright (overridable per-example, e.g. rack_test).
+  # Without this, untagged `type: :system` specs fall back to Rails' default
+  # :selenium driver, which no longer loads.
+  config.before(:each, type: :system) { driven_by(:playwright) }
 end
 
 require "vcr"

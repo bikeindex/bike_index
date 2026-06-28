@@ -39,11 +39,17 @@ jobs:
       - name: Get CPU cores
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
-      # install system dependencies
+      # install system dependencies. libfuse2t64 is for setup-imagemagick's AppImage below.
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
-          version: 1.0
+          packages: curl gettext libfuse2t64 libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          version: 1.1
+      # install imagemagick separately; the apt imagemagick package doesn't
+      # reliably provide `identify` (db:seed needs it for bike photos).
+      - uses: mfinelli/setup-imagemagick@v6
+        with:
+          cache: true
+          install-libfuse2: false
       - name: Checkout code
         uses: actions/checkout@v7
       # Install Ruby dependencies
