@@ -1,69 +1,101 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:py-6">
-  <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
-    <h1 class="tw:text-2xl tw:font-semibold">
-      Registration sequence
-      <span class="tw:text-base tw:font-normal tw:text-gray-500">(<%= @registration_sequence.status %>)</span>
-    </h1>
-
-    <% if @registration_sequence.draft? %>
-      <%= form_with url: organization_registration_sequence_pages_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id), method: :post do %>
-        <%= render UI::Button::Component.new(text: "Add a page", color: :primary, kind: :submit) %>
-      <% end %>
-    <% end %>
-  </div>
-
   <% if @registration_sequence.draft? %>
-    <p class="tw:mb-4 tw:text-gray-600">
-      Drag pages to reorder them; use Edit to change a page or Delete to remove
-      it.
-    </p>
+    <% pages = @registration_sequence.registration_sequence_pages.to_a %>
     <div
-      data-controller="sortable"
-      data-sortable-url-value="<%= sort_organization_registration_sequence_pages_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id) %>"
-      class="tw:flex tw:flex-col tw:gap-4"
+      class="
+        tw:overflow-hidden tw:rounded-xl tw:border tw:border-gray-700
+        tw:bg-gray-900 tw:text-white tw:shadow
+      "
     >
-      <% @registration_sequence.registration_sequence_pages.each do |page| %>
-        <div
-          data-sortable-target="item"
-          data-page-id="<%= page.id %>"
-          draggable="true"
+      <div
+        class="
+          tw:flex tw:items-center tw:justify-between tw:gap-4 tw:border-b
+          tw:border-gray-800 tw:px-5 tw:py-4
+        "
+      >
+        <h1
           class="
-            tw:flex tw:items-start tw:gap-4 tw:rounded tw:border
-            tw:border-gray-200 tw:bg-white tw:p-4
+            tw:text-lg tw:font-semibold tw:tracking-normal tw:text-white
+            tw:normal-case
           "
         >
-          <span
-            class="tw:cursor-grab tw:text-gray-400 tw:select-none"
-            aria-hidden="true"
+          Registration sequence
+          <span class="tw:font-normal tw:text-gray-400">· <%= number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
+        </h1>
+
+        <%= form_with url: organization_registration_sequence_pages_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id), method: :post do %>
+          <button
+            type="submit"
+            class="
+              tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-lg
+              tw:border tw:border-gray-600 tw:px-3 tw:py-1.5 tw:text-sm
+              tw:font-medium tw:whitespace-nowrap tw:hover:bg-gray-800
+            "
           >
-            ⠿
-          </span>
+            <span aria-hidden="true">+</span> Add page
+          </button>
+        <% end %>
+      </div>
 
-          <% if page.image.attached? %>
-            <%= image_tag page.image_url, class: "tw:w-24 tw:rounded tw:object-cover" %>
-          <% end %>
+      <div
+        data-controller="sortable"
+        data-sortable-url-value="<%= sort_organization_registration_sequence_pages_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id) %>"
+      >
+        <% pages.each do |page| %>
+          <div
+            data-sortable-target="item"
+            data-page-id="<%= page.id %>"
+            draggable="true"
+            class="
+              tw:flex tw:items-center tw:gap-4 tw:border-b
+              tw:border-gray-800 tw:px-5 tw:py-4 tw:last:border-b-0
+            "
+          >
+            <span
+              class="tw:cursor-grab tw:text-gray-500 tw:select-none"
+              aria-hidden="true"
+            >
+              ⠿
+            </span>
 
-          <div class="tw:flex-1">
-            <% if page.title.present? %>
-              <h3 class="tw:font-semibold"><%= page.title %></h3>
-            <% end %>
+            <div class="tw:min-w-0 tw:flex-1">
+              <h3 class="tw:font-semibold tw:text-white tw:normal-case">
+                <%= page.title %>
+              </h3>
 
-            <div class="tw:prose tw:max-w-none">
-              <%= page.body&.html_safe %>
+              <% if page.subtitle.present? %>
+                <p class="tw:mt-0.5 tw:text-sm tw:text-gray-400">
+                  <%= page.subtitle %>
+                </p>
+              <% end %>
+            </div>
+
+            <div class="tw:flex tw:items-center tw:gap-3">
+              <%= link_to "Edit", edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), class: "tw:rounded-lg tw:border tw:border-gray-600 tw:px-3 tw:py-1.5 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-gray-800" %>
+
+              <%= form_with url: organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), method: :delete, data: {turbo_confirm: "Remove this page?"} do %>
+                <button
+                  type="submit"
+                  class="
+                    tw:text-sm tw:font-medium tw:text-red-400
+                    tw:hover:text-red-300
+                  "
+                >
+                  Delete
+                </button>
+              <% end %>
             </div>
           </div>
-
-          <div class="tw:flex tw:flex-col tw:items-end tw:gap-2">
-            <%= link_to "Edit", edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), class: "twlink" %>
-
-            <%= form_with url: organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), method: :delete, data: {turbo_confirm: "Remove this page?"} do %>
-              <%= render UI::Button::Component.new(text: "Delete", color: :error, size: :sm, kind: :submit) %>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </div>
   <% else %>
+    <div class="tw:mb-6">
+      <h1 class="tw:text-2xl tw:font-semibold">
+        Registration sequence
+        <span class="tw:text-base tw:font-normal tw:text-gray-500">(<%= @registration_sequence.status %>)</span>
+      </h1>
+    </div>
     <%= render RegistrationSequencePreview::Component.new(registration_sequence: @registration_sequence) %>
   <% end %>
 </div>
