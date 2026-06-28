@@ -43,21 +43,28 @@ module Spreadsheets
     end
 
     def update_or_create_for!(row)
-      family_ids = if row[:families].present?
-        # Find or create the matching families
-        row[:families].split("&").map do |name|
-          PrimaryActivity.family.friendly_find(name)&.id ||
-            PrimaryActivity.create!(name:, family: true).id
-        end
+      family_ids = row[:families].presence&.split("&")&.map do |name|
+        upsert!(PrimaryActivity.family, name, family: true).id
       end
       return if row[:flavor].blank?
 
       (family_ids || [nil]).each do |primary_activity_family_id|
-        PrimaryActivity.where(primary_activity_family_id:).friendly_find(row[:flavor]) ||
-          PrimaryActivity.create(name: row[:flavor], primary_activity_family_id:, family: false)
+        # Top-level flavors self-reference their id, so nil never matches them
+        scope = primary_activity_family_id ? PrimaryActivity.where(primary_activity_family_id:) : PrimaryActivity.flavor.top_level
+        upsert!(scope, row[:flavor], primary_activity_family_id:, family: false)
       end
     end
 
-    conceal :names_and_families, :update_or_create_for!
+    # Find by exact slug and correct the stored name, or create. Slug, not friendly_find, keeps re-imports idempotent
+    def upsert!(scope, name, **create_attrs)
+      name = name.strip
+      existing = scope.find_by(slug: Slugifyer.slugify(name))
+      return PrimaryActivity.create!(name:, **create_attrs) unless existing
+
+      existing.update!(name:) unless existing.name == name
+      existing
+    end
+
+    conceal :names_and_families, :update_or_create_for!, :upsert!
   end
 end
