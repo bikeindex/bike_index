@@ -15,9 +15,12 @@ export default class extends Controller {
 
   bindHandle (handle) {
     const item = handle.closest('[data-sortable-target="item"]')
-    handle.addEventListener('dragstart', () => {
+    handle.addEventListener('dragstart', (event) => {
       this.dragging = item
-      item.classList.add('tw:opacity-50')
+      const rect = item.getBoundingClientRect()
+      event.dataTransfer.setDragImage(item, event.clientX - rect.left, event.clientY - rect.top)
+      // Defer dimming the source so the full row (with its text) is captured as the drag image.
+      setTimeout(() => item.classList.add('tw:opacity-50'), 0)
     })
     handle.addEventListener('dragend', () => {
       item.classList.remove('tw:opacity-50')
