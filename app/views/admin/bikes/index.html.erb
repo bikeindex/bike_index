@@ -246,22 +246,15 @@
   </div>
 <% end %>
 
-<% table_view = capture do %>
-  <% unless admin_nav_display_view_all %>
-    <p>
-      There are currently <%= number_with_delimiter(PublicImage.count) %> bike
-      images
-      <em>(<%= PublicImage.where("created_at >= ?", Time.current.beginning_of_day).count %> today)</em>
-    </p>
-    <p>
-      <%= number_with_delimiter(Bike.count) %> publicly registered,
-      <em>(<%= Bike.where("created_at >= ?", Time.current.beginning_of_day).count %> today)</em>
-      &nbsp;
-      <%= number_with_delimiter(Ownership.where(current: true).where(claimed: true).count) %>
-      are claimed
-    </p>
-  <% end %>
+<% count_detail = capture do %>
+  &mdash; <%= number_display(Bike.count) %> publicly registered
+  <em>(<%= number_display(Bike.where("created_at >= ?", Time.current.beginning_of_day).count) %> today)</em>,
+  <%= number_display(Ownership.where(current: true, claimed: true).count) %>
+  claimed, <%= number_display(PublicImage.count) %> bike images
+  <em>(<%= number_display(PublicImage.where("created_at >= ?", Time.current.beginning_of_day).count) %> today)</em>
+<% end unless admin_nav_display_view_all %>
 
+<% table_view = capture do %>
   <%= render partial: "/admin/bikes/table", locals: {render_sortable: true, render_multi_check: @multi_delete} %>
 <% end %>
 
@@ -272,4 +265,5 @@
   rendered_chart:,
   admin_search_form:,
   table_view:,
+  count_detail:,
 )) %>

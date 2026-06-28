@@ -73,9 +73,9 @@ module Admin
 
     def searched_manufacturers
       manufacturers = Manufacturer
-      @with_logos = Binxtils::InputNormalizer.boolean(params[:search_with_logos])
-      manufacturers = manufacturers.with_websites if @with_logos
       @with_websites = Binxtils::InputNormalizer.boolean(params[:search_with_websites])
+      manufacturers = manufacturers.with_websites if @with_websites
+      @with_logos = Binxtils::InputNormalizer.boolean(params[:search_with_logos])
       manufacturers = manufacturers.with_logos if @with_logos
       manufacturers
     end
