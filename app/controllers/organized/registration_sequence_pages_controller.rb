@@ -1,5 +1,6 @@
 module Organized
   class RegistrationSequencePagesController < Organized::AdminController
+    before_action :ensure_access_to_registration_sequences!
     before_action :find_draft
     before_action :find_page, only: %i[edit update destroy]
 
@@ -35,6 +36,14 @@ module Organized
     end
 
     private
+
+    # Superusers can view regardless; org admins/members need the feature flag
+    def ensure_access_to_registration_sequences!
+      return unless ensure_current_organization!
+      return true if current_organization.enabled?("registration_sequences") || current_user.superuser?
+
+      raise_do_not_have_access!
+    end
 
     # Pages are only editable on the draft
     def find_draft

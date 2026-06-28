@@ -5,6 +5,7 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
+    before { current_organization.update_columns(enabled_feature_slugs: ["registration_sequences"]) }
 
     describe "index" do
       it "renders without creating a draft" do
@@ -42,6 +43,27 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
       get base_url
       expect(response).to redirect_to(organization_root_path)
       expect(flash[:error]).to be_present
+    end
+  end
+
+  context "logged_in_as_organization_admin without the feature" do
+    include_context :request_spec_logged_in_as_organization_admin
+
+    it "blocks the org admin" do
+      get base_url
+      expect(response).to redirect_to(organization_root_path)
+      expect(flash[:error]).to be_present
+    end
+  end
+
+  context "logged_in_as_superuser" do
+    include_context :request_spec_logged_in_as_superuser
+    let(:current_organization) { FactoryBot.create(:organization) }
+
+    it "renders even without the feature" do
+      get base_url
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
     end
   end
 end
