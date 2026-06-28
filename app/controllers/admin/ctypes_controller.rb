@@ -48,7 +48,7 @@ module Admin
     protected
 
     def sortable_columns
-      %w[name slug cgroup image created_at updated_at]
+      %w[name secondary_name slug cgroup image created_at updated_at]
     end
 
     def default_direction = "asc"
