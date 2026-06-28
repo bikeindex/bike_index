@@ -13,12 +13,7 @@
           tw:border-gray-800 tw:px-5 tw:py-4
         "
       >
-        <h1
-          class="
-            tw:text-lg tw:font-semibold tw:tracking-normal tw:text-white
-            tw:normal-case
-          "
-        >
+        <h1 class="uncap tw:text-lg tw:font-semibold tw:tracking-normal tw:text-white">
           Registration sequence
           <span class="tw:font-normal tw:text-gray-400">· <%= number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
         </h1>
@@ -59,7 +54,7 @@
             </span>
 
             <div class="tw:min-w-0 tw:flex-1">
-              <h3 class="tw:font-semibold tw:text-white tw:normal-case">
+              <h3 class="uncap tw:font-semibold tw:text-white">
                 <%= page.title %>
               </h3>
 
@@ -91,7 +86,7 @@
     </div>
   <% else %>
     <div class="tw:mb-6">
-      <h1 class="tw:text-2xl tw:font-semibold">
+      <h1 class="uncap tw:text-2xl tw:font-semibold">
         Registration sequence
         <span class="tw:text-base tw:font-normal tw:text-gray-500">(<%= @registration_sequence.status %>)</span>
       </h1>
