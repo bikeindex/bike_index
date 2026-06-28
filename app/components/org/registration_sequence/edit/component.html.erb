@@ -1,7 +1,7 @@
 <div class="tw:mb-3 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
   <h1 class="uncap">
     Draft registration sequence
-    <span class="tw:font-normal tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
+    <span class="tw:text-xl tw:font-normal tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
   </h1>
 
   <%= form_with url: organization_registration_sequence_pages_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id), method: :post do %>
@@ -19,58 +19,68 @@
     <% pages.each do |page| %>
       <div
         data-sortable-target="item"
-        data-url="<%= organization_registration_sequence_page_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id) %>"
-        class="tw:flex tw:items-baseline tw:py-1.5"
+        data-url="<%= organization_registration_sequence_page_path(organization_id: @organization.to_param, id: page.id) %>"
+        data-controller="disclosure"
+        class="tw:py-1.5"
       >
-        <span
-          data-sortable-target="handle"
-          draggable="true"
-          class="tw:cursor-grab tw:pr-4 tw:text-gray-400 tw:select-none"
-          aria-hidden="true"
-        >
-          ⠿
-        </span>
-
-        <div class="tw:min-w-0 tw:flex-1" data-controller="disclosure">
-          <div class="tw:flex tw:items-center tw:gap-2">
-            <button
-              type="button"
-              data-action="disclosure#toggle"
-              aria-expanded="false"
-              class="tw:cursor-pointer tw:text-gray-400 tw:hover:text-gray-600"
-            >
-              <span class="tw:sr-only">Toggle page details</span>
-
-              <span
-                data-disclosure-target="chevron"
-                class="tw:inline-block tw:transition-transform tw:duration-200"
-              >
-                <%= helpers.inline_svg_tag "icons/chevron-right.svg", class: "tw:block tw:h-3 tw:w-3" %>
-              </span>
-            </button>
-
-            <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
-              <%= page.title %>
-            </h3>
-          </div>
-
-          <div
-            data-disclosure-target="content"
-            class="tw:mt-1 tw:hidden tw:space-y-1"
+        <div class="tw:flex tw:items-baseline">
+          <span
+            data-sortable-target="handle"
+            draggable="true"
+            class="tw:cursor-grab tw:pr-4 tw:text-gray-400 tw:select-none"
+            aria-hidden="true"
           >
+            ⠿
+          </span>
+
+          <div class="tw:min-w-0 tw:flex-1">
+            <div class="tw:flex tw:items-center tw:gap-2">
+              <button
+                type="button"
+                data-action="disclosure#toggle"
+                aria-expanded="false"
+                class="tw:cursor-pointer tw:text-gray-400 tw:hover:text-gray-600"
+              >
+                <span class="tw:sr-only">Toggle page details</span>
+
+                <span
+                  data-disclosure-target="chevron"
+                  class="tw:inline-block tw:transition-transform tw:duration-200"
+                >
+                  <%= helpers.inline_svg_tag "icons/chevron-right.svg", class: "tw:block tw:h-3 tw:w-3" %>
+                </span>
+              </button>
+
+              <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
+                <%= page.title %>
+              </h3>
+            </div>
+
             <% if page.subtitle.present? %>
-              <p class="tw:mb-0 tw:text-sm tw:text-gray-600">
+              <p
+                data-disclosure-target="content"
+                class="
+                  tw:mt-1 tw:mb-0 tw:hidden tw:pl-5 tw:text-sm
+                  tw:text-gray-600
+                "
+              >
                 <%= page.subtitle %>
               </p>
             <% end %>
-
-            <div class="tw:prose tw:max-w-none tw:text-sm">
-              <%= page.body&.html_safe %>
-            </div>
           </div>
+
+          <%= link_to "Edit", edit_organization_registration_sequence_page_path(organization_id: @organization.to_param, id: page.id), class: "twlink" %>
         </div>
 
-        <%= link_to "Edit", edit_organization_registration_sequence_page_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), class: "twlink tw:pl-4" %>
+        <div
+          data-disclosure-target="content"
+          class="
+            tw:prose tw:mt-1 tw:hidden tw:max-w-none tw:py-2 tw:text-sm
+            tw:[&_ul]:my-0 tw:[&_ul]:list-disc tw:[&_ul]:pl-5
+          "
+        >
+          <%= page.body&.html_safe %>
+        </div>
       </div>
     <% end %>
   </div>

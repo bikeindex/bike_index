@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/registration_sequences/#{draft.id}/pages" }
+  let(:member_url) { "/o/#{current_organization.to_param}/registration_sequence_pages" }
   let(:sequence_path) { organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id) }
 
   context "logged_in_as_organization_admin" do
@@ -13,7 +14,7 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
       it "adds a blank page and opens it for editing" do
         expect { post base_url }.to change { draft.registration_sequence_pages.count }.by(1)
         page = draft.registration_sequence_pages.reorder(:id).last
-        expect(response).to redirect_to("#{base_url}/#{page.id}/edit")
+        expect(response).to redirect_to("#{member_url}/#{page.id}/edit")
       end
     end
 
@@ -21,7 +22,7 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
       let(:page) { draft.registration_sequence_pages.first }
 
       it "renders" do
-        get "#{base_url}/#{page.id}/edit"
+        get "#{member_url}/#{page.id}/edit"
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
       end
@@ -31,7 +32,7 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
       let(:page) { draft.registration_sequence_pages.first }
 
       it "updates the page title, subtitle and body, and redirects to the sequence" do
-        patch "#{base_url}/#{page.id}", params: {
+        patch "#{member_url}/#{page.id}", params: {
           registration_sequence_page: {title: "Battery & charging", subtitle: "Charge safely", body: "<ul><li>first</li><li>second</li></ul>"}
         }
         expect(response).to redirect_to(sequence_path)
@@ -45,7 +46,7 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
       let!(:page) { draft.registration_sequence_pages.first }
 
       it "removes the page" do
-        expect { delete "#{base_url}/#{page.id}" }.to change { draft.registration_sequence_pages.count }.by(-1)
+        expect { delete "#{member_url}/#{page.id}" }.to change { draft.registration_sequence_pages.count }.by(-1)
         expect(response).to redirect_to(sequence_path)
       end
     end
@@ -53,7 +54,7 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
     describe "update with a position" do
       it "moves the page to the position and re-sequences" do
         ids = draft.registration_sequence_pages.pluck(:id)
-        patch "#{base_url}/#{ids.last}", params: {position: 0}
+        patch "#{member_url}/#{ids.last}", params: {position: 0}
         expect(response.status).to eq(200)
         expect(draft.registration_sequence_pages.reload.pluck(:id)).to eq([ids.last] + ids[0...-1])
       end
@@ -64,6 +65,11 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
 
       it "404s on create" do
         post "/o/#{current_organization.to_param}/registration_sequences/#{active.id}/pages"
+        expect(response.status).to eq(404)
+      end
+
+      it "404s when editing a page on a non-draft sequence" do
+        get "#{member_url}/#{active.registration_sequence_pages.first.id}/edit"
         expect(response.status).to eq(404)
       end
     end

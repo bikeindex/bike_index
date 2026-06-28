@@ -1894,6 +1894,8 @@ es:
         y deben actualizarse en el registro original %{bike_type}. %{bike_registration_link}.
       updated_serial: Número de serie actualizado
       version_name: Nombre de la versión
+      other_manufacturer: Otro fabricante
+      select_other: Seleccione 'Otro' si el fabricante no aparece al ingresarlo.
     bike_fields:
       revised_colors:
         add_a_color: Añade un color

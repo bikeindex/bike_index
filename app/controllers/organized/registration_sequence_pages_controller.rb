@@ -1,7 +1,7 @@
 module Organized
   class RegistrationSequencePagesController < Organized::AdminController
     before_action :ensure_access_to_registration_sequences!
-    before_action :find_draft
+    before_action :find_draft, only: %i[create]
     before_action :find_page, only: %i[edit update destroy]
 
     # Adds a blank page to the draft, then opens it for editing
@@ -43,13 +43,16 @@ module Organized
       raise_do_not_have_access!
     end
 
-    # Pages are only editable on the draft
     def find_draft
       @draft = current_organization.registration_sequences.draft.find(params[:registration_sequence_id])
     end
 
+    # Pages are only editable on the org's draft sequence
     def find_page
-      @page = @draft.registration_sequence_pages.find(params[:id])
+      @page = RegistrationSequencePage
+        .where(registration_sequence: current_organization.registration_sequences.draft)
+        .find(params[:id])
+      @draft = @page.registration_sequence
     end
 
     def sequence_path
@@ -57,7 +60,7 @@ module Organized
     end
 
     def edit_page_path(page)
-      edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id, id: page.id)
+      edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: page.id)
     end
 
     def permitted_parameters

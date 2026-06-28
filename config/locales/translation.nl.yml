@@ -5123,6 +5123,9 @@ nl:
         versies en moeten worden bijgewerkt op de originele %{bike_type}-registratie.
         %{bike_registration_link}.
       version_name: Versienaam
+      other_manufacturer: Andere fabrikant
+      select_other: Selecteer 'Overig' als de fabrikant niet verschijnt wanneer deze
+        wordt ingevoerd
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe
