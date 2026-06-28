@@ -19,11 +19,9 @@
           <p class="tw:mb-2 tw:text-gray-600"><%= page.subtitle %></p>
         <% end %>
 
-        <ul class="tw:prose tw:max-w-none">
-          <% Array(page.bullet_points).each do |bullet| %>
-            <li><%= bullet.html_safe %></li>
-          <% end %>
-        </ul>
+        <div class="tw:prose tw:max-w-none">
+          <%= page.body&.html_safe %>
+        </div>
       </div>
     </div>
   <% end %>

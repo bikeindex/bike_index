@@ -1,5 +1,3 @@
-<% content_for(:header) { stylesheet_link_tag "lexxy", "lexxy_overrides", "data-turbo-track": "reload" } %>
-
 <div class="tw:py-6">
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
     <h1 class="tw:text-2xl tw:font-semibold">Edit page</h1>
@@ -9,7 +7,7 @@
 
   <%= form_with model: @page,
     url: organization_registration_sequence_page_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id, id: @page.id),
-    method: :patch, html: {multipart: true}, data: {controller: "lexxy"} do |f| %>
+    method: :patch, html: {multipart: true} do |f| %>
     <%= render Org::RegistrationSequencePageFields::Component.new(form_builder: f) %>
 
     <div class="tw:mt-4">

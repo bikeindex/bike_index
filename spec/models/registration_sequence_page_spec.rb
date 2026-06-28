@@ -1,22 +1,21 @@
 require "rails_helper"
 
 RSpec.describe RegistrationSequencePage, type: :model do
-  describe "#normalize_bullet_points" do
-    let(:page) { FactoryBot.create(:registration_sequence_page, bullet_points: bullet_points) }
-    let(:bullet_points) { ["<p>one</p>", "<p></p>", "<b>two</b><script>alert(1)</script>", "  "] }
+  describe "#sanitize_body" do
+    let(:page) { FactoryBot.create(:registration_sequence_page, body:) }
+    let(:body) { "<ul><li>one</li><li><b>two</b><script>alert(1)</script></li></ul>" }
 
-    it "sanitizes html and drops empty bullets on save" do
-      expect(page.bullet_points.size).to eq(2)
-      expect(page.bullet_points.first).to eq("<p>one</p>")
-      expect(page.bullet_points.last).to include("<b>two</b>")
-      expect(page.bullet_points.last).to_not include("script")
+    it "strips disallowed tags on save" do
+      expect(page.body).to include("<li>one</li>")
+      expect(page.body).to include("<b>two</b>")
+      expect(page.body).to_not include("script")
     end
 
-    context "no bullet points" do
-      let(:bullet_points) { [] }
+    context "blank body" do
+      let(:body) { nil }
 
-      it "stores an empty array" do
-        expect(page.bullet_points).to eq([])
+      it "stays nil" do
+        expect(page.body).to be_nil
       end
     end
   end

@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Org::RegistrationSequencePageFields::Component, type: :component do
-  let(:page) { RegistrationSequencePage.new(bullet_points: ["<p>first bullet</p>"]) }
+  let(:page) { RegistrationSequencePage.new(body: "<ul><li>first bullet</li></ul>") }
 
   def rendered_component(page)
     render_in_view_context do
@@ -15,10 +15,9 @@ RSpec.describe Org::RegistrationSequencePageFields::Component, type: :component 
 
   let(:component) { rendered_component(page) }
 
-  it "renders the image field and a single-line Lexxy editor per bullet" do
+  it "renders the image field and a Lexxy editor bound to the body" do
     expect(component).to have_field("registration_sequence_page_image")
-    expect(component).to have_css("lexxy-editor[multi-line='false'][name='registration_sequence_page[bullet_points][]']")
-    expect(component).to have_button("Add bullet point")
+    expect(component).to have_css("lexxy-editor[name='registration_sequence_page[body]']")
     expect(component).to_not have_field("registration_sequence_page_listing_order")
   end
 end

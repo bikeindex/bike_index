@@ -1,6 +1,7 @@
 # Seeds the global RegistrationSequence template (org drafts are cloned from it). The template's
 # pages live in the database; these are the default e-vehicle safety attestation pages a fresh
-# install starts with. Each bullet is HTML (authored via a single-line Lexxy editor in the form).
+# install starts with. The bullets become each page's `body`, a single HTML list authored in the
+# Lexxy rich-text editor on the form.
 default_pages = [
   {
     title: "Battery & charging",
@@ -85,6 +86,6 @@ default_pages.each_with_index do |attributes, index|
   template.registration_sequence_pages.find_or_create_by!(listing_order: index) do |new_page|
     new_page.title = attributes[:title]
     new_page.subtitle = attributes[:subtitle]
-    new_page.bullet_points = attributes[:bullet_points]
+    new_page.body = "<ul>#{attributes[:bullet_points].map { |bullet| "<li>#{bullet}</li>" }.join}</ul>"
   end
 end

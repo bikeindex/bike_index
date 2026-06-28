@@ -3,6 +3,6 @@ FactoryBot.define do
     registration_sequence
     sequence(:listing_order) { |n| n }
     title { "Safety check" }
-    bullet_points { ["point one", "point two"] }
+    body { "<ul><li>point one</li><li>point two</li></ul>" }
   end
 end

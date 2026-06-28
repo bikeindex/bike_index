@@ -48,11 +48,9 @@
               <h3 class="tw:font-semibold"><%= page.title %></h3>
             <% end %>
 
-            <ul class="tw:prose tw:max-w-none">
-              <% Array(page.bullet_points).each do |bullet| %>
-                <li><%= bullet.html_safe %></li>
-              <% end %>
-            </ul>
+            <div class="tw:prose tw:max-w-none">
+              <%= page.body&.html_safe %>
+            </div>
           </div>
 
           <div class="tw:flex tw:flex-col tw:items-end tw:gap-2">
