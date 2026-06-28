@@ -21,10 +21,11 @@ RSpec.describe Spreadsheets::ImporterJob, type: :job do
     context "with a name" do
       it "imports only the named spreadsheet" do
         VCR.use_cassette("Spreadsheets_ImporterJob-components") do
-          expect { described_class.new.perform("components") }.to change(Ctype, :count)
+          expect { described_class.new.perform("components") }
+            .to change(Ctype, :count)
+            .and change(Manufacturer, :count).by(0)
+            .and change(PrimaryActivity, :count).by(0)
         end
-        expect(Manufacturer.count).to eq 0
-        expect(PrimaryActivity.count).to eq 0
       end
     end
   end
