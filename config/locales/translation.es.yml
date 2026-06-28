@@ -5994,6 +5994,7 @@ es:
         no_matches_found: No se encontraron coincidencias
         result_count_html: "— %{count} %{results}"
         serial_label: 'De serie:'
+        sticker_label:
         view_all: ver todo
     alerts:
       object_errors:
