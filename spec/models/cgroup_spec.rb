@@ -7,6 +7,12 @@ RSpec.describe Cgroup, type: :model do
     it "finds additional parts" do
       expect(Cgroup.additional_parts.name).to eq "Additional parts"
     end
+    context "with the spreadsheet importer's casing" do
+      let!(:cgroup) { FactoryBot.create(:cgroup, name: "Additional Parts") }
+      it "matches without creating a duplicate" do
+        expect { expect(Cgroup.additional_parts).to eq cgroup }.not_to change(Cgroup, :count)
+      end
+    end
   end
 
   describe "bike_attributable scopes" do

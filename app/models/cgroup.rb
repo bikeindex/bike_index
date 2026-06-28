@@ -22,6 +22,7 @@ class Cgroup < ApplicationRecord
   scope :commonness, -> { reorder("cgroups.priority ASC, cgroups.name DESC") }
 
   def self.additional_parts
-    find_by(name: "Additional parts") || create(name: "Additional parts", priority: 4)
+    # friendly_find (slug-based) so the spreadsheet importer's "Additional Parts" casing still matches
+    friendly_find("Additional parts") || create(name: "Additional parts", priority: 4)
   end
 end
