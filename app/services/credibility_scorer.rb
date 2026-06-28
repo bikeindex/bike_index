@@ -132,7 +132,7 @@ class CredibilityScorer
     badges += [:user_sent_in_bike_tip] if Feedback.where(user_id: user.id).stolen_tip.any?
     badges += [:user_supporter] if user.payments.any?
     badges += [:long_time_user] if user.created_at < Time.current - 2.years
-    badges += [:user_connected_to_strava] if user.integrations.strava.any?
+    badges += [:user_connected_to_strava] if user.strava_integration.present?
     badges += [:user_verified_phone] if user.phone_confirmed?
     # Don't mark suspicious if we trust them
     unless (badges & %i[user_trusted_organization_role]).any?

@@ -62,7 +62,7 @@ Describe the end state, not the journey. Reviewers want to know what the PR does
 Push the branch: `git push -u origin HEAD`.
 
 - If `$EXISTING_PR` from step 1 was non-empty: `gh pr edit <num> --body-file <tmp-body-file>` (don't overwrite the title unless the user asks).
-- Otherwise: `gh pr create --base main --title "..." --body-file <tmp-body-file>`. Capture the PR number from the output.
+- Otherwise: `gh pr create --draft --base main --title "..." --body-file <tmp-body-file>`. Create as a draft by default; only omit `--draft` (or mark ready) if the user explicitly asks for a ready-for-review PR. Capture the PR number from the output.
 
 Always pass the body via `--body-file` (not inline `--body`) to preserve formatting.
 

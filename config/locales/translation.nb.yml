@@ -5735,6 +5735,7 @@ nb:
         result_count_html: "— %{count} %{results}"
         serial_label: 'Serie:'
         view_all: se alle
+        sticker_label: 'Klistremerke:'
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
