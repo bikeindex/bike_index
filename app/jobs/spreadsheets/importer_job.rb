@@ -5,7 +5,7 @@ module Spreadsheets
     IMPORTERS = %w[manufacturers primary_activities components].freeze
 
     def perform(name = nil)
-      return IMPORTERS.each { |n| self.class.perform_async(n) } if name.blank?
+      return IMPORTERS.each { |n| perform(n) } if name.blank?
 
       Tempfile.create([name, ".csv"]) do |file|
         file.write(download("#{RESOURCES_URL}/#{name}.csv"))

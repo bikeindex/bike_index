@@ -1,4 +1,4 @@
-system "bin/rake setup:import_manufacturers_csv setup:import_primary_activities_csv setup:import_components_csv"
+system "bin/rake setup:import_spreadsheets"
 
 # NOTE: this does not seed manufacturers, primary_activities or components, those are pulled via rake task
 require File.expand_path("db/seeds/seed_helpers", Rails.root)
