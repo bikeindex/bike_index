@@ -43,7 +43,7 @@
           <% end %>
         </div>
 
-        <%= render UI::ButtonLink::Component.new(text: "Edit", href: edit_organization_registration_sequence_page_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), color: :secondary) %>
+        <%= link_to "Edit", edit_organization_registration_sequence_page_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), class: "twlink" %>
       </div>
     <% end %>
   </div>
