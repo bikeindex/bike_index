@@ -67,6 +67,7 @@ class OrganizationFeature < ApplicationRecord
     registration_notes
     require_reg_address
     require_reg_student_id
+    saml_sso
     show_bulk_import
     show_bulk_import_impound
     show_bulk_import_stolen
@@ -121,7 +122,7 @@ class OrganizationFeature < ApplicationRecord
     # These are attributes that add fields to admin organization edit
     def with_admin_organization_attributes
       reg_fields_with_customizable_labels +
-        %w[regional_bike_counts passwordless_users graduated_notifications organization_stolen_message]
+        %w[regional_bike_counts passwordless_users graduated_notifications organization_stolen_message saml_sso]
     end
 
     def feature_slugs

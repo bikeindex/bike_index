@@ -65,6 +65,10 @@ Rails.application.routes.draw do
   end
   get "logout", to: "sessions#destroy"
 
+  # Organization SAML SSO (Service Provider). Public SP metadata for IdP onboarding;
+  # the login flow (init/callback) lands in a later PR.
+  get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
+
   resources :payments, only: %i[new create] do
     collection { get :success }
   end

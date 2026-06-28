@@ -123,10 +123,12 @@ class Organization < ApplicationRecord
   has_one :hot_sheet_configuration
   has_one :organization_stolen_message
   has_one :impound_configuration
+  has_one :organization_saml_configuration
   has_many :hot_sheets
   has_many :organization_model_audits
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :organization_stolen_message
+  accepts_nested_attributes_for :organization_saml_configuration
   accepts_nested_attributes_for :locations, allow_destroy: true
 
   validates_presence_of :name
@@ -345,6 +347,10 @@ class Organization < ApplicationRecord
 
   def fetch_impound_configuration
     impound_configuration.present? ? impound_configuration : ImpoundConfiguration.create(organization_id: id)
+  end
+
+  def fetch_saml_configuration
+    organization_saml_configuration || OrganizationSamlConfiguration.create(organization_id: id)
   end
 
   def hot_sheet_on?

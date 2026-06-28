@@ -55,6 +55,16 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template("admin/organizations/edit")
     end
+    context "saml_sso enabled" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      it "renders the SAML configuration section" do
+        Country.united_states
+        get "#{base_url}/#{organization.to_param}/edit"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("SAML SSO")
+        expect(response.body).to include("/sso/#{organization.to_param}/metadata")
+      end
+    end
   end
 
   describe "create" do
@@ -227,6 +237,23 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         put "#{base_url}/#{organization.to_param}", params: {organization: {passwordless_user_domain: "@bikeindex.org"}}
         organization.reload
         expect(organization.passwordless_user_domain).to eq "@bikeindex.org"
+      end
+    end
+    context "update organization_saml_configuration" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      let(:saml_attributes) do
+        {enabled: "1", idp_entity_id: "https://idp.example.edu/",
+         idp_sso_target_url: "https://idp.example.edu/idp/profile/SAML2/POST/SSO",
+         idp_cert: File.read(Rails.root.join("spec/fixtures/saml/idp_cert.pem"))}
+      end
+      it "creates the nested configuration" do
+        expect do
+          put "#{base_url}/#{organization.to_param}", params: {organization: {organization_saml_configuration_attributes: saml_attributes}}
+        end.to change(OrganizationSamlConfiguration, :count).by(1)
+        saml_configuration = organization.reload.organization_saml_configuration
+        expect(saml_configuration.enabled?).to be_truthy
+        expect(saml_configuration.idp_entity_id).to eq "https://idp.example.edu/"
+        expect(saml_configuration.configured?).to be_truthy
       end
     end
     context "updating graduated notifications" do

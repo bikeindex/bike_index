@@ -2710,6 +2710,46 @@ ALTER SEQUENCE public.organization_roles_id_seq OWNED BY public.organization_rol
 
 
 --
+-- Name: organization_saml_configurations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_saml_configurations (
+    id bigint NOT NULL,
+    organization_id bigint,
+    enabled boolean DEFAULT false,
+    idp_entity_id character varying,
+    idp_sso_target_url character varying,
+    idp_slo_target_url character varying,
+    idp_cert text,
+    idp_cert_fingerprint character varying,
+    idp_cert_multi text,
+    email_attribute_name character varying,
+    name_id_format character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_saml_configurations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_saml_configurations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_saml_configurations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_saml_configurations_id_seq OWNED BY public.organization_saml_configurations.id;
+
+
+--
 -- Name: organization_stolen_messages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3328,6 +3368,43 @@ CREATE SEQUENCE public.social_posts_id_seq
 --
 
 ALTER SEQUENCE public.social_posts_id_seq OWNED BY public.social_posts.id;
+
+
+--
+-- Name: sso_identities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sso_identities (
+    id bigint NOT NULL,
+    user_id bigint,
+    organization_id bigint,
+    provider character varying,
+    uid character varying,
+    email character varying,
+    last_sign_in_at timestamp(6) without time zone,
+    name_id_format character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: sso_identities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.sso_identities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: sso_identities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.sso_identities_id_seq OWNED BY public.sso_identities.id;
 
 
 --
@@ -4652,6 +4729,13 @@ ALTER TABLE ONLY public.organization_roles ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: organization_saml_configurations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_saml_configurations ALTER COLUMN id SET DEFAULT nextval('public.organization_saml_configurations_id_seq'::regclass);
+
+
+--
 -- Name: organization_stolen_messages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4747,6 +4831,13 @@ ALTER TABLE ONLY public.social_accounts ALTER COLUMN id SET DEFAULT nextval('pub
 --
 
 ALTER TABLE ONLY public.social_posts ALTER COLUMN id SET DEFAULT nextval('public.social_posts_id_seq'::regclass);
+
+
+--
+-- Name: sso_identities id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sso_identities ALTER COLUMN id SET DEFAULT nextval('public.sso_identities_id_seq'::regclass);
 
 
 --
@@ -5442,6 +5533,14 @@ ALTER TABLE ONLY public.organization_roles
 
 
 --
+-- Name: organization_saml_configurations organization_saml_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_saml_configurations
+    ADD CONSTRAINT organization_saml_configurations_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organization_stolen_messages organization_stolen_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5551,6 +5650,14 @@ ALTER TABLE ONLY public.social_accounts
 
 ALTER TABLE ONLY public.social_posts
     ADD CONSTRAINT social_posts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sso_identities sso_identities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sso_identities
+    ADD CONSTRAINT sso_identities_pkey PRIMARY KEY (id);
 
 
 --
@@ -6617,6 +6724,13 @@ CREATE INDEX index_organization_roles_on_user_id ON public.organization_roles US
 
 
 --
+-- Name: index_organization_saml_configurations_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_organization_saml_configurations_on_organization_id ON public.organization_saml_configurations USING btree (organization_id);
+
+
+--
 -- Name: index_organization_stolen_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6817,6 +6931,27 @@ CREATE INDEX index_social_posts_on_social_account_id ON public.social_posts USIN
 --
 
 CREATE INDEX index_social_posts_on_stolen_record_id ON public.social_posts USING btree (stolen_record_id);
+
+
+--
+-- Name: index_sso_identities_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sso_identities_on_organization_id ON public.sso_identities USING btree (organization_id);
+
+
+--
+-- Name: index_sso_identities_on_organization_id_and_provider_and_uid; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_sso_identities_on_organization_id_and_provider_and_uid ON public.sso_identities USING btree (organization_id, provider, uid);
+
+
+--
+-- Name: index_sso_identities_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sso_identities_on_user_id ON public.sso_identities USING btree (user_id);
 
 
 --
@@ -7122,6 +7257,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260626170001'),
+('20260626170000'),
 ('20260626162049'),
 ('20260528152450'),
 ('20260525162548'),
