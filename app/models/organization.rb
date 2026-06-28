@@ -353,6 +353,10 @@ class Organization < ApplicationRecord
     organization_saml_configuration || OrganizationSamlConfiguration.create(organization_id: id)
   end
 
+  def saml_sso_configured?
+    enabled?("saml_sso") && organization_saml_configuration&.configured?
+  end
+
   def hot_sheet_on?
     hot_sheet_configuration.present? && hot_sheet_configuration.on?
   end

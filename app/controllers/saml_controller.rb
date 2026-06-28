@@ -20,6 +20,17 @@ class SamlController < ApplicationController
       content_type: "application/samlmetadata+xml"
   end
 
+  # Org-slug entry point for users whose email domain isn't auto-detected on the login form.
+  # Submitting a slug that maps to a configured org forwards to #init.
+  def login
+    return if params[:org_slug].blank?
+
+    organization = Organization.friendly_find(params[:org_slug])
+    return redirect_to saml_init_path(org_slug: organization.to_param) if organization&.saml_sso_configured?
+
+    flash.now[:error] = "We couldn't find single sign-on for that organization"
+  end
+
   # SP-initiated login: redirect to the IdP with a signed AuthnRequest, remembering the
   # request id (replay protection) and org slug (cross-tenant binding) for the callback.
   def init

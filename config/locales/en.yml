@@ -4754,6 +4754,14 @@ en:
         stolen
       vehicle_manufacturer: Vehicle manufacturer
       your: your
+  saml:
+    login:
+      back_to_sign_in: Back to sign in
+      continue: Continue
+      enter_your_organization: Enter your organization's Bike Index short name to continue
+        to single sign-on.
+      organization: Organization
+      sign_in_with_sso: Sign in with single sign-on
   search:
     marketplace:
       index:
@@ -4796,6 +4804,7 @@ en:
       sign_in_using_facebook: Sign in using Facebook
       sign_in_using_globalid: Sign in using globaliD
       sign_in_using_magic_link: Emailed sign in link
+      sign_in_using_sso: Single sign-on
       sign_in_using_strava: Sign in using Strava
       sign_up: sign up
   shared:

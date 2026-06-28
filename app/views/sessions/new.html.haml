@@ -23,6 +23,10 @@
             %span.oauth-logo-block
               = inline_svg_tag "icons/envelope.svg", class: "tw:block tw:w-6 tw:h-6 tw:mx-auto"
             %span.oauth-text-block= t(".sign_in_using_magic_link")
+          %a.magic_link-login{ href: saml_login_path }
+            %span.oauth-logo-block
+              = inline_svg_tag "icons/lock.svg", class: "tw:block tw:w-6 tw:h-6 tw:mx-auto"
+            %span.oauth-text-block= t(".sign_in_using_sso")
         .sign-in-up-or
           %h3= t(".or")
         .main-form
