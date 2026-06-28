@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--multi-search'
 export default class extends Controller {
   static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll', 'searchAllHint']
-  static values = { url: String, searchKind: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
+  static values = { url: String, searchKind: String, serialsPlaceholder: String, stickersPlaceholder: String, serialsButton: String, stickersButton: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
     if (this.searching) return
@@ -36,13 +36,8 @@ export default class extends Controller {
   }
 
   updatePlaceholderAndButton () {
-    if (this.searchKindValue === 'stickers') {
-      this.textareaTarget.placeholder = 'Enter multiple sticker codes, separated by commas or new lines'
-      this.buttonTarget.textContent = 'Search stickers'
-    } else {
-      this.textareaTarget.placeholder = 'Enter multiple serial numbers, separated by commas or new lines'
-      this.buttonTarget.textContent = 'Search serials'
-    }
+    this.textareaTarget.placeholder = this[`${this.searchKindValue}PlaceholderValue`]
+    this.buttonTarget.textContent = this[`${this.searchKindValue}ButtonValue`]
   }
 
   // Sticker search always spans every organization, so lock "search all" on while it's active
