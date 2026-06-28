@@ -68,6 +68,15 @@ RSpec.describe Spreadsheets::PrimaryActivities do
         expect { described_class.import(csv_path) }.not_to change(PrimaryActivity, :count)
         expect(PrimaryActivity.all.map(&:display_name)).to match_array target_display_names
       end
+
+      it "corrects the stored name of an existing activity (e.g. casing)" do
+        described_class.import(csv_path)
+        bike_polo = PrimaryActivity.flavor.top_level.friendly_find("Bike Polo")
+        bike_polo.update_columns(name: "Bike polo") # bypass callbacks; slug stays "bike-polo"
+
+        expect { described_class.import(csv_path) }.not_to change(PrimaryActivity, :count)
+        expect(bike_polo.reload.name).to eq "Bike Polo"
+      end
     end
   end
 end

@@ -18,8 +18,8 @@ namespace :setup do
   end
 
   desc "import primary activities from GitHub"
-  # NOTE: This doesn't actually do a good job updating existing primary activities.
-  # If that is required, probably do it manually via console
+  # NOTE: Corrects the name of existing activities, but doesn't re-parent or remove them.
+  # For structural changes, probably do it manually via console
   task import_primary_activities_csv: :environment do
     url = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data/primary_activities.csv"
     file_path = Rails.root.join("tmp/primary_activities.csv")
