@@ -27,7 +27,15 @@ class SsoIdentity < ApplicationRecord
   validates :provider, :uid, presence: true
   validates :uid, uniqueness: {scope: %i[organization_id provider]}
 
+  before_validation :set_calculated_attributes
+
   def self.for(organization:, provider:, uid:)
     find_by(organization_id: organization.id, provider:, uid:)
+  end
+
+  private
+
+  def set_calculated_attributes
+    self.email = EmailNormalizer.normalize(email)
   end
 end

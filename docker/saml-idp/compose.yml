@@ -1,0 +1,16 @@
+# Local SAML Identity Provider for manually exercising the SSO login flow end-to-end.
+# Not used by CI or production — the deterministic coverage lives in
+# spec/requests/saml_callback_request_spec.rb. See README.md for the runbook.
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: bikeindex-saml-idp
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: "8080"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro

@@ -1,0 +1,54 @@
+{
+  "realm": "bikeindex-test",
+  "enabled": true,
+  "displayName": "Bike Index SAML Test IdP",
+  "users": [
+    {
+      "username": "ssouser",
+      "enabled": true,
+      "email": "ssouser@ssotest.example",
+      "emailVerified": true,
+      "firstName": "SSO",
+      "lastName": "Tester",
+      "credentials": [
+        {"type": "password", "value": "password", "temporary": false}
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "http://localhost:3042/sso/sso-test/metadata",
+      "name": "Bike Index (local SP)",
+      "protocol": "saml",
+      "enabled": true,
+      "fullScopeAllowed": true,
+      "frontchannelLogout": true,
+      "redirectUris": ["http://localhost:3042/sso/sso-test/callback"],
+      "attributes": {
+        "saml.assertion.signature": "true",
+        "saml.server.signature": "true",
+        "saml.client.signature": "false",
+        "saml.signature.algorithm": "RSA_SHA256",
+        "saml.authnstatement": "true",
+        "saml_name_id_format": "email",
+        "saml.force.post.binding": "true",
+        "saml_assertion_consumer_url_post": "http://localhost:3042/sso/sso-test/callback",
+        "saml_single_logout_service_url_redirect": "http://localhost:3042/sso/sso-test/slo"
+      },
+      "protocolMappers": [
+        {
+          "name": "email",
+          "protocol": "saml",
+          "protocolMapper": "saml-user-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "email",
+            "friendly.name": "email",
+            "attribute.name": "urn:oid:0.9.2342.19200300.100.1.3",
+            "attribute.nameformat": "URI Reference"
+          }
+        }
+      ]
+    }
+  ]
+}

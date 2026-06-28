@@ -77,6 +77,7 @@ module Saml
     end
 
     def assign_security(settings)
+      settings.soft = true # collect validation errors instead of raising
       settings.security[:want_assertions_signed] = true
       settings.security[:authn_requests_signed] = true
       settings.security[:digest_method] = XMLSecurity::Document::SHA256
