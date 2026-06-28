@@ -216,6 +216,29 @@ RSpec.describe Users::MergeAdditionalEmailJob, type: :job do
       end
     end
 
+    context "strava_integration" do
+      let!(:strava_integration) { FactoryBot.create(:strava_integration, :with_athlete, user: old_user) }
+      let!(:strava_request) { FactoryBot.create(:strava_request, strava_integration:) }
+
+      it "moves the strava_integration to the user" do
+        expect(strava_integration.reload.user_id).to eq old_user.id
+        expect(strava_request.reload.user_id).to eq old_user.id
+        instance.perform(user_email.id)
+        expect(strava_integration.reload.user_id).to eq user.id
+        expect(strava_request.reload.user_id).to eq user.id
+      end
+
+      context "user already has a strava_integration" do
+        let!(:user_strava_integration) { FactoryBot.create(:strava_integration, :with_athlete, user:) }
+
+        it "keeps the user's integration and soft-deletes the old one" do
+          instance.perform(user_email.id)
+          expect(user.reload.strava_integration).to eq user_strava_integration
+          expect(StravaIntegration.unscoped.find(strava_integration.id).deleted_at).to be_present
+        end
+      end
+    end
+
     context "email_ban" do
       let!(:email_ban) { FactoryBot.create(:email_ban, user: old_user) }
       it "updates the email_ban" do
