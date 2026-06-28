@@ -43,7 +43,7 @@
             data-page-id="<%= page.id %>"
             draggable="true"
             class="
-              tw:flex tw:items-center tw:gap-4 tw:border-b
+              tw:flex tw:items-baseline tw:gap-4 tw:border-b
               tw:border-gray-200 tw:px-5 tw:py-4 tw:last:border-b-0
             "
           >
@@ -55,7 +55,9 @@
             </span>
 
             <div class="tw:min-w-0 tw:flex-1">
-              <h3 class="uncap tw:font-semibold"><%= page.title %></h3>
+              <h3 class="uncap tw:mb-[1em] tw:text-base tw:font-semibold">
+                <%= page.title %>
+              </h3>
 
               <% if page.subtitle.present? %>
                 <p class="tw:mt-0.5 tw:text-sm tw:text-gray-600">
