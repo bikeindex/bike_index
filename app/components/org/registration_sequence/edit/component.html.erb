@@ -31,16 +31,43 @@
           ⠿
         </span>
 
-        <div class="tw:min-w-0 tw:flex-1">
-          <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
-            <%= page.title %>
-          </h3>
+        <div class="tw:min-w-0 tw:flex-1" data-controller="disclosure">
+          <div class="tw:flex tw:items-center tw:gap-2">
+            <button
+              type="button"
+              data-action="disclosure#toggle"
+              aria-expanded="false"
+              class="tw:cursor-pointer tw:text-gray-400 tw:hover:text-gray-600"
+            >
+              <span class="tw:sr-only">Toggle page details</span>
 
-          <% if page.subtitle.present? %>
-            <p class="tw:mb-0 tw:text-sm tw:text-gray-600">
-              <%= page.subtitle %>
-            </p>
-          <% end %>
+              <span
+                data-disclosure-target="chevron"
+                class="tw:inline-block tw:transition-transform tw:duration-200"
+              >
+                <%= helpers.inline_svg_tag "icons/chevron-right.svg", class: "tw:block tw:h-3 tw:w-3" %>
+              </span>
+            </button>
+
+            <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
+              <%= page.title %>
+            </h3>
+          </div>
+
+          <div
+            data-disclosure-target="content"
+            class="tw:mt-1 tw:hidden tw:space-y-1"
+          >
+            <% if page.subtitle.present? %>
+              <p class="tw:mb-0 tw:text-sm tw:text-gray-600">
+                <%= page.subtitle %>
+              </p>
+            <% end %>
+
+            <div class="tw:prose tw:max-w-none tw:text-sm">
+              <%= page.body&.html_safe %>
+            </div>
+          </div>
         </div>
 
         <%= link_to "Edit", edit_organization_registration_sequence_page_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id, id: page.id), class: "twlink tw:pl-4" %>

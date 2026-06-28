@@ -20,4 +20,11 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     expect(page).to have_css("[data-sortable-target='item'] [data-sortable-target='handle'][draggable='true']", minimum: 1)
     expect(page).to have_no_css("[data-sortable-target='item'][draggable]")
   end
+
+  it "puts each page's body in a collapsed disclosure toggled by a chevron" do
+    render_inline(described_class.new(registration_sequence:))
+
+    expect(page).to have_css("button[data-action~='disclosure#toggle'] [data-disclosure-target='chevron']", minimum: 1)
+    expect(page).to have_css("[data-disclosure-target='content'][class*='hidden'] li", minimum: 1)
+  end
 end
