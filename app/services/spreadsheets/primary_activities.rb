@@ -53,8 +53,15 @@ module Spreadsheets
       return if row[:flavor].blank?
 
       (family_ids || [nil]).each do |primary_activity_family_id|
-        PrimaryActivity.where(primary_activity_family_id:).friendly_find(row[:flavor]) ||
-          PrimaryActivity.create(name: row[:flavor], primary_activity_family_id:, family: false)
+        # Top-level flavors store their own id as the family id (see PrimaryActivity#set_calculated_attributes),
+        # so a `primary_activity_family_id: nil` lookup never matches them — scope to top_level instead
+        existing = if primary_activity_family_id
+          PrimaryActivity.where(primary_activity_family_id:).friendly_find(row[:flavor])
+        else
+          PrimaryActivity.flavor.top_level.friendly_find(row[:flavor])
+        end
+
+        existing || PrimaryActivity.create!(name: row[:flavor], primary_activity_family_id:, family: false)
       end
     end
 

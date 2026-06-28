@@ -61,6 +61,13 @@ RSpec.describe Spreadsheets::PrimaryActivities do
 
         expect(PrimaryActivity.all.map(&:display_name)).to match_array target_display_names
       end
+
+      it "is idempotent on re-import (top-level flavors included)" do
+        described_class.import(csv_path)
+
+        expect { described_class.import(csv_path) }.not_to change(PrimaryActivity, :count)
+        expect(PrimaryActivity.all.map(&:display_name)).to match_array target_display_names
+      end
     end
   end
 end
