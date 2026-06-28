@@ -43,7 +43,6 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         patch "#{base_url}/#{draft.id}"
         expect(response).to redirect_to(admin_registration_sequences_path)
         expect(draft.reload).to be_active
-        expect(draft.approved_by).to eq(current_user)
         expect(active.reload).to be_archived
         expect(organization.registration_sequences.active.count).to eq(1)
       end

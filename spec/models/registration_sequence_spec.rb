@@ -66,16 +66,14 @@ RSpec.describe RegistrationSequence, type: :model do
 
   describe "#make_active!" do
     let(:organization) { FactoryBot.create(:organization) }
-    let(:approver) { FactoryBot.create(:superuser) }
     let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
     let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
 
     it "ends the prior active and makes the draft active" do
-      expect(draft.make_active!(approver)).to be_truthy
+      expect(draft.make_active!).to be_truthy
 
       expect(draft.reload).to be_active
       expect(draft.start_at).to be_present
-      expect(draft.approved_by).to eq(approver)
       expect(active.reload).to be_archived
       expect(active.end_at).to be_present
       expect(organization.registration_sequences.active.count).to eq(1)
@@ -85,7 +83,7 @@ RSpec.describe RegistrationSequence, type: :model do
       let!(:draft) { FactoryBot.create(:registration_sequence, organization:) }
 
       it "does not become active" do
-        expect(draft.make_active!(approver)).to be_falsey
+        expect(draft.make_active!).to be_falsey
         expect(draft.reload).to be_draft
         expect(active.reload).to be_active
       end

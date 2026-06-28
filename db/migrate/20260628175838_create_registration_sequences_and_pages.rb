@@ -2,7 +2,6 @@ class CreateRegistrationSequencesAndPages < ActiveRecord::Migration[8.1]
   def change
     create_table :registration_sequences do |t|
       t.references :organization, index: true
-      t.bigint :approved_by_id
       t.datetime :start_at
       t.datetime :end_at
 
@@ -25,7 +24,7 @@ class CreateRegistrationSequencesAndPages < ActiveRecord::Migration[8.1]
       t.references :registration_sequence, null: false, index: true
       t.string :title
       t.text :subtitle
-      t.text :bullet_points, array: true, default: []
+      t.text :body
       t.integer :listing_order
 
       t.timestamps

@@ -3263,7 +3263,6 @@ ALTER SEQUENCE public.registration_sequence_pages_id_seq OWNED BY public.registr
 CREATE TABLE public.registration_sequences (
     id bigint NOT NULL,
     organization_id bigint,
-    approved_by_id bigint,
     start_at timestamp(6) without time zone,
     end_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
@@ -7312,7 +7311,6 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260628175840'),
 ('20260628175839'),
 ('20260628175838'),
 ('20260626162049'),

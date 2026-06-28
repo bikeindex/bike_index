@@ -8,7 +8,6 @@
 #  start_at        :datetime
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  approved_by_id  :bigint
 #  organization_id :bigint
 #
 # Indexes
@@ -23,7 +22,6 @@ class RegistrationSequence < ApplicationRecord
   STATUSES = STATUS_SCOPES.keys.freeze
 
   belongs_to :organization, optional: true
-  belongs_to :approved_by, class_name: "User", optional: true
 
   has_many :registration_sequence_pages, -> { order(:listing_order) },
     dependent: :destroy, inverse_of: :registration_sequence
@@ -94,12 +92,12 @@ class RegistrationSequence < ApplicationRecord
     end
   end
 
-  def make_active!(approver)
+  def make_active!
     return false unless draft? && registration_sequence_pages.any?
 
     transaction do
       self.class.active_for(organization)&.update!(end_at: Time.current)
-      update!(start_at: Time.current, approved_by: approver)
+      update!(start_at: Time.current)
     end
   end
 end

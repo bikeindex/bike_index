@@ -18,7 +18,7 @@ module Admin
 
     # Authorizes the draft to become active (and ends the prior active)
     def update
-      if @registration_sequence.make_active!(current_user)
+      if @registration_sequence.make_active!
         flash[:success] = "Registration sequence is now active"
         redirect_to admin_registration_sequences_path
       else
