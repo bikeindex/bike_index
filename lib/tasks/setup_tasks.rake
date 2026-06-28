@@ -11,6 +11,7 @@ namespace :setup do
 
   desc "refresh reference data (manufacturers, primary activities, components) from spreadsheets"
   task import_spreadsheets: :environment do
+    # Run inline rather than enqueue: seeding's later steps need this data present
     Spreadsheets::ImporterJob.new.perform
   end
 end
