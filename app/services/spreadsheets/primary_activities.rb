@@ -63,6 +63,8 @@ module Spreadsheets
 
       existing.update!(name:) unless existing.name == name
       existing
+    rescue ActiveRecord::RecordInvalid => e
+      raise "PrimaryActivity #{name.inspect} — #{e.message}"
     end
 
     conceal :names_and_families, :update_or_create_for!, :upsert!

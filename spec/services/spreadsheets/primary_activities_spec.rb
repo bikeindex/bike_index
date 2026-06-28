@@ -70,6 +70,18 @@ RSpec.describe Spreadsheets::PrimaryActivities do
         expect(PrimaryActivity.all.map(&:display_name)).to match_array target_display_names
       end
 
+      it "names the offending activity when a create fails validation" do
+        described_class.import(csv_path)
+        # Drift the slug so the slug lookup misses and the create collides on name uniqueness
+        PrimaryActivity.flavor.top_level.friendly_find("Bike Polo").update_columns(slug: "drifted")
+
+        Tempfile.create(["primary_activities", ".csv"], Rails.root.join("tmp")) do |file|
+          file.write("Flavor,Families\nBike Polo,\n")
+          file.flush
+          expect { described_class.import(file.path) }.to raise_error(/Bike Polo/)
+        end
+      end
+
       it "corrects the stored name of an existing activity (e.g. casing)" do
         described_class.import(csv_path)
         bike_polo = PrimaryActivity.flavor.top_level.friendly_find("Bike Polo")
