@@ -231,10 +231,16 @@
     .modal-body
       = render partial: 'shared/alert', locals: {body: t(".please_fill_in_both_fields"), class_names: "currently-hidden"}
       = hidden_field_tag :manufacturer_update_bike_id, @bike.id
-      .form-group
-        %label{for: :manufacturer_update_manufacturer}
-          = t(".manufacturer")
-        = text_field_tag :manufacturer_update_manufacturer, "", class: "form-control unfancy"
+      .related-fields
+        .form-group
+          %label{for: :manufacturer_update_manufacturer}
+            = t(".manufacturer")
+          = text_field_tag :manufacturer_update_manufacturer, "", class: "form-control unfancy"
+          %span.below-input-help= t(".select_other")
+        .form-group.hidden-other
+          %label{for: :manufacturer_update_manufacturer_other}
+            = t(".other_manufacturer")
+          = text_field_tag :manufacturer_update_manufacturer_other, "", class: "form-control"
       .form-group
         %label{for: :manufacturer_update_reason}
           = t(".reason_for_update")

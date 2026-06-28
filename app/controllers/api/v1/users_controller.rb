@@ -38,12 +38,12 @@ module API
               feedback.feedback_hash[:old_manufacturer] = bike.mnfg_name
               if bike.manufacturer_other.present?
                 feedback.feedback_hash[:old_manufacturer] += " (#{bike.manufacturer_other})"
-                bike.manufacturer_other = nil
               end
               bike.manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer_update_manufacturer])
+              bike.manufacturer_other = bike.manufacturer&.other? ? params[:manufacturer_update_manufacturer_other] : nil
               if bike.manufacturer_id.present?
                 bike.save
-                feedback.feedback_hash[:new_manufacturer] = bike.manufacturer.name
+                feedback.feedback_hash[:new_manufacturer] = bike.mnfg_name
               end
             elsif feedback_type.match?("bike_recovery")
               recover_bike(bike, feedback)
