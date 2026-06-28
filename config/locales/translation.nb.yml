@@ -1855,6 +1855,8 @@ nb:
         versjoner og må oppdateres på den originale %{bike_type}-registreringen. %{bike_registration_link}.
       updated_serial: Oppdatert serie
       version_name: Versjonsnavn
+      other_manufacturer: Annen produsent
+      select_other: Velg "Annet" hvis produsenten ikke vises når du skriver inn
     bike_fields:
       revised_colors:
         add_a_color: Legg til en farge
