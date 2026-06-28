@@ -5030,6 +5030,7 @@ en:
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
       manage_impounding: Manage impounding
+      manage_registration_sequences: Manage Registration sequences
       manage_users: Manage users
       model_audits: E-Vehicle audits
       multi_search: Multi search
@@ -5040,7 +5041,6 @@ en:
       parking_notification_unregistered: New unregistered notification
       parking_notifications: Parking notifications
       recoveries: Recoveries
-      registration_sequences: Registration sequences
       registration_stickers: Registration stickers
       resources: Resources
       stolen_hot_sheet: Stolen Bike Hot Sheet

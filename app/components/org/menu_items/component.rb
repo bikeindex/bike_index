@@ -135,6 +135,8 @@ module Org
           on_bikes_new? && !on_bikes_new_with_parking_notification?
         when :on_bikes_new_with_parking_notification
           on_bikes_new_with_parking_notification?
+        when :on_registration_sequences
+          on_registration_sequences?
         else
           item[:active]
         end

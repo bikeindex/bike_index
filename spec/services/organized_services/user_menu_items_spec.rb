@@ -113,7 +113,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
           link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),
           link_item("#{organization.short_name} profile", "/o/#{organization.to_param}/manage"),
           link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations"),
-          link_item("Registration sequences", "/o/#{organization.to_param}/registration_sequences", active: :match_controller)
+          link_item("Manage Registration sequences", "/o/#{organization.to_param}/registration_sequences", active: :on_registration_sequences)
         ]
       end
 
@@ -127,9 +127,9 @@ RSpec.describe OrganizedServices::UserMenuItems do
       end
       let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
 
-      it "lists Registration sequences below the Hot Sheet configuration" do
+      it "lists Manage Registration sequences below the Hot Sheet configuration" do
         labels = items.map { |i| i[:label] }
-        expect(labels.index("Registration sequences")).to be > labels.index("Stolen Bike Hot Sheet configuration")
+        expect(labels.index("Manage Registration sequences")).to be > labels.index("Stolen Bike Hot Sheet configuration")
       end
     end
 
