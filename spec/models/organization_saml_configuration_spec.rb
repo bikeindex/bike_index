@@ -21,6 +21,18 @@ RSpec.describe OrganizationSamlConfiguration, type: :model do
     end
   end
 
+  describe "#slo_configured?" do
+    it "is false when configured but missing the IdP logout endpoint" do
+      saml_configuration = FactoryBot.create(:organization_saml_configuration, :enabled)
+      expect(saml_configuration.slo_configured?).to be_falsey
+    end
+
+    it "is true once the IdP logout endpoint is present" do
+      saml_configuration = FactoryBot.create(:organization_saml_configuration, :enabled, :with_slo)
+      expect(saml_configuration.slo_configured?).to be_truthy
+    end
+  end
+
   describe "validations" do
     let(:saml_configuration) { FactoryBot.build(:organization_saml_configuration, enabled: true) }
     it "requires idp essentials when enabled" do

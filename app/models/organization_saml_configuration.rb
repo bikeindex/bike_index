@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id                   :bigint           not null, primary key
+#  allow_idp_initiated  :boolean          default(FALSE)
 #  email_attribute_name :string
 #  enabled              :boolean          default(FALSE)
 #  idp_cert             :text
@@ -43,6 +44,11 @@ class OrganizationSamlConfiguration < ApplicationRecord
   # Ready to drive a live login: enabled and the IdP essentials are present
   def configured?
     enabled? && idp_entity_id.present? && idp_sso_target_url.present? && idp_cert.present?
+  end
+
+  # Single Logout additionally needs the IdP's logout endpoint
+  def slo_configured?
+    configured? && idp_slo_target_url.present?
   end
 
   def email_attribute

@@ -8,5 +8,13 @@ FactoryBot.define do
       idp_sso_target_url { "https://idp.example.edu/idp/profile/SAML2/POST/SSO" }
       idp_cert { File.read(Rails.root.join("spec/fixtures/saml/idp_cert.pem")) }
     end
+
+    trait :with_slo do
+      idp_slo_target_url { "https://idp.example.edu/idp/profile/SAML2/Redirect/SLO" }
+    end
+
+    trait :idp_initiated do
+      allow_idp_initiated { true }
+    end
   end
 end

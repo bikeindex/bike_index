@@ -2726,7 +2726,8 @@ CREATE TABLE public.organization_saml_configurations (
     email_attribute_name character varying,
     name_id_format character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    allow_idp_initiated boolean DEFAULT false
 );
 
 
@@ -7257,6 +7258,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260627120000'),
 ('20260626170001'),
 ('20260626170000'),
 ('20260626162049'),
