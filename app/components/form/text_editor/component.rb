@@ -8,8 +8,7 @@ module Form
     class Component < ApplicationComponent
       SIZE = %i[default single_line].freeze
 
-      # Lexxy renders a fixed toolbar (lexxy.js LexicalToolbarElement.defaultTemplate); pass
-      # toolbar_buttons: to show only a subset -- the rest are hidden via lexxy_overrides.css.
+      # toolbar_buttons: shows only a subset -- the rest are hidden via lexxy_overrides.css.
       TOOLBAR_BUTTONS = %i[bold italic strikethrough highlight link quote heading code
         unordered_list ordered_list table divider undo redo].freeze
 
