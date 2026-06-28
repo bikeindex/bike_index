@@ -5,12 +5,13 @@ RSpec.describe Cgroup, type: :model do
 
   describe "additional_parts" do
     it "finds additional parts" do
-      expect(Cgroup.additional_parts.name).to eq "Additional parts"
+      expect(Cgroup.additional_parts.name).to eq "Additional Parts"
     end
-    context "with the spreadsheet importer's casing" do
-      let!(:cgroup) { FactoryBot.create(:cgroup, name: "Additional Parts") }
+    context "when the stored casing differs" do
       it "matches without creating a duplicate" do
-        expect { expect(Cgroup.additional_parts).to eq cgroup }.not_to change(Cgroup, :count)
+        additional_parts = Cgroup.additional_parts
+        additional_parts.update_column(:name, "Additional parts")
+        expect { expect(Cgroup.additional_parts).to eq additional_parts }.not_to change(Cgroup, :count)
       end
     end
   end
