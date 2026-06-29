@@ -1,24 +1,19 @@
-import { Controller } from '@hotwired/stimulus'
+import Sortable from './sortable_controller'
 
 // Connects to data-controller='bullet-editors'
 // The page model stores its bullets as a single `body` HTML string (a <ul> of <li>s).
-// These per-bullet editors are purely a frontend convenience: we recombine them into the
-// hidden body field on every change and before submit, leaving the backend contract unchanged.
-export default class extends Controller {
-  static targets = ['field', 'list', 'template', 'bullet', 'handle']
+// These per-bullet editors are a frontend convenience: we recombine them into the hidden
+// body field on change and submit. Reordering reuses the sortable drag + drop-indicator,
+// but swaps editor *content* instead of moving rows -- relocating a lexxy editor crashes it.
+export default class extends Sortable {
+  static targets = ['field', 'list', 'template']
 
   #counter = 0
-  #dragging = null
-  #indicator = null
 
   connect () {
+    super.connect()
     this.element.addEventListener('lexxy:change', this.compose)
     this.form?.addEventListener('submit', this.compose)
-    // A thin bar slid into the gap during a drag to show where the bullet will land --
-    // we can't move the lexxy editors themselves for live feedback (it crashes them).
-    this.#indicator = document.createElement('div')
-    this.#indicator.setAttribute('aria-hidden', 'true')
-    this.#indicator.style.cssText = 'height:2px;border-radius:9999px;background:#2563eb;'
   }
 
   disconnect () {
@@ -34,57 +29,23 @@ export default class extends Controller {
 
   remove (event) {
     event.preventDefault()
-    event.currentTarget.closest('[data-bullet-editors-target="bullet"]').remove()
+    event.currentTarget.closest('[data-bullet-editors-target="item"]').remove()
     this.compose()
   }
 
   focusFirst (event) {
     event.preventDefault()
     // Focus the contenteditable directly -- the host's focus() defers to Lexical and no-ops here
-    this.bulletTargets[0]?.querySelector('lexxy-editor [contenteditable]')?.focus()
+    this.itemTargets[0]?.querySelector('lexxy-editor [contenteditable]')?.focus()
   }
 
-  // Drag-to-reorder by swapping editor *content* on drop. We never relocate the lexxy-editor
-  // nodes: moving one fires its disconnect/connect callbacks, which crash Lexxy mid-drag.
-  // Editors stay mounted; only their values (and thus the composed body) shuffle.
-  handleTargetConnected (handle) {
-    const item = handle.closest('[data-bullet-editors-target="bullet"]')
-    handle.addEventListener('dragstart', event => {
-      this.#dragging = item
-      event.dataTransfer.effectAllowed = 'move'
-      event.dataTransfer.setData('text/plain', '')
-      setTimeout(() => item.classList.add('tw:opacity-50'), 0)
-    })
-    handle.addEventListener('dragend', () => {
-      item.classList.remove('tw:opacity-50')
-      this.#dragging = null
-      this.#indicator.remove()
-    })
-  }
-
-  bulletTargetConnected (item) {
-    item.addEventListener('dragover', event => {
-      if (!this.#dragging) return
-      event.preventDefault()
-      event.dataTransfer.dropEffect = 'move'
-      const box = item.getBoundingClientRect()
-      const after = event.clientY > box.top + box.height / 2
-      this.listTarget.insertBefore(this.#indicator, after ? item.nextSibling : item)
-    })
-    item.addEventListener('drop', event => {
-      if (!this.#dragging || item === this.#dragging) return
-      event.preventDefault()
-      this.#reorder(item, event.clientY)
-    })
-  }
-
-  #reorder (target, clientY) {
-    const items = this.bulletTargets
-    const editors = items.map(item => item.querySelector('lexxy-editor'))
-    const values = editors.map(editor => editor?.value ?? '')
-    const from = items.indexOf(this.#dragging)
-    const box = target.getBoundingClientRect()
-    let to = items.indexOf(target) + (clientY > box.top + box.height / 2 ? 1 : 0)
+  // Swap editor content instead of moving rows: relocating a lexxy editor fires its
+  // disconnect/connect callbacks, which crash it mid-drag.
+  reorder (target, after) {
+    const editors = this.itemTargets.map((item) => item.querySelector('lexxy-editor'))
+    const values = editors.map((editor) => editor?.value ?? '')
+    const from = this.itemTargets.indexOf(this.draggingItem)
+    let to = this.itemTargets.indexOf(target) + (after ? 1 : 0)
     if (to > from) to -= 1
     if (from === to) return
 
@@ -96,17 +57,17 @@ export default class extends Controller {
 
   // Arrow so it survives being passed as an event listener
   compose = () => {
-    const editors = this.bulletTargets
-      .map(bullet => bullet.querySelector('lexxy-editor'))
+    const editors = this.itemTargets
+      .map((item) => item.querySelector('lexxy-editor'))
       .filter(Boolean)
     // Editors upgrade asynchronously; bail until every one exposes a value so the first
     // paint never clobbers the server-rendered body with empties.
-    if (editors.some(editor => editor.value === undefined)) return
+    if (editors.some((editor) => editor.value === undefined)) return
 
     const items = editors
-      .map(editor => this.#inline(editor.value))
-      .filter(content => this.#hasText(content))
-      .map(content => `<li>${content}</li>`)
+      .map((editor) => this.#inline(editor.value))
+      .filter((content) => this.#hasText(content))
+      .map((content) => `<li>${content}</li>`)
     this.fieldTarget.value = items.length ? `<ul>${items.join('')}</ul>` : ''
   }
 

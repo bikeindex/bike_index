@@ -32,17 +32,10 @@
     <div data-bullet-editors-target="list" class="tw:flex tw:flex-col tw:gap-2">
       <% bullets.each_with_index do |content, index| %>
         <div
-          data-bullet-editors-target="bullet"
+          data-bullet-editors-target="item"
           class="tw:mb-2 tw:flex tw:items-start tw:gap-2"
         >
-          <span
-            data-bullet-editors-target="handle"
-            draggable="true"
-            aria-hidden="true"
-            class="tw:cursor-grab tw:pt-2 tw:text-gray-400 tw:select-none"
-          >
-            ⠿
-          </span>
+          <%= render UI::DragHandle::Component.new(controller: "bullet-editors", html_class: "tw:pt-2") %>
 
           <div class="tw:flex-1">
             <%= render Form::TextEditor::Component.new(form_builder: bullet_builder(index), attribute: :content, size: :single_line, value: content) %>
@@ -55,17 +48,10 @@
 
     <template data-bullet-editors-target="template">
       <div
-        data-bullet-editors-target="bullet"
+        data-bullet-editors-target="item"
         class="tw:mb-2 tw:flex tw:items-start tw:gap-2"
       >
-        <span
-          data-bullet-editors-target="handle"
-          draggable="true"
-          aria-hidden="true"
-          class="tw:cursor-grab tw:pt-2 tw:text-gray-400 tw:select-none"
-        >
-          ⠿
-        </span>
+        <%= render UI::DragHandle::Component.new(controller: "bullet-editors", html_class: "tw:pt-2") %>
 
         <div class="tw:flex-1">
           <%= render Form::TextEditor::Component.new(form_builder: bullet_builder("__INDEX__"), attribute: :content, size: :single_line, value: "") %>
