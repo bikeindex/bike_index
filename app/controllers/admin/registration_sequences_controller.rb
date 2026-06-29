@@ -40,7 +40,7 @@ module Admin
     end
 
     def earliest_period_date
-      Time.at(1748736000) # 2025-06-01 - registration sequences introduced
+      Time.at(1780272000) # 2026-06-01 - registration sequences introduced
     end
 
     def matching_registration_sequences
