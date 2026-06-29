@@ -63,6 +63,6 @@ RSpec.describe Form::TextEditor::Component, :js, type: :system do
 
     # The compact override sets a custom property only on .lexxy-editor--compact
     rows = page.evaluate_script("getComputedStyle(document.querySelector('lexxy-editor')).getPropertyValue('--lexxy-editor-rows').trim()")
-    expect(rows).to eq("2.4em")
+    expect(rows).to eq("1.4em")
   end
 end

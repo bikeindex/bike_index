@@ -27,6 +27,16 @@ RSpec.describe Form::TextEditor::Component, type: :component do
       .to have_css("lexxy-editor[data-controller='lexxy'][data-lexxy-stylesheet-value*='lexxy']")
   end
 
+  it "derives the standalone editor's accessible name from the attribute (Lexxy copies aria-label onto the box)" do
+    expect(rendered_component(record)).to have_css("lexxy-editor[aria-label='Description']")
+  end
+
+  context "standalone: false" do
+    it "omits aria-label so the paired Form::Group label is the accessible name" do
+      expect(rendered_component(record, standalone: false)).to have_no_css("lexxy-editor[aria-label]")
+    end
+  end
+
   context "size: :single_line" do
     it "adds the compact modifier class and defaults to the trimmed toolbar" do
       component = rendered_component(record, size: :single_line)
