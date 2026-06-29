@@ -11,8 +11,19 @@ module SpamEstimator
     \b(?:drop|truncate)\s+table\b |
     \b(?:delete\s+from|insert\s+into)\b |
     ['"]\s*or\s+['"]?\d+['"]?\s*=\s*['"]?\d+ |
-    \bpg_sleep\s*\( |
+    \b(?:pg_sleep|sleep)\s*\( |
+    \bwaitfor\s+delay\b |
+    \bdbms_pipe\.receive_message\b |
+    \bxor\s*\( |
+    \bselect\b[^;]*\bfrom\s+dual\b |
+    \bsysdate\s*\( |
     ;\s*(?:drop|delete|truncate|exec)\b
+  /xi
+
+  # RFC 2606 / 6761 reserved domains, which can never be a real registrant
+  RESERVED_EMAIL_DOMAIN_REGEX = /
+    \A(?:.+\.)?example\.(?:com|net|org)\z |
+    (?:\A|\.)(?:test|example|invalid|localhost)\z
   /xi
 
   def estimate_bike(bike, stolen_record = nil)
@@ -58,8 +69,17 @@ module SpamEstimator
     str.match?(MALICIOUS_REGEX)
   end
 
+  def reserved_email_domain?(email)
+    domain = email&.split("@")&.last&.strip
+    return false if domain.blank?
+
+    domain.match?(RESERVED_EMAIL_DOMAIN_REGEX)
+  end
+
   def domain_estimate(email)
     return 0 unless EmailDomain::VERIFICATION_ENABLED
+    # RFC-reserved domains (e.g. example.com) are never a real registrant
+    return 100 if reserved_email_domain?(email)
 
     email_domain = EmailDomain.find_or_create_for(email)
 
@@ -185,7 +205,7 @@ module SpamEstimator
     I18n.transliterate(str).downcase
   end
 
-  conceal :looks_malicious?, :domain_estimate, :estimate_stolen_record,
+  conceal :looks_malicious?, :reserved_email_domain?, :domain_estimate, :estimate_stolen_record,
     :vowel_frequency_suspiciousness, :vowel_ratio,
     :capital_count_suspiciousness, :non_letter_count_suspiciousness,
     :space_count_suspiciousness, :within_bounds, :downcase_transliterate

@@ -51,6 +51,8 @@ RSpec.describe Email::OwnershipInvitationJob, type: :job do
   end
   context "ownership is for a banned domain" do
     before { stub_const("EmailDomain::VERIFICATION_ENABLED", true) }
+    # non-reserved domain, so the status under test - not RFC-reserved detection - drives spaminess
+    let(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "rider@registrant-domain.com") }
     let!(:email_domain) { FactoryBot.create(:email_domain, domain: bike.owner_email.gsub(/\A.*@/, ""), status:) }
     let(:status) { :permitted }
 
