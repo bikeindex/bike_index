@@ -14,7 +14,17 @@ export default class extends Controller {
     // when the rows themselves can't move (e.g. they hold editors that crash on relocation).
     this.indicator = document.createElement('div')
     this.indicator.setAttribute('aria-hidden', 'true')
-    this.indicator.style.cssText = 'height:2px;border-radius:9999px;background:#2563eb;'
+    // pointer-events:none so the bar never becomes the drop target and swallows the drop
+    this.indicator.style.cssText = 'height:2px;border-radius:9999px;background:#2563eb;pointer-events:none;'
+    // Capture phase so a child (e.g. a rich-text editor's contenteditable) can't swallow
+    // dragover/drop before we handle them.
+    this.element.addEventListener('dragover', this.#onDragOver, true)
+    this.element.addEventListener('drop', this.#onDrop, true)
+  }
+
+  disconnect () {
+    this.element.removeEventListener('dragover', this.#onDragOver, true)
+    this.element.removeEventListener('drop', this.#onDrop, true)
   }
 
   handleTargetConnected (handle) {
@@ -33,19 +43,20 @@ export default class extends Controller {
     })
   }
 
-  itemTargetConnected (item) {
-    item.addEventListener('dragover', (event) => {
-      if (!this.draggingItem) return
-      event.preventDefault()
-      event.dataTransfer.dropEffect = 'move'
-      item.parentNode.insertBefore(this.indicator, this.#after(item, event.clientY) ? item.nextSibling : item)
-    })
-    item.addEventListener('drop', (event) => {
-      if (!this.draggingItem || item === this.draggingItem) return
-      event.preventDefault()
-      this.indicator.remove()
-      this.reorder(item, this.#after(item, event.clientY))
-    })
+  #onDragOver = (event) => {
+    const item = this.draggingItem && event.target.closest?.(this.#itemSelector)
+    if (!item) return
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'move'
+    item.parentNode.insertBefore(this.indicator, this.#after(item, event.clientY) ? item.nextSibling : item)
+  }
+
+  #onDrop = (event) => {
+    const item = this.draggingItem && event.target.closest?.(this.#itemSelector)
+    this.indicator.remove()
+    if (!item || item === this.draggingItem) return
+    event.preventDefault()
+    this.reorder(item, this.#after(item, event.clientY))
   }
 
   // Default: move the dragged row next to the target, then persist its new position.

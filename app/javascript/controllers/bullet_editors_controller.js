@@ -17,6 +17,7 @@ export default class extends Sortable {
   }
 
   disconnect () {
+    super.disconnect()
     this.element.removeEventListener('lexxy:change', this.compose)
     this.form?.removeEventListener('submit', this.compose)
   }
