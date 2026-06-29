@@ -9,10 +9,16 @@ export default class extends Controller {
 
   #counter = 0
   #dragging = null
+  #indicator = null
 
   connect () {
     this.element.addEventListener('lexxy:change', this.compose)
     this.form?.addEventListener('submit', this.compose)
+    // A thin bar slid into the gap during a drag to show where the bullet will land --
+    // we can't move the lexxy editors themselves for live feedback (it crashes them).
+    this.#indicator = document.createElement('div')
+    this.#indicator.setAttribute('aria-hidden', 'true')
+    this.#indicator.style.cssText = 'height:2px;border-radius:9999px;background:#2563eb;'
   }
 
   disconnect () {
@@ -52,6 +58,7 @@ export default class extends Controller {
     handle.addEventListener('dragend', () => {
       item.classList.remove('tw:opacity-50')
       this.#dragging = null
+      this.#indicator.remove()
     })
   }
 
@@ -60,6 +67,9 @@ export default class extends Controller {
       if (!this.#dragging) return
       event.preventDefault()
       event.dataTransfer.dropEffect = 'move'
+      const box = item.getBoundingClientRect()
+      const after = event.clientY > box.top + box.height / 2
+      this.listTarget.insertBefore(this.#indicator, after ? item.nextSibling : item)
     })
     item.addEventListener('drop', event => {
       if (!this.#dragging || item === this.#dragging) return
