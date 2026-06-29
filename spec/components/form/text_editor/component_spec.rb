@@ -27,6 +27,13 @@ RSpec.describe Form::TextEditor::Component, type: :component do
       .to have_css("lexxy-editor[data-controller='lexxy'][data-lexxy-stylesheet-value*='lexxy']")
   end
 
+  context "with aria_label:" do
+    it "sets the editor's accessible name (Lexxy copies it onto the contenteditable box)" do
+      expect(rendered_component(record, aria_label: "Description"))
+        .to have_css("lexxy-editor[aria-label='Description']")
+    end
+  end
+
   context "size: :single_line" do
     it "adds the compact modifier class and defaults to the trimmed toolbar" do
       component = rendered_component(record, size: :single_line)
