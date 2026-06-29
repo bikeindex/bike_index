@@ -1,6 +1,6 @@
 <%# The editor carries data-controller="lexxy", which loads the JS bundle and stylesheet itself. %>
 <%= form_with(model: OrganizationFeature.new(description: "<p>A rich-text description</p>"), url: "#", builder: BikeIndexFormBuilder) do |f| %>
   <%= render(Form::Group::Component.new(form_builder: f, attribute: :description, kind: :content_block)) do %>
-    <%= render(Form::TextEditor::Component.new(form_builder: f, attribute: :description, size: local_assigns.fetch(:size, :default))) %>
+    <%= render(Form::TextEditor::Component.new(form_builder: f, attribute: :description, size: local_assigns.fetch(:size, :default), toolbar_buttons: local_assigns.fetch(:toolbar_buttons, nil))) %>
   <% end %>
 <% end %>
