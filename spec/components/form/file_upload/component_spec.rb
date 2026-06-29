@@ -37,4 +37,28 @@ RSpec.describe Form::FileUpload::Component, type: :component do
       expect(component).to have_css("input[multiple]")
     end
   end
+
+  context "with accept" do
+    context "as a string" do
+      let(:options) { {accept: "image/png,image/jpeg"} }
+
+      it "sets the accept attribute" do
+        expect(component).to have_css("input[type='file'][accept='image/png,image/jpeg']")
+      end
+    end
+
+    context "as an array" do
+      let(:options) { {accept: %w[.png .jpg]} }
+
+      it "joins into the accept attribute" do
+        expect(component).to have_css("input[type='file'][accept='.png,.jpg']")
+      end
+    end
+
+    context "when omitted" do
+      it "renders no accept attribute" do
+        expect(component).to have_no_css("input[type='file'][accept]")
+      end
+    end
+  end
 end

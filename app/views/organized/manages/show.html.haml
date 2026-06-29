@@ -66,7 +66,7 @@
       - if @organization.avatar?
         = link_to image_tag(@organization.avatar_url(:thumb)), @organization.avatar_url
 
-      = render(Form::FileUpload::Component.new(form_builder: f, attribute: :avatar, button_text: t(".choose_file"), html_options: {accept: ImageUploader.permitted_extensions.join(",")}))
+      = render(Form::FileUpload::Component.new(form_builder: f, attribute: :avatar, button_text: t(".choose_file"), accept: ImageUploader.permitted_extensions))
       = f.hidden_field :avatar_cache
       %span.below-input-help
         = t(".square_image")
