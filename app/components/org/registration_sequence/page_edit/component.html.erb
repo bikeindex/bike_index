@@ -48,13 +48,7 @@
             <%= render Form::TextEditor::Component.new(form_builder: bullet_builder(index), attribute: :content, size: :single_line, value: content) %>
           </div>
 
-          <button
-            type="button"
-            data-action="bullet-editors#remove"
-            class="twlink tw:pt-2 tw:text-xs"
-          >
-            Remove
-          </button>
+          <%= render UI::Button::Component.new(text: "Remove", color: :link, html_class: "tw:pt-2 tw:text-xs", data: {action: "bullet-editors#remove"}) %>
         </div>
       <% end %>
     </div>
@@ -77,24 +71,12 @@
           <%= render Form::TextEditor::Component.new(form_builder: bullet_builder("__INDEX__"), attribute: :content, size: :single_line, value: "") %>
         </div>
 
-        <button
-          type="button"
-          data-action="bullet-editors#remove"
-          class="twlink tw:pt-2 tw:text-xs"
-        >
-          Remove
-        </button>
+        <%= render UI::Button::Component.new(text: "Remove", color: :link, html_class: "tw:pt-2 tw:text-xs", data: {action: "bullet-editors#remove"}) %>
       </div>
     </template>
 
     <div class="tw:mt-1">
-      <button
-        type="button"
-        data-action="bullet-editors#add"
-        class="twlink tw:text-sm"
-      >
-        + Add bullet
-      </button>
+      <%= render UI::Button::Component.new(text: "+ Add bullet", color: :link, html_class: "tw:text-sm", data: {action: "bullet-editors#add"}) %>
     </div>
   </div>
 </div>
