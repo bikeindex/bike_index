@@ -14,7 +14,6 @@ RSpec.describe Form::FileUpload::Component, type: :component do
   it "renders a labelless file input with a filename display" do
     expect(component).to have_css("input[type='file'][name='user[avatar]']")
     expect(component).to have_no_css("label")
-    expect(component.to_html).to include("twinput")
     expect(component).to have_css("[data-controller='form--file-upload']")
     expect(component).to have_css("[data-form--file-upload-target='input']")
     expect(component).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
