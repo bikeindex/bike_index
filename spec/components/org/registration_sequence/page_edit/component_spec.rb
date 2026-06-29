@@ -15,9 +15,10 @@ RSpec.describe Org::RegistrationSequence::PageEdit::Component, type: :component 
 
   let(:component) { rendered_component(page) }
 
-  it "renders the image field and a Lexxy editor bound to the body" do
+  it "renders the image field, a hidden body field, and a Lexxy editor per bullet" do
     expect(component).to have_field("registration_sequence_page_image")
-    expect(component).to have_css("lexxy-editor[name='registration_sequence_page[body]']")
+    expect(component).to have_css("input[type=hidden][name='registration_sequence_page[body]']", visible: :all)
+    expect(component).to have_css("lexxy-editor[name='bullet[0][content]']", visible: :all)
     expect(component).to_not have_field("registration_sequence_page_listing_order")
   end
 end

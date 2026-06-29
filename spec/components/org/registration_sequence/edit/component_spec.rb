@@ -14,11 +14,10 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     expect(page).to have_link("Edit")
   end
 
-  it "makes only the grip draggable, not the whole row" do
+  it "renders a drag grip on each row (SortableJS limits dragging to the handle)" do
     render_inline(described_class.new(registration_sequence:))
 
-    expect(page).to have_css("[data-sortable-target='item'] [data-sortable-target='handle'][draggable='true']", minimum: 1)
-    expect(page).to have_no_css("[data-sortable-target='item'][draggable]")
+    expect(page).to have_css("[data-sortable-target='item'] [data-sortable-target='handle']", minimum: 1)
   end
 
   it "puts each page's body in a collapsed disclosure toggled by a chevron" do
