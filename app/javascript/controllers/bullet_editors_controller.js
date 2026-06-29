@@ -94,8 +94,8 @@ export default class extends Controller {
     if (editors.some(editor => editor.value === undefined)) return
 
     const items = editors
-      .map(editor => this.#clean(editor.value))
-      .filter(content => content.length)
+      .map(editor => this.#inline(editor.value))
+      .filter(content => this.#hasText(content))
       .map(content => `<li>${content}</li>`)
     this.fieldTarget.value = items.length ? `<ul>${items.join('')}</ul>` : ''
   }
@@ -104,8 +104,19 @@ export default class extends Controller {
     return this.element.closest('form')
   }
 
-  // Drop the single wrapping <p> the editor adds so each bullet stays a clean inline <li>
-  #clean (html) {
-    return (html || '').trim().replace(/^<p>([\s\S]*?)<\/p>$/i, '$1').trim()
+  // Flatten the editor's block markup into inline content for one <li>. Lexxy wraps each
+  // line in <p>, and Enter adds more -- left as-is they'd produce a malformed <li>...</p><p>...
+  #inline (html) {
+    return (html || '')
+      .replace(/<p[^>]*>/gi, '')
+      .replace(/<\/p>\s*/gi, ' ')
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  }
+
+  // True when real text remains once tags and entities are stripped -- skips blank bullets
+  #hasText (html) {
+    return html.replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim().length > 0
   }
 }
