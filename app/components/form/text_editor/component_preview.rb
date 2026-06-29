@@ -15,10 +15,6 @@ module Form
         {template: "form/text_editor/component_preview/default", locals: {size: :single_line}}
       end
 
-      # @!endgroup
-
-      # @!group Toolbar
-
       # Restricted toolbar -- only the buttons listed in toolbar_buttons: are shown
       def custom_toolbar
         {template: "form/text_editor/component_preview/default",

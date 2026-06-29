@@ -22,14 +22,9 @@ lexxy-editor.lexxy-editor--compact .lexxy-editor__toolbar-button {
   block-size: 1.6em;
 }
 
-/* Per-instance toolbar trimming (Form::TextEditor::Component toolbar_buttons:). The gem renders a
-   fixed button set (lexxy.js LexicalToolbarElement.defaultTemplate) with no per-button config, so
-   the component adds a lexxy-editor--hide-<button> class for each button the caller omitted; hidden
-   commands stay reachable via hotkeys. Upload is already hidden by attachments: "false".
-   Button selectors use a descendant (not child) combinator on purpose: the gem's overflow
-   ResizeObserver relocates trailing <button>s into the "..." overflow menu, so a child combinator
-   would stop matching once a hidden button is moved. The <details> rows (link/highlight) are never
-   relocated, so they stay child-combinator. */
+/* Per-instance toolbar trimming: the component adds a lexxy-editor--hide-<button> class per button
+   omitted from toolbar_buttons:. Buttons use a descendant (not child) combinator because the gem's
+   overflow observer relocates trailing <button>s into the "..." menu; <details> rows aren't moved. */
 .lexxy-editor--hide-bold lexxy-toolbar [name="bold"],
 .lexxy-editor--hide-italic lexxy-toolbar [name="italic"],
 .lexxy-editor--hide-strikethrough lexxy-toolbar [name="strikethrough"],
