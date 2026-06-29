@@ -1,25 +1,29 @@
-import Sortable from './sortable_controller'
+import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='bullet-editors'
 // The page model stores its bullets as a single `body` HTML string (a <ul> of <li>s).
 // These per-bullet editors are a frontend convenience: we recombine them into the hidden
-// body field on change and submit. Reordering reuses the sortable drag + drop-indicator,
-// but swaps editor *content* instead of moving rows -- relocating a lexxy editor crashes it.
-export default class extends Sortable {
-  static targets = ['field', 'list', 'template']
+// body field on change and submit. Reorder uses pointer events and swaps editor *content*
+// rather than moving rows -- relocating a lexxy editor crashes it, so SortableJS can't be
+// used here the way it is on plain lists (sortable_controller).
+export default class extends Controller {
+  static targets = ['field', 'list', 'template', 'item', 'handle']
 
   #counter = 0
 
   connect () {
-    super.connect()
     this.element.addEventListener('lexxy:change', this.compose)
     this.form?.addEventListener('submit', this.compose)
+    // Slid into the target gap during a drag; pointer-events:none so it never blocks hit-testing.
+    this.indicator = document.createElement('div')
+    this.indicator.setAttribute('aria-hidden', 'true')
+    this.indicator.style.cssText = 'height:2px;border-radius:9999px;background:#2563eb;pointer-events:none;'
   }
 
   disconnect () {
-    super.disconnect()
     this.element.removeEventListener('lexxy:change', this.compose)
     this.form?.removeEventListener('submit', this.compose)
+    this.#stopTracking()
   }
 
   add (event) {
@@ -40,9 +44,51 @@ export default class extends Sortable {
     this.itemTargets[0]?.querySelector('lexxy-editor [contenteditable]')?.focus()
   }
 
-  // Swap editor content instead of moving rows: relocating a lexxy editor fires its
-  // disconnect/connect callbacks, which crash it mid-drag.
-  reorder (target, after) {
+  // -- pointer drag-to-reorder --
+  handleTargetConnected (handle) {
+    handle.addEventListener('pointerdown', this.#onPointerDown)
+  }
+
+  #onPointerDown = (event) => {
+    if (event.button !== 0) return
+    const item = event.target.closest('[data-bullet-editors-target="item"]')
+    if (!item) return
+    event.preventDefault()
+    this.draggingItem = item
+    this.dropTarget = null
+    item.classList.add('tw:opacity-50')
+    document.addEventListener('pointermove', this.#onPointerMove)
+    document.addEventListener('pointerup', this.#onPointerUp, { once: true })
+  }
+
+  #onPointerMove = (event) => {
+    const item = this.itemTargets.find((row) => {
+      const box = row.getBoundingClientRect()
+      return event.clientY >= box.top && event.clientY <= box.bottom
+    })
+    if (!item) return
+    const box = item.getBoundingClientRect()
+    this.dropTarget = item
+    this.dropAfter = event.clientY > box.top + box.height / 2
+    item.parentNode.insertBefore(this.indicator, this.dropAfter ? item.nextSibling : item)
+  }
+
+  #onPointerUp = () => {
+    this.#stopTracking()
+    this.draggingItem.classList.remove('tw:opacity-50')
+    if (this.dropTarget && this.dropTarget !== this.draggingItem) this.#reorder(this.dropTarget, this.dropAfter)
+    this.draggingItem = null
+    this.dropTarget = null
+  }
+
+  #stopTracking () {
+    document.removeEventListener('pointermove', this.#onPointerMove)
+    document.removeEventListener('pointerup', this.#onPointerUp)
+    this.indicator?.remove()
+  }
+
+  // Swap editor values to match the new order; the rows (and their editors) never move.
+  #reorder (target, after) {
     const editors = this.itemTargets.map((item) => item.querySelector('lexxy-editor'))
     const values = editors.map((editor) => editor?.value ?? '')
     const from = this.itemTargets.indexOf(this.draggingItem)

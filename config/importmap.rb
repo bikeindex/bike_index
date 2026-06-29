@@ -14,6 +14,8 @@ pin "@bikeindex/time-localizer", to: "https://cdn.jsdelivr.net/npm/@bikeindex/ti
 # root-absolute /npm/ imports that 404 against our origin; the vendored
 # file is esm.sh's self-contained bundle. See the file header to re-generate.
 pin "@floating-ui/dom", to: "@floating-ui--dom.js"
+# Vendored SortableJS (self-contained ESM, no runtime deps) for drag-to-reorder lists
+pin "sortablejs", to: "sortablejs.js"
 
 # jQuery is required for select2, which is used by search. It should not be used!
 # ideally we transition off it soon!
