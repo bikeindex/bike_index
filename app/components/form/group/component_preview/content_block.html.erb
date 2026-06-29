@@ -1,6 +1,6 @@
 <%# kind: :content_block renders the label, then yields to a content block -- here a Lexxy text editor. %>
 <%= form_with(model: OrganizationFeature.new(description: "<p>A rich-text description</p>"), url: "#", builder: BikeIndexFormBuilder) do |f| %>
   <%= render(Form::Group::Component.new(form_builder: f, attribute: :description, kind: :content_block)) do %>
-    <%= render(Form::TextEditor::Component.new(form_builder: f, attribute: :description)) %>
+    <%= render(Form::TextEditor::Component.new(form_builder: f, attribute: :description, standalone: false)) %>
   <% end %>
 <% end %>

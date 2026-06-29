@@ -14,6 +14,14 @@ export default class extends Controller {
     this.#addStylesheet()
   }
 
+  // A <label for> click forwards a click to this host element (not the inner editor), so the caret
+  // never lands in the box. Move focus into the contenteditable so the label acts like a field label.
+  focusEditor (event) {
+    if (event.target !== this.element) return
+
+    this.element.querySelector('[contenteditable="true"]')?.focus()
+  }
+
   #addStylesheet () {
     const href = this.stylesheetValue
     if (!href || document.querySelector(`link[rel="stylesheet"][href="${href}"]`)) return
