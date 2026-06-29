@@ -15,12 +15,14 @@ module Form
       # The compact single-line editor gets a trimmed toolbar unless the caller overrides it.
       SINGLE_LINE_TOOLBAR_BUTTONS = %i[bold italic link undo redo].freeze
 
-      def initialize(form_builder:, attribute:, size: :default, toolbar_buttons: nil)
+      # value: overrides the editor's initial HTML, for editors not backed by a model attribute
+      def initialize(form_builder:, attribute:, size: :default, toolbar_buttons: nil, value: nil)
         raise ArgumentError, "size must be one of #{SIZE.inspect}, got #{size.inspect}" unless SIZE.include?(size)
 
         @form_builder = form_builder
         @attribute = attribute
         @size = size
+        @value = value
         @toolbar_buttons = toolbar_buttons || (SINGLE_LINE_TOOLBAR_BUTTONS if size == :single_line)
 
         unknown = (@toolbar_buttons || []) - TOOLBAR_BUTTONS
@@ -34,7 +36,8 @@ module Form
       private
 
       def options
-        {attachments: "false", class: editor_class, data: asset_data}
+        base = {attachments: "false", class: editor_class, data: asset_data}
+        @value.nil? ? base : base.merge(value: @value)
       end
 
       def asset_data
