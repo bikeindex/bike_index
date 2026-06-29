@@ -5,9 +5,10 @@ import { Controller } from '@hotwired/stimulus'
 // These per-bullet editors are purely a frontend convenience: we recombine them into the
 // hidden body field on every change and before submit, leaving the backend contract unchanged.
 export default class extends Controller {
-  static targets = ['field', 'list', 'template', 'bullet']
+  static targets = ['field', 'list', 'template', 'bullet', 'handle']
 
   #counter = 0
+  #dragging = null
 
   connect () {
     this.element.addEventListener('lexxy:change', this.compose)
@@ -29,6 +30,51 @@ export default class extends Controller {
     event.preventDefault()
     event.currentTarget.closest('[data-bullet-editors-target="bullet"]').remove()
     this.compose()
+  }
+
+  focusFirst (event) {
+    event.preventDefault()
+    // Focus the contenteditable directly -- the host's focus() defers to Lexical and no-ops here
+    this.bulletTargets[0]?.querySelector('lexxy-editor [contenteditable]')?.focus()
+  }
+
+  // Drag-to-reorder, mirroring sortable_controller but recomposing the body locally
+  // instead of persisting -- bullets live only in the body string, so order is just DOM order.
+  handleTargetConnected (handle) {
+    const item = handle.closest('[data-bullet-editors-target="bullet"]')
+    handle.addEventListener('dragstart', event => {
+      this.#dragging = item
+      const rect = item.getBoundingClientRect()
+      event.dataTransfer.setDragImage(item, event.clientX - rect.left, event.clientY - rect.top)
+      // Defer dimming so the full row is captured as the drag image first
+      setTimeout(() => item.classList.add('tw:opacity-50'), 0)
+    })
+    handle.addEventListener('dragend', () => {
+      item.classList.remove('tw:opacity-50')
+      this.#dragging = null
+      this.compose()
+    })
+  }
+
+  bulletTargetConnected (item) {
+    item.addEventListener('dragover', event => {
+      event.preventDefault()
+      if (!this.#dragging) return
+      const after = this.#afterElement(event.clientY)
+      if (after == null) this.listTarget.appendChild(this.#dragging)
+      else this.listTarget.insertBefore(this.#dragging, after)
+    })
+  }
+
+  #afterElement (y) {
+    return this.bulletTargets
+      .filter(item => item !== this.#dragging)
+      .reduce((closest, item) => {
+        const box = item.getBoundingClientRect()
+        const offset = y - box.top - box.height / 2
+        if (offset < 0 && offset > closest.offset) return { offset, element: item }
+        return closest
+      }, { offset: Number.NEGATIVE_INFINITY, element: null }).element
   }
 
   // Arrow so it survives being passed as an event listener
