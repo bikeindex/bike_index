@@ -442,7 +442,7 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
-    resources :registration_sequences, only: %i[index create show] do
+    resources :registration_sequences, only: %i[index create show edit] do
       resources :pages, only: %i[create], controller: "registration_sequence_pages"
     end
     resources :registration_sequence_pages, only: %i[edit update destroy]

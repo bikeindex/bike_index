@@ -2,7 +2,7 @@
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
     <h1 class="uncap tw:text-2xl tw:font-semibold">Edit page</h1>
 
-    <%= link_to "Back to pages", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), class: "twlink" %>
+    <%= link_to "Back to pages", edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), class: "twlink" %>
   </div>
 
   <%= form_with model: @page,

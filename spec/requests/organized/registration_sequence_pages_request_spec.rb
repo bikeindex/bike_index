@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/registration_sequences/#{draft.id}/pages" }
   let(:member_url) { "/o/#{current_organization.to_param}/registration_sequence_pages" }
-  let(:sequence_path) { organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id) }
+  let(:sequence_path) { edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id) }
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin

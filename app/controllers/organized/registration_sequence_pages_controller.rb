@@ -56,7 +56,7 @@ module Organized
     end
 
     def sequence_path
-      organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id)
+      edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id)
     end
 
     def edit_page_path(page)

@@ -21,7 +21,7 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
           post base_url
         }.to change { current_organization.registration_sequences.draft.count }.by(1)
         draft = current_organization.registration_sequences.draft.first
-        expect(response).to redirect_to(organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id))
+        expect(response).to redirect_to(edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id))
       end
     end
 
@@ -42,6 +42,22 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
         end
+      end
+    end
+
+    describe "edit" do
+      let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
+
+      it "renders the draft management view" do
+        get "#{base_url}/#{draft.id}/edit"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:edit)
+      end
+
+      it "404s for a non-draft sequence" do
+        active = FactoryBot.create(:registration_sequence_active, organization: current_organization)
+        get "#{base_url}/#{active.id}/edit"
+        expect(response.status).to eq(404)
       end
     end
   end
