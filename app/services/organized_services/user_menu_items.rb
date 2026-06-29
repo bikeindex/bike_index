@@ -237,9 +237,7 @@ module OrganizedServices
       end
 
       if organization.enabled?("registration_sequences")
-        items << link(translation(:manage_registration_sequences),
-          routes.organization_registration_sequences_path(organization_id: organization.to_param),
-          active: :on_registration_sequences)
+        items << registration_sequences_link(organization)
       end
 
       items
