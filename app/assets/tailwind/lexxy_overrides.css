@@ -4,12 +4,14 @@
    inherited app line-heights don't bloat the controls. Overrides only — the gem's lexxy stylesheet
    still provides the base styling, and editors without this class keep the normal size. */
 lexxy-editor.lexxy-editor--compact {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   line-height: 1.4;
-  border: 0;
+  /* keep the input box (matches .twinput) rather than the gem's heavier frame */
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 0.25rem; /* rounded-sm */
 
-  /* content box: a couple of lines instead of the default 8 */
-  --lexxy-editor-rows: 2.4em;
+  /* content box: a single line (it still grows as text wraps) instead of the default 8 */
+  --lexxy-editor-rows: 1.4em;
   --lexxy-editor-padding: 0.4ch;
 }
 
@@ -20,6 +22,15 @@ lexxy-editor.lexxy-editor--compact lexxy-toolbar {
 
 lexxy-editor.lexxy-editor--compact .lexxy-editor__toolbar-button {
   block-size: 1.6em;
+}
+
+/* Keep single-line content tight: pad the left edge and drop the default paragraph margin */
+lexxy-editor.lexxy-editor--compact .lexxy-editor__content {
+  padding-left: 0.4ch;
+}
+
+lexxy-editor.lexxy-editor--compact .lexxy-editor__content p {
+  margin-bottom: 0;
 }
 
 /* Per-instance toolbar trimming: the component adds a lexxy-editor--hide-<button> class per button

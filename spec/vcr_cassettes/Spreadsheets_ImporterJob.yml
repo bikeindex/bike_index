@@ -144,7 +144,7 @@ http_interactions:
   recorded_at: Sun, 28 Jun 2026 19:16:44 GMT
 - request:
     method: get
-    uri: https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data/components.csv
+    uri: https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data/component_types.csv
     body:
       encoding: US-ASCII
       string: ''

@@ -20,6 +20,10 @@ module Form
         {template: "form/group/component_preview/check_box"}
       end
 
+      def content_block
+        {template: "form/group/component_preview/content_block"}
+      end
+
       def custom_label
         {template: "form/group/component_preview/custom_label"}
       end

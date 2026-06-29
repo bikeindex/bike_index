@@ -2,9 +2,8 @@
 
 module Form
   module TextEditor
-    # Bare Lexxy editor; pair with Form::Group (kind: :content_block) for a label -- both run through
-    # the form builder, so the label's `for` matches the editor id for a given attribute. Carries
-    # data-controller="lexxy", which loads the editor JS and stylesheet on demand.
+    # Bare Lexxy editor; pair with Form::Group (kind: :content_block, standalone: false) for a label.
+    # Carries data-controller="lexxy", which loads the editor JS and stylesheet on demand.
     class Component < ApplicationComponent
       SIZE = %i[default single_line].freeze
 
@@ -15,12 +14,14 @@ module Form
       # The compact single-line editor gets a trimmed toolbar unless the caller overrides it.
       SINGLE_LINE_TOOLBAR_BUTTONS = %i[bold italic link undo redo].freeze
 
-      def initialize(form_builder:, attribute:, size: :default, toolbar_buttons: nil)
+      def initialize(form_builder:, attribute:, size: :default, toolbar_buttons: nil, value: nil, standalone: true)
         raise ArgumentError, "size must be one of #{SIZE.inspect}, got #{size.inspect}" unless SIZE.include?(size)
 
         @form_builder = form_builder
         @attribute = attribute
         @size = size
+        @value = value
+        @standalone = standalone
         @toolbar_buttons = toolbar_buttons || (SINGLE_LINE_TOOLBAR_BUTTONS if size == :single_line)
 
         unknown = (@toolbar_buttons || []) - TOOLBAR_BUTTONS
@@ -35,10 +36,12 @@ module Form
 
       def options
         {attachments: "false", class: editor_class, data: asset_data}
+          .merge(@value.nil? ? {} : {value: @value})
+          .merge(@standalone ? {aria: {label: @attribute.to_s.humanize}} : {})
       end
 
       def asset_data
-        {controller: "lexxy", lexxy_stylesheet_value: helpers.stylesheet_path("lexxy")}
+        {controller: "lexxy", action: "click->lexxy#focusEditor", lexxy_stylesheet_value: helpers.stylesheet_path("lexxy")}
       end
 
       def editor_class
