@@ -38,43 +38,50 @@ export default class extends Controller {
     this.bulletTargets[0]?.querySelector('lexxy-editor [contenteditable]')?.focus()
   }
 
-  // Drag-to-reorder, mirroring sortable_controller but recomposing the body locally
-  // instead of persisting -- bullets live only in the body string, so order is just DOM order.
+  // Drag-to-reorder by swapping editor *content* on drop. We never relocate the lexxy-editor
+  // nodes: moving one fires its disconnect/connect callbacks, which crash Lexxy mid-drag.
+  // Editors stay mounted; only their values (and thus the composed body) shuffle.
   handleTargetConnected (handle) {
     const item = handle.closest('[data-bullet-editors-target="bullet"]')
     handle.addEventListener('dragstart', event => {
       this.#dragging = item
-      const rect = item.getBoundingClientRect()
-      event.dataTransfer.setDragImage(item, event.clientX - rect.left, event.clientY - rect.top)
-      // Defer dimming so the full row is captured as the drag image first
+      event.dataTransfer.effectAllowed = 'move'
+      event.dataTransfer.setData('text/plain', '')
       setTimeout(() => item.classList.add('tw:opacity-50'), 0)
     })
     handle.addEventListener('dragend', () => {
       item.classList.remove('tw:opacity-50')
       this.#dragging = null
-      this.compose()
     })
   }
 
   bulletTargetConnected (item) {
     item.addEventListener('dragover', event => {
-      event.preventDefault()
       if (!this.#dragging) return
-      const after = this.#afterElement(event.clientY)
-      if (after == null) this.listTarget.appendChild(this.#dragging)
-      else this.listTarget.insertBefore(this.#dragging, after)
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'move'
+    })
+    item.addEventListener('drop', event => {
+      if (!this.#dragging || item === this.#dragging) return
+      event.preventDefault()
+      this.#reorder(item, event.clientY)
     })
   }
 
-  #afterElement (y) {
-    return this.bulletTargets
-      .filter(item => item !== this.#dragging)
-      .reduce((closest, item) => {
-        const box = item.getBoundingClientRect()
-        const offset = y - box.top - box.height / 2
-        if (offset < 0 && offset > closest.offset) return { offset, element: item }
-        return closest
-      }, { offset: Number.NEGATIVE_INFINITY, element: null }).element
+  #reorder (target, clientY) {
+    const items = this.bulletTargets
+    const editors = items.map(item => item.querySelector('lexxy-editor'))
+    const values = editors.map(editor => editor?.value ?? '')
+    const from = items.indexOf(this.#dragging)
+    const box = target.getBoundingClientRect()
+    let to = items.indexOf(target) + (clientY > box.top + box.height / 2 ? 1 : 0)
+    if (to > from) to -= 1
+    if (from === to) return
+
+    const [moved] = values.splice(from, 1)
+    values.splice(to, 0, moved)
+    editors.forEach((editor, i) => { if (editor && editor.value !== values[i]) editor.value = values[i] })
+    this.compose()
   }
 
   // Arrow so it survives being passed as an event listener
