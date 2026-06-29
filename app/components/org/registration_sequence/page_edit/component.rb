@@ -19,12 +19,6 @@ module Org
           items = Nokogiri::HTML.fragment(html).css("li")
           items.any? ? items.map { it.inner_html.strip } : [html.strip]
         end
-
-        # A throwaway builder per bullet: its fields submit under an unpermitted `bullet`
-        # param (ignored by the backend); the JS controller recombines them into body.
-        def bullet_builder(index)
-          BikeIndexFormBuilder.new("bullet[#{index}]", nil, helpers, {})
-        end
       end
     end
   end
