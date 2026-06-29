@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data/components.csv
+    uri: https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data/component_types.csv
     body:
       encoding: US-ASCII
       string: ''
