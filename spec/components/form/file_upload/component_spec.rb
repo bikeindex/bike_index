@@ -11,20 +11,19 @@ RSpec.describe Form::FileUpload::Component, type: :component do
   let(:attribute) { :avatar }
   let(:options) { {} }
 
-  it "renders a labelless file input with a filename display" do
-    expect(component).to have_css("input[type='file'][name='user[avatar]']")
-    expect(component).to have_no_css("label")
+  it "renders a file input with an associated label and filename display" do
+    expect(component).to have_css("input#user_avatar[type='file'][name='user[avatar]']")
+    expect(component).to have_css("label[for='user_avatar']", text: "Choose file")
     expect(component).to have_css("[data-controller='form--file-upload']")
     expect(component).to have_css("[data-form--file-upload-target='input']")
     expect(component).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
-    expect(component).to have_text("Choose file")
   end
 
   context "with custom button_text and placeholder" do
     let(:options) { {button_text: "Browse", placeholder: "Pick an image"} }
 
     it "uses the provided text" do
-      expect(component).to have_text("Browse")
+      expect(component).to have_css("label[for='user_avatar']", text: "Browse")
       expect(component).to have_css("[data-form--file-upload-target='filename']", text: "Pick an image")
     end
   end
