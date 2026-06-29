@@ -1,0 +1,6 @@
+<%# kind: :content_block renders the label, then yields to a content block -- here a file upload input. %>
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(Form::Group::Component.new(form_builder: f, attribute: :avatar, kind: :content_block)) do %>
+    <%= render(Form::FileUpload::Component.new(form_builder: f, attribute: :avatar)) %>
+  <% end %>
+<% end %>
