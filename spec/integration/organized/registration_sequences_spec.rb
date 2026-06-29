@@ -64,4 +64,25 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     expect(edited.image).to be_attached
     expect(draft.registration_sequence_pages.pluck(:title)).to include("Campus-specific rules")
   end
+
+  # Drives the bullet-editors Stimulus controller end-to-end (add a row, clone the <template>,
+  # upgrade a fresh Lexxy editor). This can't catch the importmap relative-import 404 that broke
+  # this in production -- dev and test serve undigested assets, so a relative import resolves here
+  # too. That specific regression is guarded by spec/javascript_controller_imports_spec.rb.
+  it "adds a bullet to a page that already has bullets" do
+    visit "/o/#{organization.to_param}/registration_sequences"
+    click_button "Edit sequence"
+    click_link "Edit", match: :first
+    expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10) # editors upgrade lazily
+
+    initial = all("[data-bullet-editors-target='item']", visible: :all).count
+    expect(initial).to be > 1 # the cloned template page ships several bullets
+
+    click_button "+ Add bullet"
+
+    # Fails if the bullet-editors controller never wired up its add action
+    expect(page).to have_css("[data-bullet-editors-target='item']", count: initial + 1, visible: :all, wait: 8)
+    # the new row's editor must upgrade into a usable Lexxy editor, not an inert element
+    expect(page).to have_css("lexxy-editor lexxy-toolbar", count: initial + 1, wait: 10)
+  end
 end

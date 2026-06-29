@@ -1,4 +1,6 @@
-import Sortable from './sortable_controller'
+// Pinned specifier, not relative: under importmap a './' import resolves to a non-digested
+// URL that 404s with precompiled assets, so the whole controller would silently never load.
+import Sortable from 'controllers/sortable_controller'
 
 // Connects to data-controller='bullet-editors'
 // The page model stores its bullets as a single `body` HTML string (a <ul> of <li>s).
