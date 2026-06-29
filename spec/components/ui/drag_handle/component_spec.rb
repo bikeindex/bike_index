@@ -7,8 +7,8 @@ RSpec.describe UI::DragHandle::Component, type: :component do
   let(:component) { render_inline(instance) }
   let(:options) { {controller: "sortable"} }
 
-  it "renders a draggable grip targeting the controller's handle" do
-    expect(component).to have_css("span[draggable='true'][data-sortable-target='handle']")
+  it "renders a grip targeting the controller's handle" do
+    expect(component).to have_css("span[data-sortable-target='handle']")
     expect(component.to_html).to include("tw:cursor-grab")
   end
 

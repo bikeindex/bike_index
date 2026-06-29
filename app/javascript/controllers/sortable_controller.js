@@ -1,62 +1,69 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='sortable'
-// Drag-and-drop reordering of [data-sortable-target=item] rows, grabbed by their
-// [data-sortable-target=handle] grip. A thin bar shows where the row will land; on drop
+// Pointer drag-to-reorder of [data-sortable-target=item] rows, grabbed by their
+// [data-sortable-target=handle] grip. A thin bar shows where the row will land; on release
 // the row is moved there and (when it has data-url) its new position is PATCHed.
-// Subclasses override reorder() when the rows can't be relocated directly.
+// Pointer events -- not native HTML5 draggable -- so a rich-text editor inside a row can't
+// swallow the drag and there is no native snap-back animation. Subclasses override reorder().
 export default class extends Controller {
   static targets = ['item', 'handle']
 
   connect () {
     this.draggingItem = null
-    // Slid into the target gap during a drag -- decoupled from the rows so it works even
-    // when the rows themselves can't move (e.g. they hold editors that crash on relocation).
+    this.dropTarget = null
+    this.dropAfter = false
+    // Slid into the target gap during a drag; pointer-events:none so it never blocks hit-testing.
     this.indicator = document.createElement('div')
     this.indicator.setAttribute('aria-hidden', 'true')
-    // pointer-events:none so the bar never becomes the drop target and swallows the drop
     this.indicator.style.cssText = 'height:2px;border-radius:9999px;background:#2563eb;pointer-events:none;'
-    // Capture phase so a child (e.g. a rich-text editor's contenteditable) can't swallow
-    // dragover/drop before we handle them.
-    this.element.addEventListener('dragover', this.#onDragOver, true)
-    this.element.addEventListener('drop', this.#onDrop, true)
   }
 
   disconnect () {
-    this.element.removeEventListener('dragover', this.#onDragOver, true)
-    this.element.removeEventListener('drop', this.#onDrop, true)
+    this.#stopTracking()
   }
 
   handleTargetConnected (handle) {
-    const item = handle.closest(this.#itemSelector)
-    handle.addEventListener('dragstart', (event) => {
-      this.draggingItem = item
-      event.dataTransfer.effectAllowed = 'move'
-      event.dataTransfer.setData('text/plain', '')
-      // Defer dimming so the full row is captured as the drag image first
-      setTimeout(() => item.classList.add('tw:opacity-50'), 0)
-    })
-    handle.addEventListener('dragend', () => {
-      item.classList.remove('tw:opacity-50')
-      this.draggingItem = null
-      this.indicator.remove()
-    })
+    handle.addEventListener('pointerdown', this.#onPointerDown)
   }
 
-  #onDragOver = (event) => {
-    const item = this.draggingItem && event.target.closest?.(this.#itemSelector)
+  #onPointerDown = (event) => {
+    if (event.button !== 0) return
+    const item = event.target.closest(this.#itemSelector)
     if (!item) return
     event.preventDefault()
-    event.dataTransfer.dropEffect = 'move'
-    item.parentNode.insertBefore(this.indicator, this.#after(item, event.clientY) ? item.nextSibling : item)
+    this.draggingItem = item
+    this.dropTarget = null
+    item.classList.add('tw:opacity-50')
+    document.addEventListener('pointermove', this.#onPointerMove)
+    document.addEventListener('pointerup', this.#onPointerUp, { once: true })
   }
 
-  #onDrop = (event) => {
-    const item = this.draggingItem && event.target.closest?.(this.#itemSelector)
+  #onPointerMove = (event) => {
+    const item = this.itemTargets.find((row) => {
+      const box = row.getBoundingClientRect()
+      return event.clientY >= box.top && event.clientY <= box.bottom
+    })
+    if (!item) return
+    this.dropTarget = item
+    this.dropAfter = this.#after(item, event.clientY)
+    item.parentNode.insertBefore(this.indicator, this.dropAfter ? item.nextSibling : item)
+  }
+
+  #onPointerUp = () => {
+    this.#stopTracking()
+    this.draggingItem.classList.remove('tw:opacity-50')
+    if (this.dropTarget && this.dropTarget !== this.draggingItem) {
+      this.reorder(this.dropTarget, this.dropAfter)
+    }
+    this.draggingItem = null
+    this.dropTarget = null
+  }
+
+  #stopTracking () {
+    document.removeEventListener('pointermove', this.#onPointerMove)
+    document.removeEventListener('pointerup', this.#onPointerUp)
     this.indicator.remove()
-    if (!item || item === this.draggingItem) return
-    event.preventDefault()
-    this.reorder(item, this.#after(item, event.clientY))
   }
 
   // Default: move the dragged row next to the target, then persist its new position.

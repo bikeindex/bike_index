@@ -12,8 +12,8 @@ module UI
 
       def call
         content_tag(:span, "⠿",
-          draggable: "true",
           aria: {hidden: true},
+          style: "touch-action:none",
           class: ["tw:cursor-grab tw:select-none tw:text-gray-400", @html_class].compact.join(" "),
           data: {"#{@controller.tr("-", "_")}_target": "handle"})
       end
