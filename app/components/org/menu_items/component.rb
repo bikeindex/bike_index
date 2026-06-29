@@ -39,10 +39,10 @@ module Org
          path: helpers.admin_organization_path(@organization)}
       end
 
-      # Re-add the dashboard / bulk-imports link when the user is on those pages
-      # but the org doesn't have the feature enabled — so the active page stays
-      # represented in the menu. Cached payload only contains these when the
-      # org-level flag is on.
+      # Re-add a feature-gated link when the user is on its page but the org
+      # doesn't have the feature enabled — so the active page stays represented
+      # in the menu. The cached payload only contains these when the org-level
+      # flag is on.
       def with_route_overrides(items)
         items = [dashboard_link, divider, *items] if needs_dashboard_override?(items)
         items = insert_after_add_bike(items, bulk_import_link) if needs_bulk_import_override?(items)
