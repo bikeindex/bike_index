@@ -40,6 +40,23 @@ RSpec.describe Form::TextEditor::Component, :js, type: :system do
     expect(page).to have_no_css("lexxy-toolbar summary[name='highlight']")
   end
 
+  it "keeps trimmed buttons hidden after the gem's overflow relocates them into the ... menu" do
+    visit "/rails/view_components/form/text_editor/component/custom_toolbar"
+    expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10)
+
+    # A narrow editor makes the gem's ResizeObserver sweep trailing <button>s -- including the
+    # hidden ones -- into the overflow menu. We constrain the editor width rather than the window
+    # because headless Chrome clamps the window to a 500px floor, too wide to overflow the toolbar.
+    page.execute_script("document.querySelector('lexxy-editor').style.maxWidth = '140px'")
+    expect(page).to have_css("lexxy-toolbar[overflowing]", wait: 5)
+    find("lexxy-toolbar .lexxy-editor__toolbar-overflow > summary").click
+
+    # table is hidden and gets relocated into the open menu; a child-combinator hide rule would
+    # stop matching once it moves, so this guards the descendant combinator.
+    expect(page).to have_css(".lexxy-editor__toolbar-overflow-menu [name='table']", visible: :all)
+    expect(page).to have_no_css("lexxy-toolbar [name='table']", visible: true)
+  end
+
   it "applies the size-scoped overrides to the compact variant (size: :single_line)" do
     visit "/rails/view_components/form/text_editor/component/single_line"
 
