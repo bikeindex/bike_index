@@ -1,0 +1,24 @@
+<div
+  class="twinput tw:relative tw:flex tw:cursor-pointer tw:items-center tw:gap-3"
+  data-controller="form--file-upload"
+  data-form--file-upload-placeholder-value="<%= @placeholder %>"
+>
+  <span
+    class="
+      tw:rounded-sm tw:bg-gray-100 tw:px-2.5 tw:py-1 tw:text-sm
+      tw:whitespace-nowrap tw:text-gray-700 tw:dark:bg-gray-600
+      tw:dark:text-gray-200
+    "
+  >
+    <%= @button_text %>
+  </span>
+
+  <span
+    class="tw:truncate tw:text-gray-500 tw:dark:text-gray-400"
+    data-form--file-upload-target="filename"
+  >
+    <%= @placeholder %>
+  </span>
+
+  <%= @form_builder.file_field(@attribute, @html_options) %>
+</div>
