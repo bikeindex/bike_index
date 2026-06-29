@@ -6,15 +6,15 @@
   <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Current</h2>
 
   <% if @active.present? %>
-    <p class="tw:text-gray-600">
+    <p class="tw:mb-2 tw:text-gray-600">
       This is the active version your registrants see.
       <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @active.id), class: "twlink" %>
     </p>
   <% else %>
-    <p class="tw:text-gray-600">
+    <p class="tw:mb-2 tw:text-gray-600">
       There is no active registration sequence.
     </p>
-    <p class="tw:text-gray-600">
+    <p class="tw:mb-2 tw:text-gray-600">
       Edit your draft sequence and contact Bike Index when you're ready to make
       it live.
     </p>
@@ -22,7 +22,7 @@
 
   <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Draft</h2>
 
-  <p class="tw:text-gray-600">
+  <p class="tw:mb-2 tw:text-gray-600">
     <% if @draft.present? %>
       Your draft sequence, last edited
       <span class="localizeTime preciseTime">
