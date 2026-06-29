@@ -94,7 +94,7 @@ RSpec.describe Org::MenuItems::Component, type: :component do
       it "injects an active Manage Registration sequences link on the sequences and pages controllers" do
         expect(organization.enabled?("registration_sequences")).to be false
         ["/o/#{organization.to_param}/registration_sequences",
-          "/o/#{organization.to_param}/registration_sequences/1/pages/1/edit"].each do |path|
+          "/o/#{organization.to_param}/registration_sequence_pages/1/edit"].each do |path|
           rendered = with_request_url(path) { render_inline(instance) }
           active = rendered.css("a.nav-link.active").map { |a| a.text.strip }
           expect(active).to include("Manage Registration sequences")
