@@ -10,20 +10,23 @@ RSpec.describe Admin::CtypesController, type: :request do
       let!(:ctype_a) { FactoryBot.create(:ctype, name: "Axle", cgroup: FactoryBot.create(:cgroup, name: "Wheels")) }
       let!(:ctype_b) { FactoryBot.create(:ctype, name: "Brakes", cgroup: FactoryBot.create(:cgroup, name: "Additional parts")) }
 
+      # Scope to our ctypes -- a leaked Ctype.other from another spec would flake a full-collection match
+      let(:sorted_ids) { -> { assigns(:ctypes).pluck(:id) & [ctype_a.id, ctype_b.id] } }
+
       it "renders and sorts by the requested column and direction" do
         get base_url
         expect(response).to be_ok
         expect(response).to render_template(:index)
 
         get base_url, params: {sort: "name", direction: "asc"}
-        expect(assigns(:ctypes).pluck(:id)).to eq([ctype_a.id, ctype_b.id])
+        expect(sorted_ids.call).to eq([ctype_a.id, ctype_b.id])
 
         get base_url, params: {sort: "name", direction: "desc"}
-        expect(assigns(:ctypes).pluck(:id)).to eq([ctype_b.id, ctype_a.id])
+        expect(sorted_ids.call).to eq([ctype_b.id, ctype_a.id])
 
         # Sorts by component group name, not the cgroup_id foreign key
         get base_url, params: {sort: "cgroup", direction: "asc"}
-        expect(assigns(:ctypes).pluck(:id)).to eq([ctype_b.id, ctype_a.id])
+        expect(sorted_ids.call).to eq([ctype_b.id, ctype_a.id])
       end
     end
   end
