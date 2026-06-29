@@ -2,11 +2,8 @@
 
 module Form
   module TextEditor
-    # Bare Lexxy editor. A standalone editor (the default) derives its aria-label from the attribute
-    # for an accessible name. Pair with Form::Group (kind: :content_block) and pass standalone: false
-    # so the group's <label> is the accessible name instead -- both run through the form builder, so
-    # the label's `for` matches the editor id. Carries data-controller="lexxy", which loads the editor
-    # JS and stylesheet on demand.
+    # Bare Lexxy editor; pair with Form::Group (kind: :content_block, standalone: false) for a label.
+    # Carries data-controller="lexxy", which loads the editor JS and stylesheet on demand.
     class Component < ApplicationComponent
       SIZE = %i[default single_line].freeze
 
@@ -17,7 +14,6 @@ module Form
       # The compact single-line editor gets a trimmed toolbar unless the caller overrides it.
       SINGLE_LINE_TOOLBAR_BUTTONS = %i[bold italic link undo redo].freeze
 
-      # value: overrides the editor's initial HTML, for editors not backed by a model attribute
       def initialize(form_builder:, attribute:, size: :default, toolbar_buttons: nil, value: nil, standalone: true)
         raise ArgumentError, "size must be one of #{SIZE.inspect}, got #{size.inspect}" unless SIZE.include?(size)
 
