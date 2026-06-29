@@ -41,6 +41,20 @@ RSpec.describe RegistrationSequence, type: :model do
       expect(page.body).to eq("<p>Hello</p>")
     end
 
+    it "duplicates template page images into independent blobs" do
+      template = RegistrationSequence.template
+      template_page = template.registration_sequence_pages.create!(title: "Battery", listing_order: 0)
+      template_page.image.attach(io: StringIO.new("fake image"), filename: "battery.jpg", content_type: "image/jpeg")
+
+      page = RegistrationSequence.draft_for(organization).registration_sequence_pages.first
+
+      expect(page.image).to be_attached
+      # A distinct blob means destroying the clone won't purge the template's image
+      expect(page.image.blob.id).to_not eq(template_page.image.blob.id)
+      expect(page.image.download).to eq("fake image")
+      expect(page.image.filename.to_s).to eq("battery.jpg")
+    end
+
     context "with an existing draft" do
       let!(:existing) { FactoryBot.create(:registration_sequence, organization:) }
 

@@ -62,10 +62,17 @@ class RegistrationSequence < ApplicationRecord
         draft = create!(organization:)
         template.registration_sequence_pages.each do |template_page|
           page = draft.registration_sequence_pages.create!(title: template_page.title, subtitle: template_page.subtitle, body: template_page.body, listing_order: template_page.listing_order)
-          page.image.attach(template_page.image.blob) if template_page.image.attached?
+          copy_image(template_page.image, page.image) if template_page.image.attached?
         end
         draft
       end
+    end
+
+    # Duplicate into a new blob; attaching the source blob directly would share it,
+    # so purging either record's image (page/sequence/org destroy) would break the other.
+    def copy_image(source, target)
+      blob = source.blob
+      target.attach(io: StringIO.new(blob.download), filename: blob.filename, content_type: blob.content_type)
     end
   end
 
