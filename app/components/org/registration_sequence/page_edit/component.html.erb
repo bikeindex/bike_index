@@ -19,8 +19,64 @@
     <%= @form_builder.file_field :image, accept: "image/*", class: "twinput tw:w-full" %>
   </div>
 
-  <div>
-    <%= @form_builder.label :body, "Body", class: "twlabel" %>
-    <%= render Form::TextEditor::Component.new(form_builder: @form_builder, attribute: :body) %>
+  <div data-controller="bullet-editors">
+    <%= @form_builder.label :body, "Bullets", class: "twlabel" %>
+    <%= @form_builder.hidden_field :body, data: {bullet_editors_target: "field"} %>
+
+    <div data-bullet-editors-target="list" class="tw:flex tw:flex-col tw:gap-2">
+      <% bullets.each_with_index do |content, index| %>
+        <div
+          data-bullet-editors-target="bullet"
+          class="tw:flex tw:items-start tw:gap-2"
+        >
+          <span aria-hidden="true" class="tw:pt-2 tw:text-gray-500">
+            &bull;
+          </span>
+
+          <div class="tw:flex-1">
+            <%= render Form::TextEditor::Component.new(form_builder: bullet_builder(index), attribute: :content, size: :single_line, value: content) %>
+          </div>
+
+          <button
+            type="button"
+            data-action="bullet-editors#remove"
+            class="twlink tw:pt-2 tw:text-sm"
+          >
+            Remove
+          </button>
+        </div>
+      <% end %>
+    </div>
+
+    <template data-bullet-editors-target="template">
+      <div
+        data-bullet-editors-target="bullet"
+        class="tw:flex tw:items-start tw:gap-2"
+      >
+        <span aria-hidden="true" class="tw:pt-2 tw:text-gray-500">&bull;</span>
+
+        <div class="tw:flex-1">
+          <%= render Form::TextEditor::Component.new(form_builder: bullet_builder("__INDEX__"), attribute: :content, size: :single_line, value: "") %>
+        </div>
+
+        <button
+          type="button"
+          data-action="bullet-editors#remove"
+          class="twlink tw:pt-2 tw:text-sm"
+        >
+          Remove
+        </button>
+      </div>
+    </template>
+
+    <div class="tw:mt-1">
+      <button
+        type="button"
+        data-action="bullet-editors#add"
+        class="twlink tw:text-sm"
+      >
+        + Add bullet
+      </button>
+    </div>
   </div>
 </div>
