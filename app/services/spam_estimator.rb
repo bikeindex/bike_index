@@ -72,7 +72,7 @@ module SpamEstimator
     str.match?(MALICIOUS_REGEX)
   end
 
-  # Bots reuse one junk value across every field; matching 1-2 char fields are never a real bike
+  # Bots reuse one junk value across every field; matching 1-2 char fields are probably not a real bike
   def low_entropy_fingerprint?(bike)
     fields = [bike.serial_number, bike.frame_model, bike.manufacturer_other]
       .map { |value| value&.strip&.downcase }
