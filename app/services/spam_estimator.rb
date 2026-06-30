@@ -35,6 +35,7 @@ module SpamEstimator
     estimate += 35 if bike.creation_organization&.spam_registrations
     estimate += 0.2 * string_spaminess(bike.frame_model)
     estimate += 0.4 * string_spaminess(bike.manufacturer_other)
+    estimate += 50 if low_entropy_fingerprint?(bike)
     estimate += domain_estimate(bike.owner_email)
     estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
 
@@ -68,6 +69,15 @@ module SpamEstimator
     return false if str.blank?
 
     str.match?(MALICIOUS_REGEX)
+  end
+
+  # Bots reuse one junk value across every field; matching 1-2 char fields are never a real bike
+  def low_entropy_fingerprint?(bike)
+    fields = [bike.serial_number, bike.frame_model, bike.manufacturer_other]
+      .map { |value| value&.strip&.downcase }
+    return false if fields.any?(&:blank?)
+
+    fields.uniq.one? && fields.first.length <= 2
   end
 
   def reserved_email_domain?(email)
@@ -206,7 +216,7 @@ module SpamEstimator
     I18n.transliterate(str).downcase
   end
 
-  conceal :looks_malicious?, :reserved_email_domain?, :domain_estimate, :estimate_stolen_record,
+  conceal :looks_malicious?, :low_entropy_fingerprint?, :reserved_email_domain?, :domain_estimate, :estimate_stolen_record,
     :vowel_frequency_suspiciousness, :vowel_ratio,
     :capital_count_suspiciousness, :non_letter_count_suspiciousness,
     :space_count_suspiciousness, :within_bounds, :downcase_transliterate

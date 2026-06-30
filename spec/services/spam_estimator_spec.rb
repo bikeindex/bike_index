@@ -78,6 +78,19 @@ RSpec.describe SpamEstimator do
         end
       end
     end
+    context "low-entropy fingerprint" do
+      let(:bike) { Bike.new(serial_number: str, frame_model: str, manufacturer_other: str) }
+      let(:str) { "xy" }
+      it "adds a penalty" do
+        expect(described_class.estimate_bike(bike)).to eq 50
+      end
+      context "longer than 2 chars" do
+        let(:str) { "xyz" }
+        it "is not penalized" do
+          expect(described_class.estimate_bike(bike)).to eq 0
+        end
+      end
+    end
     context "reserved owner_email domain" do
       before { stub_const("EmailDomain::VERIFICATION_ENABLED", true) }
       let(:bike) { Bike.new(owner_email: "testing@example.com") }
@@ -313,6 +326,23 @@ RSpec.describe SpamEstimator do
       expect(described_class.send(:looks_malicious?, "1'||DBMS_PIPE.RECEIVE_MESSAGE(CHR(98)||CHR(98),15)||'")).to be_truthy
       expect(described_class.send(:looks_malicious?, "10\"XOR(1*if(now()=sysdate(),sleep(15),0))XOR\"Z")).to be_truthy
       expect(described_class.send(:looks_malicious?, "(select 198766*667891 from DUAL)")).to be_truthy
+    end
+  end
+
+  describe "low_entropy_fingerprint?" do
+    def fingerprint?(bike)
+      described_class.send(:low_entropy_fingerprint?, bike)
+    end
+
+    it "is true when serial/frame_model/manufacturer_other match and are 1-2 chars" do
+      expect(fingerprint?(Bike.new(serial_number: "x", frame_model: "x", manufacturer_other: "x"))).to be_truthy
+      expect(fingerprint?(Bike.new(serial_number: "AB", frame_model: " ab", manufacturer_other: "ab "))).to be_truthy
+    end
+
+    it "is false when a field is blank, fields differ, or longer than 2 chars" do
+      expect(fingerprint?(Bike.new(serial_number: "x", frame_model: "x"))).to be_falsey
+      expect(fingerprint?(Bike.new(serial_number: "x", frame_model: "y", manufacturer_other: "z"))).to be_falsey
+      expect(fingerprint?(Bike.new(serial_number: "xyz", frame_model: "xyz", manufacturer_other: "xyz"))).to be_falsey
     end
   end
 
