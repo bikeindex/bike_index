@@ -3,12 +3,14 @@ name: pr
 description: >-
   Create or update a pull request for the current branch. Trigger when the user
   asks to create/open/make a PR, or to edit/update/rewrite/fix the PR
-  description, body, or summary — for both new PRs (`gh pr create`) and
-  existing ones (`gh pr edit --body-file`). For frontend diffs, delegates to
-  the `frontend-screenshots` skill to capture desktop+mobile screenshots and
-  embeds them under a `## Screenshots` section. Use for any verb that lands on
-  a PR's text content: "open a PR", "make a PR", "update the PR description",
-  "rewrite the PR body", "fix the description".
+  description, body, summary, or title — including bare update phrasings like
+  "update pr", "update this pr", or "update the PR" with no other object — for
+  both new PRs (`gh pr create`) and existing ones (`gh pr edit`). For frontend
+  diffs, delegates to the `frontend-screenshots` skill to capture
+  desktop+mobile screenshots and embeds them under a `## Screenshots` section.
+  Use for any verb that lands on a PR's text content: "open a PR", "make a PR",
+  "update pr", "update this pr", "update the PR description", "rewrite the PR
+  body", "fix the description".
 allowed-tools: Bash, Read, Glob, Grep
 ---
 
@@ -19,6 +21,14 @@ Create or update a pull request for the current branch. If the diff contains fro
 The workflow is ordered so the always-runs phase (steps 1–3) happens first, then the screenshot phase (steps 4–7) runs only when needed. Each step ends with the conditions under which you stop and return.
 
 ## Workflow
+
+### 0. Lint and conform to CLAUDE.md
+
+Run `bin/lint` to auto-format the code. (Always use `bin/lint`, never another formatter or `standardrb` directly.)
+
+Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix anything that doesn't conform — code-style guidelines (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names, pithy comments), testing conventions, and frontend rules. Only touch lines this branch already changed; don't reformat unrelated code.
+
+Any edits from this step get picked up by the branch-state and push steps below — don't separately commit them here; the normal commit/push in step 3 handles it.
 
 ### 1. Gather branch state
 
@@ -61,7 +71,7 @@ Describe the end state, not the journey. Reviewers want to know what the PR does
 
 Push the branch: `git push -u origin HEAD`.
 
-- If `$EXISTING_PR` from step 1 was non-empty: `gh pr edit <num> --body-file <tmp-body-file>` (don't overwrite the title unless the user asks).
+- If `$EXISTING_PR` from step 1 was non-empty: `gh pr edit <num> --title "..." --body-file <tmp-body-file>`. Refresh the title to match the current diff (this is what an "update pr" request expects) unless the user already gave the PR a deliberate custom title you'd be clobbering — if unsure, keep the existing title and only update the body.
 - Otherwise: `gh pr create --draft --base main --title "..." --body-file <tmp-body-file>`. Create as a draft by default; only omit `--draft` (or mark ready) if the user explicitly asks for a ready-for-review PR. Capture the PR number from the output.
 
 Always pass the body via `--body-file` (not inline `--body`) to preserve formatting.
