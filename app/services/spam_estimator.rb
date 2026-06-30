@@ -29,11 +29,13 @@ module SpamEstimator
   def estimate_bike(bike, stolen_record = nil)
     estimate = 0
     return estimate if bike.blank?
-    return 100 if looks_malicious?(bike.cached_data)
+    # serial_number isn't in cached_data, and it's the most common injection target
+    return 100 if looks_malicious?(bike.cached_data) || looks_malicious?(bike.serial_number)
 
     estimate += 35 if bike.creation_organization&.spam_registrations
     estimate += 0.2 * string_spaminess(bike.frame_model)
     estimate += 0.4 * string_spaminess(bike.manufacturer_other)
+    estimate += 0.2 * string_spaminess(bike.serial_number)
     estimate += domain_estimate(bike.owner_email)
     estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
 

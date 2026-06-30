@@ -25,7 +25,7 @@ RSpec.describe SpamEstimator do
       end
     end
     context "manufacturer_other" do
-      let(:bike) { FactoryBot.build(:bike, manufacturer: Manufacturer.other, manufacturer_other: str) }
+      let(:bike) { FactoryBot.build(:bike, manufacturer: Manufacturer.other, manufacturer_other: str, serial_number: "unknown") }
       context "garbage" do
         let(:str) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
         it "estimate is percentage" do
@@ -60,6 +60,23 @@ RSpec.describe SpamEstimator do
       it "returns 100" do
         expect(bike.cached_data).to include("union select")
         expect(described_class.estimate_bike(bike)).to eq 100
+      end
+    end
+    context "serial_number" do
+      let(:bike) { Bike.new(serial_number: serial) }
+      context "malicious" do
+        let(:serial) { "x'; DROP TABLE bikes; --" }
+        it "returns 100" do
+          expect(bike.cached_data).to be_blank # the payload is in serial_number, not cached_data
+          expect(described_class.estimate_bike(bike)).to eq 100
+        end
+      end
+      context "garbage" do
+        let(:serial) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
+        it "contributes to the estimate" do
+          expect(described_class.string_spaminess(serial)).to eq 100
+          expect(described_class.estimate_bike(bike)).to eq 20
+        end
       end
     end
     context "reserved owner_email domain" do
