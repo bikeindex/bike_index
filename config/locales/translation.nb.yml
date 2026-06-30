@@ -5005,6 +5005,7 @@ nb:
       stolen_message: Stjålet melding
       super_admin_view: Superadministrator for %{org_name}
       multi_search: Multisøk
+      manage_registration_sequences: Administrer registreringssekvenser
     organized_skeleton:
       additional_features_html: Bike Index gir tilleggsfunksjoner for verifiserte
         rettshåndhevelsesorganisasjoner. Ta kontakt med %{email_link} for å få dem
