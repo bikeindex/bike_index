@@ -320,6 +320,10 @@ RSpec.describe SpamEstimator do
       expect(described_class.send(:looks_malicious?, "ndbGRKFw')) OR 96=(SELECT 96 FROM PG_SLEEP(15))--")).to be_truthy
     end
 
+    it "is false for benign words that brush against SQL tokens" do
+      expect(described_class.send(:looks_malicious?, "Time to sleep (soon)")).to be_falsey
+    end
+
     it "detects time-based blind SQL injection attempts" do
       expect(described_class.send(:looks_malicious?, "1-1 waitfor delay '0:0:15' --")).to be_truthy
       expect(described_class.send(:looks_malicious?, "1*if(now()=sysdate(),sleep(15),0)")).to be_truthy

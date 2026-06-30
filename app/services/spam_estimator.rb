@@ -11,7 +11,8 @@ module SpamEstimator
     \b(?:drop|truncate)\s+table\b |
     \b(?:delete\s+from|insert\s+into)\b |
     ['"]\s*or\s+['"]?\d+['"]?\s*=\s*['"]?\d+ |
-    \b(?:pg_sleep|sleep)\s*\( |
+    \bpg_sleep\s*\( |
+    \bsleep\s*\(\s*\d |
     \bwaitfor\s+delay\b |
     \bdbms_pipe\.receive_message\b |
     \bxor\s*\( |
