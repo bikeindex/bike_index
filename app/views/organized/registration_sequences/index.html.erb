@@ -8,7 +8,6 @@
   <% if @active.present? %>
     <p class="tw:mb-2 tw:text-gray-600">
       This is the active version your registrants see.
-      <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @active.id), class: "twlink" %>
     </p>
   <% else %>
     <p class="tw:mb-2 tw:text-gray-600">
@@ -34,17 +33,4 @@
   </p>
 
   <%= button_to "Edit sequence", organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, class: "twlink", form_class: "tw:mb-6 tw:inline-block" %>
-
-  <% if @previous.any? %>
-    <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Previous</h2>
-    <ul class="tw:list-none tw:text-gray-600">
-      <% @previous.each do |registration_sequence| %>
-        <li class="tw:mb-1">
-          <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, id: registration_sequence.id), class: "twlink" %>
-          ended
-          <span class="localizeTime"><%= l registration_sequence.end_at, format: :convert_time %></span>
-        </li>
-      <% end %>
-    </ul>
-  <% end %>
 </div>

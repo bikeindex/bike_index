@@ -25,26 +25,6 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
       end
     end
 
-    describe "show" do
-      let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
-
-      it "renders" do
-        get "#{base_url}/#{draft.id}"
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:show)
-      end
-
-      context "with an active (non-draft) sequence" do
-        let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
-
-        it "renders the preview" do
-          get "#{base_url}/#{active.id}"
-          expect(response.status).to eq(200)
-          expect(response).to render_template(:show)
-        end
-      end
-    end
-
     describe "edit" do
       let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
 
