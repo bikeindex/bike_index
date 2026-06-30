@@ -5,7 +5,7 @@
     <thead class="thead-light">
       <th><%= sortable "created_at", render_sortable: render_sortable %></th>
 
-      <th class="only-dev-visible small">
+      <th class="small">
         <%= sortable "updated_at", render_sortable: render_sortable %>
       </th>
 
@@ -28,13 +28,13 @@
             <div class="less-strong-hold">
               <%= link_to l(registration_sequence.created_at, format: :convert_time), admin_registration_sequence_path(registration_sequence), class: "localizeTime" %>
 
-              <span class="less-strong-right d-none d-md-block only-dev-visible">
+              <span class="less-strong-right d-none d-md-block">
                 <%= registration_sequence.id %>
               </span>
             </div>
           </td>
 
-          <td class="only-dev-visible">
+          <td>
             <small class="localizeTime">
               <%= l registration_sequence.updated_at, format: :convert_time %>
             </small>
