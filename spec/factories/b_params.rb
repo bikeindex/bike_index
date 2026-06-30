@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :b_param do
     transient do
-      owner_email { "bike_owner@example.com" }
+      owner_email { "bike_owner@bikeindex.org" }
     end
     creator { FactoryBot.create(:user) }
     params { {bike: {owner_email: owner_email}} }

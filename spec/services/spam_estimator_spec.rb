@@ -62,6 +62,42 @@ RSpec.describe SpamEstimator do
         expect(described_class.estimate_bike(bike)).to eq 100
       end
     end
+    context "serial_number" do
+      let(:bike) { Bike.new(serial_number: serial) }
+      context "malicious" do
+        let(:serial) { "x'; DROP TABLE bikes; --" }
+        it "returns 100" do
+          expect(bike.cached_data).to be_blank # the payload is in serial_number, not cached_data
+          expect(described_class.estimate_bike(bike)).to eq 100
+        end
+      end
+      context "random-looking but not malicious" do
+        let(:serial) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
+        it "is 0 (serial only scores via the injection check)" do
+          expect(described_class.estimate_bike(bike)).to eq 0
+        end
+      end
+    end
+    context "low-entropy fingerprint" do
+      let(:bike) { Bike.new(serial_number: str, frame_model: str, manufacturer_other: str) }
+      let(:str) { "xy" }
+      it "adds a penalty" do
+        expect(described_class.estimate_bike(bike)).to eq 50
+      end
+      context "longer than 2 chars" do
+        let(:str) { "xyz" }
+        it "is not penalized" do
+          expect(described_class.estimate_bike(bike)).to eq 0
+        end
+      end
+    end
+    context "reserved owner_email domain" do
+      before { stub_const("EmailDomain::VERIFICATION_ENABLED", true) }
+      let(:bike) { Bike.new(owner_email: "testing@example.com") }
+      it "returns 100" do
+        expect(described_class.estimate_bike(bike)).to eq 100
+      end
+    end
     context "stolen_record" do
       let(:bike) { Bike.new }
       let(:stolen_record) { StolenRecord.new(theft_description: str, street: street) }
@@ -282,6 +318,50 @@ RSpec.describe SpamEstimator do
       expect(described_class.send(:looks_malicious?, "x'; DELETE FROM bikes WHERE 1=1; --")).to be_truthy
       expect(described_class.send(:looks_malicious?, "admin'; INSERT INTO users VALUES('a')--")).to be_truthy
       expect(described_class.send(:looks_malicious?, "ndbGRKFw')) OR 96=(SELECT 96 FROM PG_SLEEP(15))--")).to be_truthy
+    end
+
+    it "is false for benign words that brush against SQL tokens" do
+      expect(described_class.send(:looks_malicious?, "Time to sleep (soon)")).to be_falsey
+    end
+
+    it "detects time-based blind SQL injection attempts" do
+      expect(described_class.send(:looks_malicious?, "1-1 waitfor delay '0:0:15' --")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "1*if(now()=sysdate(),sleep(15),0)")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "1'||DBMS_PIPE.RECEIVE_MESSAGE(CHR(98)||CHR(98),15)||'")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "10\"XOR(1*if(now()=sysdate(),sleep(15),0))XOR\"Z")).to be_truthy
+      expect(described_class.send(:looks_malicious?, "(select 198766*667891 from DUAL)")).to be_truthy
+    end
+  end
+
+  describe "low_entropy_fingerprint?" do
+    def fingerprint?(bike)
+      described_class.send(:low_entropy_fingerprint?, bike)
+    end
+
+    it "is true when serial/frame_model/manufacturer_other match and are 1-2 chars" do
+      expect(fingerprint?(Bike.new(serial_number: "x", frame_model: "x", manufacturer_other: "x"))).to be_truthy
+      expect(fingerprint?(Bike.new(serial_number: "AB", frame_model: " ab", manufacturer_other: "ab "))).to be_truthy
+    end
+
+    it "is false when a field is blank, fields differ, or longer than 2 chars" do
+      expect(fingerprint?(Bike.new(serial_number: "x", frame_model: "x"))).to be_falsey
+      expect(fingerprint?(Bike.new(serial_number: "x", frame_model: "y", manufacturer_other: "z"))).to be_falsey
+      expect(fingerprint?(Bike.new(serial_number: "xyz", frame_model: "xyz", manufacturer_other: "xyz"))).to be_falsey
+    end
+  end
+
+  describe "reserved_email_domain?" do
+    it "is false for normal domains" do
+      expect(described_class.send(:reserved_email_domain?, "rider@gmail.com")).to be_falsey
+      expect(described_class.send(:reserved_email_domain?, "rider@myexample.com")).to be_falsey
+      expect(described_class.send(:reserved_email_domain?, nil)).to be_falsey
+    end
+
+    it "is true for RFC 2606 reserved domains" do
+      expect(described_class.send(:reserved_email_domain?, "testing@example.com")).to be_truthy
+      expect(described_class.send(:reserved_email_domain?, "a@sub.example.org")).to be_truthy
+      expect(described_class.send(:reserved_email_domain?, "a@thing.test")).to be_truthy
+      expect(described_class.send(:reserved_email_domain?, "a@localhost")).to be_truthy
     end
   end
 
