@@ -2,8 +2,6 @@ module Admin
   class RegistrationSequencesController < Admin::BaseController
     include Binxtils::SortableTable
 
-    before_action :find_registration_sequence, only: %i[show update]
-
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
@@ -11,20 +9,6 @@ module Admin
           .reorder("registration_sequences.#{sort_column} #{sort_direction}"),
         limit: @per_page,
         page: permitted_page)
-    end
-
-    def show
-    end
-
-    # Authorizes the draft to become active (and ends the prior active)
-    def update
-      if @registration_sequence.make_active!
-        flash[:success] = "Registration sequence is now active"
-        redirect_to admin_registration_sequences_path
-      else
-        flash[:error] = "Unable to make active - the draft needs at least one page"
-        redirect_to admin_registration_sequence_path(@registration_sequence)
-      end
     end
 
     helper_method :matching_registration_sequences, :searchable_statuses
@@ -55,12 +39,6 @@ module Admin
       @time_range_column = sort_column if %w[updated_at].include?(sort_column)
       @time_range_column ||= "created_at"
       registration_sequences.where(@time_range_column => @time_range)
-    end
-
-    private
-
-    def find_registration_sequence
-      @registration_sequence = RegistrationSequence.find(params[:id])
     end
   end
 end
