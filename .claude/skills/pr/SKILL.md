@@ -3,13 +3,14 @@ name: pr
 description: >-
   Create or update a pull request for the current branch. Trigger when the user
   asks to create/open/make a PR, or to edit/update/rewrite/fix the PR
-  description, body, or summary — including the bare phrase "update pr" — for
-  both new PRs (`gh pr create`) and existing ones (`gh pr edit --body-file`).
-  For frontend diffs, delegates to the `frontend-screenshots` skill to capture
+  description, body, summary, or title — including bare update phrasings like
+  "update pr", "update this pr", or "update the PR" with no other object — for
+  both new PRs (`gh pr create`) and existing ones (`gh pr edit`). For frontend
+  diffs, delegates to the `frontend-screenshots` skill to capture
   desktop+mobile screenshots and embeds them under a `## Screenshots` section.
   Use for any verb that lands on a PR's text content: "open a PR", "make a PR",
-  "update pr", "update the PR description", "rewrite the PR body", "fix the
-  description".
+  "update pr", "update this pr", "update the PR description", "rewrite the PR
+  body", "fix the description".
 allowed-tools: Bash, Read, Glob, Grep
 ---
 
