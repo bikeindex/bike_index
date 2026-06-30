@@ -25,7 +25,7 @@ RSpec.describe SpamEstimator do
       end
     end
     context "manufacturer_other" do
-      let(:bike) { FactoryBot.build(:bike, manufacturer: Manufacturer.other, manufacturer_other: str, serial_number: "unknown") }
+      let(:bike) { FactoryBot.build(:bike, manufacturer: Manufacturer.other, manufacturer_other: str) }
       context "garbage" do
         let(:str) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
         it "estimate is percentage" do
@@ -71,11 +71,10 @@ RSpec.describe SpamEstimator do
           expect(described_class.estimate_bike(bike)).to eq 100
         end
       end
-      context "garbage" do
+      context "random-looking but not malicious" do
         let(:serial) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
-        it "contributes to the estimate" do
-          expect(described_class.string_spaminess(serial)).to eq 100
-          expect(described_class.estimate_bike(bike)).to eq 20
+        it "is 0 (serial only scores via the injection check)" do
+          expect(described_class.estimate_bike(bike)).to eq 0
         end
       end
     end

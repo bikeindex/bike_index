@@ -35,7 +35,6 @@ module SpamEstimator
     estimate += 35 if bike.creation_organization&.spam_registrations
     estimate += 0.2 * string_spaminess(bike.frame_model)
     estimate += 0.4 * string_spaminess(bike.manufacturer_other)
-    estimate += 0.2 * string_spaminess(bike.serial_number)
     estimate += domain_estimate(bike.owner_email)
     estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
 
