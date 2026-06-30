@@ -5239,6 +5239,7 @@ es:
       stolen_message: Mensaje robado
       super_admin_view: Superadministrador de %{org_name}
       multi_search: Búsqueda múltiple
+      manage_registration_sequences: Gestionar secuencias de registro
     organized_skeleton:
       additional_features_html: Bike Index ofrece funciones adicionales para organizaciones
         policiales verificadas. Comuníquese con %{email_link} para activarlas.

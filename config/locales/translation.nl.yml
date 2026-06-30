@@ -4463,6 +4463,7 @@ nl:
       stolen_message: Gestolen bericht
       model_audits: Audits van e-voertuigen
       multi_search: Meerdere zoekopdrachten
+      manage_registration_sequences: Beheer registratiereeksen
     bike_search_form:
       anywhere: Overal
       doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
