@@ -25,6 +25,14 @@ module UI
         link: "tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold"
       }.freeze
 
+      # Literal strings so Tailwind's scanner generates these aria-pressed:/active: variants.
+      ACTIVE_PREFIXED = {
+        primary: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-blue-500/40 tw:active:ring-blue-500/40 tw:aria-pressed:bg-blue-700 tw:active:bg-blue-700 tw:aria-pressed:dark:bg-blue-600 tw:active:dark:bg-blue-600",
+        secondary: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-blue-500/40 tw:active:ring-blue-500/40 tw:aria-pressed:bg-gray-200 tw:active:bg-gray-200 tw:aria-pressed:border-gray-400 tw:active:border-gray-400 tw:aria-pressed:dark:bg-gray-800 tw:active:dark:bg-gray-800 tw:aria-pressed:dark:border-gray-600 tw:active:dark:border-gray-600",
+        error: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-red-500/40 tw:active:ring-red-500/40 tw:aria-pressed:bg-red-700 tw:active:bg-red-700 tw:aria-pressed:dark:bg-red-600 tw:active:dark:bg-red-600",
+        link: "tw:aria-pressed:text-blue-800 tw:active:text-blue-800 tw:aria-pressed:dark:text-blue-300 tw:active:dark:text-blue-300 tw:aria-pressed:font-bold tw:active:font-bold"
+      }.freeze
+
       KINDS = %i[button submit]
 
       def self.build_classes(color:, size:, active: false, html_class: nil)
@@ -34,23 +42,25 @@ module UI
           classes << "tw:focus:outline-none tw:focus:ring-3 tw:font-medium tw:no-underline"
         end
         classes << ACTIVE_COLORS[color] if active
+        classes << ACTIVE_PREFIXED[color]
         classes.compact.join(" ")
       end
 
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, data: {})
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, data: {}, aria: {})
         @text = text
         @color = COLORS.key?(color) ? color : :secondary
         @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
         @active = active
         @html_class = html_class
         @data = data
+        @aria = aria
 
         @size = SIZES.key?(size) ? size : :md
         raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
       end
 
       def call
-        content_tag(:button, @text || content, class: button_classes, type: (@kind == :submit) ? "submit" : "button", data: @data)
+        content_tag(:button, @text || content, class: button_classes, type: (@kind == :submit) ? "submit" : "button", data: @data, aria: @aria)
       end
 
       def button_classes
