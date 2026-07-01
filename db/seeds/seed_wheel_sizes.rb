@@ -1,7 +1,10 @@
 # Seed the database with the wheel sizes
 wheel_sizes = [
+  {name: "8in", iso_bsd: 93, priority: :uncommon, description: "8in (200 x 50, ETRTO 47-93) smaller e-scooters and hoverboards (Uncommon)"},
+  {name: "8.5in", iso_bsd: 134, priority: :common, description: "8.5in (8 1/2 x 2, ISO 50-134) Xiaomi M365/Pro and most 8.5in e-scooters (Common)"},
   {name: "8 x 1 1/4", iso_bsd: 137, priority: :rare, description: "8 x 1 1/4 (Rare)"},
-  {name: "10 x 2", iso_bsd: 152, priority: :rare, description: "10 x 2 (Rare)"},
+  {name: "10in", iso_bsd: 152, priority: :common, description: "10in (10 x 2, 54-152) Ninebot ES/Max and many 10in e-scooters (Common)"},
+  {name: "11in", iso_bsd: 165, priority: :uncommon, description: "11in (90/65-6.5; Ninebot Max 10in uses 60/70-6.5) Dualtron, Ninebot Max e-scooters (Uncommon)"},
   {name: "12in", iso_bsd: 203, priority: :standard, description: "12in (Standard size)"},
   {name: "16in", iso_bsd: 305, priority: :standard, description: "16in (Standard size)"},
   {name: "16 x 1 3/4", iso_bsd: 317, priority: :rare, description: "16 x 1 3/4 (Rare)"},
