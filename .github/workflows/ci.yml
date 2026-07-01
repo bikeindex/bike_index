@@ -140,18 +140,32 @@ jobs:
       - name: Get CPU cores
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
-      # install system dependencies. libfuse2t64 is for setup-imagemagick's
-      # AppImage below — cached here (hence this step runs first) instead of
-      # the action's uncached apt-get install.
+      # install system dependencies. libfuse2t64 is for the ImageMagick
+      # AppImage below — cached here (hence this step runs first).
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: google-chrome-stable curl gettext libfuse2t64 libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           version: 1.3
-      # install imagemagick separately, cache-apt-pkgs-action wasn't installing correctly
-      - uses: mfinelli/setup-imagemagick@v6
+      # install imagemagick 7 separately — mini_magick 5 needs the `magick` CLI,
+      # which Ubuntu apt doesn't ship (cache-apt-pkgs-action installs v6 only).
+      # Inlined instead of mfinelli/setup-imagemagick@v6: every released tag
+      # hardcodes imagemagick.org/archive/binaries/magick, which now 404s after
+      # upstream moved binaries (mfinelli/setup-imagemagick#571). libfuse2 for the
+      # AppImage comes from cache-apt-pkgs-action above.
+      - name: Cache ImageMagick
+        id: cache-imagemagick
+        uses: actions/cache@v4
         with:
-          cache: true
-          install-libfuse2: false
+          path: ~/bin/magick
+          key: imagemagick-magick-v1
+      - name: Install ImageMagick
+        if: steps.cache-imagemagick.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/bin
+          curl -fsSL https://download.imagemagick.org/archive/binaries/magick -o ~/bin/magick
+          chmod +x ~/bin/magick
+      - name: Add ImageMagick to PATH
+        run: echo "$HOME/bin" >> "$GITHUB_PATH"
       - name: Ensure ImageMagick is available
         run: echo $(identify --version)
       # Checkout persists this App token (below) as the git creds so the sync
