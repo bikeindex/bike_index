@@ -140,41 +140,13 @@ jobs:
       - name: Get CPU cores
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
-      # install system dependencies. libfuse2t64 is for the ImageMagick
-      # AppImage below — cached here (hence this step runs first).
+      # install system dependencies, imagemagick included — apt ships v6, which
+      # matches production and is what mini_magick 5 uses when no `magick` (v7)
+      # binary is present.
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: google-chrome-stable curl gettext libfuse2t64 libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           version: 1.3
-      # install imagemagick 7 separately — mini_magick 5 needs the `magick` CLI,
-      # which Ubuntu apt doesn't ship (cache-apt-pkgs-action installs v6 only).
-      # Inlined instead of mfinelli/setup-imagemagick@v6: every released tag
-      # hardcodes imagemagick.org/archive/binaries/magick, which now 404s after
-      # upstream moved binaries (mfinelli/setup-imagemagick#571). libfuse2 for the
-      # AppImage comes from cache-apt-pkgs-action above.
-      # Split into restore/save like the assets cache below: all matrix jobs
-      # restore, but only ci_node_index == 0 writes — a combined actions/cache
-      # races on reserveCache across the matrix and never populates.
-      - name: Restore ImageMagick cache
-        id: cache-imagemagick
-        uses: actions/cache/restore@v6
-        with:
-          path: ~/bin/magick
-          key: imagemagick-magick-v1
-      - name: Install ImageMagick
-        if: steps.cache-imagemagick.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p ~/bin
-          curl -fsSL https://download.imagemagick.org/archive/binaries/magick -o ~/bin/magick
-          chmod +x ~/bin/magick
-      - name: Save ImageMagick cache
-        if: matrix.ci_node_index == 0 && steps.cache-imagemagick.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
-        with:
-          path: ~/bin/magick
-          key: imagemagick-magick-v1
-      - name: Add ImageMagick to PATH
-        run: echo "$HOME/bin" >> "$GITHUB_PATH"
       - name: Ensure ImageMagick is available
         run: echo $(identify --version)
       # Checkout persists this App token (below) as the git creds so the sync
