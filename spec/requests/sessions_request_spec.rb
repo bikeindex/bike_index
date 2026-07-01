@@ -124,6 +124,28 @@ RSpec.describe SessionsController, type: :request do
       end
     end
 
+    context "email belongs to an org with configured SAML SSO" do
+      let(:domain) { "saml.edu" }
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: %w[saml_sso passwordless_users], passwordless_user_domain: domain)
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+
+      it "redirects to the IdP instead of authenticating with a password" do
+        post "/session", params: {session: {email: "rider@#{domain}", password: "anything"}}
+        expect(response).to redirect_to saml_init_path(org_slug: organization.to_param)
+      end
+
+      context "SAML not configured" do
+        let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, organization:) }
+        it "falls through to normal password auth" do
+          post "/session", params: {session: {email: user.email, password:}}
+          expect(response).to redirect_to my_account_url
+        end
+      end
+    end
+
     context "with rack_attack" do
       include_context :rack_attack
 

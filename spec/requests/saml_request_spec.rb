@@ -46,4 +46,28 @@ RSpec.describe SamlController, type: :request do
       end
     end
   end
+
+  describe "GET /sso (org-slug entry)" do
+    it "renders the entry form" do
+      get "/sso"
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("org_slug")
+    end
+
+    context "slug for a configured org" do
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+      it "forwards to init" do
+        get "/sso", params: {org_slug: organization.to_param}
+        expect(response).to redirect_to saml_init_path(org_slug: organization.to_param)
+      end
+    end
+
+    context "slug for an unconfigured org" do
+      it "re-renders with an error" do
+        get "/sso", params: {org_slug: organization.to_param}
+        expect(response).to have_http_status(:ok)
+        expect(flash.now[:error]).to be_present
+      end
+    end
+  end
 end

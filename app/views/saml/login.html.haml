@@ -1,0 +1,11 @@
+.container
+  .sign-in-up-wrap
+    .main-form
+      %h3.sign-in-up-main-form-header= t(".sign_in_with_sso")
+      %p= t(".enter_your_organization")
+      = form_with url: saml_login_path, method: :get do |f|
+        .form-group
+          = f.label :org_slug, t(".organization"), class: "sr-only"
+          = f.text_field :org_slug, value: params[:org_slug], placeholder: t(".organization"), class: "form-control"
+        = f.submit t(".continue"), class: "btn btn-primary btn-lg"
+      %p= link_to t(".back_to_sign_in"), new_session_path

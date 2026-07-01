@@ -47,6 +47,9 @@ class SessionsController < ApplicationController
   end
 
   def create
+    organization = saml_sso_organization(permitted_parameters[:email])
+    return redirect_to saml_init_path(org_slug: organization.to_param) if organization.present?
+
     @user = User.fuzzy_confirmed_or_unconfirmed_email_find(permitted_parameters[:email])
     if @user.present?
       if @user.authenticate(permitted_parameters[:password])
@@ -77,6 +80,15 @@ class SessionsController < ApplicationController
   end
 
   private
+
+  # When an email belongs to an org with live SAML SSO, send them to the IdP instead of
+  # asking for a Bike Index password.
+  def saml_sso_organization(email)
+    return if email.blank?
+
+    organization = Organization.passwordless_email_matching(email)
+    organization if organization&.saml_sso_configured?
+  end
 
   def permitted_parameters
     params.require(:session).permit(:password, :email, :remember_me)
