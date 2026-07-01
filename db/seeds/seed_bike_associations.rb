@@ -34,7 +34,11 @@ f_gear_types = [
   {name: "2", count: 2, internal: false, standard: true},
   {name: "3", count: 3, internal: false, standard: true},
   {name: "2 internal", count: 2, internal: true},
-  {name: "3 internal", count: 3, internal: true}
+  {name: "3 internal", count: 3, internal: true},
+  {name: "6 Speed Pinion Gearbox", count: 6, internal: true},
+  {name: "9 Speed Pinion Gearbox", count: 9, internal: true},
+  {name: "12 Speed Pinion Gearbox", count: 12, internal: true},
+  {name: "18 Speed Pinion Gearbox", count: 18, internal: true}
 ]
 f_gear_types.each do |gear|
   f_gear_type = FrontGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal], standard: gear[:standard])
@@ -55,10 +59,6 @@ r_gear_types = [
   {name: "12", count: 12, internal: false, standard: true},
   {name: "13", count: 13, internal: false, standard: true},
   {name: "14", count: 14, internal: false, standard: true},
-  {name: "15", count: 15, internal: false, standard: true},
-  {name: "16", count: 16, internal: false, standard: true},
-  {name: "17", count: 17, internal: false, standard: true},
-  {name: "18", count: 18, internal: false, standard: true},
   {name: "1 internal", count: 1, internal: true, standard: false},
   {name: "2 internal", count: 2, internal: true, standard: false},
   {name: "3 internal", count: 3, internal: true, standard: false},
