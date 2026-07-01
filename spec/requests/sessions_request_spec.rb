@@ -1,6 +1,42 @@
 require "rails_helper"
 
 RSpec.describe SessionsController, type: :request do
+  describe "new" do
+    it "renders the identifier-first form" do
+      get "/session/new"
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('data-controller="login"')
+      expect(response.body).to include('autocomplete="username"')
+      expect(response.body).to include('autocomplete="current-password"')
+    end
+  end
+
+  describe "lookup" do
+    def lookup_method(email)
+      post "/session/lookup", params: {email:}, as: :json
+      response.parsed_body["method"]
+    end
+
+    it "returns password for an ordinary email" do
+      expect(lookup_method("someone@example.com")).to eq "password"
+    end
+
+    it "returns password for a blank email" do
+      expect(lookup_method("")).to eq "password"
+    end
+
+    context "passwordless organization domain" do
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "party.edu")
+      end
+      it "returns magic_link for the org domain and password otherwise" do
+        expect(lookup_method("someone@party.edu")).to eq "magic_link"
+        expect(lookup_method("someone@elsewhere.edu")).to eq "password"
+      end
+    end
+  end
+
   describe "create_magic_link" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
     it "sends the magic link" do

@@ -8,6 +8,12 @@ class SessionsController < ApplicationController
     render_partner_or_default_signin_layout
   end
 
+  # Identifier-first: the login form asks for an email, then this tells the client
+  # which credential to collect next based on the email's organization preferences.
+  def lookup
+    render json: {method: login_method_for(params[:email])}
+  end
+
   def magic_link
     @token = params[:token]
     @incorrect_token = params[:incorrect_token].presence
@@ -77,6 +83,15 @@ class SessionsController < ApplicationController
   end
 
   private
+
+  # Which credential an email's organization requires. Determined by org domain
+  # preference only (never account existence), so this leaks no more than the
+  # eventual sign-in redirect already would. "sso" will slot in here once the
+  # SAML SP lands; today only passwordless-domain orgs diverge from password.
+  def login_method_for(email)
+    return "password" if email.blank?
+    Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
+  end
 
   def permitted_parameters
     params.require(:session).permit(:password, :email, :remember_me)

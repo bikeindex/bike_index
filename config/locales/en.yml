@@ -4786,20 +4786,24 @@ en:
       you_should_be_signed_in_automatically: You should be automatically signed in.
       your_email_address: your email address
     new:
+      continue: Continue
       dont_have_an_account: don't have an account?
       email: email
+      email_sign_in_link: Email me a sign-in link
       forgot_your_password: Forgot your password?
       get_on_bike_index: Get on Bike Index
       keep_me_logged_in: Keep me logged in
       log_in: Log in
       no_bike_index_account: No Bike Index account?
       or: Or
+      org_uses_magic_link: Your organization signs in with an emailed link.
       password: password
       sign_in_using_facebook: Sign in using Facebook
       sign_in_using_globalid: Sign in using globaliD
       sign_in_using_magic_link: Emailed sign in link
       sign_in_using_strava: Sign in using Strava
       sign_up: sign up
+      use_a_different_email: Use a different email
   shared:
     bike_search_form:
       anywhere: Anywhere
