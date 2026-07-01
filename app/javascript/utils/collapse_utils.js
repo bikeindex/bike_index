@@ -89,9 +89,16 @@ export class CollapseUtils {
     if (this.isVisible(element) && !element.classList.contains(scale)) return
     // Remove the hidden
     element.classList.remove('tw:hidden!', 'tw:hidden')
+
+    // Skip animation if duration is 0
+    if (!duration) return
+
+    // A prior hide leaves the size/scale pinned to 0; reset before measuring.
+    element.classList.remove(scale)
+    this.setSize(element, styles, '')
     // Measure the natural size while visible, before collapsing to 0.
     const target = this.naturalSize(element, dimension)
-    // First, ensure the hidden attributes are set
+    // Collapse to 0 as the transition's starting point
     element.classList.add(scale)
     this.setSize(element, styles, 0)
     // Always add transition classes (moving toward a more generalizable collapse method)
@@ -120,6 +127,12 @@ export class CollapseUtils {
     this._cancelFinalizer(element)
     // Return early if already hidden
     if (!this.isVisible(element)) return
+
+    // Skip animation if duration is 0
+    if (!duration) {
+      element.classList.add('tw:hidden!')
+      return
+    }
 
     const { dimension, styles, scale } = this.axis(direction)
     // Pin the current natural size so the transition has a starting point.
