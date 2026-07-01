@@ -152,9 +152,12 @@ jobs:
       # hardcodes imagemagick.org/archive/binaries/magick, which now 404s after
       # upstream moved binaries (mfinelli/setup-imagemagick#571). libfuse2 for the
       # AppImage comes from cache-apt-pkgs-action above.
-      - name: Cache ImageMagick
+      # Split into restore/save like the assets cache below: all matrix jobs
+      # restore, but only ci_node_index == 0 writes — a combined actions/cache
+      # races on reserveCache across the matrix and never populates.
+      - name: Restore ImageMagick cache
         id: cache-imagemagick
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v6
         with:
           path: ~/bin/magick
           key: imagemagick-magick-v1
@@ -164,6 +167,12 @@ jobs:
           mkdir -p ~/bin
           curl -fsSL https://download.imagemagick.org/archive/binaries/magick -o ~/bin/magick
           chmod +x ~/bin/magick
+      - name: Save ImageMagick cache
+        if: matrix.ci_node_index == 0 && steps.cache-imagemagick.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/bin/magick
+          key: imagemagick-magick-v1
       - name: Add ImageMagick to PATH
         run: echo "$HOME/bin" >> "$GITHUB_PATH"
       - name: Ensure ImageMagick is available
