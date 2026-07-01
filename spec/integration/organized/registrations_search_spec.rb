@@ -343,8 +343,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       within(".current-organization-submenu") { click_link "Multi search" }
       expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
 
-      expect(page).to have_content(/multiple serial search/i)
+      expect(page).to have_content(/multi search/i)
       expect(page).to have_css("[data-controller~='org--multi-search']", wait: 5)
+
+      # Kind toggle radios should not be present without bike_stickers feature
+      expect(page).not_to have_field("Serials", visible: :all)
+      expect(page).not_to have_field("Registration Stickers", visible: :all)
 
       find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
       click_button "Search serials"
@@ -371,6 +375,60 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
       expect(page).to have_content("owner-beta@example.com", wait: 10)
       expect(page).not_to have_content("owner-alpha@example.com")
+    end
+
+    context "with bike_stickers enabled" do
+      let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes bike_stickers] }
+      let(:claimed_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      let!(:sticker_a) { FactoryBot.create(:bike_sticker, code: "STKR100", organization:) }
+      let!(:sticker_b) { FactoryBot.create(:bike_sticker_claimed, code: "STKR200", organization:, bike: claimed_bike) }
+      let!(:other_org_sticker) { FactoryBot.create(:bike_sticker, code: "STKR300") }
+
+      it "toggles to sticker search and shows results" do
+        visit multi_serial_path
+
+        # Kind toggle radios are present
+        expect(page).to have_field("Serials", visible: :all)
+        expect(page).to have_field("Registration Stickers", visible: :all)
+
+        # "Search all" starts interactive (serial search can scope to just the org)
+        expect(page).to have_field("search_all", checked: false, disabled: false)
+
+        # Switch to sticker search
+        choose "Registration Stickers", allow_label_click: true, visible: :all
+
+        expect(page).to have_current_path(/search_kind=stickers/, wait: 5)
+        expect(page).to have_field("serials", placeholder: /sticker codes/i)
+
+        # Sticker search always spans every org, so "search all" is forced on and locked
+        expect(page).to have_field("search_all", checked: true, disabled: true)
+
+        # The locked checkbox gets an info tooltip explaining why; it appears on hover
+        expect(page).to have_css("button[aria-label='Sticker search always searches all bikes']")
+        find("button[aria-label='Sticker search always searches all bikes']").hover
+        expect(page).to have_css("[role=tooltip]", text: "Sticker search always searches all bikes")
+
+        find("textarea#serials").set("STKR200, STKR100, STKR300")
+        click_button "Search stickers"
+
+        # Chips for unclaimed and non-org stickers show gray (no bikes)
+        expect(page).to have_css("#chip_1.tw\\:bg-gray-300", wait: 15)
+        expect(page).to have_css("#chip_2.tw\\:bg-gray-300")
+
+        # Only claimed org sticker has a bike result
+        expect(page).to have_css("#chip_0.tw\\:bg-emerald-500")
+
+        # Switch back to serials
+        choose "Serials", allow_label_click: true, visible: :all
+        expect(page).not_to have_current_path(/search_kind=stickers/)
+
+        # "Search all" is interactive again on serial search, with the sticker tooltip hidden
+        expect(page).to have_field("search_all", checked: false, disabled: false)
+        expect(page).not_to have_css("button[aria-label='Sticker search always searches all bikes']")
+
+        # Previous results cleared
+        expect(page).not_to have_css(".multi-search-serial-result")
+      end
     end
   end
 

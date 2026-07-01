@@ -5,7 +5,7 @@ FactoryBot.define do
     creator { FactoryBot.create(:user) }
     serial_number
     manufacturer { FactoryBot.create(:manufacturer) }
-    sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
+    sequence(:owner_email) { |n| "bike_owner#{n}@bikeindex.org" }
     primary_frame_color { Color.black }
     cycle_type { CycleType.slugs.first }
     propulsion_type { "foot-pedal" }

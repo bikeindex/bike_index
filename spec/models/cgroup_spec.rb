@@ -5,7 +5,14 @@ RSpec.describe Cgroup, type: :model do
 
   describe "additional_parts" do
     it "finds additional parts" do
-      expect(Cgroup.additional_parts.name).to eq "Additional parts"
+      expect(Cgroup.additional_parts.name).to eq "Additional Parts"
+    end
+    context "when the stored casing differs" do
+      it "matches without creating a duplicate" do
+        additional_parts = Cgroup.additional_parts
+        additional_parts.update_column(:name, "Additional parts")
+        expect { expect(Cgroup.additional_parts).to eq additional_parts }.not_to change(Cgroup, :count)
+      end
     end
   end
 

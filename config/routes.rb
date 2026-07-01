@@ -277,6 +277,8 @@ Rails.application.routes.draw do
 
     resources :theft_alert_plans, only: %i[index edit update new create]
 
+    resources :registration_sequences, only: %i[index]
+
     resources :organizations do
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
@@ -368,6 +370,8 @@ Rails.application.routes.draw do
   end
   get "manufacturers_tsv", to: "manufacturers#tsv" # TODO: can we delete this?
 
+  resources :components, only: %i[index]
+
   get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
   get "theft-ring", to: redirect("theft-rings")
   resources :stolen_bike_listings, only: %i[index]
@@ -444,6 +448,10 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
+    resources :registration_sequences, only: %i[index create edit] do
+      resources :pages, only: %i[create], controller: "registration_sequence_pages"
+    end
+    resources :registration_sequence_pages, only: %i[edit update destroy]
   end
 
   # This is the public organizations section

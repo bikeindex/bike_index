@@ -109,4 +109,38 @@ RSpec.describe UI::Button::Component, type: :component do
       expect(component).to have_css("button[data-action='click->ui--modal#open']")
     end
   end
+
+  it "always applies the prefixed active classes (inert until pressed/toggled)" do
+    tokens = component.css("button").first["class"].split
+    expect(tokens).to include("tw:aria-pressed:ring-2", "tw:active:ring-2")
+    expect(tokens).not_to include("tw:ring-2", "tw:bg-gray-200")
+  end
+
+  context "with aria-controls" do
+    let(:options) { {aria: {controls: "panel"}} }
+    it "renders aria-controls" do
+      expect(component.to_html).to include('aria-controls="panel"')
+    end
+  end
+
+  context "active: true" do
+    let(:options) { {active: true} }
+    it "applies the bare active classes statically" do
+      tokens = component.css("button").first["class"].split
+      expect(tokens).to include("tw:ring-2", "tw:bg-gray-200")
+    end
+  end
+
+  describe "ACTIVE_PREFIXED" do
+    it "prefixes every ACTIVE_COLORS class with aria-pressed: and active: for each color" do
+      expect(described_class::ACTIVE_PREFIXED.keys).to eq(described_class::ACTIVE_COLORS.keys)
+      described_class::ACTIVE_COLORS.each do |color, classes|
+        expected = classes.split.flat_map do |variant|
+          base = variant.delete_prefix("tw:")
+          ["tw:aria-pressed:#{base}", "tw:active:#{base}"]
+        end
+        expect(described_class::ACTIVE_PREFIXED[color].split).to eq(expected)
+      end
+    end
+  end
 end

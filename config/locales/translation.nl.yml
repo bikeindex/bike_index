@@ -4463,6 +4463,7 @@ nl:
       stolen_message: Gestolen bericht
       model_audits: Audits van e-voertuigen
       multi_search: Meerdere zoekopdrachten
+      manage_registration_sequences: Beheer registratiereeksen
     bike_search_form:
       anywhere: Overal
       doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
@@ -5123,6 +5124,9 @@ nl:
         versies en moeten worden bijgewerkt op de originele %{bike_type}-registratie.
         %{bike_registration_link}.
       version_name: Versienaam
+      other_manufacturer: Andere fabrikant
+      select_other: Selecteer 'Overig' als de fabrikant niet verschijnt wanneer deze
+        wordt ingevoerd
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe
@@ -5892,6 +5896,7 @@ nl:
         result_count_html: "— %{count} %{results}"
         serial_label: 'Serial:'
         view_all: alles bekijken
+        sticker_label: 'Sticker:'
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat

@@ -1894,6 +1894,8 @@ es:
         y deben actualizarse en el registro original %{bike_type}. %{bike_registration_link}.
       updated_serial: Número de serie actualizado
       version_name: Nombre de la versión
+      other_manufacturer: Otro fabricante
+      select_other: Seleccione 'Otro' si el fabricante no aparece al ingresarlo.
     bike_fields:
       revised_colors:
         add_a_color: Añade un color
@@ -5237,6 +5239,7 @@ es:
       stolen_message: Mensaje robado
       super_admin_view: Superadministrador de %{org_name}
       multi_search: Búsqueda múltiple
+      manage_registration_sequences: Gestionar secuencias de registro
     organized_skeleton:
       additional_features_html: Bike Index ofrece funciones adicionales para organizaciones
         policiales verificadas. Comuníquese con %{email_link} para activarlas.
@@ -5995,6 +5998,7 @@ es:
         result_count_html: "— %{count} %{results}"
         serial_label: 'De serie:'
         view_all: ver todo
+        sticker_label: 'Etiqueta engomada:'
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} impidió que se guardara
