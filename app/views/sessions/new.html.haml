@@ -17,7 +17,7 @@
                 for
                 %em= company
             - else
-              = t(".log_in")
+              = t(".log_in_or_sign_up")
 
           = form_for :session, url: identify_session_path(params.permit(:return_to)) do |f|
             - if sign_in_partner

@@ -4796,6 +4796,7 @@ en:
       get_on_bike_index: Get on Bike Index
       keep_me_logged_in: Keep me logged in
       log_in: Log in
+      log_in_or_sign_up: Log in or sign up
       org_uses_magic_link: Your organization signs in with an emailed link.
       password: password
   shared:
