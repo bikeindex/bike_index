@@ -64,3 +64,8 @@ jobs:
         run: bin/rails assets:precompile
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
+        env:
+          # Seed bikes are registered to RFC-reserved domains (example.com),
+          # which SpamEstimator marks likely_spam — hiding every seeded org bike
+          # and crashing later seed steps that expect them to be visible.
+          SKIP_EMAIL_DOMAIN_VERIFICATION: "true"

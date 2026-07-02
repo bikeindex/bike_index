@@ -94,7 +94,10 @@ chdir APP_ROOT do
     system! "bin/rails dartsass:build"
 
     puts "\n== Seeding database =="
-    system! "bin/rake db:seed"
+    # Seed bikes are registered to RFC-reserved domains (example.com), which
+    # SpamEstimator marks likely_spam — hiding every seeded org bike and
+    # crashing later seed steps that expect them to be visible.
+    system!({"SKIP_EMAIL_DOMAIN_VERIFICATION" => "true"}, "bin/rake db:seed")
 
     puts "\n== Preparing test database (including parallelism) =="
     system! "bin/rake parallel:prepare"
