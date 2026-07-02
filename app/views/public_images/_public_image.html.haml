@@ -14,7 +14,9 @@
     .processing
       = t(".processing")
     - if image.image?
-      %img{ src: image.image_url(:small) }
+      -# Versions are generated in a background job; until they exist (e.g. just after
+      -# upload) fall back to the original, which is stored synchronously
+      %img{ src: image.image_url(:small) || image.image_url }
     - else
       %em.missing-image
         = t(".missing_image")
