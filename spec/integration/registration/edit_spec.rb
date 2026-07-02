@@ -70,8 +70,15 @@ RSpec.describe "Editing a registration", :js, type: :system do
     click_button "Log in"
     expect(page).to have_content("Logged in", wait: 5)
 
-    # Register a bike to the logged in user (owner_email defaults to their email)
-    visit "/bikes/new"
+    # Dismiss the donation modal that greets logged-in users so it doesn't cover the nav
+    find("#donationModal .close").click
+    expect(page).to have_no_css("#donationModal.in", wait: 5)
+
+    # Navigate to registration through the menus, then register a bike to the
+    # logged in user (owner_email defaults to their email)
+    find("#primary_nav_hamburgler").click
+    click_link "Register a new bike"
+    click_link "Register bike"
     fill_in "Serial number", with: "SERIAL-ORIGINAL-1"
     pick_remote_selectize(selectize_for("bike_manufacturer_id"), "Surly")
     pick_selectize("bike_primary_frame_color_id", "Black")
