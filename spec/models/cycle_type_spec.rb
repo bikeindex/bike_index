@@ -114,7 +114,7 @@ RSpec.describe CycleType, type: :model do
     it "has the values" do
       expect(CycleType.select_options).to include(["Bike", "bike"])
       expect(CycleType.select_options(traditional_bike: true)).to include(trad_bike)
-      expect(CycleType.select_options(traditional_bike: true).uniq.count).to eq 22
+      expect(CycleType.select_options(traditional_bike: true).uniq.count).to eq 23
     end
   end
 
@@ -225,6 +225,15 @@ RSpec.describe CycleType, type: :model do
         expect(CycleType.not_cycle_drivetrain?(vtype)).to be_truthy
         expect(CycleType.not_cycle?(vtype)).to be_falsey
         expect(CycleType.front_and_rear_wheels?(vtype)).to be_falsey
+      end
+    end
+    context "balance-bike" do
+      let(:vtype) { "balance-bike" }
+      it "is a pedal-less, never-motorized cycle without a drivetrain" do
+        expect(CycleType.not_cycle_drivetrain?(vtype)).to be_truthy
+        expect(CycleType.not_cycle?(vtype)).to be_falsey
+        expect(CycleType.pedal_type?(vtype)).to be_falsey
+        expect(CycleType.strict_motorized(vtype)).to eq :never
       end
     end
   end
