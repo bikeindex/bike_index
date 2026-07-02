@@ -32,11 +32,13 @@ sf_locations = [
 
 pn_kinds = %w[appears_abandoned_notification parked_incorrectly_notification appears_abandoned_notification parked_incorrectly_notification]
 
+# Not @example.com: SpamEstimator scores RFC-reserved domains as 100, which
+# would mark every seeded bike likely_spam and hide it from Bike's default scope
 owner_emails = %w[
-  alice@example.com bob@example.com carol@example.com dave@example.com
-  eve@example.com frank@example.com grace@example.com heidi@example.com
-  ivan@example.com judy@example.com kevin@example.com laura@example.com
-  mike@example.com nora@example.com oscar@example.com
+  alice@bikeindex.org bob@bikeindex.org carol@bikeindex.org dave@bikeindex.org
+  eve@bikeindex.org frank@bikeindex.org grace@bikeindex.org heidi@bikeindex.org
+  ivan@bikeindex.org judy@bikeindex.org kevin@bikeindex.org laura@bikeindex.org
+  mike@bikeindex.org nora@bikeindex.org oscar@bikeindex.org
 ]
 
 creator = BikeServices::Creator.new
