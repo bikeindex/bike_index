@@ -7,7 +7,7 @@ RSpec.describe Autocomplete::Loader do
   # manufacturer.count == 1 tests are failing, because manufacturers are sticking around
   before { Manufacturer.delete_all }
 
-  cycle_type_count = 22
+  cycle_type_count = 23
 
   describe "load_all" do
     let!(:color) { Color.black }
@@ -23,7 +23,7 @@ RSpec.describe Autocomplete::Loader do
       info = subject.info
       # IDK, db0 seems to cause problems
       expect(info.keys - [:db0]).to match_array(%i[category_keys cache_keys used_memory used_memory_peak])
-      expect(info[:category_keys]).to eq 3976
+      expect(info[:category_keys]).to eq 4072
       expect(info[:cache_keys]).to eq 0
     end
 

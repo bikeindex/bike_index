@@ -140,20 +140,22 @@ jobs:
       - name: Get CPU cores
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
-      # install system dependencies. libfuse2t64 is for setup-imagemagick's
-      # AppImage below — cached here (hence this step runs first) instead of
-      # the action's uncached apt-get install.
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: google-chrome-stable curl gettext libfuse2t64 libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
-          version: 1.3
-      # install imagemagick separately, cache-apt-pkgs-action wasn't installing correctly
-      - uses: mfinelli/setup-imagemagick@v6
-        with:
-          cache: true
-          install-libfuse2: false
-      - name: Ensure ImageMagick is available
-        run: echo $(identify --version)
+      # Plain apt, not cache-apt-pkgs-action: its restore skips package
+      # postinst scripts (losing update-alternatives binaries like imagemagick's
+      # `identify`), and on cache miss it pins versions from the runner's stale
+      # apt lists, 404s, silently installs nothing, and caches the empty result.
+      # imagemagick from apt is v6, matching production — mini_magick 5 uses
+      # `identify`/`convert` when there's no `magick` (v7) binary.
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          identify --version
+          # The runner image ships a chromedriver that lags the apt google-chrome-stable
+          # version; leaving it on PATH makes Selenium use a mismatched driver (flaky
+          # keystroke/focus handling in :js specs). Remove it so Selenium Manager
+          # provisions a chromedriver matching the installed Chrome.
+          sudo rm -f "$(command -v chromedriver)" /usr/local/bin/chromedriver /usr/bin/chromedriver 2>/dev/null || true
       # Checkout persists this App token (below) as the git creds so the sync
       # branch is pushed as the App — only a non-default-token push fires
       # `on: push`, which is what attaches the required checks to the PR.

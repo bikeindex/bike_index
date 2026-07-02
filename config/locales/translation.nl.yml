@@ -870,6 +870,7 @@ nl:
         e_motorcycle: e-motorfiets (of e-dirtbike)
         traditional_bike: Traditionele fiets (2 wielen, 1 zadel, pedaal)
         elliptical: Elliptische fiets
+        balance_bike: Loopfiets
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet

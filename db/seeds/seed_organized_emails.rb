@@ -220,7 +220,7 @@ unless transferred_bike_exists
         primary_frame_color_id: Color.pluck(:id).sample,
         rear_tire_narrow: "true",
         handlebar_type: HandlebarType.slugs.first,
-        owner_email: "previous-owner@example.com"
+        owner_email: "previous-owner@bikeindex.org"
       }
     })
   )
@@ -229,7 +229,7 @@ unless transferred_bike_exists
   BikeServices::Updator.new(
     user: user,
     bike: bike,
-    permitted_params: {bike: {owner_email: "new-owner@example.com"}}.as_json
+    permitted_params: {bike: {owner_email: "new-owner@bikeindex.org"}}.as_json
   ).update_available_attributes
   CallbackJob::AfterBikeSaveJob.new.perform(bike.id, true, true)
   puts "  Created transferred bike ##{bike.id}"
