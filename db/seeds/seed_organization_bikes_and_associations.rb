@@ -149,9 +149,11 @@ sample_notes = [
   "Frequent visitor, registered at orientation",
   "Needs new sticker - old one damaged"
 ]
-hogwarts.bike_organizations.limit(5).each_with_index do |bike_organization, index|
-  BikeOrganizationNote.upsert(bike: bike_organization.bike, organization: bike_organization.organization, body: sample_notes[index], user: member)
-  puts "  Added note for bike ##{bike_organization.bike_id} in #{bike_organization.organization.short_name}"
+# hogwarts.bikes rather than bike_organizations: the unregistered parking
+# notification bikes above are user_hidden, so their bike_organization.bike is nil
+hogwarts.bikes.limit(5).each_with_index do |bike, index|
+  BikeOrganizationNote.upsert(bike:, organization: hogwarts, body: sample_notes[index], user: member)
+  puts "  Added note for bike ##{bike.id} in #{hogwarts.short_name}"
 end
 
 # --- 5 impound records via BikeServices::Creator with status_impounded ---
