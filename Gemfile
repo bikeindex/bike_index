@@ -98,6 +98,10 @@ gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape" # API DSL
 gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
 
+# SAML 2.0 Service Provider (organization SSO). Pin >= 1.18: earlier versions carry
+# critical signature-verification CVEs (CVE-2024-45409, CVE-2025-25291/25292).
+gem "ruby-saml", ">= 1.18", "< 2"
+
 # Frontend
 gem "chartkick" # Display charts
 gem "coderay" # Pretty print code

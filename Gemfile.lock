@@ -763,6 +763,9 @@ GEM
       prism (>= 1.2, < 2.0)
       rbs (>= 3, < 5)
     ruby-progressbar (1.13.0)
+    ruby-saml (1.18.1)
+      nokogiri (>= 1.13.10)
+      rexml
     ruby-vips (2.3.0)
       ffi (~> 1.12)
       logger
@@ -1014,6 +1017,7 @@ DEPENDENCIES
   rspec-sidekiq
   rspec_junit_formatter
   ruby-lsp
+  ruby-saml (>= 1.18, < 2)
   ruby-vips
   secure_headers (~> 7.2)
   selenium-webdriver

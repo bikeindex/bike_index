@@ -45,6 +45,7 @@ feature_name_and_slugs = [
   {name: "Registration field: Student ID", feature_slugs: ["reg_student_id"]},
   {name: "Registration field: Student ID - REQUIRED", feature_slugs: ["reg_student_id", "require_reg_student_id"]},
   {name: "Registration field: True/False question", feature_slugs: []},
+  {name: "SAML SSO", feature_slugs: ["saml_sso"]},
   {name: "Skip ownership email", feature_slugs: ["skip_ownership_email"]},
   {name: "Social media ad campaign", feature_slugs: []}
 ]

@@ -65,6 +65,12 @@ Rails.application.routes.draw do
   end
   get "logout", to: "sessions#destroy"
 
+  # Organization SAML SSO (Service Provider). Metadata is public for IdP onboarding;
+  # init begins SP-initiated login, callback is the Assertion Consumer Service.
+  get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
+  get "/sso/:org_slug/init", to: "saml#init", as: :saml_init
+  post "/sso/:org_slug/callback", to: "saml#callback", as: :saml_callback
+
   resources :payments, only: %i[new create] do
     collection { get :success }
   end

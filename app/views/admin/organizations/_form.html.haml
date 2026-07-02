@@ -244,3 +244,43 @@
                         = OrganizationStolenMessage::MAX_SEARCH_RADIUS
                         miles
                   = number_field_tag :organization_stolen_message_search_radius_miles, organization_stolen_message.search_radius_miles, {class: "form-control"}
+
+          - if @organization.enabled?("saml_sso")
+            - saml_configuration = @organization.organization_saml_configuration || @organization.build_organization_saml_configuration
+            - saml_settings = Saml::SettingsBuilder.new(saml_configuration)
+            .form-group.mt-4
+              %h4 SAML SSO
+              %p.text-success
+                Service Provider details for the organization's IdP admin — or just share the metadata URL, which contains all of them.
+              %ul
+                %li
+                  Metadata URL:
+                  = link_to saml_metadata_url(org_slug: @organization.to_param), saml_metadata_url(org_slug: @organization.to_param)
+                %li
+                  SP entityID:
+                  %code= saml_settings.sp_entity_id
+                %li
+                  ACS (callback) URL:
+                  %code= saml_settings.assertion_consumer_service_url
+              = f.fields_for :organization_saml_configuration, saml_configuration do |saml_f|
+                .form-check.mt-2
+                  = saml_f.check_box :enabled, class: "form-check-input"
+                  = saml_f.label :enabled, "Enable live SAML login for this organization", class: "form-check-label"
+                .form-group.mt-2
+                  = saml_f.label :idp_entity_id, "IdP entityID"
+                  = saml_f.text_field :idp_entity_id, class: "form-control"
+                .form-group.mt-2
+                  = saml_f.label :idp_sso_target_url, "IdP SSO target URL"
+                  = saml_f.text_field :idp_sso_target_url, class: "form-control"
+                .form-group.mt-2
+                  = saml_f.label :idp_slo_target_url, "IdP SLO target URL (optional)"
+                  = saml_f.text_field :idp_slo_target_url, class: "form-control"
+                .form-group.mt-2
+                  = saml_f.label :idp_cert, "IdP certificate (PEM or base64)"
+                  = saml_f.text_area :idp_cert, class: "form-control", rows: 4
+                .form-group.mt-2
+                  = saml_f.label :idp_cert_fingerprint, "IdP certificate fingerprint (optional)"
+                  = saml_f.text_field :idp_cert_fingerprint, class: "form-control"
+                .form-group.mt-2
+                  = saml_f.label :email_attribute_name, "Email attribute name (optional)"
+                  = saml_f.text_field :email_attribute_name, class: "form-control", placeholder: OrganizationSamlConfiguration::DEFAULT_EMAIL_ATTRIBUTE

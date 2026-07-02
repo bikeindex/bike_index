@@ -114,6 +114,7 @@ class User < ApplicationRecord
   has_one :mailchimp_datum
   has_one :strava_integration, dependent: :destroy
   has_one :user_ban
+  has_many :sso_identities, dependent: :destroy
 
   validates_uniqueness_of :username
   validates_with UserNameValidator
