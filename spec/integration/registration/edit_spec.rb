@@ -42,11 +42,12 @@ RSpec.describe "Editing a registration", :js, type: :system do
     control.find(".selectize-dropdown-content .option", text: text, wait: 5).click
   end
 
-  # Types into a remote-autocomplete selectize (manufacturer fields) and picks the match
+  # Types into a remote-autocomplete selectize (manufacturer fields) and picks the match.
+  # The option is loaded over AJAX, so allow a longer wait for it to appear.
   def pick_remote_selectize(control, text)
     control.find(".selectize-input").click
     control.find(".selectize-input input").set(text)
-    control.find(".selectize-dropdown-content .option", text: text, wait: 5).click
+    control.find(".selectize-dropdown-content .option", text:, wait: 10).click
   end
 
   def save_bike
@@ -94,6 +95,9 @@ RSpec.describe "Editing a registration", :js, type: :system do
     pick_selectize("bike_year", "2020")
     fill_in "Frame model", with: "Cross-Check"
     find("#add-secondary").click
+    # Revealing the field slides it down and clears its selectize value, so wait for
+    # that to settle before picking, otherwise the pick can be erased
+    expect(page).to have_css("#secondary-color.unhidden", wait: 5)
     pick_selectize("bike_secondary_frame_color_id", "Blue")
     pick_selectize("bike_frame_material", "Steel")
     within(".ordinal-sizes") { find("label.btn", text: "M").click }
@@ -117,6 +121,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
 
     # ---- Details: serial correction (updates the serial via the modal) ----
     find('[data-target="#serial-correction"]').click
+    expect(page).to have_css("#serial-correction.in", wait: 5)
     within("#serial-correction") do
       fill_in "serial_update_serial", with: "SERIAL-UPDATED-9"
       fill_in "serial_update_reason", with: "Read the frame more carefully"
@@ -127,6 +132,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
 
     # ---- Details: manufacturer correction ----
     find('[data-target="#manufacturer-correction"]').click
+    expect(page).to have_css("#manufacturer-correction.in", wait: 5)
     within("#manufacturer-correction") do
       pick_remote_selectize(selectize_for("manufacturer_update_manufacturer"), "Trek")
       fill_in "manufacturer_update_reason", with: "It is actually a Trek"
