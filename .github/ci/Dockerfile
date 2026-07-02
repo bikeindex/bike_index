@@ -27,9 +27,9 @@ ENV BUNDLE_PATH=/usr/local/bundle
 # libvips, curl, gettext, libcurl4-gnutls-dev, libexpat1-dev, libssl-dev,
 # libz-dev, postgresql-client, ripgrep), plus packages the GitHub-hosted
 # runner ships preinstalled that this slim base doesn't: build-essential/
-# libpq-dev/libyaml-dev/pkg-config (native gem compilation, e.g. pg), git
-# (required by actions/checkout inside a container job), ca-certificates and
-# xz-utils (fetching/unpacking Node below).
+# libpq-dev/libyaml-dev/libffi-dev/pkg-config (native gem compilation, e.g.
+# pg, fiddle), git (required by actions/checkout inside a container job),
+# ca-certificates and xz-utils (fetching/unpacking Node below).
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
       build-essential \
@@ -40,6 +40,7 @@ RUN apt-get update -qq && \
       imagemagick \
       libcurl4-gnutls-dev \
       libexpat1-dev \
+      libffi-dev \
       libpq-dev \
       libssl-dev \
       libvips \
