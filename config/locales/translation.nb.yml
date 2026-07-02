@@ -870,6 +870,7 @@ nb:
         e_motorcycle: e-motorsykkel (eller e-Dirtbike)
         traditional_bike: Tradisjonell sykkel (2 hjul, 1 sete, pedal)
         elliptical: Elliptisk sykkel
+        balance_bike: Balansesykkel
       frame_material:
         aluminum: Aluminium
         composite: Karbon eller kompositt
@@ -1855,6 +1856,8 @@ nb:
         versjoner og må oppdateres på den originale %{bike_type}-registreringen. %{bike_registration_link}.
       updated_serial: Oppdatert serie
       version_name: Versjonsnavn
+      other_manufacturer: Annen produsent
+      select_other: Velg "Annet" hvis produsenten ikke vises når du skriver inn
     bike_fields:
       revised_colors:
         add_a_color: Legg til en farge
@@ -5003,6 +5006,7 @@ nb:
       stolen_message: Stjålet melding
       super_admin_view: Superadministrator for %{org_name}
       multi_search: Multisøk
+      manage_registration_sequences: Administrer registreringssekvenser
     organized_skeleton:
       additional_features_html: Bike Index gir tilleggsfunksjoner for verifiserte
         rettshåndhevelsesorganisasjoner. Ta kontakt med %{email_link} for å få dem

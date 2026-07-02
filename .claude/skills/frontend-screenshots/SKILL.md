@@ -36,17 +36,19 @@ Pick the user the caller specified, or default to `user@bikeindex.org` (lowest p
 - `admin@bikeindex.org` — `SuperuserAbility`; effectively admin of every org. Use when capturing admin-only menu items, `/admin/...` routes, or org pages where you want the fully-loaded sidebar.
 - `:anonymous` — skip sign-in entirely. Use for public pages where the signed-out rendering is the point.
 
-If a URL redirects to `/session/new` or `/session/magic_link`, drive the form via Playwright — don't ask the user to sign in manually.
+Signed-out is the normal starting state, **not** a blocker: if a page redirects to `/session/new` or `/session/magic_link` (or `#navUserSettingLink` has no email), drive the sign-in form via Playwright with the seed credentials above — don't ask the user to sign in manually, and don't skip the screenshot for lack of a session. **Only ever authenticate against the local dev server** (`$BASE_URL` / localhost) — never sign in to any other host, and never create, promote, or impersonate users to bypass auth.
 
 **Picking an org slug.** When the URL is org-scoped (`/o/<slug>/...`) and the caller didn't specify a slug, default to `hogwarts`
 
-**Verify identity before capturing.** The dev DB can contain real-looking data, so a non-seed user signed into the persistent profile is a PII risk on upload. Check:
+**Verify identity before capturing.** The gate isn't about *whether* to authenticate — signing in with seed credentials is expected. It's about confirming the session and its data are seed-only, so no PII lands in an uploaded image. After signing in, check:
 
 ```js
 document.getElementById('navUserSettingLink')?.dataset.email
 ```
 
-If it's set but not one of the three seeded emails, **stop and ask** — either you're signed in as a non-seed user (PII risk on upload) or the seeds haven't run (`bundle exec rails db:seed`). For `:anonymous`, expect `undefined` and confirm before continuing.
+If it's set but not one of the seeded emails, **stop and ask** — you're signed in as a non-seed user (PII risk on upload). If it's `undefined` when you expected a session, sign-in didn't take (often the seeds haven't run — `bundle exec rails db:seed`); retry the sign-in, don't capture signed-out. For `:anonymous`, expect `undefined` and confirm before continuing.
+
+**Don't capture if any on-page data looks non-seeded.** Even signed in as a seed user, if a page shows records that don't look like seed data (unfamiliar names/emails, real-looking user content), stop and ask — the dev DB may have been loaded with production data, and screenshots are permanent once uploaded.
 
 ## Capture
 

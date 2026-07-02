@@ -39,17 +39,16 @@ jobs:
       - name: Get CPU cores
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
-      # install system dependencies. libfuse2t64 is for setup-imagemagick's AppImage below.
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: curl gettext libfuse2t64 libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
-          version: 1.1
-      # install imagemagick separately; the apt imagemagick package doesn't
-      # reliably provide `identify` (db:seed needs it for bike photos).
-      - uses: mfinelli/setup-imagemagick@v6
-        with:
-          cache: true
-          install-libfuse2: false
+      # Plain apt, not cache-apt-pkgs-action: its restore skips package
+      # postinst scripts (losing update-alternatives binaries like imagemagick's
+      # `identify`), and on cache miss it pins versions from the runner's stale
+      # apt lists, 404s, silently installs nothing, and caches the empty result.
+      # No google-chrome-stable: :js specs run Playwright's bundled Chromium (below).
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          identify --version
       - name: Checkout code
         uses: actions/checkout@v7
       # Install Ruby dependencies
