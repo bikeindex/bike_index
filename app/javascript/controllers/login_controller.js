@@ -8,15 +8,12 @@ import { Controller } from '@hotwired/stimulus'
 // so password managers can still associate username + password for autofill.
 export default class extends Controller {
   static targets = ['form', 'email', 'continueStep', 'passwordStep', 'passwordInput',
-    'magicLinkStep', 'magicLinkButton', 'changeEmail', 'altMethods']
+    'magicLinkStep', 'magicLinkButton', 'changeEmail']
 
   static values = { lookupUrl: String, magicLinkUrl: String }
 
   connect () {
     this.defaultAction = this.formTarget.getAttribute('action')
-    // Alternate sign-in methods (the standalone magic-link link, the "or" divider) are
-    // no-JS fallbacks — hide them so nothing surfaces until the email check resolves.
-    this.altMethodsTargets.forEach((element) => this.toggle(element, false))
     this.reset()
     // A pre-filled email (e.g. re-rendered after a failed password attempt) skips
     // straight to its step so the user isn't asked to click Continue again.
