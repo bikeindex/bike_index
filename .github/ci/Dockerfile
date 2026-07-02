@@ -1,25 +1,32 @@
 # syntax=docker/dockerfile:1
 # check=error=true
 
-# Tooling image for CI's `test` job (see ../workflows/ci.yml). Bakes the OS
-# packages, Node runtime, and Playwright's Chromium + OS deps that otherwise
-# get reinstalled from scratch on every one of the 5 parallel test shards.
+# Tooling image for CI's `test` job (see ../workflows/ci.yml). Bakes Ruby, the
+# OS packages, the Node runtime, and Playwright's Chromium + OS deps that
+# otherwise get reinstalled from scratch on every one of the 5 parallel test
+# shards.
 #
-# Ruby itself is deliberately NOT baked here: ruby/setup-ruby's own cached
-# install is already fast and also manages the gem cache, so duplicating it
-# would be dead weight. Gems and npm packages aren't baked either — they
-# change on every dependency bump, while these inputs change rarely, and
-# bundle/npm install already run fast off actions/cache.
+# Ruby is baked here (not left to ruby/setup-ruby) because that action
+# downloads a prebuilt binary sized for the full GitHub-hosted runner image —
+# inside a minimal container it fails to dynamically link
+# ("libruby.so.4.0: cannot open shared object file"). The official `ruby`
+# image (same one the root Dockerfile builds review apps from) doesn't have
+# that problem. Gems and npm packages still aren't baked — they change on
+# every dependency bump, while these inputs change rarely, and bundle/npm
+# install already run fast off actions/cache.
 #
 # Rebuilt automatically (ci.yml's build_ci_image job) whenever this file,
 # .tool-versions, or package.json changes.
 
-FROM docker.io/library/debian:bookworm-slim
+ARG RUBY_VERSION=4.0.5
+FROM docker.io/library/ruby:$RUBY_VERSION-slim
+
+ENV BUNDLE_PATH=/usr/local/bundle
 
 # Matches ci.yml's former "Install system dependencies" step (imagemagick,
 # libvips, curl, gettext, libcurl4-gnutls-dev, libexpat1-dev, libssl-dev,
 # libz-dev, postgresql-client, ripgrep), plus packages the GitHub-hosted
-# runner ships preinstalled that this minimal base doesn't: build-essential/
+# runner ships preinstalled that this slim base doesn't: build-essential/
 # libpq-dev/libyaml-dev/pkg-config (native gem compilation, e.g. pg), git
 # (required by actions/checkout inside a container job), ca-certificates and
 # xz-utils (fetching/unpacking Node below).
