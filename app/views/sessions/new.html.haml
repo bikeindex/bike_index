@@ -5,8 +5,8 @@
         %h1= t(".get_on_bike_index")
   .container
     .sign-in-up-wrap
-      .row
-        .oauth-providers
+      .row{data: {controller: "login", "login-lookup-url-value": lookup_session_path, "login-magic-link-url-value": create_magic_link_session_path}}
+        .oauth-providers{data: {login_target: "altMethods"}}
           -# %a.facebook-login{ href: '/auth/facebook' }
           -#   %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
           /   %span.oauth-text-block= t(".sign_in_using_facebook")
@@ -23,7 +23,7 @@
             %span.oauth-logo-block
               = inline_svg_tag "icons/envelope.svg", class: "tw:block tw:w-6 tw:h-6 tw:mx-auto"
             %span.oauth-text-block= t(".sign_in_using_magic_link")
-        .sign-in-up-or
+        .sign-in-up-or{data: {login_target: "altMethods"}}
           %h3= t(".or")
         .main-form
           - company = session[:company] if sign_in_partner.present? && session[:company].present?
@@ -45,7 +45,7 @@
               = t(".log_in")
 
           = form_for :session, url: session_url(params.permit(:return_to)),
-            html: {data: {controller: "login", "login-lookup-url-value": lookup_session_path, "login-magic-link-url-value": create_magic_link_session_path}} do |f|
+            html: {data: {login_target: "form"}} do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
 
@@ -77,6 +77,8 @@
                   = t(".keep_me_logged_in")
 
               = f.submit t(".log_in"), class: 'btn btn-primary btn-lg'
+
+              %p.forgot-password-link= link_to t(".email_sign_in_link_instead"), "#", data: {action: "login#sendMagicLink"}
 
             -# Passwordless organizations have no Bike Index password — offer the magic link instead.
             .form-group.tw:hidden{data: {login_target: "magicLinkStep"}}

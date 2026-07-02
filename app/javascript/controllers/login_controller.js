@@ -7,13 +7,16 @@ import { Controller } from '@hotwired/stimulus'
 // The password field stays in the DOM the whole time (only its container is toggled)
 // so password managers can still associate username + password for autofill.
 export default class extends Controller {
-  static targets = ['email', 'continueStep', 'passwordStep', 'passwordInput',
-    'magicLinkStep', 'magicLinkButton', 'changeEmail']
+  static targets = ['form', 'email', 'continueStep', 'passwordStep', 'passwordInput',
+    'magicLinkStep', 'magicLinkButton', 'changeEmail', 'altMethods']
 
   static values = { lookupUrl: String, magicLinkUrl: String }
 
   connect () {
-    this.defaultAction = this.element.getAttribute('action')
+    this.defaultAction = this.formTarget.getAttribute('action')
+    // Alternate sign-in methods (the standalone magic-link link, the "or" divider) are
+    // no-JS fallbacks — hide them so nothing surfaces until the email check resolves.
+    this.altMethodsTargets.forEach((element) => this.toggle(element, false))
     this.reset()
     // A pre-filled email (e.g. re-rendered after a failed password attempt) skips
     // straight to its step so the user isn't asked to click Continue again.
@@ -56,7 +59,7 @@ export default class extends Controller {
 
   changeEmail (event) {
     event.preventDefault()
-    this.element.setAttribute('action', this.defaultAction)
+    this.formTarget.setAttribute('action', this.defaultAction)
     this.reset()
     this.emailTarget.focus()
   }
@@ -65,7 +68,7 @@ export default class extends Controller {
   // top-level email param, so mirror the email there before submitting.
   sendMagicLink (event) {
     event.preventDefault()
-    const form = this.element
+    const form = this.formTarget
     form.setAttribute('action', this.magicLinkUrlValue)
     let hidden = form.querySelector('input[name="email"]')
     if (hidden == null) {
