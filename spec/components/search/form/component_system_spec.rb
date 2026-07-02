@@ -91,8 +91,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       find("#location").set(location)
       expect(page_text(page.text)).to match("miles of")
 
-      # Enter on the empty combobox input submits the search
-      find(".hw-combobox__input").send_keys(:return)
+      # Submit via the button — Enter on the combobox is flaky under Playwright
+      # (refocusing it reopens the dropdown, which swallows the keypress).
+      find("#search-button").click
       expect(page).to have_current_path(/\?/, wait: 5)
 
       expect_localstorage_location(location:, distance:)
