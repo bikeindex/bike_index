@@ -876,6 +876,7 @@ it:
         unicycle: Monociclo
         wheelchair: Sedia a rotelle
         elliptical: Bicicletta ellittica
+        balance_bike: Bicicletta senza pedali
       frame_material:
         aluminum: Alluminio
         composite: Carbonio o composito

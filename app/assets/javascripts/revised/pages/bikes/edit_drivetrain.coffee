@@ -59,7 +59,7 @@ class BikeIndex.BikesEditDrivetrain extends BikeIndex
       fixed_values[side] = $("##{side}_gear_select_value").attr('data-fixed')
     if is_fixed
       $('#edit_drivetrain .not-fixed').slideUp 'medium', ->
-        $('#edit_drivetrain .not-fixed input[type="checkbox"]').prop('checked', '')
+        $('#edit_drivetrain .not-fixed input[type="checkbox"]').prop('checked', '').prop('disabled', false)
         $("#front_gear_select_value #bike_front_gear_type_id_#{fixed_values.front}").prop('checked', true)
         $("#rear_gear_select_value #bike_rear_gear_type_id_#{fixed_values.rear}").prop('checked', true)
     else
@@ -67,8 +67,21 @@ class BikeIndex.BikesEditDrivetrain extends BikeIndex
       $('.not-fixed').slideDown()
 
 
+  # Pinion Gearboxes are internal-only (no external option for their count):
+  # force the internal checkbox on and lock it while one is selected
+  lockInternalFront: (count) ->
+    $checkbox = $('#front_gear_select_internal')
+    internal_only = !isNaN(count) and
+      $("#front_gear_select_value .count_#{count}.internal_true").length > 0 and
+      $("#front_gear_select_value .count_#{count}.internal_false").length == 0
+    if internal_only
+      $checkbox.prop('checked', true).prop('disabled', true)
+    else
+      $checkbox.prop('disabled', false)
+
   setDrivetrainValue: (position) ->
     v = parseInt($("##{position}").val(), 10)
+    @lockInternalFront(v) if position == 'front_gear_select'
     i = $("##{position}_internal").prop('checked')
     if isNaN(v)
       $("##{position}_value .placeholder").prop('selected', 'selected')
