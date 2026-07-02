@@ -39,18 +39,14 @@ jobs:
       - name: Get CPU cores
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
-      # install system dependencies
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: google-chrome-stable curl gettext libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
-          version: 1.0
-      # imagemagick can't go in the cached step above: `identify`/`convert` are
-      # update-alternatives symlinks created by the package's postinst, which
-      # doesn't run on cache restore.
-      - name: Install ImageMagick
+      # Plain apt, not cache-apt-pkgs-action: its restore skips package
+      # postinst scripts (losing update-alternatives binaries like imagemagick's
+      # `identify`), and on cache miss it pins versions from the runner's stale
+      # apt lists, 404s, silently installs nothing, and caches the empty result.
+      - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends imagemagick
+          sudo apt-get install -y --no-install-recommends google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           identify --version
       - name: Checkout code
         uses: actions/checkout@v7
