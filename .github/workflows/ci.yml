@@ -140,15 +140,20 @@ jobs:
       - name: Get CPU cores
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
-      # install system dependencies, imagemagick included — apt ships v6, which
-      # matches production and is what mini_magick 5 uses when no `magick` (v7)
-      # binary is present.
+      # install system dependencies
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          packages: google-chrome-stable curl gettext libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           version: 1.3
-      - name: Ensure ImageMagick is available
-        run: echo $(identify --version)
+      # imagemagick can't go in the cached step above: `identify`/`convert` are
+      # update-alternatives symlinks created by the package's postinst, which
+      # doesn't run on cache restore. apt ships v6, matching production —
+      # mini_magick 5 uses `identify`/`convert` when there's no `magick` (v7).
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends imagemagick
+          identify --version
       # Checkout persists this App token (below) as the git creds so the sync
       # branch is pushed as the App — only a non-default-token push fires
       # `on: push`, which is what attaches the required checks to the PR.
