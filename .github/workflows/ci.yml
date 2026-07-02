@@ -146,16 +146,12 @@ jobs:
       # apt lists, 404s, silently installs nothing, and caches the empty result.
       # imagemagick from apt is v6, matching production — mini_magick 5 uses
       # `identify`/`convert` when there's no `magick` (v7) binary.
+      # No google-chrome-stable: :js specs run Playwright's bundled Chromium (below).
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          sudo apt-get install -y --no-install-recommends curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           identify --version
-          # The runner image ships a chromedriver that lags the apt google-chrome-stable
-          # version; leaving it on PATH makes Selenium use a mismatched driver (flaky
-          # keystroke/focus handling in :js specs). Remove it so Selenium Manager
-          # provisions a chromedriver matching the installed Chrome.
-          sudo rm -f "$(command -v chromedriver)" /usr/local/bin/chromedriver /usr/bin/chromedriver 2>/dev/null || true
       # Checkout persists this App token (below) as the git creds so the sync
       # branch is pushed as the App — only a non-default-token push fires
       # `on: push`, which is what attaches the required checks to the PR.
@@ -177,6 +173,21 @@ jobs:
         with:
           bundler-cache: true
       - run: bundle install
+      # :js system specs run through capybara-playwright-driver, which drives the
+      # `playwright` npm package and its bundled Chromium.
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          cache: 'npm'
+      - run: npm install
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
       - name: Sync translations (only on main by default)

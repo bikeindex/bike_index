@@ -36,7 +36,7 @@ RSpec.describe "Bike search", :js, type: :system do
   end
 
   def search_color_and_submit(color)
-    find(".hw-combobox__input").set(color)
+    type_into(".hw-combobox__input", color)
     expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
     find(".hw-combobox__option", text: color, match: :first).click
     find("#search-button").click
@@ -52,13 +52,6 @@ RSpec.describe "Bike search", :js, type: :system do
     page.current_window.resize_to(1280, 900)
     visit "/"
     click_link "Search", exact: true, match: :first
-  end
-
-  # Clear the browser's back/forward stack. Capybara never resets history between
-  # examples, so it accumulates across the suite, and WebDriver back/forward only
-  # behave reliably on a shallow stack.
-  def reset_browser_history
-    page.driver.browser.execute_cdp("Page.resetNavigationHistory")
   end
 
   # Assert the results *inside the eager turbo-frame* match a color search, so it
