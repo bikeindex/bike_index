@@ -14,6 +14,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
   let!(:wheel_26) { FactoryBot.create(:wheel_size, iso_bsd: 559, name: "26in") }
   let!(:front_gear_fixed) { FrontGearType.fixed }
   let!(:front_gear_double) { FactoryBot.create(:front_gear_type, name: "Double", count: 2, standard: true) }
+  let!(:front_gear_pinion) { FactoryBot.create(:front_gear_type, name: "12 Speed Pinion Gearbox", count: 12, internal: true) }
   let!(:rear_gear_fixed) { RearGearType.fixed }
   let!(:rear_gear_nine) { FactoryBot.create(:rear_gear_type, name: "Nine speed", count: 9, standard: true) }
   let!(:ctype_saddle) { FactoryBot.create(:ctype, name: "Saddle") }
@@ -149,7 +150,15 @@ RSpec.describe "Editing a registration", :js, type: :system do
     choose("bike_rear_tire_narrow_false")
     check("bike_coaster_brake")
     check("bike_belt_drive")
+    # Pinion Gearboxes are internal-only: selecting one checks and disables "Internal front gears"
+    pick_selectize("front_gear_select", "12 Speed Pinion Gearbox")
+    internal_front_check = find("#front_gear_select_internal")
+    expect(internal_front_check).to be_checked
+    expect(internal_front_check).to be_disabled
+    # Switching to a standard front gear re-enables the checkbox
     pick_selectize("front_gear_select", "Double")
+    expect(internal_front_check).not_to be_disabled
+    uncheck "Internal front gears"
     pick_selectize("rear_gear_select", "Nine speed")
     save_bike
 
