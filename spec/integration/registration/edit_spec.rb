@@ -47,7 +47,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
   # The option is loaded over AJAX, so allow a longer wait for it to appear.
   def pick_remote_selectize(control, text)
     control.find(".selectize-input").click
-    control.find(".selectize-input input").set(text)
+    type_into(control.find(".selectize-input input"), text)
     control.find(".selectize-dropdown-content .option", text:, wait: 10).click
   end
 
@@ -65,6 +65,10 @@ RSpec.describe "Editing a registration", :js, type: :system do
   end
 
   it "registers a bike then edits every section of the registration" do
+    # The registration nav below uses the mobile hamburger, shown only below the
+    # lg breakpoint; the Playwright driver defaults to desktop width, so narrow it.
+    page.current_window.resize_to(720, 2000)
+
     # Sign in
     visit new_session_path
     fill_in "Email", with: owner.email

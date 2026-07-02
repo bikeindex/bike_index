@@ -63,7 +63,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     # combobox search: type a query, pick the autocomplete option, submit
     # (also catches turbo-cache stale-DOM regression — the combobox must be usable)
     expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
-    find(".hw-combobox__input").set("Black")
+    type_into(".hw-combobox__input", "Black")
     expect(page).to have_css(".hw-combobox__option", text: "Black", wait: 10)
     find(".hw-combobox__option", text: "Black", match: :first).click
     find("#search-button").click
