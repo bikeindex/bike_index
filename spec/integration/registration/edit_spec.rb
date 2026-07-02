@@ -43,14 +43,11 @@ RSpec.describe "Editing a registration", :js, type: :system do
   end
 
   # Types into a remote-autocomplete selectize (manufacturer fields) and picks the match.
-  # The option is loaded over AJAX, so nudge a keyup to ensure selectize fires its
-  # debounced remote load, then wait generously for the option to render on busy CI.
+  # The option is loaded over AJAX, so allow a longer wait for it to appear.
   def pick_remote_selectize(control, text)
     control.find(".selectize-input").click
-    input = control.find(".selectize-input input")
-    input.set(text)
-    input.send_keys(:space, :backspace)
-    control.find(".selectize-dropdown-content .option", text:, wait: 20).click
+    control.find(".selectize-input input").set(text)
+    control.find(".selectize-dropdown-content .option", text:, wait: 10).click
   end
 
   def save_bike

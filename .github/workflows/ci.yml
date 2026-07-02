@@ -151,6 +151,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           identify --version
+          # The runner image ships a chromedriver that lags the apt google-chrome-stable
+          # version; leaving it on PATH makes Selenium use a mismatched driver (flaky
+          # keystroke/focus handling in :js specs). Remove it so Selenium Manager
+          # provisions a chromedriver matching the installed Chrome.
+          sudo rm -f "$(command -v chromedriver)" /usr/local/bin/chromedriver /usr/bin/chromedriver 2>/dev/null || true
       # Checkout persists this App token (below) as the git creds so the sync
       # branch is pushed as the App — only a non-default-token push fires
       # `on: push`, which is what attaches the required checks to the PR.
