@@ -5,26 +5,7 @@
         %h1= t(".get_on_bike_index")
   .container
     .sign-in-up-wrap
-      .row{data: {controller: "login", "login-lookup-url-value": lookup_session_path, "login-magic-link-url-value": create_magic_link_session_path}}
-        .oauth-providers
-          -# %a.facebook-login{ href: '/auth/facebook' }
-          -#   %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
-          /   %span.oauth-text-block= t(".sign_in_using_facebook")
-          -# %a.strava-login{ href: '/auth/strava' }
-          -#   %span.oauth-logo-block= image_tag 'revised/strava_login.svg'
-          /    %span.oauth-text-block= t(".sign_in_using_strava")
-
-          -#- unless sign_in_partner.present?
-          -#  %a.globalid-login{ href: '/auth/globalid' }
-          -#    %span.oauth-logo-block= image_tag 'revised/globalid_logo.svg'
-          /     %span.oauth-text-block= t(".sign_in_using_globalid")
-
-          %a.magic_link-login{ href: magic_link_session_path }
-            %span.oauth-logo-block
-              = inline_svg_tag "icons/envelope.svg", class: "tw:block tw:w-6 tw:h-6 tw:mx-auto"
-            %span.oauth-text-block= t(".sign_in_using_magic_link")
-        .sign-in-up-or
-          %h3= t(".or")
+      .row
         .main-form
           - company = session[:company] if sign_in_partner.present? && session[:company].present?
           %h3.sign-in-up-main-form-header{ class: (company.present? ? "mb-1" : "") }
@@ -44,8 +25,7 @@
             - else
               = t(".log_in")
 
-          = form_for :session, url: session_url(params.permit(:return_to)),
-            html: {data: {login_target: "form"}} do |f|
+          = form_for :session, url: identify_session_path(params.permit(:return_to)) do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
 
@@ -56,34 +36,7 @@
               placeholder: t(".email"),
               autocomplete: "username",
               required: true,
-              class: 'form-control',
-              data: {login_target: "email"}
+              autofocus: true,
+              class: 'form-control'
 
-            -# Identifier-first step: revealed by JS; without JS the password step below is already shown.
-            .form-group.tw:hidden{data: {login_target: "continueStep"}}
-              %button.btn.btn-primary.btn-lg{type: "button", data: {action: "login#continue"}}= t(".continue")
-
-            .form-group{data: {login_target: "passwordStep"}}
-              = f.label :password, class: 'sr-only'
-              = f.password_field :password,
-              placeholder: t(".password"),
-              autocomplete: "current-password",
-              class: 'form-control',
-              data: {login_target: "passwordInput"}
-
-              .checkbox
-                %label
-                  = f.check_box :remember_me, value: '1', checked: true
-                  = t(".keep_me_logged_in")
-
-              = f.submit t(".log_in"), class: 'btn btn-primary btn-lg'
-
-            -# Passwordless organizations have no Bike Index password — offer the magic link instead.
-            .form-group.tw:hidden{data: {login_target: "magicLinkStep"}}
-              %p= t(".org_uses_magic_link")
-              %button.btn.btn-primary.btn-lg{type: "button", data: {action: "login#sendMagicLink", login_target: "magicLinkButton"}}= t(".email_sign_in_link")
-
-            %p.tw:hidden{data: {login_target: "changeEmail"}}
-              = link_to t(".use_a_different_email"), "#", data: {action: "login#changeEmail"}
-
-          %p.forgot-password-link= link_to t(".forgot_your_password"), request_password_reset_form_users_path
+            = f.submit t(".continue"), class: 'btn btn-primary btn-lg'

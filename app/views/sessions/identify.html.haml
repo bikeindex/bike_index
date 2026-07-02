@@ -1,0 +1,43 @@
+.sign-in-up{ class: (sign_in_partner.present? ? "with-partner" : "not-partner") }
+  - unless sign_in_partner.present?
+    .sign-in-up-header.container
+      .row
+        %h1= t("sessions.new.get_on_bike_index")
+  .container
+    .sign-in-up-wrap
+      .row
+        .main-form
+          %h3.sign-in-up-main-form-header= t("sessions.new.log_in")
+          %p.sign-in-up-identity
+            %strong= @email
+            = link_to t(".back"), new_session_path(email: @email, partner: sign_in_partner, return_to: params[:return_to])
+
+          - if @login_method == "magic_link"
+            %p= t("sessions.new.org_uses_magic_link")
+            = form_tag create_magic_link_session_path, method: "post" do
+              = hidden_field_tag :email, @email
+              = submit_tag t("sessions.new.email_sign_in_link"), class: "btn btn-primary btn-lg"
+          - else
+            = form_for :session, url: session_url(params.permit(:return_to)) do |f|
+              - if sign_in_partner
+                = hidden_field_tag :partner, sign_in_partner
+              -# The email shows as text above; this hidden field keeps password managers
+                associating the username with the password for autofill.
+              = f.hidden_field :email, value: @email, autocomplete: "username"
+
+              .form-group
+                = f.label :password, class: 'sr-only'
+                = f.password_field :password,
+                placeholder: t("sessions.new.password"),
+                autocomplete: "current-password",
+                autofocus: true,
+                class: 'form-control'
+
+              .checkbox
+                %label
+                  = f.check_box :remember_me, value: '1', checked: true
+                  = t("sessions.new.keep_me_logged_in")
+
+              = f.submit t("sessions.new.log_in"), class: 'btn btn-primary btn-lg'
+
+            %p.forgot-password-link= link_to t("sessions.new.forgot_your_password"), request_password_reset_form_users_path

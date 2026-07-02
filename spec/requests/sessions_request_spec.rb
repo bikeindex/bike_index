@@ -2,27 +2,42 @@ require "rails_helper"
 
 RSpec.describe SessionsController, type: :request do
   describe "new" do
-    it "renders the identifier-first form" do
+    it "renders the email-only first step, without a password field" do
       get "/session/new"
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('data-controller="login"')
       expect(response.body).to include('autocomplete="username"')
-      expect(response.body).to include('autocomplete="current-password"')
+      expect(response.body).to_not include('autocomplete="current-password"')
     end
   end
 
-  describe "lookup" do
-    def lookup_method(email)
-      post "/session/lookup", params: {email:}, as: :json
-      response.parsed_body["method"]
+  describe "identify" do
+    def identify(email)
+      post "/session/identify", params: {session: {email:}}
     end
 
-    it "returns password for an ordinary email" do
-      expect(lookup_method("someone@example.com")).to eq "password"
+    context "existing account" do
+      let!(:user) { FactoryBot.create(:user_confirmed, email: "person@example.com") }
+      it "renders the password step with the email preserved" do
+        identify("person@example.com")
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(:identify)
+        expect(response.body).to include('autocomplete="current-password"')
+        expect(response.body).to include("person@example.com")
+      end
     end
 
-    it "returns password for a blank email" do
-      expect(lookup_method("")).to eq "password"
+    context "no account" do
+      it "redirects to sign up with the email pre-filled" do
+        identify("newperson@example.com")
+        expect(response).to redirect_to(new_user_path(email: "newperson@example.com"))
+      end
+    end
+
+    context "blank email" do
+      it "re-renders the email step" do
+        identify("")
+        expect(response).to render_template(:new)
+      end
     end
 
     context "passwordless organization domain" do
@@ -30,9 +45,11 @@ RSpec.describe SessionsController, type: :request do
         FactoryBot.create(:organization_with_organization_features,
           enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "party.edu")
       end
-      it "returns magic_link for the org domain and password otherwise" do
-        expect(lookup_method("someone@party.edu")).to eq "magic_link"
-        expect(lookup_method("someone@elsewhere.edu")).to eq "password"
+      it "renders the magic-link step for the org domain (even with no account yet)" do
+        identify("newperson@party.edu")
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(:identify)
+        expect(response.body).to_not include('autocomplete="current-password"')
       end
     end
   end

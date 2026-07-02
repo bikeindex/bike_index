@@ -371,7 +371,8 @@ RSpec.describe SessionsController, type: :controller do
         expect(user).to receive(:authenticate).and_return(false)
         post :create, params: {session: {password: "something incorrect"}}
         expect(session[:user_id]).to be_nil
-        expect(response).to render_template("new")
+        # Wrong password stays on the credential step (identify), not the email step
+        expect(response).to render_template("identify")
         expect(response).to render_template("layouts/application")
       end
 
