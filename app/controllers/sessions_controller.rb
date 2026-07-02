@@ -8,6 +8,22 @@ class SessionsController < ApplicationController
     render_partner_or_default_signin_layout
   end
 
+  # Dropbox-style identifier-first: the first screen collects only an email; this
+  # decides what the second screen asks for (or where to send them) from that email.
+  def identify
+    @email = permitted_parameters[:email]
+    return render_partner_or_default_signin_layout(render_action: :new) if @email.blank?
+
+    @login_method = login_method_for(@email)
+    # "sso" will join this branch once the SAML SP lands (redirect to the IdP).
+    if @login_method == "password" && User.fuzzy_confirmed_or_unconfirmed_email_find(@email).blank?
+      # No account — start sign-up with the entered email pre-filled.
+      redirect_to new_user_path(email: @email, partner: sign_in_partner)
+    else
+      render_partner_or_default_signin_layout(render_action: :identify)
+    end
+  end
+
   def magic_link
     @token = params[:token]
     @incorrect_token = params[:incorrect_token].presence
@@ -52,12 +68,14 @@ class SessionsController < ApplicationController
       if @user.authenticate(permitted_parameters[:password])
         sign_in_and_redirect(@user)
       else
-        # User couldn't authenticate, so password is invalid
+        # Wrong password — stay on the credential step with the email preserved
         flash.now[:error] = translation(:invalid_email_or_password)
-        render_partner_or_default_signin_layout(render_action: :new)
+        @email = permitted_parameters[:email]
+        @login_method = "password"
+        render_partner_or_default_signin_layout(render_action: :identify)
       end
     else
-      # Email address is not in the DB
+      # Email address is not in the DB — back to the email step
       flash.now[:error] = translation(:invalid_email_or_password)
       render_partner_or_default_signin_layout(render_action: :new)
     end
@@ -77,6 +95,15 @@ class SessionsController < ApplicationController
   end
 
   private
+
+  # Which credential an email's organization requires. Determined by org domain
+  # preference only (never account existence), so this leaks no more than the
+  # eventual sign-in redirect already would. "sso" will slot in here once the
+  # SAML SP lands; today only passwordless-domain orgs diverge from password.
+  def login_method_for(email)
+    return "password" if email.blank?
+    Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
+  end
 
   def permitted_parameters
     params.require(:session).permit(:password, :email, :remember_me)
