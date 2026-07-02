@@ -61,6 +61,19 @@ RSpec.describe CspReportsController, type: :request do
       end
     end
 
+    context "invalid UTF-8 byte sequences" do
+      let(:raw_body) do
+        report.to_json.sub(blocked_uri, "#{blocked_uri}\xC0\xA7\xC0\xA2".force_encoding(Encoding::ASCII_8BIT))
+      end
+
+      it "scrubs the body instead of raising, and forwards the report" do
+        post base_url, params: raw_body,
+          headers: {"CONTENT_TYPE" => "application/csp-report", "HTTP_USER_AGENT" => user_agent}
+        expect(response.status).to eq(204)
+        expect(ForwardCspReportJob.jobs.count).to eq 1
+      end
+    end
+
     context "malformed body" do
       ["not json", "null", "123", {"csp-report" => 5}.to_json].each do |raw_body|
         it "returns 204 without enqueuing for #{raw_body.inspect}" do

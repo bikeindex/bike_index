@@ -701,6 +701,7 @@ en:
         mxn: MXN
         usd: USD
       cycle_type:
+        balance_bike: Balance Bike
         bike: Bike
         cargo: Cargo Bike (front storage)
         cargo_rear: Cargo Bike Rear (e.g. longtail)

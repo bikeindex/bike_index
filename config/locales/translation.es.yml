@@ -882,6 +882,7 @@ es:
           sin pedales)
         traditional_bike: Bicicleta tradicional (2 ruedas, 1 asiento, pedales)
         elliptical: Bicicleta elíptica
+        balance_bike: Bicicleta de equilibrio
       frame_material:
         aluminum: Aluminio
         composite: Carbono o compuesto

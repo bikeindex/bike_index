@@ -8,15 +8,19 @@ class CspReportsController < ApplicationController
   TRANSLATE_DOCUMENT = /\.translate\.goog\z|translate\.google(apis)?\.com/
 
   def create
-    report = parsed_report(request.raw_post)
-    ForwardCspReportJob.perform_async(request.raw_post, current_user&.id) if send_report?(report)
+    # Browsers/bots occasionally send malformed byte sequences (e.g. overlong
+    # UTF-8) that raise downstream, both from Regexp#match? and from Sidekiq's
+    # JSON-encoding of the job args, so scrub once at the boundary.
+    body = request.raw_post.dup.force_encoding(Encoding::UTF_8).scrub
+    report = parsed_report(body)
+    ForwardCspReportJob.perform_async(body, current_user&.id) if send_report?(report)
     head :no_content
   end
 
   private
 
-  def parsed_report(raw_post)
-    parsed = JSON.parse(raw_post)
+  def parsed_report(body)
+    parsed = JSON.parse(body)
     parsed["csp-report"] if parsed.is_a?(Hash) && parsed["csp-report"].is_a?(Hash)
   rescue JSON::ParserError, TypeError
     nil

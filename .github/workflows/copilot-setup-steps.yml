@@ -39,11 +39,16 @@ jobs:
       - name: Get CPU cores
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
-      # install system dependencies
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
-          version: 1.0
+      # Plain apt, not cache-apt-pkgs-action: its restore skips package
+      # postinst scripts (losing update-alternatives binaries like imagemagick's
+      # `identify`), and on cache miss it pins versions from the runner's stale
+      # apt lists, 404s, silently installs nothing, and caches the empty result.
+      # No google-chrome-stable: :js specs run Playwright's bundled Chromium (below).
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          identify --version
       - name: Checkout code
         uses: actions/checkout@v7
       # Install Ruby dependencies
@@ -52,6 +57,15 @@ jobs:
         with:
           bundler-cache: true
       - run: bundle install
+      # :js system specs run through capybara-playwright-driver, which drives the
+      # `playwright` npm package and its bundled Chromium.
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          cache: 'npm'
+      - run: npm install
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
       # db:seed renders mailers (e.g. parking notifications) whose layout calls
       # stylesheet_link_tag "email"; without compiled builds/*.css, Sprockets falls
       # back to compiling the raw .scss with sassc, which isn't bundled (we use
