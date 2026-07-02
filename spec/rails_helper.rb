@@ -41,7 +41,6 @@ require "paper_trail/frameworks/rspec"
 # before any system spec boots the server.
 require "view_component/test_helpers"
 require "view_component/system_test_helpers"
-require "axe-rspec"
 
 ActiveRecord::Migration.maintain_test_schema!
 

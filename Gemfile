@@ -190,5 +190,6 @@ group :test do
   gem "capybara" # For view components
   gem "capybara-playwright-driver" # Drives :js specs through Playwright (the playwright npm package)
   gem "chunky_png" # used to test that generated images match their targets
-  gem "axe-core-rspec" # Accessibility testing
+  # Accessibility testing runs axe-core (the npm package) via Playwright directly;
+  # see spec/support/axe.rb (the axe rubygems assume a Selenium driver).
 end

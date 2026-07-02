@@ -4,7 +4,7 @@ if ENV["LOCAL_CHROME_OVERRIDE"]
   # No-op when LOCAL_CHROME_OVERRIDE is unset — CI and developer machines are
   # unaffected.
   Capybara.register_driver :playwright do |app|
-    PlaywrightDriver.new(app,
+    Capybara::Playwright::Driver.new(app,
       browser_type: :chromium,
       headless: true,
       viewport: {width: 1920, height: 1080},
