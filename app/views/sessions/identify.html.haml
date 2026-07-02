@@ -8,7 +8,7 @@
       .row
         .main-form
           %h3.sign-in-up-main-form-header= t("sessions.new.log_in")
-          %p.sign-in-up-identity
+          %p.sign-in-up-identity{class: "tw:mb-4!"}
             %strong= @email
 
           - if @login_method == "magic_link"
@@ -41,4 +41,4 @@
               = f.submit t("sessions.new.log_in"), class: 'btn btn-primary btn-lg'
 
             %p.forgot-password-link= link_to t("sessions.new.forgot_your_password"), request_password_reset_form_users_path
-            %p.forgot-password-link= link_to t(".different_email"), new_session_path(email: @email, partner: sign_in_partner, return_to: params[:return_to])
+            %p.forgot-password-link{class: "tw:mt-2!"}= link_to t(".different_email"), new_session_path(email: @email, partner: sign_in_partner, return_to: params[:return_to])
