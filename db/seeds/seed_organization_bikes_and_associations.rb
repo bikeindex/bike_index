@@ -32,11 +32,13 @@ sf_locations = [
 
 pn_kinds = %w[appears_abandoned_notification parked_incorrectly_notification appears_abandoned_notification parked_incorrectly_notification]
 
+# Not @example.com: SpamEstimator scores RFC-reserved domains as 100, which
+# would mark every seeded bike likely_spam and hide it from Bike's default scope
 owner_emails = %w[
-  alice@example.com bob@example.com carol@example.com dave@example.com
-  eve@example.com frank@example.com grace@example.com heidi@example.com
-  ivan@example.com judy@example.com kevin@example.com laura@example.com
-  mike@example.com nora@example.com oscar@example.com
+  alice@bikeindex.org bob@bikeindex.org carol@bikeindex.org dave@bikeindex.org
+  eve@bikeindex.org frank@bikeindex.org grace@bikeindex.org heidi@bikeindex.org
+  ivan@bikeindex.org judy@bikeindex.org kevin@bikeindex.org laura@bikeindex.org
+  mike@bikeindex.org nora@bikeindex.org oscar@bikeindex.org
 ]
 
 creator = BikeServices::Creator.new
@@ -149,9 +151,11 @@ sample_notes = [
   "Frequent visitor, registered at orientation",
   "Needs new sticker - old one damaged"
 ]
-hogwarts.bike_organizations.limit(5).each_with_index do |bike_organization, index|
-  BikeOrganizationNote.upsert(bike: bike_organization.bike, organization: bike_organization.organization, body: sample_notes[index], user: member)
-  puts "  Added note for bike ##{bike_organization.bike_id} in #{bike_organization.organization.short_name}"
+# hogwarts.bikes rather than bike_organizations: the unregistered parking
+# notification bikes above are user_hidden, so their bike_organization.bike is nil
+hogwarts.bikes.limit(5).each_with_index do |bike, index|
+  BikeOrganizationNote.upsert(bike:, organization: hogwarts, body: sample_notes[index], user: member)
+  puts "  Added note for bike ##{bike.id} in #{hogwarts.short_name}"
 end
 
 # --- 5 impound records via BikeServices::Creator with status_impounded ---
