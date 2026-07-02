@@ -83,7 +83,8 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def stolen_location
-    current_stolen_record&.address
+    [current_stolen_record&.formatted_address_string(render_country: false),
+      current_stolen_record&.country_iso].reject(&:blank?).join(", ").presence
   end
 
   def stolen_coordinates

@@ -40,7 +40,7 @@
                 <%= @bike.status_impounded? ? translation("found") : translation("stolen_from") %>
               </strong>
 
-              <%= stolen_record.address(country: [:skip_default]) %>
+              <%= stolen_record.formatted_address_string %>
             </li>
             <li>
               <strong><%= translation("stolen_at") %></strong>

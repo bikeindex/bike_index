@@ -103,7 +103,7 @@
                 %p.d-none
                   = Country.united_states_id
             .form-group.col-6
-              = render Form::Combobox::Component.new(name: :state_id, form: s, label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id))
+              = render Form::Combobox::Component.new(name: :region_record_id, form: s, label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id))
           .form-group
             = label :street, "Intersection or address"
             = s.text_field :street, placeholder: "Intersection or address", class: "form-control"
@@ -112,8 +112,8 @@
               = label :city, "City"
               = s.text_field :city, placeholder: "City", class: "form-control"
             .col-6.form-group
-              = label :zipcode, "Zipcode"
-              = s.text_field :zipcode, placeholder: "Zipcode", class: "form-control"
+              = label :postal_code, "Zipcode"
+              = s.text_field :postal_code, placeholder: "Zipcode", class: "form-control"
 
         .col-md-8
           .form-group

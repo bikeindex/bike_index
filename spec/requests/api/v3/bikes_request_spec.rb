@@ -894,7 +894,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.status_stolen?).to be_truthy
       stolen_record = bike.current_stolen_record
       expect(stolen_record.country_id).to eq Country.canada.id
-      expect(stolen_record.state_id).to be_nil
+      expect(stolen_record.region_record_id).to be_nil
       expect(stolen_record.city).to eq "Edmonton"
     end
 
@@ -1283,7 +1283,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.reload.status_stolen?).to be_truthy
       stolen_record = bike.current_stolen_record
       expect(stolen_record.country_id).to eq Country.canada.id
-      expect(stolen_record.state_id).to be_nil
+      expect(stolen_record.region_record_id).to be_nil
       expect(stolen_record.city).to eq "Edmonton"
     end
 
