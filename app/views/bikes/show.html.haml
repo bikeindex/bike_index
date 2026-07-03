@@ -22,7 +22,11 @@
             .col-sm-4.col-lg-2.mt-4
               = submit_tag t(".update"), class: "btn btn-success"
 
-  = render(Org::BikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:))
+  - render_admin_redesign = show_admin_redesigned_bike_page?(@bike, current_user, passive_organization)
+  - if render_admin_redesign
+    = render(PageBlock::BikeAdminRedesign::Component.new(bike: @bike, current_user:, organization: passive_organization))
+  - else
+    = render(Org::BikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:))
 
   - if current_user.present? && @bike.user == current_user
     = render partial: "owner_bike_status_alerts"
@@ -45,7 +49,9 @@
     = render(UI::Alert::Component.new(kind: :notice)) do
       = t(".viewing_listing_preview")
       #{link_to(t(".view_public_non_listing"), bike_path(@bike))}.
-  - if show_redesigned_bike_page?(@bike, current_user)
+  - if render_admin_redesign
+    -# The redesigned admin panel is rendered above, replacing the access panel
+  - elsif show_redesigned_bike_page?(@bike, current_user)
     = render(PageBlock::BikeShowRedesign::Component.new(bike: @bike, current_user:, show_for_sale: @show_for_sale))
   - else
     .row

@@ -739,6 +739,39 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+  context "bike_show_redesign admin panel" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+    before { Flipper.enable(:bike_show_redesign) }
+
+    context "org staff (admin)" do
+      let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
+      it "renders the admin redesign in place of the access panel" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to render_template(:show)
+        body = whitespace_normalized_body_text
+        expect(body).to match("Admin / Staff")
+        expect(body).to match("Bike details")
+        expect(body).to match("Owner & access")
+        expect(body).to match(bike.owner_email)
+        expect(body).to_not match("Access Panel")
+      end
+    end
+
+    context "limited role (member_no_bike_edit)" do
+      let(:current_user) { FactoryBot.create(:organization_user, organization: organization, role: "member_no_bike_edit") }
+      it "hides owner contact and shows the restricted card" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to render_template(:show)
+        body = whitespace_normalized_body_text
+        expect(body).to match("Limited · RA")
+        expect(body).to match("Restricted for your role")
+        expect(body).to match("Bike details")
+        expect(body).to_not match(bike.owner_email)
+        expect(body).to_not match("Access Panel")
+      end
+    end
+  end
   context "qr code png" do
     it "renders" do
       get "#{base_url}/#{bike.id}.png"

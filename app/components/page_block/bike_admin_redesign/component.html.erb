@@ -1,0 +1,321 @@
+<% action_card_classes = "tw:relative tw:block tw:rounded-xl tw:border tw:border-gray-200 tw:p-4 tw:transition tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:dark:border-gray-700 tw:dark:hover:bg-purple-950" %>
+
+<div class="tw:flex tw:flex-col tw:gap-6">
+  <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-4">
+    <div>
+      <div class="tw:mb-2 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+        <%= render(UI::Badge::Component.new(text: org_chip_label, color: org_chip_color, size: :sm)) %>
+        <%= render(UI::Badge::Component.new(text: role_label, color: :gray, size: :sm)) %>
+      </div>
+
+      <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
+
+      <p class="tw:opacity-65"><%= subtitle %></p>
+
+      <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
+        <%= render(UI::Badge::Component.new(text: translation(".registered"), color: :notice)) %>
+
+        <% if @bike.claimed? %>
+          <%= render(UI::Badge::Component.new(text: translation(".claimed"), color: :gray)) %>
+        <% end %>
+
+        <%= render(UI::Badge::Component.new(text: translation(".not_stolen"), color: :success)) %>
+      </div>
+    </div>
+
+    <div class="tw:text-right">
+      <p class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+        <%= translation(".registration") %>
+      </p>
+
+      <p class="tw:font-mono">#<%= @bike.id %></p>
+      <p class="tw:text-sm tw:opacity-65"><%= registered_full_date %></p>
+    </div>
+  </div>
+
+  <div class="tw:grid tw:gap-3 tw:sm:grid-cols-2 tw:lg:grid-cols-4">
+    <% if show_contact? %>
+      <%= link_to "mailto:#{@bike.owner_email}", class: action_card_classes do %>
+        <span class="tw:block tw:font-bold">
+          <%= translation(".message_owner") %>
+        </span>
+
+        <span class="tw:block tw:text-xs tw:opacity-65">
+          <%= translation(".message_owner_sub") %>
+        </span>
+      <% end %>
+    <% end %>
+
+    <% if show_impound? %>
+      <%= link_to impound_path, class: action_card_classes do %>
+        <span class="tw:block tw:font-bold"><%= impound_label %></span>
+
+        <span class="tw:block tw:text-xs tw:opacity-65">
+          <%= impound_sublabel %>
+        </span>
+      <% end %>
+    <% end %>
+
+    <% if staff? && show_parking_notifications? %>
+      <%= link_to notifications_path, class: action_card_classes do %>
+        <span class="tw:block tw:font-bold">
+          <%= translation(".parking_notice") %>
+        </span>
+
+        <span class="tw:block tw:text-xs tw:opacity-65">
+          <%= translation(".parking_notice_sub") %>
+        </span>
+      <% end %>
+    <% end %>
+
+    <% if show_parking_notifications? %>
+      <%= link_to notifications_path, class: action_card_classes do %>
+        <% if current_notifications_count > 0 %>
+          <span class="tw:absolute tw:top-2 tw:right-2">
+            <%= render(UI::Badge::Component.new(text: current_notifications_count, color: :notice, size: :sm)) %>
+          </span>
+        <% end %>
+
+        <span class="tw:block tw:font-bold">
+          <%= translation(".view_notifications") %>
+        </span>
+
+        <span class="tw:block tw:text-xs tw:opacity-65">
+          <%= translation(".view_notifications_sub", current: current_notifications_count, resolved: resolved_notifications_count) %>
+        </span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="tw:grid tw:gap-6 tw:lg:grid-cols-3">
+    <div class="tw:flex tw:flex-col tw:gap-6 tw:lg:col-span-2">
+      <%= render(UI::Card::Component.new) do %>
+        <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+          <%= translation(".bike_details") %>
+        </h2>
+
+        <%= render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"))) { helpers.render_serial_display(@bike, @current_user) } %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registration_number"), value: "##{@bike.id}")) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".credibility"), value: "#{credibility_score} · #{duplicate_serial_note}")) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: manufacturer_name)) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".model"), value: @bike.frame_model)) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".year"), value: @bike.year)) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".primary_colors"), value: @bike.frame_colors.to_sentence)) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_size"), value: @bike.frame_size&.upcase)) %>
+        <% end %>
+      <% end %>
+
+      <% if show_notes? %>
+        <%= render(UI::Card::Component.new) do %>
+          <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+            <%= translation(".internal_notes") %>
+          </h2>
+
+          <% if bike_organization_note.present? %>
+            <div
+              class="
+                tw:mt-3 tw:border-b tw:border-gray-100 tw:pb-3
+                tw:dark:border-gray-800
+              "
+            >
+              <p class="tw:text-sm"><%= bike_organization_note.body %></p>
+
+              <p class="tw:mt-1 tw:text-xs tw:opacity-65">
+                <%= translation(".note_by", user: bike_organization_note.user&.display_name) %>
+
+                <span class="localizeTime withPreposition">
+                  <%= l bike_organization_note.updated_at, format: :convert_time %>
+                </span>
+              </p>
+            </div>
+          <% end %>
+
+          <%= form_with(url: notes_url, method: :patch, class: "tw:mt-3") do |f| %>
+            <%= f.text_area :notes, value: bike_organization_note&.body, name: "notes", rows: 3, class: "twinput tw:w-full", placeholder: translation(".notes_placeholder") %>
+
+            <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">
+              <small class="tw:opacity-65">
+                <%= translation(".posts_as", user: @current_user.display_name) %>
+              </small>
+
+              <%= f.submit translation(".post_note"), class: UI::Button::Component.build_classes(color: :primary, size: :sm) %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% if show_contact? && other_user_bikes.count > 1 %>
+        <%= render(UI::Card::Component.new) do %>
+          <div class="tw:flex tw:items-baseline tw:justify-between">
+            <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+              <%= translation(".other_registrations") %>
+            </h2>
+
+            <span class="tw:text-xs tw:opacity-65">
+              <%= translation(".law_enforcement_access") %>
+            </span>
+          </div>
+
+          <ul class="tw:mt-3 tw:flex tw:flex-col tw:gap-2">
+            <% other_user_bikes.each do |other_bike| %>
+              <li
+                class="
+                  tw:flex tw:items-baseline tw:justify-between tw:gap-3
+                  tw:text-sm
+                "
+              >
+                <span class="tw:opacity-65">
+                  <%= l other_bike.created_at, format: "%b %-d, %Y" %>
+                </span>
+
+                <% if other_bike.id == @bike.id %>
+                  <em class="tw:opacity-65">
+                    <%= translation(".this_bike") %>
+                  </em>
+                <% else %>
+                  <%= link_to other_bike.title_string, bike_path(other_bike), class: "twlink tw:text-right" %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:gap-6">
+      <%= render(UI::Card::Component.new) do %>
+        <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+          <%= translation(".owner_access") %>
+        </h2>
+
+        <% if show_contact? %>
+          <%= render(UI::DefinitionList::Container::Component.new) do %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_name"), value: @bike.owner_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_email"))) { link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") } %>
+
+            <% if owner_phone.present? %>
+              <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_phone"))) { link_to(owner_phone, "tel:#{owner_phone}", class: "twlink tw:font-mono") } %>
+            <% end %>
+
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered"), value: registered_full_date)) %>
+          <% end %>
+          <% if staff? %>
+            <div
+              class="
+                tw:mt-3 tw:rounded-lg tw:bg-purple-50 tw:p-3
+                tw:dark:bg-purple-950
+              "
+            >
+              <p class="tw:text-sm tw:font-bold">
+                <%= translation(".org_can_edit", org_name: @organization.short_name) %>
+              </p>
+
+              <%= link_to translation(".edit_access"), edit_access_path, class: "twlink tw:text-sm" %>
+            </div>
+          <% end %>
+        <% else %>
+          <div
+            class="
+              tw:mt-3 tw:rounded-lg tw:border tw:border-dashed
+              tw:border-gray-300 tw:p-4 tw:dark:border-gray-700
+            "
+          >
+            <p class="tw:font-bold"><%= contact_blocked_title %></p>
+
+            <p class="tw:mt-1 tw:text-sm tw:opacity-65">
+              <%= contact_blocked_message %>
+            </p>
+          </div>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::Card::Component.new) do %>
+        <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+          <%= translation(".e_vehicle_compliance") %>
+        </h2>
+
+        <div class="tw:mt-3 tw:flex tw:flex-col tw:gap-3">
+          <div class="tw:flex tw:items-center tw:justify-between">
+            <div>
+              <p class="tw:text-sm tw:font-bold">
+                <%= translation(".audit") %>
+              </p>
+
+              <p class="tw:text-xs tw:opacity-65">
+                <%= translation(".not_audited") %>
+              </p>
+            </div>
+
+            <span class="tw:cursor-not-allowed tw:opacity-50 <%= UI::Button::Component.build_classes(color: :secondary, size: :sm) %>">
+              <%= translation(".start_audit") %>
+            </span>
+          </div>
+
+          <div class="tw:flex tw:items-center tw:justify-between">
+            <div>
+              <p class="tw:text-sm tw:font-bold">
+                <%= translation(".owner_attestation") %>
+              </p>
+
+              <p class="tw:text-xs tw:opacity-65">
+                <%= translation(".not_attested") %>
+              </p>
+            </div>
+
+            <span class="tw:cursor-not-allowed tw:opacity-50 <%= UI::Button::Component.build_classes(color: :secondary, size: :sm) %>">
+              <%= translation(".request") %>
+            </span>
+          </div>
+        </div>
+
+        <p class="tw:mt-3 tw:text-xs tw:opacity-65">
+          <%= translation(".coming_soon") %>
+        </p>
+      <% end %>
+
+      <% if show_parking_notifications? %>
+        <%= render(UI::Card::Component.new) do %>
+          <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+            <%= translation(".parking_notifications") %>
+          </h2>
+
+          <div class="tw:mt-3 tw:grid tw:grid-cols-2 tw:gap-3">
+            <div
+              class="
+                tw:rounded-lg tw:border tw:border-gray-200 tw:p-3
+                tw:text-center tw:dark:border-gray-700
+              "
+            >
+              <p class="tw:text-2xl tw:font-bold">
+                <%= current_notifications_count %>
+              </p>
+
+              <p class="tw:text-xs tw:opacity-65">
+                <%= translation(".current") %>
+              </p>
+            </div>
+
+            <div
+              class="
+                tw:rounded-lg tw:border tw:border-gray-200 tw:p-3
+                tw:text-center tw:dark:border-gray-700
+              "
+            >
+              <p class="tw:text-2xl tw:font-bold">
+                <%= resolved_notifications_count %>
+              </p>
+
+              <p class="tw:text-xs tw:opacity-65">
+                <%= translation(".resolved") %>
+              </p>
+            </div>
+          </div>
+
+          <%= link_to translation(".open_notifications_page"), notifications_path, class: "twlink tw:mt-3 tw:inline-block tw:text-sm" %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
