@@ -213,9 +213,9 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
 
     # For debugging:
-    if Manufacturer.count > 0
-      raise DirtyDatabaseError.new(example.metadata)
-    end
+    # if ModelName.count > 0
+    #   raise DirtyDatabaseError.new(example.metadata)
+    # end
   end
 
   config.after(:all, :context_state) do
