@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>.bcm *{box-sizing:border-box;}</style>
+<script src="./image-slot.js"></script>
+</helmet>
+
+<div class="bcm" style="width:100%; font-family:'Hanken Grotesk',sans-serif; -webkit-font-smoothing:antialiased; color:#333; background:#fafafa;">
+
+  <!-- status bar -->
+  <div style="height:44px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 22px 6px; background:#fff;">
+    <span style="font-size:13px; font-weight:700;">9:41</span>
+    <span style="display:flex; gap:6px; align-items:center; color:#333;"><svg width="17" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"></rect><rect x="4" y="4" width="3" height="8" rx="1"></rect><rect x="8" y="2" width="3" height="10" rx="1"></rect><rect x="12" y="0" width="3" height="12" rx="1" opacity=".35"></rect></svg><svg width="22" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="#333" stroke-width="1.2"></rect><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="#333"></rect><rect x="22" y="4" width="1.6" height="4" rx="1" fill="#333"></rect></svg></span>
+  </div>
+
+  <!-- app bar -->
+  <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:#fff; border-bottom:1px solid #eee;">
+    <div style="display:flex; align-items:center; gap:9px;">
+      <div style="width:24px; height:24px; border-radius:7px; background:#715eb2; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:12px;">B</div>
+      <span style="font-size:14px; font-weight:800; color:#222;">Bike Index</span>
+    </div>
+    <span style="font-size:12px; font-weight:700; color:#fff; background:{{ pillColor }}; padding:5px 11px; border-radius:999px;">{{ audiencePill }}</span>
+  </div>
+
+  <!-- hero photo -->
+  <div style="position:relative; background:#fff;">
+    <image-slot id="cMain" shape="rect" placeholder="Drop the hero photo" style="display:block; width:100%; height:300px;"></image-slot>
+    <div style="position:absolute; left:0; right:0; bottom:0; padding:18px; background:linear-gradient(to top, rgba(0,0,0,.62), rgba(0,0,0,0));">
+      <sc-if value="{{ stolen }}" hint-placeholder-val="{{ false }}">
+      <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:800; color:#fff; background:#c0392b; padding:4px 10px; border-radius:999px; margin-bottom:7px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>REPORTED STOLEN</span>
+      </sc-if>
+      <h1 style="margin:0 0 2px; font-size:25px; font-weight:800; line-height:1.05; color:#fff;">Cosmo&rsquo;s Trek</h1>
+      <div style="font-size:13.5px; color:rgba(255,255,255,.85);">2022 Trek X-Caliber &middot; Red</div>
+    </div>
+  </div>
+
+  <!-- STOLEN alert (prominent, below hero) -->
+  <sc-if value="{{ stolen }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:12px 18px 0; background:#fff;">
+    <div style="display:flex; align-items:center; gap:10px; padding:12px 14px; background:#fdecea; border:1px solid #f3c9c9; border-left:4px solid #c0392b; border-radius:11px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+      <div><div style="font-size:13.5px; font-weight:800; color:#c0392b; line-height:1.15;">Reported stolen</div><div style="font-size:11.5px; color:#a23b30;">Salt Lake City &middot; Jun 24, 2026 &middot; Report a sighting if seen.</div></div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- thumbnails -->
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:12px 18px; background:#fff;">
+    <image-slot id="cT1" shape="rounded" radius="9" placeholder="Photo" style="display:block; width:100%; height:60px;"></image-slot>
+    <image-slot id="cT2" shape="rounded" radius="9" placeholder="Photo" style="display:block; width:100%; height:60px;"></image-slot>
+    <image-slot id="cT3" shape="rounded" radius="9" placeholder="Photo" style="display:block; width:100%; height:60px;"></image-slot>
+    <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}">
+    <div onClick="{{ onEditPhotos }}" style="height:60px; border-radius:9px; border:1.5px dashed #d6d4e0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#9a8fc4; cursor:pointer; gap:1px;"><span style="font-size:16px; line-height:1;">+</span><span style="font-size:9.5px; font-weight:600;">Add</span></div>
+    </sc-if>
+    <sc-if value="{{ isViewer }}" hint-placeholder-val="{{ false }}">
+    <div style="height:60px; border-radius:9px; background:#f3f1fa; display:flex; align-items:center; justify-content:center; color:#9a8fc4; font-size:11px; font-weight:700;">+5</div>
+    </sc-if>
+  </div>
+
+  <!-- badges -->
+  <div style="display:flex; flex-wrap:wrap; gap:7px; padding:4px 18px 14px; background:#fff;">
+    <span style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; color:#016ec2; background:#e7f3fb; padding:6px 10px; border-radius:999px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#016ec2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>Registered &amp; protected</span>
+    <span style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; color:{{ stolenTagColor }}; background:{{ stolenTagBg }}; padding:6px 10px; border-radius:999px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ stolenTagColor }};"></span>{{ stolenTag }}</span>
+    <span style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; color:#6b6b73; background:#f0f0f2; padding:6px 10px; border-radius:999px;">Registered since May 2026</span>
+  </div>
+
+  <!-- actions -->
+  <div style="padding:0 18px 14px; display:flex; flex-direction:column; gap:9px;">
+    <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}">
+    <button onClick="{{ onMarketplace }}" style="width:100%; padding:14px; border:none; border-radius:12px; background:#715eb2; color:#fff; font-weight:800; font-size:14.5px; cursor:pointer; font-family:inherit;">Sell on Marketplace</button>
+    <div style="display:flex; gap:9px;">
+      <button onClick="{{ onEditBike }}" style="flex:1; padding:12px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; color:#333; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;">Edit bike</button>
+      <button onClick="{{ onShare }}" style="flex:1; padding:12px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; color:#333; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;">Share</button>
+    </div>
+    <button onClick="{{ onStolen }}" style="width:100%; padding:12px; border:1px solid #f3c9c9; border-radius:12px; background:#fff; color:#c0392b; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;">{{ ownerStolenLabel }}</button>
+    </sc-if>
+    <sc-if value="{{ isAuthorized }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; gap:9px;">
+      <button onClick="{{ onContact }}" style="flex:1; padding:13px; border:none; border-radius:12px; background:#715eb2; color:#fff; font-weight:800; font-size:13px; cursor:pointer; font-family:inherit;">Contact owner</button>
+      <button onClick="{{ onShare }}" style="flex:1; padding:13px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; color:#333; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;">Share</button>
+    </div>
+    </sc-if>
+    <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; gap:9px;">
+      <button onClick="{{ onReportStolen }}" style="flex:1; padding:13px; border:none; border-radius:12px; background:#c0392b; color:#fff; font-weight:800; font-size:13px; cursor:pointer; font-family:inherit;">Report stolen</button>
+      <button onClick="{{ onShare }}" style="flex:1; padding:13px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; color:#333; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;">Share</button>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- this bike on Bike Index (congruent widget) -->
+  <div style="padding:0 18px 14px;">
+    <div style="background:#fff; border:1px solid #e5e5e5; border-radius:14px; padding:16px 18px;">
+      <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2; margin-bottom:12px;">This bike on Bike Index</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; justify-content:space-between; gap:12px;"><span style="font-size:13px; color:#9a9aa2;">Registered since</span><span style="font-size:13.5px; color:#333; font-weight:600;">May 2026</span></div>
+        <div style="display:flex; justify-content:space-between; gap:12px;"><span style="font-size:13px; color:#9a9aa2;">Visibility</span><span style="font-size:13.5px; color:#333; font-weight:600;">Public registry</span></div>
+        <div style="display:flex; justify-content:space-between; gap:12px;"><span style="font-size:13px; color:#9a9aa2;">Stolen status</span><span style="font-size:13.5px; color:{{ stolenTagColor }}; font-weight:600;">{{ stolenStatusValue }}</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- bike details (all info except BI reg # + credibility) -->
+  <div style="padding:0 18px 14px;">
+    <div style="background:#fff; border:1px solid #e5e5e5; border-radius:14px; padding:16px 18px;">
+      <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2; margin-bottom:12px;">Bike details</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div><div style="font-size:11px; color:#9a9aa2; margin-bottom:2px;">Serial</div><div style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#333;">WTU218JV6136R</div></div>
+        <div><div style="font-size:11px; color:#9a9aa2; margin-bottom:2px;">Sticker #</div><div style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#333;">A 471 829</div></div>
+        <div><div style="font-size:11px; color:#9a9aa2; margin-bottom:2px;">Manufacturer</div><div style="font-size:13.5px; color:#333;">Trek</div></div>
+        <div><div style="font-size:11px; color:#9a9aa2; margin-bottom:2px;">Model</div><div style="font-size:13.5px; color:#333;">X-Caliber</div></div>
+        <div><div style="font-size:11px; color:#9a9aa2; margin-bottom:2px;">Year</div><div style="font-size:13.5px; color:#333;">2022</div></div>
+        <div><div style="font-size:11px; color:#9a9aa2; margin-bottom:2px;">Activity</div><div style="font-size:13.5px; color:#333;">Mountain</div></div>
+        <div><div style="font-size:11px; color:#9a9aa2; margin-bottom:2px;">Frame</div><div style="font-size:13.5px; color:#333;">Aluminum &middot; S</div></div>
+        <div><div style="font-size:11px; color:#9a9aa2; margin-bottom:2px;">Color</div><div style="font-size:13.5px; color:#333; display:flex; align-items:center; gap:6px;"><span style="width:11px; height:11px; border-radius:3px; background:#e23b3b;"></span>Red</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- about -->
+  <div style="padding:0 18px 14px;">
+    <div style="background:#fff; border:1px solid #e5e5e5; border-radius:14px; padding:16px 18px;">
+      <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2; margin-bottom:8px;">About this bike</div>
+      <p style="margin:0; font-size:13px; line-height:1.55; color:#5b5b63; text-wrap:pretty;">My everyday trail companion &mdash; built up for fast singletrack and the occasional bikepacking weekend.</p>
+      <div style="display:flex; align-items:center; gap:7px; margin-top:12px; font-size:11.5px; color:#9a9aa2;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>Registered May 7, 2026</div>
+    </div>
+  </div>
+
+  <!-- full spec sheet (expandable, below the fold) -->
+  <div style="padding:0 18px 14px;">
+    <button onClick="{{ onToggleSpecs }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:14px 16px; border:1px solid #e5e5e5; border-radius:14px; background:#fff; cursor:pointer; font-family:inherit;">
+      <span style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><span style="font-size:13.5px; font-weight:700; color:#333;">Full spec sheet</span><span style="font-size:11.5px; color:#9a9aa2;">{{ specHint }}</span></span>
+      <span style="display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:#715eb2;">{{ specToggleLabel }}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#715eb2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></span>
+    </button>
+    <sc-if value="{{ expanded }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column; gap:12px; margin-top:12px;">
+      <sc-for list="{{ specGroups }}" as="group" hint-placeholder-count="3">
+      <div style="background:#fff; border:1px solid #e5e5e5; border-radius:14px; padding:15px 16px;">
+        <div style="font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#715eb2; margin-bottom:11px;">{{ group.title }}</div>
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <sc-for list="{{ group.rows }}" as="row" hint-placeholder-count="2">
+          <div style="display:flex; gap:10px;"><span style="flex:none; width:82px; font-size:11.5px; color:#9a9aa2;">{{ row.label }}</span><span style="flex:1; font-size:13px; color:#333; line-height:1.4;">{{ row.value }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-for>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- think this bike is stolen? -->
+  <div style="padding:0 18px 22px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; background:#fff; border:1px solid #e5e5e5; border-radius:14px; padding:14px 16px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="width:30px; height:30px; flex:none; border-radius:8px; background:#fdecea; display:flex; align-items:center; justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></span>
+        <div style="font-size:13px; font-weight:700; color:#333;">Think this bike is stolen?</div>
+      </div>
+      <button onClick="{{ onStolenHelp }}" style="flex:none; padding:9px 13px; border:1px solid #e5e5e5; border-radius:9px; background:#fff; color:#333; font-weight:700; font-size:12.5px; cursor:pointer; font-family:inherit;">{{ stolenHelpCta }}</button>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:11px 18px; border-radius:11px; font-size:13px; font-weight:600; box-shadow:0 10px 30px rgba(0,0,0,.25); z-index:5; white-space:nowrap;">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1700},&quot;viewer&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;owner&quot;,&quot;authorized&quot;,&quot;public&quot;],&quot;default&quot;:&quot;owner&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;stolen&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { toast: '', expanded: false };
+  fire(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: '' }), 2000);
+  }
+  renderVals() {
+    const viewer = this.props.viewer || 'owner';   // 'owner' | 'authorized' | 'public'
+    const isOwner = viewer === 'owner';
+    const isAuthorized = viewer === 'authorized';
+    const isPublic = viewer === 'public';
+    const isViewer = !isOwner;
+    const canContact = isAuthorized;
+    const stolen = !!this.props.stolen;
+
+    let audiencePill, pillColor;
+    if (isOwner) { audiencePill = 'Your bike'; pillColor = '#1f8a5b'; }
+    else if (isAuthorized) { audiencePill = 'Authorized'; pillColor = '#715eb2'; }
+    else { audiencePill = 'Public view'; pillColor = '#3397dc'; }
+
+    const expanded = !!this.state.expanded;
+    const specGroups = [
+      { title: 'Frame & fork', rows: [
+        { label: 'Front fork', value: 'RockShox Judy SL, 100mm, Boost110' },
+        { label: 'Rear susp.', value: 'None — hardtail' },
+        { label: 'Headset', value: 'Semi-integrated, sealed' },
+      ]},
+      { title: 'Wheels & tires', rows: [
+        { label: 'Wheel size', value: '29 in' },
+        { label: 'Tire width', value: '2.20 in' },
+        { label: 'Front wheel', value: 'Bontrager Connection, Tubeless Ready' },
+        { label: 'Rear wheel', value: 'Bontrager Connection, Tubeless Ready' },
+        { label: 'Front tire', value: 'Bontrager XR2 Team Issue, 29×2.20"' },
+        { label: 'Rear tire', value: 'Bontrager XR2 Team Issue, 29×2.20"' },
+      ]},
+      { title: 'Drivetrain', rows: [
+        { label: 'Speeds', value: '1 × 12' },
+        { label: 'Chain', value: 'Shimano Deore M6100' },
+        { label: 'Crankset', value: 'Shimano, 32T' },
+        { label: 'Bottom br.', value: '73mm BSA threaded' },
+        { label: 'Rear der.', value: 'Shimano Deore M6100, 12-spd' },
+        { label: 'Pedals', value: 'Not included' },
+      ]},
+      { title: 'Brakes', rows: [
+        { label: 'Front/rear', value: 'Shimano MT200 hydraulic disc' },
+      ]},
+      { title: 'Cockpit & finishing', rows: [
+        { label: 'Handlebar', value: 'Flat alloy, 720mm' },
+        { label: 'Saddle', value: 'Bontrager Arvada' },
+        { label: 'Seatpost', value: 'Bontrager alloy, 31.6mm' },
+      ]},
+      { title: 'Distinguishing features', rows: [
+        { label: 'Notes', value: 'Custom blue cable housing; small scratch on the top tube near the head badge.' },
+      ]},
+    ];
+
+    return {
+      isOwner, isViewer, isAuthorized, isPublic, canContact, audiencePill, pillColor,
+      stolen,
+      stolenTag: stolen ? 'Reported stolen' : 'Not stolen',
+      stolenTagColor: stolen ? '#c0392b' : '#1f8a5b',
+      stolenTagBg: stolen ? '#fdecea' : '#e8f5ee',
+      stolenStatusValue: stolen ? 'Reported stolen' : 'Not reported',
+      ownerStolenLabel: stolen ? 'Update stolen report' : 'Mark stolen',
+      onReportStolen: () => this.fire('Report this bike as stolen'),
+      expanded,
+      specGroups,
+      specToggleLabel: expanded ? 'Hide' : 'Show all',
+      specHint: 'Drivetrain, wheels, brakes & more',
+      onToggleSpecs: () => this.setState(s => ({ expanded: !s.expanded })),
+      stolenHelpCta: isAuthorized ? 'Get contact' : 'What to do',
+      hasToast: !!this.state.toast,
+      toast: this.state.toast,
+      onMarketplace: () => this.fire('Listing on Marketplace'),
+      onShare: () => this.fire('Share link copied'),
+      onStolen: () => this.fire('Report bike as stolen'),
+      onContact: () => this.fire('Contact form opened'),
+      onSeen: () => this.fire('Sighting reported'),
+      onEditPhotos: () => this.fire('Edit gallery photos'),
+      onEditBike: () => this.fire('Opening the edit-bike page'),
+      onStolenHelp: () => this.fire(isAuthorized
+        ? 'Owner contact — craig@bikeindex.org · 415-602-6066'
+        : 'Opening the Bike Index stolen-bike guide'),
+    };
+  }
+}
+</script>
+</body>
+</html>

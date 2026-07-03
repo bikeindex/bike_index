@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .bcv * { box-sizing: border-box; }
+</style>
+<script src="./image-slot.js"></script>
+</helmet>
+
+<div class="bcv" style="width:100%; font-family:'Hanken Grotesk',sans-serif; -webkit-font-smoothing:antialiased; color:#333; background:#fafafa; border-radius:16px; box-shadow:0 8px 30px rgba(17,17,26,.10); overflow:hidden; border:1px solid #e5e5e5;">
+
+  <!-- public nav -->
+  <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 26px; background:#fff; border-bottom:1px solid #eee;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="width:26px; height:26px; border-radius:7px; background:#715eb2; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:13px;">B</div>
+      <span style="font-size:15px; font-weight:800; color:#222;">Bike Index</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#b3b3b9;">bikeindex.org/bikes/2918844</span>
+      <span style="font-size:12.5px; font-weight:700; color:#fff; background:{{ pillColor }}; padding:5px 12px; border-radius:999px;">{{ audiencePill }}</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:0;">
+
+    <!-- gallery -->
+    <div style="padding:24px; background:#fff;">
+      <image-slot id="cMain" shape="rounded" radius="14" placeholder="Drop the hero photo" style="display:block; width:100%; height:360px;"></image-slot>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px;">
+        <image-slot id="cT1" shape="rounded" radius="10" placeholder="Photo" style="display:block; width:100%; height:74px;"></image-slot>
+        <image-slot id="cT2" shape="rounded" radius="10" placeholder="Photo" style="display:block; width:100%; height:74px;"></image-slot>
+        <image-slot id="cT3" shape="rounded" radius="10" placeholder="Photo" style="display:block; width:100%; height:74px;"></image-slot>
+        <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}">
+        <div onClick="{{ onEditPhotos }}" style="height:74px; border-radius:10px; border:1.5px dashed #d6d4e0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#9a8fc4; cursor:pointer; gap:2px;"><span style="font-size:18px; line-height:1;">+</span><span style="font-size:10.5px; font-weight:600;">Add</span></div>
+        </sc-if>
+        <sc-if value="{{ isViewer }}" hint-placeholder-val="{{ false }}">
+        <div style="height:74px; border-radius:10px; background:#f3f1fa; display:flex; align-items:center; justify-content:center; color:#9a8fc4; font-size:11px; font-weight:700;">+5 more</div>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- summary -->
+    <div style="padding:28px 28px 24px; background:linear-gradient(160deg,#f7f5fc,#fafafa); display:flex; flex-direction:column;">
+      <h1 style="margin:0 0 4px; font-size:30px; font-weight:800; line-height:1.05; color:#222;">Cosmo’s Trek</h1>
+      <div style="font-size:15px; color:#6b6b73; margin-bottom:14px;">2022 Trek X-Caliber · Red</div>
+
+      <!-- badges -->
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;">
+        <span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:#016ec2; background:#e7f3fb; padding:6px 11px; border-radius:999px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#016ec2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>Registered &amp; protected</span>
+        <span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:#1f8a5b; background:#e8f5ee; padding:6px 11px; border-radius:999px;"><span style="width:7px; height:7px; border-radius:50%; background:#1f8a5b;"></span>Not stolen</span>
+      </div>
+
+      <!-- primary actions -->
+      <div style="display:flex; flex-direction:column; gap:9px; margin-top:auto;">
+        <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ onMarketplace }}" style="width:100%; padding:13px; border:none; border-radius:11px; background:#715eb2; color:#fff; font-weight:800; font-size:14px; cursor:pointer; font-family:inherit;">Sell on Marketplace</button>
+        <div style="display:flex; gap:9px;">
+          <button onClick="{{ onShare }}" style="flex:1; padding:11px; border:1px solid #e5e5e5; border-radius:11px; background:#fff; color:#333; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;">Share my page</button>
+          <button onClick="{{ onStolen }}" style="flex:1; padding:11px; border:1px solid #f3c9c9; border-radius:11px; background:#fff; color:#c0392b; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;">Mark stolen</button>
+        </div>
+        </sc-if>
+        <sc-if value="{{ isViewer }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ onContact }}" style="width:100%; padding:13px; border:none; border-radius:11px; background:#715eb2; color:#fff; font-weight:800; font-size:14px; cursor:pointer; font-family:inherit;">Contact owner via Bike Index</button>
+        <div style="display:flex; gap:9px;">
+          <button onClick="{{ onShare }}" style="flex:1; padding:11px; border:1px solid #e5e5e5; border-radius:11px; background:#fff; color:#333; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;">Share</button>
+          <button onClick="{{ onSeen }}" style="flex:1; padding:11px; border:1px solid #e5e5e5; border-radius:11px; background:#fff; color:#333; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;">Report sighting</button>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <!-- specs strip -->
+  <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:#eee; border-top:1px solid #eee; border-bottom:1px solid #eee;">
+    <div style="background:#fff; padding:16px 18px;"><div style="font-size:11px; color:#9a9aa2; margin-bottom:3px;">Frame</div><div style="font-size:14px; font-weight:600; color:#333;">Aluminum · S</div></div>
+    <div style="background:#fff; padding:16px 18px;"><div style="font-size:11px; color:#9a9aa2; margin-bottom:3px;">Activity</div><div style="font-size:14px; font-weight:600; color:#333;">Mountain</div></div>
+    <div style="background:#fff; padding:16px 18px;"><div style="font-size:11px; color:#9a9aa2; margin-bottom:3px;">Color</div><div style="font-size:14px; font-weight:600; color:#333; display:flex; align-items:center; gap:6px;"><span style="width:11px; height:11px; border-radius:3px; background:#e23b3b;"></span>Red</div></div>
+    <div style="background:#fff; padding:16px 18px;"><div style="font-size:11px; color:#9a9aa2; margin-bottom:3px;">Year</div><div style="font-size:14px; font-weight:600; color:#333;">2022</div></div>
+    <div style="background:#fff; padding:16px 18px;"><div style="font-size:11px; color:#9a9aa2; margin-bottom:3px;">Status</div><div style="font-size:14px; font-weight:600; color:#1f8a5b;">Not stolen</div></div>
+  </div>
+
+  <!-- bottom band -->
+  <div style="padding:22px 26px;">
+    <!-- about / story -->
+    <div style="background:#fff; border:1px solid #eee; border-radius:14px; padding:20px 22px;">
+      <div style="font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2; margin-bottom:10px;">About this bike</div>
+      <p style="margin:0; font-size:14px; line-height:1.55; color:#5b5b63; text-wrap:pretty;">My everyday trail companion — built up for fast singletrack and the occasional bikepacking weekend. Registered on Bike Index so it’s protected, recognizable, and ready to show off.</p>
+      <div style="display:flex; align-items:center; gap:8px; margin-top:14px; font-size:12.5px; color:#9a9aa2;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>Registered May 7, 2026 · #2918844</div>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; bottom:18px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:12px 20px; border-radius:11px; font-size:13.5px; font-weight:600; box-shadow:0 10px 30px rgba(0,0,0,.25); z-index:5;">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1000},&quot;isOwner&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { toast: '' };
+  fire(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: '' }), 2200);
+  }
+  renderVals() {
+    const isOwner = this.props.isOwner !== false;
+    return {
+      isOwner,
+      isViewer: !isOwner,
+      audiencePill: isOwner ? 'Your bike' : 'Public view',
+      pillColor: isOwner ? '#1f8a5b' : '#3397dc',
+      hasToast: !!this.state.toast,
+      toast: this.state.toast,
+      onMarketplace: () => this.fire('Listing on Marketplace'),
+      onShare: () => this.fire('Share link copied'),
+      onStolen: () => this.fire('Report bike as stolen'),
+      onContact: () => this.fire('Contact form opened (owner stays private)'),
+      onSeen: () => this.fire('Sighting reported'),
+      onEditPhotos: () => this.fire('Edit gallery photos'),
+    };
+  }
+}
+</script>
+</body>
+</html>
