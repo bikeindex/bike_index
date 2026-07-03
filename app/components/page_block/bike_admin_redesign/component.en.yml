@@ -26,8 +26,9 @@ en:
         not_attested: Not attested
         not_audited: Not audited
         not_in_org: Not in your org
-        not_registered_message: Owner contact isn't available for bikes outside your
-          organization. You can still add internal notes.
+        not_registered_message: >-
+          Owner contact isn't available for bikes outside your organization. You can
+          still add internal notes.
         not_registered_title: Not registered with %{org_name}
         not_stolen: Not stolen
         note_by: Note by %{user}
@@ -54,8 +55,9 @@ en:
         request_impound: Request impound
         request_impound_sub: Sent for approval
         resolved: Resolved
-        restricted_message: Owner contact is available to admin & staff. You can add
-          notes and request an impound.
+        restricted_message: >-
+          Owner contact is available to admin & staff. You can add notes and request
+          an impound.
         restricted_title: Restricted for your role
         role_limited: Limited · RA
         role_staff: Admin / Staff
