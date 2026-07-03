@@ -68,6 +68,12 @@ brakebills_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_o
 brakebills_invoice.update(organization_feature_ids: brakebills_feature_ids)
 OrganizationRole.create(organization_id: brakebills.id, user_id: User.find_by_email("member@bikeindex.org").id, role: "member")
 
+# Logo (rasterized from db/seeds/images/brakebills.svg — CarrierWave rejects SVG)
+if brakebills.avatar.blank?
+  File.open(Rails.root.join("db/seeds/images/brakebills.png")) { |file| brakebills.avatar = file }
+  brakebills.save!
+end
+
 # --- Ike's Bikes ---
 ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
 ikes.save
