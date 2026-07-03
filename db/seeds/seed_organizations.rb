@@ -1,4 +1,4 @@
-# Seed organizations: Hogwarts, Ike's Bikes, and Cannondale
+# Seed organizations: Brakebills, Ike's Bikes, and Cannondale
 
 # --- Organization Features ---
 # This list was created with:
@@ -61,12 +61,12 @@ feature_name_and_slugs.each do |attrs|
   skip_ownership_email_feature_id = org_feature.id if attrs[:name] == "Skip ownership email"
 end
 
-# --- Hogwarts: all features except official_manufacturer, with is_endless invoice - and skip_ownership_email ---
-hogwarts = Organization.find_by_name("Hogwarts") || Organization.create!(name: "Hogwarts")
-hogwarts_invoice = Invoice.create(organization: hogwarts, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
-hogwarts_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_ownership_email_feature_id]
-hogwarts_invoice.update(organization_feature_ids: hogwarts_feature_ids)
-OrganizationRole.create(organization_id: hogwarts.id, user_id: User.find_by_email("member@bikeindex.org").id, role: "member")
+# --- Brakebills: all features except official_manufacturer, with is_endless invoice - and skip_ownership_email ---
+brakebills = Organization.find_by_name("Brakebills") || Organization.create!(name: "Brakebills")
+brakebills_invoice = Invoice.create(organization: brakebills, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
+brakebills_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_ownership_email_feature_id]
+brakebills_invoice.update(organization_feature_ids: brakebills_feature_ids)
+OrganizationRole.create(organization_id: brakebills.id, user_id: User.find_by_email("member@bikeindex.org").id, role: "member")
 
 # --- Ike's Bikes ---
 ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
@@ -86,4 +86,4 @@ OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user
 # Make sure example organization exists
 Organization.example
 
-puts "Organizations seeded: Hogwarts, Ikes Bike's, Cannondale\n"
+puts "Organizations seeded: Brakebills, Ikes Bike's, Cannondale\n"

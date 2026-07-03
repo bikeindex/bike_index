@@ -1,13 +1,13 @@
-# Seed parking notifications and impound records around San Francisco for the Hogwarts organization
-hogwarts = Organization.find_by_name("Hogwarts")
+# Seed parking notifications and impound records around San Francisco for the Brakebills organization
+brakebills = Organization.find_by_name("Brakebills")
 member = User.find_by_email("member@bikeindex.org")
 user = User.find_by_email("user@bikeindex.org")
 
-raise "missing Hogwarts org, test users, or manufacturers" if member.blank? || user.blank? || Manufacturer.none?
+raise "missing Brakebills org, test users, or manufacturers" if member.blank? || user.blank? || Manufacturer.none?
 
-# Make member a member of Hogwarts if not already
-unless OrganizationRole.where(organization: hogwarts, user: member).exists?
-  OrganizationRole.create!(organization: hogwarts, user: member, role: "member")
+# Make member a member of Brakebills if not already
+unless OrganizationRole.where(organization: brakebills, user: member).exists?
+  OrganizationRole.create!(organization: brakebills, user: member, role: "member")
 end
 
 us = Country.united_states
@@ -35,15 +35,15 @@ pn_kinds = %w[appears_abandoned_notification parked_incorrectly_notification app
 # Not @example.com: SpamEstimator scores RFC-reserved domains as 100, which
 # would mark every seeded bike likely_spam and hide it from Bike's default scope
 owner_emails = %w[
-  alice@bikeindex.org bob@bikeindex.org carol@bikeindex.org dave@bikeindex.org
-  eve@bikeindex.org frank@bikeindex.org grace@bikeindex.org heidi@bikeindex.org
-  ivan@bikeindex.org judy@bikeindex.org kevin@bikeindex.org laura@bikeindex.org
-  mike@bikeindex.org nora@bikeindex.org oscar@bikeindex.org
+  alice@brakebills.edu bob@brakebills.edu carol@brakebills.edu dave@brakebills.edu
+  eve@brakebills.edu frank@brakebills.edu grace@brakebills.edu heidi@brakebills.edu
+  ivan@brakebills.edu judy@brakebills.edu kevin@brakebills.edu laura@brakebills.edu
+  mike@brakebills.edu nora@brakebills.edu oscar@brakebills.edu
 ]
 
 creator = BikeServices::Creator.new
 
-def org_bike_params(owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id, manufacturer_id: nil)
+def org_bike_params(owner_email:, creation_organization_id: Organization.find_by_name("Brakebills").id, manufacturer_id: nil)
   manufacturer_id ||= SeedHelpers.weighted_frame_maker_id
   {
     cycle_type: "bike",
@@ -58,7 +58,7 @@ def org_bike_params(owner_email:, creation_organization_id: Organization.find_by
   }
 end
 
-def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organization.find_by_name("Hogwarts").id, **bike_attrs)
+def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organization.find_by_name("Brakebills").id, **bike_attrs)
   b_param = BParam.create!(creator: user, params: {bike: org_bike_params(owner_email:, creation_organization_id:).merge(bike_attrs)})
   b_param.origin = "organization_form"
   bike = creator.create_bike(b_param)
@@ -76,7 +76,7 @@ initial_notifications = []
   pn = ParkingNotification.create!(
     bike:,
     user: member,
-    organization: hogwarts,
+    organization: brakebills,
     kind: pn_kinds[i % pn_kinds.length],
     street: loc[:street],
     city: loc[:city],
@@ -98,7 +98,7 @@ end
   pn = ParkingNotification.create!(
     bike_id: initial.bike_id,
     user: member,
-    organization: hogwarts,
+    organization: brakebills,
     kind: "impound_notification",
     initial_record_id: initial.id,
     street: loc[:street],
@@ -151,15 +151,15 @@ sample_notes = [
   "Frequent visitor, registered at orientation",
   "Needs new sticker - old one damaged"
 ]
-# hogwarts.bikes rather than bike_organizations: the unregistered parking
+# brakebills.bikes rather than bike_organizations: the unregistered parking
 # notification bikes above are user_hidden, so their bike_organization.bike is nil
-hogwarts.bikes.limit(5).each_with_index do |bike, index|
-  BikeOrganizationNote.upsert(bike:, organization: hogwarts, body: sample_notes[index], user: member)
-  puts "  Added note for bike ##{bike.id} in #{hogwarts.short_name}"
+brakebills.bikes.limit(5).each_with_index do |bike, index|
+  BikeOrganizationNote.upsert(bike:, organization: brakebills, body: sample_notes[index], user: member)
+  puts "  Added note for bike ##{bike.id} in #{brakebills.short_name}"
 end
 
 # --- 5 impound records via BikeServices::Creator with status_impounded ---
-puts "Creating 5 impound records in San Francisco for Hogwarts..."
+puts "Creating 5 impound records in San Francisco for Brakebills..."
 
 5.times do |i|
   loc = sf_locations[i]
@@ -193,7 +193,7 @@ end
 
 puts "Impound records seeded successfully!"
 
-# --- Non-bike cycle types registered to Hogwarts ---
+# --- Non-bike cycle types registered to Brakebills ---
 puts "Seeding non-cycle types and e-vehicles"
 [
   {cycle_type: "e-scooter", propulsion_type: "foot-pedal"},
@@ -208,20 +208,20 @@ puts "Seeding non-cycle types and e-vehicles"
   FindOrCreateModelAuditJob.new.perform(bike.id)
 end
 
-# --- Bike Sticker Batch "HO" for Hogwarts ---
-puts "Creating bike sticker batch HO with 20 stickers..."
+# --- Bike Sticker Batch "BR" for Brakebills ---
+puts "Creating bike sticker batch BR with 20 stickers..."
 sticker_batch = BikeStickerBatch.create!(
-  prefix: "HO",
-  organization: hogwarts,
+  prefix: "BR",
+  organization: brakebills,
   user: member,
   code_number_length: 4
 )
 sticker_batch.create_codes(20, initial_code_integer: 0)
 
 # Assign 3 stickers to bikes
-hogwarts_bikes = hogwarts.bikes.limit(3)
+brakebills_bikes = brakebills.bikes.limit(3)
 sticker_batch.bike_stickers.limit(3).each_with_index do |sticker, i|
-  sticker.claim(user: member, bike: hogwarts_bikes[i])
-  puts "  Assigned sticker #{sticker.code} to bike ##{hogwarts_bikes[i].id}"
+  sticker.claim(user: member, bike: brakebills_bikes[i])
+  puts "  Assigned sticker #{sticker.code} to bike ##{brakebills_bikes[i].id}"
 end
-puts "Bike sticker batch HO seeded with 20 stickers (3 assigned to bikes)"
+puts "Bike sticker batch BR seeded with 20 stickers (3 assigned to bikes)"
