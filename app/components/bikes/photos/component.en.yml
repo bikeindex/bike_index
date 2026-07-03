@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    bikes:
+      photos:
+        add_photo: Add photo
+        remove_photo: Remove
+        replace_photo: Replace

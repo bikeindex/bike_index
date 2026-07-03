@@ -1,0 +1,81 @@
+<div class="tw:flex tw:flex-col tw:gap-3">
+  <% if has_photos? %>
+    <div
+      data-controller="bike-photos"
+      data-bike-photos-active-class="tw:border-blue-500"
+      class="tw:flex tw:flex-col tw:gap-3"
+    >
+      <div class="tw:overflow-hidden tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900">
+        <%= image_tag(
+          bike_image_url,
+          alt: t("bikes.main_show_block.bike_photo", bike_type: @bike.type_titleize),
+          data: {bike_photos_target: "main"},
+          class: "tw:aspect-4/3 tw:w-full tw:object-contain",
+        ) %>
+      </div>
+
+      <% if @owner %>
+        <div class="tw:flex tw:gap-2">
+          <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: translation(".replace_photo"), size: :sm)) %>
+          <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: translation(".remove_photo"), size: :sm, color: :error)) %>
+        </div>
+      <% end %>
+
+      <% if @bike.public_images.count > 1 %>
+        <ul class="tw:flex tw:flex-wrap tw:gap-2">
+          <% @bike.public_images.select(&:image_url).each_with_index do |public_image, index| %>
+            <li class="tw:flex tw:flex-col tw:items-center tw:gap-1">
+              <button
+                type="button"
+                data-bike-photos-target="thumbnail"
+                data-action="click->bike-photos#select"
+                data-large-url="<%= public_image.image_url(:large) %>"
+                data-photo-alt="<%= public_image.name %>"
+                class="
+                  tw:cursor-pointer tw:overflow-hidden tw:rounded-sm tw:border-2
+                  <%= (index == 0) ? "tw:border-blue-500" : "tw:border-transparent" %>
+                "
+              >
+                <%= image_tag public_image.image_url(:small), alt: public_image.name.to_s, class: "tw:h-16 tw:w-16 tw:object-cover" %>
+              </button>
+
+              <% if @owner %>
+                <div class="tw:flex tw:gap-1">
+                  <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: translation(".replace_photo"), size: :sm)) %>
+                  <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: translation(".remove_photo"), size: :sm, color: :error)) %>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+
+          <% if @owner %>
+            <li>
+              <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  <% elsif @bike.stock_photo_url.present? %>
+    <div class="tw:overflow-hidden tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900">
+      <h3 class="tw:p-2 tw:text-sm tw:opacity-65">
+        <%= t("bikes.main_show_block.stock_photo", year: @bike.year, model: @bike.frame_model) %>
+        <em><%= t("bikes.main_show_block.color_may_not_match") %></em>
+      </h3>
+
+      <%= image_tag(@bike.stock_photo_url, alt: t("bikes.main_show_block.bike_photo", bike_type: @bike.type_titleize), class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
+    </div>
+    <% if @owner %>
+      <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
+    <% end %>
+  <% elsif @owner %>
+    <div
+      class="
+        tw:flex tw:aspect-4/3 tw:items-center tw:justify-center
+        tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900
+      "
+    >
+      <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
+    </div>
+  <% end %>
+</div>
