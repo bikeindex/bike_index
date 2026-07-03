@@ -5,6 +5,8 @@ en:
       bike_show_redesign:
         about_this_bike: About this bike
         activity: Activity
+        audience_owner: Your bike
+        audience_public: Public view
         bike_details: Bike details
         component_no_info: "-"
         componentyear: "%{componentyear}"
@@ -29,6 +31,7 @@ en:
         registered_since_label: Registered since
         sell_on_marketplace: Sell on Marketplace
         serial: Serial
+        share: Share
         share_my_page: Share my page
         sticker_number: 'Sticker #'
         stolen_status: Stolen status

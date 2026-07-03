@@ -8,7 +8,12 @@
 
     <div class="tw:flex tw:flex-col tw:gap-4">
       <div>
+        <div class="tw:mb-1">
+          <%= render(UI::Badge::Component.new(text: audience_label, color: audience_color, size: :sm)) %>
+        </div>
+
         <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
+
         <p class="tw:opacity-65"><%= subtitle %></p>
       </div>
 
@@ -51,6 +56,16 @@
           </details>
         </div>
         <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :error, html_class: "tw:justify-center")) %>
+      <% else %>
+        <details class="tw:group">
+          <summary class="tw:list-none tw:justify-center <%= UI::Button::Component.build_classes(color: :secondary, size: :md) %>">
+            <%= translation(".share") %>
+          </summary>
+
+          <div class="tw:mt-2">
+            <%= render partial: "shared/share_this" %>
+          </div>
+        </details>
       <% end %>
     </div>
   </div>

@@ -25,6 +25,14 @@ module PageBlock
         @bike.manufacturer&.other? ? @bike.mnfg_name : @bike.manufacturer&.name
       end
 
+      def audience_label
+        @owner ? translation(".audience_owner") : translation(".audience_public")
+      end
+
+      def audience_color
+        @owner ? :success : :notice
+      end
+
       def registered_since_month_year
         l(@bike.created_at, format: "%B %Y")
       end

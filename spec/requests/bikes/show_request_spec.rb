@@ -698,6 +698,7 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.id}"
         expect(response).to render_template(:show)
         expect(whitespace_normalized_body_text).to match("Bike details")
+        expect(whitespace_normalized_body_text).to match("Your bike")
         expect(whitespace_normalized_body_text).to match("Edit bike")
         expect(whitespace_normalized_body_text).to match("Mark stolen")
         expect(whitespace_normalized_body_text).to match("Add photo")
@@ -705,10 +706,12 @@ RSpec.describe "BikesController#show", type: :request do
 
       context "current_user not owner" do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
-        it "hides owner actions" do
+        it "hides owner actions, shows the public view and share" do
           get "#{base_url}/#{bike.id}"
           expect(response).to render_template(:show)
           expect(whitespace_normalized_body_text).to match("Bike details")
+          expect(whitespace_normalized_body_text).to match("Public view")
+          expect(whitespace_normalized_body_text).to match("Share")
           expect(whitespace_normalized_body_text).to_not match("Edit bike")
           expect(whitespace_normalized_body_text).to_not match("Mark stolen")
           expect(whitespace_normalized_body_text).to_not match("Add photo")
