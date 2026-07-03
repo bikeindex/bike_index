@@ -1,5 +1,5 @@
 .col-md-8
-  = render partial: "bikes/bike_photos", locals: { bike: @bike }
+  = render partial: "bikes/bike_photos", locals: { bike: @bike, owner: false }
 
   .show-bike-details
     - if @show_for_sale

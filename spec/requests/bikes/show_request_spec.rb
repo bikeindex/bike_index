@@ -700,6 +700,7 @@ RSpec.describe "BikesController#show", type: :request do
         expect(whitespace_normalized_body_text).to match("Bike details")
         expect(whitespace_normalized_body_text).to match("Edit bike")
         expect(whitespace_normalized_body_text).to match("Mark stolen")
+        expect(whitespace_normalized_body_text).to match("Add photo")
       end
 
       context "current_user not owner" do
@@ -710,6 +711,18 @@ RSpec.describe "BikesController#show", type: :request do
           expect(whitespace_normalized_body_text).to match("Bike details")
           expect(whitespace_normalized_body_text).to_not match("Edit bike")
           expect(whitespace_normalized_body_text).to_not match("Mark stolen")
+          expect(whitespace_normalized_body_text).to_not match("Add photo")
+        end
+      end
+
+      context "with photos" do
+        let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
+        it "renders replace/remove links to the photos edit page" do
+          get "#{base_url}/#{bike.id}"
+          expect(response).to render_template(:show)
+          expect(whitespace_normalized_body_text).to match("Replace")
+          expect(whitespace_normalized_body_text).to match("Remove")
+          expect(response.body).to match(edit_bike_path(bike, edit_template: "photos"))
         end
       end
 

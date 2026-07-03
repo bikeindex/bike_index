@@ -1024,6 +1024,10 @@ en:
     index:
       primary_colors: Primary colors
   bikes:
+    bike_photos:
+      add_photo: Add photo
+      remove_photo: Remove
+      replace_photo: Replace
     bike_show_overlays:
       add_a_picture_of_it: Add a picture of it, so everyone can admire its beauty!
       add_a_picture_so_people_know_what_to_look: Add a picture so people know what
