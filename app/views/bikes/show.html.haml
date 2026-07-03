@@ -45,103 +45,106 @@
     = render(UI::Alert::Component.new(kind: :notice)) do
       = t(".viewing_listing_preview")
       #{link_to(t(".view_public_non_listing"), bike_path(@bike))}.
-  .row
-    .col-md-8
-      %h1.bike-title
-        = bike_status_span(@bike, override_to_for_sale: @show_for_sale)
-        %span.uncap= bike_title_html(@bike)
-        - if @bike.example?
-          %small.text-warning.uncap= t(".test_registration")
+  - if show_redesigned_bike_page?(@bike, current_user)
+    = render(PageBlock::BikeShowRedesign::Component.new(bike: @bike, current_user:, show_for_sale: @show_for_sale))
+  - else
+    .row
+      .col-md-8
+        %h1.bike-title
+          = bike_status_span(@bike, override_to_for_sale: @show_for_sale)
+          %span.uncap= bike_title_html(@bike)
+          - if @bike.example?
+            %small.text-warning.uncap= t(".test_registration")
 
-      - if @bike.status_impounded?
-        %strong.text-warning= t(".looking_for_correct_owner", bike_type: @bike.type)
-      - elsif !@bike.status_with_owner? && @bike.created_by_notification_or_impounding?
-        -# This should only show up if the bike isn't registered
-        %strong.text-warning= t(".not_registered_by_user")
-        - if @bike.current_ownership&.origin == "unregistered_parking_notification"
-          %em= t(".created_to_record_parking_notification", bike_type: @bike.type_titleize, organization: @bike.creation_organization.short_name)
+        - if @bike.status_impounded?
+          %strong.text-warning= t(".looking_for_correct_owner", bike_type: @bike.type)
+        - elsif !@bike.status_with_owner? && @bike.created_by_notification_or_impounding?
+          -# This should only show up if the bike isn't registered
+          %strong.text-warning= t(".not_registered_by_user")
+          - if @bike.current_ownership&.origin == "unregistered_parking_notification"
+            %em= t(".created_to_record_parking_notification", bike_type: @bike.type_titleize, organization: @bike.creation_organization.short_name)
 
-      - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?
-        %p
-          %strong= @bike.status_humanized_translated.titleize
-          %span.localizeTime.preciseTime
-            - time = @stolen_record.present? ? @stolen_record.date_stolen : @bike.current_impound_record.impounded_at
-            = l time, format: :convert_time
-          %small.localizeTimezone
-          - if @stolen_record&.address.present? || @bike.current_impound_record&.address_present?
-            %strong
-              = @bike.status_found? ? t(".in") : t(".from")
-            - if @stolen_record.present?
-              = @stolen_record.address
-            - else
-              = @bike.current_impound_record.formatted_address_string
-
-      - if @bike.user&.show_bikes?
-        %h4
-          = link_to t(".view_users_other_registrations"), user_path(@bike.owner.username)
-
-    .col-md-4.ad-col
-      .ad-block.ad-binx.ad468x60
-  .row
-    = render partial: "/bikes/main_show_block"
-
-    .col-md-4
-      .social-share-bike.mb-4.mt-4
-        %h4
-          - if @bike.status_stolen_or_impounded?
-            = t(".spread_the_word")
-          - else
-            = t(".share_it")
-        = render 'shared/share_this'
-      - if BikeServices::Displayer.display_contact_owner?(@bike, current_user)
-        .contact-the-owner
-          %p.preface
-            %em
-              = t(".know_something_about_this_bike_type", bike_type: @bike.type)
-          %h3
-            = t(".contact_the_owner")
-          - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
-          #write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
-            %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
-              = t(".write_them_a_message")
-
-          .collapse#new_stolen_message{ class: ("in" if @contact_owner_open) }
-            - @stolen_notification ||= StolenNotification.new(bike: @bike)
-            = form_for @stolen_notification do |f|
-              = f.hidden_field :bike_id, value: @bike.id
-              = f.text_area :message, required: true, placeholder: t(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control"
-              = f.text_field :reference_url, placeholder: t(".link_url"), class: "form-control additional-field"
-
-              .send-message
-                = f.submit t(".send_message"), class: 'btn btn-primary btn-lg'
-          - if @bike.phoneable_by?(current_user)
-            %p.phoneable-by.mt-2
-              %em
-                = t(".or_call")
+        - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?
+          %p
+            %strong= @bike.status_humanized_translated.titleize
+            %span.localizeTime.preciseTime
+              - time = @stolen_record.present? ? @stolen_record.date_stolen : @bike.current_impound_record.impounded_at
+              = l time, format: :convert_time
+            %small.localizeTimezone
+            - if @stolen_record&.address.present? || @bike.current_impound_record&.address_present?
               %strong
-                = t(".owners_phone_number")
-              = phone_link(@stolen_record.phone)
+                = @bike.status_found? ? t(".in") : t(".from")
+              - if @stolen_record.present?
+                = @stolen_record.address
+              - else
+                = @bike.current_impound_record.formatted_address_string
 
-      -# Don't show if contact_owner is open - because then we're rendering impound_claim in the main page
-      - if BikeServices::Displayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open
-        - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
+        - if @bike.user&.show_bikes?
+          %h4
+            = link_to t(".view_users_other_registrations"), user_path(@bike.owner.username)
 
-        .contact-the-owner#write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
-          %p.preface
-            %em
-              Does this look like your #{@bike.type}?
-          %h3
-            Claim
-            = @bike.current_impound_record.kind
-            #{@bike.type}
+      .col-md-4.ad-col
+        .ad-block.ad-binx.ad468x60
+    .row
+      = render partial: "/bikes/main_show_block"
 
-          %a.btn.btn-primary.btn-lg{ href: '#impound_claim', 'aria-controls' => 'impound_claim', 'data-toggle' => 'collapse' }
-            Open claim
-      - if BikeServices::Displayer.display_marketplace_message?(@bike)
-        .contact-the-owner.mt-5.pt-4.pb-4
-          %h3.uncap
-            Interested in purchasing this #{@bike.type}?
-          = link_to "contact the owner", my_account_message_path("ml_#{@bike.current_marketplace_listing.id}"), class: "btn btn-primary btn-lg"
+      .col-md-4
+        .social-share-bike.mb-4.mt-4
+          %h4
+            - if @bike.status_stolen_or_impounded?
+              = t(".spread_the_word")
+            - else
+              = t(".share_it")
+          = render 'shared/share_this'
+        - if BikeServices::Displayer.display_contact_owner?(@bike, current_user)
+          .contact-the-owner
+            %p.preface
+              %em
+                = t(".know_something_about_this_bike_type", bike_type: @bike.type)
+            %h3
+              = t(".contact_the_owner")
+            - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
+            #write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
+              %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
+                = t(".write_them_a_message")
 
-      .ad-block.ad-binx.ad300x600
-      = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google ad300x600 mt-2"}
+            .collapse#new_stolen_message{ class: ("in" if @contact_owner_open) }
+              - @stolen_notification ||= StolenNotification.new(bike: @bike)
+              = form_for @stolen_notification do |f|
+                = f.hidden_field :bike_id, value: @bike.id
+                = f.text_area :message, required: true, placeholder: t(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control"
+                = f.text_field :reference_url, placeholder: t(".link_url"), class: "form-control additional-field"
+
+                .send-message
+                  = f.submit t(".send_message"), class: 'btn btn-primary btn-lg'
+            - if @bike.phoneable_by?(current_user)
+              %p.phoneable-by.mt-2
+                %em
+                  = t(".or_call")
+                %strong
+                  = t(".owners_phone_number")
+                = phone_link(@stolen_record.phone)
+
+        -# Don't show if contact_owner is open - because then we're rendering impound_claim in the main page
+        - if BikeServices::Displayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open
+          - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
+
+          .contact-the-owner#write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
+            %p.preface
+              %em
+                Does this look like your #{@bike.type}?
+            %h3
+              Claim
+              = @bike.current_impound_record.kind
+              #{@bike.type}
+
+            %a.btn.btn-primary.btn-lg{ href: '#impound_claim', 'aria-controls' => 'impound_claim', 'data-toggle' => 'collapse' }
+              Open claim
+        - if BikeServices::Displayer.display_marketplace_message?(@bike)
+          .contact-the-owner.mt-5.pt-4.pb-4
+            %h3.uncap
+              Interested in purchasing this #{@bike.type}?
+            = link_to "contact the owner", my_account_message_path("ml_#{@bike.current_marketplace_listing.id}"), class: "btn btn-primary btn-lg"
+
+        .ad-block.ad-binx.ad300x600
+        = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google ad300x600 mt-2"}

@@ -63,6 +63,12 @@ module BikeHelper
     image_path("revised/bike_photo_placeholder.svg")
   end
 
+  # The redesign only covers the common "registered, not stolen" case -
+  # stolen/impounded/found bikes and bike versions keep the existing page
+  def show_redesigned_bike_page?(bike, user)
+    Flipper.enabled?(:bike_show_redesign, user) && bike.status_with_owner? && !bike.version?
+  end
+
   private
 
   def deleted_span

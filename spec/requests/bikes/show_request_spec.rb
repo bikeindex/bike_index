@@ -681,6 +681,48 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+  context "bike_show_redesign flag" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity) }
+    let(:current_user) { bike.reload.user }
+
+    it "renders the legacy page when the flag is disabled" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      expect(whitespace_normalized_body_text).to_not match("Bike details")
+    end
+
+    context "flag enabled" do
+      before { Flipper.enable(:bike_show_redesign) }
+
+      it "renders the redesigned page with owner actions" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to render_template(:show)
+        expect(whitespace_normalized_body_text).to match("Bike details")
+        expect(whitespace_normalized_body_text).to match("Edit bike")
+        expect(whitespace_normalized_body_text).to match("Mark stolen")
+      end
+
+      context "current_user not owner" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+        it "hides owner actions" do
+          get "#{base_url}/#{bike.id}"
+          expect(response).to render_template(:show)
+          expect(whitespace_normalized_body_text).to match("Bike details")
+          expect(whitespace_normalized_body_text).to_not match("Edit bike")
+          expect(whitespace_normalized_body_text).to_not match("Mark stolen")
+        end
+      end
+
+      context "stolen bike" do
+        let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+        it "still renders the legacy page" do
+          get "#{base_url}/#{bike.id}"
+          expect(response).to render_template(:show)
+          expect(whitespace_normalized_body_text).to_not match("Bike details")
+        end
+      end
+    end
+  end
   context "qr code png" do
     it "renders" do
       get "#{base_url}/#{bike.id}.png"
