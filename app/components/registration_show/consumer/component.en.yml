@@ -1,8 +1,8 @@
 ---
 en:
   components:
-    registrations:
-      bike_show_redesign:
+    registration_show:
+      consumer:
         about_this_bike: About this bike
         activity: Activity
         audience_owner: Your bike

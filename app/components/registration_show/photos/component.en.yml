@@ -1,7 +1,7 @@
 ---
 en:
   components:
-    registrations:
+    registration_show:
       photos:
         add_photo: Add photo
         remove_photo: Remove

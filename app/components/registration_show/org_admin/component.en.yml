@@ -1,8 +1,8 @@
 ---
 en:
   components:
-    registrations:
-      bike_admin_redesign:
+    registration_show:
+      org_admin:
         audit: Audit
         bike_details: Bike details
         claimed: Claimed

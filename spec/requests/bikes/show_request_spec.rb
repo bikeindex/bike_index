@@ -696,7 +696,7 @@ RSpec.describe "BikesController#show", type: :request do
 
       it "renders the redesigned page with owner actions" do
         get "#{base_url}/#{bike.id}"
-        expect(response).to render_template(:show)
+        expect(response).to_not render_template(:show)
         expect(whitespace_normalized_body_text).to match("Bike details")
         expect(whitespace_normalized_body_text).to match("Your bike")
         expect(whitespace_normalized_body_text).to match("Edit bike")
@@ -708,7 +708,7 @@ RSpec.describe "BikesController#show", type: :request do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
         it "hides owner actions, shows the public view and share" do
           get "#{base_url}/#{bike.id}"
-          expect(response).to render_template(:show)
+          expect(response).to_not render_template(:show)
           expect(whitespace_normalized_body_text).to match("Bike details")
           expect(whitespace_normalized_body_text).to match("Public view")
           expect(whitespace_normalized_body_text).to match("Share")
@@ -722,7 +722,7 @@ RSpec.describe "BikesController#show", type: :request do
         let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
         it "renders replace/remove links to the photos edit page" do
           get "#{base_url}/#{bike.id}"
-          expect(response).to render_template(:show)
+          expect(response).to_not render_template(:show)
           expect(whitespace_normalized_body_text).to match("Replace")
           expect(whitespace_normalized_body_text).to match("Remove")
           expect(response.body).to match(edit_bike_path(bike, edit_template: "photos"))
@@ -748,7 +748,7 @@ RSpec.describe "BikesController#show", type: :request do
       let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
       it "renders the admin redesign in place of the access panel" do
         get "#{base_url}/#{bike.id}"
-        expect(response).to render_template(:show)
+        expect(response).to_not render_template(:show)
         body = whitespace_normalized_body_text
         expect(body).to match("Admin / Staff")
         expect(body).to match("Bike details")
@@ -762,7 +762,7 @@ RSpec.describe "BikesController#show", type: :request do
       let(:current_user) { FactoryBot.create(:organization_user, organization: organization, role: "member_no_bike_edit") }
       it "hides owner contact and shows the restricted card" do
         get "#{base_url}/#{bike.id}"
-        expect(response).to render_template(:show)
+        expect(response).to_not render_template(:show)
         body = whitespace_normalized_body_text
         expect(body).to match("Limited · RA")
         expect(body).to match("Restricted for your role")

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Registrations
+module RegistrationShow
   module Photos
     class Component < ApplicationComponent
       def initialize(bike:, owner: false)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Registrations
-  module BikeShowRedesign
+module RegistrationShow
+  module Consumer
     class Component < ApplicationComponent
       def initialize(bike:, current_user:, show_for_sale: false)
         @bike = bike

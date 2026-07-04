@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Registrations
-  module BikeAdminRedesign
+module RegistrationShow
+  module OrgAdmin
     class Component < ApplicationComponent
       def initialize(bike:, current_user:, organization:)
         @bike = bike

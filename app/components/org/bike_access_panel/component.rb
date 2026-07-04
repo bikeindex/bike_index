@@ -14,8 +14,7 @@ module Org
 
       def render?
         @bike.present? && @organization.present? && @user.present? &&
-          @user.authorized?(@organization) && @bike.visible_by?(@user) &&
-          !Registrations::ShowPage::Component.admin_redesign?(@bike, @user, @organization)
+          @user.authorized?(@organization) && @bike.visible_by?(@user)
       end
 
       private

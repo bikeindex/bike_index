@@ -29,7 +29,7 @@ class BikesController < Bikes::BaseController
     @show_for_sale = show_for_sale?(@bike)
     find_token
     respond_to do |format|
-      format.html { render :show }
+      format.html { render_show }
       format.png do
         qrcode = RQRCode::QRCode.new(bike_url(@bike))
         render plain: qrcode.as_png(size: 1200, border_modules: 0), template: nil, format: :png
@@ -219,6 +219,28 @@ class BikesController < Bikes::BaseController
     return false unless marketplace_listing.visible_by?(current_user)
 
     @marketplace_preview = true
+  end
+
+  def render_show
+    if show_admin_redesign?
+      render(RegistrationShow::OrgAdmin::Component.new(bike: @bike, current_user:, organization: passive_organization))
+    elsif show_redesign?
+      render(RegistrationShow::Consumer::Component.new(bike: @bike, current_user:, show_for_sale: @show_for_sale))
+    else
+      render :show
+    end
+  end
+
+  # The redesign only covers the common "registered, not stolen" case -
+  # stolen/impounded/found bikes and versions keep the legacy page
+  def show_redesign?
+    Flipper.enabled?(:bike_show_redesign, current_user) && @bike.status_with_owner? && !@bike.version?
+  end
+
+  # Org staff viewing an accessible bike get the redesigned admin panel
+  def show_admin_redesign?
+    show_redesign? && passive_organization.present? &&
+      current_user&.authorized?(passive_organization) && @bike.visible_by?(current_user)
   end
 
   def new_bike_attrs
