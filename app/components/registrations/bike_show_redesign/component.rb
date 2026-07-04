@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PageBlock
+module Registrations
   module BikeShowRedesign
     class Component < ApplicationComponent
       def initialize(bike:, current_user:, show_for_sale: false)

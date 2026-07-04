@@ -63,20 +63,6 @@ module BikeHelper
     image_path("revised/bike_photo_placeholder.svg")
   end
 
-  # The redesign only covers the common "registered, not stolen" case -
-  # stolen/impounded/found bikes and bike versions keep the existing page
-  def show_redesigned_bike_page?(bike, user)
-    Flipper.enabled?(:bike_show_redesign, user) && bike.status_with_owner? && !bike.version?
-  end
-
-  # Org staff viewing an accessible bike get the redesigned admin panel in place
-  # of the legacy Org::BikeAccessPanel
-  def show_admin_redesigned_bike_page?(bike, user, organization)
-    return false unless show_redesigned_bike_page?(bike, user)
-
-    organization.present? && user&.authorized?(organization) && bike.visible_by?(user)
-  end
-
   private
 
   def deleted_span

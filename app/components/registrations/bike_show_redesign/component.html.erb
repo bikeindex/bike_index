@@ -2,7 +2,7 @@
   <div class="tw:grid tw:gap-6 tw:lg:grid-cols-3">
     <div class="tw:lg:col-span-2">
       <%= render(UI::Card::Component.new) do %>
-        <%= render(Bikes::Photos::Component.new(bike: @bike, owner: @owner)) %>
+        <%= render(Registrations::Photos::Component.new(bike: @bike, owner: @owner)) %>
       <% end %>
     </div>
 

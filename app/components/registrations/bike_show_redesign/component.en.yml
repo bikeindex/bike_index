@@ -1,7 +1,7 @@
 ---
 en:
   components:
-    page_block:
+    registrations:
       bike_show_redesign:
         about_this_bike: About this bike
         activity: Activity

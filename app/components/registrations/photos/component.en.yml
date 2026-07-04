@@ -1,7 +1,7 @@
 ---
 en:
   components:
-    bikes:
+    registrations:
       photos:
         add_photo: Add photo
         remove_photo: Remove
