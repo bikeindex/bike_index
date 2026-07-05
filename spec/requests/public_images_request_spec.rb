@@ -33,16 +33,19 @@ RSpec.describe PublicImagesController, type: :request do
         end
         context "with an image file" do
           let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
-          it "renders the synchronously-stored original while versions are backgrounded" do
+          it "renders the original and wires the image-fallback for the backgrounded versions" do
             Sidekiq::Job.clear_all
             post base_url, params: {bike_id: bike.id, public_image: {image: file}, format: :js}
             expect(response).to have_http_status(:ok)
             public_image = bike.reload.public_images.first
             expect(public_image.image).to be_present
             expect(PublicImageProcessJob.jobs.count).to eq 1 # version generation deferred
-            # falls back to the original so the just-uploaded thumbnail isn't blank before reload
+            # freshly stored original is shown immediately; if a version url 404s before the
+            # worker finishes, image_fallback_controller swaps back to this original
             expect(response.body).to include("/uploads/Pu/#{public_image.id}/bike.jpg")
             expect(response.body).to_not include("small_bike.jpg")
+            expect(response.body).to include("image-fallback")
+            expect(response.body).to include("useOriginal")
             public_image.image.remove!
           end
         end
