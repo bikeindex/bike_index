@@ -137,10 +137,6 @@ module RegistrationShow
         staff? ? translation(".impound") : translation(".request_impound")
       end
 
-      def impound_sublabel
-        staff? ? translation(".impound_sub") : translation(".request_impound_sub")
-      end
-
       def edit_access_path
         edit_bike_path(@bike, edit_template: @bike.default_edit_template)
       end

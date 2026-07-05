@@ -15,13 +15,11 @@ en:
         frame_size: Frame size
         has_duplicate_serials: has dup. serials
         impound: Impound
-        impound_sub: Single confirmation
         internal_notes: Internal notes
         law_enforcement_access: law-enforcement access
         link_sticker: Link sticker
         manufacturer: Manufacturer
         message_owner: Message owner
-        message_owner_sub: Email the owner
         model: Model
         no_duplicate_serials: no dup. serials
         not_attested: Not attested
@@ -45,7 +43,6 @@ en:
         owner_name: Name
         owner_phone: Phone
         parking_notice: Parking notice
-        parking_notice_sub: Abandoned · incorrect
         parking_notifications: Parking notifications
         post_note: Post note
         posts_as: Posts as %{user}
@@ -55,7 +52,6 @@ en:
         registration_number: Bike Index Registration
         request: Request
         request_impound: Request impound
-        request_impound_sub: Sent for approval
         resolved: Resolved
         restricted_message: >-
           Owner contact is available to admin & staff. You can add notes and request
@@ -67,5 +63,4 @@ en:
         start_audit: Start audit
         this_bike: This bike
         view_notifications: View notifications
-        view_notifications_sub: Parking activity
         year: Year
