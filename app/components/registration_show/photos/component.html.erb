@@ -68,14 +68,12 @@
     <% if @owner %>
       <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
     <% end %>
-  <% elsif @owner %>
-    <div
-      class="
-        tw:flex tw:aspect-4/3 tw:items-center tw:justify-center
-        tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900
-      "
-    >
-      <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
+  <% else %>
+    <div class="tw:overflow-hidden tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900">
+      <%= image_tag(helpers.bike_placeholder_image_path, alt: t("bikes.main_show_block.bike_photo", bike_type: @bike.type_titleize), class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
     </div>
+    <% if @owner %>
+      <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
+    <% end %>
   <% end %>
 </div>
