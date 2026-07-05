@@ -65,7 +65,7 @@ module RegistrationShow
       end
 
       def title
-        @bike.name.presence || helpers.bike_title_html(@bike)
+        helpers.bike_title_html(@bike)
       end
 
       def subtitle
