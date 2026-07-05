@@ -1,8 +1,17 @@
 class RegistrationsController < ApplicationController
-  before_action :allow_x_frame, except: [:new]
+  before_action :allow_x_frame, except: %i[new show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
   before_action :simple_header
   layout "reg_embed"
+
+  # The redesigned bike show page. Renders for any viewable bike regardless of
+  # status - the design only covers the registered case, so that's what we render.
+  def show
+    @bike = Bike.unscoped.find_id(params[:id])
+    fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
+
+    render(show_component, layout: "application")
+  end
 
   def new
     @stolen = params[:stolen] # Passed into embed form
@@ -41,6 +50,19 @@ class RegistrationsController < ApplicationController
   end
 
   private
+
+  def show_component
+    if show_admin_redesign?
+      RegistrationShow::OrgAdmin::Component.new(bike: @bike, current_user:, organization: passive_organization)
+    else
+      RegistrationShow::Consumer::Component.new(bike: @bike, current_user:, show_for_sale: @bike.is_for_sale?)
+    end
+  end
+
+  # Org staff viewing an accessible bike get the redesigned admin panel
+  def show_admin_redesign?
+    passive_organization.present? && current_user&.authorized?(passive_organization)
+  end
 
   def simple_header
     @simple_header ||= Binxtils::InputNormalizer.boolean(params[:simple_header])
