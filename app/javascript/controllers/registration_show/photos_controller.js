@@ -1,9 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='bike-photos'
-// Swaps the large photo in [data-bike-photos-target=main] to match the clicked
-// [data-bike-photos-target=thumbnail], toggling data-bike-photos-active-class
-// onto whichever thumbnail is currently selected.
+// Connects to data-controller='registration-show--photos'
+// Swaps the large photo in [data-registration-show--photos-target=main] to match
+// the clicked [data-registration-show--photos-target=thumbnail], toggling
+// data-registration-show--photos-active-class onto the selected thumbnail.
 export default class extends Controller {
   static targets = ['main', 'thumbnail']
   static classes = ['active']

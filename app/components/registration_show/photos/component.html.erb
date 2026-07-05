@@ -1,15 +1,15 @@
 <div class="tw:flex tw:flex-col tw:gap-3">
   <% if has_photos? %>
     <div
-      data-controller="bike-photos"
-      data-bike-photos-active-class="tw:border-blue-500"
+      data-controller="registration-show--photos"
+      data-registration-show--photos-active-class="tw:border-blue-500"
       class="tw:flex tw:flex-col tw:gap-3"
     >
       <div class="tw:overflow-hidden tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900">
         <%= image_tag(
           bike_image_url,
           alt: t("bikes.main_show_block.bike_photo", bike_type: @bike.type_titleize),
-          data: {bike_photos_target: "main"},
+          data: {"registration-show--photos-target": "main"},
           class: "tw:aspect-4/3 tw:w-full tw:object-contain",
         ) %>
       </div>
@@ -27,8 +27,8 @@
             <li class="tw:flex tw:flex-col tw:items-center tw:gap-1">
               <button
                 type="button"
-                data-bike-photos-target="thumbnail"
-                data-action="click->bike-photos#select"
+                data-registration-show--photos-target="thumbnail"
+                data-action="click->registration-show--photos#select"
                 data-large-url="<%= public_image.image_url(:large) %>"
                 data-photo-alt="<%= public_image.name %>"
                 class="
