@@ -2,7 +2,7 @@
   <div class="tw:grid tw:gap-6 tw:lg:grid-cols-3">
     <div class="tw:lg:col-span-2">
       <%= render(UI::Card::Component.new) do %>
-        <%= render(RegistrationShow::Photos::Component.new(bike: @bike, owner: @owner)) %>
+        <%= render(RegistrationShow::Photos::Component.new(bike: @bike, owner: @owner, title: title, subtitle: subtitle)) %>
       <% end %>
     </div>
 
@@ -12,9 +12,11 @@
           <%= render(UI::Badge::Component.new(text: audience_label, color: audience_color, size: :sm, solid: true)) %>
         </div>
 
-        <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
+        <div class="tw:hidden tw:lg:block">
+          <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
 
-        <p class="tw:opacity-65"><%= subtitle %></p>
+          <p class="tw:opacity-65"><%= subtitle %></p>
+        </div>
       </div>
 
       <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">

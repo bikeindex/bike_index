@@ -5,13 +5,20 @@
       data-registration-show--photos-active-class="tw:border-blue-500"
       class="tw:flex tw:flex-col tw:gap-3"
     >
-      <div class="tw:overflow-hidden tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900">
+      <div
+        class="
+          tw:relative tw:overflow-hidden tw:rounded-sm tw:bg-gray-100
+          tw:dark:bg-gray-900
+        "
+      >
         <%= image_tag(
           bike_image_url,
           alt: t("bikes.main_show_block.bike_photo", bike_type: @bike.type_titleize),
           data: {"registration-show--photos-target": "main"},
           class: "tw:aspect-4/3 tw:w-full tw:object-contain",
         ) %>
+
+        <%= hero_overlay %>
       </div>
 
       <% if @owner %>
@@ -57,20 +64,34 @@
       <% end %>
     </div>
   <% elsif @bike.stock_photo_url.present? %>
-    <div class="tw:overflow-hidden tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900">
+    <div
+      class="
+        tw:relative tw:overflow-hidden tw:rounded-sm tw:bg-gray-100
+        tw:dark:bg-gray-900
+      "
+    >
       <h3 class="tw:p-2 tw:text-sm tw:opacity-65">
         <%= t("bikes.main_show_block.stock_photo", year: @bike.year, model: @bike.frame_model) %>
         <em><%= t("bikes.main_show_block.color_may_not_match") %></em>
       </h3>
 
       <%= image_tag(@bike.stock_photo_url, alt: t("bikes.main_show_block.bike_photo", bike_type: @bike.type_titleize), class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
+
+      <%= hero_overlay %>
     </div>
     <% if @owner %>
       <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
     <% end %>
   <% else %>
-    <div class="tw:overflow-hidden tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900">
+    <div
+      class="
+        tw:relative tw:overflow-hidden tw:rounded-sm tw:bg-gray-100
+        tw:dark:bg-gray-900
+      "
+    >
       <%= image_tag(helpers.bike_placeholder_image_path, alt: t("bikes.main_show_block.bike_photo", bike_type: @bike.type_titleize), class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
+
+      <%= hero_overlay %>
     </div>
     <% if @owner %>
       <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
