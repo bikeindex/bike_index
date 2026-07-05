@@ -24,15 +24,21 @@ class BikeIndex.NavHeader extends BikeIndex
     $("#primary_nav_hamburgler").html("&#9776;")
     $('.hamburgler').click (e) =>
       e.preventDefault()
-      $('.hamburgler a').toggleClass('active') # prevent hamburglar flicker back and forth
+      $('#primary_nav_hamburgler').toggleClass('active') # prevent hamburglar flicker back and forth
       @toggleMenu($('nav.primary-header-nav').hasClass('menu-in') )
 
     $('#menu-opened-backdrop').click (e) =>
       @toggleMenu(true)
 
+    $(document).keyup (e) =>
+      return unless e.key == 'Escape' && $('nav.primary-header-nav').hasClass('menu-in')
+      @toggleMenu(true)
+      $('#primary_nav_hamburgler').focus()
+
   toggleMenu: (is_open = false)->
+    $('#primary_nav_hamburgler').attr('aria-expanded', "#{!is_open}")
     if is_open
-      $('.hamburgler a').removeClass('active')
+      $('#primary_nav_hamburgler').removeClass('active')
       $('nav.primary-header-nav').removeClass('menu-in')
       $('body').removeClass('menu-in')
 
@@ -44,7 +50,7 @@ class BikeIndex.NavHeader extends BikeIndex
       ), 200
     else
       $('nav.primary-header-nav').addClass('enabled')
-      $('.hamburgler a').addClass('active')
+      $('#primary_nav_hamburgler').addClass('active')
       setTimeout (->
         $('nav.primary-header-nav').addClass('menu-in')
         $('body').addClass('menu-in')

@@ -26,3 +26,7 @@ pin_all_from "app/components", under: "components"
 pin_all_from "app/javascript/utils", under: "utils", to: "utils"
 
 pin "@honeybadger-io/js", to: "https://cdn.jsdelivr.net/npm/@honeybadger-io/js@6.12.3/dist/browser/honeybadger.min.js"
+
+# Lexxy rich text editor (Action Text). Assets served by the lexxy/activestorage gems.
+pin "lexxy", to: "lexxy.js"
+pin "@rails/activestorage", to: "activestorage.esm.js"

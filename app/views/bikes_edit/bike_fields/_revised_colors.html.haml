@@ -10,14 +10,14 @@
 
     .form-well-input.fancy-select.unfancy
       = f.select(:primary_frame_color_id, Color.select_options, required: true, prompt: t(".choose_color") )
-      %a.inline-input-help{ title: t(".color_help"), data: { toggle: 'popover', content: t(".primary_color_help_content_html") } }
+      %button.inline-input-help{ type: "button", title: t(".color_help"), "aria-label" => t(".color_help"), data: { toggle: 'popover', content: t(".primary_color_help_content_html") } }
         ?
     .right-input-help
-      %a#add-secondary.optional-form-block{ class: ('currently-hidden' if display_secondary_color), data: { target: '#secondary-color', toggle: '#rm-secondary' } }
+      %a#add-secondary.optional-form-block{ href: "#", class: ('currently-hidden' if display_secondary_color), data: { target: '#secondary-color', toggle: '#rm-secondary' } }
         %span.context-display-help
           +
         = t(".add_a_color")
-      %a#rm-secondary.optional-form-block{ class: ('currently-hidden' unless display_secondary_color), data: { target: '#secondary-color', toggle: '#add-secondary', action: 'rm-block' } }
+      %a#rm-secondary.optional-form-block{ href: "#", class: ('currently-hidden' unless display_secondary_color), data: { target: '#secondary-color', toggle: '#add-secondary', action: 'rm-block' } }
         %span.context-display-help
           &ndash;
         = t(".remove_color")
@@ -27,11 +27,11 @@
     .form-well-input.fancy-select.unfancy
       = f.select(:secondary_frame_color_id, Color.select_options, prompt: t(".choose_color") )
     .right-input-help
-      %a#add-tertiary.optional-form-block{ class: ('currently-hidden' if display_tertiary_color), data: { target: '#tertiary-color', toggle: '#rm-tertiary' } }
+      %a#add-tertiary.optional-form-block{ href: "#", class: ('currently-hidden' if display_tertiary_color), data: { target: '#tertiary-color', toggle: '#rm-tertiary' } }
         %span.context-display-help
           +
         = t(".add_a_color")
-      %a#rm-tertiary.optional-form-block{ class: ('currently-hidden' unless display_tertiary_color), data: { target: '#tertiary-color', toggle: '#add-tertiary', action: 'rm-block' } }
+      %a#rm-tertiary.optional-form-block{ href: "#", class: ('currently-hidden' unless display_tertiary_color), data: { target: '#tertiary-color', toggle: '#add-tertiary', action: 'rm-block' } }
         %span.context-display-help
           &ndash;
         = t(".remove_color")

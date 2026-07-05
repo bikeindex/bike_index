@@ -43,10 +43,15 @@ module Admin
         strava_requests = case params[:search_response_status]
         when "pending_or_success" then strava_requests.where(response_status: StravaRequest::PENDING_OR_SUCCESS)
         when "not_successful" then strava_requests.where(response_status: StravaRequest::NOT_SUCCESSFUL)
-        when "only_binx_response" then strava_requests.where(response_status: StravaRequest::BINX_RESPONSE)
-        when "only_strava_response" then strava_requests.strava_response
+        when "errors_and_failures" then strava_requests.errors_and_failures
         else strava_requests.where(response_status: params[:search_response_status])
         end
+      end
+
+      strava_requests = case params[:search_responder]
+      when "only_binx_response" then strava_requests.where(response_status: StravaRequest::BINX_RESPONSE)
+      when "only_strava_response" then strava_requests.strava_response
+      else strava_requests
       end
 
       @proxy_request = Binxtils::InputNormalizer.boolean(params[:search_proxy_requests])

@@ -8,4 +8,5 @@ en:
         no_matches_found: No matches found
         result_count_html: "— %{count} %{results}"
         serial_label: 'Serial:'
+        sticker_label: 'Sticker:'
         view_all: view all

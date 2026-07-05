@@ -4,9 +4,19 @@
   </li>
 <% end %>
 
+<% header_content = capture do %>
+  <%= render partial: "cgroups_table", locals: {cgroups: @cgroups, ctype_counts: @ctype_counts} %>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "table", locals: {collection: @ctypes, render_sortable: true} %>
+<% end %>
+
 <%= render(Admin::IndexSkeleton::Component.new(
   collection: @ctypes,
   viewing: "Component Types",
   skip_charting: true,
-  nav_header_list_items:
+  nav_header_list_items:,
+  header_content:,
+  table_view:
 )) %>

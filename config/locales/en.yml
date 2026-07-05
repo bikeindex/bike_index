@@ -701,6 +701,7 @@ en:
         mxn: MXN
         usd: USD
       cycle_type:
+        balance_bike: Balance Bike
         bike: Bike
         cargo: Cargo Bike (front storage)
         cargo_rear: Cargo Bike Rear (e.g. longtail)
@@ -1350,12 +1351,14 @@ en:
       manufacturer: Manufacturer
       model_year: Model year
       nevermind: Nevermind
+      other_manufacturer: Other manufacturer
       other_serial_or_registration_number: Other serial or registration number
       please_fill_in_both_fields: Please fill in both fields
       reason_for_update: Reason for update
       remove_end: Remove end
       remove_start: Remove start
       seat_tube_length: Seat tube length
+      select_other: Select 'Other' if manufacturer doesn't show up when entered
       submit_manufacturer_correction: Submit Manufacturer Correction
       submit_serial_correction: Submit serial correction
       submit_update: Submit update
@@ -3722,9 +3725,12 @@ en:
       logout: Logout
       marketplace: Marketplace
       marketplace_messages: Marketplace messages
+      menu: Menu
       register_a_new_bike: Register a new bike
       search: Search
+      settings_menu: Settings
       sign_up: Sign up
+      skip_to_main_content: Skip to main content
       stolen_bike: Stolen bike?
       the_nonprofit_bike_registry: the non-profit bike registry
       user_settings: "%{user_email} settings"
@@ -4721,6 +4727,7 @@ en:
       photo_stock: Stock photo
       photo_uncategorized: Photo of your %{bike_type}
       processing: "... processing"
+      remove_image: Remove image
     show:
       are_you_sure: Are you sure?
       back_to_images: Back to public images
@@ -4988,40 +4995,6 @@ en:
       sign_up_a_shop_or_organization: Sign up a shop or organization
       terms_and_conditions: terms and conditions
       vendor_terms: vendor terms
-    footer_revised:
-      about: About
-      ambassadors: Ambassadors
-      api_documentation: API documentation
-      bike_index: Bike Index
-      bike_manufacturer_list: Bike Manufacturer List
-      bike_shops: Bike Shops
-      blog: Blog
-      change_preferred_language: change preferred language
-      cities: Cities
-      community_groups: Community Groups
-      copyright_html: "%{current_year} &copy; Bike Index, a 501(c)(3) nonprofit -
-        EIN 81-4296194"
-      dev_and_design_resources: Dev & Design Resources
-      donate: Donate
-      faq: FAQ
-      help: Help
-      how_to_get_your_stolen_bike_back: Get your stolen bike back
-      language: Language
-      law_enforcement: Law Enforcement
-      press_inquiries: Press inquiries
-      privacy_policy: Privacy policy
-      protect_your_bike: Protect your bike
-      resources: Resources
-      schools_and_universities: Schools and Universities
-      security: Security
-      stolen_bike_recoveries: Stolen Bike Recoveries
-      store: Store
-      strava_search: Strava Search and update
-      support_us: Support Us
-      terms_and_conditions: terms and conditions
-      vendor_terms: vendor terms
-      where_we_are: Where We Are
-      who_we_serve: Who we serve
     form_well_footer_save:
       save_changes: Save changes
     header_nav:
@@ -5060,6 +5033,7 @@ en:
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
       manage_impounding: Manage impounding
+      manage_registration_sequences: Manage Registration sequences
       manage_users: Manage users
       model_audits: E-Vehicle audits
       multi_search: Multi search
@@ -5104,6 +5078,8 @@ en:
       bike: Bike
       recovered_date: recovered %{date}
       translated_from_english: translated from English
+    shops_map:
+      map_of_partner_locations: Map of partner locations
     user_general_alert:
       add_location_theft_bike_title_html: Add the location of the theft of your <strong>%{bike_title}</strong>
       add_photo_theft_bike_title_html: Add a photo to your <strong>%{bike_title}</strong>

@@ -1,19 +1,31 @@
 #!/usr/bin/env bash
-# Run an arbitrary kamal command against one review app, without exporting the
-# REVIEW_APP_* vars its ERB config needs or passing --config-file every time.
+# Run kamal against per-PR review apps: arbitrary passthrough commands, plus the
+# orchestrated deploy/destroy lifecycle. Wraps kamal so you don't export the
+# REVIEW_APP_* vars its ERB config needs or pass --config-file every time.
 #
-#   bin/kamal_review <review-app> <kamal args...>
+#   bin/kamal_review <kamal args...> --app <review-app>   # any kamal command
+#   bin/kamal_review deploy  --app <review-app> [--version <tag>]
+#   bin/kamal_review destroy --app <review-app>
 #
-# <review-app> identifies the PR and is accepted in any of these forms — all the
-# same app:
+# <review-app> identifies the PR in any of these forms — all the same app:
 #   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 #
-# Everything after it is passed straight through to kamal, e.g.
-#   bin/kamal_review 3594    app logs -f
-#   bin/kamal_review pr-3594 app exec --reuse "bin/rails console"
+# Passthrough sends everything else straight to kamal; --app may go anywhere and
+# defaults to PR 0 (the shared accessories aren't PR-specific), e.g.
+#   bin/kamal_review app logs -f --app 3594
+#   bin/kamal_review accessory reboot db
 #
-# Host + secrets come from the same places bin/review-app uses (see
-# docs/review-apps.md): REVIEW_APP_HOST and .kamal/secrets (1Password).
+# deploy/destroy require an explicit --app and run the per-PR lifecycle:
+#   deploy  — kamal deploy --version <tag> --skip-push (tag via --version or IMAGE_TAG)
+#   destroy — kamal app remove, drop the per-PR databases + role, flush its redis db
+# deploy is idempotent — same path on first and subsequent deploys;
+# bin/docker-entrypoint creates the per-PR Postgres role on first boot and
+# db:prepare handles schema/seed-or-migrate.
+#
+# Called by .github/workflows/review-app.yml; runs locally too with kamal
+# installed and SSH access. Kamal reads .kamal/secrets — locally from 1Password
+# (account bike-index, item Kamal/BikeIndex Review) + `gh auth token`; CI copies
+# .kamal/secrets-ci over it first.
 
 set -euo pipefail
 
@@ -22,20 +34,23 @@ REDIS_DATABASES="${REDIS_DATABASES:-31}"  # shared-redis boots with --databases 
 
 usage() {
   cat <<USAGE
-Usage: bin/kamal_review <review-app> <kamal args...>
+Usage:
+  bin/kamal_review <kamal args...> --app <review-app>   # any kamal command
+  bin/kamal_review deploy  --app <review-app> [--version <tag>]
+  bin/kamal_review destroy --app <review-app>
 
 <review-app> is a PR, in any of these equivalent forms:
-  3594
-  pr-3594
-  pr-3594.review.bikeindex.org
-  https://pr-3594.review.bikeindex.org
+  3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
+
+Passthrough defaults --app to 0 when omitted; deploy/destroy require it.
 
 Examples:
-  bin/kamal_review 3594 app logs -f
-  bin/kamal_review pr-3594 app exec --reuse "bin/rails runner 'puts Bike.count'"
-  bin/kamal_review https://pr-3594.review.bikeindex.org app details
+  bin/kamal_review app logs -f --app 3594
+  bin/kamal_review app exec --reuse "bin/rails runner 'puts Bike.count'" --app pr-3594
+  bin/kamal_review accessory reboot db
+  bin/kamal_review deploy  --app 3594 --version pr-3594-abc123
+  bin/kamal_review destroy --app 3594
 
-Runs: kamal <kamal args...> --config-file ${CONFIG}
 Env:  REVIEW_APP_HOST (default host.review.bikeindex.org); secrets via .kamal/secrets.
 USAGE
 }
@@ -55,22 +70,107 @@ review_app_pr_number() {
   printf '%s' "$s"
 }
 
+# Export the REVIEW_APP_* vars config/deploy.review.yml's ERB reads. The mod-N
+# Redis logical DB allocation collides PRs congruent mod REDIS_DATABASES (cache +
+# Sidekiq queues mix); mitigation is to bump the shared-redis `--databases` and
+# REDIS_DATABASES together.
+export_review_app_env() {
+  export REVIEW_APP_PR_NUMBER="$1"
+  export REVIEW_APP_HOST="${REVIEW_APP_HOST:-host.review.bikeindex.org}"
+  export REVIEW_APP_REDIS_DB="$((($1 % REDIS_DATABASES) + 1))"
+}
+
+not_a_review_app() {
+  echo "Error: '$1' is not a review app (expected e.g. 3594, pr-3594, or pr-3594.review.bikeindex.org)" >&2
+  echo >&2
+  usage >&2
+  exit 1
+}
+
 [[ $# -eq 0 ]] && { usage >&2; exit 1; }
 case "$1" in
   -h | --help | help) usage; exit 0 ;;
 esac
 
-if ! pr_number="$(review_app_pr_number "$1")"; then
-  echo "Error: '$1' is not a review app (expected e.g. 3594, pr-3594, or pr-3594.review.bikeindex.org)" >&2
-  echo >&2
-  usage >&2
-  exit 1
+mode=""
+case "$1" in
+  deploy | destroy) mode="$1"; shift ;;
+esac
+
+# Passthrough: any kamal command, --app anywhere, defaults to PR 0. Always execs,
+# so control never reaches the lifecycle code below.
+if [[ -z "$mode" ]]; then
+  app="0"
+  kamal_args=()
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --app) app="${2:-}"; shift 2 ;;
+      --app=*) app="${1#--app=}"; shift ;;
+      *) kamal_args+=("$1"); shift ;;
+    esac
+  done
+  pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
+  export_review_app_env "$pr_number"
+  echo "==> [pr-${pr_number} on ${REVIEW_APP_HOST}] kamal ${kamal_args[*]} --config-file ${CONFIG}" >&2
+  exec kamal "${kamal_args[@]}" --config-file "$CONFIG"
 fi
-shift
 
-export REVIEW_APP_PR_NUMBER="$pr_number"
-export REVIEW_APP_HOST="${REVIEW_APP_HOST:-host.review.bikeindex.org}"
-export REVIEW_APP_REDIS_DB="$(((pr_number % REDIS_DATABASES) + 1))"
+# deploy/destroy lifecycle: --app is required (no default — a destroy must never
+# fall back to PR 0); --version (or IMAGE_TAG) supplies the deploy image tag.
+app=""
+version="${IMAGE_TAG:-}"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --app) app="${2:-}"; shift 2 ;;
+    --app=*) app="${1#--app=}"; shift ;;
+    --version) version="${2:-}"; shift 2 ;;
+    --version=*) version="${1#--version=}"; shift ;;
+    *) echo "Error: unexpected argument '$1' for $mode" >&2; usage >&2; exit 1 ;;
+  esac
+done
+[[ -n "$app" ]] || { echo "Error: $mode requires --app <review-app>" >&2; echo >&2; usage >&2; exit 1; }
+pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
+export_review_app_env "$pr_number"
 
-echo "==> [pr-${pr_number} on ${REVIEW_APP_HOST}] kamal $* --config-file ${CONFIG}" >&2
-exec kamal "$@" --config-file "$CONFIG"
+# Role/database names must stay in lockstep with config/deploy.review.yml's env
+# section — destroy drops whatever names are derived here.
+slug="pr-${pr_number}"
+role="bike_index_pr_${pr_number}"
+primary_db="bike_index_review_pr_${pr_number}_primary"
+analytics_db="bike_index_review_pr_${pr_number}_analytics"
+
+kamal() { command kamal "$@" --config-file "$CONFIG"; }
+
+case "$mode" in
+  deploy)
+    : "${version:?deploy requires an image tag (--version <tag> or IMAGE_TAG env)}"
+    echo "==> Deploying $slug at image tag $version"
+    # kamal 2.x takes the image tag as --version (there is no `image_tag:` key).
+    # --skip-push: CI already built + pushed the image, so kamal just pulls it.
+    # It also avoids kamal cloning the repo --recurse-submodules, which fails on
+    # the private app/services/facebook submodule (see config/deploy.review.yml).
+    kamal deploy --version "$version" --skip-push
+    echo "==> Done. URL: https://${slug}.review.bikeindex.org"
+    ;;
+
+  destroy)
+    echo "==> Destroying review app $slug"
+    kamal app remove || true
+
+    echo "==> Dropping per-PR databases ($primary_db, $analytics_db) and role ($role)"
+    # One SSH round-trip, ordered so the databases drop before the role that owns
+    # them. Best-effort (|| true) with no ON_ERROR_STOP, so a failed DROP (e.g. a
+    # db that was never created) doesn't skip the rest.
+    kamal accessory exec db --reuse \
+      "psql -U postgres -d postgres \
+        -c 'DROP DATABASE IF EXISTS ${primary_db} WITH (FORCE)' \
+        -c 'DROP DATABASE IF EXISTS ${analytics_db} WITH (FORCE)' \
+        -c 'DROP ROLE IF EXISTS ${role}'" || true
+
+    echo "==> Flushing redis logical DB $REVIEW_APP_REDIS_DB"
+    kamal accessory exec redis --reuse \
+      "redis-cli -n ${REVIEW_APP_REDIS_DB} FLUSHDB" || true
+
+    echo "==> Done."
+    ;;
+esac

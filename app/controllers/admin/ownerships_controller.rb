@@ -85,7 +85,7 @@ module Admin
 
     def find_ownership
       @ownership = Ownership.find(params[:id])
-      @bike = Bike.unscoped.find(@ownership.bike_id)
+      @bike = Bike.unscoped.find_id(@ownership.bike_id)
       @users = User.all
     end
 

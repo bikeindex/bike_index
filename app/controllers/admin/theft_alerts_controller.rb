@@ -77,7 +77,7 @@ module Admin
     def find_theft_alert
       @theft_alert ||= TheftAlert.find(params[:id])
       @stolen_record ||= @theft_alert.stolen_record
-      @bike ||= Bike.unscoped.find(@stolen_record.bike_id)
+      @bike ||= Bike.unscoped.find_id(@stolen_record.bike_id)
     end
 
     def permitted_update_params

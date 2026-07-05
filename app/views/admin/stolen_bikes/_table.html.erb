@@ -31,7 +31,7 @@
     <tbody>
       <% @stolen_records.each do |stolen_record| %>
         <%# Handle cases where bike is user hidden or deleted %>
-        <% bike = stolen_record.bike || Bike.unscoped.find(stolen_record.bike_id) %>
+        <% bike = stolen_record.bike || Bike.unscoped.find_id(stolen_record.bike_id) %>
 
         <tr>
           <td class="display-multi-check table-checkbox-select">

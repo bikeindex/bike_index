@@ -4,8 +4,8 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--multi-search'
 export default class extends Controller {
-  static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll']
-  static values = { url: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
+  static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll', 'searchAllHint']
+  static values = { url: String, searchKind: String, serialsPlaceholder: String, stickersPlaceholder: String, serialsButton: String, stickersButton: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
     if (this.searching) return
@@ -13,10 +13,44 @@ export default class extends Controller {
     if (this.hasSearchAllTarget && params.get('search_all') === '1') {
       this.searchAllTarget.checked = true
     }
+    this.syncSearchAll()
     const serialsParam = params.get('serials')
     if (serialsParam) {
       this.textareaTarget.value = serialsParam
       this.search(this.parseSerials(serialsParam))
+    }
+  }
+
+  switchKind (event) {
+    const value = event.target.value
+    if (this.searchKindValue === value) return
+    this.searchKindValue = value
+    this.updatePlaceholderAndButton()
+    this.syncSearchAll()
+    this.resultsTarget.innerHTML = ''
+    this.serialChipsTarget.innerHTML = ''
+
+    const url = new URL(window.location.pathname, window.location.origin)
+    url.searchParams.set('search_kind', value)
+    window.history.pushState({}, '', url)
+  }
+
+  updatePlaceholderAndButton () {
+    this.textareaTarget.placeholder = this[`${this.searchKindValue}PlaceholderValue`]
+    this.buttonTarget.textContent = this[`${this.searchKindValue}ButtonValue`]
+  }
+
+  // Sticker search always spans every organization, so lock "search all" on while it's active
+  syncSearchAll () {
+    if (!this.hasSearchAllTarget) return
+    if (this.searchKindValue === 'stickers') {
+      this.searchAllTarget.checked = true
+      this.searchAllTarget.disabled = true
+      if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.remove('tw:hidden')
+    } else if (this.searchAllTarget.disabled) {
+      this.searchAllTarget.checked = false
+      this.searchAllTarget.disabled = false
+      if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.add('tw:hidden')
     }
   }
 
@@ -41,6 +75,9 @@ export default class extends Controller {
     this.searching = true
     const url = new URL(window.location.pathname, window.location.origin)
     url.searchParams.set('serials', serials.join(','))
+    if (this.searchKindValue === 'stickers') {
+      url.searchParams.set('search_kind', 'stickers')
+    }
     if (this.searchAll) {
       url.searchParams.set('search_all', '1')
     } else {
@@ -52,7 +89,7 @@ export default class extends Controller {
     this.renderPlaceholderChips(serials)
     this.buttonTarget.disabled = true
 
-    await Promise.all(serials.map((serial, index) => this.searchSerial(serial, index)))
+    await Promise.all(serials.map((serial, index) => this.searchItem(serial, index)))
 
     // Wait a frame for Turbo stream DOM updates to complete
     await new Promise(resolve => requestAnimationFrame(resolve))
@@ -119,11 +156,16 @@ export default class extends Controller {
       })
   }
 
-  async searchSerial (serial, index) {
+  async searchItem (query, index) {
+    const stickers = this.searchKindValue === 'stickers'
     const url = new URL(this.urlValue, window.location.origin)
-    url.searchParams.set('serial', serial)
+    url.searchParams.set(stickers ? 'query' : 'serial', query)
     url.searchParams.set('chip_id', `chip_${index}`)
-    if (this.searchAll) url.searchParams.set('search_all', '1')
+    if (stickers) {
+      url.searchParams.set('search_kind', 'stickers')
+    } else if (this.searchAll) {
+      url.searchParams.set('search_all', '1')
+    }
 
     try {
       const response = await fetch(url, {
@@ -133,10 +175,10 @@ export default class extends Controller {
       if (response.ok) {
         Turbo.renderStreamMessage(await response.text())
       } else {
-        this.showChipError(serial, index, `Server error ${response.status}`)
+        this.showChipError(query, index, `Server error ${response.status}`)
       }
     } catch {
-      this.showChipError(serial, index, 'Network error')
+      this.showChipError(query, index, 'Network error')
     }
   }
 

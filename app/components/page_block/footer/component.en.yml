@@ -1,0 +1,40 @@
+---
+en:
+  components:
+    page_block:
+      footer:
+        about: About
+        ambassadors: Ambassadors
+        api_documentation: API documentation
+        bike_index: Bike Index
+        bike_manufacturer_list: Bike Manufacturer List
+        bike_shops: Bike Shops
+        blog: Blog
+        change_preferred_language: change preferred language
+        cities: Cities
+        community_groups: Community Groups
+        copyright_html: "%{current_year} &copy; Bike Index, a 501(c)(3) nonprofit
+          - EIN 81-4296194"
+        dev_and_design_resources: Dev & Design Resources
+        donate: Donate
+        faq: FAQ
+        help: Help
+        how_to_get_your_stolen_bike_back: Get your stolen bike back
+        language: Language
+        law_enforcement: Law Enforcement
+        legal: Legal
+        press_inquiries: Press inquiries
+        privacy_policy: Privacy policy
+        protect_your_bike: Protect your bike
+        resources: Resources
+        schools_and_universities: Schools and Universities
+        security: Security
+        social_media: Social media
+        stolen_bike_recoveries: Stolen Bike Recoveries
+        store: Store
+        strava_search: Strava Search and update
+        support_us: Support Us
+        terms_and_conditions: terms and conditions
+        vendor_terms: vendor terms
+        where_we_are: Where We Are
+        who_we_serve: Who we serve

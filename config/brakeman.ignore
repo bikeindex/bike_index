@@ -117,20 +117,20 @@
     {
       "warning_type": "File Access",
       "warning_code": 16,
-      "fingerprint": "166fe865092e012918499aecabf56ec00d19e14320c875c4998e5b1b7ac76761",
+      "fingerprint": "4db2f0d5c124fd2ecf9020ea27b071859c47776e45a1bc2ffb74cbc2da4c4e90",
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/controllers/bikes_controller.rb",
       "line": 48,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
-      "code": "File.open(\"#{Rails.root}/tmp/#{(\"Registration_\" + Bike.unscoped.find((params[:bike_id] or params[:id])).updated_at.strftime(\"%m%d_%H%M\")[(0..)])}.pdf\", \"wb\")",
+      "code": "File.open(\"#{Rails.root}/tmp/#{(\"Registration_\" + Bike.unscoped.find_id((params[:bike_id] or params[:id])).updated_at.strftime(\"%m%d_%H%M\")[(0..)])}.pdf\", \"wb\")",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "BikesController",
         "method": "pdf"
       },
-      "user_input": "Bike.unscoped.find((params[:bike_id] or params[:id]))",
+      "user_input": "Bike.unscoped.find_id((params[:bike_id] or params[:id]))",
       "confidence": "Weak",
       "cwe_id": [
         22
@@ -264,20 +264,20 @@
     {
       "warning_type": "Redirect",
       "warning_code": 18,
-      "fingerprint": "2843118e7bef96258449dfb2f745e07476f8a3193835936f63af1254bdf24a9c",
+      "fingerprint": "d1de06806c36414ad7d4dd99a60fd5145753bc0292b61683f7160182186c3d2c",
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
       "file": "app/controllers/bikes/theft_alerts_controller.rb",
-      "line": 45,
+      "line": 46,
       "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to(Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url, :allow_other_host => true)",
+      "code": "redirect_to(Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find_id((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url, :allow_other_host => true)",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "Bikes::TheftAlertsController",
         "method": "create"
       },
-      "user_input": "Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url",
+      "user_input": "Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find_id((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url",
       "confidence": "Weak",
       "cwe_id": [
         601
@@ -1927,20 +1927,20 @@
     {
       "warning_type": "File Access",
       "warning_code": 16,
-      "fingerprint": "f7d454b573455bc594427f5e95e9375abcc9216a36f98b0b998a0011ba85e347",
+      "fingerprint": "3d0ef73451bf50f96f6d663daba322f85529f31bd7845c55cdbced8109dd7212",
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/controllers/bikes_controller.rb",
       "line": 52,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
-      "code": "File.open(\"#{Rails.root}/tmp/#{(\"Registration_\" + Bike.unscoped.find((params[:bike_id] or params[:id])).updated_at.strftime(\"%m%d_%H%M\")[(0..)])}.pdf\")",
+      "code": "File.open(\"#{Rails.root}/tmp/#{(\"Registration_\" + Bike.unscoped.find_id((params[:bike_id] or params[:id])).updated_at.strftime(\"%m%d_%H%M\")[(0..)])}.pdf\")",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "BikesController",
         "method": "pdf"
       },
-      "user_input": "Bike.unscoped.find((params[:bike_id] or params[:id]))",
+      "user_input": "Bike.unscoped.find_id((params[:bike_id] or params[:id]))",
       "confidence": "Weak",
       "cwe_id": [
         22

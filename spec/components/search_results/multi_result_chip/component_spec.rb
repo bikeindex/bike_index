@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
-  let(:component) { render_inline(described_class.new(serial:, chip_id:, result_count:, error:, error_message:)) }
-  let(:serial) { "SERIAL111" }
+  let(:component) { render_inline(described_class.new(chip_id:, result_count:, label:, error:, error_message:)) }
+  let(:label) { "SERIAL111" }
   let(:chip_id) { "chip_0" }
   let(:result_count) { 1 }
   let(:error) { false }
@@ -40,6 +40,14 @@ RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
 
     it "does not underline the serial span" do
       expect(component).not_to have_css("span.tw\\:underline")
+    end
+  end
+
+  context "with a sticker code label" do
+    let(:label) { "STKR100" }
+
+    it "uses the label as the chip text" do
+      expect(component).to have_css("span#chip_0 a", text: "STKR100")
     end
   end
 

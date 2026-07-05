@@ -1,0 +1,3 @@
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(Form::FileUpload::Component.new(form_builder: f, attribute: :file)) %>
+<% end %>

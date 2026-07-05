@@ -45,6 +45,7 @@ class Membership < ApplicationRecord
     to: :current_stripe_subscription, allow_nil: true
 
   before_validation :set_calculated_attributes
+  after_commit :enqueue_after_user_change_job, if: :saved_change_to_status?
 
   scope :admin_managed, -> { where.not(creator_id: nil) }
   scope :stripe_managed, -> { where(creator_id: nil) }
@@ -108,6 +109,12 @@ class Membership < ApplicationRecord
   end
 
   private
+
+  # Membership changes don't otherwise touch the user, so enqueue the job that
+  # recalculates the user's cached membership state (e.g. MarketplaceListing#seller_member)
+  def enqueue_after_user_change_job
+    CallbackJob::AfterUserChangeJob.perform_async(user_id) if user_id.present?
+  end
 
   def calculated_status
     if start_at.blank? || start_at > Time.current + 1.minute

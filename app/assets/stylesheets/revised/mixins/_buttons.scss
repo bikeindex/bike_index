@@ -315,6 +315,11 @@ $btn-border-radius-sm: 1px;
       $btn-secondary-bg,
       $btn-secondary-border
     );
+
+    // Make the focus different from active - so in a button list, active vs focused is distiguishable
+    &:focus:not(:active):not(.active) {
+      background: $btn-secondary-bg;
+    }
   }
 
   .btn-info {

@@ -97,6 +97,7 @@ Rails.application.routes.draw do
   resources :stolen_notifications, only: %i[create new]
 
   resources :feedbacks, only: %i[index create]
+  post "csp_reports", to: "csp_reports#create"
   get "vendor_signup", to: redirect("/organizations/new")
   get "lightspeed_interface", to: "organizations#lightspeed_interface"
   get "help", to: "feedbacks#index"
@@ -176,6 +177,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # Short_id forms the resources :id segment can't match (prefix + slash, dots).
+  # Before resources so it wins for "r/..." paths; its constraint leaves plain ids alone.
+  get "bikes/*id", to: "bikes#show", constraints: {id: /r\W.*/i}, format: false
   resources :bikes, except: %i[index edit] do
     collection { get :scanned }
     member do
@@ -266,6 +270,8 @@ Rails.application.routes.draw do
     end
 
     resources :theft_alert_plans, only: %i[index edit update new create]
+
+    resources :registration_sequences, only: %i[index]
 
     resources :organizations do
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
@@ -358,6 +364,8 @@ Rails.application.routes.draw do
   end
   get "manufacturers_tsv", to: "manufacturers#tsv" # TODO: can we delete this?
 
+  resources :components, only: %i[index]
+
   get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
   get "theft-ring", to: redirect("theft-rings")
   resources :stolen_bike_listings, only: %i[index]
@@ -434,6 +442,10 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
+    resources :registration_sequences, only: %i[index create edit] do
+      resources :pages, only: %i[create], controller: "registration_sequence_pages"
+    end
+    resources :registration_sequence_pages, only: %i[edit update destroy]
   end
 
   # This is the public organizations section
@@ -444,6 +456,14 @@ Rails.application.routes.draw do
   # old search URLs to new search URLs
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
+
+  # Short bike URLs: /r/<short_id> (and /R/...). The whole path is passed through
+  # so ShortId#decode strips the "r/" prefix itself, even when the body starts with "r".
+  get "*id", to: "bikes#show", constraints: {id: %r{[rR]/.*}}, format: false
+  # Short bike_version URLs: /v/<short_id> (and /V/...)
+  get "*id", to: "bike_versions#show", constraints: {id: %r{[vV]/.*}}, format: false
+  # Short marketplace_listing URLs: /m/<short_id> (and /M/...)
+  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[mM]/.*}}, format: false
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
 end

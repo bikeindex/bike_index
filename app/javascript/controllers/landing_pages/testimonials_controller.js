@@ -7,21 +7,34 @@ export default class extends Controller {
   // Testimonials carousel functionality
   connect () {
     this.currentIndex = 0
-    // Create dots
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     this.createDots()
-    // Auto-advance testimonials every 8 seconds, pause on hover
+    // Auto-advance testimonials every 8 seconds, pause on hover or keyboard focus
     this.startAutoAdvance()
-    const wrapper = this.element.querySelector('.le-testimonials-carousel-wrapper')
-    wrapper.addEventListener('mouseenter', () => this.pauseAutoAdvance())
-    wrapper.addEventListener('mouseleave', () => this.startAutoAdvance())
+    this.pauseHandler = () => this.pauseAutoAdvance()
+    this.resumeHandler = () => this.startAutoAdvance()
+    this.focusOutHandler = (e) => {
+      if (!this.element.contains(e.relatedTarget)) this.startAutoAdvance()
+    }
+    this.wrapper = this.element.querySelector('.le-testimonials-carousel-wrapper')
+    this.wrapper.addEventListener('mouseenter', this.pauseHandler)
+    this.wrapper.addEventListener('mouseleave', this.resumeHandler)
+    this.element.addEventListener('focusin', this.pauseHandler)
+    this.element.addEventListener('focusout', this.focusOutHandler)
   }
 
   disconnect () {
     clearInterval(this.autoAdvanceInterval)
+    this.wrapper.removeEventListener('mouseenter', this.pauseHandler)
+    this.wrapper.removeEventListener('mouseleave', this.resumeHandler)
+    this.element.removeEventListener('focusin', this.pauseHandler)
+    this.element.removeEventListener('focusout', this.focusOutHandler)
   }
 
   startAutoAdvance () {
     clearInterval(this.autoAdvanceInterval)
+    if (this.reducedMotion.matches) return
+
     this.autoAdvanceInterval = setInterval(() => this.next(), 8000)
   }
 
@@ -35,10 +48,15 @@ export default class extends Controller {
 
     this.testimonialTargets.forEach((_, index) => {
       const dot = document.createElement('button')
+      dot.type = 'button'
       dot.className = 'le-testimonial-dot'
       dot.dataset.index = index
+      dot.setAttribute('aria-label', `Testimonial ${index + 1}`)
       dot.addEventListener('click', () => this.goTo(index))
-      if (index === 0) dot.classList.add('active')
+      if (index === 0) {
+        dot.classList.add('active')
+        dot.setAttribute('aria-current', 'true')
+      }
       this.dotsContainer.appendChild(dot)
     })
   }
@@ -71,11 +89,15 @@ export default class extends Controller {
 
   show () {
     this.testimonialTargets.forEach(t => t.classList.remove('active'))
-    this.dots.forEach(d => d.classList.remove('active'))
+    this.dots.forEach(d => {
+      d.classList.remove('active')
+      d.removeAttribute('aria-current')
+    })
 
     this.testimonialTargets[this.currentIndex].classList.add('active')
     if (this.dots[this.currentIndex]) {
       this.dots[this.currentIndex].classList.add('active')
+      this.dots[this.currentIndex].setAttribute('aria-current', 'true')
     }
   }
 }

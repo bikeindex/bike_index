@@ -1,0 +1,17 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item tw:text-sm">
+    <%= render(UI::Dropdown::Component.new(
+      name: @status.present? ? "#{@status.titleize} only" : "All statuses",
+      button_size: :sm,
+      active: @status.present?
+    )) do |dropdown|
+      dropdown.with_entry_item { link_to "All statuses", url_for(sortable_search_params.merge(search_status: nil)), class: (@status.blank? ? "active" : nil) }
+      dropdown.with_entry_divider
+      searchable_statuses.each do |kind|
+        dropdown.with_entry_item { link_to "#{kind.titleize} only", url_for(sortable_search_params.merge(search_status: kind)), class: (@status == kind ? "active" : nil) }
+      end
+    end %>
+  </li>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, chart_collection: @render_chart && matching_registration_sequences)) %>

@@ -85,21 +85,32 @@
 
       <%# Tabbed Widget %>
       <div class="le-tabbed-widget" data-controller="landing-pages--tabs">
-        <div class="le-tab-buttons">
+        <div class="le-tab-buttons" role="tablist">
           <button
+            type="button"
             class="le-tab-button active"
+            id="tab-button-database"
+            role="tab"
+            aria-selected="true"
+            aria-controls="tab-database"
             data-tab="database"
             data-landing-pages--tabs-target="button"
-            data-action="click->landing-pages--tabs#select"
+            data-action="click->landing-pages--tabs#select keydown->landing-pages--tabs#keydown"
           >
             All-in-One Database Management for Operational Efficiency
           </button>
 
           <button
+            type="button"
             class="le-tab-button"
+            id="tab-button-defense"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-defense"
+            tabindex="-1"
             data-tab="defense"
             data-landing-pages--tabs-target="button"
-            data-action="click->landing-pages--tabs#select"
+            data-action="click->landing-pages--tabs#select keydown->landing-pages--tabs#keydown"
           >
             First Line of Defense Against Theft for Your Campus Members
           </button>
@@ -109,6 +120,9 @@
           <div
             class="le-tab-panel active"
             id="tab-database"
+            role="tabpanel"
+            aria-labelledby="tab-button-database"
+            tabindex="0"
             data-landing-pages--tabs-target="panel"
           >
             <div class="le-tab-panel-content">
@@ -148,6 +162,9 @@
           <div
             class="le-tab-panel"
             id="tab-defense"
+            role="tabpanel"
+            aria-labelledby="tab-button-defense"
+            tabindex="0"
             data-landing-pages--tabs-target="panel"
           >
             <div class="le-tab-panel-content">
@@ -236,7 +253,7 @@
                 </div>
 
                 <div class="le-testimonial-image">
-                  <%= image_tag testimonial[:image], alt: "Bike Love" %>
+                  <%= image_tag testimonial[:image], alt: testimonial[:author] %>
                 </div>
               </div>
             </div>
@@ -245,16 +262,25 @@
 
         <div class="le-testimonial-nav">
           <button
+            type="button"
             class="le-testimonial-arrow"
+            aria-label="Previous testimonial"
             data-action="click->landing-pages--testimonials#prev"
           >
             &lsaquo;
           </button>
 
-          <div class="le-testimonial-dots" data-testimonials-dots></div>
+          <div
+            class="le-testimonial-dots"
+            role="group"
+            aria-label="Testimonial selection"
+            data-testimonials-dots
+          ></div>
 
           <button
+            type="button"
             class="le-testimonial-arrow"
+            aria-label="Next testimonial"
             data-action="click->landing-pages--testimonials#next"
           >
             &rsaquo;

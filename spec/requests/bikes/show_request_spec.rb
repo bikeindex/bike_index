@@ -19,6 +19,26 @@ RSpec.describe "BikesController#show", type: :request do
       expect(assigns(:claim_message)).to be_blank
     end
   end
+  context "short_id" do
+    let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:bike, id: 35)) }
+    it "finds the bike from any short_id form and the /r/ short URL" do
+      expect(bike.short_id).to eq "r/Z"
+      ["#{base_url}/35", "#{base_url}/z", "#{base_url}/r/z", "#{base_url}/R/Z", "#{base_url}/r/35", "#{base_url}/R.Z-", "/r/z", "/R/Z", "/r/Z"].each do |path|
+        get path
+        expect(response).to render_template(:show)
+        expect(assigns(:bike)).to eq bike
+      end
+    end
+    context "short_id body starting with the prefix letter" do
+      let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:bike, id: 27)) }
+      it "does not double-strip the prefix" do
+        expect(bike.short_id).to eq "r/R"
+        get "/#{bike.short_id}"
+        expect(response).to render_template(:show)
+        expect(assigns(:bike)).to eq bike
+      end
+    end
+  end
   context "likely_spam bike" do
     it "shows the bike" do
       ownership.bike.update(likely_spam: true)

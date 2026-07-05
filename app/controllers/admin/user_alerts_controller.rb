@@ -34,7 +34,7 @@ module Admin
         user_alerts = user_alerts.where(user_id: user_subject&.id || params[:user_id])
       end
       if params[:search_bike_id].present?
-        @bike = Bike.unscoped.find(params[:search_bike_id])
+        @bike = Bike.unscoped.find_id(params[:search_bike_id])
         user_alerts = user_alerts.where(bike_id: @bike.id) if @bike.present?
       end
       @with_notification = Binxtils::InputNormalizer.boolean(params[:search_with_notification])

@@ -94,16 +94,18 @@ class StravaIntegration < ApplicationRecord
   end
 
   def update_from_athlete_and_stats(athlete, stats = nil)
-    if stats
-      self.athlete_activity_count = (stats.dig("all_ride_totals", "count") || 0) +
-        (stats.dig("all_run_totals", "count") || 0) +
-        (stats.dig("all_swim_totals", "count") || 0)
-    end
+    self.athlete_activity_count = activity_count_from_stats(stats) if stats
     update(strava_data: athlete.except("id"), strava_id: athlete["id"], status: calculated_status)
 
     bikes = (athlete["bikes"] || []).map { |g| g.merge("gear_type" => "bike") }
     shoes = (athlete["shoes"] || []).map { |g| g.merge("gear_type" => "shoe") }
     (bikes + shoes).each { |gear_data| StravaGear.update_from_strava(self, gear_data) }
+  end
+
+  def update_from_stats(stats)
+    return if stats.blank?
+
+    update(athlete_activity_count: activity_count_from_stats(stats))
   end
 
   def update_sync_status(force_update: false)
@@ -128,6 +130,12 @@ class StravaIntegration < ApplicationRecord
   end
 
   private
+
+  def activity_count_from_stats(stats)
+    (stats.dig("all_ride_totals", "count") || 0) +
+      (stats.dig("all_run_totals", "count") || 0) +
+      (stats.dig("all_swim_totals", "count") || 0)
+  end
 
   def calculated_status
     return :error if status == :error

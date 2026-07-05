@@ -2,6 +2,13 @@
 
 # General helper methods shared with View Components
 module ApplicationComponentHelper
+  # Override ActionView `cache` helper, adding the current locale to the cache
+  # key. Lives here (rather than ApplicationHelper) so both views and view
+  # components get it; otherwise a component's `cache` would skip the locale.
+  def cache(key = {}, options = {}, &block)
+    super([key, locale: I18n.locale], options, &block)
+  end
+
   def number_display(number)
     content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
   end

@@ -40,7 +40,7 @@ module Admin
       private
 
       def bike
-        Bike.find(35)
+        Bike.find_id(35)
       end
     end
   end

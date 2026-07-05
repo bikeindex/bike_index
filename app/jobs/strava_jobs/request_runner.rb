@@ -52,6 +52,8 @@ module StravaJobs
           Integrations::Strava::Client.fetch_activity(strava_integration, strava_request.parameters["strava_id"])
         when "fetch_athlete"
           Integrations::Strava::Client.fetch_athlete(strava_integration)
+        when "fetch_athlete_stats"
+          Integrations::Strava::Client.fetch_athlete_stats(strava_integration)
         when "fetch_gear"
           Integrations::Strava::Client.fetch_gear(strava_integration, strava_request.parameters["strava_gear_id"])
         else
@@ -73,6 +75,8 @@ module StravaJobs
           StravaActivity.create_or_update_from_strava_response(strava_integration, response)
         elsif strava_request.fetch_athlete?
           strava_integration.update_from_athlete_and_stats(response)
+        elsif strava_request.fetch_athlete_stats?
+          strava_integration.update_from_stats(response)
         elsif strava_request.fetch_gear?
           StravaGear.update_from_strava(strava_integration, response)
         end

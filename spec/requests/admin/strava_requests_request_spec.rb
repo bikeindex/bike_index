@@ -21,6 +21,35 @@ RSpec.describe Admin::StravaRequestsController, type: :request do
       expect(assigns(:collection).pluck(:id)).to eq([strava_request.id])
     end
 
+    context "with search_response_status errors_and_failures" do
+      let!(:skipped_request) { FactoryBot.create(:strava_request, response_status: :skipped) }
+      let!(:binx_request) { FactoryBot.create(:strava_request, response_status: :binx_response) }
+      let!(:error_request) { FactoryBot.create(:strava_request, response_status: :error) }
+
+      it "excludes successful, skipped, and binx_response" do
+        get base_url, params: {search_response_status: "errors_and_failures"}
+        expect(response.status).to eq(200)
+        expect(assigns(:collection).pluck(:id)).to eq([error_request.id])
+      end
+    end
+
+    context "with search_responder" do
+      let!(:binx_request) { FactoryBot.create(:strava_request, response_status: :binx_response) }
+      let!(:strava_response_request) { FactoryBot.create(:strava_request, response_status: :success, requested_at: Time.current) }
+
+      it "filters to only Binx responses" do
+        get base_url, params: {search_responder: "only_binx_response"}
+        expect(response.status).to eq(200)
+        expect(assigns(:collection).pluck(:id)).to eq([binx_request.id])
+      end
+
+      it "filters to only Strava responses" do
+        get base_url, params: {search_responder: "only_strava_response"}
+        expect(response.status).to eq(200)
+        expect(assigns(:collection).pluck(:id)).to eq([strava_response_request.id])
+      end
+    end
+
     context "with render_chart" do
       it "renders chart including integration pie chart" do
         get base_url, params: {render_chart: true, period: "year"}

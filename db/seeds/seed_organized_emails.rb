@@ -1,17 +1,17 @@
 # Seed records required for the OrganizedMailer previews
-# (`/rails/mailers/organized_mailer/<kind>`) and for /organizations/hogwarts/emails
+# (`/rails/mailers/organized_mailer/<kind>`) and for /organizations/brakebills/emails
 # to render. Each preview action fetches its target via `Model.last`/`Model.scope.last`,
-# so we need at least one of each kind tied to Hogwarts.
+# so we need at least one of each kind tied to Brakebills.
 
-hogwarts = Organization.find_by_name("Hogwarts")
+brakebills = Organization.find_by_name("Brakebills")
 member = User.find_by_email("member@bikeindex.org")
 user = User.find_by_email("user@bikeindex.org")
 
-raise "missing Hogwarts org or test users" if hogwarts.blank? || member.blank? || user.blank?
+raise "missing Brakebills org or test users" if brakebills.blank? || member.blank? || user.blank?
 
 # --- Mail snippets ---
 # Bodies for the "structural" snippets (header/welcome/footer/security/partial_registration)
-# are copied verbatim from the dev database's Hogwarts records. The notification-kind
+# are copied verbatim from the dev database's Brakebills records. The notification-kind
 # snippets exercise the `organization_message_snippet` paths in OrganizedMailer previews.
 snippets = {
   "header" => {
@@ -19,7 +19,7 @@ snippets = {
     body: <<~HTML
       <div class="organized-partnership-header">
         <p>
-          <img src="https://files.bikeindex.org/uploads/Pu/479405/Daco_4242902.png">
+          <img src="#{brakebills.avatar.medium.url}">
         </p>
         <hr>
       </div>
@@ -61,48 +61,48 @@ snippets = {
   },
   "appears_abandoned_notification" => {
     is_enabled: true,
-    subject: "Your bike appears abandoned at Hogwarts",
+    subject: "Your bike appears abandoned at Brakebills",
     body: <<~HTML
-      <p>Greetings from the Hogwarts groundskeeper,</p>
-      <p>During a recent sweep of the castle bike racks your broomstick-substitute appeared to have a flat tire, excessive rust, missing parts, or other signs that it has not been ridden in some time.</p>
-      <p>Left as is, it risks being impounded by Mr. Filch.</p>
-      <p>Hogwarts grounds regulations require bikes to be in working order and used regularly. Please return to your bike within two weeks, otherwise it will be impounded.</p>
-      <p>Yours,<br>Hogwarts Bike Programme</p>
+      <p>Greetings from the Brakebills groundskeeper,</p>
+      <p>During a recent sweep of the campus bike racks your bike appeared to have a flat tire, excessive rust, missing parts, or other signs that it has not been ridden in some time.</p>
+      <p>Left as is, it risks being impounded by the groundskeeper.</p>
+      <p>Brakebills grounds regulations require bikes to be in working order and used regularly. Please return to your bike within two weeks, otherwise it will be impounded.</p>
+      <p>Yours,<br>Brakebills Bike Programme</p>
     HTML
   },
   "parked_incorrectly_notification" => {
     is_enabled: true,
-    subject: "Your bike is improperly parked at Hogwarts",
+    subject: "Your bike is improperly parked at Brakebills",
     body: <<~HTML
       <p>Greetings,</p>
-      <p>Your bike is improperly parked and must be moved to a designated rack within 24 hours or it risks being impounded. Hogwarts regulations state that bikes must be locked to bike racks &mdash; the Whomping Willow does not count.</p>
-      <p>If your bike is impounded, contact the Hogwarts Bike Programme for next steps.</p>
-      <p>Sincerely,<br>Hogwarts Bike Programme</p>
+      <p>Your bike is improperly parked and must be moved to a designated rack within 24 hours or it risks being impounded. Brakebills regulations state that bikes must be locked to bike racks &mdash; the welters court fence does not count.</p>
+      <p>If your bike is impounded, contact the Brakebills Bike Programme for next steps.</p>
+      <p>Sincerely,<br>Brakebills Bike Programme</p>
     HTML
   },
   "impound_notification" => {
     is_enabled: true,
-    subject: "Your bike has been impounded at Hogwarts",
+    subject: "Your bike has been impounded at Brakebills",
     body: <<~HTML
       <p>Hello,</p>
-      <p>Your bike has been impounded by Mr. Filch due to one or more infractions of Hogwarts bike regulations. Please contact the Hogwarts Bike Programme for next steps to resolve this.</p>
-      <p>Per Wizarding law, bikes not claimed one year after impoundment may be donated to area Hogsmeade non-profit organizations for repair and reuse.</p>
-      <p>Sincerely,<br>Hogwarts Bike Programme</p>
+      <p>Your bike has been impounded by the groundskeeper due to one or more infractions of Brakebills bike regulations. Please contact the Brakebills Bike Programme for next steps to resolve this.</p>
+      <p>Per Brakebills policy, bikes not claimed one year after impoundment may be donated to area Hudson Valley non-profit organizations for repair and reuse.</p>
+      <p>Sincerely,<br>Brakebills Bike Programme</p>
     HTML
   },
   "other_parking_notification" => {
     is_enabled: true,
-    subject: "Bike registration needed at Hogwarts",
+    subject: "Bike registration needed at Brakebills",
     body: <<~HTML
-      <p>If you are missing a registration sticker or need to re-register your bike, please visit the Hogwarts Bike Programme office in the Owlery courtyard.</p>
+      <p>If you are missing a registration sticker or need to re-register your bike, please visit the Brakebills Bike Programme office in the main quad.</p>
     HTML
   },
   "graduated_notification" => {
     is_enabled: true,
-    subject: "Renew your bike registration with Hogwarts",
+    subject: "Renew your bike registration with Brakebills",
     body: <<~HTML
-      <p>Time to renew your registration with Hogwarts!</p>
-      <p>If you are remaining at the castle next term, click the button below to keep your registration current. Your registration sticker will remain valid.</p>
+      <p>Time to renew your registration with Brakebills!</p>
+      <p>If you are remaining at Brakebills next term, click the button below to keep your registration current. Your registration sticker will remain valid.</p>
       <p>If you are graduating &mdash; congratulations! &mdash; your bike registration will transfer to the general Bike Index registry.</p>
     HTML
   },
@@ -110,34 +110,34 @@ snippets = {
     is_enabled: true,
     subject: "Your impound claim has been approved",
     body: <<~HTML
-      <p>Your impound claim was approved. Please come to the Hogwarts Bike Programme office between 9-5 to retrieve your bike. Bring photo ID (or your house badge).</p>
+      <p>Your impound claim was approved. Please come to the Brakebills Bike Programme office between 9-5 to retrieve your bike. Bring photo ID (or your student ID).</p>
     HTML
   },
   "impound_claim_denied" => {
     is_enabled: true,
     subject: "Your impound claim has been denied",
     body: <<~HTML
-      <p>Your impound claim was denied. Reply to this email if you would like to appeal &mdash; the Hogwarts Bike Programme office will review your case.</p>
+      <p>Your impound claim was denied. Reply to this email if you would like to appeal &mdash; the Brakebills Bike Programme office will review your case.</p>
     HTML
   }
 }
 
 snippets.each do |kind, attrs|
-  snippet = hogwarts.mail_snippets.where(kind:).first_or_initialize
+  snippet = brakebills.mail_snippets.where(kind:).first_or_initialize
   snippet.update!(attrs)
 end
 
 # --- OrganizationStolenMessage: enable so it renders in stolen-bike emails ---
-OrganizationStolenMessage.for(hogwarts).update!(
+OrganizationStolenMessage.for(brakebills).update!(
   is_enabled: true,
-  body: "If your bike was stolen near Hogwarts, please report the theft to the Auror Office at the Ministry of Magic. Include a detailed description and any photos you have.",
+  body: "If your bike was stolen near Brakebills, please report the theft to the campus police. Include a detailed description and any photos you have.",
   search_radius_miles: 25
 )
 
 # --- GraduatedNotification: needs deliver_graduated_notifications? to be true ---
-hogwarts.update!(graduated_notification_interval: 1.year.to_i) if hogwarts.graduated_notification_interval.blank?
+brakebills.update!(graduated_notification_interval: 1.year.to_i) if brakebills.graduated_notification_interval.blank?
 
-if GraduatedNotification.where(organization: hogwarts).none?
+if GraduatedNotification.where(organization: brakebills).none?
   graduated_bike = BikeServices::Creator.new.create_bike(
     BParam.create!(creator: user, params: {
       bike: {
@@ -149,7 +149,7 @@ if GraduatedNotification.where(organization: hogwarts).none?
         rear_tire_narrow: "true",
         handlebar_type: HandlebarType.slugs.first,
         owner_email: user.email,
-        creation_organization_id: hogwarts.id.to_s
+        creation_organization_id: brakebills.id.to_s
       }
     })
   )
@@ -161,27 +161,27 @@ if GraduatedNotification.where(organization: hogwarts).none?
   graduated_bike.current_ownership.update_columns(created_at: old_time, claimed: true, user_id: user.id)
   BikeOrganization.where(bike: graduated_bike).update_all(created_at: old_time)
 
-  GraduatedNotification.create!(bike: graduated_bike, organization: hogwarts, user: user)
+  GraduatedNotification.create!(bike: graduated_bike, organization: brakebills, user: user)
   puts "  Created GraduatedNotification for bike ##{graduated_bike.id}"
 end
 
 # --- HotSheet: preset stolen_record_ids and recipient_ids so we don't depend
 # on hot_sheet_configuration's bounding box (the preview just renders) ---
-if HotSheet.where(organization: hogwarts).none?
+if HotSheet.where(organization: brakebills).none?
   stolen_record_ids = StolenRecord.current.reorder(date_stolen: :desc).limit(5).pluck(:id)
   HotSheet.create!(
-    organization: hogwarts,
+    organization: brakebills,
     sheet_date: Time.current.to_date,
-    recipient_ids: [member.id, hogwarts.auto_user_id].compact,
+    recipient_ids: [member.id, brakebills.auto_user_id].compact,
     stolen_record_ids: stolen_record_ids
   )
   puts "  Created HotSheet with #{stolen_record_ids.size} stolen records"
 end
 
 # --- ImpoundClaims: one submitted, one approved, one denied ---
-impound_records = hogwarts.impound_records.reorder(:id).limit(3).to_a
-if impound_records.any? && ImpoundClaim.where(organization: hogwarts).none?
-  bike_submitting = hogwarts.bikes.where.not(id: impound_records.map(&:bike_id)).first ||
+impound_records = brakebills.impound_records.reorder(:id).limit(3).to_a
+if impound_records.any? && ImpoundClaim.where(organization: brakebills).none?
+  bike_submitting = brakebills.bikes.where.not(id: impound_records.map(&:bike_id)).first ||
     user.bikes.first
 
   impound_records.zip(%w[submitting approved denied]).each do |record, status|
@@ -189,7 +189,7 @@ if impound_records.any? && ImpoundClaim.where(organization: hogwarts).none?
 
     ImpoundClaim.create!(
       impound_record: record,
-      organization: hogwarts,
+      organization: brakebills,
       user: user,
       bike_submitting: bike_submitting,
       bike_claimed: record.bike,
@@ -220,7 +220,7 @@ unless transferred_bike_exists
         primary_frame_color_id: Color.pluck(:id).sample,
         rear_tire_narrow: "true",
         handlebar_type: HandlebarType.slugs.first,
-        owner_email: "previous-owner@example.com"
+        owner_email: "previous-owner@bikeindex.org"
       }
     })
   )
@@ -229,7 +229,7 @@ unless transferred_bike_exists
   BikeServices::Updator.new(
     user: user,
     bike: bike,
-    permitted_params: {bike: {owner_email: "new-owner@example.com"}}.as_json
+    permitted_params: {bike: {owner_email: "new-owner@bikeindex.org"}}.as_json
   ).update_available_attributes
   CallbackJob::AfterBikeSaveJob.new.perform(bike.id, true, true)
   puts "  Created transferred bike ##{bike.id}"

@@ -1,0 +1,24 @@
+<div class="tw:py-6">
+  <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
+    <h1 class="uncap tw:text-2xl tw:font-semibold">Edit page</h1>
+
+    <%= link_to "Back to pages", edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), class: "twlink" %>
+  </div>
+
+  <%= form_with model: @page,
+    url: organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: @page.id),
+    method: :patch, html: {multipart: true} do |f| %>
+    <%= render Org::RegistrationSequence::PageEdit::Component.new(form_builder: f) %>
+
+    <div
+      class="
+        tw:mt-4 tw:flex tw:items-baseline tw:justify-between tw:pt-4
+        tw:md:pt-8
+      "
+    >
+      <%= render UI::Button::Component.new(text: "Save page", color: :primary, kind: :submit) %>
+
+      <%= render UI::ButtonLink::Component.new(text: "Delete page", href: organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: @page.id), color: :error, size: :sm, data: {turbo: true, turbo_method: :delete, turbo_confirm: "This action can't be undone, you'll have to re-create the page"}) %>
+    </div>
+  <% end %>
+</div>

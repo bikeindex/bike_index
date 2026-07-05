@@ -29,6 +29,28 @@ RSpec.describe Search::RegistrationsController, type: :request do
       expect(assigns(:bikes)).to be_blank
     end
 
+    describe "facebook pixel" do
+      let(:pixel_id) { "199066297131941" }
+      it "renders the pixel by default" do
+        get base_url
+        expect(response.body).to include(pixel_id)
+      end
+      context "with proximity param" do
+        it "skips the pixel" do
+          get "#{base_url}?proximity=Chicago"
+          expect(response.code).to eq("200")
+          expect(response.body).to_not include(pixel_id)
+        end
+      end
+      context "with search_email param" do
+        it "skips the pixel" do
+          get "#{base_url}?search_email=test@example.com"
+          expect(response.code).to eq("200")
+          expect(response.body).to_not include(pixel_id)
+        end
+      end
+    end
+
     context "with search_no_js" do
       it "renders with bikes" do
         get "#{base_url}?search_no_js=true"

@@ -20,6 +20,7 @@
 #   :on_registrations_index                - component computes from current request
 #   :on_bikes_new                          - "
 #   :on_bikes_new_with_parking_notification - "
+#   :on_registration_sequences             - " (also matches the pages controller)
 module OrganizedServices
   module UserMenuItems
     extend Functionable
@@ -48,6 +49,12 @@ module OrganizedServices
       link(bulk_label,
         routes.organization_bulk_imports_path(organization_id: organization.to_param),
         active: :match_controller)
+    end
+
+    def registration_sequences_link(organization)
+      link(translation(:manage_registration_sequences),
+        routes.organization_registration_sequences_path(organization_id: organization.to_param),
+        active: :on_registration_sequences)
     end
 
     #
@@ -227,6 +234,10 @@ module OrganizedServices
       if organization.enabled?("hot_sheet")
         items << link(translation(:stolen_hot_sheet_configuration),
           routes.edit_organization_hot_sheet_path(organization_id: organization.to_param))
+      end
+
+      if organization.enabled?("registration_sequences")
+        items << registration_sequences_link(organization)
       end
 
       items

@@ -199,6 +199,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           components = rendered_view_component_names { get "#{base_url}/finished_registration" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::FinishedRegistration::Component")
+          expect(response.body).to include("Bike details")
           expect(response.body).to include("Protect your bike by following these locking guidelines")
           expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
@@ -206,6 +207,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           components = rendered_view_component_names { get "#{base_url}/whateverrrrr" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::FinishedRegistration::Component")
+          expect(response.body).to include("Bike details")
           expect(response.body).to include("Protect your bike by following these locking guidelines")
           expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])

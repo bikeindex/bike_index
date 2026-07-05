@@ -4,7 +4,7 @@
 
 <p>
   <% if OrganizationDisplayer.avatar?(ownership.organization) %>
-    <%= image_tag ownership.organization.avatar.url(:medium), class: "claim-message-org-avatar" %>
+    <%= image_tag ownership.organization.avatar.url(:medium), alt: ownership.organization.name, class: "claim-message-org-avatar" %>
   <% end %>
 
   <strong>

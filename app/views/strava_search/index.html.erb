@@ -16,7 +16,14 @@
   <% end %>
 <% end %>
 
-<div id="root"></div>
+<%#
+  The layout skips its own <main id="main-content"> here (the SPA renders its own <main>),
+  so provide the skip-link target around the React mount point
+%>
+
+<div id="main-content">
+  <div id="root"></div>
+</div>
 
 <script>
   window.stravaSearchConfig = <%= @strava_search_config.to_json.html_safe %>;

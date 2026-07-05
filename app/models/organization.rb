@@ -110,6 +110,7 @@ class Organization < ApplicationRecord
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :location_address_records, -> { where(kind: :organization) }, class_name: "AddressRecord", foreign_key: :organization_id
   has_many :mail_snippets
+  has_many :registration_sequences, dependent: :destroy
   has_many :parking_notifications
   has_many :impound_records
   has_many :impound_claims

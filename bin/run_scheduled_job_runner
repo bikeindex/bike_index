@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+# Cron entrypoint (every minute — see config/crontab) that enqueues
+# ScheduledJobRunner when one isn't already queued. Loading just the Sidekiq
+# client instead of all of Rails keeps each run cheap: a full Rails boot every
+# minute is needless memory pressure, and on the shared review-apps host stacked
+# boots OOM a 4GB box.
+#
+# Rather than reconstruct Sidekiq's payload by hand (fragile across upgrades), we
+# use its public client API. Sidekiq owns the wire format; we only name the
+# worker and queue.
+#
+# The 59s-frequency half of ScheduledJob.should_enqueue? is intentionally dropped:
+# with a 60s cron it's always true, and reading it would couple us to the private
+# history-hash layout. The dedup half (don't pile up / don't add past max) is kept.
+require "bundler/setup"
+require "sidekiq"
+require "sidekiq/api"
+
+# Locals, not constants, so spec/jobs/scheduled_job_runner_spec.rb can `load` this
+worker = "ScheduledJobRunner"
+queue_name = "high_priority" # ScheduledJobRunner's sidekiq_options queue
+queue_maximum = 200 # ScheduledJob.queue_maximum_addition_size
+
+Sidekiq.configure_client { |config| config.redis = {url: ENV.fetch("REDIS_URL")} }
+
+# Mirror of ScheduledJob.enqueued? via Sidekiq's public API
+queue = Sidekiq::Queue.new(queue_name)
+already_queued = queue.size > queue_maximum || queue.any? { |job| job.klass == worker }
+
+unless already_queued
+  Sidekiq::Client.push("class" => worker, "queue" => queue_name, "retry" => false, "args" => [])
+end

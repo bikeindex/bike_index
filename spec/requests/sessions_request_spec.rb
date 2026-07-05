@@ -59,6 +59,21 @@ RSpec.describe SessionsController, type: :request do
     end
   end
 
+  describe "new" do
+    it "renders" do
+      get "/session/new"
+      expect(response.code).to eq "200"
+      expect(response).to render_template(:new)
+    end
+    context "json format" do
+      it "renders html (scanners request .json)" do
+        get "/session/new.json"
+        expect(response.code).to eq "200"
+        expect(response).to render_template(:new)
+      end
+    end
+  end
+
   describe "create" do
     let(:password) { "example_password2" }
     let!(:user) { FactoryBot.create(:user_confirmed, password: password, password_confirmation: password, banned: banned) }

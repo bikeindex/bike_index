@@ -1,6 +1,6 @@
 # This worker runs all the scheduled workers
 # It needs to have a frequency <= the most frequent scheduled worker interval
-# It's enqueued by a rake task that runs every minute, and enqueues this job if it .should_enqueue?
+# It's enqueued every minute by bin/run_scheduled_job_runner (via cron) when it .should_enqueue?
 # This worker, in turn, runs every scheduled worker that hasn't run for at least as long as its frequency, unless the queue is backed up
 
 class ScheduledJobRunner < ScheduledJob

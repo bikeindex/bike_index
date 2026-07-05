@@ -18,7 +18,7 @@
     >
       <% if action_name == 'create' %>
         <header class="reg-header">
-          <%= image_tag 'revised/logo.svg', class: 'reg-header-logo' %>
+          <%= image_tag 'revised/logo.svg', alt: 'Bike Index', class: 'reg-header-logo' %>
         </header>
       <% elsif @simple_header %>
         <% header_style = @button_and_header.blank? ? '' : "background: #{@button_and_header}" %>
@@ -29,7 +29,7 @@
         </header>
       <% else %>
         <header class="reg-header">
-          <%= image_tag 'revised/logo.svg', class: 'reg-header-logo' %>
+          <%= image_tag 'revised/logo.svg', alt: 'Bike Index', class: 'reg-header-logo' %>
 
           <h2><%= t(".protect_your_bike_today") %></h2>
 

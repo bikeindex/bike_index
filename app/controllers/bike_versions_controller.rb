@@ -16,7 +16,7 @@ class BikeVersionsController < ApplicationController
   end
 
   def create
-    bike = Bike.unscoped.find(params[:bike_id])
+    bike = Bike.unscoped.find_id(params[:bike_id])
     if bike&.authorized?(current_user)
       # Do it inline because it's blocking
       bike_version = BikeVersionCreatorJob.new.perform(bike.id)
@@ -60,7 +60,7 @@ class BikeVersionsController < ApplicationController
 
   def find_bike_version
     begin
-      @bike_version = BikeVersion.unscoped.find(params[:id])
+      @bike_version = BikeVersion.unscoped.find_id(params[:id])
     rescue ActiveRecord::StatementInvalid => e
       raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
     end

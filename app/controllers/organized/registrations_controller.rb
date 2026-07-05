@@ -48,23 +48,46 @@ module Organized
     end
 
     def multi_search
+      @search_kind = normalized_search_kind
     end
 
     def multi_search_response
-      @serial = params[:serial].to_s.strip
+      @search_kind = normalized_search_kind
+      @query = (sticker_search? ? params[:query] : params[:serial]).to_s.strip
       @chip_id = params[:chip_id].to_s.strip.presence
-      return head(:bad_request) unless @serial.present?
+      return head(:bad_request) unless @query.present?
 
-      @search_all = Binxtils::InputNormalizer.boolean(params[:search_all])
-      @interpreted_params = BikeSearchable.searchable_interpreted_params({serial: @serial, stolenness: "all"}, ip: forwarded_ip_address)
-      search_scope = @search_all ? Bike : current_organization.bikes
-      bikes = search_scope.search(@interpreted_params)
       @per_page = 10
+      bikes = sticker_search? ? sticker_search_bikes : serial_search_bikes
       @pagy, @bikes = pagy(:countish, bikes.reorder("bikes.id desc"), limit: @per_page, page: permitted_page)
-      @close_serials = search_scope.search_close_serials(@interpreted_params).limit(25) if @bikes.none?
+      @close_serials = @search_scope.search_close_serials(@interpreted_params).limit(25) if !sticker_search? && @bikes.none?
     end
 
     private
+
+    def normalized_search_kind
+      (params[:search_kind] == "stickers") ? "stickers" : "serials"
+    end
+
+    def sticker_search?
+      @search_kind == "stickers"
+    end
+
+    def serial_search_bikes
+      @search_all = Binxtils::InputNormalizer.boolean(params[:search_all])
+      @interpreted_params = BikeSearchable.searchable_interpreted_params({serial: @query, stolenness: "all"}, ip: forwarded_ip_address)
+      @search_scope = @search_all ? Bike : current_organization.bikes
+      @search_scope.search(@interpreted_params)
+    end
+
+    # A blank normalized code makes sticker_code_search return `all`, so guard against it
+    # surfacing every organization's bikes
+    def sticker_search_bikes
+      return Bike.none if BikeSticker.normalize_code(@query, leading_zeros: true).blank?
+
+      bike_ids = BikeSticker.sticker_code_search(@query).claimed.select(:bike_id)
+      Bike.where(id: bike_ids)
+    end
 
     def sortable_columns
       SORTABLE_COLUMNS

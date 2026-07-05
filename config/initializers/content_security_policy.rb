@@ -44,6 +44,8 @@ Rails.application.configure do
       "https://bikebook.herokuapp.com",
       "https://www.google-analytics.com",
       "https://*.google-analytics.com",
+      # GA4 region-redirects measurement hits to www.google.com/g/collect
+      "https://www.google.com",
       "https://www.googletagmanager.com",
       "https://maps.googleapis.com",
       "https://translate.googleapis.com", # Google Translate API
@@ -78,9 +80,7 @@ Rails.application.configure do
       "https://m.facebook.com",
       "https://platform.twitter.com",
       "https://js.stripe.com"
-    policy.report_uri -> do
-      "https://api.honeybadger.io/v1/browser/csp?api_key=#{ENV["HONEYBADGER_CSP_API_KEY"]}&report_only=false&env=#{Rails.env}&context[user_id]=#{current_user&.id if respond_to?(:current_user)}"
-    end
+    policy.report_uri "/csp_reports"
   end
 
   config.content_security_policy_report_only = false

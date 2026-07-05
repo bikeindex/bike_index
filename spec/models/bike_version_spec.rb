@@ -99,4 +99,13 @@ RSpec.describe BikeVersion, type: :model do
       expect(BikeVersion.pluck(:id)).to eq([bike_version_1.id, bike_version_2.id, bike_version_3.id])
     end
   end
+
+  describe "short_id and find_id" do
+    let(:bike_version) { FactoryBot.create(:bike_version, id: 3431156) }
+    it "round-trips through find_id" do
+      expect(bike_version.short_id).to eq "v/21J-HW"
+      expect(BikeVersion.find_id(bike_version.short_id)).to eq bike_version
+      expect(BikeVersion.find_id(bike_version.id)).to eq bike_version
+    end
+  end
 end

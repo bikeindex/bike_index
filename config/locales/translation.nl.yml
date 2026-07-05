@@ -2,7 +2,7 @@
 # IF YOU UPDATE IT, YOUR CHANGES WILL BE LOST AT THE NEXT SYNC.
 #
 # To update this file, use this translation interface:
-# https://translation.io/bikeindex/bike_index/nl
+# https://translation.io/sethherr/bike_index/nl
 #
 ---
 nl:
@@ -870,6 +870,7 @@ nl:
         e_motorcycle: e-motorfiets (of e-dirtbike)
         traditional_bike: Traditionele fiets (2 wielen, 1 zadel, pedaal)
         elliptical: Elliptische fiets
+        balance_bike: Loopfiets
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
@@ -3629,6 +3630,9 @@ nl:
       marketplace_messages: Marktplaatsberichten
       your_registrations: Uw registraties
       marketplace: Marktplaats
+      menu: Menu
+      settings_menu: Instellingen
+      skip_to_main_content: Ga direct naar de hoofdinhoud
     application_bikehub:
       contact: contact
       home: Thuis
@@ -4312,40 +4316,6 @@ nl:
       sign_up_a_shop_or_organization: Registreer een winkel of organisatie
       terms_and_conditions: Termen en voorwaarden
       vendor_terms: leveranciersvoorwaarden
-    footer_revised:
-      about: Over
-      ambassadors: Ambassadors
-      api_documentation: API-documentatie
-      bike_index: Bike Index
-      bike_manufacturer_list: Lijst met fietsfabrikanten
-      bike_shops: Fietsenwinkels
-      blog: Blog
-      cities: Steden
-      community_groups: Community's
-      copyright_html: "%{current_year} & kopiëren; Bike Index, een 501 (c) (3) non-profit
-        - EIN 81-4296194"
-      donate: Schenken
-      faq: FAQ
-      help: Helpen
-      language: Taal
-      law_enforcement: Politie
-      privacy_policy: Privacybeleid
-      resources: Middelen
-      schools_and_universities: Scholen en universiteiten
-      stolen_bike_recoveries: Gestolen fietsherstel
-      store: Winkel
-      support_us: Steun ons
-      terms_and_conditions: Termen en voorwaarden
-      vendor_terms: leveranciersvoorwaarden
-      where_we_are: Waar we zijn
-      who_we_serve: Wie we dienen
-      change_preferred_language: voorkeurstaal wijzigen
-      security: veiligheid
-      protect_your_bike: Bescherm je fiets
-      how_to_get_your_stolen_bike_back: Haal je gestolen fiets terug
-      press_inquiries: Persvragen
-      strava_search: Zoeken en bijwerken op Strava
-      dev_and_design_resources: Ontwikkelings- en ontwerpbronnen
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:
@@ -4494,6 +4464,7 @@ nl:
       stolen_message: Gestolen bericht
       model_audits: Audits van e-voertuigen
       multi_search: Meerdere zoekopdrachten
+      manage_registration_sequences: Beheer registratiereeksen
     bike_search_form:
       anywhere: Overal
       doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
@@ -4508,6 +4479,8 @@ nl:
       bike: Fiets
       recovered_date: hersteld %{date}
       translated_from_english: vertaald uit het Engels
+    shops_map:
+      map_of_partner_locations: Kaart met partnerlocaties
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -4911,6 +4884,7 @@ nl:
       photo_of_user_with_bike: Jij met je %{bike_type}
       photo_stock: Stock foto
       photo_uncategorized: Foto van uw %{bike_type}
+      remove_image: Afbeelding verwijderen
     show:
       are_you_sure: Weet je het zeker?
       back_to_images: Terug naar openbare afbeeldingen
@@ -5151,6 +5125,9 @@ nl:
         versies en moeten worden bijgewerkt op de originele %{bike_type}-registratie.
         %{bike_registration_link}.
       version_name: Versienaam
+      other_manufacturer: Andere fabrikant
+      select_other: Selecteer 'Overig' als de fabrikant niet verschijnt wanneer deze
+        wordt ingevoerd
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe
@@ -5468,6 +5445,7 @@ nl:
         removed_from: Verwijderd uit de fietsindex
       vehicle_thumbnail:
         registered_not_stolen: geregistreerd, niet gestolen
+        member: Lid van Bike Index
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
       multi_result_chip:
@@ -5481,6 +5459,8 @@ nl:
         price_is_firm_false: prijs is onderhandelbaar
         price_is_firm_true: prijs is vast
         still_for_sale_at: Nog steeds te koop bij
+        member_listing: Lid van Bike Index
+        member_listing_tooltip: Deze verkoper is lid van Bike Index.
       homepage_for_buttons:
         bike_shops: Fietsenwinkels
         cities: Steden
@@ -5520,6 +5500,42 @@ nl:
         letter_opener_link: e-mail outbox
         letter_opener_tooltip: Bekijk de e-mail die door deze review-app is verzonden.
         pr_link: 'PR #%{number}'
+      footer:
+        about: Over
+        ambassadors: Ambassadors
+        api_documentation: API-documentatie
+        bike_index: Bike Index
+        bike_manufacturer_list: Lijst met fietsfabrikanten
+        bike_shops: Fietsenwinkels
+        blog: Blog
+        change_preferred_language: voorkeurstaal wijzigen
+        cities: Steden
+        community_groups: Community's
+        copyright_html: "%{current_year} & kopiëren; Bike Index, een 501 (c) (3) non-profit
+          - EIN 81-4296194"
+        dev_and_design_resources: Ontwikkelings- en ontwerpbronnen
+        donate: Schenken
+        faq: FAQ
+        help: Helpen
+        how_to_get_your_stolen_bike_back: Haal je gestolen fiets terug
+        language: Taal
+        law_enforcement: Politie
+        press_inquiries: Persvragen
+        privacy_policy: Privacybeleid
+        protect_your_bike: Bescherm je fiets
+        resources: Middelen
+        schools_and_universities: Scholen en universiteiten
+        security: veiligheid
+        stolen_bike_recoveries: Gestolen fietsherstel
+        store: Winkel
+        strava_search: Zoeken en bijwerken op Strava
+        support_us: Steun ons
+        terms_and_conditions: Termen en voorwaarden
+        vendor_terms: leveranciersvoorwaarden
+        where_we_are: Waar we zijn
+        who_we_serve: Wie we dienen
+        legal: Juridisch
+        social_media: Sociale media
     emails:
       partials:
         bike_box:
@@ -5578,13 +5594,42 @@ nl:
         thanks_for_adding_this_bike_type_you_found: Bedankt voor het toevoegen van
           deze %{bike_type} die je aan Bike Index hebt gevonden
         use_a_ulock: Gebruik een U-Lock.
-        welcome_to_bike_index: Welkom bij Bike Index
         were_sorry_your_bike_type_was_stolen: Het spijt ons dat uw %{bike_type} is
           gestolen.
         when_you_do: wanneer je dat doet!
         you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
           Bike Index
         youre_almost_done_registering: Je bent bijna klaar met registreren!
+        bike_details: Fietsdetails
+        bike_love_one: Fietsliefde stripverhaal één
+        bike_love_three: Fietsliefde stripverhaal drie
+        bike_love_two: Fietsliefde stripverhaal twee
+        claim_your_bike_type: Claim je %{bike_type}
+        indoor_storage_tip: We raden altijd aan om je fiets, indien mogelijk, binnen
+          te zetten of op een veilige plek te stallen, vooral 's nachts.
+        keep_your_registration_updated: Houd uw registratie actueel.
+        marketplace_illustration: Illustratie van een marktplaats
+        pro_tip_illustration: Professionele tip (illustratie)
+        registered_animation: Geregistreerde animatie
+        registration_complete_message: Je fiets is nu opgenomen in 's werelds meest
+          effectieve fietsregister. Je beschermt je fiets en helpt fietsdiefstal in
+          je buurt te voorkomen.
+        registration_confirm_message: Je bent slechts één stap verwijderd van het
+          activeren van het meest effectieve fietsregister en het beschermen van je
+          fiets in jouw buurt.
+        spread_the_word_body: Moedig je vrienden en familie aan om hun fietsen ook
+          te registreren.
+        spread_the_word_title: Vertel het verder over Bike Index!
+        stolen_guidance: Als je fiets gestolen wordt, log dan direct in op Bike Index
+          en meld hem als gestolen om ons opsporingsnetwerk te activeren.
+        theft_victims_illustration: Illustratie van slachtoffers van diefstal
+        ulock_illustration: U-slot illustratie
+        updated_registration_guidance: Als u verhuist, uw fiets verkoopt of er andere
+          wijzigingen aan aanbrengt, zorg er dan voor dat de registratie is bijgewerkt,
+          zodat de gegevens correct en bruikbaar blijven.
+        view_your_bike: Bekijk je fiets
+        what_if_my_bike_gets_stolen: Wat als mijn fiets gestolen wordt?
+        whats_next: Wat volgt?
       organization_invitation:
         hello: Hallo %{name},
         join_org: Doe mee met %{org_name}
@@ -5852,6 +5897,7 @@ nl:
         result_count_html: "— %{count} %{results}"
         serial_label: 'Serial:'
         view_all: alles bekijken
+        sticker_label: 'Sticker:'
     alerts:
       object_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat

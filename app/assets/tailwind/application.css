@@ -11,6 +11,7 @@
 @source "../../javascript";
 @source "../../../public/*.html";
 @import "./combobox.css";
+@import "./lexxy_overrides.css";
 
 /* Class-based dark mode (the legacy config's darkMode: 'selector'); a `.dark`
  * ancestor activates tw:dark:* utilities. */

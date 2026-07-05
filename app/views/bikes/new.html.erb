@@ -52,14 +52,16 @@
               <div id="serial-input">
                 <%= f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: t('.required'), class: 'form-control' %>
 
-                <a
+                <button
+                  type="button"
                   class="inline-input-help"
                   title="<%= t(".serial_help") %>"
+                  aria-label="<%= t(".serial_help") %>"
                   data-toggle="popover"
                   data-content="<%= serial_help_content.to_str %>"
                 >
                   ?
-                </a>
+                </button>
               </div>
 
               <div id="made-without-serial-input">
@@ -72,6 +74,7 @@
               <div class="below-input-help" id="made-without-serial-help">
                 <div class="hidden-other">
                   <a
+                    href="#made-without-serial-modal"
                     data-toggle="modal"
                     data-target="#made-without-serial-modal"
                   >
@@ -83,7 +86,7 @@
 
             <div class="right-input-help">
               <label class="cursor-pointer made-without-serial-checkbox">
-                <%= check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1 %>
+                <%= check_box_tag :has_no_serial, true, @bike.serial_unknown? %>
                 <%= t(".missing_serial") %>
               </label>
             </div>
@@ -163,7 +166,7 @@
 
             <div class="right-input-help">
               <label class="cursor-pointer">
-                <input id="bike_unknown_year" type="checkbox" tabindex="-1">
+                <input id="bike_unknown_year" type="checkbox">
                 <%= t(".unknown_year") %>
               </label>
             </div>

@@ -14,6 +14,14 @@ Rails.application.configure do
   # the :staging group.
   config.action_mailer.delivery_method = :letter_opener_web
 
+  # Persist the inbox on the storage volume (config/deploy.review.yml mounts
+  # <app>_storage at /rails/storage) instead of the gem default tmp/letter_opener
+  # — each deploy boots a fresh container with an empty tmp/, which would drop
+  # every captured message.
+  LetterOpenerWeb.configure do |letter_opener_config|
+    letter_opener_config.letters_location = Rails.root.join("storage", "letter_opener")
+  end
+
   # Upload to the dev R2 bucket so staging doesn't touch production assets
   # (see config/storage.yml).
   config.active_storage.service = :cloudflare_dev

@@ -3,12 +3,14 @@ name: pr
 description: >-
   Create or update a pull request for the current branch. Trigger when the user
   asks to create/open/make a PR, or to edit/update/rewrite/fix the PR
-  description, body, or summary — for both new PRs (`gh pr create`) and
-  existing ones (`gh pr edit --body-file`). For frontend diffs, delegates to
-  the `frontend-screenshots` skill to capture desktop+mobile screenshots and
-  embeds them under a `## Screenshots` section. Use for any verb that lands on
-  a PR's text content: "open a PR", "make a PR", "update the PR description",
-  "rewrite the PR body", "fix the description".
+  description, body, summary, or title — including bare update phrasings like
+  "update pr", "update this pr", or "update the PR" with no other object — for
+  both new PRs (`gh pr create`) and existing ones (`gh pr edit`). For frontend
+  diffs, delegates to the `frontend-screenshots` skill to capture
+  desktop+mobile screenshots and embeds them under a `## Screenshots` section.
+  Use for any verb that lands on a PR's text content: "open a PR", "make a PR",
+  "update pr", "update this pr", "update the PR description", "rewrite the PR
+  body", "fix the description".
 allowed-tools: Bash, Read, Glob, Grep
 ---
 
@@ -19,6 +21,14 @@ Create or update a pull request for the current branch. If the diff contains fro
 The workflow is ordered so the always-runs phase (steps 1–3) happens first, then the screenshot phase (steps 4–7) runs only when needed. Each step ends with the conditions under which you stop and return.
 
 ## Workflow
+
+### 0. Lint and conform to CLAUDE.md
+
+Run `bin/lint` to auto-format the code. (Always use `bin/lint`, never another formatter or `standardrb` directly.)
+
+Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix anything that doesn't conform — code-style guidelines (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names, pithy comments), testing conventions, and frontend rules. Only touch lines this branch already changed; don't reformat unrelated code.
+
+Any edits from this step get picked up by the branch-state and push steps below — don't separately commit them here; the normal commit/push in step 3 handles it.
 
 ### 1. Gather branch state
 
@@ -47,18 +57,22 @@ Record this as `FRONTEND=true|false` for the screenshot decision in step 4.
 
 Write a summary of the change (2–5 bullets based on the diff and recent commits) to a temp file. Follow the repo's existing PR body style — look at the last few merged PRs (`gh pr list --state merged --limit 5 --json body,title`) to match tone and length. Keep the title under ~70 chars.
 
-Bias toward brevity. Reviewers skim. A bullet that fits on one line beats one that wraps three times — push detail down to the diff or commit log, not the body. If a per-file bullet starts feeling like an essay, compress to a single sentence naming the *kind* of change (e.g., "tightened description, trimmed unused allowed-tools, consolidated duplicated snippets") rather than enumerating each edit. Aim for under ~6 bullets total across the whole body, including any nested ones; if you're past that, regroup by category until you fit.
+Bias hard toward brevity — default to a one-line intro plus ~2-3 bullets, not the 5-bullet maximum. Reviewers skim. A bullet that fits on one line beats one that wraps three times — push detail down to the diff or commit log, not the body. If a per-file bullet starts feeling like an essay, compress to a single sentence naming the *kind* of change (e.g., "tightened description, trimmed unused allowed-tools, consolidated duplicated snippets") rather than enumerating each edit.
+
+Cut anything the reviewer can see in the diff. Implementation mechanics — which HTTP client, file-mode flags, helper-method names, column renames, the exact tasks/files removed — belong to the diff, not the body. Keep only what the diff *doesn't* make obvious: what the PR adds, the single entry point a reviewer would use, and any non-obvious behavior or decision they'd otherwise have to reverse-engineer. When in doubt, leave it out and let the code speak. Aim for under ~6 bullets total including nested ones; if you're past that, regroup by category — but most PRs should land well under that.
 
 Describe the end state, not the journey. Reviewers want to know what the PR does *now* — the diff that will land — not the order in which it was built. Avoid framings like "first pass" / "second pass", commit-hash references for stages of work that all merge into the same shipped diff, "originally we tried X then switched to Y", or play-by-play of how the conversation evolved. The git log preserves that. If a discarded approach is genuinely load-bearing context for the reviewer (e.g., explains why the chosen approach is structured oddly), one line is enough; otherwise omit. The same applies when *updating* an existing PR body: rewrite to describe the current diff, don't append a changelog of edits made since the last revision.
 
 **No "Test plan" section unless the user asks.** Don't list things CI already covers — `bundle exec rspec ...`, `bin/lint`, `bin/dev` boots cleanly, etc. Those belong to CI, not the PR body. Only add a Test plan when there's reviewer-facing manual verification a human needs to do (e.g. "click X, confirm Y appears"), and only when the user requests it.
 
+**No generic "covered by tests" bullet.** Drop summary bullets like "Covered by specs and a fixture" / "Added tests" / "Includes specs" — that a change is tested is assumed, so the bullet adds no information, and it names test *mechanics* (a fixture, a VCR cassette, an inline `StringIO`) that quietly go stale when the test approach changes mid-PR. Mention tests in the body only when *what* is verified is itself the reviewer-facing point (e.g. "adds a regression test for the UTF-8 download crash"), not merely that tests exist.
+
 **No Claude Code attribution footer.** Don't append the "🤖 Generated with [Claude Code](https://claude.com/claude-code)" line (or any variant of it) to the body. The PR body should read like the human author wrote it.
 
 Push the branch: `git push -u origin HEAD`.
 
-- If `$EXISTING_PR` from step 1 was non-empty: `gh pr edit <num> --body-file <tmp-body-file>` (don't overwrite the title unless the user asks).
-- Otherwise: `gh pr create --base main --title "..." --body-file <tmp-body-file>`. Capture the PR number from the output.
+- If `$EXISTING_PR` from step 1 was non-empty: `gh pr edit <num> --title "..." --body-file <tmp-body-file>`. Refresh the title to match the current diff (this is what an "update pr" request expects) unless the user already gave the PR a deliberate custom title you'd be clobbering — if unsure, keep the existing title and only update the body.
+- Otherwise: `gh pr create --draft --base main --title "..." --body-file <tmp-body-file>`. Create as a draft by default; only omit `--draft` (or mark ready) if the user explicitly asks for a ready-for-review PR. Capture the PR number from the output.
 
 Always pass the body via `--body-file` (not inline `--body`) to preserve formatting.
 

@@ -76,7 +76,7 @@
 
         <% strava_integration = current_user.strava_integration %>
 
-        <% if strava_integration&.show_gear_link? %>
+        <% if strava_integration&.show_gear_link? && !@bike.version? %>
           <div class="form-wrap secondary-form-wrap">
             <div class="form-well-form-header-always-visible">
               <h3><%= t("bikes_edit.strava_gear.strava_gear") %></h3>

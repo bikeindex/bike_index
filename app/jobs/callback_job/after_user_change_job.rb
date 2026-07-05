@@ -38,6 +38,10 @@ module CallbackJob
 
       user.user_ban.delete if user.user_ban.present? && !user.banned?
 
+      # Update current Marketplace Listings that don't match the user's membership status
+      user.marketplace_listings.current.where.not(seller_member: user.member?)
+        .each { it.update(updated_at: Time.current) }
+
       process_bikes(user) unless skip_bike_update
     end
 

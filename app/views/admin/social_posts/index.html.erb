@@ -46,8 +46,6 @@
 <% admin_search_form = capture do %>
   <div class="row mt-4 mb-4">
     <div class="col-sm-5">
-      <%= number_with_delimiter(matching_social_posts.size) %> matching posts
-      <em><%= humanized_time_range(@time_range) %></em>
       <% if @social_account.present? %>
         <strong>
           from

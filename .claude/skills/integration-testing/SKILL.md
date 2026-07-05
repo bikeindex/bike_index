@@ -145,6 +145,24 @@ page.execute_script("document.querySelector('.search-btn').click()")
 
 When repeated assertions get noisy, define small DSL-style helpers in the file (`def listing_for(item)`, `def thumbnail_selector(...)`) — they read better than scattered selectors and keep you out of `page.execute_script`.
 
+## Component system specs must assert accessibility
+
+A component system spec (`spec/components/**/*_system_spec.rb`) exists to verify a component renders and behaves correctly in a real browser — and "correctly" includes being accessible. **Every component system spec must call `expect_axe_clean` at least once**, after the component has rendered (and after any state change that swaps in new markup — a new field, an opened menu, an added row). The axe audit catches missing accessible names, bad ARIA, and broken label associations that no CSS-selector assertion would.
+
+Treat an axe failure as a real bug in the component, not noise to silence: fix the markup (add the `aria-label`, associate the `<label>`, correct the `role`) rather than narrowing the audit. The shared helper already disables the rules that don't apply to an isolated component preview (`region`, `landmark-*`, `page-has-heading-one`, etc.), so a remaining violation is almost always genuine.
+
+```ruby
+visit "/rails/view_components/form/text_editor/component/default"
+
+expect(page).to have_css("lexxy-editor lexxy-toolbar", count: 2, wait: 10)
+expect_axe_clean
+
+click_button "Add feature slug"
+
+expect(page).to have_css("lexxy-editor lexxy-toolbar", count: 3)
+expect_axe_clean # re-audit: the cloned row is new markup
+```
+
 ## ActionCable broadcasts: do the real thing
 
 The test cable adapter is `:async`, so broadcasts in the test process do round-trip to the browser. **Don't synthesize `turbo:morph-element` events with `execute_script` to fake an ActionCable refresh** — call the real broadcaster (`Component.broadcast_replace_to`, `broadcast_refresh_later_to`, etc.) and let Capybara's wait do the synchronization.

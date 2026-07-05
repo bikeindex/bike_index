@@ -4,7 +4,7 @@
   <div class="organized-menu-wrapper">
     <header class="<%= show_overview_dashboard ? "with-dashboard-link" : "with-divider-below" %>">
       <% if OrganizationDisplayer.avatar?(current_organization) %>
-        <%= image_tag current_organization.avatar.url(:medium) %>
+        <%= image_tag current_organization.avatar.url(:medium), alt: current_organization.name %>
       <% end %>
 
       <h3>

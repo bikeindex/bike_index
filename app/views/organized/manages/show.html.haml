@@ -66,11 +66,8 @@
       - if @organization.avatar?
         = link_to image_tag(@organization.avatar_url(:thumb)), @organization.avatar_url
 
-      %label.file
-        = f.file_field :avatar, class: "avatar-upload-field", accept: ImageUploader.permitted_extensions.join(",")
-        %span.file-custom
-          %span.file-upload-text= t(".choose_file")
-        = f.hidden_field :avatar_cache
+      = render(Form::FileUpload::Component.new(form_builder: f, attribute: :avatar, button_text: t(".choose_file"), accept: ImageUploader.permitted_extensions))
+      = f.hidden_field :avatar_cache
       %span.below-input-help
         = t(".square_image")
 

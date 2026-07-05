@@ -43,4 +43,20 @@ RSpec.describe Form::Group::Component, type: :component do
       expect(component).to have_css("textarea")
     end
   end
+
+  context "when content_block" do
+    let(:kind) { :content_block }
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, kind:, label_text:)) do
+        "<my-field></my-field>".html_safe
+      end
+    end
+
+    it "renders the label and content block, skipping Form::Input" do
+      expect(component).to have_css("label[for='user_name']", text: "Name")
+      expect(component).to have_css("my-field")
+      expect(component).to_not have_css("input")
+      expect(component).to_not have_css("textarea")
+    end
+  end
 end

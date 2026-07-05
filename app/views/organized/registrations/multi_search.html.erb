@@ -3,6 +3,15 @@
   skip_search_and_filters: true
 ) %>
 
+<% search_kind = @search_kind %>
+
+<% placeholders = {
+  "serials" => "Enter multiple serial numbers, separated by commas or new lines",
+  "stickers" => "Enter multiple sticker codes, separated by commas or new lines"
+} %>
+
+<% button_texts = {"serials" => "Search serials", "stickers" => "Search stickers"} %>
+
 <% error_tooltip_template = capture do %>
   <%= render(UI::Tooltip::Component.new(text: "__MESSAGE__")) do %>
     <small class="tw:text-2xs tw:ml-3 tw:block tw:leading-none">error</small>
@@ -12,6 +21,11 @@
 <div
   data-controller="org--multi-search org--registration-search org--registration-search-column-toggle"
   data-org--multi-search-url-value="<%= multi_search_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
+  data-org--multi-search-search-kind-value="<%= search_kind %>"
+  data-org--multi-search-serials-placeholder-value="<%= placeholders["serials"] %>"
+  data-org--multi-search-stickers-placeholder-value="<%= placeholders["stickers"] %>"
+  data-org--multi-search-serials-button-value="<%= button_texts["serials"] %>"
+  data-org--multi-search-stickers-button-value="<%= button_texts["stickers"] %>"
   data-org--multi-search-empty-class-value="<%= UI::Badge::Component.badge_classes(color: :empty, size: :md) %>"
   data-org--multi-search-success-class-value="<%= UI::Badge::Component.badge_classes(color: :success, size: :md) %>"
   data-org--multi-search-gray-class-value="<%= UI::Badge::Component.badge_classes(color: :gray, size: :md) %>"
@@ -21,26 +35,55 @@
   data-org--registration-search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
 >
   <div class="tw:mx-auto tw:mb-6 tw:max-w-2xl">
-    <h3 class="uncap tw:mb-4">Multiple Serial Search</h3>
+    <h3 class="uncap tw:mb-4">Multi Search</h3>
+
+    <% if current_organization.enabled?("bike_stickers") %>
+      <div class="tw:mb-4">
+        <%= render Form::RadioButtonGroup::Component.new(
+          name: :search_kind,
+          selected: search_kind,
+          entries: [
+            {value: "serials", label: "Serials"},
+            {value: "stickers", label: "Registration Stickers"}
+          ],
+          data: {action: "change->org--multi-search#switchKind"}
+        ) %>
+      </div>
+    <% end %>
 
     <form data-action="submit->org--multi-search#submit">
       <%= text_area_tag :serials, nil,
-        placeholder: "Enter multiple serial numbers, separated by commas or new lines",
+        placeholder: placeholders[search_kind],
         class: "twinput tw:w-full tw:font-mono tw:h-32 tw:resize-none",
         data: {"org--multi-search-target": "textarea"} %>
 
       <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:gap-3">
-        <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
-          <%= check_box_tag :search_all, "1", false,
-            data: {"org--multi-search-target": "searchAll"} %>
+        <div class="tw:flex tw:items-center tw:gap-2">
+          <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
+            <%= check_box_tag :search_all, "1", false,
+              data: {"org--multi-search-target": "searchAll"} %>
 
-          <span>
-            Search all bikes (not just <%= current_organization.short_name %>)
+            <span>
+              Search all bikes (not just <%= current_organization.short_name %>)
+            </span>
+          </label>
+
+          <span
+            data-org--multi-search-target="searchAllHint"
+            class="tw:hidden tw:leading-none"
+          >
+            <%= render(UI::Tooltip::Component.new(text: "Sticker search always searches all bikes")) do |tooltip| %>
+              <% tooltip.with_tooltip_button(
+                class: "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
+                  "tw:bg-gray-300 tw:text-gray-700 tw:hover:bg-gray-400 tw:dark:bg-gray-600 tw:dark:text-gray-100 " \
+                  "tw:text-2xs tw:font-bold tw:cursor-help tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+              ) { "?" } %>
+            <% end %>
           </span>
-        </label>
+        </div>
 
         <%= render UI::Button::Component.new(
-          text: "Search serials",
+          text: button_texts[search_kind],
           color: :primary,
           size: :lg,
           kind: :submit,
