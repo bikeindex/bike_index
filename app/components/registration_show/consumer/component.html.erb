@@ -28,7 +28,7 @@
       <div class="tw:mt-auto tw:flex tw:flex-col tw:gap-2">
         <% if @owner %>
           <% if show_marketplace_button? %>
-            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "marketplace"), text: translation(".sell_on_marketplace"), color: :purple, size: :lg, html_class: "tw:justify-center")) %>
+            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "marketplace"), text: translation(".sell_on_marketplace"), color: :purple, size: :lg, class: "tw:justify-center")) %>
           <% end %>
           <div class="tw:grid tw:grid-cols-2 tw:gap-2">
             <details class="tw:group">
@@ -41,7 +41,7 @@
               </div>
             </details>
 
-            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :danger_outline, html_class: "tw:justify-center")) %>
+            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :danger_outline, class: "tw:justify-center")) %>
           </div>
         <% else %>
           <details class="tw:group">
