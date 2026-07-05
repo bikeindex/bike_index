@@ -60,7 +60,7 @@ RSpec.describe ProcessGraduatedNotificationJob, type: :lib do
   end
 
   describe "email delivery" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 2.years.to_i, short_name: "Hogwarts") }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 2.years.to_i, short_name: "Brakebills") }
     let(:graduated_notification) { FactoryBot.create(:graduated_notification, organization: organization) }
 
     it "delivers the renewal email, records a delivery_success Notification, and is idempotent" do
@@ -77,8 +77,8 @@ RSpec.describe ProcessGraduatedNotificationJob, type: :lib do
 
       mail = ActionMailer::Base.deliveries.last
       expect(mail.to).to eq([graduated_notification.email])
-      expect(mail.subject).to eq("Renew your #{graduated_notification.bike.type} registration with Hogwarts")
-      expect(mail.body.encoded).to include("Renew your #{graduated_notification.bike.type} registration with Hogwarts")
+      expect(mail.subject).to eq("Renew your #{graduated_notification.bike.type} registration with Brakebills")
+      expect(mail.body.encoded).to include("Renew your #{graduated_notification.bike.type} registration with Brakebills")
       expect(mail.body.encoded).to include("Click to renew")
 
       expect { instance.perform(graduated_notification.id) }
