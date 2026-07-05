@@ -1,4 +1,4 @@
-<% action_card_classes = "tw:relative tw:block tw:rounded-xl tw:border tw:border-gray-200 tw:p-4 tw:transition tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:dark:border-gray-700 tw:dark:hover:bg-purple-950" %>
+<% action_card_classes = "tw:relative tw:flex tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-gray-200 tw:p-4 tw:transition tw:hover:border-[#715eb2] tw:hover:bg-[#f7f5fc] tw:dark:border-gray-700 tw:dark:hover:bg-purple-950" %>
 
 <div class="tw:flex tw:flex-col tw:gap-6">
   <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-4">
@@ -13,13 +13,13 @@
       <p class="tw:opacity-65"><%= subtitle %></p>
 
       <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
-        <%= render(UI::Badge::Component.new(text: translation(".registered"), color: :notice)) %>
+        <%= render(UI::Badge::Component.new(text: translation(".registered"), color: :success, indicator: true)) %>
 
         <% if @bike.claimed? %>
-          <%= render(UI::Badge::Component.new(text: translation(".claimed"), color: :gray)) %>
+          <%= render(UI::Badge::Component.new(text: translation(".claimed"), color: :notice, indicator: true)) %>
         <% end %>
 
-        <%= render(UI::Badge::Component.new(text: translation(".not_stolen"), color: :success)) %>
+        <%= render(UI::Badge::Component.new(text: translation(".not_stolen"), color: :success, indicator: true)) %>
       </div>
     </div>
 
@@ -39,34 +39,46 @@
   <div class="tw:grid tw:gap-3 tw:sm:grid-cols-2 tw:lg:grid-cols-4">
     <% if show_contact? %>
       <%= link_to "mailto:#{@bike.owner_email}", class: action_card_classes do %>
-        <span class="tw:block tw:font-bold">
-          <%= translation(".message_owner") %>
-        </span>
+        <%= action_icon("mail") %>
 
-        <span class="tw:block tw:text-xs tw:opacity-65">
-          <%= translation(".message_owner_sub") %>
+        <span>
+          <span class="tw:block tw:font-bold">
+            <%= translation(".message_owner") %>
+          </span>
+
+          <span class="tw:block tw:text-xs tw:opacity-65">
+            <%= translation(".message_owner_sub") %>
+          </span>
         </span>
       <% end %>
     <% end %>
 
     <% if show_impound? %>
       <%= link_to impound_path, class: action_card_classes do %>
-        <span class="tw:block tw:font-bold"><%= impound_label %></span>
+        <%= action_icon("lock", tile: staff? ? :purple : :amber) %>
 
-        <span class="tw:block tw:text-xs tw:opacity-65">
-          <%= impound_sublabel %>
+        <span>
+          <span class="tw:block tw:font-bold"><%= impound_label %></span>
+
+          <span class="tw:block tw:text-xs tw:opacity-65">
+            <%= impound_sublabel %>
+          </span>
         </span>
       <% end %>
     <% end %>
 
     <% if staff? && show_parking_notifications? %>
       <%= link_to notifications_path, class: action_card_classes do %>
-        <span class="tw:block tw:font-bold">
-          <%= translation(".parking_notice") %>
-        </span>
+        <%= action_icon("map-pin") %>
 
-        <span class="tw:block tw:text-xs tw:opacity-65">
-          <%= translation(".parking_notice_sub") %>
+        <span>
+          <span class="tw:block tw:font-bold">
+            <%= translation(".parking_notice") %>
+          </span>
+
+          <span class="tw:block tw:text-xs tw:opacity-65">
+            <%= translation(".parking_notice_sub") %>
+          </span>
         </span>
       <% end %>
     <% end %>
@@ -79,12 +91,16 @@
           </span>
         <% end %>
 
-        <span class="tw:block tw:font-bold">
-          <%= translation(".view_notifications") %>
-        </span>
+        <%= action_icon("bell", tile: :blue) %>
 
-        <span class="tw:block tw:text-xs tw:opacity-65">
-          <%= translation(".view_notifications_sub", current: current_notifications_count, resolved: resolved_notifications_count) %>
+        <span>
+          <span class="tw:block tw:font-bold">
+            <%= translation(".view_notifications") %>
+          </span>
+
+          <span class="tw:block tw:text-xs tw:opacity-65">
+            <%= translation(".view_notifications_sub", current: current_notifications_count, resolved: resolved_notifications_count) %>
+          </span>
         </span>
       <% end %>
     <% end %>

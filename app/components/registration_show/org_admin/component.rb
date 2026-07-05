@@ -16,6 +16,18 @@ module RegistrationShow
 
       private
 
+      # A rounded icon tile for the quick-action bar
+      def action_icon(icon, tile: :purple)
+        tile_bg, icon_color = case tile
+        when :blue then ["tw:bg-[#e7f3fb]", "tw:text-[#016ec2]"]
+        when :amber then ["tw:bg-[#fff8e1]", "tw:text-[#caa11a]"]
+        else ["tw:bg-[#f0edfa]", "tw:text-[#715eb2]"]
+        end
+        content_tag(:span, class: "tw:flex tw:size-9 tw:flex-none tw:items-center tw:justify-center tw:rounded-lg #{tile_bg}") do
+          helpers.inline_svg_tag("icons/registration_show/#{icon}.svg", class: "tw:h-[19px] tw:w-[19px] #{icon_color}")
+        end
+      end
+
       def staff?
         @current_user.member_bike_edit_of?(@organization)
       end
