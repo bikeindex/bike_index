@@ -19,7 +19,7 @@ snippets = {
     body: <<~HTML
       <div class="organized-partnership-header">
         <p>
-          <img src="https://files.bikeindex.org/uploads/Pu/479405/Daco_4242902.png">
+          <img src="#{brakebills.avatar.medium.url}">
         </p>
         <hr>
       </div>
