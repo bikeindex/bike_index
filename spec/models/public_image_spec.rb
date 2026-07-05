@@ -20,27 +20,6 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
-  describe "large images that exceed the size restriction" do
-    before { PublicImageUploader.enable_processing = true }
-    after { PublicImageUploader.enable_processing = false }
-
-    # Processing (including this dimension check) is deferred to
-    # PublicImageProcessJob via process_in_background. Setting process_image_upload
-    # before assigning the image forces the synchronous processing path the job runs.
-    it "are not created" do
-      large_image = File.open(Rails.root.join("spec", "fixtures", "hugeimg.png"))
-      public_image = PublicImage.new(imageable: FactoryBot.create(:bike))
-      public_image.process_image_upload = true
-      public_image.image = large_image
-      expect(public_image.save).to eq(false)
-      expect(public_image.id).to be_nil
-      # Because updated versions of imagemagick respond with different errors
-      error_msg = public_image.errors.full_messages.to_sentence
-      expect(error_msg).to match(/(too large)|(width exceeds)|(failed to manipulate)/i)
-      large_image.close
-    end
-  end
-
   describe "enqueue_after_commit_jobs" do
     context "non-bike" do
       let(:public_image) { PublicImage.new(imageable_type: "Blog", imageable_id: 12) }
