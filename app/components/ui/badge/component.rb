@@ -26,16 +26,32 @@ module UI
         empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600"
       }.freeze
 
-      def self.badge_classes(color:, size:, cursor: "tw:cursor-default")
-        [BASE_CLASSES, cursor, COLORS[color], SIZES[size]].join(" ")
+      # Solid pills (saturated background + white text) — e.g. the redesign audience pill
+      SOLID_COLORS = {
+        notice: "tw:bg-blue-500 tw:text-white tw:border-transparent",
+        error: "tw:bg-red-600 tw:text-white tw:border-transparent",
+        warning: "tw:bg-amber-500 tw:text-white tw:border-transparent",
+        success: "tw:bg-green-600 tw:text-white tw:border-transparent",
+        cyan: "tw:bg-cyan-500 tw:text-white tw:border-transparent",
+        gray: "tw:bg-gray-500 tw:text-white tw:border-transparent",
+        purple: "tw:bg-purple-500 tw:text-white tw:border-transparent",
+        rose: "tw:bg-rose-500 tw:text-white tw:border-transparent",
+        orange: "tw:bg-orange-500 tw:text-white tw:border-transparent",
+        empty: "tw:bg-gray-500 tw:text-white tw:border-transparent"
+      }.freeze
+
+      def self.badge_classes(color:, size:, cursor: "tw:cursor-default", solid: false)
+        palette = solid ? SOLID_COLORS : COLORS
+        [BASE_CLASSES, cursor, palette[color], SIZES[size]].join(" ")
       end
 
-      def initialize(text:, title: nil, color: :gray, size: :md, indicator: false)
+      def initialize(text:, title: nil, color: :gray, size: :md, indicator: false, solid: false)
         @text = text
         @title = title
         @color = COLORS.key?(color) ? color : :gray
         @size = SIZES.include?(size) ? size : :md
         @indicator = indicator
+        @solid = solid
       end
 
       def call
@@ -58,7 +74,7 @@ module UI
       end
 
       def badge_class
-        self.class.badge_classes(color: @color, size: @size, cursor: custom_title? ? "tw:cursor-help" : "tw:cursor-default")
+        self.class.badge_classes(color: @color, size: @size, solid: @solid, cursor: custom_title? ? "tw:cursor-help" : "tw:cursor-default")
       end
     end
   end
