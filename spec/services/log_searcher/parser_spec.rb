@@ -115,8 +115,8 @@ RSpec.describe LogSearcher::Parser do
       end
     end
     context "organized" do
-      let(:log_line) { 'I, [2023-10-23T17:57:36.142389 #666692]  INFO -- : [2ac7efc6-6660-4b11-a1ca-a276698bdbdf] {"method":"GET","path":"/o/hogwarts/bikes","format":"html","controller":"Organized::BikesController","action":"index","status":200,"allocations":510947,"duration":699.31,"view":307.43,"db":383.28,"remote_ip":"127.0.0.1","u_id":85,"params":{"page":"undefined","search_email":"","serial":"","sort":"id","sort_direction":"desc","render_chart":"false","period":"","end_time":"","start_time":"","user_id":"","search_bike_id":"","search_status":"","search_kind":"","organization_id":"hogwarts","stolenness":"stolen","search_stickers":"","search_address":"","search_secondary":[""]},"@timestamp":"2023-10-23T17:57:36.142Z","@version":"1","message":"[200] GET /o/hogwarts/bikes (Organized::BikesController#index)"}' }
-      let!(:organization) { FactoryBot.create(:organization, name: "Hogwarts") }
+      let(:log_line) { 'I, [2023-10-23T17:57:36.142389 #666692]  INFO -- : [2ac7efc6-6660-4b11-a1ca-a276698bdbdf] {"method":"GET","path":"/o/brakebills/bikes","format":"html","controller":"Organized::BikesController","action":"index","status":200,"allocations":510947,"duration":699.31,"view":307.43,"db":383.28,"remote_ip":"127.0.0.1","u_id":85,"params":{"page":"undefined","search_email":"","serial":"","sort":"id","sort_direction":"desc","render_chart":"false","period":"","end_time":"","start_time":"","user_id":"","search_bike_id":"","search_status":"","search_kind":"","organization_id":"brakebills","stolenness":"stolen","search_stickers":"","search_address":"","search_secondary":[""]},"@timestamp":"2023-10-23T17:57:36.142Z","@version":"1","message":"[200] GET /o/brakebills/bikes (Organized::BikesController#index)"}' }
+      let!(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
       let(:target) do
         {
           request_at: Time.at(1698083856).utc,
@@ -137,7 +137,7 @@ RSpec.describe LogSearcher::Parser do
         expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
       end
       context "/v3/bikes/check_if_registered" do
-        let(:log_line) { 'I, [2023-10-23T00:20:31.0000 #149741]  INFO -- : [7e0645ff-032e-4095-9a75-81afb12b8892] {"status":201,"method":"POST","path":"/api/v3/bikes/check_if_registered","params":{"access_token":"[FILTERED]","serial":"999xxxx","owner_email":"example@bikeindex.org","organization_slug":"hogwarts","manufacturer":"salsa"},"host":"bikeindex.org","remote_ip":"11.222.33.4","format":"json","db":1076.85,"view":15.86000000000013,"duration":1092.71}' }
+        let(:log_line) { 'I, [2023-10-23T00:20:31.0000 #149741]  INFO -- : [7e0645ff-032e-4095-9a75-81afb12b8892] {"status":201,"method":"POST","path":"/api/v3/bikes/check_if_registered","params":{"access_token":"[FILTERED]","serial":"999xxxx","owner_email":"example@bikeindex.org","organization_slug":"brakebills","manufacturer":"salsa"},"host":"bikeindex.org","remote_ip":"11.222.33.4","format":"json","db":1076.85,"view":15.86000000000013,"duration":1092.71}' }
         let(:target) do
           {
             request_at: Time.at(1698020431).utc,
