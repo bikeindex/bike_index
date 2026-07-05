@@ -28,8 +28,6 @@
         <%= translation(".registration") %>
       </p>
 
-      <p class="tw:font-mono">#<%= @bike.id %></p>
-
       <p class="tw:text-sm tw:opacity-65">
         <%= render(UI::Time::Component.new(time: @bike.created_at)) %>
       </p>
