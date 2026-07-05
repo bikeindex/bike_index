@@ -39,7 +39,7 @@ RSpec.describe PublicImagesController, type: :request do
             expect(response).to have_http_status(:ok)
             public_image = bike.reload.public_images.first
             expect(public_image.image).to be_present
-            expect(PublicImageProcessJob.jobs.count).to eq 1 # version generation deferred
+            expect(CarrierWaveProcessJob.jobs.count).to eq 1 # version generation deferred
             # falls back to the original so the just-uploaded thumbnail isn't blank before reload
             expect(response.body).to include("/uploads/Pu/#{public_image.id}/bike.jpg")
             expect(response.body).to_not include("small_bike.jpg")
