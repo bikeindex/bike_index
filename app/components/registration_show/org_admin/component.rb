@@ -65,10 +65,6 @@ module RegistrationShow
         @bike.manufacturer&.other? ? @bike.mnfg_name : @bike.manufacturer&.name
       end
 
-      def registered_full_date
-        l(@bike.created_at, format: "%B %-d, %Y")
-      end
-
       def credibility_score
         @credibility_score ||= @bike.credibility_scorer.score
       end

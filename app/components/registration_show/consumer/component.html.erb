@@ -122,7 +122,8 @@
       <p class="tw:mt-2"><%= @bike.description %></p>
 
       <p class="tw:mt-2 tw:text-xs tw:opacity-65">
-        <%= translation(".registered_on", date: registered_full_date) %>
+        <%= translation(".registered") %>
+        <%= render(UI::Time::Component.new(time: @bike.created_at)) %>
       </p>
     <% end %>
   <% end %>

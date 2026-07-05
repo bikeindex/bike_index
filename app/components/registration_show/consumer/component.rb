@@ -33,10 +33,6 @@ module RegistrationShow
         @owner ? :success : :notice
       end
 
-      def registered_full_date
-        l(@bike.created_at, format: "%B %-d, %Y")
-      end
-
       def frame_spec
         [@bike.frame_material_name, @bike.frame_size&.upcase].compact_blank.join(" · ")
       end

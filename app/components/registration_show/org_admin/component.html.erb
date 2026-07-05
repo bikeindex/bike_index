@@ -29,7 +29,10 @@
       </p>
 
       <p class="tw:font-mono">#<%= @bike.id %></p>
-      <p class="tw:text-sm tw:opacity-65"><%= registered_full_date %></p>
+
+      <p class="tw:text-sm tw:opacity-65">
+        <%= render(UI::Time::Component.new(time: @bike.created_at)) %>
+      </p>
     </div>
   </div>
 
@@ -125,9 +128,7 @@
               <p class="tw:mt-1 tw:text-xs tw:opacity-65">
                 <%= translation(".note_by", user: bike_organization_note.user&.display_name) %>
 
-                <span class="localizeTime withPreposition">
-                  <%= l bike_organization_note.updated_at, format: :convert_time %>
-                </span>
+                <%= render(UI::Time::Component.new(time: bike_organization_note.updated_at)) %>
               </p>
             </div>
           <% end %>
@@ -167,7 +168,7 @@
                 "
               >
                 <span class="tw:opacity-65">
-                  <%= l other_bike.created_at, format: "%b %-d, %Y" %>
+                  <%= render(UI::Time::Component.new(time: other_bike.created_at)) %>
                 </span>
 
                 <% if other_bike.id == @bike.id %>
@@ -199,7 +200,7 @@
               <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_phone"))) { link_to(owner_phone, "tel:#{owner_phone}", class: "twlink tw:font-mono") } %>
             <% end %>
 
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered"), value: registered_full_date)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
           <% end %>
           <% if staff? %>
             <div

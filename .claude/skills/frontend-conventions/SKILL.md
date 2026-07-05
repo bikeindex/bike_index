@@ -4,7 +4,8 @@ description: >-
   Bike Index's frontend conventions — Tailwind class prefixing (`tw:`),
   the standard `twinput`/`twlabel`/`twlink` form/link classes, the
   `number_display` helper for numbers, and ViewComponent rules (keyword
-  arguments, instance variables, `helpers.` prefix in templates). Trigger
+  arguments, instance variables, `helpers.` prefix in templates), and
+  `UI::Time::Component` for every date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
   controllers, Tailwind classes, or any frontend code that touches styling
   or interactivity. **Also trigger before any
@@ -34,6 +35,7 @@ The `bin/dev` command handles building and updating Tailwind and JS.
   - Bad: `[@bike.year, @bike.mnfg_name].join(" ")`
   - "Number" includes years, counts, prices, distances, IDs — anything numeric, even when it reads like a label.
 - **Currency amounts** use `amount_display(obj)` instead of `number_display` directly. It takes an object that responds to `amount_cents`, `amount`, `currency_symbol`, and `currency_name` (e.g. a `MarketplaceListing`), and renders the symbol + `number_display(amount)` together. Don't reach for `number_to_currency` or roll your own.
+- **Every date/time** renders through `UI::Time::Component` — `render(UI::Time::Component.new(time: some_time))`. It emits the client-localized `localizeTime` span the frontend JS converts to the viewer's timezone. This is the *only* way to show a time: never `l(time, ...)`, `strftime`, `time_ago_in_words`, or a hand-written `localizeTime` span. Pass `format: :localize_time_precise` when you need seconds precision (default is `:localize_time`). It self-hides when `time` is nil, so no surrounding `if` guard is needed.
 
 ## No dead hooks in markup
 

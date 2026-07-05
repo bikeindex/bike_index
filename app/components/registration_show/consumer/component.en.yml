@@ -11,7 +11,7 @@ en:
         frame: Frame
         mark_stolen: Mark stolen
         not_stolen: Not stolen
-        registered_on: Registered %{date}
+        registered: Registered
         registered_protected: Registered & protected
         sell_on_marketplace: Sell on Marketplace
         share: Share
