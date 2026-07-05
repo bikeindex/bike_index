@@ -18,6 +18,7 @@ en:
         impound_sub: Single confirmation
         internal_notes: Internal notes
         law_enforcement_access: law-enforcement access
+        link_sticker: Link sticker
         manufacturer: Manufacturer
         message_owner: Message owner
         message_owner_sub: Email the owner
@@ -36,6 +37,7 @@ en:
           thread.
         open_notifications_page: Open notifications page →
         org_can_edit: "%{org_name} can edit this bike"
+        org_can_edit_sub: Including after the bike is claimed.
         other_registrations: Other registrations by this user
         owner_access: Owner & access
         owner_attestation: Owner attestation
@@ -65,5 +67,5 @@ en:
         start_audit: Start audit
         this_bike: This bike
         view_notifications: View notifications
-        view_notifications_sub: "%{current} current · %{resolved} resolved"
+        view_notifications_sub: Parking activity
         year: Year

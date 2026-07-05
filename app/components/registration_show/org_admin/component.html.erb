@@ -99,7 +99,7 @@
           </span>
 
           <span class="tw:block tw:text-xs tw:opacity-65">
-            <%= translation(".view_notifications_sub", current: current_notifications_count, resolved: resolved_notifications_count) %>
+            <%= translation(".view_notifications_sub") %>
           </span>
         </span>
       <% end %>
@@ -120,7 +120,23 @@
           <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: manufacturer_name)) %>
           <%= render(UI::DefinitionList::Row::Component.new(label: translation(".model"), value: @bike.frame_model)) %>
           <%= render(UI::DefinitionList::Row::Component.new(label: translation(".year"), value: @bike.year)) %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".primary_colors"), value: @bike.frame_colors.to_sentence)) %>
+
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".primary_colors"))) do %>
+            <span class="tw:flex tw:items-center tw:gap-1.5">
+              <% if primary_color_hex.present? %>
+                <span
+                  class="
+                    tw:inline-block tw:h-3 tw:w-3 tw:rounded-xs tw:border
+                    tw:border-gray-300
+                  "
+                  style="background-color: <%= primary_color_hex %>"
+                ></span>
+              <% end %>
+
+              <%= @bike.frame_colors.to_sentence %>
+            </span>
+          <% end %>
+
           <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>
           <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_size"), value: @bike.frame_size&.upcase)) %>
         <% end %>
@@ -157,7 +173,7 @@
                 <%= translation(".posts_as", user: @current_user.display_name) %>
               </small>
 
-              <%= f.submit translation(".post_note"), class: UI::Button::Component.build_classes(color: :primary, size: :sm) %>
+              <%= f.submit translation(".post_note"), class: UI::Button::Component.build_classes(color: :purple, size: :sm) %>
             </div>
           <% end %>
         <% end %>
@@ -229,7 +245,20 @@
                 <%= translation(".org_can_edit", org_name: @organization.short_name) %>
               </p>
 
-              <%= link_to translation(".edit_access"), edit_access_path, class: "twlink tw:text-sm" %>
+              <p class="tw:mt-1 tw:text-xs tw:opacity-65">
+                <%= translation(".org_can_edit_sub") %>
+              </p>
+
+              <div class="tw:mt-2 tw:flex tw:gap-4">
+                <%= link_to translation(".edit_access"), edit_access_path, class: "twlink tw:text-sm" %>
+
+                <span
+                  class="tw:cursor-not-allowed tw:text-sm tw:opacity-50"
+                  title="<%= translation(".coming_soon") %>"
+                >
+                  <%= translation(".link_sticker") %>
+                </span>
+              </div>
             </div>
           <% end %>
         <% else %>

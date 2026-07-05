@@ -77,6 +77,10 @@ module RegistrationShow
         @bike.manufacturer&.other? ? @bike.mnfg_name : @bike.manufacturer&.name
       end
 
+      def primary_color_hex
+        @bike.primary_frame_color&.display
+      end
+
       def credibility_score
         @credibility_score ||= @bike.credibility_scorer.score
       end
