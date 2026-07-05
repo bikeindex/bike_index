@@ -13,6 +13,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
     it "renders the redesigned consumer view with owner actions" do
       get "#{base_url}/#{bike.id}"
       expect(response.status).to eq(200)
+      # Renders full-width, not wrapped in the content skeleton's sidebar
+      expect(response.body).to_not include("primary-content-menu")
       body = whitespace_normalized_body_text
       expect(body).to match("Your bike")
       expect(body).to match("Activity")
