@@ -358,7 +358,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       click_button "Search serials"
 
       # Chips update with results
-      expect(page).to have_css("#chip_2.tw\\:bg-gray-300", wait: 15)
+      expect(page).to have_css("#chip_2.tw\\:bg-gray-100", wait: 15)
 
       # Results sorted by chip order, empty results removed
       expect(page).to have_css(".multi-search-serial-result", count: 2)
@@ -416,11 +416,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
         click_button "Search stickers"
 
         # Chips for unclaimed and non-org stickers show gray (no bikes)
-        expect(page).to have_css("#chip_1.tw\\:bg-gray-300", wait: 15)
-        expect(page).to have_css("#chip_2.tw\\:bg-gray-300")
+        expect(page).to have_css("#chip_1.tw\\:bg-gray-100", wait: 15)
+        expect(page).to have_css("#chip_2.tw\\:bg-gray-100")
 
         # Only claimed org sticker has a bike result
-        expect(page).to have_css("#chip_0.tw\\:bg-emerald-500")
+        expect(page).to have_css("#chip_0.tw\\:bg-green-50")
 
         # Switch back to serials
         choose "Serials", allow_label_click: true, visible: :all
