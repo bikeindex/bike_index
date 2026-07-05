@@ -7,40 +7,14 @@ en:
         activity: Activity
         audience_owner: Your bike
         audience_public: Public view
-        bike_details: Bike details
-        component_no_info: "-"
-        componentyear: "%{componentyear}"
-        edit_bike: Edit bike
-        frame_material: Frame material
-        frame_size: Frame size
-        front: Front
-        front_rear: Front & rear
-        full_spec_sheet: Full spec sheet
-        full_spec_sheet_subtitle: Frame, drivetrain, wheels, brakes & more
-        manufacturer: Manufacturer
+        color: Color
+        frame: Frame
         mark_stolen: Mark stolen
-        model: Model
-        not_reported: Not reported
         not_stolen: Not stolen
-        other: Other
-        primary_colors: Primary colors
-        rear: Rear
         registered_on: Registered %{date}
         registered_protected: Registered & protected
-        registered_since: Registered since %{date}
-        registered_since_label: Registered since
         sell_on_marketplace: Sell on Marketplace
-        serial: Serial
         share: Share
         share_my_page: Share my page
-        sticker_number: 'Sticker #'
-        stolen_status: Stolen status
-        think_stolen: Think this bike is stolen?
-        think_stolen_description: See the Bike Index guide for reporting a stolen
-          bike.
-        this_bike_on_bike_index: This bike on Bike Index
-        visibility: Visibility
-        visibility_private: Only visible to you
-        visibility_public: Public registry
-        what_to_do: What to do
+        status: Status
         year: Year

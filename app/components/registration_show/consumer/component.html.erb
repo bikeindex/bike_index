@@ -23,70 +23,95 @@
         <% end %>
 
         <%= render(UI::Badge::Component.new(text: translation(".not_stolen"), color: :success)) %>
-        <%= render(UI::Badge::Component.new(text: translation(".registered_since", date: registered_since_month_year), color: :gray)) %>
       </div>
 
-      <%= render(UI::Card::Component.new) do %>
-        <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
-          <%= translation(".this_bike_on_bike_index") %>
-        </h2>
+      <div class="tw:mt-auto tw:flex tw:flex-col tw:gap-2">
+        <% if @owner %>
+          <% if show_marketplace_button? %>
+            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "marketplace"), text: translation(".sell_on_marketplace"), color: :primary, size: :lg, html_class: "tw:justify-center")) %>
+          <% end %>
+          <div class="tw:grid tw:grid-cols-2 tw:gap-2">
+            <details class="tw:group">
+              <summary class="tw:list-none tw:justify-center <%= UI::Button::Component.build_classes(color: :secondary, size: :md) %>">
+                <%= translation(".share_my_page") %>
+              </summary>
 
-        <%= render(UI::DefinitionList::Container::Component.new) do %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered_since_label"), value: registered_since_month_year)) %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".visibility"), value: visibility_label)) %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".stolen_status"), value: translation(".not_reported"))) %>
-        <% end %>
-      <% end %>
+              <div class="tw:mt-2">
+                <%= render partial: "shared/share_this" %>
+              </div>
+            </details>
 
-      <% if @owner %>
-        <% if show_marketplace_button? %>
-          <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "marketplace"), text: translation(".sell_on_marketplace"), color: :primary, size: :lg, html_class: "tw:justify-center")) %>
-        <% end %>
-        <div class="tw:grid tw:grid-cols-2 tw:gap-2">
-          <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike), text: translation(".edit_bike"), html_class: "tw:justify-center")) %>
-
+            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :error, html_class: "tw:justify-center")) %>
+          </div>
+        <% else %>
           <details class="tw:group">
             <summary class="tw:list-none tw:justify-center <%= UI::Button::Component.build_classes(color: :secondary, size: :md) %>">
-              <%= translation(".share_my_page") %>
+              <%= translation(".share") %>
             </summary>
 
             <div class="tw:mt-2">
               <%= render partial: "shared/share_this" %>
             </div>
           </details>
-        </div>
-        <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :error, html_class: "tw:justify-center")) %>
-      <% else %>
-        <details class="tw:group">
-          <summary class="tw:list-none tw:justify-center <%= UI::Button::Component.build_classes(color: :secondary, size: :md) %>">
-            <%= translation(".share") %>
-          </summary>
-
-          <div class="tw:mt-2">
-            <%= render partial: "shared/share_this" %>
-          </div>
-        </details>
-      <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
 
-  <%= render(UI::Card::Component.new) do %>
-    <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
-      <%= translation(".bike_details") %>
-    </h2>
+  <dl
+    class="
+      tw:grid tw:grid-cols-2 tw:gap-px tw:overflow-hidden tw:rounded-lg
+      tw:border tw:border-gray-200 tw:bg-gray-200 tw:sm:grid-cols-5
+      tw:dark:border-gray-700 tw:dark:bg-gray-700
+    "
+  >
+    <div class="tw:bg-white tw:p-4 tw:dark:bg-gray-950">
+      <dt class="tw:text-xs tw:opacity-65"><%= translation(".frame") %></dt>
 
-    <%= render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"))) { helpers.render_serial_display(@bike, @current_user) } %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".sticker_number"), value: sticker_code)) %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: manufacturer_name)) %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".model"), value: @bike.frame_model)) %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".year"), value: @bike.year)) %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".activity"), value: @bike.primary_activity&.display_name)) %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".primary_colors"), value: @bike.frame_colors.to_sentence)) %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_size"), value: @bike.frame_size&.upcase)) %>
-    <% end %>
-  <% end %>
+      <dd class="tw:mt-0.5 tw:font-semibold">
+        <%= frame_spec.presence || "—" %>
+      </dd>
+    </div>
+
+    <div class="tw:bg-white tw:p-4 tw:dark:bg-gray-950">
+      <dt class="tw:text-xs tw:opacity-65"><%= translation(".activity") %></dt>
+
+      <dd class="tw:mt-0.5 tw:font-semibold">
+        <%= activity_name.presence || "—" %>
+      </dd>
+    </div>
+
+    <div class="tw:bg-white tw:p-4 tw:dark:bg-gray-950">
+      <dt class="tw:text-xs tw:opacity-65"><%= translation(".color") %></dt>
+
+      <dd class="tw:mt-0.5 tw:flex tw:items-center tw:gap-1.5 tw:font-semibold">
+        <% if primary_color_hex.present? %>
+          <span
+            class="
+              tw:inline-block tw:h-3 tw:w-3 tw:rounded-xs tw:border
+              tw:border-gray-300
+            "
+            style="background-color: <%= primary_color_hex %>"
+          ></span>
+        <% end %>
+
+        <%= primary_color_name.presence || "—" %>
+      </dd>
+    </div>
+
+    <div class="tw:bg-white tw:p-4 tw:dark:bg-gray-950">
+      <dt class="tw:text-xs tw:opacity-65"><%= translation(".year") %></dt>
+      <dd class="tw:mt-0.5 tw:font-semibold"><%= @bike.year || "—" %></dd>
+    </div>
+
+    <div class="tw:bg-white tw:p-4 tw:dark:bg-gray-950">
+      <dt class="tw:text-xs tw:opacity-65"><%= translation(".status") %></dt>
+
+      <dd class="tw:mt-0.5 tw:font-semibold tw:text-green-600">
+        <%= translation(".not_stolen") %>
+      </dd>
+    </div>
+  </dl>
 
   <% if @bike.description.present? %>
     <%= render(UI::Card::Component.new) do %>
@@ -100,62 +125,5 @@
         <%= translation(".registered_on", date: registered_full_date) %>
       </p>
     <% end %>
-  <% end %>
-
-  <% cgroups = cgroups_with_components %>
-
-  <% if cgroups.any? %>
-    <details class="tw:group">
-      <%= render(UI::Card::Component.new) do %>
-        <summary
-          class="
-            tw:flex tw:cursor-pointer tw:list-none tw:items-center
-            tw:justify-between
-          "
-        >
-          <span>
-            <span class="tw:block tw:font-bold">
-              <%= translation(".full_spec_sheet") %>
-            </span>
-
-            <span class="tw:block tw:text-sm tw:opacity-65">
-              <%= translation(".full_spec_sheet_subtitle") %>
-            </span>
-          </span>
-
-          <span class="tw:transition-transform tw:group-open:rotate-180">
-            &#9660;
-          </span>
-        </summary>
-
-        <div class="tw:mt-4 tw:flex tw:flex-col tw:gap-4">
-          <% cgroups.each do |cgroup, cgroup_components| %>
-            <div>
-              <h3 class="tw:mb-2 tw:font-bold"><%= cgroup.name %></h3>
-
-              <%= render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do %>
-                <% cgroup_components.each do |component| %>
-                  <%= render(UI::DefinitionList::Row::Component.new(label: component_label(component), value: component_value(component))) %>
-                <% end %>
-              <% end %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-    </details>
-  <% end %>
-
-  <%= render(UI::Card::Component.new) do %>
-    <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4">
-      <div>
-        <p class="tw:font-bold"><%= translation(".think_stolen") %></p>
-
-        <p class="tw:text-sm tw:opacity-65">
-          <%= translation(".think_stolen_description") %>
-        </p>
-      </div>
-
-      <%= render(UI::ButtonLink::Component.new(href: protect_your_bike_path, text: translation(".what_to_do"))) %>
-    </div>
   <% end %>
 </div>

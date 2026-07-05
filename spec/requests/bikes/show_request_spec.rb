@@ -697,9 +697,8 @@ RSpec.describe "BikesController#show", type: :request do
       it "renders the redesigned page with owner actions" do
         get "#{base_url}/#{bike.id}"
         expect(response).to_not render_template(:show)
-        expect(whitespace_normalized_body_text).to match("Bike details")
         expect(whitespace_normalized_body_text).to match("Your bike")
-        expect(whitespace_normalized_body_text).to match("Edit bike")
+        expect(whitespace_normalized_body_text).to match("Activity")
         expect(whitespace_normalized_body_text).to match("Mark stolen")
         expect(whitespace_normalized_body_text).to match("Add photo")
       end
@@ -709,10 +708,10 @@ RSpec.describe "BikesController#show", type: :request do
         it "hides owner actions, shows the public view and share" do
           get "#{base_url}/#{bike.id}"
           expect(response).to_not render_template(:show)
-          expect(whitespace_normalized_body_text).to match("Bike details")
+          expect(whitespace_normalized_body_text).to match("Activity")
           expect(whitespace_normalized_body_text).to match("Public view")
           expect(whitespace_normalized_body_text).to match("Share")
-          expect(whitespace_normalized_body_text).to_not match("Edit bike")
+          expect(whitespace_normalized_body_text).to_not match("Sell on Marketplace")
           expect(whitespace_normalized_body_text).to_not match("Mark stolen")
           expect(whitespace_normalized_body_text).to_not match("Add photo")
         end
