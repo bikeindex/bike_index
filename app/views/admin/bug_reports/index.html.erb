@@ -28,19 +28,18 @@
 
 <% table_view = capture do %>
   <%= form_tag assign_tags_admin_bug_reports_path, method: :post, data: {controller: "table-multi-checkbox"} do %>
-    <%= render partial: "table", locals: {collection: @collection, render_sortable: true} %>
+    <div class="row">
+      <div class="col-md-4">
+        <%= render Form::Combobox::Component.new(name: :tags, label: "Tag to assign", free_text: true, options: searchable_tags, placeholder: "Select or create a tag") %>
+      </div>
 
-    <div class="mb-3 tw:flex tw:flex-wrap tw:items-end tw:justify-center tw:gap-2">
-      <%= render(Form::Combobox::Component.new(
-        name: "tags",
-        label: "Tag to assign",
-        label_class: "twlabel",
-        free_text: true,
-        options: searchable_tags,
-        placeholder: "Select or create a tag"
-      )) %>
+      <div class="col-md-2">
+        <%= submit_tag "Add tag to selected", class: "btn btn-primary" %>
+      </div>
+    </div>
 
-      <%= submit_tag "Add tag to selected", class: "btn btn-outline-primary" %>
+    <div class="mt-4">
+      <%= render partial: "table", locals: {collection: @collection, render_sortable: true} %>
     </div>
   <% end %>
 <% end %>

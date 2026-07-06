@@ -93,5 +93,14 @@ RSpec.describe Admin::BugReportsController, type: :request do
         expect(bug_report.reload.tags).to eq(["parking"])
       end
     end
+
+    context "without a selection" do
+      it "does not update" do
+        post "#{base_url}/assign_tags", params: {tags: "search"}
+        expect(response).to redirect_to(admin_bug_reports_path)
+        expect(flash[:error]).to be_present
+        expect(bug_report.reload.tags).to eq(["parking"])
+      end
+    end
   end
 end
