@@ -917,7 +917,10 @@ CREATE TABLE public.bug_reports (
     github_pull_request integer,
     tags text[] DEFAULT '{}'::text[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    received_at timestamp(6) without time zone,
+    from_name text,
+    inbound_email_id bigint
 );
 
 
@@ -6348,6 +6351,13 @@ CREATE INDEX index_blog_content_tags_on_content_tag_id ON public.blog_content_ta
 
 
 --
+-- Name: index_bug_reports_on_inbound_email_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_inbound_email_id ON public.bug_reports USING btree (inbound_email_id);
+
+
+--
 -- Name: index_bug_reports_on_tags; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7428,12 +7438,21 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 
 
 --
+-- Name: bug_reports fk_rails_fd37ef25f8; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bug_reports
+    ADD CONSTRAINT fk_rails_fd37ef25f8 FOREIGN KEY (inbound_email_id) REFERENCES public.action_mailbox_inbound_emails(id) ON DELETE SET NULL;
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260706180000'),
 ('20260706164500'),
 ('20260706164435'),
 ('20260628175839'),

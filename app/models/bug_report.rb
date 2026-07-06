@@ -6,20 +6,28 @@
 #  id                         :bigint           not null, primary key
 #  body                       :text
 #  email                      :text
+#  from_name                  :text
 #  github_pull_request        :integer
 #  is_member                  :boolean          default(FALSE), not null
 #  is_paid_organization       :boolean          default(FALSE), not null
 #  is_paid_organization_staff :boolean          default(FALSE), not null
+#  received_at                :datetime
 #  subject                    :text
 #  tags                       :text             default([]), not null, is an Array
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
+#  inbound_email_id           :bigint
 #  user_id                    :bigint
 #
 # Indexes
 #
-#  index_bug_reports_on_tags     (tags) USING gin
-#  index_bug_reports_on_user_id  (user_id)
+#  index_bug_reports_on_inbound_email_id  (inbound_email_id)
+#  index_bug_reports_on_tags              (tags) USING gin
+#  index_bug_reports_on_user_id           (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (inbound_email_id => action_mailbox_inbound_emails.id) ON DELETE => nullify
 #
 class BugReport < ApplicationRecord
   include PgSearch::Model
@@ -27,8 +35,9 @@ class BugReport < ApplicationRecord
   GITHUB_REPO_URL = "https://github.com/bikeindex/bike_index"
 
   belongs_to :user
+  belongs_to :inbound_email, class_name: "ActionMailbox::InboundEmail"
 
-  has_many_attached :attachments
+  has_many_attached :images
 
   has_paper_trail only: %i[tags github_pull_request is_member is_paid_organization is_paid_organization_staff]
 
@@ -57,6 +66,10 @@ class BugReport < ApplicationRecord
     return if github_pull_request.blank?
 
     "#{GITHUB_REPO_URL}/pull/#{github_pull_request}"
+  end
+
+  def display_subject
+    subject.presence || "(no subject)"
   end
 
   private

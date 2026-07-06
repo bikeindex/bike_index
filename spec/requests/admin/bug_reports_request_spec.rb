@@ -15,8 +15,8 @@ RSpec.describe Admin::BugReportsController, type: :request do
 
     context "json" do
       let(:target_json) do
-        bug_report.as_json(only: %w[id user_id email subject body tags github_pull_request
-          is_member is_paid_organization is_paid_organization_staff created_at updated_at])
+        bug_report.as_json(only: %w[id user_id email from_name subject body tags github_pull_request
+          is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
       end
 
       it "renders a paginated list" do

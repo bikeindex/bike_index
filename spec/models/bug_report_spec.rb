@@ -99,4 +99,12 @@ RSpec.describe BugReport, type: :model do
       expect(bug_report.github_pull_request_url).to be_nil
     end
   end
+
+  describe "display_subject" do
+    let(:bug_report) { FactoryBot.build(:bug_report, subject: " ") }
+
+    it "falls back when blank" do
+      expect(bug_report.display_subject).to eq "(no subject)"
+    end
+  end
 end

@@ -63,7 +63,7 @@ module Admin
     protected
 
     def sortable_columns
-      %w[created_at updated_at email user_id github_pull_request].freeze
+      %w[created_at received_at updated_at email user_id github_pull_request].freeze
     end
 
     def earliest_period_date
@@ -90,8 +90,8 @@ module Admin
     end
 
     def bug_report_json(bug_report)
-      bug_report.as_json(only: %w[id user_id email subject body tags github_pull_request
-        is_member is_paid_organization is_paid_organization_staff created_at updated_at])
+      bug_report.as_json(only: %w[id user_id email from_name subject body tags github_pull_request
+        is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
     end
   end
 end

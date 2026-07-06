@@ -1,9 +1,6 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
-  # Prepare the ingress controller used to receive mail
-  # config.action_mailbox.ingress = :relay
-
   # Settings specified here will take precedence over those in config/application.rb.
   # Use lograge for logging to production
   config.lograge.enabled = true
@@ -131,6 +128,10 @@ Rails.application.configure do
       api_token: ENV["POSTMARK_API_TOKEN"]
     }
   end
+
+  # Inbound mail (bugs@) via Postmark inbound webhook.
+  # Set RAILS_INBOUND_EMAIL_PASSWORD to authenticate the webhook.
+  config.action_mailbox.ingress = :postmark
 
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]

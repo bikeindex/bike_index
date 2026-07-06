@@ -15,7 +15,7 @@
         </button>
       </th>
 
-      <th><%= sortable "created_at", render_sortable: %></th>
+      <th><%= sortable "received_at", "Received", render_sortable: %></th>
       <th><%= sortable "email", "Sender", render_sortable: %></th>
       <th>Subject</th>
       <th>Tags</th>
@@ -34,7 +34,7 @@
           <td>
             <%= link_to admin_bug_report_path(bug_report) do %>
               <span class="localizeTime">
-                <%= l bug_report.created_at, format: :convert_time %>
+                <%= l bug_report.received_at || bug_report.created_at, format: :convert_time %>
               </span>
             <% end %>
           </td>
@@ -43,12 +43,13 @@
             <% if bug_report.user_id.present? %>
               <%= render Admin::UserCell::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
             <% else %>
-              <%= bug_report.email %>
+              <%= bug_report.from_name %>
+              <small><%= bug_report.email %></small>
             <% end %>
           </td>
 
           <td>
-            <%= link_to bug_report.subject, admin_bug_report_path(bug_report) %>
+            <%= link_to bug_report.display_subject, admin_bug_report_path(bug_report) %>
           </td>
 
           <td><%= bug_report.tags.join(", ") %></td>

@@ -13,6 +13,10 @@
             <td class="only-dev-visible">ID</td>
             <td><code><%= @bug_report.id %></code></td>
           </tr>
+          <tr>
+            <td class="only-dev-visible">Inbound email</td>
+            <td><code><%= @bug_report.inbound_email_id %></code></td>
+          </tr>
         <% end %>
 
         <tr>
@@ -23,16 +27,20 @@
               <%= render Admin::UserCell::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
             <% end %>
 
-            <small><%= @bug_report.email %></small>
+            <%= @bug_report.from_name %>
+
+            <small>
+              <%= mail_to @bug_report.email, nil, class: "twlink" %>
+            </small>
           </td>
         </tr>
 
         <tr>
-          <td>Created</td>
+          <td>Received</td>
 
           <td>
             <span class="localizeTime preciseTime">
-              <%= l @bug_report.created_at, format: :convert_time %>
+              <%= l @bug_report.received_at || @bug_report.created_at, format: :convert_time %>
             </span>
           </td>
         </tr>
@@ -85,17 +93,24 @@
 </div>
 
 <%= render(UI::Card::Component.new(shadow: true)) do %>
-  <p><strong>Subject:</strong> <%= @bug_report.subject %></p>
+  <p><strong>Subject:</strong> <%= @bug_report.display_subject %></p>
   <%= render(UI::UserTextBlockDisplay::Component.new(text: @bug_report.body, max_height_class: "")) %>
 <% end %>
 
-<% if @bug_report.attachments.any? %>
-  <h2 class="mt-5">Attachments</h2>
-  <ul>
-    <% @bug_report.attachments.each do |attachment| %>
-      <li>
-        <%= link_to attachment.filename, BlobUrl.for(attachment.blob), class: "twlink" %>
-      </li>
+<% if @bug_report.images.attached? %>
+  <h2 class="mt-5">Images</h2>
+  <div class="tw:flex tw:flex-wrap tw:gap-4">
+    <% @bug_report.images.each do |image| %>
+      <div>
+        <%= link_to BlobUrl.for(image.blob), target: "_blank", rel: "noopener" do %>
+          <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "img-thumbnail tw:max-h-72" %>
+        <% end %>
+
+        <div class="small less-strong">
+          <%= image.filename %>
+          <%= number_to_human_size(image.byte_size) %>
+        </div>
+      </div>
     <% end %>
-  </ul>
+  </div>
 <% end %>

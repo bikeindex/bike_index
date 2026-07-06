@@ -1,12 +1,17 @@
 class BugReportsMailbox < ApplicationMailbox
   def process
     bug_report = BugReport.create!(
+      inbound_email:,
       email: mail.from&.first,
+      from_name: mail[:from]&.display_names&.first,
       subject: mail.subject,
-      body: body_text
+      body: body_text,
+      received_at: mail.date || Time.current
     )
     mail.attachments.each do |attachment|
-      bug_report.attachments.attach(
+      next unless attachment.mime_type&.start_with?("image/")
+
+      bug_report.images.attach(
         io: StringIO.new(attachment.decoded),
         filename: attachment.filename,
         content_type: attachment.mime_type
