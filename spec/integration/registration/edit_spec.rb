@@ -207,6 +207,19 @@ RSpec.describe "Editing a registration", :js, type: :system do
 
     expect(bike.reload.organizations).to include(organization)
 
+    # ---- Photos (upload an image through the real uploader) ----
+    click_edit_nav "Photos"
+    attach_file("public_image_image", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
+    # The plugin auto-submits on select; the appended thumbnail shows the
+    # synchronously-stored original (versions are generated in a background job)
+    expect(page).to have_css("#public_images img[src$='/bike.jpg']", wait: 10)
+    expect(bike.reload.public_images.count).to eq 1
+
+    # On reload the server renders the not-yet-generated version url; image_fallback
+    # swaps the 404ing thumbnail back to the stored original so it isn't broken
+    visit page.current_url
+    expect(page).to have_css("#public_images img[src$='/bike.jpg']", wait: 10)
+
     # ---- Transfer ----
     click_edit_nav "Transfer, Hide or Delete"
     fill_in "Owner email", with: new_owner_email
