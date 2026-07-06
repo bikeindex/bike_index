@@ -271,6 +271,18 @@ RSpec.describe UsersController, type: :controller do
         end
       end
     end
+    context "honeypot filled" do
+      it "creates the user but bans them as spam" do
+        expect {
+          post :create, params: {user: user_attributes.merge(additional: "http://spam.example.com")}
+        }.to change(User, :count).by(1)
+        user = User.order(:created_at).last
+        expect(user.banned?).to be_truthy
+        user_ban = user.user_ban
+        expect(user_ban.reason).to eq "spamming"
+        expect(user_ban.description).to eq "Honeypot field filled on sign up"
+      end
+    end
     context "revised" do
       let(:user_attrs) do
         {

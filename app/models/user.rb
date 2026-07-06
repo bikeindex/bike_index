@@ -138,7 +138,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :user_ban
 
-  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password, :skip_update
+  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password, :skip_update, :additional
   # stripe_id, is_paid_member, paid_organization_role_info
 
   before_validation :set_calculated_attributes
@@ -283,6 +283,11 @@ class User < ApplicationRecord
 
   def banned?
     banned
+  end
+
+  # `additional` is a honeypot field on the sign up form - only bots fill it in
+  def looks_like_spam?
+    additional.present?
   end
 
   def ambassador?

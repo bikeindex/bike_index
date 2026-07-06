@@ -16,6 +16,7 @@ class UsersController < ApplicationController
       @user.preferred_language = requested_locale
     end
     if @user.save
+      ban_spam_signup(@user) if @user.looks_like_spam?
       sign_in_and_redirect(@user)
     else
       @page_errors = @user.errors
@@ -175,10 +176,16 @@ class UsersController < ApplicationController
 
   private
 
+  def ban_spam_signup(user)
+    user.update(banned: true)
+    UserBan.create(user_id: user.id, reason: :spamming,
+      description: "Honeypot field filled on sign up")
+  end
+
   def permitted_parameters
     params.require(:user)
       .permit(:name, :email, :notification_newsletters, :notification_unstolen, :terms_of_service,
-        :password, :password_confirmation, :preferred_language)
+        :password, :password_confirmation, :preferred_language, :additional)
       .merge(sign_in_partner.present? ? {partner_data: {sign_up: sign_in_partner}} : {})
   end
 
