@@ -126,7 +126,7 @@
       <p class="tw:mt-2 tw:text-xs tw:opacity-65">
         <%= translation(".registered") %>
         <%= render(UI::Time::Component.new(time: @bike.created_at)) %> ·
-        <%= @bike.short_id %>
+        <%= render(UI::ShortId::Component.new(record: @bike)) %>
       </p>
     <% end %>
   <% end %>

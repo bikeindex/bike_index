@@ -124,7 +124,7 @@
 
         <%= render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do %>
           <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"))) { helpers.render_serial_display(@bike, @current_user) } %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registration_number"), value: @bike.short_id)) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registration_number"))) { render(UI::ShortId::Component.new(record: @bike)) } %>
           <%= render(UI::DefinitionList::Row::Component.new(label: translation(".credibility"), value: "#{credibility_score} · #{duplicate_serial_note}")) %>
           <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: manufacturer_name)) %>
           <%= render(UI::DefinitionList::Row::Component.new(label: translation(".model"), value: @bike.frame_model)) %>
