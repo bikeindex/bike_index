@@ -28,6 +28,15 @@ RSpec.describe BugReport, type: :model do
         end
       end
 
+      context "when the user becomes a member after creation" do
+        it "keeps the creation-time snapshot" do
+          expect(bug_report.is_member).to be_falsey
+          FactoryBot.create(:membership, user:)
+          bug_report.update!(tags: ["search"])
+          expect(bug_report.reload.is_member).to be_falsey
+        end
+      end
+
       context "in a paid organization" do
         let(:organization) { FactoryBot.create(:organization, :paid) }
         let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, organization:, role:) }

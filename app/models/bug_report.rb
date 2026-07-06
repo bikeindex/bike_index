@@ -64,7 +64,8 @@ class BugReport < ApplicationRecord
   def set_calculated_attributes
     self.email = EmailNormalizer.normalize(email)
     self.user_id ||= User.fuzzy_email_find(email)&.id
-    return if user.blank?
+    # booleans snapshot the sender's status at report time - don't re-derive on update
+    return unless new_record? && user.present?
 
     self.is_member = user.member?
     self.is_paid_organization = user.paid_org?
