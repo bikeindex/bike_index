@@ -26,7 +26,7 @@ class BugReport < ApplicationRecord
 
   GITHUB_REPO_URL = "https://github.com/bikeindex/bike_index"
 
-  belongs_to :user, optional: true
+  belongs_to :user
 
   has_many_attached :attachments
 
