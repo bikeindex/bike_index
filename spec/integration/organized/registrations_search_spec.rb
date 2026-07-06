@@ -221,6 +221,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Switch to past 30 days for daily chart bucketing, then enable the chart on the search page
     click_link "past 30 days"
     expect(page).to have_current_path(/period=month/, wait: 10)
+    # "Render chart" lives inside the results frame the period change above
+    # replaces. Wait for that swap to settle (bob is the only match in the past
+    # 30 days) before clicking, so the advance nav isn't superseded mid-swap.
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
 
     click_link "Render chart"
     expect(page).to have_current_path(/render_chart=true/, wait: 10)
@@ -239,6 +243,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     fill_in "search_email", with: ""
     find("#search-button").click
     expect(page).to have_current_path(/period=year/, wait: 10)
+    # The "custom" button lives inside the results frame, which this search
+    # replaces. Wait for the swap to finish (count reflects the cleared email)
+    # before toggling it -- otherwise Playwright grabs the old button and it
+    # detaches mid-click ("Element is not attached to the DOM").
+    expect(page).to have_text("11 registrations matching")
 
     click_button "custom"
     start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")

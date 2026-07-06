@@ -33,7 +33,7 @@ html_content = <<-HTML
         </a>
         <span class='current-organization-nav-item'>
           <a aria-expanded='false' aria-haspopup='true' data-toggle='dropdown' href='#' id='passive_organization_submenu'>
-            Hogwarts
+            Brakebills
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="tw:rotate-90 tw:inline-block tw:w-3 tw:h-3 tw:ml-1">
               <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"></path>
             </svg>
@@ -78,7 +78,7 @@ RSpec.describe HtmlContentHelpers do
 
   describe "whitespace_normalized_body_text" do
     let(:target) do
-      "the non-profit bike registry Hogwarts Location Oakland, CA 94608 Stolen at 2019-05-20T07:00:00-0700"
+      "the non-profit bike registry Brakebills Location Oakland, CA 94608 Stolen at 2019-05-20T07:00:00-0700"
     end
     it "responds with target" do
       expect(whitespace_normalized_body_text(html_content)).to eq target

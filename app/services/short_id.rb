@@ -4,11 +4,15 @@ module ShortId
   # Prefix per model class, so a short_id self-identifies
   PREFIXES = {"Bike" => "r", "BikeVersion" => "v", "MarketplaceListing" => "m"}.freeze
 
-  # Compact, prefixed alias for an id, e.g. ShortId.encode("Bike", 3431156) => "r/21J-HW"
+  # Compact, prefixed alias for an id, e.g. ShortId.encode("Bike", 3431156) => "r/21J-HW".
+  # Ids whose base36 form is under 3 digits stay decimal, so they never collide with
+  # the all-digit decimal ids that decode reads back verbatim (e.g. 36 => "r/36", not "r/10").
   def encode(class_name, id)
     return if id.blank?
 
-    "#{PREFIXES.fetch(class_name)}/#{id.to_s(36).upcase.scan(/.{1,3}/).join("-")}"
+    base36 = id.to_s(36).upcase
+    body = (base36.length < 3) ? id.to_s : base36.scan(/.{1,3}/).join("-")
+    "#{PREFIXES.fetch(class_name)}/#{body}"
   end
 
   # Resolve a short_id back to an id. The class prefix and its separator are

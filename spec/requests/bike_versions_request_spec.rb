@@ -30,7 +30,7 @@ RSpec.describe BikeVersionsController, type: :request do
     context "short_id" do
       let(:bike_version) { FactoryBot.create(:bike_version, owner: current_user, id: 35) }
       it "finds the version via short_id and the /v/ short URL" do
-        expect(bike_version.short_id).to eq "v/Z"
+        expect(bike_version.short_id).to eq "v/35"
         ["#{base_url}/35", "#{base_url}/z", "/v/z", "/V/Z", "/v/Z"].each do |path|
           get path
           expect(response).to render_template(:show)

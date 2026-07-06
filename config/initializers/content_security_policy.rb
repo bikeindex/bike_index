@@ -41,6 +41,9 @@ Rails.application.configure do
       "https://cdn.jsdelivr.net",
       "https://api.mapbox.com"
     policy.connect_src :self,
+      # Our own image CDNs — third-party scripts (Facebook Pixel) fetch bike photos, not just <img> them
+      "https://files.bikeindex.org",
+      "https://uploads.bikeindex.org",
       "https://bikebook.herokuapp.com",
       "https://www.google-analytics.com",
       "https://*.google-analytics.com",
