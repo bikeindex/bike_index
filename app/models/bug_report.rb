@@ -44,6 +44,15 @@ class BugReport < ApplicationRecord
     distinct.pluck(Arel.sql("unnest(tags)")).sort
   end
 
+  def self.normalized_tags(value)
+    value = value.to_s.split(/,|\n/) unless value.is_a?(Array)
+    value.map { it.to_s.strip.downcase }.reject(&:blank?).uniq.sort
+  end
+
+  def tags=(value)
+    super(self.class.normalized_tags(value))
+  end
+
   def github_pull_request_url
     return if github_pull_request.blank?
 
@@ -54,7 +63,6 @@ class BugReport < ApplicationRecord
 
   def set_calculated_attributes
     self.email = EmailNormalizer.normalize(email)
-    self.tags = tags.map { it.strip.downcase }.reject(&:blank?).uniq.sort
     self.user_id ||= User.fuzzy_email_find(email)&.id
     return if user.blank?
 

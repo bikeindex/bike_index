@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe BugReport, type: :model do
   describe "set_calculated_attributes" do
-    let(:bug_report) { FactoryBot.create(:bug_report, email: "SomeOne@example.com ", tags: ["Broken ", "search", "broken", ""]) }
+    let(:bug_report) { FactoryBot.create(:bug_report, email: "SomeOne@example.com ", tags: "Broken , search,broken,") }
 
     it "normalizes email and tags" do
       expect(bug_report).to have_attributes(email: "someone@example.com",

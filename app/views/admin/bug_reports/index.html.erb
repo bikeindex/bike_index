@@ -28,7 +28,7 @@
 
 <% table_view = capture do %>
   <%= form_tag assign_tags_admin_bug_reports_path, method: :post, data: {controller: "table-multi-checkbox"} do %>
-    <%= render partial: "table", locals: {collection: @collection, render_sortable: true, render_checkboxes: true} %>
+    <%= render partial: "table", locals: {collection: @collection, render_sortable: true} %>
 
     <div class="mb-3 tw:flex tw:flex-wrap tw:items-end tw:justify-center tw:gap-2">
       <%= render(Form::Combobox::Component.new(

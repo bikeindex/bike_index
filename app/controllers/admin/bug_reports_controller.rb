@@ -43,7 +43,7 @@ module Admin
     end
 
     def assign_tags
-      new_tags = split_tags(params[:tags])
+      new_tags = BugReport.normalized_tags(params[:tags])
       if new_tags.none?
         flash[:error] = "No tag selected"
       else
@@ -86,13 +86,7 @@ module Admin
     end
 
     def permitted_params
-      permitted = params.require(:bug_report).permit(:github_pull_request, :tags, tags: [])
-      tags = permitted[:tags]
-      tags.is_a?(String) ? permitted.merge(tags: split_tags(tags)) : permitted
-    end
-
-    def split_tags(string)
-      string.to_s.split(",").map(&:strip)
+      params.require(:bug_report).permit(:github_pull_request, :tags, tags: [])
     end
 
     def bug_report_json(bug_report)
