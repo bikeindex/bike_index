@@ -43,9 +43,14 @@ module Admin
     end
 
     def assign_tags
-      bug_reports = BugReport.where(id: (params[:bug_reports_selected] || {}).keys)
-      bug_reports.each { it.update(tags: it.tags + split_tags(params[:tags])) }
-      flash[:success] = "Added tags to #{bug_reports.count} bug #{"report".pluralize(bug_reports.count)}"
+      new_tags = split_tags(params[:tags])
+      if new_tags.none?
+        flash[:error] = "No tag selected"
+      else
+        bug_reports = BugReport.where(id: (params[:bug_reports_selected] || {}).keys)
+        bug_reports.each { it.update(tags: it.tags + new_tags) }
+        flash[:success] = "Added tags to #{bug_reports.count} bug #{"report".pluralize(bug_reports.count)}"
+      end
       redirect_back(fallback_location: admin_bug_reports_path)
     end
 

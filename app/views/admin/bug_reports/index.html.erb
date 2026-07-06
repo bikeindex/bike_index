@@ -18,10 +18,17 @@
   <%= form_tag assign_tags_admin_bug_reports_path, method: :post, data: {controller: "table-multi-checkbox"} do %>
     <%= render partial: "table", locals: {collection: @collection, render_sortable: true, render_checkboxes: true} %>
 
-    <div class="mb-3 tw:flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-2">
-      <label for="tags" class="twlabel tw:mb-0">Tags (comma separated)</label>
-      <%= text_field_tag :tags, nil, required: true, class: "twinput tw:max-w-xs" %>
-      <%= submit_tag "Add tags to selected", class: "btn btn-outline-primary" %>
+    <div class="mb-3 tw:flex tw:flex-wrap tw:items-end tw:justify-center tw:gap-2">
+      <%= render(Form::Combobox::Component.new(
+        name: "tags",
+        label: "Tag to assign",
+        label_class: "twlabel",
+        free_text: true,
+        options: searchable_tags,
+        placeholder: "Select or create a tag"
+      )) %>
+
+      <%= submit_tag "Add tag to selected", class: "btn btn-outline-primary" %>
     </div>
   <% end %>
 <% end %>
