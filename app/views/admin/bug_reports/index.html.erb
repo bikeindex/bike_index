@@ -14,6 +14,18 @@
   </li>
 <% end %>
 
+<% admin_search_form = capture do %>
+  <%= form_tag admin_bug_reports_path, method: :get, class: "form-inline mt-4 mb-4 justify-content-md-end" do %>
+    <%= hidden_field_tag :search_tag, params[:search_tag] %>
+
+    <div class="form-group mr-2 mb-2">
+      <%= text_field_tag :query, params[:query], placeholder: "Search subject, body and sender", class: "form-control" %>
+    </div>
+
+    <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+  <% end %>
+<% end %>
+
 <% table_view = capture do %>
   <%= form_tag assign_tags_admin_bug_reports_path, method: :post, data: {controller: "table-multi-checkbox"} do %>
     <%= render partial: "table", locals: {collection: @collection, render_sortable: true, render_checkboxes: true} %>
@@ -33,4 +45,4 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_bug_reports)) %>
+<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, admin_search_form:, table_view:, chart_collection: @render_chart && matching_bug_reports)) %>

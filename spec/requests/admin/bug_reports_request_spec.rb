@@ -27,6 +27,16 @@ RSpec.describe Admin::BugReportsController, type: :request do
         expect(json_result).to match(hash_including("page" => 1, "per_page" => 1))
       end
     end
+
+    context "with query" do
+      let!(:bug_report_other) { FactoryBot.create(:bug_report, subject: "Payments page timeout") }
+
+      it "full text searches" do
+        expect(bug_report).to be_present
+        get "#{base_url}.json", params: {query: "payments timeout"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_other.id])
+      end
+    end
   end
 
   describe "show" do

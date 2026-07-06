@@ -22,6 +22,8 @@
 #  index_bug_reports_on_user_id  (user_id)
 #
 class BugReport < ApplicationRecord
+  include PgSearch::Model
+
   GITHUB_REPO_URL = "https://github.com/bikeindex/bike_index"
 
   belongs_to :user, optional: true
@@ -29,6 +31,8 @@ class BugReport < ApplicationRecord
   has_many_attached :attachments
 
   has_paper_trail only: %i[tags github_pull_request is_member is_paid_organization is_paid_organization_staff]
+
+  pg_search_scope :text_search, against: {subject: "A", email: "A", body: "B"}
 
   validates :email, presence: true
 

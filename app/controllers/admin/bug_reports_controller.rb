@@ -75,6 +75,7 @@ module Admin
       @searched_tag = params[:search_tag] if searchable_tags.include?(params[:search_tag])
       bug_reports = bug_reports.with_tag(@searched_tag) if @searched_tag.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
+      bug_reports = bug_reports.text_search(params[:query]) if params[:query].present?
       bug_reports.where(created_at: @time_range)
     end
 
