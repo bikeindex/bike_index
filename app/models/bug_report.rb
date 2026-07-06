@@ -28,6 +28,8 @@ class BugReport < ApplicationRecord
 
   has_many_attached :attachments
 
+  has_paper_trail only: %i[tags github_pull_request is_member is_paid_organization is_paid_organization_staff]
+
   validates :email, presence: true
 
   before_validation :set_calculated_attributes

@@ -50,6 +50,26 @@ RSpec.describe BugReport, type: :model do
     end
   end
 
+  describe "versioning" do
+    include_context :with_paper_trail
+
+    let(:bug_report) { FactoryBot.create(:bug_report, tags: ["search"]) }
+
+    it "creates versions for tracked attributes" do
+      expect(bug_report.versions.count).to eq 1
+      expect(bug_report.versions.last.event).to eq "create"
+
+      bug_report.update!(tags: ["search", "broken"], github_pull_request: 3805)
+      expect(bug_report.versions.count).to eq 2
+      target_changes = {tags: [["search"], ["broken", "search"]], github_pull_request: [nil, 3805]}
+      expect(bug_report.versions.last.object_changes).to eq target_changes.as_json
+
+      # untracked attributes don't create versions
+      bug_report.update!(subject: "A new subject")
+      expect(bug_report.versions.count).to eq 2
+    end
+  end
+
   describe "with_tag and all_tags" do
     let!(:bug_report) { FactoryBot.create(:bug_report, tags: %w[search broken]) }
     let!(:bug_report_other) { FactoryBot.create(:bug_report, tags: ["search"]) }
