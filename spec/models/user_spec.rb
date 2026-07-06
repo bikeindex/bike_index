@@ -877,6 +877,19 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "looks_like_spam?" do
+    let(:user) { User.new }
+    it "is false without the honeypot" do
+      expect(user.looks_like_spam?).to be_falsey
+    end
+    context "with the additional honeypot filled" do
+      let(:user) { User.new(additional: "http://spam.example.com") }
+      it "is true" do
+        expect(user.looks_like_spam?).to be_truthy
+      end
+    end
+  end
+
   describe "can_create_listing?" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     context "superuser" do

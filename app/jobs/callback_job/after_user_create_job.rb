@@ -20,6 +20,8 @@ module CallbackJob
     end
 
     def perform_create_jobs(user, email)
+      # Ban honeypot signups before enqueuing emails, so EmailBan.ban? suppresses them
+      EmailBan.create(user:, reason: :honeypot) if user.looks_like_spam?
       # This may confirm the user. We auto-confirm users that belong to orgs.
       # Auto confirming the user actually ends up running perform_confirmed_jobs.
       associate_organization_role_invites(user, email)
