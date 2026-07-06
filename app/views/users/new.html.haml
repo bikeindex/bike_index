@@ -41,7 +41,7 @@
               = hidden_field_tag :partner, sign_in_partner
 
             -# Honeypot spam trap - hidden from people, only bots fill it in
-            .form-group.additional-field{ style: "display: none;", aria: { hidden: true } }
+            .form-group.additional-field{ style: "display: none;" }
               = f.label :additional, "Additional", class: "sr-only"
               = f.text_field :additional, tabindex: -1, autocomplete: "off", class: "form-control"
 
