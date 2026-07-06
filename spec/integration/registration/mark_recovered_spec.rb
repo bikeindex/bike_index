@@ -45,6 +45,9 @@ RSpec.describe "Marking a stolen registration recovered", :js, type: :system do
       click_button "Mark recovered"
     end
 
+    # While the (delayed) recovery request is in flight, the spinner is shown
+    expect(page).to have_content("Marking your bike recovered", wait: 5)
+
     # After recovery the bike is no longer stolen: the theft nav is gone and the
     # "Report Stolen or Missing" nav (only shown for un-stolen bikes) appears
     expect(page).to have_link("Report Stolen or Missing", wait: 10)
