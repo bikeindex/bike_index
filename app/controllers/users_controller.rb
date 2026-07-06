@@ -16,7 +16,8 @@ class UsersController < ApplicationController
       @user.preferred_language = requested_locale
     end
     if @user.save
-      ban_spam_signup(@user) if @user.looks_like_spam?
+      # Honeypot filled - the EmailBan stops the confirmation email, so the account never activates
+      EmailBan.create(user: @user, reason: :honeypot) if @user.looks_like_spam?
       sign_in_and_redirect(@user)
     else
       @page_errors = @user.errors
@@ -175,10 +176,6 @@ class UsersController < ApplicationController
   end
 
   private
-
-  def ban_spam_signup(user)
-    EmailBan.create(user:, reason: :honeypot)
-  end
 
   def permitted_parameters
     params.require(:user)

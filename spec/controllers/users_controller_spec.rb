@@ -280,6 +280,10 @@ RSpec.describe UsersController, type: :controller do
         expect(user.email_banned?).to be_truthy
         email_ban = user.email_bans.last
         expect(email_ban.reason).to eq "honeypot"
+        # The ban blocks the confirmation email, so the account can't be activated
+        expect {
+          Email::ConfirmationJob.new.perform(user.id)
+        }.to_not change(ActionMailer::Base.deliveries, :count)
       end
     end
     context "revised" do
