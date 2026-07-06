@@ -177,9 +177,7 @@ class UsersController < ApplicationController
   private
 
   def ban_spam_signup(user)
-    user.update(banned: true)
-    UserBan.create(user_id: user.id, reason: :spamming,
-      description: "Honeypot field filled on sign up")
+    EmailBan.create(user:, reason: :honeypot)
   end
 
   def permitted_parameters
