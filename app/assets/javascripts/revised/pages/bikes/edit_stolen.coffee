@@ -13,11 +13,9 @@ class BikeIndex.BikesEditStolen extends BikeIndex
   initializeEventListeners: ->
     $('#toggle-stolen form').submit (e) =>
       e.preventDefault()
+      # recoveredRequestCallback redirects once recovery succeeds. Redirecting here
+      # would race a slow request, navigating away before the bike is recovered.
       @markRecovered()
-      setTimeout (->
-        # Should redirect to the default page - which should no longer be a stolen page
-        window.location = window.location.pathname
-      ), 500
 
   recoveredRequestCallback: (message, success) ->
     if success
