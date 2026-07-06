@@ -1,0 +1,29 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item tw:text-sm">
+    <%= render(UI::Dropdown::Component.new(
+      name: @searched_tag.present? ? "Tagged: #{@searched_tag}" : "All tags",
+      button_size: :sm,
+      active: @searched_tag.present?
+    )) do |dropdown|
+      dropdown.with_entry_item { link_to "All tags", url_for(sortable_search_params.merge(search_tag: nil)), class: (@searched_tag.blank? ? "active" : nil) }
+      dropdown.with_entry_divider
+      searchable_tags.each do |tag|
+        dropdown.with_entry_item { link_to tag, url_for(sortable_search_params.merge(search_tag: tag)), class: (@searched_tag == tag ? "active" : nil) }
+      end
+    end %>
+  </li>
+<% end %>
+
+<% table_view = capture do %>
+  <%= form_tag assign_tags_admin_bug_reports_path, method: :post, data: {controller: "table-multi-checkbox"} do %>
+    <%= render partial: "table", locals: {collection: @collection, render_sortable: true, render_checkboxes: true} %>
+
+    <div class="mb-3 tw:flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-2">
+      <label for="tags" class="twlabel tw:mb-0">Tags (comma separated)</label>
+      <%= text_field_tag :tags, nil, required: true, class: "twinput tw:max-w-xs" %>
+      <%= submit_tag "Add tags to selected", class: "btn btn-outline-primary" %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_bug_reports)) %>
