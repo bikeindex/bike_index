@@ -1,9 +1,19 @@
-<div class="tw:flex tw:flex-col tw:gap-6">
+<div
+  class="
+    tw:mx-auto tw:-mt-9 tw:flex tw:w-full tw:max-w-[1440px] tw:flex-col
+    tw:gap-6 tw:px-2 tw:lg:mt-0
+  "
+>
   <div class="tw:grid tw:gap-6 tw:lg:grid-cols-3">
     <div class="tw:lg:col-span-2">
-      <%= render(UI::Card::Component.new) do %>
+      <div
+        class="
+          tw:lg:rounded-sm tw:lg:border tw:lg:border-gray-200 tw:lg:bg-white
+          tw:lg:p-4 tw:lg:dark:border-gray-700 tw:lg:dark:bg-gray-800
+        "
+      >
         <%= render(RegistrationShow::Photos::Component.new(bike: @bike, owner: @owner, title: title, subtitle: subtitle)) %>
-      <% end %>
+      </div>
     </div>
 
     <div class="tw:flex tw:flex-col tw:gap-4">
@@ -20,11 +30,11 @@
       </div>
 
       <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <% unless @bike.user_hidden %>
-          <%= render(UI::Badge::Component.new(text: translation(".registered_protected"), color: :notice)) %>
+        <% if @bike.status_with_owner? && !@bike.user_hidden %>
+          <%= render(UI::Badge::Component.new(text: translation(".registered_protected"), color: :notice, icon: "registration_show/shield")) %>
         <% end %>
 
-        <%= render(UI::Badge::Component.new(text: translation(".not_stolen"), color: :success, indicator: true)) %>
+        <%= render(UI::Badge::Component.new(text: status_label, color: status_color, indicator: true)) %>
       </div>
 
       <div class="tw:mt-auto tw:flex tw:flex-col tw:gap-2">
@@ -32,11 +42,15 @@
           <% if show_marketplace_button? %>
             <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "marketplace"), text: translation(".sell_on_marketplace"), color: :purple, size: :lg, class: "tw:justify-center")) %>
           <% end %>
-          <div class="tw:grid tw:grid-cols-2 tw:gap-2">
-            <%= render(RegistrationShow::Share::Component.new(text: translation(".share_my_page"), url: bike_url(@bike))) %>
+          <% if @bike.status_with_owner? %>
+            <div class="tw:grid tw:grid-cols-2 tw:gap-2">
+              <%= render(RegistrationShow::Share::Component.new(text: translation(".share_my_page"), url: bike_url(@bike))) %>
 
-            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :danger_outline, class: "tw:justify-center")) %>
-          </div>
+              <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :danger_outline, class: "tw:justify-center")) %>
+            </div>
+          <% else %>
+            <%= render(RegistrationShow::Share::Component.new(text: translation(".share_my_page"), url: bike_url(@bike))) %>
+          <% end %>
         <% else %>
           <%= render(RegistrationShow::Share::Component.new(text: translation(".share"), url: bike_url(@bike))) %>
         <% end %>
@@ -93,11 +107,13 @@
     <div class="tw:bg-white tw:p-4 tw:dark:bg-gray-950">
       <dt class="tw:text-xs tw:opacity-65"><%= translation(".status") %></dt>
 
-      <dd class="tw:mt-0.5 tw:font-semibold tw:text-green-600">
-        <%= translation(".not_stolen") %>
+      <dd class="tw:mt-0.5 tw:font-semibold <%= status_text_class %>">
+        <%= status_label %>
       </dd>
     </div>
   </dl>
+
+  <%= render(RegistrationShow::StolenDetails::Component.new(bike: @bike)) %>
 
   <% if @bike.description.present? %>
     <%= render(UI::Card::Component.new) do %>
@@ -109,8 +125,11 @@
 
       <p class="tw:mt-2 tw:text-xs tw:opacity-65">
         <%= translation(".registered") %>
-        <%= render(UI::Time::Component.new(time: @bike.created_at)) %>
+        <%= render(UI::Time::Component.new(time: @bike.created_at)) %> ·
+        <%= @bike.short_id %>
       </p>
     <% end %>
   <% end %>
+
+  <%= render(RegistrationShow::ComponentList::Component.new(bike: @bike)) %>
 </div>

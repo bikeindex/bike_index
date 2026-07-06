@@ -36,23 +36,47 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
-    context "with photos" do
-      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
-      it "renders replace/remove links to the photos edit page" do
+    context "current_user previously owned the bike (sent away)" do
+      let(:previous_owner) { bike.reload.user }
+      let(:current_user) { previous_owner }
+      # Capture the original owner, then transfer to a new owner (demoting the
+      # original's ownership to non-current)
+      before do
+        previous_owner
+        FactoryBot.create(:ownership, bike:, user: FactoryBot.create(:user_confirmed))
+      end
+      it "shows the sent-away badge and hides owner actions" do
         get "#{base_url}/#{bike.id}"
         body = whitespace_normalized_body_text
-        expect(body).to match("Replace")
-        expect(body).to match("Remove")
+        expect(body).to match("No longer your bike")
+        expect(body).to_not match("Your bike")
+        expect(body).to_not match("Mark stolen")
+      end
+    end
+
+    context "with photos" do
+      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
+      let!(:public_image2) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
+      it "renders the add-photo link but no replace/remove links" do
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("Add photo")
+        expect(body).to_not match("Replace")
+        expect(body).to_not match("Remove")
         expect(response.body).to match(edit_bike_path(bike, edit_template: "photos"))
       end
     end
 
     context "stolen bike" do
       let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
-      it "still renders the redesign" do
+      it "still renders the redesign, hiding mark-stolen and marketplace for the owner" do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
-        expect(whitespace_normalized_body_text).to match("Activity")
+        body = whitespace_normalized_body_text
+        expect(body).to match("Activity")
+        expect(body).to match("Share my page")
+        expect(body).to_not match("Mark stolen")
+        expect(body).to_not match("Sell on Marketplace")
       end
     end
   end

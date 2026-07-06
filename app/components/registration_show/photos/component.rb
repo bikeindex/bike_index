@@ -20,11 +20,15 @@ module RegistrationShow
         parts = [content_tag(:h2, @title, class: "tw:text-xl tw:font-bold tw:text-white tw:leading-tight")]
         parts << content_tag(:p, @subtitle, class: "tw:mt-0.5 tw:text-sm tw:text-white/85") if @subtitle.present?
 
-        content_tag(:div, safe_join(parts), class: "tw:pointer-events-none tw:absolute tw:inset-x-0 tw:bottom-0 tw:bg-gradient-to-t tw:from-black/60 tw:to-transparent tw:p-4 tw:lg:hidden")
+        content_tag(:div, safe_join(parts), class: "tw:pointer-events-none tw:absolute tw:inset-x-0 tw:bottom-0 tw:bg-gradient-to-t tw:from-black/60 tw:to-transparent tw:px-2 tw:py-4 tw:lg:hidden")
       end
 
       def bike_image_url
         @bike.image_url(:large) # corrects the URL for remote images in development
+      end
+
+      def bike_image_original_url
+        @bike.image_url # original, un-resized
       end
 
       def bike_image

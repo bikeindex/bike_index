@@ -7,6 +7,7 @@ en:
         activity: Activity
         audience_owner: Your bike
         audience_public: Public view
+        audience_sent_away: No longer your bike
         color: Color
         frame: Frame
         mark_stolen: Mark stolen
@@ -17,4 +18,5 @@ en:
         share: Share
         share_my_page: Share my page
         status: Status
+        stolen: Stolen
         year: Year

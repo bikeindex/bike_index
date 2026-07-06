@@ -45,24 +45,32 @@ module UI
         [BASE_CLASSES, cursor, palette[color], SIZES[size]].join(" ")
       end
 
-      def initialize(text:, title: nil, color: :gray, size: :md, indicator: false, solid: false)
+      def initialize(text:, title: nil, color: :gray, size: :md, indicator: false, solid: false, icon: nil)
         @text = text
         @title = title
         @color = COLORS.key?(color) ? color : :gray
         @size = SIZES.include?(size) ? size : :md
         @indicator = indicator
         @solid = solid
+        @icon = icon
       end
 
       def call
+        leading = leading_element
         label = content.presence || @text
-        label = safe_join([indicator_dot, label]) if @indicator
+        label = safe_join([leading, label]) if leading
         badge = content_tag(:span, label, class: badge_class)
         return badge unless custom_title?
         render(UI::Tooltip::Component.new(text: @title)) { badge }
       end
 
       private
+
+      # An inline icon (by name) takes precedence over the status dot
+      def leading_element
+        return helpers.inline_svg_tag("icons/#{@icon}.svg", class: "tw:mr-1 tw:size-3.5") if @icon.present?
+        indicator_dot if @indicator
+      end
 
       # A small status dot inheriting the badge's text color
       def indicator_dot

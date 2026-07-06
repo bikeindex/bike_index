@@ -76,6 +76,8 @@ module ApplicationHelper
       "kelsey_landing-page-body"
     elsif current_page_skeleton == "organized_skeleton"
       "organized-body"
+    elsif controller_name == "registrations" && action_name == "show"
+      "tw:bg-[#f7f6fb]"
     end
   end
 

@@ -7,7 +7,7 @@ module RegistrationShow
         @bike = bike
         @current_user = current_user
         @show_for_sale = show_for_sale
-        @owner = @bike.authorized?(@current_user)
+        @owner = @current_user.present? && @bike.owner == @current_user
       end
 
       private
@@ -26,11 +26,36 @@ module RegistrationShow
       end
 
       def audience_label
-        @owner ? translation(".audience_owner") : translation(".audience_public")
+        return translation(".audience_owner") if @owner
+        return translation(".audience_sent_away") if previously_owned?
+
+        translation(".audience_public")
       end
 
       def audience_color
-        @owner ? :success : :notice
+        return :success if @owner
+        return :warning if previously_owned?
+
+        :notice
+      end
+
+      # The current user held an ownership that's no longer current (bike sent away)
+      def previously_owned?
+        return false if @owner || @current_user.blank?
+
+        @bike.ownerships.where(user_id: @current_user.id, current: false).exists?
+      end
+
+      def status_label
+        @bike.status_stolen? ? translation(".stolen") : translation(".not_stolen")
+      end
+
+      def status_color
+        @bike.status_stolen? ? :error : :success
+      end
+
+      def status_text_class
+        @bike.status_stolen? ? "tw:text-red-600" : "tw:text-green-600"
       end
 
       def frame_spec
@@ -50,7 +75,8 @@ module RegistrationShow
       end
 
       def show_marketplace_button?
-        @owner && (@bike.current_marketplace_listing&.current? || @current_user&.can_create_listing?)
+        @owner && @bike.status_with_owner? &&
+          (@bike.current_marketplace_listing&.current? || @current_user&.can_create_listing?)
       end
     end
   end

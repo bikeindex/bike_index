@@ -4,5 +4,3 @@ en:
     registration_show:
       photos:
         add_photo: Add photo
-        remove_photo: Remove
-        replace_photo: Replace

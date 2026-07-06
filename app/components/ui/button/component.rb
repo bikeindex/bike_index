@@ -19,6 +19,8 @@ module UI
         purple: "tw:text-white tw:bg-[#715eb2] tw:border tw:border-[#715eb2] tw:hover:bg-[#5d4b9c] tw:hover:border-[#5d4b9c] tw:active:bg-[#5d4b9c] tw:focus:ring-[#715eb2]/40",
         # Redesign: white button with a soft danger outline (Mark stolen)
         danger_outline: "tw:text-[#c0392b] tw:bg-white tw:border tw:border-[#f3c9c9] tw:hover:bg-red-50 tw:active:bg-red-100 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:hover:bg-red-950",
+        # Redesign: crisp white button with a neutral outline (Share)
+        outline: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-300 tw:hover:bg-gray-50 tw:hover:border-gray-400 tw:active:bg-gray-100 tw:focus:ring-blue-500/40 tw:dark:bg-transparent tw:dark:text-gray-100 tw:dark:border-gray-600 tw:dark:hover:bg-gray-800",
         link: "tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:underline tw:active:text-blue-800 tw:active:dark:text-blue-300 tw:active:font-bold tw:p-0 tw:focus:outline-none"
       }.freeze
 

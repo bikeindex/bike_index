@@ -4,8 +4,6 @@ class RegistrationsController < ApplicationController
   before_action :simple_header
   layout "reg_embed"
 
-  # The redesigned bike show page. Renders for any viewable bike regardless of
-  # status - the design only covers the registered case, so that's what we render.
   def show
     @bike = Bike.unscoped.find_id(params[:id])
     fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
@@ -59,7 +57,6 @@ class RegistrationsController < ApplicationController
     end
   end
 
-  # Org staff viewing an accessible bike get the redesigned admin panel
   def show_admin_redesign?
     passive_organization.present? && current_user&.authorized?(passive_organization)
   end

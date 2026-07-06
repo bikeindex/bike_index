@@ -1,0 +1,26 @@
+<%= render(UI::Card::Component.new) do %>
+  <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+    <%= t("bikes.main_show_block.stolen_details") %>
+  </h2>
+
+  <% if stolen_record.latitude.present? %>
+    <div class="registration-show-stolen tw:mt-3">
+      <style>
+        #map_canvas { width: 100%; height: 320px; border-radius: 4px; }
+        .registration-show-stolen .map-holder { width: 100%; max-width: 100%; padding: 0; flex: 0 0 100%; }
+      </style>
+
+      <%= render partial: "bikes/stolen_map", locals: {mapping_record: stolen_record} %>
+    </div>
+  <% end %>
+
+  <%= render(UI::DefinitionList::Container::Component.new) do %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.location"), value: stolen_record.address(country: [:skip_default]))) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.locking_description"), value: stolen_record.locking_description)) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.locking_circumvented"), value: stolen_record.lock_defeat_description)) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.stolen_at"), value: stolen_record.date_stolen, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.police_report"), value: stolen_record.police_report_number)) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.department_city"), value: stolen_record.police_report_department)) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.description_of_incident"), full_width: true, value: stolen_record.theft_description)) %>
+  <% end %>
+<% end %>

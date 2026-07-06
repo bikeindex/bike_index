@@ -16,7 +16,6 @@ module RegistrationShow
 
       private
 
-      # A rounded icon tile for the quick-action bar
       def action_icon(icon, tile: :purple)
         tile_bg, icon_color = case tile
         when :blue then ["tw:bg-[#e7f3fb]", "tw:text-[#016ec2]"]
@@ -25,6 +24,15 @@ module RegistrationShow
         end
         content_tag(:span, class: "tw:flex tw:size-9 tw:flex-none tw:items-center tw:justify-center tw:rounded-lg #{tile_bg}") do
           helpers.inline_svg_tag("icons/registration_show/#{icon}.svg", class: "tw:h-[19px] tw:w-[19px] #{icon_color}")
+        end
+      end
+
+      def action_label(title, subtitle)
+        content_tag(:span, class: "tw:min-w-0") do
+          safe_join([
+            content_tag(:span, title, class: "tw:block tw:font-bold"),
+            content_tag(:span, subtitle, class: "tw:mt-0.5 tw:hidden tw:text-xs tw:opacity-60 tw:lg:block")
+          ])
         end
       end
 
@@ -66,6 +74,14 @@ module RegistrationShow
 
       def title
         helpers.bike_title_html(@bike)
+      end
+
+      def status_label
+        @bike.status_stolen? ? translation(".stolen") : translation(".not_stolen")
+      end
+
+      def status_color
+        @bike.status_stolen? ? :error : :success
       end
 
       def subtitle
@@ -131,6 +147,10 @@ module RegistrationShow
 
       def impound_path
         organization_impound_records_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
+      end
+
+      def impound_sub
+        staff? ? translation(".impound_sub") : translation(".request_impound_sub")
       end
 
       def impound_label
