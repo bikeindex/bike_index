@@ -2,6 +2,7 @@ class RegistrationsController < ApplicationController
   before_action :allow_x_frame, except: %i[new show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
   before_action :simple_header
+  before_action :assign_current_organization, only: %i[show]
   layout "reg_embed"
 
   def show
@@ -59,6 +60,13 @@ class RegistrationsController < ApplicationController
 
   def show_admin_redesign?
     passive_organization.present? && current_user&.authorized?(passive_organization)
+  end
+
+  # Apply the organization_id param (e.g. ?organization_id=false) before the view
+  # reads passive_organization — otherwise it's memoized from the session and the
+  # switch only takes effect on the next request
+  def assign_current_organization
+    current_organization
   end
 
   def simple_header

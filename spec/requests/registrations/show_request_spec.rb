@@ -108,5 +108,19 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to_not match(bike.owner_email)
       end
     end
+
+    context "removing the organization via organization_id=false" do
+      let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
+      it "drops the admin view on the same request, not only on reload" do
+        # With the org in the session (their default), the admin view renders
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("Admin / Staff")
+
+        # Removing the org should drop the admin view on this request, not only
+        # after a subsequent reload
+        get "#{base_url}/#{bike.id}", params: {organization_id: "false"}
+        expect(whitespace_normalized_body_text).to_not match("Admin / Staff")
+      end
+    end
   end
 end
