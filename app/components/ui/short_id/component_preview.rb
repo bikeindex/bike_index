@@ -3,8 +3,9 @@
 module UI
   module ShortId
     class ComponentPreview < ApplicationComponentPreview
-      def default
-        render(UI::ShortId::Component.new(short_id: "r/21J-HW"))
+      # @param id text "ID to render"
+      def default(id: "r/21J-HW")
+        render(UI::ShortId::Component.new(short_id: id))
       end
 
       # @label short (decimal) id
