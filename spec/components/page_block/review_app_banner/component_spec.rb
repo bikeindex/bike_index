@@ -9,9 +9,10 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   end
 
   context "when review_app is present" do
-    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:)) }
+    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, current_user:)) }
     let(:pr_number) { nil }
     let(:pr_title) { nil }
+    let(:current_user) { nil }
 
     it "renders the label and disclaimer" do
       expect(component.text).to include("Review app")
@@ -30,6 +31,34 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
         expect(form).to be_present
         expect(form.css("button").text).to eq("sign in as superadmin")
         expect(form.css("input[name='token']").first[:value]).to eq superadmin.reload.magic_link_token
+      end
+
+      # The banner renders on pages served under set_reading_role, so refreshing
+      # the (persisted) token must not raise ActiveRecord::ReadOnlyError
+      it "generates the token under the reading database role" do
+        input = ActiveRecord::Base.connected_to(role: :reading) do
+          render_inline(described_class.new(review_app: "1"))
+            .css("form[action='/session/sign_in_with_magic_link'] input[name='token']").first
+        end
+        expect(input[:value]).to eq superadmin.reload.magic_link_token
+      end
+
+      context "when signed in as the superadmin" do
+        let(:current_user) { superadmin }
+
+        it "shows a signed-in label instead of the button" do
+          expect(component.css("form[action='/session/sign_in_with_magic_link']")).to be_empty
+          expect(component.text).to include("signed in as superadmin")
+        end
+      end
+
+      context "when signed in as another user" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+        it "still renders the sign in button" do
+          expect(component.css("form[action='/session/sign_in_with_magic_link']")).to be_present
+          expect(component.text).not_to include("signed in as superadmin")
+        end
       end
     end
 
