@@ -4,6 +4,10 @@ RSpec.describe Images::ExternalUrlStoreJob, type: :job do
   let(:instance) { described_class.new }
 
   context "valid performance" do
+    # Version generation only defers to CarrierWaveProcessJob with remote (fog)
+    # storage; simulate production since test uses local file storage (inline)
+    before { allow_any_instance_of(PublicImage).to receive(:remote_storage?).and_return(true) }
+
     let(:bike) { FactoryBot.create(:bike) }
     let(:is_private) { false }
     let(:public_image) do
