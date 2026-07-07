@@ -33,9 +33,9 @@
               autofocus: true,
               class: 'form-control'
 
-            .checkbox
+            .checkbox{ class: "tw:mt-4!" }
               %label
                 = f.check_box :remember_me, value: '1', checked: true
                 = t(".keep_me_logged_in")
 
-            = f.submit t(".continue"), class: 'btn btn-primary btn-lg tw:mx-0! tw:mt-6!'
+            = f.submit t(".continue"), class: 'btn btn-primary btn-lg tw:mx-0! tw:mt-4!'
