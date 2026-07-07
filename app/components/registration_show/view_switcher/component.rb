@@ -23,19 +23,26 @@ module RegistrationShow
       end
 
       def button_class
-        UI::Badge::Component.badge_classes(color: @color, size: :sm, solid: @solid, cursor: "tw:cursor-pointer")
+        "#{UI::Badge::Component.badge_classes(color: @color, size: :sm, solid: @solid, cursor: "tw:cursor-pointer")} tw:gap-1"
       end
 
-      def view_label(view)
+      # The part after the italic "View as" in each dropdown entry. Organization
+      # views are an [organization, role] pair.
+      def entry_label(view)
         case view
-        when :public then t("components.registration_show.consumer.audience_public")
-        when :owner then t("components.registration_show.consumer.audience_owner")
-        else view.short_name
+        when :owner then "owner of bike"
+        when :public then "Public"
+        else
+          organization, role = view
+          "#{organization.short_name} #{role}"
         end
       end
 
       def view_param(view)
-        view.is_a?(Organization) ? view.to_param : view.to_s
+        return view.to_s unless view.is_a?(Array)
+
+        organization, role = view
+        "#{organization.to_param}:#{role}"
       end
     end
   end

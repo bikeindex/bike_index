@@ -3,12 +3,15 @@
 module RegistrationShow
   module OrgAdmin
     class Component < ApplicationComponent
-      def initialize(bike:, current_user:, organization:, mapbox_key: nil, available_views: [])
+      # staff: overrides the computed role so a superadmin can view the org
+      # panel as staff or as limited (view_as)
+      def initialize(bike:, current_user:, organization:, mapbox_key: nil, available_views: [], staff: nil)
         @bike = bike
         @current_user = current_user
         @organization = organization
         @mapbox_key = mapbox_key
         @available_views = available_views
+        @force_staff = staff
       end
 
       def render?
@@ -39,6 +42,8 @@ module RegistrationShow
       end
 
       def staff?
+        return @force_staff unless @force_staff.nil?
+
         @current_user.member_bike_edit_of?(@organization)
       end
 

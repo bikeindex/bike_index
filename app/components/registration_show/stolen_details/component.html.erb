@@ -5,8 +5,8 @@
 
   <%= render(RegistrationShow::Map::Component.new(latitude: stolen_record.latitude_public, longitude: stolen_record.longitude_public, mapbox_key: @mapbox_key, precise: stolen_record.show_address)) %>
 
-  <%= render(UI::DefinitionList::Container::Component.new) do %>
-    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.location"), value: stolen_record.address(country: [:skip_default]))) %>
+  <%= render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.location"), value: stolen_record.address(country: [:skip_default]).presence || "No location given")) %>
     <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.locking_description"), value: stolen_record.locking_description)) %>
     <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.locking_circumvented"), value: stolen_record.lock_defeat_description)) %>
     <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.stolen_at"), value: stolen_record.date_stolen, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
