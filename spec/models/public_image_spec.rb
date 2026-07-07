@@ -20,6 +20,40 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  describe "process_image_upload" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }
+
+    context "local file storage (staging/dev)" do
+      it "generates versions inline and does not enqueue the background job" do
+        expect(PublicImageUploader.storage).to eq CarrierWave::Storage::File
+        PublicImageUploader.enable_processing = true
+        public_image = nil
+        expect do
+          public_image = PublicImage.create!(imageable: bike, image: image_file)
+        end.to change(CarrierWaveProcessJob.jobs, :size).by(0)
+        expect(public_image.process_image_upload).to be_truthy
+        expect(File.exist?(public_image.image.small.path)).to be_truthy
+      ensure
+        PublicImageUploader.enable_processing = false
+        public_image&.image&.remove!
+        image_file.close
+      end
+    end
+
+    context "fog storage (production)" do
+      it "defers version generation to the background job" do
+        public_image = PublicImage.new(imageable: bike, image: image_file)
+        allow(public_image).to receive(:remote_storage?).and_return(true)
+        expect do
+          public_image.save!
+        end.to change(CarrierWaveProcessJob.jobs, :size).by(1)
+        expect(public_image.process_image_upload).to be_nil
+        image_file.close
+      end
+    end
+  end
+
   describe "open_file" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec", "fixtures", "bike.jpg"))) }

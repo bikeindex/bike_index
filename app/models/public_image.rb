@@ -84,6 +84,16 @@ class PublicImage < ApplicationRecord
     CallbackJob::AfterBikeSaveJob.perform_async(imageable_id, false, true)
   end
 
+  # CarrierWaveProcessJob generates versions by reading the stored original back
+  # from remote storage, which only works with fog (production). With local file
+  # storage (staging/dev) the worker can't see the web box's disk, so process
+  # versions inline — otherwise the job silently skips them and thumbnails 404.
+  def process_image_upload
+    return true unless remote_storage?
+
+    @process_image_upload
+  end
+
   # Because the way we load the file is different if it's remote or local
   # This is hacky, but whatever
   def local_file?
@@ -98,5 +108,11 @@ class PublicImage < ApplicationRecord
     else
       URI.parse(image.url).open
     end
+  end
+
+  private
+
+  def remote_storage?
+    PublicImageUploader.storage == CarrierWave::Storage::Fog
   end
 end
