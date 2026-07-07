@@ -21,6 +21,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.current_window.resize_to(720, 2000)
     visit new_session_path
     fill_in "Email", with: user.email
+    click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     find(".alert-success .close").click
