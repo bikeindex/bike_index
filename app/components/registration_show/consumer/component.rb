@@ -3,11 +3,14 @@
 module RegistrationShow
   module Consumer
     class Component < ApplicationComponent
-      def initialize(bike:, current_user:, show_for_sale: false)
+      # owner: overrides the computed ownership so the wrapper can force the
+      # public or owner perspective (view_as)
+      def initialize(bike:, current_user:, show_for_sale: false, mapbox_key: nil, owner: nil)
         @bike = bike
         @current_user = current_user
         @show_for_sale = show_for_sale
-        @owner = @current_user.present? && @bike.owner == @current_user
+        @mapbox_key = mapbox_key
+        @owner = owner.nil? ? (@current_user.present? && @bike.owner == @current_user) : owner
       end
 
       private

@@ -122,5 +122,38 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(whitespace_normalized_body_text).to_not match("Admin / Staff")
       end
     end
+
+    context "view_as switching" do
+      let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
+      it "offers a switcher and applies an allowed view_as" do
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("Admin / Staff")
+        expect(response.body).to include("view_as=public")
+
+        get "#{base_url}/#{bike.id}", params: {view_as: "public"}
+        body = whitespace_normalized_body_text
+        expect(body).to_not match("Admin / Staff")
+        expect(body).to match("Public view")
+      end
+
+      it "flashes and falls back when view_as is not permitted" do
+        get "#{base_url}/#{bike.id}", params: {view_as: "owner"}
+        body = whitespace_normalized_body_text
+        expect(body).to match("Admin / Staff")
+        expect(body).to match("not allowed to view this registration")
+      end
+    end
+
+    context "superuser view_as options" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      let!(:brakebills) { FactoryBot.create(:organization, name: "Brakebills") }
+      it "offers the bike's organization and Brakebills as views" do
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("view_as=#{organization.to_param}")
+        expect(response.body).to include("view_as=#{brakebills.to_param}")
+        expect(response.body).to include("view_as=public")
+      end
+    end
   end
 end

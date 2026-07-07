@@ -3,10 +3,11 @@
 module RegistrationShow
   module OrgAdmin
     class Component < ApplicationComponent
-      def initialize(bike:, current_user:, organization:)
+      def initialize(bike:, current_user:, organization:, mapbox_key: nil)
         @bike = bike
         @current_user = current_user
         @organization = organization
+        @mapbox_key = mapbox_key
       end
 
       def render?

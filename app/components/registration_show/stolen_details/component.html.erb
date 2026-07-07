@@ -3,16 +3,7 @@
     <%= t("bikes.main_show_block.stolen_details") %>
   </h2>
 
-  <% if stolen_record.latitude.present? %>
-    <div class="registration-show-stolen tw:mt-3">
-      <style>
-        #map_canvas { width: 100%; height: 320px; border-radius: 4px; }
-        .registration-show-stolen .map-holder { width: 100%; max-width: 100%; padding: 0; flex: 0 0 100%; }
-      </style>
-
-      <%= render partial: "bikes/stolen_map", locals: {mapping_record: stolen_record} %>
-    </div>
-  <% end %>
+  <%= render(RegistrationShow::Map::Component.new(latitude: stolen_record.latitude_public, longitude: stolen_record.longitude_public, mapbox_key: @mapbox_key, precise: stolen_record.show_address)) %>
 
   <%= render(UI::DefinitionList::Container::Component.new) do %>
     <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.location"), value: stolen_record.address(country: [:skip_default]))) %>

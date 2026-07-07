@@ -4,8 +4,9 @@ module RegistrationShow
   module StolenDetails
     # Theft details for a stolen bike — mirrors the legacy show page's stolen block
     class Component < ApplicationComponent
-      def initialize(bike:)
+      def initialize(bike:, mapbox_key: nil)
         @bike = bike
+        @mapbox_key = mapbox_key
       end
 
       def render?

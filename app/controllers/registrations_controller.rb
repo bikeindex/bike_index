@@ -9,7 +9,8 @@ class RegistrationsController < ApplicationController
     @bike = Bike.unscoped.find_id(params[:id])
     fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
 
-    render(show_component, layout: "application")
+    render(RegistrationShow::Wrapper::Component.new(bike: @bike, current_user:, view: current_view,
+      available_views:, mapbox_key: ENV["MAPBOX_MAPPING"]), layout: "application")
   end
 
   def new
@@ -50,16 +51,54 @@ class RegistrationsController < ApplicationController
 
   private
 
-  def show_component
-    if show_admin_redesign?
-      RegistrationShow::OrgAdmin::Component.new(bike: @bike, current_user:, organization: passive_organization)
-    else
-      RegistrationShow::Consumer::Component.new(bike: @bike, current_user:, show_for_sale: @bike.is_for_sale?)
+  # The resolved perspective: :public, :owner, or an Organization (admin view).
+  # A ?view_as param overrides the default, but only to a perspective the user is
+  # allowed — otherwise it flashes and falls back to the default.
+  def current_view
+    return @current_view if defined?(@current_view)
+
+    requested = view_from_param(params[:view_as])
+    if params[:view_as].present? && !available_views.include?(requested)
+      flash.now[:error] = "You're not allowed to view this registration that way"
+      requested = nil
     end
+    @current_view = requested || default_view
   end
 
-  def show_admin_redesign?
-    passive_organization.present? && current_user&.authorized?(passive_organization)
+  # The perspectives the current user may view this bike as
+  def available_views
+    @available_views ||= [
+      (:owner if @bike.owner == current_user),
+      *viewable_organizations,
+      :public
+    ].compact
+  end
+
+  def viewable_organizations
+    return [] if current_user.blank?
+
+    orgs = if current_user.superuser?
+      [passive_organization, @bike.organizations.first, Organization.friendly_find("brakebills")]
+    else
+      current_user.organizations.to_a
+    end
+    orgs.compact.uniq.select { |org| current_user.authorized?(org) }
+  end
+
+  def default_view
+    return passive_organization if passive_organization.present? && current_user&.authorized?(passive_organization)
+    return :owner if @bike.owner == current_user
+
+    :public
+  end
+
+  def view_from_param(param)
+    case param
+    when "public" then :public
+    when "owner" then :owner
+    when nil, "" then nil
+    else Organization.friendly_find(param)
+    end
   end
 
   # Apply the organization_id param (e.g. ?organization_id=false) before the view

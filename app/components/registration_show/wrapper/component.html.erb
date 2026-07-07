@@ -1,0 +1,22 @@
+<div class="tw:flex tw:flex-col">
+  <% if switchable? %>
+    <div
+      class="
+        tw:mx-auto tw:flex tw:w-full tw:max-w-[1440px] tw:justify-end
+        tw:px-2 tw:pt-2
+      "
+    >
+      <%= render(UI::Dropdown::Component.new(name: view_label(@view), button_color: :secondary, button_size: :sm)) do |dropdown| %>
+        <% @available_views.each do |available_view| %>
+          <% dropdown.with_entry_item do %>
+            <%= link_to(view_label(available_view), registration_path(@bike, view_as: view_param(available_view)), class: "tw:block tw:whitespace-nowrap tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700 tw:no-underline tw:hover:bg-gray-100 tw:dark:text-gray-200 tw:dark:hover:bg-gray-800 #{"tw:font-bold" if available_view == @view}") %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% cache(cache_key) do %>
+    <%= render(inner_component) %>
+  <% end %>
+</div>

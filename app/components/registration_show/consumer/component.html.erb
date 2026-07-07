@@ -113,7 +113,7 @@
     </div>
   </dl>
 
-  <%= render(RegistrationShow::StolenDetails::Component.new(bike: @bike)) %>
+  <%= render(RegistrationShow::StolenDetails::Component.new(bike: @bike, mapbox_key: @mapbox_key)) %>
 
   <% if @bike.description.present? %>
     <%= render(UI::Card::Component.new) do %>
