@@ -52,6 +52,27 @@ RSpec.describe SessionsController, type: :request do
         expect(response.body).to_not include('autocomplete="current-password"')
       end
     end
+
+    context "with rack_attack" do
+      include_context :rack_attack
+
+      it "returns 429 after exceeding the per-IP sign-in limit" do
+        # Fresh email per request keeps each under the per-email throttle, so only per-IP trips
+        throttled = rack_attack_throttled_response(limit: 10) do
+          identify("person-#{SecureRandom.hex(4)}@example.com")
+          response
+        end
+        expect(throttled.headers["retry-after"]).to eq "60"
+      end
+
+      it "returns 429 after exceeding the per-email sign-in limit" do
+        throttled = rack_attack_throttled_response(limit: 5) do
+          identify("person@example.com")
+          response
+        end
+        expect(throttled.headers["retry-after"]).to eq "20"
+      end
+    end
   end
 
   describe "create_magic_link" do

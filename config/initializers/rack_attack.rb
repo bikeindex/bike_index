@@ -6,6 +6,9 @@ class Rack::Attack
   CSP_REPORTS_MAX_REQUESTS = ENV.fetch("RACK_ATTACK_CSP_LIMIT", MAX_REQUESTS_PER_TWENTY).to_i
 
   SIGN_IN_PATH = "/session"
+  # Email-first login enters auth at /session/identify (account + org lookup) before
+  # /session (password), so both share the sign-in throttles below.
+  SIGN_IN_PATHS = [SIGN_IN_PATH, "/session/identify"].freeze
   CSP_REPORTS_PATH = "/csp_reports"
 
   SENSITIVE_AUTH_PATHS = %w[
@@ -48,14 +51,14 @@ class Rack::Attack
 
   # Sign-in: 10 per minute per IP
   throttle("sign_in/ip", limit: 10, period: 1.minute) do |request|
-    request.ip if request.post? && request.path == SIGN_IN_PATH
+    request.ip if request.post? && SIGN_IN_PATHS.include?(request.path)
   end
 
   # Sign-in: 5 per 20 seconds per email (protects individual accounts)
   # Note: a malicious user could intentionally throttle logins for
   # another user, but this is uncommon in practice.
   throttle("sign_in/email", limit: 5, period: 20.seconds) do |request|
-    if request.post? && request.path == SIGN_IN_PATH
+    if request.post? && SIGN_IN_PATHS.include?(request.path)
       EmailNormalizer.normalize(request.params.dig("session", "email"))
     end
   end
