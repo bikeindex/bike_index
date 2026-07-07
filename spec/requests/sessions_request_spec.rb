@@ -74,6 +74,17 @@ RSpec.describe SessionsController, type: :request do
     end
   end
 
+  describe "sign_in_with_magic_link" do
+    let!(:superadmin) { FactoryBot.create(:superuser) }
+
+    it "signs in the superadmin with a refreshed token" do
+      post "/session/sign_in_with_magic_link", params: {token: superadmin.refreshed_magic_link_token}
+      expect(response).to redirect_to admin_root_url
+      expect(superadmin.reload.magic_link_token).to be_nil
+      expect(superadmin.last_login_at).to be_within(1.second).of Time.current
+    end
+  end
+
   describe "create" do
     let(:password) { "example_password2" }
     let!(:user) { FactoryBot.create(:user_confirmed, password: password, password_confirmation: password, banned: banned) }

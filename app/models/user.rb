@@ -402,6 +402,14 @@ class User < ApplicationRecord
     Email::MagicLoginLinkJob.perform_async(id)
   end
 
+  # Unlike send_magic_link_email, reuses an unexpired token and sends no email
+  def refreshed_magic_link_token
+    if magic_link_token.blank? || auth_token_expired?("magic_link_token")
+      update_auth_token("magic_link_token")
+    end
+    magic_link_token
+  end
+
   def update_last_login(ip_address)
     save! unless id.present? # throw an error that shows why the user isn't created
     update_columns(last_login_at: Time.current, last_login_ip: ip_address)
