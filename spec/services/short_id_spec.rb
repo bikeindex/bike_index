@@ -8,6 +8,13 @@ RSpec.describe ShortId do
       expect(ShortId.encode("MarketplaceListing", 3431156)).to eq "m/21J-HW"
       expect(ShortId.encode("Bike", nil)).to be_nil
     end
+    it "keeps ids with an under-3-digit base36 form as decimals, round-tripping cleanly" do
+      [1, 35, 36, 37, 1295].each do |id|
+        short_id = ShortId.encode("Bike", id)
+        expect(short_id).to eq "r/#{id}"
+        expect(ShortId.decode("Bike", short_id)).to eq id.to_s
+      end
+    end
   end
 
   describe "decode" do

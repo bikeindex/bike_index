@@ -1,18 +1,24 @@
 ---
 name: sandbox-test-setup
 description: >-
-  Bike Index Ruby + RSpec environment setup. Two environments:
+  Bike Index Ruby + RSpec environment setup. Three environments:
   **(A) local macOS Conductor workspace** (`/Users/…/conductor/workspaces/…`) —
-  Ruby 4.0.2 is installed via mise but Claude Code's shell sometimes
+  Ruby is installed via mise but Claude Code's shell sometimes
   spawns subprocesses without the mise shim, so bare `ruby`/`bundle`
   falls back to system 2.6 and fails with `Could not find 'bundler'
   (4.0.0.beta2)`. Fix is a PATH prefix, not a reinstall.
-  **(B) Claude Code's Linux web sandbox** (`/home/user/bike_index`) —
-  Ruby 4.0.2 must be built from source (~8–10 min, `cache.ruby-lang.org`
+  **(B) Conductor cloud sandbox** (`/home/vercel-sandbox/workspace`,
+  Amazon Linux 2023) — nothing is preinstalled, so bare `ruby`/`bundle`/
+  `bin/lint` fail with `env: 'ruby': No such file or directory`. Egress is
+  open (unlike C), so install mise + dnf build deps and let `mise install`
+  compile the pinned Ruby (~2 min).
+  **(C) Claude Code's Linux web sandbox** (`/home/user/bike_index`) —
+  Ruby must be built from GitHub source (~8–10 min, `cache.ruby-lang.org`
   firewalled); also postgres/redis, tailwind build, Chrome-matching
   ChromeDriver, and a local jsdelivr proxy for `:js, type: :system`
   specs. Trigger whenever a session runs RSpec/bundle/`bin/lint`, or
-  the user reports `Bundler::RubyVersionMismatch` /
+  the user reports `env: 'ruby': No such file or directory` /
+  `Bundler::RubyVersionMismatch` /
   `Could not find 'bundler' (4.0.0.beta2)` /
   `command not found: rspec` / `tailwind.css is not present` /
   chromedriver version-mismatch.
@@ -20,9 +26,10 @@ description: >-
 
 # Running Ruby + RSpec for Bike Index
 
-Pick the section matching the environment: macOS paths under
-`/Users/…/conductor/workspaces/…` use **Local macOS**; Linux paths
-under `/home/user/bike_index` use **Claude Code web sandbox**.
+Pick the section matching the environment by its path: macOS paths under
+`/Users/…/conductor/workspaces/…` use **Local macOS**;
+`/home/vercel-sandbox/workspace` on Amazon Linux uses **Conductor cloud
+sandbox**; `/home/user/bike_index` uses **Claude Code web sandbox**.
 
 ## Local macOS (Conductor workspace)
 
@@ -63,6 +70,67 @@ and the jsdelivr proxy are handled by your local dev environment —
 skip the rest of this skill **except** Tailwind build below, which
 can still bite a fresh Conductor workspace where `bin/dev` hasn't
 run.
+
+## Conductor cloud sandbox (Amazon Linux)
+
+Identify by the path `/home/vercel-sandbox/workspace` on Amazon Linux 2023
+(`ID_LIKE=fedora`, `dnf`, user `vercel-sandbox` with passwordless `sudo`).
+**Nothing is preinstalled** — no mise, no Ruby, no compiler — so bare
+`ruby`/`bundle`/`bin/lint` fail with `env: 'ruby': No such file or directory`.
+
+Unlike the web sandbox (C), egress here is wide open: `cache.ruby-lang.org`,
+`rubygems.org`, `registry.npmjs.org`, `cdn.jsdelivr.net`, and `api.github.com`
+are all reachable. So take mise's normal build path — **skip the
+GitHub-source hand-build and the jsdelivr proxy**; neither is needed here.
+
+### One-time setup (~2–3 min)
+
+```bash
+# 1. Compiler + headers (mise/ruby-build compiles Ruby from source).
+#    shared-mime-info is required: the mimemagic gem errors at install without it.
+sudo dnf install -y gcc gcc-c++ make openssl-devel readline-devel \
+  zlib-devel libyaml-devel libffi-devel gdbm-devel ncurses-devel \
+  shared-mime-info
+
+# 2. Install mise (not preinstalled)
+curl -fsSL https://mise.run | sh          # -> ~/.local/bin/mise
+
+# 3. Build the Ruby + Node pinned in mise.toml. `mise install` reads the file;
+#    the Ruby compile is ~2 min because cache.ruby-lang.org is reachable here.
+export PATH="$HOME/.local/bin:$PATH"
+cd /home/vercel-sandbox/workspace
+mise trust --yes
+mise install
+```
+
+### Each shell
+
+Activate mise so its shims put the pinned Ruby and a matching Bundler on PATH
+(Bundler 4.0.x ships as a default gem — no separate `gem install bundler`):
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+eval "$(mise activate bash)"
+ruby --version      # => ruby 4.0.5 ... [x86_64-linux]
+bundle install      # ~8s once shared-mime-info is present; vendor/bundle + .bundle are gitignored
+```
+
+`bin/lint`, `bundle exec rspec`, etc. then work normally. If a subprocess
+drops the mise shim (same harness quirk as Local macOS), prefix the install
+dir directly instead of reactivating (match the version in `mise.toml`):
+
+```bash
+export PATH="$HOME/.local/share/mise/installs/ruby/4.0.5/bin:$PATH"
+```
+
+### Database-backed specs
+
+Postgres and redis aren't preinstalled here either. Install the server packages
+from dnf (`dnf search postgresql` / `dnf search redis` for the current version
+suffix), start the daemons, then the psql / db:migrate steps in **Services + DB**
+below apply unchanged (that section's `service …` / `apt` wording is web-sandbox
+specific, but the SQL and Rails commands are the same). Tailwind (below) still
+applies to any spec that renders the layout.
 
 ## Claude Code web sandbox
 

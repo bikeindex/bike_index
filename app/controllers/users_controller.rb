@@ -178,7 +178,7 @@ class UsersController < ApplicationController
   def permitted_parameters
     params.require(:user)
       .permit(:name, :email, :notification_newsletters, :notification_unstolen, :terms_of_service,
-        :password, :password_confirmation, :preferred_language)
+        :password, :password_confirmation, :preferred_language, :additional)
       .merge(sign_in_partner.present? ? {partner_data: {sign_up: sign_in_partner}} : {})
   end
 

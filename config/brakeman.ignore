@@ -3,40 +3,6 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "077c5f6dca08a24f14c7748a921fbc405d6c5c2a7efeb00cef88db55b1e1d02f",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/admin/ambassador_tasks/index.html.haml",
-      "line": 20,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "(Unresolved Model).new.description_html",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::AmbassadorTasksController",
-          "method": "index",
-          "line": 6,
-          "file": "app/controllers/admin/ambassador_tasks_controller.rb",
-          "rendered": {
-            "name": "admin/ambassador_tasks/index",
-            "file": "app/views/admin/ambassador_tasks/index.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "admin/ambassador_tasks/index"
-      },
-      "user_input": null,
-      "confidence": "High",
-      "cwe_id": [
-        79
-      ],
-      "note": "Admin-only view. ambassador_task.description_html is admin-authored content intentionally rendered as HTML"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
       "fingerprint": "0ffefb46fb11b12f2129c2b96c51cade952dc489a83a3a4886062071e2ad6410",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped model attribute",
@@ -1946,6 +1912,40 @@
         22
       ],
       "note": "File path uses only model timestamps via strftime(), no user-controlled path components"
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "cb4a67d9c3bfb893b4103e366c427ea99a52baffc8363f8067fda06007e01b98",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/admin/bug_reports/show.html.erb",
+      "line": 68,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(BugReport.find(params[:id]).github_pull_request_url, :class => \"twlink\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::BugReportsController",
+          "method": "show",
+          "line": 25,
+          "file": "app/controllers/admin/bug_reports_controller.rb",
+          "rendered": {
+            "name": "admin/bug_reports/show",
+            "file": "app/views/admin/bug_reports/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admin/bug_reports/show"
+      },
+      "user_input": "BugReport.find(params[:id]).github_pull_request_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "github_pull_request is an integer column interpolated into a constant GitHub URL"
     }
   ],
   "brakeman_version": "8.0.4"

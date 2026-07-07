@@ -31,6 +31,27 @@ RSpec.describe PublicImagesController, type: :request do
           expect(bike.reload.updated_at).to be_within(1).of Time.current
           expect(bike.public_images.first.name).to eq "cool name"
         end
+        context "with an image file" do
+          let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
+          it "renders the original and wires the image-fallback for the backgrounded versions" do
+            # Versions only defer to the job with remote (fog) storage; simulate production
+            # since test uses local file storage, which processes inline
+            allow_any_instance_of(PublicImage).to receive(:remote_storage?).and_return(true)
+            Sidekiq::Job.clear_all
+            post base_url, params: {bike_id: bike.id, public_image: {image: file}, format: :js}
+            expect(response).to have_http_status(:ok)
+            public_image = bike.reload.public_images.first
+            expect(public_image.image).to be_present
+            expect(CarrierWaveProcessJob.jobs.count).to eq 1 # version generation deferred
+            # freshly stored original is shown immediately; if a version url 404s before the
+            # worker finishes, image_fallback_controller swaps back to this original
+            expect(response.body).to include("/uploads/Pu/#{public_image.id}/bike.jpg")
+            expect(response.body).to_not include("small_bike.jpg")
+            expect(response.body).to include("image-fallback")
+            expect(response.body).to include("useOriginal")
+            public_image.image.remove!
+          end
+        end
         context "user hidden" do
           it "creates an image" do
             bike.update(marked_user_hidden: true)

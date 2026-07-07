@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe Org::RegistrationSearch::Component, :js, type: :system do
   let(:preview_path) { "/rails/view_components/org/registration_search/component/default" }
-  let!(:organization) { FactoryBot.create(:organization_hogwarts) }
+  let!(:organization) { FactoryBot.create(:organization_brakebills) }
   let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 
   before do

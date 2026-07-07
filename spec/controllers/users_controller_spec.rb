@@ -271,6 +271,21 @@ RSpec.describe UsersController, type: :controller do
         end
       end
     end
+    context "honeypot filled" do
+      it "creates the user but email bans them as spam" do
+        expect {
+          post :create, params: {user: user_attributes.merge(additional: "http://spam.example.com")}
+        }.to change(User, :count).by(1)
+        user = User.order(:created_at).last
+        expect(user.email_banned?).to be_truthy
+        email_ban = user.email_bans.last
+        expect(email_ban.reason).to eq "honeypot"
+        # The ban blocks the confirmation email, so the account can't be activated
+        expect {
+          Email::ConfirmationJob.new.perform(user.id)
+        }.to_not change(ActionMailer::Base.deliveries, :count)
+      end
+    end
     context "revised" do
       let(:user_attrs) do
         {
