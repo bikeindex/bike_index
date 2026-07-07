@@ -619,6 +619,18 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "refreshed_magic_link_token" do
+    let(:user) { FactoryBot.create(:user) }
+
+    it "generates a token, reuses it while unexpired, replaces it once expired" do
+      token = user.refreshed_magic_link_token
+      expect(token).to be_present
+      expect(user.refreshed_magic_link_token).to eq token
+      user.update_auth_token("magic_link_token", (Time.current - 3.hours).to_i)
+      expect(user.refreshed_magic_link_token).to_not eq token
+    end
+  end
+
   describe "update_last_login" do
     let(:user) { FactoryBot.create(:user) }
     let(:update_time) { Time.current - 3.hours }
