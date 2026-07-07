@@ -25,11 +25,9 @@
   <% end %>
   <% if superadmin %>
     &middot;
-    <%= button_to translation(".superadmin_button"), sign_in_with_magic_link_session_path,
-      params: {token: superadmin.refreshed_magic_link_token},
-      form_class: "tw:inline-block",
-      class: "tw:cursor-pointer tw:rounded tw:bg-[#1e881e] tw:px-2 tw:py-0.5 tw:text-xs " \
-        "tw:font-normal tw:text-white tw:hover:bg-[#166016] " \
-        "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40" %>
+    <%= form_with url: sign_in_with_magic_link_session_path, class: "tw:inline-block tw:align-middle" do %>
+      <%= hidden_field_tag :token, superadmin.refreshed_magic_link_token %>
+      <%= render UI::Button::Component.new(text: translation(".superadmin_button"), kind: :submit, size: :sm) %>
+    <% end %>
   <% end %>
 </div>
