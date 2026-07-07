@@ -30,16 +30,22 @@ Then review the changed files against the repo's `CLAUDE.md` (root and any neste
 
 Any edits from this step get picked up by the branch-state and push steps below — don't separately commit them here; the normal commit/push in step 3 handles it.
 
+### 0.5. Determine the base branch
+
+The base is `main` **unless** the user explicitly named a different one — either as a `--base <branch>` argument to this skill or in their request (e.g. "open a PR off `sethherr/foo`", "base this on `release-2`", "stacked on `<branch>`"). Set `BASE` to that branch and use it everywhere `main` appears below — the diff/log commands in step 1, the summary, and `gh pr create --base`. Never silently retarget an explicitly-requested base to `main`.
+
+When updating an **existing** PR, leave its base untouched: run `gh pr edit` without `--base` (which preserves the current base). Only change an existing PR's base when the user explicitly asks you to retarget it.
+
 ### 1. Gather branch state
 
-Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback. Then run in parallel:
+Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback. Then run in parallel (using `$BASE` from step 0.5):
 - `git status` (no `-uall`)
-- `git diff main...HEAD --stat`
-- `git diff main...HEAD --name-only`
-- `git log main..HEAD --oneline`
+- `git diff "$BASE"...HEAD --stat`
+- `git diff "$BASE"...HEAD --name-only`
+- `git log "$BASE"..HEAD --oneline`
 - `EXISTING_PR=$(gh pr view --json number,url,title 2>/dev/null)` — capture for step 3.
 
-If the branch has no commits ahead of `main`, stop and tell the user.
+If the branch has no commits ahead of `$BASE`, stop and tell the user.
 
 ### 2. Classify the diff
 
@@ -72,7 +78,7 @@ Describe the end state, not the journey. Reviewers want to know what the PR does
 Push the branch: `git push -u origin HEAD`.
 
 - If `$EXISTING_PR` from step 1 was non-empty: `gh pr edit <num> --title "..." --body-file <tmp-body-file>`. Refresh the title to match the current diff (this is what an "update pr" request expects) unless the user already gave the PR a deliberate custom title you'd be clobbering — if unsure, keep the existing title and only update the body.
-- Otherwise: `gh pr create --draft --base main --title "..." --body-file <tmp-body-file>`. Create as a draft by default; only omit `--draft` (or mark ready) if the user explicitly asks for a ready-for-review PR. Capture the PR number from the output.
+- Otherwise: `gh pr create --draft --base "$BASE" --title "..." --body-file <tmp-body-file>` (`$BASE` from step 0.5). Create as a draft by default; only omit `--draft` (or mark ready) if the user explicitly asks for a ready-for-review PR. Capture the PR number from the output.
 
 Always pass the body via `--body-file` (not inline `--body`) to preserve formatting.
 
@@ -106,13 +112,13 @@ Invoke the `github-upload-image-to-pr` skill to upload each PNG from step 5 to t
 
 Collect the returned URLs, keyed by `(page-slug, viewport)`.
 
-### 6.5 Capture and upload the same URLs on `main`
+### 6.5 Capture and upload the same URLs on the base branch
 
-Capture the **base-branch** version of every screenshot from step 5 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you reached step 5 at all, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
+Capture the **base-branch** (`$BASE` from step 0.5) version of every screenshot from step 5 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you reached step 5 at all, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
 
-Skip per-page only when the URL didn't exist on `main` (a brand-new route or page added in this PR) — there's nothing to compare to.
+Skip per-page only when the URL didn't exist on `$BASE` (a brand-new route or page added in this PR) — there's nothing to compare to.
 
-Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against `main` (its step 6 — git checkout dance, captures into `...-main-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs.
+Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against `$BASE` (its step 6 — git checkout dance, captures into `...-base-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs.
 
 ### 7. Post the Screenshots section as the first PR comment
 
@@ -128,9 +134,9 @@ SCREENSHOT_COMMENT_ID=$(gh api repos/{owner}/{repo}/issues/{PR_NUMBER}/comments 
 - If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment <num> --body-file <tmp-comment-file>`.
 - Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body=@<tmp-comment-file>`.
 
-**Headers are always `| Desktop | Mobile |`** — that stays the same regardless of whether there's a main comparison. The main shots and branch shots stack as additional rows, with a small indicator row between them when both are present.
+**Headers are always `| Desktop | Mobile |`** — that stays the same regardless of whether there's a base-branch comparison. The base-branch shots and branch shots stack as additional rows, with a small indicator row between them when both are present.
 
-Default (with main comparison):
+Default (with base-branch comparison — use the actual base name from `$BASE`, e.g. `main`, in the indicator row):
 
 ```markdown
 ## Screenshots
@@ -139,12 +145,12 @@ Default (with main comparison):
 
 | Desktop | Mobile |
 | --- | --- |
-| <img src="<main-desktop-url>" width="500"> | <img src="<main-mobile-url>" width="250"> |
-| main 👆 | this branch 👇 |
+| <img src="<base-desktop-url>" width="500"> | <img src="<base-mobile-url>" width="250"> |
+| $BASE 👆 | this branch 👇 |
 | <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
 ```
 
-Brand-new page (URL didn't exist on `main` — see step 6.5), no comparison row:
+Brand-new page (URL didn't exist on `$BASE` — see step 6.5), no comparison row:
 
 ```markdown
 ### <url-path>
