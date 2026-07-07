@@ -681,6 +681,26 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+  context "bike_show_redesign flag" do
+    it "renders the legacy page when the flag is disabled" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+    end
+
+    context "flag enabled" do
+      before { Flipper.enable(:bike_show_redesign) }
+
+      it "redirects to the redesigned registration page" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to redirect_to(registration_path(bike))
+      end
+
+      it "still renders the qr code png" do
+        get "#{base_url}/#{bike.id}.png"
+        expect(response.status).to eq(200)
+      end
+    end
+  end
   context "qr code png" do
     it "renders" do
       get "#{base_url}/#{bike.id}.png"
