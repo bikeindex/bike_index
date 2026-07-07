@@ -1,4 +1,6 @@
-system "bin/rake setup:import_spreadsheets"
+# Abort loudly if the import fails: later steps (e.g. seed_manufacturer_priorities)
+# depend on this reference data and would otherwise raise a misleading error.
+abort "Seeding failed: bin/rake setup:import_spreadsheets" unless system("bin/rake setup:import_spreadsheets")
 
 # Set Cgroup display order; the import assigns priority by CSV row order, which isn't what we want
 cgroup_priorities = [["Frame and Fork", 1], ["Wheels", 2], ["Drivetrain", 3], ["Brakes", 4], ["Cargo", 5], ["Additional Parts", 6]]

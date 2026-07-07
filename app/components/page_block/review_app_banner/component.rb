@@ -8,10 +8,11 @@ module PageBlock
     # `ENV["REVIEW_APP_PR_TITLE"]`; the component renders only when `review_app`
     # is present.
     class Component < ApplicationComponent
-      def initialize(review_app:, pr_number: nil, pr_title: nil)
+      def initialize(review_app:, pr_number: nil, pr_title: nil, current_user: nil)
         @review_app = review_app
         @pr_number = pr_number
         @pr_title = pr_title
+        @current_user = current_user
       end
 
       def render?
@@ -34,6 +35,18 @@ module PageBlock
         return @superadmin if defined?(@superadmin)
 
         @superadmin = User.admins.first
+      end
+
+      def signed_in_as_superadmin?
+        @current_user.present? && @current_user == superadmin
+      end
+
+      # Refreshing the token persists it, so force the writing role: the banner
+      # renders on pages (e.g. bikes#show) served under set_reading_role.
+      def superadmin_magic_link_token
+        ActiveRecord::Base.connected_to(role: :writing) do
+          superadmin.refreshed_magic_link_token
+        end
       end
     end
   end
