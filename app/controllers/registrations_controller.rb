@@ -112,7 +112,7 @@ class RegistrationsController < ApplicationController
     when "owner" then :owner
     when nil, "" then nil
     else
-      slug, role = param.split(":", 2)
+      slug, role = param.split(".", 2)
       org = Organization.friendly_find(slug)
       org && [org, (role == "limited") ? :limited : :staff]
     end

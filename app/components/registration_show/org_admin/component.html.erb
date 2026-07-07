@@ -27,7 +27,12 @@
     </div>
 
     <div class="tw:text-right">
-      <p class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+      <p
+        class="
+          tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+          tw:uppercase
+        "
+      >
         <%= translation(".registration") %>
       </p>
 
@@ -80,7 +85,12 @@
 
       <% if archive_images.any? %>
         <%= render(UI::Card::Component.new) do %>
-          <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+          <h2
+            class="
+              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+              tw:uppercase
+            "
+          >
             <%= translation(".photo_archive") %>
           </h2>
 
@@ -105,57 +115,118 @@
         <% end %>
       <% end %>
 
-      <%= render(RegistrationShow::StolenDetails::Component.new(bike: @bike, mapbox_key: @mapbox_key)) %>
+      <%= render(RegistrationShow::StolenDetails::Component.new(bike: @bike, current_user: @current_user, mapbox_key: @mapbox_key)) %>
+
+      <%= render(UI::Card::Component.new) do %>
+        <h2
+          class="
+            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+            tw:uppercase
+          "
+        >
+          <%= t("components.registration_show.consumer.this_bike_on_bike_index", bike_type: @bike.type) %>
+        </h2>
+
+        <div class="tw:mt-3">
+          <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+            <% if color_swatches.any? %>
+              <%= render(UI::DefinitionList::Row::Component.new(label: primary_colors_label)) do %>
+                <%= safe_join(color_swatches, content_tag(:span, " and ", class: "tw:font-normal tw:text-gray-400")) %>
+              <% end %>
+            <% end %>
+
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("components.registration_show.consumer.frame_material"), value: @bike.frame_material_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("components.registration_show.consumer.activity"), value: activity_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("components.registration_show.consumer.id"))) { render(UI::ShortId::Component.new(record: @bike)) } %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("components.registration_show.consumer.registered_since"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
+
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".credibility"))) do %>
+              <%= render(UI::Tooltip::Component.new) do |tooltip| %>
+                <% tooltip.with_body do %>
+                  <span class="tw:block tw:text-left">
+                    <span class="tw:mb-1 tw:block tw:font-semibold">
+                      Factors in score
+                    </span>
+
+                    <% credibility_badges.each do |badge, value| %>
+                      <span class="tw:flex tw:justify-between tw:gap-4">
+                        <span>
+                          <%= CredibilityScorer.humanize_badge(badge) %>
+                        </span>
+
+                        <span class="<%= "tw:text-red-600" if value.negative? %>">
+                          <%= value %>
+                        </span>
+                      </span>
+                    <% end %>
+                  </span>
+                <% end %>
+
+                <span
+                  class="
+                    tw:inline-block tw:rounded tw:px-2 tw:py-0.5
+                    tw:font-bold tw:text-white
+                  "
+                  style="background-color: <%= credibility_color %>"
+                >
+                  <%= credibility_score %>
+                </span>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= render(UI::Card::Component.new) do %>
+        <h2
+          class="
+            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+            tw:uppercase
+          "
+        >
+          <%= translation(".bike_details", bike_type: @bike.type_titleize) %>
+        </h2>
+
+        <div class="tw:mt-3">
+          <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.serial"))) { helpers.render_serial_display(@bike, @current_user) } %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.other_serial"), value: @bike.extra_registration_number)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.vehicle_type"), value: vehicle_type)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.manufacturer"), value: manufacturer_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.model"), value: @bike.frame_model)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.year"), value: @bike.year)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.frame_material"), value: @bike.frame_material_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.frame_size"), value: @bike.frame_size&.upcase)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.handlebar_type"), value: @bike.handlebar_type_name)) %>
+          <% end %>
+        </div>
+      <% end %>
 
       <% if @bike.description.present? %>
         <%= render(UI::Card::Component.new) do %>
-          <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
-            <%= translation(".about_this_bike") %>
+          <h2
+            class="
+              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+              tw:uppercase
+            "
+          >
+            <%= translation(".about_this_bike", bike_type: @bike.type) %>
           </h2>
 
           <p class="tw:mt-2"><%= @bike.description %></p>
         <% end %>
       <% end %>
 
-      <%= render(UI::Card::Component.new) do %>
-        <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
-          <%= translation(".bike_details") %>
-        </h2>
-
-        <%= render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"))) { helpers.render_serial_display(@bike, @current_user) } %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registration_number"))) { render(UI::ShortId::Component.new(record: @bike)) } %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".credibility"), value: "#{credibility_score} · #{duplicate_serial_note}")) %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: manufacturer_name)) %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".model"), value: @bike.frame_model)) %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".year"), value: @bike.year)) %>
-
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".primary_colors"))) do %>
-            <span class="tw:flex tw:items-center tw:gap-1.5">
-              <% if primary_color_hex.present? %>
-                <span
-                  class="
-                    tw:inline-block tw:h-3 tw:w-3 tw:rounded-xs tw:border
-                    tw:border-gray-300
-                  "
-                  style="background-color: <%= primary_color_hex %>"
-                ></span>
-              <% end %>
-
-              <%= @bike.frame_colors.to_sentence %>
-            </span>
-          <% end %>
-
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_size"), value: @bike.frame_size&.upcase)) %>
-        <% end %>
-      <% end %>
-
-      <%= render(RegistrationShow::ComponentList::Component.new(bike: @bike)) %>
+      <%= render(RegistrationShow::ComponentList::Component.new(bike: @bike, collapsed: true)) %>
 
       <% if show_notes? %>
         <%= render(UI::Card::Component.new) do %>
-          <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+          <h2
+            class="
+              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+              tw:uppercase
+            "
+          >
             <%= translation(".internal_notes") %>
           </h2>
 
@@ -193,7 +264,12 @@
       <% if show_contact? && other_user_bikes.count > 1 %>
         <%= render(UI::Card::Component.new) do %>
           <div class="tw:flex tw:items-baseline tw:justify-between">
-            <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+            <h2
+              class="
+                tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+                tw:uppercase
+              "
+            >
               <%= translation(".other_registrations") %>
             </h2>
 
@@ -216,7 +292,7 @@
 
                 <% if other_bike.id == @bike.id %>
                   <em class="tw:opacity-65">
-                    <%= translation(".this_bike") %>
+                    <%= translation(".this_bike", bike_type: @bike.type) %>
                   </em>
                 <% else %>
                   <%= link_to other_bike.title_string, bike_path(other_bike), class: "twlink tw:text-right" %>
@@ -230,12 +306,17 @@
 
     <div class="tw:flex tw:flex-col tw:gap-6">
       <%= render(UI::Card::Component.new) do %>
-        <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+        <h2
+          class="
+            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+            tw:uppercase
+          "
+        >
           <%= translation(".owner_access") %>
         </h2>
 
         <% if show_contact? %>
-          <%= render(UI::DefinitionList::Container::Component.new) do %>
+          <%= render(UI::DefinitionList::Container::Component.new(term: :right_align)) do %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_name"), value: @bike.owner_name)) %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_email"))) { link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") } %>
 
@@ -253,11 +334,11 @@
               "
             >
               <p class="tw:text-sm tw:font-bold">
-                <%= translation(".org_can_edit", org_name: @organization.short_name) %>
+                <%= translation(".org_can_edit", org_name: @organization.short_name, bike_type: @bike.type) %>
               </p>
 
               <p class="tw:mt-1 tw:text-xs tw:opacity-65">
-                <%= translation(".org_can_edit_sub") %>
+                <%= translation(".org_can_edit_sub", bike_type: @bike.type) %>
               </p>
 
               <div class="tw:mt-2 tw:flex tw:gap-4">
@@ -289,7 +370,12 @@
       <% end %>
 
       <%= render(UI::Card::Component.new) do %>
-        <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+        <h2
+          class="
+            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+            tw:uppercase
+          "
+        >
           <%= translation(".e_vehicle_compliance") %>
         </h2>
 
@@ -334,7 +420,12 @@
 
       <% if show_parking_notifications? %>
         <%= render(UI::Card::Component.new) do %>
-          <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+          <h2
+            class="
+              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+              tw:uppercase
+            "
+          >
             <%= translation(".parking_notifications") %>
           </h2>
 

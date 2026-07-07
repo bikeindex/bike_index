@@ -39,7 +39,7 @@ module RegistrationShow
         return @view.to_s unless @view.is_a?(Array)
 
         organization, role = @view
-        "#{organization.to_param}:#{role}"
+        "#{organization.to_param}.#{role}"
       end
     end
   end

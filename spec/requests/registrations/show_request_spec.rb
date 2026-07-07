@@ -80,6 +80,12 @@ RSpec.describe "RegistrationsController#show", type: :request do
         # Theft details always show a location row, even with no location on file
         expect(body).to match("No location given")
       end
+
+      it "includes the owner phone in theft details when phone visibility permits" do
+        stolen_record.update(phone: "3025551234", phone_for_everyone: true)
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("3025551234")
+      end
     end
   end
 
@@ -168,7 +174,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
 
       it "can view an org panel as limited" do
-        get "#{base_url}/#{bike.id}", params: {view_as: "#{brakebills.to_param}:limited"}
+        get "#{base_url}/#{bike.id}", params: {view_as: "#{brakebills.to_param}.limited"}
         body = whitespace_normalized_body_text
         expect(body).to match("Limited")
         expect(body).to_not match("Admin / Staff")

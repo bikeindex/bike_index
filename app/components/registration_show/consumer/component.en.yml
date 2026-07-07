@@ -3,20 +3,22 @@ en:
   components:
     registration_show:
       consumer:
-        about_this_bike: About this bike
+        about_this_bike: "About this %{bike_type}"
         activity: Activity
-        audience_owner: Your bike
+        audience_owner: "Your %{bike_type}"
         audience_public: Public view
-        audience_sent_away: No longer your bike
-        color: Color
-        frame: Frame
+        audience_sent_away: "No longer your %{bike_type}"
+        bike_details: "%{bike_type} details"
+        frame_material: Frame material
+        id: ID
         mark_stolen: Mark stolen
         not_stolen: Not stolen
-        registered: Registered
+        primary_color: Primary color
+        primary_colors: Primary colors
         registered_protected: Registered & protected
+        registered_since: Registered since
         sell_on_marketplace: Sell on Marketplace
         share: Share
         share_my_page: Share my page
-        status: Status
         stolen: Stolen
-        year: Year
+        this_bike_on_bike_index: "This %{bike_type} on Bike Index"
