@@ -3,9 +3,11 @@ name: frontend-conventions
 description: >-
   Bike Index's frontend conventions — Tailwind class prefixing (`tw:`),
   the standard `twinput`/`twlabel`/`twlink` form/link classes, the
-  `number_display` helper for numbers, and ViewComponent rules (keyword
-  arguments, instance variables, `helpers.` prefix in templates), and
-  `UI::Time::Component` for every date/time. Trigger
+  `number_display` helper for numbers, the UI component library rule
+  (every button is `UI::Button`/`UI::ButtonLink`, never hand-rolled
+  markup), ViewComponent rules (keyword arguments, instance variables,
+  `helpers.` prefix in templates), and `UI::Time::Component` for every
+  date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
   controllers, Tailwind classes, or any frontend code that touches styling
   or interactivity. **Also trigger before any
@@ -36,6 +38,15 @@ The `bin/dev` command handles building and updating Tailwind and JS.
   - "Number" includes years, counts, prices, distances, IDs — anything numeric, even when it reads like a label.
 - **Currency amounts** use `amount_display(obj)` instead of `number_display` directly. It takes an object that responds to `amount_cents`, `amount`, `currency_symbol`, and `currency_name` (e.g. a `MarketplaceListing`), and renders the symbol + `number_display(amount)` together. Don't reach for `number_to_currency` or roll your own.
 - **Every date/time** renders through `UI::Time::Component` — `render(UI::Time::Component.new(time: some_time))`. It emits the client-localized `localizeTime` span the frontend JS converts to the viewer's timezone. This is the *only* way to show a time: never `l(time, ...)`, `strftime`, `time_ago_in_words`, or a hand-written `localizeTime` span. Pass `format: :localize_time_precise` when you need seconds precision (default is `:localize_time`). It self-hides when `time` is nil, so no surrounding `if` guard is needed.
+
+## Buttons: always `UI::Button` (and the UI component library generally)
+
+**Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (`:primary`/`:secondary`/`:error`/`:link`), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
+
+- Plain button or form submit: `render UI::Button::Component.new(text: "Save", color: :primary, kind: :submit)`. For a POST with params, wrap in `form_with`/`form_tag` + `hidden_field_tag` — `button_to` can't render a component, so don't reach for it.
+- A link styled as a button: `UI::ButtonLink::Component.new(href:, text:, color:, size:)` — same palette, renders an `<a>`.
+
+The same instinct applies beyond buttons: **check `app/components/ui/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, badges, modals, pagination, tables…). If a `UI::*` component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
 
 ## No dead hooks in markup
 
