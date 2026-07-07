@@ -1,4 +1,6 @@
-system "bin/rake setup:import_spreadsheets"
+# Abort loudly if the import fails: later steps (e.g. seed_manufacturer_priorities)
+# depend on this reference data and would otherwise raise a misleading error.
+abort "Seeding failed: bin/rake setup:import_spreadsheets" unless system("bin/rake setup:import_spreadsheets")
 
 # NOTE: this does not seed manufacturers, primary_activities or components, those are pulled via rake task
 require File.expand_path("db/seeds/seed_helpers", Rails.root)
