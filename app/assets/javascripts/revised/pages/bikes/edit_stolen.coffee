@@ -13,11 +13,9 @@ class BikeIndex.BikesEditStolen extends BikeIndex
   initializeEventListeners: ->
     $('#toggle-stolen form').submit (e) =>
       e.preventDefault()
+      # recoveredRequestCallback redirects once recovery succeeds. Redirecting here
+      # would race a slow request, navigating away before the bike is recovered.
       @markRecovered()
-      setTimeout (->
-        # Should redirect to the default page - which should no longer be a stolen page
-        window.location = window.location.pathname
-      ), 500
 
   recoveredRequestCallback: (message, success) ->
     if success
@@ -26,6 +24,9 @@ class BikeIndex.BikesEditStolen extends BikeIndex
       redirect_url = window.location.href.replace(window.location.search, "")
       window.BikeIndexAlerts.add('success', msg, () -> window.location.href = redirect_url)
     else
+      # Recovery failed - hide the spinner and restore the button so they can retry
+      $('#mark_recovered_spinner').hide()
+      $('#mark_recovered_action').show()
       msg = "Oh no! Something went wrong and we couldn't mark your bike recovered."
       window.BikeIndexAlerts.add('error', msg)
 
@@ -36,6 +37,10 @@ class BikeIndex.BikesEditStolen extends BikeIndex
     did_we_help = $('#mark_recovered_we_helped').prop('checked')
     can_share_recovery = $('#mark_recovered_can_share_recovery').prop('checked')
     if reason.length > 0 && bike_id.length > 0
+      # SubmitUserRequest hides the modal, so show the spinner on the page behind it
+      # to signal the pending request until recoveredRequestCallback redirects
+      $('#mark_recovered_action').hide()
+      $('#mark_recovered_spinner').show()
       data =
         request_type: 'bike_recovery'
         request_bike_id: bike_id

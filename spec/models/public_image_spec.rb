@@ -20,19 +20,57 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
-  describe "large images that exceed the size restriction" do
-    before { PublicImageUploader.enable_processing = true }
-    after { PublicImageUploader.enable_processing = false }
+  describe "process_image_upload" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }
 
-    it "are not created" do
-      large_image = File.open(Rails.root.join("spec", "fixtures", "hugeimg.png"))
-      public_image = FactoryBot.build(:public_image, image: large_image)
-      expect(public_image.save).to eq(false)
-      expect(public_image.id).to be_nil
-      # Because updated versions of imagemagick respond with different errors
-      error_msg = public_image.errors.full_messages.to_sentence
-      expect(error_msg).to match(/(too large)|(width exceeds)|(failed to manipulate)/i)
-      large_image.close
+    context "local file storage (staging/dev)" do
+      it "generates versions inline and does not enqueue the background job" do
+        expect(PublicImageUploader.storage).to eq CarrierWave::Storage::File
+        PublicImageUploader.enable_processing = true
+        public_image = nil
+        expect do
+          public_image = PublicImage.create!(imageable: bike, image: image_file)
+        end.to change(CarrierWaveProcessJob.jobs, :size).by(0)
+        expect(public_image.process_image_upload).to be_truthy
+        expect(File.exist?(public_image.image.small.path)).to be_truthy
+      ensure
+        PublicImageUploader.enable_processing = false
+        public_image&.image&.remove!
+        image_file.close
+      end
+    end
+
+    context "fog storage (production)" do
+      it "defers version generation to the background job" do
+        public_image = PublicImage.new(imageable: bike, image: image_file)
+        allow(public_image).to receive(:remote_storage?).and_return(true)
+        expect do
+          public_image.save!
+        end.to change(CarrierWaveProcessJob.jobs, :size).by(1)
+        expect(public_image.process_image_upload).to be_nil
+        image_file.close
+      end
+    end
+  end
+
+  describe "open_file" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec", "fixtures", "bike.jpg"))) }
+
+    it "opens the local file" do
+      expect(public_image.local_file?).to be_truthy
+      file = public_image.open_file
+      expect(file).to be_present
+      file.close
+    end
+
+    context "local file missing on disk" do
+      it "returns nil" do
+        expect(public_image.local_file?).to be_truthy
+        FileUtils.rm(public_image.image.path)
+        expect(public_image.open_file).to be_nil
+      end
     end
   end
 

@@ -1,0 +1,77 @@
+<% render_sortable ||= false %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th class="table-checkbox-select">
+        <button
+          type="button"
+          class="twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0"
+          title="Toggle all checked"
+          aria-label="Toggle all checked"
+          data-action="click->table-multi-checkbox#toggleAll"
+        >
+          <%= check_mark %>
+        </button>
+      </th>
+
+      <th><%= sortable "received_at", "Received", render_sortable: %></th>
+      <th><%= sortable "email", "Sender", render_sortable: %></th>
+      <th>Subject</th>
+      <th>Tags</th>
+      <th>Member</th>
+      <th>Paid org</th>
+      <th><%= sortable "github_pull_request", "PR", render_sortable: %></th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |bug_report| %>
+        <tr>
+          <td class="display-multi-check table-checkbox-select">
+            <%= check_box_tag "bug_reports_selected[#{bug_report.id}]", bug_report.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
+          </td>
+
+          <td>
+            <%= link_to admin_bug_report_path(bug_report) do %>
+              <span class="localizeTime">
+                <%= l bug_report.received_at || bug_report.created_at, format: :convert_time %>
+              </span>
+            <% end %>
+          </td>
+
+          <td>
+            <% if bug_report.user_id.present? %>
+              <%= render Admin::UserCell::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
+            <% else %>
+              <%= bug_report.from_name %>
+              <small><%= bug_report.email %></small>
+            <% end %>
+          </td>
+
+          <td>
+            <%= link_to bug_report.display_subject, admin_bug_report_path(bug_report) %>
+          </td>
+
+          <td><%= bug_report.tags.join(", ") %></td>
+          <td><%= check_mark if bug_report.is_member %></td>
+
+          <td>
+            <%= check_mark if bug_report.is_paid_organization %>
+
+            <% if bug_report.is_paid_organization_staff %>
+              <small>staff</small>
+            <% end %>
+          </td>
+
+          <td>
+            <% if bug_report.github_pull_request.present? %>
+              <%= link_to bug_report.github_pull_request_url do %>
+                #<%= number_display(bug_report.github_pull_request) %>
+              <% end %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

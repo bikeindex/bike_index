@@ -36,7 +36,7 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
 - `bin/setup` sets up the application and seeds test organizations, bikes and users:
   - Four test user accounts: admin@bikeindex.org, dev@bikeindex.org (developer), member@bikeindex.org, user@bikeindex.org (all have password `pleaseplease12`)
   - Gives user@bikeindex.org 50 bikes
-  - Give test organization Hogwarts all organization features and some test parking notifications
+  - Give test organization Brakebills all organization features and some test parking notifications
 
 - `bin/dev` start the server. It starts redis in the background and runs foreman with the [dev procfile](Procfile.dev). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3042, change the appropriate values in [Procfile.dev](Procfile.dev) and [.env](.env)
 

@@ -18,6 +18,21 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       expect(component.text).to include("data is ephemeral")
     end
 
+    it "doesn't render the superadmin button when there is no superadmin" do
+      expect(component.css("form[action='/session/sign_in_with_magic_link']")).to be_empty
+    end
+
+    context "with a superadmin" do
+      let!(:superadmin) { FactoryBot.create(:superuser) }
+
+      it "renders a button posting the superadmin's magic link token" do
+        form = component.css("form[action='/session/sign_in_with_magic_link']").first
+        expect(form).to be_present
+        expect(form.css("button").text).to eq("sign in as superadmin")
+        expect(form.css("input[name='token']").first[:value]).to eq superadmin.reload.magic_link_token
+      end
+    end
+
     it "links to the letter_opener outbox with a tooltip" do
       outbox = component.css("a[href='/letter_opener']").first
       expect(outbox).to be_present
