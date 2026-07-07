@@ -4,6 +4,10 @@ RSpec.describe CarrierWaveProcessJob, type: :job do
   before { PublicImageUploader.enable_processing = true }
   after { PublicImageUploader.enable_processing = false }
 
+  # The job only runs in production, where fog storage lets versions defer to it.
+  # Simulate that so uploads defer (test storage is local file, where they wouldn't).
+  before { allow_any_instance_of(PublicImage).to receive(:remote_storage?).and_return(true) }
+
   def image_metadata(path)
     `identify -verbose #{path} 2>/dev/null`
   end
