@@ -20,6 +20,26 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  describe "open_file" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec", "fixtures", "bike.jpg"))) }
+
+    it "opens the local file" do
+      expect(public_image.local_file?).to be_truthy
+      file = public_image.open_file
+      expect(file).to be_present
+      file.close
+    end
+
+    context "local file missing on disk" do
+      it "returns nil" do
+        expect(public_image.local_file?).to be_truthy
+        FileUtils.rm(public_image.image.path)
+        expect(public_image.open_file).to be_nil
+      end
+    end
+  end
+
   describe "enqueue_after_commit_jobs" do
     context "non-bike" do
       let(:public_image) { PublicImage.new(imageable_type: "Blog", imageable_id: 12) }

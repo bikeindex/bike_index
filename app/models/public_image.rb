@@ -90,8 +90,13 @@ class PublicImage < ApplicationRecord
     image&._storage&.to_s == "CarrierWave::Storage::File"
   end
 
-  # To enable stream processing for both local and remote files
+  # To enable stream processing for both local and remote files.
+  # Returns nil when a local file is missing on disk (e.g. staging without synced uploads)
   def open_file
-    local_file? ? File.open(image.path, "r") : URI.parse(image.url).open
+    if local_file?
+      File.open(image.path, "r") if File.exist?(image.path)
+    else
+      URI.parse(image.url).open
+    end
   end
 end
