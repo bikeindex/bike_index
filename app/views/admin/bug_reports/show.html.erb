@@ -1,0 +1,116 @@
+<div class="admin-subnav">
+  <div class="col-md-12">
+    <h1>Bug Report</h1>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <% if display_dev_info? %>
+          <tr>
+            <td class="only-dev-visible">ID</td>
+            <td><code><%= @bug_report.id %></code></td>
+          </tr>
+          <tr>
+            <td class="only-dev-visible">Inbound email</td>
+            <td><code><%= @bug_report.inbound_email_id %></code></td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>Sender</td>
+
+          <td>
+            <% if @bug_report.user_id.present? %>
+              <%= render Admin::UserCell::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
+            <% end %>
+
+            <%= @bug_report.from_name %>
+
+            <small>
+              <%= mail_to @bug_report.email, nil, class: "twlink" %>
+            </small>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Received</td>
+
+          <td>
+            <span class="localizeTime preciseTime">
+              <%= l @bug_report.received_at || @bug_report.created_at, format: :convert_time %>
+            </span>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Member</td>
+          <td><%= check_mark if @bug_report.is_member %></td>
+        </tr>
+
+        <tr>
+          <td>Paid organization</td>
+          <td><%= check_mark if @bug_report.is_paid_organization %></td>
+        </tr>
+
+        <tr>
+          <td>Paid organization staff</td>
+          <td><%= check_mark if @bug_report.is_paid_organization_staff %></td>
+        </tr>
+
+        <% if @bug_report.github_pull_request.present? %>
+          <tr>
+            <td>Pull request</td>
+
+            <td>
+              <%= link_to @bug_report.github_pull_request_url, class: "twlink" do %>
+                #<%= number_display(@bug_report.github_pull_request) %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <%= form_with(model: [:admin, @bug_report]) do |f| %>
+      <div class="mb-3">
+        <%= f.label :tags, "Tags (comma separated)", class: "twlabel" %>
+        <%= f.text_field :tags, value: @bug_report.tags.join(", "), class: "twinput" %>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :github_pull_request, class: "twlabel" %>
+        <%= f.number_field :github_pull_request, class: "twinput" %>
+      </div>
+
+      <%= f.submit "Update", class: "btn btn-outline-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render(UI::Card::Component.new(shadow: true)) do %>
+  <p><strong>Subject:</strong> <%= @bug_report.display_subject %></p>
+  <%= render(UI::UserTextBlockDisplay::Component.new(text: @bug_report.body, max_height_class: "")) %>
+<% end %>
+
+<% if @bug_report.images.attached? %>
+  <h2 class="mt-5">Images</h2>
+  <div class="tw:flex tw:flex-wrap tw:gap-4">
+    <% @bug_report.images.each do |image| %>
+      <div>
+        <%= link_to BlobUrl.for(image.blob), target: "_blank", rel: "noopener" do %>
+          <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "img-thumbnail tw:max-h-72" %>
+        <% end %>
+
+        <div class="small less-strong">
+          <%= image.filename %>
+          <%= number_to_human_size(image.byte_size) %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

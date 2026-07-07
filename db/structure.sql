@@ -73,6 +73,39 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: action_mailbox_inbound_emails; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.action_mailbox_inbound_emails (
+    id bigint NOT NULL,
+    status integer DEFAULT 0 NOT NULL,
+    message_id character varying NOT NULL,
+    message_checksum character varying NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: action_mailbox_inbound_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.action_mailbox_inbound_emails_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: action_mailbox_inbound_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.action_mailbox_inbound_emails_id_seq OWNED BY public.action_mailbox_inbound_emails.id;
+
+
+--
 -- Name: action_text_rich_texts; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -866,6 +899,48 @@ CREATE SEQUENCE public.blogs_id_seq
 --
 
 ALTER SEQUENCE public.blogs_id_seq OWNED BY public.blogs.id;
+
+
+--
+-- Name: bug_reports; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bug_reports (
+    id bigint NOT NULL,
+    user_id bigint,
+    email text,
+    subject text,
+    body text,
+    is_member boolean DEFAULT false NOT NULL,
+    is_paid_organization boolean DEFAULT false NOT NULL,
+    is_paid_organization_staff boolean DEFAULT false NOT NULL,
+    github_pull_request integer,
+    tags text[] DEFAULT '{}'::text[] NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    received_at timestamp(6) without time zone,
+    from_name text,
+    inbound_email_id bigint
+);
+
+
+--
+-- Name: bug_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bug_reports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bug_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bug_reports_id_seq OWNED BY public.bug_reports.id;
 
 
 --
@@ -4278,6 +4353,13 @@ ALTER SEQUENCE public.wheel_sizes_id_seq OWNED BY public.wheel_sizes.id;
 
 
 --
+-- Name: action_mailbox_inbound_emails id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.action_mailbox_inbound_emails ALTER COLUMN id SET DEFAULT nextval('public.action_mailbox_inbound_emails_id_seq'::regclass);
+
+
+--
 -- Name: action_text_rich_texts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4408,6 +4490,13 @@ ALTER TABLE ONLY public.blog_content_tags ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.blogs ALTER COLUMN id SET DEFAULT nextval('public.blogs_id_seq'::regclass);
+
+
+--
+-- Name: bug_reports id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bug_reports ALTER COLUMN id SET DEFAULT nextval('public.bug_reports_id_seq'::regclass);
 
 
 --
@@ -5013,6 +5102,14 @@ ALTER TABLE ONLY public.wheel_sizes ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: action_mailbox_inbound_emails action_mailbox_inbound_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.action_mailbox_inbound_emails
+    ADD CONSTRAINT action_mailbox_inbound_emails_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: action_text_rich_texts action_text_rich_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5170,6 +5267,14 @@ ALTER TABLE ONLY public.blog_content_tags
 
 ALTER TABLE ONLY public.blogs
     ADD CONSTRAINT blogs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bug_reports bug_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bug_reports
+    ADD CONSTRAINT bug_reports_pkey PRIMARY KEY (id);
 
 
 --
@@ -5861,6 +5966,13 @@ ALTER TABLE ONLY public.wheel_sizes
 
 
 --
+-- Name: index_action_mailbox_inbound_emails_uniqueness; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_action_mailbox_inbound_emails_uniqueness ON public.action_mailbox_inbound_emails USING btree (message_id, message_checksum);
+
+
+--
 -- Name: index_action_text_rich_texts_uniqueness; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6236,6 +6348,27 @@ CREATE INDEX index_blog_content_tags_on_blog_id ON public.blog_content_tags USIN
 --
 
 CREATE INDEX index_blog_content_tags_on_content_tag_id ON public.blog_content_tags USING btree (content_tag_id);
+
+
+--
+-- Name: index_bug_reports_on_inbound_email_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_inbound_email_id ON public.bug_reports USING btree (inbound_email_id);
+
+
+--
+-- Name: index_bug_reports_on_tags; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_tags ON public.bug_reports USING gin (tags);
+
+
+--
+-- Name: index_bug_reports_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_user_id ON public.bug_reports USING btree (user_id);
 
 
 --
@@ -7305,12 +7438,23 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 
 
 --
+-- Name: bug_reports fk_rails_fd37ef25f8; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bug_reports
+    ADD CONSTRAINT fk_rails_fd37ef25f8 FOREIGN KEY (inbound_email_id) REFERENCES public.action_mailbox_inbound_emails(id) ON DELETE SET NULL;
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260706180000'),
+('20260706164500'),
+('20260706164435'),
 ('20260628175839'),
 ('20260628175838'),
 ('20260626162049'),
