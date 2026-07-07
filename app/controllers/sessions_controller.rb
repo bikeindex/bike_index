@@ -46,13 +46,6 @@ class SessionsController < ApplicationController
     end
   end
 
-  # Review-app banner button — signs in as the seeded superadmin
-  def review_app_superadmin
-    raise ActionController::RoutingError, "Not Found" if ENV["REVIEW_APP"].blank?
-
-    sign_in_and_redirect(User.admins.first!)
-  end
-
   def create
     @user = User.fuzzy_confirmed_or_unconfirmed_email_find(permitted_parameters[:email])
     if @user.present?
