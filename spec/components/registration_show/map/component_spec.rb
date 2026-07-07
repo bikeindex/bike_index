@@ -36,12 +36,4 @@ RSpec.describe RegistrationShow::Map::Component, type: :component do
       expect(page.native.text).to be_blank
     end
   end
-
-  context "placeholder mapbox_key (not a real pk. token)" do
-    let(:options) { {latitude: 40.7, longitude: -73.9, mapbox_key: "PLACEHOLDER-REPLACE-BEFORE-DEPLOY"} }
-    it "does not render" do
-      render_inline(component)
-      expect(page.native.text).to be_blank
-    end
-  end
 end

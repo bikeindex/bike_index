@@ -13,16 +13,10 @@ module RegistrationShow
       end
 
       def render?
-        @latitude.present? && @longitude.present? && usable_mapbox_key?
+        @latitude.present? && @longitude.present? && @mapbox_key.present?
       end
 
       private
-
-      # Only a real public token renders tiles — skip the placeholder used on
-      # review apps (and the dev dummy) so the map doesn't 404 / CORS-error
-      def usable_mapbox_key?
-        @mapbox_key.to_s.start_with?("pk.")
-      end
 
       # The circle grows faster with zoom when the exact address is public
       def radius_base
