@@ -19,7 +19,7 @@
     <div class="tw:flex tw:flex-col tw:gap-4">
       <div>
         <div class="tw:mb-1">
-          <%= render(UI::Badge::Component.new(text: audience_label, color: audience_color, size: :sm, solid: true)) %>
+          <%= render(RegistrationShow::ViewSwitcher::Component.new(bike: @bike, current_view: @owner ? :owner : :public, available_views: @available_views, label: audience_label, color: audience_color)) %>
         </div>
 
         <div class="tw:hidden tw:lg:block">

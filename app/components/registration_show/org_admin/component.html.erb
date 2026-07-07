@@ -9,7 +9,7 @@
   <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-4">
     <div>
       <div class="tw:mb-2 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <%= render(UI::Badge::Component.new(text: org_chip_label, color: org_chip_color, size: :sm)) %>
+        <%= render(RegistrationShow::ViewSwitcher::Component.new(bike: @bike, current_view: @organization, available_views: @available_views, label: org_chip_label, color: org_chip_color, solid: false)) %>
         <%= render(UI::Badge::Component.new(text: role_label, color: :gray, size: :sm)) %>
       </div>
 

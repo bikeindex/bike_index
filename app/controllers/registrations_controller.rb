@@ -68,7 +68,7 @@ class RegistrationsController < ApplicationController
   # The perspectives the current user may view this bike as
   def available_views
     @available_views ||= [
-      (:owner if @bike.owner == current_user),
+      (:owner if @bike.owner == current_user || current_user&.superuser?),
       *viewable_organizations,
       :public
     ].compact

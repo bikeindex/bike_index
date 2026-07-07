@@ -19,32 +19,21 @@ module RegistrationShow
 
       def inner_component
         if @view.is_a?(Organization)
-          OrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization: @view, mapbox_key: @mapbox_key)
+          OrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization: @view,
+            mapbox_key: @mapbox_key, available_views: @available_views)
         else
           Consumer::Component.new(bike: @bike, current_user: @current_user, owner: @view == :owner,
-            show_for_sale: @bike.is_for_sale?, mapbox_key: @mapbox_key)
+            show_for_sale: @bike.is_for_sale?, mapbox_key: @mapbox_key, available_views: @available_views)
         end
       end
 
       # Keyed on the viewer too: the admin view has per-user content + CSRF tokens
       def cache_key
-        ["registration_show", @current_user&.id, view_param(@view), @bike.cache_key_with_version]
+        ["registration_show", @current_user&.id, view_param, @bike.cache_key_with_version]
       end
 
-      def switchable?
-        @available_views.size > 1
-      end
-
-      def view_param(view)
-        view.is_a?(Organization) ? view.to_param : view.to_s
-      end
-
-      def view_label(view)
-        case view
-        when :public then t("components.registration_show.consumer.audience_public")
-        when :owner then t("components.registration_show.consumer.audience_owner")
-        else view.short_name
-        end
+      def view_param
+        @view.is_a?(Organization) ? @view.to_param : @view.to_s
       end
     end
   end

@@ -1,0 +1,11 @@
+<% if switchable? %>
+  <%= render(UI::Dropdown::Component.new(name: @label, button_class: button_class)) do |dropdown| %>
+    <% @available_views.each do |available_view| %>
+      <% dropdown.with_entry_item do %>
+        <%= link_to(view_label(available_view), registration_path(@bike, view_as: view_param(available_view)), class: "tw:block tw:whitespace-nowrap tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700 tw:no-underline tw:hover:bg-gray-100 tw:dark:text-gray-200 tw:dark:hover:bg-gray-800 #{"tw:font-bold" if available_view == @current_view}") %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= render(UI::Badge::Component.new(text: @label, color: @color, size: :sm, solid: @solid)) %>
+<% end %>

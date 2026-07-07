@@ -147,12 +147,20 @@ RSpec.describe "RegistrationsController#show", type: :request do
     context "superuser view_as options" do
       let(:current_user) { FactoryBot.create(:superuser) }
       let!(:brakebills) { FactoryBot.create(:organization, name: "Brakebills") }
-      it "offers the bike's organization and Brakebills as views" do
+      it "offers owner, the bike's organization, and Brakebills as views" do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
+        expect(response.body).to include("view_as=owner")
         expect(response.body).to include("view_as=#{organization.to_param}")
         expect(response.body).to include("view_as=#{brakebills.to_param}")
         expect(response.body).to include("view_as=public")
+      end
+
+      it "renders the owner view even though they don't own the bike" do
+        get "#{base_url}/#{bike.id}", params: {view_as: "owner"}
+        body = whitespace_normalized_body_text
+        expect(body).to match("Your bike")
+        expect(body).to match("Mark stolen")
       end
     end
   end
