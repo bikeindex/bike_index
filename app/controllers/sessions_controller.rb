@@ -11,7 +11,10 @@ class SessionsController < ApplicationController
   # Dropbox-style identifier-first: the first screen collects only an email; this
   # decides what the second screen asks for (or where to send them) from that email.
   def identify
-    @email = permitted_parameters[:email]
+    # dig rather than require(:session) so a bare GET (reload/bookmark/back) doesn't
+    # raise ParameterMissing — it falls through to re-rendering the email step.
+    @email = params.dig(:session, :email)
+    @remember_me = params.dig(:session, :remember_me)
     return render_partner_or_default_signin_layout(render_action: :new) if @email.blank?
 
     @login_method = login_method_for(@email)
@@ -53,6 +56,9 @@ class SessionsController < ApplicationController
       end
     end
     if user.present?
+      # Stash the remember-me choice so the emailed-link GET (which carries no form
+      # params) can still honor it in sign_in_and_redirect.
+      session[:magic_link_remember_me] = Binxtils::InputNormalizer.boolean(params[:remember_me])
       user.send_magic_link_email
       flash[:success] = translation(:link_sent)
       redirect_to root_path

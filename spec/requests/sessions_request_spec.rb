@@ -1,6 +1,12 @@
 require "rails_helper"
 
 RSpec.describe SessionsController, type: :request do
+  # The `auth` Set-Cookie line for the last response. A permanent (remember-me)
+  # cookie carries an `expires=`; a session cookie doesn't.
+  def auth_set_cookie
+    Array(response.headers["Set-Cookie"]).join("\n").lines.find { |line| line.start_with?("auth=") }.to_s
+  end
+
   describe "new" do
     it "renders the email-only first step, without a password field" do
       get "/session/new"
@@ -37,6 +43,15 @@ RSpec.describe SessionsController, type: :request do
       it "re-renders the email step" do
         identify("")
         expect(response).to render_template(:new)
+      end
+    end
+
+    context "GET (reload / bookmark / back)" do
+      it "re-renders the email step instead of 404ing or attempting a login" do
+        get "/session/identify"
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(:new)
+        expect(response.cookies["auth"]).to be_blank
       end
     end
 
@@ -159,6 +174,22 @@ RSpec.describe SessionsController, type: :request do
     end
   end
 
+  describe "remember_me across the magic-link round-trip" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+    it "sets a permanent auth cookie when remember_me was chosen at request time" do
+      post "/session/create_magic_link", params: {email: user.email, remember_me: "1"}
+      token = user.reload.magic_link_token
+      expect(token).to be_present
+      post "/session/sign_in_with_magic_link", params: {token:}
+      expect(auth_set_cookie).to include("expires=")
+    end
+    it "sets a session auth cookie without remember_me" do
+      post "/session/create_magic_link", params: {email: user.email}
+      post "/session/sign_in_with_magic_link", params: {token: user.reload.magic_link_token}
+      expect(auth_set_cookie).to_not include("expires=")
+    end
+  end
+
   describe "create" do
     let(:password) { "example_password2" }
     let!(:user) { FactoryBot.create(:user_confirmed, password: password, password_confirmation: password, banned: banned) }
@@ -206,6 +237,19 @@ RSpec.describe SessionsController, type: :request do
         expect(response).to redirect_to new_session_path
         user.reload
         expect(user.last_login_at).to be_blank
+      end
+    end
+
+    context "remember_me" do
+      it "sets a permanent auth cookie when checked" do
+        post "/session", params: {session: {email: user.email, password:, remember_me: "1"}}
+        expect(response).to redirect_to my_account_url
+        expect(auth_set_cookie).to include("expires=")
+      end
+      it "sets a session auth cookie when unchecked" do
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(response).to redirect_to my_account_url
+        expect(auth_set_cookie).to_not include("expires=")
       end
     end
 
