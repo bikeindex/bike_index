@@ -33,10 +33,10 @@ RSpec.describe PublicImagesController, type: :request do
         end
         context "with an image file" do
           let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
+          # Versions only defer to the job with remote (fog) storage; simulate production
+          # since test uses local file storage, which processes inline
+          before { allow_any_instance_of(PublicImage).to receive(:remote_storage?).and_return(true) }
           it "renders the original and wires the image-fallback for the backgrounded versions" do
-            # Versions only defer to the job with remote (fog) storage; simulate production
-            # since test uses local file storage, which processes inline
-            allow_any_instance_of(PublicImage).to receive(:remote_storage?).and_return(true)
             Sidekiq::Job.clear_all
             post base_url, params: {bike_id: bike.id, public_image: {image: file}, format: :js}
             expect(response).to have_http_status(:ok)
