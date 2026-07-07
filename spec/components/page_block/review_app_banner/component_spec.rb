@@ -31,6 +31,16 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
         expect(form.css("button").text).to eq("sign in as superadmin")
         expect(form.css("input[name='token']").first[:value]).to eq superadmin.reload.magic_link_token
       end
+
+      # The banner renders on pages served under set_reading_role, so refreshing
+      # the (persisted) token must not raise ActiveRecord::ReadOnlyError
+      it "generates the token under the reading database role" do
+        input = ActiveRecord::Base.connected_to(role: :reading) do
+          render_inline(described_class.new(review_app: "1"))
+            .css("form[action='/session/sign_in_with_magic_link'] input[name='token']").first
+        end
+        expect(input[:value]).to eq superadmin.reload.magic_link_token
+      end
     end
 
     it "links to the letter_opener outbox with a tooltip" do

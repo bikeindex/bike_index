@@ -26,7 +26,7 @@
   <% if superadmin %>
     &middot;
     <%= form_with url: sign_in_with_magic_link_session_path, class: "tw:inline-block tw:align-middle" do %>
-      <%= hidden_field_tag :token, superadmin.refreshed_magic_link_token %>
+      <%= hidden_field_tag :token, superadmin_magic_link_token %>
       <%= render UI::Button::Component.new(text: translation(".superadmin_button"), kind: :submit, size: :sm) %>
     <% end %>
   <% end %>

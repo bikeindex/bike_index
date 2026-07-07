@@ -35,6 +35,14 @@ module PageBlock
 
         @superadmin = User.admins.first
       end
+
+      # Refreshing the token persists it, so force the writing role: the banner
+      # renders on pages (e.g. bikes#show) served under set_reading_role.
+      def superadmin_magic_link_token
+        ActiveRecord::Base.connected_to(role: :writing) do
+          superadmin.refreshed_magic_link_token
+        end
+      end
     end
   end
 end
