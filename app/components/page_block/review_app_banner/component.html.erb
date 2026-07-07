@@ -23,4 +23,10 @@
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
     ) { "?" } %>
   <% end %>
+  &middot;
+  <%= button_to translation(".superadmin_button"), review_app_superadmin_session_path,
+    form_class: "tw:inline-block",
+    class: "tw:cursor-pointer tw:rounded tw:bg-[#1e881e] tw:px-2 tw:py-0.5 tw:text-xs " \
+      "tw:font-normal tw:text-white tw:hover:bg-[#166016] " \
+      "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40" %>
 </div>

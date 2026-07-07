@@ -74,6 +74,26 @@ RSpec.describe SessionsController, type: :request do
     end
   end
 
+  describe "review_app_superadmin" do
+    let!(:superadmin) { FactoryBot.create(:superuser) }
+
+    it "404s" do
+      post "/session/review_app_superadmin"
+      expect(response.status).to eq 404
+      expect(superadmin.reload.last_login_at).to be_nil
+    end
+
+    context "on a review app" do
+      before { stub_const("ENV", ENV.to_hash.merge("REVIEW_APP" => "1")) }
+
+      it "signs in as the superadmin" do
+        post "/session/review_app_superadmin"
+        expect(response).to redirect_to admin_root_url
+        expect(superadmin.reload.last_login_at).to be_within(1.second).of Time.current
+      end
+    end
+  end
+
   describe "create" do
     let(:password) { "example_password2" }
     let!(:user) { FactoryBot.create(:user_confirmed, password: password, password_confirmation: password, banned: banned) }

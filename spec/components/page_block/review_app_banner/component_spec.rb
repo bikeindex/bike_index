@@ -18,6 +18,12 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       expect(component.text).to include("data is ephemeral")
     end
 
+    it "renders a sign in as superadmin button" do
+      form = component.css("form[action='/session/review_app_superadmin']").first
+      expect(form).to be_present
+      expect(form.css("button").text).to eq("sign in as superadmin")
+    end
+
     it "links to the letter_opener outbox with a tooltip" do
       outbox = component.css("a[href='/letter_opener']").first
       expect(outbox).to be_present
