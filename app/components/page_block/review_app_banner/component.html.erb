@@ -13,7 +13,17 @@
     "Review app" and "data is ephemeral" are just labels; hide them (and their
     separators) on small screens so the actionable links fit
   %>
-  <span class="tw:hidden tw:sm:inline"><%= translation(".label") %></span>
+  <span class="tw:hidden tw:sm:inline"><%= banner_label %></span>
+
+  <% if @commit.present? %>
+    <%= render(UI::Tooltip::Component.new(text: translation(".commit_tooltip", commit: @commit))) do |tooltip| %>
+      <% tooltip.with_tooltip_button(
+        class: "tw:hidden tw:sm:inline-block tw:align-baseline tw:font-mono tw:font-normal " \
+          "tw:text-xs tw:underline tw:decoration-dotted tw:cursor-help " \
+          "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+      ) { @commit } %>
+    <% end %>
+  <% end %>
 
   <% if @pr_number %>
     <span class="tw:hidden tw:sm:inline">&middot;</span>

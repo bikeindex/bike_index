@@ -13,6 +13,9 @@
 # This file is NOT used by production (Cloud66).
 
 <% host = ENV.fetch("REVIEW_APP_HOST") %>
+<%# The deploy runs from a checkout at the deployed commit, so git resolves the
+    short SHA the banner shows. Empty if git isn't available. %>
+<% commit = `git rev-parse --short HEAD 2>/dev/null`.strip %>
 
 service: bike-index-staging
 # No registry host — kamal prepends registry.server (see config/deploy.review.yml).
@@ -57,6 +60,7 @@ env:
     # Renders the non-production banner + review favicon (no PR number, so the
     # banner shows no PR link). See PageBlock::ReviewAppBanner.
     REVIEW_APP: "1"
+    REVIEW_APP_COMMIT: "<%= commit %>"
     BASE_URL: "https://staging.review.bikeindex.org"
 
     # Postgres — a persistent role + databases on the shared-db accessory (unlike

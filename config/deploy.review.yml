@@ -34,6 +34,9 @@
 <% redis_url = "redis://shared-redis:6379/#{ENV.fetch("REVIEW_APP_REDIS_DB", "1")}" %>
 <%# .to_json quotes/escapes the title into a valid (double-quoted) YAML scalar. %>
 <% pr_title_json = ENV.fetch("REVIEW_APP_PR_TITLE", "").to_json %>
+<%# The deploy runs from a checkout at the deployed commit, so git resolves the
+    short SHA the banner shows. Empty if git isn't available. %>
+<% commit = `git rev-parse --short HEAD 2>/dev/null`.strip %>
 
 service: <%= appname %>
 # NOTE: no registry host here — kamal prepends `registry.server` (configuration.rb
@@ -94,6 +97,7 @@ env:
     # Empty unless the deployer exports REVIEW_APP_PR_TITLE (the workflow does);
     # the banner then falls back to "PR #<number>".
     REVIEW_APP_PR_TITLE: <%= pr_title_json %>
+    REVIEW_APP_COMMIT: "<%= commit %>"
     BASE_URL: "https://<%= slug %>.review.bikeindex.org"
 
     # Postgres (shared-db accessory; per-PR role + databases). The staging
