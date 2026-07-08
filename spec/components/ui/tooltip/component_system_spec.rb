@@ -97,12 +97,9 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     find("body").click
     expect(tooltip).not_to be_visible
 
-    # Click layering pushes each clicked tooltip's z-index higher. Only button
-    # triggers — a link trigger (the tooltip_link slot) navigates on click, which
-    # is the link's behavior, not the tooltip state machine.
-    button_ids = tooltip_ids.select { |id| find("[aria-describedby='#{id}']").tag_name == "button" }
-    button_ids.each { |id| find("[aria-describedby='#{id}']").click }
-    z_indexes = button_ids.map { |id| tooltip_z_index(id).to_i }
+    # Click layering pushes each clicked tooltip's z-index higher
+    tooltip_ids.each { |id| find("[aria-describedby='#{id}']").click }
+    z_indexes = tooltip_ids.map { |id| tooltip_z_index(id).to_i }
     expect(z_indexes).to eq z_indexes.sort
     expect(z_indexes.last).to be > z_indexes.first
   end

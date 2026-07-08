@@ -51,21 +51,6 @@ RSpec.describe UI::Tooltip::Component, type: :component do
     end
   end
 
-  context "with a tooltip_link slot" do
-    let(:component) do
-      render_inline(described_class.new(text: "tip")) do |tooltip|
-        tooltip.with_tooltip_link(href: "/commit/abc") { "?" }
-      end
-    end
-
-    it "renders the trigger as a link, with no button type, wired to the tooltip actions" do
-      link = component.css("a[aria-describedby]").first
-      expect(link[:href]).to eq "/commit/abc"
-      expect(link[:type]).to be_nil
-      expect(link["data-action"]).to include "mouseenter->ui--tooltip#showOnHover"
-    end
-  end
-
   context "with multiple instances" do
     let(:components) do
       [

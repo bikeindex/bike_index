@@ -5,12 +5,7 @@ module PageBlock
     class ComponentPreview < ApplicationComponentPreview
       def with_pr_link
         render(PageBlock::ReviewAppBanner::Component.new(review_app: "1", pr_number: 3664,
-          pr_title: "Add Promoted section to marketplace index", commit: "a1b2c3d"))
-      end
-
-      # Persistent staging deploy — no PR number, so the label reads "Staging".
-      def staging
-        render(PageBlock::ReviewAppBanner::Component.new(review_app: "1", commit: "a1b2c3d"))
+          pr_title: "Add Promoted section to marketplace index"))
       end
 
       # No title available — link falls back to "PR #<number>".

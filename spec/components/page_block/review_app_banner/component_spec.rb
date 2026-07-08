@@ -9,23 +9,20 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   end
 
   context "when review_app is present" do
-    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, commit:, current_user:, return_to:)) }
+    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, current_user:, return_to:)) }
     let(:pr_number) { nil }
     let(:pr_title) { nil }
-    let(:commit) { nil }
     let(:current_user) { nil }
     let(:return_to) { nil }
 
-    it "renders the staging label and disclaimer" do
-      # No pr_number is the persistent staging deploy, not a per-PR review app
-      expect(component.text).to include("Staging")
-      expect(component.text).not_to include("Review app")
+    it "renders the label and disclaimer" do
+      expect(component.text).to include("Review app")
       expect(component.text).to include("data is ephemeral")
     end
 
     it "hides the label and disclaimer on small screens" do
       # tw:hidden tw:sm:inline => display:none below the sm breakpoint
-      label = component.css("span.tw\\:hidden", text: "Staging").first
+      label = component.css("span.tw\\:hidden", text: "Review app").first
       disclaimer = component.css("span.tw\\:hidden", text: "data is ephemeral").first
       expect(label).to be_present
       expect(disclaimer).to be_present
@@ -97,23 +94,6 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       expect(component.css("a[href^='https://github.com']")).to be_empty
     end
 
-    it "omits the commit tooltip when no commit is given" do
-      expect(component.text).not_to include("current commit")
-    end
-
-    context "with a commit" do
-      let(:commit) { "a1b2c3d" }
-
-      it "renders a '?' tooltip link to the commit on github" do
-        link = component.css("a[aria-label='current commit: a1b2c3d']").first
-        expect(link).to be_present
-        expect(link[:href]).to eq("https://github.com/bikeindex/bike_index/commit/a1b2c3d")
-        # visible trigger is "?" (like the email-outbox tooltip), not the raw SHA
-        expect(link.xpath("./text()").text.strip).to eq("?")
-        expect(component.css("[role='tooltip']").text).to include("current commit: a1b2c3d")
-      end
-    end
-
     context "with a pr_number" do
       let(:pr_number) { 1234 }
 
@@ -121,11 +101,6 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
         link = component.css("a[href^='https://github.com']").first
         expect(link[:href]).to eq("https://github.com/bikeindex/bike_index/pull/1234")
         expect(link.text).to include("PR #1234")
-      end
-
-      it "shows the review app label instead of the staging label" do
-        expect(component.text).to include("Review app")
-        expect(component.text).not_to include("Staging")
       end
 
       context "with a pr_title" do
