@@ -57,10 +57,15 @@ RSpec.describe "Editing a registration", :js, type: :system do
   end
 
   # Success alerts are fixed-position and overlay the edit menu, so dismiss them
-  # before navigating to the next section
+  # before navigating to the next section. A preceding correction reloads the
+  # page and re-renders its stored alert asynchronously (JS/Mustache), so a
+  # single dismiss can race the render — retry until the block is actually clear.
   def click_edit_nav(text)
-    all(".primary-alert-block .alert .close").each(&:click)
-    expect(page).to have_no_css(".primary-alert-block .alert", wait: 5)
+    Timeout.timeout(5) do
+      until has_no_css?(".primary-alert-block .alert", wait: 0.5)
+        all(".primary-alert-block .alert .close").each(&:click)
+      end
+    end
     click_link text
   end
 
