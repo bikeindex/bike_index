@@ -28,7 +28,7 @@ module RegistrationShow
         else ["tw:bg-[#f0edfa]", "tw:text-[#715eb2]"]
         end
         content_tag(:span, class: "tw:flex tw:size-9 tw:flex-none tw:items-center tw:justify-center tw:rounded-lg #{tile_bg}") do
-          helpers.inline_svg_tag("icons/registration_show/#{icon}.svg", class: "tw:h-[19px] tw:w-[19px] #{icon_color}")
+          helpers.inline_svg_tag("kelsey/registration_show/#{icon}.svg", class: "tw:h-[19px] tw:w-[19px] #{icon_color}")
         end
       end
 

@@ -66,9 +66,10 @@ module UI
 
       private
 
-      # An inline icon (by name) takes precedence over the status dot
+      # An inline icon (@icon is a path under app/assets/images, sans .svg) takes
+      # precedence over the status dot
       def leading_element
-        return helpers.inline_svg_tag("icons/#{@icon}.svg", class: "tw:mr-1 tw:size-3.5") if @icon.present?
+        return helpers.inline_svg_tag("#{@icon}.svg", class: "tw:mr-1 tw:size-3.5") if @icon.present?
         indicator_dot if @indicator
       end
 
