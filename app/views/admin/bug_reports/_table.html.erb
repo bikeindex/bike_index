@@ -3,7 +3,7 @@
 <div class="full-screen-table">
   <table class="table table-striped table-bordered table-sm">
     <thead class="thead-light">
-      <th class="table-checkbox-select">
+      <th class="table-cell-check">
         <button
           type="button"
           class="twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0"
@@ -27,7 +27,7 @@
     <tbody>
       <% collection.each do |bug_report| %>
         <tr>
-          <td class="display-multi-check table-checkbox-select">
+          <td class="display-multi-check table-cell-check">
             <%= check_box_tag "bug_reports_selected[#{bug_report.id}]", bug_report.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
           </td>
 
