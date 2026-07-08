@@ -62,7 +62,7 @@ Only CI's on-push dispatch and `closed` are wired up, so toggling the label by h
 
 ## How a deploy works
 
-Four jobs: `resolve` (PR number + deploy/destroy), `build` (label + build/push image; deploy only), `update` (does the work, branching by step `if:`), `report` (failure-only). `build` is separate so a newer push cancels a stale build (`cancel-in-progress`); `update` handles **both deploy and destroy in one job** (separate jobs would show a skipped check every run) and serializes per PR *without* cancellation, since killing kamal mid-deploy can strand the deploy lock.
+Four jobs: `resolve` (PR number + deploy/destroy, and labels on deploy), `op` (calls the shared `kamal-deploy.yml` reusable workflow to build + run the kamal command), `post` (PR-side follow-ups: deployment link, failure-comment cleanup, label removal + GHCR image cleanup on destroy), `report` (failure-only). The reusable workflow's `build` job cancels superseded builds (`cancel-in-progress`) while its `run` job serializes per PR *without* cancellation, since killing kamal mid-deploy can strand the deploy lock. `kamal-deploy.yml` is shared with `staging.yml`.
 
 | Trigger | Action | What runs |
 |---|---|---|
@@ -72,14 +72,13 @@ Four jobs: `resolve` (PR number + deploy/destroy), `build` (label + build/push i
 
 Unlabeled PR closes are filtered by `resolve`'s job-level `if:`; fork PRs by the same-repo check (`proceed=false`). On **deploy**:
 
-1. `build` builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label). Warm builds are fast: docker layers cache in GHCR's `:buildcache`, and sprockets' cache persists via a BuildKit cache mount + buildkit-cache-dance.
-2. It attaches a `/rails/storage` volume for ActiveStorage and a `/rails/public/uploads` volume for Carrierwave
-3. `update` runs `bin/kamal_review deploy --app <pr>` → `kamal deploy --version <tag> --skip-push` (tag from `IMAGE_TAG`). Kamal **pulls** the CI image (no rebuild, which would clone the private `app/services/facebook` submodule) and:
-   - Boots the per-PR `-web`, `-worker`, `-cron` containers.
+1. The reusable `build` job builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label). Warm builds are fast: docker layers cache in GHCR's `:buildcache`, and sprockets' cache persists via a BuildKit cache mount + buildkit-cache-dance.
+2. The `run` job runs `bin/kamal_review deploy --app <pr>` → `kamal deploy --version <tag> --skip-push` (tag from `IMAGE_TAG`). Kamal **pulls** the CI image (no rebuild, which would clone the private `app/services/facebook` submodule) and:
+   - Boots the per-PR `-web`, `-worker`, `-cron` containers, mounting the `/rails/storage` (ActiveStorage) and `/rails/public/uploads` (Carrierwave) volumes.
    - First boot: `bin/docker-entrypoint` creates the Postgres **superuser** role `bike_index_pr_<N>` and runs `db:prepare`, creating `bike_index_review_pr_<N>_primary` + `_analytics` and **seeding** them before Puma starts — slow, hence `deploy_timeout: 240`. Redeploys skip seeding and boot fast.
    - Later boots: `db:prepare` runs migrations only.
-4. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
-5. The `review-app` environment surfaces the URL ("View deployment").
+3. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
+4. The `review-app` environment surfaces the URL ("View deployment").
 
 Destroy reverses it: `kamal app remove`, drop both databases + the role, `FLUSHDB` the assigned Redis logical DB, and delete every `pr-<N>-<sha>` GHCR image version (best-effort, `packages: write`).
 
@@ -110,7 +109,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
 | `.kamal/hooks/post-deploy` | Best-effort Honeybadger deploy notification (`staging` env); never fails the deploy — no-ops if `HONEYBADGER_API_KEY` is unset or the gem is absent (e.g. CI) |
-| `.github/workflows/review-app.yml` | `resolve` + `build` + `update` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
+| `.github/workflows/review-app.yml` | `resolve` + `op` (calls `kamal-deploy.yml`) + `post` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `.github/workflows/ci.yml` (`dispatch` job) | Auto-dispatches a deploy on every push to a labeled PR — the auto-redeploy half of the label gate |
 | `.kamal/provisioning/` | Ansible playbook for one-time host hardening |
 | `app/components/page_block/review_app_banner/` | ViewComponent shown in the layout when `ENV["REVIEW_APP"]` is set |
