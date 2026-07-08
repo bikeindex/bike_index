@@ -88,6 +88,8 @@
 
   <%= render(RegistrationShow::StolenDetails::Component.new(bike: @bike, current_user: @current_user, mapbox_key: @mapbox_key)) %>
 
+  <%= render(RegistrationShow::ContactOwner::Component.new(bike: @bike, current_user: @current_user)) %>
+
   <%= render(UI::Card::Component.new) do %>
     <h2
       class="
