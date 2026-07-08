@@ -15,8 +15,8 @@ RSpec.describe UpdateMailchimpDatumJob, type: :job do
       let(:email_address) { "seth@bikeindex.org" }
       let(:user) { FactoryBot.create(:user, email: email_address, name: "Seth Herr") }
       let(:organization_created_at) { Time.at(1552072143) }
-      let(:target_merge_fields) { {"NAME" => "Seth Herr", "O_NAME" => "Hogwarts", "O_AT" => organization_created_at.to_date.to_s} }
-      let(:organization) { FactoryBot.create(:organization, kind: "school", name: "Hogwarts", created_at: organization_created_at) }
+      let(:target_merge_fields) { {"NAME" => "Seth Herr", "O_NAME" => "Brakebills", "O_AT" => organization_created_at.to_date.to_s} }
+      let(:organization) { FactoryBot.create(:organization, kind: "school", name: "Brakebills", created_at: organization_created_at) }
       let(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: organization, user: user, role: "admin") }
       let(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
 
@@ -83,7 +83,7 @@ RSpec.describe UpdateMailchimpDatumJob, type: :job do
            "RECOVE_AT" => "2015-08-05",
            "SIGN_UP_AT" => "2013-07-14",
            "signed_up_at" => "2021-06-22",
-           "organization_name" => "Hogwarts",
+           "organization_name" => "Brakebills",
            "number_of_donations" => 1,
            "most_recent_donation_at" => "2021-06-22",
            "organization_signed_up_at" => "2019-03-08"}

@@ -57,10 +57,15 @@ RSpec.describe "Editing a registration", :js, type: :system do
   end
 
   # Success alerts are fixed-position and overlay the edit menu, so dismiss them
-  # before navigating to the next section
+  # before navigating to the next section. A preceding correction reloads the
+  # page and re-renders its stored alert asynchronously (JS/Mustache), so a
+  # single dismiss can race the render — retry until the block is actually clear.
   def click_edit_nav(text)
-    all(".primary-alert-block .alert .close").each(&:click)
-    expect(page).to have_no_css(".primary-alert-block .alert", wait: 5)
+    Timeout.timeout(5) do
+      until has_no_css?(".primary-alert-block .alert", wait: 0.5)
+        all(".primary-alert-block .alert .close").each(&:click)
+      end
+    end
     click_link text
   end
 
@@ -143,7 +148,10 @@ RSpec.describe "Editing a registration", :js, type: :system do
       fill_in "manufacturer_update_reason", with: "It is actually a Trek"
       click_button "Submit update"
     end
-    expect(page).to have_content("Trek", wait: 10)
+    # The correction reloads the page and re-shows the stored success alert. Wait
+    # for that alert rather than the "Trek" selectize chip, which renders before
+    # the reload — otherwise click_edit_nav races the alert and can't dismiss it.
+    expect(page).to have_content("We've updated your manufacturer!", wait: 10)
     expect(bike.reload.manufacturer).to eq trek
 
     # ---- Wheels and Drivetrain ----
@@ -206,6 +214,19 @@ RSpec.describe "Editing a registration", :js, type: :system do
     save_bike
 
     expect(bike.reload.organizations).to include(organization)
+
+    # ---- Photos (upload an image through the real uploader) ----
+    click_edit_nav "Photos"
+    attach_file("public_image_image", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
+    # The plugin auto-submits on select; the appended thumbnail shows the
+    # synchronously-stored original (versions are generated in a background job)
+    expect(page).to have_css("#public_images img[src$='/bike.jpg']", wait: 10)
+    expect(bike.reload.public_images.count).to eq 1
+
+    # On reload the server renders the not-yet-generated version url; image_fallback
+    # swaps the 404ing thumbnail back to the stored original so it isn't broken
+    visit page.current_url
+    expect(page).to have_css("#public_images img[src$='/bike.jpg']", wait: 10)
 
     # ---- Transfer ----
     click_edit_nav "Transfer, Hide or Delete"

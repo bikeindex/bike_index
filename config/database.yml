@@ -7,7 +7,7 @@ default_local: &default_local
   <<: *default
   port: <%= ENV.fetch("PGPORT", 5432) %>
   <% if ENV["CI"] %>
-  host: 127.0.0.1
+  host: <%= ENV.fetch("PGHOST", "127.0.0.1") %>
   username: rails
   password: password
   <% else %>

@@ -12,6 +12,18 @@ module PageBlock
       def without_pr_title
         render(PageBlock::ReviewAppBanner::Component.new(review_app: "1", pr_number: 3664))
       end
+
+      # Superadmin sign-in button, carrying the current page as return_to.
+      def superadmin_sign_in
+        render(PageBlock::ReviewAppBanner::Component.new(review_app: "1", pr_number: 3664,
+          return_to: "/bikes/12"))
+      end
+
+      # Already signed in as the superadmin — de-emphasized italic label.
+      def superadmin_signed_in
+        render(PageBlock::ReviewAppBanner::Component.new(review_app: "1", pr_number: 3664,
+          current_user: User.admins.first))
+      end
     end
   end
 end

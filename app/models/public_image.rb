@@ -28,7 +28,8 @@ class PublicImage < ApplicationRecord
     photo_of_receipt: 6
   }.freeze
 
-  mount_uploader :image, PublicImageUploader # Not processed in background, because they are uploaded directly
+  mount_uploader :image, PublicImageUploader
+  process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
   enum :kind, KIND_ENUM
 
@@ -83,14 +84,35 @@ class PublicImage < ApplicationRecord
     CallbackJob::AfterBikeSaveJob.perform_async(imageable_id, false, true)
   end
 
+  # CarrierWaveProcessJob generates versions by reading the stored original back
+  # from remote storage, which only works with fog (production). With local file
+  # storage (staging/dev) the worker can't see the web box's disk, so process
+  # versions inline — otherwise the job silently skips them and thumbnails 404.
+  def process_image_upload
+    return true unless remote_storage?
+
+    @process_image_upload
+  end
+
   # Because the way we load the file is different if it's remote or local
   # This is hacky, but whatever
   def local_file?
     image&._storage&.to_s == "CarrierWave::Storage::File"
   end
 
-  # To enable stream processing for both local and remote files
+  # To enable stream processing for both local and remote files.
+  # Returns nil when a local file is missing on disk (e.g. staging without synced uploads)
   def open_file
-    local_file? ? File.open(image.path, "r") : URI.parse(image.url).open
+    if local_file?
+      File.open(image.path, "r") if File.exist?(image.path)
+    else
+      URI.parse(image.url).open
+    end
+  end
+
+  private
+
+  def remote_storage?
+    PublicImageUploader.storage == CarrierWave::Storage::Fog
   end
 end

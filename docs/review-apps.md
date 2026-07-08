@@ -4,6 +4,14 @@ Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single 
 
 Review apps run the **staging Rails environment** `RAILS_ENV=staging`, a near-duplicate of production (`config/environments/staging.rb` imports production.rb)
 
+## Staging (persistent `main` deploy)
+
+Alongside the per-PR apps, `main` is continuously deployed to **`staging.review.bikeindex.org`** — think of it as a review app that never gets a PR number and is never destroyed. It shares the same host, the `shared-db`/`shared-redis` accessories, `RAILS_ENV=staging`, and the `review-app` GitHub Environment secrets. It differs only in fixed names: service `bike-index-staging`, Postgres role `bike_index_staging` + databases `bike_index_staging_{primary,analytics}`, and Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
+
+- **Config:** `config/deploy.staging.yml` (no `accessories:` block — the shared infra is owned by `deploy.review.yml`).
+- **Workflow:** `.github/workflows/staging.yml` deploys on `workflow_run` after **CI succeeds on `main`** (so a red main never ships), plus a `workflow_dispatch` for manual redeploys. Its data persists across deploys: first boot seeds, later boots migrate only.
+- **One-time setup:** none beyond the review-app host — the `*.review.bikeindex.org` wildcard already resolves `staging.`, kamal-proxy auto-issues its TLS cert on first deploy, and the shared accessories are already booted. Deploy manually the first time via the workflow's "Run workflow" button (or `kamal deploy --version staging-<sha> --skip-push --config-file config/deploy.staging.yml` locally).
+
 ## How to trigger one
 
 1. Open the [Review App workflow](https://github.com/bikeindex/bike_index/actions/workflows/review-app.yml) in Actions.
@@ -92,6 +100,8 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
 | `bin/kamal_review` | Run kamal against one review app — `deploy`/`destroy` lifecycle plus arbitrary passthrough commands (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
 | `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
+| `config/deploy.staging.yml` | Kamal config for the persistent `staging.review.bikeindex.org` deploy of `main` (fixed names; no accessories) |
+| `.github/workflows/staging.yml` | Deploys `main` to staging after CI passes (`workflow_run`) — see [Staging](#staging-persistent-main-deploy) |
 | `config/crontab` | Scheduled rake tasks run by the `cron` server role |
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |

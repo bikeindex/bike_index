@@ -1712,7 +1712,8 @@ RSpec.describe Bike, type: :model do
         expect(bike.reload.thumb_path).to be_present
         expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
         expect(bike.image_url).to eq public_image.image_url
-        expect(bike.image_url(:medium)).to eq public_image.image_url(:medium)
+        # reload so the version URL reconstructs from the stored identifier (generation is backgrounded)
+        expect(bike.image_url(:medium)).to eq public_image.reload.image_url(:medium)
       end
       # On Fog storage, CarrierWave's Uploader#blank? issues an S3 HEAD per call
       # (via Fog::File#exists? → directory.files.head). image_url is invoked twice

@@ -159,6 +159,17 @@ RSpec.describe Images::StolenProcessor do
       end
     end
 
+    context "public_image file missing on disk" do
+      it "does not raise and skips attaching images" do
+        expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
+        FileUtils.rm(public_image.image.path)
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 0
+        expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
+      end
+    end
+
     context "with stock photo" do
       let(:bike) { FactoryBot.create(:bike, stock_photo_url:) }
       let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/13095/csm_INFINITO_CV_SUPER_RECORD_EPS_Compact_2a2c680c1b.jpg" }

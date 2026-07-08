@@ -4,6 +4,10 @@ RSpec.describe Images::ExternalUrlStoreJob, type: :job do
   let(:instance) { described_class.new }
 
   context "valid performance" do
+    # Version generation only defers to CarrierWaveProcessJob with remote (fog)
+    # storage; simulate production since test uses local file storage (inline)
+    before { allow_any_instance_of(PublicImage).to receive(:remote_storage?).and_return(true) }
+
     let(:bike) { FactoryBot.create(:bike) }
     let(:is_private) { false }
     let(:public_image) do
@@ -20,8 +24,10 @@ RSpec.describe Images::ExternalUrlStoreJob, type: :job do
         public_image.reload
         expect(public_image.image).to be_present
       end
-      expect(Sidekiq::Job.jobs.count).to eq 1
+      # AfterBikeSaveJob + backgrounded version generation (process_in_background :image)
+      expect(Sidekiq::Job.jobs.count).to eq 2
       expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+      expect(CarrierWaveProcessJob).to have_enqueued_sidekiq_job("PublicImage", public_image.id.to_s, "image")
     end
     context "is_private true" do
       let(:is_private) { true }
@@ -34,8 +40,10 @@ RSpec.describe Images::ExternalUrlStoreJob, type: :job do
           public_image.reload
           expect(public_image.image).to be_present
         end
-        expect(Sidekiq::Job.jobs.count).to eq 1
+        # AfterBikeSaveJob + backgrounded version generation (process_in_background :image)
+        expect(Sidekiq::Job.jobs.count).to eq 2
         expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+        expect(CarrierWaveProcessJob).to have_enqueued_sidekiq_job("PublicImage", public_image.id.to_s, "image")
       end
     end
   end

@@ -5,7 +5,6 @@ class ImageUploader < ApplicationUploader
     self.class.extensions
   end
 
-  process :validate_dimensions
   process :fix_exif_rotation
   process :strip
 

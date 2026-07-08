@@ -9,13 +9,78 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   end
 
   context "when review_app is present" do
-    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:)) }
+    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, current_user:, return_to:)) }
     let(:pr_number) { nil }
     let(:pr_title) { nil }
+    let(:current_user) { nil }
+    let(:return_to) { nil }
 
     it "renders the label and disclaimer" do
       expect(component.text).to include("Review app")
       expect(component.text).to include("data is ephemeral")
+    end
+
+    it "hides the label and disclaimer on small screens" do
+      # tw:hidden tw:sm:inline => display:none below the sm breakpoint
+      label = component.css("span.tw\\:hidden", text: "Review app").first
+      disclaimer = component.css("span.tw\\:hidden", text: "data is ephemeral").first
+      expect(label).to be_present
+      expect(disclaimer).to be_present
+      # The outbox link stays visible, so it's not inside a hidden span
+      expect(component.css("span.tw\\:hidden a[href='/letter_opener']")).to be_empty
+    end
+
+    it "doesn't render the superadmin button when there is no superadmin" do
+      expect(component.css("form[action='/session/sign_in_with_magic_link']")).to be_empty
+    end
+
+    context "with a superadmin" do
+      let!(:superadmin) { FactoryBot.create(:superuser) }
+
+      it "renders a button posting the superadmin's magic link token" do
+        form = component.css("form[action='/session/sign_in_with_magic_link']").first
+        expect(form).to be_present
+        expect(form.css("button").text).to eq("sign in as superadmin")
+        expect(form.css("input[name='token']").first[:value]).to eq superadmin.reload.magic_link_token
+        expect(form.css("input[name='return_to']")).to be_empty
+      end
+
+      context "with a return_to" do
+        let(:return_to) { "/bikes/12" }
+
+        it "posts the return_to so sign-in redirects back to the current page" do
+          form = component.css("form[action='/session/sign_in_with_magic_link']").first
+          expect(form.css("input[name='return_to']").first[:value]).to eq "/bikes/12"
+        end
+      end
+
+      # The banner renders on pages served under set_reading_role, so refreshing
+      # the (persisted) token must not raise ActiveRecord::ReadOnlyError
+      it "generates the token under the reading database role" do
+        input = ActiveRecord::Base.connected_to(role: :reading) do
+          render_inline(described_class.new(review_app: "1"))
+            .css("form[action='/session/sign_in_with_magic_link'] input[name='token']").first
+        end
+        expect(input[:value]).to eq superadmin.reload.magic_link_token
+      end
+
+      context "when signed in as the superadmin" do
+        let(:current_user) { superadmin }
+
+        it "shows a signed-in label instead of the button" do
+          expect(component.css("form[action='/session/sign_in_with_magic_link']")).to be_empty
+          expect(component.text).to include("signed in as superadmin")
+        end
+      end
+
+      context "when signed in as another user" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+        it "still renders the sign in button" do
+          expect(component.css("form[action='/session/sign_in_with_magic_link']")).to be_present
+          expect(component.text).not_to include("signed in as superadmin")
+        end
+      end
     end
 
     it "links to the letter_opener outbox with a tooltip" do
