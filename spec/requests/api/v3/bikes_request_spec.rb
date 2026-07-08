@@ -113,10 +113,11 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     describe "short_id" do
-      # A short_id's "/" must be URL-encoded (%2F) in a path segment; the "_" and "-"
-      # separators (see ShortId.decode) are equivalent and avoid the encoding.
+      # The short_id "/" is a real path separator here (e.g. /api/v3/bikes/r/35); the "_" and
+      # "-" separators (see ShortId.decode) are accepted equivalents.
       it "finds the bike from its short_id (r/ and r_)" do
-        [bike.short_id.sub("/", "%2F"), bike.short_id.tr("/", "_")].each do |short_id|
+        expect(bike.short_id).to eq "r/#{bike.id}"
+        [bike.short_id, bike.short_id.tr("/", "_")].each do |short_id|
           get "/api/v3/bikes/#{short_id}", params: {format: :json}
           expect(response.code).to eq("200")
           expect(json_result["bike"]["id"]).to eq bike.id
@@ -124,15 +125,21 @@ RSpec.describe "Bikes API V3", type: :request do
       end
 
       context "bike_sticker short_id" do
-        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "A1029", bike: bike) }
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "A044", bike: bike) }
 
-        it "finds the sticker's bike (s/ and s-)" do
-          expect(bike_sticker.short_id).to eq "s/A1029"
-          ["s%2FA1029", "s-A1029"].each do |short_id|
+        it "finds the sticker's bike (s/, lowercase, and s-)" do
+          expect(bike_sticker.short_id).to eq "s/A44" # code normalizes, stripping the leading zero
+          ["s/A44", "s/a044", "s-A44"].each do |short_id|
             get "/api/v3/bikes/#{short_id}", params: {format: :json}
             expect(response.code).to eq("200")
             expect(json_result["bike"]["id"]).to eq bike.id
           end
+        end
+
+        it "responds with 404 for an unknown sticker" do
+          get "/api/v3/bikes/s/nope999", params: {format: :json}
+          expect(response.code).to eq("404")
+          expect(json_result["error"].present?).to be_truthy
         end
       end
     end
