@@ -4,18 +4,15 @@ name: Staging Deploy
 # with Kamal, on the same host + shared accessories as the per-PR review apps.
 # See config/deploy.staging.yml and docs/review-apps.md.
 #
-# Triggers:
-#   - workflow_run   : after CI succeeds on main, so a red main never ships.
-#   - workflow_dispatch : manual redeploy of the current main.
+# Trigger: workflow_dispatch only. CI's `dispatch` job fires this on every push
+# to main (see .github/workflows/ci.yml), and it's also a manual redeploy button.
+# NOTE: CI dispatches this in parallel with its own test job, so a staging deploy
+# does NOT wait for the test suite to pass.
 #
 # There is no destroy path — staging is long-lived. Its Postgres role/databases
 # and Redis DB 0 persist across deploys (first boot seeds, later boots migrate).
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -32,19 +29,14 @@ concurrency:
 jobs:
   build:
     name: Build image
-    # Skip unless CI passed (workflow_dispatch has no conclusion, so allow it).
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     outputs:
       head_sha: ${{ steps.vars.outputs.head_sha }}
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}
-      # workflow_run carries the CI'd commit; workflow_dispatch falls back to the
-      # branch head. Both are the main commit we want to ship.
-      HEAD_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      # The main commit to ship — the head of the ref this was dispatched against.
+      HEAD_SHA: ${{ github.sha }}
     steps:
       - name: Expose head sha
         id: vars
