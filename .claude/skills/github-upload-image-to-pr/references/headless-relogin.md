@@ -1,6 +1,6 @@
 # Logging into GitHub when the MCP runs headless
 
-The Playwright MCP is registered in **user config** (`~/.claude.json`; inspect with `claude mcp get playwright`) with `--isolated --headless`, seeding each browser session's auth from a storage-state file: `--storage-state=$HOME/.cache/ms-playwright/mcp-auth.json`. Two consequences:
+The Playwright MCP is registered in the project's **`.mcp.json`** (inspect with `claude mcp get playwright`) with `--isolated --headless`, seeding each browser session's auth from a storage-state file: `--storage-state=${HOME}/.cache/ms-playwright/mcp-auth.json`. Two consequences:
 
 - The github.com session lives in that file, not in a browser profile. Every new browser session re-reads it at context creation.
 - The file is read-only from the MCP's perspective: `--isolated` keeps the profile in memory and never writes back to disk. A login performed inside the MCP browser is lost when the browser closes — so re-login means **regenerating the state file**, not driving the MCP browser through the login form. (This holds even if the MCP happens to be running headed: an in-browser login lasts only until that browser session ends.)

@@ -42,16 +42,9 @@ Use `ToolSearch` with a query like `"browser navigate upload"` to confirm `mcp__
 
 Playwright MCP runs isolated (`--isolated --storage-state=…/mcp-auth.json`), loading github.com cookies from that shared storage-state file at startup — so the session persists across sessions once the file is populated. It's load-only: the MCP never writes it back, so login can't be refreshed through the MCP browser. If GitHub logs the user out and you hit a 404 / login screen mid-task, see [references/headless-relogin.md](references/headless-relogin.md) — full login can't be driven headlessly.
 
-### If Playwright MCP is not installed
+### If Playwright MCP is not registered
 
-Recommend the user install it — isolated, with the shared storage-state file and headless (matches [references/headless-relogin.md](references/headless-relogin.md)):
-
-```bash
-claude mcp add playwright -s user -- npx -y @playwright/mcp@latest \
-  --isolated --storage-state="$HOME/.cache/ms-playwright/mcp-auth.json" --headless
-```
-
-After install, the Claude Code session must be restarted for `mcp__playwright__*` tools to register. On first use `mcp-auth.json` won't exist yet — populate it via the login helper in the re-login guide.
+The project ships a `.mcp.json` registering Playwright MCP (isolated, shared storage-state file, headless). Claude Code prompts to approve project MCP servers on first entry — if the `mcp__playwright__*` tools aren't registered, approve the `playwright` server there and restart the session (or `/mcp` → **playwright** → **reconnect**). On first use `mcp-auth.json` won't exist yet — populate it via the login helper in the re-login guide.
 
 ## Step 3: Navigate to PR page and check login state
 
@@ -180,7 +173,7 @@ Reload the page in the Playwright browser and take a screenshot to confirm the i
 | File upload fails | Ensure the file path is absolute |
 | Textarea doesn't contain URLs yet | Wait 3–5 seconds after upload before running JS eval; retry once if needed |
 | Textarea selector not found | GitHub UI changes occasionally — use the multi-selector JS in Step 4 to find the current element |
-| Playwright MCP not registered | `claude mcp add playwright -s user -- npx -y @playwright/mcp@latest --isolated --storage-state="$HOME/.cache/ms-playwright/mcp-auth.json" --headless`, then restart the Claude Code session |
+| Playwright MCP not registered | Approve the `playwright` server from the project `.mcp.json` (Claude Code prompts on project entry), then restart the session or `/mcp` → reconnect |
 | PR not found / 404 | Private repos return 404 for unauthenticated users — check login state |
 
 ## Notes
