@@ -20,6 +20,16 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       expect(component.text).to include("data is ephemeral")
     end
 
+    it "hides the label and disclaimer on small screens" do
+      # tw:hidden tw:sm:inline => display:none below the sm breakpoint
+      label = component.css("span.tw\\:hidden", text: "Review app").first
+      disclaimer = component.css("span.tw\\:hidden", text: "data is ephemeral").first
+      expect(label).to be_present
+      expect(disclaimer).to be_present
+      # The outbox link stays visible, so it's not inside a hidden span
+      expect(component.css("span.tw\\:hidden a[href='/letter_opener']")).to be_empty
+    end
+
     it "doesn't render the superadmin button when there is no superadmin" do
       expect(component.css("form[action='/session/sign_in_with_magic_link']")).to be_empty
     end
