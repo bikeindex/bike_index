@@ -68,8 +68,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
     end
 
     context "stolen bike" do
-      let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
-      it "still renders the redesign, hiding mark-stolen and marketplace for the owner" do
+      let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:, phone: "3025551234", phone_for_everyone: true) }
+      it "renders the redesign theft details, hiding mark-stolen and marketplace for the owner" do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
         body = whitespace_normalized_body_text
@@ -79,12 +79,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to_not match("Sell on Marketplace")
         # Theft details always show a location row, even with no location on file
         expect(body).to match("No location given")
-      end
-
-      it "includes the owner phone in theft details when phone visibility permits" do
-        stolen_record.update(phone: "3025551234", phone_for_everyone: true)
-        get "#{base_url}/#{bike.id}"
-        expect(whitespace_normalized_body_text).to match("3025551234")
+        # Owner phone shows when phone visibility permits
+        expect(body).to match("3025551234")
       end
     end
   end
@@ -133,18 +129,18 @@ RSpec.describe "RegistrationsController#show", type: :request do
 
     context "view_as switching" do
       let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
-      it "offers a switcher and applies an allowed view_as" do
+      it "offers a switcher, applies an allowed view_as, and rejects a disallowed one" do
         get "#{base_url}/#{bike.id}"
         expect(whitespace_normalized_body_text).to match("Admin / Staff")
         expect(response.body).to include("view_as=public")
 
+        # An allowed view_as applies
         get "#{base_url}/#{bike.id}", params: {view_as: "public"}
         body = whitespace_normalized_body_text
         expect(body).to_not match("Admin / Staff")
         expect(body).to match("Public view")
-      end
 
-      it "flashes and falls back when view_as is not permitted" do
+        # A disallowed view_as flashes and falls back to the admin view
         get "#{base_url}/#{bike.id}", params: {view_as: "owner"}
         body = whitespace_normalized_body_text
         expect(body).to match("Admin / Staff")
@@ -155,7 +151,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
     context "superuser view_as options" do
       let(:current_user) { FactoryBot.create(:superuser) }
       let!(:brakebills) { FactoryBot.create(:organization, name: "Brakebills") }
-      it "offers owner, both org roles, and public as views" do
+      it "offers every view and renders the owner and org-limited perspectives" do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
         body = whitespace_normalized_body_text
@@ -164,16 +160,14 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("View as #{brakebills.short_name} limited")
         # public is the superuser's default/current view
         expect(body).to match("Viewing as Public")
-      end
 
-      it "renders the owner view even though they don't own the bike" do
+        # Renders the owner view even though they don't own the bike
         get "#{base_url}/#{bike.id}", params: {view_as: "owner"}
         body = whitespace_normalized_body_text
         expect(body).to match("Your bike")
         expect(body).to match("Mark stolen")
-      end
 
-      it "can view an org panel as limited" do
+        # Renders an org panel as limited
         get "#{base_url}/#{bike.id}", params: {view_as: "#{brakebills.to_param}.limited"}
         body = whitespace_normalized_body_text
         expect(body).to match("Limited")
