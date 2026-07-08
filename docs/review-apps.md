@@ -23,8 +23,8 @@ Alongside the per-PR apps, `main` is continuously deployed to **`staging.review.
 `bin/kamal_review` runs **any** kamal command against one review app (so you don't have to export the `REVIEW_APP_*` vars or include `--config-file`). Name the app with `--app` — any of these forms work — and everything else passes through to kamal:
 
 ```bash
+bin/kamal_review console                              --app pr-3594 # rails console
 bin/kamal_review app logs -f                          --app 3594
-bin/kamal_review app exec --reuse "bin/rails console" --app pr-3594
 bin/kamal_review app details                          --app pr-3594.review.bikeindex.org
 bin/kamal_review app version                          --app https://pr-3594.review.bikeindex.org
 ```
