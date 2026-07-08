@@ -1,67 +1,41 @@
-# Logging into GitHub when the MCP runs headless
+# Logging into GitHub for the isolated, headless MCP
 
-The Playwright MCP is usually configured with `--headless` (no visible window, so it never steals focus). The github.com login cookie lives in the persistent `--user-data-dir` profile and keeps working headless once it exists — but you can't *type* credentials, a 2FA code, or a passkey into a window that doesn't exist. So when GitHub has logged the user out (expired session, or first-ever use), briefly run **headed**, let the user sign in, then switch back to headless.
+The Playwright MCP here runs **isolated** against a shared storage-state file:
 
-## First: confirm you're actually headless (the trigger gate)
-
-Do **none** of this unless the MCP is currently headless. Check:
-
-```bash
-claude mcp get playwright   # look for `--headless` in the Args line
+```
+--isolated --storage-state=$HOME/.cache/ms-playwright/mcp-auth.json --headless
 ```
 
-If `--headless` is **absent**, the window is already visible — just `browser_navigate` to `https://github.com/login` and ask the user to sign in there. Skip the entire config dance below.
+`--isolated` keeps the browser profile in memory (nothing on disk); `--storage-state` **loads** github.com cookies from `mcp-auth.json` into every new browser context at startup. That single file is the shared auth store — every Claude Code session's MCP reads the same cookies from it, which is why login "sticks" across sessions with no visible window.
 
-## The clean switch — one reconnect each way
+**It is load-only.** The MCP never writes `mcp-auth.json` back. Signing in *inside* the MCP browser doesn't persist: an isolated context is discarded on `browser_close` and the fresh cookie goes with it. (This is the difference from the old `--user-data-dir` persistent profile, which saved login to disk automatically.) So when GitHub logs you out, refresh the file out-of-band, then let the MCP re-read it.
 
-The trap that caused us to reconnect repeatedly: the running browser holds a lock on the shared profile dir (`mcp-chrome-shared`). If you change the config and reconnect while that browser is **still alive**, the new server can't launch — it fails with `Browser is already in use ... use --isolated` — and you're forced to kill orphaned processes, which itself drops the MCP connection and forces yet another reconnect.
+## When this triggers
 
-Avoid all of that by **closing the browser first** so the lock is released *before* each reconnect. Done this way it's exactly one reconnect per direction, no process-killing.
+You hit a GitHub 404 / login screen mid-task (a private-repo page 404s when logged out). **Stop** — don't try to drive GitHub's login form through the MCP: it can't persist the result, and 2FA / passkeys can't be typed into a headless window.
 
-### Headless → headed (to log in)
+## Refresh the shared auth file
 
-1. `browser_close` — releases the profile lock. Login state lives on disk, so this never logs anyone out.
-2. Drop the `--headless` flag (re-register the server without it):
+1. Confirm the storage-state path from the live config — don't assume it, read whatever `--storage-state` points at:
    ```bash
-   claude mcp remove playwright -s user
-   claude mcp add playwright -s user -- npx -y @playwright/mcp@latest \
-     --user-data-dir="$HOME/.cache/ms-playwright/mcp-chrome-shared"
+   claude mcp get playwright   # read the --storage-state=<path> in the Args line
    ```
-3. Ask the user to run `/mcp` → **playwright** → **reconnect**. A full Claude Code restart is **not** needed — reconnect re-reads the config and relaunches the server.
-4. After they confirm reconnection, `browser_navigate` to `https://github.com/login`. A visible Chrome window appears; the user types their credentials and clears any 2FA/passkey themselves. **Do not type their credentials for them.**
-5. When they say they're signed in, `browser_navigate` to `https://github.com` and `browser_snapshot` to confirm the account sidebar shows their handle.
-
-### Headed → headless (restore when done)
-
-6. `browser_close` again — releases the lock; the freshly-saved cookie is already persisted to the profile.
-7. Re-add `--headless`:
+2. **Ask the user** to run a one-off headed login that loads the current cookies and saves them back after they sign in. They type their own credentials / 2FA / passkey — **never do it for them**:
    ```bash
-   claude mcp remove playwright -s user
-   claude mcp add playwright -s user -- npx -y @playwright/mcp@latest \
-     --user-data-dir="$HOME/.cache/ms-playwright/mcp-chrome-shared" --headless
+   AUTH="$HOME/.cache/ms-playwright/mcp-auth.json"   # the --storage-state path from step 1
+   npx -y playwright open --load-storage="$AUTH" --save-storage="$AUTH" https://github.com/login
    ```
-8. User runs `/mcp` → reconnect once more. Verify with a `browser_navigate` + `browser_snapshot`: headless again, still signed in.
+   A visible browser opens (carrying any still-valid cookies from the file). They finish signing in, then **close the window** — Playwright writes the refreshed cookies to `mcp-auth.json` on close. This is a user-run login helper, not a screenshot path; screenshots still go only through the MCP, never the Playwright CLI.
+3. Back in the MCP, pick up the new file — usually no config change and no reconnect:
+   ```
+   browser_close                    # drop the logged-out context
+   browser_navigate https://github.com
+   browser_snapshot                 # confirm the account handle shows in the sidebar
+   ```
+   The next isolated context re-reads `mcp-auth.json` (the path is resolved lazily per context, not cached at launch). If the snapshot still shows logged-out, reconnect once — `/mcp` → **playwright** → **reconnect** — and re-check.
 
-> The config lives in `~/.claude.json` (often a symlink into a dotfile manager like Mackup). Prefer the `claude mcp remove/add` commands above over hand-editing that file — they handle the symlink and write the exact args. If you must edit the JSON directly, edit the real symlink target, not the link.
+## Notes
 
-## Fallback: "Browser is already in use" even after closing
-
-This happens when another process is still holding the lock — usually a **prior crashed session's** orphaned headless Chrome, but it can also be a **second, currently-active Claude Code session** running its own headless Playwright against the same shared profile. That second possibility is why you must never kill on your own judgment here.
-
-Inspect first — never bare "Chrome", which would take down the user's real browser ([[feedback_never_kill_non_mcp_chrome]]):
-
-```bash
-# Inspect — the actual Chrome browser process has `--headless` BEFORE the
-# user-data-dir, so eyeball the list rather than trusting a one-shot regex.
-# (Your own shell may appear in the list because this command contains the
-# match strings — ignore the zsh/grep lines.)
-pgrep -fl "mcp-chrome-shared" | grep -- "--headless"
-```
-
-**Stop and ask the user before killing anything.** These processes are scoped to `mcp-chrome-shared`, which is *shared across every Claude Code session on this machine* — the lock-holder might be a live Playwright session in another window, not a dead orphan, and killing it would crash that session's browser mid-task. Show the user the inspected PID list and ask them to confirm these are stale/abandoned before you `kill <those PIDs>`. Only proceed on explicit confirmation.
-
-Killing the MCP processes drops this session's connection too, so reconnect via `/mcp` afterward (this is the one case where you pay an extra reconnect).
-
-## Mid-task
-
-If you hit a 404 / login screen mid-task while headless, **stop** and walk the user through the headed re-login above — never try to drive GitHub's login form blind.
+- **No profile lock anymore.** `--isolated` keeps nothing on disk, so concurrent sessions don't fight over a shared profile — you'll never see the old `Browser is already in use ... use --isolated` error, and there's no orphaned-Chrome process to hunt down or kill.
+- `npx playwright open` uses Playwright's bundled Chromium. If it reports the browser is missing, run `npx playwright install chromium` once.
+- The config lives in `~/.claude.json` (often a symlink into a dotfile manager like Mackup). Prefer `claude mcp get/remove/add` over hand-editing it; if you must edit the JSON, edit the real symlink target, not the link.
