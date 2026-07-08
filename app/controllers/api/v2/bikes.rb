@@ -97,7 +97,11 @@ module API
         end
 
         def find_bike
-          @bike = Bike.unscoped.find_id(params[:id])
+          @bike = if params[:id].to_s.match?(/\As[\W_]/i) # sticker short_id, e.g. "s/A1029"
+            BikeSticker.lookup_with_fallback(params[:id].to_s.sub(/\As[\W_]*/i, ""))&.bike
+          else
+            Bike.unscoped.find_id(params[:id])
+          end
         end
 
         def owner_duplicate_bike(bikes: nil)
@@ -156,7 +160,7 @@ module API
       resource :bikes do
         desc "View bike with a given ID"
         params do
-          requires :id, type: Integer, desc: "Bike id"
+          requires :id, type: String, desc: "Bike id, or a short_id (bike: 'r/21J-HW', sticker: 's/A1029')"
         end
         get ":id" do
           BikeV2ShowSerializer.new(find_bike, root: "bike").as_json

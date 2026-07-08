@@ -111,6 +111,31 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
     end
+
+    describe "short_id" do
+      # A short_id's "/" must be URL-encoded (%2F) in a path segment; the "_" and "-"
+      # separators (see ShortId.decode) are equivalent and avoid the encoding.
+      it "finds the bike from its short_id (r/ and r_)" do
+        [bike.short_id.sub("/", "%2F"), bike.short_id.tr("/", "_")].each do |short_id|
+          get "/api/v3/bikes/#{short_id}", params: {format: :json}
+          expect(response.code).to eq("200")
+          expect(json_result["bike"]["id"]).to eq bike.id
+        end
+      end
+
+      context "bike_sticker short_id" do
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "A1029", bike: bike) }
+
+        it "finds the sticker's bike (s/ and s-)" do
+          expect(bike_sticker.short_id).to eq "s/A1029"
+          ["s%2FA1029", "s-A1029"].each do |short_id|
+            get "/api/v3/bikes/#{short_id}", params: {format: :json}
+            expect(response.code).to eq("200")
+            expect(json_result["bike"]["id"]).to eq bike.id
+          end
+        end
+      end
+    end
   end
 
   describe "check_if_registered" do
