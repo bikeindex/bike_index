@@ -98,9 +98,9 @@ module API
 
         def find_bike
           # short_id "/" separator arrives split across :prefix and :id (Grape's :id can't span a slash)
-          short_id = params[:prefix].present? ? "#{params[:prefix]}/#{params[:id]}" : params[:id]
-          @bike = if short_id.to_s.match?(/\As[\W_]/i) # sticker short_id, e.g. "s/A1029"
-            BikeSticker.lookup_with_fallback(short_id.to_s.sub(/\As[\W_]*/i, ""))&.bike
+          short_id = (params[:prefix].present? ? "#{params[:prefix]}/#{params[:id]}" : params[:id]).to_s
+          @bike = if short_id.match?(/\As[\W_]/i) # sticker short_id, e.g. "s/A1029"
+            BikeSticker.lookup_with_fallback(short_id.sub(/\As[\W_]*/i, ""))&.bike
           else
             Bike.unscoped.find_id(short_id)
           end
