@@ -46,7 +46,7 @@ class PrimaryActivity < ApplicationRecord
 
   scope :family, -> { where(family: true) }
   scope :flavor, -> { where(family: false) }
-  scope :by_priority, -> { order(priority: :desc) }
+  scope :by_priority, -> { order(priority: :desc, id: :asc) }
   scope :alphabetized, -> { order(Arel.sql("LOWER(name)")) }
   # top_level means that there isn't a family
   scope :top_level, -> { where("primary_activity_family_id = id") }
