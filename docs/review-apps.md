@@ -8,9 +8,9 @@ Review apps run the **staging Rails environment** `RAILS_ENV=staging`, a near-du
 
 Alongside the per-PR apps, `main` is continuously deployed to **`staging.review.bikeindex.org`** — think of it as a review app that never gets a PR number and is never destroyed. It shares the same host, the `shared-db`/`shared-redis` accessories, `RAILS_ENV=staging`, and the `review-app` GitHub Environment secrets. It differs only in fixed names: service `bike-index-staging`, Postgres role `bike_index_staging` + databases `bike_index_staging_{primary,analytics}`, and Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
 
-- **Config:** `config/deploy.staging.yml` (no `accessories:` block — the shared infra is owned by `deploy.review.yml`).
-- **Workflow:** `.github/workflows/staging.yml` deploys on `workflow_run` after **CI succeeds on `main`** (so a red main never ships), plus a `workflow_dispatch` for manual redeploys. Its data persists across deploys: first boot seeds, later boots migrate only.
-- **One-time setup:** none beyond the review-app host — the `*.review.bikeindex.org` wildcard already resolves `staging.`, kamal-proxy auto-issues its TLS cert on first deploy, and the shared accessories are already booted. Deploy manually the first time via the workflow's "Run workflow" button (or `kamal deploy --version staging-<sha> --skip-push --config-file config/deploy.staging.yml` locally).
+- **Config:** shares `config/deploy.review.yml` — with no `REVIEW_APP_PR_NUMBER` set, its ERB resolves the `staging` slug and omits the `accessories:` block (so a staging deploy can't touch the shared infra the PR apps depend on).
+- **Workflow:** `.github/workflows/staging.yml` is a thin caller of the shared `kamal-deploy.yml` reusable workflow. CI's `dispatch` job runs it on **every push to `main`** (`workflow_dispatch`), plus a manual "Run workflow" button. It dispatches in parallel with CI's tests, so a staging deploy does **not** wait for the suite to pass. Data persists across deploys: first boot seeds, later boots migrate only.
+- **One-time setup:** none beyond the review-app host — the `*.review.bikeindex.org` wildcard already resolves `staging.`, kamal-proxy auto-issues its TLS cert on first deploy, and the shared accessories are already booted. Deploy manually the first time via the workflow's "Run workflow" button (or `REVIEW_APP_REDIS_DB=0 kamal deploy --version staging-<sha> --skip-push --config-file config/deploy.review.yml` locally).
 
 ## How to trigger one
 
@@ -59,7 +59,7 @@ Only CI's on-push dispatch and `closed` are wired up, so toggling the label by h
 
 ## How a deploy works
 
-Four jobs: `resolve` (PR number + deploy/destroy), `build` (label + build/push image; deploy only), `update` (does the work, branching by step `if:`), `report` (failure-only). `build` is separate so a newer push cancels a stale build (`cancel-in-progress`); `update` handles **both deploy and destroy in one job** (separate jobs would show a skipped check every run) and serializes per PR *without* cancellation, since killing kamal mid-deploy can strand the deploy lock.
+Four jobs: `resolve` (PR number + deploy/destroy, and labels on deploy), `op` (calls the shared `kamal-deploy.yml` reusable workflow to build + run the kamal command), `post` (PR-side follow-ups: deployment link, failure-comment cleanup, label removal + GHCR image cleanup on destroy), `report` (failure-only). The reusable workflow's `build` job cancels superseded builds (`cancel-in-progress`) while its `run` job serializes per PR *without* cancellation, since killing kamal mid-deploy can strand the deploy lock. `kamal-deploy.yml` is shared with `staging.yml`.
 
 | Trigger | Action | What runs |
 |---|---|---|
@@ -99,14 +99,14 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `bin/docker-entrypoint` | Creates the per-PR Postgres **superuser** role + runs `db:prepare` (schema + seed) on first boot |
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
 | `bin/kamal_review` | Run kamal against one review app — `deploy`/`destroy` lifecycle plus arbitrary passthrough commands (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
-| `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
-| `config/deploy.staging.yml` | Kamal config for the persistent `staging.review.bikeindex.org` deploy of `main` (fixed names; no accessories) |
-| `.github/workflows/staging.yml` | Deploys `main` to staging after CI passes (`workflow_run`) — see [Staging](#staging-persistent-main-deploy) |
+| `config/deploy.review.yml` | Kamal config for both targets — ERB derives `pr-<N>` (with `REVIEW_APP_PR_NUMBER`) or the `staging` slug (without); accessories emitted for review apps only |
+| `.github/workflows/staging.yml` | Thin caller of `kamal-deploy.yml` for the `main`→staging deploy — see [Staging](#staging-persistent-main-deploy) |
+| `.github/workflows/kamal-deploy.yml` | Reusable (`workflow_call`) build + kamal-command workflow shared by review-app and staging |
 | `config/crontab` | Scheduled rake tasks run by the `cron` server role |
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
 | `.kamal/hooks/post-deploy` | Best-effort Honeybadger deploy notification (`staging` env); never fails the deploy — no-ops if `HONEYBADGER_API_KEY` is unset or the gem is absent (e.g. CI) |
-| `.github/workflows/review-app.yml` | `resolve` + `build` + `update` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
+| `.github/workflows/review-app.yml` | `resolve` + `op` (calls `kamal-deploy.yml`) + `post` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `.github/workflows/ci.yml` (`dispatch` job) | Auto-dispatches a deploy on every push to a labeled PR — the auto-redeploy half of the label gate |
 | `.kamal/provisioning/` | Ansible playbook for one-time host hardening |
 | `app/components/page_block/review_app_banner/` | ViewComponent shown in the layout when `ENV["REVIEW_APP"]` is set |
