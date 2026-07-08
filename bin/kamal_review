@@ -11,9 +11,12 @@
 #   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 #
 # Passthrough sends everything else straight to kamal; --app may go anywhere and
-# defaults to PR 0 (the shared accessories aren't PR-specific), e.g.
-#   bin/kamal_review app logs -f --app 3594
-#   bin/kamal_review accessory reboot db
+# defaults to the persistent `staging` app, e.g.
+#   bin/kamal_review app logs -f              # staging (default)
+#   bin/kamal_review app logs -f --app 3594   # a PR
+# Accessory commands need an explicit `--app 0` (or any PR): the shared-db /
+# shared-redis accessories live only in the pr-* config, not staging's.
+#   bin/kamal_review accessory reboot db --app 0
 #
 # deploy/destroy require an explicit --app and run the per-PR lifecycle:
 #   deploy  — kamal deploy --version <tag> --skip-push (tag via --version or IMAGE_TAG)
@@ -42,12 +45,13 @@ Usage:
 <review-app> is a PR, in any of these equivalent forms:
   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 
-Passthrough defaults --app to 0 when omitted; deploy/destroy require it.
+Passthrough defaults --app to the persistent 'staging' app; deploy/destroy require it.
 
 Examples:
+  bin/kamal_review app logs -f                       # staging (default)
   bin/kamal_review app logs -f --app 3594
   bin/kamal_review app exec --reuse "bin/rails runner 'puts Bike.count'" --app pr-3594
-  bin/kamal_review accessory reboot db
+  bin/kamal_review accessory reboot db --app 0       # accessories live in the pr-* config
   bin/kamal_review deploy  --app 3594 --version pr-3594-abc123
   bin/kamal_review destroy --app 3594
 
@@ -80,6 +84,27 @@ export_review_app_env() {
   export REVIEW_APP_REDIS_DB="$((($1 % REDIS_DATABASES) + 1))"
 }
 
+# The persistent staging app: no PR number (config/deploy.review.yml's ERB then
+# resolves the `staging` slug), Redis DB 0 — the one the mod-N PR allocation
+# reserves.
+export_staging_env() {
+  unset REVIEW_APP_PR_NUMBER
+  export REVIEW_APP_HOST="${REVIEW_APP_HOST:-host.review.bikeindex.org}"
+  export REVIEW_APP_REDIS_DB="0"
+}
+
+# True when the app id refers to staging, in any of review_app_pr_number's forms
+# (bare `staging`, host, or URL).
+is_staging() {
+  local s
+  s="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
+  s="${s#http://}"
+  s="${s#https://}"
+  s="${s%%/*}"   # drop any /path
+  s="${s%%.*}"   # drop the .review.bikeindex.org domain
+  [[ "$s" == "staging" ]]
+}
+
 not_a_review_app() {
   echo "Error: '$1' is not a review app (expected e.g. 3594, pr-3594, or pr-3594.review.bikeindex.org)" >&2
   echo >&2
@@ -97,10 +122,10 @@ case "$1" in
   deploy | destroy) mode="$1"; shift ;;
 esac
 
-# Passthrough: any kamal command, --app anywhere, defaults to PR 0. Always execs,
-# so control never reaches the lifecycle code below.
+# Passthrough: any kamal command, --app anywhere, defaults to staging. Always
+# execs, so control never reaches the lifecycle code below.
 if [[ -z "$mode" ]]; then
-  app="0"
+  app="staging"
   kamal_args=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -109,9 +134,15 @@ if [[ -z "$mode" ]]; then
       *) kamal_args+=("$1"); shift ;;
     esac
   done
-  pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
-  export_review_app_env "$pr_number"
-  echo "==> [pr-${pr_number} on ${REVIEW_APP_HOST}] kamal ${kamal_args[*]} --config-file ${CONFIG}" >&2
+  if is_staging "$app"; then
+    export_staging_env
+    slug="staging"
+  else
+    pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
+    export_review_app_env "$pr_number"
+    slug="pr-${pr_number}"
+  fi
+  echo "==> [${slug} on ${REVIEW_APP_HOST}] kamal ${kamal_args[*]} --config-file ${CONFIG}" >&2
   exec kamal "${kamal_args[@]}" --config-file "$CONFIG"
 fi
 
