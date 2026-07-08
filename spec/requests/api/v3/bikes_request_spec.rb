@@ -141,6 +141,14 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(response.code).to eq("404")
           expect(json_result["error"].present?).to be_truthy
         end
+
+        it "responds with 404 for an unassigned sticker" do
+          unassigned = FactoryBot.create(:bike_sticker, code: "B22")
+          expect(unassigned.bike_id).to be_nil
+          get "/api/v3/bikes/#{unassigned.short_id}", params: {format: :json}
+          expect(response.code).to eq("404")
+          expect(json_result["error"].present?).to be_truthy
+        end
       end
     end
   end
