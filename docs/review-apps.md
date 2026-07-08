@@ -29,7 +29,7 @@ bin/kamal_review app details                          --app pr-3594.review.bikei
 bin/kamal_review app version                          --app https://pr-3594.review.bikeindex.org
 ```
 
-All four resolve to PR `3594`. (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The shared accessories aren't PR-specific, so any PR number works when operating on them — and with no `--app` given it defaults to PR `0`, so reboot Postgres after changing its `shared_preload_libraries` with just:
+All four resolve to PR `3594`; `--app staging` targets the persistent staging app ([below](#against-staging)). (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The shared accessories aren't PR-specific, so any PR number works when operating on them — and with no `--app` given it defaults to PR `0`, so reboot Postgres after changing its `shared_preload_libraries` with just:
 
 ```bash
 bin/kamal_review accessory reboot db
@@ -37,20 +37,16 @@ bin/kamal_review accessory reboot db
 
 ### Against staging
 
-`bin/kamal_review` resolves a PR number and always uses `config/deploy.review.yml`, so it can't name the persistent [staging app](#staging-persistent-main-deploy) directly. Point it at the staging config with `KAMAL_CONFIG` — staging has fixed names, so no `--app` is needed (it defaults to PR `0`, which the ERB just ignores):
+`--app staging` targets the persistent [staging app](#staging-persistent-main-deploy) (`config/deploy.staging.yml`) instead of a PR — for passthrough commands only, since staging is deployed by its own workflow, not the `deploy`/`destroy` lifecycle:
 
 ```bash
-KAMAL_CONFIG=config/deploy.staging.yml bin/kamal_review console   # rails console (staging)
-KAMAL_CONFIG=config/deploy.staging.yml bin/kamal_review shell     # bash
-KAMAL_CONFIG=config/deploy.staging.yml bin/kamal_review dbc       # rails dbconsole
-KAMAL_CONFIG=config/deploy.staging.yml bin/kamal_review app logs -f
+bin/kamal_review console      --app staging   # rails console (staging)
+bin/kamal_review shell        --app staging   # bash
+bin/kamal_review dbc          --app staging   # rails dbconsole
+bin/kamal_review app logs -f  --app staging
 ```
 
-`config/deploy.staging.yml` defines the same `console`/`shell`/`dbc`/`logs` aliases as the review config. Or drive kamal directly — the wrapper only saves you exporting `REVIEW_APP_HOST` and passing `--config-file`:
-
-```bash
-REVIEW_APP_HOST=host.review.bikeindex.org kamal console --config-file config/deploy.staging.yml
-```
+`config/deploy.staging.yml` defines the same `console`/`shell`/`dbc`/`logs` aliases as the review config. (`deploy`/`destroy --app staging` are refused — staging is managed by [`staging.yml`](#staging-persistent-main-deploy).)
 
 ## What about production?
 

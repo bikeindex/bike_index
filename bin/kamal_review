@@ -10,9 +10,14 @@
 # <review-app> identifies the PR in any of these forms — all the same app:
 #   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 #
+# --app staging targets the persistent main deploy (staging.review.bikeindex.org)
+# via config/deploy.staging.yml — passthrough only; it's deployed by
+# .github/workflows/staging.yml, not the deploy/destroy lifecycle here.
+#
 # Passthrough sends everything else straight to kamal; --app may go anywhere and
 # defaults to PR 0 (the shared accessories aren't PR-specific), e.g.
 #   bin/kamal_review app logs -f --app 3594
+#   bin/kamal_review console --app staging
 #   bin/kamal_review accessory reboot db
 #
 # deploy/destroy require an explicit --app and run the per-PR lifecycle:
@@ -41,12 +46,14 @@ Usage:
 
 <review-app> is a PR, in any of these equivalent forms:
   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
+or the literal 'staging' (passthrough only — the persistent main deploy).
 
 Passthrough defaults --app to 0 when omitted; deploy/destroy require it.
 
 Examples:
   bin/kamal_review app logs -f --app 3594
   bin/kamal_review app exec --reuse "bin/rails runner 'puts Bike.count'" --app pr-3594
+  bin/kamal_review console --app staging
   bin/kamal_review accessory reboot db
   bin/kamal_review deploy  --app 3594 --version pr-3594-abc123
   bin/kamal_review destroy --app 3594
@@ -68,6 +75,18 @@ review_app_pr_number() {
   s="${s#pr-}"   # drop the pr- prefix
   [[ "$s" =~ ^[0-9]+$ ]] || return 1
   printf '%s' "$s"
+}
+
+# The persistent main deploy — a review app with no PR number. Matches the same
+# id forms as review_app_pr_number, reduced to the host label 'staging'.
+is_staging_app() {
+  local s
+  s="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
+  s="${s#http://}"
+  s="${s#https://}"
+  s="${s%%/*}"
+  s="${s%%.*}"
+  [[ "$s" == "staging" ]]
 }
 
 # Export the REVIEW_APP_* vars config/deploy.review.yml's ERB reads. The mod-N
@@ -109,9 +128,16 @@ if [[ -z "$mode" ]]; then
       *) kamal_args+=("$1"); shift ;;
     esac
   done
-  pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
-  export_review_app_env "$pr_number"
-  echo "==> [pr-${pr_number} on ${REVIEW_APP_HOST}] kamal ${kamal_args[*]} --config-file ${CONFIG}" >&2
+  if is_staging_app "$app"; then
+    CONFIG="${KAMAL_CONFIG:-config/deploy.staging.yml}"
+    export REVIEW_APP_HOST="${REVIEW_APP_HOST:-host.review.bikeindex.org}"
+    label="staging"
+  else
+    pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
+    export_review_app_env "$pr_number"
+    label="pr-${pr_number}"
+  fi
+  echo "==> [${label} on ${REVIEW_APP_HOST}] kamal ${kamal_args[*]} --config-file ${CONFIG}" >&2
   exec kamal "${kamal_args[@]}" --config-file "$CONFIG"
 fi
 
@@ -129,6 +155,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 [[ -n "$app" ]] || { echo "Error: $mode requires --app <review-app>" >&2; echo >&2; usage >&2; exit 1; }
+if is_staging_app "$app"; then
+  echo "Error: staging is $([[ "$mode" == deploy ]] && echo "deployed by" || echo "persistent — never destroyed by") .github/workflows/staging.yml, not bin/kamal_review $mode" >&2
+  exit 1
+fi
 pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
 export_review_app_env "$pr_number"
 
