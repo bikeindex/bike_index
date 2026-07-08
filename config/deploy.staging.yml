@@ -114,10 +114,16 @@ aliases:
   logs:    app logs -f
   dbc:     app exec --interactive --reuse "bin/rails dbconsole --include-password"
 
-# Persistent active-storage volume (letter_opener inbox lives here — see
-# config/environments/staging.rb).
+# Persistent named volumes, mounted on every role so the worker sees the same
+# files the web container wrote. Like everything on staging these persist across
+# deploys and are never torn down (there's no destroy path).
+# - _storage: ActiveStorage local service + the letter_opener inbox (see
+#   config/environments/staging.rb).
+# - _uploads: user uploads under public/uploads — web writes the original, the
+#   worker reads it back to generate versions.
 volumes:
   - "bike-index-staging_storage:/rails/storage"
+  - "bike-index-staging_uploads:/rails/public/uploads"
 
 asset_path: /rails/public/assets
 
