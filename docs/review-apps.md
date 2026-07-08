@@ -35,6 +35,23 @@ All four resolve to PR `3594`. (It also drives the `deploy`/`destroy` lifecycle 
 bin/kamal_review accessory reboot db
 ```
 
+### Against staging
+
+`bin/kamal_review` resolves a PR number and always uses `config/deploy.review.yml`, so it can't name the persistent [staging app](#staging-persistent-main-deploy) directly. Point it at the staging config with `KAMAL_CONFIG` — staging has fixed names, so no `--app` is needed (it defaults to PR `0`, which the ERB just ignores):
+
+```bash
+KAMAL_CONFIG=config/deploy.staging.yml bin/kamal_review console   # rails console (staging)
+KAMAL_CONFIG=config/deploy.staging.yml bin/kamal_review shell     # bash
+KAMAL_CONFIG=config/deploy.staging.yml bin/kamal_review dbc       # rails dbconsole
+KAMAL_CONFIG=config/deploy.staging.yml bin/kamal_review app logs -f
+```
+
+`config/deploy.staging.yml` defines the same `console`/`shell`/`dbc`/`logs` aliases as the review config. Or drive kamal directly — the wrapper only saves you exporting `REVIEW_APP_HOST` and passing `--config-file`:
+
+```bash
+REVIEW_APP_HOST=host.review.bikeindex.org kamal console --config-file config/deploy.staging.yml
+```
+
 ## What about production?
 
 Production runs on Cloud66. The differences vs production:
