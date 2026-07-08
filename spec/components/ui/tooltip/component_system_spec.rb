@@ -23,11 +23,14 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
 
     tooltips = all("[role='tooltip']", visible: :all)
     expect(tooltips.size).to be >= 2
-    expect(tooltips.map { |t| t[:id] }.uniq.size).to eq tooltips.size
+    # Capture ids up front; re-reading them off the node handles late in this
+    # long test intermittently raises Playwright StaleReferenceError.
+    tooltip_ids = tooltips.map { |t| t[:id] }
+    expect(tooltip_ids.uniq.size).to eq tooltips.size
     expect_axe_clean
 
     tooltip = tooltips.first
-    trigger = find("[aria-describedby='#{tooltip[:id]}']")
+    trigger = find("[aria-describedby='#{tooltip_ids.first}']")
     expect(trigger.tag_name).to eq "button"
     expect(tooltip.text(:all)).to eq "5–9 mi"
     expect(tooltip).not_to be_visible
@@ -38,7 +41,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     # Hover shows, mouseleave hides
     trigger.hover
     expect(tooltip).to be_visible
-    expect(tooltip_position(tooltip[:id])).to include("top" => be_present, "left" => be_present)
+    expect(tooltip_position(tooltip_ids.first)).to include("top" => be_present, "left" => be_present)
     find("body").hover
     expect(tooltip).not_to be_visible
 
@@ -79,7 +82,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     expect(tooltip).not_to be_visible
 
     # Focus moving to another trigger hides the first
-    triggers = tooltips.map { |t| find("[aria-describedby='#{t[:id]}']") }
+    triggers = tooltip_ids.map { |id| find("[aria-describedby='#{id}']") }
     page.execute_script("arguments[0].focus()", triggers.first)
     expect(tooltips.first).to be_visible
     page.execute_script("arguments[0].focus()", triggers.last)
@@ -95,8 +98,8 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     expect(tooltip).not_to be_visible
 
     # Click layering pushes each clicked tooltip's z-index higher
-    tooltips.each { |t| find("[aria-describedby='#{t[:id]}']").click }
-    z_indexes = tooltips.map { |t| tooltip_z_index(t[:id]).to_i }
+    tooltip_ids.each { |id| find("[aria-describedby='#{id}']").click }
+    z_indexes = tooltip_ids.map { |id| tooltip_z_index(id).to_i }
     expect(z_indexes).to eq z_indexes.sort
     expect(z_indexes.last).to be > z_indexes.first
   end

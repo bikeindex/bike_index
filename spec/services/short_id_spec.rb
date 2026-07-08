@@ -19,7 +19,7 @@ RSpec.describe ShortId do
 
   describe "decode" do
     it "ignores the prefix, its separator, other separators, and case" do
-      ["r/21J-HW", "R/21JHW", "r/21J HW", "r/21J+HW", "r-21JHW", "r21jhw", "21J-HW", "21jhw"].each do |str|
+      ["r/21J-HW", "R/21JHW", "r/21J HW", "r/21J+HW", "r-21JHW", "r_21JHW", "r_21J_HW", "r21jhw", "21J-HW", "21jhw"].each do |str|
         expect(ShortId.decode("Bike", str)).to eq 3431156
       end
     end
