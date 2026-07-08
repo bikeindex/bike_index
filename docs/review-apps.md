@@ -8,9 +8,9 @@ Review apps run the **staging Rails environment** `RAILS_ENV=staging`, a near-du
 
 Alongside the per-PR apps, `main` is continuously deployed to **`staging.review.bikeindex.org`** — think of it as a review app that never gets a PR number and is never destroyed. It shares the same host, the `shared-db`/`shared-redis` accessories, `RAILS_ENV=staging`, and the `review-app` GitHub Environment secrets. It differs only in fixed names: service `bike-index-staging`, Postgres role `bike_index_staging` + databases `bike_index_staging_{primary,analytics}`, and Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
 
-- **Config:** `config/deploy.staging.yml` (no `accessories:` block — the shared infra is owned by `deploy.review.yml`).
+- **Config:** shares `config/deploy.review.yml` — with no `REVIEW_APP_PR_NUMBER` set, its ERB resolves the `staging` slug and omits the `accessories:` block (so a staging deploy can't touch the shared infra the PR apps depend on).
 - **Workflow:** `.github/workflows/staging.yml` is a thin caller of the shared `kamal-deploy.yml` reusable workflow. CI's `dispatch` job runs it on **every push to `main`** (`workflow_dispatch`), plus a manual "Run workflow" button. It dispatches in parallel with CI's tests, so a staging deploy does **not** wait for the suite to pass. Data persists across deploys: first boot seeds, later boots migrate only.
-- **One-time setup:** none beyond the review-app host — the `*.review.bikeindex.org` wildcard already resolves `staging.`, kamal-proxy auto-issues its TLS cert on first deploy, and the shared accessories are already booted. Deploy manually the first time via the workflow's "Run workflow" button (or `kamal deploy --version staging-<sha> --skip-push --config-file config/deploy.staging.yml` locally).
+- **One-time setup:** none beyond the review-app host — the `*.review.bikeindex.org` wildcard already resolves `staging.`, kamal-proxy auto-issues its TLS cert on first deploy, and the shared accessories are already booted. Deploy manually the first time via the workflow's "Run workflow" button (or `REVIEW_APP_REDIS_DB=0 kamal deploy --version staging-<sha> --skip-push --config-file config/deploy.review.yml` locally).
 
 ## How to trigger one
 
@@ -99,8 +99,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `bin/docker-entrypoint` | Creates the per-PR Postgres **superuser** role + runs `db:prepare` (schema + seed) on first boot |
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
 | `bin/kamal_review` | Run kamal against one review app — `deploy`/`destroy` lifecycle plus arbitrary passthrough commands (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
-| `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
-| `config/deploy.staging.yml` | Kamal config for the persistent `staging.review.bikeindex.org` deploy of `main` (fixed names; no accessories) |
+| `config/deploy.review.yml` | Kamal config for both targets — ERB derives `pr-<N>` (with `REVIEW_APP_PR_NUMBER`) or the `staging` slug (without); accessories emitted for review apps only |
 | `.github/workflows/staging.yml` | Thin caller of `kamal-deploy.yml` for the `main`→staging deploy — see [Staging](#staging-persistent-main-deploy) |
 | `.github/workflows/kamal-deploy.yml` | Reusable (`workflow_call`) build + kamal-command workflow shared by review-app and staging |
 | `config/crontab` | Scheduled rake tasks run by the `cron` server role |
