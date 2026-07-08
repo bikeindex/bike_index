@@ -51,18 +51,19 @@ RSpec.describe UI::Tooltip::Component, type: :component do
     end
   end
 
-  context "with a tooltip_link slot" do
+  context "with a link as the content" do
     let(:component) do
-      render_inline(described_class.new(text: "tip")) do |tooltip|
-        tooltip.with_tooltip_link(href: "/commit/abc") { "?" }
+      render_inline(described_class.new(text: "tip")) do
+        '<a href="/commit/abc">?</a>'.html_safe
       end
     end
 
-    it "renders the trigger as a link, with no button type, wired to the tooltip actions" do
-      link = component.css("a[aria-describedby]").first
-      expect(link[:href]).to eq "/commit/abc"
-      expect(link[:type]).to be_nil
-      expect(link["data-action"]).to include "mouseenter->ui--tooltip#showOnHover"
+    it "wraps the link in a span trigger, not a button, wired to the tooltip actions" do
+      trigger = component.css("[aria-describedby]").first
+      expect(trigger.name).to eq "span"
+      expect(trigger["data-action"]).to include "mouseenter->ui--tooltip#showOnHover"
+      expect(trigger.at_css("a")[:href]).to eq "/commit/abc"
+      expect(component.css("button")).to be_empty
     end
   end
 

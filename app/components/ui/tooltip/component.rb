@@ -14,12 +14,6 @@ module UI
         inner = block ? safe_join([capture(&block), tooltip_span], " ") : tooltip_span
         tag.button(**trigger_attrs(**attrs)) { inner }
       }
-      # Like tooltip_button, but the trigger is a link — clicking navigates while
-      # hover/focus still shows the tooltip.
-      renders_one :tooltip_link, ->(href:, **attrs, &block) {
-        inner = block ? safe_join([capture(&block), tooltip_span], " ") : tooltip_span
-        tag.a(href:, **trigger_attrs(as: :a, **attrs)) { inner }
-      }
 
       def initialize(text: nil)
         @text = text
@@ -27,18 +21,28 @@ module UI
 
       def call
         return tooltip_button if tooltip_button?
-        return tooltip_link if tooltip_link?
+        return interactive_trigger if interactive_content?
 
         tag.button(**trigger_attrs(class: TRIGGER_CLASS)) { safe_join([content, tooltip_span], " ") }
       end
 
       private
 
+      # A link or button in the content is itself the trigger; wrap it in a plain
+      # span rather than another button so the click reaches it. The content is
+      # responsible for its own label (aria-label/text).
+      def interactive_trigger
+        tag.span(**trigger_attrs(as: :span, class: "tw:inline-block")) { safe_join([content, tooltip_span], " ") }
+      end
+
+      def interactive_content?
+        content.to_s.match?(/<(a|button)[\s>]/)
+      end
+
       def trigger_attrs(as: :button, data: {}, **extra_attrs)
         action = [data[:action], TRIGGER_ACTIONS].compact.join(" ")
         {
-          **((as == :button) ? {type: "button"} : {}),
-          "aria-label": @text.presence,
+          **((as == :button) ? {type: "button", "aria-label": @text.presence} : {}),
           "aria-describedby": tooltip_id,
           data: {controller: "ui--tooltip", "ui--tooltip-target": "trigger", **data, action:},
           **extra_attrs
