@@ -320,6 +320,10 @@ $mainmenu-open-zindex: 10;
   }
 
   .primary-header-nav.menu-in {
+    // Lift above the review-app banner ($banner z-index: 1040) so the open menu
+    // isn't tucked under it
+    z-index: $zindex-navbar-fixed + 20;
+
     #menu-opened-backdrop {
       display: block;
     }

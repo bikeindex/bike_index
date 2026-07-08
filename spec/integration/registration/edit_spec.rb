@@ -143,7 +143,10 @@ RSpec.describe "Editing a registration", :js, type: :system do
       fill_in "manufacturer_update_reason", with: "It is actually a Trek"
       click_button "Submit update"
     end
-    expect(page).to have_content("Trek", wait: 10)
+    # The correction reloads the page and re-shows the stored success alert. Wait
+    # for that alert rather than the "Trek" selectize chip, which renders before
+    # the reload — otherwise click_edit_nav races the alert and can't dismiss it.
+    expect(page).to have_content("We've updated your manufacturer!", wait: 10)
     expect(bike.reload.manufacturer).to eq trek
 
     # ---- Wheels and Drivetrain ----
