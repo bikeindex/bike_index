@@ -438,6 +438,12 @@ RSpec.describe BikesController, type: :request do
       expect(assigns(:bike_sticker)&.id).to eq bike_sticker1.id
       expect(assigns(:organization))
     end
+    it "redirects the /s/ short URL to scanned, preserving the query string" do
+      get "/s/UC1101"
+      expect(response).to redirect_to("/bikes/scanned/UC1101")
+      get "/s/UC1101?organization_id=UCLA"
+      expect(response).to redirect_to("/bikes/scanned/UC1101?organization_id=UCLA")
+    end
     context "UI" do
       let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, code: "UI1101", organization: organization) }
       let!(:bike_sticker3) { FactoryBot.create(:bike_sticker, code: "U1101", organization: organization2) }

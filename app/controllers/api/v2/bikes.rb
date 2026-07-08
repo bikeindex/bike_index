@@ -97,7 +97,19 @@ module API
         end
 
         def find_bike
-          @bike = Bike.unscoped.find_id(params[:id])
+          # short_id "/" separator arrives split across :prefix and :id (Grape's :id can't span a slash)
+          short_id = (params[:prefix].present? ? "#{params[:prefix]}/#{params[:id]}" : params[:id]).to_s
+          unless short_id.match?(/\As[\W_]/i)
+            @bike = Bike.unscoped.find_id(short_id)
+            raise ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
+            return @bike
+          end
+
+          code = short_id.sub(/\As[\W_]*/i, "") # sticker short_id, e.g. "s/A1029"
+          bike_sticker = BikeSticker.lookup_with_fallback(code)
+          error!("Unable to find bike sticker: #{code}", 404) if bike_sticker.blank?
+          error!("Bike sticker #{bike_sticker.code} is not assigned to a bike", 404) if bike_sticker.bike.blank?
+          @bike = bike_sticker.bike
         end
 
         def owner_duplicate_bike(bikes: nil)
@@ -156,9 +168,18 @@ module API
       resource :bikes do
         desc "View bike with a given ID"
         params do
-          requires :id, type: Integer, desc: "Bike id"
+          requires :id, type: String, desc: "Bike id, or a short_id (bike: 'r/21J-HW', sticker: 's/A1029')"
         end
         get ":id" do
+          BikeV2ShowSerializer.new(find_bike, root: "bike").as_json
+        end
+
+        desc "View bike by a short_id with a '/' separator (bike 'r/35', sticker 's/a044')"
+        params do
+          requires :prefix, type: String, desc: "Short_id prefix ('r' bike, 's' sticker)"
+          requires :id, type: String, desc: "Short_id body"
+        end
+        get ":prefix/:id", requirements: {prefix: /[rs]/i} do
           BikeV2ShowSerializer.new(find_bike, root: "bike").as_json
         end
 
