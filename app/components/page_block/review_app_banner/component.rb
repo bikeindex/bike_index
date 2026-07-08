@@ -38,6 +38,10 @@ module PageBlock
         "https://github.com/bikeindex/bike_index/pull/#{@pr_number}"
       end
 
+      def commit_url
+        "https://github.com/bikeindex/bike_index/commit/#{@commit}"
+      end
+
       # The seeded superadmin, signed in via the existing magic link flow
       def superadmin
         return @superadmin if defined?(@superadmin)
