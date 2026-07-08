@@ -4,14 +4,6 @@ Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single 
 
 Review apps run the **staging Rails environment** `RAILS_ENV=staging`, a near-duplicate of production (`config/environments/staging.rb` imports production.rb)
 
-## Staging (persistent `main` deploy)
-
-Alongside the per-PR apps, `main` is continuously deployed to **`staging.review.bikeindex.org`** — think of it as a review app that never gets a PR number and is never destroyed. It shares the same host, the `shared-db`/`shared-redis` accessories, `RAILS_ENV=staging`, and the `review-app` GitHub Environment secrets. It differs only in fixed names: service `bike-index-staging`, Postgres role `bike_index_staging` + databases `bike_index_staging_{primary,analytics}`, and Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
-
-- **Config:** `config/deploy.staging.yml` (no `accessories:` block — the shared infra is owned by `deploy.review.yml`).
-- **Workflow:** `.github/workflows/staging.yml` deploys on `workflow_run` after **CI succeeds on `main`** (so a red main never ships), plus a `workflow_dispatch` for manual redeploys. Its data persists across deploys: first boot seeds, later boots migrate only.
-- **One-time setup:** none beyond the review-app host — the `*.review.bikeindex.org` wildcard already resolves `staging.`, kamal-proxy auto-issues its TLS cert on first deploy, and the shared accessories are already booted. Deploy manually the first time via the workflow's "Run workflow" button (or `kamal deploy --version staging-<sha> --skip-push --config-file config/deploy.staging.yml` locally).
-
 ## How to trigger one
 
 1. Open the [Review App workflow](https://github.com/bikeindex/bike_index/actions/workflows/review-app.yml) in Actions.
@@ -23,30 +15,28 @@ Alongside the per-PR apps, `main` is continuously deployed to **`staging.review.
 `bin/kamal_review` runs **any** kamal command against one review app (so you don't have to export the `REVIEW_APP_*` vars or include `--config-file`). Name the app with `--app` — any of these forms work — and everything else passes through to kamal:
 
 ```bash
-bin/kamal_review console                              --app pr-3594 # rails console
-bin/kamal_review app logs -f                          --app 3594
-bin/kamal_review app details                          --app pr-3594.review.bikeindex.org
-bin/kamal_review app version                          --app https://pr-3594.review.bikeindex.org
+bin/kamal_review console      --app pr-3594 # Access a rails console
+bin/kamal_review app logs -f  --app 3594
+bin/kamal_review app details  --app pr-3594.review.bikeindex.org
+bin/kamal_review app version  --app https://pr-3594.review.bikeindex.org
 ```
 
-All four resolve to PR `3594`; `--app staging` targets the persistent staging app ([below](#against-staging)). (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The shared accessories aren't PR-specific, so any PR number works when operating on them — and with no `--app` given it defaults to PR `0`, so reboot Postgres after changing its `shared_preload_libraries` with just:
+All four resolve to PR `3594`; `--app staging` targets the persistent staging app ([below](#against-staging)). (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The shared accessories aren't PR-specific, so any PR number works when operating on them — so reboot Postgres after changing its `shared_preload_libraries` with just:
 
 ```bash
 bin/kamal_review accessory reboot db
 ```
 
-### Against staging
+## Staging (persistent `main` deploy)
 
-`--app staging` targets the persistent [staging app](#staging-persistent-main-deploy) (`config/deploy.staging.yml`) instead of a PR — for passthrough commands only, since staging is deployed by its own workflow, not the `deploy`/`destroy` lifecycle:
+Alongside the per-PR apps, `main` is continuously deployed to **[staging.review.bikeindex.org](https://staging.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It differs only in using Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
+
+For `bin/kamal_review`, with no `--app` given it defaults to staging - but you can also use `--app staging` to target it. This works for passthrough commands only, since staging is deployed by its own workflow, not the `deploy`/`destroy` lifecycle:
 
 ```bash
-bin/kamal_review console      --app staging   # rails console (staging)
-bin/kamal_review shell        --app staging   # bash
-bin/kamal_review dbc          --app staging   # rails dbconsole
-bin/kamal_review app logs -f  --app staging
+bin/kamal_review shell        --app staging   # bash on staging
+bin/kamal_review console                      # rails console, also on staging
 ```
-
-`config/deploy.staging.yml` defines the same `console`/`shell`/`dbc`/`logs` aliases as the review config. (`deploy`/`destroy --app staging` are refused — staging is managed by [`staging.yml`](#staging-persistent-main-deploy).)
 
 ## What about production?
 
