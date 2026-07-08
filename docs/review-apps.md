@@ -21,15 +21,15 @@ bin/kamal_review app details  --app pr-3594.review.bikeindex.org
 bin/kamal_review app version  --app https://pr-3594.review.bikeindex.org
 ```
 
-All four resolve to PR `3594`; `--app staging` targets the persistent staging app ([below](#against-staging)). (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The shared accessories aren't PR-specific, so any PR number works when operating on them — so reboot Postgres after changing its `shared_preload_libraries` with just:
+All four resolve to PR `3594`; with no `--app` it defaults to the persistent staging app, and `--app staging` names it explicitly ([below](#staging-persistent-main-deploy)). (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The `shared-db`/`shared-redis` accessories live only in the per-PR config, so accessory commands need an explicit `--app 0` (or any PR) — e.g. reboot Postgres after changing its `shared_preload_libraries`:
 
 ```bash
-bin/kamal_review accessory reboot db
+bin/kamal_review accessory reboot db --app 0
 ```
 
 ## Staging (persistent `main` deploy)
 
-Alongside the per-PR apps, `main` is continuously deployed to **[staging.review.bikeindex.org](https://staging.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It differs only in using Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
+Alongside the per-PR apps, `main` is continuously deployed to **[staging.review.bikeindex.org](https://staging.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It shares `config/deploy.review.yml`: with no `REVIEW_APP_PR_NUMBER` set, the ERB resolves the `staging` slug and omits the `accessories:` block (so a staging deploy can't touch the shared infra the PR apps depend on). It differs only in using Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
 
 For `bin/kamal_review`, with no `--app` given it defaults to staging - but you can also use `--app staging` to target it. This works for passthrough commands only, since staging is deployed by its own workflow, not the `deploy`/`destroy` lifecycle:
 
@@ -103,9 +103,9 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `bin/docker-entrypoint` | Creates the per-PR Postgres **superuser** role + runs `db:prepare` (schema + seed) on first boot |
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
 | `bin/kamal_review` | Run kamal against one review app — `deploy`/`destroy` lifecycle plus arbitrary passthrough commands (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
-| `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
-| `config/deploy.staging.yml` | Kamal config for the persistent `staging.review.bikeindex.org` deploy of `main` (fixed names; no accessories) |
-| `.github/workflows/staging.yml` | Deploys `main` to staging after CI passes (`workflow_run`) — see [Staging](#staging-persistent-main-deploy) |
+| `config/deploy.review.yml` | Kamal config for both targets — ERB derives `pr-<N>` (with `REVIEW_APP_PR_NUMBER`) or the `staging` slug (without); accessories emitted for PR apps only |
+| `.github/workflows/staging.yml` | Thin caller of `kamal-deploy.yml` for the `main`→staging deploy, dispatched on every push to `main` — see [Staging](#staging-persistent-main-deploy) |
+| `.github/workflows/kamal-deploy.yml` | Reusable (`workflow_call`) build + kamal-command workflow shared by review-app and staging deploys |
 | `config/crontab` | Scheduled rake tasks run by the `cron` server role |
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
