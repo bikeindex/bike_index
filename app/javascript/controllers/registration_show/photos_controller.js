@@ -28,11 +28,8 @@ export default class extends Controller {
     this.thumbnailTargets.forEach((el) => el.classList.toggle(this.activeClass, el === thumbnail))
   }
 
-  brokenImage () {
-    this.disableLink()
-  }
-
-  // A link without an href isn't a hyperlink (and reverts to the default cursor)
+  // A broken main image drops its enclosing link: without an href an <a> isn't a
+  // hyperlink and reverts to the default cursor
   disableLink () {
     if (!this.hasLinkTarget) return
     this.linkTarget.removeAttribute('href')

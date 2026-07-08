@@ -16,7 +16,7 @@
         <%= image_tag(
           bike_image_url,
           alt: t("bikes.main_show_block.bike_photo", bike_type: @bike.type_titleize),
-          data: {"registration-show--photos-target": "main", action: "error->registration-show--photos#brokenImage"},
+          data: {"registration-show--photos-target": "main", action: "error->registration-show--photos#disableLink"},
           class: "tw:aspect-4/3 tw:w-full tw:object-contain",
         ) %>
 

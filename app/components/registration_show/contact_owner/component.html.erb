@@ -1,8 +1,5 @@
 <%= render(UI::Card::Component.new) do %>
-  <div
-    data-controller="registration-show--contact-owner"
-    data-registration-show--contact-owner-redirect-value="<%= sign_in_redirect %>"
-  >
+  <div data-controller="registration-show--contact-owner">
     <p class="tw:text-sm tw:italic tw:opacity-65">
       <%= t("bikes.show.know_something_about_this_bike_type", bike_type: @bike.type) %>
     </p>
@@ -17,31 +14,34 @@
     </h2>
 
     <div class="tw:mt-3">
-      <%= render(UI::Button::Component.new(
-        text: t("bikes.show.write_them_a_message"),
-        color: :purple,
-        data: {"registration-show--contact-owner-target": "trigger", action: "registration-show--contact-owner#reveal"}
-      )) %>
+      <% if sign_in_redirect %>
+        <%= render(UI::ButtonLink::Component.new(href: sign_in_redirect, text: t("bikes.show.write_them_a_message"), color: :purple)) %>
+      <% else %>
+        <%= render(UI::Button::Component.new(
+          text: t("bikes.show.write_them_a_message"),
+          color: :purple,
+          data: {"registration-show--contact-owner-target": "trigger", action: "registration-show--contact-owner#reveal"}
+        )) %>
+        <div data-registration-show--contact-owner-target="form" hidden>
+          <%= form_with(model: stolen_notification, url: stolen_notifications_path) do |form| %>
+            <%= form.hidden_field :bike_id, value: @bike.id %>
 
-      <div data-registration-show--contact-owner-target="form" hidden>
-        <%= form_with(model: stolen_notification, url: stolen_notifications_path) do |form| %>
-          <%= form.hidden_field :bike_id, value: @bike.id %>
+            <%= form.text_area :message,
+              required: true,
+              rows: 6,
+              placeholder: t("bikes.show.where_did_you_see_this_bike", bike_type: @bike.type),
+              class: "twinput tw:w-full" %>
 
-          <%= form.text_area :message,
-            required: true,
-            rows: 6,
-            placeholder: t("bikes.show.where_did_you_see_this_bike", bike_type: @bike.type),
-            class: "twinput tw:w-full" %>
+            <%= form.text_field :reference_url,
+              placeholder: t("bikes.show.link_url"),
+              class: "twinput tw:mt-2 tw:w-full" %>
 
-          <%= form.text_field :reference_url,
-            placeholder: t("bikes.show.link_url"),
-            class: "twinput tw:mt-2 tw:w-full" %>
-
-          <div class="tw:mt-3">
-            <%= render(UI::Button::Component.new(text: t("bikes.show.send_message"), color: :purple, kind: :submit)) %>
-          </div>
-        <% end %>
-      </div>
+            <div class="tw:mt-3">
+              <%= render(UI::Button::Component.new(text: t("bikes.show.send_message"), color: :purple, kind: :submit)) %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     </div>
 
     <% if owner_phone.present? %>
@@ -50,7 +50,7 @@
           <%= t("bikes.show.or_call") %>
         </span>
 
-        <%= link_to(owner_phone, "tel:#{owner_phone}", class: "twlink tw:font-mono") %>
+        <%= phone_link(owner_phone, class: "twlink tw:font-mono") %>
       </p>
     <% end %>
   </div>

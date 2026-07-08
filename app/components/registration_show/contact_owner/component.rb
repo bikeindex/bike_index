@@ -24,12 +24,14 @@ module RegistrationShow
       def sign_in_redirect
         return if @current_user.present?
 
-        new_session_path(return_to: "#{registration_path(@bike)}?contact_owner=true")
+        new_session_path(return_to: registration_path(@bike, contact_owner: true))
       end
 
       # Shown only when the owner's phone-visibility settings permit this viewer
       def owner_phone
-        @bike.current_stolen_record&.phone if @bike.phoneable_by?(@current_user)
+        return @owner_phone if defined?(@owner_phone)
+
+        @owner_phone = @bike.current_stolen_record&.phone if @bike.phoneable_by?(@current_user)
       end
     end
   end
