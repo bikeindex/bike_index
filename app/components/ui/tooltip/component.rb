@@ -14,6 +14,12 @@ module UI
         inner = block ? safe_join([capture(&block), tooltip_span], " ") : tooltip_span
         tag.button(**trigger_attrs(**attrs)) { inner }
       }
+      # Like tooltip_button, but the trigger is a link — clicking navigates while
+      # hover/focus still shows the tooltip.
+      renders_one :tooltip_link, ->(href:, **attrs, &block) {
+        inner = block ? safe_join([capture(&block), tooltip_span], " ") : tooltip_span
+        tag.a(href:, **trigger_attrs(as: :a, **attrs)) { inner }
+      }
 
       def initialize(text: nil)
         @text = text
@@ -21,16 +27,17 @@ module UI
 
       def call
         return tooltip_button if tooltip_button?
+        return tooltip_link if tooltip_link?
 
         tag.button(**trigger_attrs(class: TRIGGER_CLASS)) { safe_join([content, tooltip_span], " ") }
       end
 
       private
 
-      def trigger_attrs(data: {}, **extra_attrs)
+      def trigger_attrs(as: :button, data: {}, **extra_attrs)
         action = [data[:action], TRIGGER_ACTIONS].compact.join(" ")
         {
-          type: "button",
+          **((as == :button) ? {type: "button"} : {}),
           "aria-label": @text.presence,
           "aria-describedby": tooltip_id,
           data: {controller: "ui--tooltip", "ui--tooltip-target": "trigger", **data, action:},

@@ -13,7 +13,24 @@
     "Review app" and "data is ephemeral" are just labels; hide them (and their
     separators) on small screens so the actionable links fit
   %>
-  <span class="tw:hidden tw:sm:inline"><%= translation(".label") %></span>
+  <span class="tw:hidden tw:sm:inline"><%= banner_label %></span>
+
+  <%#
+    "?" link to the commit on GitHub, styled like the email-outbox tooltip but
+    hidden on small screens like the label it follows (else it orphans at the
+    banner's start). Hover shows the SHA; clicking opens the commit.
+  %>
+
+  <% if @commit.present? %>
+    <%= render(UI::Tooltip::Component.new(text: translation(".commit_tooltip", commit: @commit))) do |tooltip| %>
+      <% tooltip.with_tooltip_link(
+        href: commit_url,
+        class: "tw:hidden tw:sm:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
+          "tw:bg-[#1e881e] tw:text-white tw:hover:bg-[#166016] tw:text-2xs tw:font-bold tw:cursor-pointer " \
+          "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+      ) { "?" } %>
+    <% end %>
+  <% end %>
 
   <% if @pr_number %>
     <span class="tw:hidden tw:sm:inline">&middot;</span>
