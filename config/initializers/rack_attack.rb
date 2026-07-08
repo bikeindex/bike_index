@@ -5,10 +5,9 @@ class Rack::Attack
   API_MAX_REQUESTS = ENV.fetch("RACK_ATTACK_API_MAX_LIMIT", 150).to_i
   CSP_REPORTS_MAX_REQUESTS = ENV.fetch("RACK_ATTACK_CSP_LIMIT", MAX_REQUESTS_PER_TWENTY).to_i
 
-  SIGN_IN_PATH = "/session"
   # Email-first login enters auth at /session/identify (account + org lookup) before
   # /session (password), so both share the sign-in throttles below.
-  SIGN_IN_PATHS = [SIGN_IN_PATH, "/session/identify"].freeze
+  SIGN_IN_PATHS = ["/session", "/session/identify"].freeze
   CSP_REPORTS_PATH = "/csp_reports"
 
   SENSITIVE_AUTH_PATHS = %w[
