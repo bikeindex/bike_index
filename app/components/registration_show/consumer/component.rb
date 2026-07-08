@@ -78,9 +78,16 @@ module RegistrationShow
       # Each color as its own swatch + name, kept together so only the "and" wraps
       def color_swatches
         frame_color_records.map do |color|
-          swatch = content_tag(:span, "", class: "tw:mr-1 tw:inline-block tw:h-3 tw:w-3 tw:rounded-xs tw:border tw:border-gray-300 tw:align-middle", style: "background-color: #{color.display}")
+          swatch = content_tag(:span, "", class: "tw:mr-1 tw:inline-block tw:h-3 tw:w-3 tw:rounded-xs tw:border tw:border-gray-300 tw:align-middle", style: swatch_style(color))
           content_tag(:span, safe_join([swatch, color.name]), class: "tw:whitespace-nowrap")
         end
+      end
+
+      # Stickers/tape/cover-up has no real color (display is white) — show a multicolor swatch
+      def swatch_style(color)
+        return "background-color: #{color.display}" unless color.name.match?(/sticker/i)
+
+        "background: conic-gradient(#ec1313, #ff8d1d, #fff44b, #1ba100, #386ed2, #a745c0, #ec1313)"
       end
 
       def show_marketplace_button?

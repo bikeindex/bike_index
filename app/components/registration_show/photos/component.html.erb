@@ -45,20 +45,7 @@
           <% end %>
 
           <% if @owner %>
-            <li>
-              <%= link_to photos_edit_path, class: "tw:flex tw:size-[68px] tw:flex-col tw:items-center tw:justify-center tw:gap-0.5 tw:rounded-sm tw:border-2 tw:border-dashed tw:border-[#d6d4e0] tw:text-[#9a8fc4] tw:no-underline tw:transition tw:hover:border-[#715eb2] tw:hover:text-[#715eb2]" do %>
-                <span class="tw:text-lg tw:leading-none">+</span>
-
-                <span
-                  class="
-                    tw:text-center tw:text-[10px] tw:leading-tight
-                    tw:font-semibold
-                  "
-                >
-                  <%= translation(".add_photo") %>
-                </span>
-              <% end %>
-            </li>
+            <li><%= add_photo_box %></li>
           <% end %>
         </ul>
       <% end %>
@@ -80,7 +67,7 @@
       <%= hero_overlay %>
     </div>
     <% if @owner %>
-      <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
+      <%= add_photo_box %>
     <% end %>
   <% else %>
     <div
@@ -94,7 +81,7 @@
       <%= hero_overlay %>
     </div>
     <% if @owner %>
-      <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
+      <%= add_photo_box %>
     <% end %>
   <% end %>
 </div>

@@ -141,27 +141,7 @@
             <%= render(UI::DefinitionList::Row::Component.new(label: t("components.registration_show.consumer.registered_since"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
 
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".credibility"))) do %>
-              <%= render(UI::Tooltip::Component.new) do |tooltip| %>
-                <% tooltip.with_body do %>
-                  <span class="tw:block tw:text-left">
-                    <span class="tw:mb-1 tw:block tw:font-semibold">
-                      Factors in score
-                    </span>
-
-                    <% credibility_badges.each do |badge, value| %>
-                      <span class="tw:flex tw:justify-between tw:gap-4">
-                        <span>
-                          <%= CredibilityScorer.humanize_badge(badge) %>
-                        </span>
-
-                        <span class="<%= "tw:text-red-600" if value.negative? %>">
-                          <%= value %>
-                        </span>
-                      </span>
-                    <% end %>
-                  </span>
-                <% end %>
-
+              <span class="tw:inline-flex tw:items-center tw:gap-1.5">
                 <span
                   class="
                     tw:inline-block tw:rounded tw:px-2 tw:py-0.5
@@ -171,7 +151,33 @@
                 >
                   <%= credibility_score %>
                 </span>
-              <% end %>
+
+                <%= render(UI::Tooltip::Component.new(text: translation(".credibility"))) do |tooltip| %>
+                  <% tooltip.with_body do %>
+                    <span class="tw:block tw:text-left">
+                      <span class="tw:mb-1 tw:block tw:font-semibold">
+                        Factors in score
+                      </span>
+
+                      <% credibility_badges.each do |badge, value| %>
+                        <span class="tw:flex tw:justify-between tw:gap-4">
+                          <span>
+                            <%= CredibilityScorer.humanize_badge(badge) %>
+                          </span>
+
+                          <span class="<%= "tw:text-red-600" if value.negative? %>">
+                            <%= value %>
+                          </span>
+                        </span>
+                      <% end %>
+                    </span>
+                  <% end %>
+
+                  <% tooltip.with_tooltip_button(class: "tw:inline-flex tw:size-4 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-200 tw:text-[10px] tw:font-bold tw:text-gray-600 tw:hover:bg-gray-300 tw:dark:bg-gray-700 tw:dark:text-gray-200") do %>
+                    ?
+                  <% end %>
+                <% end %>
+              </span>
             <% end %>
           <% end %>
         </div>
