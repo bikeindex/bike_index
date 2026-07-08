@@ -24,11 +24,14 @@
           <% different_email_link = link_to t(".different_email"), new_session_path(email: @email, partner: sign_in_partner, return_to: params[:return_to]) %>
 
           <% if @login_method == "magic_link" %>
-            <p><%= t("sessions.new.org_uses_magic_link") %></p>
+            <p><%= t("sessions.new.org_uses_passwordless") %></p>
+            <p class="tw:mb-4! tw:text-sm! tw:text-gray-500!">
+              <%= t("sessions.new.passwordless_help") %>
+            </p>
             <%= form_tag create_magic_link_session_path, method: "post" do %>
               <%= hidden_field_tag :email, @email %>
               <%= hidden_field_tag :remember_me, @remember_me %>
-              <%= submit_tag t("sessions.new.email_sign_in_link"), class: "btn btn-primary btn-lg tw:mx-0!" %>
+              <%= submit_tag t("sessions.new.email_me_the_link"), class: "btn btn-primary btn-lg tw:mx-0!" %>
             <% end %>
             <p class="forgot-password-link"><%= different_email_link %></p>
           <% else %>
@@ -36,7 +39,10 @@
               Separate form (button_to renders its own <form>) so it can't nest in the
               password form; sits above the password input as an alternative sign-in.
             %>
-            <%= button_to t("sessions.new.email_sign_in_link"), create_magic_link_session_path, params: {email: @email, remember_me: @remember_me}, form: {class: "tw:mb-4!"}, class: "twlink tw:bg-transparent! tw:border-0! tw:p-0! tw:font-bold! tw:cursor-pointer!" %>
+            <%= button_to t("sessions.new.sign_in_without_password"), create_magic_link_session_path, params: {email: @email, remember_me: @remember_me}, form: {class: "tw:mb-1!"}, class: "twlink tw:bg-transparent! tw:border-0! tw:p-0! tw:font-bold! tw:cursor-pointer!" %>
+            <p class="tw:mb-4! tw:text-sm! tw:text-gray-500!">
+              <%= t("sessions.new.passwordless_help") %>
+            </p>
             <%= form_for :session, url: session_url(params.permit(:return_to)) do |f| %>
               <% if sign_in_partner %>
                 <%= hidden_field_tag :partner, sign_in_partner %>

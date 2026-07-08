@@ -4792,14 +4792,16 @@ en:
     new:
       continue: Continue
       email: email
-      email_sign_in_link: Email me a sign-in link
+      email_me_the_link: Email me the link
       forgot_your_password: Forgot your password?
       get_on_bike_index: Get on Bike Index
       keep_me_logged_in: Keep me logged in
       log_in: Log in
       log_in_or_sign_up: Log in or sign up
-      org_uses_magic_link: Your organization signs in with an emailed link.
+      org_uses_passwordless: Your organization signs in without a password.
       password: password
+      passwordless_help: We'll email you a secure link to sign in.
+      sign_in_without_password: Sign in without a password
   shared:
     bike_search_form:
       anywhere: Anywhere
