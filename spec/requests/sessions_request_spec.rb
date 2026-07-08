@@ -251,6 +251,12 @@ RSpec.describe SessionsController, type: :request do
         expect(response).to redirect_to my_account_url
         expect(auth_set_cookie).to_not include("expires=")
       end
+      it "preserves the choice on the credential step after a wrong password" do
+        post "/session", params: {session: {email: user.email, password: "wrong", remember_me: "1"}}
+        expect(response).to render_template(:identify)
+        expect(response.body).to include('name="session[remember_me]"')
+        expect(response.body).to include('value="1"')
+      end
     end
 
     context "with rack_attack" do

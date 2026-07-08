@@ -74,9 +74,11 @@ class SessionsController < ApplicationController
       if @user.authenticate(permitted_parameters[:password])
         sign_in_and_redirect(@user)
       else
-        # Wrong password — stay on the credential step with the email preserved
+        # Wrong password — stay on the credential step, preserving the email and
+        # the keep-me-logged-in choice carried from the email step
         flash.now[:error] = translation(:invalid_email_or_password)
         @email = permitted_parameters[:email]
+        @remember_me = permitted_parameters[:remember_me]
         @login_method = "password"
         render_partner_or_default_signin_layout(render_action: :identify)
       end
@@ -107,7 +109,6 @@ class SessionsController < ApplicationController
   # eventual sign-in redirect already would. "sso" will slot in here once the
   # SAML SP lands; today only passwordless-domain orgs diverge from password.
   def login_method_for(email)
-    return "password" if email.blank?
     Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
   end
 
