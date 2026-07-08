@@ -139,7 +139,7 @@ RSpec.describe "Bikes API V3", type: :request do
         it "responds with 404 for an unknown sticker" do
           get "/api/v3/bikes/s/nope999", params: {format: :json}
           expect(response.code).to eq("404")
-          expect(json_result["error"].present?).to be_truthy
+          expect(json_result["error"]).to eq "Unable to find bike sticker: nope999"
         end
 
         it "responds with 404 for an unassigned sticker" do
@@ -147,7 +147,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(unassigned.bike_id).to be_nil
           get "/api/v3/bikes/#{unassigned.short_id}", params: {format: :json}
           expect(response.code).to eq("404")
-          expect(json_result["error"].present?).to be_truthy
+          expect(json_result["error"]).to eq "Bike sticker B22 is not assigned to a bike"
         end
       end
     end
