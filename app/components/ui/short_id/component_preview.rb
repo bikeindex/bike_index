@@ -2,6 +2,7 @@
 
 module UI
   module ShortId
+    # @label Short ID
     class ComponentPreview < ApplicationComponentPreview
       # @param id text "ID to render"
       def default(id: "r/21J-HW")

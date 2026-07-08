@@ -3,10 +3,15 @@
 module UI
   module Dropdown
     class Component < ApplicationComponent
+      # Literal strings so Tailwind's scanner generates these aria-current:/active: variants.
+      # Applied to the <li>; the `[&>a]` variant colors the item's link (the surface).
+      # aria-current (not aria-pressed) because aria-pressed is invalid on role="menuitem".
+      ACTIVE_PREFIXED = "tw:aria-[current]:[&>a]:bg-gray-200 tw:active:[&>a]:bg-gray-200 tw:aria-[current]:[&>a]:text-gray-900 tw:active:[&>a]:text-gray-900 tw:aria-[current]:dark:[&>a]:bg-gray-600 tw:active:dark:[&>a]:bg-gray-600 tw:aria-[current]:dark:[&>a]:text-gray-100 tw:active:dark:[&>a]:text-gray-100"
+
       renders_one :button
       renders_many :entries, types: {
-        item: lambda { |&block|
-          content_tag(:li, nil, role: "menuitem", &block)
+        item: lambda { |active: false, &block|
+          content_tag(:li, capture(&block), role: "menuitem", class: ACTIVE_PREFIXED, aria: {current: active || nil})
         },
         divider: lambda {
           content_tag(:li, "", role: "separator")
