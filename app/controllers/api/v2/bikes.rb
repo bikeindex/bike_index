@@ -99,7 +99,11 @@ module API
         def find_bike
           # short_id "/" separator arrives split across :prefix and :id (Grape's :id can't span a slash)
           short_id = (params[:prefix].present? ? "#{params[:prefix]}/#{params[:id]}" : params[:id]).to_s
-          return @bike = Bike.unscoped.find_id(short_id) unless short_id.match?(/\As[\W_]/i)
+          unless short_id.match?(/\As[\W_]/i)
+            @bike = Bike.unscoped.find_id(short_id)
+            raise ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
+            return @bike
+          end
 
           code = short_id.sub(/\As[\W_]*/i, "") # sticker short_id, e.g. "s/A1029"
           bike_sticker = BikeSticker.lookup_with_fallback(code)

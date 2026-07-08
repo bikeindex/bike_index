@@ -150,6 +150,29 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(json_result["error"]).to eq "Bike sticker B22 is not assigned to a bike"
         end
       end
+
+      context "soft-deleted bike with an assigned sticker" do
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "C55", bike: bike) }
+        before { bike.destroy }
+
+        it "404s identically by id and short_id, and reads the sticker as unassigned" do
+          expect(bike.deleted_at).to be_present
+
+          # the bike id and its r/ short_id are no longer visible - identical 404
+          get "/api/v3/bikes/#{bike.id}", params: {format: :json}
+          expect(response.code).to eq("404")
+          by_id_error = json_result["error"]
+
+          get "/api/v3/bikes/#{bike.short_id}", params: {format: :json}
+          expect(response.code).to eq("404")
+          expect(json_result["error"]).to eq by_id_error
+
+          # the sticker still points at the now-invisible bike, so it reads as unassigned
+          get "/api/v3/bikes/s/C55", params: {format: :json}
+          expect(response.code).to eq("404")
+          expect(json_result["error"]).to eq "Bike sticker C55 is not assigned to a bike"
+        end
+      end
     end
   end
 
