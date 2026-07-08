@@ -73,12 +73,13 @@ Four jobs: `resolve` (PR number + deploy/destroy), `build` (label + build/push i
 Unlabeled PR closes are filtered by `resolve`'s job-level `if:`; fork PRs by the same-repo check (`proceed=false`). On **deploy**:
 
 1. `build` builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label). Warm builds are fast: docker layers cache in GHCR's `:buildcache`, and sprockets' cache persists via a BuildKit cache mount + buildkit-cache-dance.
-2. `update` runs `bin/kamal_review deploy --app <pr>` → `kamal deploy --version <tag> --skip-push` (tag from `IMAGE_TAG`). Kamal **pulls** the CI image (no rebuild, which would clone the private `app/services/facebook` submodule) and:
+2. It attaches a `/rails/storage` volume for ActiveStorage and a `/rails/public/uploads` volume for Carrierwave
+3. `update` runs `bin/kamal_review deploy --app <pr>` → `kamal deploy --version <tag> --skip-push` (tag from `IMAGE_TAG`). Kamal **pulls** the CI image (no rebuild, which would clone the private `app/services/facebook` submodule) and:
    - Boots the per-PR `-web`, `-worker`, `-cron` containers.
    - First boot: `bin/docker-entrypoint` creates the Postgres **superuser** role `bike_index_pr_<N>` and runs `db:prepare`, creating `bike_index_review_pr_<N>_primary` + `_analytics` and **seeding** them before Puma starts — slow, hence `deploy_timeout: 240`. Redeploys skip seeding and boot fast.
    - Later boots: `db:prepare` runs migrations only.
-3. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
-4. The `review-app` environment surfaces the URL ("View deployment").
+4. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
+5. The `review-app` environment surfaces the URL ("View deployment").
 
 Destroy reverses it: `kamal app remove`, drop both databases + the role, `FLUSHDB` the assigned Redis logical DB, and delete every `pr-<N>-<sha>` GHCR image version (best-effort, `packages: write`).
 
