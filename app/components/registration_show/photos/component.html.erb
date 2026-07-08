@@ -10,13 +10,13 @@
         data-registration-show--photos-target="link"
         class="
           tw:relative tw:-mx-2 tw:block tw:overflow-hidden tw:rounded-none
-          tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-sm tw:dark:bg-gray-900
+          tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-2xl tw:dark:bg-gray-900
         "
       >
         <%= image_tag(
           bike_image_url,
           alt: t("bikes.main_show_block.bike_photo", bike_type: @bike.type_titleize),
-          data: {"registration-show--photos-target": "main"},
+          data: {"registration-show--photos-target": "main", action: "error->registration-show--photos#disableLink"},
           class: "tw:aspect-4/3 tw:w-full tw:object-contain",
         ) %>
 
@@ -45,20 +45,7 @@
           <% end %>
 
           <% if @owner %>
-            <li>
-              <%= link_to photos_edit_path, class: "tw:flex tw:size-[68px] tw:flex-col tw:items-center tw:justify-center tw:gap-0.5 tw:rounded-sm tw:border-2 tw:border-dashed tw:border-[#d6d4e0] tw:text-[#9a8fc4] tw:no-underline tw:transition tw:hover:border-[#715eb2] tw:hover:text-[#715eb2]" do %>
-                <span class="tw:text-lg tw:leading-none">+</span>
-
-                <span
-                  class="
-                    tw:text-center tw:text-[10px] tw:leading-tight
-                    tw:font-semibold
-                  "
-                >
-                  <%= translation(".add_photo") %>
-                </span>
-              <% end %>
-            </li>
+            <li><%= add_photo_box %></li>
           <% end %>
         </ul>
       <% end %>
@@ -67,7 +54,7 @@
     <div
       class="
         tw:relative tw:-mx-2 tw:overflow-hidden tw:rounded-none
-        tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-sm tw:dark:bg-gray-900
+        tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-2xl tw:dark:bg-gray-900
       "
     >
       <h3 class="tw:p-2 tw:text-sm tw:opacity-65">
@@ -80,13 +67,13 @@
       <%= hero_overlay %>
     </div>
     <% if @owner %>
-      <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
+      <%= add_photo_box %>
     <% end %>
   <% else %>
     <div
       class="
         tw:relative tw:-mx-2 tw:overflow-hidden tw:rounded-none
-        tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-sm tw:dark:bg-gray-900
+        tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-2xl tw:dark:bg-gray-900
       "
     >
       <%= image_tag(helpers.bike_placeholder_image_path, alt: t("bikes.main_show_block.bike_photo", bike_type: @bike.type_titleize), class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
@@ -94,7 +81,7 @@
       <%= hero_overlay %>
     </div>
     <% if @owner %>
-      <%= render(UI::ButtonLink::Component.new(href: photos_edit_path, text: "+ #{translation(".add_photo")}", size: :sm)) %>
+      <%= add_photo_box %>
     <% end %>
   <% end %>
 </div>

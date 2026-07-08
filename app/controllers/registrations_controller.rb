@@ -51,9 +51,9 @@ class RegistrationsController < ApplicationController
 
   private
 
-  # The resolved perspective: :public, :owner, or an Organization (admin view).
-  # A ?view_as param overrides the default, but only to a perspective the user is
-  # allowed — otherwise it flashes and falls back to the default.
+  # The resolved perspective: :public, :owner, or an [organization, role] pair
+  # (admin view). A ?view_as param overrides the default, but only to a
+  # perspective the user is allowed — otherwise it flashes and falls back.
   def current_view
     return @current_view if defined?(@current_view)
 
@@ -69,9 +69,21 @@ class RegistrationsController < ApplicationController
   def available_views
     @available_views ||= [
       (:owner if @bike.owner == current_user || current_user&.superuser?),
-      *viewable_organizations,
+      *organization_views,
       :public
     ].compact
+  end
+
+  # [organization, role] pairs. Superadmins may preview both staff and limited.
+  def organization_views
+    viewable_organizations.flat_map do |org|
+      roles = if current_user.superuser?
+        %i[staff limited]
+      else
+        [current_user.member_bike_edit_of?(org) ? :staff : :limited]
+      end
+      roles.map { |role| [org, role] }
+    end
   end
 
   def viewable_organizations
@@ -86,7 +98,9 @@ class RegistrationsController < ApplicationController
   end
 
   def default_view
-    return passive_organization if passive_organization.present? && current_user&.authorized?(passive_organization)
+    if passive_organization.present? && current_user&.authorized?(passive_organization)
+      return [passive_organization, current_user.member_bike_edit_of?(passive_organization) ? :staff : :limited]
+    end
     return :owner if @bike.owner == current_user
 
     :public
@@ -97,7 +111,10 @@ class RegistrationsController < ApplicationController
     when "public" then :public
     when "owner" then :owner
     when nil, "" then nil
-    else Organization.friendly_find(param)
+    else
+      slug, role = param.split(".", 2)
+      org = Organization.friendly_find(slug)
+      org && [org, (role == "limited") ? :limited : :staff]
     end
   end
 

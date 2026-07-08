@@ -3,9 +3,7 @@
 module RegistrationShow
   module Wrapper
     # Renders the registration show page as the resolved perspective (:public,
-    # :owner, or an Organization admin view) and fragment-caches it. When the
-    # viewer is allowed more than one perspective it also renders a switcher
-    # that links to the others via ?view_as=.
+    # :owner, or an [organization, role] admin view) and fragment-caches it.
     class Component < ApplicationComponent
       def initialize(bike:, current_user:, view:, available_views:, mapbox_key: nil)
         @bike = bike
@@ -15,12 +13,17 @@ module RegistrationShow
         @mapbox_key = mapbox_key
       end
 
+      def call
+        capture { cache(cache_key) { concat(render(inner_component)) } }
+      end
+
       private
 
       def inner_component
-        if @view.is_a?(Organization)
-          OrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization: @view,
-            mapbox_key: @mapbox_key, available_views: @available_views)
+        if @view.is_a?(Array) # [organization, role]
+          organization, role = @view
+          OrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
+            staff: role == :staff, mapbox_key: @mapbox_key, available_views: @available_views)
         else
           Consumer::Component.new(bike: @bike, current_user: @current_user, owner: @view == :owner,
             show_for_sale: @bike.is_for_sale?, mapbox_key: @mapbox_key, available_views: @available_views)
@@ -33,7 +36,10 @@ module RegistrationShow
       end
 
       def view_param
-        @view.is_a?(Organization) ? @view.to_param : @view.to_s
+        return @view.to_s unless @view.is_a?(Array)
+
+        organization, role = @view
+        "#{organization.to_param}.#{role}"
       end
     end
   end

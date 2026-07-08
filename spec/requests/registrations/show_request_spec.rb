@@ -77,6 +77,14 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Share my page")
         expect(body).to_not match("Mark stolen")
         expect(body).to_not match("Sell on Marketplace")
+        # Theft details always show a location row, even with no location on file
+        expect(body).to match("No location given")
+      end
+
+      it "includes the owner phone in theft details when phone visibility permits" do
+        stolen_record.update(phone: "3025551234", phone_for_everyone: true)
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("3025551234")
       end
     end
   end
@@ -147,13 +155,15 @@ RSpec.describe "RegistrationsController#show", type: :request do
     context "superuser view_as options" do
       let(:current_user) { FactoryBot.create(:superuser) }
       let!(:brakebills) { FactoryBot.create(:organization, name: "Brakebills") }
-      it "offers owner, the bike's organization, and Brakebills as views" do
+      it "offers owner, both org roles, and public as views" do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
-        expect(response.body).to include("view_as=owner")
-        expect(response.body).to include("view_as=#{organization.to_param}")
-        expect(response.body).to include("view_as=#{brakebills.to_param}")
-        expect(response.body).to include("view_as=public")
+        body = whitespace_normalized_body_text
+        expect(body).to match("View as owner of bike")
+        expect(body).to match("View as #{brakebills.short_name} staff")
+        expect(body).to match("View as #{brakebills.short_name} limited")
+        # public is the superuser's default/current view
+        expect(body).to match("Viewing as Public")
       end
 
       it "renders the owner view even though they don't own the bike" do
@@ -161,6 +171,13 @@ RSpec.describe "RegistrationsController#show", type: :request do
         body = whitespace_normalized_body_text
         expect(body).to match("Your bike")
         expect(body).to match("Mark stolen")
+      end
+
+      it "can view an org panel as limited" do
+        get "#{base_url}/#{bike.id}", params: {view_as: "#{brakebills.to_param}.limited"}
+        body = whitespace_normalized_body_text
+        expect(body).to match("Limited")
+        expect(body).to_not match("Admin / Staff")
       end
     end
   end

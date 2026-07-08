@@ -1,17 +1,69 @@
-<%= render(UI::Card::Component.new) do %>
-  <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
-    <%= t("activerecord.attributes.bike.components") %>
-  </h2>
+<details <% unless @collapsed %>  open<% end %>>
+  <summary
+    class="
+      tw:flex tw:cursor-pointer tw:list-none tw:items-center
+      tw:justify-between tw:gap-3 tw:rounded-sm tw:border tw:border-gray-200
+      tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800
+      tw:[&::-webkit-details-marker]:hidden
+    "
+  >
+    <span class="tw:flex tw:flex-col tw:items-start tw:gap-0.5">
+      <span class="tw:text-[14.5px] tw:font-bold">
+        <%= translation(".full_spec_sheet") %>
+      </span>
 
-  <% grouped_components.each do |cgroup, cgroup_components| %>
-    <h3 class="tw:mt-4 tw:mb-2 tw:text-sm tw:font-semibold">
-      <%= cgroup.name %>
-    </h3>
+      <span class="tw:text-xs tw:opacity-65"><%= spec_hint %></span>
+    </span>
 
-    <%= render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do %>
-      <% cgroup_components.each do |component| %>
-        <%= render(UI::DefinitionList::Row::Component.new(label: component_label(component), value: component_value(component))) %>
+    <span
+      class="
+        tw:flex tw:flex-none tw:items-center tw:gap-1.5 tw:text-[13px]
+        tw:font-bold tw:text-[#715eb2]
+      "
+    >
+      <span class="tw:[details[open]_&]:hidden">
+        <%= translation(".show_all") %>
+      </span>
+
+      <span class="tw:hidden tw:[details[open]_&]:inline">
+        <%= translation(".hide") %>
+      </span>
+
+      <svg
+        class="tw:size-4 tw:transition-transform tw:[details[open]_&]:rotate-180"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </span>
+  </summary>
+
+  <div class="tw:mt-6 tw:flex tw:flex-col tw:gap-6">
+    <% grouped_rows.each do |cgroup, rows| %>
+      <%= render(UI::Card::Component.new) do %>
+        <h2
+          class="
+            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+            tw:uppercase
+          "
+        >
+          <%= cgroup.name %>
+        </h2>
+
+        <div class="tw:mt-3">
+          <%= render(UI::DefinitionList::Container::Component.new(term: :right_align, multi_columns: true)) do %>
+            <% rows.each do |label, value| %>
+              <%= render(UI::DefinitionList::Row::Component.new(label: label, value: value)) %>
+            <% end %>
+          <% end %>
+        </div>
       <% end %>
     <% end %>
-  <% end %>
-<% end %>
+  </div>
+</details>

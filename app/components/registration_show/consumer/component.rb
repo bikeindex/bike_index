@@ -29,9 +29,14 @@ module RegistrationShow
         @bike.manufacturer&.other? ? @bike.mnfg_name : @bike.manufacturer&.name
       end
 
+      # Only vehicles that aren't a standard bike surface the type
+      def vehicle_type
+        @bike.cycle_type_name unless @bike.type == "bike"
+      end
+
       def audience_label
-        return translation(".audience_owner") if @owner
-        return translation(".audience_sent_away") if previously_owned?
+        return translation(".audience_owner", bike_type: @bike.type) if @owner
+        return translation(".audience_sent_away", bike_type: @bike.type) if previously_owned?
 
         translation(".audience_public")
       end
@@ -58,24 +63,24 @@ module RegistrationShow
         @bike.status_stolen? ? :error : :success
       end
 
-      def status_text_class
-        @bike.status_stolen? ? "tw:text-red-600" : "tw:text-green-600"
-      end
-
-      def frame_spec
-        [@bike.frame_material_name, @bike.frame_size&.upcase].compact_blank.join(" · ")
-      end
-
       def activity_name
         @bike.primary_activity&.display_name
       end
 
-      def primary_color_name
-        @bike.frame_colors.first
+      def primary_colors_label
+        frame_color_records.many? ? translation(".primary_colors") : translation(".primary_color")
       end
 
-      def primary_color_hex
-        @bike.primary_frame_color&.display
+      def frame_color_records
+        [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
+      end
+
+      # Each color as its own swatch + name, kept together so only the "and" wraps
+      def color_swatches
+        frame_color_records.map do |color|
+          swatch = content_tag(:span, "", class: "tw:mr-1 tw:inline-block tw:h-3 tw:w-3 tw:rounded-xs tw:border tw:border-gray-300 tw:align-middle", style: color.swatch_style)
+          content_tag(:span, safe_join([swatch, color.name]), class: "tw:whitespace-nowrap")
+        end
       end
 
       def show_marketplace_button?

@@ -279,6 +279,10 @@ Rails.application.routes.draw do
 
     resources :registration_sequences, only: %i[index]
 
+    resources :bug_reports, only: %i[index show update] do
+      collection { post :assign_tags }
+    end
+
     resources :organizations do
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"

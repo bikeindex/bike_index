@@ -1534,6 +1534,7 @@ en:
       its_how_we_get_better_at_recovering_bikes: It"s how we get better at recovering
         bikes.
       mark_recovered: Mark recovered
+      marking_recovered: Marking your bike recovered…
       nevermind: Nevermind
       not_enough_info: Not enough information!
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}

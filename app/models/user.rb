@@ -138,7 +138,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :user_ban
 
-  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password, :skip_update
+  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password, :skip_update, :additional
   # stripe_id, is_paid_member, paid_organization_role_info
 
   before_validation :set_calculated_attributes
@@ -285,6 +285,11 @@ class User < ApplicationRecord
     banned
   end
 
+  # `additional` is a honeypot field on the sign up form - only bots fill it in
+  def looks_like_spam?
+    additional.present?
+  end
+
   def ambassador?
     organization_roles.ambassador_organizations.limit(1).any?
   end
@@ -395,6 +400,14 @@ class User < ApplicationRecord
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
     Email::MagicLoginLinkJob.perform_async(id)
+  end
+
+  # Unlike send_magic_link_email, reuses an unexpired token and sends no email
+  def refreshed_magic_link_token
+    if magic_link_token.blank? || auth_token_expired?("magic_link_token")
+      update_auth_token("magic_link_token")
+    end
+    magic_link_token
   end
 
   def update_last_login(ip_address)

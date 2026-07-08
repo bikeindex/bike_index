@@ -3,12 +3,15 @@
 module RegistrationShow
   module OrgAdmin
     class Component < ApplicationComponent
-      def initialize(bike:, current_user:, organization:, mapbox_key: nil, available_views: [])
+      # staff: overrides the computed role so a superadmin can view the org
+      # panel as staff or as limited (view_as)
+      def initialize(bike:, current_user:, organization:, mapbox_key: nil, available_views: [], staff: nil)
         @bike = bike
         @current_user = current_user
         @organization = organization
         @mapbox_key = mapbox_key
         @available_views = available_views
+        @force_staff = staff
       end
 
       def render?
@@ -39,6 +42,8 @@ module RegistrationShow
       end
 
       def staff?
+        return @force_staff unless @force_staff.nil?
+
         @current_user.member_bike_edit_of?(@organization)
       end
 
@@ -95,16 +100,48 @@ module RegistrationShow
         @bike.manufacturer&.other? ? @bike.mnfg_name : @bike.manufacturer&.name
       end
 
-      def primary_color_hex
-        @bike.primary_frame_color&.display
+      # Only vehicles that aren't a standard bike surface the type
+      def vehicle_type
+        @bike.cycle_type_name unless @bike.type == "bike"
+      end
+
+      def activity_name
+        @bike.primary_activity&.display_name
+      end
+
+      def frame_color_records
+        [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
+      end
+
+      def primary_colors_label
+        t("components.registration_show.consumer.#{frame_color_records.many? ? "primary_colors" : "primary_color"}")
+      end
+
+      def color_swatches
+        frame_color_records.map do |color|
+          swatch = content_tag(:span, "", class: "tw:mr-1 tw:inline-block tw:h-3 tw:w-3 tw:rounded-xs tw:border tw:border-gray-300 tw:align-middle", style: color.swatch_style)
+          content_tag(:span, safe_join([swatch, color.name]), class: "tw:whitespace-nowrap")
+        end
+      end
+
+      def credibility_scorer
+        @credibility_scorer ||= @bike.credibility_scorer
       end
 
       def credibility_score
-        @credibility_score ||= @bike.credibility_scorer.score
+        credibility_scorer.score
       end
 
-      def duplicate_serial_note
-        @bike.duplicate_bikes.any? ? translation(".has_duplicate_serials") : translation(".no_duplicate_serials")
+      # Matches the credibility_scorer_color used on bikes/show
+      def credibility_color
+        return "#dc3545" if credibility_score < 31
+        return "#ffc107" if credibility_score < 70
+
+        "#28a745"
+      end
+
+      def credibility_badges
+        CredibilityScorer.permitted_badges_hash(credibility_scorer.badges)
       end
 
       def owner_phone

@@ -1,12 +1,17 @@
 <%= render(UI::Card::Component.new) do %>
-  <h2 class="tw:text-xs tw:font-bold tw:uppercase tw:opacity-65">
+  <h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">
     <%= t("bikes.main_show_block.stolen_details") %>
   </h2>
 
   <%= render(RegistrationShow::Map::Component.new(latitude: stolen_record.latitude_public, longitude: stolen_record.longitude_public, mapbox_key: @mapbox_key, precise: stolen_record.show_address)) %>
 
-  <%= render(UI::DefinitionList::Container::Component.new) do %>
-    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.location"), value: stolen_record.address(country: [:skip_default]))) %>
+  <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.location"), value: stolen_record.address(country: [:skip_default]).presence || "No location given")) %>
+
+    <% if owner_phone.present? %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: StolenRecord.human_attribute_name(:phone))) { link_to(owner_phone, "tel:#{owner_phone}", class: "twlink tw:font-mono") } %>
+    <% end %>
+
     <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.locking_description"), value: stolen_record.locking_description)) %>
     <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.locking_circumvented"), value: stolen_record.lock_defeat_description)) %>
     <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.stolen_at"), value: stolen_record.date_stolen, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
