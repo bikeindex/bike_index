@@ -34,5 +34,28 @@ RSpec.describe Spreadsheets::ImporterJob, type: :job do
         expect { described_class.new.perform("bikes") }.to raise_error(ArgumentError, /Unknown importer/)
       end
     end
+
+    context "with a transient network failure" do
+      let(:url) { "#{described_class::RESOURCES_URL}/manufacturers.csv" }
+      let(:csv) do
+        "name,alternate_name,website,makes_frames,ebike_only,open_year,close_year,logo_url\n" \
+          "Retry Bikes,,,,,,,\n"
+      end
+      let(:job) { described_class.new }
+
+      before { allow(job).to receive(:sleep) } # skip the retry backoff
+      after { WebMock.reset! } # these stubs are registered outside a VCR cassette
+
+      it "retries the download, then imports" do
+        WebMock.stub_request(:get, url).to_timeout.then.to_return(status: 200, body: csv)
+        expect { job.perform("manufacturers") }.to change(Manufacturer, :count).by(1)
+        expect(Manufacturer.friendly_find("Retry Bikes")).to be_present
+      end
+
+      it "gives up after DOWNLOAD_ATTEMPTS and raises" do
+        WebMock.stub_request(:get, url).to_timeout
+        expect { job.perform("manufacturers") }.to raise_error(Faraday::Error)
+      end
+    end
   end
 end

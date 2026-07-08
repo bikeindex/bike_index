@@ -9,3 +9,4 @@ en:
         letter_opener_tooltip: View the email sent by this review app
         pr_link: 'PR #%{number}'
         superadmin_button: sign in as superadmin
+        superadmin_signed_in: signed in as superadmin
