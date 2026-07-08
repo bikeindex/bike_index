@@ -1,0 +1,157 @@
+name: Staging Deploy
+
+# Deploys `main` to the persistent staging app (staging.review.bikeindex.org)
+# with Kamal, on the same host + shared accessories as the per-PR review apps.
+# See config/deploy.staging.yml and docs/review-apps.md.
+#
+# Triggers:
+#   - workflow_run   : after CI succeeds on main, so a red main never ships.
+#   - workflow_dispatch : manual redeploy of the current main.
+#
+# There is no destroy path — staging is long-lived. Its Postgres role/databases
+# and Redis DB 0 persist across deploys (first boot seeds, later boots migrate).
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write       # push to GHCR
+  deployments: write    # surface the staging deployment + URL
+
+# Serialize deploys without cancellation — killing kamal mid-deploy can strand
+# the deploy lock on the host. A newer queued run supersedes an older pending one.
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build image
+    # Skip unless CI passed (workflow_dispatch has no conclusion, so allow it).
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      head_sha: ${{ steps.vars.outputs.head_sha }}
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+      # workflow_run carries the CI'd commit; workflow_dispatch falls back to the
+      # branch head. Both are the main commit we want to ship.
+      HEAD_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - name: Expose head sha
+        id: vars
+        run: echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+      - name: Checkout the CI'd commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.HEAD_SHA }}
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v4
+      # Persist sprockets' incremental cache across runners (its own build mount
+      # doesn't survive an ephemeral runner). A dedicated key — the review-app and
+      # CI asset bundles bake different BASE_URLs, so their caches can't be shared.
+      - name: Restore sprockets asset cache
+        id: sprockets-cache
+        uses: actions/cache@v6
+        with:
+          path: sprockets-cache
+          key: staging-sprockets-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
+          restore-keys: |
+            staging-sprockets-
+      - name: Inject sprockets cache into the docker build
+        uses: reproducible-containers/buildkit-cache-dance@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          cache-map: |
+            {
+              "sprockets-cache": "/rails/tmp/cache/assets"
+            }
+          skip-extraction: ${{ steps.sprockets-cache.outputs.cache-hit }}
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${{ env.HEAD_SHA }}
+          # kamal verifies the deployed image carries a `service` label matching
+          # the config; CI builds + deploys with --skip-push, so set it here.
+          labels: service=bike-index-staging
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+
+  deploy:
+    name: Deploy staging
+    needs: build
+    runs-on: ubuntu-latest
+    # Reuse the review-app GitHub Environment — staging runs on the same host,
+    # shared-db/shared-redis, and sandbox secrets, so its REVIEW_APP_* secrets +
+    # REVIEW_APP_HOST variable apply unchanged. (Split into its own environment
+    # later if staging needs distinct secrets.)
+    environment:
+      name: review-app
+      url: https://staging.review.bikeindex.org
+    env:
+      IMAGE_TAG: staging-${{ needs.build.outputs.head_sha }}
+      # kamal deploys against the staging config; the post-deploy Honeybadger
+      # hook reads KAMAL_CONFIG for the same reason.
+      KAMAL_CONFIG: config/deploy.staging.yml
+      REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+      SECRET_KEY_BASE: ${{ secrets.REVIEW_APP_SECRET_KEY_BASE }}
+      SESSION_SECRET: ${{ secrets.REVIEW_APP_SESSION_SECRET }}
+      VERIFICATION_SECRET: ${{ secrets.REVIEW_APP_VERIFICATION_SECRET }}
+      GOOGLE_MAPS: ${{ secrets.REVIEW_APP_GOOGLE_MAPS }}
+      GOOGLE_MAPS_STATIC: ${{ secrets.REVIEW_APP_GOOGLE_MAPS_STATIC }}
+      GOOGLE_GEOCODER: ${{ secrets.REVIEW_APP_GOOGLE_GEOCODER }}
+      MAPBOX_GEOCODER: ${{ secrets.REVIEW_APP_MAPBOX_GEOCODER }}
+      MAPBOX_MAPPING: ${{ secrets.REVIEW_APP_MAPBOX_MAPPING }}
+      R2_DEV_ENDPOINT: ${{ secrets.REVIEW_APP_R2_DEV_ENDPOINT }}
+      R2_DEV_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY }}
+      R2_DEV_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET }}
+      HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
+      HONEYBADGER_FRONTEND_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_FRONTEND_API_KEY }}
+    steps:
+      - name: Checkout the CI'd commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.build.outputs.head_sha }}
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0.5"
+      - name: Install Kamal
+        run: gem install kamal -v "~> 2.0"
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.REVIEW_APP_SSH_KEY }}
+      - name: Trust review host
+        # Scan the hostname AND resolved IP un-hashed — kamal's net-ssh verifies
+        # both (check_host_ip on by default). See review-app.yml.
+        run: |
+          mkdir -p ~/.ssh
+          host='${{ vars.REVIEW_APP_HOST }}'
+          ip="$(getent hosts "$host" | awk 'NR==1 { print $1 }')"
+          ssh-keyscan "$host" $ip >> ~/.ssh/known_hosts
+      - name: Stage CI secrets file
+        run: cp .kamal/secrets-ci .kamal/secrets
+      - name: Deploy
+        # CI already built + pushed the image, so kamal just pulls it (--skip-push
+        # also avoids kamal cloning the private app/services/facebook submodule).
+        run: kamal deploy --version "$IMAGE_TAG" --skip-push --config-file config/deploy.staging.yml
