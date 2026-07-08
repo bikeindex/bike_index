@@ -158,6 +158,7 @@ Rails.application.routes.draw do
 
   resources :registrations, only: %i[new create show] do
     collection { get :embed }
+    member { get :edit, to: redirect("/bikes/%{id}/edit") }
   end
 
   namespace :search do
