@@ -3,7 +3,7 @@ en:
   components:
     registration_show:
       org_admin:
-        about_this_bike: "About this %{bike_type}"
+        about_this_bike: About this %{bike_type}
         audit: Audit
         bike_details: "%{bike_type} details"
         claimed: Claimed
@@ -38,7 +38,7 @@ en:
           thread.
         open_notifications_page: Open notifications page →
         org_can_edit: "%{org_name} can edit this %{bike_type}"
-        org_can_edit_sub: "Including after the %{bike_type} is claimed."
+        org_can_edit_sub: Including after the %{bike_type} is claimed.
         other_registrations: Other registrations by this user
         owner_access: Owner & access
         owner_attestation: Owner attestation
@@ -68,7 +68,7 @@ en:
         serial: Serial
         start_audit: Start audit
         stolen: Stolen
-        this_bike: "This %{bike_type}"
+        this_bike: This %{bike_type}
         view_notifications: View notifications
         view_notifications_sub: Parking activity
         year: Year
