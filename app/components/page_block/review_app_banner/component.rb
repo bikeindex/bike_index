@@ -8,11 +8,12 @@ module PageBlock
     # `ENV["REVIEW_APP_PR_TITLE"]`; the component renders only when `review_app`
     # is present.
     class Component < ApplicationComponent
-      def initialize(review_app:, pr_number: nil, pr_title: nil, current_user: nil)
+      def initialize(review_app:, pr_number: nil, pr_title: nil, current_user: nil, return_to: nil)
         @review_app = review_app
         @pr_number = pr_number
         @pr_title = pr_title
         @current_user = current_user
+        @return_to = return_to
       end
 
       def render?

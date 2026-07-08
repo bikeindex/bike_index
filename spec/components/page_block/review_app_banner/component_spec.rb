@@ -9,10 +9,11 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   end
 
   context "when review_app is present" do
-    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, current_user:)) }
+    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, current_user:, return_to:)) }
     let(:pr_number) { nil }
     let(:pr_title) { nil }
     let(:current_user) { nil }
+    let(:return_to) { nil }
 
     it "renders the label and disclaimer" do
       expect(component.text).to include("Review app")
@@ -31,6 +32,16 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
         expect(form).to be_present
         expect(form.css("button").text).to eq("sign in as superadmin")
         expect(form.css("input[name='token']").first[:value]).to eq superadmin.reload.magic_link_token
+        expect(form.css("input[name='return_to']")).to be_empty
+      end
+
+      context "with a return_to" do
+        let(:return_to) { "/bikes/12" }
+
+        it "posts the return_to so sign-in redirects back to the current page" do
+          form = component.css("form[action='/session/sign_in_with_magic_link']").first
+          expect(form.css("input[name='return_to']").first[:value]).to eq "/bikes/12"
+        end
       end
 
       # The banner renders on pages served under set_reading_role, so refreshing
