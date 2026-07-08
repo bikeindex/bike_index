@@ -161,10 +161,16 @@ aliases:
   logs:    app logs -f
   dbc:     app exec --interactive --reuse "bin/rails dbconsole --include-password"
 
-# Per-PR active storage volume (review apps mostly use R2, but ActiveStorage's
-# local service writes here if anything falls through).
+# Per-PR named volumes, mounted on every role so the worker sees the same files
+# the web container wrote. Named volumes survive redeploys; bin/kamal_review's
+# destroy removes them (kamal app remove leaves them behind).
+# - _storage: ActiveStorage local service — review apps mostly use R2, but this
+#   catches anything that falls through.
+# - _uploads: user uploads under public/uploads — web writes the original, the
+#   worker reads it back to generate versions.
 volumes:
   - "<%= appname %>_storage:/rails/storage"
+  - "<%= appname %>_uploads:/rails/public/uploads"
 
 asset_path: /rails/public/assets
 

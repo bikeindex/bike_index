@@ -132,9 +132,10 @@ done
 pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
 export_review_app_env "$pr_number"
 
-# Role/database names must stay in lockstep with config/deploy.review.yml's env
-# section — destroy drops whatever names are derived here.
+# Role/database/volume names must stay in lockstep with config/deploy.review.yml
+# — destroy drops whatever names are derived here.
 slug="pr-${pr_number}"
+appname="bike-index-${slug}"
 role="bike_index_pr_${pr_number}"
 primary_db="bike_index_review_pr_${pr_number}_primary"
 analytics_db="bike_index_review_pr_${pr_number}_analytics"
@@ -150,6 +151,18 @@ case "$mode" in
     # It also avoids kamal cloning the repo --recurse-submodules, which fails on
     # the private app/services/facebook submodule (see config/deploy.review.yml).
     kamal deploy --version "$version" --skip-push
+
+    # Start each review-app deploy with a clean Rails cache so new code never
+    # serves stale cached fragments. Runs only here, so staging (which deploys
+    # via `kamal deploy` directly, not this script) is left untouched. --reuse
+    # execs in the running web container; --roles web runs it once. Best-effort:
+    # a failed clear must never fail the deploy.
+    # NOTE: cache, Sidekiq, and rack_attack share this PR's one Redis logical DB
+    # and the cache store is un-namespaced, so this clear is a FLUSHDB of that DB.
+    echo "==> Clearing Rails cache"
+    kamal app exec --reuse --roles web "bin/rails runner 'Rails.cache.clear'" ||
+      echo "Rails cache clear skipped/failed (non-fatal)"
+
     echo "==> Done. URL: https://${slug}.review.bikeindex.org"
     ;;
 
@@ -170,6 +183,13 @@ case "$mode" in
     echo "==> Flushing redis logical DB $REVIEW_APP_REDIS_DB"
     kamal accessory exec redis --reuse \
       "redis-cli -n ${REVIEW_APP_REDIS_DB} FLUSHDB" || true
+
+    # Named volumes outlive `kamal app remove`, so drop them or they leak on the
+    # host. The app containers are gone by now, so the volumes are free to remove.
+    # `server exec` runs on the host (as root) rather than inside a container.
+    echo "==> Removing per-PR volumes (${appname}_storage, ${appname}_uploads)"
+    kamal server exec \
+      "docker volume rm ${appname}_storage ${appname}_uploads" || true
 
     echo "==> Done."
     ;;
