@@ -22,7 +22,10 @@
           color: :purple,
           data: {"registration-show--contact-owner-target": "trigger", action: "registration-show--contact-owner#reveal"}
         )) %>
-        <div data-registration-show--contact-owner-target="form" hidden>
+        <div
+          data-registration-show--contact-owner-target="form"
+          class="tw:hidden"
+        >
           <%= form_with(model: stolen_notification, url: stolen_notifications_path) do |form| %>
             <%= form.hidden_field :bike_id, value: @bike.id %>
 

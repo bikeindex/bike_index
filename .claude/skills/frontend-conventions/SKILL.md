@@ -48,6 +48,21 @@ The `bin/dev` command handles building and updating Tailwind and JS.
 
 The same instinct applies beyond buttons: **check `app/components/ui/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, badges, modals, pagination, tables…). If a `UI::*` component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
 
+## Showing and hiding elements: always use the collapse helpers
+
+Any time you show, hide, or toggle an element in response to interaction, go through the shared collapse helpers. **Never** hand-roll it with the `hidden` attribute, `element.style.display`, `element.hidden = true`, or ad-hoc `classList.add('tw:hidden')` — those skip the shared show/hide animation and the `tw:hidden!`/`tw:hidden` class contract the rest of the app depends on.
+
+- **Markup-only toggle** (a trigger reveals/collapses a panel, no other logic): add `data-controller="collapse"`, mark the collapsible element `data-collapse-target="content"`, and wire the trigger's `data-action` to `collapse#toggle` / `collapse#show` / `collapse#hide` (`app/javascript/controllers/collapse_controller.js`; optional `data-collapse-duration-value`).
+- **Inside your own Stimulus controller** (you have extra logic — a redirect branch, a query-param check, etc.): import `collapse_utils` and call it directly:
+
+  ```js
+  import { collapse } from 'utils/collapse_utils'
+  // ...
+  collapse('show', this.formTarget)   // 'show' | 'hide' | 'toggle'; optional duration (default 200)
+  ```
+
+The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
+
 ## No dead hooks in markup
 
 Only add an `id` or non-utility `class` when something concrete consumes it — a CSS rule, a JS/Stimulus selector, a test fixture, an accessibility attribute. Don't keep or invent "structural identifier" hooks "in case something needs them later," and don't replace a removed hook with a renamed one out of inertia.

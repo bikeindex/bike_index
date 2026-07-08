@@ -41,7 +41,8 @@ RSpec.describe RegistrationShow::ContactOwner::Component, type: :component do
         expect(page).to have_text("Contact the owner")
         expect(page).to have_css("[data-registration-show--contact-owner-target='trigger']", text: "Write them a message")
         expect(page).not_to have_link("Write them a message")
-        expect(page).to have_css("[data-registration-show--contact-owner-target='form'][hidden]", visible: :all)
+        # The form starts collapsed via the tw:hidden class (collapse_utils manages it)
+        expect(page).to have_css("[data-registration-show--contact-owner-target='form'].tw\\:hidden")
         expect(page).to have_css("textarea[name='stolen_notification[message]'][required]", visible: :all)
         expect(page).to have_css("input[name='stolen_notification[bike_id]'][value='#{bike.id}']", visible: :all)
       end

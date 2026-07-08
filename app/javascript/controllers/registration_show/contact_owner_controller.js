@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='registration-show--contact-owner'
 // Reveals the "contact the owner" message form on click. A viewer returning from
@@ -8,8 +9,9 @@ export default class extends Controller {
   static targets = ['form', 'trigger']
 
   connect () {
+    // Returning from sign-in opens the form without animating in
     if (new URLSearchParams(window.location.search).has('contact_owner')) {
-      this.open()
+      this.open(0)
     }
   }
 
@@ -18,9 +20,9 @@ export default class extends Controller {
     this.open()
   }
 
-  open () {
+  open (duration = 200) {
     if (!this.hasFormTarget) return
-    this.formTarget.hidden = false
-    if (this.hasTriggerTarget) this.triggerTarget.hidden = true
+    collapse('show', this.formTarget, duration)
+    if (this.hasTriggerTarget) collapse('hide', this.triggerTarget, duration)
   }
 }
