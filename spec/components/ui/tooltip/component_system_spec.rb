@@ -81,19 +81,13 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     page.execute_script("arguments[0].blur()", trigger)
     expect(tooltip).not_to be_visible
 
-    # Focus moving to another trigger hides the first. A button trigger is itself
-    # focusable; an interactive trigger is a span whose inner link takes focus.
-    focusable = ->(id) {
-      el = find("[aria-describedby='#{id}']")
-      (el.tag_name == "span") ? el.find("a, button") : el
-    }
-    first_focusable = focusable.call(tooltip_ids.first)
-    other_focusable = focusable.call(tooltip_ids.last)
-    page.execute_script("arguments[0].focus()", first_focusable)
+    # Focus moving to another trigger hides the first
+    triggers = tooltip_ids.map { |id| find("[aria-describedby='#{id}']") }
+    page.execute_script("arguments[0].focus()", triggers.first)
     expect(tooltips.first).to be_visible
-    page.execute_script("arguments[0].focus()", other_focusable)
+    page.execute_script("arguments[0].focus()", triggers.last)
     expect(tooltips.first).not_to be_visible
-    page.execute_script("arguments[0].blur()", other_focusable)
+    page.execute_script("arguments[0].blur()", triggers.last)
 
     # Clicking the trigger persists the tooltip through mouseleave until a body click
     trigger.hover
@@ -103,12 +97,9 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     find("body").click
     expect(tooltip).not_to be_visible
 
-    # Click layering pushes each clicked tooltip's z-index higher. Only button
-    # triggers — an interactive-content trigger (a link) navigates on click,
-    # which is the link's behavior, not the tooltip state machine.
-    button_ids = tooltip_ids.select { |id| find("[aria-describedby='#{id}']").tag_name == "button" }
-    button_ids.each { |id| find("[aria-describedby='#{id}']").click }
-    z_indexes = button_ids.map { |id| tooltip_z_index(id).to_i }
+    # Click layering pushes each clicked tooltip's z-index higher
+    tooltip_ids.each { |id| find("[aria-describedby='#{id}']").click }
+    z_indexes = tooltip_ids.map { |id| tooltip_z_index(id).to_i }
     expect(z_indexes).to eq z_indexes.sort
     expect(z_indexes.last).to be > z_indexes.first
   end

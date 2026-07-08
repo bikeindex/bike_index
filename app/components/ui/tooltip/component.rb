@@ -11,40 +11,36 @@ module UI
 
       renders_one :body
       renders_one :tooltip_button, ->(**attrs, &block) {
-        inner = block ? safe_join([capture(&block), tooltip_span], " ") : tooltip_span
-        tag.button(**trigger_attrs(**attrs)) { inner }
+        tag.button(**trigger_attrs(**attrs)) { block ? capture(&block) : "" }
       }
 
       def initialize(text: nil)
         @text = text
       end
 
+      # The controller and its hover/focus actions live on the wrapping span so
+      # the trigger and the tooltip are siblings — a link in the tooltip body
+      # can't be nested inside the trigger button.
       def call
-        return tooltip_button if tooltip_button?
-        return interactive_trigger if interactive_content?
-
-        tag.button(**trigger_attrs(class: TRIGGER_CLASS)) { safe_join([content, tooltip_span], " ") }
+        tag.span(class: "tw:inline-block", data: {controller: "ui--tooltip", action: TRIGGER_ACTIONS}) do
+          safe_join([trigger, tooltip_span], " ")
+        end
       end
 
       private
 
-      # A link or button in the content is itself the trigger; wrap it in a plain
-      # span rather than another button so the click reaches it. The content is
-      # responsible for its own label (aria-label/text).
-      def interactive_trigger
-        tag.span(**trigger_attrs(as: :span, class: "tw:inline-block")) { safe_join([content, tooltip_span], " ") }
+      def trigger
+        return tooltip_button if tooltip_button?
+
+        tag.button(**trigger_attrs(class: TRIGGER_CLASS)) { content }
       end
 
-      def interactive_content?
-        content.to_s.match?(/<(a|button)[\s>]/)
-      end
-
-      def trigger_attrs(as: :button, data: {}, **extra_attrs)
-        action = [data[:action], TRIGGER_ACTIONS].compact.join(" ")
+      def trigger_attrs(data: {}, **extra_attrs)
         {
-          **((as == :button) ? {type: "button", "aria-label": @text.presence} : {}),
+          type: "button",
+          "aria-label": @text.presence,
           "aria-describedby": tooltip_id,
-          data: {controller: "ui--tooltip", "ui--tooltip-target": "trigger", **data, action:},
+          data: {"ui--tooltip-target": "trigger", **data},
           **extra_attrs
         }
       end
@@ -57,13 +53,20 @@ module UI
         body? ? body : @text
       end
 
+      # A link or button in the body means the tooltip is meant to be clicked
+      # into (it stays open on click), so the popup needs pointer events.
+      def interactive_body?
+        tooltip_body.to_s.match?(/<(a|button)[\s>]/)
+      end
+
       def tooltip_span
+        pointer = interactive_body? ? "tw:pointer-events-auto" : "tw:pointer-events-none"
         tag.span(
           tooltip_body,
           role: "tooltip",
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
-          class: "twtext-color tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:rounded " \
+          class: "twtext-color tw:hidden #{pointer} tw:whitespace-nowrap tw:rounded " \
             "tw:bg-white tw:px-2 tw:py-1 tw:text-xs tw:font-normal tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
             "tw:dark:bg-gray-800 tw:dark:border-gray-700"
         )

@@ -104,13 +104,15 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
     context "with a commit" do
       let(:commit) { "a1b2c3d" }
 
-      it "renders a '?' tooltip link to the commit on github" do
-        link = component.css("a[aria-label='current commit: a1b2c3d']").first
-        expect(link).to be_present
-        expect(link[:href]).to eq("https://github.com/bikeindex/bike_index/commit/a1b2c3d")
+      it "renders a '?' tooltip whose popup links to the commit on github" do
         # visible trigger is "?" (like the email-outbox tooltip), not the raw SHA
-        expect(link.xpath("./text()").text.strip).to eq("?")
-        expect(component.css("[role='tooltip']").text).to include("current commit: a1b2c3d")
+        button = component.css("button[aria-label='current commit: a1b2c3d']").first
+        expect(button.text.strip).to eq("?")
+        tooltip = component.css("[role='tooltip']")
+        expect(tooltip.text).to include("current commit:")
+        link = tooltip.css("a").first
+        expect(link[:href]).to eq("https://github.com/bikeindex/bike_index/commit/a1b2c3d")
+        expect(link.text.strip).to eq("a1b2c3d")
       end
     end
 
