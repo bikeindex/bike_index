@@ -209,11 +209,22 @@ class Export < ApplicationRecord
     options["bike_codes_assigned"] || []
   end
 
-  def remove_bike_stickers_and_record!(passed_user = nil)
+  def undo_bike_stickers_and_record!(passed_user = nil)
     return true unless assign_bike_codes? && !bike_codes_removed?
 
-    remove_bike_stickers(passed_user)
+    undo_bike_stickers(passed_user)
     update_attribute :options, options.merge(bike_codes_removed: true)
+  end
+
+  # Restores each sticker to the bike it was on before this export claimed it
+  def undo_bike_stickers(passed_user = nil)
+    bike_stickers_assigned.each do |code|
+      bike_sticker = BikeSticker.lookup(code, organization_id: organization_id)
+      next if bike_sticker.blank?
+
+      bike_sticker.claim(user: passed_user, bike: bike_before_export(bike_sticker),
+        organization: organization, creator_kind: "creator_export")
+    end
   end
 
   def remove_bike_stickers(passed_user = nil)
@@ -354,6 +365,17 @@ class Export < ApplicationRecord
   end
 
   private
+
+  # nil when the sticker was unclaimed before the export, or when its prior bike has since been deleted
+  def bike_before_export(bike_sticker)
+    export_update = bike_sticker.bike_sticker_updates.successful
+      .where(export_id: id).reorder(:id).first
+    return nil if export_update.blank?
+
+    # Bike's default_scope hides user_hidden and example bikes, which are still valid to restore
+    bike = Bike.unscoped.find_by(id: export_update.previous_successful_updates.reorder(:id).last&.bike_id)
+    bike if bike&.deleted_at.blank?
+  end
 
   def validated_options(opts)
     opts = self.class.default_options(kind).merge(opts)

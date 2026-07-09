@@ -213,6 +213,69 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  describe "undo_bike_stickers_and_record!" do
+    let(:export) { FactoryBot.create(:export_organization) }
+    let(:organization) { export.organization }
+    let(:user) { FactoryBot.create(:user) }
+    let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "A11") }
+    let(:exported_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    before do
+      export.update(options: export.options.merge(assign_bike_codes: true, bike_codes_assigned: ["A11"]))
+    end
+
+    def export_claim(bike)
+      bike_sticker.claim(user: user, bike: bike, organization: organization,
+        export_id: export.id, creator_kind: "creator_export")
+    end
+
+    context "sticker was unclaimed before the export" do
+      it "unclaims the sticker" do
+        export_claim(exported_bike)
+        expect(bike_sticker.reload.bike).to eq exported_bike
+        export.undo_bike_stickers_and_record!(user)
+        expect(bike_sticker.reload.claimed?).to be_falsey
+        expect(bike_sticker.bike).to be_nil
+        expect(bike_sticker.bike_sticker_updates.last.kind).to eq "un_claim"
+        expect(export.reload.bike_codes_removed?).to be_truthy
+      end
+    end
+
+    context "sticker was claimed to a different bike before the export" do
+      let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      it "restores the previous bike" do
+        bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
+        export_claim(exported_bike)
+        expect(bike_sticker.reload.bike).to eq exported_bike
+        export.undo_bike_stickers_and_record!(user)
+        expect(bike_sticker.reload.claimed?).to be_truthy
+        expect(bike_sticker.bike).to eq previous_bike
+        expect(bike_sticker.bike_sticker_updates.last.kind).to eq "re_claim"
+      end
+    end
+
+    context "previous bike has since been deleted" do
+      let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      it "unclaims the sticker" do
+        bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
+        export_claim(exported_bike)
+        previous_bike.destroy
+        export.undo_bike_stickers_and_record!(user)
+        expect(bike_sticker.reload.claimed?).to be_falsey
+        expect(bike_sticker.bike).to be_nil
+      end
+    end
+
+    context "already undone" do
+      it "does not re-run" do
+        export_claim(exported_bike)
+        export.undo_bike_stickers_and_record!(user)
+        expect {
+          export.undo_bike_stickers_and_record!(user)
+        }.to_not change(BikeStickerUpdate, :count)
+      end
+    end
+  end
+
   describe "bikes_scoped" do
     # Pending - we're getting the organization scopes up and running before migrating existing Spreadsheets::TsvCreator tasks
     # But we eventually want to add stolen tsv's into here
