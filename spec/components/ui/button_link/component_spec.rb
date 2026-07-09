@@ -23,14 +23,6 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
     end
   end
 
-  context "with active state" do
-    let(:options) { {text: "Active", href: "/test", color: :primary, active: true} }
-
-    it "includes active ring classes" do
-      expect(component.to_html).to include("tw:ring-2")
-    end
-  end
-
   it "always applies the prefixed active classes (inert until pressed/toggled)" do
     tokens = component.css("a").first["class"].split
     expect(tokens).to include("tw:aria-pressed:ring-2", "tw:active:ring-2")

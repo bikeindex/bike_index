@@ -19,7 +19,7 @@ module UI
       def call
         return button_to_form if @method
 
-        helpers.link_to(@text || content, @href, **@html_options.merge(class: link_classes))
+        helpers.link_to(@text || content, @href, @html_options.merge(class: link_classes))
       end
 
       private
