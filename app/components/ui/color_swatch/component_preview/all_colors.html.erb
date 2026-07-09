@@ -1,0 +1,8 @@
+<ul class="tw:flex tw:flex-col tw:gap-2">
+  <% colors.each do |color| %>
+    <li class="tw:flex tw:items-center tw:gap-2">
+      <%= render(UI::ColorSwatch::Component.new(display: color.display, name: color.name)) %>
+      <span><%= color.name %></span>
+    </li>
+  <% end %>
+</ul>

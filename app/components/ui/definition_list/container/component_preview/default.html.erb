@@ -1,6 +1,7 @@
 <% multi_columns ||= false %>
+<% term ||= :left_align %>
 
-<%= render(UI::DefinitionList::Container::Component.new(multi_columns:)) do %>
+<%= render(UI::DefinitionList::Container::Component.new(multi_columns:, term:)) do %>
   <% description =
     "I'm baby microdosing church-key try-hard, yuccie small batch lumbersexual craft beer skateboard slow-carb neutral milk hotel big mood enamel pin gatekeep chartreuse schlitz. Deep v try-hard green juice retro shaman occupy artisan shabby chic vinyl.\n\nStreet art kickstarter JOMO chillwave heirloom drinking vinegar single-origin coffee banh mi try-hard air plant." %>
 

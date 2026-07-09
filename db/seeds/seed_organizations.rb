@@ -52,6 +52,7 @@ feature_name_and_slugs = [
 feature_ids = []
 official_manufacturer_feature_id = nil
 skip_ownership_email_feature_id = nil
+avery_export_feature_id = nil
 
 feature_name_and_slugs.each do |attrs|
   org_feature = OrganizationFeature.find_by_name(attrs[:name]) ||
@@ -59,12 +60,13 @@ feature_name_and_slugs.each do |attrs|
   feature_ids << org_feature.id
   official_manufacturer_feature_id = org_feature.id if attrs[:name] == "Official manufacturer organization"
   skip_ownership_email_feature_id = org_feature.id if attrs[:name] == "Skip ownership email"
+  avery_export_feature_id = org_feature.id if attrs[:name] == "Avery Export"
 end
 
-# --- Brakebills: all features except official_manufacturer, with is_endless invoice - and skip_ownership_email ---
+# --- Brakebills: all features except official_manufacturer, avery_export, with is_endless invoice - and skip_ownership_email ---
 brakebills = Organization.find_by_name("Brakebills") || Organization.create!(name: "Brakebills")
 brakebills_invoice = Invoice.create(organization: brakebills, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
-brakebills_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_ownership_email_feature_id]
+brakebills_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_ownership_email_feature_id, avery_export_feature_id]
 brakebills_invoice.update(organization_feature_ids: brakebills_feature_ids)
 OrganizationRole.create(organization_id: brakebills.id, user_id: User.find_by_email("member@bikeindex.org").id, role: "member")
 

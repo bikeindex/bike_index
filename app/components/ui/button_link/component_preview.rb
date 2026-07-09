@@ -26,6 +26,18 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Turbo Link", href: "#", data: {turbo: false}))
       end
       # @!endgroup
+
+      # @!group button_to (form submit)
+      # @label button_to POST
+      def button_to_post
+        render(UI::ButtonLink::Component.new(text: "Follow", href: "#", color: :primary, method: :post))
+      end
+
+      # @label button_to DELETE
+      def button_to_delete
+        render(UI::ButtonLink::Component.new(text: "Delete", href: "#", color: :error, method: :delete))
+      end
+      # @!endgroup
     end
   end
 end

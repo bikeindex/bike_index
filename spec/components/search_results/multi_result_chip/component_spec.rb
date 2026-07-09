@@ -17,7 +17,7 @@ RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
     end
 
     it "uses success badge classes" do
-      expect(component.to_html).to include("tw:bg-emerald-500")
+      expect(component.to_html).to include("tw:bg-green-50")
     end
 
     it "underlines the link" do
@@ -35,7 +35,7 @@ RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
     end
 
     it "uses gray badge classes" do
-      expect(component.to_html).to include("tw:bg-gray-300")
+      expect(component.to_html).to include("tw:bg-gray-100")
     end
 
     it "does not underline the serial span" do
@@ -63,14 +63,14 @@ RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
     end
 
     it "uses error badge classes" do
-      expect(component.to_html).to include("tw:bg-red-300")
+      expect(component.to_html).to include("tw:bg-red-50")
     end
 
     context "with error_message" do
       let(:error_message) { "Server error 500" }
 
       it "wraps the error label in a tooltip showing the message and uses the help cursor" do
-        expect(component).to have_css("button[data-controller~='ui--tooltip'] small", text: "error")
+        expect(component).to have_css("[data-controller~='ui--tooltip'] button small", text: "error")
         expect(component).to have_css("[role=tooltip]", text: "Server error 500", visible: :all)
         expect(component.to_html).to include("tw:cursor-help")
       end

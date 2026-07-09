@@ -77,7 +77,7 @@
 
               <% if export.assign_bike_codes? %>
                 &nbsp;
-                <%= render UI::Badge::Component.new(text: "stickers", title: "Assigned stickers", color: :cyan, size: :sm) %>
+                <%= render UI::Badge::Component.new(size: :sm, **export_stickers_badge_attributes(export)) %>
               <% end %>
             </td>
 
