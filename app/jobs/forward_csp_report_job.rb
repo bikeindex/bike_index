@@ -6,6 +6,10 @@ class ForwardCspReportJob < ApplicationJob
   EXTENSION_SCHEME = %r{\A(chrome|moz|safari|safari-web)-extension://}
   IN_APP_BROWSER = /\b(FBAN|FBAV|FB_IAB|Instagram|Line\/)\b/
   TRANSLATE_DOCUMENT = /\.translate\.goog\z|translate\.google(apis)?\.com/
+  # Google Ads conversion iframes load on country-specific google.<tld> domains;
+  # CSP frame_src allowlists common ones, we silence reports for the rest. Frame
+  # violations report the bare origin, hence the trailing slash-or-end.
+  GOOGLE_FRAME = %r{\Ahttps://www\.google\.[a-z.]+(/|\z)}
   # Corporate proxies, antivirus, and carriers inject frames pointing at private
   # or loopback IPs — the user's own network, nothing we serve or can fix.
   PRIVATE_IP_FRAME = %r{\Ahttps?://(10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)}
@@ -35,7 +39,8 @@ class ForwardCspReportJob < ApplicationJob
 
   def forward?(report, user_agent)
     report.present? && !user_agent.to_s.match?(IN_APP_BROWSER) &&
-      !extension_noise?(report) && !translate_noise?(report) && !private_ip_noise?(report)
+      !extension_noise?(report) && !translate_noise?(report) &&
+      !google_frame_noise?(report) && !private_ip_noise?(report)
   end
 
   def extension_noise?(report)
@@ -43,13 +48,14 @@ class ForwardCspReportJob < ApplicationJob
       .any? { |uri| uri.match?(EXTENSION_SCHEME) }
   end
 
-  # Google Translate reskins the page and injects google.<tld> frames + read-aloud TTS audio
+  # Google Translate reskins the page and injects read-aloud TTS audio as data: media
   def translate_noise?(report)
-    blocked = report["blocked-uri"].to_s
     return true if report["document-uri"].to_s.match?(TRANSLATE_DOCUMENT)
-    # Frame violations report the bare origin (no path), so match a trailing slash or end
-    return true if blocked.match?(%r{\Ahttps://www\.google\.[a-z.]+(/|\z)})
-    report["effective-directive"] == "media-src" && blocked == "data"
+    report["effective-directive"] == "media-src" && report["blocked-uri"].to_s == "data"
+  end
+
+  def google_frame_noise?(report)
+    report["blocked-uri"].to_s.match?(GOOGLE_FRAME)
   end
 
   def private_ip_noise?(report)
