@@ -23,11 +23,26 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
     end
   end
 
-  context "with active state" do
-    let(:options) { {text: "Active", href: "/test", color: :primary, active: true} }
+  it "always applies the prefixed active classes (inert until pressed/toggled)" do
+    tokens = component.css("a").first["class"].split
+    expect(tokens).to include("tw:aria-pressed:ring-2", "tw:active:ring-2")
+    expect(tokens).not_to include("tw:ring-2", "tw:bg-gray-200")
+  end
 
-    it "includes active ring classes" do
-      expect(component.to_html).to include("tw:ring-2")
+  context "active: true" do
+    let(:options) { {text: "Active", href: "/test", active: true} }
+
+    it "applies the bare active classes statically" do
+      tokens = component.css("a").first["class"].split
+      expect(tokens).to include("tw:ring-2", "tw:bg-gray-200")
+    end
+  end
+
+  context "with aria-controls" do
+    let(:options) { {text: "Toggle", href: "/test", aria: {controls: "panel"}} }
+
+    it "renders aria-controls" do
+      expect(component.to_html).to include('aria-controls="panel"')
     end
   end
 
@@ -36,6 +51,40 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
 
     it "passes through html options" do
       expect(component).to have_css("a[data-turbo='false']")
+    end
+  end
+
+  context "with method" do
+    let(:options) { {text: "Follow", href: "/follow", color: :primary, method: :post} }
+
+    it "renders a button_to form submitting to the href" do
+      expect(component).to have_css("form[action='/follow'][method='post']")
+      expect(component).to have_css("form button[type='submit']", text: "Follow")
+      expect(component.css("button").first["class"]).to include("tw:bg-blue-600")
+    end
+
+    context "with a non-post method" do
+      let(:options) { {text: "Delete", href: "/thing", method: :delete} }
+
+      it "adds the _method hidden field" do
+        expect(component).to have_css("input[type='hidden'][name='_method'][value='delete']", visible: :hidden)
+      end
+    end
+
+    context "with form attributes" do
+      let(:options) { {text: "Revoke", href: "/thing", method: :delete, form: {onsubmit: "return confirm('Are you sure?')"}} }
+
+      it "sets attributes on the form element" do
+        expect(component).to have_css("form[onsubmit=\"return confirm('Are you sure?')\"]")
+      end
+    end
+
+    context "with params" do
+      let(:options) { {text: "Assign", href: "/thing", method: :post, params: {membership_id: 42}} }
+
+      it "renders params as hidden fields" do
+        expect(component).to have_css("input[type='hidden'][name='membership_id'][value='42']", visible: :hidden)
+      end
     end
   end
 end

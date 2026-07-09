@@ -85,13 +85,14 @@ RUN groupadd --system --gid 1000 rails && \
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
 
-# Ensure the storage mountpoint exists owned by rails BEFORE the per-PR named
-# volume (config/deploy.review.yml) mounts over it. Docker copies this dir's
+# Ensure the volume mountpoints exist owned by rails BEFORE the per-PR named
+# volumes (config/deploy.review.yml) mount over them. Docker copies each dir's
 # rails ownership into an empty volume on first mount; without it Docker creates
-# /rails/storage root-owned and letter_opener_web can't mkdir its inbox there
-# (Errno::EACCES, see config/environments/staging.rb).
+# them root-owned and the rails user hits Errno::EACCES on mkdir — letter_opener_web's
+# inbox under /rails/storage, CarrierWave's tsv/json dirs under /rails/public/uploads.
 # Runs as root: WORKDIR created /rails root-owned, so the rails user can't mkdir here.
-RUN mkdir -p /rails/storage && chown rails:rails /rails/storage
+RUN mkdir -p /rails/storage /rails/public/uploads && \
+    chown rails:rails /rails/storage /rails/public/uploads
 USER 1000:1000
 
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
