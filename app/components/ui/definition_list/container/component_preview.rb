@@ -4,13 +4,23 @@ module UI
   module DefinitionList
     module Container
       class ComponentPreview < ApplicationComponentPreview
-        # @!group Multi Column
+        # @!group Left aligned (default)
         def default
           {template: "ui/definition_list/container/component_preview/default", locals: {multi_columns: false}}
         end
 
         def multi_columns_true
           {template: "ui/definition_list/container/component_preview/default", locals: {multi_columns: true}}
+        end
+        # @!endgroup
+
+        # @!group Redesign terms
+        def right_align
+          {template: "ui/definition_list/container/component_preview/default", locals: {term: :right_align}}
+        end
+
+        def below
+          {template: "ui/definition_list/container/component_preview/default", locals: {term: :below}}
         end
         # @!endgroup
       end

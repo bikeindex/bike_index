@@ -9,7 +9,7 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
   it "renders the page list with Add page and per-page Edit links" do
     render_inline(described_class.new(registration_sequence:))
 
-    expect(page).to have_text("Add page")
+    expect(page).to have_css("form[method='post'] button[type='submit']", text: "Add page")
     expect(page).to have_css("[data-controller='sortable'] [data-sortable-target='item']", minimum: 1)
     expect(page).to have_link("Edit")
   end

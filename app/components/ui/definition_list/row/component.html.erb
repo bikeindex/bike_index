@@ -3,7 +3,7 @@
   <dt class="<%= dt_classes %>"><%= @label %></dt>
 
   <%# bootstrap sets margin_bottom on dd %>
-  <dd class="tw:mb-0!">
+  <dd class="<%= dd_classes %>">
     <% if render_convertime? %>
       <span class="<%= @time_localizer_classes %>">
         <%= l @value, format: :convert_time %>

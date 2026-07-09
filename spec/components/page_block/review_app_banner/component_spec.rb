@@ -9,25 +9,27 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   end
 
   context "when review_app is present" do
-    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, current_user:, return_to:)) }
+    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, commit:, current_user:, return_to:)) }
     let(:pr_number) { nil }
     let(:pr_title) { nil }
+    let(:commit) { nil }
     let(:current_user) { nil }
     let(:return_to) { nil }
 
-    it "renders the label and disclaimer" do
-      expect(component.text).to include("Review app")
+    it "renders the staging label and disclaimer" do
+      # No pr_number is the persistent staging deploy, not a per-PR review app
+      expect(component.text).to include("Staging")
+      expect(component.text).not_to include("Review app")
       expect(component.text).to include("data is ephemeral")
     end
 
-    it "hides the label and disclaimer on small screens" do
-      # tw:hidden tw:sm:inline => display:none below the sm breakpoint
-      label = component.css("span.tw\\:hidden", text: "Review app").first
-      disclaimer = component.css("span.tw\\:hidden", text: "data is ephemeral").first
-      expect(label).to be_present
-      expect(disclaimer).to be_present
-      # The outbox link stays visible, so it's not inside a hidden span
-      expect(component.css("span.tw\\:hidden a[href='/letter_opener']")).to be_empty
+    it "keeps the Staging label visible on small screens but hides the disclaimer" do
+      # tw:hidden tw:sm:inline => display:none below the sm breakpoint. Staging has
+      # no PR title, so the label itself carries the context on small screens.
+      label = component.css("span").find { |span| span.text.strip == "Staging" }
+      disclaimer = component.css("span").find { |span| span.text.include?("data is ephemeral") }
+      expect(label[:class].to_s).not_to include("tw:hidden")
+      expect(disclaimer[:class].to_s).to include("tw:hidden")
     end
 
     it "doesn't render the superadmin button when there is no superadmin" do
@@ -94,6 +96,29 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       expect(component.css("a[href^='https://github.com']")).to be_empty
     end
 
+    it "omits the commit tooltip when no commit is given" do
+      expect(component.text).not_to include("current commit")
+    end
+
+    context "with a commit" do
+      let(:commit) { "a1b2c3d" }
+
+      it "renders a '?' tooltip whose popup links to the commit on github" do
+        # visible trigger is "?" (like the email-outbox tooltip), not the raw SHA
+        button = component.css("button[aria-label='current commit: a1b2c3d']").first
+        expect(button.text.strip).to eq("?")
+        tooltip = component.css("[role='tooltip']")
+        expect(tooltip.text).to include("current commit:")
+        link = tooltip.css("a").first
+        expect(link[:href]).to eq("https://github.com/bikeindex/bike_index/commit/a1b2c3d")
+        expect(link.text.strip).to eq("a1b2c3d")
+      end
+
+      it "shows the commit tooltip on small screens (not inside a hidden span)" do
+        expect(component.css("span.tw\\:hidden button[aria-label='current commit: a1b2c3d']")).to be_empty
+      end
+    end
+
     context "with a pr_number" do
       let(:pr_number) { 1234 }
 
@@ -101,6 +126,14 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
         link = component.css("a[href^='https://github.com']").first
         expect(link[:href]).to eq("https://github.com/bikeindex/bike_index/pull/1234")
         expect(link.text).to include("PR #1234")
+      end
+
+      it "shows the review app label instead of the staging label, hidden on small screens" do
+        expect(component.text).to include("Review app")
+        expect(component.text).not_to include("Staging")
+        # The PR title carries the context on small screens, so the label hides
+        label = component.css("span").find { |span| span.text.strip == "Review app" }
+        expect(label[:class].to_s).to include("tw:hidden")
       end
 
       context "with a pr_title" do
