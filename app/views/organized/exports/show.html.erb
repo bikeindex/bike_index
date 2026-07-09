@@ -206,8 +206,12 @@
                   <%= t(".no_stickers_assigned") %>
                 </small>
               <% elsif @export.bike_codes_undone? %>
-                <em class="text-danger">
-                  <%= t(".stickers_have_been_restored") %>
+                <em>
+                  <%= t(".stickers_initially_assigned") %>
+
+                  <span class="text-danger">
+                    <%= t(".stickers_have_been_restored") %>
+                  </span>
                 </em>
                 <% if @export.bike_stickers_not_undone.any? %>
                   <p class="text-warning mb-0">

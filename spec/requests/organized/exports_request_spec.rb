@@ -62,7 +62,7 @@ RSpec.describe Organized::ExportsController, type: :request do
         let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
         let(:assigned_title) { "Assigned stickers" }
         let(:unassigned_title) { "Stickers assigned by this export were unassigned" }
-        let(:restored_title) { "Stickers were restored to their previous bikes" }
+        let(:undone_title) { "Stickers were assigned, then the assignment was undone" }
         before do
           export.update(options: export.options.merge(sticker_options))
           get base_url
@@ -74,7 +74,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           it "badges the assignment" do
             expect(response.body).to include(assigned_title)
             expect(response.body).to_not include(unassigned_title)
-            expect(response.body).to_not include(restored_title)
+            expect(response.body).to_not include(undone_title)
           end
         end
 
@@ -83,14 +83,17 @@ RSpec.describe Organized::ExportsController, type: :request do
           it "badges stickers unassigned" do
             expect(response.body).to include(unassigned_title)
             expect(response.body).to_not include(assigned_title)
+            expect(response.body).to_not include(undone_title)
           end
         end
 
         context "undone" do
           let(:sticker_options) { {bike_codes_undone: true} }
-          it "badges stickers restored" do
-            expect(response.body).to include(restored_title)
+          # Same "stickers unassigned" text as a removal, distinguished by its tooltip
+          it "badges the undone assignment" do
+            expect(response.body).to include(undone_title)
             expect(response.body).to_not include(unassigned_title)
+            expect(response.body).to_not include(assigned_title)
           end
         end
       end
@@ -121,8 +124,10 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(response.body).to match(/Show previously assigned stickers/)
             expect(response.body).to match(/data-controller="disclosure"/)
             expect(response.body).to match(/data-disclosure-target="content"/)
+            # Only the second phrase is red
+            expect(response.body).to match(%r{Stickers initially assigned, but\s*<span class="text-danger">\s*have now been restored})
             # The restored message comes before the collapsed sticker list
-            expect(response.body.index("Stickers have been restored"))
+            expect(response.body.index("Stickers initially assigned"))
               .to be < response.body.index("Show previously assigned stickers")
           end
         end
