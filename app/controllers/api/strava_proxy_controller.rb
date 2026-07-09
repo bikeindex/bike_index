@@ -2,6 +2,8 @@
 
 module API
   class StravaProxyController < ApplicationController
+    include API::TokenAuthenticatable
+
     respond_to :json
     wrap_parameters false
     skip_before_action :verify_authenticity_token
@@ -44,12 +46,6 @@ module API
       return nil unless url&.match?(/enriched_since=/)
       match = url.match(/enriched_since=(\d+)/)
       match ? match[1].to_i : nil
-    end
-
-    def doorkeeper_token
-      @doorkeeper_token ||= Doorkeeper::OAuth::Token.authenticate(
-        request, *Doorkeeper.configuration.access_token_methods
-      )
     end
 
     def permitted_params

@@ -17,7 +17,7 @@ module AdminData
       stats = ::Sidekiq::Stats.new
       {
         stats: stats_data(stats),
-        queues: queues_data,
+        queues: queues_data(stats),
         processes: processes_data,
         retries_by_class: set_by_class(::Sidekiq::RetrySet.new),
         dead_by_class: set_by_class(::Sidekiq::DeadSet.new)
@@ -40,9 +40,9 @@ module AdminData
       }
     end
 
-    def queues_data
-      ::Sidekiq::Queue.all.map do |queue|
-        {name: queue.name, size: queue.size, latency: queue.latency, paused: queue.paused?}
+    def queues_data(stats)
+      stats.queue_summaries.map do |queue|
+        {name: queue.name, size: queue.size, latency: queue.latency, paused: queue.paused}
       end
     end
 
@@ -66,7 +66,7 @@ module AdminData
     def set_by_class(job_set)
       return {too_large: job_set.size} if job_set.size > MAX_SET_SCAN
 
-      job_set.group_by(&:display_class).transform_values(&:count)
+      job_set.map(&:display_class).tally
     end
   end
 end

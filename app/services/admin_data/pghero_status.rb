@@ -22,9 +22,10 @@ module AdminData
     end
 
     def as_json
+      enabled = safe { ::PgHero.query_stats_enabled? }
       base = {
-        query_stats_enabled: safe { ::PgHero.query_stats_enabled? },
-        query_stats: query_stats
+        query_stats_enabled: enabled,
+        query_stats: (safe { ::PgHero.query_stats(limit: QUERY_STATS_LIMIT) } if enabled == true)
       }
       METRICS.each_with_object(base) do |metric, result|
         result[metric] = safe { ::PgHero.public_send(metric) }
@@ -32,14 +33,6 @@ module AdminData
     end
 
     private
-
-    def query_stats
-      safe do
-        next nil unless ::PgHero.query_stats_enabled?
-
-        ::PgHero.query_stats(limit: QUERY_STATS_LIMIT)
-      end
-    end
 
     def safe
       yield
