@@ -2040,6 +2040,7 @@ es:
         tu %{bike_type}, ¡realmente nos importa!
       this_bike_has_been_returned: "¡Este %{bike_type} ha sido devuelto!"
       were_so_glad: "¡Nos alegra mucho que hayas recuperado tu %{bike_type}!"
+      marking_recovered: Marcando tu bicicleta recuperada…
     report_stolen:
       this_bike_type_is_stolen_or_missing: "¡Este %{bike_type} ha sido robado o está
         desaparecido!"
@@ -2338,8 +2339,10 @@ es:
         destroy:
           export_deleted: "¡La exportación se eliminó correctamente!"
         update:
-          bike_stickers_removed: "¡Códigos de bicicleta eliminados!"
           unknown_update_action: "¡Acción de actualización desconocida!"
+          bike_stickers_undone: Las pegatinas de las bicicletas se están restaurando
+            a sus bicicletas anteriores (o no están asignadas). Esto tardará unos
+            minutos.
       manage_impoundings:
         update:
           could_not_update: Lo sentimos, tuvimos problemas para actualizar %{org_name}.
@@ -4666,6 +4669,13 @@ es:
         org_exports_html: "%{org_name} Exportaciones"
         progress: Progreso
         stickers_assigned: "¿Pegatinas asignadas?"
+        stickers: pegatinas
+        stickers_restored: pegatinas restauradas
+        stickers_restored_title: Las pegatinas fueron devueltas a sus bicicletas originales.
+        stickers_title: Pegatinas asignadas
+        stickers_unassigned: pegatinas sin asignar
+        stickers_unassigned_title: Las pegatinas asignadas por esta exportación no
+          fueron asignadas.
       show:
         avery_export: Exportación de Avery
         bikes_exported: Bicicletas exportadas
@@ -4691,8 +4701,16 @@ es:
         stickers_exported: "%{bike_stickers_count} Pegatinas exportadas"
         stickers_have_been_unassigned: Las pegatinas no han sido asignadas.
         unable_to_export: No se puede exportar, no forma parte de su organización.
-        unassign_stickers: Desasignar pegatinas
         view_avery_labels: Ver etiquetas Avery
+        show_previously_assigned_stickers: Mostrar pegatinas asignadas previamente
+        stickers_have_been_restored: Las pegatinas se han vuelto a colocar en sus
+          bicicletas originales.
+        stickers_not_undone: 'Estas pegatinas se asignaron de nuevo después de esta
+          exportación, por lo que no se deshicieron:'
+        undo_sticker_assignment: Deshacer la asignación de pegatinas
+        undo_sticker_assignment_confirm: "¿Seguro que quieres deshacer la asignación
+          de pegatinas? Esto eliminará el historial de asignación de estas pegatinas.
+          Esta acción es irreversible."
     manage_impoundings:
       edit:
         impound_settings_html: Administrar la configuración de retención <em>%{org_name}</em>
@@ -5604,6 +5622,10 @@ es:
         letter_opener_tooltip: Vea el correo electrónico enviado por esta aplicación
           de reseñas.
         pr_link: 'PR #%{number}'
+        commit_tooltip: 'Commit actual:'
+        label_staging: Puesta en escena
+        superadmin_button: Iniciar sesión como superadministrador
+        superadmin_signed_in: Sesión iniciada como superadministrador
       footer:
         about: Acerca
         ambassadors: Embajadores

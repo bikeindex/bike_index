@@ -37,7 +37,7 @@ module UI
           if @full_width
             "tw:col-span-full"
           else
-            "tw:items-center tw:@sm:flex tw:@sm:gap-x-2 tw:@sm:pt-2"
+            "tw:flex tw:items-baseline tw:justify-between tw:gap-x-4"
           end + " tw:pt-3 tw:leading-tight"
         end
 
@@ -45,8 +45,12 @@ module UI
           if @full_width
             "tw:pb-1"
           else
-            "tw:@sm:text-right tw:@sm:w-1/4 tw:min-w-[100px]"
-          end + " tw:text-sm tw:leading-none tw:opacity-65 tw:font-bold!"
+            "tw:flex-none"
+          end + " tw:text-sm tw:leading-tight tw:opacity-65"
+        end
+
+        def dd_classes
+          @full_width ? "tw:mb-0!" : "tw:mb-0! tw:text-right"
         end
 
         def time_localizer_classes(time_localizer_settings)
