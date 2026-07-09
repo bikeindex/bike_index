@@ -211,20 +211,20 @@
                   <div
                     class="
                       tw:flex tw:flex-col tw:items-end tw:gap-2
-                      tw:sm:flex-row tw:sm:justify-end
+                      tw:sm:flex-row tw:sm:items-center tw:sm:justify-end
+                      tw:sm:gap-4
                     "
                   >
                     <%= render UI::ButtonLink::Component.new(
                       href: organization_export_path(@export.id, organization_id: current_organization.to_param, undo_bike_stickers: true),
                       text: t(".undo_sticker_assignment"),
-                      color: :primary,
+                      color: :link_warning,
                       method: :put) %>
 
                     <% unless @export.bike_codes_removed? %>
-                      <%= link_to(t(".unassign_stickers"),
-                        organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_stickers: true),
-                        method: :put,
-                        class: "btn btn-warning") %>
+                      <%= form_with(url: organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_stickers: true), method: :put) do %>
+                        <%= render UI::Button::Component.new(text: t(".unassign_stickers"), color: :error, kind: :submit) %>
+                      <% end %>
                     <% end %>
                   </div>
                 <% end %>
