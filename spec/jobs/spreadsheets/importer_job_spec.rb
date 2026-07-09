@@ -52,6 +52,20 @@ RSpec.describe Spreadsheets::ImporterJob, type: :job do
         expect(Manufacturer.friendly_find("Retry Bikes")).to be_present
       end
 
+      it "retries a 429 rate-limit response, then imports" do
+        WebMock.stub_request(:get, url)
+          .to_return(status: 429).then.to_return(status: 200, body: csv)
+        expect { job.perform("manufacturers") }.to change(Manufacturer, :count).by(1)
+        expect(Manufacturer.friendly_find("Retry Bikes")).to be_present
+      end
+
+      it "does not retry a non-retryable status, and raises" do
+        # 404 then 200: a retry would consume the 200 and succeed, so raising proves no retry
+        WebMock.stub_request(:get, url)
+          .to_return(status: 404).then.to_return(status: 200, body: csv)
+        expect { job.perform("manufacturers") }.to raise_error(/Failed to fetch.*404/)
+      end
+
       it "gives up after DOWNLOAD_ATTEMPTS and raises" do
         WebMock.stub_request(:get, url).to_timeout
         expect { job.perform("manufacturers") }.to raise_error(Faraday::Error)

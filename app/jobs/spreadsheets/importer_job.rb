@@ -4,9 +4,11 @@ module Spreadsheets
     # Maps each importer module (e.g. Spreadsheets::Manufacturers) to its CSV filename in the resources repo
     IMPORTERS = {"manufacturers" => "manufacturers", "primary_activities" => "primary_activities", "components" => "component_types"}.freeze
     # db/seeds.rb runs this inline, so a transient blip reaching GitHub would abort the
-    # whole seed (e.g. CI). Retry a few times before giving up.
-    DOWNLOAD_ATTEMPTS = 3
+    # whole seed (e.g. CI). Retry a few times before giving up. Parallel CI shards all
+    # hit raw.githubusercontent.com at once, so 429 rate-limits are the common failure.
+    DOWNLOAD_ATTEMPTS = 4
     RETRY_DELAY_SECONDS = 2
+    RETRYABLE_STATUSES = [429, 500, 502, 503, 504].freeze
 
     def perform(name = nil)
       return IMPORTERS.each_key { |n| perform(n) } if name.blank?
@@ -30,12 +32,14 @@ module Spreadsheets
       begin
         attempt += 1
         response = connection.get(url)
-        raise "Failed to fetch #{url}: #{response.status}" unless response.success?
+        return response.body if response.success?
 
-        response.body
-      rescue Faraday::ConnectionFailed, Faraday::TimeoutError
+        # Faraday::Error (not a plain RuntimeError) so the rescue below retries it
+        raise Faraday::Error, "Failed to fetch #{url}: #{response.status}" if RETRYABLE_STATUSES.include?(response.status)
+        raise "Failed to fetch #{url}: #{response.status}"
+      rescue Faraday::Error
         raise if attempt >= DOWNLOAD_ATTEMPTS
-        sleep RETRY_DELAY_SECONDS
+        sleep RETRY_DELAY_SECONDS * attempt
         retry
       end
     end
