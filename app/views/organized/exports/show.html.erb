@@ -208,7 +208,12 @@
                       <%= t(".stickers_have_been_unassigned") %>
                     </em>
                   <% end %>
-                  <div class="tw:flex tw:justify-end tw:gap-2">
+                  <div
+                    class="
+                      tw:flex tw:flex-col tw:items-end tw:gap-2
+                      tw:sm:flex-row tw:sm:justify-end
+                    "
+                  >
                     <%= render UI::ButtonLink::Component.new(
                       href: organization_export_path(@export.id, organization_id: current_organization.to_param, undo_bike_stickers: true),
                       text: t(".undo_sticker_assignment"),

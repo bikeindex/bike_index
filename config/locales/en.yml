@@ -4493,7 +4493,8 @@ en:
         specific_bikes: Specific bikes
         stickers: Stickers
         stickers_exported: "%{bike_stickers_count} Stickers exported"
-        stickers_have_been_restored: Stickers have been restored to their previous bikes
+        stickers_have_been_restored: Stickers have been restored to their previous
+          bikes
         stickers_have_been_unassigned: Stickers have been unassigned
         unable_to_export: Unable to export, not part of your organization
         unassign_stickers: Unassign stickers
