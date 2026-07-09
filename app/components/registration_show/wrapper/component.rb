@@ -30,7 +30,10 @@ module RegistrationShow
         end
       end
 
-      # Keyed on the viewer too: the admin view has per-user content + CSRF tokens
+      # Keyed on the viewer for the admin view's per-user content. This key can't
+      # keep cached forms' CSRF tokens valid (they're session-scoped, and a user's
+      # session varies across devices/logins) — the csrf-refresh controller reissues
+      # them client-side from the meta tag.
       def cache_key
         ["registration_show", @current_user&.id, view_param, @bike.cache_key_with_version]
       end

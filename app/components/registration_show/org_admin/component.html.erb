@@ -253,7 +253,7 @@
             </div>
           <% end %>
 
-          <%= form_with(url: notes_url, method: :patch, class: "tw:mt-3") do |f| %>
+          <%= form_with(url: notes_url, method: :patch, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |f| %>
             <%= f.text_area :notes, value: bike_organization_note&.body, name: "notes", rows: 3, class: "twinput tw:w-full", placeholder: translation(".notes_placeholder") %>
 
             <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">

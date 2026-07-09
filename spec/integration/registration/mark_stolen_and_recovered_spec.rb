@@ -78,6 +78,21 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     expect(stolen_record.theft_description).to eq "Cut lock outside the cafe"
     expect(stolen_record.date_stolen).to be_present
 
+    # ---- Send a message through the stolen bike's contact-owner form on the
+    # redesigned show page. The form is fragment-cached (RegistrationShow::Wrapper),
+    # so its session-scoped CSRF token is reissued client-side by the csrf-refresh
+    # controller. The stale-token failure itself can't be reproduced here (it needs
+    # production fragment caching + forgery protection, both off in test), so this
+    # exercises the form end-to-end; the component spec guards the csrf-refresh hook. ----
+    RearGearType.fixed # bike-details render creates this lazily, which is read-only mid-request
+    visit registration_path(bike)
+    within("[data-controller~='registration-show--contact-owner']") do
+      click_on "Write them a message"
+      fill_in "stolen_notification[message]", with: "Saw this locked up outside the library"
+      click_on "Send message"
+    end
+    expect(page).to have_content("Thanks for looking out!", wait: 10)
+
     # ---- Mark the bike recovered ----
     delay_recovery_request(2)
 
