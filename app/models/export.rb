@@ -171,6 +171,15 @@ class Export < ApplicationRecord
     option?("bike_codes_removed")
   end
 
+  def bike_codes_undone?
+    option?("bike_codes_undone")
+  end
+
+  # Either action ends the export's sticker assignment, so neither can run afterward
+  def bike_codes_reverted?
+    bike_codes_removed? || bike_codes_undone?
+  end
+
   def custom_bike_ids
     options["custom_bike_ids"]
   end
@@ -210,17 +219,17 @@ class Export < ApplicationRecord
   end
 
   def remove_bike_stickers_and_record!(passed_user = nil)
-    return true unless assign_bike_codes? && !bike_codes_removed?
+    return true unless assign_bike_codes? && !bike_codes_reverted?
 
     remove_bike_stickers(passed_user)
     update_attribute :options, options.merge(bike_codes_removed: true)
   end
 
   def undo_bike_stickers_and_record!(passed_user = nil)
-    return true unless assign_bike_codes? && !bike_codes_removed?
+    return true unless assign_bike_codes? && !bike_codes_reverted?
 
     undo_bike_stickers(passed_user)
-    update_attribute :options, options.merge(bike_codes_removed: true)
+    update_attribute :options, options.merge(bike_codes_undone: true)
   end
 
   # Restores each sticker to the bike it was on before this export claimed it

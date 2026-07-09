@@ -198,7 +198,11 @@
                     </li>
                   <% end %>
                 </ul>
-                <% if @export.bike_codes_removed? %>
+                <% if @export.bike_codes_undone? %>
+                  <em class="text-danger">
+                    <%= t(".stickers_have_been_restored") %>
+                  </em>
+                <% elsif @export.bike_codes_removed? %>
                   <em class="text-danger">
                     <%= t(".stickers_have_been_unassigned") %>
                   </em>

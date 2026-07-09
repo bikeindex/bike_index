@@ -469,7 +469,8 @@ RSpec.describe Organized::ExportsController, type: :request do
 
         put "#{base_url}/#{export.to_param}?undo_bike_stickers=1"
 
-        expect(export.reload.bike_codes_removed?).to be_truthy
+        expect(export.reload.bike_codes_undone?).to be_truthy
+        expect(export.bike_codes_removed?).to be_falsey
         expect(bike_sticker.reload.bike).to eq previous_bike
 
         bike_sticker_update = bike_sticker.bike_sticker_updates.last

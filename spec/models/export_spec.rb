@@ -236,7 +236,9 @@ RSpec.describe Export, type: :model do
         expect(bike_sticker.reload.claimed?).to be_falsey
         expect(bike_sticker.bike).to be_nil
         expect(bike_sticker.bike_sticker_updates.last.kind).to eq "un_claim"
-        expect(export.reload.bike_codes_removed?).to be_truthy
+        expect(export.reload.bike_codes_undone?).to be_truthy
+        expect(export.bike_codes_removed?).to be_falsey
+        expect(export.bike_codes_reverted?).to be_truthy
       end
     end
 
@@ -271,6 +273,21 @@ RSpec.describe Export, type: :model do
         expect {
           export.undo_bike_stickers_and_record!(user)
         }.to_not change(BikeStickerUpdate, :count)
+      end
+    end
+
+    context "already removed" do
+      let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      it "does not undo on top of the removal" do
+        bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
+        export_claim(exported_bike)
+        export.remove_bike_stickers_and_record!(user)
+        expect(export.reload.bike_codes_removed?).to be_truthy
+        expect {
+          export.undo_bike_stickers_and_record!(user)
+        }.to_not change(BikeStickerUpdate, :count)
+        expect(bike_sticker.reload.bike).to be_nil
+        expect(export.reload.bike_codes_undone?).to be_falsey
       end
     end
   end
