@@ -38,4 +38,30 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
       expect(component).to have_css("a[data-turbo='false']")
     end
   end
+
+  context "with method" do
+    let(:options) { {text: "Follow", href: "/follow", color: :primary, method: :post} }
+
+    it "renders a button_to form submitting to the href" do
+      expect(component).to have_css("form[action='/follow'][method='post']")
+      expect(component).to have_css("form button[type='submit']", text: "Follow")
+      expect(component.css("button").first["class"]).to include("tw:bg-blue-600")
+    end
+
+    context "with a non-post method" do
+      let(:options) { {text: "Delete", href: "/thing", method: :delete} }
+
+      it "adds the _method hidden field" do
+        expect(component).to have_css("input[type='hidden'][name='_method'][value='delete']", visible: :hidden)
+      end
+    end
+
+    context "with form attributes" do
+      let(:options) { {text: "Revoke", href: "/thing", method: :delete, form: {onsubmit: "return confirm('Are you sure?')"}} }
+
+      it "sets attributes on the form element" do
+        expect(component).to have_css("form[onsubmit=\"return confirm('Are you sure?')\"]")
+      end
+    end
+  end
 end

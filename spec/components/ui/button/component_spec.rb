@@ -110,40 +110,6 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  context "with url" do
-    let(:options) { {text: "Follow", color: :primary, url: "/follow"} }
-
-    it "renders a button_to form submitting to the url" do
-      expect(component).to have_css("form[action='/follow'][method='post']")
-      expect(component).to have_css("form button[type='submit']", text: "Follow")
-      expect(component.css("button").first["class"]).to include("tw:bg-blue-600")
-    end
-
-    context "with method" do
-      let(:options) { {text: "Delete", color: :error, url: "/thing", method: :delete} }
-
-      it "adds the _method hidden field" do
-        expect(component).to have_css("input[type='hidden'][name='_method'][value='delete']", visible: :hidden)
-      end
-    end
-
-    context "with data attributes" do
-      let(:options) { {text: "Follow", url: "/follow", data: {turbo: false}} }
-
-      it "renders data on the button" do
-        expect(component).to have_css("button[data-turbo='false']")
-      end
-    end
-
-    context "with form attributes" do
-      let(:options) { {text: "Revoke", url: "/thing", method: :delete, form: {onsubmit: "return confirm('Are you sure?')"}} }
-
-      it "sets attributes on the form element" do
-        expect(component).to have_css("form[onsubmit=\"return confirm('Are you sure?')\"]")
-      end
-    end
-  end
-
   it "always applies the prefixed active classes (inert until pressed/toggled)" do
     tokens = component.css("button").first["class"].split
     expect(tokens).to include("tw:aria-pressed:ring-2", "tw:active:ring-2")
