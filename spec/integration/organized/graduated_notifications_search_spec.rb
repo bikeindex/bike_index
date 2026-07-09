@@ -82,11 +82,9 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_field("search_email", with: "")
 
     # Form submit + direct back-nav: regression guard for turbo-cache spinner state.
-    # Read the field back before submitting so Capybara waits for the typed value
-    # to be committed in the DOM — otherwise a slow runner can submit the form
-    # while search_email is still empty (observed only on CI).
-    fill_in "search_email", with: "alice@example.com"
-    expect(page).to have_field("search_email", with: "alice@example.com", wait: 10)
+    # fill_in_and_confirm re-fills if Turbo's cached-snapshot preview (shown first
+    # on back-nav, then replaced by the real render) wipes the value we just typed.
+    fill_in_and_confirm "search_email", with: "alice@example.com"
     find("#search-button").click
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
@@ -103,7 +101,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_field("search_email", with: "")
 
     # Re-apply alice filter for click-row/back-nav steps
-    fill_in "search_email", with: "alice@example.com"
+    fill_in_and_confirm "search_email", with: "alice@example.com"
     find("#search-button").click
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)

@@ -31,6 +31,19 @@ module SystemSpecHelpers
     field
   end
 
+  # Fill a field and confirm the value stuck. On back-navigation Turbo Drive
+  # renders a cached snapshot first, then swaps in a fresh render -- a fill
+  # applied to the preview is wiped when the real page arrives (fill_in itself
+  # raises nothing, the value just vanishes). Re-fill until it holds.
+  def fill_in_and_confirm(locator, with:, wait: Capybara.default_max_wait_time)
+    2.times do
+      fill_in(locator, with:)
+      return if has_field?(locator, with:, wait:)
+    end
+    fill_in(locator, with:)
+    expect(page).to have_field(locator, with:, wait:)
+  end
+
   # capybara-playwright wraps click/find so a mid-action "Element is not attached
   # to the DOM" (Turbo re-rendering the field) becomes a StaleReferenceError that
   # Capybara auto-retries -- but its `set` path (fill_in) only rescues timeouts,
