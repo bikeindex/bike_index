@@ -80,7 +80,7 @@ Unlabeled PR closes are filtered by `resolve`'s job-level `if:`; fork PRs by the
 3. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
 4. The `review-app` environment surfaces the URL ("View deployment").
 
-Destroy reverses it: `kamal app remove`, drop both databases + the role, `FLUSHDB` the assigned Redis logical DB, and delete every `pr-<N>-<sha>` GHCR image version (best-effort, `packages: write`).
+Destroy reverses it: purge the PR's ActiveStorage objects from the shared R2 bucket (while the app's still up — see [storage](#storage-is-shared)), `kamal app remove`, drop both databases + the role, `FLUSHDB` the assigned Redis logical DB, and delete every `pr-<N>-<sha>` GHCR image version (best-effort, `packages: write`).
 
 **Failures comment on the PR.** These runs are `workflow_dispatch`-triggered, so their check runs never hit the PR's rollup. The `report` job comments the failure (edited in place on repeats); the next successful deploy deletes it.
 
@@ -117,7 +117,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 ## Known limits
 
 - **Redis DB allocation is mod-31.** PRs congruent mod 31 share a logical DB — caches + Sidekiq queues mix. Mitigation: bump `--databases` in the redis accessory `cmd:` and raise `REDIS_DATABASES` in `bin/kamal_review`.
-- **Storage is shared.** All review apps write to the same R2 bucket under a `review-app/` prefix.
+- <a id="storage-is-shared"></a>**Storage is shared.** Uploads split by backend: CarrierWave (bike photos, most images) writes to the per-PR local `_uploads` volume, dropped on destroy. ActiveStorage attachments go to the shared R2 dev bucket (`cloudflare_dev`, bucket `bikeindex-dev`) at the bucket root with random keys — no per-PR prefix, because `BlobUrl` serves them off a CDN host by raw key. Destroy purges them by enumerating the PR's own blobs (`ActiveStorage::Blob.find_each { … service.delete(key) }`) through the running app before `app remove`; keys are globally unique so no other app's objects are touched. Best-effort — a PR whose app can't boot at destroy leaves its blobs orphaned in the bucket.
 - **One Sidekiq worker per app at concurrency=2.** Enough for demos, not for stress-testing queues.
 - **Forks aren't auto-deployed.** A maintainer triggers fork PRs manually via `workflow_dispatch` after reviewing the diff.
 - **GHCR accumulates untagged versions.** Each build overwrites `:buildcache`, orphaning the prior manifest; destroyed-PR deletions can leave shared-blob leftovers. GHCR never GCs itself — prune untagged versions if the package grows large.
