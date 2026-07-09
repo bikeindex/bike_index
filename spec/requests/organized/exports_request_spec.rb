@@ -130,13 +130,27 @@ RSpec.describe Organized::ExportsController, type: :request do
               .to be < response.body.index("Show previously assigned stickers")
           end
         end
+        context "already removed (legacy unassign)" do
+          it "does not offer undo, and collapses the assigned stickers behind a toggle" do
+            export.update(options: export.options.merge(bike_codes_assigned: ["a1111"], bike_codes_removed: true))
+            get "#{base_url}/#{export.id}"
+            expect(response.code).to eq("200")
+            expect(response.body).to_not match(/undo_bike_stickers/)
+            expect(response.body).to match(/Show previously assigned stickers/)
+            expect(response.body).to match(/legacy version of/)
+            # The legacy message comes before the collapsed sticker list
+            expect(response.body.index("Stickers have been unassigned"))
+              .to be < response.body.index("Show previously assigned stickers")
+          end
+        end
         context "with stickers that could not be undone" do
-          it "lists them" do
+          it "links them" do
             export.update(options: export.options.merge(bike_codes_assigned: %w[a1111 a1112],
               bike_codes_undone: true, bike_codes_not_undone: ["a1112"]))
             get "#{base_url}/#{export.id}"
             expect(response.code).to eq("200")
             expect(response.body).to match(/were not\s+undone/)
+            expect(response.body).to match(%r{<a [^>]*href="[^"]*/stickers/a1112/edit"[^>]*>\s*a1112\s*</a>})
           end
         end
       end
