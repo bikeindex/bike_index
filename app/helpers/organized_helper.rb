@@ -50,7 +50,7 @@ module OrganizedHelper
   def export_stickers_badge_attributes(export)
     scope = %i[organized exports index]
     if export.bike_codes_undone?
-      {text: t(:stickers_restored, scope:), title: t(:stickers_restored_title, scope:), color: :gray}
+      {text: t(:stickers_restored, scope:), title: t(:stickers_restored_title, scope:), color: :warning}
     elsif export.bike_codes_removed?
       {text: t(:stickers_unassigned, scope:), title: t(:stickers_unassigned_title, scope:), color: :orange}
     else
