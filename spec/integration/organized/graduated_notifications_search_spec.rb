@@ -82,9 +82,12 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_field("search_email", with: "")
 
     # Form submit + direct back-nav: regression guard for turbo-cache spinner state.
-    # fill_in_and_confirm re-fills if Turbo's cached-snapshot preview (shown first
-    # on back-nav, then replaced by the real render) wipes the value we just typed.
-    fill_in_and_confirm "search_email", with: "alice@example.com"
+    # Let Turbo's restoration preview settle to the real render before typing, then
+    # read the field back so a real "typed value doesn't persist after back-nav"
+    # regression still fails here rather than being retried away.
+    wait_for_turbo_restore
+    fill_in "search_email", with: "alice@example.com"
+    expect(page).to have_field("search_email", with: "alice@example.com", wait: 10)
     find("#search-button").click
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
@@ -101,7 +104,8 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_field("search_email", with: "")
 
     # Re-apply alice filter for click-row/back-nav steps
-    fill_in_and_confirm "search_email", with: "alice@example.com"
+    wait_for_turbo_restore
+    fill_in "search_email", with: "alice@example.com"
     find("#search-button").click
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)

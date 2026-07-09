@@ -31,17 +31,12 @@ module SystemSpecHelpers
     field
   end
 
-  # Fill a field and confirm the value stuck. On back-navigation Turbo Drive
-  # renders a cached snapshot first, then swaps in a fresh render -- a fill
-  # applied to the preview is wiped when the real page arrives (fill_in itself
-  # raises nothing, the value just vanishes). Re-fill until it holds.
-  def fill_in_and_confirm(locator, with:, wait: Capybara.default_max_wait_time)
-    2.times do
-      fill_in(locator, with:)
-      return if has_field?(locator, with:, wait:)
-    end
-    fill_in(locator, with:)
-    expect(page).to have_field(locator, with:, wait:)
+  # Wait for Turbo Drive to finish a back/forward restoration before interacting.
+  # On restore Turbo shows a cached snapshot (html[data-turbo-preview]) first,
+  # then swaps in the real render -- typing during the preview loses the value
+  # when the real page lands. Returns once the preview attribute is gone.
+  def wait_for_turbo_restore(wait: 10)
+    expect(page).to have_no_css("html[data-turbo-preview]", wait:)
   end
 
   # capybara-playwright wraps click/find so a mid-action "Element is not attached
