@@ -66,6 +66,16 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
       end
+      context "with assigned bike stickers" do
+        let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
+        it "renders both sticker actions" do
+          export.update(options: export.options.merge(bike_codes_assigned: ["a1111"]))
+          get "#{base_url}/#{export.id}"
+          expect(response.code).to eq("200")
+          expect(response.body).to match(/undo_bike_stickers/)
+          expect(response.body).to match(/remove_bike_stickers/)
+        end
+      end
       context "with impounded_bikes only" do
         let(:export) { FactoryBot.create(:export_organization, organization: current_organization, options: Export.default_options("organization").merge("impounded_bikes" => true, "partial_registrations" => "none")) }
         it "shows Impounded" do
@@ -442,6 +452,31 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(bike_sticker_update.user).to eq current_user
         expect(bike_sticker_update.bike).to be_blank
         expect(bike_sticker_update.organization_id).to eq current_organization.id
+      end
+    end
+
+    describe "update undo_bike_stickers" do
+      let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "z ", organization: current_organization, user: current_user) }
+      let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+      let(:exported_bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: current_organization, code: "z") }
+      it "restores the bike the sticker was on before the export" do
+        bike_sticker.claim(user: current_user, bike: previous_bike)
+        export.update(options: export.options.merge(bike_codes_assigned: ["Z"]))
+        bike_sticker.claim(user: current_user, bike: exported_bike, organization: current_organization,
+          export_id: export.id, creator_kind: "creator_export")
+        expect(bike_sticker.reload.bike).to eq exported_bike
+
+        put "#{base_url}/#{export.to_param}?undo_bike_stickers=1"
+
+        expect(export.reload.bike_codes_removed?).to be_truthy
+        expect(bike_sticker.reload.bike).to eq previous_bike
+
+        bike_sticker_update = bike_sticker.bike_sticker_updates.last
+        expect(bike_sticker_update.kind).to eq "re_claim"
+        expect(bike_sticker_update.creator_kind).to eq "creator_export"
+        expect(bike_sticker_update.bike).to eq previous_bike
+        expect(bike_sticker_update.user).to eq current_user
       end
     end
   end

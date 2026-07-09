@@ -203,10 +203,18 @@
                     <%= t(".stickers_have_been_unassigned") %>
                   </em>
                 <% else %>
-                  <%= link_to(t(".unassign_stickers"),
-                    organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_stickers: true),
-                    method: :put,
-                    class: "btn btn-warning float-right") %>
+                  <div class="tw:flex tw:justify-end tw:gap-2">
+                    <%= render UI::ButtonLink::Component.new(
+                      href: organization_export_path(@export.id, organization_id: current_organization.to_param, undo_bike_stickers: true),
+                      text: t(".undo_sticker_assignment"),
+                      color: :primary,
+                      method: :put) %>
+
+                    <%= link_to(t(".unassign_stickers"),
+                      organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_stickers: true),
+                      method: :put,
+                      class: "btn btn-warning") %>
+                  </div>
                 <% end %>
               <% else %>
                 <small class="less-strong">

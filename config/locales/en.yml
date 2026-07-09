@@ -1882,6 +1882,7 @@ en:
           export_deleted: Export was successfully deleted!
         update:
           bike_stickers_removed: Bike codes removed!
+          bike_stickers_undone: Bike codes restored to their previous bikes!
           unknown_update_action: Unknown update action!
       impound_records:
         available_impound_records:
@@ -4495,6 +4496,7 @@ en:
         stickers_have_been_unassigned: Stickers have been unassigned
         unable_to_export: Unable to export, not part of your organization
         unassign_stickers: Unassign stickers
+        undo_sticker_assignment: Undo sticker assignment
         view_avery_labels: View Avery Labels
     impound_records:
       index:

@@ -209,6 +209,13 @@ class Export < ApplicationRecord
     options["bike_codes_assigned"] || []
   end
 
+  def remove_bike_stickers_and_record!(passed_user = nil)
+    return true unless assign_bike_codes? && !bike_codes_removed?
+
+    remove_bike_stickers(passed_user)
+    update_attribute :options, options.merge(bike_codes_removed: true)
+  end
+
   def undo_bike_stickers_and_record!(passed_user = nil)
     return true unless assign_bike_codes? && !bike_codes_removed?
 
