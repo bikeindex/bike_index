@@ -42,6 +42,13 @@ module PageBlock
         "https://github.com/bikeindex/bike_index/commit/#{@commit}"
       end
 
+      # Green pill styling shared by the commit and email-outbox "?" tooltip triggers
+      def pill_button_class
+        "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
+          "tw:bg-[#1e881e] tw:text-white tw:hover:bg-[#166016] tw:text-2xs tw:font-bold tw:cursor-help " \
+          "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+      end
+
       # The seeded superadmin, signed in via the existing magic link flow
       def superadmin
         return @superadmin if defined?(@superadmin)

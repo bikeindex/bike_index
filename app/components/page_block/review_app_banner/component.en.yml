@@ -3,8 +3,7 @@ en:
   components:
     page_block:
       review_app_banner:
-        commit_tooltip: 'current commit: %{commit}'
-        commit_tooltip_prefix: 'current commit:'
+        commit_tooltip: 'current commit:'
         disclaimer: data is ephemeral
         label: Review app
         label_staging: Staging
