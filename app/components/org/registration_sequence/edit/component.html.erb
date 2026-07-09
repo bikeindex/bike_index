@@ -4,10 +4,8 @@
     <span class="tw:text-xl tw:font-normal tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
   </h1>
 
-  <%= form_with url: organization_registration_sequence_pages_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id), method: :post do %>
-    <%= render UI::Button::Component.new(color: :secondary, kind: :submit, html_class: "tw:whitespace-nowrap") do %>
-      <span aria-hidden="true">+</span> Add page
-    <% end %>
+  <%= render UI::Button::Component.new(url: organization_registration_sequence_pages_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id), method: :post, color: :secondary, html_class: "tw:whitespace-nowrap") do %>
+    <span aria-hidden="true">+</span> Add page
   <% end %>
 </div>
 

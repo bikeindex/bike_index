@@ -46,12 +46,15 @@ module UI
         classes.compact.join(" ")
       end
 
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, data: {}, aria: {})
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, url: nil, method: nil, form: {}, data: {}, aria: {})
         @text = text
         @color = COLORS.key?(color) ? color : :secondary
         @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
         @active = active
         @html_class = html_class
+        @url = url
+        @method = method
+        @form = form
         @data = data
         @aria = aria
 
@@ -59,12 +62,26 @@ module UI
         raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
       end
 
+      # Passing url: renders a button_to form (the button submits a request to url,
+      # honoring method:) instead of a plain <button>. form: sets attributes on the
+      # wrapping form element (e.g. onsubmit for a confirm dialog).
       def call
+        return button_to_form if @url
+
         content_tag(:button, @text || content, class: button_classes, type: (@kind == :submit) ? "submit" : "button", data: @data, aria: @aria)
       end
 
       def button_classes
         self.class.build_classes(color: @color, size: @size, active: @active, html_class: @html_class)
+      end
+
+      private
+
+      def button_to_form
+        options = {class: button_classes, method: @method, data: @data, aria: @aria, form: @form.presence}.compact
+        helpers.button_to(@url, options) do
+          @text || content
+        end
       end
     end
   end

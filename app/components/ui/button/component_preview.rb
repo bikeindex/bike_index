@@ -63,6 +63,18 @@ module UI
         end
       end
       # @!endgroup
+
+      # @!group button_to (form submit)
+      # @label button_to POST
+      def button_to_post
+        render(UI::Button::Component.new(text: "Follow", color: :primary, url: "#"))
+      end
+
+      # @label button_to DELETE
+      def button_to_delete
+        render(UI::Button::Component.new(text: "Delete", color: :error, url: "#", method: :delete))
+      end
+      # @!endgroup
     end
   end
 end
