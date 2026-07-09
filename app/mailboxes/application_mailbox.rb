@@ -1,3 +1,3 @@
 class ApplicationMailbox < ActionMailbox::Base
-  routing(/bugs@/i => :bug_reports)
+  routing(/(?:bugs|contact)@/i => :bug_reports)
 end
