@@ -6,6 +6,9 @@ class CspReportsController < ApplicationController
   EXTENSION_SCHEME = %r{\A(chrome|moz|safari|safari-web)-extension://}
   IN_APP_BROWSER = /\b(FBAN|FBAV|FB_IAB|Instagram|Line\/)\b/
   TRANSLATE_DOCUMENT = /\.translate\.goog\z|translate\.google(apis)?\.com/
+  # Corporate proxies, antivirus, and carriers inject frames pointing at private
+  # or loopback IPs — the user's own network, nothing we serve or can fix.
+  PRIVATE_IP_FRAME = %r{\Ahttps?://(10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)}
 
   def create
     # Browsers/bots occasionally send malformed byte sequences (e.g. overlong
@@ -28,7 +31,11 @@ class CspReportsController < ApplicationController
 
   def send_report?(report)
     report.present? && !request.user_agent.to_s.match?(IN_APP_BROWSER) &&
-      !extension_noise?(report) && !translate_noise?(report)
+      !extension_noise?(report) && !translate_noise?(report) && !private_ip_noise?(report)
+  end
+
+  def private_ip_noise?(report)
+    report["blocked-uri"].to_s.match?(PRIVATE_IP_FRAME)
   end
 
   def extension_noise?(report)
@@ -40,7 +47,8 @@ class CspReportsController < ApplicationController
   def translate_noise?(report)
     blocked = report["blocked-uri"].to_s
     return true if report["document-uri"].to_s.match?(TRANSLATE_DOCUMENT)
-    return true if blocked.match?(%r{\Ahttps://www\.google\.[a-z.]+/})
+    # Frame violations report the bare origin (no path), so match a trailing slash or end
+    return true if blocked.match?(%r{\Ahttps://www\.google\.[a-z.]+(/|\z)})
 
     report["effective-directive"] == "media-src" && blocked == "data"
   end

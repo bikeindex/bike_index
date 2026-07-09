@@ -45,8 +45,17 @@ RSpec.describe CspReportsController, type: :request do
       end
     end
 
-    context "translate proxy frame" do
-      let(:blocked_uri) { "https://www.google.co.id/" }
+    context "google country-domain frame (origin only, no path)" do
+      let(:blocked_uri) { "https://www.google.co.id" }
+      it "drops the report" do
+        post_report
+        expect(ForwardCspReportJob.jobs.count).to eq 0
+      end
+    end
+
+    context "private-ip frame injection" do
+      let(:blocked_uri) { "https://10.255.99.112" }
+      let(:report) { {"csp-report" => {"blocked-uri" => blocked_uri, "document-uri" => "https://bikeindex.org/bikes/1", "effective-directive" => "frame-src"}} }
       it "drops the report" do
         post_report
         expect(ForwardCspReportJob.jobs.count).to eq 0
