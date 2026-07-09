@@ -43,11 +43,29 @@ RSpec.describe UI::Tooltip::Component, type: :component do
       end
     end
 
-    it "chains the custom action with the tooltip actions" do
-      action = component.css("button").attr("data-action").value
-      expect(action).to include "click->custom#handler"
-      expect(action).to include "mouseenter->ui--tooltip#showOnHover"
-      expect(action).to include "focusin->ui--tooltip#showOnFocus"
+    it "keeps the custom action on the trigger and the tooltip actions on the wrapper" do
+      expect(component.css("button").attr("data-action").value).to include "click->custom#handler"
+      wrapper = component.css("[data-controller='ui--tooltip']").first
+      expect(wrapper["data-action"]).to include "mouseenter->ui--tooltip#showOnHover"
+      expect(wrapper["data-action"]).to include "focusin->ui--tooltip#showOnFocus"
+    end
+  end
+
+  context "with a link in the body" do
+    let(:component) do
+      render_inline(described_class.new(text: "tip")) do |tooltip|
+        tooltip.with_body { '<a href="/commit/abc">abc</a>'.html_safe }
+        tooltip.with_tooltip_button { "?" }
+      end
+    end
+
+    it "keeps the trigger a button and makes the popup clickable, not nested in the button" do
+      trigger = component.css("[aria-describedby]").first
+      expect(trigger.name).to eq "button"
+      tooltip = component.css("[role='tooltip']").first
+      expect(tooltip["class"]).to include "tw:pointer-events-auto"
+      expect(tooltip.at_css("a")[:href]).to eq "/commit/abc"
+      expect(component.css("button a")).to be_empty
     end
   end
 
