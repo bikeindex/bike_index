@@ -366,15 +366,14 @@ class Export < ApplicationRecord
 
   private
 
-  # nil when the sticker was unclaimed before the export, or when its prior bike has since been deleted
+  # nil when the sticker was unclaimed before the export
   def bike_before_export(bike_sticker)
     export_update = bike_sticker.bike_sticker_updates.successful
       .where(export_id: id).reorder(:id).first
     return nil if export_update.blank?
 
-    # Bike's default_scope hides user_hidden and example bikes, which are still valid to restore
-    bike = Bike.unscoped.find_by(id: export_update.previous_successful_updates.reorder(:id).last&.bike_id)
-    bike if bike&.deleted_at.blank?
+    # unscoped because default_scope hides deleted, user_hidden and example bikes - all valid to restore
+    Bike.unscoped.find_by(id: export_update.previous_successful_updates.reorder(:id).last&.bike_id)
   end
 
   def validated_options(opts)

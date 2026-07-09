@@ -255,13 +255,12 @@ RSpec.describe Export, type: :model do
 
     context "previous bike has since been deleted" do
       let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
-      it "unclaims the sticker" do
+      it "restores the deleted bike" do
         bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
         export_claim(exported_bike)
         previous_bike.destroy
         export.undo_bike_stickers_and_record!(user)
-        expect(bike_sticker.reload.claimed?).to be_falsey
-        expect(bike_sticker.bike).to be_nil
+        expect(bike_sticker.reload.bike_id).to eq previous_bike.id
       end
     end
 
