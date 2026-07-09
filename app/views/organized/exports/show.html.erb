@@ -217,11 +217,13 @@
                     </strong>
                   </p>
                   <% if @export.bike_stickers_not_undone.any? %>
-                    <p class="text-warning tw:mb-2">
-                      <%= t(".stickers_not_undone") %>
+                    <p class="tw:mb-2">
+                      <span class="text-warning">
+                        <%= t(".stickers_not_undone") %>
+                      </span>
 
                       <% @export.bike_stickers_not_undone.each_with_index do |code, i| %>
-                        <%= link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param), class: "text-warning text-underline" %><%= i == (@export.bike_stickers_not_undone.count - 1) ? "" : "," %>
+                        <%= link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param), class: "twlink" %><%= i == (@export.bike_stickers_not_undone.count - 1) ? "" : "," %>
                       <% end %>
                     </p>
                   <% end %>
