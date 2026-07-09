@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://www.strava.com/api/v3/activities/17323701543
+    uri: https://www.api-v3.strava.com/activities/17323701543
     body:
       encoding: US-ASCII
       string: ''
@@ -75,7 +75,7 @@ http_interactions:
   recorded_at: Sat, 28 Feb 2026 00:07:00 GMT
 - request:
     method: get
-    uri: https://www.strava.com/api/v3/activities/12345
+    uri: https://www.api-v3.strava.com/activities/12345
     body:
       encoding: US-ASCII
       string: ''
