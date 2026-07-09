@@ -235,22 +235,17 @@ class Export < ApplicationRecord
 
   # Restores each sticker to the bike it was on before this export claimed it
   def undo_bike_stickers(passed_user = nil)
-    bike_stickers_assigned.each do |code|
-      bike_sticker = BikeSticker.lookup(code, organization_id: organization_id)
-      next if bike_sticker.blank?
-
+    each_assigned_bike_sticker do |bike_sticker|
       bike = bike_before_export(bike_sticker)
       next if bike_sticker.bike_id == bike&.id
 
-      bike_sticker.claim(user: passed_user, bike: bike,
-        organization: organization, creator_kind: "creator_export")
+      bike_sticker.claim(user: passed_user, bike:, organization:, creator_kind: "creator_export")
     end
   end
 
   def remove_bike_stickers(passed_user = nil)
-    (bike_stickers_assigned || []).each do |code|
-      BikeSticker.lookup(code, organization_id: organization_id)
-        &.claim(user: passed_user, bike_string: nil, organization: organization, creator_kind: "creator_export")
+    each_assigned_bike_sticker do |bike_sticker|
+      bike_sticker.claim(user: passed_user, bike_string: nil, organization:, creator_kind: "creator_export")
     end
   end
 
@@ -386,14 +381,17 @@ class Export < ApplicationRecord
 
   private
 
-  # nil when the sticker was unclaimed before the export
-  def bike_before_export(bike_sticker)
-    export_update = bike_sticker.bike_sticker_updates.successful
-      .where(export_id: id).reorder(:id).first
-    return nil if export_update.blank?
+  def each_assigned_bike_sticker
+    bike_stickers_assigned.each do |code|
+      bike_sticker = BikeSticker.lookup(code, organization_id:)
+      yield bike_sticker if bike_sticker.present?
+    end
+  end
 
-    # unscoped because default_scope hides deleted, user_hidden and example bikes - all valid to restore
-    Bike.unscoped.find_by(id: export_update.previous_successful_updates.reorder(:id).last&.bike_id)
+  # nil when the sticker was unclaimed before the export, or this export never claimed it
+  def bike_before_export(bike_sticker)
+    bike_sticker.bike_sticker_updates.successful
+      .where(export_id: id).reorder(:id).first&.bike_before
   end
 
   def validated_options(opts)

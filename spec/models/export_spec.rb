@@ -219,6 +219,7 @@ RSpec.describe Export, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "A11") }
     let(:exported_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
     before do
       export.update(options: export.options.merge(assign_bike_codes: true, bike_codes_assigned: ["A11"]))
     end
@@ -243,7 +244,6 @@ RSpec.describe Export, type: :model do
     end
 
     context "sticker was claimed to a different bike before the export" do
-      let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       it "restores the previous bike" do
         bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
         export_claim(exported_bike)
@@ -256,7 +256,6 @@ RSpec.describe Export, type: :model do
     end
 
     context "previous bike has since been deleted" do
-      let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       it "restores the deleted bike" do
         bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
         export_claim(exported_bike)
@@ -277,7 +276,6 @@ RSpec.describe Export, type: :model do
     end
 
     context "already removed" do
-      let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       it "restores the previous bike after a removal" do
         bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
         export_claim(exported_bike)

@@ -10,6 +10,34 @@ RSpec.describe BikeStickerUpdate, type: :model do
     end
   end
 
+  describe "bike_before" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization) }
+    let(:earlier_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let(:later_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+
+    it "is nil for the sticker's first update" do
+      bike_sticker.claim(user: user, bike: later_bike, organization: organization)
+      expect(bike_sticker.bike_sticker_updates.last.bike_before).to be_nil
+    end
+
+    context "sticker was previously claimed" do
+      it "is the bike from the preceding successful update" do
+        bike_sticker.claim(user: user, bike: earlier_bike, organization: organization)
+        bike_sticker.claim(user: user, bike: later_bike, organization: organization)
+        expect(bike_sticker.bike_sticker_updates.reorder(:id).last.bike_before).to eq earlier_bike
+      end
+
+      it "returns the bike even if it has been deleted" do
+        bike_sticker.claim(user: user, bike: earlier_bike, organization: organization)
+        bike_sticker.claim(user: user, bike: later_bike, organization: organization)
+        earlier_bike.destroy
+        expect(bike_sticker.bike_sticker_updates.reorder(:id).last.bike_before&.id).to eq earlier_bike.id
+      end
+    end
+  end
+
   describe "user association" do
     let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed) }
     let(:user) { bike_sticker.user }
