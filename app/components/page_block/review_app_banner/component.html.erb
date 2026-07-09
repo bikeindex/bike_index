@@ -9,12 +9,7 @@
     tw:px-4 tw:py-2 tw:text-center tw:font-semibold tw:text-black
   "
 >
-  <%#
-    "data is ephemeral" and the per-PR "Review app" label are hidden on small
-    screens so the actionable links fit; the PR title carries the context there.
-    "Staging" has no PR title, so it stays visible on small screens.
-  %>
-
+  <%# Hide the "Review app" label on small screens — the PR title carries the context there; "Staging" has no title, so it stays %>
   <span class="<%= "tw:hidden tw:sm:inline" if @pr_number %>">
     <%= banner_label %>
   </span>
@@ -23,11 +18,6 @@
     <span class="tw:hidden tw:sm:inline">&middot;</span>
     <a class="tw:underline" href="<%= pr_url %>"><%= pr_link_text %></a>
   <% end %>
-
-  <%#
-    "?" button styled like the email-outbox tooltip; its popup shows the commit
-    SHA as a link to GitHub. Shown on all screens, following the PR title.
-  %>
 
   <% if @commit.present? %>
     <%= render(UI::Tooltip::Component.new(text: "#{translation(".commit_tooltip")} #{@commit}")) do |tooltip| %>
@@ -43,7 +33,6 @@
     &middot; <%= translation(".disclaimer") %>
   </span>
 
-  <%# The label (or PR title) always precedes the outbox, so its separator shows on all screens %>
   <span>&middot;</span>
 
   <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:font-normal tw:underline" %>

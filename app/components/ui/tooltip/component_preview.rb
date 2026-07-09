@@ -33,8 +33,7 @@ module UI
         end
       end
 
-      # Interactive body: a link in the popup, detected from the content, so the
-      # popup gets pointer events. Click the "?" to keep it open, then the link.
+      # A link in the popup: click the "?" to keep it open, then click the link
       def with_interactive_body
         render(UI::Tooltip::Component.new(text: "current commit: a1b2c3d")) do |tooltip|
           tooltip.with_body do

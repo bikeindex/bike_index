@@ -23,8 +23,7 @@ module PageBlock
 
       private
 
-      # No PR number means this is the persistent staging deploy, not a per-PR
-      # review app. See config/deploy.review.yml (the shared Kamal config).
+      # No PR number means the persistent staging deploy, not a per-PR review app
       def banner_label
         @pr_number.present? ? translation(".label") : translation(".label_staging")
       end
