@@ -57,6 +57,43 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:exports).pluck(:id)).to eq([export.id])
       end
+
+      context "with assigned bike stickers" do
+        let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
+        let(:assigned_title) { "Assigned stickers" }
+        let(:unassigned_title) { "Stickers assigned by this export were unassigned" }
+        let(:restored_title) { "Stickers were restored to their previous bikes" }
+        before do
+          export.update(options: export.options.merge(sticker_options))
+          get base_url
+          expect(response.code).to eq("200")
+        end
+
+        context "still assigned" do
+          let(:sticker_options) { {} }
+          it "badges the assignment" do
+            expect(response.body).to include(assigned_title)
+            expect(response.body).to_not include(unassigned_title)
+            expect(response.body).to_not include(restored_title)
+          end
+        end
+
+        context "removed" do
+          let(:sticker_options) { {bike_codes_removed: true} }
+          it "badges stickers unassigned" do
+            expect(response.body).to include(unassigned_title)
+            expect(response.body).to_not include(assigned_title)
+          end
+        end
+
+        context "undone" do
+          let(:sticker_options) { {bike_codes_undone: true} }
+          it "badges stickers restored" do
+            expect(response.body).to include(restored_title)
+            expect(response.body).to_not include(unassigned_title)
+          end
+        end
+      end
     end
 
     describe "show" do
@@ -65,6 +102,39 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
+      end
+      context "with assigned bike stickers" do
+        let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
+        it "renders the undo action, with a confirm" do
+          export.update(options: export.options.merge(bike_codes_assigned: ["a1111"]))
+          get "#{base_url}/#{export.id}"
+          expect(response.code).to eq("200")
+          expect(response.body).to match(/undo_bike_stickers/)
+          expect(response.body).to match(/This will remove the history of having assigned these stickers/)
+        end
+        context "already undone" do
+          it "does not offer undo, and collapses the assigned stickers behind a toggle" do
+            export.update(options: export.options.merge(bike_codes_assigned: ["a1111"], bike_codes_undone: true))
+            get "#{base_url}/#{export.id}"
+            expect(response.code).to eq("200")
+            expect(response.body).to_not match(/undo_bike_stickers/)
+            expect(response.body).to match(/Show previously assigned stickers/)
+            expect(response.body).to match(/data-controller="disclosure"/)
+            expect(response.body).to match(/data-disclosure-target="content"/)
+            # The restored message comes before the collapsed sticker list
+            expect(response.body.index("Stickers have been restored"))
+              .to be < response.body.index("Show previously assigned stickers")
+          end
+        end
+        context "with stickers that could not be undone" do
+          it "lists them" do
+            export.update(options: export.options.merge(bike_codes_assigned: %w[a1111 a1112],
+              bike_codes_undone: true, bike_codes_not_undone: ["a1112"]))
+            get "#{base_url}/#{export.id}"
+            expect(response.code).to eq("200")
+            expect(response.body).to match(/were not\s+undone/)
+          end
+        end
       end
       context "with impounded_bikes only" do
         let(:export) { FactoryBot.create(:export_organization, organization: current_organization, options: Export.default_options("organization").merge("impounded_bikes" => true, "partial_registrations" => "none")) }
@@ -408,40 +478,47 @@ RSpec.describe Organized::ExportsController, type: :request do
       end
     end
 
-    describe "update bike_codes_removed" do
-      let(:export) { FactoryBot.build(:export_avery, progress: "pending", file: nil, bike_code_start: "z ", organization: current_organization, user: current_user) }
-      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+    describe "update undo_bike_stickers" do
+      let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "z ", organization: current_organization, user: current_user) }
+      let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+      let(:exported_bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: current_organization, code: "z") }
-      it "removes the bike codes" do
-        export.options = export.options.merge(bike_codes_assigned: ["Z"])
-        bike_sticker.claim(user: current_user, bike: bike)
-        export.save
-        export.reload
-        bike_sticker.reload
-        expect(export.assign_bike_codes?).to be_truthy
-        expect(export.bike_stickers_assigned).to eq(["Z"])
-        expect(export.bike_codes_removed?).to be_falsey
-        expect(bike_sticker.claimed?).to be_truthy
-        expect(bike_sticker.bike).to eq bike
-        expect {
-          put "#{base_url}/#{export.to_param}?remove_bike_stickers=1"
-        }.to change(BikeStickerUpdate, :count).by 1
-        export.reload
-        bike_sticker.reload
-        expect(export.assign_bike_codes?).to be_truthy
-        expect(export.bike_stickers_assigned).to eq(["Z"])
-        expect(export.bike_codes_removed?).to be_truthy
-        expect(bike_sticker.claimed?).to be_falsey
-        expect(bike_sticker.bike).to be_nil
-        expect(bike_sticker.bike_sticker_updates.count).to eq 2
+      before do
+        bike_sticker.claim(user: current_user, bike: previous_bike)
+        export.update(options: export.options.merge(bike_codes_assigned: ["Z"]))
+        bike_sticker.claim(user: current_user, bike: exported_bike, organization: current_organization,
+          export_id: export.id, creator_kind: "creator_export")
+        expect(bike_sticker.reload.bike).to eq exported_bike
+      end
 
-        bike_sticker_update = bike_sticker.bike_sticker_updates.last
-        expect(bike_sticker_update.kind).to eq "un_claim"
-        expect(bike_sticker_update.creator_kind).to eq "creator_export"
-        expect(bike_sticker_update.organization_kind).to eq "primary_organization"
-        expect(bike_sticker_update.user).to eq current_user
-        expect(bike_sticker_update.bike).to be_blank
-        expect(bike_sticker_update.organization_id).to eq current_organization.id
+      it "restores the bike the sticker was on before the export" do
+        Sidekiq::Testing.inline! { put "#{base_url}/#{export.to_param}?undo_bike_stickers=1" }
+
+        expect(flash[:success]).to match(/restoring to their previous bikes/)
+        expect(export.reload.bike_codes_undone?).to be_truthy
+        expect(export.bike_stickers_not_undone).to eq([])
+        expect(bike_sticker.reload.bike).to eq previous_bike
+        # The export's update is deleted, so only the original claim remains
+        expect(bike_sticker.bike_sticker_updates.count).to eq 1
+      end
+
+      context "sticker claimed again after the export" do
+        it "skips it and records the code" do
+          bike_sticker.claim(user: current_user, bike: previous_bike, organization: current_organization)
+          Sidekiq::Testing.inline! { put "#{base_url}/#{export.to_param}?undo_bike_stickers=1" }
+
+          expect(export.reload.bike_stickers_not_undone).to eq([bike_sticker.code])
+          expect(bike_sticker.reload.bike).to eq previous_bike
+          expect(bike_sticker.bike_sticker_updates.count).to eq 3
+        end
+      end
+
+      context "unknown update action" do
+        it "flashes an error" do
+          put "#{base_url}/#{export.to_param}?remove_bike_stickers=1"
+          expect(flash[:error]).to be_present
+          expect(export.reload.bike_codes_undone?).to be_falsey
+        end
       end
     end
   end

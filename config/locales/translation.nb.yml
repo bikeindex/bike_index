@@ -1999,6 +1999,7 @@ nb:
         vi bryr oss virkelig!
       this_bike_has_been_returned: Denne %{bike_type} har blitt returnert!
       were_so_glad: Vi er så glade for at du har fått tilbake %{bike_type}!
+      marking_recovered: Merking av sykkelen din som er funnet igjen…
     report_stolen:
       this_bike_type_is_stolen_or_missing: Denne %{bike_type} er stjålet eller savnet!
     theft_details:
@@ -2286,8 +2287,9 @@ nb:
         destroy:
           export_deleted: Eksporten ble slettet!
         update:
-          bike_stickers_removed: Sykkelkoder fjernet!
           unknown_update_action: Ukjent oppdateringshandling!
+          bike_stickers_undone: Sykkelklistremerker gjenopprettes til tidligere sykler
+            (eller ikke-tilordnede). Dette vil ta noen minutter
       manage_impoundings:
         update:
           could_not_update: Vi beklager, vi hadde problemer med å oppdatere %{org_name}.
@@ -4460,6 +4462,14 @@ nb:
         org_exports_html: "%{org_name} Eksporter"
         progress: Framgang
         stickers_assigned: Tildelt klistremerker?
+        stickers: klistremerker
+        stickers_restored: klistremerker restaurert
+        stickers_restored_title: Klistremerkene ble restaurert til de tidligere syklene
+          deres
+        stickers_title: Tildelte klistremerker
+        stickers_unassigned: klistremerker ikke tilordnet
+        stickers_unassigned_title: Klistremerker som ble tilordnet av denne eksporten,
+          ble ikke lenger tilordnet
       show:
         avery_export: Avery Export
         bikes_exported: Sykler eksportert
@@ -4485,8 +4495,16 @@ nb:
         stickers_exported: "%{bike_stickers_count} Klistremerker eksportert"
         stickers_have_been_unassigned: Klistremerker har blitt fjernet
         unable_to_export: Kan ikke eksportere, ikke en del av organisasjonen din
-        unassign_stickers: Fjern tildelingen av klistremerker
         view_avery_labels: Se Avery-etiketter
+        show_previously_assigned_stickers: Vis tidligere tildelte klistremerker
+        stickers_have_been_restored: Klistremerkene har blitt restaurert til de tidligere
+          syklene deres
+        stickers_not_undone: 'Disse klistremerkene ble tilordnet på nytt etter denne
+          eksporten, så de ble ikke angret:'
+        undo_sticker_assignment: Angre klistremerketildeling
+        undo_sticker_assignment_confirm: Er du sikker på at du vil angre tildelingen
+          av klistremerket? Dette vil fjerne historikken over tildelingen av disse
+          klistremerkene. Dette kan ikke angres.
     manage_impoundings:
       edit:
         impound_settings_html: Administrer <em>%{org_name}</em> lagringsinnstillinger
@@ -5351,6 +5369,10 @@ nb:
         letter_opener_link: e-post utboks
         letter_opener_tooltip: Se e-posten som ble sendt av denne anmeldelsesappen
         pr_link: PR-nummer %{number}
+        commit_tooltip: 'nåværende forpliktelse:'
+        label_staging: Iscenesettelse
+        superadmin_button: logg inn som superadministrator
+        superadmin_signed_in: logget inn som superadministrator
       footer:
         about: Om
         ambassadors: Ambassadører

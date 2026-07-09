@@ -2122,7 +2122,8 @@ nl:
           export_deleted: Export is succesvol verwijderd!
         update:
           unknown_update_action: Onbekende updateactie!
-          bike_stickers_removed: Fietscodes verwijderd!
+          bike_stickers_undone: De stickers op de fietsen worden teruggeplaatst op
+            de oorspronkelijke (of niet-toegewezen) fietsen. Dit duurt een paar minuten.
       stickers:
         update:
           cannot_update: Je kunt dat %{bike_sticker_kind} niet bijwerken. Neem contact
@@ -3953,6 +3954,14 @@ nl:
         org_exports_html: "%{org_name} Exporteert"
         progress: Vooruitgang
         stickers_assigned: Stickers toegewezen?
+        stickers: stickers
+        stickers_restored: stickers hersteld
+        stickers_restored_title: De stickers werden teruggeplaatst op hun oorspronkelijke
+          fietsen.
+        stickers_title: Toegewezen stickers
+        stickers_unassigned: stickers niet toegewezen
+        stickers_unassigned_title: De stickers die bij deze export hoorden, waren
+          niet toegewezen.
       show:
         avery_export: Avery Export
         bikes_exported: Fietsen geëxporteerd
@@ -3976,10 +3985,18 @@ nl:
         stickers_exported: "%{bike_codes_count} Stickers geëxporteerd"
         stickers_have_been_unassigned: Stickers zijn niet toegewezen
         unable_to_export: Kan niet exporteren, geen onderdeel van uw organisatie
-        unassign_stickers: Stickers ongedaan maken
         view_avery_labels: Bekijk Avery-labels
         registration_types: Registratietypen
         by: Door
+        show_previously_assigned_stickers: Toon eerder toegewezen stickers
+        stickers_have_been_restored: De stickers zijn weer op de originele fietsen
+          geplakt.
+        stickers_not_undone: 'Deze stickers werden na deze export opnieuw toegewezen,
+          dus ze zijn niet verwijderd:'
+        undo_sticker_assignment: Stickeropdracht ongedaan maken
+        undo_sticker_assignment_confirm: Weet je zeker dat je de stickertoewijzing
+          ongedaan wilt maken? Hiermee wordt de geschiedenis van de stickertoewijzing
+          verwijderd. Dit kan niet ongedaan worden gemaakt.
     stickers:
       edit:
         bike: Fiets
@@ -5267,6 +5284,7 @@ nl:
         terug hebt gekregen, het kan ons echt schelen!
       this_bike_has_been_returned: Deze %{bike_type} is geretourneerd!
       were_so_glad: We zijn zo blij dat je je %{bike_type} terug hebt!
+      marking_recovered: Je fiets is teruggevonden en gemarkeerd...
     report_stolen:
       this_bike_type_is_stolen_or_missing: Deze %{bike_type} is gestolen of ontbreekt!
     theft_details:
@@ -5500,6 +5518,10 @@ nl:
         letter_opener_link: e-mail outbox
         letter_opener_tooltip: Bekijk de e-mail die door deze review-app is verzonden.
         pr_link: 'PR #%{number}'
+        commit_tooltip: 'huidige commit:'
+        label_staging: Enscenering
+        superadmin_button: Meld u aan als superbeheerder.
+        superadmin_signed_in: ingelogd als superbeheerder
       footer:
         about: Over
         ambassadors: Ambassadors

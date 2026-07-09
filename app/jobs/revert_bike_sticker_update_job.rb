@@ -22,10 +22,7 @@ class RevertBikeStickerUpdateJob < ApplicationJob
       .where(update_number: ...bike_sticker_update.update_number)
       .order(update_number: :desc)
 
-    following_updates = bike_sticker.bike_sticker_updates
-      .where("update_number > ?", bike_sticker_update.update_number)
-
-    if following_updates.present?
+    if bike_sticker_update.following_updates.any?
       raise "Following claim, failing"
 
     elsif previous_updates.present?
