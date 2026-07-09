@@ -175,7 +175,6 @@ class Export < ApplicationRecord
     option?("bike_codes_undone")
   end
 
-  # Either action ends the export's sticker assignment, so neither can run afterward
   def bike_codes_reverted?
     bike_codes_removed? || bike_codes_undone?
   end
@@ -225,8 +224,10 @@ class Export < ApplicationRecord
     update_attribute :options, options.merge(bike_codes_removed: true)
   end
 
+  # Can still run after remove_bike_stickers_and_record! - removal's un_claim updates come after the
+  # export's own claim, so they don't obscure the bike each sticker was on beforehand
   def undo_bike_stickers_and_record!(passed_user = nil)
-    return true unless assign_bike_codes? && !bike_codes_reverted?
+    return true unless assign_bike_codes? && !bike_codes_undone?
 
     undo_bike_stickers(passed_user)
     update_attribute :options, options.merge(bike_codes_undone: true)
@@ -238,7 +239,10 @@ class Export < ApplicationRecord
       bike_sticker = BikeSticker.lookup(code, organization_id: organization_id)
       next if bike_sticker.blank?
 
-      bike_sticker.claim(user: passed_user, bike: bike_before_export(bike_sticker),
+      bike = bike_before_export(bike_sticker)
+      next if bike_sticker.bike_id == bike&.id
+
+      bike_sticker.claim(user: passed_user, bike: bike,
         organization: organization, creator_kind: "creator_export")
     end
   end

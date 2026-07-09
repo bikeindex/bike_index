@@ -278,16 +278,29 @@ RSpec.describe Export, type: :model do
 
     context "already removed" do
       let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
-      it "does not undo on top of the removal" do
+      it "restores the previous bike after a removal" do
         bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
         export_claim(exported_bike)
         export.remove_bike_stickers_and_record!(user)
         expect(export.reload.bike_codes_removed?).to be_truthy
-        expect {
-          export.undo_bike_stickers_and_record!(user)
-        }.to_not change(BikeStickerUpdate, :count)
         expect(bike_sticker.reload.bike).to be_nil
-        expect(export.reload.bike_codes_undone?).to be_falsey
+
+        export.undo_bike_stickers_and_record!(user)
+        expect(bike_sticker.reload.bike).to eq previous_bike
+        expect(export.reload.bike_codes_undone?).to be_truthy
+        expect(export.bike_codes_removed?).to be_truthy
+      end
+
+      context "sticker was unclaimed before the export" do
+        it "leaves the sticker unclaimed without recording a redundant update" do
+          export_claim(exported_bike)
+          export.remove_bike_stickers_and_record!(user)
+          expect {
+            export.undo_bike_stickers_and_record!(user)
+          }.to_not change(BikeStickerUpdate, :count)
+          expect(bike_sticker.reload.bike).to be_nil
+          expect(export.reload.bike_codes_undone?).to be_truthy
+        end
       end
     end
   end

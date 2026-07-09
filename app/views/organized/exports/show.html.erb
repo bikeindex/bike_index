@@ -202,11 +202,12 @@
                   <em class="text-danger">
                     <%= t(".stickers_have_been_restored") %>
                   </em>
-                <% elsif @export.bike_codes_removed? %>
-                  <em class="text-danger">
-                    <%= t(".stickers_have_been_unassigned") %>
-                  </em>
                 <% else %>
+                  <% if @export.bike_codes_removed? %>
+                    <em class="text-danger">
+                      <%= t(".stickers_have_been_unassigned") %>
+                    </em>
+                  <% end %>
                   <div class="tw:flex tw:justify-end tw:gap-2">
                     <%= render UI::ButtonLink::Component.new(
                       href: organization_export_path(@export.id, organization_id: current_organization.to_param, undo_bike_stickers: true),
@@ -214,10 +215,12 @@
                       color: :primary,
                       method: :put) %>
 
-                    <%= link_to(t(".unassign_stickers"),
-                      organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_stickers: true),
-                      method: :put,
-                      class: "btn btn-warning") %>
+                    <% unless @export.bike_codes_removed? %>
+                      <%= link_to(t(".unassign_stickers"),
+                        organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_stickers: true),
+                        method: :put,
+                        class: "btn btn-warning") %>
+                    <% end %>
                   </div>
                 <% end %>
               <% else %>

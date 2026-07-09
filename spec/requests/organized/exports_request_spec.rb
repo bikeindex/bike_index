@@ -75,6 +75,24 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(response.body).to match(/undo_bike_stickers/)
           expect(response.body).to match(/remove_bike_stickers/)
         end
+        context "already removed" do
+          it "still offers undo" do
+            export.update(options: export.options.merge(bike_codes_assigned: ["a1111"], bike_codes_removed: true))
+            get "#{base_url}/#{export.id}"
+            expect(response.code).to eq("200")
+            expect(response.body).to match(/undo_bike_stickers/)
+            expect(response.body).to_not match(/remove_bike_stickers/)
+          end
+        end
+        context "already undone" do
+          it "offers neither" do
+            export.update(options: export.options.merge(bike_codes_assigned: ["a1111"], bike_codes_undone: true))
+            get "#{base_url}/#{export.id}"
+            expect(response.code).to eq("200")
+            expect(response.body).to_not match(/undo_bike_stickers/)
+            expect(response.body).to_not match(/remove_bike_stickers/)
+          end
+        end
       end
       context "with impounded_bikes only" do
         let(:export) { FactoryBot.create(:export_organization, organization: current_organization, options: Export.default_options("organization").merge("impounded_bikes" => true, "partial_registrations" => "none")) }
