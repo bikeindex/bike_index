@@ -48,13 +48,15 @@ module OrganizedHelper
 
   # Whether the export's sticker assignment is still in effect
   def export_stickers_badge_attributes(export)
-    scope = %i[organized exports index]
     if export.bike_codes_undone?
-      {text: t(:stickers_restored, scope:), title: t(:stickers_restored_title, scope:), color: :warning}
+      {text: t("organized.exports.index.stickers_restored"),
+       title: t("organized.exports.index.stickers_restored_title"), color: :warning}
     elsif export.bike_codes_removed?
-      {text: t(:stickers_unassigned, scope:), title: t(:stickers_unassigned_title, scope:), color: :orange}
+      {text: t("organized.exports.index.stickers_unassigned"),
+       title: t("organized.exports.index.stickers_unassigned_title"), color: :orange}
     else
-      {text: t(:stickers, scope:), title: t(:stickers_title, scope:), color: :cyan}
+      {text: t("organized.exports.index.stickers"),
+       title: t("organized.exports.index.stickers_title"), color: :cyan}
     end
   end
 

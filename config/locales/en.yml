@@ -1882,8 +1882,8 @@ en:
           export_deleted: Export was successfully deleted!
         update:
           bike_stickers_undone: >-
-            Bike stickers restoring to their previous bikes (or unassigned). This will
-            take a few minutes
+            Bike stickers restoring to their previous bikes (or unassigned). This
+            will take a few minutes
           unknown_update_action: Unknown update action!
       impound_records:
         available_impound_records:
@@ -4504,9 +4504,8 @@ en:
         stickers_have_been_restored: Stickers have been restored to their previous
           bikes
         stickers_have_been_unassigned: Stickers have been unassigned
-        stickers_not_undone: >-
-          These stickers were assigned again after this export, so they were not
-          undone:
+        stickers_not_undone: 'These stickers were assigned again after this export,
+          so they were not undone:'
         unable_to_export: Unable to export, not part of your organization
         undo_sticker_assignment: Undo sticker assignment
         undo_sticker_assignment_confirm: >-
