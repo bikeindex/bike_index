@@ -42,9 +42,9 @@ RSpec.describe PublicImage, type: :model do
     end
 
     context "fog storage (production)" do
+      let(:public_image) { PublicImage.new(imageable: bike, image: image_file) }
+      before { allow(public_image).to receive(:remote_storage?).and_return(true) }
       it "defers version generation to the background job" do
-        public_image = PublicImage.new(imageable: bike, image: image_file)
-        allow(public_image).to receive(:remote_storage?).and_return(true)
         expect do
           public_image.save!
         end.to change(CarrierWaveProcessJob.jobs, :size).by(1)

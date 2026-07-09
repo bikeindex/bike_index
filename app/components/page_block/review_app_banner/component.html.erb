@@ -9,13 +9,32 @@
     tw:px-4 tw:py-2 tw:text-center tw:font-semibold tw:text-black
   "
 >
-  <%= translation(".label") %>
+  <%#
+    "Review app" and "data is ephemeral" are just labels; hide them (and their
+    separators) on small screens so the actionable links fit
+  %>
+  <span class="tw:hidden tw:sm:inline"><%= translation(".label") %></span>
+
   <% if @pr_number %>
-    &middot;
+    <span class="tw:hidden tw:sm:inline">&middot;</span>
     <a class="tw:underline" href="<%= pr_url %>"><%= pr_link_text %></a>
   <% end %>
-  &middot; <%= translation(".disclaimer") %> &middot;
+
+  <span class="tw:hidden tw:sm:inline">
+    &middot; <%= translation(".disclaimer") %>
+  </span>
+
+  <%#
+    Separator before the outbox: keep it on small screens only when a PR link
+    precedes it, otherwise it would orphan at the start
+  %>
+
+  <span class="<%= "tw:hidden tw:sm:inline" unless @pr_number %>">
+    &middot;
+  </span>
+
   <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:font-normal tw:underline" %>
+
   <%= render(UI::Tooltip::Component.new(text: translation(".letter_opener_tooltip"))) do |tooltip| %>
     <% tooltip.with_tooltip_button(
       class: "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
@@ -23,10 +42,17 @@
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
     ) { "?" } %>
   <% end %>
-  <% if superadmin %>
+
+  <% if signed_in_as_superadmin? %>
+    &middot;
+    <span class="tw:font-normal tw:text-black/60 tw:italic">
+      <%= translation(".superadmin_signed_in") %>
+    </span>
+  <% elsif superadmin %>
     &middot;
     <%= form_with url: sign_in_with_magic_link_session_path, class: "tw:inline-block tw:align-middle" do %>
-      <%= hidden_field_tag :token, superadmin.refreshed_magic_link_token %>
+      <%= hidden_field_tag :token, superadmin_magic_link_token %>
+      <%= hidden_field_tag :return_to, @return_to if @return_to.present? %>
       <%= render UI::Button::Component.new(text: translation(".superadmin_button"), kind: :submit, size: :sm) %>
     <% end %>
   <% end %>

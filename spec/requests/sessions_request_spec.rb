@@ -172,6 +172,13 @@ RSpec.describe SessionsController, type: :request do
       expect(superadmin.reload.magic_link_token).to be_nil
       expect(superadmin.last_login_at).to be_within(1.second).of Time.current
     end
+
+    it "redirects back to return_to when passed (review-app banner)" do
+      post "/session/sign_in_with_magic_link",
+        params: {token: superadmin.refreshed_magic_link_token, return_to: "/bikes/12"}
+      expect(response).to redirect_to "/bikes/12"
+      expect(superadmin.reload.magic_link_token).to be_nil
+    end
   end
 
   describe "remember_me across the magic-link round-trip" do

@@ -104,10 +104,8 @@ module Admin
         end
       end
 
-      def deleted_item_class(value)
-        if value.nil? ? !deleted_active? : @render_deleted == value
-          "active"
-        end
+      def deleted_item_active?(value)
+        value.nil? ? !deleted_active? : @render_deleted == value
       end
 
       def default_table_view

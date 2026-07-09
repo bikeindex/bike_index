@@ -82,8 +82,12 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
     expect(page).to have_field("search_email", with: "")
 
-    # Form submit + direct back-nav: regression guard for turbo-cache spinner state
+    # Form submit + direct back-nav: regression guard for turbo-cache spinner state.
+    # Read the field back before submitting so Capybara waits for the typed value
+    # to be committed in the DOM — otherwise a slow runner can submit the form
+    # while search_email is still empty (observed only on CI).
     fill_in "search_email", with: "alice@example.com"
+    expect(page).to have_field("search_email", with: "alice@example.com", wait: 10)
     find("#search-button").click
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
