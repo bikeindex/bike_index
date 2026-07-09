@@ -85,6 +85,24 @@ RSpec.describe "RegistrationsController#show", type: :request do
     end
   end
 
+  context "anonymous viewer of an ownerless bike" do
+    # A bike with no ownership has owner == nil; a logged-out viewer (current_user
+    # nil) must not match the owner view via nil == nil
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:current_user) { nil }
+
+    it "renders the public view, not the owner view" do
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq(200)
+      body = whitespace_normalized_body_text
+      expect(body).to match("Public view")
+      expect(body).to_not match("Your bike")
+      expect(body).to_not match("Mark stolen")
+      expect(body).to_not match("Sell on Marketplace")
+      expect(body).to_not match("Add photo")
+    end
+  end
+
   context "admin panel" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }

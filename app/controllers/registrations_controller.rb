@@ -68,7 +68,7 @@ class RegistrationsController < ApplicationController
   # The perspectives the current user may view this bike as
   def available_views
     @available_views ||= [
-      (:owner if @bike.owner == current_user || current_user&.superuser?),
+      (:owner if (current_user.present? && @bike.owner == current_user) || current_user&.superuser?),
       *organization_views,
       :public
     ].compact
@@ -101,7 +101,7 @@ class RegistrationsController < ApplicationController
     if passive_organization.present? && current_user&.authorized?(passive_organization)
       return [passive_organization, current_user.member_bike_edit_of?(passive_organization) ? :staff : :limited]
     end
-    return :owner if @bike.owner == current_user
+    return :owner if current_user.present? && @bike.owner == current_user
 
     :public
   end
