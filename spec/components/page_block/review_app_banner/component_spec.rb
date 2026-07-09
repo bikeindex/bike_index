@@ -23,14 +23,13 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       expect(component.text).to include("data is ephemeral")
     end
 
-    it "hides the label and disclaimer on small screens" do
-      # tw:hidden tw:sm:inline => display:none below the sm breakpoint
-      label = component.css("span.tw\\:hidden", text: "Staging").first
-      disclaimer = component.css("span.tw\\:hidden", text: "data is ephemeral").first
-      expect(label).to be_present
-      expect(disclaimer).to be_present
-      # The outbox link stays visible, so it's not inside a hidden span
-      expect(component.css("span.tw\\:hidden a[href='/letter_opener']")).to be_empty
+    it "keeps the Staging label visible on small screens but hides the disclaimer" do
+      # tw:hidden tw:sm:inline => display:none below the sm breakpoint. Staging has
+      # no PR title, so the label itself carries the context on small screens.
+      label = component.css("span").find { |span| span.text.strip == "Staging" }
+      disclaimer = component.css("span").find { |span| span.text.include?("data is ephemeral") }
+      expect(label[:class].to_s).not_to include("tw:hidden")
+      expect(disclaimer[:class].to_s).to include("tw:hidden")
     end
 
     it "doesn't render the superadmin button when there is no superadmin" do
@@ -114,6 +113,10 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
         expect(link[:href]).to eq("https://github.com/bikeindex/bike_index/commit/a1b2c3d")
         expect(link.text.strip).to eq("a1b2c3d")
       end
+
+      it "shows the commit tooltip on small screens (not inside a hidden span)" do
+        expect(component.css("span.tw\\:hidden button[aria-label='current commit: a1b2c3d']")).to be_empty
+      end
     end
 
     context "with a pr_number" do
@@ -125,9 +128,12 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
         expect(link.text).to include("PR #1234")
       end
 
-      it "shows the review app label instead of the staging label" do
+      it "shows the review app label instead of the staging label, hidden on small screens" do
         expect(component.text).to include("Review app")
         expect(component.text).not_to include("Staging")
+        # The PR title carries the context on small screens, so the label hides
+        label = component.css("span").find { |span| span.text.strip == "Review app" }
+        expect(label[:class].to_s).to include("tw:hidden")
       end
 
       context "with a pr_title" do
