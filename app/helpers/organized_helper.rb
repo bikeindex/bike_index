@@ -46,6 +46,18 @@ module OrganizedHelper
     (export.calculated_progress == "finished") ? "text-success" : "text-warning"
   end
 
+  # Whether the export's sticker assignment is still in effect
+  def export_stickers_badge_attributes(export)
+    scope = %i[organized exports index]
+    if export.bike_codes_undone?
+      {text: t(:stickers_restored, scope:), title: t(:stickers_restored_title, scope:), color: :gray}
+    elsif export.bike_codes_removed?
+      {text: t(:stickers_unassigned, scope:), title: t(:stickers_unassigned_title, scope:), color: :orange}
+    else
+      {text: t(:stickers, scope:), title: t(:stickers_title, scope:), color: :cyan}
+    end
+  end
+
   def organized_container
     fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits registrations]
     return "container-fluid" if fluid.include?(controller_name)

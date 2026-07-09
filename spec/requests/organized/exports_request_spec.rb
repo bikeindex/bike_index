@@ -57,6 +57,43 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:exports).pluck(:id)).to eq([export.id])
       end
+
+      context "with assigned bike stickers" do
+        let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
+        let(:assigned_title) { "Assigned stickers" }
+        let(:unassigned_title) { "Stickers assigned by this export were unassigned" }
+        let(:restored_title) { "Stickers were restored to their previous bikes" }
+        before do
+          export.update(options: export.options.merge(sticker_options))
+          get base_url
+          expect(response.code).to eq("200")
+        end
+
+        context "still assigned" do
+          let(:sticker_options) { {} }
+          it "badges the assignment" do
+            expect(response.body).to include(assigned_title)
+            expect(response.body).to_not include(unassigned_title)
+            expect(response.body).to_not include(restored_title)
+          end
+        end
+
+        context "removed" do
+          let(:sticker_options) { {bike_codes_removed: true} }
+          it "badges stickers unassigned" do
+            expect(response.body).to include(unassigned_title)
+            expect(response.body).to_not include(assigned_title)
+          end
+        end
+
+        context "undone" do
+          let(:sticker_options) { {bike_codes_undone: true} }
+          it "badges stickers restored" do
+            expect(response.body).to include(restored_title)
+            expect(response.body).to_not include(unassigned_title)
+          end
+        end
+      end
     end
 
     describe "show" do
