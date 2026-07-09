@@ -21,8 +21,9 @@ class Color < ApplicationRecord
 
   COVER_UP_NAME = "Stickers tape or other cover-up"
 
-  # The cover-up "color" has no real display value, so its swatch is a rainbow gradient
-  COVER_UP_SWATCH = "linear-gradient(90deg, #ec1313, #ff8d1d, #fff44b, #1ba100, #386ed2, #a745c0)"
+  # The cover-up "color" has no real display value, so its swatch is a rainbow arch drawn on white
+  COVER_UP_SWATCH = "radial-gradient(circle at 50% 100%, transparent 0 24%, #a745c0 24% 36%, " \
+    "#386ed2 36% 48%, #1ba100 48% 60%, #fff44b 60% 72%, #ff8d1d 72% 84%, #ec1313 84% 96%, transparent 96%), #fff"
 
   has_many :bikes
   has_many :paints
