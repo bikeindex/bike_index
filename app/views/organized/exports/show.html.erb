@@ -205,14 +205,33 @@
                 <small class="less-strong">
                   <%= t(".no_stickers_assigned") %>
                 </small>
-              <% elsif @export.bike_codes_undone? %>
-                <em class="text-danger">
-                  <%= t(".stickers_have_been_restored") %>
-                </em>
-                <% if @export.bike_stickers_not_undone.any? %>
-                  <p class="text-warning mb-0">
-                    <%= t(".stickers_not_undone") %>
-                    <%= @export.bike_stickers_not_undone.join(", ") %>
+              <% elsif @export.bike_codes_undone? || @export.bike_codes_removed? %>
+                <% if @export.bike_codes_undone? %>
+                  <p class="tw:mb-2">
+                    <strong>
+                      <%= t(".stickers_initially_assigned") %>
+
+                      <span class="text-danger">
+                        <%= t(".stickers_have_been_restored") %>
+                      </span>
+                    </strong>
+                  </p>
+                  <% if @export.bike_stickers_not_undone.any? %>
+                    <p class="tw:mb-2">
+                      <span class="text-warning">
+                        <%= t(".stickers_not_undone") %>
+                      </span>
+
+                      <% @export.bike_stickers_not_undone.each_with_index do |code, i| %>
+                        <%= link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param), class: "twlink" %><%= i == (@export.bike_stickers_not_undone.count - 1) ? "" : "," %>
+                      <% end %>
+                    </p>
+                  <% end %>
+                <% else %>
+                  <p class="tw:mb-2">
+                    <strong class="text-danger">
+                      <%= t(".stickers_have_been_unassigned") %>
+                    </strong>
                   </p>
                 <% end %>
                 <div data-controller="disclosure">
@@ -228,11 +247,6 @@
                 </div>
               <% else %>
                 <%= assigned_stickers %>
-                <% if @export.bike_codes_removed? %>
-                  <em class="text-danger">
-                    <%= t(".stickers_have_been_unassigned") %>
-                  </em>
-                <% end %>
                 <div class="tw:flex tw:justify-end">
                   <%= render UI::ButtonLink::Component.new(
                     href: organization_export_path(@export.id, organization_id: current_organization.to_param, undo_bike_stickers: true),
