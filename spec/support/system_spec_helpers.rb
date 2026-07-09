@@ -31,6 +31,14 @@ module SystemSpecHelpers
     field
   end
 
+  # Wait for Turbo Drive to finish a back/forward restoration before interacting.
+  # On restore Turbo shows a cached snapshot (html[data-turbo-preview]) first,
+  # then swaps in the real render -- typing during the preview loses the value
+  # when the real page lands. Returns once the preview attribute is gone.
+  def wait_for_turbo_restore(wait: 10)
+    expect(page).to have_no_css("html[data-turbo-preview]", wait:)
+  end
+
   # capybara-playwright wraps click/find so a mid-action "Element is not attached
   # to the DOM" (Turbo re-rendering the field) becomes a StaleReferenceError that
   # Capybara auto-retries -- but its `set` path (fill_in) only rescues timeouts,
