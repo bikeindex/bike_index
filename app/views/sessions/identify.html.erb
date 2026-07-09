@@ -17,13 +17,11 @@
             <%= t("sessions.new.log_in") %>
           </h3>
 
-          <p class="sign-in-up-identity tw:mb-4!">
-            <strong><%= @email %></strong>
-          </p>
-
+          <% email_display = tag.p(tag.strong(@email), class: "sign-in-up-identity tw:mb-4!") %>
           <% different_email_link = link_to t(".different_email"), new_session_path(email: @email, partner: sign_in_partner, return_to: params[:return_to]) %>
 
           <% if @login_method == "magic_link" %>
+            <%= email_display %>
             <p><%= t("sessions.new.org_uses_passwordless") %></p>
             <p class="tw:mb-4! tw:text-sm! tw:text-gray-500!">
               <%= t("sessions.new.passwordless_help") %>
@@ -39,10 +37,11 @@
               Separate form (button_to renders its own <form>) so it can't nest in the
               password form; sits above the password input as an alternative sign-in.
             %>
-            <%= button_to t("sessions.new.sign_in_without_password"), create_magic_link_session_path, params: {email: @email, remember_me: @remember_me}, form: {class: "tw:mb-1!"}, class: "twlink tw:bg-transparent! tw:border-0! tw:p-0! tw:font-bold! tw:cursor-pointer!" %>
-            <p class="tw:mb-4! tw:text-sm! tw:text-gray-500!">
+            <%= button_to t("sessions.new.sign_in_without_password"), create_magic_link_session_path, params: {email: @email, remember_me: @remember_me}, form: {class: "tw:mb-0!"}, class: "twlink tw:bg-transparent! tw:border-0! tw:p-0! tw:font-bold! tw:cursor-pointer!" %>
+            <p class="tw:mt-1! tw:mb-8! tw:text-sm! tw:text-gray-500!">
               <%= t("sessions.new.passwordless_help") %>
             </p>
+            <%= email_display %>
             <%= form_for :session, url: session_url(params.permit(:return_to)) do |f| %>
               <% if sign_in_partner %>
                 <%= hidden_field_tag :partner, sign_in_partner %>
