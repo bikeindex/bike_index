@@ -9,38 +9,36 @@
     tw:px-4 tw:py-2 tw:text-center tw:font-semibold tw:text-black
   "
 >
-  <%#
-    "Review app" and "data is ephemeral" are just labels; hide them (and their
-    separators) on small screens so the actionable links fit
-  %>
-  <span class="tw:hidden tw:sm:inline"><%= translation(".label") %></span>
+  <%# Hide the "Review app" label on small screens — the PR title carries the context there; "Staging" has no title, so it stays %>
+  <span class="<%= "tw:hidden tw:sm:inline" if @pr_number %>">
+    <%= banner_label %>
+  </span>
 
   <% if @pr_number %>
     <span class="tw:hidden tw:sm:inline">&middot;</span>
     <a class="tw:underline" href="<%= pr_url %>"><%= pr_link_text %></a>
   <% end %>
 
+  <% if @commit.present? %>
+    <%= render(UI::Tooltip::Component.new(text: "#{translation(".commit_tooltip")} #{@commit}")) do |tooltip| %>
+      <% tooltip.with_body do %>
+        <%= translation(".commit_tooltip") %> <%= link_to @commit, commit_url, class: "twlink tw:text-inherit" %>
+      <% end %>
+
+      <% tooltip.with_tooltip_button(class: pill_button_class) { "?" } %>
+    <% end %>
+  <% end %>
+
   <span class="tw:hidden tw:sm:inline">
     &middot; <%= translation(".disclaimer") %>
   </span>
 
-  <%#
-    Separator before the outbox: keep it on small screens only when a PR link
-    precedes it, otherwise it would orphan at the start
-  %>
-
-  <span class="<%= "tw:hidden tw:sm:inline" unless @pr_number %>">
-    &middot;
-  </span>
+  <span>&middot;</span>
 
   <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:font-normal tw:underline" %>
 
   <%= render(UI::Tooltip::Component.new(text: translation(".letter_opener_tooltip"))) do |tooltip| %>
-    <% tooltip.with_tooltip_button(
-      class: "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
-        "tw:bg-[#1e881e] tw:text-white tw:hover:bg-[#166016] tw:text-2xs tw:font-bold tw:cursor-help " \
-        "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
-    ) { "?" } %>
+    <% tooltip.with_tooltip_button(class: pill_button_class) { "?" } %>
   <% end %>
 
   <% if signed_in_as_superadmin? %>
