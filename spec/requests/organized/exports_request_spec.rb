@@ -61,8 +61,8 @@ RSpec.describe Organized::ExportsController, type: :request do
       context "with assigned bike stickers" do
         let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
         let(:assigned_title) { "Assigned stickers" }
-        let(:unassigned_title) { "Stickers assigned by this export were unassigned" }
-        let(:restored_title) { "Stickers were restored to their previous bikes" }
+        let(:removed_title) { "Stickers assigned by this export were unassigned" }
+        let(:undone_title) { "Stickers were assigned, then the assignment was undone" }
         before do
           export.update(options: export.options.merge(sticker_options))
           get base_url
@@ -73,24 +73,26 @@ RSpec.describe Organized::ExportsController, type: :request do
           let(:sticker_options) { {} }
           it "badges the assignment" do
             expect(response.body).to include(assigned_title)
-            expect(response.body).to_not include(unassigned_title)
-            expect(response.body).to_not include(restored_title)
+            expect(response.body).to_not include(removed_title)
+            expect(response.body).to_not include(undone_title)
           end
         end
 
         context "removed" do
           let(:sticker_options) { {bike_codes_removed: true} }
-          it "badges stickers unassigned" do
-            expect(response.body).to include(unassigned_title)
-            expect(response.body).to_not include(assigned_title)
+          it "badges stickers removed" do
+            expect(response.body).to match(/>\s*stickers removed\s*</)
+            expect(response.body).to include(removed_title)
+            expect(response.body).to_not include(undone_title)
           end
         end
 
         context "undone" do
           let(:sticker_options) { {bike_codes_undone: true} }
-          it "badges stickers restored" do
-            expect(response.body).to include(restored_title)
-            expect(response.body).to_not include(unassigned_title)
+          it "badges stickers unassigned" do
+            expect(response.body).to match(/>\s*stickers unassigned\s*</)
+            expect(response.body).to include(undone_title)
+            expect(response.body).to_not include(removed_title)
           end
         end
       end
@@ -121,18 +123,34 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(response.body).to match(/Show previously assigned stickers/)
             expect(response.body).to match(/data-controller="disclosure"/)
             expect(response.body).to match(/data-disclosure-target="content"/)
+            # Only the second phrase is red
+            expect(response.body).to match(%r{Stickers initially assigned, but\s*<span class="text-danger">\s*have now been restored})
             # The restored message comes before the collapsed sticker list
-            expect(response.body.index("Stickers have been restored"))
+            expect(response.body.index("Stickers initially assigned"))
+              .to be < response.body.index("Show previously assigned stickers")
+          end
+        end
+        context "already removed (legacy unassign)" do
+          it "does not offer undo, and collapses the assigned stickers behind a toggle" do
+            export.update(options: export.options.merge(bike_codes_assigned: ["a1111"], bike_codes_removed: true))
+            get "#{base_url}/#{export.id}"
+            expect(response.code).to eq("200")
+            expect(response.body).to_not match(/undo_bike_stickers/)
+            expect(response.body).to match(/Show previously assigned stickers/)
+            expect(response.body).to match(/legacy version of/)
+            # The legacy message comes before the collapsed sticker list
+            expect(response.body.index("Stickers have been unassigned"))
               .to be < response.body.index("Show previously assigned stickers")
           end
         end
         context "with stickers that could not be undone" do
-          it "lists them" do
+          it "links them" do
             export.update(options: export.options.merge(bike_codes_assigned: %w[a1111 a1112],
               bike_codes_undone: true, bike_codes_not_undone: ["a1112"]))
             get "#{base_url}/#{export.id}"
             expect(response.code).to eq("200")
             expect(response.body).to match(/were not\s+undone/)
+            expect(response.body).to match(%r{<a [^>]*href="[^"]*/stickers/a1112/edit"[^>]*>\s*a1112\s*</a>})
           end
         end
       end

@@ -4692,13 +4692,13 @@ it:
         progress: Progresso
         stickers_assigned: Adesivi assegnati?
         stickers: adesivi
-        stickers_restored: adesivi ripristinati
-        stickers_restored_title: Gli adesivi sono stati ripristinati sulle loro biciclette
-          precedenti.
         stickers_title: Adesivi come da indicazioni
         stickers_unassigned: adesivi non assegnati
-        stickers_unassigned_title: Gli adesivi assegnati da questa esportazione sono
+        stickers_removed: adesivi rimossi
+        stickers_removed_title: Gli adesivi assegnati da questa esportazione sono
           stati rimossi
+        stickers_undone_title: Sono stati assegnati degli adesivi, poi l'assegnazione
+          è stata annullata.
       show:
         avery_export: Avery Export
         bikes_exported: Biciclette esportate
@@ -4734,6 +4734,7 @@ it:
         undo_sticker_assignment_confirm: Sei sicuro di voler annullare l'assegnazione
           degli adesivi? Questa operazione rimuoverà la cronologia relativa all'assegnazione
           di questi adesivi. Tale operazione non può essere annullata.
+        stickers_initially_assigned: Adesivi inizialmente assegnati, ma
     manage_impoundings:
       edit:
         impound_settings_html: Gestisci le impostazioni di sequestro <em>%{org_name}</em>
