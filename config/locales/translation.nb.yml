@@ -4463,13 +4463,13 @@ nb:
         progress: Framgang
         stickers_assigned: Tildelt klistremerker?
         stickers: klistremerker
-        stickers_restored: klistremerker restaurert
-        stickers_restored_title: Klistremerkene ble restaurert til de tidligere syklene
-          deres
         stickers_title: Tildelte klistremerker
         stickers_unassigned: klistremerker ikke tilordnet
-        stickers_unassigned_title: Klistremerker som ble tilordnet av denne eksporten,
+        stickers_removed: klistremerker fjernet
+        stickers_removed_title: Klistremerker som ble tilordnet av denne eksporten,
           ble ikke lenger tilordnet
+        stickers_undone_title: Klistremerker ble tildelt, deretter ble tildelingen
+          angret
       show:
         avery_export: Avery Export
         bikes_exported: Sykler eksportert
@@ -4505,6 +4505,7 @@ nb:
         undo_sticker_assignment_confirm: Er du sikker på at du vil angre tildelingen
           av klistremerket? Dette vil fjerne historikken over tildelingen av disse
           klistremerkene. Dette kan ikke angres.
+        stickers_initially_assigned: Klistremerker opprinnelig tildelt, men
     manage_impoundings:
       edit:
         impound_settings_html: Administrer <em>%{org_name}</em> lagringsinnstillinger
