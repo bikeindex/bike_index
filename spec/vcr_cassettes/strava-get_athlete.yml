@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://www.api-v3.strava.com/athlete
+    uri: https://www.strava.com/api/v3/athlete
     body:
       encoding: US-ASCII
       string: ''
@@ -75,7 +75,7 @@ http_interactions:
   recorded_at: Sun, 08 Feb 2026 22:46:40 GMT
 - request:
     method: get
-    uri: https://www.api-v3.strava.com/athlete/2430215
+    uri: https://www.strava.com/api/v3/athlete/2430215
     body:
       encoding: US-ASCII
       string: ''

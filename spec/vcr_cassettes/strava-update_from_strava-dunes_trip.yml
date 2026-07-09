@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://www.api-v3.strava.com/activities/630203151
+    uri: https://www.strava.com/api/v3/activities/630203151
     body:
       encoding: US-ASCII
       string: ''
