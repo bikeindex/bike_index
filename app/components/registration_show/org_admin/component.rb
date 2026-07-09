@@ -119,8 +119,8 @@ module RegistrationShow
 
       def color_swatches
         frame_color_records.map do |color|
-          swatch = content_tag(:span, "", class: "tw:mr-1 tw:inline-block tw:h-3 tw:w-3 tw:rounded-xs tw:border tw:border-gray-300 tw:align-middle", style: color.swatch_style)
-          content_tag(:span, safe_join([swatch, color.name]), class: "tw:whitespace-nowrap")
+          swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm))
+          content_tag(:span, safe_join([swatch, " ", color.name]), class: "tw:whitespace-nowrap")
         end
       end
 
