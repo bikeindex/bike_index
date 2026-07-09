@@ -86,5 +86,13 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
         expect(component).to have_css("form[onsubmit=\"return confirm('Are you sure?')\"]")
       end
     end
+
+    context "with params" do
+      let(:options) { {text: "Assign", href: "/thing", method: :post, params: {membership_id: 42}} }
+
+      it "renders params as hidden fields" do
+        expect(component).to have_css("input[type='hidden'][name='membership_id'][value='42']", visible: :hidden)
+      end
+    end
   end
 end
