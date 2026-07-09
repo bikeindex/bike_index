@@ -30,7 +30,12 @@ RSpec.describe "Bike search", :js, type: :system do
 
   def click_first_bike_and_go_back
     first(".bike-box-item .title-link a").click
-    expect(page).to have_css("h1.bike-title", wait: 10)
+    # Assert the navigation separately from the render: this flakes on CI, and the
+    # two failures have different causes. No current_path means the click was lost
+    # (the frame re-rendered and detached the link); current_path without the h1
+    # means the bike page itself was slow to render under load.
+    expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
+    expect(page).to have_css("h1.bike-title", wait: 15)
     page.go_back
     expect(page).to have_css(".bike-box-item", wait: 10)
   end

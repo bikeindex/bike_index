@@ -3955,13 +3955,13 @@ nl:
         progress: Vooruitgang
         stickers_assigned: Stickers toegewezen?
         stickers: stickers
-        stickers_restored: stickers hersteld
-        stickers_restored_title: De stickers werden teruggeplaatst op hun oorspronkelijke
-          fietsen.
         stickers_title: Toegewezen stickers
         stickers_unassigned: stickers niet toegewezen
-        stickers_unassigned_title: De stickers die bij deze export hoorden, waren
-          niet toegewezen.
+        stickers_removed: stickers verwijderd
+        stickers_removed_title: De stickers die bij deze export hoorden, waren niet
+          toegewezen.
+        stickers_undone_title: Er werden stickers uitgedeeld, maar die toewijzing
+          werd vervolgens weer ongedaan gemaakt.
       show:
         avery_export: Avery Export
         bikes_exported: Fietsen geëxporteerd
@@ -3997,6 +3997,7 @@ nl:
         undo_sticker_assignment_confirm: Weet je zeker dat je de stickertoewijzing
           ongedaan wilt maken? Hiermee wordt de geschiedenis van de stickertoewijzing
           verwijderd. Dit kan niet ongedaan worden gemaakt.
+        stickers_initially_assigned: De stickers werden aanvankelijk toegewezen, maar
     stickers:
       edit:
         bike: Fiets
