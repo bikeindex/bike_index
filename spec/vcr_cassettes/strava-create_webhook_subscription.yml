@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: https://www.strava.com/api/v3/push_subscriptions
+    uri: https://www.api-v3.strava.com/push_subscriptions
     body:
       encoding: UTF-8
       string: client_id=<STRAVA_KEY>&client_secret=<STRAVA_SECRET>&callback_url=http%3A%2F%2Flocalhost%3A3042%2Fwebhooks%2Fstrava&verify_token=<STRAVA_WEBHOOK_VERIFY_TOKEN>
