@@ -31,6 +31,29 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
     end
   end
 
+  it "always applies the prefixed active classes (inert until pressed/toggled)" do
+    tokens = component.css("a").first["class"].split
+    expect(tokens).to include("tw:aria-pressed:ring-2", "tw:active:ring-2")
+    expect(tokens).not_to include("tw:ring-2", "tw:bg-gray-200")
+  end
+
+  context "active: true" do
+    let(:options) { {text: "Active", href: "/test", active: true} }
+
+    it "applies the bare active classes statically" do
+      tokens = component.css("a").first["class"].split
+      expect(tokens).to include("tw:ring-2", "tw:bg-gray-200")
+    end
+  end
+
+  context "with aria-controls" do
+    let(:options) { {text: "Toggle", href: "/test", aria: {controls: "panel"}} }
+
+    it "renders aria-controls" do
+      expect(component.to_html).to include('aria-controls="panel"')
+    end
+  end
+
   context "with extra html options" do
     let(:options) { {text: "Turbo", href: "/test", data: {turbo: false}} }
 
