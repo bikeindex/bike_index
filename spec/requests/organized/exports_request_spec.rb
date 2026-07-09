@@ -113,11 +113,17 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(response.body).to match(/This will remove the history of having assigned these stickers/)
         end
         context "already undone" do
-          it "does not offer undo" do
+          it "does not offer undo, and collapses the assigned stickers behind a toggle" do
             export.update(options: export.options.merge(bike_codes_assigned: ["a1111"], bike_codes_undone: true))
             get "#{base_url}/#{export.id}"
             expect(response.code).to eq("200")
             expect(response.body).to_not match(/undo_bike_stickers/)
+            expect(response.body).to match(/Show previously assigned stickers/)
+            expect(response.body).to match(/data-controller="disclosure"/)
+            expect(response.body).to match(/data-disclosure-target="content"/)
+            # The restored message comes before the collapsed sticker list
+            expect(response.body.index("Stickers have been restored"))
+              .to be < response.body.index("Show previously assigned stickers")
           end
         end
         context "with stickers that could not be undone" do
@@ -488,7 +494,7 @@ RSpec.describe Organized::ExportsController, type: :request do
       it "restores the bike the sticker was on before the export" do
         Sidekiq::Testing.inline! { put "#{base_url}/#{export.to_param}?undo_bike_stickers=1" }
 
-        expect(flash[:success]).to be_present
+        expect(flash[:success]).to match(/restoring to their previous bikes/)
         expect(export.reload.bike_codes_undone?).to be_truthy
         expect(export.bike_stickers_not_undone).to eq([])
         expect(bike_sticker.reload.bike).to eq previous_bike
