@@ -28,23 +28,9 @@ RSpec.describe "Bike search", :js, type: :system do
     FrontGearType.fixed
   end
 
-  # reloadRestoredFrame re-sets the frame's src every 100ms for up to ~2s after a
-  # back/forward while the frame is still empty, so a queued fetch can land after
-  # the results already look settled and replace every .bike-box-item. A click
-  # that resolves a link just before that render hits a detached node and the
-  # navigation is silently lost. Retry the click while we're still on the results
-  # page - a bike page that loads without an h1 is a real failure, not a lost click.
-  def click_first_bike_and_go_back(attempts: 3)
-    attempt = 0
-    begin
-      attempt += 1
-      first(".bike-box-item .title-link a").click
-      expect(page).to have_css("h1.bike-title", wait: 10)
-    rescue RSpec::Expectations::ExpectationNotMetError, Capybara::ElementNotFound
-      raise if attempt >= attempts || page.has_no_css?(".bike-box-item", wait: 5)
-
-      retry
-    end
+  def click_first_bike_and_go_back
+    first(".bike-box-item .title-link a").click
+    expect(page).to have_css("h1.bike-title", wait: 10)
     page.go_back
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
