@@ -4472,9 +4472,10 @@ en:
         progress: Progress
         stickers: stickers
         stickers_assigned: Stickers assigned?
+        stickers_removed: stickers removed
+        stickers_removed_title: Stickers assigned by this export were unassigned
         stickers_title: Assigned stickers
         stickers_unassigned: stickers unassigned
-        stickers_unassigned_title: Stickers assigned by this export were unassigned
         stickers_undone_title: Stickers were assigned, then the assignment was undone
       show:
         avery_export: Avery Export
@@ -4501,7 +4502,8 @@ en:
         stickers: Stickers
         stickers_exported: "%{bike_stickers_count} Stickers exported"
         stickers_have_been_restored: have now been restored to their previous bikes
-        stickers_have_been_unassigned: Stickers have been unassigned
+        stickers_have_been_unassigned: >-
+          Stickers have been unassigned (legacy version of 'Undo sticker assignment')
         stickers_initially_assigned: Stickers initially assigned, but
         stickers_not_undone: 'These stickers were assigned again after this export,
           so they were not undone:'

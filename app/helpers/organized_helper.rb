@@ -52,8 +52,8 @@ module OrganizedHelper
       {text: t("organized.exports.index.stickers_unassigned"),
        title: t("organized.exports.index.stickers_undone_title"), color: :warning}
     elsif export.bike_codes_removed?
-      {text: t("organized.exports.index.stickers_unassigned"),
-       title: t("organized.exports.index.stickers_unassigned_title"), color: :orange}
+      {text: t("organized.exports.index.stickers_removed"),
+       title: t("organized.exports.index.stickers_removed_title"), color: :orange}
     else
       {text: t("organized.exports.index.stickers"),
        title: t("organized.exports.index.stickers_title"), color: :cyan}

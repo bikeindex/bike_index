@@ -61,7 +61,7 @@ RSpec.describe Organized::ExportsController, type: :request do
       context "with assigned bike stickers" do
         let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
         let(:assigned_title) { "Assigned stickers" }
-        let(:unassigned_title) { "Stickers assigned by this export were unassigned" }
+        let(:removed_title) { "Stickers assigned by this export were unassigned" }
         let(:undone_title) { "Stickers were assigned, then the assignment was undone" }
         before do
           export.update(options: export.options.merge(sticker_options))
@@ -73,27 +73,26 @@ RSpec.describe Organized::ExportsController, type: :request do
           let(:sticker_options) { {} }
           it "badges the assignment" do
             expect(response.body).to include(assigned_title)
-            expect(response.body).to_not include(unassigned_title)
+            expect(response.body).to_not include(removed_title)
             expect(response.body).to_not include(undone_title)
           end
         end
 
         context "removed" do
           let(:sticker_options) { {bike_codes_removed: true} }
-          it "badges stickers unassigned" do
-            expect(response.body).to include(unassigned_title)
-            expect(response.body).to_not include(assigned_title)
+          it "badges stickers removed" do
+            expect(response.body).to match(/>\s*stickers removed\s*</)
+            expect(response.body).to include(removed_title)
             expect(response.body).to_not include(undone_title)
           end
         end
 
         context "undone" do
           let(:sticker_options) { {bike_codes_undone: true} }
-          # Same "stickers unassigned" text as a removal, distinguished by its tooltip
-          it "badges the undone assignment" do
+          it "badges stickers unassigned" do
+            expect(response.body).to match(/>\s*stickers unassigned\s*</)
             expect(response.body).to include(undone_title)
-            expect(response.body).to_not include(unassigned_title)
-            expect(response.body).to_not include(assigned_title)
+            expect(response.body).to_not include(removed_title)
           end
         end
       end

@@ -225,19 +225,6 @@ class Export < ApplicationRecord
       bike_codes_not_undone: undo_bike_stickers)
   end
 
-  # Deletes this export's sticker updates, restoring each sticker to its pre-export state.
-  # Returns the codes it skipped - a sticker claimed again since can't be reverted without
-  # erasing that later claim
-  def undo_bike_stickers
-    revertable, skipped = bike_sticker_updates.partition { |update| update.following_updates.none? }
-    revertable.each { |update| RevertBikeStickerUpdateJob.perform_async(update.id) }
-    skipped.map { |update| update.bike_sticker&.code }.compact
-  end
-
-  def bike_sticker_updates
-    BikeStickerUpdate.where(export_id: id).successful.includes(:bike_sticker).reorder(:id)
-  end
-
   def remove_bike_stickers(passed_user = nil)
     bike_stickers_assigned.each do |code|
       BikeSticker.lookup(code, organization_id:)
@@ -376,6 +363,19 @@ class Export < ApplicationRecord
   end
 
   private
+
+  # Deletes this export's sticker updates, restoring each sticker to its pre-export state.
+  # Returns the codes it skipped - a sticker claimed again since can't be reverted without
+  # erasing that later claim
+  def undo_bike_stickers
+    revertable, skipped = bike_sticker_updates.partition { |update| update.following_updates.none? }
+    revertable.each { |update| RevertBikeStickerUpdateJob.perform_async(update.id) }
+    skipped.map { |update| update.bike_sticker&.code }.compact
+  end
+
+  def bike_sticker_updates
+    BikeStickerUpdate.where(export_id: id).successful.includes(:bike_sticker).reorder(:id)
+  end
 
   def validated_options(opts)
     opts = self.class.default_options(kind).merge(opts)
