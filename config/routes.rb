@@ -61,6 +61,7 @@ Rails.application.routes.draw do
       get :magic_link
       post :sign_in_with_magic_link
       post :create_magic_link
+      match :identify, via: %i[get post]
     end
   end
   get "logout", to: "sessions#destroy"
