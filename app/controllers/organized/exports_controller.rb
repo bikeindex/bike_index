@@ -45,11 +45,8 @@ module Organized
 
     def update
       if params[:undo_bike_stickers] && @export.assign_bike_codes?
-        @export.undo_bike_stickers_and_record!(current_user)
+        @export.undo_bike_stickers_and_record!
         flash[:success] = translation(:bike_stickers_undone)
-      elsif params[:remove_bike_stickers] && @export.assign_bike_codes?
-        @export.remove_bike_stickers_and_record!(current_user)
-        flash[:success] = translation(:bike_stickers_removed)
       else
         flash[:error] = translation(:unknown_update_action)
       end

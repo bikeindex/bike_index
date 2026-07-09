@@ -42,14 +42,6 @@ module UI
       def link_active
         render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
       end
-
-      def link_warning
-        render(UI::Button::Component.new(text: "Link warning style", color: :link_warning))
-      end
-
-      def link_warning_active
-        render(UI::Button::Component.new(text: "Link Warning Active", color: :link_warning, active: true))
-      end
       # @!endgroup
 
       # @!group Sizes

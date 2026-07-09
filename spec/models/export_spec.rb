@@ -217,88 +217,56 @@ RSpec.describe Export, type: :model do
     let(:export) { FactoryBot.create(:export_organization) }
     let(:organization) { export.organization }
     let(:user) { FactoryBot.create(:user) }
-    let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "A11") }
+    let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:, code: "A11") }
     let(:exported_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
-    let(:previous_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let(:later_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
     before do
       export.update(options: export.options.merge(assign_bike_codes: true, bike_codes_assigned: ["A11"]))
     end
 
     def export_claim(bike)
-      bike_sticker.claim(user: user, bike: bike, organization: organization,
-        export_id: export.id, creator_kind: "creator_export")
+      bike_sticker.claim(user:, bike:, organization:, export_id: export.id, creator_kind: "creator_export")
     end
 
-    context "sticker was unclaimed before the export" do
-      it "unclaims the sticker" do
+    it "enqueues a revert for the export's sticker update" do
+      export_claim(exported_bike)
+      bike_sticker_update = bike_sticker.bike_sticker_updates.last
+      expect {
+        export.undo_bike_stickers_and_record!
+      }.to change(RevertBikeStickerUpdateJob.jobs, :count).by 1
+      expect(RevertBikeStickerUpdateJob.jobs.last["args"]).to eq([bike_sticker_update.id])
+      expect(export.reload.bike_codes_undone?).to be_truthy
+      expect(export.bike_stickers_not_undone).to eq([])
+    end
+
+    it "reverts the sticker when the job runs" do
+      export_claim(exported_bike)
+      expect(bike_sticker.reload.bike).to eq exported_bike
+      Sidekiq::Testing.inline! { export.undo_bike_stickers_and_record! }
+      expect(bike_sticker.reload.bike).to be_nil
+      expect(bike_sticker.bike_sticker_updates.count).to eq 0
+    end
+
+    context "sticker was claimed again after the export" do
+      it "skips it and records the code" do
         export_claim(exported_bike)
-        expect(bike_sticker.reload.bike).to eq exported_bike
-        export.undo_bike_stickers_and_record!(user)
-        expect(bike_sticker.reload.claimed?).to be_falsey
-        expect(bike_sticker.bike).to be_nil
-        expect(bike_sticker.bike_sticker_updates.last.kind).to eq "un_claim"
+        bike_sticker.claim(user:, bike: later_bike, organization:)
+        expect {
+          export.undo_bike_stickers_and_record!
+        }.to_not change(RevertBikeStickerUpdateJob.jobs, :count)
         expect(export.reload.bike_codes_undone?).to be_truthy
-        expect(export.bike_codes_removed?).to be_falsey
-        expect(export.bike_codes_reverted?).to be_truthy
-      end
-    end
-
-    context "sticker was claimed to a different bike before the export" do
-      it "restores the previous bike" do
-        bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
-        export_claim(exported_bike)
-        expect(bike_sticker.reload.bike).to eq exported_bike
-        export.undo_bike_stickers_and_record!(user)
-        expect(bike_sticker.reload.claimed?).to be_truthy
-        expect(bike_sticker.bike).to eq previous_bike
-        expect(bike_sticker.bike_sticker_updates.last.kind).to eq "re_claim"
-      end
-    end
-
-    context "previous bike has since been deleted" do
-      it "restores the deleted bike" do
-        bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
-        export_claim(exported_bike)
-        previous_bike.destroy
-        export.undo_bike_stickers_and_record!(user)
-        expect(bike_sticker.reload.bike_id).to eq previous_bike.id
+        expect(export.bike_stickers_not_undone).to eq(["A11"])
+        expect(bike_sticker.reload.bike).to eq later_bike
       end
     end
 
     context "already undone" do
       it "does not re-run" do
         export_claim(exported_bike)
-        export.undo_bike_stickers_and_record!(user)
+        export.undo_bike_stickers_and_record!
         expect {
-          export.undo_bike_stickers_and_record!(user)
-        }.to_not change(BikeStickerUpdate, :count)
-      end
-    end
-
-    context "already removed" do
-      it "restores the previous bike after a removal" do
-        bike_sticker.claim(user: user, bike: previous_bike, organization: organization)
-        export_claim(exported_bike)
-        export.remove_bike_stickers_and_record!(user)
-        expect(export.reload.bike_codes_removed?).to be_truthy
-        expect(bike_sticker.reload.bike).to be_nil
-
-        export.undo_bike_stickers_and_record!(user)
-        expect(bike_sticker.reload.bike).to eq previous_bike
-        expect(export.reload.bike_codes_undone?).to be_truthy
-        expect(export.bike_codes_removed?).to be_truthy
-      end
-
-      context "sticker was unclaimed before the export" do
-        it "leaves the sticker unclaimed without recording a redundant update" do
-          export_claim(exported_bike)
-          export.remove_bike_stickers_and_record!(user)
-          expect {
-            export.undo_bike_stickers_and_record!(user)
-          }.to_not change(BikeStickerUpdate, :count)
-          expect(bike_sticker.reload.bike).to be_nil
-          expect(export.reload.bike_codes_undone?).to be_truthy
-        end
+          export.undo_bike_stickers_and_record!
+        }.to_not change(RevertBikeStickerUpdateJob.jobs, :count)
       end
     end
   end

@@ -18,19 +18,14 @@ module UI
         primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:hover:bg-blue-700 tw:active:bg-blue-800 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:hover:bg-blue-600 tw:dark:active:bg-blue-700",
         secondary: "tw:text-gray-700 tw:bg-gray-50 tw:border tw:border-gray-300 tw:hover:bg-gray-200 tw:hover:border-gray-400 tw:active:bg-gray-300 tw:focus:ring-blue-500/40 tw:dark:text-gray-200 tw:dark:bg-gray-700 tw:dark:border-gray-500 tw:dark:hover:bg-gray-800 tw:dark:hover:border-gray-600 tw:dark:active:bg-gray-900",
         error: "tw:text-white tw:bg-red-600 tw:border tw:border-red-600 tw:hover:bg-red-700 tw:active:bg-red-800 tw:focus:ring-red-500/40 tw:dark:bg-red-500 tw:dark:border-red-500 tw:dark:hover:bg-red-600 tw:dark:active:bg-red-700",
-        link: "tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:underline tw:active:text-blue-800 tw:active:dark:text-blue-300 tw:active:font-bold tw:p-0 tw:focus:outline-none",
-        link_warning: "tw:text-yellow-600 tw:hover:text-yellow-800 tw:dark:text-yellow-400 tw:dark:hover:text-yellow-300 tw:underline tw:active:text-yellow-800 tw:active:dark:text-yellow-300 tw:active:font-bold tw:p-0 tw:focus:outline-none"
+        link: "tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:underline tw:active:text-blue-800 tw:active:dark:text-blue-300 tw:active:font-bold tw:p-0 tw:focus:outline-none"
       }.freeze
-
-      # Rendered as underlined text rather than a filled button - no size or padding
-      LINK_COLORS = %i[link link_warning].freeze
 
       ACTIVE_COLORS = {
         primary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-blue-700 tw:dark:bg-blue-600",
         secondary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-gray-200 tw:border-gray-400 tw:dark:bg-gray-800 tw:dark:border-gray-600",
         error: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-700 tw:dark:bg-red-600",
-        link: "tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold",
-        link_warning: "tw:text-yellow-800 tw:dark:text-yellow-300 tw:font-bold"
+        link: "tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold"
       }.freeze
 
       # Literal strings so Tailwind's scanner generates these aria-pressed:/active: variants.
@@ -38,15 +33,14 @@ module UI
         primary: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-blue-500/40 tw:active:ring-blue-500/40 tw:aria-pressed:bg-blue-700 tw:active:bg-blue-700 tw:aria-pressed:dark:bg-blue-600 tw:active:dark:bg-blue-600",
         secondary: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-blue-500/40 tw:active:ring-blue-500/40 tw:aria-pressed:bg-gray-200 tw:active:bg-gray-200 tw:aria-pressed:border-gray-400 tw:active:border-gray-400 tw:aria-pressed:dark:bg-gray-800 tw:active:dark:bg-gray-800 tw:aria-pressed:dark:border-gray-600 tw:active:dark:border-gray-600",
         error: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-red-500/40 tw:active:ring-red-500/40 tw:aria-pressed:bg-red-700 tw:active:bg-red-700 tw:aria-pressed:dark:bg-red-600 tw:active:dark:bg-red-600",
-        link: "tw:aria-pressed:text-blue-800 tw:active:text-blue-800 tw:aria-pressed:dark:text-blue-300 tw:active:dark:text-blue-300 tw:aria-pressed:font-bold tw:active:font-bold",
-        link_warning: "tw:aria-pressed:text-yellow-800 tw:active:text-yellow-800 tw:aria-pressed:dark:text-yellow-300 tw:active:dark:text-yellow-300 tw:aria-pressed:font-bold tw:active:font-bold"
+        link: "tw:aria-pressed:text-blue-800 tw:active:text-blue-800 tw:aria-pressed:dark:text-blue-300 tw:active:dark:text-blue-300 tw:aria-pressed:font-bold tw:active:font-bold"
       }.freeze
 
       KINDS = %i[button submit]
 
       def self.build_classes(color:, size:, active: false, html_class: nil)
         classes = [BASE_CLASSES, COLORS[color], html_class]
-        unless LINK_COLORS.include?(color)
+        unless color == :link
           classes << SIZES[size]
           classes << "tw:focus:outline-none tw:focus:ring-3 tw:font-medium tw:no-underline"
         end
@@ -65,7 +59,7 @@ module UI
         @aria = aria
 
         @size = SIZES.key?(size) ? size : :md
-        raise ArgumentError, "size is not supported for link color" if LINK_COLORS.include?(@color) && @size != :md
+        raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
       end
 
       def call

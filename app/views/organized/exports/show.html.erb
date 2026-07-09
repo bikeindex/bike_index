@@ -202,32 +202,25 @@
                   <em class="text-danger">
                     <%= t(".stickers_have_been_restored") %>
                   </em>
+                  <% if @export.bike_stickers_not_undone.any? %>
+                    <p class="text-warning mb-0">
+                      <%= t(".stickers_not_undone") %>
+                      <%= @export.bike_stickers_not_undone.join(", ") %>
+                    </p>
+                  <% end %>
                 <% else %>
                   <% if @export.bike_codes_removed? %>
                     <em class="text-danger">
                       <%= t(".stickers_have_been_unassigned") %>
                     </em>
                   <% end %>
-                  <div
-                    class="
-                      tw:flex tw:flex-col tw:items-end tw:gap-2
-                      tw:sm:flex-row tw:sm:items-center tw:sm:justify-end
-                      tw:sm:gap-4
-                    "
-                  >
+                  <div class="tw:flex tw:justify-end">
                     <%= render UI::ButtonLink::Component.new(
                       href: organization_export_path(@export.id, organization_id: current_organization.to_param, undo_bike_stickers: true),
                       text: t(".undo_sticker_assignment"),
-                      color: :link_warning,
-                      method: :put) %>
-
-                    <% unless @export.bike_codes_removed? %>
-                      <%= render UI::ButtonLink::Component.new(
-                        href: organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_stickers: true),
-                        text: t(".unassign_stickers"),
-                        color: :error,
-                        method: :put) %>
-                    <% end %>
+                      color: :error,
+                      method: :put,
+                      form: {onsubmit: "return confirm('#{j t(".undo_sticker_assignment_confirm")}')"}) %>
                   </div>
                 <% end %>
               <% else %>

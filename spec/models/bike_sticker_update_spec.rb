@@ -10,30 +10,25 @@ RSpec.describe BikeStickerUpdate, type: :model do
     end
   end
 
-  describe "bike_before" do
+  describe "following_updates" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:user) { FactoryBot.create(:user) }
-    let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization) }
+    let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:) }
     let(:earlier_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
     let(:later_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 
-    it "is nil for the sticker's first update" do
-      bike_sticker.claim(user: user, bike: later_bike, organization: organization)
-      expect(bike_sticker.bike_sticker_updates.last.bike_before).to be_nil
+    it "is empty for the sticker's only update" do
+      bike_sticker.claim(user:, bike: earlier_bike, organization:)
+      expect(bike_sticker.bike_sticker_updates.last.following_updates.count).to eq 0
     end
 
-    context "sticker was previously claimed" do
-      it "is the bike from the preceding successful update" do
-        bike_sticker.claim(user: user, bike: earlier_bike, organization: organization)
-        bike_sticker.claim(user: user, bike: later_bike, organization: organization)
-        expect(bike_sticker.bike_sticker_updates.reorder(:id).last.bike_before).to eq earlier_bike
-      end
-
-      it "returns the bike even if it has been deleted" do
-        bike_sticker.claim(user: user, bike: earlier_bike, organization: organization)
-        bike_sticker.claim(user: user, bike: later_bike, organization: organization)
-        earlier_bike.destroy
-        expect(bike_sticker.bike_sticker_updates.reorder(:id).last.bike_before&.id).to eq earlier_bike.id
+    context "sticker was claimed again" do
+      it "is the later update" do
+        bike_sticker.claim(user:, bike: earlier_bike, organization:)
+        bike_sticker.claim(user:, bike: later_bike, organization:)
+        first_update, second_update = bike_sticker.bike_sticker_updates.reorder(:id)
+        expect(first_update.following_updates.pluck(:id)).to eq([second_update.id])
+        expect(second_update.following_updates.count).to eq 0
       end
     end
   end

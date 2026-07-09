@@ -175,8 +175,9 @@ class Export < ApplicationRecord
     option?("bike_codes_undone")
   end
 
-  def bike_codes_reverted?
-    bike_codes_removed? || bike_codes_undone?
+  # Codes that were claimed again after this export, so reverting would erase that later claim
+  def bike_stickers_not_undone
+    options["bike_codes_not_undone"] || []
   end
 
   def custom_bike_ids
@@ -217,35 +218,30 @@ class Export < ApplicationRecord
     options["bike_codes_assigned"] || []
   end
 
-  def remove_bike_stickers_and_record!(passed_user = nil)
-    return true unless assign_bike_codes? && !bike_codes_reverted?
-
-    remove_bike_stickers(passed_user)
-    update_attribute :options, options.merge(bike_codes_removed: true)
-  end
-
-  # Can still run after remove_bike_stickers_and_record! - removal's un_claim updates come after the
-  # export's own claim, so they don't obscure the bike each sticker was on beforehand
-  def undo_bike_stickers_and_record!(passed_user = nil)
+  def undo_bike_stickers_and_record!
     return true unless assign_bike_codes? && !bike_codes_undone?
 
-    undo_bike_stickers(passed_user)
-    update_attribute :options, options.merge(bike_codes_undone: true)
+    update_attribute :options, options.merge(bike_codes_undone: true,
+      bike_codes_not_undone: undo_bike_stickers)
   end
 
-  # Restores each sticker to the bike it was on before this export claimed it
-  def undo_bike_stickers(passed_user = nil)
-    each_assigned_bike_sticker do |bike_sticker|
-      bike = bike_before_export(bike_sticker)
-      next if bike_sticker.bike_id == bike&.id
+  # Deletes this export's sticker updates, restoring each sticker to its pre-export state.
+  # Returns the codes it skipped - a sticker claimed again since can't be reverted without
+  # erasing that later claim
+  def undo_bike_stickers
+    revertable, skipped = bike_sticker_updates.partition { |update| update.following_updates.none? }
+    revertable.each { |update| RevertBikeStickerUpdateJob.perform_async(update.id) }
+    skipped.map { |update| update.bike_sticker&.code }.compact
+  end
 
-      bike_sticker.claim(user: passed_user, bike:, organization:, creator_kind: "creator_export")
-    end
+  def bike_sticker_updates
+    BikeStickerUpdate.where(export_id: id).successful.includes(:bike_sticker).reorder(:id)
   end
 
   def remove_bike_stickers(passed_user = nil)
-    each_assigned_bike_sticker do |bike_sticker|
-      bike_sticker.claim(user: passed_user, bike_string: nil, organization:, creator_kind: "creator_export")
+    bike_stickers_assigned.each do |code|
+      BikeSticker.lookup(code, organization_id:)
+        &.claim(user: passed_user, bike_string: nil, organization:, creator_kind: "creator_export")
     end
   end
 
@@ -380,19 +376,6 @@ class Export < ApplicationRecord
   end
 
   private
-
-  def each_assigned_bike_sticker
-    bike_stickers_assigned.each do |code|
-      bike_sticker = BikeSticker.lookup(code, organization_id:)
-      yield bike_sticker if bike_sticker.present?
-    end
-  end
-
-  # nil when the sticker was unclaimed before the export, or this export never claimed it
-  def bike_before_export(bike_sticker)
-    bike_sticker.bike_sticker_updates.successful
-      .where(export_id: id).reorder(:id).first&.bike_before
-  end
 
   def validated_options(opts)
     opts = self.class.default_options(kind).merge(opts)

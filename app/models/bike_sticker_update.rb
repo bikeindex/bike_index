@@ -97,11 +97,9 @@ class BikeStickerUpdate < ApplicationRecord
       .where("created_at < ?", created_at || Time.current)
   end
 
-  # The bike the sticker was on immediately before this update - nil if it was unclaimed.
-  # unscoped because Bike's default_scope hides deleted, user_hidden and example bikes
-  def bike_before
-    previous_bike_id = previous_successful_updates.reorder(:id).last&.bike_id
-    Bike.unscoped.find_by(id: previous_bike_id) if previous_bike_id.present?
+  # Updates to the same sticker after this one - reverting this update would erase them
+  def following_updates
+    BikeStickerUpdate.where(bike_sticker_id:).where("update_number > ?", update_number)
   end
 
   def kind_humanized
