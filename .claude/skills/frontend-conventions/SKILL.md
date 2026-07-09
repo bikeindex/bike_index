@@ -41,8 +41,9 @@ The `bin/dev` command handles building and updating Tailwind and JS.
 
 **Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (`:primary`/`:secondary`/`:error`/`:link`), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
 
-- Plain button or form submit: `render UI::Button::Component.new(text: "Save", color: :primary, kind: :submit)`. For a POST with params, wrap in `form_with`/`form_tag` + `hidden_field_tag` — `button_to` can't render a component, so don't reach for it.
+- Plain button or form submit: `render UI::Button::Component.new(text: "Save", color: :primary, kind: :submit)`.
 - A link styled as a button: `UI::ButtonLink::Component.new(href:, text:, color:, size:)` — same palette, renders an `<a>`.
+- A non-GET action (PUT/PATCH/DELETE, or a POST with params): `UI::ButtonTo::Component.new(href:, text:, color:, method: :put)` — same palette, renders Rails' `button_to` form + `<button>`. Don't hand-roll `form_with` + `UI::Button` around it, and don't call bare `button_to` with your own classes.
 
 The same instinct applies beyond buttons: **check `app/components/ui/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, badges, modals, pagination, tables…). If a `UI::*` component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
 
