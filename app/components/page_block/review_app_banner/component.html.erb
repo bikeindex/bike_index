@@ -47,14 +47,8 @@
     &middot; <%= translation(".disclaimer") %>
   </span>
 
-  <%#
-    Separator before the outbox: keep it on small screens only when a PR link
-    precedes it, otherwise it would orphan at the start
-  %>
-
-  <span class="<%= "tw:hidden tw:sm:inline" unless @pr_number %>">
-    &middot;
-  </span>
+  <%# The label (or PR title) always precedes the outbox, so its separator shows on all screens %>
+  <span>&middot;</span>
 
   <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:font-normal tw:underline" %>
 
