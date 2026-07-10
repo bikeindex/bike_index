@@ -94,10 +94,8 @@ class StravaActivity < ApplicationRecord
       activity.update(attrs)
       activity
     rescue ActiveRecord::RecordNotUnique
-      # A concurrent import inserted the row after find_or_initialize_by missed it; re-find and update
-      activity = strava_integration.strava_activities.find_by!(strava_id: response["id"])
-      activity.update(attrs)
-      activity
+      # A concurrent import won the insert; retry to merge our attributes onto the committed row
+      create_or_update_from_strava_response(strava_integration, response)
     end
 
     def strava_attributes_from(response)
