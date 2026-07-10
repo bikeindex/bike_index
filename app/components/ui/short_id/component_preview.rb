@@ -4,6 +4,7 @@ module UI
   module ShortId
     # @label Short ID
     class ComponentPreview < ApplicationComponentPreview
+      # @!group Variants
       # @param id text "ID to render"
       def default(id: "r/21J-HW")
         render(UI::ShortId::Component.new(short_id: id))
@@ -18,6 +19,7 @@ module UI
       def with_html_class
         render(UI::ShortId::Component.new(short_id: "r/21J-HW", html_class: "tw:text-base"))
       end
+      # @!endgroup
     end
   end
 end

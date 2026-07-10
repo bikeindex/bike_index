@@ -2,6 +2,9 @@
 
 module UI
   module Button
+    # Renders a <button>. For a link styled as a button, or an action button that
+    # submits a request to a URL (button_to), use UI::ButtonLink instead — it reuses
+    # this component's build_classes, so the two stay visually in lockstep.
     class Component < ApplicationComponent
       BASE_CLASSES = "tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-lg tw:cursor-pointer tw:transition-colors"
 

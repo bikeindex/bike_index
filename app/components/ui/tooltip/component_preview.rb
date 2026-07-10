@@ -32,6 +32,22 @@ module UI
           ) { "?" }
         end
       end
+
+      # A link in the popup: click the "?" to keep it open, then click the link
+      def with_interactive_body
+        render(UI::Tooltip::Component.new(text: "current commit: a1b2c3d")) do |tooltip|
+          tooltip.with_body do
+            'current commit: <a href="https://github.com/bikeindex/bike_index/commit/a1b2c3d" class="twlink">a1b2c3d</a>'.html_safe
+          end
+          tooltip.with_tooltip_button(
+            class: "tw:inline-flex tw:items-center tw:justify-center tw:h-5 tw:w-5 tw:rounded-full " \
+              "tw:bg-gray-200 tw:text-gray-700 tw:hover:bg-gray-300 " \
+              "tw:dark:bg-gray-700 tw:dark:text-gray-200 tw:dark:hover:bg-gray-600 " \
+              "tw:text-xs tw:font-bold tw:cursor-help " \
+              "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+          ) { "?" }
+        end
+      end
       # @!endgroup
     end
   end

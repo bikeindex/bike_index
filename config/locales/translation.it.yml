@@ -2039,6 +2039,7 @@ it:
         %{bike_type}, ci interessa davvero!
       this_bike_has_been_returned: Questo %{bike_type} è stato restituito!
       were_so_glad: Siamo così contenti che tu abbia recuperato il tuo %{bike_type}!
+      marking_recovered: Segnalazione del ritrovamento della tua bici…
     report_stolen:
       this_bike_type_is_stolen_or_missing: Questo %{bike_type} è stato rubato o è
         scomparso!
@@ -2337,8 +2338,9 @@ it:
         destroy:
           export_deleted: L'esportazione è stata eliminata con successo!
         update:
-          bike_stickers_removed: Codici per biciclette rimossi!
           unknown_update_action: Azione di aggiornamento sconosciuta!
+          bike_stickers_undone: Ripristino degli adesivi per biciclette sulle biciclette
+            precedenti (o non assegnati). Questa operazione richiederà alcuni minuti.
       manage_impoundings:
         update:
           could_not_update: Ci dispiace, abbiamo riscontrato un problema durante l'aggiornamento
@@ -4689,6 +4691,14 @@ it:
         org_exports_html: "%{org_name} Esportazioni"
         progress: Progresso
         stickers_assigned: Adesivi assegnati?
+        stickers: adesivi
+        stickers_title: Adesivi come da indicazioni
+        stickers_unassigned: adesivi non assegnati
+        stickers_removed: adesivi rimossi
+        stickers_removed_title: Gli adesivi assegnati da questa esportazione sono
+          stati rimossi
+        stickers_undone_title: Sono stati assegnati degli adesivi, poi l'assegnazione
+          è stata annullata.
       show:
         avery_export: Avery Export
         bikes_exported: Biciclette esportate
@@ -4714,8 +4724,17 @@ it:
         stickers_exported: "%{bike_stickers_count} Adesivi esportati"
         stickers_have_been_unassigned: Gli adesivi sono stati rimossi
         unable_to_export: Impossibile esportare, non fai parte della tua organizzazione
-        unassign_stickers: Rimuovi gli adesivi
         view_avery_labels: Visualizza le etichette Avery
+        show_previously_assigned_stickers: Mostra gli adesivi assegnati in precedenza
+        stickers_have_been_restored: Gli adesivi sono stati ripristinati sulle loro
+          biciclette precedenti.
+        stickers_not_undone: 'Questi adesivi sono stati riassegnati dopo questa esportazione,
+          quindi non sono stati rimossi:'
+        undo_sticker_assignment: Annulla l'assegnazione degli adesivi
+        undo_sticker_assignment_confirm: Sei sicuro di voler annullare l'assegnazione
+          degli adesivi? Questa operazione rimuoverà la cronologia relativa all'assegnazione
+          di questi adesivi. Tale operazione non può essere annullata.
+        stickers_initially_assigned: Adesivi inizialmente assegnati, ma
     manage_impoundings:
       edit:
         impound_settings_html: Gestisci le impostazioni di sequestro <em>%{org_name}</em>
@@ -5615,6 +5634,10 @@ it:
         letter_opener_link: Posta in uscita
         letter_opener_tooltip: Visualizza l'email inviata da questa app di recensioni
         pr_link: 'PR #%{number}'
+        commit_tooltip: 'Commit corrente:'
+        label_staging: Allestimento
+        superadmin_button: Accedi come superamministratore
+        superadmin_signed_in: accesso effettuato come superamministratore
       footer:
         about: Di
         ambassadors: Ambasciatori

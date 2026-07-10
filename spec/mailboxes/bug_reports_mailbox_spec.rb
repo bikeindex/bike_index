@@ -21,6 +21,19 @@ RSpec.describe BugReportsMailbox do
     expect(BugReport.last.received_at).to be_present
   end
 
+  it "creates a bug report from an email to contact@" do
+    expect do
+      receive_inbound_email_from_mail(
+        from: user.email,
+        to: "contact@bikeindex.org",
+        subject: "Question",
+        body: "How do I register?"
+      )
+    end.to change(BugReport, :count).by 1
+
+    expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id, subject: "Question")
+  end
+
   context "with attachments" do
     let(:mail) do
       Mail.new do

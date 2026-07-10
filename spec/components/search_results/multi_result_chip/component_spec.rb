@@ -70,7 +70,7 @@ RSpec.describe SearchResults::MultiResultChip::Component, type: :component do
       let(:error_message) { "Server error 500" }
 
       it "wraps the error label in a tooltip showing the message and uses the help cursor" do
-        expect(component).to have_css("button[data-controller~='ui--tooltip'] small", text: "error")
+        expect(component).to have_css("[data-controller~='ui--tooltip'] button small", text: "error")
         expect(component).to have_css("[role=tooltip]", text: "Server error 500", visible: :all)
         expect(component.to_html).to include("tw:cursor-help")
       end

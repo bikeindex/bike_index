@@ -245,6 +245,13 @@ RSpec.describe BikeSticker, type: :model do
     end
   end
 
+  describe "short_id" do
+    it "is the code prefixed with s/" do
+      bike_sticker = FactoryBot.create(:bike_sticker, code: "UC1101")
+      expect(bike_sticker.short_id).to eq "s/UC1101"
+    end
+  end
+
   describe "code_integer code_prefix and pretty_lookup" do
     let(:bike_sticker) { BikeSticker.new(code: "b02012012") }
     before { bike_sticker.set_calculated_attributes }

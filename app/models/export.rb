@@ -171,6 +171,15 @@ class Export < ApplicationRecord
     option?("bike_codes_removed")
   end
 
+  def bike_codes_undone?
+    option?("bike_codes_undone")
+  end
+
+  # Codes that were claimed again after this export, so reverting would erase that later claim
+  def bike_stickers_not_undone
+    options["bike_codes_not_undone"] || []
+  end
+
   def custom_bike_ids
     options["custom_bike_ids"]
   end
@@ -209,17 +218,17 @@ class Export < ApplicationRecord
     options["bike_codes_assigned"] || []
   end
 
-  def remove_bike_stickers_and_record!(passed_user = nil)
-    return true unless assign_bike_codes? && !bike_codes_removed?
+  def undo_bike_stickers_and_record!
+    return true unless assign_bike_codes? && !bike_codes_undone?
 
-    remove_bike_stickers(passed_user)
-    update_attribute :options, options.merge(bike_codes_removed: true)
+    update_attribute :options, options.merge(bike_codes_undone: true,
+      bike_codes_not_undone: undo_bike_stickers)
   end
 
   def remove_bike_stickers(passed_user = nil)
-    (bike_stickers_assigned || []).each do |code|
-      BikeSticker.lookup(code, organization_id: organization_id)
-        &.claim(user: passed_user, bike_string: nil, organization: organization, creator_kind: "creator_export")
+    bike_stickers_assigned.each do |code|
+      BikeSticker.lookup(code, organization_id:)
+        &.claim(user: passed_user, bike_string: nil, organization:, creator_kind: "creator_export")
     end
   end
 
@@ -354,6 +363,19 @@ class Export < ApplicationRecord
   end
 
   private
+
+  # Deletes this export's sticker updates, restoring each sticker to its pre-export state.
+  # Returns the codes it skipped - a sticker claimed again since can't be reverted without
+  # erasing that later claim
+  def undo_bike_stickers
+    revertable, skipped = bike_sticker_updates.partition { |update| update.following_updates.none? }
+    revertable.each { |update| RevertBikeStickerUpdateJob.perform_async(update.id) }
+    skipped.map { |update| update.bike_sticker&.code }.compact
+  end
+
+  def bike_sticker_updates
+    BikeStickerUpdate.where(export_id: id).successful.includes(:bike_sticker).reorder(:id)
+  end
 
   def validated_options(opts)
     opts = self.class.default_options(kind).merge(opts)

@@ -33,7 +33,7 @@
 
       <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
         <% if @bike.status_with_owner? && !@bike.user_hidden %>
-          <%= render(UI::Badge::Component.new(text: translation(".registered_protected"), color: :notice, icon: "registration_show/shield")) %>
+          <%= render(UI::Badge::Component.new(text: translation(".registered_protected"), color: :notice, icon: "kelsey/registration_show/shield")) %>
         <% end %>
 
         <%= render(UI::Badge::Component.new(text: status_label, color: status_color, indicator: true)) %>

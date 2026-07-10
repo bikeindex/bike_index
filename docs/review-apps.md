@@ -4,14 +4,6 @@ Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single 
 
 Review apps run the **staging Rails environment** `RAILS_ENV=staging`, a near-duplicate of production (`config/environments/staging.rb` imports production.rb)
 
-## Staging (persistent `main` deploy)
-
-Alongside the per-PR apps, `main` is continuously deployed to **`staging.review.bikeindex.org`** — think of it as a review app that never gets a PR number and is never destroyed. It shares the same host, the `shared-db`/`shared-redis` accessories, `RAILS_ENV=staging`, and the `review-app` GitHub Environment secrets. It differs only in fixed names: service `bike-index-staging`, Postgres role `bike_index_staging` + databases `bike_index_staging_{primary,analytics}`, and Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
-
-- **Config:** `config/deploy.staging.yml` (no `accessories:` block — the shared infra is owned by `deploy.review.yml`).
-- **Workflow:** `.github/workflows/staging.yml` deploys on `workflow_run` after **CI succeeds on `main`** (so a red main never ships), plus a `workflow_dispatch` for manual redeploys. Its data persists across deploys: first boot seeds, later boots migrate only.
-- **One-time setup:** none beyond the review-app host — the `*.review.bikeindex.org` wildcard already resolves `staging.`, kamal-proxy auto-issues its TLS cert on first deploy, and the shared accessories are already booted. Deploy manually the first time via the workflow's "Run workflow" button (or `kamal deploy --version staging-<sha> --skip-push --config-file config/deploy.staging.yml` locally).
-
 ## How to trigger one
 
 1. Open the [Review App workflow](https://github.com/bikeindex/bike_index/actions/workflows/review-app.yml) in Actions.
@@ -23,16 +15,27 @@ Alongside the per-PR apps, `main` is continuously deployed to **`staging.review.
 `bin/kamal_review` runs **any** kamal command against one review app (so you don't have to export the `REVIEW_APP_*` vars or include `--config-file`). Name the app with `--app` — any of these forms work — and everything else passes through to kamal:
 
 ```bash
-bin/kamal_review app logs -f                          --app 3594
-bin/kamal_review app exec --reuse "bin/rails console" --app pr-3594
-bin/kamal_review app details                          --app pr-3594.review.bikeindex.org
-bin/kamal_review app version                          --app https://pr-3594.review.bikeindex.org
+bin/kamal_review console      --app pr-3594 # Access a rails console
+bin/kamal_review app logs -f  --app 3594
+bin/kamal_review app details  --app pr-3594.review.bikeindex.org
+bin/kamal_review app version  --app https://pr-3594.review.bikeindex.org
 ```
 
-All four resolve to PR `3594`. (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The shared accessories aren't PR-specific, so any PR number works when operating on them — and with no `--app` given it defaults to PR `0`, so reboot Postgres after changing its `shared_preload_libraries` with just:
+All four resolve to PR `3594`; with no `--app` it defaults to the persistent staging app, and `--app staging` names it explicitly ([below](#staging-persistent-main-deploy)). (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The `shared-db`/`shared-redis` accessories live only in the per-PR config, so accessory commands need an explicit `--app 0` (or any PR) — e.g. reboot Postgres after changing its `shared_preload_libraries`:
 
 ```bash
-bin/kamal_review accessory reboot db
+bin/kamal_review accessory reboot db --app 0
+```
+
+## Staging (persistent `main` deploy)
+
+Alongside the per-PR apps, `main` is continuously deployed to **[staging.review.bikeindex.org](https://staging.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It shares `config/deploy.review.yml`: with no `REVIEW_APP_PR_NUMBER` set, the ERB resolves the `staging` slug and omits the `accessories:` block (so a staging deploy can't touch the shared infra the PR apps depend on). It differs only in using Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
+
+For `bin/kamal_review`, with no `--app` given it defaults to staging - but you can also use `--app staging` to target it. This works for passthrough commands only, since staging is deployed by its own workflow, not the `deploy`/`destroy` lifecycle:
+
+```bash
+bin/kamal_review shell        --app staging   # bash on staging
+bin/kamal_review console                      # rails console, also on staging
 ```
 
 ## What about production?
@@ -59,7 +62,7 @@ Only CI's on-push dispatch and `closed` are wired up, so toggling the label by h
 
 ## How a deploy works
 
-Four jobs: `resolve` (PR number + deploy/destroy), `build` (label + build/push image; deploy only), `update` (does the work, branching by step `if:`), `report` (failure-only). `build` is separate so a newer push cancels a stale build (`cancel-in-progress`); `update` handles **both deploy and destroy in one job** (separate jobs would show a skipped check every run) and serializes per PR *without* cancellation, since killing kamal mid-deploy can strand the deploy lock.
+Four jobs: `resolve` (PR number + deploy/destroy, and labels on deploy), `op` (calls the shared `kamal-deploy.yml` reusable workflow to build + run the kamal command), `post` (PR-side follow-ups: deployment link, failure-comment cleanup, label removal + GHCR image cleanup on destroy), `report` (failure-only). The reusable workflow's `build` job cancels superseded builds (`cancel-in-progress`) while its `run` job serializes per PR *without* cancellation, since killing kamal mid-deploy can strand the deploy lock. `kamal-deploy.yml` is shared with `staging.yml`.
 
 | Trigger | Action | What runs |
 |---|---|---|
@@ -69,9 +72,9 @@ Four jobs: `resolve` (PR number + deploy/destroy), `build` (label + build/push i
 
 Unlabeled PR closes are filtered by `resolve`'s job-level `if:`; fork PRs by the same-repo check (`proceed=false`). On **deploy**:
 
-1. `build` builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label). Warm builds are fast: docker layers cache in GHCR's `:buildcache`, and sprockets' cache persists via a BuildKit cache mount + buildkit-cache-dance.
-2. `update` runs `bin/kamal_review deploy --app <pr>` → `kamal deploy --version <tag> --skip-push` (tag from `IMAGE_TAG`). Kamal **pulls** the CI image (no rebuild, which would clone the private `app/services/facebook` submodule) and:
-   - Boots the per-PR `-web`, `-worker`, `-cron` containers.
+1. The reusable `build` job builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label). Warm builds are fast: docker layers cache in GHCR's `:buildcache`, and sprockets' cache persists via a BuildKit cache mount + buildkit-cache-dance.
+2. The `run` job runs `bin/kamal_review deploy --app <pr>` → `kamal deploy --version <tag> --skip-push` (tag from `IMAGE_TAG`). Kamal **pulls** the CI image (no rebuild, which would clone the private `app/services/facebook` submodule) and:
+   - Boots the per-PR `-web`, `-worker`, `-cron` containers, mounting the `/rails/storage` (ActiveStorage) and `/rails/public/uploads` (Carrierwave) volumes.
    - First boot: `bin/docker-entrypoint` creates the Postgres **superuser** role `bike_index_pr_<N>` and runs `db:prepare`, creating `bike_index_review_pr_<N>_primary` + `_analytics` and **seeding** them before Puma starts — slow, hence `deploy_timeout: 240`. Redeploys skip seeding and boot fast.
    - Later boots: `db:prepare` runs migrations only.
 3. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
@@ -99,14 +102,14 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `bin/docker-entrypoint` | Creates the per-PR Postgres **superuser** role + runs `db:prepare` (schema + seed) on first boot |
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
 | `bin/kamal_review` | Run kamal against one review app — `deploy`/`destroy` lifecycle plus arbitrary passthrough commands (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
-| `config/deploy.review.yml` | Kamal config, ERB-templated per PR via `REVIEW_APP_PR_NUMBER` |
-| `config/deploy.staging.yml` | Kamal config for the persistent `staging.review.bikeindex.org` deploy of `main` (fixed names; no accessories) |
-| `.github/workflows/staging.yml` | Deploys `main` to staging after CI passes (`workflow_run`) — see [Staging](#staging-persistent-main-deploy) |
+| `config/deploy.review.yml` | Kamal config for both targets — ERB derives `pr-<N>` (with `REVIEW_APP_PR_NUMBER`) or the `staging` slug (without); accessories emitted for PR apps only |
+| `.github/workflows/staging.yml` | Thin caller of `kamal-deploy.yml` for the `main`→staging deploy, dispatched on every push to `main` — see [Staging](#staging-persistent-main-deploy) |
+| `.github/workflows/kamal-deploy.yml` | Reusable (`workflow_call`) build + kamal-command workflow shared by review-app and staging deploys |
 | `config/crontab` | Scheduled rake tasks run by the `cron` server role |
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
 | `.kamal/hooks/post-deploy` | Best-effort Honeybadger deploy notification (`staging` env); never fails the deploy — no-ops if `HONEYBADGER_API_KEY` is unset or the gem is absent (e.g. CI) |
-| `.github/workflows/review-app.yml` | `resolve` + `build` + `update` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
+| `.github/workflows/review-app.yml` | `resolve` + `op` (calls `kamal-deploy.yml`) + `post` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `.github/workflows/ci.yml` (`dispatch` job) | Auto-dispatches a deploy on every push to a labeled PR — the auto-redeploy half of the label gate |
 | `.kamal/provisioning/` | Ansible playbook for one-time host hardening |
 | `app/components/page_block/review_app_banner/` | ViewComponent shown in the layout when `ENV["REVIEW_APP"]` is set |

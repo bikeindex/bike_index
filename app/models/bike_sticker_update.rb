@@ -97,6 +97,11 @@ class BikeStickerUpdate < ApplicationRecord
       .where("created_at < ?", created_at || Time.current)
   end
 
+  # Updates to the same sticker after this one - reverting this update would erase them
+  def following_updates
+    BikeStickerUpdate.where(bike_sticker_id:).where("update_number > ?", update_number)
+  end
+
   def kind_humanized
     self.class.kind_humanized(kind)
   end

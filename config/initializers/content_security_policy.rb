@@ -63,6 +63,7 @@ Rails.application.configure do
       "https://www.google.com",
       # Google Ads conversion tracking iframes use country-specific Google domains
       "https://www.google.ca",
+      "https://www.google.co.id",
       "https://www.google.co.uk",
       "https://www.google.com.au",
       "https://www.google.com.br",
