@@ -88,7 +88,7 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     RearGearType.fixed # bike-details render creates this lazily, which is read-only mid-request
     visit registration_path(bike)
     within("[data-controller~='registration-show--contact-owner']") do
-      click_on "Write them a message"
+      click_on "Contact the owner"
       fill_in "stolen_notification[message]", with: "Saw this locked up outside the library"
       click_on "Send message"
     end

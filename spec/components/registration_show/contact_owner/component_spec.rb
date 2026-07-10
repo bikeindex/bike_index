@@ -11,7 +11,7 @@ RSpec.describe RegistrationShow::ContactOwner::Component, type: :component do
     it "does not render" do
       render_inline(described_class.new(bike:, current_user:))
 
-      expect(page).not_to have_text("Contact the owner")
+      expect(page).not_to have_text("Know something about this bike")
     end
   end
 
@@ -24,8 +24,8 @@ RSpec.describe RegistrationShow::ContactOwner::Component, type: :component do
       it "renders the card with a sign-in link that returns to this page" do
         render_inline(described_class.new(bike:, current_user:))
 
-        expect(page).to have_text("Contact the owner")
-        expect(page).to have_link("Write them a message",
+        expect(page).to have_text("Know something about this bike")
+        expect(page).to have_link("Contact the owner",
           href: "/session/new?return_to=%2Fregistrations%2F#{bike.id}%3Fcontact_owner%3Dtrue")
         # No in-page message form until the viewer signs in
         expect(page).not_to have_css("textarea[name='stolen_notification[message]']", visible: :all)
@@ -38,9 +38,9 @@ RSpec.describe RegistrationShow::ContactOwner::Component, type: :component do
       it "renders the trigger and a hidden message form" do
         render_inline(described_class.new(bike:, current_user:))
 
-        expect(page).to have_text("Contact the owner")
-        expect(page).to have_css("[data-registration-show--contact-owner-target='trigger']", text: "Write them a message")
-        expect(page).not_to have_link("Write them a message")
+        expect(page).to have_text("Know something about this bike")
+        expect(page).to have_css("[data-registration-show--contact-owner-target='trigger']", text: "Contact the owner")
+        expect(page).not_to have_link("Contact the owner")
         # The form starts collapsed via the tw:hidden class (collapse_utils manages it)
         expect(page).to have_css("[data-registration-show--contact-owner-target='form'].tw\\:hidden")
         # The cached form's CSRF token is refreshed client-side (see cache concerns)
