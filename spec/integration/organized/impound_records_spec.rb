@@ -54,6 +54,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     page.current_window.resize_to(1280, 900)
     visit new_session_path
     fill_in "Email", with: user.email
+    click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     find(".alert-success .close").click

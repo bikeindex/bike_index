@@ -25,6 +25,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     Autocomplete::Loader.load_all(%w[Color])
     visit new_session_path
     fill_in "Email", with: user.email
+    click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     # Dismiss the post-login flash and wait for it to clear, so the next
