@@ -22,21 +22,23 @@ RSpec.describe IpSpoofAttackFilter, type: :request do
       {"HTTP_CLIENT_IP" => client_ip, "HTTP_X_FORWARDED_FOR" => forwarded_for}
     end
 
-    it "returns 403 on a normal route" do
+    it "returns 403 instead of 500, across routes and skipping non-HTML formats" do
+      # A normal route
       get "/", headers: spoofed_headers
-
       expect(response.status).to eq(403)
       expect(response.body).to eq("Forbidden")
-    end
 
-    it "returns 403 on the error page, not 500" do
       # errors#not_found renders the full HTML layout — the exact path that 500'd 1,208 times
       # when a scanner walked unrouted paths (*unmatched_route → errors#not_found) with spoofed
       # headers. /404 exercises the same controller and layout without the prod-only catch-all.
       get "/404", headers: spoofed_headers
-
       expect(response.status).to eq(403)
       expect(response.body).to eq("Forbidden")
+
+      # Non-HTML formats skip the layout that reads remote_ip, so they are never spoof-blocked
+      get "/404.json", headers: spoofed_headers
+      expect(response.status).to eq(404)
+      expect(response.media_type).to eq("application/json")
     end
 
     context "with a matching HTTP_FORWARDED header" do
@@ -51,25 +53,16 @@ RSpec.describe IpSpoofAttackFilter, type: :request do
         expect(response.body).to eq("Forbidden")
       end
     end
-
-    it "does not spoof-block non-HTML formats, which skip the layout that reads remote_ip" do
-      get "/404.json", headers: spoofed_headers
-
-      expect(response.status).to eq(404)
-      expect(response.media_type).to eq("application/json")
-    end
   end
 
   context "when only one of the IP headers is present" do
-    it "does not trip the filter for HTTP_CLIENT_IP alone" do
+    it "does not trip the filter — only the contradiction between the two headers is a spoof" do
+      # Client-IP alone
       get "/404", headers: {"HTTP_CLIENT_IP" => client_ip}
-
       expect(response.status).to eq(404)
-    end
 
-    it "does not trip the filter for HTTP_X_FORWARDED_FOR alone" do
+      # X-Forwarded-For alone
       get "/404", headers: {"HTTP_X_FORWARDED_FOR" => forwarded_for}
-
       expect(response.status).to eq(404)
     end
   end
