@@ -1,5 +1,10 @@
-<div class="tw:mx-auto tw:max-w-md tw:px-4 tw:py-10">
-  <%= render UI::Card::Component.new(shadow: true) do %>
+<div
+  class="
+    tw:-mt-9 tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:min-[992px]:-mt-15
+    tw:dark:bg-gray-900
+  "
+>
+  <div class="tw:mx-auto tw:max-w-md">
     <div class="tw:px-1 tw:py-6 tw:text-center">
       <div
         class="
@@ -46,12 +51,12 @@
       <div class="tw:flex tw:flex-col tw:gap-2.5">
         <% if @bike.present? %>
           <%= render UI::ButtonLink::Component.new(text: t(".view_your_registration"), href: bike_path(@bike),
-            color: :primary, size: :lg, class: "tw:w-full") %>
+            color: :purple, size: :lg, class: "tw:w-full") %>
         <% end %>
 
         <%= render UI::ButtonLink::Component.new(text: t(".register_another"), href: register_path,
           color: :secondary, size: :lg, class: "tw:w-full") %>
       </div>
     </div>
-  <% end %>
+  </div>
 </div>

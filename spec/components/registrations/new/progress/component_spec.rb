@@ -7,6 +7,6 @@ RSpec.describe Registrations::New::Progress::Component, type: :component do
 
   it "renders a segment per step, filling the completed ones" do
     expect(component.css("span").count).to eq 3
-    expect(component.css("span.tw\\:bg-blue-500").count).to eq 2
+    expect(component.to_html.scan("tw:bg-[#715eb2]").count).to eq 2
   end
 end
