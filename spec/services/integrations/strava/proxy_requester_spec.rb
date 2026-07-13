@@ -9,15 +9,17 @@ RSpec.describe Integrations::Strava::ProxyRequester do
   let(:user) { strava_integration.user }
 
   describe ".authorize_user_and_strava_integration" do
-    let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
-    let(:access_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
-    before { stub_const("Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
-
     it "returns user and strava_integration when valid" do
-      result = described_class.authorize_user_and_strava_integration(access_token)
+      result = described_class.authorize_user_and_strava_integration({user:})
       expect(result[:error]).to be_nil
       expect(result[:user]).to eq user
       expect(result[:strava_integration]).to eq strava_integration
+    end
+
+    it "passes through an authorization error" do
+      result = described_class.authorize_user_and_strava_integration({status: 401, error: "OAuth token required"})
+      expect(result[:status]).to eq 401
+      expect(result[:error]).to eq "OAuth token required"
     end
   end
 

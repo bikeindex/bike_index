@@ -12,7 +12,7 @@ module API
     rescue_from ArgumentError, with: :render_bad_request
 
     def create
-      auth_response = Integrations::Strava::ProxyRequester.authorize_user_and_strava_integration(doorkeeper_token)
+      auth_response = Integrations::Strava::ProxyRequester.authorize_user_and_strava_integration(authorize_user(doorkeeper_token))
       if auth_response[:error].present?
         render json: {error: auth_response[:error]}, status: auth_response[:status]
         return
@@ -41,6 +41,10 @@ module API
     end
 
     private
+
+    def authorized_app?(access_token)
+      access_token.application_id == Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID
+    end
 
     def enriched_since_from_url(url)
       return nil unless url&.match?(/enriched_since=/)
