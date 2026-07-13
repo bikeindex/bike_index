@@ -44,6 +44,23 @@ module UI
       end
       # @!endgroup
 
+      # @!group Redesign variants
+      # Filled purple primary
+      def purple
+        render(UI::Button::Component.new(text: "Purple", color: :purple))
+      end
+
+      # White button with a soft danger outline
+      def danger_outline
+        render(UI::Button::Component.new(text: "Mark stolen", color: :danger_outline))
+      end
+
+      # White button with a neutral outline
+      def outline
+        render(UI::Button::Component.new(text: "Share", color: :outline))
+      end
+      # @!endgroup
+
       # @!group Sizes
       def small
         render(UI::Button::Component.new(text: "Small", size: :sm))
