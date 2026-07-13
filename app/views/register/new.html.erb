@@ -1,14 +1,14 @@
 <div class="tw:mx-auto tw:max-w-md tw:px-4 tw:py-10">
   <%= render UI::Card::Component.new(shadow: true) do %>
-    <%= render partial: "progress", locals: {step: 1, total: 2} %>
-    <%= render partial: "heading", locals: {title: t(".register_your_bike"), subtitle: t(".just_the_essentials")} %>
+    <%= render Registrations::New::Progress::Component.new(step: 1, total: 2) %>
+    <%= render Registrations::New::Heading::Component.new(title: t(".register_your_bike"), subtitle: t(".just_the_essentials")) %>
 
     <% if @b_param.errors.any? %>
       <%= render UI::Alert::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
     <% end %>
 
     <%= form_with(url: register_path, method: :post, scope: :b_param) do |f| %>
-      <%= render partial: "section_label", locals: {text: t(".bike_info")} %>
+      <%= render Registrations::New::SectionLabel::Component.new(text: t(".bike_info")) %>
 
       <div
         class="tw:relative tw:mb-4"
@@ -65,7 +65,7 @@
         <%= t(".electric_motorized") %>
       </label>
 
-      <%= render partial: "section_label", locals: {text: t(".your_info"), divider: true} %>
+      <%= render Registrations::New::SectionLabel::Component.new(text: t(".your_info"), divider: true) %>
 
       <div class="tw:mb-6">
         <%= f.label :owner_email, class: "twlabel" do %>

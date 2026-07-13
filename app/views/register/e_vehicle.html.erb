@@ -1,12 +1,12 @@
 <div class="tw:mx-auto tw:max-w-md tw:px-4 tw:py-10">
   <%= render UI::Card::Component.new(shadow: true) do %>
-    <%= render partial: "progress", locals: {step: 3, total: 3} %>
+    <%= render Registrations::New::Progress::Component.new(step: 3, total: 3) %>
 
     <div class="tw:mb-3">
       <%= render UI::Badge::Component.new(text: "⚡️ #{t(".electric_detected")}", color: :warning) %>
     </div>
 
-    <%= render partial: "heading", locals: {title: t(".e_vehicle_attestation"), subtitle: t(".confirm_details_below")} %>
+    <%= render Registrations::New::Heading::Component.new(title: t(".e_vehicle_attestation"), subtitle: t(".confirm_details_below")) %>
 
     <%= form_with(url: register_path, method: :patch) do %>
       <%= hidden_field_tag :b_param_token, @b_param.id_token %>

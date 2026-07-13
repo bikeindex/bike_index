@@ -1,4 +1,4 @@
-<% if local_assigns[:divider] %>
+<% if @divider %>
   <div class="tw:my-6 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700"></div>
 <% end %>
 
@@ -8,5 +8,5 @@
     tw:uppercase
   "
 >
-  <%= text %>
+  <%= @text %>
 </div>
