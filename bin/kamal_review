@@ -20,7 +20,8 @@
 #
 # deploy/destroy require an explicit --app and run the per-PR lifecycle:
 #   deploy  — kamal deploy --version <tag> --skip-push (tag via --version or IMAGE_TAG)
-#   destroy — kamal app remove, drop the per-PR databases + role, flush its redis db
+#   destroy — purge the PR's ActiveStorage objects from the shared R2 bucket, kamal
+#             app remove, drop the per-PR databases + role, flush its redis db
 # deploy is idempotent — same path on first and subsequent deploys;
 # bin/docker-entrypoint creates the per-PR Postgres role on first boot and
 # db:prepare handles schema/seed-or-migrate.
@@ -198,6 +199,16 @@ case "$mode" in
     ;;
 
   destroy)
+    # ActiveStorage attachments land in the shared R2 dev bucket (cloudflare_dev)
+    # at the bucket root with random keys — no per-PR prefix to drop — so delete
+    # them through the running app, whose database lists exactly this PR's blobs
+    # (keys are globally unique, so no other app's objects are touched). Must run
+    # before `app remove` drops the container and its R2 credentials. Best-effort
+    # like the rest of destroy: a broken/already-gone app just leaves the blobs.
+    echo "==> Purging this PR's ActiveStorage objects from R2"
+    kamal app exec --reuse --roles web \
+      "bin/rails runner 'ActiveStorage::Blob.find_each { |blob| blob.service.delete(blob.key) }'" || true
+
     echo "==> Destroying review app $slug"
     kamal app remove || true
 

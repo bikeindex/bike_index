@@ -30,7 +30,7 @@ Then run `bin/lint` to auto-format the code (it also picks up whatever `/simplif
 
 Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix anything that doesn't conform — code-style guidelines (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names, pithy comments), testing conventions, and frontend rules. Only touch lines this branch already changed; don't reformat unrelated code.
 
-Any edits from this step get picked up by the branch-state and push steps below — don't separately commit them here; the normal commit/push in step 3 handles it.
+Commit these edits before continuing — step 1's `git merge` needs a clean working tree, and committing here is what lets the step 0 edits ride along the merge as ordinary branch commits (which step 3 then pushes).
 
 ### 0.5. Determine the base branch
 
