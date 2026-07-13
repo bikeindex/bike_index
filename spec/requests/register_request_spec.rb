@@ -6,7 +6,7 @@ RSpec.describe RegisterController, type: :request do
   let(:color) { FactoryBot.create(:color, name: "Red") }
   let(:owner_email) { "owner@example.com" }
   let(:b_param) do
-    BParam.create(origin: "embed_partial",
+    BParam.create(origin: "registration_flow",
       params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
   end
 
@@ -24,7 +24,7 @@ RSpec.describe RegisterController, type: :request do
     it "creates a partial registration, sends the email and redirects to details" do
       expect { post base_url, params: create_params }.to change(BParam, :count).by 1
       new_b_param = BParam.last
-      expect(new_b_param).to have_attributes(origin: "embed_partial", owner_email:,
+      expect(new_b_param).to have_attributes(origin: "registration_flow", owner_email:,
         manufacturer_id: manufacturer.id, creator_id: nil)
       expect(new_b_param.partial_registration?).to be_truthy
       expect(new_b_param.motorized?).to be_falsey
@@ -79,7 +79,7 @@ RSpec.describe RegisterController, type: :request do
 
   describe "e_vehicle" do
     let(:b_param) do
-      BParam.create(origin: "embed_partial",
+      BParam.create(origin: "registration_flow",
         params: {bike: {owner_email:}, propulsion_type_motorized: true}.as_json)
     end
 
@@ -112,7 +112,7 @@ RSpec.describe RegisterController, type: :request do
 
       context "motorized" do
         let(:b_param) do
-          BParam.create(origin: "embed_partial",
+          BParam.create(origin: "registration_flow",
             params: {bike: {owner_email:, manufacturer_id: "Trek"}, propulsion_type_motorized: "1"}.as_json)
         end
 
@@ -149,6 +149,7 @@ RSpec.describe RegisterController, type: :request do
         expect(bike).to have_attributes(manufacturer_id: manufacturer.id,
           primary_frame_color_id: color.id, serial_number: "XYZ 123",
           owner_email:, creator_id: current_user.id)
+        expect(bike.current_ownership.origin).to eq "registration_flow"
         expect(b_param.reload.created_bike_id).to eq bike.id
         expect(response).to redirect_to register_complete_path(b_param_token: b_param.id_token)
         follow_redirect!
@@ -172,7 +173,7 @@ RSpec.describe RegisterController, type: :request do
 
       context "b_param created by a different user" do
         let(:b_param) do
-          BParam.create(origin: "embed_partial", creator_id: FactoryBot.create(:user_confirmed).id,
+          BParam.create(origin: "registration_flow", creator_id: FactoryBot.create(:user_confirmed).id,
             params: {bike: {owner_email:}}.as_json)
         end
 

@@ -30,6 +30,7 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
+  PARTIAL_REGISTRATION_ORIGINS = %w[embed_partial registration_flow].freeze
   REGISTRATION_INFO_ATTRS = %w[
     accuracy
     bike_code
@@ -86,7 +87,7 @@ class BParam < ApplicationRecord
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
-  scope :partial_registrations, -> { where(origin: "embed_partial") }
+  scope :partial_registrations, -> { where(origin: PARTIAL_REGISTRATION_ORIGINS) }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
@@ -402,7 +403,7 @@ class BParam < ApplicationRecord
   end
 
   def partial_registration?
-    origin == "embed_partial"
+    PARTIAL_REGISTRATION_ORIGINS.include?(origin)
   end
 
   def primary_frame_color

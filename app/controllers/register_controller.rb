@@ -6,7 +6,7 @@ class RegisterController < ApplicationController
   end
 
   def create
-    @b_param = BParam.new(origin: "embed_partial", creator_id: current_user&.id,
+    @b_param = BParam.new(origin: "registration_flow", creator_id: current_user&.id,
       params: create_params.as_json)
     if @b_param.owner_email.blank?
       @b_param.errors.add(:owner_email, translation(:email_required))
