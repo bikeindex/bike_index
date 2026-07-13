@@ -20,17 +20,11 @@ module API
     private
 
     def require_admin_data_superuser!
-      return if oauth_user&.superuser?(controller_name:, action_name:)
+      auth = authorize_user(doorkeeper_token)
+      return render(json: {error: auth[:error]}, status: auth[:status]) if auth[:error]
+      return if auth[:user].superuser?(controller_name:, action_name:)
 
-      error, status = oauth_user ? ["Not permitted", 403] : ["OAuth token required", 401]
-      render json: {error:}, status:
-    end
-
-    def oauth_user
-      return @oauth_user if defined?(@oauth_user)
-
-      token = doorkeeper_token
-      @oauth_user = token&.accessible? ? User.confirmed.find_by(id: token.resource_owner_id) : nil
+      render json: {error: "Not permitted"}, status: 403
     end
   end
 end

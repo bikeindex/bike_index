@@ -11,12 +11,10 @@ module Integrations
       # returns {user:, strava_integration:} if valid
       # otherwise {error: message, status: status_code}
       def authorize_user_and_strava_integration(access_token)
-        return {status: 401, error: "OAuth token required"} unless access_token&.accessible?
-        return {status: 403, error: "Unauthorized application"} unless authorized_app?(access_token)
+        auth = authorize_user(access_token)
+        return auth if auth[:error]
 
-        user = User.find_by(id: access_token.resource_owner_id)
-        return {error: "User not found", status: 401} unless user
-
+        user = auth[:user]
         strava_integration = user.strava_integration
         return {error: "No Strava integration", status: 404} unless strava_integration
         return {error: "Strava authorization failed. Please re-authenticate with Strava.", status: 401} if strava_integration.error?
@@ -92,6 +90,17 @@ module Integrations
       # private below here
       #
 
+      # returns {user:} if valid, otherwise {error: message, status: status_code}
+      def authorize_user(access_token)
+        return {status: 401, error: "OAuth token required"} unless access_token&.accessible?
+        return {status: 403, error: "Unauthorized application"} unless authorized_app?(access_token)
+
+        user = User.find_by(id: access_token.resource_owner_id)
+        return {error: "User not found", status: 401} unless user
+
+        {user:}
+      end
+
       def internal_response?(strava_request)
         strava_request.fetch_athlete? || strava_request.list_activities?
       end
@@ -157,7 +166,7 @@ module Integrations
         body.except(*SENSITIVE_KEYS)
       end
 
-      conceal :internal_response?, :internal_response!,
+      conceal :authorize_user, :internal_response?, :internal_response!,
         :authorized_app?, :proxy_request_type, :validate_url!,
         :serialize_proxy_response, :sanitize_response_body
     end
