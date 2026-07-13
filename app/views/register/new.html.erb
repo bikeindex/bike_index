@@ -1,0 +1,97 @@
+<div class="tw:mx-auto tw:max-w-md tw:px-4 tw:py-10">
+  <%= render UI::Card::Component.new(shadow: true) do %>
+    <%= render partial: "progress", locals: {step: 1, total: 2} %>
+    <%= render partial: "heading", locals: {title: t(".register_your_bike"), subtitle: t(".just_the_essentials")} %>
+
+    <% if @b_param.errors.any? %>
+      <%= render UI::Alert::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
+    <% end %>
+
+    <%= form_with(url: register_path, method: :post, scope: :b_param) do |f| %>
+      <%= render partial: "section_label", locals: {text: t(".bike_info")} %>
+
+      <div
+        class="tw:relative tw:mb-4"
+        data-controller="register--manufacturer-search"
+      >
+        <%= f.label :manufacturer_id, t(".manufacturer"), class: "twlabel" %>
+
+        <%= f.text_field :manufacturer_id,
+          value: @b_param.bike["manufacturer_other"].presence || @b_param.bike["manufacturer_id"],
+          placeholder: t(".manufacturer_placeholder"),
+          autocomplete: "off",
+          class: "twinput tw:mt-1",
+          data: {
+            "register--manufacturer-search-target": "input",
+            action: "input->register--manufacturer-search#search " \
+              "focus->register--manufacturer-search#search " \
+              "blur->register--manufacturer-search#hideSoon " \
+              "keydown.esc->register--manufacturer-search#hide"
+          } %>
+
+        <div
+          class="
+            tw:absolute tw:right-0 tw:left-0 tw:z-20 tw:mt-1 tw:hidden
+            tw:max-h-56 tw:overflow-y-auto tw:rounded-sm tw:border
+            tw:border-gray-200 tw:bg-white tw:shadow-lg
+            tw:dark:border-gray-700 tw:dark:bg-gray-800
+          "
+          data-register--manufacturer-search-target="menu"
+        ></div>
+
+        <p
+          class="
+            tw:mt-1.5 tw:hidden tw:text-xs tw:text-blue-600
+            tw:dark:text-blue-400
+          "
+          data-register--manufacturer-search-target="selfReportedNote"
+        >
+          <%= t(".not_in_our_list") %>
+        </p>
+      </div>
+
+      <div class="tw:mb-4">
+        <%= f.label :frame_model, class: "twlabel" do %>
+          <%= t(".model") %>
+          <%= render UI::Badge::Component.new(text: t(".optional")) %>
+        <% end %>
+
+        <%= f.text_field :frame_model, value: @b_param.bike["frame_model"],
+          placeholder: t(".model_placeholder"), class: "twinput tw:mt-1" %>
+      </div>
+
+      <label class="twlabel tw:mb-4 tw:flex tw:items-center tw:gap-2">
+        <%= check_box_tag :propulsion_type_motorized, true, @b_param.motorized?, class: "tw:h-4 tw:w-4" %>
+        <%= t(".electric_motorized") %>
+      </label>
+
+      <%= render partial: "section_label", locals: {text: t(".your_info"), divider: true} %>
+
+      <div class="tw:mb-6">
+        <%= f.label :owner_email, class: "twlabel" do %>
+          <%= t(".email") %>
+          <span class="tw:text-red-600">*</span>
+        <% end %>
+
+        <%= f.email_field :owner_email, value: @b_param.owner_email, required: true,
+          placeholder: t(".email_placeholder"), class: "twinput tw:mt-1" %>
+
+        <p class="tw:mt-1.5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+          <%= t(".confirmation_link_here") %>
+        </p>
+      </div>
+
+      <%= render UI::Button::Component.new(text: t(".next"), color: :primary, size: :lg,
+        kind: :submit, html_class: "tw:w-full") %>
+
+      <p
+        class="
+          tw:mt-3 tw:text-center tw:text-xs tw:text-gray-500
+          tw:dark:text-gray-400
+        "
+      >
+        <%= t(".no_need_to_wait") %>
+      </p>
+    <% end %>
+  <% end %>
+</div>

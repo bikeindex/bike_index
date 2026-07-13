@@ -160,6 +160,14 @@ class BParam < ApplicationRecord
         .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
     end
 
+    # Resume a registration by token (/register flow): anonymous or created by the passed user
+    def find_for_token(toke, user_id: nil)
+      return nil if toke.blank?
+
+      where(id_token: toke).where("created_at >= ?", Time.current - 1.month)
+        .detect { |b| b.creator_id.blank? || b.creator_id == user_id }
+    end
+
     def email_search(str)
       return all unless str.present?
 

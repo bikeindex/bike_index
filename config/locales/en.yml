@@ -1955,6 +1955,13 @@ en:
         no_permission_to_edit: Sorry! You don't have permission to edit that image.
       update:
         image_updated: Image was successfully updated.
+    register:
+      create:
+        email_required: Email is required to register
+        unable_to_save: We're unable to save that registration, please try again
+      find_b_param:
+        registration_not_found: We couldn't find that registration — start a new one
+          below
     search:
       marketplace:
         set_interpreted_params:
@@ -3903,6 +3910,10 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
+    register_complete: Bike registration
+    register_details: Add your bike's details
+    register_e_vehicle: E-vehicle attestation
+    register_new: Register your bike!
     registrations_embed: Register a bike with %{organization}
     search_registrations_index: Search results
     sessions_create: Log in
@@ -4754,6 +4765,93 @@ en:
       edit: Edit
       image_from: Image from %{image_title}
       looks_like_this_is_your_image: Looks like this is your image.
+  register:
+    complete:
+      check_your_email: Check your email!
+      register_another: Register another bike
+      registration_complete: Registration complete!
+      view_your_registration: View your registration
+      we_sent_a_confirmation_link_html: >-
+        We sent a confirmation link to %{email}. Click it to finish registering your
+        bike and activate your account — everything you've entered is saved.
+      we_will_keep_watch: >-
+        Your %{bike_display} is registered with Bike Index. We'll keep watch — if
+        it's ever reported stolen, the whole community is looking.
+    details:
+      add_your_bikes_details: Add your bike's details
+      additional_contact_info: Additional contact info
+      bike_details: Bike details
+      bottom_bracket: Bottom bracket
+      choose_color: Choose color
+      color: Color
+      complete_registration: Complete Bike Registration
+      confirmation_link_sent: >-
+        We've sent a confirmation link to your email. No need to wait — you can finish
+        registering right now.
+      easier_to_recover: The more you add, the easier your bike is to recover.
+      email: Email
+      enter_size: Enter size
+      found: Found
+      found_description: I found this bike
+      frame_size: Frame size
+      from_step_1: From step 1
+      head_tube: Head tube
+      inches: inches
+      next: Next
+      not_stolen: Not stolen
+      not_stolen_description: Registering to keep it safe
+      optional: optional
+      or: or
+      phone: Phone
+      phone_placeholder: "(555) 000-0000"
+      rear_dropouts: Rear dropouts
+      registration_type: Registration type
+      serial_help_intro: >-
+        Most bicycles have their serial number engraved on the frame. Look for your
+        serial number:
+      serial_location_bottom_bracket: underside of the bottom bracket
+      serial_location_head_tube: on the head tube
+      serial_location_rear_dropouts: on rear dropouts
+      serial_number: Serial number
+      serial_placeholder: Usually stamped under the frame
+      sticker_number: Bike Index sticker number
+      sticker_placeholder: e.g. A 471 829
+      stolen: Stolen
+      stolen_description: This bike has been stolen
+      view_serial_guide: View the full serial number guide
+      wheres_my_serial: Where's my serial number?
+    e_vehicle:
+      complete_registration: Complete Bike Registration
+      confirm_details_below: >-
+        Your bike is registered as a motorized e-bike. Confirm the details below so
+        it's registered correctly. Not an e-vehicle? You can skip this.
+      e_vehicle_attestation: E-vehicle attestation
+      electric_detected: Electric (motorized) detected
+      i_attest: I attest that the information above is accurate.
+      meets_certification: This e-bike meets EN 15194 (or equivalent) certification.
+      motor_under_750w: Motor output is 750W or less.
+      pedal_assist: It's pedal-assist (Class 1–3), not throttle-only.
+      skip_not_an_e_vehicle: Skip — this isn't an e-vehicle
+    new:
+      bike_info: Bike info
+      confirmation_link_here: We'll send your confirmation link here.
+      electric_motorized: "⚡️ Electric (motorized)"
+      email: Email
+      email_placeholder: you@example.com
+      just_the_essentials: >-
+        Just the essentials to start. We'll email you the next steps — but you can
+        keep going right now.
+      manufacturer: Manufacturer
+      manufacturer_placeholder: Start typing e.g. Trek
+      model: Model
+      model_placeholder: e.g. Marlin 7
+      next: Next
+      no_need_to_wait: We'll email a confirmation link too — you don't have to wait
+        for it to continue.
+      not_in_our_list: Not in our list — self-reported for review.
+      optional: optional
+      register_your_bike: Register your bike!
+      your_info: Your info
   registrations:
     create:
       follow_link_in_email: Follow the link in the email to complete your registration.

@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .rb *{box-sizing:border-box;}
+  .rb input::placeholder{color:#b3b3ba;}
+  .rb input:focus{border-color:#715eb2 !important;box-shadow:0 0 0 3px rgba(113,94,178,.14) !important;}
+  .rb a{color:#715eb2;}
+  .rb a:hover{color:#5a4a94;}
+  .rb button{font-family:inherit;}
+</style>
+</helmet>
+
+<div class="rb" style="min-height:100vh; background:#ecedf0; padding:44px 40px 90px; font-family:'Hanken Grotesk',sans-serif; -webkit-font-smoothing:antialiased; color:#333;">
+
+  <!-- ===================== ONE-STEP ===================== -->
+  <sc-if value="{{ isOne }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex; justify-content:center;">
+    <div style="width:390px; flex:none; background:#fafafa; border-radius:30px; overflow:hidden; box-shadow:0 22px 56px rgba(26,26,31,.16); border:1px solid #e2e2e8;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 18px; background:#fff; border-bottom:1px solid #eee;">
+        <div style="display:flex; align-items:center; gap:9px;">
+          <div style="width:24px; height:24px; border-radius:7px; background:#715eb2; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:12px;">B</div>
+          <span style="font-size:14px; font-weight:800; color:#222;">Bike Index</span>
+        </div>
+        <span style="font-size:12px; font-weight:700; color:#715eb2; background:#f3f1fa; padding:5px 11px; border-radius:999px;">Register</span>
+      </div>
+
+      <!-- SUCCESS -->
+      <sc-if value="{{ submittedOne }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:44px 24px 40px; text-align:center;">
+        <div style="width:64px; height:64px; margin:0 auto 18px; border-radius:50%; background:#e8f5ee; display:flex; align-items:center; justify-content:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1f8a5b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+        <h2 style="margin:0 0 8px; font-size:22px; font-weight:800; color:#1a1a1f;">Check your email!</h2>
+        <p style="margin:0 0 22px; font-size:13.5px; line-height:1.55; color:#6b6b73;">We sent a confirmation link to <strong>{{ emailShown }}</strong>. Click it to finish registering your bike and activate your account.</p>
+        <button onClick="{{ resetOne }}" style="width:100%; padding:14px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; color:#715eb2; font-weight:800; font-size:14px; cursor:pointer;">Back to form</button>
+      </div>
+      </sc-if>
+
+      <!-- FORM -->
+      <sc-if value="{{ notSubmittedOne }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:24px 20px 30px;">
+        <h2 style="margin:0 0 6px; font-size:24px; font-weight:800; letter-spacing:-.02em; color:#1a1a1f;">Register your bike!</h2>
+        <p style="margin:0 0 22px; font-size:13.5px; line-height:1.5; color:#6b6b73;">Join the world&rsquo;s largest bike registry. If it&rsquo;s ever stolen, this is what gets it home.</p>
+
+        <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2; margin:0 0 15px;">Bike info</div>
+
+        <!-- manufacturer typeahead -->
+        <div style="margin-bottom:16px; position:relative;">
+          <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Manufacturer</label>
+          <input value="{{ manuf }}" onChange="{{ onManuf }}" onFocus="{{ onManufFocus }}" onBlur="{{ onManufBlur }}" placeholder="Start typing e.g. Trek" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:inherit; color:#333; background:#fff; outline:none;">
+          <sc-if value="{{ showManufMenu }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:20; background:#fff; border:1px solid #e5e5e5; border-radius:12px; box-shadow:0 14px 34px rgba(26,26,31,.14); overflow:hidden; max-height:230px; overflow-y:auto;">
+            <sc-for list="{{ manufMatches }}" as="m" hint-placeholder-count="3">
+              <div onMouseDown="{{ m.onPick }}" style="{{ m.rowStyle }}">{{ m.name }}</div>
+            </sc-for>
+            <sc-if value="{{ showManufAdd }}" hint-placeholder-val="{{ false }}">
+              <div onMouseDown="{{ onManufAdd }}" style="border-top:1px solid #eee; padding:11px 14px; font-size:13px; font-weight:700; color:#715eb2; display:flex; align-items:center; gap:7px; cursor:pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#715eb2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>{{ manufAddLabel }}</div>
+            </sc-if>
+          </div>
+          </sc-if>
+          <sc-if value="{{ manufSelfReported }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:6px; margin-top:7px; font-size:11.5px; color:#8a7fb0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8a7fb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Not in our list &mdash; self-reported for review.</div>
+          </sc-if>
+        </div>
+
+        <!-- color -->
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Color</label>
+          <input value="{{ color }}" onChange="{{ onColor }}" placeholder="e.g. Red" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:inherit; color:#333; background:#fff; outline:none;">
+        </div>
+
+        <!-- frame size -->
+        <div style="margin-bottom:16px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <label style="font-size:12.5px; font-weight:700; color:#333;">Frame size</label>
+            <span style="font-size:11px; font-weight:600; color:#9a9aa2; background:#f0f0f2; padding:1px 7px; border-radius:999px;">optional</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-bottom:8px;">
+            <sc-for list="{{ frameChips }}" as="c" hint-placeholder-count="5">
+              <div onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.label }}</div>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:11.5px; color:#9a9aa2;">or</span>
+            <div style="flex:1; display:flex; align-items:center; border:1px solid #e5e5e5; border-radius:10px; background:#fff; overflow:hidden;">
+              <input value="{{ frameInches }}" onChange="{{ onInches }}" placeholder="Enter size" style="flex:1; min-width:0; padding:11px 12px; border:none; font-size:13.5px; font-family:inherit; color:#333; background:transparent; outline:none;">
+              <span style="padding:0 13px; font-size:12.5px; font-weight:700; color:#9a9aa2; border-left:1px solid #eee; align-self:stretch; display:flex; align-items:center;">inches</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- model dropdown + electric detection -->
+        <div style="margin-bottom:16px; position:relative;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:7px;">
+            <label style="font-size:12.5px; font-weight:700; color:#333;">Model</label>
+            <span style="font-size:11px; font-weight:600; color:#9a9aa2; background:#f0f0f2; padding:1px 7px; border-radius:999px;">optional</span>
+          </div>
+          <div onClick="{{ toggleModel }}" style="display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; cursor:pointer;">
+            <span style="{{ modelSpanStyle }}">{{ modelShown }}</span>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+          <sc-if value="{{ modelOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:20; background:#fff; border:1px solid #e5e5e5; border-radius:12px; box-shadow:0 14px 34px rgba(26,26,31,.14); overflow:hidden; max-height:240px; overflow-y:auto;">
+            <sc-for list="{{ modelList }}" as="md" hint-placeholder-count="4">
+              <div onClick="{{ md.onPick }}" style="{{ md.rowStyle }}"><span>{{ md.name }}</span><span style="{{ md.tagStyle }}">{{ md.tag }}</span></div>
+            </sc-for>
+          </div>
+          </sc-if>
+          <sc-if value="{{ isElectric }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:9px;">
+            <span style="display:inline-flex; align-items:center; gap:5px; padding:5px 11px; background:#fff4e6; border:1px solid #f6d9a8; border-radius:999px; font-size:12px; font-weight:800; color:#b5730f;">&#9889;&#65039; Electric (motorized)</span>
+            <span style="display:inline-flex; align-items:center; gap:5px; padding:5px 11px; background:#e8f5ee; border:1px solid #cfe9db; border-radius:999px; font-size:12px; font-weight:700; color:#1f8a5b;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1f8a5b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ certLabel }}</span>
+          </div>
+          </sc-if>
+        </div>
+
+        <!-- serial + tooltip -->
+        <div style="margin-bottom:16px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:7px;">
+            <label style="font-size:12.5px; font-weight:700; color:#333;">Serial number</label>
+            <span onClick="{{ toggleSerialTip }}" style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; color:#715eb2; cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#715eb2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Where&rsquo;s my serial number?</span>
+          </div>
+          <input value="{{ serial }}" onChange="{{ onSerial }}" placeholder="Usually stamped under the frame" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:'JetBrains Mono',monospace; color:#333; background:#fff; outline:none;">
+          <sc-if value="{{ serialTipOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="position:relative; margin-top:10px; background:#fff; border:1px solid #e5e5e5; border-radius:14px; padding:15px 16px; box-shadow:0 12px 32px rgba(26,26,31,.12);">
+            <div style="position:absolute; top:-7px; right:26px; width:13px; height:13px; background:#fff; border-left:1px solid #e5e5e5; border-top:1px solid #e5e5e5; transform:rotate(45deg);"></div>
+            <div style="font-size:13px; font-weight:800; color:#1a1a1f; margin-bottom:8px;">Where&rsquo;s my serial number?</div>
+            <p style="margin:0 0 9px; font-size:12.5px; line-height:1.55; color:#5b5b63; text-wrap:pretty;">Most bicycles have their serial number engraved on the frame. Look for your serial number:</p>
+            <ul style="margin:0 0 12px; padding-left:18px; font-size:12.5px; line-height:1.65; color:#5b5b63;">
+              <li>underside of the bottom bracket</li>
+              <li>on the head tube</li>
+              <li>on rear dropouts</li>
+            </ul>
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <div style="flex:1;">
+                <div style="aspect-ratio:1/1; border-radius:9px; overflow:hidden; background:#eceef0;"><img src="assets/serial-bottom-bracket.png" alt="Serial number under the bottom bracket" style="width:100%; height:100%; object-fit:cover; display:block;"></div>
+                <div style="font-size:9.5px; font-weight:700; text-align:center; line-height:1.2; color:#7a7a82; margin-top:5px;">Bottom bracket</div>
+              </div>
+              <div style="flex:1;">
+                <div style="aspect-ratio:1/1; border-radius:9px; overflow:hidden; background:#eceef0;"><img src="assets/serial-head-tube.png" alt="Serial number on the head tube" style="width:100%; height:100%; object-fit:cover; display:block;"></div>
+                <div style="font-size:9.5px; font-weight:700; text-align:center; line-height:1.2; color:#7a7a82; margin-top:5px;">Head tube</div>
+              </div>
+              <div style="flex:1;">
+                <div style="aspect-ratio:1/1; border-radius:9px; overflow:hidden; background:#eceef0;"><img src="assets/serial-rear-dropouts.png" alt="Serial number on the rear dropouts" style="width:100%; height:100%; object-fit:cover; display:block;"></div>
+                <div style="font-size:9.5px; font-weight:700; text-align:center; line-height:1.2; color:#7a7a82; margin-top:5px;">Rear dropouts</div>
+              </div>
+            </div>
+            <a href="#" style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:#715eb2; text-decoration:none;">View the full serial number guide<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#715eb2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg></a>
+          </div>
+          </sc-if>
+        </div>
+
+        <!-- sticker -->
+        <div style="margin-bottom:16px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:7px;">
+            <label style="font-size:12.5px; font-weight:700; color:#333;">Bike Index sticker number</label>
+            <span style="font-size:11px; font-weight:600; color:#9a9aa2; background:#f0f0f2; padding:1px 7px; border-radius:999px;">optional</span>
+          </div>
+          <input value="{{ sticker }}" onChange="{{ onSticker }}" placeholder="e.g. A 471 829" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:'JetBrains Mono',monospace; color:#333; background:#fff; outline:none;">
+        </div>
+
+        <!-- org -->
+        <sc-if value="{{ isGeneral }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-bottom:16px; position:relative;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:7px;">
+            <label style="font-size:12.5px; font-weight:700; color:#333;">Register with an organization</label>
+            <span style="font-size:11px; font-weight:600; color:#9a9aa2; background:#f0f0f2; padding:1px 7px; border-radius:999px;">optional</span>
+          </div>
+          <div onClick="{{ toggleOrg }}" style="display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; cursor:pointer;">
+            <span style="{{ orgSpanStyle }}">{{ orgShown }}</span>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+          <sc-if value="{{ orgOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:20; background:#fff; border:1px solid #e5e5e5; border-radius:12px; box-shadow:0 14px 34px rgba(26,26,31,.14); overflow:hidden;">
+            <sc-for list="{{ orgList }}" as="o" hint-placeholder-count="4">
+              <div onClick="{{ o.onPick }}" style="{{ o.rowStyle }}">{{ o.name }}</div>
+            </sc-for>
+          </div>
+          </sc-if>
+          <div style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:11.5px; color:#9a9aa2;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>You can add more organizations later.</div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ isUni }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Organization</label>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; background:#f5f5f7;">
+            <span style="font-size:14px; color:#333; font-weight:600;">Hogwarts University</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:11.5px; color:#9a9aa2;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>Set by your organization. You can add more later.</div>
+        </div>
+        </sc-if>
+
+        <!-- reg type -->
+        <sc-if value="{{ isGeneral }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-bottom:6px;">
+          <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:8px;">Registration type</label>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <sc-for list="{{ regOptions }}" as="r" hint-placeholder-count="3">
+              <div onClick="{{ r.onPick }}" style="{{ r.rowStyle }}">
+                <span style="{{ r.dotStyle }}"><span style="{{ r.dotInner }}"></span></span>
+                <div><div style="font-size:13.5px; font-weight:700; color:#333;">{{ r.title }}</div><div style="font-size:11.5px; color:#9a9aa2;">{{ r.desc }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ isUni }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:6px; position:relative;">
+          <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Registration type</label>
+          <div onClick="{{ toggleRegUni }}" style="display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; cursor:pointer;">
+            <span style="font-size:14px; color:#333;">{{ regUniShown }}</span>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+          <sc-if value="{{ regUniOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:20; background:#fff; border:1px solid #e5e5e5; border-radius:12px; box-shadow:0 14px 34px rgba(26,26,31,.14); overflow:hidden;">
+            <sc-for list="{{ regUniList }}" as="r" hint-placeholder-count="3">
+              <div onClick="{{ r.onPick }}" style="{{ r.rowStyle }}">{{ r.name }}</div>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- e-vehicle attestation inline (electric only) -->
+        <sc-if value="{{ isElectric }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:16px; border:1px solid #f6d9a8; background:#fffaf1; border-radius:14px; padding:16px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:13px; font-weight:800; color:#1a1a1f;">&#9889;&#65039; E-vehicle attestation</span>
+            <span style="font-size:11px; font-weight:600; color:#b5730f; background:#fff4e6; padding:1px 8px; border-radius:999px;">recommended</span>
+          </div>
+          <p style="margin:0 0 12px; font-size:12px; line-height:1.5; color:#7a6a4a;">Your {{ modelShown }} is motorized. Confirm the details below so it&rsquo;s registered correctly.</p>
+          <sc-for list="{{ evItems }}" as="e" hint-placeholder-count="3">
+            <div onClick="{{ e.onToggle }}" style="display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; cursor:pointer;">
+              <span style="{{ e.boxStyle }}"><span style="{{ e.checkStyle }}"></span></span>
+              <span style="font-size:12.5px; line-height:1.45; color:#333;">{{ e.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <div style="height:1px; background:#eee; margin:24px 0;"></div>
+        <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2; margin:0 0 15px;">Your info</div>
+
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Email <span style="color:#c0392b;">*</span></label>
+          <input value="{{ email }}" onChange="{{ onEmail }}" placeholder="you@example.com" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:inherit; color:#333; background:#fff; outline:none;">
+          <div style="font-size:11.5px; color:#9a9aa2; margin-top:7px;">We&rsquo;ll send your confirmation link here.</div>
+        </div>
+
+        <sc-if value="{{ isUni }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Student ID</label>
+          <input value="{{ studentId }}" onChange="{{ onStudentId }}" placeholder="e.g. 900 123 456" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:'JetBrains Mono',monospace; color:#333; background:#fff; outline:none;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Campus address</label>
+          <input value="{{ campus }}" onChange="{{ onCampus }}" placeholder="Residence hall &amp; room, or dept." style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:inherit; color:#333; background:#fff; outline:none;">
+        </div>
+        </sc-if>
+
+        <div style="margin-bottom:18px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:7px;">
+            <label style="font-size:12.5px; font-weight:700; color:#333;">Phone</label>
+            <span style="font-size:11px; font-weight:600; color:#9a9aa2; background:#f0f0f2; padding:1px 7px; border-radius:999px;">optional</span>
+          </div>
+          <input value="{{ phone }}" onChange="{{ onPhone }}" placeholder="(555) 000-0000" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:inherit; color:#333; background:#fff; outline:none;">
+        </div>
+
+        <div onClick="{{ toggleContact }}" style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 16px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; margin-bottom:24px; cursor:pointer;">
+          <div style="flex:1;"><div style="font-size:13px; font-weight:700; color:#333; margin-bottom:2px;">Let other members contact me</div><div style="font-size:11.5px; line-height:1.4; color:#9a9aa2;">Someone who finds your bike can reach you through Bike Index.</div></div>
+          <span style="{{ contactTrackStyle }}"><span style="{{ contactKnobStyle }}"></span></span>
+        </div>
+
+        <button onClick="{{ submitOne }}" style="width:100%; padding:15px; border:none; border-radius:12px; background:#715eb2; color:#fff; font-weight:800; font-size:15px; cursor:pointer;">Register Bike</button>
+        <p style="margin:12px 0 0; text-align:center; font-size:11.5px; line-height:1.5; color:#9a9aa2;">We&rsquo;ll email you a confirmation link. Click it and your bike is registered &mdash; your account is created at the same time.</p>
+      </div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== QUICK START + COMPLETE ===================== -->
+  <sc-if value="{{ isTwo }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex; justify-content:center;">
+    <div style="width:390px; flex:none; background:#fafafa; border-radius:30px; overflow:hidden; box-shadow:0 22px 56px rgba(26,26,31,.16); border:1px solid #e2e2e8;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 18px; background:#fff; border-bottom:1px solid #eee;">
+        <div style="display:flex; align-items:center; gap:9px;">
+          <div style="width:24px; height:24px; border-radius:7px; background:#715eb2; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:12px;">B</div>
+          <span style="font-size:14px; font-weight:800; color:#222;">Bike Index</span>
+        </div>
+        <span style="font-size:12px; font-weight:700; color:#715eb2; background:#f3f1fa; padding:5px 11px; border-radius:999px;">{{ twoStepLabel }}</span>
+      </div>
+
+      <div style="padding:24px 20px 30px;">
+        <!-- progress -->
+        <sc-if value="{{ notDoneTwo }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:5px; margin-bottom:18px;">
+          <sc-for list="{{ twoProgress }}" as="p" hint-placeholder-count="3">
+            <span style="{{ p.style }}"></span>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <!-- PAGE 1 -->
+        <sc-if value="{{ isP1 }}" hint-placeholder-val="{{ true }}">
+          <h2 style="margin:0 0 6px; font-size:24px; font-weight:800; letter-spacing:-.02em; color:#1a1a1f;">Register your bike!</h2>
+          <p style="margin:0 0 24px; font-size:13.5px; line-height:1.5; color:#6b6b73;">Just the essentials to start. We&rsquo;ll email you the next steps &mdash; but you can keep going right now.</p>
+          <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2; margin:0 0 15px;">Bike info</div>
+
+          <div style="margin-bottom:16px; position:relative;">
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Manufacturer</label>
+            <input value="{{ manuf }}" onChange="{{ onManuf }}" onFocus="{{ onManufFocus }}" onBlur="{{ onManufBlur }}" placeholder="Start typing e.g. Trek" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:inherit; color:#333; background:#fff; outline:none;">
+            <sc-if value="{{ showManufMenu }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:20; background:#fff; border:1px solid #e5e5e5; border-radius:12px; box-shadow:0 14px 34px rgba(26,26,31,.14); overflow:hidden; max-height:230px; overflow-y:auto;">
+              <sc-for list="{{ manufMatches }}" as="m" hint-placeholder-count="3">
+                <div onMouseDown="{{ m.onPick }}" style="{{ m.rowStyle }}">{{ m.name }}</div>
+              </sc-for>
+              <sc-if value="{{ showManufAdd }}" hint-placeholder-val="{{ false }}">
+                <div onMouseDown="{{ onManufAdd }}" style="border-top:1px solid #eee; padding:11px 14px; font-size:13px; font-weight:700; color:#715eb2; display:flex; align-items:center; gap:7px; cursor:pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#715eb2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>{{ manufAddLabel }}</div>
+              </sc-if>
+            </div>
+            </sc-if>
+            <sc-if value="{{ manufSelfReported }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; align-items:center; gap:6px; margin-top:7px; font-size:11.5px; color:#8a7fb0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8a7fb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Not in our list &mdash; self-reported for review.</div>
+            </sc-if>
+          </div>
+
+          <!-- MODEL required, up top -->
+          <div style="margin-bottom:16px; position:relative;">
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Model <span style="color:#c0392b;">*</span></label>
+            <div onClick="{{ toggleModel }}" style="display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; cursor:pointer;">
+              <span style="{{ modelSpanStyle }}">{{ modelShown }}</span>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+            <sc-if value="{{ modelOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:20; background:#fff; border:1px solid #e5e5e5; border-radius:12px; box-shadow:0 14px 34px rgba(26,26,31,.14); overflow:hidden; max-height:240px; overflow-y:auto;">
+              <sc-for list="{{ modelList }}" as="md" hint-placeholder-count="4">
+                <div onClick="{{ md.onPick }}" style="{{ md.rowStyle }}"><span>{{ md.name }}</span><span style="{{ md.tagStyle }}">{{ md.tag }}</span></div>
+              </sc-for>
+            </div>
+            </sc-if>
+            <sc-if value="{{ isElectric }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:9px;">
+              <span style="display:inline-flex; align-items:center; gap:5px; padding:5px 11px; background:#fff4e6; border:1px solid #f6d9a8; border-radius:999px; font-size:12px; font-weight:800; color:#b5730f;">&#9889;&#65039; Electric (motorized)</span>
+              <span style="display:inline-flex; align-items:center; gap:5px; padding:5px 11px; background:#e8f5ee; border:1px solid #cfe9db; border-radius:999px; font-size:12px; font-weight:700; color:#1f8a5b;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1f8a5b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ certLabel }}</span>
+            </div>
+            </sc-if>
+            <div style="font-size:11.5px; color:#9a9aa2; margin-top:7px;">Choosing a model helps us flag e-bikes and verify certification.</div>
+          </div>
+
+          <div style="height:1px; background:#eee; margin:6px 0 22px;"></div>
+          <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2; margin:0 0 15px;">Your info</div>
+          <div style="margin-bottom:24px;">
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Email <span style="color:#c0392b;">*</span></label>
+            <input value="{{ email }}" onChange="{{ onEmail }}" placeholder="you@example.com" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:inherit; color:#333; background:#fff; outline:none;">
+          </div>
+
+          <button onClick="{{ goP2 }}" style="width:100%; padding:15px; border:none; border-radius:12px; background:#715eb2; color:#fff; font-weight:800; font-size:15px; cursor:pointer;">Next</button>
+          <p style="margin:12px 0 0; text-align:center; font-size:11.5px; line-height:1.5; color:#9a9aa2;">We&rsquo;ll email a confirmation link too &mdash; you don&rsquo;t have to wait for it to continue.</p>
+        </sc-if>
+
+        <!-- PAGE 2 -->
+        <sc-if value="{{ isP2 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; background:#f3f1fa; border:1px solid #e0d9f2; border-radius:11px; margin-bottom:20px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#715eb2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:1px;"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-10 6L2 7"></path></svg>
+            <div style="font-size:12px; font-weight:600; color:#5a4a94; line-height:1.4;">We&rsquo;ve sent a confirmation link to your email. No need to wait &mdash; you can finish registering right now.</div>
+          </div>
+
+          <h2 style="margin:0 0 6px; font-size:22px; font-weight:800; letter-spacing:-.02em; color:#1a1a1f;">Add your bike&rsquo;s details</h2>
+          <p style="margin:0 0 22px; font-size:13.5px; line-height:1.5; color:#6b6b73;">The more you add, the easier your bike is to recover.</p>
+          <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2; margin:0 0 15px;">Bike details</div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Color</label>
+            <input value="{{ color }}" onChange="{{ onColor }}" placeholder="e.g. Red" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:inherit; color:#333; background:#fff; outline:none;">
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <label style="font-size:12.5px; font-weight:700; color:#333;">Frame size</label>
+              <span style="font-size:11px; font-weight:600; color:#9a9aa2; background:#f0f0f2; padding:1px 7px; border-radius:999px;">optional</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-bottom:8px;">
+              <sc-for list="{{ frameChips }}" as="c" hint-placeholder-count="5">
+                <div onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.label }}</div>
+              </sc-for>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:11.5px; color:#9a9aa2;">or</span>
+              <div style="flex:1; display:flex; align-items:center; border:1px solid #e5e5e5; border-radius:10px; background:#fff; overflow:hidden;">
+                <input value="{{ frameInches }}" onChange="{{ onInches }}" placeholder="Enter size" style="flex:1; min-width:0; padding:11px 12px; border:none; font-size:13.5px; font-family:inherit; color:#333; background:transparent; outline:none;">
+                <span style="padding:0 13px; font-size:12.5px; font-weight:700; color:#9a9aa2; border-left:1px solid #eee; align-self:stretch; display:flex; align-items:center;">inches</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:7px;">
+              <label style="font-size:12.5px; font-weight:700; color:#333;">Serial number</label>
+              <span onClick="{{ toggleSerialTip }}" style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; color:#715eb2; cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#715eb2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>Where&rsquo;s my serial number?</span>
+            </div>
+            <input value="{{ serial }}" onChange="{{ onSerial }}" placeholder="Usually stamped under the frame" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:'JetBrains Mono',monospace; color:#333; background:#fff; outline:none;">
+            <sc-if value="{{ serialTipOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative; margin-top:10px; background:#fff; border:1px solid #e5e5e5; border-radius:14px; padding:15px 16px; box-shadow:0 12px 32px rgba(26,26,31,.12);">
+              <div style="position:absolute; top:-7px; right:26px; width:13px; height:13px; background:#fff; border-left:1px solid #e5e5e5; border-top:1px solid #e5e5e5; transform:rotate(45deg);"></div>
+              <div style="font-size:13px; font-weight:800; color:#1a1a1f; margin-bottom:8px;">Where&rsquo;s my serial number?</div>
+              <p style="margin:0 0 9px; font-size:12.5px; line-height:1.55; color:#5b5b63; text-wrap:pretty;">Most bicycles have their serial number engraved on the frame. Look for your serial number:</p>
+              <ul style="margin:0 0 12px; padding-left:18px; font-size:12.5px; line-height:1.65; color:#5b5b63;">
+                <li>underside of the bottom bracket</li>
+                <li>on the head tube</li>
+                <li>on rear dropouts</li>
+              </ul>
+              <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <div style="flex:1;">
+                  <div style="aspect-ratio:1/1; border-radius:9px; overflow:hidden; background:#eceef0;"><img src="assets/serial-bottom-bracket.png" alt="Serial number under the bottom bracket" style="width:100%; height:100%; object-fit:cover; display:block;"></div>
+                  <div style="font-size:9.5px; font-weight:700; text-align:center; line-height:1.2; color:#7a7a82; margin-top:5px;">Bottom bracket</div>
+                </div>
+                <div style="flex:1;">
+                  <div style="aspect-ratio:1/1; border-radius:9px; overflow:hidden; background:#eceef0;"><img src="assets/serial-head-tube.png" alt="Serial number on the head tube" style="width:100%; height:100%; object-fit:cover; display:block;"></div>
+                  <div style="font-size:9.5px; font-weight:700; text-align:center; line-height:1.2; color:#7a7a82; margin-top:5px;">Head tube</div>
+                </div>
+                <div style="flex:1;">
+                  <div style="aspect-ratio:1/1; border-radius:9px; overflow:hidden; background:#eceef0;"><img src="assets/serial-rear-dropouts.png" alt="Serial number on the rear dropouts" style="width:100%; height:100%; object-fit:cover; display:block;"></div>
+                  <div style="font-size:9.5px; font-weight:700; text-align:center; line-height:1.2; color:#7a7a82; margin-top:5px;">Rear dropouts</div>
+                </div>
+              </div>
+              <a href="#" style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:#715eb2; text-decoration:none;">View the full serial number guide<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#715eb2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg></a>
+            </div>
+            </sc-if>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:7px;">
+              <label style="font-size:12.5px; font-weight:700; color:#333;">Bike Index sticker number</label>
+              <span style="font-size:11px; font-weight:600; color:#9a9aa2; background:#f0f0f2; padding:1px 7px; border-radius:999px;">optional</span>
+            </div>
+            <input value="{{ sticker }}" onChange="{{ onSticker }}" placeholder="e.g. A 471 829" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:'JetBrains Mono',monospace; color:#333; background:#fff; outline:none;">
+          </div>
+
+          <sc-if value="{{ isGeneral }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-bottom:16px; position:relative;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:7px;">
+              <label style="font-size:12.5px; font-weight:700; color:#333;">Register with an organization</label>
+              <span style="font-size:11px; font-weight:600; color:#9a9aa2; background:#f0f0f2; padding:1px 7px; border-radius:999px;">optional</span>
+            </div>
+            <div onClick="{{ toggleOrg }}" style="display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; cursor:pointer;">
+              <span style="{{ orgSpanStyle }}">{{ orgShown }}</span>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+            <sc-if value="{{ orgOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:20; background:#fff; border:1px solid #e5e5e5; border-radius:12px; box-shadow:0 14px 34px rgba(26,26,31,.14); overflow:hidden;">
+              <sc-for list="{{ orgList }}" as="o" hint-placeholder-count="4">
+                <div onClick="{{ o.onPick }}" style="{{ o.rowStyle }}">{{ o.name }}</div>
+              </sc-for>
+            </div>
+            </sc-if>
+            <div style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:11.5px; color:#9a9aa2;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>You can add more organizations later.</div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ isUni }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Organization</label>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; background:#f5f5f7;">
+              <span style="font-size:14px; color:#333; font-weight:600;">Hogwarts University</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:11.5px; color:#9a9aa2;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>Set by your organization. You can add more later.</div>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ isGeneral }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-bottom:6px;">
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:8px;">Registration type</label>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <sc-for list="{{ regOptions }}" as="r" hint-placeholder-count="3">
+                <div onClick="{{ r.onPick }}" style="{{ r.rowStyle }}">
+                  <span style="{{ r.dotStyle }}"><span style="{{ r.dotInner }}"></span></span>
+                  <div><div style="font-size:13.5px; font-weight:700; color:#333;">{{ r.title }}</div><div style="font-size:11.5px; color:#9a9aa2;">{{ r.desc }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ isUni }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:6px; position:relative;">
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Registration type</label>
+            <div onClick="{{ toggleRegUni }}" style="display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; cursor:pointer;">
+              <span style="font-size:14px; color:#333;">{{ regUniShown }}</span>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9a9aa2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+            </div>
+            <sc-if value="{{ regUniOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:20; background:#fff; border:1px solid #e5e5e5; border-radius:12px; box-shadow:0 14px 34px rgba(26,26,31,.14); overflow:hidden;">
+              <sc-for list="{{ regUniList }}" as="r" hint-placeholder-count="3">
+                <div onClick="{{ r.onPick }}" style="{{ r.rowStyle }}">{{ r.name }}</div>
+              </sc-for>
+            </div>
+            </sc-if>
+          </div>
+          </sc-if>
+
+          <div style="height:1px; background:#eee; margin:24px 0;"></div>
+          <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2; margin:0 0 15px;">Additional contact info</div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Email</label>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; background:#f5f5f7;">
+              <span style="font-size:14px; color:#5b5b63;">{{ emailShown }}</span>
+              <span style="font-size:10.5px; font-weight:700; color:#9a9aa2; background:#e9e9ec; padding:2px 8px; border-radius:999px;">FROM STEP 1</span>
+            </div>
+          </div>
+
+          <sc-if value="{{ isUni }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Student ID</label>
+            <input value="{{ studentId }}" onChange="{{ onStudentId }}" placeholder="e.g. 900 123 456" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:'JetBrains Mono',monospace; color:#333; background:#fff; outline:none;">
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#333; margin-bottom:7px;">Campus address</label>
+            <input value="{{ campus }}" onChange="{{ onCampus }}" placeholder="Residence hall &amp; room, or dept." style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:inherit; color:#333; background:#fff; outline:none;">
+          </div>
+          </sc-if>
+
+          <div style="margin-bottom:18px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:7px;">
+              <label style="font-size:12.5px; font-weight:700; color:#333;">Phone</label>
+              <span style="font-size:11px; font-weight:600; color:#9a9aa2; background:#f0f0f2; padding:1px 7px; border-radius:999px;">optional</span>
+            </div>
+            <input value="{{ phone }}" onChange="{{ onPhone }}" placeholder="(555) 000-0000" style="width:100%; padding:13px 14px; border:1px solid #e5e5e5; border-radius:12px; font-size:14px; font-family:inherit; color:#333; background:#fff; outline:none;">
+          </div>
+
+          <div onClick="{{ toggleContact }}" style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 16px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; margin-bottom:24px; cursor:pointer;">
+            <div style="flex:1;"><div style="font-size:13px; font-weight:700; color:#333; margin-bottom:2px;">Let other members contact me</div><div style="font-size:11.5px; line-height:1.4; color:#9a9aa2;">Someone who finds your bike can reach you through Bike Index.</div></div>
+            <span style="{{ contactTrackStyle }}"><span style="{{ contactKnobStyle }}"></span></span>
+          </div>
+
+          <button onClick="{{ p2Next }}" style="width:100%; padding:15px; border:none; border-radius:12px; background:#715eb2; color:#fff; font-weight:800; font-size:15px; cursor:pointer;">{{ p2ButtonLabel }}</button>
+          <div style="text-align:center; margin-top:12px;"><span onClick="{{ goP1 }}" style="font-size:12.5px; font-weight:700; color:#9a9aa2; cursor:pointer;">&larr; Back</span></div>
+        </sc-if>
+
+        <!-- PAGE 3 : E-VEHICLE ATTESTATION -->
+        <sc-if value="{{ isP3 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:inline-flex; align-items:center; gap:6px; padding:5px 11px; background:#fff4e6; border:1px solid #f6d9a8; border-radius:999px; font-size:12px; font-weight:800; color:#b5730f; margin-bottom:14px;">&#9889;&#65039; Electric (motorized) detected</div>
+          <h2 style="margin:0 0 6px; font-size:22px; font-weight:800; letter-spacing:-.02em; color:#1a1a1f;">E-vehicle attestation</h2>
+          <p style="margin:0 0 22px; font-size:13.5px; line-height:1.5; color:#6b6b73;">Your {{ modelShown }} is a motorized e-bike. Confirm the details below so it&rsquo;s registered correctly. Not an e-vehicle? You can skip this.</p>
+
+          <div style="border:1px solid #e5e5e5; background:#fff; border-radius:14px; padding:6px 16px;">
+            <sc-for list="{{ evItems }}" as="e" hint-placeholder-count="3">
+              <div onClick="{{ e.onToggle }}" style="{{ e.rowStyle }}">
+                <span style="{{ e.boxStyle }}"><span style="{{ e.checkStyle }}"></span></span>
+                <span style="font-size:12.5px; line-height:1.45; color:#333;">{{ e.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div onClick="{{ toggleAttest }}" style="display:flex; gap:11px; align-items:flex-start; margin:16px 2px 24px; cursor:pointer;">
+            <span style="{{ attestBox }}"><span style="{{ attestCheck }}"></span></span>
+            <span style="font-size:12.5px; line-height:1.45; color:#333; font-weight:600;">I attest that the information above is accurate.</span>
+          </div>
+
+          <button onClick="{{ completeTwo }}" style="width:100%; padding:15px; border:none; border-radius:12px; background:#715eb2; color:#fff; font-weight:800; font-size:15px; cursor:pointer;">Complete Bike Registration</button>
+          <div style="text-align:center; margin-top:12px; display:flex; align-items:center; justify-content:space-between;">
+            <span onClick="{{ goP2 }}" style="font-size:12.5px; font-weight:700; color:#9a9aa2; cursor:pointer;">&larr; Back</span>
+            <span onClick="{{ completeTwo }}" style="font-size:12.5px; font-weight:700; color:#9a9aa2; cursor:pointer;">Skip &mdash; this isn&rsquo;t an e-vehicle</span>
+          </div>
+        </sc-if>
+
+        <!-- DONE -->
+        <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 4px 12px; text-align:center;">
+            <div style="width:64px; height:64px; margin:0 auto 18px; border-radius:50%; background:#e8f5ee; display:flex; align-items:center; justify-content:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1f8a5b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+            <h2 style="margin:0 0 8px; font-size:22px; font-weight:800; color:#1a1a1f;">Registration complete!</h2>
+            <p style="margin:0 0 22px; font-size:13.5px; line-height:1.55; color:#6b6b73;">Your {{ manufShown }} is registered with Bike Index. We&rsquo;ll keep watch &mdash; if it&rsquo;s ever reported stolen, the whole community is looking.</p>
+            <button onClick="{{ restartTwo }}" style="width:100%; padding:14px; border:1px solid #e5e5e5; border-radius:12px; background:#fff; color:#715eb2; font-weight:800; font-size:14px; cursor:pointer;">Register another bike</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;flow&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;One-step&quot;,&quot;Quick start + complete&quot;],&quot;default&quot;:&quot;Quick start + complete&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Preview&quot;},&quot;audience&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;General public&quot;,&quot;University&quot;],&quot;default&quot;:&quot;General public&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Preview&quot;}}">
+class Component extends DCLogic {
+  state = {
+    manuf: '', manufFocused: false, manufChosen: false, manufSelf: false,
+    color: '',
+    frameSize: null, frameInches: '',
+    model: null,
+    serial: '', serialTipOpen: false,
+    sticker: '',
+    org: '', regType: null, regUni: 'Not stolen',
+    open: null,           // 'model' | 'org' | 'regUni'
+    contact: true,
+    email: '', phone: '', studentId: '', campus: '',
+    ev: { cert: true, watt: false, pedal: false }, attest: false,
+    submittedOne: false,
+    page: 1,              // two-step: 1,2,3,'done'
+  };
+
+  MANUFACTURERS = ['Trek','Trinx','Trifox','Specialized','Surly','Cannondale','Giant','Santa Cruz','Bianchi','Brooklyn Bicycle Co.','Cervelo','Kona','Salsa','Marin'];
+
+  MODELS = {
+    Trek: [
+      { name: 'Powerfly 5', electric: true, cert: 'EN 15194 certified' },
+      { name: 'Verve+ 2 LT', electric: true, cert: 'EN 15194 certified' },
+      { name: 'X-Caliber 8', electric: false },
+      { name: 'Marlin 7', electric: false },
+      { name: 'FX 3 Disc', electric: false },
+    ],
+    Specialized: [
+      { name: 'Turbo Vado 4.0', electric: true, cert: 'EN 15194 certified' },
+      { name: 'Rockhopper', electric: false },
+      { name: 'Allez', electric: false },
+    ],
+    _default: [
+      { name: 'City E-Cruiser', electric: true, cert: 'EN 15194 certified' },
+      { name: 'Road Classic', electric: false },
+      { name: 'Trail Hardtail', electric: false },
+      { name: 'Commuter 3', electric: false },
+    ],
+  };
+
+  ORGS = ['Hogwarts Cycling Club','Gotham Bike Collective','Rivendell Riders','Wakanda Wheelers','Springfield Spokes'];
+
+  set(patch) { this.setState(patch); }
+
+  renderVals() {
+    const s = this.state;
+    const flow = this.props.flow ?? 'One-step';
+    const audience = this.props.audience ?? 'General public';
+    const isUni = audience === 'University';
+    const isOne = flow === 'One-step';
+    const isTwo = flow === 'Quick start + complete';
+
+    // ---- manufacturer typeahead ----
+    const q = s.manuf.trim().toLowerCase();
+    const matches = q ? this.MANUFACTURERS.filter(m => m.toLowerCase().includes(q)) : this.MANUFACTURERS;
+    const exact = this.MANUFACTURERS.some(m => m.toLowerCase() === q);
+    const showManufMenu = s.manufFocused && !s.manufChosen && q.length > 0;
+    const manufMatches = matches.map(name => ({
+      name,
+      rowStyle: 'padding:11px 14px; font-size:13.5px; color:#333; cursor:pointer;',
+      onPick: () => this.set({ manuf: name, manufChosen: true, manufFocused: false, manufSelf: false, model: null, open: null }),
+    }));
+
+    // ---- models (depend on manufacturer) ----
+    const modelSet = this.MODELS[s.manuf] || this.MODELS._default;
+    const selected = s.model;
+    const isElectric = !!(selected && selected.electric);
+    const modelList = modelSet.map(m => ({
+      name: m.name,
+      tag: m.electric ? '\u26A1\uFE0F' : '',
+      tagStyle: m.electric ? 'font-size:13px;' : 'display:none;',
+      rowStyle: 'display:flex; align-items:center; justify-content:space-between; padding:11px 14px; font-size:13.5px; color:#333; cursor:pointer;' + (selected && selected.name === m.name ? ' background:#f6f4fc; font-weight:700; color:#715eb2;' : ''),
+      onPick: () => this.set({ model: m, open: null }),
+    }));
+
+    // ---- frame chips ----
+    const chipBase = 'padding:10px 0; border-radius:10px; font-size:13px; text-align:center; cursor:pointer;';
+    const frameChips = ['XS','S','M','L','XL'].map(label => {
+      const on = s.frameSize === label;
+      return {
+        label,
+        style: chipBase + (on
+          ? ' border:1.5px solid #715eb2; background:#f3f1fa; font-weight:800; color:#715eb2;'
+          : ' border:1px solid #e5e5e5; background:#fff; font-weight:700; color:#5b5b63;'),
+        onPick: () => this.set({ frameSize: label, frameInches: '' }),
+      };
+    });
+
+    // ---- reg type (general radios) ----
+    const regDefs = [
+      { key: 'Not stolen', title: 'Not stolen', desc: 'Registering to keep it safe' },
+      { key: 'Stolen', title: 'Stolen', desc: 'This bike has been stolen' },
+      { key: 'Found', title: 'Found', desc: 'I found this bike' },
+    ];
+    const regOptions = regDefs.map(r => {
+      const on = s.regType === r.key;
+      return {
+        title: r.title, desc: r.desc,
+        rowStyle: 'display:flex; align-items:center; gap:11px; padding:13px 14px; border-radius:12px; background:#fff; cursor:pointer;' + (on ? ' border:1.5px solid #715eb2;' : ' border:1px solid #e5e5e5;'),
+        dotStyle: 'width:18px; height:18px; flex:none; border-radius:50%; display:flex; align-items:center; justify-content:center;' + (on ? ' border:2px solid #715eb2;' : ' border:2px solid #cdcdd4;'),
+        dotInner: on ? 'width:9px; height:9px; border-radius:50%; background:#715eb2;' : 'display:none;',
+        onPick: () => this.set({ regType: r.key }),
+      };
+    });
+    const regUniList = regDefs.map(r => ({
+      name: r.key,
+      rowStyle: 'padding:11px 14px; font-size:13.5px; color:#333; cursor:pointer;' + (s.regUni === r.key ? ' background:#f6f4fc; font-weight:700; color:#715eb2;' : ''),
+      onPick: () => this.set({ regUni: r.key, open: null }),
+    }));
+
+    // ---- orgs ----
+    const orgList = this.ORGS.map(name => ({
+      name,
+      rowStyle: 'padding:11px 14px; font-size:13.5px; color:#333; cursor:pointer;' + (s.org === name ? ' background:#f6f4fc; font-weight:700; color:#715eb2;' : ''),
+      onPick: () => this.set({ org: name, open: null }),
+    }));
+
+    // ---- ev attestation items ----
+    const evDefs = [
+      { key: 'cert', label: 'This e-bike meets EN 15194 (or equivalent) certification.' },
+      { key: 'watt', label: 'Motor output is 750W or less.' },
+      { key: 'pedal', label: "It's pedal-assist (Class 1\u20133), not throttle-only." },
+    ];
+    const evItems = evDefs.map((e, i) => {
+      const on = s.ev[e.key];
+      return {
+        label: e.label,
+        rowStyle: 'display:flex; gap:11px; align-items:flex-start; padding:14px 0; cursor:pointer;' + (i < evDefs.length - 1 ? ' border-bottom:1px solid #f0f0f2;' : ''),
+        boxStyle: 'width:20px; height:20px; flex:none; border-radius:6px; display:flex; align-items:center; justify-content:center;' + (on ? ' background:#715eb2;' : ' border:2px solid #cdcdd4; background:#fff;'),
+        checkStyle: on ? 'width:11px; height:6px; border-left:2.4px solid #fff; border-bottom:2.4px solid #fff; transform:rotate(-45deg) translateY(-1px);' : 'display:none;',
+        onToggle: () => this.set({ ev: Object.assign({}, s.ev, { [e.key]: !on }) }),
+      };
+    });
+
+    // ---- two-step navigation ----
+    const totalPages = isElectric ? 3 : 2;
+    const page = s.page;
+    const isP1 = page === 1, isP2 = page === 2, isP3 = page === 3, isDone = page === 'done';
+    const twoProgress = [];
+    for (let i = 1; i <= totalPages; i++) {
+      const active = (typeof page === 'number' && i <= page);
+      twoProgress.push({ style: 'flex:1; height:4px; border-radius:999px; background:' + (active ? '#715eb2' : '#e5e2ef') + ';' });
+    }
+    const p2ButtonLabel = isElectric ? 'Next' : 'Complete Bike Registration';
+    const p2Next = () => this.set({ page: isElectric ? 3 : 'done', open: null, serialTipOpen: false });
+
+    const emailShown = s.email.trim() ? s.email.trim() : 'your email';
+    const manufShown = s.manuf.trim() ? s.manuf.trim() : 'bike';
+
+    return {
+      isOne, isTwo, isUni, isGeneral: !isUni,
+
+      // manufacturer
+      manuf: s.manuf,
+      onManuf: (e) => this.set({ manuf: e.target.value, manufChosen: false, manufSelf: false }),
+      onManufFocus: () => this.set({ manufFocused: true, open: null }),
+      onManufBlur: () => this.set({ manufFocused: false }),
+      showManufMenu, manufMatches,
+      showManufAdd: q.length > 0 && !exact,
+      manufAddLabel: 'Add \u201C' + s.manuf.trim() + '\u201D \u2014 not in our list',
+      onManufAdd: () => this.set({ manufChosen: true, manufFocused: false, manufSelf: true, model: null }),
+      manufSelfReported: s.manufSelf,
+
+      // color
+      color: s.color, onColor: (e) => this.set({ color: e.target.value }),
+
+      // frame
+      frameChips, frameInches: s.frameInches,
+      onInches: (e) => this.set({ frameInches: e.target.value, frameSize: null }),
+
+      // model
+      modelShown: selected ? selected.name : 'Select a model',
+      modelSpanStyle: 'font-size:14px; color:' + (selected ? '#333' : '#b3b3ba') + ';',
+      modelOpen: s.open === 'model',
+      toggleModel: () => this.set({ open: s.open === 'model' ? null : 'model' }),
+      modelList, isElectric,
+      certLabel: selected && selected.cert ? selected.cert : 'EN 15194 certified',
+
+      // serial
+      serial: s.serial, onSerial: (e) => this.set({ serial: e.target.value }),
+      serialTipOpen: s.serialTipOpen,
+      toggleSerialTip: () => this.set({ serialTipOpen: !s.serialTipOpen }),
+
+      // sticker
+      sticker: s.sticker, onSticker: (e) => this.set({ sticker: e.target.value }),
+
+      // org
+      orgShown: s.org ? s.org : 'Select an organization',
+      orgSpanStyle: 'font-size:14px; color:' + (s.org ? '#333' : '#b3b3ba') + ';',
+      orgOpen: s.open === 'org',
+      toggleOrg: () => this.set({ open: s.open === 'org' ? null : 'org' }),
+      orgList,
+
+      // reg type
+      regOptions,
+      regUniShown: s.regUni,
+      regUniOpen: s.open === 'regUni',
+      toggleRegUni: () => this.set({ open: s.open === 'regUni' ? null : 'regUni' }),
+      regUniList,
+
+      // ev
+      evItems,
+      attestBox: 'width:20px; height:20px; flex:none; border-radius:6px; display:flex; align-items:center; justify-content:center;' + (s.attest ? ' background:#715eb2;' : ' border:2px solid #cdcdd4; background:#fff;'),
+      attestCheck: s.attest ? 'width:11px; height:6px; border-left:2.4px solid #fff; border-bottom:2.4px solid #fff; transform:rotate(-45deg) translateY(-1px);' : 'display:none;',
+      toggleAttest: () => this.set({ attest: !s.attest }),
+
+      // contact toggle
+      contactTrackStyle: 'flex:none; width:44px; height:26px; border-radius:999px; position:relative; transition:background .15s; background:' + (s.contact ? '#715eb2' : '#d4d4da') + ';',
+      contactKnobStyle: 'position:absolute; top:3px; width:20px; height:20px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.25); transition:left .15s; left:' + (s.contact ? '21px' : '3px') + ';',
+      toggleContact: () => this.set({ contact: !s.contact }),
+
+      // your info
+      email: s.email, onEmail: (e) => this.set({ email: e.target.value }),
+      phone: s.phone, onPhone: (e) => this.set({ phone: e.target.value }),
+      studentId: s.studentId, onStudentId: (e) => this.set({ studentId: e.target.value }),
+      campus: s.campus, onCampus: (e) => this.set({ campus: e.target.value }),
+      emailShown, manufShown,
+
+      // one-step submit
+      submittedOne: s.submittedOne,
+      notSubmittedOne: !s.submittedOne,
+      submitOne: () => this.set({ submittedOne: true }),
+      resetOne: () => this.set({ submittedOne: false }),
+
+      // two-step nav
+      isP1, isP2, isP3, isDone, notDoneTwo: !isDone,
+      twoProgress,
+      twoStepLabel: isDone ? 'Confirmed' : 'Register',
+      goP1: () => this.set({ page: 1, open: null, serialTipOpen: false }),
+      goP2: () => this.set({ page: 2, open: null, serialTipOpen: false }),
+      p2Next, p2ButtonLabel,
+      completeTwo: () => this.set({ page: 'done', open: null }),
+      restartTwo: () => this.set({ page: 1 }),
+    };
+  }
+}
+</script>
+</body>
+</html>

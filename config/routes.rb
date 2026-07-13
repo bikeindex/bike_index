@@ -161,6 +161,14 @@ Rails.application.routes.draw do
     collection { get :embed }
   end
 
+  # Redesigned registration flow: quick start, then complete on-site or via email
+  get "register", to: "register#new"
+  post "register", to: "register#create"
+  patch "register", to: "register#update"
+  get "register/details", to: "register#details", as: :register_details
+  get "register/e_vehicle", to: "register#e_vehicle", as: :register_e_vehicle
+  get "register/complete", to: "register#complete", as: :register_complete
+
   namespace :search do
     get "/", to: redirect("/search/registrations")
     # Autocomplete + selection chips for the search query items combobox
