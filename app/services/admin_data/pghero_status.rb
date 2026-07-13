@@ -34,8 +34,8 @@ module AdminData
     # private below here
     #
 
-    def safe
-      yield
+    def safe(&block)
+      block.call
     rescue => e
       {error: e.message}
     end
