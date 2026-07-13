@@ -1,5 +1,5 @@
 class RegisterController < ApplicationController
-  before_action :find_b_param, only: %i[details update complete]
+  before_action :find_b_param, only: %i[details update confirm complete]
 
   def new
     @b_param ||= BParam.new(params: {bike: BParam.status_hash_from_params(params)}.as_json)
@@ -31,9 +31,24 @@ class RegisterController < ApplicationController
     if creator_available?
       create_bike_and_redirect
     else
-      # Without a user to assign the bike to, everything is saved on the b_param -
-      # the confirmation email finishes the registration (and creates the account)
+      # Everything is saved on the b_param - the bike is created once the
+      # confirmation link from the partial registration email is clicked
       redirect_to register_complete_path(b_param_token: @b_param.id_token)
+    end
+  end
+
+  # The tokenized link from the partial registration email - proves control of the email
+  def confirm
+    unless @b_param.confirmation_token_matches?(params[:confirmation_token])
+      flash[:error] = translation(:invalid_confirmation_link)
+      redirect_to(register_path) && return
+    end
+    @b_param.confirm_email!
+    if @b_param.details_completed?
+      create_bike_and_redirect
+    else
+      flash[:success] = translation(:email_confirmed_add_details)
+      redirect_to register_details_path(b_param_token: @b_param.id_token)
     end
   end
 
@@ -55,10 +70,21 @@ class RegisterController < ApplicationController
   end
 
   def creator_available?
-    @b_param.creator_id.present? || @b_param.creation_organization&.auto_user_id.present?
+    @b_param.creator_id.present? || @b_param.creation_organization&.auto_user_id.present? ||
+      (@b_param.email_confirmed? && confirmed_email_creator.present?)
+  end
+
+  # With the email confirmed, the registrant's own account (if the email has one)
+  # or the AUTO_ORG_MEMBER system user can stand in as the creator
+  def confirmed_email_creator
+    return @confirmed_email_creator if defined?(@confirmed_email_creator)
+
+    @confirmed_email_creator = User.fuzzy_email_find(@b_param.owner_email) ||
+      User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"])
   end
 
   def create_bike_and_redirect
+    @b_param.creator_id ||= confirmed_email_creator&.id if @b_param.email_confirmed?
     bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
     if bike.errors.any?
       flash[:error] = @b_param.bike_errors&.to_sentence
@@ -76,8 +102,9 @@ class RegisterController < ApplicationController
   end
 
   def update_params
-    {bike: params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
-      :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
-      :bike_sticker, :phone, :status, :frame_model).reject { |_k, v| v.blank? }}
+    {details_completed: true,
+     bike: params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
+       :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
+       :bike_sticker, :phone, :status, :frame_model).reject { |_k, v| v.blank? }}
   end
 end

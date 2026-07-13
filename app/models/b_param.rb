@@ -82,6 +82,7 @@ class BParam < ApplicationRecord
   serialize :bike_errors, coder: YAML
 
   before_create :generate_id_token
+  before_create :generate_confirmation_token, if: -> { origin == "registration_flow" }
   before_save :clean_params
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
@@ -165,8 +166,10 @@ class BParam < ApplicationRecord
     def find_for_token(toke, user_id: nil)
       return nil if toke.blank?
 
+      # Once the bike exists the token only ever renders the completion page,
+      # so access doesn't require matching the creator assigned at creation
       where(id_token: toke).where("created_at >= ?", Time.current - 1.month)
-        .detect { |b| b.creator_id.blank? || b.creator_id == user_id }
+        .detect { |b| b.creator_id.blank? || b.creator_id == user_id || b.created_bike_id.present? }
     end
 
     def email_search(str)
@@ -406,6 +409,30 @@ class BParam < ApplicationRecord
     PARTIAL_REGISTRATION_ORIGINS.include?(origin)
   end
 
+  # Only sent in the partial registration email - unlike id_token, the anonymous
+  # registrant never sees it, so presenting it proves control of the email
+  def confirmation_token
+    params["confirmation_token"]
+  end
+
+  def confirmation_token_matches?(token)
+    confirmation_token.present? && token.present? &&
+      ActiveSupport::SecurityUtils.secure_compare(confirmation_token, token.to_s)
+  end
+
+  def email_confirmed?
+    params["email_confirmed_at"].present?
+  end
+
+  def confirm_email!
+    email_confirmed? || update(params: params.merge("email_confirmed_at" => Time.current))
+  end
+
+  # Set once the details step (registration flow step 2) has been submitted
+  def details_completed?
+    params["details_completed"].present?
+  end
+
   def primary_frame_color
     primary_frame_color_id.present? && Color.find_by_id(primary_frame_color_id)&.name
   end
@@ -583,6 +610,10 @@ class BParam < ApplicationRecord
 
   def generate_id_token
     self.id_token ||= SecurityTokenizer.new_token
+  end
+
+  def generate_confirmation_token
+    self.params = params.merge("confirmation_token" => SecureRandom.urlsafe_base64(24))
   end
 
   def parking_notification_params

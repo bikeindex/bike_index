@@ -27,6 +27,7 @@ RSpec.describe RegisterController, type: :request do
       expect(new_b_param).to have_attributes(origin: "registration_flow", owner_email:,
         manufacturer_id: manufacturer.id, creator_id: nil)
       expect(new_b_param.partial_registration?).to be_truthy
+      expect(new_b_param.confirmation_token).to be_present
       expect(new_b_param.motorized?).to be_falsey
       expect(new_b_param.bike["frame_model"]).to eq "Marlin 7"
       expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(new_b_param.id)
@@ -90,11 +91,26 @@ RSpec.describe RegisterController, type: :request do
         }.to_not change(Bike, :count)
         expect(response).to redirect_to register_complete_path(b_param_token: b_param.id_token)
         b_param.reload
+        expect(b_param.details_completed?).to be_truthy
         # IDs pass through as posted strings; they're cast when the bike is created
         expect(b_param.bike).to match_hash_indifferently(bike_details.merge(owner_email:,
           manufacturer_id: manufacturer.id, primary_frame_color_id: color.id.to_s))
         follow_redirect!
-        expect(response.body).to include "Check your email"
+        expect(response.body).to include "Registration complete"
+        expect(response.body).to include "verify your email"
+      end
+
+      context "email already confirmed" do
+        let!(:user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+
+        it "creates the bike with the email's user as creator" do
+          b_param.confirm_email!
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to change(Bike, :count).by 1
+          expect(Bike.last).to have_attributes(owner_email:, creator_id: user.id)
+          expect(response).to redirect_to register_complete_path(b_param_token: b_param.id_token)
+        end
       end
 
       context "motorized" do
@@ -155,6 +171,67 @@ RSpec.describe RegisterController, type: :request do
           expect(response).to redirect_to register_path
           expect(flash[:info]).to be_present
         end
+      end
+    end
+  end
+
+  describe "confirm" do
+    let(:bike_details) do
+      {primary_frame_color_id: color.id, serial_number: "XYZ 123", status: "status_with_owner"}
+    end
+    let(:confirm_path) do
+      register_confirm_path(b_param_token: b_param.id_token,
+        confirmation_token: b_param.confirmation_token)
+    end
+
+    context "details completed, a user exists for the email" do
+      let!(:user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+
+      it "creates the bike with that user as creator" do
+        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        expect {
+          get confirm_path
+        }.to change(Bike, :count).by 1
+        bike = Bike.last
+        expect(bike).to have_attributes(owner_email:, creator_id: user.id,
+          manufacturer_id: manufacturer.id)
+        expect(b_param.reload.email_confirmed?).to be_truthy
+        expect(response).to redirect_to register_complete_path(b_param_token: b_param.id_token)
+        follow_redirect!
+        expect(response.body).to include "Registration complete"
+
+        # Clicking the link again just returns to complete
+        expect { get confirm_path }.to_not change(Bike, :count)
+        expect(response).to redirect_to register_complete_path(b_param_token: b_param.id_token)
+      end
+    end
+
+    context "details completed, no user for the email" do
+      let!(:auto_org_user) { FactoryBot.create(:user_confirmed, email: "auto_user@bikeindex.org") }
+
+      it "creates the bike with the AUTO_ORG_MEMBER user as creator" do
+        stub_const("ENV", ENV.to_hash.merge("AUTO_ORG_MEMBER" => auto_org_user.email))
+        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        expect { get confirm_path }.to change(Bike, :count).by 1
+        expect(Bike.last).to have_attributes(owner_email:, creator_id: auto_org_user.id)
+      end
+    end
+
+    context "details not completed" do
+      it "confirms the email and sends them to the details step" do
+        expect { get confirm_path }.to_not change(Bike, :count)
+        expect(b_param.reload.email_confirmed?).to be_truthy
+        expect(response).to redirect_to register_details_path(b_param_token: b_param.id_token)
+        expect(flash[:success]).to be_present
+      end
+    end
+
+    context "invalid confirmation token" do
+      it "redirects to the start without confirming" do
+        get register_confirm_path(b_param_token: b_param.id_token, confirmation_token: "wrong")
+        expect(response).to redirect_to register_path
+        expect(flash[:error]).to be_present
+        expect(b_param.reload.email_confirmed?).to be_falsey
       end
     end
   end

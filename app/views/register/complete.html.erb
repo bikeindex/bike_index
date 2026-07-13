@@ -32,14 +32,14 @@
           tw:text-gray-900 tw:dark:text-gray-100
         "
       >
-        <%= @bike.present? ? t(".registration_complete") : t(".check_your_email") %>
+        <%= t(".registration_complete") %>
       </h1>
 
       <p class="tw:mb-6 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
         <% if @bike.present? %>
           <%= t(".we_will_keep_watch", bike_display: @bike.mnfg_name) %>
         <% else %>
-          <%= t(".we_sent_a_confirmation_link_html", email: content_tag(:strong, @b_param.owner_email)) %>
+          <%= t(".verify_your_email_html", email: content_tag(:strong, @b_param.owner_email)) %>
         <% end %>
       </p>
 

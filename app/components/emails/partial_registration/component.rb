@@ -23,7 +23,14 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? OrganizedServices::EmailPreview::TOKEN_PATH : new_bike_url(b_param_token: @b_param.id_token)
+        return OrganizedServices::EmailPreview::TOKEN_PATH if @email_preview
+
+        if @b_param.origin == "registration_flow"
+          register_confirm_url(b_param_token: @b_param.id_token,
+            confirmation_token: @b_param.confirmation_token)
+        else
+          new_bike_url(b_param_token: @b_param.id_token)
+        end
       end
 
       def organization_snippet_body

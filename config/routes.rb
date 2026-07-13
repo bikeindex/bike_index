@@ -166,6 +166,7 @@ Rails.application.routes.draw do
   post "register", to: "register#create"
   patch "register", to: "register#update"
   get "register/details", to: "register#details", as: :register_details
+  get "register/confirm", to: "register#confirm", as: :register_confirm
   get "register/complete", to: "register#complete", as: :register_complete
 
   namespace :search do

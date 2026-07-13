@@ -1956,6 +1956,11 @@ en:
       update:
         image_updated: Image was successfully updated.
     register:
+      confirm:
+        email_confirmed_add_details: Email confirmed! Add your bike's details to finish
+          your registration
+        invalid_confirmation_link: That confirmation link isn't valid — start a new
+          registration below
       create:
         email_required: Email is required to register
         unable_to_save: We're unable to save that registration, please try again
@@ -4766,13 +4771,12 @@ en:
       looks_like_this_is_your_image: Looks like this is your image.
   register:
     complete:
-      check_your_email: Check your email!
       register_another: Register another bike
       registration_complete: Registration complete!
+      verify_your_email_html: >-
+        One more step — verify your email. We sent a confirmation link to %{email};
+        click it to finish your registration. Everything you've entered is saved.
       view_your_registration: View your registration
-      we_sent_a_confirmation_link_html: >-
-        We sent a confirmation link to %{email}. Click it to finish registering your
-        bike and activate your account — everything you've entered is saved.
       we_will_keep_watch: >-
         Your %{bike_display} is registered with Bike Index. We'll keep watch — if
         it's ever reported stolen, the whole community is looking.
