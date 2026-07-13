@@ -45,6 +45,8 @@ Rails.application.configure do
       "https://*.tiles.mapbox.com",
       # GA4 also routes /g/collect beacons to analytics.google.com and (region-redirected) www.google.com
       "https://analytics.google.com",
+      # GA4 ad-personalization beacons to DoubleClick (/g/collect)
+      "https://stats.g.doubleclick.net",
       "https://api.honeybadger.io",
       "https://api.mapbox.com",
       "https://bikebook.herokuapp.com",
