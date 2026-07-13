@@ -1,5 +1,5 @@
 class RegisterController < ApplicationController
-  before_action :find_b_param, only: %i[details e_vehicle update complete]
+  before_action :find_b_param, only: %i[details update complete]
 
   def new
     @b_param ||= BParam.new(params: {bike: BParam.status_hash_from_params(params)}.as_json)
@@ -23,17 +23,12 @@ class RegisterController < ApplicationController
   def details
   end
 
-  def e_vehicle
-  end
-
   def update
     @b_param.creator_id ||= current_user&.id
     # clean_params runs before_save, resolving the merged foreign keys
     @b_param.params = @b_param.params.with_indifferent_access.deep_merge(update_params.as_json)
     @b_param.save
-    if params[:finalize].blank? && @b_param.motorized?
-      redirect_to register_e_vehicle_path(b_param_token: @b_param.id_token)
-    elsif creator_available?
+    if creator_available?
       create_bike_and_redirect
     else
       # Without a user to assign the bike to, everything is saved on the b_param -
@@ -81,16 +76,8 @@ class RegisterController < ApplicationController
   end
 
   def update_params
-    permitted = {bike: params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
+    {bike: params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
       :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
       :bike_sticker, :phone, :status, :frame_model).reject { |_k, v| v.blank? }}
-    %i[propulsion_type_motorized propulsion_type_pedal_assist propulsion_type_throttle].each do |key|
-      permitted[key] = params[key] if params[key].present?
-    end
-    if params[:e_vehicle_attestation].present?
-      permitted[:e_vehicle_attestation] = params.require(:e_vehicle_attestation)
-        .permit(:en_15194, :motor_under_750w, :accurate)
-    end
-    permitted
   end
 end

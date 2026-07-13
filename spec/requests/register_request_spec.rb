@@ -77,19 +77,6 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
-  describe "e_vehicle" do
-    let(:b_param) do
-      BParam.create(origin: "registration_flow",
-        params: {bike: {owner_email:}, propulsion_type_motorized: true}.as_json)
-    end
-
-    it "renders" do
-      get register_e_vehicle_path(b_param_token: b_param.id_token)
-      expect(response.status).to eq 200
-      expect(response).to render_template(:e_vehicle)
-    end
-  end
-
   describe "update" do
     let(:bike_details) do
       {primary_frame_color_id: color.id, serial_number: "XYZ 123", frame_size: "m",
@@ -116,24 +103,10 @@ RSpec.describe RegisterController, type: :request do
             params: {bike: {owner_email:, manufacturer_id: "Trek"}, propulsion_type_motorized: "1"}.as_json)
         end
 
-        it "goes through the e-vehicle attestation step" do
+        it "completes directly, keeping motorized" do
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-          expect(response).to redirect_to register_e_vehicle_path(b_param_token: b_param.id_token)
-
-          patch base_url, params: {b_param_token: b_param.id_token, finalize: true,
-                                   propulsion_type_pedal_assist: "1",
-                                   e_vehicle_attestation: {en_15194: "1", accurate: "1"}}
           expect(response).to redirect_to register_complete_path(b_param_token: b_param.id_token)
-          b_param.reload
-          expect(BParam.propulsion_type(b_param.params)).to eq "pedal-assist"
-          expect(b_param.params["e_vehicle_attestation"]).to eq({"en_15194" => "1", "accurate" => "1"})
-        end
-
-        it "skipping clears motorized" do
-          patch base_url, params: {b_param_token: b_param.id_token, finalize: true,
-                                   propulsion_type_motorized: "false"}
-          expect(response).to redirect_to register_complete_path(b_param_token: b_param.id_token)
-          expect(b_param.reload.motorized?).to be_falsey
+          expect(b_param.reload.motorized?).to be_truthy
         end
       end
     end

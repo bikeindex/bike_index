@@ -3912,7 +3912,6 @@ en:
     payments_new: Support Bike Index!
     register_complete: Bike registration
     register_details: Add your bike's details
-    register_e_vehicle: E-vehicle attestation
     register_new: Register your bike!
     registrations_embed: Register a bike with %{organization}
     search_registrations_index: Search results
@@ -4797,7 +4796,6 @@ en:
       from_step_1: From step 1
       head_tube: Head tube
       inches: inches
-      next: Next
       not_stolen: Not stolen
       not_stolen_description: Registering to keep it safe
       optional: optional
@@ -4820,18 +4818,6 @@ en:
       stolen_description: This bike has been stolen
       view_serial_guide: View the full serial number guide
       wheres_my_serial: Where's my serial number?
-    e_vehicle:
-      complete_registration: Complete Bike Registration
-      confirm_details_below: >-
-        Your bike is registered as a motorized e-bike. Confirm the details below so
-        it's registered correctly. Not an e-vehicle? You can skip this.
-      e_vehicle_attestation: E-vehicle attestation
-      electric_detected: Electric (motorized) detected
-      i_attest: I attest that the information above is accurate.
-      meets_certification: This e-bike meets EN 15194 (or equivalent) certification.
-      motor_under_750w: Motor output is 750W or less.
-      pedal_assist: It's pedal-assist (Class 1–3), not throttle-only.
-      skip_not_an_e_vehicle: Skip — this isn't an e-vehicle
     new:
       bike_info: Bike info
       confirmation_link_here: We'll send your confirmation link here.
