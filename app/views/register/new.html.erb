@@ -10,44 +10,12 @@
     <%= form_with(url: register_path, method: :post, scope: :b_param) do |f| %>
       <%= render Registrations::New::SectionLabel::Component.new(text: t(".bike_info")) %>
 
-      <div
-        class="tw:relative tw:mb-4"
-        data-controller="register--manufacturer-search"
-      >
-        <%= f.label :manufacturer_id, t(".manufacturer"), class: "twlabel" %>
-
-        <%= f.text_field :manufacturer_id,
+      <div class="tw:mb-4">
+        <%= render Form::Combobox::Component.new(name: :manufacturer_id, form: f,
+          label: t(".manufacturer"), label_class: "twlabel", free_text: true,
           value: @b_param.bike["manufacturer_other"].presence || @b_param.bike["manufacturer_id"],
           placeholder: t(".manufacturer_placeholder"),
-          autocomplete: "off",
-          class: "twinput tw:mt-1",
-          data: {
-            "register--manufacturer-search-target": "input",
-            action: "input->register--manufacturer-search#search " \
-              "focus->register--manufacturer-search#search " \
-              "blur->register--manufacturer-search#hideSoon " \
-              "keydown.esc->register--manufacturer-search#hide"
-          } %>
-
-        <div
-          class="
-            tw:absolute tw:right-0 tw:left-0 tw:z-20 tw:mt-1 tw:hidden
-            tw:max-h-56 tw:overflow-y-auto tw:rounded-sm tw:border
-            tw:border-gray-200 tw:bg-white tw:shadow-lg
-            tw:dark:border-gray-700 tw:dark:bg-gray-800
-          "
-          data-register--manufacturer-search-target="menu"
-        ></div>
-
-        <p
-          class="
-            tw:mt-1.5 tw:hidden tw:text-xs tw:text-blue-600
-            tw:dark:text-blue-400
-          "
-          data-register--manufacturer-search-target="selfReportedNote"
-        >
-          <%= t(".not_in_our_list") %>
-        </p>
+          options: Manufacturer.frame_makers.pluck(:name, :id)) %>
       </div>
 
       <div class="tw:mb-4">
