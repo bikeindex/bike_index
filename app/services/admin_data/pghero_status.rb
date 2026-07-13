@@ -4,7 +4,9 @@ module AdminData
   # Single-payload health snapshot from PgHero's primary database. Each metric
   # is captured independently so one failing query (e.g. a missing extension or
   # insufficient privilege) doesn't blank the whole report.
-  class PgheroStatus
+  module PgheroStatus
+    extend Functionable
+
     METRICS = %i[
       database_size total_connections connection_stats
       running_queries long_running_queries blocked_queries
@@ -17,11 +19,7 @@ module AdminData
 
     QUERY_STATS_LIMIT = 25
 
-    def self.call
-      new.as_json
-    end
-
-    def as_json
+    def call
       enabled = safe { ::PgHero.query_stats_enabled? }
       base = {
         query_stats_enabled: enabled,
@@ -32,12 +30,12 @@ module AdminData
       end
     end
 
-    private
-
     def safe
       yield
     rescue => e
       {error: e.message}
     end
+
+    conceal :safe
   end
 end

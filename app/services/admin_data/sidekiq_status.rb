@@ -5,15 +5,13 @@ require "sidekiq/api"
 module AdminData
   # Single-payload snapshot of Sidekiq: aggregate stats, per-queue depth/latency,
   # running processes, and a class breakdown of the retry/dead sets.
-  class SidekiqStatus
+  module SidekiqStatus
+    extend Functionable
+
     # Guard against scanning a pathologically large retry/dead set on production.
     MAX_SET_SCAN = 5_000
 
-    def self.call
-      new.as_json
-    end
-
-    def as_json
+    def call
       stats = ::Sidekiq::Stats.new
       {
         stats: stats_data(stats),
@@ -23,8 +21,6 @@ module AdminData
         dead_by_class: set_by_class(::Sidekiq::DeadSet.new)
       }
     end
-
-    private
 
     def stats_data(stats)
       {
@@ -68,5 +64,7 @@ module AdminData
 
       job_set.map(&:display_class).tally
     end
+
+    conceal :stats_data, :queues_data, :processes_data, :set_by_class
   end
 end
