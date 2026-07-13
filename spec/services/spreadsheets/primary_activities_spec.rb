@@ -16,8 +16,8 @@ RSpec.describe Spreadsheets::PrimaryActivities do
     context "with family" do
       let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Biking)", priority: 10) }
       let!(:primary_activity_2) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family:, priority: 4) }
-      # The family exports as its own row, with the flavor and families columns matching
-      let(:target) { ["flavor,families", "ATB (All Terrain Biking),ATB (All Terrain Biking)", "All Road,ATB (All Terrain Biking)", "Bike Polo,"] }
+      # The family exports as a flavor-less row (empty flavor column)
+      let(:target) { ["flavor,families", ",ATB (All Terrain Biking)", "All Road,ATB (All Terrain Biking)", "Bike Polo,"] }
 
       it "generates" do
         result = described_class.to_csv.split("\n")
@@ -34,8 +34,8 @@ RSpec.describe Spreadsheets::PrimaryActivities do
         let!(:primary_activity_3) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family: primary_activity_family_2, priority: 3) }
         let(:target) do
           ["flavor,families",
-            "ATB (All Terrain Biking),ATB (All Terrain Biking)",
-            "Road Biking,Road Biking",
+            ",ATB (All Terrain Biking)",
+            ",Road Biking",
             "All Road,ATB (All Terrain Biking) & Road Biking",
             "Bike Polo,"]
         end
@@ -57,7 +57,7 @@ RSpec.describe Spreadsheets::PrimaryActivities do
     let!(:family) { FactoryBot.create(:primary_activity_family, name: "Road Biking") }
     let!(:flavor) { FactoryBot.create(:primary_activity, name: "Triathalon", primary_activity_family: family) }
 
-    it "re-imports the exported CSV without creating a flavor for a family self-row" do
+    it "re-imports the exported CSV without creating a flavor for a family row" do
       Tempfile.create(["primary_activities", ".csv"], Rails.root.join("tmp")) do |file|
         file.write(described_class.to_csv)
         file.flush
