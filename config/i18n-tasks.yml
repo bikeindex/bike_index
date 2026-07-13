@@ -25,6 +25,7 @@ data:
     - ["{doorkeeper}.*", 'config/locales/\1.%{locale}.yml']
     # handle namespaced components manually.
     # This is definitely hack :/
+    - ['components.{:}.{:}.{:}.:', 'app/components/\1/\2/\3/component.%{locale}.yml']
     - ['components.{:}.{:}.:', 'app/components/\1/\2/component.%{locale}.yml']
     - ['components.{:}.:', 'app/components/\1/component.%{locale}.yml']
     ## Catch-all default:

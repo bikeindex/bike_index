@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    org:
+      impound_records_index:
+        matching_impound_record:
+          one: matching impound record
+          other: matching impound records

@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    registrations:
+      show:
+        photos:
+          add_photo: Add photo

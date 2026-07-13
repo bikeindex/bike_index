@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    page_block:
+      strava_integration:
+        activities_synced:
+          one: activity synced
+          other: activities synced
