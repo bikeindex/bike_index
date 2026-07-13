@@ -19,7 +19,7 @@
           class: "twinput tw:mt-1" %>
       </div>
 
-      <div class="tw:mb-4" data-controller="register--frame-size">
+      <div class="tw:mb-4" data-controller="registrations--new--frame-size">
         <span class="twlabel">
           <%= t(".frame_size") %>
           <%= render UI::Badge::Component.new(text: t(".optional")) %>
@@ -31,8 +31,8 @@
               <%= f.radio_button :frame_size, size, checked: @b_param.bike["frame_size"] == size,
                 class: "tw:peer tw:sr-only",
                 data: {
-                  "register--frame-size-target": "chip",
-                  action: "change->register--frame-size#pickChip"
+                  "registrations--new--frame-size-target": "chip",
+                  action: "change->registrations--new--frame-size#pickChip"
                 } %>
 
               <span
@@ -62,8 +62,8 @@
               step: 0.5, min: 0, placeholder: t(".enter_size"),
               class: "twinput tw:rounded-r-none",
               data: {
-                "register--frame-size-target": "number",
-                action: "input->register--frame-size#pickNumber"
+                "registrations--new--frame-size-target": "number",
+                action: "input->registrations--new--frame-size#pickNumber"
               } %>
 
             <span

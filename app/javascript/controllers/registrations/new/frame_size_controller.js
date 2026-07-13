@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='register--frame-size'
+// Connects to data-controller='registrations--new--frame-size'
 //
 // Frame size is either an ordinal chip (XS-XL) or a number in inches - picking
 // one clears the other so only a single size is submitted.
