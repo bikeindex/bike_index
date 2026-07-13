@@ -50,6 +50,14 @@ RSpec.describe RegistrationShow::ContactOwner::Component, type: :component do
       end
     end
 
+    context "viewed by the owner" do
+      it "does not render — owners don't contact themselves" do
+        render_inline(described_class.new(bike:, current_user:, owner: true))
+
+        expect(page).not_to have_text("Know something about this bike")
+      end
+    end
+
     context "when the owner's phone is public" do
       before { bike.current_stolen_record.update(phone: "7183914410", phone_for_everyone: true) }
 

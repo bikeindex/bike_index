@@ -223,8 +223,6 @@
         <% end %>
       <% end %>
 
-      <%= render(RegistrationShow::ComponentList::Component.new(bike: @bike, collapsed: true)) %>
-
       <% if show_notes? %>
         <%= render(UI::Card::Component.new) do %>
           <h2
@@ -266,6 +264,8 @@
           <% end %>
         <% end %>
       <% end %>
+
+      <%= render(RegistrationShow::ComponentList::Component.new(bike: @bike, collapsed: true)) %>
 
       <% if show_contact? && other_user_bikes.count > 1 %>
         <%= render(UI::Card::Component.new) do %>
@@ -322,16 +322,22 @@
         </h2>
 
         <% if show_contact? %>
-          <%= render(UI::DefinitionList::Container::Component.new(term: :right_align)) do %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_name"), value: @bike.owner_name)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_email"))) { link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") } %>
+          <div class="tw:mt-3">
+            <%= render(UI::DefinitionList::Container::Component.new(term: :right_align)) do %>
+              <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_name"), value: @bike.owner_name)) %>
+              <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_email"))) { link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") } %>
 
-            <% if owner_phone.present? %>
-              <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_phone"))) { link_to(owner_phone, "tel:#{owner_phone}", class: "twlink tw:font-mono") } %>
+              <% if owner_phone.present? %>
+                <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_phone"))) { link_to(owner_phone, "tel:#{owner_phone}", class: "twlink tw:font-mono") } %>
+              <% end %>
+
+              <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
+
+              <% org_registration_field_rows.each do |label, value| %>
+                <%= render(UI::DefinitionList::Row::Component.new(label: label, value: value)) %>
+              <% end %>
             <% end %>
-
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
-          <% end %>
+          </div>
           <% if staff? %>
             <div
               class="
@@ -348,7 +354,7 @@
               </p>
 
               <div class="tw:mt-2 tw:flex tw:gap-4">
-                <%= link_to translation(".edit_access"), edit_access_path, class: "twlink tw:text-sm" %>
+                <%= link_to translation(".edit_bike_type", bike_type: @bike.type), edit_access_path, class: "twlink tw:text-sm" %>
 
                 <span
                   class="tw:cursor-not-allowed tw:text-sm tw:opacity-50"

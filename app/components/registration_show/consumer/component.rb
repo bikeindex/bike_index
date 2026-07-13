@@ -78,7 +78,7 @@ module RegistrationShow
       # Each color as its own swatch + name, kept together so only the "and" wraps
       def color_swatches
         frame_color_records.map do |color|
-          swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm))
+          swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm, align: :baseline))
           content_tag(:span, safe_join([swatch, " ", color.name]), class: "tw:whitespace-nowrap")
         end
       end
@@ -86,6 +86,12 @@ module RegistrationShow
       def show_marketplace_button?
         @owner && @bike.status_with_owner? &&
           (@bike.current_marketplace_listing&.current? || @current_user&.can_create_listing?)
+      end
+
+      # Half-width next to "Sell on Marketplace" when it shows, full-width otherwise
+      def edit_bike_button
+        render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: @bike.default_edit_template),
+          text: translation(".edit_this_bike", bike_type: @bike.type), color: :purple, size: :lg, class: "tw:justify-center tw:text-center tw:py-2.5!"))
       end
     end
   end

@@ -5,13 +5,15 @@ module RegistrationShow
     # "Contact the owner" message form for a stolen bike — mirrors the legacy
     # bikes/show contact block, revealing the form via Stimulus
     class Component < ApplicationComponent
-      def initialize(bike:, current_user: nil)
+      def initialize(bike:, current_user: nil, owner: false)
         @bike = bike
         @current_user = current_user
+        @owner = owner
       end
 
+      # Not shown to the owner — they don't contact themselves
       def render?
-        BikeServices::Displayer.display_contact_owner?(@bike, @current_user)
+        !@owner && BikeServices::Displayer.display_contact_owner?(@bike, @current_user)
       end
 
       private

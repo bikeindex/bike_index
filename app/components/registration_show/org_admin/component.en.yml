@@ -11,7 +11,7 @@ en:
         credibility: Credibility
         current: Current
         e_vehicle_compliance: E-vehicle compliance
-        edit_access: Edit access
+        edit_bike_type: Edit %{bike_type}
         frame_material: Frame material
         frame_size: Frame size
         has_duplicate_serials: has dup. serials

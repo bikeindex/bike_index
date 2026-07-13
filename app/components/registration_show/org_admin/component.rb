@@ -119,7 +119,7 @@ module RegistrationShow
 
       def color_swatches
         frame_color_records.map do |color|
-          swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm))
+          swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm, align: :baseline))
           content_tag(:span, safe_join([swatch, " ", color.name]), class: "tw:whitespace-nowrap")
         end
       end
@@ -146,6 +146,43 @@ module RegistrationShow
 
       def owner_phone
         @bike.phone if @bike.phoneable_by?(@current_user)
+      end
+
+      # The organization's additional registration fields (affiliation, student
+      # ID, etc.) for this bike, as [label, value] rows — blank values dropped
+      def org_registration_field_rows
+        (@organization.additional_registration_fields - ["reg_bike_sticker"]).filter_map do |reg_field|
+          bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
+          value = org_registration_field_value(bike_attr)
+          next if value.blank?
+
+          [org_registration_field_label(reg_field, bike_attr), value]
+        end
+      end
+
+      def org_registration_field_value(bike_attr)
+        case bike_attr
+        when "organization_affiliation" then @bike.organization_affiliation(@organization)&.humanize
+        when "student_id" then @bike.student_id(@organization)
+        when "address" then org_registration_address
+        else @bike.send(bike_attr)
+        end
+      end
+
+      # The org's custom label for the field, falling back to the humanized attribute
+      def org_registration_field_label(reg_field, bike_attr)
+        custom = @organization.registration_field_labels&.dig(reg_field)
+        return Binxtils::InputNormalizer.sanitize(custom) if custom.present?
+
+        bike_attr.humanize(keep_id_suffix: true)
+      end
+
+      def org_registration_address
+        address = @bike.registration_address
+        return if address.blank? || address == @organization.default_location&.address_hash_legacy
+
+        [address["address"], address["city"], [address["state"], address["zipcode"]].compact_blank.join(" ")]
+          .compact_blank.join(", ").presence
       end
 
       def show_notes?

@@ -9,6 +9,7 @@ en:
         audience_public: Public view
         audience_sent_away: No longer your %{bike_type}
         bike_details: "%{bike_type} details"
+        edit_this_bike: Edit this %{bike_type}
         frame_material: Frame material
         id: ID
         mark_stolen: Mark stolen
