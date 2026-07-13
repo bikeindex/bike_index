@@ -9,7 +9,7 @@ class RegistrationsController < ApplicationController
     @bike = Bike.unscoped.find_id(params[:id])
     fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
 
-    render(RegistrationShow::Wrapper::Component.new(bike: @bike, current_user:, view: current_view,
+    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view: current_view,
       available_views:, mapbox_key: ENV["MAPBOX_MAPPING"]), layout: "application")
   end
 

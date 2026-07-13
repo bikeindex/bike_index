@@ -1,8 +1,0 @@
----
-en:
-  components:
-    registration_show:
-      component_list:
-        full_spec_sheet: Full spec sheet
-        hide: Hide
-        show_all: Show all
