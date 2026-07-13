@@ -132,7 +132,7 @@ Substitute whichever form (markdown `![](...)` or HTML `<img ...>`) GitHub retur
 
 If a screenshots comment already exists (one authored by you whose body starts with `## Screenshots`), edit it in place instead of posting a new one:
 ```bash
-SCREENSHOT_COMMENT_ID=$(gh api repos/{owner}/{repo}/issues/{PR_NUMBER}/comments \
+SCREENSHOT_COMMENT_ID=$(gh api "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" \
   --jq '.[] | select(.body | startswith("## Screenshots")) | .id' | head -1)
 ```
 
@@ -144,7 +144,7 @@ Write the comment body to a temp file:
 ```
 
 - If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment {PR_NUMBER} --body-file <tmp-comment-file>`.
-- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body=@<tmp-comment-file>`.
+- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body="$(cat <tmp-comment-file>)" --jq .html_url`. Don't use `-f body=@<file>` — `gh api`'s `-f` stores the literal string `@<file>` rather than reading it, so the comment gets clobbered with the filename.
 
 Only edit the PR description instead when the user explicitly asks for it:
 ```bash

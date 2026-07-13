@@ -69,8 +69,8 @@ class BParam < ApplicationRecord
     stolen
     street
   ].freeze
-  mount_uploader :image, ImageUploader
-  process_in_background :image, CarrierWaveStoreJob
+  mount_uploader :image, ImageUploaderBackgrounded
+  process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"

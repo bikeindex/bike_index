@@ -262,6 +262,26 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "image processing" do
+    let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }
+    let(:b_param) { FactoryBot.build(:b_param) }
+
+    # Regression: process_in_background with a non-Delay uploader resized inline in the
+    # request, hitting the 30s Rack::Timeout on bikes#create (Honeybadger 132565677)
+    it "defers version generation to the background job instead of resizing inline" do
+      ImageUploaderBackgrounded.enable_processing = true
+      b_param.image = image_file
+      expect { b_param.save! }.to change(CarrierWaveProcessJob.jobs, :size).by(1)
+      expect(b_param.process_image_upload).to be_nil
+      expect(b_param.image.file).to be_present # original stored synchronously
+      expect(b_param.image.large.file).to be_blank # resized versions deferred to the job
+    ensure
+      ImageUploaderBackgrounded.enable_processing = false
+      b_param.image&.remove!
+      image_file.close
+    end
+  end
+
   describe "additional_registration_fields" do
     let(:params_hash) { {bike: bike_params}.as_json }
     let(:b_param) { BParam.new(params: params_hash) }

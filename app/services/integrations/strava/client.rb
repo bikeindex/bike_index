@@ -6,7 +6,7 @@ module Integrations
       extend Functionable
 
       BASE_URL = "https://www.strava.com"
-      API_URL = "https://www.api-v3.strava.com"
+      API_URL = "https://www.strava.com/api/v3"
       DEFAULT_SCOPE = "read,activity:read_all,profile:read_all"
       STRAVA_SEARCH_SCOPE = "#{DEFAULT_SCOPE},activity:write"
       STRAVA_KEY = ENV["STRAVA_KEY"]
@@ -88,7 +88,7 @@ module Integrations
       end
 
       def create_webhook_subscription
-        oauth_connection.post("#{API_URL}/push_subscriptions") do |req|
+        oauth_connection.post("api/v3/push_subscriptions") do |req|
           req.body = {
             client_id: STRAVA_KEY,
             client_secret: STRAVA_SECRET,
@@ -99,7 +99,7 @@ module Integrations
       end
 
       def view_webhook_subscriptions
-        oauth_connection.get("#{API_URL}/push_subscriptions") do |req|
+        oauth_connection.get("api/v3/push_subscriptions") do |req|
           req.params = {client_id: STRAVA_KEY, client_secret: STRAVA_SECRET}
         end
       end
@@ -113,7 +113,7 @@ module Integrations
       end
 
       def delete_webhook_subscription(subscription_id)
-        oauth_connection.delete("#{API_URL}/push_subscriptions/#{subscription_id}") do |req|
+        oauth_connection.delete("api/v3/push_subscriptions/#{subscription_id}") do |req|
           req.body = {client_id: STRAVA_KEY, client_secret: STRAVA_SECRET}
         end
       end

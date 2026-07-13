@@ -42,8 +42,11 @@ permissions:
 
 env:
   REVIEW_LABEL: review-app
-  # Marks the `report` job's failure comment so it can be found again — edited in
-  # place on repeat failures, deleted by `post` after a successful deploy.
+  # Marks the `report` job's failure comment so it can be found again. Each comment
+  # also carries the failing commit's SHA (`<!-- sha:… -->`), so `report` edits in
+  # place only when the SAME commit fails again. The comment is hidden (minimized as
+  # OUTDATED), never deleted, once it's stale — either the deploy succeeds (`post`)
+  # or a newer commit is deployed (`report` hides the prior commit's comment).
   FAILURE_COMMENT_MARKER: "<!-- review-app-failure -->"
 
 jobs:
@@ -174,19 +177,22 @@ jobs:
               state: "success",
               environment_url: process.env.DEPLOY_URL,
             })
-      # A successful deploy clears the `report` job's now-stale failure comment.
-      - name: Remove stale deploy-failure comment
+      # A successful deploy makes the `report` job's failure comment stale. Hide it
+      # (minimize as OUTDATED) rather than delete — the record stays on the PR.
+      - name: Hide stale deploy-failure comment
         if: needs.resolve.outputs.action == 'deploy' && needs.op.result == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
         run: |
-          cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
-            --jq "[.[] | select(.body | startswith(\"$FAILURE_COMMENT_MARKER\")) | .id][0] // empty")
-          if [ -n "$cid" ]; then
-            echo "Deleting stale failure comment $cid"
-            gh api --method DELETE "repos/$GITHUB_REPOSITORY/issues/comments/$cid" || true
-          fi
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+            --jq ".[] | select(.body | startswith(\"$FAILURE_COMMENT_MARKER\")) | .node_id" \
+          | while read -r nid; do
+              [ -n "$nid" ] || continue
+              echo "Hiding stale failure comment $nid"
+              gh api graphql -f query='mutation($id: ID!) { minimizeComment(input: {classifier: OUTDATED, subjectId: $id}) { minimizedComment { isMinimized } } }' -f id="$nid" || true
+            done
 
       # Gated on op success: a failed teardown leaves the app/db/volumes behind,
       # so keep the label (the app still exists) and the images needed to retry.
@@ -223,8 +229,9 @@ jobs:
 
   # Failed builds/deploys are invisible on the PR otherwise: these runs are
   # workflow_dispatch-triggered, so their check runs never appear in the PR's
-  # check rollup. Comment the failure instead — edited in place on repeat failures
-  # (matched via the marker), deleted by `post` on the next successful deploy.
+  # check rollup. Comment the failure instead — edited in place when the SAME commit
+  # fails again (matched via the marker + SHA), and hidden (never deleted) once stale:
+  # by `post` on the next successful deploy, or here when a newer commit fails.
   report:
     name: Report failure on PR
     needs: [resolve, op, post]
@@ -241,15 +248,28 @@ jobs:
           HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          body="$FAILURE_COMMENT_MARKER
+          set -euo pipefail
+          sha_marker="<!-- sha:$HEAD_SHA -->"
+          body="$FAILURE_COMMENT_MARKER $sha_marker
           🚨 **Review app ${ACTION} failed** for \`${HEAD_SHA:0:7}\` — [run logs](${RUN_URL})
 
           Push a fix to retry automatically, or re-run the Review App workflow manually."
+          # Edit in place only when THIS commit failed before; a comment for an older
+          # commit is left untouched here and hidden below.
           cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
-            --jq "[.[] | select(.body | startswith(\"$FAILURE_COMMENT_MARKER\")) | .id][0] // empty")
+            --jq "[.[] | select(.body | startswith(\"$FAILURE_COMMENT_MARKER\")) | select(.body | contains(\"$sha_marker\")) | .id][0] // empty" | head -n1)
           if [ -n "$cid" ]; then
             echo "Updating existing failure comment $cid"
             gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$cid" -f body="$body"
           else
             gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "$body"
           fi
+          # A newer commit is being deployed, so hide (never delete) any failure
+          # comment left over from an earlier commit.
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+            --jq ".[] | select(.body | startswith(\"$FAILURE_COMMENT_MARKER\")) | select(.body | contains(\"$sha_marker\") | not) | .node_id" \
+          | while read -r nid; do
+              [ -n "$nid" ] || continue
+              echo "Hiding stale failure comment $nid"
+              gh api graphql -f query='mutation($id: ID!) { minimizeComment(input: {classifier: OUTDATED, subjectId: $id}) { minimizedComment { isMinimized } } }' -f id="$nid" || true
+            done
