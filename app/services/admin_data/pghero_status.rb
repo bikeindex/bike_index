@@ -30,6 +30,10 @@ module AdminData
       end
     end
 
+    #
+    # private below here
+    #
+
     def safe
       yield
     rescue => e

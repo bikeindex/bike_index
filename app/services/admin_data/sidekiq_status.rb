@@ -22,6 +22,10 @@ module AdminData
       }
     end
 
+    #
+    # private below here
+    #
+
     def stats_data(stats)
       {
         enqueued: stats.enqueued,
