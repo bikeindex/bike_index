@@ -19,6 +19,10 @@ module UI
       def success
         render(UI::Alert::Component.new(text: "This is a success alert", kind: :success))
       end
+
+      def custom_icon
+        render(UI::Alert::Component.new(text: "Check your email", kind: :notice, icon: "icons/envelope"))
+      end
       # @!endgroup
 
       # @!group Dismissable variants

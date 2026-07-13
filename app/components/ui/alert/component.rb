@@ -11,7 +11,9 @@ module UI
         success: "tw:text-green-800 tw:dark:text-green-400"
       }.freeze
 
-      def initialize(text: nil, header: nil, kind: nil, dismissable: false, margin_classes: "tw:mb-4")
+      # icon: a path under app/assets/images, sans .svg (e.g. "icons/envelope") -
+      # replaces the default info icon
+      def initialize(text: nil, header: nil, kind: nil, dismissable: false, margin_classes: "tw:mb-4", icon: nil)
         @text = text
         @header = header
         @kind = if KINDS.include?(kind&.to_sym)
@@ -21,6 +23,7 @@ module UI
         end
         @dismissable = dismissable
         @margin_classes = margin_classes
+        @icon = icon
       end
 
       private
