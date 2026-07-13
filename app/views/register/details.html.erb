@@ -7,7 +7,8 @@
   <div class="tw:mx-auto tw:max-w-md">
     <%= render Registrations::New::Progress::Component.new(step: 2, total: 2) %>
 
-    <%= render UI::Alert::Component.new(kind: :notice, icon: "icons/envelope", text: t(".confirmation_link_sent")) %>
+    <%= render UI::Alert::Component.new(kind: :notice, text: t(".confirmation_link_sent"),
+      icon: inline_svg_tag("icons/envelope.svg", class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)) %>
 
     <%= render Registrations::New::Heading::Component.new(title: t(".add_your_bikes_details"), subtitle: t(".easier_to_recover")) %>
 

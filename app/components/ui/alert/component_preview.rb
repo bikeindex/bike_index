@@ -21,7 +21,9 @@ module UI
       end
 
       def custom_icon
-        render(UI::Alert::Component.new(text: "Check your email", kind: :notice, icon: "icons/envelope"))
+        envelope = ActionController::Base.helpers.inline_svg_tag("icons/envelope.svg",
+          class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)
+        render(UI::Alert::Component.new(text: "Check your email", kind: :notice, icon: envelope))
       end
       # @!endgroup
 

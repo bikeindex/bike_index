@@ -14,8 +14,9 @@ RSpec.describe UI::Alert::Component, type: :component do
   end
 
   describe "icon" do
-    let(:options) { {text: "some text", icon: "icons/envelope"} }
-    it "renders the custom icon instead of the default" do
+    let(:icon) { ActionController::Base.helpers.inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4") }
+    let(:options) { {text: "some text", icon:} }
+    it "renders the passed icon instead of the default" do
       expect(component.to_html).to include "M8.47 1.318" # the envelope path
       expect(component.to_html).to_not include "M10 .5a9.5" # the default info path
     end

@@ -11,7 +11,7 @@ module UI
         success: "tw:text-green-800 tw:dark:text-green-400"
       }.freeze
 
-      # icon: a path under app/assets/images, sans .svg (e.g. "icons/envelope") -
+      # icon: rendered markup, e.g. inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4") -
       # replaces the default info icon
       def initialize(text: nil, header: nil, kind: nil, dismissable: false, margin_classes: "tw:mb-4", icon: nil)
         @text = text

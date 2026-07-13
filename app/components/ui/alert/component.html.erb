@@ -5,7 +5,7 @@
 >
   <div class="tw:w-4">
     <% if @icon.present? %>
-      <%= helpers.inline_svg_tag "#{@icon}.svg", class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true %>
+      <%= @icon %>
     <% else %>
       <svg
         class="tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0"
