@@ -39,9 +39,22 @@
           {display: label, value: slug, content:}
         end %>
 
-        <%= render Form::Combobox::Component.new(name: :cycle_type, form: f,
-          label: t(".vehicle_type"), label_class: "twlabel",
-          value: @b_param.cycle_type, options: cycle_type_options) %>
+        <div
+          class="tw:relative"
+          data-controller="registrations--new--combobox-display"
+        >
+          <%= render Form::Combobox::Component.new(name: :cycle_type, form: f,
+            label: t(".vehicle_type"), label_class: "twlabel",
+            value: @b_param.cycle_type, options: cycle_type_options) %>
+
+          <div
+            class="
+              tw:pointer-events-none tw:absolute tw:hidden tw:truncate
+              tw:text-gray-900 tw:dark:text-gray-200
+            "
+            data-registrations--new--combobox-display-target="overlay"
+          ></div>
+        </div>
 
         <label
           class="twlabel tw:mt-3 tw:flex tw:items-center tw:gap-2"
