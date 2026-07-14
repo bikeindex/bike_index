@@ -52,12 +52,7 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 
 ## Typeaheads: always `Form::Combobox`
 
-**Every typeahead / autocomplete / combobox goes through `Form::Combobox::Component`** (built on the hotwire_combobox gem) — never a new Stimulus controller that fetches matches and renders its own menu. A hand-rolled typeahead duplicates the listbox markup, keyboard navigation, mobile dialog variant, and ARIA wiring the gem already provides, and silently drifts from the shared `hw-combobox` styling (`app/assets/tailwind/combobox.css`).
-
-- In-memory choices: `render Form::Combobox::Component.new(name: :manufacturer_id, form: f, label: "Manufacturer", options: Manufacturer.frame_makers.pluck(:name, :id))` — accepts strings, `[display, value]` pairs, or `{display:, value:}` hashes.
-- Async options: pass `src:` with an endpoint that renders hotwire_combobox options (see `Search::ComboboxController#options`) instead of `options:`.
-- To allow values outside the list, pass `free_text: true` — unmatched input submits as the raw string (e.g. self-reported manufacturers resolve server-side via `BParam#set_manufacturer_key`).
-- Other keywords (`label:`, `value:`, `placeholder:`, `open:`, `include_blank:`, `label_class:`, …) forward to `hw_combobox_tag`.
+**Every typeahead / autocomplete / combobox goes through `Form::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. See `app/components/form/combobox/` (component + `component_preview.rb`) and `spec/components/form/combobox` for how to invoke it.
 
 ## Showing and hiding elements: always use the collapse helpers
 
