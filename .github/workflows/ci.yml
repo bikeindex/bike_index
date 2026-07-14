@@ -61,7 +61,7 @@ jobs:
       - run: bundle install
 
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           cache: 'npm'
       - run: npm install
@@ -265,7 +265,7 @@ jobs:
       # `playwright` npm package against the Chromium baked into the CI image
       # (.github/ci/Dockerfile) at PLAYWRIGHT_BROWSERS_PATH.
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           cache: 'npm'
       - run: npm install
