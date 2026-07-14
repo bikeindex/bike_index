@@ -23,18 +23,14 @@ export default class extends Controller {
   syncFromUrl () {
     const params = new URL(window.location).searchParams
     const kind = params.get('search_kind') === 'stickers' ? 'stickers' : 'serials'
-    if (this.searchKindValue !== kind) {
-      this.searchKindValue = kind
-      this.updatePlaceholderAndButton()
-      const radio = this.element.querySelector(`input[name='search_kind'][value='${kind}']`)
-      if (radio) radio.checked = true
-    }
+    if (this.searchKindValue !== kind) this.applyKind(kind)
     if (this.hasSearchAllTarget && !this.searchAllTarget.disabled) {
       this.searchAllTarget.checked = params.get('search_all') === '1'
     }
     this.syncSearchAll()
-    const serials = this.parseSerials(params.get('serials') || '')
-    this.textareaTarget.value = params.get('serials') || ''
+    const serialsParam = params.get('serials') || ''
+    this.textareaTarget.value = serialsParam
+    const serials = this.parseSerials(serialsParam)
     if (serials.length) {
       this.search(serials, { pushHistory: false })
     } else {
@@ -46,15 +42,21 @@ export default class extends Controller {
   switchKind (event) {
     const value = event.target.value
     if (this.searchKindValue === value) return
-    this.searchKindValue = value
-    this.updatePlaceholderAndButton()
-    this.syncSearchAll()
+    this.applyKind(value)
     this.resultsTarget.innerHTML = ''
     this.serialChipsTarget.innerHTML = ''
 
     const url = new URL(window.location.pathname, window.location.origin)
     url.searchParams.set('search_kind', value)
     window.history.pushState({}, '', url)
+  }
+
+  applyKind (kind) {
+    this.searchKindValue = kind
+    this.updatePlaceholderAndButton()
+    const radio = this.element.querySelector(`input[name='search_kind'][value='${kind}']`)
+    if (radio) radio.checked = true
+    this.syncSearchAll()
   }
 
   updatePlaceholderAndButton () {
@@ -167,15 +169,17 @@ export default class extends Controller {
     return span
   }
 
+  // A result with no bikes renders no table, so drop it; exact matches and close
+  // serials both render one, so they survive.
   sortAndFilterResults () {
     const results = Array.from(this.resultsTarget.querySelectorAll('.multi-search-serial-result'))
     results
       .sort((a, b) => parseInt(a.dataset.serialIndex) - parseInt(b.dataset.serialIndex))
       .forEach(result => {
-        if (result.dataset.resultCount === '0') {
-          result.remove()
-        } else {
+        if (result.querySelector('table')) {
           this.resultsTarget.appendChild(result)
+        } else {
+          result.remove()
         }
       })
   }

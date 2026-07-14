@@ -2,7 +2,6 @@
   class="multi-search-serial-result"
   id="result_<%= result_index %>"
   data-serial-index="<%= result_index %>"
-  data-result-count="<%= displayed_result_count %>"
 >
   <h4 class="uncap tw:mt-4 tw:mb-0 tw:px-1">
     <%= translation(sticker_search? ? ".sticker_label" : ".serial_label") %>
@@ -20,7 +19,9 @@
 
   <% if displayed_bikes&.any? %>
     <% if close_serials_only? %>
-      <p class="tw:text-gray-500"><%= translation(".no_exact_matches") %></p>
+      <p class="tw:mb-0 tw:text-gray-500">
+        <%= translation(".no_exact_matches") %>
+      </p>
     <% end %>
     <%= render(Org::RegistrationSearch::Component.new(
       organization: @organization,

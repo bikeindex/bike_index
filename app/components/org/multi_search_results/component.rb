@@ -30,16 +30,13 @@ module Org
 
       # Fall back to close serials (near Levenshtein matches) when nothing matched exactly
       def displayed_bikes
-        @bikes.presence || @close_serials
+        return @displayed_bikes if defined?(@displayed_bikes)
+
+        @displayed_bikes = (@bikes.presence || @close_serials)&.to_a
       end
 
       def close_serials_only?
-        @bikes.blank? && @close_serials.present?
-      end
-
-      # Drives the JS filter that drops empty results; close serials must keep it alive
-      def displayed_result_count
-        displayed_bikes&.size || 0
+        @bikes.blank? && displayed_bikes.present?
       end
 
       def show_view_all?
