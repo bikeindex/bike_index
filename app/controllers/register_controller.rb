@@ -108,6 +108,8 @@ class RegisterController < ApplicationController
       :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
       :bike_sticker, :phone, :status, :frame_model)
       .reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
+    # The unit only means something alongside a numeric size
+    bike_params.delete("frame_size_unit") if bike_params["frame_size_number"].blank?
     {details_completed: true, bike: bike_params}
   end
 end

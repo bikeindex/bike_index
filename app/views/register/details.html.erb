@@ -114,17 +114,13 @@
                 action: "input->registrations--new--frame-size#pickNumber"
               } %>
 
-            <span
-              class="
-                tw:self-stretch tw:rounded-r-sm tw:border tw:border-l-0
+            <%= f.select :frame_size_unit, [[t(".inches"), "in"], [t(".cm"), "cm"]],
+              {selected: @b_param.bike["frame_size_unit"] || "in"},
+              class: "tw:self-stretch tw:rounded-r-sm tw:border tw:border-l-0
                 tw:border-gray-300 tw:bg-gray-50 tw:px-3 tw:py-1.5
                 tw:text-sm tw:font-medium tw:text-gray-500
                 tw:dark:border-gray-600 tw:dark:bg-gray-700
-                tw:dark:text-gray-400
-              "
-            >
-              <%= t(".inches") %>
-            </span>
+                tw:dark:text-gray-400" %>
           </div>
         </div>
       </div>

@@ -108,6 +108,22 @@ RSpec.describe RegisterController, type: :request do
         expect(response.body).to include "verify your email"
       end
 
+      context "frame size in cm" do
+        it "saves the unit with the number, dropping it otherwise" do
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: {frame_size_number: "56", frame_size_unit: "cm", status: "status_with_owner"}}
+          expect(b_param.reload.bike).to match_hash_indifferently(
+            owner_email:, manufacturer_id: manufacturer.id,
+            frame_size_number: "56", frame_size_unit: "cm", status: "status_with_owner"
+          )
+
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: {frame_size: "m", frame_size_unit: "in", status: "status_with_owner"}}
+          expect(b_param.reload.bike["frame_size"]).to eq "m"
+          expect(b_param.bike["frame_size_unit"]).to eq "cm" # unit without a number isn't overwritten
+        end
+      end
+
       context "additional colors" do
         let(:color2) { FactoryBot.create(:color, name: "Blue") }
 
