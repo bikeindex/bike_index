@@ -3,11 +3,6 @@
 module UI
   module Button
     class ComponentPreview < ApplicationComponentPreview
-      # @label legacy (using twbtn classes)
-      def legacy
-        {template: "ui/button/component_preview/default"}
-      end
-
       # @!group Colors
       def primary
         render(UI::Button::Component.new(text: "Primary", color: :primary))
