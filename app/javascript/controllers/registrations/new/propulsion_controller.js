@@ -5,15 +5,20 @@ import { Controller } from '@hotwired/stimulus'
 // Mirrors the registration embed's UpdatePropulsionType: the electric checkbox
 // is forced on/off (and disabled) for always/never-motorized vehicle types.
 export default class extends Controller {
-  static targets = ['cycleType', 'motorized', 'motorizedWrapper']
+  static targets = ['motorized', 'motorizedWrapper']
   static values = { alwaysMotorized: Array, neverMotorized: Array }
 
   connect () {
+    this.element.addEventListener('hw-combobox:selection', this.update)
     this.update()
   }
 
-  update () {
-    const cycleType = this.cycleTypeTarget.value
+  disconnect () {
+    this.element.removeEventListener('hw-combobox:selection', this.update)
+  }
+
+  update = () => {
+    const cycleType = this.element.querySelector('input[name$="[cycle_type]"]')?.value
     if (this.alwaysMotorizedValue.includes(cycleType)) {
       this.setMotorized({ checked: true, enabled: false })
     } else if (this.neverMotorizedValue.includes(cycleType)) {

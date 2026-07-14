@@ -29,14 +29,19 @@
         data-registrations--new--propulsion-always-motorized-value="<%= CycleType::ALWAYS_MOTORIZED.to_json %>"
         data-registrations--new--propulsion-never-motorized-value="<%= CycleType::NEVER_MOTORIZED.to_json %>"
       >
-        <%= f.label :cycle_type, t(".vehicle_type"), class: "twlabel" %>
+        <% cycle_type_options = CycleType.select_options(traditional_bike: true).map do |label, slug|
+          base, parens = label.split(" (", 2)
+          content = if parens
+            safe_join([base, " ", content_tag(:span, "(#{parens}", class: "tw:text-[#9a9aa2] tw:dark:text-gray-500")])
+          else
+            label
+          end
+          {display: label, value: slug, content:}
+        end %>
 
-        <%= f.select :cycle_type, CycleType.select_options(traditional_bike: true),
-          {selected: @b_param.cycle_type}, class: "twinput tw:mt-1",
-          data: {
-            "registrations--new--propulsion-target": "cycleType",
-            action: "change->registrations--new--propulsion#update"
-          } %>
+        <%= render Form::Combobox::Component.new(name: :cycle_type, form: f,
+          label: t(".vehicle_type"), label_class: "twlabel",
+          value: @b_param.cycle_type, options: cycle_type_options) %>
 
         <label
           class="twlabel tw:mt-3 tw:flex tw:items-center tw:gap-2"
