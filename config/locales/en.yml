@@ -4793,8 +4793,7 @@ en:
       manufacturer: Manufacturer
       manufacturer_placeholder: Start typing e.g. Trek
       next: Next
-      no_need_to_wait: We'll email a confirmation link too — you don't have to wait
-        for it to continue.
+      no_need_to_wait: We'll email a confirmation link too after you've finished registering
       register_your_bike: Register your bike!
       vehicle_type: Vehicle type
       your_info: Your info
