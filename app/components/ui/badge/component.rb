@@ -20,12 +20,10 @@ module UI
         success: "tw:bg-green-50 tw:text-green-700 tw:border-transparent tw:dark:bg-green-950 tw:dark:text-green-200",
         # Special badge classes:
         cyan: "tw:bg-cyan-50 tw:text-cyan-700 tw:border-transparent tw:dark:bg-cyan-950 tw:dark:text-cyan-200",
-        gray: "tw:bg-gray-100 tw:text-gray-700 tw:border-transparent tw:dark:bg-gray-800 tw:dark:text-gray-200",
+        gray: "tw:bg-[#f0f0f2] tw:text-[#9a9aa2] tw:border-transparent tw:dark:bg-gray-800 tw:dark:text-gray-500",
         purple: "tw:bg-purple-50 tw:text-purple-700 tw:border-transparent tw:dark:bg-purple-950 tw:dark:text-purple-200",
         rose: "tw:bg-rose-50 tw:text-rose-700 tw:border-transparent tw:dark:bg-rose-950 tw:dark:text-rose-200",
         orange: "tw:bg-orange-50 tw:text-orange-700 tw:border-transparent tw:dark:bg-orange-950 tw:dark:text-orange-200",
-        # Redesign: quiet inline label, e.g. the "optional" pill next to form labels
-        muted: "tw:bg-[#f0f0f2] tw:text-[#9a9aa2] tw:border-transparent tw:dark:bg-gray-800 tw:dark:text-gray-500",
         empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600"
       }.freeze
 
