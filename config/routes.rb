@@ -157,14 +157,8 @@ Rails.application.routes.draw do
     member { post :is_private }
   end
 
-  resources :registrations, only: %i[new create show] do
+  resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
-    member do
-      get :edit, to: redirect { |path_params, request|
-        query = request.query_string
-        "/bikes/#{path_params[:id]}/edit#{"?#{query}" unless query.blank?}"
-      }
-    end
   end
 
   namespace :search do
