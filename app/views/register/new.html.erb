@@ -41,10 +41,7 @@
       <%= render Registrations::New::SectionLabel::Component.new(text: t(".your_info"), divider: true) %>
 
       <div class="tw:mb-6">
-        <%= f.label :owner_email, class: "twlabel" do %>
-          <%= t(".email") %>
-          <span class="tw:text-red-600">*</span>
-        <% end %>
+        <%= f.label :owner_email, t(".email"), class: "twlabel" %>
 
         <%= f.email_field :owner_email, value: @b_param.owner_email, required: true,
           placeholder: t(".email_placeholder"), class: "twinput tw:mt-1" %>
