@@ -100,6 +100,20 @@ RSpec.describe RegisterController, type: :request do
         expect(response.body).to include "verify your email"
       end
 
+      context "additional colors" do
+        let(:color2) { FactoryBot.create(:color, name: "Blue") }
+
+        it "saves them and clears them when posted blank (remove additional color)" do
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(secondary_frame_color_id: color2.id)}
+          expect(b_param.reload.bike["secondary_frame_color_id"]).to eq color2.id.to_s
+
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(secondary_frame_color_id: "")}
+          expect(b_param.reload.bike["secondary_frame_color_id"]).to be_blank
+        end
+      end
+
       context "email already confirmed" do
         let!(:user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 

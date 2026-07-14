@@ -17,12 +17,42 @@
 
       <%= render Registrations::New::SectionLabel::Component.new(text: t(".bike_details")) %>
 
-      <div class="tw:mb-4">
+      <div
+        class="tw:mb-4"
+        data-controller="registrations--new--additional-colors"
+      >
         <%= f.label :primary_frame_color_id, t(".color"), class: "twlabel" %>
 
         <%= f.select :primary_frame_color_id, Color.select_options,
           {selected: @b_param.primary_frame_color_id, include_blank: t(".choose_color")},
           class: "twinput tw:mt-1" %>
+
+        <% [:secondary_frame_color_id, :tertiary_frame_color_id].each do |field| %>
+          <% value = @b_param.bike[field.to_s] %>
+
+          <div
+            class="tw:mt-2 tw:flex tw:items-center tw:gap-3 <%= "tw:hidden" if value.blank? %>"
+            data-registrations--new--additional-colors-target="row"
+          >
+            <%= f.select field, Color.select_options,
+              {selected: value, include_blank: t(".choose_color")}, class: "twinput" %>
+
+            <%= render UI::Button::Component.new(text: t(".remove_additional_color"),
+              color: :purple_link, html_class: "tw:shrink-0 tw:text-xs",
+              data: {action: "registrations--new--additional-colors#remove"}) %>
+          </div>
+        <% end %>
+
+        <% all_colors_shown = %w[secondary_frame_color_id tertiary_frame_color_id].all? { |field| @b_param.bike[field].present? } %>
+
+        <div
+          class="tw:mt-2 <%= "tw:hidden" if all_colors_shown %>"
+          data-registrations--new--additional-colors-target="addButton"
+        >
+          <%= render UI::Button::Component.new(text: t(".add_additional_color"),
+            color: :purple_link, html_class: "tw:text-xs",
+            data: {action: "registrations--new--additional-colors#add"}) %>
+        </div>
       </div>
 
       <div class="tw:mb-4" data-controller="registrations--new--frame-size">

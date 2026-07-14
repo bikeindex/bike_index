@@ -4736,6 +4736,7 @@ en:
         Your %{bike_display} is registered with Bike Index. We'll keep watch — if
         it's ever reported stolen, the whole community is looking.
     details:
+      add_additional_color: Add additional color
       add_your_bikes_details: Add your bike's details
       additional_contact_info: Additional contact info
       bike_details: Bike details
@@ -4763,6 +4764,7 @@ en:
       phone_placeholder: "(555) 000-0000"
       rear_dropouts: Rear dropouts
       registration_type: Registration type
+      remove_additional_color: Remove additional color
       serial_help_intro: >-
         Most bicycles have their serial number engraved on the frame. Look for your
         serial number:

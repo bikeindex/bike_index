@@ -101,10 +101,13 @@ class RegisterController < ApplicationController
     {bike: bike_params, propulsion_type_motorized: params[:propulsion_type_motorized]}
   end
 
+  # Blank values are dropped rather than overwriting what step 1 saved - except the
+  # additional colors, where blank is the "remove additional color" button clearing one
   def update_params
-    {details_completed: true,
-     bike: params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
-       :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
-       :bike_sticker, :phone, :status, :frame_model).reject { |_k, v| v.blank? }}
+    bike_params = params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
+      :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
+      :bike_sticker, :phone, :status, :frame_model)
+      .reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
+    {details_completed: true, bike: bike_params}
   end
 end
