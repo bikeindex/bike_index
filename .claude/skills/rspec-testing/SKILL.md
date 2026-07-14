@@ -59,6 +59,12 @@ allow(ENV).to receive(:[]).and_call_original
 allow(ENV).to receive(:[]).with("STRIPE_SECRET_KEY").and_return("sk_test_123")
 ```
 
+## Drain Sidekiq jobs, don't run them inline
+
+Run enqueued jobs by draining them in the default fake mode — `SomeJob.drain` for one job, `Sidekiq::Job.drain_all` for everything (clear first with `Sidekiq::Job.clear_all` when earlier setup left jobs queued). Don't wrap the exercise in `Sidekiq::Testing.inline!`. Draining lets the request finish and commit before the jobs run, against that committed state — the way production does it — and keeps the test from silently pulling in every cascading job.
+
+Reach for `inline!` only when the behavior under test depends on a job firing *at enqueue time* — e.g. reproducing an ordering/race bug where a job sees different state mid-request than after it (see the ban-survives example in `spec/requests/admin/users_request_spec.rb`).
+
 ## Always fix failing tests
 
 Fix every failing test, even ones that were already failing on `main`. Confirming a failure pre-dates your branch (via `git stash` or checking out `main`) explains *what* broke — not whether you fix it. You fix it.
