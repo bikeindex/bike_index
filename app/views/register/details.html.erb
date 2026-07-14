@@ -28,7 +28,7 @@
       <div class="tw:mb-4" data-controller="registrations--new--frame-size">
         <span class="twlabel">
           <%= t(".frame_size") %>
-          <%= render UI::Badge::Component.new(text: t(".optional")) %>
+          <%= render UI::Badge::Component.new(text: t(".optional"), color: :muted, size: :xs) %>
         </span>
 
         <div class="tw:mt-2 tw:mb-2 tw:grid tw:grid-cols-5 tw:gap-2">
@@ -154,7 +154,7 @@
       <div class="tw:mb-4">
         <%= f.label :bike_sticker, class: "twlabel" do %>
           <%= t(".sticker_number") %>
-          <%= render UI::Badge::Component.new(text: t(".optional")) %>
+          <%= render UI::Badge::Component.new(text: t(".optional"), color: :muted, size: :xs) %>
         <% end %>
 
         <%= f.text_field :bike_sticker, value: @b_param.bike_sticker_code,
@@ -225,7 +225,7 @@
       <div class="tw:mb-6">
         <%= f.label :phone, class: "twlabel" do %>
           <%= t(".phone") %>
-          <%= render UI::Badge::Component.new(text: t(".optional")) %>
+          <%= render UI::Badge::Component.new(text: t(".optional"), color: :muted, size: :xs) %>
         <% end %>
 
         <%= f.telephone_field :phone, value: @b_param.bike["phone"],

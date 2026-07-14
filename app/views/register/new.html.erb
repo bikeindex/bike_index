@@ -26,7 +26,7 @@
       <div class="tw:mb-4">
         <%= f.label :frame_model, class: "twlabel" do %>
           <%= t(".model") %>
-          <%= render UI::Badge::Component.new(text: t(".optional")) %>
+          <%= render UI::Badge::Component.new(text: t(".optional"), color: :muted, size: :xs) %>
         <% end %>
 
         <%= f.text_field :frame_model, value: @b_param.bike["frame_model"],

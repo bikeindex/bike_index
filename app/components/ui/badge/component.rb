@@ -6,6 +6,7 @@ module UI
       BASE_CLASSES = "tw:inline-flex tw:border tw:items-center tw:leading-4 tw:rounded-full"
 
       SIZES = {
+        xs: "tw:text-[11px] tw:font-semibold tw:px-[7px] tw:py-px",
         sm: "tw:text-xs tw:font-medium tw:px-1 tw:py-px",
         md: "tw:text-xs tw:font-bold tw:px-2 tw:py-1",
         lg: "tw:text-md tw:font-extrabold tw:px-3 tw:py-1"
@@ -23,6 +24,8 @@ module UI
         purple: "tw:bg-purple-50 tw:text-purple-700 tw:border-transparent tw:dark:bg-purple-950 tw:dark:text-purple-200",
         rose: "tw:bg-rose-50 tw:text-rose-700 tw:border-transparent tw:dark:bg-rose-950 tw:dark:text-rose-200",
         orange: "tw:bg-orange-50 tw:text-orange-700 tw:border-transparent tw:dark:bg-orange-950 tw:dark:text-orange-200",
+        # Redesign: quiet inline label, e.g. the "optional" pill next to form labels
+        muted: "tw:bg-[#f0f0f2] tw:text-[#9a9aa2] tw:border-transparent tw:dark:bg-gray-800 tw:dark:text-gray-500",
         empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600"
       }.freeze
 
