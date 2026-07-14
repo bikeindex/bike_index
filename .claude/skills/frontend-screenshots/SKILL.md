@@ -58,10 +58,21 @@ If it's set but not one of the seeded emails, **stop and ask** — you're signed
 Clear stale shots: `rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true`.
 
 Two viewports — resize once each, then walk every URL:
-1. `browser_resize` 1440×900 → for each URL: navigate → settle → `browser_take_screenshot` (`fullPage: false`) to `...-desktop.png`.
+1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
 2. `browser_resize` 390×844 → same loop → `...-mobile.png`.
 
-**`fullPage: false` and no `target:` arg.** Reviewers need the page as a browser of that size actually renders it. `fullPage: true` produces a 2000–3000px scroll capture (not how mobile renders); element-only crops slice context off.
+**Full page, minus the footer, no `target:` arg.** Capture the whole page (`fullPage: true`) so nothing below the fold is cut off, but hide the site footer first — it's identical on every page and just pads every capture. After each navigation (hiding doesn't persist across page loads), run:
+
+```js
+browser_evaluate: () => {
+  document.querySelector('.primary-footer, footer, [role="contentinfo"]')?.style.setProperty('display', 'none');
+  return document.body.scrollHeight; // content height with the footer gone
+}
+```
+
+If the returned content height is **less than the viewport height**, `browser_resize` the height down to it before the shot (the `<html>` element's near-black background fills the gap otherwise), then resize back to the standard viewport before the next URL. Taller-than-viewport pages need no resize — `fullPage` scroll-stitches them.
+
+Element-only crops (`target:`) still slice context off — don't use them for page captures.
 
 **Settle before the screenshot.** Stimulus + Chartkick render after document load; either `browser_wait_for` on a known element or pause ~500ms–1s. Otherwise charts capture mid-draw.
 
