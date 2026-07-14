@@ -23,6 +23,12 @@ module UI
       def purple
         render(UI::Alert::Component.new(text: "We've sent a confirmation link to your email. No need to wait — you can finish registering right now.", kind: :purple))
       end
+
+      def custom_icon
+        envelope = ActionController::Base.helpers.inline_svg_tag("icons/envelope.svg",
+          class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)
+        render(UI::Alert::Component.new(text: "Check your email", kind: :notice, icon: envelope))
+      end
       # @!endgroup
 
       # @!group Dismissable variants

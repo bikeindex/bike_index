@@ -12,7 +12,9 @@ module UI
         purple: "tw:text-purple-800 tw:dark:text-purple-400"
       }.freeze
 
-      def initialize(text: nil, header: nil, kind: nil, dismissable: false, margin_classes: "tw:mb-4")
+      # icon: rendered markup, e.g. inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4") -
+      # replaces the default info icon
+      def initialize(text: nil, header: nil, kind: nil, dismissable: false, margin_classes: "tw:mb-4", icon: nil)
         @text = text
         @header = header
         @kind = if KINDS.include?(kind&.to_sym)
@@ -22,6 +24,7 @@ module UI
         end
         @dismissable = dismissable
         @margin_classes = margin_classes
+        @icon = icon
       end
 
       private

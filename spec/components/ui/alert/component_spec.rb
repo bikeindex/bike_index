@@ -34,6 +34,16 @@ RSpec.describe UI::Alert::Component, type: :component do
     end
   end
 
+  describe "custom icon" do
+    let(:options) { {text: "some text", icon: '<svg class="custom-icon"></svg>'.html_safe} }
+    it "renders the given markup instead of the default icon" do
+      html = component.to_html
+      expect(html).to include('<svg class="custom-icon">')
+      # The default info icon is not rendered
+      expect(html).to_not include("M10 .5a9.5")
+    end
+  end
+
   context "success dismissable" do
     let(:options) { {text: "some text", kind: "success", dismissable: true} }
     it "renders with dismissable" do
