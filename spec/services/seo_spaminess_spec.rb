@@ -38,5 +38,24 @@ RSpec.describe SeoSpaminess do
         expect(described_class.estimate_user(user)).to be > SeoSpaminess::MARK_SPAM_PERCENT
       end
     end
+
+    context "user owns bikes" do
+      let(:user) { FactoryBot.create(:user_confirmed, show_bikes: true, name:, description:) }
+      let(:description) { "Best online casino and slot gacor bonus, join now!" }
+
+      context "one bike" do
+        let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+        it "subtracts 30" do
+          expect(described_class.estimate_user(user.reload)).to eq 70
+        end
+      end
+
+      context "multiple bikes" do
+        let!(:bikes) { FactoryBot.create_list(:bike, 2, :with_ownership_claimed, user:) }
+        it "subtracts 50" do
+          expect(described_class.estimate_user(user.reload)).to eq 50
+        end
+      end
+    end
   end
 end

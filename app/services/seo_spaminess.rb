@@ -15,10 +15,11 @@ module SeoSpaminess
 
   def estimate_user(user)
     return 0 if user.blank?
-    # a crypto/gambling reference anywhere in the profile is a definite signal
-    return 100 if seo_spam_references?(user)
 
-    spammy_text_estimate(user)
+    # a crypto/gambling reference anywhere in the profile is a definite signal
+    estimate = seo_spam_references?(user) ? 100 : spammy_text_estimate(user)
+
+    (estimate - bike_ownership_reduction(user)).clamp(0, 100)
   end
 
   #
@@ -44,5 +45,13 @@ module SeoSpaminess
       user.mb_link_target, user.twitter, user.instagram].select(&:present?)
   end
 
-  conceal :seo_spam_references?, :spammy_text_estimate, :scannable_strings
+  # real registrations are strong evidence against spam
+  def bike_ownership_reduction(user)
+    bike_count = user.bikes.limit(2).count
+    return 50 if bike_count > 1
+
+    (bike_count == 1) ? 30 : 0
+  end
+
+  conceal :seo_spam_references?, :spammy_text_estimate, :scannable_strings, :bike_ownership_reduction
 end
