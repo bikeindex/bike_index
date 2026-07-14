@@ -9,15 +9,37 @@ export default class extends Controller {
 
   connect () {
     if (this.searching) return
+    this.onPopState = () => this.syncFromUrl()
+    window.addEventListener('popstate', this.onPopState)
+    this.syncFromUrl()
+  }
+
+  disconnect () {
+    window.removeEventListener('popstate', this.onPopState)
+  }
+
+  // Restore the form + results from the URL, on initial load and on back/forward.
+  // The URL already reflects this state, so don't push another history entry.
+  syncFromUrl () {
     const params = new URL(window.location).searchParams
-    if (this.hasSearchAllTarget && params.get('search_all') === '1') {
-      this.searchAllTarget.checked = true
+    const kind = params.get('search_kind') === 'stickers' ? 'stickers' : 'serials'
+    if (this.searchKindValue !== kind) {
+      this.searchKindValue = kind
+      this.updatePlaceholderAndButton()
+      const radio = this.element.querySelector(`input[name='search_kind'][value='${kind}']`)
+      if (radio) radio.checked = true
+    }
+    if (this.hasSearchAllTarget && !this.searchAllTarget.disabled) {
+      this.searchAllTarget.checked = params.get('search_all') === '1'
     }
     this.syncSearchAll()
-    const serialsParam = params.get('serials')
-    if (serialsParam) {
-      this.textareaTarget.value = serialsParam
-      this.search(this.parseSerials(serialsParam))
+    const serials = this.parseSerials(params.get('serials') || '')
+    this.textareaTarget.value = params.get('serials') || ''
+    if (serials.length) {
+      this.search(serials, { pushHistory: false })
+    } else {
+      this.resultsTarget.innerHTML = ''
+      this.serialChipsTarget.innerHTML = ''
     }
   }
 
@@ -71,19 +93,21 @@ export default class extends Controller {
     )]
   }
 
-  async search (serials) {
+  async search (serials, { pushHistory = true } = {}) {
     this.searching = true
-    const url = new URL(window.location.pathname, window.location.origin)
-    url.searchParams.set('serials', serials.join(','))
-    if (this.searchKindValue === 'stickers') {
-      url.searchParams.set('search_kind', 'stickers')
+    if (pushHistory) {
+      const url = new URL(window.location.pathname, window.location.origin)
+      url.searchParams.set('serials', serials.join(','))
+      if (this.searchKindValue === 'stickers') {
+        url.searchParams.set('search_kind', 'stickers')
+      }
+      if (this.searchAll) {
+        url.searchParams.set('search_all', '1')
+      } else {
+        url.searchParams.delete('search_all')
+      }
+      window.history.pushState({}, '', url)
     }
-    if (this.searchAll) {
-      url.searchParams.set('search_all', '1')
-    } else {
-      url.searchParams.delete('search_all')
-    }
-    window.history.pushState({}, '', url)
 
     this.resultsTarget.innerHTML = ''
     this.renderPlaceholderChips(serials)

@@ -28,10 +28,18 @@ module Org
         @chip_id&.delete_prefix("chip_")
       end
 
-      # Drives the JS filter that drops empty results. Close serials are displayed
-      # results even though there are no exact bike matches, so keep them.
+      # Fall back to close serials (near Levenshtein matches) when nothing matched exactly
+      def displayed_bikes
+        @bikes.presence || @close_serials
+      end
+
+      def close_serials_only?
+        @bikes.blank? && @close_serials.present?
+      end
+
+      # Drives the JS filter that drops empty results; close serials must keep it alive
       def displayed_result_count
-        @bikes&.any? ? @pagy.count : (@close_serials&.size || 0)
+        displayed_bikes&.size || 0
       end
 
       def show_view_all?
