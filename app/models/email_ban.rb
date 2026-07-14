@@ -21,7 +21,7 @@ class EmailBan < ApplicationRecord
   BLOCK_DUPLICATE_PERIOD = 1.day
   PRE_PERIOD_DUPLICATE_LIMIT = 2
   PERMITTED_DUPLICATE_DOMAINS = %w[bikeindex.org bikehub.com].freeze
-  REASON_ENUM = {email_domain: 0, email_duplicate: 1, delivery_failure: 2, honeypot: 3, seo_spam: 4}.freeze
+  REASON_ENUM = {email_domain: 0, email_duplicate: 1, delivery_failure: 2, honeypot: 3}.freeze
 
   enum :reason, REASON_ENUM
 

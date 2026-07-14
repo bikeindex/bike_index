@@ -1,6 +1,6 @@
 module Users
-  # Flags a likely SEO-spam public-profile (show_bikes) user — crypto/gambling link
-  # farms and gibberish profiles — with an EmailBan. Enqueued from AfterUserChangeJob.
+  # Bans a likely SEO-spam public-profile (show_bikes) user — crypto/gambling link
+  # farms and gibberish profiles. Enqueued from AfterUserChangeJob.
   class SeoSpamCheckJob < ApplicationJob
     sidekiq_options retry: false
 
@@ -16,9 +16,9 @@ module Users
 
     def perform(user_id)
       user = User.find_by(id: user_id)
-      return if user.blank? || !user.show_bikes? || user.banned? || user.email_banned?
+      return if user.blank? || !user.show_bikes? || user.banned?
 
-      EmailBan.create(user:, reason: :seo_spam) if seo_spam?(user)
+      ban_for_seo_spam(user) if seo_spam?(user)
     end
 
     def seo_spam?(user)
@@ -26,6 +26,12 @@ module Users
     end
 
     private
+
+    def ban_for_seo_spam(user)
+      # banned must be set too — AfterUserChangeJob deletes an unbanned user's user_ban
+      user.update(banned: true)
+      UserBan.create(user:, reason: :spamming, description: "Automated SEO-spam check (show_bikes)")
+    end
 
     # crypto/gambling references anywhere in the public profile, including link URLs
     def seo_spam_references?(user)

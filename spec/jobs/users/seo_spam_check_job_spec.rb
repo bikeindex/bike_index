@@ -10,18 +10,19 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
 
     context "ordinary profile" do
       it "does not ban" do
-        expect { instance.perform(user.id) }.to_not change(EmailBan, :count)
+        expect { instance.perform(user.id) }.to_not change(UserBan, :count)
+        expect(user.reload.banned?).to be_falsey
       end
     end
 
     context "crypto/gambling references" do
       let(:description) { "Best online casino and slot gacor bonus, join now!" }
-      it "creates a seo_spam EmailBan" do
-        expect { instance.perform(user.id) }.to change(EmailBan, :count).by(1)
-        email_ban = EmailBan.last
-        expect(email_ban.user_id).to eq user.id
-        expect(email_ban.reason).to eq "seo_spam"
-        expect(user.reload.email_banned?).to be_truthy
+      it "bans the user for spamming" do
+        expect { instance.perform(user.id) }.to change(UserBan, :count).by(1)
+        user_ban = UserBan.last
+        expect(user_ban.user_id).to eq user.id
+        expect(user_ban.reason).to eq "spamming"
+        expect(user.reload.banned?).to be_truthy
       end
     end
 
@@ -30,35 +31,28 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
         FactoryBot.create(:user_confirmed, show_bikes: true,
           my_bikes_hash: {"link_target" => "https://buy-bitcoin-presale.example"})
       end
-      it "creates a seo_spam EmailBan" do
-        expect { instance.perform(user.id) }.to change(EmailBan, :count).by(1)
-        expect(EmailBan.last.reason).to eq "seo_spam"
+      it "bans the user for spamming" do
+        expect { instance.perform(user.id) }.to change(UserBan, :count).by(1)
+        expect(UserBan.last.reason).to eq "spamming"
+        expect(user.reload.banned?).to be_truthy
       end
     end
 
     context "gibberish profile text" do
       let(:name) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
       let(:description) { "efgBz9pNdd7efgBz9pNdd7 xzkqwrmlbnptvxz" }
-      it "creates a seo_spam EmailBan" do
+      it "bans the user for spamming" do
         expect(SpamEstimator.string_spaminess([name, description].join(" ")))
           .to be > SpamEstimator::MARK_SPAM_PERCENT
-        expect { instance.perform(user.id) }.to change(EmailBan, :count).by(1)
+        expect { instance.perform(user.id) }.to change(UserBan, :count).by(1)
       end
     end
 
-    context "already email_banned" do
-      let(:description) { "Best online casino and slot gacor bonus, join now!" }
-      before { EmailBan.create!(user:, reason: :honeypot) }
-      it "does not create a duplicate ban" do
-        expect { instance.perform(user.id) }.to_not change(EmailBan, :count)
-      end
-    end
-
-    context "banned user" do
+    context "already banned user" do
       let(:description) { "Best online casino and slot gacor bonus, join now!" }
       before { user.update_column(:banned, true) }
       it "does nothing" do
-        expect { instance.perform(user.id) }.to_not change(EmailBan, :count)
+        expect { instance.perform(user.id) }.to_not change(UserBan, :count)
       end
     end
 
@@ -66,7 +60,7 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
       let(:description) { "Best online casino and slot gacor bonus, join now!" }
       before { user.update_column(:show_bikes, false) }
       it "does nothing" do
-        expect { instance.perform(user.id) }.to_not change(EmailBan, :count)
+        expect { instance.perform(user.id) }.to_not change(UserBan, :count)
       end
     end
   end
