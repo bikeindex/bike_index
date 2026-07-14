@@ -531,6 +531,23 @@ RSpec.describe BParam, type: :model do
         expect(result.id).to be_nil
         expect(result.creator_id).to eq user.id
       end
+      context "with no creator" do
+        it "does not return that BParam" do
+          b_param_nil.update_columns(id_token: nil, creator_id: nil)
+          result = BParam.find_or_new_from_token(nil, user_id: user.id)
+          expect(result.is_a?(BParam)).to be_truthy
+          expect(result.id).to be_nil
+          expect(result.creator_id).to eq user.id
+        end
+      end
+    end
+  end
+
+  describe "with_organization_or_no_creator" do
+    it "returns nil for a blank token" do
+      FactoryBot.create(:b_param) # a creator-less b_param that a blank token must not match
+      expect(BParam.with_organization_or_no_creator(nil)).to be_nil
+      expect(BParam.with_organization_or_no_creator("")).to be_nil
     end
   end
 

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe FileCacheMaintainer do
   describe "cached_all_stolen" do
     it "returns the most recent all_stolen" do
-      FileCacheMaintainer.update_file_info("1456863086_all_stolen_cache.json", 1456863086)
+      FileCacheMaintainer.reset_file_info("1456863086_all_stolen_cache.json", 1456863086)
       t = Time.current.to_i
       FileCacheMaintainer.update_file_info("#{t}_all_stolen_cache.json", t)
       target = {
