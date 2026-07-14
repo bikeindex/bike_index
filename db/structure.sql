@@ -6071,6 +6071,13 @@ CREATE INDEX index_b_params_on_email_trgm ON public.b_params USING gin (email pu
 
 
 --
+-- Name: index_b_params_on_id_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_id_token ON public.b_params USING btree (id_token);
+
+
+--
 -- Name: index_b_params_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7452,6 +7459,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260713120000'),
 ('20260706180000'),
 ('20260706164500'),
 ('20260706164435'),
