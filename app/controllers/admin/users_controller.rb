@@ -38,14 +38,16 @@ module Admin
         end
         @user.developer = params[:user][:developer] if current_user.developer? && params[:user].key?(:developer)
         @user.banned = params[:user][:banned]
-        if @user.banned && permitted_ban_parameters[:reason].present?
-          UserBan.create!(permitted_ban_parameters)
-        end
         @user.username = params[:user][:username]
         @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
         @user.can_send_many_marketplace_messages = params[:user][:can_send_many_marketplace_messages]
         @user.phone = params[:user][:phone]
         if @user.save
+          # Create the ban after saving, so banned is persisted first - otherwise
+          # AfterUserChangeJob sees an unbanned user and deletes the new UserBan
+          if @user.banned && permitted_ban_parameters[:reason].present?
+            UserBan.create!(permitted_ban_parameters)
+          end
           @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
           redirect_to admin_users_url, notice: "User Updated"
         else
