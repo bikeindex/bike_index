@@ -64,6 +64,7 @@ class ScheduledJobRunner < ScheduledJob
       UpdateManufacturerLogoAndPriorityJob,
       UpdateOrganizationPosKindJob,
       Users::RemoveUnconfirmedJob,
+      Users::SeoSpamCheckJob,
       self
     ].freeze
   end
