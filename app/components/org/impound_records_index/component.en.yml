@@ -9,6 +9,9 @@ en:
         hide_update: Hide update
         impound_records: Impound_records
         interpreted_params: Interpreted_params
+        matching_impound_record:
+          one: matching impound record
+          other: matching impound records
         only_unregistered: Only unregistered
         only_user_registered: Only user registered
         pagy: Pagy
