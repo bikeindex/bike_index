@@ -19,17 +19,16 @@ RSpec.describe RegisterController, type: :request do
   end
 
   describe "create" do
-    let(:create_params) { {b_param: {manufacturer_id: "Trek", frame_model: "Marlin 7", owner_email:}} }
+    let(:create_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:}} }
 
     it "creates a partial registration, sends the email and redirects to details" do
       expect { post base_url, params: create_params }.to change(BParam, :count).by 1
       new_b_param = BParam.last
       expect(new_b_param).to have_attributes(origin: "registration_flow", owner_email:,
-        manufacturer_id: manufacturer.id, creator_id: nil)
+        manufacturer_id: manufacturer.id, creator_id: nil, cycle_type: "cargo")
       expect(new_b_param.partial_registration?).to be_truthy
       expect(new_b_param.confirmation_token).to be_present
       expect(new_b_param.motorized?).to be_falsey
-      expect(new_b_param.bike["frame_model"]).to eq "Marlin 7"
       expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(new_b_param.id)
       expect(response).to redirect_to register_details_path(b_param_token: new_b_param.id_token)
     end
@@ -37,16 +36,26 @@ RSpec.describe RegisterController, type: :request do
     context "motorized, stolen, manufacturer not in the list" do
       let(:create_params) do
         {b_param: {manufacturer_id: "Fancy Cycles", owner_email:},
-         propulsion_type_motorized: "1", status: "stolen"}
+         propulsion_type_motorized: "1", propulsion_type_pedal_assist: "1", status: "stolen"}
       end
 
-      it "self-reports the manufacturer and keeps motorized and status" do
+      it "self-reports the manufacturer and keeps propulsion and status" do
         expect { post base_url, params: create_params }.to change(BParam, :count).by 1
         new_b_param = BParam.last
         expect(new_b_param).to have_attributes(owner_email:, manufacturer_id: Manufacturer.other.id,
           status: "status_stolen")
         expect(new_b_param.bike["manufacturer_other"]).to eq "Fancy Cycles"
         expect(new_b_param.motorized?).to be_truthy
+        expect(BParam.propulsion_type(new_b_param.params)).to eq "pedal-assist"
+      end
+    end
+
+    context "always-motorized cycle type" do
+      let(:create_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}} }
+
+      it "is motorized without the checkbox" do
+        post base_url, params: create_params
+        expect(BParam.last.motorized?).to be_truthy
       end
     end
 
@@ -81,7 +90,7 @@ RSpec.describe RegisterController, type: :request do
   describe "update" do
     let(:bike_details) do
       {primary_frame_color_id: color.id, serial_number: "XYZ 123", frame_size: "m",
-       phone: "(555) 000-0000", status: "status_with_owner"}
+       frame_model: "Marlin 7", phone: "(555) 000-0000", status: "status_with_owner"}
     end
 
     context "anonymous" do

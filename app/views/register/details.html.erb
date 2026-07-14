@@ -17,6 +17,16 @@
 
       <%= render Registrations::New::SectionLabel::Component.new(text: t(".bike_details")) %>
 
+      <div class="tw:mb-4">
+        <%= f.label :frame_model, class: "twlabel" do %>
+          <%= t(".model") %>
+          <%= render UI::Badge::Component.new(text: t(".optional"), color: :muted, size: :xs) %>
+        <% end %>
+
+        <%= f.text_field :frame_model, value: @b_param.bike["frame_model"],
+          placeholder: t(".model_placeholder"), class: "twinput tw:mt-1" %>
+      </div>
+
       <div
         class="tw:mb-4"
         data-controller="registrations--new--additional-colors"

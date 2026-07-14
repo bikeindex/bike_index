@@ -23,20 +23,59 @@
           options: Manufacturer.frame_makers.pluck(:name, :id)) %>
       </div>
 
-      <div class="tw:mb-4">
-        <%= f.label :frame_model, class: "twlabel" do %>
-          <%= t(".model") %>
-          <%= render UI::Badge::Component.new(text: t(".optional"), color: :muted, size: :xs) %>
-        <% end %>
+      <div
+        class="tw:mb-4"
+        data-controller="registrations--new--propulsion"
+        data-registrations--new--propulsion-pedal-value="<%= CycleType::PEDAL.to_json %>"
+        data-registrations--new--propulsion-always-motorized-value="<%= CycleType::ALWAYS_MOTORIZED.to_json %>"
+        data-registrations--new--propulsion-never-motorized-value="<%= CycleType::NEVER_MOTORIZED.to_json %>"
+      >
+        <%= f.label :cycle_type, t(".vehicle_type"), class: "twlabel" %>
 
-        <%= f.text_field :frame_model, value: @b_param.bike["frame_model"],
-          placeholder: t(".model_placeholder"), class: "twinput tw:mt-1" %>
+        <%= f.select :cycle_type, CycleType.select_options(traditional_bike: true),
+          {selected: @b_param.cycle_type}, class: "twinput tw:mt-1",
+          data: {
+            "registrations--new--propulsion-target": "cycleType",
+            action: "change->registrations--new--propulsion#update"
+          } %>
+
+        <label
+          class="twlabel tw:mt-3 tw:flex tw:items-center tw:gap-2"
+          data-registrations--new--propulsion-target="motorizedWrapper"
+        >
+          <%= check_box_tag :propulsion_type_motorized, true, @b_param.motorized?,
+            class: "tw:h-4 tw:w-4",
+            data: {
+              "registrations--new--propulsion-target": "motorized",
+              action: "change->registrations--new--propulsion#update"
+            } %>
+
+          <%= t(".electric_motorized") %>
+        </label>
+
+        <div
+          class="tw:hidden"
+          data-registrations--new--propulsion-target="propulsionFields"
+        >
+          <div class="tw:mt-2 tw:ml-6 tw:flex tw:items-center tw:gap-5">
+            <label class="twlabel tw:flex tw:items-center tw:gap-2">
+              <%= check_box_tag :propulsion_type_throttle, true,
+                Binxtils::InputNormalizer.boolean(@b_param.params["propulsion_type_throttle"]),
+                class: "tw:h-4 tw:w-4" %>
+
+              <%= t(".throttle") %>
+            </label>
+
+            <label class="twlabel tw:flex tw:items-center tw:gap-2">
+              <%= check_box_tag :propulsion_type_pedal_assist, true,
+                Binxtils::InputNormalizer.boolean(@b_param.params["propulsion_type_pedal_assist"]),
+                class: "tw:h-4 tw:w-4" %>
+
+              <%= t(".pedal_assist") %>
+            </label>
+          </div>
+        </div>
       </div>
-
-      <label class="twlabel tw:mb-4 tw:flex tw:items-center tw:gap-2">
-        <%= check_box_tag :propulsion_type_motorized, true, @b_param.motorized?, class: "tw:h-4 tw:w-4" %>
-        <%= t(".electric_motorized") %>
-      </label>
 
       <%= render Registrations::New::SectionLabel::Component.new(text: t(".your_info"), divider: true) %>
 

@@ -4756,6 +4756,8 @@ en:
       from_step_1: From step 1
       head_tube: Head tube
       inches: inches
+      model: Model
+      model_placeholder: e.g. Marlin 7
       not_stolen: Not stolen
       not_stolen_description: Registering to keep it safe
       optional: optional
@@ -4790,13 +4792,13 @@ en:
         keep going right now.
       manufacturer: Manufacturer
       manufacturer_placeholder: Start typing e.g. Trek
-      model: Model
-      model_placeholder: e.g. Marlin 7
       next: Next
       no_need_to_wait: We'll email a confirmation link too — you don't have to wait
         for it to continue.
-      optional: optional
+      pedal_assist: Pedal assist
       register_your_bike: Register your bike!
+      throttle: Throttle
+      vehicle_type: Vehicle type
       your_info: Your info
   registrations:
     create:

@@ -95,10 +95,12 @@ class RegisterController < ApplicationController
   end
 
   def create_params
-    bike_params = params.require(:b_param).permit(:manufacturer_id, :frame_model, :owner_email)
+    bike_params = params.require(:b_param).permit(:manufacturer_id, :cycle_type, :owner_email)
       .to_h.merge(BParam.status_hash_from_params(params))
     bike_params[:creation_organization_id] = current_organization.id if current_organization.present?
-    {bike: bike_params, propulsion_type_motorized: params[:propulsion_type_motorized]}
+    propulsion_params = %i[propulsion_type_motorized propulsion_type_throttle propulsion_type_pedal_assist]
+      .filter_map { |key| [key, params[key]] if params[key].present? }.to_h
+    {bike: bike_params}.merge(propulsion_params)
   end
 
   # Blank values are dropped rather than overwriting what step 1 saved - except the
