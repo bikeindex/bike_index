@@ -42,9 +42,7 @@ module UI
       def link_active
         render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
       end
-      # @!endgroup
 
-      # @!group Redesign variants
       # Filled purple primary
       def purple
         render(UI::Button::Component.new(text: "Purple", color: :purple))
