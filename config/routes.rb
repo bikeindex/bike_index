@@ -162,12 +162,12 @@ Rails.application.routes.draw do
   end
 
   # Redesigned registration flow: quick start, then complete on-site or via email
-  get "register", to: "register#new"
-  post "register", to: "register#create"
-  patch "register", to: "register#update"
-  get "register/details", to: "register#details", as: :register_details
-  get "register/confirm", to: "register#confirm", as: :register_confirm
-  get "register/complete", to: "register#complete", as: :register_complete
+  resource :register, only: %i[new create update], controller: :register do
+    get :details
+    get :confirm
+    get :complete
+  end
+  get "register", to: redirect("/register/new")
 
   namespace :search do
     get "/", to: redirect("/search/registrations")

@@ -13,7 +13,7 @@ class RegisterController < ApplicationController
       render :new, status: :unprocessable_entity
     elsif @b_param.save
       Email::PartialRegistrationJob.perform_async(@b_param.id)
-      redirect_to register_details_path(b_param_token: @b_param.id_token)
+      redirect_to details_register_path(b_param_token: @b_param.id_token)
     else
       @b_param.errors.add(:base, translation(:unable_to_save))
       render :new, status: :unprocessable_entity
@@ -33,7 +33,7 @@ class RegisterController < ApplicationController
     else
       # Everything is saved on the b_param - the bike is created once the
       # confirmation link from the partial registration email is clicked
-      redirect_to register_complete_path(b_param_token: @b_param.id_token)
+      redirect_to complete_register_path(b_param_token: @b_param.id_token)
     end
   end
 
@@ -41,14 +41,14 @@ class RegisterController < ApplicationController
   def confirm
     unless @b_param.confirmation_token_matches?(params[:confirmation_token])
       flash[:error] = translation(:invalid_confirmation_link)
-      redirect_to(register_path) && return
+      redirect_to(new_register_path) && return
     end
     @b_param.confirm_email!
     if @b_param.details_completed?
       create_bike_and_redirect
     else
       flash[:success] = translation(:email_confirmed_add_details)
-      redirect_to register_details_path(b_param_token: @b_param.id_token)
+      redirect_to details_register_path(b_param_token: @b_param.id_token)
     end
   end
 
@@ -62,10 +62,10 @@ class RegisterController < ApplicationController
     @b_param = BParam.find_for_token(params[:b_param_token], user_id: current_user&.id)
     if @b_param.blank?
       flash[:info] = translation(:registration_not_found)
-      redirect_to(register_path) && return
+      redirect_to(new_register_path) && return
     end
     if @b_param.with_bike? && action_name != "complete"
-      redirect_to register_complete_path(b_param_token: @b_param.id_token)
+      redirect_to complete_register_path(b_param_token: @b_param.id_token)
     end
   end
 
@@ -88,9 +88,9 @@ class RegisterController < ApplicationController
     bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
     if bike.errors.any?
       flash[:error] = @b_param.bike_errors&.to_sentence
-      redirect_to register_details_path(b_param_token: @b_param.id_token)
+      redirect_to details_register_path(b_param_token: @b_param.id_token)
     else
-      redirect_to register_complete_path(b_param_token: @b_param.id_token)
+      redirect_to complete_register_path(b_param_token: @b_param.id_token)
     end
   end
 
