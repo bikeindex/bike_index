@@ -1,7 +1,7 @@
 module SeoSpaminess
   extend Functionable
 
-  MARK_SPAM_PERCENT = SpamEstimator::MARK_SPAM_PERCENT
+  MARK_SPAM_PERCENT = 90 # May modify in the future!
 
   # crypto and gambling terms that SEO-spam profiles exist to promote
   SEO_SPAM_REGEX = /\b(?:
