@@ -4,7 +4,8 @@ description: >-
   Bike Index's frontend conventions — Tailwind class prefixing (`tw:`),
   the standard `twinput`/`twlabel`/`twlink` form/link classes, the
   `number_display` helper for numbers, the UI component library rule
-  (every button is `UI::Button`/`UI::ButtonLink`, never hand-rolled
+  (every button is `UI::Button`/`UI::ButtonLink`, every
+  typeahead/autocomplete is `Form::Combobox`, never hand-rolled
   markup), ViewComponent rules (keyword arguments, instance variables,
   `helpers.` prefix in templates), and `UI::Time::Component` for every
   date/time. Trigger
@@ -47,7 +48,11 @@ The `bin/dev` command handles building and updating Tailwind and JS.
 - A link styled as a button: `UI::ButtonLink::Component.new(href:, text:, color:, size:)` — same palette, renders an `<a>`.
 - A standalone action button (POST/DELETE/etc. to a URL) — a link that performs an action: pass `method:` to `ButtonLink` and it renders `button_to` for you (`render UI::ButtonLink::Component.new(text: "Delete", color: :error, href: bike_path(@bike), method: :delete)`), so don't hand-roll a `button_to` or wrap a submit button in a bare form. Extra `html_options` flow through: pass `params:` for a POST that carries params (they render as hidden fields — no manual `form_with`/`hidden_field_tag` needed), and `form: {onsubmit: …}` for a confirm on the wrapping form.
 
-The same instinct applies beyond buttons: **check `app/components/ui/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, badges, modals, pagination, tables…). If a `UI::*` component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
+The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/form/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, badges, modals, pagination, tables…). If a `UI::*`/`Form::*` component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
+
+## Typeaheads: always `Form::Combobox`
+
+**Every typeahead / autocomplete / combobox goes through `Form::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. See `app/components/form/combobox/` (component + `component_preview.rb`) and `spec/components/form/combobox` for how to invoke it.
 
 ## Showing and hiding elements: always use the collapse helpers
 
