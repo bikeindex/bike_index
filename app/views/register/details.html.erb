@@ -93,13 +93,8 @@
         <div class="tw:flex tw:items-center tw:justify-between tw:gap-2">
           <%= f.label :serial_number, t(".serial_number"), class: "twlabel" %>
 
-          <button
-            type="button"
-            class="twlink tw:text-xs tw:font-semibold"
-            data-action="collapse#toggle"
-          >
-            <%= t(".wheres_my_serial") %>
-          </button>
+          <%= render UI::Button::Component.new(text: t(".wheres_my_serial"),
+            color: :purple_link, html_class: "tw:text-xs", data: {action: "collapse#toggle"}) %>
         </div>
 
         <%= f.text_field :serial_number, value: @b_param.bike["serial_number"],
