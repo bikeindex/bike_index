@@ -9,6 +9,24 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
     end
   end
 
+  describe "SEO spam check" do
+    let(:user) { FactoryBot.create(:user_confirmed, show_bikes:) }
+    context "show_bikes" do
+      let(:show_bikes) { true }
+      it "enqueues the check" do
+        instance.perform(user.id)
+        expect(Users::SeoSpamCheckJob).to have_enqueued_sidekiq_job(user.id)
+      end
+    end
+    context "not show_bikes" do
+      let(:show_bikes) { false }
+      it "does not enqueue the check" do
+        instance.perform(user.id)
+        expect(Users::SeoSpamCheckJob.jobs.count).to eq 0
+      end
+    end
+  end
+
   describe "add_phones_for_verification" do
     let(:phone) { "4334445555" }
     let(:user) { FactoryBot.create(:user, phone: phone) }

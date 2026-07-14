@@ -1,10 +1,8 @@
 module Users
-  # Weekly sweep of public-profile (show_bikes) users, flagging likely SEO-spam
-  # accounts — crypto/gambling link farms and gibberish profiles — with an EmailBan.
-  class SeoSpamCheckJob < ScheduledJob
-    prepend ScheduledJobRecorder
-
-    SEO_SPAM_CHECK_LIMIT = 1000
+  # Flags a likely SEO-spam public-profile (show_bikes) user — crypto/gambling link
+  # farms and gibberish profiles — with an EmailBan. Enqueued from AfterUserChangeJob.
+  class SeoSpamCheckJob < ApplicationJob
+    sidekiq_options retry: false
 
     # crypto and gambling terms that SEO-spam profiles exist to promote
     SEO_SPAM_REGEX = /\b(?:
@@ -16,23 +14,11 @@ module Users
       bet365 | betting | wager
     )\b/xi
 
-    def self.frequency
-      1.week
-    end
-
-    def perform(user_id = nil)
-      return enqueue_workers if user_id.blank?
-
+    def perform(user_id)
       user = User.find_by(id: user_id)
       return if user.blank? || !user.show_bikes? || user.banned? || user.email_banned?
 
       EmailBan.create(user:, reason: :seo_spam) if seo_spam?(user)
-    end
-
-    def enqueue_workers
-      User.where(show_bikes: true).order(Arel.sql("RANDOM()"))
-        .limit(SEO_SPAM_CHECK_LIMIT).pluck(:id)
-        .each { |id| self.class.perform_async(id) }
     end
 
     def seo_spam?(user)

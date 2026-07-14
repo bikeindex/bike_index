@@ -2,26 +2,6 @@ require "rails_helper"
 
 RSpec.describe Users::SeoSpamCheckJob, type: :job do
   let(:instance) { described_class.new }
-  include_context :scheduled_job
-  include_examples :scheduled_job_tests
-
-  it "is the correct queue and frequency" do
-    expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
-    expect(described_class.frequency).to eq 1.week
-  end
-
-  describe "enqueue_workers" do
-    let!(:user_shown) { FactoryBot.create(:user_confirmed, show_bikes: true) }
-    let!(:user_shown2) { FactoryBot.create(:user_confirmed, show_bikes: true) }
-    let!(:user_hidden) { FactoryBot.create(:user_confirmed, show_bikes: false) }
-
-    it "enqueues a job for each show_bikes user" do
-      expect(described_class.jobs.count).to eq 0
-      instance.perform
-      enqueued_ids = described_class.jobs.map { |j| j["args"].first }
-      expect(enqueued_ids).to match_array([user_shown.id, user_shown2.id])
-    end
-  end
 
   describe "perform" do
     let(:user) { FactoryBot.create(:user_confirmed, show_bikes: true, name:, description:) }
