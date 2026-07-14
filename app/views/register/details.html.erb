@@ -238,11 +238,12 @@
       <div class="tw:mb-4">
         <span class="twlabel"><%= t(".email") %></span>
 
-        <div
+        <p
           class="
-            tw:mt-1 tw:flex tw:items-center tw:justify-between tw:gap-2
-            tw:rounded-sm tw:border tw:border-gray-300 tw:bg-gray-50
-            tw:px-2.5 tw:py-1.5 tw:dark:border-gray-600 tw:dark:bg-gray-700
+            tw:mt-1 tw:mb-0 tw:flex tw:items-center tw:justify-between
+            tw:gap-2 tw:rounded-sm tw:border tw:border-gray-300
+            tw:bg-gray-50 tw:px-2.5 tw:py-1.5 tw:dark:border-gray-600
+            tw:dark:bg-gray-700
           "
         >
           <span class="tw:truncate tw:text-base tw:text-gray-600 tw:dark:text-gray-300">
@@ -250,7 +251,7 @@
           </span>
 
           <%= render UI::Badge::Component.new(text: t(".from_step_1"), size: :xs) %>
-        </div>
+        </p>
       </div>
 
       <div class="tw:mb-6">
