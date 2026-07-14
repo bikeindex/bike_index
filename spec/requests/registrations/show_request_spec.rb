@@ -20,6 +20,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
       expect(body).to match("Activity")
       expect(body).to match("Mark stolen")
       expect(body).to match("Add photo")
+      expect(body).to match("Edit this bike")
+      expect(response.body).to match(edit_bike_path(bike, edit_template: bike.default_edit_template))
     end
 
     context "current_user not owner" do
@@ -116,6 +118,21 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Bike details")
         expect(body).to match("Owner & access")
         expect(body).to match(bike.owner_email)
+      end
+    end
+
+    context "with organization registration fields" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[reg_organization_affiliation reg_student_id]) }
+      let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
+      before { bike.current_ownership.update(registration_info: {"organization_affiliation" => "student", "student_id" => "sid-99"}) }
+
+      it "shows the org registration fields in owner & access" do
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("Owner & access")
+        expect(body).to match("Organization affiliation")
+        expect(body).to match("Student") # the "student" affiliation, humanized
+        expect(body).to match("sid-99")
       end
     end
 

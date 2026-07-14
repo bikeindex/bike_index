@@ -42,6 +42,21 @@ module UI
       def link_active
         render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
       end
+
+      # Filled purple primary
+      def purple
+        render(UI::Button::Component.new(text: "Purple", color: :purple))
+      end
+
+      # White button with a soft danger outline
+      def danger_outline
+        render(UI::Button::Component.new(text: "Mark stolen", color: :danger_outline))
+      end
+
+      # White button with a neutral outline
+      def outline
+        render(UI::Button::Component.new(text: "Share", color: :outline))
+      end
       # @!endgroup
 
       # @!group Sizes

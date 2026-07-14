@@ -1,0 +1,9 @@
+<button
+  type="button"
+  data-controller="registrations--show--share"
+  data-registrations--show--share-url-value="<%= @url %>"
+  data-action="registrations--show--share#share"
+  class="tw:w-full <%= UI::Button::Component.build_classes(color: :outline, size: :md, html_class: "tw:justify-center tw:py-2.5!") %>"
+>
+  <span data-registrations--show--share-target="label"><%= @text %></span>
+</button>

@@ -6,12 +6,10 @@ The flow: decide what to capture → capture the branch → upload → capture t
 
 ## 1. Decide whether screenshots are needed and which URLs to capture
 
-Only continue when there's a real reason to capture; otherwise return the PR URL.
+You're only here because `FRONTEND=true` (SKILL.md gates on that before sending you here). Decide scope by PR state:
 
-- New PR + `FRONTEND=false` → done.
-- New PR + `FRONTEND=true` → continue; capture every affected page.
-- Existing PR + `FRONTEND=false` → done.
-- Existing PR + `FRONTEND=true` → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, done.
+- New PR → capture every affected page.
+- Existing PR → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, return the PR URL.
 
 From the changed files, infer the affected routes. Heuristics:
 - A view at `app/views/bikes/show.html.erb` → `/bikes/:id` (pick a representative id from the dev db, e.g. `Bike.last.id`)
