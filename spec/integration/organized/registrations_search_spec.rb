@@ -389,6 +389,17 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
       expect(page).to have_content("owner-beta@example.com", wait: 10)
       expect(page).not_to have_content("owner-alpha@example.com")
+
+      # Close serials: a serial with no exact match but a bike within Levenshtein
+      # distance keeps showing. Regression: sortAndFilterResults dropped the whole
+      # result a frame after it rendered because the exact-match count was 0, so
+      # the close serials flashed then disappeared.
+      find("textarea#serials").set("SERIAL119")
+      click_button "Search serials"
+
+      expect(page).to have_content("No exact matches. Close serials:", wait: 15)
+      expect(page).to have_css(".multi-search-serial-result", count: 1)
+      within(".multi-search-serial-result") { expect(page).to have_link("SERIAL111") }
     end
 
     context "with bike_stickers enabled" do

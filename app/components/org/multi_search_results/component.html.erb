@@ -2,7 +2,7 @@
   class="multi-search-serial-result"
   id="result_<%= result_index %>"
   data-serial-index="<%= result_index %>"
-  data-result-count="<%= @pagy.count %>"
+  data-result-count="<%= displayed_result_count %>"
 >
   <h4 class="uncap tw:mt-4 tw:mb-0 tw:px-1">
     <%= translation(sticker_search? ? ".sticker_label" : ".serial_label") %>
