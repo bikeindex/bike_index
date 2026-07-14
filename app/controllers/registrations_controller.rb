@@ -13,6 +13,11 @@ class RegistrationsController < ApplicationController
       available_views:, mapbox_key: ENV["MAPBOX_MAPPING"]), layout: "application")
   end
 
+  # The redesign has no edit view of its own; edit still lives on the bike
+  def edit
+    redirect_to edit_bike_path(params[:id], request.query_parameters)
+  end
+
   def new
     @stolen = params[:stolen] # Passed into embed form
     render layout: "application"
