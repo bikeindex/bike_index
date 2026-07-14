@@ -19,6 +19,10 @@ module UI
       def success
         render(UI::Alert::Component.new(text: "This is a success alert", kind: :success))
       end
+
+      def purple
+        render(UI::Alert::Component.new(text: "We've sent a confirmation link to your email. No need to wait — you can finish registering right now.", kind: :purple))
+      end
       # @!endgroup
 
       # @!group Dismissable variants

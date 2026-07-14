@@ -23,6 +23,17 @@ RSpec.describe UI::Alert::Component, type: :component do
     end
   end
 
+  describe "purple" do
+    let(:options) { {text: "some text", kind: "purple"} }
+    it "renders" do
+      expect(component).to have_content "some text"
+      expect(component).to have_css('[role="alert"].tw:text-purple-800')
+      expect(component.to_html).to include("tw:bg-purple-50")
+      # It doesn't have dismissable button
+      expect(component).to_not have_selector("button")
+    end
+  end
+
   context "success dismissable" do
     let(:options) { {text: "some text", kind: "success", dismissable: true} }
     it "renders with dismissable" do
