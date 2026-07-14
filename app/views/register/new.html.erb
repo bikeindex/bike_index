@@ -26,7 +26,6 @@
       <div
         class="tw:mb-4"
         data-controller="registrations--new--propulsion"
-        data-registrations--new--propulsion-pedal-value="<%= CycleType::PEDAL.to_json %>"
         data-registrations--new--propulsion-always-motorized-value="<%= CycleType::ALWAYS_MOTORIZED.to_json %>"
         data-registrations--new--propulsion-never-motorized-value="<%= CycleType::NEVER_MOTORIZED.to_json %>"
       >
@@ -52,29 +51,6 @@
 
           <%= t(".electric_motorized") %>
         </label>
-
-        <div
-          class="tw:hidden"
-          data-registrations--new--propulsion-target="propulsionFields"
-        >
-          <div class="tw:mt-2 tw:ml-6 tw:flex tw:items-center tw:gap-5">
-            <label class="twlabel tw:flex tw:items-center tw:gap-2">
-              <%= check_box_tag :propulsion_type_throttle, true,
-                Binxtils::InputNormalizer.boolean(@b_param.params["propulsion_type_throttle"]),
-                class: "tw:h-4 tw:w-4" %>
-
-              <%= t(".throttle") %>
-            </label>
-
-            <label class="twlabel tw:flex tw:items-center tw:gap-2">
-              <%= check_box_tag :propulsion_type_pedal_assist, true,
-                Binxtils::InputNormalizer.boolean(@b_param.params["propulsion_type_pedal_assist"]),
-                class: "tw:h-4 tw:w-4" %>
-
-              <%= t(".pedal_assist") %>
-            </label>
-          </div>
-        </div>
       </div>
 
       <%= render Registrations::New::SectionLabel::Component.new(text: t(".your_info"), divider: true) %>

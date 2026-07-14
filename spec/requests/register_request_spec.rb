@@ -36,17 +36,16 @@ RSpec.describe RegisterController, type: :request do
     context "motorized, stolen, manufacturer not in the list" do
       let(:create_params) do
         {b_param: {manufacturer_id: "Fancy Cycles", owner_email:},
-         propulsion_type_motorized: "1", propulsion_type_pedal_assist: "1", status: "stolen"}
+         propulsion_type_motorized: "1", status: "stolen"}
       end
 
-      it "self-reports the manufacturer and keeps propulsion and status" do
+      it "self-reports the manufacturer and keeps motorized and status" do
         expect { post base_url, params: create_params }.to change(BParam, :count).by 1
         new_b_param = BParam.last
         expect(new_b_param).to have_attributes(owner_email:, manufacturer_id: Manufacturer.other.id,
           status: "status_stolen")
         expect(new_b_param.bike["manufacturer_other"]).to eq "Fancy Cycles"
         expect(new_b_param.motorized?).to be_truthy
-        expect(BParam.propulsion_type(new_b_param.params)).to eq "pedal-assist"
       end
     end
 
