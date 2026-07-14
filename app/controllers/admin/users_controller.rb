@@ -42,13 +42,15 @@ module Admin
         @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
         @user.can_send_many_marketplace_messages = params[:user][:can_send_many_marketplace_messages]
         @user.phone = params[:user][:phone]
-        if @user.save
-          # Create the ban after saving, so banned is persisted first - otherwise
-          # AfterUserChangeJob sees an unbanned user and deletes the new UserBan
+        # skip_update so the save doesn't enqueue AfterUserChangeJob; create the ban
+        # after saving (banned persisted first, before UserBan's callbacks could delete
+        # it), then enqueue the job once below against the final state
+        if @user.update(skip_update: true)
           if @user.banned && permitted_ban_parameters[:reason].present?
             UserBan.create!(permitted_ban_parameters)
           end
           @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
+          CallbackJob::AfterUserChangeJob.perform_async(@user.id)
           redirect_to admin_users_url, notice: "User Updated"
         else
           calculate_user_bikes
