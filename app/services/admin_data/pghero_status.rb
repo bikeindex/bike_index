@@ -20,13 +20,13 @@ module AdminData
     QUERY_STATS_LIMIT = 25
 
     def call
-      enabled = safe { ::PgHero.query_stats_enabled? }
+      enabled = safe(:query_stats_enabled?)
       base = {
         query_stats_enabled: enabled,
-        query_stats: (safe { ::PgHero.query_stats(limit: QUERY_STATS_LIMIT) } if enabled == true)
+        query_stats: (safe(:query_stats, limit: QUERY_STATS_LIMIT) if enabled == true)
       }
       METRICS.each_with_object(base) do |metric, result|
-        result[metric] = safe { ::PgHero.public_send(metric) }
+        result[metric] = safe(metric)
       end
     end
 
@@ -34,8 +34,8 @@ module AdminData
     # private below here
     #
 
-    def safe(&block)
-      block.call
+    def safe(...)
+      ::PgHero.public_send(...)
     rescue => e
       {error: e.message}
     end
