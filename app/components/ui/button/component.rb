@@ -20,14 +20,19 @@ module UI
         error: "tw:text-white tw:bg-red-600 tw:border tw:border-red-600 tw:hover:bg-red-700 tw:active:bg-red-800 tw:focus:ring-red-500/40 tw:dark:bg-red-500 tw:dark:border-red-500 tw:dark:hover:bg-red-600 tw:dark:active:bg-red-700",
         purple: "tw:text-white tw:bg-[#715eb2] tw:border tw:border-[#715eb2] tw:hover:bg-[#5d4b9c] tw:hover:border-[#5d4b9c] tw:active:bg-[#5d4b9c] tw:focus:ring-[#715eb2]/40",
         danger_outline: "tw:text-[#c0392b] tw:bg-white tw:border tw:border-[#f3c9c9] tw:hover:bg-red-50 tw:active:bg-red-100 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:hover:bg-red-950",
-        link: "tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:hover:underline tw:active:underline tw:active:text-blue-800 tw:active:dark:text-blue-300 tw:active:font-bold tw:p-0"
+        link: "twlink tw:p-0",
+        link_purple: "tw:text-[#715eb2] tw:hover:text-[#5d4b9c] tw:hover:underline tw:active:text-[#5d4b9c] tw:active:underline tw:font-bold tw:p-0"
       }.freeze
+
+      # Text-only colors: no size padding, focus ring or font-medium override
+      LINK_COLORS = %i[link link_purple].freeze
 
       ACTIVE_COLORS = {
         primary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-blue-700 tw:dark:bg-blue-600",
         secondary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-gray-200 tw:border-gray-400 tw:dark:bg-gray-800 tw:dark:border-gray-600",
         error: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-700 tw:dark:bg-red-600",
-        link: "tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold tw:underline"
+        link: "tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold tw:underline",
+        link_purple: "tw:text-[#5d4b9c] tw:underline"
       }.freeze
 
       # Literal strings so Tailwind's scanner generates these aria-pressed:/active: variants.
@@ -35,14 +40,15 @@ module UI
         primary: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-blue-500/40 tw:active:ring-blue-500/40 tw:aria-pressed:bg-blue-700 tw:active:bg-blue-700 tw:aria-pressed:dark:bg-blue-600 tw:active:dark:bg-blue-600",
         secondary: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-blue-500/40 tw:active:ring-blue-500/40 tw:aria-pressed:bg-gray-200 tw:active:bg-gray-200 tw:aria-pressed:border-gray-400 tw:active:border-gray-400 tw:aria-pressed:dark:bg-gray-800 tw:active:dark:bg-gray-800 tw:aria-pressed:dark:border-gray-600 tw:active:dark:border-gray-600",
         error: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-red-500/40 tw:active:ring-red-500/40 tw:aria-pressed:bg-red-700 tw:active:bg-red-700 tw:aria-pressed:dark:bg-red-600 tw:active:dark:bg-red-600",
-        link: "tw:aria-pressed:text-blue-800 tw:active:text-blue-800 tw:aria-pressed:dark:text-blue-300 tw:active:dark:text-blue-300 tw:aria-pressed:font-bold tw:active:font-bold"
+        link: "tw:aria-pressed:text-blue-800 tw:active:text-blue-800 tw:aria-pressed:dark:text-blue-300 tw:active:dark:text-blue-300 tw:aria-pressed:font-bold tw:active:font-bold tw:aria-pressed:underline tw:active:underline",
+        link_purple: "tw:aria-pressed:text-[#5d4b9c] tw:active:text-[#5d4b9c] tw:aria-pressed:underline tw:active:underline"
       }.freeze
 
       KINDS = %i[button submit]
 
       def self.build_classes(color:, size:, active: false, html_class: nil)
         classes = [BASE_CLASSES, COLORS[color], html_class]
-        unless color == :link
+        unless LINK_COLORS.include?(color)
           classes << SIZES[size]
           classes << "tw:focus:outline-none tw:focus:ring-3 tw:font-medium tw:no-underline"
         end
@@ -61,7 +67,7 @@ module UI
         @aria = aria
 
         @size = SIZES.key?(size) ? size : :md
-        raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
+        raise ArgumentError, "size is not supported for link colors" if LINK_COLORS.include?(@color) && @size != :md
       end
 
       def call

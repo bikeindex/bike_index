@@ -39,8 +39,8 @@ RSpec.describe UI::Button::Component, type: :component do
 
     it "renders link styles" do
       html = component.to_html
-      expect(html).to include("tw:underline")
-      expect(html).to include("tw:text-blue-600")
+      expect(html).to include("twlink")
+      expect(html).not_to include("tw:text-blue-600")
       expect(html).not_to include("tw:bg-blue-600")
     end
 
