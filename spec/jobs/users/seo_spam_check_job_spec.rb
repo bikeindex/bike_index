@@ -42,7 +42,7 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
       let(:name) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
       let(:description) { "efgBz9pNdd7efgBz9pNdd7 xzkqwrmlbnptvxz" }
       it "bans the user for spamming" do
-        expect(SpamEstimator.string_spaminess([name, description].join(" ")))
+        expect(SpamEstimator::String.string_spaminess([name, description].join(" ")))
           .to be > SpamEstimator::MARK_SPAM_PERCENT
         expect { instance.perform(user.id) }.to change(UserBan, :count).by(1)
       end

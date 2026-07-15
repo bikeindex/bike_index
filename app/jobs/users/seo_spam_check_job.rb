@@ -8,7 +8,7 @@ module Users
       user = User.find_by(id: user_id)
       return if user.blank? || !user.show_bikes? || user.banned?
 
-      ban_for_seo_spam(user) if SeoSpaminess.estimate_user(user) > SeoSpaminess::MARK_SPAM_PERCENT
+      ban_for_seo_spam(user) if SpamEstimator::User.estimate_user(user) > SpamEstimator::MARK_SPAM_PERCENT
     end
 
     private

@@ -11,7 +11,7 @@ module Email
       update_current_marketplace_listings(ownership.bike)
 
       # recalculate spaminess, to verify that bike should be emailed
-      if SpamEstimator.estimate_bike(ownership.bike) > SpamEstimator::MARK_SPAM_PERCENT
+      if SpamEstimator::Bike.estimate_bike(ownership.bike) > SpamEstimator::MARK_SPAM_PERCENT
         ownership.bike.update(likely_spam: true) unless ownership.bike.likely_spam?
       end
       ownership.bike&.update(updated_at: Time.current)

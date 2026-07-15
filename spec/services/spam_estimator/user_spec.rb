@@ -1,13 +1,13 @@
 require "rails_helper"
 
-RSpec.describe SeoSpaminess do
+RSpec.describe SpamEstimator::User do
   describe "estimate_user" do
     let(:user) { User.new(show_bikes: true, name:, description:) }
     let(:name) { "Rider Person" }
     let(:description) { "I ride bikes around Chicago and love my Surly." }
 
     it "is low for an ordinary profile" do
-      expect(described_class.estimate_user(user)).to be < SeoSpaminess::MARK_SPAM_PERCENT
+      expect(described_class.estimate_user(user)).to be < SpamEstimator::MARK_SPAM_PERCENT
     end
 
     it "is 0 for a blank user" do
@@ -31,11 +31,17 @@ RSpec.describe SeoSpaminess do
       end
     end
 
-    context "gibberish profile text" do
-      let(:name) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
+    context "gibberish description" do
       let(:description) { "efgBz9pNdd7efgBz9pNdd7 xzkqwrmlbnptvxz" }
       it "is above the spam threshold" do
-        expect(described_class.estimate_user(user)).to be > SeoSpaminess::MARK_SPAM_PERCENT
+        expect(described_class.estimate_user(user)).to be > SpamEstimator::MARK_SPAM_PERCENT
+      end
+    end
+
+    context "gibberish only in name/username (weighted lightly)" do
+      let(:user) { User.new(show_bikes: true, name: "VhriBJhD1nuwHoI9", username: "efgBz9pNdd7efgBz9", description:) }
+      it "stays below the threshold" do
+        expect(described_class.estimate_user(user)).to be < SpamEstimator::MARK_SPAM_PERCENT
       end
     end
 
