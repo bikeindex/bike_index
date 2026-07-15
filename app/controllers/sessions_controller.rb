@@ -18,8 +18,7 @@ class SessionsController < ApplicationController
     return render_partner_or_default_signin_layout(render_action: :new) if @email.blank?
 
     # SSO-forced org: skip the credential step entirely and hand off to the IdP.
-    saml_organization = Organization.saml_email_matching(@email)
-    return redirect_to saml_init_path(org_slug: saml_organization.to_param) if saml_organization.present?
+    return if redirect_to_forced_saml(@email)
 
     @login_method = login_method_for(@email)
     if @login_method == "password" && User.fuzzy_confirmed_or_unconfirmed_email_find(@email).blank?
@@ -48,6 +47,8 @@ class SessionsController < ApplicationController
   end
 
   def create_magic_link
+    return if redirect_to_forced_saml(params[:email])
+
     user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
     if user.blank?
       matching_organization = Organization.passwordless_email_matching(params[:email])
@@ -72,6 +73,8 @@ class SessionsController < ApplicationController
   end
 
   def create
+    return if redirect_to_forced_saml(permitted_parameters[:email])
+
     @user = User.fuzzy_confirmed_or_unconfirmed_email_find(permitted_parameters[:email])
     if @user.present?
       if @user.authenticate(permitted_parameters[:password])
@@ -113,6 +116,17 @@ class SessionsController < ApplicationController
   # #identify (redirect to the IdP); here only magic-link vs password remains.
   def login_method_for(email)
     Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
+  end
+
+  # SSO orgs force SSO: an SSO-managed email is handed to the IdP from every credential
+  # entry point (identify/create/create_magic_link), not merely hidden from the UI, so a
+  # direct POST can't bypass it. Redirects and returns whether it did.
+  def redirect_to_forced_saml(email)
+    organization = Organization.saml_email_matching(email)
+    return false if organization.blank?
+
+    redirect_to saml_init_path(org_slug: organization.to_param)
+    true
   end
 
   def permitted_parameters
