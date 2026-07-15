@@ -16,7 +16,7 @@ module Users
     def ban_for_seo_spam(user)
       # banned must be set too — AfterUserChangeJob deletes an unbanned user's user_ban
       user.update(banned: true)
-      UserBan.create(user:, reason: :spamming, description: "Automated SEO-spam check (show_bikes)")
+      UserBan.create(user:, reason: :spamming, description: "User profile is SEO spam")
     end
   end
 end

@@ -22,6 +22,7 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
         user_ban = UserBan.last
         expect(user_ban.user_id).to eq user.id
         expect(user_ban.reason).to eq "spamming"
+        expect(user_ban.description).to eq "User profile is SEO spam"
         expect(user.reload.banned?).to be_truthy
       end
     end
