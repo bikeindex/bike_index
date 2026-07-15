@@ -8,20 +8,6 @@ module Integrations
       STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3).to_i
       SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
 
-      # Takes the result of API::TokenAuthenticatable#authorize_user.
-      # returns {user:, strava_integration:} if valid, otherwise passes through
-      # {error: message, status: status_code}
-      def authorize_user_and_strava_integration(auth)
-        return auth if auth[:error]
-
-        user = auth[:user]
-        strava_integration = user.strava_integration
-        return {error: "No Strava integration", status: 404} unless strava_integration
-        return {error: "Strava authorization failed. Please re-authenticate with Strava.", status: 401} if strava_integration.error?
-
-        {user:, strava_integration:}
-      end
-
       def sync_status(strava_integration)
         {
           sync_status: {

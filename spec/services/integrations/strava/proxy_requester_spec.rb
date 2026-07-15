@@ -8,21 +8,6 @@ RSpec.describe Integrations::Strava::ProxyRequester do
   let(:strava_integration) { FactoryBot.create(:strava_integration) }
   let(:user) { strava_integration.user }
 
-  describe ".authorize_user_and_strava_integration" do
-    it "returns user and strava_integration when valid" do
-      result = described_class.authorize_user_and_strava_integration({user:})
-      expect(result[:error]).to be_nil
-      expect(result[:user]).to eq user
-      expect(result[:strava_integration]).to eq strava_integration
-    end
-
-    it "passes through an authorization error" do
-      result = described_class.authorize_user_and_strava_integration({status: 401, error: "OAuth token required"})
-      expect(result[:status]).to eq 401
-      expect(result[:error]).to eq "OAuth token required"
-    end
-  end
-
   describe ".sync_status" do
     it "returns sync_status hash for the integration" do
       expect(strava_integration.synced?).to be_falsey
