@@ -12,15 +12,15 @@ RSpec.describe UserBan, type: :model do
     end
   end
 
-  describe "reason_display" do
+  describe "reason_humanized" do
     it "humanizes by default" do
-      expect(UserBan.reason_display("known_criminal")).to eq "Known criminal"
+      expect(UserBan.reason_humanized("known_criminal")).to eq "Known criminal"
     end
     it "uses the override for seo_spam" do
-      expect(UserBan.new(reason: :seo_spam).reason_display).to eq "SEO SPAM"
+      expect(UserBan.new(reason: :seo_spam).reason_humanized).to eq "SEO SPAM"
     end
     it "is nil when blank" do
-      expect(UserBan.reason_display(nil)).to be_nil
+      expect(UserBan.reason_humanized(nil)).to be_nil
     end
   end
 end

@@ -10,7 +10,7 @@
     </div>
 
     <div class="tw:mt-12">
-      <%= f.submit translation(:record_sale), class: "twbtn-blue twbtn-lg tw:mr-2" %>
+      <%= render UI::Button::Component.new(text: translation(:record_sale), color: :primary, size: :lg, kind: :submit, html_class: "tw:mr-2") %>
 
       <span class="tw:text-sm tw:italic">
         <% buyer_html = content_tag(:strong, buyer_name) %>

@@ -37,17 +37,22 @@ module Admin
           @user.superuser_abilities.universal.destroy_all
         end
         @user.developer = params[:user][:developer] if current_user.developer? && params[:user].key?(:developer)
-        @user.banned = params[:user][:banned]
+        ban_params = permitted_ban_parameters
+        newly_banned = Binxtils::InputNormalizer.boolean(params[:user][:banned]) && !@user.banned?
+        creating_ban = newly_banned && ban_params[:reason].present?
+        # A created UserBan marks the user banned (see UserBan#update_user_on_create)
+        @user.banned = params[:user][:banned] unless creating_ban
         @user.username = params[:user][:username]
         @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
         @user.can_send_many_marketplace_messages = params[:user][:can_send_many_marketplace_messages]
         @user.phone = params[:user][:phone]
-        # skip_update so the save doesn't enqueue AfterUserChangeJob; create the ban
-        # after saving (banned persisted first, before UserBan's callbacks could delete
-        # it), then enqueue the job once below against the final state
+        # skip_update so the save doesn't auto-enqueue AfterUserChangeJob - it's enqueued
+        # once below, after UserBan.create! (which marks the user banned) has run
         if @user.update(skip_update: true)
-          if @user.banned && permitted_ban_parameters[:reason].present?
-            UserBan.create!(permitted_ban_parameters)
+          if creating_ban
+            UserBan.create!(ban_params)
+          elsif ban_params[:reason].present?
+            @user.user_ban&.update(ban_params.slice(:reason, :description))
           end
           @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
           CallbackJob::AfterUserChangeJob.perform_async(@user.id)
@@ -86,9 +91,8 @@ module Admin
     end
 
     def permitted_ban_parameters
-      params.require(:user).permit(user_ban_attributes: %i[reason description])
-        &.dig(:user_ban_attributes)
-        &.merge(creator_id: current_user.id, user_id: @user.id)
+      ban_attributes = params.require(:user).permit(user_ban_attributes: %i[reason description]).dig(:user_ban_attributes)
+      (ban_attributes || {}).merge(creator_id: current_user.id, user_id: @user.id)
     end
 
     def force_merge_users(email)

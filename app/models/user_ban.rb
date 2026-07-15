@@ -44,20 +44,21 @@ class UserBan < ApplicationRecord
     REASON_ENUM.keys.map(&:to_s)
   end
 
-  def self.reason_display(reason)
+  def self.reason_humanized(reason)
     return if reason.blank?
 
     REASON_DISPLAY[reason.to_s] || reason.to_s.humanize
   end
 
-  def reason_display
-    self.class.reason_display(reason)
+  def reason_humanized
+    self.class.reason_humanized(reason)
   end
 
   def update_user_on_create
     return if id.blank?
 
-    # Sign them out
+    # Ban the user and sign them out (one save, via update_auth_token)
+    user.banned = true
     user.update_auth_token("auth_token")
     # Delete their bikes
     user.bike_ids(true).each { BikeDeleterJob.perform_async(it, false, creator_id) }
