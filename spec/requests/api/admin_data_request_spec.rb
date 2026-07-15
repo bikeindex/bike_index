@@ -7,6 +7,7 @@ RSpec.describe "Admin Data API", type: :request do
   let(:user) { FactoryBot.create(:user_confirmed) }
   let(:doorkeeper_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
   let(:token_param) { {access_token: doorkeeper_token.token} }
+  before { stub_const("API::AdminDataController::ADMIN_DOORKEEPER_APP_ID", doorkeeper_app.id) }
 
   shared_examples "requires admin_data superuser" do
     context "no token" do
@@ -14,6 +15,15 @@ RSpec.describe "Admin Data API", type: :request do
         get url
         expect(response.status).to eq 401
         expect(json_result[:error]).to eq "OAuth token required"
+      end
+    end
+
+    context "token from the wrong app" do
+      before { stub_const("API::AdminDataController::ADMIN_DOORKEEPER_APP_ID", doorkeeper_app.id + 1) }
+      it "returns 403" do
+        get url, params: token_param
+        expect(response.status).to eq 403
+        expect(json_result[:error]).to eq "Unauthorized application"
       end
     end
 

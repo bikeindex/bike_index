@@ -6,6 +6,8 @@ module API
   class AdminDataController < ApplicationController
     include API::TokenAuthenticatable
 
+    ADMIN_DOORKEEPER_APP_ID = ENV.fetch("ADMIN_DOORKEEPER_APP_ID", 54).to_i
+
     respond_to :json
     before_action :require_admin_data_superuser!
 
@@ -18,6 +20,10 @@ module API
     end
 
     private
+
+    def authorized_app?(access_token)
+      access_token.application_id == ADMIN_DOORKEEPER_APP_ID
+    end
 
     def require_admin_data_superuser!
       auth = authorize_user(doorkeeper_token)
