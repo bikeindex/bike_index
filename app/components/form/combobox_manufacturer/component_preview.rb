@@ -5,9 +5,14 @@ module Form
     class ComponentPreview < ApplicationComponentPreview
       # @!group Variants
 
-      # Frame makers, keyed to :manufacturer_id
+      # Every manufacturer, keyed to :manufacturer_id
       def default
         render(Form::ComboboxManufacturer::Component.new)
+      end
+
+      # Limited to frame makers
+      def frame_makers
+        render(Form::ComboboxManufacturer::Component.new(frame_maker: true))
       end
 
       # Pre-selected value, custom label
