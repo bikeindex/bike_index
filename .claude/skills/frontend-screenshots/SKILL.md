@@ -8,8 +8,11 @@ description: >-
   across branches, design review, demos — including mid-interaction states
   like an open dropdown, a modal showing, a form mid-fill, or a hover. Use it
   even when the user just says "grab a screenshot" or "show me what this looks
-  like" without naming Playwright. Inputs: `(url-path, page-slug)` pairs,
-  optionally with per-URL interaction steps. Output: local PNG paths.
+  like" without naming Playwright. For a component that only renders under an
+  env var / feature flag / hard-to-reach state (e.g. the review-app banner),
+  screenshot its ViewComponent/Lookbook preview URL instead of a full page.
+  Inputs: `(url-path, page-slug)` pairs, optionally with per-URL interaction
+  steps. Output: local PNG paths.
 allowed-tools: Bash, Read
 ---
 
@@ -32,37 +35,64 @@ Drive Playwright MCP to capture viewport screenshots of pages served by `bin/dev
 Pick the user the caller specified, or default to `user@bikeindex.org` (lowest privilege; most non-org-affiliated pages render for them). All seeded users use password `pleaseplease12`:
 
 - `user@bikeindex.org` — no org memberships. Default. Use for personal pages (`/my_account`, `/bikes/new`) or to show how an org-less account sees a route.
-- `member@bikeindex.org` — `member` (not admin) of Hogwarts. Use to capture the non-admin view of an org.
+- `member@bikeindex.org` — `member` (not admin) of Brakebills. Use to capture the non-admin view of an org.
 - `admin@bikeindex.org` — `SuperuserAbility`; effectively admin of every org. Use when capturing admin-only menu items, `/admin/...` routes, or org pages where you want the fully-loaded sidebar.
 - `:anonymous` — skip sign-in entirely. Use for public pages where the signed-out rendering is the point.
 
-If a URL redirects to `/session/new` or `/session/magic_link`, drive the form via Playwright — don't ask the user to sign in manually.
+Signed-out is the normal starting state, **not** a blocker: if a page redirects to `/session/new` or `/session/magic_link` (or `#navUserSettingLink` has no email), drive the sign-in form via Playwright with the seed credentials above — don't ask the user to sign in manually, and don't skip the screenshot for lack of a session. **Only ever authenticate against the local dev server** (`$BASE_URL` / localhost) — never sign in to any other host, and never create, promote, or impersonate users to bypass auth.
 
-**Picking an org slug.** When the URL is org-scoped (`/o/<slug>/...`) and the caller didn't specify a slug, default to `hogwarts`
+**Picking an org slug.** When the URL is org-scoped (`/o/<slug>/...`) and the caller didn't specify a slug, default to `brakebills`
 
-**Verify identity before capturing.** The dev DB can contain real-looking data, so a non-seed user signed into the persistent profile is a PII risk on upload. Check:
+**Verify identity before capturing.** The gate isn't about *whether* to authenticate — signing in with seed credentials is expected. It's about confirming the session and its data are seed-only, so no PII lands in an uploaded image. After signing in, check:
 
 ```js
 document.getElementById('navUserSettingLink')?.dataset.email
 ```
 
-If it's set but not one of the three seeded emails, **stop and ask** — either you're signed in as a non-seed user (PII risk on upload) or the seeds haven't run (`bundle exec rails db:seed`). For `:anonymous`, expect `undefined` and confirm before continuing.
+If it's set but not one of the seeded emails, **stop and ask** — you're signed in as a non-seed user (PII risk on upload). If it's `undefined` when you expected a session, sign-in didn't take (often the seeds haven't run — `bundle exec rails db:seed`); retry the sign-in, don't capture signed-out. For `:anonymous`, expect `undefined` and confirm before continuing.
+
+**Don't capture if any on-page data looks non-seeded.** Even signed in as a seed user, if a page shows records that don't look like seed data (unfamiliar names/emails, real-looking user content), stop and ask — the dev DB may have been loaded with production data, and screenshots are permanent once uploaded.
 
 ## Capture
 
 Clear stale shots: `rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true`.
 
 Two viewports — resize once each, then walk every URL:
-1. `browser_resize` 1440×900 → for each URL: navigate → settle → `browser_take_screenshot` (`fullPage: false`) to `...-desktop.png`.
+1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
 2. `browser_resize` 390×844 → same loop → `...-mobile.png`.
 
-**`fullPage: false` and no `target:` arg.** Reviewers need the page as a browser of that size actually renders it. `fullPage: true` produces a 2000–3000px scroll capture (not how mobile renders); element-only crops slice context off.
+**Full page, minus the footer, no `target:` arg.** Capture the whole page (`fullPage: true`) so nothing below the fold is cut off, but hide the site footer first — it's identical on every page and just pads every capture. After each navigation (hiding doesn't persist across page loads), run:
+
+```js
+browser_evaluate: () => {
+  document.querySelector('.primary-footer, footer, [role="contentinfo"]')?.style.setProperty('display', 'none');
+  return document.body.scrollHeight; // content height with the footer gone
+}
+```
+
+If the returned content height is **less than the viewport height**, `browser_resize` the height down to it before the shot (the `<html>` element's near-black background fills the gap otherwise), then resize back to the standard viewport before the next URL. Taller-than-viewport pages need no resize — `fullPage` scroll-stitches them.
+
+Element-only crops (`target:`) still slice context off — don't use them for page captures.
 
 **Settle before the screenshot.** Stimulus + Chartkick render after document load; either `browser_wait_for` on a known element or pause ~500ms–1s. Otherwise charts capture mid-draw.
 
 **Mid-interaction states are in scope.** When the caller asks for a dropdown open, a modal showing, a hover state, a partially-filled form, etc., drive Playwright between settle and the screenshot — `browser_click`, `browser_type`, `browser_press_key`, `browser_hover`, then wait for the UI to reach the target state (`browser_wait_for` on a marker element, or check via `browser_evaluate`) before `browser_take_screenshot`. Treat the interaction sequence as part of the page-slug — e.g. capture `combobox-open` after clicking + typing, distinct from a static `search-registrations` page-load shot. For cross-branch comparisons, run the *same* interaction sequence on each branch so the screenshots actually compare like-for-like.
 
 Sanity-check each PNG: under ~5 KB usually means the page errored. Pull `browser_console_messages` and look only for **uncaught exceptions from app code** (Stimulus registration failures, `TypeError`s in `app/javascript/**`) — Webpacker logs, asset 404s, third-party deprecation warnings are noise. To diagnose a failed capture: HTTP status via `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"`, response body via `curl -s "$BASE_URL/<path>" | head -200`, full backtrace via `tail -200 log/development.log`.
+
+## Component previews (when no page shows the state)
+
+Some components only render in a context you can't reproduce on a normal dev page — gated by an env var (e.g. the review-app banner needs `REVIEW_APP`), a feature flag, or a hard-to-reach error/empty state. When a component has a ViewComponent/Lookbook preview, screenshot the **preview URL** instead of hunting for a page that happens to render it:
+
+```
+$BASE_URL/rails/view_components/<preview_path>/<scenario>
+```
+
+`<preview_path>` is the preview class underscored with the `Preview` suffix dropped, and `<scenario>` is the preview method. `PageBlock::ReviewAppBanner::ComponentPreview#superadmin_signed_in` → `/rails/view_components/page_block/review_app_banner/component/superadmin_signed_in`. If a scenario doesn't exist yet, add a method to the component's `*_preview.rb` first — a preview that renders the exact state (pass the args that trigger it) is often the fastest path to a clean shot.
+
+The preview page loads Tailwind and renders the component standalone (no site chrome), so capture the viewport as usual (`fullPage: false`); a small ViewComponent render-timing line at the bottom is harmless. Everything else still applies — same PII/seed-data gate, same `(url-path, page-slug)` naming (use a slug like `banner-signed-in`).
+
+Previews that query the dev DB (e.g. `User.admins.first`) render nothing when that data is missing — if the state doesn't appear, seed first with `bundle exec rails db:seed`. This is component-only: a preview can't show layout/stacking against the rest of the page (e.g. a navbar z-index fix), so use a real page for those.
 
 ## Cross-branch comparison (optional)
 

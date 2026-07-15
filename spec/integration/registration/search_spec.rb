@@ -30,13 +30,18 @@ RSpec.describe "Bike search", :js, type: :system do
 
   def click_first_bike_and_go_back
     first(".bike-box-item .title-link a").click
-    expect(page).to have_css("h1.bike-title", wait: 10)
+    # Assert the navigation separately from the render: this flakes on CI, and the
+    # two failures have different causes. No current_path means the click was lost
+    # (the frame re-rendered and detached the link); current_path without the h1
+    # means the bike page itself was slow to render under load.
+    expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
+    expect(page).to have_css("h1.bike-title", wait: 15)
     page.go_back
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
   def search_color_and_submit(color)
-    find(".hw-combobox__input").set(color)
+    type_into(".hw-combobox__input", color)
     expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
     find(".hw-combobox__option", text: color, match: :first).click
     find("#search-button").click
@@ -52,13 +57,6 @@ RSpec.describe "Bike search", :js, type: :system do
     page.current_window.resize_to(1280, 900)
     visit "/"
     click_link "Search", exact: true, match: :first
-  end
-
-  # Clear the browser's back/forward stack. Capybara never resets history between
-  # examples, so it accumulates across the suite, and WebDriver back/forward only
-  # behave reliably on a shallow stack.
-  def reset_browser_history
-    page.driver.browser.execute_cdp("Page.resetNavigationHistory")
   end
 
   # Assert the results *inside the eager turbo-frame* match a color search, so it

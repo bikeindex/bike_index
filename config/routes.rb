@@ -61,6 +61,7 @@ Rails.application.routes.draw do
       get :magic_link
       post :sign_in_with_magic_link
       post :create_magic_link
+      match :identify, via: %i[get post]
     end
   end
   get "logout", to: "sessions#destroy"
@@ -200,6 +201,10 @@ Rails.application.routes.draw do
   get "bikes/:id/edit(/:edit_template)", to: "bikes/edits#show", as: :edit_bike
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
   get "stickers/:scanned_id", to: "bikes#scanned"
+  # Short sticker URL (BikeSticker short_id): /s/<code> redirects to the canonical scanned path
+  get "s/:scanned_id", to: redirect { |params, request|
+    ["/bikes/scanned/#{params[:scanned_id]}", request.query_string.presence].compact.join("?")
+  }
 
   resources :bike_versions, except: [:edit]
   get "bike_versions/:id/edit(/:edit_template)", to: "bike_versions/edits#show", as: :edit_bike_version
@@ -279,6 +284,10 @@ Rails.application.routes.draw do
 
     resources :registration_sequences, only: %i[index]
 
+    resources :bug_reports, only: %i[index show update] do
+      collection { post :assign_tags }
+    end
+
     resources :organizations do
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
@@ -355,6 +364,12 @@ Rails.application.routes.draw do
     end
     resources :autocomplete, only: %i[index]
     resources :strava_proxy, only: %i[create]
+    resources :admin_data, only: [] do
+      collection do
+        get :sidekiq
+        get :pghero
+      end
+    end
   end
   mount API::Base => "/api"
 

@@ -3,8 +3,8 @@ require "rails_helper"
 base_url = "/csp_reports"
 RSpec.describe CspReportsController, type: :request do
   describe "create" do
-    let(:report) { {"csp-report" => {"blocked-uri" => blocked_uri, "document-uri" => "https://bikeindex.org/bikes/1", "effective-directive" => "script-src"}} }
     let(:blocked_uri) { "https://evil.example.com/x.js" }
+    let(:report) { {"csp-report" => {"blocked-uri" => blocked_uri, "document-uri" => "https://bikeindex.org/bikes/1", "effective-directive" => "script-src"}} }
     let(:user_agent) { "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/148.0.0.0 Safari/537.36" }
 
     def post_report
@@ -12,10 +12,10 @@ RSpec.describe CspReportsController, type: :request do
         headers: {"CONTENT_TYPE" => "application/csp-report", "HTTP_USER_AGENT" => user_agent}
     end
 
-    it "forwards a real violation to Honeybadger" do
+    it "enqueues the forward job with the body, user, and user agent" do
       post_report
       expect(response.status).to eq(204)
-      expect(ForwardCspReportJob).to have_enqueued_sidekiq_job(report.to_json, nil)
+      expect(ForwardCspReportJob).to have_enqueued_sidekiq_job(report.to_json, nil, user_agent)
     end
 
     context "with a signed-in user" do
@@ -24,51 +24,20 @@ RSpec.describe CspReportsController, type: :request do
         post "#{base_url}?context[user_id]=999", params: report.to_json,
           headers: {"CONTENT_TYPE" => "application/csp-report", "HTTP_USER_AGENT" => user_agent}
         expect(response.status).to eq(204)
-        expect(ForwardCspReportJob).to have_enqueued_sidekiq_job(report.to_json, current_user.id)
+        expect(ForwardCspReportJob).to have_enqueued_sidekiq_job(report.to_json, current_user.id, user_agent)
       end
     end
 
-    context "browser-extension noise" do
-      let(:blocked_uri) { "chrome-extension://0dca8e62/fonts/Inter-Variable.ttf" }
-      it "drops the report" do
-        post_report
+    context "invalid UTF-8 byte sequences" do
+      let(:raw_body) do
+        report.to_json.sub(blocked_uri, "#{blocked_uri}\xC0\xA7\xC0\xA2".force_encoding(Encoding::ASCII_8BIT))
+      end
+
+      it "scrubs the body before enqueuing instead of raising" do
+        post base_url, params: raw_body,
+          headers: {"CONTENT_TYPE" => "application/csp-report", "HTTP_USER_AGENT" => user_agent}
         expect(response.status).to eq(204)
-        expect(ForwardCspReportJob.jobs.count).to eq 0
-      end
-    end
-
-    context "in-app browser" do
-      let(:user_agent) { "Mozilla/5.0 (Linux; Android 12) Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/488.0.0.78.79;]" }
-      it "drops the report" do
-        post_report
-        expect(ForwardCspReportJob.jobs.count).to eq 0
-      end
-    end
-
-    context "translate proxy frame" do
-      let(:blocked_uri) { "https://www.google.co.id/" }
-      it "drops the report" do
-        post_report
-        expect(ForwardCspReportJob.jobs.count).to eq 0
-      end
-    end
-
-    context "read-aloud data: media" do
-      let(:report) { {"csp-report" => {"blocked-uri" => "data", "effective-directive" => "media-src"}} }
-      it "drops the report" do
-        post_report
-        expect(ForwardCspReportJob.jobs.count).to eq 0
-      end
-    end
-
-    context "malformed body" do
-      ["not json", "null", "123", {"csp-report" => 5}.to_json].each do |raw_body|
-        it "returns 204 without enqueuing for #{raw_body.inspect}" do
-          post base_url, params: raw_body,
-            headers: {"CONTENT_TYPE" => "application/csp-report"}
-          expect(response.status).to eq(204)
-          expect(ForwardCspReportJob.jobs.count).to eq 0
-        end
+        expect(ForwardCspReportJob.jobs.count).to eq 1
       end
     end
 

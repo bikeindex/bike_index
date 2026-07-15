@@ -256,13 +256,13 @@ module Organized
 
     def claimed_ownerships_search
       bikes = organization_bikes
-      if %w[transferred initial].include?(params[:search_claimedness])
-        @search_claimedness = params[:search_claimedness]
-        bikes = if @search_claimedness == "initial"
-          bikes.joins(:ownerships).where(ownerships: {current: true, previous_ownership_id: nil})
-        else
-          bikes.joins(:ownerships).where.not(ownerships: {previous_ownership_id: nil})
-        end
+      @search_claimedness = %w[transferred initial].include?(params[:search_claimedness]) ? params[:search_claimedness] : "all"
+      bikes = if @search_claimedness == "initial"
+        bikes.joins(:ownerships).where(ownerships: {current: true, previous_ownership_id: nil})
+      elsif @search_claimedness == "transferred"
+        bikes.joins(:ownerships).where.not(ownerships: {previous_ownership_id: nil})
+      else
+        bikes
       end
       bikes.where(created_at: @time_range)
     end

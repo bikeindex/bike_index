@@ -102,6 +102,8 @@ module API
         403
       elsif (eclass =~ /RecordNotFound/) || (error.message =~ /unable to find/i)
         404
+      elsif error.is_a?(Rack::BadRequest) # malformed request body (e.g. empty multipart)
+        400
       else
         (error.respond_to? :status) && error.status || 500
       end

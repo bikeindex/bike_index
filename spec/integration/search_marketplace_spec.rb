@@ -49,8 +49,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   def scroll_to_lazy_load
     # Scroll the lazy-loading frame into view to trigger its IntersectionObserver.
     # Use an instant scroll (not "smooth") so the observer fires deterministically
-    # in headless Chrome; capybara-lockstep then holds the next assertion until the
-    # frame's in-flight fetch completes, so no manual sleep is needed.
+    # in headless Chrome; the waiting `have_css` assertions that follow then hold
+    # until the frame's in-flight fetch completes, so no manual sleep is needed.
     page.execute_script(<<~JS)
       const lazyFrame = document.querySelector('turbo-frame#page_2[loading="lazy"]');
       if (lazyFrame) {
@@ -78,17 +78,10 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # matching option, then submit. Works whether the combobox starts empty or
   # already has a selection (set replaces the existing text).
   def search_primary_activity(display_name)
-    find("#primary_activity").set(display_name)
+    type_into("#primary_activity", display_name)
     expect(page).to have_css(".hw-combobox__option", text: display_name, wait: 5)
     find(".hw-combobox__option", text: display_name, match: :first).click
     find("#search-button").click
-  end
-
-  # Clear the browser's back/forward stack. Capybara never resets history between
-  # examples, so it accumulates across the suite, and WebDriver back/forward only
-  # behave reliably on a shallow stack.
-  def reset_browser_history
-    page.driver.browser.execute_cdp("Page.resetNavigationHistory")
   end
 
   it "loads the kind counts on initial render" do
@@ -138,7 +131,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     fill_in "price_max_amount", with: ""
     # Scope to the everything-combobox - the primary_activity field is also a combobox
     within("[data-controller~='search--everything-combobox']") do
-      find(".hw-combobox__input").set("Yuba")
+      type_into(".hw-combobox__input", "Yuba")
       # Wait for the combobox autocomplete to load
       expect(page).to have_css(".hw-combobox__option", text: "Listings made by Yuba", wait: 5)
       find(".hw-combobox__option", text: "Listings made by Yuba", match: :first).click

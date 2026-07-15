@@ -69,11 +69,7 @@ module Search
         case match["category"]
         when "colors"
           prefix = tag.span("#{@search_obj_name} #{translation(".that_are")} ", class: "sch_")
-          swatch = if match["display"].present?
-            tag.span("", class: "sclr", style: "background: #{match["display"]}")
-          else
-            tag.span("stckrs", class: "sclr")
-          end
+          swatch = render(UI::ColorSwatch::Component.new(display: match["display"], name: match["text"]))
           safe_join([prefix, swatch])
         when "cmp_mnfg", "frame_mnfg"
           tag.span("#{@search_obj_name} #{translation(".made_by")}", class: "sch_")

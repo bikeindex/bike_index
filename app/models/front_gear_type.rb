@@ -22,6 +22,7 @@ class FrontGearType < ApplicationRecord
 
   scope :standard, -> { where(standard: true) }
   scope :internal, -> { where(internal: true) }
+  scope :pinion, -> { where("name ILIKE ?", "%pinion%") }
 
   def self.fixed
     where(name: "1", count: 1, internal: false, standard: true).first_or_create

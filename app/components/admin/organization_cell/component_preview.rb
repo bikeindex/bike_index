@@ -24,7 +24,7 @@ module Admin
       private
 
       def organization
-        Organization.friendly_find "hogwarts"
+        Organization.friendly_find "brakebills"
       end
     end
   end

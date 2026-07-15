@@ -166,7 +166,7 @@ RSpec.describe InfoController, type: :request do
   end
 
   describe "current_tsv" do
-    it "redirects to current_tsv" do
+    it "redirects to how_not_to_buy_stolen PDF" do
       get "/how_not_to_buy_stolen"
       expect(response).to redirect_to InfoController::DONT_BUY_STOLEN_URL
     end

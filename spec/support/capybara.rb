@@ -2,20 +2,20 @@
 
 require "capybara/rails"
 require "capybara/rspec"
-require "capybara-lockstep"
+require "capybara-playwright-driver"
 
-Capybara.register_driver :chrome_headless do |app|
-  # unhandled_prompt_behavior: "ignore" keeps capybara-lockstep from stalling on
-  # a JS dialog (alert/confirm/prompt) that a spec hasn't explicitly accepted.
-  options = Selenium::WebDriver::Chrome::Options.new(unhandled_prompt_behavior: "ignore")
-  options.add_argument("--headless")
-  options.add_argument("--window-size=1920,1080")
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+Capybara.register_driver :playwright do |app|
+  # Playwright drives the `playwright` npm package (see package.json) and
+  # auto-waits for elements/navigation, so no separate lockstep sync is needed.
+  Capybara::Playwright::Driver.new(app,
+    browser_type: :chromium,
+    headless: true,
+    viewport: {width: 1920, height: 1080})
 end
 
 Capybara.configure do |config|
-  config.default_driver = :chrome_headless
-  config.javascript_driver = :chrome_headless
+  config.default_driver = :playwright
+  config.javascript_driver = :playwright
 end
 
 # Pin Capybara's app server to a predictable host:port. Defaults to

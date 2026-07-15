@@ -23,6 +23,27 @@ RSpec.describe UI::Alert::Component, type: :component do
     end
   end
 
+  describe "purple" do
+    let(:options) { {text: "some text", kind: "purple"} }
+    it "renders" do
+      expect(component).to have_content "some text"
+      expect(component).to have_css('[role="alert"].tw:text-purple-800')
+      expect(component.to_html).to include("tw:bg-purple-50")
+      # It doesn't have dismissable button
+      expect(component).to_not have_selector("button")
+    end
+  end
+
+  describe "custom icon" do
+    let(:options) { {text: "some text", icon: '<svg class="custom-icon"></svg>'.html_safe} }
+    it "renders the given markup instead of the default icon" do
+      html = component.to_html
+      expect(html).to include('<svg class="custom-icon">')
+      # The default info icon is not rendered
+      expect(html).to_not include("M10 .5a9.5")
+    end
+  end
+
   context "success dismissable" do
     let(:options) { {text: "some text", kind: "success", dismissable: true} }
     it "renders with dismissable" do

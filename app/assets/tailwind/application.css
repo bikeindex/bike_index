@@ -74,49 +74,16 @@
 
 @layer components {
   .twlink {
-    @apply tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition-colors tw:underline;
+    @apply tw:text-blue-600 tw:hover:text-blue-800 tw:hover:underline tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition-colors;
   }
 
   .twlink.active,
   .twlink:active {
-    @apply tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold;
+    @apply tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold tw:underline;
   }
 
   .twless-strong {
     @apply tw:opacity-65 tw:decoration-gray-900/65 tw:dark:decoration-gray-400/65;
-  }
-
-  .twbtn,
-  .twbtn-blue,
-  .twbtn-green {
-    @apply tw:inline-block tw:shadow-sm tw:rounded-md tw:p-3 tw:text-center
-    tw:cursor-pointer tw:active:outline tw:focus-visible:outline-offset-2
-    tw:disabled:cursor-not-allowed tw:disabled:opacity-85
-    tw:focus-visible:outline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2
-    tw:active:outline-none tw:active:opacity-95;
-  }
-
-  .twbtn {
-    @apply tw:border tw:border-gray-200 tw:hover:bg-gray-100 tw:dark:border-gray-700 tw:dark:hover:bg-gray-800
-      tw:focus-visible:outline-gray-200 tw:disabled:hover:bg-transparent
-      tw:active:opacity-80;
-  }
-
-  .twbtn-green {
-    @apply tw:text-white tw:bg-green-600
-      tw:hover:bg-green-500 tw:focus-visible:outline-green-600 tw:disabled:hover:bg-green-600;
-  }
-
-  .twbtn-blue {
-    @apply tw:text-white tw:bg-blue-600
-      tw:hover:bg-blue-500 tw:focus-visible:outline-blue-600
-      tw:disabled:hover:bg-blue-600;
-  }
-
-  .twbtn.twbtn-lg,
-  .twbtn-blue.twbtn-lg,
-  .twbtn-green.twbtn-lg {
-    @apply tw:px-6 tw:text-lg;
   }
 
   .twinput {
@@ -149,12 +116,6 @@
     @apply tw:block tw:px-4 tw:py-1 tw:text-left tw:text-base tw:text-gray-700 tw:no-underline
       tw:hover:bg-gray-100 tw:hover:text-gray-900
       tw:dark:text-gray-200 tw:dark:hover:bg-gray-700 tw:dark:hover:text-gray-100;
-  }
-
-  .twdropdown li[role="menuitem"] > a.active,
-  .twdropdown li[role="menuitem"] > a:active {
-    @apply tw:bg-gray-200 tw:text-gray-900
-      tw:dark:bg-gray-600 tw:dark:text-gray-100;
   }
 
   .twdropdown li[role="menuitem"]:has(+ li[role="separator"]) > a {

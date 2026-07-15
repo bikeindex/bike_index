@@ -59,6 +59,10 @@ allow(ENV).to receive(:[]).and_call_original
 allow(ENV).to receive(:[]).with("STRIPE_SECRET_KEY").and_return("sk_test_123")
 ```
 
+## Drain Sidekiq jobs, don't run them inline
+
+Run enqueued jobs by draining them in the default fake mode — `SomeJob.drain` for one job, `Sidekiq::Job.drain_all` for everything (clear first with `Sidekiq::Job.clear_all` when earlier setup left jobs queued). Don't wrap the exercise in `Sidekiq::Testing.inline!`. Draining lets the request finish and commit before the jobs run, against that committed state — the way production does it — and keeps the test from silently pulling in every cascading job.
+
 ## Always fix failing tests
 
 Fix every failing test, even ones that were already failing on `main`. Confirming a failure pre-dates your branch (via `git stash` or checking out `main`) explains *what* broke — not whether you fix it. You fix it.
@@ -167,3 +171,53 @@ end
 ```
 
 The bad version repeats setup, mocks the object, and doesn't communicate what each case represents.
+
+## One example per distinct setup — combine same-setup `it` blocks
+
+`context`/`let`/`before` isolate what *varies*. The corollary runs the other way: if two sibling `it` blocks share the **same** setup — no differing `context`, `before`, or `let` override between them — collapse them into **one** example. Each distinct setup earns exactly one `it`; put all of that setup's assertions (and all of its requests/renders) in that single block.
+
+This is the same instinct as "everything making the same request should be in a single test", generalized: splitting same-setup assertions across sibling `it` blocks re-runs identical setup (factories, HTTP requests, renders) once per block for zero isolation benefit, and scatters one logical behavior across the file. Two `it` blocks that differ *only* in the request params or the assertion — with identical `let`s and no `before` between them — are one example.
+
+After writing a spec, scan each `context`/`describe`: if it holds multiple `it` blocks and they don't each sit behind a distinct `context`/`before`/`let`, merge them.
+
+### Good
+
+```ruby
+context "superuser" do
+  let(:current_user) { FactoryBot.create(:superuser) }
+
+  it "offers every view and renders the owner and org-limited perspectives" do
+    get "#{base_url}/#{bike.id}"
+    expect(body_text).to match("View as owner of bike")
+
+    get "#{base_url}/#{bike.id}", params: {view_as: "owner"}
+    expect(body_text).to match("Your bike")
+
+    get "#{base_url}/#{bike.id}", params: {view_as: "#{org.to_param}.limited"}
+    expect(body_text).to match("Limited")
+  end
+end
+```
+
+### Bad
+
+```ruby
+context "superuser" do
+  let(:current_user) { FactoryBot.create(:superuser) }   # re-created for every it below
+
+  it "offers every view" do
+    get "#{base_url}/#{bike.id}"
+    expect(body_text).to match("View as owner of bike")
+  end
+  it "renders the owner view" do
+    get "#{base_url}/#{bike.id}", params: {view_as: "owner"}
+    expect(body_text).to match("Your bike")
+  end
+  it "renders an org panel as limited" do
+    get "#{base_url}/#{bike.id}", params: {view_as: "#{org.to_param}.limited"}
+    expect(body_text).to match("Limited")
+  end
+end
+```
+
+This only merges blocks whose setup is identical. Different setup still means separate examples, each in its own `context` with the `let`/`before` that differs — that's the section above, not a contradiction of it.

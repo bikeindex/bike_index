@@ -36,7 +36,7 @@
           Manufacturer
           %em.small
             = link_to "mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name), class: "less-strong"
-        = render Form::Combobox::Component.new(name: :manufacturer_id, form: f, label: manufacturer_label, required: true, options: Manufacturer.frame_makers.pluck(:name, :id))
+        = render Form::ComboboxManufacturer::Component.new(frame_maker: true, form: f, label: manufacturer_label, required: true)
     .col-6.col-md-4.col-lg-3
       .form-group
         = f.label :manufacturer_other do

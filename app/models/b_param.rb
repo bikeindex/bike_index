@@ -25,6 +25,7 @@
 #  index_b_params_on_bike_owner_email_trgm  ((((params -> 'bike'::text) ->> 'owner_email'::text)) gin_trgm_ops) USING gin
 #  index_b_params_on_created_bike_id        (created_bike_id)
 #  index_b_params_on_email_trgm             (email) WHERE (created_bike_id IS NULL) USING gin
+#  index_b_params_on_id_token               (id_token)
 #  index_b_params_on_organization_id        (organization_id)
 #
 
@@ -69,8 +70,8 @@ class BParam < ApplicationRecord
     stolen
     street
   ].freeze
-  mount_uploader :image, ImageUploader
-  process_in_background :image, CarrierWaveStoreJob
+  mount_uploader :image, ImageUploaderBackgrounded
+  process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"
@@ -156,6 +157,8 @@ class BParam < ApplicationRecord
 
     # Because organization embed bikes might not match the creator
     def with_organization_or_no_creator(toke)
+      return if toke.blank?
+
       without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
         .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
     end

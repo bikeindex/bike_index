@@ -30,6 +30,7 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     # Sign in as the registrar
     visit new_session_path
     fill_in "Email", with: registrar.email
+    click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     expect(page).to have_content("Logged in", wait: 5)
@@ -41,7 +42,7 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     # Manufacturer field is a text input enhanced by selectize + remote autocomplete
     manufacturer_box = selectize_for("bike_manufacturer_id")
     manufacturer_box.find(".selectize-input").click
-    manufacturer_box.find(".selectize-input input").set("Surly")
+    type_into(manufacturer_box.find(".selectize-input input"), "Surly")
     expect(page).to have_css(".selectize-dropdown-content .option", text: "Surly", wait: 5)
     find(".selectize-dropdown-content .option", text: "Surly").click
 

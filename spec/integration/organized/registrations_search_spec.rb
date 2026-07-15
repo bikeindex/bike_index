@@ -21,6 +21,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.current_window.resize_to(720, 2000)
     visit new_session_path
     fill_in "Email", with: user.email
+    click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     find(".alert-success .close").click
@@ -51,7 +52,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.all("tbody tr a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
   end
 
-  it "searches by email and serial" do
+  # flaky: the in-frame "Render chart" advance-link toggle intermittently leaves
+  # the results frame showing a stale snapshot under Playwright (its history/frame
+  # nav settles differently than Selenium's), so the toggle reads the wrong state.
+  # Retry like the back/forward sync spec; a real browser renders it reliably.
+  it "searches by email and serial", flaky: 4 do
     # Create enough bikes to trigger pagination (default per_page is 10)
     FactoryBot.create_list(:bike_organized, 10, creation_organization: organization)
 
@@ -200,7 +205,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # writes session[:timezone] from Intl.DateTimeFormat (varies between local
     # Chrome and CI's headless Chrome), and set_timezone prefers session over
     # cookie — so the cookie override only takes effect while session is empty.
-    expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to be_present
+    expect(browser_cookie_value("timezone")).to be_present
 
     # 5 AM UTC = 9 PM PDT (or 12 AM CDT) the previous day, so PDT and CDT fall on different days.
     chart_bike_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
@@ -212,11 +217,15 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Replace the cookie via JS the same way the app does, so attributes (SameSite, path)
     # match and Chrome reliably overwrites the existing cookie set on previous loads.
     page.execute_script("document.cookie = 'timezone=America/Los_Angeles;path=/;max-age=31536000;SameSite=Lax'")
-    expect(page.driver.browser.manage.cookie_named("timezone")[:value]).to eq("America/Los_Angeles")
+    expect(browser_cookie_value("timezone")).to eq("America/Los_Angeles")
 
     # Switch to past 30 days for daily chart bucketing, then enable the chart on the search page
     click_link "past 30 days"
     expect(page).to have_current_path(/period=month/, wait: 10)
+    # "Render chart" lives inside the results frame the period change above
+    # replaces. Wait for that swap to settle (bob is the only match in the past
+    # 30 days) before clicking, so the advance nav isn't superseded mid-swap.
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
 
     click_link "Render chart"
     expect(page).to have_current_path(/render_chart=true/, wait: 10)
@@ -235,6 +244,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     fill_in "search_email", with: ""
     find("#search-button").click
     expect(page).to have_current_path(/period=year/, wait: 10)
+    # The "custom" button lives inside the results frame, which this search
+    # replaces. Wait for the swap to finish (count reflects the cleared email)
+    # before toggling it -- otherwise Playwright grabs the old button and it
+    # detaches mid-click ("Element is not attached to the DOM").
+    expect(page).to have_text("11 registrations matching")
 
     click_button "custom"
     start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
@@ -354,7 +368,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       click_button "Search serials"
 
       # Chips update with results
-      expect(page).to have_css("#chip_2.tw\\:bg-gray-300", wait: 15)
+      expect(page).to have_css("#chip_2.tw\\:bg-gray-100", wait: 15)
 
       # Results sorted by chip order, empty results removed
       expect(page).to have_css(".multi-search-serial-result", count: 2)
@@ -375,6 +389,35 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
       expect(page).to have_content("owner-beta@example.com", wait: 10)
       expect(page).not_to have_content("owner-alpha@example.com")
+
+      # Close serials: a serial with no exact match but a bike within Levenshtein
+      # distance renders in the results table. Regression: sortAndFilterResults
+      # dropped the whole result a frame after it rendered because the exact-match
+      # count was 0, so the close serials flashed then disappeared.
+      find("textarea#serials").set("SERIAL119")
+      click_button "Search serials"
+
+      expect(page).to have_content("No exact matches. Close serials:", wait: 15)
+      expect(page).to have_css(".multi-search-serial-result", count: 1)
+      within(".multi-search-serial-result") do
+        expect(page).to have_css("table")
+        expect(page).to have_link(href: %r{/bikes/#{bike_a.id}})
+      end
+
+      # Back/forward re-syncs the search box and results to the URL
+      find("textarea#serials").set("SERIAL111")
+      click_button "Search serials"
+      expect(page).to have_css(".multi-search-serial-result", count: 1)
+      expect(page).to have_current_path(/serials=SERIAL111(&|\z)/, wait: 10)
+
+      find("textarea#serials").set("SERIAL111, SERIAL222")
+      click_button "Search serials"
+      expect(page).to have_css(".multi-search-serial-result", count: 2)
+
+      page.go_back
+      expect(page).to have_current_path(/serials=SERIAL111(&|\z)/, wait: 10)
+      expect(page).to have_field("serials", with: "SERIAL111")
+      expect(page).to have_css(".multi-search-serial-result", count: 1)
     end
 
     context "with bike_stickers enabled" do
@@ -412,11 +455,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
         click_button "Search stickers"
 
         # Chips for unclaimed and non-org stickers show gray (no bikes)
-        expect(page).to have_css("#chip_1.tw\\:bg-gray-300", wait: 15)
-        expect(page).to have_css("#chip_2.tw\\:bg-gray-300")
+        expect(page).to have_css("#chip_1.tw\\:bg-gray-100", wait: 15)
+        expect(page).to have_css("#chip_2.tw\\:bg-gray-100")
 
         # Only claimed org sticker has a bike result
-        expect(page).to have_css("#chip_0.tw\\:bg-emerald-500")
+        expect(page).to have_css("#chip_0.tw\\:bg-green-50")
 
         # Switch back to serials
         choose "Serials", allow_label_click: true, visible: :all

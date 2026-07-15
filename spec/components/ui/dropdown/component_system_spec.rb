@@ -46,6 +46,9 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       expect(page).to have_text("Last synced: 2 minutes ago")
       expect(page).to have_text("Settings")
       expect(page).to have_text("Sync")
+      # The active item is marked aria-current; inactive items are not
+      expect(page).to have_css('li[role="menuitem"][aria-current]', text: "Sync")
+      expect(page).to have_css('li[role="menuitem"]:not([aria-current])', text: "Settings")
       expect_axe_clean
 
       send_keys(:escape)

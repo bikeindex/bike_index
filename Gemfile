@@ -76,7 +76,7 @@ gem "flipper-active_record" # Feature flagging
 gem "flipper-ui" # Feature flagging
 gem "geocoder" # Geolocation using external APIs
 gem "money-rails", "~> 1.11" # Money formatting
-gem "sitemap_generator", "~> 6" # Make sitemaps
+gem "sitemap_generator", "~> 7" # Make sitemaps
 
 # API wrappers, external requests
 gem "twitter" # Twitter. For rendering tweets
@@ -192,8 +192,8 @@ group :test do
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry flaky test failures on CI
   gem "capybara" # For view components
-  gem "capybara-lockstep" # Sync Capybara with in-flight JS/AJAX to reduce flaky :js specs
-  gem "selenium-webdriver" # For capybara
+  gem "capybara-playwright-driver" # Drives :js specs through Playwright (the playwright npm package)
   gem "chunky_png" # used to test that generated images match their targets
-  gem "axe-core-rspec" # Accessibility testing
+  # Accessibility testing runs axe-core (the npm package) via Playwright directly;
+  # see spec/support/axe.rb (the axe rubygems assume a Selenium driver).
 end

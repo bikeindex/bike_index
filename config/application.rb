@@ -8,6 +8,7 @@ require "active_model/railtie"
 require "active_record/railtie"
 require "active_storage/engine"
 require "action_controller/railtie"
+require "action_mailbox/engine"
 require "action_mailer/railtie"
 require "action_text/engine"
 require "action_view/railtie"
@@ -61,7 +62,9 @@ module Bikeindex
     config.i18n.available_locales = %i[en es it nl nb]
     config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
 
-    config.middleware.insert_after ActionDispatch::RemoteIp, IpSpoofAttackFilter
+    # Must sit below DebugExceptions/ShowExceptions: those rescue the raised IpSpoofAttackError
+    # and render it as a 500 before it can reach this filter. Above them it never fires.
+    config.middleware.insert_after ActionDispatch::DebugExceptions, IpSpoofAttackFilter
     config.middleware.use Rack::Deflater
     config.middleware.insert 0, Rack::UTF8Sanitizer
 

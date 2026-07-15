@@ -41,25 +41,32 @@ Rails.application.configure do
       "https://cdn.jsdelivr.net",
       "https://api.mapbox.com"
     policy.connect_src :self,
-      "https://bikebook.herokuapp.com",
-      "https://www.google-analytics.com",
       "https://*.google-analytics.com",
-      # GA4 region-redirects measurement hits to www.google.com/g/collect
-      "https://www.google.com",
-      "https://www.googletagmanager.com",
+      "https://*.tiles.mapbox.com",
+      # GA4 also routes /g/collect beacons to analytics.google.com and (region-redirected) www.google.com
+      "https://analytics.google.com",
+      # GA4 ad-personalization beacons to DoubleClick (/g/collect)
+      "https://stats.g.doubleclick.net",
+      "https://api.honeybadger.io",
+      "https://api.mapbox.com",
+      "https://bikebook.herokuapp.com",
+      "https://cdn.jsdelivr.net",
+      "https://events.mapbox.com",
+      # Our own image CDNs — third-party scripts (Facebook Pixel) fetch bike photos, not just <img> them
+      "https://files.bikeindex.org",
       "https://maps.googleapis.com",
       "https://translate.googleapis.com", # Google Translate API
+      "https://uploads.bikeindex.org",
       "https://www.facebook.com",
-      "https://api.mapbox.com",
-      "https://events.mapbox.com",
-      "https://*.tiles.mapbox.com",
-      "https://cdn.jsdelivr.net",
-      "https://api.honeybadger.io"
+      "https://www.google-analytics.com",
+      "https://www.google.com",
+      "https://www.googletagmanager.com"
     policy.worker_src :self, :blob
     policy.frame_src :self,
       "https://www.google.com",
       # Google Ads conversion tracking iframes use country-specific Google domains
       "https://www.google.ca",
+      "https://www.google.co.id",
       "https://www.google.co.uk",
       "https://www.google.com.au",
       "https://www.google.com.br",
