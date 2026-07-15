@@ -3,11 +3,6 @@
 module UI
   module Button
     class ComponentPreview < ApplicationComponentPreview
-      # @label legacy (using twbtn classes)
-      def legacy
-        {template: "ui/button/component_preview/default"}
-      end
-
       # @!group Colors
       def primary
         render(UI::Button::Component.new(text: "Primary", color: :primary))
@@ -57,10 +52,6 @@ module UI
         render(UI::Button::Component.new(text: "Mark stolen", color: :danger_outline))
       end
 
-      # White button with a neutral outline
-      def outline
-        render(UI::Button::Component.new(text: "Share", color: :outline))
-      end
       # @!endgroup
 
       # @!group Sizes

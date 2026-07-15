@@ -153,10 +153,10 @@
           } %>
 
         <div class="tw:mt-2 tw:grid tw:grid-cols-2 tw:gap-2">
-          <%= render UI::Button::Component.new(text: t(".take_photo"), color: :outline,
+          <%= render UI::Button::Component.new(text: t(".take_photo"), color: :secondary,
             html_class: "tw:justify-center", data: {action: "registrations--new--photo#takePhoto"}) %>
 
-          <%= render UI::Button::Component.new(text: t(".upload"), color: :outline,
+          <%= render UI::Button::Component.new(text: t(".upload"), color: :secondary,
             html_class: "tw:justify-center", data: {action: "registrations--new--photo#upload"}) %>
         </div>
 
