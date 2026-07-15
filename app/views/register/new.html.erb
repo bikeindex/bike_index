@@ -12,7 +12,7 @@
 
     <div class="tw:mb-4">
       <%= render Form::ComboboxManufacturer::Component.new(form: f,
-          label_class: "twlabel", free_text: true,
+          frame_maker: true, label_class: "twlabel", free_text: true,
           value: bike["manufacturer_other"].presence || bike["manufacturer_id"],
           placeholder: t(".manufacturer_placeholder")) %>
     </div>
