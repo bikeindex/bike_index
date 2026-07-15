@@ -28,6 +28,22 @@ module Org
         @chip_id&.delete_prefix("chip_")
       end
 
+      # Fall back to close serials (near Levenshtein matches) when nothing matched exactly
+      def displayed_bikes
+        return @displayed_bikes if defined?(@displayed_bikes)
+
+        @displayed_bikes = bikes_array.presence || @close_serials&.to_a
+      end
+
+      def close_serials_only?
+        bikes_array.empty? && displayed_bikes.present?
+      end
+
+      # Load @bikes once; every emptiness check then stays in-memory rather than re-querying
+      def bikes_array
+        @bikes_array ||= @bikes.to_a
+      end
+
       def show_view_all?
         @pagy.count > @pagy.limit
       end
