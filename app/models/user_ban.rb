@@ -57,7 +57,8 @@ class UserBan < ApplicationRecord
   def update_user_on_create
     return if id.blank?
 
-    # Sign them out
+    # Ban the user and sign them out (one save, via update_auth_token)
+    user.banned = true
     user.update_auth_token("auth_token")
     # Delete their bikes
     user.bike_ids(true).each { BikeDeleterJob.perform_async(it, false, creator_id) }

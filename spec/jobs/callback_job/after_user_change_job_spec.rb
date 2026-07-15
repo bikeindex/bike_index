@@ -103,6 +103,8 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
     let(:user_ban) { UserBan.create(user: user, reason: :extortion) }
     it "deletes if not banned" do
       expect(user_ban).to be_valid
+      # Creating the ban marks the user banned; unban to leave an orphaned ban record
+      user.update(banned: false)
       instance.perform(user.id)
       expect(user.reload.banned?).to be_falsey
       expect(UserBan.deleted.pluck(:user_id)).to eq([user.id])
