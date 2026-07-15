@@ -3,6 +3,9 @@ class SessionsController < ApplicationController
 
   before_action :force_html_response
   before_action :skip_if_signed_in, only: [:new, :magic_link]
+  # SSO orgs force SSO: every credential entry point redirects an SSO-managed email to the
+  # IdP before the action runs, so no direct POST can bypass SSO with a password or link.
+  before_action :redirect_forced_saml, only: %i[identify create create_magic_link]
 
   def new
     render_partner_or_default_signin_layout
@@ -16,9 +19,6 @@ class SessionsController < ApplicationController
     @email = params.dig(:session, :email)
     @remember_me = params.dig(:session, :remember_me)
     return render_partner_or_default_signin_layout(render_action: :new) if @email.blank?
-
-    # SSO-forced org: skip the credential step entirely and hand off to the IdP.
-    return if redirect_to_forced_saml(@email)
 
     @login_method = login_method_for(@email)
     if @login_method == "password" && User.fuzzy_confirmed_or_unconfirmed_email_find(@email).blank?
@@ -47,8 +47,6 @@ class SessionsController < ApplicationController
   end
 
   def create_magic_link
-    return if redirect_to_forced_saml(params[:email])
-
     user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
     if user.blank?
       matching_organization = Organization.passwordless_email_matching(params[:email])
@@ -73,8 +71,6 @@ class SessionsController < ApplicationController
   end
 
   def create
-    return if redirect_to_forced_saml(permitted_parameters[:email])
-
     @user = User.fuzzy_confirmed_or_unconfirmed_email_find(permitted_parameters[:email])
     if @user.present?
       if @user.authenticate(permitted_parameters[:password])
@@ -112,21 +108,23 @@ class SessionsController < ApplicationController
 
   # Which credential an email's organization requires. Determined by org domain
   # preference only (never account existence), so this leaks no more than the
-  # eventual sign-in redirect already would. SSO orgs are handled upstream in
-  # #identify (redirect to the IdP); here only magic-link vs password remains.
+  # eventual sign-in redirect already would. SSO orgs are handled by the
+  # redirect_forced_saml before_action; here only magic-link vs password remains.
   def login_method_for(email)
     Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
   end
 
-  # SSO orgs force SSO: an SSO-managed email is handed to the IdP from every credential
-  # entry point (identify/create/create_magic_link), not merely hidden from the UI, so a
-  # direct POST can't bypass it. Redirects and returns whether it did.
-  def redirect_to_forced_saml(email)
-    organization = Organization.saml_email_matching(email)
-    return false if organization.blank?
+  # See the before_action: hand an SSO-managed email off to the IdP. Redirecting here
+  # halts the filter chain, so the action never runs for a forced-SSO email.
+  def redirect_forced_saml
+    organization = Organization.saml_email_matching(submitted_email)
+    redirect_to saml_init_path(org_slug: organization.to_param) if organization.present?
+  end
 
-    redirect_to saml_init_path(org_slug: organization.to_param)
-    true
+  # The three guarded actions carry the email in different params: identify/create post
+  # session[:email]; create_magic_link posts a top-level :email.
+  def submitted_email
+    params.dig(:session, :email).presence || params[:email]
   end
 
   def permitted_parameters

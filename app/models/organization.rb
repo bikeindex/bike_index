@@ -268,10 +268,10 @@ class Organization < ApplicationRecord
     end
 
     def email_domain(str)
-      str = EmailNormalizer.normalize(str)
-      return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
+      normalized = EmailNormalizer.normalize(str)
+      return nil unless normalized.present? && normalized.count("@") == 1 && normalized.match?(/.@.*\../)
 
-      str.split("@").last
+      normalized.split("@").last
     end
 
     def example
