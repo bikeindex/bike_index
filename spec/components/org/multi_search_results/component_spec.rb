@@ -46,7 +46,7 @@ RSpec.describe Org::MultiSearchResults::Component, type: :component do
     let(:close_serials) { nil }
 
     it "renders no matches message" do
-      expect(component).to have_css(".multi-search-serial-result")
+      expect(component).to have_css(".multi-search-serial-result[data-has-results='false']")
       expect(component).to have_text("No matches found")
       expect(component).not_to have_css("table")
     end
@@ -60,6 +60,7 @@ RSpec.describe Org::MultiSearchResults::Component, type: :component do
 
     it "renders close serials in the results table" do
       expect(component).to have_text("No exact matches")
+      expect(component).to have_css(".multi-search-serial-result[data-has-results='true']")
       expect(component).to have_css("table")
       expect(component).to have_link(href: %r{/bikes/#{close_bike.id}})
     end

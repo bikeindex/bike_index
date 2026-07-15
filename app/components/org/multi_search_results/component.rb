@@ -32,11 +32,16 @@ module Org
       def displayed_bikes
         return @displayed_bikes if defined?(@displayed_bikes)
 
-        @displayed_bikes = (@bikes.presence || @close_serials)&.to_a
+        @displayed_bikes = bikes_array.presence || @close_serials&.to_a
       end
 
       def close_serials_only?
-        @bikes.blank? && displayed_bikes.present?
+        bikes_array.empty? && displayed_bikes.present?
+      end
+
+      # Load @bikes once; every emptiness check then stays in-memory rather than re-querying
+      def bikes_array
+        @bikes_array ||= @bikes.to_a
       end
 
       def show_view_all?

@@ -169,14 +169,13 @@ export default class extends Controller {
     return span
   }
 
-  // A result with no bikes renders no table, so drop it; exact matches and close
-  // serials both render one, so they survive.
+  // Drop results the component flagged empty (no exact matches and no close serials).
   sortAndFilterResults () {
     const results = Array.from(this.resultsTarget.querySelectorAll('.multi-search-serial-result'))
     results
       .sort((a, b) => parseInt(a.dataset.serialIndex) - parseInt(b.dataset.serialIndex))
       .forEach(result => {
-        if (result.querySelector('table')) {
+        if (result.dataset.hasResults === 'true') {
           this.resultsTarget.appendChild(result)
         } else {
           result.remove()
