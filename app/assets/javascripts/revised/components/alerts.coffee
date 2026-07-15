@@ -68,12 +68,13 @@ class @Alerts
     stored_alert =
       alert_type: alert_type
       alert_body: alert_body
-    localStorage.setItem('stored_alert', JSON.stringify(stored_alert))
+    # localStorage throws when it's blocked (private mode, sandboxed iframe)
+    try localStorage.setItem('stored_alert', JSON.stringify(stored_alert))
     callback()
 
   displayStoredAlerts: ->
-    stored_alert = localStorage.getItem 'stored_alert'
+    stored_alert = try localStorage.getItem('stored_alert')
     if stored_alert
       alert = JSON.parse stored_alert
       @displayAlert(alert.alert_type, alert.alert_body)
-      localStorage.removeItem 'stored_alert'
+      try localStorage.removeItem('stored_alert')
