@@ -133,28 +133,65 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(marketplace_listing.reload.status).to eq "removed"
       end
     end
-    context "banning with jobs running inline" do
-      # UserBan's after_commit enqueues AfterUserChangeJob, which deletes the ban
-      # for un-banned users - so the ban must be created after banned is persisted
+    context "banning, draining jobs" do
+      # UserBan.create! marks the user banned; the ban must survive once the enqueued
+      # AfterUserChangeJob (which deletes bans for un-banned users) drains
       it "keeps the ban" do
         expect(user_subject.reload.banned?).to be_falsey
-        Sidekiq::Testing.inline! do
-          patch "#{base_url}/#{user_subject.id}", params: {
-            user: {
-              email: user_subject.email,
-              banned: true,
-              can_send_many_stolen_notifications: false,
-              can_send_many_marketplace_messages: false,
-              user_ban_attributes: {reason: "known_criminal", description: "something here"}
-            }
+        Sidekiq::Job.clear_all
+        patch "#{base_url}/#{user_subject.id}", params: {
+          user: {
+            email: user_subject.email,
+            banned: true,
+            can_send_many_stolen_notifications: false,
+            can_send_many_marketplace_messages: false,
+            user_ban_attributes: {reason: "known_criminal", description: "something here"}
           }
-        end
+        }
+        Sidekiq::Job.drain_all
         expect(user_subject.reload.banned?).to be_truthy
         user_ban = user_subject.user_ban
         expect(user_ban).to be_present
         expect(user_ban.deleted_at).to be_blank
         expect(user_ban.creator_id).to eq current_user.id
         expect(user_ban.reason).to eq "known_criminal"
+      end
+    end
+    context "banning without a reason" do
+      it "still bans the user, without a UserBan" do
+        expect(user_subject.reload.banned?).to be_falsey
+        Sidekiq::Job.clear_all
+        patch "#{base_url}/#{user_subject.id}", params: {
+          user: {
+            email: user_subject.email,
+            banned: true,
+            can_send_many_stolen_notifications: false,
+            can_send_many_marketplace_messages: false
+          }
+        }
+        Sidekiq::Job.drain_all
+        expect(user_subject.reload.banned?).to be_truthy
+        expect(user_subject.user_ban).to be_blank
+      end
+    end
+    context "updating an existing ban" do
+      let(:original_creator) { FactoryBot.create(:superuser) }
+      let!(:user_ban) { UserBan.create!(user: user_subject, creator: original_creator, reason: :abuse, description: "old") }
+      it "updates the existing ban, keeping the original creator" do
+        expect(user_subject.reload.banned?).to be_truthy
+        Sidekiq::Job.clear_all
+        patch "#{base_url}/#{user_subject.id}", params: {
+          user: {
+            email: user_subject.email,
+            banned: true,
+            can_send_many_stolen_notifications: false,
+            can_send_many_marketplace_messages: false,
+            user_ban_attributes: {reason: "seo_spam", description: "new"}
+          }
+        }
+        Sidekiq::Job.drain_all
+        expect(UserBan.where(user_id: user_subject.id).count).to eq 1
+        expect(user_ban.reload).to have_attributes(reason: "seo_spam", description: "new", creator_id: original_creator.id)
       end
     end
     context "developer" do
