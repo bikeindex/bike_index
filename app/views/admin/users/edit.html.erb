@@ -120,7 +120,7 @@
 
                 <div class="col-sm-6">
                   <div class="form-group">
-                    <% opt_vals = UserBan.reasons.map { |b| [b.humanize, b] } %>
+                    <% opt_vals = UserBan.reasons.map { |b| [UserBan.reason_humanized(b), b] } %>
                     <%= user_ban.select :reason, options_for_select(opt_vals), {prompt: "Reason for ban"}, class: 'form-control userBanReasonSelect' %>
                   </div>
                 </div>
@@ -133,7 +133,7 @@
 
               <p><em class="small"> Banning a user will: </em></p>
 
-              <ul>
+              <ul class="tw:mt-0 tw:ml-4 tw:list-disc">
                 <li>
                   Log them out and prevent them from logging back in
                 </li>

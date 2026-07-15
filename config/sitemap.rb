@@ -39,6 +39,6 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(filename: :users) do
-    User.where(show_bikes: true).find_each { |u| add "/users/#{u.username}", priority: 0.4 }
+    User.where(show_bikes: true, banned: false).find_each { |u| add "/users/#{u.username}", priority: 0.4 }
   end
 end
