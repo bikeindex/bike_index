@@ -245,12 +245,33 @@ class Organization < ApplicationRecord
       where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("passwordless_users")
     end
 
+    def permitted_domain_saml_signin
+      where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("saml_sso")
+    end
+
     def passwordless_email_matching(str)
+      domain = email_domain(str)
+      return nil if domain.blank?
+
+      permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
+    end
+
+    # The org that forces SSO for an email's domain: feature enabled + a live IdP config.
+    # SSO shares the passwordless domain field for routing (no separate saml domain column).
+    def saml_email_matching(str)
+      domain = email_domain(str)
+      return nil if domain.blank?
+
+      permitted_domain_saml_signin.detect do |org|
+        org.passwordless_user_domain == domain && org.organization_saml_configuration&.configured?
+      end
+    end
+
+    def email_domain(str)
       str = EmailNormalizer.normalize(str)
       return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
 
-      domain = str.split("@").last
-      permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
+      str.split("@").last
     end
 
     def example

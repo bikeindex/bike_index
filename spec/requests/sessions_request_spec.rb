@@ -68,6 +68,28 @@ RSpec.describe SessionsController, type: :request do
       end
     end
 
+    context "sso organization domain" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], passwordless_user_domain: "sso.edu")
+      end
+
+      it "hands off to the IdP, skipping the credential step" do
+        FactoryBot.create(:organization_saml_configuration, :enabled, organization:)
+        identify("student@sso.edu")
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+      end
+
+      context "SAML config not yet live" do
+        let!(:user) { FactoryBot.create(:user_confirmed, email: "student@sso.edu") }
+        it "falls through to the password step rather than a broken SSO redirect" do
+          identify("student@sso.edu")
+          expect(response).to render_template(:identify)
+          expect(response.body).to include('autocomplete="current-password"')
+        end
+      end
+    end
+
     context "with rack_attack" do
       include_context :rack_attack
 

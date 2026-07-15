@@ -17,8 +17,11 @@ class SessionsController < ApplicationController
     @remember_me = params.dig(:session, :remember_me)
     return render_partner_or_default_signin_layout(render_action: :new) if @email.blank?
 
+    # SSO-forced org: skip the credential step entirely and hand off to the IdP.
+    saml_organization = Organization.saml_email_matching(@email)
+    return redirect_to saml_init_path(org_slug: saml_organization.to_param) if saml_organization.present?
+
     @login_method = login_method_for(@email)
-    # "sso" will join this branch once the SAML SP lands (redirect to the IdP).
     if @login_method == "password" && User.fuzzy_confirmed_or_unconfirmed_email_find(@email).blank?
       # No account — start sign-up with the entered email pre-filled.
       redirect_to new_user_path(email: @email, partner: sign_in_partner)
@@ -106,8 +109,8 @@ class SessionsController < ApplicationController
 
   # Which credential an email's organization requires. Determined by org domain
   # preference only (never account existence), so this leaks no more than the
-  # eventual sign-in redirect already would. "sso" will slot in here once the
-  # SAML SP lands; today only passwordless-domain orgs diverge from password.
+  # eventual sign-in redirect already would. SSO orgs are handled upstream in
+  # #identify (redirect to the IdP); here only magic-link vs password remains.
   def login_method_for(email)
     Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
   end
