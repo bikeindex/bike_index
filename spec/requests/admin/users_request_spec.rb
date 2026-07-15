@@ -133,6 +133,30 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(marketplace_listing.reload.status).to eq "removed"
       end
     end
+    context "banning with jobs running inline" do
+      # UserBan's after_commit enqueues AfterUserChangeJob, which deletes the ban
+      # for un-banned users - so the ban must be created after banned is persisted
+      it "keeps the ban" do
+        expect(user_subject.reload.banned?).to be_falsey
+        Sidekiq::Testing.inline! do
+          patch "#{base_url}/#{user_subject.id}", params: {
+            user: {
+              email: user_subject.email,
+              banned: true,
+              can_send_many_stolen_notifications: false,
+              can_send_many_marketplace_messages: false,
+              user_ban_attributes: {reason: "known_criminal", description: "something here"}
+            }
+          }
+        end
+        expect(user_subject.reload.banned?).to be_truthy
+        user_ban = user_subject.user_ban
+        expect(user_ban).to be_present
+        expect(user_ban.deleted_at).to be_blank
+        expect(user_ban.creator_id).to eq current_user.id
+        expect(user_ban.reason).to eq "known_criminal"
+      end
+    end
     context "developer" do
       let(:current_user) { FactoryBot.create(:superuser_developer) }
       it "updates developer" do

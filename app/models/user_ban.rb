@@ -22,8 +22,12 @@ class UserBan < ApplicationRecord
     extortion: 1,
     known_criminal: 2,
     bad_actor: 3,
-    spamming: 4
+    spamming: 4,
+    seo_spam: 5
   }.freeze
+
+  # Overrides for reasons that don't read well when humanized
+  REASON_DISPLAY = {"seo_spam" => "SEO SPAM"}.freeze
 
   acts_as_paranoid
 
@@ -38,6 +42,16 @@ class UserBan < ApplicationRecord
 
   def self.reasons
     REASON_ENUM.keys.map(&:to_s)
+  end
+
+  def self.reason_display(reason)
+    return if reason.blank?
+
+    REASON_DISPLAY[reason.to_s] || reason.to_s.humanize
+  end
+
+  def reason_display
+    self.class.reason_display(reason)
   end
 
   def update_user_on_create
