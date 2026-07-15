@@ -141,7 +141,7 @@
 
     - if @organization.official_manufacturer?
       .form-group
-        = render Form::Combobox::Component.new(name: :manufacturer_id, form: f, label: Organization.human_attribute_name(:manufacturer), required: true, options: Manufacturer.frame_makers.pluck(:name, :id))
+        = render Form::ComboboxManufacturer::Component.new(form: f, label: Organization.human_attribute_name(:manufacturer), required: true)
         %small
           %strong This organization has <code>Official manufacturer organization</code> enabled.
           Select a manufacturer to give them manufacturer access.
