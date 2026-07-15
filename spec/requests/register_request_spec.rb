@@ -114,10 +114,14 @@ RSpec.describe RegisterController, type: :request do
       end
 
       context "missing serial" do
-        it "stores the serial as unknown" do
-          patch base_url, params: {b_param_token: b_param.id_token, serial_missing: "1",
-                                   bike: {serial_number: "", status: "status_with_owner"}}
+        it "stores unknown and made_without_serial serials" do
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: {serial_number: "unknown", status: "status_with_owner"}}
           expect(b_param.reload.bike["serial_number"]).to eq "unknown"
+
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: {serial_number: "made_without_serial", status: "status_with_owner"}}
+          expect(b_param.reload.bike["serial_number"]).to eq "made_without_serial"
         end
       end
 

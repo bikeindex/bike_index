@@ -178,21 +178,93 @@
             color: :blue_link, html_class: "tw:text-xs", data: {action: "collapse#toggle"}) %>
       </div>
 
-      <%= f.text_field :serial_number, value: bike["serial_number"],
-          placeholder: t(".serial_placeholder"), autocomplete: "off", required: true,
-          class: "twinput tw:mt-1 tw:font-mono",
-          data: {"registrations--new--serial-target": "input"} %>
+      <% made_without_serial = bike["serial_number"] == "made_without_serial" %>
 
-      <label class="twlabel tw:mt-2 tw:flex tw:items-center tw:gap-2">
-        <%= check_box_tag :serial_missing, true, bike["serial_number"] == "unknown",
-            class: "tw:h-4 tw:w-4",
-            data: {
-              "registrations--new--serial-target": "missing",
-              action: "change->registrations--new--serial#toggle"
-            } %>
+      <div
+        class="<%= "tw:hidden" if made_without_serial %>"
+        data-registrations--new--serial-target="serialSection"
+      >
+        <%= f.text_field :serial_number, value: bike["serial_number"],
+            placeholder: t(".serial_placeholder"), autocomplete: "off", required: true,
+            class: "twinput tw:mt-1 tw:font-mono #{"tw:text-gray-400" if bike["serial_number"] == "unknown"}",
+            data: {"registrations--new--serial-target": "input"} %>
 
-        <%= t(".missing_serial") %>
-      </label>
+        <label class="twlabel tw:mt-2 tw:flex tw:items-center tw:gap-2">
+          <%= check_box_tag :serial_missing, true, bike["serial_number"] == "unknown",
+              class: "tw:h-4 tw:w-4",
+              data: {
+                "registrations--new--serial-target": "missing",
+                action: "change->registrations--new--serial#toggleMissing"
+              } %>
+
+          <%= t(".missing_serial") %>
+        </label>
+
+        <div
+          class="tw:mt-1.5 <%= "tw:hidden" unless bike["serial_number"] == "unknown" %>"
+          data-registrations--new--serial-target="madeWithoutLink"
+        >
+          <%= render UI::Button::Component.new(text: t(".without_serial_number"),
+              color: :blue_link, html_class: "tw:text-xs",
+              data: {open_modal: "made-without-serial-modal"}) %>
+        </div>
+      </div>
+
+      <div
+        class="<%= "tw:hidden" unless made_without_serial %>"
+        data-registrations--new--serial-target="madeWithoutRow"
+      >
+        <label class="twlabel tw:mt-2 tw:flex tw:items-center tw:gap-2">
+          <%= check_box_tag :made_without_serial_checkbox, true, made_without_serial,
+              class: "tw:h-4 tw:w-4",
+              data: {
+                "registrations--new--serial-target": "madeWithoutCheckbox",
+                action: "change->registrations--new--serial#toggleMadeWithout"
+              } %>
+
+          <%= t(".without_serial") %>
+        </label>
+      </div>
+
+      <%= render UI::Modal::Component.new(id: "made-without-serial-modal", title: t(".are_you_certain")) do |modal| %>
+        <% modal.with_body do %>
+          <p class="tw:mb-2"><%= t(".very_very_few_bikes_html") %></p>
+
+          <ul class="tw:mb-2 tw:list-disc tw:pl-5">
+            <li><%= t(".was_made_before_1970") %></li>
+            <li class="tw:list-none tw:text-center">— <%= t(".or") %> —</li>
+            <li><%= t(".is_a_handmade_frame") %></li>
+          </ul>
+
+          <p class="tw:mb-1"><%= t(".it_probably_has_a_serial_number") %></p>
+
+          <p class="tw:mb-4">
+            <%= t(".read_how_to_find_html",
+              how_to_find_link: link_to(t(".how_to_find_serial"), serials_path, target: "_blank", class: "twlink")) %>
+          </p>
+
+          <div class="tw:grid tw:grid-cols-2 tw:gap-4">
+            <div>
+              <%= render UI::Button::Component.new(text: t(".nevermind"), color: :secondary,
+                  html_class: "tw:w-full tw:justify-center", data: {action: "ui--modal#close"}) %>
+
+              <p class="tw:mt-1 tw:mb-0 tw:text-center tw:text-xs tw:text-gray-500">
+                <%= t(".i_just_dont_know_the_serial") %>
+              </p>
+            </div>
+
+            <div>
+              <%= render UI::Button::Component.new(text: t(".im_100_sure"), color: :error,
+                  html_class: "tw:w-full tw:justify-center",
+                  data: {action: "registrations--new--serial#confirmMadeWithout ui--modal#close"}) %>
+
+              <p class="tw:mt-1 tw:mb-0 tw:text-center tw:text-xs tw:text-gray-500">
+                <%= t(".without_serial") %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
 
       <div
         class="

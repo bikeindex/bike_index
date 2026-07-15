@@ -107,7 +107,6 @@ class RegisterController < ApplicationController
       .reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
     # The unit only means something alongside a numeric size
     bike_params.delete("frame_size_unit") if bike_params["frame_size_number"].blank?
-    bike_params["serial_number"] = "unknown" if Binxtils::InputNormalizer.boolean(params[:serial_missing])
     {details_completed: true, bike: bike_params}
   end
 end

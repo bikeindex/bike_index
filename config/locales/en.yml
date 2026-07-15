@@ -4739,6 +4739,7 @@ en:
       add_another_color: Add another color
       add_your_bikes_details: Add your bike's details
       additional_contact_info: Additional contact info
+      are_you_certain: Are you certain?
       attach_photo: Attach photo of bike
       back: Back
       bike_details: Bike details
@@ -4760,12 +4761,18 @@ en:
       frame_size: Frame size
       from_step_1: From step 1
       head_tube: Head tube
+      how_to_find_serial: how to find your serial number
+      i_just_dont_know_the_serial: I just don't know the serial
+      im_100_sure: I'm 100% sure
       inches: inches
-      missing_serial: This bike is missing / has no serial number
+      is_a_handmade_frame: Is a handmade frame
+      it_probably_has_a_serial_number: It probably has a serial number.
+      missing_serial: Missing serial
       model: Model
       model_placeholder: e.g. Marlin 7
       model_year: Model year
       model_year_placeholder: e.g. 2023
+      nevermind: Nevermind
       optional: optional
       or: or
       owner_registration: Owner Registration
@@ -4773,6 +4780,8 @@ en:
       phone: Phone
       phone_placeholder: "(555) 000-0000"
       primary_color_blank: Primary color — e.g. Black
+      read_how_to_find_html: Read about %{how_to_find_link} <small>(opens in a separate
+        window)</small>
       rear_dropouts: Rear dropouts
       registration_type: Registration type
       remove_additional_color: Remove color
@@ -4793,8 +4802,13 @@ en:
       third_color_blank: Third color
       up_to_3: up to 3
       upload: Upload
+      very_very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.
+        Unless this bike:'
       view_serial_guide: View the full serial number guide
+      was_made_before_1970: Was made before 1970
       wheres_my_serial: Where's my serial number?
+      without_serial: This bike was made without a serial
+      without_serial_number: This bike was made without a serial number
     new:
       bike_info: Bike info
       electric_helper: Check electric so we flag e-bikes and verify certification.
