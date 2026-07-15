@@ -27,7 +27,7 @@ class UserBan < ApplicationRecord
   }.freeze
 
   # Overrides for reasons that don't read well when humanized
-  REASON_DISPLAY = {"seo_spam" => "User profile is SEO spam"}.freeze
+  REASON_DISPLAY = {"seo_spam" => "SEO SPAM"}.freeze
 
   acts_as_paranoid
 

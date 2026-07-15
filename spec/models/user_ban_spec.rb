@@ -17,7 +17,7 @@ RSpec.describe UserBan, type: :model do
       expect(UserBan.reason_display("known_criminal")).to eq "Known criminal"
     end
     it "uses the override for seo_spam" do
-      expect(UserBan.new(reason: :seo_spam).reason_display).to eq "User profile is SEO spam"
+      expect(UserBan.new(reason: :seo_spam).reason_display).to eq "SEO SPAM"
     end
     it "is nil when blank" do
       expect(UserBan.reason_display(nil)).to be_nil
