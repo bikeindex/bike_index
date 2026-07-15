@@ -9,19 +9,28 @@ RSpec.describe Form::ComboboxManufacturer::Component, type: :component do
   let!(:frame_maker) { FactoryBot.create(:manufacturer, name: "Surly", frame_maker: true) }
   let!(:component_maker) { FactoryBot.create(:manufacturer, name: "Shimano", frame_maker: false) }
 
-  it "renders a manufacturer_id combobox of frame makers" do
+  it "renders a manufacturer_id combobox of every manufacturer" do
     expect(component).to have_css("input[type='hidden'][name='manufacturer_id']", visible: :all)
     expect(component).to have_css("label", text: "Manufacturer")
     expect(component).to have_css("[role='option'][data-value='#{frame_maker.id}']", text: "Surly", visible: :all)
-    expect(component).not_to have_css("[role='option']", text: "Shimano", visible: :all)
+    expect(component).to have_css("[role='option'][data-value='#{component_maker.id}']", text: "Shimano", visible: :all)
+  end
+
+  context "with frame_maker: true" do
+    let(:options) { {frame_maker: true} }
+
+    it "renders only frame makers" do
+      expect(component).to have_css("[role='option'][data-value='#{frame_maker.id}']", text: "Surly", visible: :all)
+      expect(component).not_to have_css("[role='option']", text: "Shimano", visible: :all)
+    end
   end
 
   context "with a custom manufacturers relation" do
-    let(:options) { {manufacturers: Manufacturer.all} }
+    let(:options) { {manufacturers: Manufacturer.frame_makers} }
 
-    it "renders every manufacturer" do
+    it "renders the given manufacturers" do
       expect(component).to have_css("[role='option']", text: "Surly", visible: :all)
-      expect(component).to have_css("[role='option']", text: "Shimano", visible: :all)
+      expect(component).not_to have_css("[role='option']", text: "Shimano", visible: :all)
     end
   end
 
