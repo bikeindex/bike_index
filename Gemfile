@@ -76,7 +76,7 @@ gem "flipper-active_record" # Feature flagging
 gem "flipper-ui" # Feature flagging
 gem "geocoder" # Geolocation using external APIs
 gem "money-rails", "~> 1.11" # Money formatting
-gem "sitemap_generator", "~> 6" # Make sitemaps
+gem "sitemap_generator", "~> 7" # Make sitemaps
 
 # API wrappers, external requests
 gem "twitter" # Twitter. For rendering tweets

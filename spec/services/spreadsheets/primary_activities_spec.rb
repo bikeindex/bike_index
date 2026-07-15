@@ -16,7 +16,8 @@ RSpec.describe Spreadsheets::PrimaryActivities do
     context "with family" do
       let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Biking)", priority: 10) }
       let!(:primary_activity_2) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family:, priority: 4) }
-      let(:target) { ["flavor,families", "All Road,ATB (All Terrain Biking)", "Bike Polo,"] }
+      # The family exports as a flavor-less row (empty flavor column)
+      let(:target) { ["flavor,families", ",ATB (All Terrain Biking)", "All Road,ATB (All Terrain Biking)", "Bike Polo,"] }
 
       it "generates" do
         result = described_class.to_csv.split("\n")
@@ -24,13 +25,20 @@ RSpec.describe Spreadsheets::PrimaryActivities do
         expect(result.first).to eq target.first
         expect(result.second).to eq target.second
         expect(result.third).to eq target.third
+        expect(result.fourth).to eq target.fourth
         expect(result.length).to eq target.length
       end
 
       context "with multiple families" do
         let(:primary_activity_family_2) { FactoryBot.create(:primary_activity_family, name: "Road Biking", priority: 9) }
         let!(:primary_activity_3) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family: primary_activity_family_2, priority: 3) }
-        let(:target) { ["flavor,families", "All Road,ATB (All Terrain Biking) & Road Biking", "Bike Polo,"] }
+        let(:target) do
+          ["flavor,families",
+            ",ATB (All Terrain Biking)",
+            ",Road Biking",
+            "All Road,ATB (All Terrain Biking) & Road Biking",
+            "Bike Polo,"]
+        end
 
         it "generates" do
           expect(primary_activity_family.reload.priority).to be > primary_activity_family_2.reload.priority
@@ -38,12 +46,26 @@ RSpec.describe Spreadsheets::PrimaryActivities do
 
           result = described_class.to_csv.split("\n")
 
-          expect(result.first).to eq target.first
-          expect(result.second).to eq target.second
-          expect(result.third).to eq target.third
-          expect(result.length).to eq target.length
+          expect(result).to eq target
         end
       end
+    end
+  end
+
+  describe "round-trips its own export" do
+    # A top-level "Bike Polo" flavor comes from the enclosing let!
+    let!(:family) { FactoryBot.create(:primary_activity_family, name: "Road Biking") }
+    let!(:flavor) { FactoryBot.create(:primary_activity, name: "Triathalon", primary_activity_family: family) }
+
+    it "re-imports the exported CSV without creating a flavor for a family row" do
+      Tempfile.create(["primary_activities", ".csv"], Rails.root.join("tmp")) do |file|
+        file.write(described_class.to_csv)
+        file.flush
+
+        expect { described_class.import(file.path) }.not_to change(PrimaryActivity, :count)
+      end
+
+      expect(PrimaryActivity.all.map(&:display_name)).to match_array ["Road Biking", "Road: Triathalon", "Bike Polo"]
     end
   end
 

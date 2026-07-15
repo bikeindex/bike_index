@@ -1604,51 +1604,6 @@ en:
       wide: Wide
       wide_help: "> 38mm (1.5in)"
       wide_title: Tires that are at least 39mm (1.5 inches) wide
-  components:
-    emails:
-      partials:
-        bike_box:
-          bike_photo: Bike photo
-          color: Color
-          color_may_be_incorrect: Color may be incorrect because it was set during
-            POS import
-          found: 'Found:'
-          make: 'Make:'
-          serial: 'Serial:'
-          stolen_at: 'Stolen at:'
-          stolen_from: 'Stolen from:'
-    form:
-      legacy_form_well:
-        address_record:
-          address: Street address
-          address_no_street: Address
-          address_or_intersection: Address or intersection
-          address_school: Campus mailing address
-          choose_country: Choose country
-          city: City
-          postal_code: Postal Code
-          region: Region / Province
-          state: State
-          street_2: Street address line 2 (optional)
-          where_was_it_status: Where was it %{bike_status}?
-          your_full_address_is_required: Your full address is required by %{org_name}
-        address_record_with_default:
-          edit_my_account_path: edit on my account
-          use_account_address: Use account address
-    org:
-      impound_records_index:
-        matching_impound_record:
-          one: matching impound record
-          other: matching impound records
-    page_block:
-      strava_integration:
-        activities_synced:
-          one: activity synced
-          other: activities synced
-    ui:
-      definition_list:
-        row:
-          no_value: none
   controllers:
     application:
       handle_unverified_request:
@@ -4472,11 +4427,11 @@ en:
         progress: Progress
         stickers: stickers
         stickers_assigned: Stickers assigned?
-        stickers_restored: stickers restored
-        stickers_restored_title: Stickers were restored to their previous bikes
+        stickers_removed: stickers removed
+        stickers_removed_title: Stickers assigned by this export were unassigned
         stickers_title: Assigned stickers
         stickers_unassigned: stickers unassigned
-        stickers_unassigned_title: Stickers assigned by this export were unassigned
+        stickers_undone_title: Stickers were assigned, then the assignment was undone
       show:
         avery_export: Avery Export
         bikes_exported: Bikes exported
@@ -4501,9 +4456,10 @@ en:
         specific_bikes: Specific bikes
         stickers: Stickers
         stickers_exported: "%{bike_stickers_count} Stickers exported"
-        stickers_have_been_restored: Stickers have been restored to their previous
-          bikes
-        stickers_have_been_unassigned: Stickers have been unassigned
+        stickers_have_been_restored: have now been restored to their previous bikes
+        stickers_have_been_unassigned: Stickers have been unassigned (legacy version
+          of 'Undo sticker assignment')
+        stickers_initially_assigned: Stickers initially assigned, but
         stickers_not_undone: 'These stickers were assigned again after this export,
           so they were not undone:'
         unable_to_export: Unable to export, not part of your organization
@@ -4792,6 +4748,8 @@ en:
         no_matched: No registrations with serial numbers similar to %{serial}
         with_similar_serials: Registrations with serials similar to %{serial}
   sessions:
+    identify:
+      different_email: Sign in with a different email
     magic_link:
       enter_email_address: Enter your email address, we'll send you an email with
         a link to log in.
@@ -4804,20 +4762,18 @@ en:
       you_should_be_signed_in_automatically: You should be automatically signed in.
       your_email_address: your email address
     new:
-      dont_have_an_account: don't have an account?
+      continue: Continue
       email: email
+      email_me_the_link: Email me the link
       forgot_your_password: Forgot your password?
       get_on_bike_index: Get on Bike Index
       keep_me_logged_in: Keep me logged in
       log_in: Log in
-      no_bike_index_account: No Bike Index account?
-      or: Or
+      log_in_or_sign_up: Log in or sign up
+      org_uses_passwordless: Your organization signs in without a password.
       password: password
-      sign_in_using_facebook: Sign in using Facebook
-      sign_in_using_globalid: Sign in using globaliD
-      sign_in_using_magic_link: Emailed sign in link
-      sign_in_using_strava: Sign in using Strava
-      sign_up: sign up
+      passwordless_help: We'll email you a secure link to sign in.
+      sign_in_without_password: Sign in without a password
   shared:
     bike_search_form:
       anywhere: Anywhere

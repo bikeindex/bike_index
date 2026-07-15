@@ -262,6 +262,26 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "image processing" do
+    let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }
+    let(:b_param) { FactoryBot.build(:b_param) }
+
+    # Regression: process_in_background with a non-Delay uploader resized inline in the
+    # request, hitting the 30s Rack::Timeout on bikes#create (Honeybadger 132565677)
+    it "defers version generation to the background job instead of resizing inline" do
+      ImageUploaderBackgrounded.enable_processing = true
+      b_param.image = image_file
+      expect { b_param.save! }.to change(CarrierWaveProcessJob.jobs, :size).by(1)
+      expect(b_param.process_image_upload).to be_nil
+      expect(b_param.image.file).to be_present # original stored synchronously
+      expect(b_param.image.large.file).to be_blank # resized versions deferred to the job
+    ensure
+      ImageUploaderBackgrounded.enable_processing = false
+      b_param.image&.remove!
+      image_file.close
+    end
+  end
+
   describe "additional_registration_fields" do
     let(:params_hash) { {bike: bike_params}.as_json }
     let(:b_param) { BParam.new(params: params_hash) }
@@ -511,6 +531,23 @@ RSpec.describe BParam, type: :model do
         expect(result.id).to be_nil
         expect(result.creator_id).to eq user.id
       end
+      context "with no creator" do
+        it "does not return that BParam" do
+          b_param_nil.update_columns(id_token: nil, creator_id: nil)
+          result = BParam.find_or_new_from_token(nil, user_id: user.id)
+          expect(result.is_a?(BParam)).to be_truthy
+          expect(result.id).to be_nil
+          expect(result.creator_id).to eq user.id
+        end
+      end
+    end
+  end
+
+  describe "with_organization_or_no_creator" do
+    it "returns nil for a blank token" do
+      FactoryBot.create(:b_param) # a creator-less b_param that a blank token must not match
+      expect(BParam.with_organization_or_no_creator(nil)).to be_nil
+      expect(BParam.with_organization_or_no_creator("")).to be_nil
     end
   end
 

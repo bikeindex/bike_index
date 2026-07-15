@@ -77,6 +77,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
     # Sign in
     visit new_session_path
     fill_in "Email", with: owner.email
+    click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     expect(page).to have_content("Logged in", wait: 5)

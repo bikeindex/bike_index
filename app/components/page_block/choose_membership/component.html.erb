@@ -136,7 +136,7 @@
         </li>
       </ul>
 
-      <%= f.submit "Enroll >", class: "twbtn-blue" %>
+      <%= render UI::Button::Component.new(text: "Enroll >", color: :primary, kind: :submit) %>
     <% end %>
 
     <p class="tw:mb-0 tw:pt-6">
