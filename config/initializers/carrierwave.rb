@@ -59,3 +59,7 @@ end
 CarrierWave::Backgrounder.configure do |c|
   c.backend :sidekiq, queue: :med_priority, retry: 2
 end
+
+# Build version subclasses up front so their lazy, thread-unsafe construction
+# can't race under Puma. See CarrierWaveVersionWarmer.
+Rails.application.config.after_initialize { CarrierWaveVersionWarmer.warm! }
