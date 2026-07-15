@@ -94,7 +94,7 @@ RSpec.describe RegisterController, type: :request do
   describe "update" do
     let(:bike_details) do
       {primary_frame_color_id: color.id, serial_number: "XYZ 123", frame_size: "m",
-       frame_model: "Marlin 7", phone: "(555) 000-0000", status: "status_with_owner"}
+       frame_model: "Marlin 7", year: "2023", phone: "(555) 000-0000", status: "status_with_owner"}
     end
 
     context "anonymous" do
@@ -111,6 +111,25 @@ RSpec.describe RegisterController, type: :request do
         follow_redirect!
         expect(response.body).to include "Registration complete"
         expect(response.body).to include "verify your email"
+      end
+
+      context "missing serial" do
+        it "stores the serial as unknown" do
+          patch base_url, params: {b_param_token: b_param.id_token, serial_missing: "1",
+                                   bike: {serial_number: "", status: "status_with_owner"}}
+          expect(b_param.reload.bike["serial_number"]).to eq "unknown"
+        end
+      end
+
+      context "with a photo" do
+        it "attaches the image to the b_param" do
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(image: Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg"))}
+          expect(response).to redirect_to complete_register_path(b_param_token: b_param.id_token)
+          expect(b_param.reload.image).to be_present
+          # The uploaded file doesn't leak into the JSON params
+          expect(b_param.params.to_json).to_not include "bike.jpg"
+        end
       end
 
       context "frame size in cm" do

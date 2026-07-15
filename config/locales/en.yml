@@ -4736,38 +4736,47 @@ en:
         Your %{bike_display} is registered with Bike Index. We'll keep watch — if
         it's ever reported stolen, the whole community is looking.
     details:
-      add_additional_color: Add additional color
+      add_another_color: Add another color
       add_your_bikes_details: Add your bike's details
       additional_contact_info: Additional contact info
+      attach_photo: Attach photo of bike
+      back: Back
       bike_details: Bike details
       bottom_bracket: Bottom bracket
-      choose_color: Choose color
       cm: cm
       color: Color
       complete_registration: Complete Bike Registration
       confirmation_link_sent: >-
         We've sent a confirmation link to your email. No need to wait — you can finish
         registering right now.
+      database_public_note: >-
+        Our database is public! You can adjust privacy settings on individual photos
+        from your account later.
       easier_to_recover: The more you add, the easier your bike is to recover.
       email: Email
       enter_size: Enter size
-      found: Found
+      found: Found/Abandoned
       found_description: I found this bike
       frame_size: Frame size
       from_step_1: From step 1
       head_tube: Head tube
       inches: inches
+      missing_serial: This bike is missing / has no serial number
       model: Model
       model_placeholder: e.g. Marlin 7
-      not_stolen: Not stolen
-      not_stolen_description: Registering to keep it safe
+      model_year: Model year
+      model_year_placeholder: e.g. 2023
       optional: optional
       or: or
+      owner_registration: Owner Registration
+      owner_registration_description: Registering for myself or on behalf of owner
       phone: Phone
       phone_placeholder: "(555) 000-0000"
+      primary_color_blank: Primary color — e.g. Black
       rear_dropouts: Rear dropouts
       registration_type: Registration type
-      remove_additional_color: Remove additional color
+      remove_additional_color: Remove color
+      second_color_blank: Second color — e.g. Red
       serial_help_intro: >-
         Most bicycles have their serial number engraved on the frame. Look for your
         serial number:
@@ -4775,16 +4784,20 @@ en:
       serial_location_head_tube: on the head tube
       serial_location_rear_dropouts: on rear dropouts
       serial_number: Serial number
-      serial_placeholder: Usually stamped under the frame
+      serial_placeholder: Required — or mark missing
       sticker_number: Bike Index sticker number
       sticker_placeholder: e.g. A 471 829
       stolen: Stolen
       stolen_description: This bike has been stolen
+      take_photo: Take Photo
+      third_color_blank: Third color
+      up_to_3: up to 3
+      upload: Upload
       view_serial_guide: View the full serial number guide
       wheres_my_serial: Where's my serial number?
     new:
       bike_info: Bike info
-      confirmation_link_here: We'll send your confirmation link here.
+      electric_helper: Check electric so we flag e-bikes and verify certification.
       electric_motorized: "⚡️ Electric (motorized)"
       email: Email
       email_placeholder: you@example.com
@@ -4794,7 +4807,8 @@ en:
       manufacturer: Manufacturer
       manufacturer_placeholder: Start typing e.g. Trek
       next: Next
-      no_need_to_wait: We'll email a confirmation link too after you've finished registering
+      no_need_to_wait: We'll email a confirmation link too — you don't have to wait
+        for it to continue.
       register_your_bike: Register your bike!
       vehicle_type: Vehicle type
       your_info: Your info

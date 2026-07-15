@@ -27,17 +27,30 @@
           placeholder: t(".model_placeholder"), class: "twinput tw:mt-1" %>
       </div>
 
+      <div class="tw:mb-4">
+        <%= f.label :year, class: "twlabel" do %>
+          <%= t(".model_year") %>
+          <%= render UI::Badge::Component.new(text: t(".optional"), size: :xs) %>
+        <% end %>
+
+        <%= f.text_field :year, value: @b_param.bike["year"], inputmode: "numeric",
+          placeholder: t(".model_year_placeholder"), class: "twinput tw:mt-1 tw:font-mono" %>
+      </div>
+
       <div
         class="tw:mb-4"
         data-controller="registrations--new--additional-colors"
       >
-        <%= f.label :primary_frame_color_id, t(".color"), class: "twlabel" %>
+        <%= f.label :primary_frame_color_id, class: "twlabel" do %>
+          <%= t(".color") %>
+          <%= render UI::Badge::Component.new(text: t(".up_to_3"), size: :xs) %>
+        <% end %>
 
         <%= f.select :primary_frame_color_id, Color.select_options,
-          {selected: @b_param.primary_frame_color_id, include_blank: t(".choose_color")},
+          {selected: @b_param.primary_frame_color_id, include_blank: t(".primary_color_blank")},
           class: "twinput tw:mt-1" %>
 
-        <% [:secondary_frame_color_id, :tertiary_frame_color_id].each do |field| %>
+        <% {secondary_frame_color_id: t(".second_color_blank"), tertiary_frame_color_id: t(".third_color_blank")}.each do |field, blank_label| %>
           <% value = @b_param.bike[field.to_s] %>
 
           <div
@@ -45,10 +58,11 @@
             data-registrations--new--additional-colors-target="row"
           >
             <%= f.select field, Color.select_options,
-              {selected: value, include_blank: t(".choose_color")}, class: "twinput" %>
+              {selected: value, include_blank: blank_label}, class: "twinput" %>
 
-            <%= render UI::Button::Component.new(text: t(".remove_additional_color"),
-              color: :purple_link, html_class: "tw:shrink-0 tw:text-xs",
+            <%= render UI::Button::Component.new(text: "×", color: :blue_link,
+              html_class: "tw:shrink-0 tw:text-xl tw:leading-none",
+              aria: {label: t(".remove_additional_color")},
               data: {action: "registrations--new--additional-colors#remove"}) %>
           </div>
         <% end %>
@@ -59,8 +73,8 @@
           class="tw:mt-2 <%= "tw:hidden" if all_colors_shown %>"
           data-registrations--new--additional-colors-target="addButton"
         >
-          <%= render UI::Button::Component.new(text: t(".add_additional_color"),
-            color: :purple_link, html_class: "tw:text-xs",
+          <%= render UI::Button::Component.new(text: "+ #{t(".add_another_color")}",
+            color: :blue_link, html_class: "tw:text-xs",
             data: {action: "registrations--new--additional-colors#add"}) %>
         </div>
       </div>
@@ -125,17 +139,69 @@
         </div>
       </div>
 
-      <div class="tw:mb-4" data-controller="collapse">
+      <div class="tw:mb-4" data-controller="registrations--new--photo">
+        <span class="twlabel">
+          <%= t(".attach_photo") %>
+          <%= render UI::Badge::Component.new(text: t(".optional"), size: :xs) %>
+        </span>
+
+        <%= f.file_field :image, accept: ImageUploader.permitted_extensions.join(","),
+          class: "tw:hidden",
+          data: {
+            "registrations--new--photo-target": "input",
+            action: "change->registrations--new--photo#changed"
+          } %>
+
+        <div class="tw:mt-2 tw:grid tw:grid-cols-2 tw:gap-2">
+          <%= render UI::Button::Component.new(text: t(".take_photo"), color: :outline,
+            html_class: "tw:justify-center", data: {action: "registrations--new--photo#takePhoto"}) %>
+
+          <%= render UI::Button::Component.new(text: t(".upload"), color: :outline,
+            html_class: "tw:justify-center", data: {action: "registrations--new--photo#upload"}) %>
+        </div>
+
+        <p
+          class="
+            tw:mt-1.5 tw:truncate tw:text-xs tw:font-medium tw:text-gray-700
+            tw:dark:text-gray-300
+          "
+          data-registrations--new--photo-target="filename"
+        ></p>
+
+        <p class="tw:mt-1.5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+          <%= t(".database_public_note") %>
+        </p>
+      </div>
+
+      <div
+        class="tw:mb-4"
+        data-controller="collapse registrations--new--serial"
+      >
         <div class="tw:flex tw:items-center tw:justify-between tw:gap-2">
-          <%= f.label :serial_number, t(".serial_number"), class: "twlabel" %>
+          <%= f.label :serial_number, class: "twlabel" do %>
+            <%= t(".serial_number") %>
+            <span class="tw:text-red-600">*</span>
+          <% end %>
 
           <%= render UI::Button::Component.new(text: t(".wheres_my_serial"),
-            color: :purple_link, html_class: "tw:text-xs", data: {action: "collapse#toggle"}) %>
+            color: :blue_link, html_class: "tw:text-xs", data: {action: "collapse#toggle"}) %>
         </div>
 
         <%= f.text_field :serial_number, value: @b_param.bike["serial_number"],
-          placeholder: t(".serial_placeholder"), autocomplete: "off",
-          class: "twinput tw:mt-1 tw:font-mono" %>
+          placeholder: t(".serial_placeholder"), autocomplete: "off", required: true,
+          class: "twinput tw:mt-1 tw:font-mono",
+          data: {"registrations--new--serial-target": "input"} %>
+
+        <label class="twlabel tw:mt-2 tw:flex tw:items-center tw:gap-2">
+          <%= check_box_tag :serial_missing, true, @b_param.bike["serial_number"] == "unknown",
+            class: "tw:h-4 tw:w-4",
+            data: {
+              "registrations--new--serial-target": "missing",
+              action: "change->registrations--new--serial#toggle"
+            } %>
+
+          <%= t(".missing_serial") %>
+        </label>
 
         <div
           class="
@@ -194,43 +260,18 @@
       </div>
 
       <div class="tw:mb-4">
-        <span class="twlabel"><%= t(".registration_type") %></span>
+        <%= f.label :status, t(".registration_type"), class: "twlabel" %>
 
-        <div class="tw:mt-2 tw:flex tw:flex-col tw:gap-2">
-          <% {"status_with_owner" => [t(".not_stolen"), t(".not_stolen_description")],
-            "status_stolen" => [t(".stolen"), t(".stolen_description")],
-            "status_impounded" => [t(".found"), t(".found_description")]}.each do |status, (title, description)| %>
-            <label class="tw:cursor-pointer">
-              <%= f.radio_button :status, status,
-                checked: (@b_param.status || "status_with_owner") == status, class: "tw:peer tw:sr-only" %>
+        <% status_options = {"status_with_owner" => [t(".owner_registration"), t(".owner_registration_description")],
+          "status_stolen" => [t(".stolen"), t(".stolen_description")],
+          "status_impounded" => [t(".found"), t(".found_description")]}.map do |status, (title, description)|
+          content = safe_join([content_tag(:span, title, class: "tw:block tw:font-semibold"),
+            content_tag(:span, description, class: "tw:block tw:text-xs tw:text-[#9a9aa2] tw:dark:text-gray-500")])
+          {display: title, value: status, content:}
+        end %>
 
-              <span
-                class="
-                  tw:flex tw:items-center tw:gap-3 tw:rounded-sm tw:border
-                  tw:border-gray-300 tw:bg-white tw:px-3.5 tw:py-3
-                  tw:peer-checked:border-[#715eb2] tw:peer-checked:ring
-                  tw:peer-checked:ring-[#715eb2]/25 tw:dark:border-gray-600
-                  tw:dark:bg-gray-800
-                "
-              >
-                <span class="tw:block">
-                  <span
-                    class="
-                      tw:block tw:text-sm tw:font-semibold tw:text-gray-800
-                      tw:dark:text-gray-200
-                    "
-                  >
-                    <%= title %>
-                  </span>
-
-                  <span class="tw:block tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
-                    <%= description %>
-                  </span>
-                </span>
-              </span>
-            </label>
-          <% end %>
-        </div>
+        <%= render Form::Combobox::Component.new(name: :status, form: f,
+          value: @b_param.status || "status_with_owner", options: status_options) %>
       </div>
 
       <%= render Registrations::New::SectionLabel::Component.new(text: t(".additional_contact_info"), divider: true) %>
@@ -265,7 +306,12 @@
       </div>
 
       <%= render UI::Button::Component.new(text: t(".complete_registration"),
-        color: :purple, size: :lg, kind: :submit, html_class: "tw:w-full") %>
+        color: :blue, size: :lg, kind: :submit, html_class: "tw:w-full") %>
+
+      <p class="tw:mt-3 tw:mb-0 tw:text-center">
+        <%= link_to "← #{t(".back")}", new_register_path,
+          class: "tw:text-sm tw:font-medium tw:text-gray-500 tw:no-underline tw:hover:text-gray-700 tw:dark:text-gray-400" %>
+      </p>
     <% end %>
   </div>
 </div>

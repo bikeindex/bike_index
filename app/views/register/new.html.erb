@@ -69,22 +69,25 @@
 
           <%= t(".electric_motorized") %>
         </label>
+
+        <p class="tw:mt-1.5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+          <%= t(".electric_helper") %>
+        </p>
       </div>
 
       <%= render Registrations::New::SectionLabel::Component.new(text: t(".your_info"), divider: true) %>
 
       <div class="tw:mb-6">
-        <%= f.label :owner_email, t(".email"), class: "twlabel" %>
+        <%= f.label :owner_email, class: "twlabel" do %>
+          <%= t(".email") %>
+          <span class="tw:text-red-600">*</span>
+        <% end %>
 
         <%= f.email_field :owner_email, value: @b_param.owner_email, required: true,
           placeholder: t(".email_placeholder"), class: "twinput tw:mt-1" %>
-
-        <p class="tw:mt-1.5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
-          <%= t(".confirmation_link_here") %>
-        </p>
       </div>
 
-      <%= render UI::Button::Component.new(text: t(".next"), color: :purple, size: :lg,
+      <%= render UI::Button::Component.new(text: t(".next"), color: :blue, size: :lg,
         kind: :submit, html_class: "tw:w-full") %>
 
       <p

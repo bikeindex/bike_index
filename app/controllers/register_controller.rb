@@ -25,6 +25,7 @@ class RegisterController < ApplicationController
 
   def update
     @b_param.creator_id ||= current_user&.id
+    @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
     # clean_params runs before_save, resolving the merged foreign keys
     @b_param.params = @b_param.params.with_indifferent_access.deep_merge(update_params.as_json)
     @b_param.save
@@ -102,14 +103,15 @@ class RegisterController < ApplicationController
   end
 
   # Blank values are dropped rather than overwriting what step 1 saved - except the
-  # additional colors, where blank is the "remove additional color" button clearing one
+  # additional colors, where blank is the "remove color" button clearing one
   def update_params
     bike_params = params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
       :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
-      :bike_sticker, :phone, :status, :frame_model)
+      :bike_sticker, :phone, :status, :frame_model, :year)
       .reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
     # The unit only means something alongside a numeric size
     bike_params.delete("frame_size_unit") if bike_params["frame_size_number"].blank?
+    bike_params["serial_number"] = "unknown" if Binxtils::InputNormalizer.boolean(params[:serial_missing])
     {details_completed: true, bike: bike_params}
   end
 end
