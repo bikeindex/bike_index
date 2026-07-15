@@ -366,6 +366,12 @@ Rails.application.routes.draw do
     end
     resources :autocomplete, only: %i[index]
     resources :strava_proxy, only: %i[create]
+    resources :admin_data, only: [] do
+      collection do
+        get :sidekiq
+        get :pghero
+      end
+    end
   end
   mount API::Base => "/api"
 

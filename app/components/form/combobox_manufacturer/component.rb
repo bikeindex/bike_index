@@ -4,14 +4,15 @@ module Form
   module ComboboxManufacturer
     # Form::Combobox preconfigured for picking a Manufacturer.
     #
-    # Defaults `name` to :manufacturer_id and the options to frame makers; pass a
-    # different `manufacturers` relation to widen the list. Every other keyword
-    # (form:, label:, value:, required:, include_blank:, placeholder:, etc.) is
-    # forwarded to Form::Combobox::Component.
+    # Defaults `name` to :manufacturer_id and the options to every manufacturer;
+    # pass `frame_maker: true` to limit the list to frame makers, or a `manufacturers`
+    # relation to set it explicitly. Every other keyword (form:, label:, value:,
+    # required:, include_blank:, placeholder:, etc.) is forwarded to
+    # Form::Combobox::Component.
     class Component < ApplicationComponent
-      def initialize(name: :manufacturer_id, manufacturers: Manufacturer.frame_makers, **combobox_options)
+      def initialize(name: :manufacturer_id, frame_maker: false, manufacturers: nil, **combobox_options)
         @name = name
-        @manufacturers = manufacturers
+        @manufacturers = manufacturers || (frame_maker ? Manufacturer.frame_makers : Manufacturer.all)
         @combobox_options = combobox_options
       end
 
