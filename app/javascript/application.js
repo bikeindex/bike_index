@@ -7,6 +7,9 @@ import { lazyLoadControllersFrom } from '@hotwired/stimulus-loading'
 
 import TimeLocalizer from '@bikeindex/time-localizer'
 
+// Escape option-value lookups so quoted search terms don't crash the combobox
+import 'utils/hw_combobox_patch'
+
 /* global Turbo */
 // Disable Turbo by default, only enable on case-by-case
 // You must include data-turbo="true" on the elements you want to enable turbo on
