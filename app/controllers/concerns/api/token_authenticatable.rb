@@ -9,20 +9,22 @@ module API
     private
 
     def current_user
-      return @current_user if defined?(@current_user)
-
-      @current_user = authorize_user(doorkeeper_token)[:user]
+      authorize_user(doorkeeper_token)[:user]
     end
 
     # Returns {user:} when the token authorizes a user, otherwise {error:, status:}
     def authorize_user(access_token)
-      return {status: 401, error: "OAuth token required"} unless access_token&.accessible?
-      return {status: 403, error: "Unauthorized application"} unless authorized_app?(access_token)
+      return @authorize_user if defined?(@authorize_user)
 
-      user = User.find_by(id: access_token.resource_owner_id)
-      return {error: "User not found", status: 401} unless user
-
-      {user:}
+      @authorize_user = if !access_token&.accessible?
+        {status: 401, error: "OAuth token required"}
+      elsif !authorized_app?(access_token)
+        {status: 403, error: "Unauthorized application"}
+      elsif (user = User.find_by(id: access_token.resource_owner_id))
+        {user:}
+      else
+        {status: 401, error: "User not found"}
+      end
     end
 
     # Overridden by controllers that restrict access to a specific OAuth application
