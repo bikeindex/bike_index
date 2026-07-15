@@ -16,11 +16,10 @@
       <%= render Registrations::New::SectionLabel::Component.new(text: t(".bike_info")) %>
 
       <div class="tw:mb-4">
-        <%= render Form::Combobox::Component.new(name: :manufacturer_id, form: f,
-          label: t(".manufacturer"), label_class: "twlabel", free_text: true,
+        <%= render Form::ComboboxManufacturer::Component.new(form: f,
+          label_class: "twlabel", free_text: true,
           value: @b_param.bike["manufacturer_other"].presence || @b_param.bike["manufacturer_id"],
-          placeholder: t(".manufacturer_placeholder"),
-          options: Manufacturer.frame_makers.pluck(:name, :id)) %>
+          placeholder: t(".manufacturer_placeholder")) %>
       </div>
 
       <div
