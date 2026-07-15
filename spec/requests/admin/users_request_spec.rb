@@ -81,6 +81,10 @@ RSpec.describe Admin::UsersController, type: :request do
 
   describe "update" do
     let(:user_subject) { FactoryBot.create(:user, confirmed: false) }
+    let(:ban_user_params) do
+      {email: user_subject.email, banned: true,
+       can_send_many_stolen_notifications: false, can_send_many_marketplace_messages: false}
+    end
     context "non developer" do
       it "updates all the things that can be edited (finding via user id)" do
         user_subject.reload
@@ -140,13 +144,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.reload.banned?).to be_falsey
         Sidekiq::Job.clear_all
         patch "#{base_url}/#{user_subject.id}", params: {
-          user: {
-            email: user_subject.email,
-            banned: true,
-            can_send_many_stolen_notifications: false,
-            can_send_many_marketplace_messages: false,
-            user_ban_attributes: {reason: "known_criminal", description: "something here"}
-          }
+          user: ban_user_params.merge(user_ban_attributes: {reason: "known_criminal", description: "something here"})
         }
         Sidekiq::Job.drain_all
         expect(user_subject.reload.banned?).to be_truthy
@@ -161,14 +159,7 @@ RSpec.describe Admin::UsersController, type: :request do
       it "still bans the user, without a UserBan" do
         expect(user_subject.reload.banned?).to be_falsey
         Sidekiq::Job.clear_all
-        patch "#{base_url}/#{user_subject.id}", params: {
-          user: {
-            email: user_subject.email,
-            banned: true,
-            can_send_many_stolen_notifications: false,
-            can_send_many_marketplace_messages: false
-          }
-        }
+        patch "#{base_url}/#{user_subject.id}", params: {user: ban_user_params}
         Sidekiq::Job.drain_all
         expect(user_subject.reload.banned?).to be_truthy
         expect(user_subject.user_ban).to be_blank
@@ -181,13 +172,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.reload.banned?).to be_truthy
         Sidekiq::Job.clear_all
         patch "#{base_url}/#{user_subject.id}", params: {
-          user: {
-            email: user_subject.email,
-            banned: true,
-            can_send_many_stolen_notifications: false,
-            can_send_many_marketplace_messages: false,
-            user_ban_attributes: {reason: "seo_spam", description: "new"}
-          }
+          user: ban_user_params.merge(user_ban_attributes: {reason: "seo_spam", description: "new"})
         }
         Sidekiq::Job.drain_all
         expect(UserBan.where(user_id: user_subject.id).count).to eq 1

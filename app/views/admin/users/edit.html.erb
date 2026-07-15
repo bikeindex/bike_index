@@ -120,7 +120,7 @@
 
                 <div class="col-sm-6">
                   <div class="form-group">
-                    <% opt_vals = UserBan.reasons.map { |b| [UserBan.reason_display(b), b] } %>
+                    <% opt_vals = UserBan.reasons.map { |b| [UserBan.reason_humanized(b), b] } %>
                     <%= user_ban.select :reason, options_for_select(opt_vals), {prompt: "Reason for ban"}, class: 'form-control userBanReasonSelect' %>
                   </div>
                 </div>

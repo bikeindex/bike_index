@@ -44,14 +44,14 @@ class UserBan < ApplicationRecord
     REASON_ENUM.keys.map(&:to_s)
   end
 
-  def self.reason_display(reason)
+  def self.reason_humanized(reason)
     return if reason.blank?
 
     REASON_DISPLAY[reason.to_s] || reason.to_s.humanize
   end
 
-  def reason_display
-    self.class.reason_display(reason)
+  def reason_humanized
+    self.class.reason_humanized(reason)
   end
 
   def update_user_on_create

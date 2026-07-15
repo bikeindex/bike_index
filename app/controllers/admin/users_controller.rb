@@ -37,8 +37,9 @@ module Admin
           @user.superuser_abilities.universal.destroy_all
         end
         @user.developer = params[:user][:developer] if current_user.developer? && params[:user].key?(:developer)
+        ban_params = permitted_ban_parameters
         newly_banned = Binxtils::InputNormalizer.boolean(params[:user][:banned]) && !@user.banned?
-        creating_ban = newly_banned && permitted_ban_parameters[:reason].present?
+        creating_ban = newly_banned && ban_params[:reason].present?
         # A created UserBan marks the user banned (see UserBan#update_user_on_create)
         @user.banned = params[:user][:banned] unless creating_ban
         @user.username = params[:user][:username]
@@ -49,9 +50,9 @@ module Admin
         # once below, after UserBan.create! (which marks the user banned) has run
         if @user.update(skip_update: true)
           if creating_ban
-            UserBan.create!(permitted_ban_parameters)
-          elsif permitted_ban_parameters[:reason].present?
-            @user.user_ban&.update(permitted_ban_parameters.slice(:reason, :description))
+            UserBan.create!(ban_params)
+          elsif ban_params[:reason].present?
+            @user.user_ban&.update(ban_params.slice(:reason, :description))
           end
           @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
           CallbackJob::AfterUserChangeJob.perform_async(@user.id)

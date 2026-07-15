@@ -47,7 +47,7 @@
             <%= render Admin::UserCell::Component.new(user: user_ban.user, render_search: false) %>
           </td>
 
-          <td><%= user_ban.reason_display %></td>
+          <td><%= user_ban.reason_humanized %></td>
 
           <td>
             <%= render Admin::UserCell::Component.new(user: user_ban.creator, render_search: render_sortable) %>
