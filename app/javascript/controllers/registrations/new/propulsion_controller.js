@@ -19,18 +19,12 @@ export default class extends Controller {
 
   update = () => {
     const cycleType = this.element.querySelector('input[name$="[cycle_type]"]')?.value
-    if (this.alwaysMotorizedValue.includes(cycleType)) {
-      this.setMotorized({ checked: true, enabled: false })
-    } else if (this.neverMotorizedValue.includes(cycleType)) {
-      this.setMotorized({ checked: false, enabled: false })
-    } else {
-      this.setMotorized({ checked: this.motorizedTarget.checked, enabled: true })
-    }
-  }
+    const forced = this.alwaysMotorizedValue.includes(cycleType)
+      ? true
+      : (this.neverMotorizedValue.includes(cycleType) ? false : null)
 
-  setMotorized ({ checked, enabled }) {
-    this.motorizedTarget.checked = checked
-    this.motorizedTarget.disabled = !enabled
-    this.motorizedWrapperTarget.classList.toggle('tw:opacity-60', !enabled)
+    if (forced !== null) this.motorizedTarget.checked = forced
+    this.motorizedTarget.disabled = forced !== null
+    this.motorizedWrapperTarget.classList.toggle('tw:opacity-60', forced !== null)
   }
 }

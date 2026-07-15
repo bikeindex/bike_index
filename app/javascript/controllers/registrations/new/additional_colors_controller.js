@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { collapse } from 'utils/collapse_utils'
+import { collapse, CollapseUtils } from 'utils/collapse_utils'
 
 // Connects to data-controller='registrations--new--additional-colors'
 //
@@ -9,7 +9,7 @@ export default class extends Controller {
   static targets = ['row', 'addButton']
 
   add () {
-    const hiddenRows = this.rowTargets.filter(row => this.hidden(row))
+    const hiddenRows = this.rowTargets.filter(row => !CollapseUtils.isVisible(row))
     if (hiddenRows.length === 0) return
 
     collapse('show', hiddenRows[0])
@@ -17,13 +17,9 @@ export default class extends Controller {
   }
 
   remove (event) {
-    const row = event.target.closest('[data-registrations--new--additional-colors-target="row"]')
+    const row = this.rowTargets.find(target => target.contains(event.target))
     row.querySelector('select').value = ''
     collapse('hide', row)
-    if (this.hidden(this.addButtonTarget)) collapse('show', this.addButtonTarget)
-  }
-
-  hidden (element) {
-    return element.classList.contains('tw:hidden') || element.classList.contains('tw:hidden!')
+    if (!CollapseUtils.isVisible(this.addButtonTarget)) collapse('show', this.addButtonTarget)
   }
 }

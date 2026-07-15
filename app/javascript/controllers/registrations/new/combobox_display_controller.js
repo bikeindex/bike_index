@@ -4,7 +4,8 @@ import { Controller } from '@hotwired/stimulus'
 //
 // Renders the selected combobox option with its parenthetical in muted text.
 // An <input> can't render two-tone text, so a mirror overlay covers the input
-// whenever it isn't focused for filtering.
+// whenever it isn't focused for filtering. The overlay clones the selected
+// option's listbox content, so the two-tone formatting has a single source.
 export default class extends Controller {
   static targets = ['overlay']
 
@@ -13,7 +14,7 @@ export default class extends Controller {
     this.input.addEventListener('focus', this.hide)
     this.input.addEventListener('blur', this.show)
     this.element.addEventListener('hw-combobox:selection', this.show)
-    window.addEventListener('resize', this.reposition)
+    window.addEventListener('resize', this.onResize)
     this.show()
   }
 
@@ -21,21 +22,16 @@ export default class extends Controller {
     this.input.removeEventListener('focus', this.hide)
     this.input.removeEventListener('blur', this.show)
     this.element.removeEventListener('hw-combobox:selection', this.show)
-    window.removeEventListener('resize', this.reposition)
+    window.removeEventListener('resize', this.onResize)
   }
 
   show = () => {
-    if (document.activeElement === this.input || this.input.value === '') return
+    if (document.activeElement === this.input) return
 
-    const [base, parens] = this.input.value.split(' (', 2)
-    this.overlayTarget.replaceChildren(document.createTextNode(base))
-    if (parens) {
-      this.overlayTarget.append(' ')
-      const muted = document.createElement('span')
-      muted.className = 'tw:text-[#9a9aa2] tw:dark:text-gray-500'
-      muted.textContent = `(${parens}`
-      this.overlayTarget.append(muted)
-    }
+    const selectedOption = this.selectedOption()
+    if (!selectedOption) return
+
+    this.overlayTarget.innerHTML = selectedOption.innerHTML
     this.reposition()
     this.input.style.color = 'transparent'
     this.overlayTarget.classList.remove('tw:hidden')
@@ -46,7 +42,20 @@ export default class extends Controller {
     this.overlayTarget.classList.add('tw:hidden')
   }
 
-  reposition = () => {
+  onResize = () => {
+    if (this.overlayTarget.classList.contains('tw:hidden')) return
+
+    this.reposition()
+  }
+
+  selectedOption () {
+    const value = this.element.querySelector('input[type="hidden"]')?.value
+    if (!value) return null
+
+    return this.element.querySelector(`[role="option"][data-value="${value}"]`)
+  }
+
+  reposition () {
     const inputRect = this.input.getBoundingClientRect()
     const wrapperRect = this.element.getBoundingClientRect()
     const computed = window.getComputedStyle(this.input)

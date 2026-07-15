@@ -83,7 +83,7 @@ class BParam < ApplicationRecord
   serialize :bike_errors, coder: YAML
 
   before_create :generate_id_token
-  before_create :generate_confirmation_token, if: -> { origin == "registration_flow" }
+  before_create :generate_confirmation_token, if: :registration_flow?
   before_save :clean_params
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
@@ -412,19 +412,26 @@ class BParam < ApplicationRecord
     PARTIAL_REGISTRATION_ORIGINS.include?(origin)
   end
 
+  def registration_flow?
+    origin == "registration_flow"
+  end
+
   # Only sent in the partial registration email - unlike id_token, the anonymous
   # registrant never sees it, so presenting it proves control of the email
   def confirmation_token
     params["confirmation_token"]
   end
 
-  def confirmation_token_matches?(token)
-    confirmation_token.present? && token.present? &&
-      ActiveSupport::SecurityUtils.secure_compare(confirmation_token, token.to_s)
-  end
-
   def email_confirmed?
     params["email_confirmed_at"].present?
+  end
+
+  # Once the email is confirmed, the email's own account (or the AUTO_ORG_MEMBER
+  # system user) can stand in as the creator the Ownership requires
+  def confirmed_email_creator_id
+    return nil unless email_confirmed?
+
+    (User.fuzzy_email_find(owner_email) || User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"]))&.id
   end
 
   def confirm_email!
@@ -616,7 +623,7 @@ class BParam < ApplicationRecord
   end
 
   def generate_confirmation_token
-    self.params = params.merge("confirmation_token" => SecureRandom.urlsafe_base64(24))
+    self.params = params.merge("confirmation_token" => SecurityTokenizer.new_token)
   end
 
   def parking_notification_params

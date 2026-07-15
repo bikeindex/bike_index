@@ -2,7 +2,7 @@ class RegisterController < ApplicationController
   before_action :find_b_param, only: %i[details update confirm complete]
 
   def new
-    @b_param ||= BParam.new(params: {bike: BParam.status_hash_from_params(params)}.as_json)
+    @b_param = BParam.new(params: {bike: BParam.status_hash_from_params(params)}.as_json)
   end
 
   def create
@@ -26,8 +26,7 @@ class RegisterController < ApplicationController
   def update
     @b_param.creator_id ||= current_user&.id
     @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
-    # clean_params runs before_save, resolving the merged foreign keys
-    @b_param.params = @b_param.params.with_indifferent_access.deep_merge(update_params.as_json)
+    @b_param.clean_params(update_params.as_json)
     @b_param.save
     if creator_available?
       create_bike_and_redirect
@@ -40,7 +39,7 @@ class RegisterController < ApplicationController
 
   # The tokenized link from the partial registration email - proves control of the email
   def confirm
-    unless @b_param.confirmation_token_matches?(params[:confirmation_token])
+    unless secure_compare?(params[:confirmation_token], @b_param.confirmation_token)
       flash[:error] = translation(:invalid_confirmation_link)
       redirect_to(new_register_path) && return
     end
@@ -72,20 +71,17 @@ class RegisterController < ApplicationController
 
   def creator_available?
     @b_param.creator_id.present? || @b_param.creation_organization&.auto_user_id.present? ||
-      (@b_param.email_confirmed? && confirmed_email_creator.present?)
+      confirmed_email_creator_id.present?
   end
 
-  # With the email confirmed, the registrant's own account (if the email has one)
-  # or the AUTO_ORG_MEMBER system user can stand in as the creator
-  def confirmed_email_creator
-    return @confirmed_email_creator if defined?(@confirmed_email_creator)
+  def confirmed_email_creator_id
+    return @confirmed_email_creator_id if defined?(@confirmed_email_creator_id)
 
-    @confirmed_email_creator = User.fuzzy_email_find(@b_param.owner_email) ||
-      User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"])
+    @confirmed_email_creator_id = @b_param.confirmed_email_creator_id
   end
 
   def create_bike_and_redirect
-    @b_param.creator_id ||= confirmed_email_creator&.id if @b_param.email_confirmed?
+    @b_param.creator_id ||= confirmed_email_creator_id
     bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
     if bike.errors.any?
       flash[:error] = @b_param.bike_errors&.to_sentence
