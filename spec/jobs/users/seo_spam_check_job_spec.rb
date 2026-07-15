@@ -17,12 +17,11 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
 
     context "crypto/gambling references" do
       let(:description) { "Best online casino and slot gacor bonus, join now!" }
-      it "bans the user for spamming" do
+      it "bans the user for seo_spam" do
         expect { instance.perform(user.id) }.to change(UserBan, :count).by(1)
         user_ban = UserBan.last
         expect(user_ban.user_id).to eq user.id
-        expect(user_ban.reason).to eq "spamming"
-        expect(user_ban.description).to eq "User profile is SEO spam"
+        expect(user_ban.reason).to eq "seo_spam"
         expect(user.reload.banned?).to be_truthy
       end
     end
@@ -32,9 +31,9 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
         FactoryBot.create(:user_confirmed, show_bikes: true,
           my_bikes_hash: {"link_target" => "https://buy-bitcoin-presale.example"})
       end
-      it "bans the user for spamming" do
+      it "bans the user for seo_spam" do
         expect { instance.perform(user.id) }.to change(UserBan, :count).by(1)
-        expect(UserBan.last.reason).to eq "spamming"
+        expect(UserBan.last.reason).to eq "seo_spam"
         expect(user.reload.banned?).to be_truthy
       end
     end
@@ -42,7 +41,7 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
     context "gibberish profile text" do
       let(:name) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
       let(:description) { "efgBz9pNdd7efgBz9pNdd7 xzkqwrmlbnptvxz" }
-      it "bans the user for spamming" do
+      it "bans the user for seo_spam" do
         expect(SpamEstimator::String.string_spaminess([name, description].join(" ")))
           .to be > SpamEstimator::MARK_SPAM_PERCENT
         expect { instance.perform(user.id) }.to change(UserBan, :count).by(1)
