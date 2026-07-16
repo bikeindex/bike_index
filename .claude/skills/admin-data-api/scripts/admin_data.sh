@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 # Helper for the AdminData production API (Sidekiq / PgHero status).
-# Reads/writes token values in .env.development. Run from the repo root.
+# Reads/writes token values in .env.development (located relative to this script,
+# so it works from any cwd). Run it directly, e.g.
+#   .claude/skills/admin-data-api/scripts/admin_data.sh check
 #
 # Requires in .env.development: ADMIN_DOORKEEPER_APP_CLIENT_ID,
 # ADMIN_DOORKEEPER_APP_CLIENT_SECRET, and (after first authorize) ADMIN_DATA_TOKEN
-# + ADMIN_DATA_REFRESH. `get` auto-refreshes the token on a 401 using the secret.
+# + ADMIN_DATA_REFRESH. Tokens auto-refresh on a 401 using the secret.
 set -euo pipefail
 
-ENV_FILE=".env.development"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+ENV_FILE="$REPO_ROOT/.env.development"
 BASE="https://bikeindex.org"
 
 env_get() { grep -E "^$1=" "$ENV_FILE" 2>/dev/null | head -1 | cut -d= -f2- || true; }
@@ -24,8 +28,7 @@ env_set() {
   fi
 }
 
-# Exchange ADMIN_DATA_REFRESH for a new token pair and store it. Returns non-zero
-# (with a message) when the secret/refresh token is missing or the grant fails.
+# Exchange ADMIN_DATA_REFRESH for a new token pair and store it.
 do_refresh() {
   local client_id secret refresh resp access new_refresh
   client_id="$(env_get ADMIN_DOORKEEPER_APP_CLIENT_ID)"
@@ -61,6 +64,44 @@ do_get() {
   [ "$code" = "200" ]
 }
 
+# do_get with a one-shot refresh + retry on failure (typically a 401). Body → stdout.
+get_or_refresh() {
+  local endpoint="$1" body
+  if body="$(do_get "$endpoint")"; then printf '%s' "$body"; return 0; fi
+  echo "Token rejected — refreshing and retrying…" >&2
+  do_refresh || return 1
+  do_get "$endpoint"
+}
+
+# jq: "nothing abnormal" verdict for each payload. Hit rates and unused/duplicate
+# indexes are informational; "System stats not enabled" is a disabled feature, not a fault.
+SIDEKIQ_VERDICT='
+  ( [ .queues[] | select(.size>0 or .latency>5 or .paused)
+      | "queue \(.name) size=\(.size) latency=\(.latency)\(if .paused then " PAUSED" else "" end)" ] ) as $backlog
+  | ( [ (if .stats.enqueued>0 then "enqueued=\(.stats.enqueued)" else empty end),
+        (if .stats.retry_size>0 then "retry_size=\(.stats.retry_size)" else empty end),
+        ($backlog[]),
+        (if (.processes|length)==0 then "no worker processes" else empty end),
+        (if ((.processes|length)>0 and ([.processes[].quiet]|all)) then "all workers quiet" else empty end) ] ) as $r
+  | "summary: enqueued=\(.stats.enqueued) retry=\(.stats.retry_size) scheduled=\(.stats.scheduled_size) processes=\(.processes|length)\n"
+    + (if ($r|length)==0 then "verdict: OK — nothing abnormal" else "verdict: ABNORMAL — " + ($r|join("; ")) end)
+'
+PGHERO_VERDICT='
+  def alen(f): (f | if type=="array" then length else 0 end);
+  ( [ to_entries[] | select(.value|type=="object" and has("error"))
+      | select(.value.error != "System stats not enabled") | "\(.key): \(.value.error)" ] ) as $errs
+  | ( [ ($errs[]),
+        (if alen(.long_running_queries)>0 then "long_running_queries=\(alen(.long_running_queries))" else empty end),
+        (if alen(.blocked_queries)>0 then "blocked_queries=\(alen(.blocked_queries))" else empty end),
+        (if alen(.invalid_indexes)>0 then "invalid_indexes=\(alen(.invalid_indexes))" else empty end),
+        (if alen(.sequence_danger)>0 then "sequence_danger=\(alen(.sequence_danger))" else empty end),
+        (if alen(.transaction_id_danger)>0 then "transaction_id_danger" else empty end),
+        (if alen(.autovacuum_danger)>0 then "autovacuum_danger=\(alen(.autovacuum_danger))" else empty end),
+        (if ((.index_hit_rate|tonumber? // 1) < 0.90) then "index_hit_rate=\(.index_hit_rate)" else empty end) ] ) as $r
+  | "summary: connections=\(.total_connections)/\(.settings.max_connections // "?") db=\(.database_size) running=\(alen(.running_queries)) index_hit=\((.index_hit_rate|tostring)[0:5]) table_hit(info)=\((.table_hit_rate|tostring)[0:5]) unused_indexes=\(alen(.unused_indexes))\n"
+    + (if ($r|length)==0 then "verdict: OK — nothing abnormal" else "verdict: ABNORMAL — " + ($r|join("; ")) end)
+'
+
 cmd="${1:-}"
 case "$cmd" in
   authorize-url)
@@ -70,12 +111,18 @@ case "$cmd" in
     echo "${BASE}/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect}&response_type=code&scope=public"
     ;;
 
-  get) # get <sidekiq|pghero> — auto-refreshes and retries once on a 401/expired token
-    endpoint="${2:?usage: get <sidekiq|pghero>}"
-    if body="$(do_get "$endpoint")"; then printf '%s\n' "$body"; exit 0; fi
-    echo "Token rejected — refreshing and retrying…" >&2
-    do_refresh || exit 22
-    body="$(do_get "$endpoint")" && { printf '%s\n' "$body"; exit 0; } || exit 22
+  get) # get <sidekiq|pghero> — auto-refreshes and retries once on a 401
+    body="$(get_or_refresh "${2:?usage: get <sidekiq|pghero>}")" || exit 22
+    printf '%s\n' "$body"
+    ;;
+
+  check) # full health check: sidekiq, then pghero — prints a summary + OK/ABNORMAL verdict each
+    echo "== SIDEKIQ =="
+    body="$(get_or_refresh sidekiq)" || exit 22
+    printf '%s' "$body" | jq -r "$SIDEKIQ_VERDICT"
+    echo ""; echo "== PGHERO =="
+    body="$(get_or_refresh pghero)" || exit 22
+    printf '%s' "$body" | jq -r "$PGHERO_VERDICT"
     ;;
 
   set-tokens) # set-tokens <access_token> <refresh_token> — for the browser authorize flow
@@ -89,7 +136,7 @@ case "$cmd" in
     ;;
 
   *)
-    echo "usage: admin_data.sh {authorize-url | get <sidekiq|pghero> | set-tokens <access> <refresh> | refresh}" >&2
+    echo "usage: admin_data.sh {check | get <sidekiq|pghero> | authorize-url | set-tokens <access> <refresh> | refresh}" >&2
     exit 64
     ;;
 esac
