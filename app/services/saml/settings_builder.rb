@@ -80,8 +80,8 @@ module Saml
       settings.soft = true # collect validation errors instead of raising
       settings.security[:want_assertions_signed] = true
       settings.security[:authn_requests_signed] = true
-      # Per-org: some IdPs (e.g. Stanford) mandate assertion encryption, others don't.
-      # Enabling it advertises the SP encryption cert in metadata and requires encryption.
+      # Per-org: some IdPs mandate assertion encryption, others don't. Enabling it
+      # advertises the SP encryption cert in metadata and requires encryption.
       settings.security[:want_assertions_encrypted] = @saml_configuration.want_assertions_encrypted
       settings.security[:digest_method] = XMLSecurity::Document::SHA256
       settings.security[:signature_method] = XMLSecurity::Document::RSA_SHA256
