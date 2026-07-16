@@ -72,13 +72,7 @@
             data-org--multi-search-target="searchAllHint"
             class="tw:hidden tw:leading-none"
           >
-            <%= render(UI::Tooltip::Component.new(text: "Sticker search always searches all bikes")) do |tooltip| %>
-              <% tooltip.with_tooltip_button(
-                class: "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
-                  "tw:bg-gray-300 tw:text-gray-700 tw:hover:bg-gray-400 tw:dark:bg-gray-600 tw:dark:text-gray-100 " \
-                  "tw:text-2xs tw:font-bold tw:cursor-help tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
-              ) { "?" } %>
-            <% end %>
+            <%= render(UI::Tooltip::Component.new(text: "Sticker search always searches all bikes")) %>
           </span>
         </div>
 

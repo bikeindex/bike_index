@@ -9,10 +9,10 @@ module UI
       TRIGGER_CLASS = "tw:inline-block tw:rounded tw:cursor-help " \
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
 
-      BUTTON_CLASS = "tw:inline-flex tw:items-center tw:justify-center tw:h-5 tw:w-5 tw:rounded-full " \
+      BUTTON_CLASS = "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
         "tw:bg-gray-200 tw:text-gray-700 tw:hover:bg-gray-300 " \
         "tw:dark:bg-gray-700 tw:dark:text-gray-200 tw:dark:hover:bg-gray-600 " \
-        "tw:text-xs tw:font-bold tw:cursor-help " \
+        "tw:text-2xs tw:font-bold tw:cursor-help " \
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
 
       renders_one :body
