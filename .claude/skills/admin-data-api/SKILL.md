@@ -37,7 +37,7 @@ All operations go through the helper — run it from the repo root:
 .claude/skills/admin-data-api/scripts/admin_data.sh get pghero
 ```
 
-It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production, and prints `HTTP <status>` then the JSON body. Pipe the body to `jq` for specific fields. On a non-200 the script exits non-zero — a **401** (`OAuth token required`) means the token is missing or expired (tokens live 1 hour); a **403** means the token's user lacks the `admin_data` superuser ability or the token is from the wrong app.
+It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production, and prints `HTTP <status>` then the JSON body. Pipe the body to `jq` for specific fields. Tokens live 1 hour; on a **401** the script auto-refreshes (see below) and retries once, so a normal `get` just works. A **403** means the token's user lacks the `admin_data` superuser ability or the token is from the wrong app. Other non-200s exit non-zero.
 
 Ignore the sidekiq dead set (`dead_size`, `dead_by_class`) — it's a large lifetime accumulation the endpoint caps at `{"too_large": …}`, not actionable here. Don't report it.
 
@@ -48,33 +48,31 @@ For a general "how's production" check, run `get sidekiq` first, then automatica
 - **Sidekiq is abnormal** when any queue has a backlog (`size > 0`) or real `latency`, `retry_size > 0`, `enqueued` is climbing, a queue is `paused`, `processes` is empty (no workers), or every process is `quiet`. Empty queues with idle-but-running workers is normal — report "nothing abnormal."
 - **PgHero is abnormal** when any metric came back as `{"error": …}`, `long_running_queries`/`blocked_queries` is non-empty, a danger metric fires (`sequence_danger`, `transaction_id_danger`, `autovacuum_danger`), there are `invalid_indexes`, or hit rates (`index_hit_rate`, `table_hit_rate`) drop below ~0.98. `unused_indexes`/`duplicate_indexes` are informational, not abnormal.
 
-## Get / refresh the token (401 or expired)
+## Refreshing the token
 
-The token is a standard authorization-code grant. The reliable path is the browser flow:
-
-1. Print the authorize URL (fills in `ADMIN_DOORKEEPER_APP_CLIENT_ID` from `.env.development`):
-   ```
-   .claude/skills/admin-data-api/scripts/admin_data.sh authorize-url
-   ```
-2. Ask the user to open it and sign in / approve. Bike Index redirects to `/documentation/authorize`, which exchanges the code and displays the token JSON (`access_token`, `refresh_token`, `expires_in`, …). Ask the user to paste that response back.
-3. Store both values:
-   ```
-   .claude/skills/admin-data-api/scripts/admin_data.sh set-tokens <access_token> <refresh_token>
-   ```
-   This upserts `ADMIN_DATA_TOKEN` and `ADMIN_DATA_REFRESH` in `.env.development`.
-4. Re-run the `get`.
-
-The authorization code expires in 10 minutes — if step 2 shows an expired/error response, have the user reload the authorize URL for a fresh one.
-
-### Optional: refresh without the browser
-
-If `.env.development` also has `ADMIN_DOORKEEPER_APP_CLIENT_SECRET` (the admin app is confidential, so the refresh grant needs it), skip the browser:
+`.env.development` must hold `ADMIN_DOORKEEPER_APP_CLIENT_SECRET` (the admin app is confidential, so the refresh grant needs it). With it, `get` refreshes automatically on a 401 — you rarely call this directly. To force a refresh:
 
 ```
 .claude/skills/admin-data-api/scripts/admin_data.sh refresh
 ```
 
-It POSTs the `refresh_token` grant and prints the new token JSON; feed the returned `access_token`/`refresh_token` into `set-tokens`. Without the secret this exits with a note to use the browser flow.
+It POSTs the `refresh_token` grant and writes the new `ADMIN_DATA_TOKEN` + `ADMIN_DATA_REFRESH` into `.env.development` (values never printed).
+
+### First-time setup / dead refresh token (browser flow)
+
+Needed only when there's no token yet, or the refresh token itself was revoked (refresh reports a failure):
+
+1. Print the authorize URL (fills in `ADMIN_DOORKEEPER_APP_CLIENT_ID`):
+   ```
+   .claude/skills/admin-data-api/scripts/admin_data.sh authorize-url
+   ```
+2. Ask the user to open it and approve. Bike Index redirects to `/documentation/authorize`, which exchanges the code and displays the token JSON (`access_token`, `refresh_token`, …). Ask the user to paste that response back.
+3. Store both values:
+   ```
+   .claude/skills/admin-data-api/scripts/admin_data.sh set-tokens <access_token> <refresh_token>
+   ```
+
+The authorization code expires 10 minutes after the page loads — if it shows an error, have the user reload the authorize URL.
 
 ## Notes
 
