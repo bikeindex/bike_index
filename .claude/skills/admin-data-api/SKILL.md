@@ -39,6 +39,8 @@ All operations go through the helper — run it from the repo root:
 
 It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production, and prints `HTTP <status>` then the JSON body. Pipe the body to `jq` for specific fields. On a non-200 the script exits non-zero — a **401** (`OAuth token required`) means the token is missing or expired (tokens live 1 hour); a **403** means the token's user lacks the `admin_data` superuser ability or the token is from the wrong app.
 
+Ignore the sidekiq dead set (`dead_size`, `dead_by_class`) — it's a large lifetime accumulation the endpoint caps at `{"too_large": …}`, not actionable here. Don't report it.
+
 ## Get / refresh the token (401 or expired)
 
 The token is a standard authorization-code grant. The reliable path is the browser flow:
