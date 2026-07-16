@@ -3,19 +3,20 @@
 # Table name: organization_saml_configurations
 # Database name: primary
 #
-#  id                   :bigint           not null, primary key
-#  email_attribute_name :string
-#  enabled              :boolean          default(FALSE)
-#  idp_cert             :text
-#  idp_cert_fingerprint :string
-#  idp_cert_multi       :text
-#  idp_slo_target_url   :string
-#  idp_sso_target_url   :string
-#  name_id_format       :string
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  idp_entity_id        :string
-#  organization_id      :bigint
+#  id                        :bigint           not null, primary key
+#  email_attribute_name      :string
+#  enabled                   :boolean          default(FALSE)
+#  idp_cert                  :text
+#  idp_cert_fingerprint      :string
+#  idp_cert_multi            :text
+#  idp_slo_target_url        :string
+#  idp_sso_target_url        :string
+#  name_id_format            :string
+#  want_assertions_encrypted :boolean          default(FALSE), not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  idp_entity_id             :string
+#  organization_id           :bigint
 #
 # Indexes
 #

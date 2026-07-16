@@ -31,6 +31,23 @@ RSpec.describe SamlController, type: :request do
       expect(response.body).to_not include(sp_key.lines[1].strip)
     end
 
+    def key_descriptor_uses(body)
+      Nokogiri::XML(body).remove_namespaces!.xpath("//KeyDescriptor").map { |kd| kd["use"] }
+    end
+
+    it "advertises a signing cert but no encryption cert by default" do
+      get "/sso/#{organization.to_param}/metadata"
+      expect(key_descriptor_uses(response.body)).to eq(["signing"])
+    end
+
+    context "organization requiring encrypted assertions" do
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, :encrypted, organization:) }
+      it "advertises an encryption cert" do
+        get "/sso/#{organization.to_param}/metadata"
+        expect(key_descriptor_uses(response.body)).to contain_exactly("signing", "encryption")
+      end
+    end
+
     context "organization without the saml_sso feature" do
       let(:organization) { FactoryBot.create(:organization) }
       it "is not found" do

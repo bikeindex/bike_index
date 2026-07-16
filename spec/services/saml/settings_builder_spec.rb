@@ -41,6 +41,17 @@ RSpec.describe Saml::SettingsBuilder do
     expect(settings.security[:signature_method]).to eq XMLSecurity::Document::RSA_SHA256
   end
 
+  it "does not require encrypted assertions by default" do
+    expect(settings.security[:want_assertions_encrypted]).to be false
+  end
+
+  context "with want_assertions_encrypted" do
+    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, :encrypted, organization:) }
+    it "requires encrypted assertions" do
+      expect(settings.security[:want_assertions_encrypted]).to be true
+    end
+  end
+
   context "with a rotation-overlap cert" do
     let(:saml_configuration) do
       FactoryBot.create(:organization_saml_configuration, :enabled, organization:, idp_cert_multi: idp_cert)

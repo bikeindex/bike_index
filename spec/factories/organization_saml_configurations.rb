@@ -8,5 +8,9 @@ FactoryBot.define do
       idp_sso_target_url { "https://idp.example.edu/idp/profile/SAML2/POST/SSO" }
       idp_cert { File.read(Rails.root.join("spec/fixtures/saml/idp_cert.pem")) }
     end
+
+    trait :encrypted do
+      want_assertions_encrypted { true }
+    end
   end
 end
