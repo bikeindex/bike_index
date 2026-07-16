@@ -41,6 +41,13 @@ It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production, and print
 
 Ignore the sidekiq dead set (`dead_size`, `dead_by_class`) — it's a large lifetime accumulation the endpoint caps at `{"too_large": …}`, not actionable here. Don't report it.
 
+### Health-check flow
+
+For a general "how's production" check, run `get sidekiq` first, then automatically run `get pghero` when sidekiq is clean — don't wait to be asked for the second one. For each, if nothing is abnormal, say so in one line and move on; only spell out the metrics that are actually off.
+
+- **Sidekiq is abnormal** when any queue has a backlog (`size > 0`) or real `latency`, `retry_size > 0`, `enqueued` is climbing, a queue is `paused`, `processes` is empty (no workers), or every process is `quiet`. Empty queues with idle-but-running workers is normal — report "nothing abnormal."
+- **PgHero is abnormal** when any metric came back as `{"error": …}`, `long_running_queries`/`blocked_queries` is non-empty, a danger metric fires (`sequence_danger`, `transaction_id_danger`, `autovacuum_danger`), there are `invalid_indexes`, or hit rates (`index_hit_rate`, `table_hit_rate`) drop below ~0.98. `unused_indexes`/`duplicate_indexes` are informational, not abnormal.
+
 ## Get / refresh the token (401 or expired)
 
 The token is a standard authorization-code grant. The reliable path is the browser flow:
