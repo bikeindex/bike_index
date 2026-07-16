@@ -43,10 +43,16 @@ Ignore the sidekiq dead set (`dead_size`, `dead_by_class`) — it's a large life
 
 ### Health-check flow
 
-For a general "how's production" check, run `get sidekiq` first, then automatically run `get pghero` when sidekiq is clean — don't wait to be asked for the second one. For each, if nothing is abnormal, say so in one line and move on; only spell out the metrics that are actually off.
+For a general "how's production" check, use one command:
 
-- **Sidekiq is abnormal** when any queue has a backlog (`size > 0`) or real `latency`, `retry_size > 0`, `enqueued` is climbing, a queue is `paused`, `processes` is empty (no workers), or every process is `quiet`. Empty queues with idle-but-running workers is normal — report "nothing abnormal."
-- **PgHero is abnormal** when any metric came back as `{"error": …}`, `long_running_queries`/`blocked_queries` is non-empty, a danger metric fires (`sequence_danger`, `transaction_id_danger`, `autovacuum_danger`), there are `invalid_indexes`, or hit rates (`index_hit_rate`, `table_hit_rate`) drop below ~0.98. `unused_indexes`/`duplicate_indexes` are informational, not abnormal.
+```
+.claude/skills/admin-data-api/scripts/admin_data.sh check
+```
+
+It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMAL` verdict for each. Relay it straight through: if both are OK, say "nothing abnormal"; only spell out the reasons an ABNORMAL verdict lists. The verdict logic lives in the script — what it counts as abnormal:
+
+- **Sidekiq**: a queue with `size > 0`, `latency > 5`, or `paused`; `retry_size > 0`; `enqueued > 0`; no worker processes; or all workers quiet.
+- **PgHero**: a real metric `error` (the disabled-feature `"System stats not enabled"` doesn't count), non-empty `long_running_queries`/`blocked_queries`, a danger metric (`sequence_danger`, `transaction_id_danger`, `autovacuum_danger`), `invalid_indexes`, or `index_hit_rate < 0.90`. Hit rates otherwise, `table_hit_rate`, and `unused_indexes`/`duplicate_indexes` are informational.
 
 ## Refreshing the token
 
