@@ -2,7 +2,7 @@ require "rails_helper"
 
 # End-to-end SP-initiated login: a real /init populates the session, then a signed
 # assertion (minted in-process, see spec/support/saml_helpers.rb) is POSTed to the ACS.
-RSpec.describe "SAML SSO login", type: :request do
+RSpec.describe "SAML SSO login", :saml_env, type: :request do
   let(:domain) { "example.edu" }
   let(:organization) do
     FactoryBot.create(:organization_with_organization_features,
@@ -11,18 +11,7 @@ RSpec.describe "SAML SSO login", type: :request do
   let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
   let(:slug) { organization.to_param }
   let(:settings) { Saml::SettingsBuilder.build(saml_configuration) }
-  let(:sp_cert) { File.read(Rails.root.join("spec/fixtures/saml/sp_cert.pem")) }
-  let(:sp_key) { File.read(Rails.root.join("spec/fixtures/saml/sp_key.pem")) }
   let(:email) { "newperson@#{domain}" }
-
-  around do |example|
-    original = ENV.values_at("SAML_SP_CERTIFICATE", "SAML_SP_PRIVATE_KEY", "BASE_URL")
-    ENV["SAML_SP_CERTIFICATE"] = sp_cert
-    ENV["SAML_SP_PRIVATE_KEY"] = sp_key
-    ENV["BASE_URL"] = "https://bikeindex.org"
-    example.run
-    ENV["SAML_SP_CERTIFICATE"], ENV["SAML_SP_PRIVATE_KEY"], ENV["BASE_URL"] = original
-  end
 
   before { saml_configuration } # ensure the config exists before /init
 

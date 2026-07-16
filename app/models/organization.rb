@@ -258,13 +258,14 @@ class Organization < ApplicationRecord
 
     # The org that forces SSO for an email's domain: feature enabled + a live IdP config.
     # SSO shares the passwordless domain field for routing (no separate saml domain column).
+    # Filter the domain in SQL and eager-load the config so a login never scans every SSO org.
     def saml_email_matching(str)
       domain = email_domain(str)
       return nil if domain.blank?
 
-      permitted_domain_saml_signin.detect do |org|
-        org.passwordless_user_domain == domain && org.organization_saml_configuration&.configured?
-      end
+      permitted_domain_saml_signin.where(passwordless_user_domain: domain)
+        .includes(:organization_saml_configuration)
+        .detect { |org| org.organization_saml_configuration&.configured? }
     end
 
     def email_domain(str)
@@ -369,10 +370,6 @@ class Organization < ApplicationRecord
 
   def fetch_impound_configuration
     impound_configuration.present? ? impound_configuration : ImpoundConfiguration.create(organization_id: id)
-  end
-
-  def fetch_saml_configuration
-    organization_saml_configuration || OrganizationSamlConfiguration.create(organization_id: id)
   end
 
   def hot_sheet_on?
