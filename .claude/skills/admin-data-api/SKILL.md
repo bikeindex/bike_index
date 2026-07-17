@@ -27,14 +27,14 @@ Auth is a Bearer token gated on an `admin_data` superuser ability **and** the ad
 All operations go through the helper — run it from the repo root:
 
 ```
-.claude/skills/admin-data-api/scripts/admin_data.sh <command>
+.claude/skills/admin-data-api/scripts/admin_data.rb <command>
 ```
 
 ## Fetch data
 
 ```
-.claude/skills/admin-data-api/scripts/admin_data.sh get sidekiq
-.claude/skills/admin-data-api/scripts/admin_data.sh get pghero
+.claude/skills/admin-data-api/scripts/admin_data.rb get sidekiq
+.claude/skills/admin-data-api/scripts/admin_data.rb get pghero
 ```
 
 It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production, and prints `HTTP <status>` then the JSON body. Pipe the body to `jq` for specific fields. Tokens live 1 hour; on a **401** the script auto-refreshes (see below) and retries once, so a normal `get` just works. A **403** means the token's user lacks the `admin_data` superuser ability or the token is from the wrong app. Other non-200s exit non-zero.
@@ -46,7 +46,7 @@ Ignore the sidekiq dead set (`dead_size`, `dead_by_class`) — it's a large life
 For a general "how's production" check, use one command:
 
 ```
-.claude/skills/admin-data-api/scripts/admin_data.sh check
+.claude/skills/admin-data-api/scripts/admin_data.rb check
 ```
 
 It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMAL` verdict for each. Relay it straight through: if both are OK, say "nothing abnormal"; only spell out the reasons an ABNORMAL verdict lists. The verdict logic lives in the script — what it counts as abnormal:
@@ -59,7 +59,7 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 `.env.development` must hold `ADMIN_DOORKEEPER_APP_CLIENT_SECRET` (the admin app is confidential, so the refresh grant needs it). With it, `get` refreshes automatically on a 401 — you rarely call this directly. To force a refresh:
 
 ```
-.claude/skills/admin-data-api/scripts/admin_data.sh refresh
+.claude/skills/admin-data-api/scripts/admin_data.rb refresh
 ```
 
 It POSTs the `refresh_token` grant and writes the new `ADMIN_DATA_TOKEN` + `ADMIN_DATA_REFRESH` into `.env.development` (values never printed).
@@ -70,12 +70,12 @@ Needed only when there's no token yet, or the refresh token itself was revoked (
 
 1. Print the authorize URL (fills in `ADMIN_DOORKEEPER_APP_CLIENT_ID`):
    ```
-   .claude/skills/admin-data-api/scripts/admin_data.sh authorize-url
+   .claude/skills/admin-data-api/scripts/admin_data.rb authorize-url
    ```
 2. Ask the user to open it and approve. Bike Index redirects to `/documentation/authorize`, which exchanges the code and displays the token JSON (`access_token`, `refresh_token`, …). Ask the user to paste that response back.
 3. Store both values:
    ```
-   .claude/skills/admin-data-api/scripts/admin_data.sh set-tokens <access_token> <refresh_token>
+   .claude/skills/admin-data-api/scripts/admin_data.rb set-tokens <access_token> <refresh_token>
    ```
 
 The authorization code expires 10 minutes after the page loads — if it shows an error, have the user reload the authorize URL.
