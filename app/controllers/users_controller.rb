@@ -23,6 +23,15 @@ class UsersController < ApplicationController
     end
   end
 
+  # Rather than dumping a would-be signup at user_root_url, hand back the form they submitted
+  def handle_unverified_request
+    return super unless action_name == "create"
+
+    @user = User.new(email: params.dig(:user, :email))
+    flash.now[:error] = translation(:invalid_authenticity_token, scope: [:controllers, :application, :handle_unverified_request])
+    render_partner_or_default_signin_layout(render_action: :new)
+  end
+
   def please_confirm_email
     redirect_to(user_root_url) && return if current_user.present?
 

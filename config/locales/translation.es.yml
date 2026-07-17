@@ -2124,10 +2124,6 @@ es:
       sync_not_finished: La sincronización con Strava aún no ha finalizado, por lo
         que es posible que no aparezcan todas las bicicletas en la lista.
   controllers:
-    application:
-      handle_unverified_request:
-        csrf_invalid: CSRF no válido. Si desconoce el motivo de este mensaje, póngase
-          en contacto con nosotros.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Para hacerlo, debes iniciar sesión.
@@ -2520,6 +2516,12 @@ es:
           we_dont_know_location: Lo sentimos, no conocemos la ubicación "%{location}".
             Por favor, intente buscar en otra ubicación para encontrar alojamientos
             cercanos.
+    application:
+      handle_unverified_request:
+        invalid_authenticity_token: El envío del formulario falló. Inténtelo de nuevo.
+          Si el problema persiste, es probable que una VPN o una extensión de privacidad
+          esté ocultando información necesaria. Intente desactivarlas para bikeindex.org.
+          Si el problema continúa, envíe un correo electrónico a contact@bikeindex.org.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4995,20 +4997,21 @@ es:
       you_should_be_signed_in_automatically: Deberías iniciar sesión automáticamente.
       your_email_address: Su dirección de correo electrónico
     new:
-      dont_have_an_account: "¿No tienes una cuenta?"
       email: correo electrónico
       forgot_your_password: "¿Olvidaste tu contraseña?"
       get_on_bike_index: Índice de bicicletas
       keep_me_logged_in: Mantenme conectado
       log_in: Acceso
-      no_bike_index_account: "¿No tienes cuenta en Bike Index?"
-      or: O
       password: contraseña
-      sign_in_using_facebook: Inicia sesión con Facebook
-      sign_in_using_globalid: Inicia sesión con globaliD
-      sign_in_using_magic_link: Enlace de inicio de sesión enviado por correo electrónico
-      sign_in_using_strava: Inicia sesión con Strava
-      sign_up: inscribirse
+      continue: Continuar
+      email_me_the_link: Envíame el enlace por correo electrónico.
+      log_in_or_sign_up: Inicia sesión o regístrate
+      org_uses_passwordless: Su organización inicia sesión sin contraseña.
+      passwordless_help: Te enviaremos por correo electrónico un enlace seguro para
+        que inicies sesión.
+      sign_in_without_password: Iniciar sesión sin contraseña
+    identify:
+      different_email: Inicia sesión con un correo electrónico diferente.
   shared:
     bike_search_form:
       anywhere: En cualquier lugar
