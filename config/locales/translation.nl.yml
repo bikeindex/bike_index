@@ -4200,20 +4200,20 @@ nl:
       sign_in: Log in
       you_should_be_signed_in_automatically: Je zou automatisch ingelogd moeten zijn.
     new:
-      dont_have_an_account: Heb je nog geen account?
       email: E-mail
       forgot_your_password: Wachtwoord vergeten?
       get_on_bike_index: Ga op Bike Index
       keep_me_logged_in: Ik wil ingelogd blijven
       log_in: Log in
-      no_bike_index_account: geen Bike Index-account?
-      or: of
       password: Wachtwoord
-      sign_in_using_facebook: Log in met Facebook
-      sign_in_using_magic_link: E-mail aanmelden link
-      sign_in_using_strava: Log in met Strava
-      sign_up: Registreren
-      sign_in_using_globalid: Log in met globaliD
+      continue: Doorgaan
+      email_me_the_link: Stuur me de link via e-mail.
+      log_in_or_sign_up: Log in of registreer je
+      org_uses_passwordless: Uw organisatie meldt zich aan zonder wachtwoord.
+      passwordless_help: We sturen je een beveiligde link per e-mail om in te loggen.
+      sign_in_without_password: Aanmelden zonder wachtwoord
+    identify:
+      different_email: Aanmelden met een ander e-mailadres
   shared:
     email_bike_box:
       color: Kleur
