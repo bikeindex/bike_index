@@ -1,6 +1,6 @@
 
 = form_for [:admin, @manufacturer] do |f|
-  = render(Alerts::ObjectErrors::Component.new(object: @manufacturer))
+  = render(UI::Alerts::ObjectError::Component.new(object: @manufacturer))
 
   .form-group
     = f.label :name

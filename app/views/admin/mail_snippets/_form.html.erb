@@ -33,7 +33,7 @@
   </ul>
 <% end %>
 
-<%= render(Alerts::ObjectErrors::Component.new(object: @mail_snippet)) %>
+<%= render(UI::Alerts::ObjectError::Component.new(object: @mail_snippet)) %>
 
 <% def select_display(kind); "#{MailSnippet.kind_humanized(kind)} - in #{MailSnippet.organization_email_for(kind)} emails" end %>
 

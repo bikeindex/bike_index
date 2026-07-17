@@ -6023,10 +6023,10 @@ es:
         serial_label: 'De serie:'
         view_all: ver todo
         sticker_label: 'Etiqueta engomada:'
-    alerts:
-      object_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} impidió que se guardara
-          este %{object_name}:"
+      alerts:
+        object_error:
+          errors_prevented_this_from_being_saved: "%{errors_count} impidió que se guardara
+            este %{object_name}:"
     form:
       legacy_form_well:
         address_record:

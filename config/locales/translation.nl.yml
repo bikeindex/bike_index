@@ -5921,10 +5921,10 @@ nl:
         serial_label: 'Serial:'
         view_all: alles bekijken
         sticker_label: 'Sticker:'
-    alerts:
-      object_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
-          dit %{object_name} wordt opgeslagen:"
+      alerts:
+        object_error:
+          errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+            dit %{object_name} wordt opgeslagen:"
     form:
       legacy_form_well:
         address_record:

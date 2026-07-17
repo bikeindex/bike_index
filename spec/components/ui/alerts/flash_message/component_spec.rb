@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Alerts::FlashMessages::Component, type: :component do
+RSpec.describe UI::Alerts::FlashMessage::Component, type: :component do
   let(:component) { render_inline(described_class.new(flash:)) }
   let(:flash) { {notice: "Saved!"} }
 

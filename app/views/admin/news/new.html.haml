@@ -3,7 +3,7 @@
 
 - url = {action: "create", controller: "news"}
 = form_for [:admin, @blog], :url => url do |f|
-  = render(Alerts::ObjectErrors::Component.new(object: @blog))
+  = render(UI::Alerts::ObjectError::Component.new(object: @blog))
 
   .row
     .col-auto

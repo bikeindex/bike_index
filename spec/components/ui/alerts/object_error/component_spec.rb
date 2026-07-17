@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Alerts::ObjectErrors::Component, type: :component do
+RSpec.describe UI::Alerts::ObjectError::Component, type: :component do
   let(:component) { render_inline(described_class.new(object:)) }
   let(:object) do
     user = User.new
