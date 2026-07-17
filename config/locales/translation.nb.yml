@@ -2080,10 +2080,6 @@ nb:
       sync_not_finished: Strava-synkroniseringen er ikke fullført ennå, så det er
         ikke sikkert at alle syklene er oppført.
   controllers:
-    application:
-      handle_unverified_request:
-        csrf_invalid: CSRF ugyldig. Hvis du ikke vet hvorfor du mottar denne meldingen,
-          vennligst kontakt oss.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Du må være pålogget for å gjøre det.
@@ -2455,6 +2451,12 @@ nb:
         set_interpreted_params:
           we_dont_know_location: Beklager, vi vet ikke hvor «%{location}» ligger.
             Prøv et annet sted for å søke etter oppføringer i nærheten.
+    application:
+      handle_unverified_request:
+        invalid_authenticity_token: Innsending av skjema mislyktes. Prøv på nytt.
+          Hvis dette fortsetter, er det sannsynlig at et VPN eller en personvernutvidelse
+          fjerner informasjonen vi trenger. Prøv å slå av disse for bikeindex.org.
+          Send en e-post til contact@bikeindex.org hvis du fortsatt står fast.
   customer_mailer:
     additional_email_confirmation:
       html:

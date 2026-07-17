@@ -1899,10 +1899,6 @@ nl:
         unable_to_find_graduated_notification: Kan die afgestudeerde melding niet
           vinden!
         unable_to_find_parking_notification: Kan die parkeermelding niet vinden!
-    application:
-      handle_unverified_request:
-        csrf_invalid: CSRF ongeldig. Neem contact met ons op als u niet weet waarom
-          u dit bericht ontvangt.
     feedbacks:
       block_the_spam:
         please_sign_in: Meld je aan om dat bericht te verzenden
@@ -2222,6 +2218,13 @@ nl:
         set_interpreted_params:
           we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
             een andere locatie om te zoeken naar nabijgelegen locaties.
+    application:
+      handle_unverified_request:
+        invalid_authenticity_token: Het verzenden van het formulier is mislukt, probeer
+          het opnieuw. Als dit blijft gebeuren, wordt waarschijnlijk informatie die
+          we nodig hebben geblokkeerd door een VPN of een privacy-extensie. Probeer
+          deze uit te schakelen voor bikeindex.org. Stuur een e-mail naar contact@bikeindex.org
+          als het probleem zich blijft voordoen.
   customer_mailer:
     additional_email_confirmation:
       html:

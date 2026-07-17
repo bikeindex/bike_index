@@ -2125,10 +2125,6 @@ it:
       sync_not_finished: La sincronizzazione con Strava non è ancora completa, quindi
         non tutte le biciclette potrebbero essere presenti nell'elenco.
   controllers:
-    application:
-      handle_unverified_request:
-        csrf_invalid: CSRF non valido. Se non sai perché ricevi questo messaggio,
-          contattaci.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Per farlo devi aver effettuato l'accesso.
@@ -2517,6 +2513,12 @@ it:
         set_interpreted_params:
           we_dont_know_location: Siamo spiacenti, non conosciamo la località "%{location}".
             Prova a cercare in una località diversa nelle vicinanze.
+    application:
+      handle_unverified_request:
+        invalid_authenticity_token: 'L''invio del modulo non è riuscito, riprova.
+          Se il problema persiste, è probabile che una VPN o un''estensione per la
+          privacy stia bloccando le informazioni necessarie: prova a disattivarle
+          per bikeindex.org. Se il problema persiste, invia un''e-mail a contact@bikeindex.org.'
   customer_mailer:
     additional_email_confirmation:
       html:
