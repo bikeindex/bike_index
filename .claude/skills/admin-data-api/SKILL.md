@@ -51,7 +51,7 @@ For a general "how's production" check, use one command:
 
 It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMAL` verdict for each. Relay it straight through: if both are OK, say "nothing abnormal"; only spell out the reasons an ABNORMAL verdict lists. The verdict logic lives in the script — what it counts as abnormal:
 
-- **Sidekiq**: a queue with `size > 0`, `latency > 5`, or `paused`; `retry_size > 0`; `enqueued > 0`; no worker processes; or all workers quiet.
+- **Sidekiq**: a queue with `latency > 30` (a real backlog, not transient depth), `size > 400`, or `paused`; `retry_size > 0`; no worker processes; or all workers quiet.
 - **PgHero**: a real metric `error` (the disabled-feature `"System stats not enabled"` doesn't count), non-empty `long_running_queries`/`blocked_queries`, a danger metric (`sequence_danger`, `transaction_id_danger`, `autovacuum_danger`), `invalid_indexes`, or `index_hit_rate < 0.90`. Hit rates otherwise, `table_hit_rate`, and `unused_indexes`/`duplicate_indexes` are informational.
 
 ## Refreshing the token

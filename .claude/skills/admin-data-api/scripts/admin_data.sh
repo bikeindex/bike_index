@@ -76,11 +76,10 @@ get_or_refresh() {
 # jq: "nothing abnormal" verdict for each payload. Hit rates and unused/duplicate
 # indexes are informational; "System stats not enabled" is a disabled feature, not a fault.
 SIDEKIQ_VERDICT='
-  ( [ .queues[] | select(.size>0 or .latency>5 or .paused)
+  ( [ .queues[] | select(.latency>30 or .size>400 or .paused)
       | "queue \(.name) size=\(.size) latency=\(.latency)\(if .paused then " PAUSED" else "" end)" ] ) as $backlog
-  | ( [ (if .stats.enqueued>0 then "enqueued=\(.stats.enqueued)" else empty end),
+  | ( [ ($backlog[]),
         (if .stats.retry_size>0 then "retry_size=\(.stats.retry_size)" else empty end),
-        ($backlog[]),
         (if (.processes|length)==0 then "no worker processes" else empty end),
         (if ((.processes|length)>0 and ([.processes[].quiet]|all)) then "all workers quiet" else empty end) ] ) as $r
   | "summary: enqueued=\(.stats.enqueued) retry=\(.stats.retry_size) scheduled=\(.stats.scheduled_size) processes=\(.processes|length)\n"
