@@ -15,8 +15,8 @@ RSpec.describe UsersController, type: :request do
       }.to_not change(User, :count)
       expect(response).to render_template(:new)
       expect(response.body).to match(email)
-      expect(flash[:error]).to match(/couldn't verify/i)
-      expect(response.body).to include("privacy extension")
+      expect(flash[:error]).to match(/try again.*a VPN/i)
+      expect(response.body).to match(/try again.*a VPN/i)
     end
   end
 
