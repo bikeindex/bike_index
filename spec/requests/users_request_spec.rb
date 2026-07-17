@@ -4,13 +4,8 @@ RSpec.describe UsersController, type: :request do
   base_url = "/users"
 
   describe "create with a null origin" do
+    include_context :test_csrf_token
     let(:email) { "ruther99@msu.edu" }
-
-    around do |example|
-      ActionController::Base.allow_forgery_protection = true
-      example.run
-      ActionController::Base.allow_forgery_protection = false
-    end
 
     # Privacy extensions and VPNs strip the Origin header, which Rails rejects outright
     it "re-renders the signup form with the email and an explanation" do
