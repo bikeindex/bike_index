@@ -1607,12 +1607,11 @@ en:
   controllers:
     application:
       handle_unverified_request:
-        csrf_invalid: >-
-          We couldn't verify your submission. Your session may have expired, so please
-          try again. If it keeps happening, a VPN, a privacy extension, or a strict
-          browser privacy setting is probably stripping the information we need —
-          try turning those off for bikeindex.org, or use a different browser. Contact
-          us if you're still stuck.
+        invalid_authenticity_token: >-
+          Form submission failed, please try again. If this keeps happening, a VPN
+          or a privacy extension is probably stripping information we need — try turning
+          those off for bikeindex.org. Email contact@bikeindex.org if you're still
+          stuck.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: You must be signed in to do that.
