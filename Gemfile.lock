@@ -371,7 +371,7 @@ GEM
     herb (0.10.1-x86_64-linux-gnu)
     highline (3.1.2)
       reline
-    honeybadger (6.9.0)
+    honeybadger (6.9.1)
       logger
       ostruct
     hotwire-livereload (1.4.1)
