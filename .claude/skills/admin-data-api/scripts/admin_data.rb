@@ -14,6 +14,7 @@
 require "net/http"
 require "uri"
 require "json"
+require "dotenv"
 
 BASE = "https://bikeindex.org"
 REPO_ROOT = File.expand_path("../../../..", __dir__)
@@ -22,13 +23,11 @@ ENV_FILE = File.join(REPO_ROOT, ".env.development")
 def env_get(key)
   return nil unless File.exist?(ENV_FILE)
 
-  File.foreach(ENV_FILE) do |line|
-    return line.chomp.sub(/\A#{Regexp.escape(key)}=/, "") if line.start_with?("#{key}=")
-  end
-  nil
+  Dotenv.parse(ENV_FILE)[key]
 end
 
-# Upsert KEY=VALUE in .env.development (replace in place, or append if absent).
+# Upsert KEY=VALUE in .env.development, preserving the rest of the file. dotenv is
+# read-only (no file writer), so the token write-back stays an in-place line edit.
 def env_set(key, value)
   content = File.exist?(ENV_FILE) ? File.read(ENV_FILE) : ""
   if content.match?(/^#{Regexp.escape(key)}=.*$/)
