@@ -13,6 +13,8 @@ class ApplicationController < ActionController::Base
   around_action :set_locale
   rescue_from Money::Bank::UnknownRate, with: :localization_failure
   rescue_from Pagy::RangeError, with: :redirect_to_last_page
+  # A "null" Origin raises from Rails' origin check rather than calling handle_unverified_request
+  rescue_from ActionController::InvalidAuthenticityToken, with: :handle_unverified_request
 
   def allow_x_frame
     SecureHeaders.opt_out_of_header(request, :x_frame_options)
