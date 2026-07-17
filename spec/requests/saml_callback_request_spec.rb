@@ -75,6 +75,16 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         end
       end
 
+      context "existing unconfirmed Bike Index user with the asserted email" do
+        let!(:existing) { FactoryBot.create(:user, email:) }
+        it "confirms and signs in the user rather than bouncing to confirm-email" do
+          expect { post_callback }.not_to change(User, :count)
+          expect(SsoIdentity.last.user).to eq existing
+          expect(existing.reload.confirmed?).to be true
+          expect(signed_in?).to be true
+        end
+      end
+
       context "returning identity (same IdP NameID)" do
         let(:name_id) { "stable-idp-uid" }
         let!(:identity) do

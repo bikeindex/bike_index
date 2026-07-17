@@ -38,6 +38,10 @@ module Saml
       user = identity.user || User.fuzzy_confirmed_or_unconfirmed_email_find(email) || provision_user(email)
       return failure("no Bike Index account for #{email}") if user.blank?
 
+      # The IdP vouched for this email, so confirm the account (as the magic-link path
+      # does) — otherwise sign-in bounces an unconfirmed user to the confirm-email page.
+      user.confirm(user.confirmation_token) unless user.confirmed?
+
       identity.update(user:, email:, name_id_format: response.name_id_format, last_sign_in_at: Time.current)
       Result.new(user:)
     rescue OneLogin::RubySaml::ValidationError => e
