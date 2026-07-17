@@ -3,6 +3,28 @@ require "rails_helper"
 RSpec.describe UsersController, type: :request do
   base_url = "/users"
 
+  describe "create with a null origin" do
+    let(:email) { "ruther99@msu.edu" }
+
+    around do |example|
+      ActionController::Base.allow_forgery_protection = true
+      example.run
+      ActionController::Base.allow_forgery_protection = false
+    end
+
+    # Privacy extensions and VPNs strip the Origin header, which Rails rejects outright
+    it "re-renders the signup form with the email and an explanation" do
+      expect {
+        post base_url, params: {user: {email:, password: "somethinggreat", terms_of_service: "1"}},
+          headers: {"HTTP_ORIGIN" => "null"}
+      }.to_not change(User, :count)
+      expect(response).to render_template(:new)
+      expect(response.body).to match(email)
+      expect(flash[:error]).to match(/couldn't verify/i)
+      expect(response.body).to include("privacy extension")
+    end
+  end
+
   describe "update" do
     include_context :request_spec_logged_in_as_user
 
