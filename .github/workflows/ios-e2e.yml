@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         device: ["iPhone 17"] # "iPhone 17 Pro", "iPad (A16)"
-        only-testing: ["UITests"]
+        only-testing: ["UnitTests"] # UITests: add after UnitTests working end-to-end
     env:
       DEV_PORT: 3042
 
@@ -31,8 +31,11 @@ jobs:
           RAILS_ENV: development
         run: |
           bin/setup --skip-server || true
-          bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate 2>/dev/null || \
-            bin/rails db:create db:migrate
+          bin/rails db:create 2>/dev/null || true
+          bin/rails db:schema:load:primary
+          bin/rails db:schema:load:analytics
+          bin/rails db:migrate
+          bin/rails db:seed
 
           redis-server --daemonize yes --port 6379 &
           RAILS_MAX_THREADS=1 bin/dev > /tmp/rails_dev.log 2>&1 &
