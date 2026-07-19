@@ -43,6 +43,7 @@ jobs:
       - name: Set up xcconfig (see README.md#quick-start)
         env:
           HONEYBADGER_API_KEY: ${{ secrets.IOS__HONEYBADGER_API_KEY }}
+          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
         run: |
           cd bike_index_ios
           echo '#include "Default"' >> BikeIndex-development.xcconfig
@@ -51,6 +52,7 @@ jobs:
           api_secret=$(grep '^API_SECRET' Default.xcconfig | sed 's/API_SECRET = //' | xargs)
           echo "API_CLIENT_ID = ${api_client_id}" >> BikeIndex-development.xcconfig
           echo "API_SECRET = ${api_secret}" >> BikeIndex-development.xcconfig
+          echo "DEVELOPMENT_TEAM = ${DEVELOPMENT_TEAM}" >> BikeIndex-development.xcconfig
           echo "HONEYBADGER_API_KEY = ${HONEYBADGER_API_KEY}" >> BikeIndex-development.xcconfig
       - name: Set up xcconfig test credentials (hardcoded for CI, see db/seeds/seed_test_users.rb)
         run: |
