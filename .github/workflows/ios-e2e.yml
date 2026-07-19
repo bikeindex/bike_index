@@ -61,24 +61,15 @@ jobs:
 
       - name: Set up xcconfig (see README.md#quick-start)
         env:
-          API_SECRET: ${{ secrets.DEVELOPMENT__API_SECRET }}
-          API_CLIENT_ID: ${{ secrets.DEVELOPMENT__API_CLIENT_ID }}
-          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
-          HONEYBADGER_API_KEY: ${{ secrets.HONEYBADGER_API_KEY }}
+          HONEYBADGER_API_KEY: ${{ secrets.IOS__HONEYBADGER_API_KEY }}
         run: |
           echo '#include "Default"' >> BikeIndex-development.xcconfig
-          echo "API_SECRET = $API_SECRET" >> BikeIndex-development.xcconfig
-          echo "API_CLIENT_ID = $API_CLIENT_ID" >> BikeIndex-development.xcconfig
-          echo "DEVELOPMENT_TEAM = $DEVELOPMENT_TEAM" >> BikeIndex-development.xcconfig
-          echo "HONEYBADGER_API_KEY = $HONEYBADGER_API_KEY" >> BikeIndex-development.xcconfig
-
-      - name: Set up xcconfig UI test credentials (see README.md#UI-Test-configuration)
-        env:
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          # API_CLIENT_ID and API_SECRET are already in Default.xcconfig (localhost + 3042)
+          echo "DEVELOPMENT_TEAM = ${DEVELOPMENT_TEAM:-8ZM5ZL6ABT}" >> BikeIndex-development.xcconfig
+      - name: Set up xcconfig test credentials (hardcoded for CI, see db/seeds/seed_test_users.rb)
         run: |
-          echo "TEST_USERNAME = $TEST_USERNAME" >> Test-credentials.xcconfig
-          echo "TEST_PASSWORD = $TEST_PASSWORD" >> Test-credentials.xcconfig
+          echo "TEST_USERNAME = admin@bikeindex.org" >> Test-credentials.xcconfig
+          echo "TEST_PASSWORD = pleaseplease12" >> Test-credentials.xcconfig
 
       - name: Validate xcconfigs
         run: ./scripts/validate-xcconfig.sh development && ./scripts/validate-xcconfig.sh test
