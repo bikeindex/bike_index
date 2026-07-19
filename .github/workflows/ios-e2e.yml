@@ -32,14 +32,8 @@ jobs:
           RAILS_ENV: development
         run: |
           bin/setup --skip-server || true
-          bin/rails db:create 2>/dev/null || true
-          bin/rails db:schema:load:primary
-          bin/rails db:schema:load:analytics
-          bin/rails db:migrate
-          bin/rails db:seed
 
-          redis-server --daemonize yes --port 6379 &
-          RAILS_MAX_THREADS=1 bin/dev > /tmp/rails_dev.log 2>&1 &
+          OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES bin/dev > /tmp/rails_dev.log 2>&1 &
           DEV_PID=$!
 
           for i in $(seq 1 120); do
@@ -49,6 +43,9 @@ jobs:
             fi
             sleep 1
           done
+
+      # bin/setup handles db:create → load:primary → load:analytics → migrate → seed (bin/setup lines 88-97).
+      # bin/dev already starts Redis (line 8), so no standalone redis-server needed.
 
       - name: Checkout bike_index_ios
         uses: actions/checkout@v6
