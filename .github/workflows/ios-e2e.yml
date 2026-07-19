@@ -84,7 +84,7 @@ jobs:
       - name: Build
         run: fastlane scan --build_for_testing=true
 
-      - name: "${{ matrix.only-testing }}" on "${{ matrix.device }}"
+      - name: "${{ matrix.only-testing }} on ${{ matrix.device }}"
         run: fastlane scan --only-testing="${{ matrix.only-testing }}" --device="${{ matrix.device }}" \
           --test_without_building=true
 
