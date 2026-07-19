@@ -26,10 +26,6 @@ jobs:
       - name: Checkout bike_index
         uses: actions/checkout@v6
 
-      - name: Install rails dependencies
-        run: |
-          brew install plistbuddy
-
       - name: Start Rails dev server
         env:
           RAILS_ENV: development
