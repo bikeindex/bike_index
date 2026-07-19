@@ -45,7 +45,11 @@ jobs:
         run: |
           echo '#include "Default"' >> BikeIndex-development.xcconfig
           # API_CLIENT_ID and API_SECRET are already in Default.xcconfig (localhost + 3042)
-          echo "DEVELOPMENT_TEAM = ${DEVELOPMENT_TEAM:-8ZM5ZL6ABT}" >> BikeIndex-development.xcconfig
+          api_client_id=$(grep '^API_CLIENT_ID' Default.xcconfig | sed 's/API_CLIENT_ID = //' | xargs)
+          api_secret=$(grep '^API_SECRET' Default.xcconfig | sed 's/API_SECRET = //' | xargs)
+          echo "API_CLIENT_ID = ${api_client_id}" >> BikeIndex-development.xcconfig
+          echo "API_SECRET = ${api_secret}" >> BikeIndex-development.xcconfig
+          echo "HONEYBADGER_API_KEY = ${HONEYBADGER_API_KEY}" >> BikeIndex-development.xcconfig
       - name: Set up xcconfig test credentials (hardcoded for CI, see db/seeds/seed_test_users.rb)
         run: |
           echo "TEST_USERNAME = admin@bikeindex.org" >> Test-credentials.xcconfig
