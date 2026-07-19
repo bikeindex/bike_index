@@ -98,11 +98,10 @@ jobs:
           --test_without_building=true
 
       - uses: actions/upload-artifact@v5
-        working-directory: bike_index_ios
         if: always()
         with:
           name: "test_output_${{ matrix.device }}_${{ matrix.only-testing }}"
-          path: "fastlane/test_output/*"
+          path: "bike_index_ios/fastlane/test_output/*"
           compression-level: 9 # maximum compression
 
       - name: Wait for rails dev server to complete
