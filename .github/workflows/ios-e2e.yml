@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: bikeindex/bike_index_ios
-          path: .
+          path: bike_index_ios
           ref: main
 
       - name: Set Xcode 26.4
@@ -43,6 +43,7 @@ jobs:
         env:
           HONEYBADGER_API_KEY: ${{ secrets.IOS__HONEYBADGER_API_KEY }}
         run: |
+          cd bike_index_ios
           echo '#include "Default"' >> BikeIndex-development.xcconfig
           # API_CLIENT_ID and API_SECRET are already in Default.xcconfig (localhost + 3042)
           api_client_id=$(grep '^API_CLIENT_ID' Default.xcconfig | sed 's/API_CLIENT_ID = //' | xargs)
@@ -52,16 +53,20 @@ jobs:
           echo "HONEYBADGER_API_KEY = ${HONEYBADGER_API_KEY}" >> BikeIndex-development.xcconfig
       - name: Set up xcconfig test credentials (hardcoded for CI, see db/seeds/seed_test_users.rb)
         run: |
+          cd bike_index_ios
           echo "TEST_USERNAME = admin@bikeindex.org" >> Test-credentials.xcconfig
           echo "TEST_PASSWORD = pleaseplease12" >> Test-credentials.xcconfig
 
       - name: Validate xcconfigs
+        working-directory: bike_index_ios
         run: ./scripts/validate-xcconfig.sh development && ./scripts/validate-xcconfig.sh test
 
       - name: List available simulators
+        working-directory: bike_index_ios
         run: xcodebuild -scheme BikeIndex -project BikeIndex.xcodeproj -showdestinations
 
       - name: Build
+        working-directory: bike_index_ios
         run: fastlane scan --build_for_testing=true
 
       - name: Start Rails dev server
