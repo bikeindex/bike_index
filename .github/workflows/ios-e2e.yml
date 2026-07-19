@@ -37,6 +37,7 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode_26.4.app
 
       - name: Install tools
+        working-directory: bike_index_ios
         run: brew bundle install
 
       - name: Set up xcconfig (see README.md#quick-start)
@@ -54,7 +55,7 @@ jobs:
       - name: Set up xcconfig test credentials (hardcoded for CI, see db/seeds/seed_test_users.rb)
         run: |
           cd bike_index_ios
-          echo "TEST_USERNAME = admin@bikeindex.org" >> Test-credentials.xcconfig
+          echo "TEST_USERNAME = user@bikeindex.org" >> Test-credentials.xcconfig
           echo "TEST_PASSWORD = pleaseplease12" >> Test-credentials.xcconfig
 
       - name: Validate xcconfigs
