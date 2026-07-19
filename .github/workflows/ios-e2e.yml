@@ -100,7 +100,7 @@ jobs:
         if: always()
         with:
           name: "test_output_${{ matrix.device }}_${{ matrix.only-testing }}"
-          path: "fastlane/test_output/*"
+          path: "bike_index_ios/fastlane/test_output/*"
           compression-level: 9 # maximum compression
 
       - name: Wait for rails dev server to complete
