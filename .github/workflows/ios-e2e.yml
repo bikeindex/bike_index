@@ -41,11 +41,11 @@ jobs:
         run: brew bundle install
 
       - name: Set up xcconfig (see README.md#quick-start)
+        working-directory: bike_index_ios
         env:
           HONEYBADGER_API_KEY: ${{ secrets.IOS__HONEYBADGER_API_KEY }}
           DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
         run: |
-          cd bike_index_ios
           echo '#include "Default"' >> BikeIndex-development.xcconfig
           # API_CLIENT_ID and API_SECRET are already in Default.xcconfig (localhost + 3042)
           api_client_id=$(grep '^API_CLIENT_ID' Default.xcconfig | sed 's/API_CLIENT_ID = //' | xargs)
@@ -55,8 +55,8 @@ jobs:
           echo "DEVELOPMENT_TEAM = ${DEVELOPMENT_TEAM}" >> BikeIndex-development.xcconfig
           echo "HONEYBADGER_API_KEY = ${HONEYBADGER_API_KEY}" >> BikeIndex-development.xcconfig
       - name: Set up xcconfig test credentials (hardcoded for CI, see db/seeds/seed_test_users.rb)
+        working-directory: bike_index_ios
         run: |
-          cd bike_index_ios
           echo "TEST_USERNAME = user@bikeindex.org" >> Test-credentials.xcconfig
           echo "TEST_PASSWORD = pleaseplease12" >> Test-credentials.xcconfig
 
@@ -93,14 +93,16 @@ jobs:
       # bin/dev already starts Redis (line 8), so no standalone redis-server needed.
 
       - name: "${{ matrix.only-testing }} on ${{ matrix.device }}"
+        working-directory: bike_index_ios
         run: fastlane scan --only-testing="${{ matrix.only-testing }}" --device="${{ matrix.device }}" \
           --test_without_building=true
 
       - uses: actions/upload-artifact@v5
+        working-directory: bike_index_ios
         if: always()
         with:
           name: "test_output_${{ matrix.device }}_${{ matrix.only-testing }}"
-          path: "bike_index_ios/fastlane/test_output/*"
+          path: "fastlane/test_output/*"
           compression-level: 9 # maximum compression
 
       - name: Wait for rails dev server to complete
