@@ -26,26 +26,6 @@ jobs:
       - name: Checkout bike_index
         uses: actions/checkout@v6
 
-      - name: Start Rails dev server
-        env:
-          RAILS_ENV: development
-        run: |
-          bin/setup --skip-server || true
-
-          OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES bin/dev > /tmp/rails_dev.log 2>&1 &
-          DEV_PID=$!
-
-          for i in $(seq 1 120); do
-            if curl -fs http://localhost:${DEV_PORT} >/dev/null 2>&1; then
-              echo "Rails dev server ready on port ${DEV_PORT}"
-              break
-            fi
-            sleep 1
-          done
-
-      # bin/setup handles db:create → load:primary → load:analytics → migrate → seed (bin/setup lines 88-97).
-      # bin/dev already starts Redis (line 8), so no standalone redis-server needed.
-
       - name: Checkout bike_index_ios
         uses: actions/checkout@v6
         with:
@@ -79,6 +59,26 @@ jobs:
 
       - name: Build
         run: fastlane scan --build_for_testing=true
+
+      - name: Start Rails dev server
+        env:
+          RAILS_ENV: development
+        run: |
+          bin/setup --skip-server || true
+
+          OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES bin/dev > /tmp/rails_dev.log 2>&1 &
+          DEV_PID=$!
+
+          for i in $(seq 1 120); do
+            if curl -fs http://localhost:${DEV_PORT} >/dev/null 2>&1; then
+              echo "Rails dev server ready on port ${DEV_PORT}"
+              break
+            fi
+            sleep 1
+          done
+
+      # bin/setup handles db:create → load:primary → load:analytics → migrate → seed (bin/setup lines 88-97).
+      # bin/dev already starts Redis (line 8), so no standalone redis-server needed.
 
       - name: "${{ matrix.only-testing }} on ${{ matrix.device }}"
         run: fastlane scan --only-testing="${{ matrix.only-testing }}" --device="${{ matrix.device }}" \
