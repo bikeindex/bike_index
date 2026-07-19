@@ -12,6 +12,7 @@ jobs:
     name: "${{ matrix.device }} ${{ matrix.only-testing }}"
     runs-on: macos-26
     strategy:
+      max-parallel: 1
       matrix:
         device: ["iPhone 17"] # "iPhone 17 Pro", "iPad (A16)"
         only-testing: ["UnitTests"] # UITests: add after UnitTests working end-to-end
