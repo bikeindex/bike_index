@@ -23,9 +23,9 @@ module PageBlock
 
       private
 
-      # No PR number means the persistent staging deploy, not a per-PR review app
+      # No PR number means the persistent sandbox deploy, not a per-PR review app
       def banner_label
-        @pr_number.present? ? translation(".label") : translation(".label_staging")
+        @pr_number.present? ? translation(".label") : translation(".label_sandbox")
       end
 
       # The PR title when known, falling back to "PR #<number>".
