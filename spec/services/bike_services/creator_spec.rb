@@ -173,7 +173,7 @@ RSpec.describe BikeServices::Creator do
             expect(ActionMailer::Base.deliveries.count).to eq 0
 
             bike = Bike.unscoped.last
-            expect(SpamEstimator.estimate_bike(bike)).to eq 100
+            expect(SpamEstimator::Bike.estimate(bike)).to eq 100
             expect(bike.creator&.id).to eq user.id
             expect(bike.current_ownership&.id).to be_present
             expect(bike.likely_spam).to be_truthy
