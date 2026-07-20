@@ -10,8 +10,20 @@ permissions:
 # the sandbox deploy with GITHUB_TOKEN, and runs started by GITHUB_TOKEN don't
 # emit the downstream events (like workflow_run) that would fire this. Also
 # dispatchable manually (against whatever sandbox currently serves).
+#
+# status_sha (passed by sandbox.yml) is the bike_index commit under test. On
+# failure, report-failure publishes a red "iOS E2E CI" commit status so it shows
+# in that commit's checks list. Nothing is posted on success, and a failure is
+# written only after the ~15-min suite finishes — long after CI passed and Cloud
+# 66's redeploy fired — so this never adds a status during the deploy window and
+# can't affect the deploy. Blank (manual runs) skips reporting.
 on:
   workflow_dispatch:
+    inputs:
+      status_sha:
+        description: "bike_index commit SHA to report an 'iOS E2E CI' failure status against (blank to skip)"
+        required: false
+        default: ""
 
 jobs:
   test-suite:
@@ -21,7 +33,7 @@ jobs:
       max-parallel: 1
       matrix:
         device: ["iPhone 17"] # "iPhone 17 Pro", "iPad (A16)"
-        only-testing: ["UnitTests"] # UITests: add after UnitTests working end-to-end
+        only-testing: ["UnitTests", "UITests"]
 
     steps:
       - name: Checkout bike_index_ios
@@ -78,3 +90,27 @@ jobs:
           name: "test_output_${{ matrix.device }}_${{ matrix.only-testing }}"
           path: "fastlane/test_output/*"
           compression-level: 9 # maximum compression
+
+  # On failure only, publish a red "iOS E2E CI" commit status so the failure
+  # surfaces in the tested commit's checks list. Nothing is posted on success,
+  # and this runs only after the suite completes — well after Cloud 66's post-CI
+  # redeploy — so it never touches the deploy path. Skipped for manual runs.
+  report-failure:
+    name: Report iOS E2E failure
+    needs: test-suite
+    if: ${{ always() && inputs.status_sha != '' && needs.test-suite.result != 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      STATUS_SHA: ${{ inputs.status_sha }}
+      RESULT: ${{ needs.test-suite.result }}
+    steps:
+      - name: Publish failing commit status
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$STATUS_SHA" \
+            -f state=failure \
+            -f context="iOS E2E CI" \
+            -f description="iOS E2E $RESULT" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
