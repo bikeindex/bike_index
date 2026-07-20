@@ -60,7 +60,10 @@ class UserBan < ApplicationRecord
     # Ban the user and sign them out (one save, via update_auth_token)
     user.banned = true
     user.update_auth_token("auth_token")
-    # Delete their bikes
-    user.bike_ids(true).each { BikeDeleterJob.perform_async(it, false, creator_id) }
+    # Mark their bikes as likely spam and pull any active marketplace listings
+    user.bikes(true).each do |bike|
+      bike.update(likely_spam: true)
+      bike.current_marketplace_listing&.update(status: "removed")
+    end
   end
 end
