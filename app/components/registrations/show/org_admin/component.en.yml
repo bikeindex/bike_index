@@ -69,7 +69,6 @@ en:
           serial: Serial
           start_audit: Start audit
           stolen: Stolen
-          this_bike: This %{bike_type}
           view_notifications: View notifications
           view_notifications_sub: Parking activity
           year: Year

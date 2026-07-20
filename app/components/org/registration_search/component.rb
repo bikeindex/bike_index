@@ -5,8 +5,7 @@ module Org
     class Component < ApplicationComponent
       include Binxtils::SortableHelper
 
-      delegate :additional_registration_fields, :column_renames,
-        :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
+      delegate :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
         to: :settings_component
       def initialize(
         organization:,
@@ -70,28 +69,10 @@ module Org
         @search_query_present || @params[:search_stickers].present? || @params[:search_address].present? || @model_audit.present?
       end
 
-      def hidden_not_registered_tag
-        @hidden_not_registered_tag ||= tag.em(
-          translation(".hidden_not_registered", org_name: @organization.short_name),
-          class: "less-strong tw:leading-snug tw:text-xs"
-        )
-      end
-
       def component_wrapper_data_attributes
         return {} if @skip_settings
         {controller: "org--registration-search org--registration-search-column-toggle",
          "org--registration-search-column-toggle-default-columns-value": initially_checked_columns.to_json}
-      end
-
-      def table_wrapper_data_attributes
-        attrs = {
-          controller: "update-cached-sortable-links org--assign-bike-sticker",
-          "update-cached-sortable-links-base-url-value": url_for(@sortable_search_params.merge(organization_id: @organization.to_param))
-        }
-        if @bike_sticker.present?
-          attrs[:"org--assign-bike-sticker-sticker-path-value"] = bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id)
-        end
-        attrs
       end
 
       def show_pagination?

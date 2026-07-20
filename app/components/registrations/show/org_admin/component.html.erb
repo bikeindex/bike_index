@@ -284,28 +284,9 @@
             </span>
           </div>
 
-          <ul class="tw:mt-3 tw:flex tw:flex-col tw:gap-2">
-            <% other_user_bikes.each do |other_bike| %>
-              <li
-                class="
-                  tw:flex tw:items-baseline tw:justify-between tw:gap-3
-                  tw:text-sm
-                "
-              >
-                <span class="tw:opacity-65">
-                  <%= render(UI::Time::Component.new(time: other_bike.created_at)) %>
-                </span>
-
-                <% if other_bike.id == @bike.id %>
-                  <em class="tw:opacity-65">
-                    <%= translation(".this_bike", bike_type: @bike.type) %>
-                  </em>
-                <% else %>
-                  <%= link_to other_bike.title_string, bike_path(other_bike), class: "twlink tw:text-right" %>
-                <% end %>
-              </li>
-            <% end %>
-          </ul>
+          <div class="tw:mt-3">
+            <%= render(Org::BikesTable::Component.new(organization: @organization, bikes: other_user_bikes, current_user: @current_user)) %>
+          </div>
         <% end %>
       <% end %>
     </div>
