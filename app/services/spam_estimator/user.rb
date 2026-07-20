@@ -14,22 +14,22 @@ module SpamEstimator
       bet365 | betting | wager
     )\b/xi
 
-    def estimate_user(user)
+    def estimate(user)
       return 0 if user.blank?
 
-      # a crypto/gambling reference anywhere in the profile is a definite signal
-      estimate = seo_spam_references?(user) ? 100 : spammy_text_estimate(user)
+      # each crypto/gambling reference is a strong signal, stacked onto the text score
+      score = spammy_text_estimate(user) + 30 * seo_spam_reference_count(user)
 
-      (estimate - bike_ownership_reduction(user)).clamp(0, 100)
+      (score - bike_ownership_reduction(user)).clamp(0, 100)
     end
 
     #
     # private below here
     #
 
-    # references anywhere in the public profile, including link URLs and handles
-    def seo_spam_references?(user)
-      scannable_strings(user).any? { |str| str.match?(SEO_SPAM_REGEX) }
+    # count of references anywhere in the public profile, including link URLs and handles
+    def seo_spam_reference_count(user)
+      scannable_strings(user).sum { |str| str.scan(SEO_SPAM_REGEX).count }
     end
 
     # description and title are the SEO-spam payload; weight them far above name/username
@@ -55,6 +55,6 @@ module SpamEstimator
       end
     end
 
-    conceal :seo_spam_references?, :spammy_text_estimate, :scannable_strings, :bike_ownership_reduction
+    conceal :seo_spam_reference_count, :spammy_text_estimate, :scannable_strings, :bike_ownership_reduction
   end
 end

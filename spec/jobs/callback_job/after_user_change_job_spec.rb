@@ -10,7 +10,7 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
   end
 
   describe "SEO spam check" do
-    let(:user) { FactoryBot.create(:user_confirmed, show_bikes:, description: "Best online casino and slot gacor bonus!") }
+    let(:user) { FactoryBot.create(:user_confirmed, show_bikes:, description: "Best online casino, poker, blackjack, and roulette bonus!") }
     context "show_bikes" do
       let(:show_bikes) { true }
       it "runs the check inline and bans SEO spam" do
