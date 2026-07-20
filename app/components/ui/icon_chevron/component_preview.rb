@@ -3,7 +3,7 @@
 module UI
   module IconChevron
     class ComponentPreview < ApplicationComponentPreview
-      # @!group Directions
+      # @!group Chevron
       def right
         render(UI::IconChevron::Component.new(direction: :right))
       end
@@ -20,9 +20,6 @@ module UI
         render(UI::IconChevron::Component.new(direction: :up))
       end
 
-      # @!endgroup
-
-      # @!group Sizes
       def sm
         render(UI::IconChevron::Component.new(size: :sm))
       end
@@ -31,12 +28,11 @@ module UI
         render(UI::IconChevron::Component.new(size: :md))
       end
 
-      # @!endgroup
-
       # @label with extra classes appended
       def with_html_class
         render(UI::IconChevron::Component.new(direction: :down, html_class: "tw:ml-1 tw:text-gray-400"))
       end
+      # @!endgroup
     end
   end
 end
