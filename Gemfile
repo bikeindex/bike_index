@@ -29,7 +29,7 @@ gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 gem "responders" # Rails responders modules
 gem "rack-attack" # Rate limiting
-gem "secure_headers", "~> 7.2"
+gem "secure_headers", "~> 7.3"
 
 # Speed, performance, etc
 gem "fast_blank"
@@ -122,24 +122,24 @@ group :production do
   gem "skylight" # Performance monitoring
 end
 
-group :staging, :production do
+group :sandbox, :production do
   gem "honeybadger" # Error monitoring
 end
 
-group :staging do
+group :sandbox do
   gem "thruster", require: false # HTTP/2, asset caching, X-Sendfile for Puma (used by review-app Dockerfile)
 end
 
-group :staging, :development do
+group :sandbox, :development do
   # Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
-  # Loaded in development (local dev) and staging (review apps — see config/deploy.review.yml).
+  # Loaded in development (local dev) and sandbox (review apps — see config/deploy.review.yml).
   gem "letter_opener_web", "~> 3.0"
 end
 
-# dotenv-rails is also loaded in :staging so review apps pick up the committed
-# .env dev/sandbox values at boot (see config/environments/staging.rb). dotenv
+# dotenv-rails is also loaded in :sandbox so review apps pick up the committed
+# .env dev/sandbox values at boot (see config/environments/sandbox.rb). dotenv
 # never overrides a var kamal already sets, so per-app/managed secrets win.
-group :development, :test, :staging do
+group :development, :test, :sandbox do
   gem "dotenv-rails"
 end
 

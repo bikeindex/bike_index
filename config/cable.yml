@@ -11,7 +11,7 @@ production:
   url: <%= ENV.fetch("REDIS_URL") %>
   channel_prefix: bikeindex_production
 
-staging:
+sandbox:
   adapter: redis
   url: <%= ENV.fetch("REDIS_URL") %>
-  channel_prefix: bikeindex_staging
+  channel_prefix: bikeindex_sandbox

@@ -9,7 +9,7 @@
     tw:px-4 tw:py-2 tw:text-center tw:font-semibold tw:text-black
   "
 >
-  <%# Hide the "Review app" label on small screens — the PR title carries the context there; "Staging" has no title, so it stays %>
+  <%# Hide the "Review app" label on small screens — the PR title carries the context there; "Sandbox" has no title, so it stays %>
   <span class="<%= "tw:hidden tw:sm:inline" if @pr_number %>">
     <%= banner_label %>
   </span>

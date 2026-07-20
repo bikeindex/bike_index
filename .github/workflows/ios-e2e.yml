@@ -1,0 +1,80 @@
+name: iOS E2E CI
+
+permissions:
+  contents: read
+
+# Runs the iOS suite against the persistent sandbox server
+# (sandbox.review.bikeindex.org) rather than a Rails dev server booted on the
+# runner. Sandbox tracks main, and its deploy job (see sandbox.yml) dispatches
+# this once the deploy finishes. A workflow_run trigger can't be used: CI starts
+# the sandbox deploy with GITHUB_TOKEN, and runs started by GITHUB_TOKEN don't
+# emit the downstream events (like workflow_run) that would fire this. Also
+# dispatchable manually (against whatever sandbox currently serves).
+on:
+  workflow_dispatch:
+
+jobs:
+  test-suite:
+    name: "${{ matrix.device }} ${{ matrix.only-testing }}"
+    runs-on: macos-26
+    strategy:
+      max-parallel: 1
+      matrix:
+        device: ["iPhone 17"] # "iPhone 17 Pro", "iPad (A16)"
+        only-testing: ["UnitTests"] # UITests: add after UnitTests working end-to-end
+
+    steps:
+      - name: Checkout bike_index_ios
+        uses: actions/checkout@v6
+        with:
+          repository: bikeindex/bike_index_ios
+          ref: main
+
+      - name: Set Xcode 26.4
+        run: sudo xcode-select -s /Applications/Xcode_26.4.app
+
+      - name: Install tools
+        run: brew bundle install
+
+      - name: Set up xcconfig (see README.md#quick-start)
+        env:
+          HONEYBADGER_API_KEY: ${{ secrets.IOS__HONEYBADGER_API_KEY }}
+          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
+        run: |
+          echo '#include "Default"' >> BikeIndex-development.xcconfig
+          # Point at sandbox instead of Default.xcconfig's localhost:3042. The
+          # seeded iOS OAuth app (bike_index db/seeds/seed_oauth_app.rb) is
+          # is_internal, so its client_id/secret authorize without a consent step
+          # on any seeded server. Slashes are \/-escaped as Default.xcconfig does.
+          api_client_id=$(grep '^API_CLIENT_ID' Default.xcconfig | sed 's/API_CLIENT_ID = //' | xargs)
+          api_secret=$(grep '^API_SECRET' Default.xcconfig | sed 's/API_SECRET = //' | xargs)
+          echo 'API_HOST = https:\/\/sandbox.review.bikeindex.org' >> BikeIndex-development.xcconfig
+          echo 'API_PORT = 443' >> BikeIndex-development.xcconfig
+          echo "API_CLIENT_ID = ${api_client_id}" >> BikeIndex-development.xcconfig
+          echo "API_SECRET = ${api_secret}" >> BikeIndex-development.xcconfig
+          echo "DEVELOPMENT_TEAM = ${DEVELOPMENT_TEAM}" >> BikeIndex-development.xcconfig
+          echo "HONEYBADGER_API_KEY = ${HONEYBADGER_API_KEY}" >> BikeIndex-development.xcconfig
+      - name: Set up xcconfig test credentials (hardcoded for CI, see db/seeds/seed_test_users.rb)
+        run: |
+          echo "TEST_USERNAME = user@bikeindex.org" >> Test-credentials.xcconfig
+          echo "TEST_PASSWORD = pleaseplease12" >> Test-credentials.xcconfig
+
+      - name: Validate xcconfigs
+        run: ./scripts/validate-xcconfig.sh development && ./scripts/validate-xcconfig.sh test
+
+      - name: List available simulators
+        run: xcodebuild -scheme BikeIndex -project BikeIndex.xcodeproj -showdestinations
+
+      - name: Build
+        run: fastlane scan --build_for_testing=true
+
+      - name: "${{ matrix.only-testing }} on ${{ matrix.device }}"
+        run: fastlane scan --only-testing="${{ matrix.only-testing }}" --device="${{ matrix.device }}" \
+          --test_without_building=true
+
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: "test_output_${{ matrix.device }}_${{ matrix.only-testing }}"
+          path: "fastlane/test_output/*"
+          compression-level: 9 # maximum compression

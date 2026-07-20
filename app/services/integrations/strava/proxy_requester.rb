@@ -8,22 +8,6 @@ module Integrations
       STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3).to_i
       SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
 
-      # returns {user:, strava_integration:} if valid
-      # otherwise {error: message, status: status_code}
-      def authorize_user_and_strava_integration(access_token)
-        return {status: 401, error: "OAuth token required"} unless access_token&.accessible?
-        return {status: 403, error: "Unauthorized application"} unless authorized_app?(access_token)
-
-        user = User.find_by(id: access_token.resource_owner_id)
-        return {error: "User not found", status: 401} unless user
-
-        strava_integration = user.strava_integration
-        return {error: "No Strava integration", status: 404} unless strava_integration
-        return {error: "Strava authorization failed. Please re-authenticate with Strava.", status: 401} if strava_integration.error?
-
-        {user:, strava_integration:}
-      end
-
       def sync_status(strava_integration)
         {
           sync_status: {
@@ -113,10 +97,6 @@ module Integrations
         {json:, status: 200}
       end
 
-      def authorized_app?(token)
-        token.application_id == STRAVA_DOORKEEPER_APP_ID
-      end
-
       def proxy_request_type(url, request_method)
         return :update_activity if %w[PUT POST].include?(request_method&.upcase)
 
@@ -158,7 +138,7 @@ module Integrations
       end
 
       conceal :internal_response?, :internal_response!,
-        :authorized_app?, :proxy_request_type, :validate_url!,
+        :proxy_request_type, :validate_url!,
         :serialize_proxy_response, :sanitize_response_body
     end
   end
