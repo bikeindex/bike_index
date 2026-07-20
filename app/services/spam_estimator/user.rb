@@ -2,6 +2,8 @@ module SpamEstimator
   module User
     extend Functionable
 
+    MARK_SPAM_PERCENT = 90 # May modify in the future!
+
     # crypto and gambling terms that SEO-spam profiles exist to promote
     SEO_SPAM_REGEX = /\b(?:
       bitcoin | btc | ethereum | crypto(?:currency|\s?wallet)? | blockchain | binance |
@@ -33,8 +35,8 @@ module SpamEstimator
     # description and title are the SEO-spam payload; weight them far above name/username
     # (URLs/handles are only regex-scanned above — the estimator scores them as gibberish)
     def spammy_text_estimate(user)
-      heavy = String.string_spaminess([user.description, user.title].select(&:present?).join(" "))
-      light = String.string_spaminess([user.name, user.username].select(&:present?).join(" "))
+      heavy = Text.estimate([user.description, user.title].select(&:present?).join(" "))
+      light = Text.estimate([user.name, user.username].select(&:present?).join(" "))
 
       heavy + 0.2 * light
     end

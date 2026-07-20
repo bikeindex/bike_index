@@ -1,12 +1,7 @@
 require "rails_helper"
 
-<<<<<<<< HEAD:spec/services/spam_estimator/string_spec.rb
-RSpec.describe SpamEstimator::String do
-  describe "string_spaminess" do
-========
 RSpec.describe SpamEstimator::Text do
   describe "estimate" do
->>>>>>>> origin/main:spec/services/spam_estimator/text_spec.rb
     context "garbage" do
       let(:str) { "VhriBJhD1nuwH" }
       it "returns for garbage" do
