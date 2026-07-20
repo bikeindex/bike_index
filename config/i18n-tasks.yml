@@ -33,6 +33,7 @@ data:
     - ['components.ui.alerts.{:}.*', 'app/components/ui/alerts/\1/component.%{locale}.yml']
     - ['components.ui.definition_list.{:}.*', 'app/components/ui/definition_list/\1/component.%{locale}.yml']
     - ['components.ui.forms.legacy_form_well.{:}.*', 'app/components/ui/forms/legacy_form_well/\1/component.%{locale}.yml']
+    - ['components.ui.forms.{:}.*', 'app/components/ui/forms/\1/component.%{locale}.yml']
     # namespace/name components. `*` (not `:`) so nested/plural keys stay in the sidecar too.
     - ['components.{:}.{:}.*', 'app/components/\1/\2/component.%{locale}.yml']
     - ['components.{:}.*', 'app/components/\1/component.%{locale}.yml']
