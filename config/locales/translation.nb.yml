@@ -2080,10 +2080,6 @@ nb:
       sync_not_finished: Strava-synkroniseringen er ikke fullført ennå, så det er
         ikke sikkert at alle syklene er oppført.
   controllers:
-    application:
-      handle_unverified_request:
-        csrf_invalid: CSRF ugyldig. Hvis du ikke vet hvorfor du mottar denne meldingen,
-          vennligst kontakt oss.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Du må være pålogget for å gjøre det.
@@ -2455,6 +2451,12 @@ nb:
         set_interpreted_params:
           we_dont_know_location: Beklager, vi vet ikke hvor «%{location}» ligger.
             Prøv et annet sted for å søke etter oppføringer i nærheten.
+    application:
+      handle_unverified_request:
+        invalid_authenticity_token: Innsending av skjema mislyktes. Prøv på nytt.
+          Hvis dette fortsetter, er det sannsynlig at et VPN eller en personvernutvidelse
+          fjerner informasjonen vi trenger. Prøv å slå av disse for bikeindex.org.
+          Send en e-post til contact@bikeindex.org hvis du fortsatt står fast.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4779,20 +4781,20 @@ nb:
       you_should_be_signed_in_automatically: Du bør logges på automatisk.
       your_email_address: Din epostadresse
     new:
-      dont_have_an_account: har du ikke en konto?
       email: e-post
       forgot_your_password: Glemt passordet?
       get_on_bike_index: Få på Bike Index
       keep_me_logged_in: Hold meg pålogget
       log_in: Logg Inn
-      no_bike_index_account: Ingen Bike Index-konto?
-      or: Eller
       password: passord
-      sign_in_using_facebook: Logg på med Facebook
-      sign_in_using_globalid: Logg på med globaliD
-      sign_in_using_magic_link: E-post påloggingslenke
-      sign_in_using_strava: Logg på med Strava
-      sign_up: melde deg på
+      continue: Fortsette
+      email_me_the_link: Send meg lenken på e-post
+      log_in_or_sign_up: Logg inn eller registrer deg
+      org_uses_passwordless: Organisasjonen din logger på uten passord.
+      passwordless_help: Vi sender deg en sikker lenke på e-post for å logge på.
+      sign_in_without_password: Logg inn uten passord
+    identify:
+      different_email: Logg inn med en annen e-postadresse
   shared:
     bike_search_form:
       anywhere: Hvor som helst
