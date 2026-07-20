@@ -8,6 +8,7 @@ const MAPBOX_SRC = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox
 const MAPBOX_CSS = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-gl.css`
 
 export default class extends Controller {
+  static targets = ['canvas', 'unavailable']
   static values = {
     apiKey: String,
     latitude: Number,
@@ -17,11 +18,15 @@ export default class extends Controller {
 
   async connect () {
     if (!this.apiKeyValue) return
-    const mapboxgl = await loadMapbox()
-    if (!this.element.isConnected) return // disconnected while loading
+    try {
+      const mapboxgl = await loadMapbox()
+      if (!this.element.isConnected) return // disconnected while loading
 
-    mapboxgl.accessToken = this.apiKeyValue
-    this.#render(mapboxgl)
+      mapboxgl.accessToken = this.apiKeyValue
+      this.#render(mapboxgl)
+    } catch (error) {
+      this.#showUnavailable(error)
+    }
   }
 
   disconnect () {
@@ -29,10 +34,21 @@ export default class extends Controller {
     this.map = null
   }
 
+  // WebGL/Mapbox can be unavailable (crawlers, headless browsers, disabled GPU,
+  // blocked CDN). Reveal a message instead of leaving a blank box, and swallow the
+  // rejection so it isn't reported as unhandled.
+  #showUnavailable (error) {
+    console.warn('Stolen map failed to render:', error)
+    if (!this.hasUnavailableTarget) return
+
+    this.canvasTarget.hidden = true
+    this.unavailableTarget.hidden = false
+  }
+
   #render (mapboxgl) {
     const center = [this.longitudeValue, this.latitudeValue]
     this.map = new mapboxgl.Map({
-      container: this.element,
+      container: this.canvasTarget,
       style: 'mapbox://styles/mapbox/streets-v11',
       center,
       zoom: 13,
