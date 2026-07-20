@@ -29,7 +29,7 @@ module SpamEstimator
 
     # count of references anywhere in the public profile, including link URLs and handles
     def seo_spam_reference_count(user)
-      scannable_strings(user).sum { |str| str.scan(SEO_SPAM_REGEX).count }
+      scannable_strings(user).join(" ").scan(SEO_SPAM_REGEX).count
     end
 
     # description and title are the SEO-spam payload; weight them far above name/username

@@ -38,7 +38,6 @@ module CallbackJob
 
       user.user_ban.delete if user.user_ban.present? && !user.banned?
 
-      # run inline — this job is already backgrounded
       Users::SeoSpamCheckJob.new.perform(user.id, user) if user.show_bikes? && !user.banned?
 
       # Update current Marketplace Listings that don't match the user's membership status
