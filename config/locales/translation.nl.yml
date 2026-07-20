@@ -5708,8 +5708,8 @@ nl:
         loading_chart: Grafiek laden...
       alerts:
         object_error:
-          errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
-            dit %{object_name} wordt opgeslagen:"
+          errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen
+            dat dit %{object_name} wordt opgeslagen:"
       forms:
         legacy_form_well:
           address_record:

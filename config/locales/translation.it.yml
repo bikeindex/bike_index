@@ -5823,8 +5823,8 @@ it:
         loading_chart: Caricamento del grafico...
       alerts:
         object_error:
-          errors_prevented_this_from_being_saved: "%{errors_count} ha impedito il salvataggio
-            di questo %{object_name}:"
+          errors_prevented_this_from_being_saved: "%{errors_count} ha impedito il
+            salvataggio di questo %{object_name}:"
       forms:
         legacy_form_well:
           address_record:

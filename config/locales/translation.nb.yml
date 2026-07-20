@@ -5569,7 +5569,8 @@ nb:
             state: Stat
             street_2: Gateadresse linje 2 (valgfritt)
             where_was_it_status: Hvor var det %{bike_status}?
-            your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}
+            your_full_address_is_required: Den fullstendige adressen din kreves av
+              %{org_name}
           address_record_with_default:
             edit_my_account_path: redigering på kontoen min
             use_account_address: Bruk kontoadresse

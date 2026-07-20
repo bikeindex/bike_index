@@ -5810,8 +5810,8 @@ es:
         loading_chart: Cargando gráfico...
       alerts:
         object_error:
-          errors_prevented_this_from_being_saved: "%{errors_count} impidió que se guardara
-            este %{object_name}:"
+          errors_prevented_this_from_being_saved: "%{errors_count} impidió que se
+            guardara este %{object_name}:"
       forms:
         legacy_form_well:
           address_record:
