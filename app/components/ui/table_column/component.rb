@@ -3,8 +3,6 @@
 module UI
   module TableColumn
     class Component < ApplicationComponent
-      ARROW_UP = "\u2191"
-      ARROW_DOWN = "\u2193"
       NBSP = "\u00A0"
 
       attr_reader :sortable, :cell_block
@@ -35,11 +33,11 @@ module UI
         end
       end
 
-      def render_header(render_sortable:, current_sort:, current_direction:, sortable_url:)
+      def render_header(render_sortable:, current_sort:, current_direction:, sortable_url:, sort_icon:)
         if sortable.present? && render_sortable
-          render_sort_link(current_sort:, current_direction:, sortable_url:)
+          render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:)
         elsif @sort_indicator.present? && @sort_indicator == current_sort
-          safe_join([header_label, NBSP, arrow_for(current_direction)])
+          safe_join([header_label, NBSP, sort_icon.call(current_direction)])
         else
           header_label
         end
@@ -73,7 +71,7 @@ module UI
         @sortable&.gsub(/_(id|at)\z/, "")&.titleize
       end
 
-      def render_sort_link(current_sort:, current_direction:, sortable_url:)
+      def render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:)
         title = header_label
         direction = (@sortable == current_sort && current_direction == "desc") ? "asc" : "desc"
         css = "twlink"
@@ -81,22 +79,18 @@ module UI
         if @sortable == current_sort
           css += " active"
           arrow_spans = [
-            content_tag(:span, arrow_for(current_direction), class: "tw:group-hover:hidden"),
-            content_tag(:span, arrow_for(direction), class: "tw:hidden tw:group-hover:inline tw:opacity-50")
+            content_tag(:span, sort_icon.call(current_direction), class: "tw:group-hover:hidden"),
+            content_tag(:span, sort_icon.call(direction), class: "tw:hidden tw:group-hover:inline tw:opacity-50")
           ]
         else
           arrow_spans = [
-            content_tag(:span, arrow_for(direction), class: "tw:opacity-0 tw:group-hover:opacity-50 tw:transition-opacity")
+            content_tag(:span, sort_icon.call(direction), class: "tw:opacity-0 tw:group-hover:opacity-50 tw:transition-opacity")
           ]
         end
 
         link_to(sortable_url.call(@sortable, direction), class: "#{css} tw:group") do
           safe_join([title, NBSP, *arrow_spans])
         end
-      end
-
-      def arrow_for(direction)
-        (direction == "desc") ? ARROW_DOWN : ARROW_UP
       end
     end
   end

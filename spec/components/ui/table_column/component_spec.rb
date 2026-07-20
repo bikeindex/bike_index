@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe UI::TableColumn::Component do
-  let(:no_sort_args) { {render_sortable: false, current_sort: nil, current_direction: "desc", sortable_url: nil} }
+  let(:no_sort_args) { {render_sortable: false, current_sort: nil, current_direction: "desc", sortable_url: nil, sort_icon: nil} }
 
   describe "#th_classes" do
     let(:col) { described_class.new(label: "Name") }

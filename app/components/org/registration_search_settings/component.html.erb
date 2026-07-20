@@ -47,7 +47,7 @@
       <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
         <span class="sort-group-label"><%= translation(".stickers") %></span>
 
-        <%= render Form::RadioButtonGroup::Component.new(
+        <%= render UI::Forms::RadioButtonGroup::Component.new(
           name: :search_stickers,
           selected: @search_stickers.presence || "",
           entries: [
@@ -64,7 +64,7 @@
       <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
         <span class="sort-group-label"><%= translation(".address") %></span>
 
-        <%= render Form::RadioButtonGroup::Component.new(
+        <%= render UI::Forms::RadioButtonGroup::Component.new(
           name: :search_address,
           selected: @search_address.presence || "",
           entries: [
@@ -88,7 +88,7 @@
         status_entries << {value: "with_owner", label: translation(".filter_not_stolen_or_impounded_html")}
         status_entries << {value: "stolen", label: translation(".filter_stolen_html")} %>
 
-      <%= render Form::RadioButtonGroup::Component.new(
+      <%= render UI::Forms::RadioButtonGroup::Component.new(
         name: :search_status,
         selected: @search_status,
         entries: status_entries,

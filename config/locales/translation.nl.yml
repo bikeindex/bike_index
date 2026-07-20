@@ -5523,7 +5523,7 @@ nl:
         letter_opener_tooltip: Bekijk de e-mail die door deze review-app is verzonden.
         pr_link: 'PR #%{number}'
         commit_tooltip: 'huidige commit:'
-        label_staging: Enscenering
+        label_sandbox: Sandbox
         superadmin_button: Meld u aan als superbeheerder.
         superadmin_signed_in: ingelogd als superbeheerder
       footer:
@@ -5706,6 +5706,28 @@ nl:
         year: jaar
       chart_async_frame:
         loading_chart: Grafiek laden...
+      alerts:
+        object_error:
+          errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen
+            dat dit %{object_name} wordt opgeslagen:"
+      forms:
+        legacy_form_well:
+          address_record:
+            address: Adres
+            address_no_street: Adres
+            address_or_intersection: Adres of kruispunt
+            address_school: Postadres van de campus
+            choose_country: Kies land
+            city: City
+            postal_code: Postcode
+            region: Regio / Provincie
+            state: Staat
+            street_2: Straatadres regel 2 (optioneel)
+            where_was_it_status: Waar was het %{bike_status}?
+            your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
+          address_record_with_default:
+            edit_my_account_path: bewerken op mijn account
+            use_account_address: Gebruik accountadres
     org:
       location_address_fields:
         address: Adres
@@ -5924,25 +5946,3 @@ nl:
         serial_label: 'Serial:'
         view_all: alles bekijken
         sticker_label: 'Sticker:'
-    alerts:
-      object_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
-          dit %{object_name} wordt opgeslagen:"
-    form:
-      legacy_form_well:
-        address_record:
-          address: Adres
-          address_no_street: Adres
-          address_or_intersection: Adres of kruispunt
-          address_school: Postadres van de campus
-          choose_country: Kies land
-          city: City
-          postal_code: Postcode
-          region: Regio / Provincie
-          state: Staat
-          street_2: Straatadres regel 2 (optioneel)
-          where_was_it_status: Waar was het %{bike_status}?
-          your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
-        address_record_with_default:
-          edit_my_account_path: bewerken op mijn account
-          use_account_address: Gebruik accountadres

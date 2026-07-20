@@ -10,7 +10,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       expect(page).to have_css('[aria-expanded="false"]')
       expect_axe_clean
 
-      click_button("Menu ▾")
+      click_button("Menu")
 
       expect(page).to have_css('[aria-expanded="true"]')
       expect(page).to have_text("Profile")
@@ -23,7 +23,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
 
       expect(page).to have_css('[aria-expanded="false"]')
 
-      click_button("Menu ▾")
+      click_button("Menu")
 
       expect(page).to have_css('[aria-expanded="true"]')
 
@@ -40,7 +40,7 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       expect(page).to have_css('[aria-expanded="false"]')
       expect_axe_clean
 
-      click_button("seth herr ▾")
+      click_button("seth herr")
 
       expect(page).to have_css('[aria-expanded="true"]')
       expect(page).to have_text("Last synced: 2 minutes ago")

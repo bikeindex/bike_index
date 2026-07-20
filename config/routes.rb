@@ -8,8 +8,8 @@ Rails.application.routes.draw do
 
   mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
   mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
-  # letter_opener_web inbox — the gem's Bundler group (:development, :staging)
-  # decides where it's mounted. Unrestricted — staging runs seeded data with no PII.
+  # letter_opener_web inbox — the gem's Bundler group (:development, :sandbox)
+  # decides where it's mounted. Unrestricted — sandbox runs seeded data with no PII.
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if defined?(LetterOpenerWeb)
 
   use_doorkeeper do
@@ -480,5 +480,5 @@ Rails.application.routes.draw do
   # Short marketplace_listing URLs: /m/<short_id> (and /M/...)
   get "*id", to: "marketplace_listings#show", constraints: {id: %r{[mM]/.*}}, format: false
 
-  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
+  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.sandbox? # Handle 404s with lograge
 end
