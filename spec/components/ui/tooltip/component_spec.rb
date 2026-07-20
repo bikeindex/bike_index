@@ -22,6 +22,16 @@ RSpec.describe UI::Tooltip::Component, type: :component do
     expect(component.css("[aria-describedby]").first.name).to eq "button"
   end
 
+  context "with no trigger block" do
+    let(:component) { render_inline(described_class.new(text: "tip")) }
+
+    it "renders the default '?' button trigger" do
+      trigger = component.css("[aria-describedby]").first
+      expect(trigger.name).to eq "button"
+      expect(trigger.text.strip).to eq "?"
+    end
+  end
+
   context "with a body slot" do
     let(:component) do
       render_inline(described_class.new) do |tooltip|
