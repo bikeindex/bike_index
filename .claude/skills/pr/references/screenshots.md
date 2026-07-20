@@ -15,6 +15,7 @@ From the changed files, infer the affected routes. Heuristics:
 - A view at `app/views/bikes/show.html.erb` → `/bikes/:id` (pick a representative id from the dev db, e.g. `Bike.last.id`)
 - A component touched by a specific page → screenshot that page
 - A shared component (header, footer, UI::Badge, etc.) → screenshot 1–2 representative pages that exercise it
+- A component with a Lookbook preview → its preview URL `/lookbook/preview/<component>/<scenario>` — a real responsive page, captured like any other URL
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
@@ -82,6 +83,7 @@ Brand-new page (URL didn't exist on `$BASE` — see step 4), no comparison row:
 
 Rules:
 - Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own table.
+- **Every** entry uses this table, with **no exceptions** — including `/lookbook/preview/...` component previews. A preview is a responsive page with a real URL, so it gets the same desktop+mobile before/after cells as any page. A width-invariant component (small icon, fixed-size control) just yields matching desktop and mobile shots — that's expected; keep both columns, never collapse to one image or special-case previews.
 - **Headers are always `| Desktop | Mobile |`** — never `| main | this branch |` or any per-PR variation. Reviewers should see the same column meaning across every PR.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 
