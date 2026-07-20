@@ -6,8 +6,8 @@ description: >-
   description, body, summary, or title — including bare update phrasings like
   "update pr", "update this pr", or "update the PR" with no other object — for
   both new PRs (`gh pr create`) and existing ones (`gh pr edit`). For frontend
-  diffs, captures screenshots and adds them to the PR via the
-  `github-upload-image-to-pr` skill under a `## Screenshots` section.
+  diffs, delegates to the `frontend-screenshots` skill to capture
+  desktop+mobile screenshots and embeds them under a `## Screenshots` section.
   Use for any verb that lands on a PR's text content: "open a PR", "make a PR",
   "update pr", "update this pr", "update the PR description", "rewrite the PR
   body", "fix the description".
@@ -16,9 +16,9 @@ allowed-tools: Bash, Read, Glob, Grep
 
 # Pull request workflow
 
-Create or update a pull request for the current branch. If the diff contains frontend changes, capture the relevant screenshots and add them to the PR via the `github-upload-image-to-pr` skill under a `## Screenshots` section.
+Create or update a pull request for the current branch. If the diff contains frontend changes, delegate screenshot capture to the `frontend-screenshots` skill and embed the results in the PR body under a `## Screenshots` section.
 
-The workflow below (steps 0–3) always runs and creates or updates the PR. When the diff is frontend, a final step (see step 3's gate) captures the relevant screenshots and hands them to the `github-upload-image-to-pr` skill — the only supported way to get images onto a PR, since the `gh` CLI can't upload them.
+The workflow below (steps 0–3) always runs and creates or updates the PR. When the diff is frontend, a second phase captures before/after screenshots and posts them as a PR comment — that machinery lives in `references/screenshots.md`, read only when step 3 sends you there.
 
 ## Workflow
 
@@ -51,7 +51,7 @@ Then gather state — run in parallel:
 
 Diff against `origin/$BASE`, not the local base branch — in a Conductor worktree the local base often lags the remote, which would inflate or stale the diff (the `git fetch` above refreshes `origin/$BASE`). If the branch has no commits ahead of `origin/$BASE`, stop and tell the user.
 
-No `bin/env` eval is needed here — it's only relevant when the screenshot step drives the dev server. Backend-only PRs never touch it.
+No `bin/env` eval is needed here — it's only relevant to the screenshot phase, and `frontend-screenshots` runs its own in preflight. Backend-only PRs never touch it.
 
 ### 2. Classify the diff
 
@@ -88,4 +88,4 @@ Push the branch: `git push -u origin HEAD`.
 
 Always pass the body via `--body-file` (not inline `--body`) to preserve formatting.
 
-**If `FRONTEND=false`, stop here and return the PR URL.** If `FRONTEND=true`, capture the relevant screenshots — component previews for component-only changes, or the affected pages on the running dev server — then invoke the `github-upload-image-to-pr` skill to upload and embed them under a `## Screenshots` section (it reuses `$EXISTING_PR`/`$PR_NUMBER`). That skill is the exclusive path for putting images on a PR. Screenshot tooling never blocks the PR — if it fails, return the PR URL and report the failure.
+**If `FRONTEND=false`, stop here and return the PR URL.** If `FRONTEND=true`, read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment (it uses `$EXISTING_PR`/`$PR_NUMBER` from the steps above). Screenshot tooling never blocks the PR — if it fails, return the PR URL and report the failure.
