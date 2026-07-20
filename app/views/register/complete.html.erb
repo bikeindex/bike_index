@@ -21,22 +21,13 @@
       </svg>
     </div>
 
-    <h1
-      class="
-        tw:mb-2 tw:text-2xl tw:font-extrabold tw:tracking-tight
-        tw:text-gray-900 tw:dark:text-gray-100
-      "
-    >
-      <%= t(".registration_complete") %>
-    </h1>
+    <% subtitle = if @bike.present?
+      t(".we_will_keep_watch", bike_display: @bike.mnfg_name)
+    else
+      t(".verify_your_email_html", email: content_tag(:strong, @b_param.owner_email))
+    end %>
 
-    <p class="tw:mb-6 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
-      <% if @bike.present? %>
-        <%= t(".we_will_keep_watch", bike_display: @bike.mnfg_name) %>
-      <% else %>
-        <%= t(".verify_your_email_html", email: content_tag(:strong, @b_param.owner_email)) %>
-      <% end %>
-    </p>
+    <%= render UI::Header::Component.new(text: t(".registration_complete"), subtitle:) %>
 
     <div class="tw:flex tw:flex-col tw:gap-2.5">
       <% if @bike.present? %>
