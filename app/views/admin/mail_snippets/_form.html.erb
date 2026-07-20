@@ -33,24 +33,24 @@
   </ul>
 <% end %>
 
-<%= render(Alerts::ObjectErrors::Component.new(object: @mail_snippet)) %>
+<%= render(UI::Alerts::ObjectError::Component.new(object: @mail_snippet)) %>
 
 <% def select_display(kind); "#{MailSnippet.kind_humanized(kind)} - in #{MailSnippet.organization_email_for(kind)} emails" end %>
 
 <div class="form-group">
   <%# kind is an integer-backed enum: options/value must be the enum *labels* — kind= rejects the integer-as-string a form submits, and an explicit value: overrides hotwire_combobox's enum branch (which would emit kind_before_type_cast) %>
-  <%= render Form::Combobox::Component.new(name: :kind, form: f, value: @mail_snippet.kind, label: MailSnippet.human_attribute_name(:kind), required: true, options: MailSnippet.kinds.map { |kind| {display: select_display(kind), value: kind} }) %>
+  <%= render UI::Forms::Combobox::Component.new(name: :kind, form: f, value: @mail_snippet.kind, label: MailSnippet.human_attribute_name(:kind), required: true, options: MailSnippet.kinds.map { |kind| {display: select_display(kind), value: kind} }) %>
 </div>
 
 <% if @mail_snippet.kind == "stolen_notification_oauth" %>
   <div class="form-group">
-    <%= render Form::Combobox::Component.new(name: :doorkeeper_app_id, form: f, label: MailSnippet.human_attribute_name(:doorkeeper_app_id), placeholder: "Choose Doorkeeper App", options: Doorkeeper::Application.where(can_send_stolen_notifications: true).map { |app| {display: app.name, value: app.id} }) %>
+    <%= render UI::Forms::Combobox::Component.new(name: :doorkeeper_app_id, form: f, label: MailSnippet.human_attribute_name(:doorkeeper_app_id), placeholder: "Choose Doorkeeper App", options: Doorkeeper::Application.where(can_send_stolen_notifications: true).map { |app| {display: app.name, value: app.id} }) %>
   </div>
 <% else %>
   <div class="form-group">
-    <%= render Form::Combobox::Component.new(name: :organization_id, form: f, label: MailSnippet.human_attribute_name(:organization_id), placeholder: "Choose organization", options: @organizations.map { |org| {display: org.name, value: org.id} }) %>
+    <%= render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, label: MailSnippet.human_attribute_name(:organization_id), placeholder: "Choose organization", options: @organizations.map { |org| {display: org.name, value: org.id} }) %>
   </div>
 <% end %>
 
-<%= render(Form::Group::Component.new(form_builder: f, attribute: :subject)) %>
-<%= render(Form::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, html_options: {placeholder: "Body", rows: 5})) %>
+<%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :subject)) %>
+<%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, html_options: {placeholder: "Body", rows: 5})) %>

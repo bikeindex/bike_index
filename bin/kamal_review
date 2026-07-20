@@ -11,11 +11,11 @@
 #   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 #
 # Passthrough sends everything else straight to kamal; --app may go anywhere and
-# defaults to the persistent `staging` app, e.g.
-#   bin/kamal_review app logs -f              # staging (default)
+# defaults to the persistent `sandbox` app, e.g.
+#   bin/kamal_review app logs -f              # sandbox (default)
 #   bin/kamal_review app logs -f --app 3594   # a PR
 # Accessory commands need an explicit `--app 0` (or any PR): the shared-db /
-# shared-redis accessories live only in the pr-* config, not staging's.
+# shared-redis accessories live only in the pr-* config, not sandbox's.
 #   bin/kamal_review accessory reboot db --app 0
 #
 # deploy/destroy require an explicit --app and run the per-PR lifecycle:
@@ -46,10 +46,10 @@ Usage:
 <review-app> is a PR, in any of these equivalent forms:
   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 
-Passthrough defaults --app to the persistent 'staging' app; deploy/destroy require it.
+Passthrough defaults --app to the persistent 'sandbox' app; deploy/destroy require it.
 
 Examples:
-  bin/kamal_review app logs -f                       # staging (default)
+  bin/kamal_review app logs -f                       # sandbox (default)
   bin/kamal_review app logs -f --app 3594
   bin/kamal_review app exec --reuse "bin/rails runner 'puts Bike.count'" --app pr-3594
   bin/kamal_review accessory reboot db --app 0       # accessories live in the pr-* config
@@ -85,25 +85,25 @@ export_review_app_env() {
   export REVIEW_APP_REDIS_DB="$((($1 % REDIS_DATABASES) + 1))"
 }
 
-# The persistent staging app: no PR number (config/deploy.review.yml's ERB then
-# resolves the `staging` slug), Redis DB 0 — the one the mod-N PR allocation
+# The persistent sandbox app: no PR number (config/deploy.review.yml's ERB then
+# resolves the `sandbox` slug), Redis DB 0 — the one the mod-N PR allocation
 # reserves.
-export_staging_env() {
+export_sandbox_env() {
   unset REVIEW_APP_PR_NUMBER
   export REVIEW_APP_HOST="${REVIEW_APP_HOST:-host.review.bikeindex.org}"
   export REVIEW_APP_REDIS_DB="0"
 }
 
-# True when the app id refers to staging, in any of review_app_pr_number's forms
-# (bare `staging`, host, or URL).
-is_staging() {
+# True when the app id refers to sandbox, in any of review_app_pr_number's forms
+# (bare `sandbox`, host, or URL).
+is_sandbox() {
   local s
   s="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
   s="${s#http://}"
   s="${s#https://}"
   s="${s%%/*}"   # drop any /path
   s="${s%%.*}"   # drop the .review.bikeindex.org domain
-  [[ "$s" == "staging" ]]
+  [[ "$s" == "sandbox" ]]
 }
 
 not_a_review_app() {
@@ -123,10 +123,10 @@ case "$1" in
   deploy | destroy) mode="$1"; shift ;;
 esac
 
-# Passthrough: any kamal command, --app anywhere, defaults to staging. Always
+# Passthrough: any kamal command, --app anywhere, defaults to sandbox. Always
 # execs, so control never reaches the lifecycle code below.
 if [[ -z "$mode" ]]; then
-  app="staging"
+  app="sandbox"
   kamal_args=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -135,9 +135,9 @@ if [[ -z "$mode" ]]; then
       *) kamal_args+=("$1"); shift ;;
     esac
   done
-  if is_staging "$app"; then
-    export_staging_env
-    slug="staging"
+  if is_sandbox "$app"; then
+    export_sandbox_env
+    slug="sandbox"
   else
     pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
     export_review_app_env "$pr_number"
@@ -185,7 +185,7 @@ case "$mode" in
     kamal deploy --version "$version" --skip-push
 
     # Start each review-app deploy with a clean Rails cache so new code never
-    # serves stale cached fragments. Runs only here, so staging (which deploys
+    # serves stale cached fragments. Runs only here, so sandbox (which deploys
     # via `kamal deploy` directly, not this script) is left untouched. --reuse
     # execs in the running web container; --roles web runs it once. Best-effort:
     # a failed clear must never fail the deploy.

@@ -3305,10 +3305,10 @@ CREATE TABLE public.registration_sequence_pages (
     registration_sequence_id bigint NOT NULL,
     title character varying,
     subtitle text,
+    body text,
     listing_order integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    body text
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 

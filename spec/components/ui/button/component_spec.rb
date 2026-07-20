@@ -14,7 +14,7 @@ RSpec.describe UI::Button::Component, type: :component do
     expect(component).to have_css("button[type='button']")
     expect(component).to have_text("Click me")
     html = component.to_html
-    expect(html).to include("tw:bg-gray-50")
+    expect(html).to include("tw:bg-white")
     expect(html).to include("tw:border-gray-300")
   end
 
@@ -39,8 +39,8 @@ RSpec.describe UI::Button::Component, type: :component do
 
     it "renders link styles" do
       html = component.to_html
-      expect(html).to include("tw:underline")
-      expect(html).to include("tw:text-blue-600")
+      expect(html).to include("twlink")
+      expect(html).not_to include("tw:text-blue-600")
       expect(html).not_to include("tw:bg-blue-600")
     end
 
@@ -57,7 +57,7 @@ RSpec.describe UI::Button::Component, type: :component do
     let(:color) { :invalid }
 
     it "falls back to secondary" do
-      expect(component.to_html).to include("tw:bg-gray-50")
+      expect(component.to_html).to include("tw:bg-white")
     end
   end
 

@@ -1,16 +1,16 @@
 <% if is_button? %>
   <%# Currently only for_sale on /search/registrations is a button %>
-  <a
-    href="<%= @button_url %>"
-    data-basepath="<%= @button_url %>"
-    id="kindSelectForSaleLink"
-    class="twbtn tw:block tw:w-full"
-    data-test-id="<%= test_id %>"
-  >
+  <%= render UI::ButtonLink::Component.new(
+    href: @button_url,
+    color: :secondary,
+    class: "tw:block tw:w-full",
+    id: "kindSelectForSaleLink",
+    data: {basepath: @button_url, test_id:}
+  ) do %>
     <%= @option_text %>
 
     <span class="twless-strong" data-count-target="<%= @option %>"></span>
-  </a>
+  <% end %>
 <% else %>
   <div
     class="tw:relative tw:flex tw:items-center tw:ps-3"
