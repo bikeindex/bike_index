@@ -90,11 +90,11 @@ RSpec.describe UI::Table::Component, type: :component do
           table.column(label: "Date", sort_indicator: "created_at") { |r| r.email }
         end
 
-        # The sort_indicator column shows the arrow but no link
+        # The sort_indicator column shows the sort icon but no link
         headers = result.css("th")
         indicator_th = headers[1]
         expect(indicator_th.text).to include("Date")
-        expect(indicator_th.text).to include("\u2193") # down arrow for desc
+        expect(indicator_th.css("svg").first[:class]).to include("tw:rotate-90") # down chevron for desc
         expect(indicator_th.css("a")).to be_empty
       end
 
