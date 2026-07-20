@@ -17,7 +17,7 @@ class ForwardCspReportJob < ApplicationJob
   # The query is rebuilt here, not forwarded from the client, so the API key and
   # user context never ride in the browser-facing CSP report_uri.
   def perform(body, user_id, user_agent = nil)
-    # dev/staging browsers still emit reports; only production forwards to Honeybadger
+    # dev/sandbox browsers still emit reports; only production forwards to Honeybadger
     return unless Rails.env.production? && HONEYBADGER_CSP_API_KEY.present?
 
     report = parsed_report(body)

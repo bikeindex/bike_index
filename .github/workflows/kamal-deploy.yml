@@ -1,11 +1,11 @@
 name: Kamal build & deploy
 
 # Reusable (workflow_call) build+deploy for a Kamal target on the shared review
-# host. Owns the boilerplate both review apps and staging share: build+push the
+# host. Owns the boilerplate both review apps and sandbox share: build+push the
 # image to GHCR, then run a kamal command over SSH. Callers pass the bits that
 # differ (image tag, service label, the kamal command, concurrency, environment).
 #
-# Callers: review-app.yml (per-PR deploy/destroy) and staging.yml (main deploy).
+# Callers: review-app.yml (per-PR deploy/destroy) and sandbox.yml (main deploy).
 # The `run` job also handles destroy — it just runs whatever `command` it's given
 # and skips the build (there's nothing to build for a teardown).
 
@@ -85,7 +85,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
       # Sprockets' incremental cache (the Dockerfile's `--mount=type=cache`) doesn't
       # survive ephemeral runners; cache-dance injects it into the buildx builder and
-      # extracts it after. A per-caller key prefix — review-app and staging bundles
+      # extracts it after. A per-caller key prefix — review-app and sandbox bundles
       # bake different BASE_URLs into ERB assets, so their caches can't be shared.
       - name: Restore sprockets asset cache
         id: sprockets-cache

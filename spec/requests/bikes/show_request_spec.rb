@@ -185,6 +185,17 @@ RSpec.describe "BikesController#show", type: :request do
       expect(stolen_record.recovery_link_token).to be_present
     end
   end
+  context "stolen bike with a location" do
+    let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:stolen_bike)) }
+    it "renders the map through the stolen-map controller, without an inline mapboxgl script" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      expect(response.body).to include('data-controller="stolen-map"')
+      expect(response.body).to include('data-stolen-map-target="canvas"')
+      # The inline script referencing mapboxgl was the source of the Turbo race - it must be gone
+      expect(response.body).to_not include("mapboxgl")
+    end
+  end
   context "user hidden bike" do
     before { bike.update(marked_user_hidden: "true") }
     context "owner of bike viewing" do

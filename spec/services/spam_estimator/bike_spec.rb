@@ -1,26 +1,26 @@
 require "rails_helper"
 
 RSpec.describe SpamEstimator::Bike do
-  describe "estimate_bike" do
+  describe "estimate" do
     context "frame_model" do
       let(:bike) { Bike.new(frame_model: str) }
       let(:str) { "Cutthroat" }
       it "is 0" do
-        expect(SpamEstimator::String.string_spaminess(str)).to eq 0
-        expect(described_class.estimate_bike(bike)).to eq 0
+        expect(SpamEstimator::Text.estimate(str)).to eq 0
+        expect(described_class.estimate(bike)).to eq 0
       end
       context "FX 1 Disc" do
         let(:str) { "FX 1 Disc" }
         it "is 0" do
-          expect(SpamEstimator::String.string_spaminess(str)).to be < 90
-          expect(described_class.estimate_bike(bike)).to be < 40
+          expect(SpamEstimator::Text.estimate(str)).to be < 90
+          expect(described_class.estimate(bike)).to be < 40
         end
       end
       context "garbage" do
         let(:str) { "efgBz9pNdd7efgBz9pNdd7" }
         it "estimate is percentage" do
-          expect(SpamEstimator::String.string_spaminess(str)).to eq 100
-          expect(described_class.estimate_bike(bike)).to be_between(9, 20)
+          expect(SpamEstimator::Text.estimate(str)).to eq 100
+          expect(described_class.estimate(bike)).to be_between(9, 20)
         end
       end
     end
@@ -29,15 +29,15 @@ RSpec.describe SpamEstimator::Bike do
       context "garbage" do
         let(:str) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
         it "estimate is percentage" do
-          expect(SpamEstimator::String.string_spaminess(str)).to eq 100
-          expect(described_class.estimate_bike(bike)).to eq 40
+          expect(SpamEstimator::Text.estimate(str)).to eq 100
+          expect(described_class.estimate(bike)).to eq 40
         end
       end
       context "SON" do
         let(:str) { "SON Nabendynamo (Wilfried Schmidt Maschinenbau)" }
         it "returns" do
-          expect(SpamEstimator::String.string_spaminess(str)).to be < 10
-          expect(described_class.estimate_bike(bike)).to be < 10
+          expect(SpamEstimator::Text.estimate(str)).to be < 10
+          expect(described_class.estimate(bike)).to be < 10
         end
       end
     end
@@ -45,12 +45,12 @@ RSpec.describe SpamEstimator::Bike do
       let(:bike) { Bike.new(creation_organization: organization) }
       let(:organization) { Organization.new }
       it "returns 0" do
-        expect(described_class.estimate_bike(bike)).to eq 0
+        expect(described_class.estimate(bike)).to eq 0
       end
       context "spam_registrations" do
         let(:organization) { Organization.new(spam_registrations: true) }
         it "returns 40" do
-          expect(described_class.estimate_bike(bike)).to be_between(29, 41)
+          expect(described_class.estimate(bike)).to be_between(29, 41)
         end
       end
     end
@@ -59,7 +59,7 @@ RSpec.describe SpamEstimator::Bike do
       let(:bike) { FactoryBot.create(:bike, paint:) }
       it "returns 100" do
         expect(bike.cached_data).to include("union select")
-        expect(described_class.estimate_bike(bike)).to eq 100
+        expect(described_class.estimate(bike)).to eq 100
       end
     end
     context "serial_number" do
@@ -68,13 +68,13 @@ RSpec.describe SpamEstimator::Bike do
         let(:serial) { "x'; DROP TABLE bikes; --" }
         it "returns 100" do
           expect(bike.cached_data).to be_blank # the payload is in serial_number, not cached_data
-          expect(described_class.estimate_bike(bike)).to eq 100
+          expect(described_class.estimate(bike)).to eq 100
         end
       end
       context "random-looking but not malicious" do
         let(:serial) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
         it "is 0 (serial only scores via the injection check)" do
-          expect(described_class.estimate_bike(bike)).to eq 0
+          expect(described_class.estimate(bike)).to eq 0
         end
       end
     end
@@ -82,12 +82,12 @@ RSpec.describe SpamEstimator::Bike do
       let(:bike) { Bike.new(serial_number: str, frame_model: str, manufacturer_other: str) }
       let(:str) { "xy" }
       it "adds a penalty" do
-        expect(described_class.estimate_bike(bike)).to eq 50
+        expect(described_class.estimate(bike)).to eq 50
       end
       context "longer than 2 chars" do
         let(:str) { "xyz" }
         it "is not penalized" do
-          expect(described_class.estimate_bike(bike)).to eq 0
+          expect(described_class.estimate(bike)).to eq 0
         end
       end
     end
@@ -95,7 +95,7 @@ RSpec.describe SpamEstimator::Bike do
       before { stub_const("EmailDomain::VERIFICATION_ENABLED", true) }
       let(:bike) { Bike.new(owner_email: "testing@example.com") }
       it "returns 100" do
-        expect(described_class.estimate_bike(bike)).to eq 100
+        expect(described_class.estimate(bike)).to eq 100
       end
     end
     context "stolen_record" do
@@ -104,23 +104,23 @@ RSpec.describe SpamEstimator::Bike do
       let(:str) { "It was stolen last night" }
       let(:street) { "5434 N Mains St" }
       it "is 0" do
-        expect(described_class.estimate_bike(bike, stolen_record)).to eq 0
+        expect(described_class.estimate(bike, stolen_record)).to eq 0
       end
       context "garbage description" do
         let(:str) { "efgBz9pNdd7" }
         it "returns over 0" do
-          expect(described_class.estimate_bike(bike, stolen_record)).to be > 35
+          expect(described_class.estimate(bike, stolen_record)).to be > 35
         end
       end
       context "garbage street" do
         let(:street) { "efgBz9pNdd7efgBz9pNdd7efgBz9pNdd7" }
         it "returns over 0" do
-          expect(described_class.estimate_bike(bike, stolen_record)).to eq 10
+          expect(described_class.estimate(bike, stolen_record)).to eq 10
         end
         context "and garbage description" do
           let(:str) { "efgBz9pNdd7" }
           it "returns over 0" do
-            expect(described_class.estimate_bike(bike, stolen_record)).to be > 95
+            expect(described_class.estimate(bike, stolen_record)).to be > 95
           end
         end
       end

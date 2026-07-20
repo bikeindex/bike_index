@@ -1,6 +1,6 @@
 # Kamal config for both non-production targets on the shared review host:
 #   - per-PR review apps      (REVIEW_APP_PR_NUMBER set → slug `pr-<N>`)
-#   - the persistent `staging` app (no PR number → slug `staging`)
+#   - the persistent `sandbox` app (no PR number → slug `sandbox`)
 # Everything below derives from `slug`; the only real fork is the `accessories:`
 # block, emitted for review apps only (see the WARNING there).
 #
@@ -8,9 +8,9 @@
 #   # review app (via .github/workflows/review-app.yml and bin/kamal_review):
 #   export REVIEW_APP_PR_NUMBER=123 REVIEW_APP_HOST=host.review.bikeindex.org
 #   kamal deploy --version pr-123-<sha> --config-file config/deploy.review.yml
-#   # staging (via .github/workflows/staging.yml): no PR number, Redis DB 0:
+#   # sandbox (via .github/workflows/sandbox.yml): no PR number, Redis DB 0:
 #   REVIEW_APP_REDIS_DB=0 REVIEW_APP_HOST=host.review.bikeindex.org \
-#     kamal deploy --version staging-<sha> --skip-push --config-file config/deploy.review.yml
+#     kamal deploy --version sandbox-<sha> --skip-push --config-file config/deploy.review.yml
 #
 # Secrets: kamal always reads .kamal/secrets. Locally that pulls from 1Password;
 # CI copies .kamal/secrets-ci over it first (see the workflows).
@@ -30,18 +30,18 @@
 # This file is NOT used by production (Cloud66).
 
 <%# The role/database naming must stay in lockstep with bin/kamal_review, which
-    re-derives it to DROP review-app databases on destroy (staging is never
+    re-derives it to DROP review-app databases on destroy (sandbox is never
     destroyed). The names reproduce both pre-existing schemes verbatim. %>
 <% require "json" %>
 <% pr      = ENV["REVIEW_APP_PR_NUMBER"].to_s %>
 <% pr      = nil if pr.empty? %>
 <% host    = ENV.fetch("REVIEW_APP_HOST") %>
-<% slug    = pr ? "pr-#{pr}" : "staging" %>
+<% slug    = pr ? "pr-#{pr}" : "sandbox" %>
 <% appname = "bike-index-#{slug}" %>
 <% role    = "bike_index_#{slug.tr("-", "_")}" %>
-<%# Review-app databases carry a `review_pr_<N>` infix; staging's are just `staging`. %>
-<% db_prefix = pr ? "bike_index_review_pr_#{pr}" : "bike_index_staging" %>
-<%# Per-PR logical Redis DB (bin/kamal_review sets 1..31); staging exports 0. %>
+<%# Review-app databases carry a `review_pr_<N>` infix; sandbox's are just `sandbox`. %>
+<% db_prefix = pr ? "bike_index_review_pr_#{pr}" : "bike_index_sandbox" %>
+<%# Per-PR logical Redis DB (bin/kamal_review sets 1..31); sandbox exports 0. %>
 <% redis_url = "redis://shared-redis:6379/#{ENV.fetch("REVIEW_APP_REDIS_DB", "1")}" %>
 <%# .to_json quotes/escapes the title into a valid (double-quoted) YAML scalar. %>
 <% pr_title_json = ENV.fetch("REVIEW_APP_PR_TITLE", "").to_json %>
@@ -99,10 +99,10 @@ registry:
 
 env:
   clear:
-    # Review apps run the dedicated staging Rails environment, which mirrors
+    # Review apps run the dedicated sandbox Rails environment, which mirrors
     # production except ActionMailer routes through letter_opener_web. See
-    # config/environments/staging.rb and config/routes.rb.
-    RAILS_ENV: staging
+    # config/environments/sandbox.rb and config/routes.rb.
+    RAILS_ENV: sandbox
     REVIEW_APP: "1"
     REVIEW_APP_PR_NUMBER: "<%= pr %>"
     # Empty unless the deployer exports REVIEW_APP_PR_TITLE (the workflow does);
@@ -111,14 +111,14 @@ env:
     REVIEW_APP_COMMIT: "<%= commit %>"
     BASE_URL: "https://<%= slug %>.review.bikeindex.org"
 
-    # Postgres (shared-db accessory; per-app role + databases). The staging
+    # Postgres (shared-db accessory; per-app role + databases). The sandbox
     # primary_replica points at the same database as the primary, so no
     # separate replica address is needed (see config/database.yml).
     POSTGRESQL_ADDRESS: shared-db
     POSTGRESQL_USERNAME: <%= role %>
     POSTGRESQL_DATABASE: <%= db_prefix %>_primary
     # Analytics lives on the same shared-db accessory (dropped alongside the
-    # primary in bin/kamal_review destroy — review apps only; staging persists).
+    # primary in bin/kamal_review destroy — review apps only; sandbox persists).
     POSTGRESQL_ANALYTICS_ADDRESS: shared-db
     ANALYTICS_DB_USERNAME: <%= role %>
     ANALYTICS_DB_DATABASE: <%= db_prefix %>_analytics
@@ -154,7 +154,7 @@ env:
     - SESSION_SECRET
     - VERIFICATION_SECRET
     # Stripe (test-mode) is NOT here — it comes from the committed .env via
-    # dotenv in staging (see config/environments/staging.rb + Gemfile).
+    # dotenv in sandbox (see config/environments/sandbox.rb + Gemfile).
     - GOOGLE_MAPS
     - GOOGLE_MAPS_STATIC
     - GOOGLE_GEOCODER
@@ -190,8 +190,8 @@ builder:
   # CI builds + pushes the image; Kamal just pulls. No remote builder needed.
 
 <%# Shared accessories — booted once during host setup, reused by every app.
-    Emitted for review-app deploys ONLY (pr present): staging must never carry
-    this block, or a staging deploy could reboot/remove the shared infra that
+    Emitted for review-app deploys ONLY (pr present): sandbox must never carry
+    this block, or a sandbox deploy could reboot/remove the shared infra that
     every PR app depends on. This is the one real fork between the two targets.
     WARNING: do not run `kamal accessory stop/remove` from a review-app deploy —
     it would tear down the shared infra and all in-flight PRs. %>
