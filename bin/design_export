@@ -39,6 +39,11 @@ EXCLUDED_COMPONENTS = %w[
 # and skipping the inline keeps ~720 KiB of base64 out of every card.
 EXCLUDED_MODULES = %w[lexxy @rails/activestorage controllers/hw_combobox_controller].freeze
 
+# Components whose interactivity relies on the JS above (excluded): their static card
+# links to the live production Lookbook rather than pretending the snapshot is functional.
+PRODUCTION_URL = "https://bikeindex.org"
+PRODUCTION_REFERENCED = %w[forms/combobox forms/text_editor].freeze
+
 CACHE = {}
 
 # Fetch from the dev server, retrying through Rack::Attack throttling. cache: memoizes
@@ -66,6 +71,12 @@ end
 
 def same_origin?(url)
   url.start_with?("/", BASE_URL)
+end
+
+# Segment-aware prefix match, e.g. "forms/combobox" matches "forms/combobox/variants"
+# but not "forms/combobox_manufacturer".
+def path_matches?(path, prefixes)
+  prefixes.any? { |prefix| path == prefix || path.start_with?("#{prefix}/") }
 end
 
 # Inline same-origin stylesheets as <style>; external links (fonts) are left alone.
@@ -114,6 +125,14 @@ def self_contain(html)
   inline_scripts(inline_importmap(inline_stylesheets(html)))
 end
 
+# Prepend a link to the live, interactive production Lookbook into the card body.
+def production_reference(html, lookup)
+  url = "#{PRODUCTION_URL}/lookbook/inspect/#{lookup}"
+  style = "margin:0 0 1rem;padding:.5rem .75rem;border:1px solid #3498db;border-radius:.25rem;font:14px/1.4 sans-serif"
+  banner = %(<div style="#{style}">Interactive component — <a href="#{url}">view live on production →</a></div>)
+  html.sub(/(<div class="tw:p-4">)/) { "#{Regexp.last_match(1)}#{banner}" }
+end
+
 previews_json = get("/lookbook/previews.json") or abort(<<~MSG)
   Dev server not reachable at #{BASE_URL} (this script does not boot Rails).
   Start it with `bin/dev`, then re-run.
@@ -131,7 +150,7 @@ cards = JSON.parse(previews_json).fetch("previews").flat_map do |preview|
   next [] unless prefix.start_with?("/lookbook/preview/ui/")
 
   path = prefix.sub("/lookbook/preview/ui/", "") # "button", "forms/legacy_form_well/address_record"
-  next [] if EXCLUDED_COMPONENTS.any? { |excluded| path == excluded || path.start_with?("#{excluded}/") }
+  next [] if path_matches?(path, EXCLUDED_COMPONENTS)
 
   component = path.split("/").first # "button", "forms", "definition_list"
   tops.map { |scenario| {url: "#{prefix}/#{scenario["name"]}", component:} }
@@ -151,9 +170,11 @@ cards.each do |card|
   end
 
   group = card[:component].split("_").map(&:capitalize).join(" ") # "short_id" => "Short Id"
+  body = self_contain(html)
+  body = production_reference(body, lookup) if path_matches?(lookup.delete_prefix("ui/"), PRODUCTION_REFERENCED)
   path = File.join(OUTPUT_DIR, "#{lookup}.html")
   FileUtils.mkdir_p(File.dirname(path))
-  size = File.write(path, "<!-- @dsCard group=\"#{group}\" -->\n#{self_contain(html)}")
+  size = File.write(path, "<!-- @dsCard group=\"#{group}\" -->\n#{body}")
   written << {path:, size:}
   puts format("  %-46s %5d KiB", lookup, size / 1024)
 end
