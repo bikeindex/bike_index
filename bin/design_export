@@ -27,8 +27,12 @@ OUTPUT_DIR = File.expand_path(ARGV[0] || "tmp/design_export", File.expand_path("
 BASE_URL = ENV["BASE_URL"].to_s
 abort("BASE_URL is not set — run `eval \"$(ruby bin/env --export)\"` first") if BASE_URL.empty?
 
-# Components to skip, keyed by their path segment (the bit after "ui/").
-EXCLUDED_COMPONENTS = %w[address_display alert button_link color_swatch time_localizer].freeze
+# Paths to skip, matched against the preview path after "ui/" as a segment-aware prefix
+# (so "forms/legacy_form_well" excludes that subtree without touching the rest of "forms").
+EXCLUDED_COMPONENTS = %w[
+  address_display alerts button_link color_swatch
+  forms/combobox_manufacturer forms/legacy_form_well time_localizer
+].freeze
 
 # Heavy same-origin importmap modules no UI:: card imports (rich-text editor + deps).
 # Left at their original /assets URL — since nothing imports them, the URL never fires,
@@ -126,9 +130,10 @@ cards = JSON.parse(previews_json).fetch("previews").flat_map do |preview|
   prefix = reference["preview_path"].sub(%r{/[^/]+\z}, "") # "/lookbook/preview/ui/button"
   next [] unless prefix.start_with?("/lookbook/preview/ui/")
 
-  component = prefix.split("/")[4] # "button", or "definition_list" for nested previews
-  next [] if EXCLUDED_COMPONENTS.include?(component)
+  path = prefix.sub("/lookbook/preview/ui/", "") # "button", "forms/legacy_form_well/address_record"
+  next [] if EXCLUDED_COMPONENTS.any? { |excluded| path == excluded || path.start_with?("#{excluded}/") }
 
+  component = path.split("/").first # "button", "forms", "definition_list"
   tops.map { |scenario| {url: "#{prefix}/#{scenario["name"]}", component:} }
 end
 abort("No UI:: previews found at #{BASE_URL}/lookbook") if cards.empty?
