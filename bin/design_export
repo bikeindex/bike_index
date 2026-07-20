@@ -1,0 +1,161 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Export the UI:: Lookbook component previews as a self-contained HTML bundle for a
+# claude.ai/design design-system project. Pair with the /design-sync skill: point
+# DesignSync at the output directory (default tmp/design_export) and push.
+#
+# Each top-level Lookbook scenario (a @!group renders all its variants stacked; an
+# ungrouped scenario renders alone) becomes one standalone card, made self-contained:
+#   - same-origin stylesheets inlined as <style>
+#   - importmap's same-origin modules inlined as data: URIs (scoped — see EXCLUDED_MODULES)
+#     so Stimulus/controllers run without reaching localhost; public CDN pins keep URLs
+#   - es-module-shims inlined; modulepreload hints dropped
+# Headed by the first-line `<!-- @dsCard group="..." -->` marker Claude indexes cards from.
+#
+# Talks only to the running dev server over HTTP — it does NOT boot Rails. Enumeration
+# from /lookbook/previews.json, rendering from /lookbook/preview/*. If the dev server
+# isn't up, it stops and asks you to start it (bin/dev).
+# Usage: bin/design_export [OUTPUT_DIR]
+
+require "net/http"
+require "fileutils"
+require "json"
+require "base64"
+
+OUTPUT_DIR = File.expand_path(ARGV[0] || "tmp/design_export", File.expand_path("..", __dir__))
+BASE_URL = ENV["BASE_URL"].to_s
+abort("BASE_URL is not set — run `eval \"$(ruby bin/env --export)\"` first") if BASE_URL.empty?
+
+# Components to skip, keyed by their path segment (the bit after "ui/").
+EXCLUDED_COMPONENTS = %w[address_display alert button_link color_swatch time_localizer].freeze
+
+# Heavy same-origin importmap modules no UI:: card imports (rich-text editor + deps).
+# Left at their original /assets URL — since nothing imports them, the URL never fires,
+# and skipping the inline keeps ~720 KiB of base64 out of every card.
+EXCLUDED_MODULES = %w[lexxy @rails/activestorage controllers/hw_combobox_controller].freeze
+
+CACHE = {}
+
+# Fetch from the dev server, retrying through Rack::Attack throttling. cache: memoizes
+# by path so repeated assets (stylesheets, shared modules) are fetched once per run.
+def get(path, cache: false)
+  return CACHE[path] if cache && CACHE.key?(path)
+
+  body = fetch(path)
+  CACHE[path] = body if cache
+  body
+end
+
+def fetch(path)
+  5.times do
+    response = Net::HTTP.get_response(URI.join(BASE_URL, path))
+    return response.body if response.is_a?(Net::HTTPSuccess)
+    return nil unless response.code == "429"
+
+    sleep 1.5
+  end
+  nil
+rescue SystemCallError
+  nil
+end
+
+def same_origin?(url)
+  url.start_with?("/", BASE_URL)
+end
+
+# Inline same-origin stylesheets as <style>; external links (fonts) are left alone.
+def inline_stylesheets(html)
+  html.gsub(/<link\b[^>]*>/i) do |tag|
+    next tag unless /rel=["']stylesheet["']/i.match?(tag)
+    href = tag[/href=["']([^"']+)["']/i, 1]
+    next tag unless href && same_origin?(href)
+
+    css = get(href, cache: true)
+    css ? "<style>\n#{css}\n</style>" : tag
+  end
+end
+
+# Rewrite same-origin importmap entries to data: URIs so bare-specifier imports (static
+# and lazyLoadControllersFrom's dynamic ones) resolve without the localhost origin.
+def inline_importmap(html)
+  html.sub(%r{<script\b[^>]*type=["']importmap["'][^>]*>(.*?)</script>}mi) do
+    map = JSON.parse(Regexp.last_match(1))
+    imports = map["imports"]
+    imports&.each do |name, url|
+      next if EXCLUDED_MODULES.include?(name) || !same_origin?(url)
+
+      js = get(url, cache: true)
+      imports[name] = "data:text/javascript;base64,#{Base64.strict_encode64(js)}" if js
+    end
+    "<script type=\"importmap\">#{JSON.generate(map)}</script>"
+  end
+end
+
+# Inline same-origin <script src> (es-module-shims) so the shim loads too; drop
+# modulepreload hints (a data: URI can't be preloaded). Inline scripts stay as-is.
+def inline_scripts(html)
+  html
+    .gsub(/<link\b[^>]*rel=["']modulepreload["'][^>]*>/i, "")
+    .gsub(%r{<script\b([^>]*)\ssrc=["']([^"']+)["']([^>]*)>\s*</script>}i) do
+      tag, attrs, src = Regexp.last_match(0), "#{Regexp.last_match(1)}#{Regexp.last_match(3)}", Regexp.last_match(2)
+      next tag unless same_origin?(src)
+
+      js = get(src, cache: true)
+      js ? "<script#{attrs}>\n#{js}\n</script>" : tag
+    end
+end
+
+def self_contain(html)
+  inline_scripts(inline_importmap(inline_stylesheets(html)))
+end
+
+previews_json = get("/lookbook/previews.json") or abort(<<~MSG)
+  Dev server not reachable at #{BASE_URL} (this script does not boot Rails).
+  Start it with `bin/dev`, then re-run.
+MSG
+
+# Only top-level scenarios are routable at /lookbook/preview/* (leaves nested in a @!group
+# are not). Build one card per top-level entry — for a group, its own render stacks the
+# variants. The group/leaf name plus the preview's URL prefix gives the render path.
+cards = JSON.parse(previews_json).fetch("previews").flat_map do |preview|
+  tops = preview["scenarios"]
+  reference = tops.flat_map { |scenario| scenario["examples"] || [scenario] }.first
+  next [] unless reference
+
+  prefix = reference["preview_path"].sub(%r{/[^/]+\z}, "") # "/lookbook/preview/ui/button"
+  next [] unless prefix.start_with?("/lookbook/preview/ui/")
+
+  component = prefix.split("/")[4] # "button", or "definition_list" for nested previews
+  next [] if EXCLUDED_COMPONENTS.include?(component)
+
+  tops.map { |scenario| {url: "#{prefix}/#{scenario["name"]}", component:} }
+end
+abort("No UI:: previews found at #{BASE_URL}/lookbook") if cards.empty?
+
+FileUtils.rm_rf(OUTPUT_DIR)
+written = []
+skipped = []
+
+cards.each do |card|
+  lookup = card[:url].sub("/lookbook/preview/", "") # e.g. "ui/button/colors"
+  html = get(card[:url])
+  if html.nil?
+    skipped << lookup
+    next
+  end
+
+  group = card[:component].split("_").map(&:capitalize).join(" ") # "short_id" => "Short Id"
+  path = File.join(OUTPUT_DIR, "#{lookup}.html")
+  FileUtils.mkdir_p(File.dirname(path))
+  size = File.write(path, "<!-- @dsCard group=\"#{group}\" -->\n#{self_contain(html)}")
+  written << {path:, size:}
+  puts format("  %-46s %5d KiB", lookup, size / 1024)
+end
+
+total = written.sum { it[:size] }
+largest = written.max_by { it[:size] }
+puts "\nWrote #{written.size} cards to #{OUTPUT_DIR}"
+puts "Bundle #{total / 1024} KiB total; largest card #{largest[:size] / 1024} KiB (#{largest[:path].sub("#{OUTPUT_DIR}/", "")})" if largest
+puts "Skipped (non-200 render): #{skipped.join(", ")}" if skipped.any?
+puts "\nNext: run /design-sync and point it at #{OUTPUT_DIR}"
