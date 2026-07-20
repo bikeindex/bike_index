@@ -1,6 +1,6 @@
-# Seed a local dev / staging iOS OAuth application.
+# Seed a local dev / sandbox iOS OAuth application.
 #
-# Idempotent, keyed on the well-known uid: staging/review databases are
+# Idempotent, keyed on the well-known uid: sandbox/review databases are
 # long-lived and only seed on first boot, so bin/docker-entrypoint re-runs this
 # every deploy to (re)create the app and repair any drifted attributes.
 

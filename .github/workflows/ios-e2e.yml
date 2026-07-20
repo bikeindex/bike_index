@@ -3,24 +3,24 @@ name: iOS E2E CI
 permissions:
   contents: read
 
-# Runs the iOS suite against the persistent staging server
-# (staging.review.bikeindex.org) rather than a Rails dev server booted on the
-# runner. Staging tracks main — CI dispatches its deploy on every push to main
-# (see staging.yml) — so this fires via workflow_run once that deploy finishes.
+# Runs the iOS suite against the persistent sandbox server
+# (sandbox.review.bikeindex.org) rather than a Rails dev server booted on the
+# runner. Sandbox tracks main — CI dispatches its deploy on every push to main
+# (see sandbox.yml) — so this fires via workflow_run once that deploy finishes.
 #
 # workflow_run only triggers from the copy of this file on the default branch,
 # so it won't run for feature-branch pushes; use workflow_dispatch to run it
-# manually (against whatever staging currently serves).
+# manually (against whatever sandbox currently serves).
 on:
   workflow_run:
-    workflows: ["Staging Deploy"]
+    workflows: ["Sandbox Deploy"]
     types: [completed]
   workflow_dispatch:
 
 jobs:
   test-suite:
     name: "${{ matrix.device }} ${{ matrix.only-testing }}"
-    # Skip when the staging deploy failed; manual dispatches always run.
+    # Skip when the sandbox deploy failed; manual dispatches always run.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
@@ -51,13 +51,13 @@ jobs:
           DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
         run: |
           echo '#include "Default"' >> BikeIndex-development.xcconfig
-          # Point at staging instead of Default.xcconfig's localhost:3042. The
+          # Point at sandbox instead of Default.xcconfig's localhost:3042. The
           # seeded iOS OAuth app (bike_index db/seeds/seed_oauth_app.rb) is
           # is_internal, so its client_id/secret authorize without a consent step
           # on any seeded server. Slashes are \/-escaped as Default.xcconfig does.
           api_client_id=$(grep '^API_CLIENT_ID' Default.xcconfig | sed 's/API_CLIENT_ID = //' | xargs)
           api_secret=$(grep '^API_SECRET' Default.xcconfig | sed 's/API_SECRET = //' | xargs)
-          echo 'API_HOST = https:\/\/staging.review.bikeindex.org' >> BikeIndex-development.xcconfig
+          echo 'API_HOST = https:\/\/sandbox.review.bikeindex.org' >> BikeIndex-development.xcconfig
           echo 'API_PORT = 443' >> BikeIndex-development.xcconfig
           echo "API_CLIENT_ID = ${api_client_id}" >> BikeIndex-development.xcconfig
           echo "API_SECRET = ${api_secret}" >> BikeIndex-development.xcconfig
