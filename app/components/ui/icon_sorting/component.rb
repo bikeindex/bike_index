@@ -3,14 +3,17 @@
 module UI
   module IconSorting
     class Component < ApplicationComponent
-      DIRECTIONS = {
-        "asc" => :up,
-        "desc" => :down
+      ARROWS = {
+        "asc" => "↑",
+        "desc" => "↓"
       }.freeze
 
-      def initialize(direction: "desc", html_class: nil)
-        @direction = DIRECTIONS.fetch(direction.to_s, :down)
-        @html_class = html_class
+      def initialize(direction: "desc")
+        @arrow = ARROWS.fetch(direction.to_s, "↓")
+      end
+
+      def call
+        @arrow.html_safe
       end
     end
   end
