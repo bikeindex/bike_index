@@ -11,7 +11,7 @@
     <%= render Registrations::New::SectionLabel::Component.new(text: translation(".bike_info")) %>
 
     <div class="tw:mb-4">
-      <%= render Form::ComboboxManufacturer::Component.new(form: f,
+      <%= render UI::Forms::ComboboxManufacturer::Component.new(form: f,
           frame_maker: true, label_class: "twlabel", free_text: true,
           value: bike["manufacturer_other"].presence || bike["manufacturer_id"],
           placeholder: translation(".manufacturer_placeholder")) %>
@@ -37,7 +37,7 @@
         class="tw:relative"
         data-controller="registrations--new--combobox-display"
       >
-        <%= render Form::Combobox::Component.new(name: :cycle_type, form: f,
+        <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f,
             label: translation(".vehicle_type"), label_class: "twlabel",
             value: @b_param.cycle_type, options: cycle_type_options) %>
 

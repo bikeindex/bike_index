@@ -341,7 +341,7 @@
           {display: title, value: status, content:}
         end %>
 
-      <%= render Form::Combobox::Component.new(name: :status, form: f,
+      <%= render UI::Forms::Combobox::Component.new(name: :status, form: f,
           value: @b_param.status || "status_with_owner", options: status_options) %>
     </div>
 
