@@ -11,7 +11,7 @@ description: >-
   Use for any verb that lands on a PR's text content: "open a PR", "make a PR",
   "update pr", "update this pr", "update the PR description", "rewrite the PR
   body", "fix the description".
-allowed-tools: Bash, Read, Glob, Grep
+allowed-tools: Bash, Read, Glob, Grep, Skill
 ---
 
 # Pull request workflow

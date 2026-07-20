@@ -27,7 +27,7 @@ If `frontend-screenshots` returns failures it couldn't diagnose, surface them an
 
 ## 3. Upload branch screenshots and get inline URLs
 
-Invoke the `github-upload-image-to-pr` skill to upload each PNG from step 2 to the PR's comment textarea — GitHub mints persistent `user-attachments/assets/` URLs that render inline in the browser (release assets would force a download on click). The skill clears the textarea without submitting the comment.
+Invoke the `github-upload-image-to-pr` skill **for uploading only**: run it through its step 7 (upload each PNG from step 2, read back the `user-attachments/assets/` URLs, clear the textarea) and **stop there — do not run its step 8 posting.** This phase composes and posts one combined before/after comment itself in step 5, so the upload skill must not post its own. GitHub mints persistent URLs that render inline in the browser (release assets would force a download on click).
 
 Collect the returned URLs, keyed by `(page-slug, viewport)`.
 
@@ -37,7 +37,7 @@ Capture the **base-branch** (`$BASE` from SKILL.md step 0.5) version of every sc
 
 Skip per-page only when the URL didn't exist on `$BASE` (a brand-new route or page added in this PR) — there's nothing to compare to.
 
-Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against the base (its "Cross-branch comparison" section — checks out the base ref, captures into `...-main-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs.
+Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against the base (its "Cross-branch comparison" section — checks out the base ref, captures into `...-main-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
 
 Caveat when `$BASE` isn't `main`: `frontend-screenshots` currently hardcodes `origin/main` for that capture, so it can't shoot a non-`main` base yet. Until it's parameterized, capture branch-only for a non-`main` base and say so in the comment rather than posting a mislabeled comparison.
 
