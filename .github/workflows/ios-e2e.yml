@@ -5,26 +5,17 @@ permissions:
 
 # Runs the iOS suite against the persistent sandbox server
 # (sandbox.review.bikeindex.org) rather than a Rails dev server booted on the
-# runner. Sandbox tracks main — CI dispatches its deploy on every push to main
-# (see sandbox.yml) — so this fires via workflow_run once that deploy finishes.
-#
-# workflow_run only triggers from the copy of this file on the default branch,
-# so it won't run for feature-branch pushes; use workflow_dispatch to run it
-# manually (against whatever sandbox currently serves).
+# runner. Sandbox tracks main, and its deploy job (see sandbox.yml) dispatches
+# this once the deploy finishes. A workflow_run trigger can't be used: CI starts
+# the sandbox deploy with GITHUB_TOKEN, and runs started by GITHUB_TOKEN don't
+# emit the downstream events (like workflow_run) that would fire this. Also
+# dispatchable manually (against whatever sandbox currently serves).
 on:
-  workflow_run:
-    workflows: ["Sandbox Deploy"]
-    types: [completed]
   workflow_dispatch:
 
 jobs:
   test-suite:
     name: "${{ matrix.device }} ${{ matrix.only-testing }}"
-    # Skip when the sandbox deploy failed; manual dispatches always run.
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.head_branch == 'main')
     runs-on: macos-26
     strategy:
       max-parallel: 1
