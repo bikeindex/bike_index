@@ -1,6 +1,6 @@
 <%= render Registrations::New::Page::Component.new do %>
   <%= render Registrations::New::Progress::Component.new(step: 1, total: 2) %>
-  <%= render Registrations::New::Heading::Component.new(title: t(".register_your_bike"), subtitle: t(".just_the_essentials")) %>
+  <%= render UI::Header::Component.new(text: t(".register_your_bike"), subtitle: t(".just_the_essentials")) %>
 
   <% if @b_param.errors.any? %>
     <%= render UI::Alert::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
