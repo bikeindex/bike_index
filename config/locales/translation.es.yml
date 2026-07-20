@@ -5808,6 +5808,28 @@ es:
         year: año
       chart_async_frame:
         loading_chart: Cargando gráfico...
+      alerts:
+        object_error:
+          errors_prevented_this_from_being_saved: "%{errors_count} impidió que se
+            guardara este %{object_name}:"
+      forms:
+        legacy_form_well:
+          address_record:
+            address: Dirección de la calle
+            address_no_street: DIRECCIÓN
+            address_or_intersection: Dirección o intersección
+            address_school: Dirección postal del campus
+            choose_country: Elige un país
+            city: Ciudad
+            postal_code: Código Postal
+            region: Región/Provincia
+            state: Estado
+            street_2: Línea de dirección postal 2 (opcional)
+            where_was_it_status: "¿Dónde estaba %{bike_status}?"
+            your_full_address_is_required: "%{org_name} requiere su dirección completa."
+          address_record_with_default:
+            edit_my_account_path: editar en mi cuenta
+            use_account_address: Utilice la dirección de la cuenta
     org:
       location_address_fields:
         address: DIRECCIÓN
@@ -6026,25 +6048,3 @@ es:
         serial_label: 'De serie:'
         view_all: ver todo
         sticker_label: 'Etiqueta engomada:'
-    alerts:
-      object_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} impidió que se guardara
-          este %{object_name}:"
-    form:
-      legacy_form_well:
-        address_record:
-          address: Dirección de la calle
-          address_no_street: DIRECCIÓN
-          address_or_intersection: Dirección o intersección
-          address_school: Dirección postal del campus
-          choose_country: Elige un país
-          city: Ciudad
-          postal_code: Código Postal
-          region: Región/Provincia
-          state: Estado
-          street_2: Línea de dirección postal 2 (opcional)
-          where_was_it_status: "¿Dónde estaba %{bike_status}?"
-          your_full_address_is_required: "%{org_name} requiere su dirección completa."
-        address_record_with_default:
-          edit_my_account_path: editar en mi cuenta
-          use_account_address: Utilice la dirección de la cuenta
