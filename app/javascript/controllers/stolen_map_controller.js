@@ -26,8 +26,10 @@ export default class extends Controller {
   // empty box - and swallow the rejection so it isn't reported as unhandled.
   showUnavailable (error) {
     console.warn('Stolen map failed to render:', error)
+    if (!this.hasUnavailableTarget) return
+
     this.canvasTarget.hidden = true
-    if (this.hasUnavailableTarget) this.unavailableTarget.hidden = false
+    this.unavailableTarget.hidden = false
   }
 
   disconnect () {
