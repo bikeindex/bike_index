@@ -12,11 +12,24 @@ const MAPBOX_JS = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-
 const MAPBOX_CSS = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-gl.css`
 
 export default class extends Controller {
-  static targets = ['canvas']
+  static targets = ['canvas', 'unavailable']
   static values = { token: String, lng: Number, lat: Number, radiusBase: Number }
 
   connect () {
-    loadMapbox().then(() => this.renderMap())
+    loadMapbox()
+      .then(() => this.renderMap())
+      .catch((error) => this.showUnavailable(error))
+  }
+
+  // WebGL/Mapbox can be unavailable (crawlers, headless browsers, disabled GPU,
+  // CDN blocked). Replace the blank canvas with a message rather than leaving an
+  // empty box - and swallow the rejection so it isn't reported as unhandled.
+  showUnavailable (error) {
+    console.warn('Stolen map failed to render:', error)
+    if (!this.hasUnavailableTarget) return
+
+    this.canvasTarget.hidden = true
+    this.unavailableTarget.hidden = false
   }
 
   disconnect () {

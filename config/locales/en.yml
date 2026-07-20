@@ -1296,6 +1296,9 @@ en:
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
       your_police_report: your Police Report Number
+    stolen_map:
+      unavailable: The map couldn't be loaded — your browser or device may not support
+        it.
     theft_alerts:
       new:
         best_value: Best value
