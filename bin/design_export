@@ -8,9 +8,10 @@
 # Each top-level Lookbook scenario (a @!group renders all its variants stacked; an
 # ungrouped scenario renders alone) becomes one standalone card, made self-contained:
 #   - same-origin stylesheets inlined as <style>
-#   - importmap's same-origin modules inlined as data: URIs (scoped — see EXCLUDED_MODULES)
-#     so Stimulus/controllers run without reaching localhost; public CDN pins keep URLs
-#   - es-module-shims inlined; modulepreload hints dropped
+#   - JS rebuilt as a minimal Stimulus bootstrap: only the controllers the card actually
+#     uses (from its data-controller attrs) are registered, and just their transitive-closure
+#     of modules is inlined as data: URIs. This replaces the app's fragile `application`
+#     entrypoint (which drags in turbo/lexxy/etc.) — cards stay small and actually interact.
 # Headed by the first-line `<!-- @dsCard group="..." -->` marker Claude indexes cards from.
 #
 # Talks only to the running dev server over HTTP — it does NOT boot Rails. Enumeration
@@ -34,10 +35,9 @@ EXCLUDED_COMPONENTS = %w[
   forms/combobox_manufacturer forms/legacy_form_well time_localizer
 ].freeze
 
-# Heavy same-origin importmap modules no UI:: card imports (rich-text editor + deps).
-# Left at their original /assets URL — since nothing imports them, the URL never fires,
-# and skipping the inline keeps ~720 KiB of base64 out of every card.
-EXCLUDED_MODULES = %w[lexxy @rails/activestorage controllers/hw_combobox_controller].freeze
+# Controllers never registered on a card: each pulls a heavy dep (rich-text editor, combobox)
+# not worth inlining, so that component renders static and its card links to production instead.
+EXCLUDED_CONTROLLERS = %w[controllers/lexxy_controller controllers/hw_combobox_controller].freeze
 
 # Components whose interactivity relies on the JS above (excluded): their static card
 # links to the live production Lookbook rather than pretending the snapshot is functional.
@@ -91,38 +91,89 @@ def inline_stylesheets(html)
   end
 end
 
-# Rewrite same-origin importmap entries to data: URIs so bare-specifier imports (static
-# and lazyLoadControllersFrom's dynamic ones) resolve without the localhost origin.
-def inline_importmap(html)
-  html.sub(%r{<script\b[^>]*type=["']importmap["'][^>]*>(.*?)</script>}mi) do
-    map = JSON.parse(Regexp.last_match(1))
-    imports = map["imports"]
-    imports&.each do |name, url|
-      next if EXCLUDED_MODULES.include?(name) || !same_origin?(url)
-
-      js = get(url, cache: true)
-      imports[name] = "data:text/javascript;base64,#{Base64.strict_encode64(js)}" if js
-    end
-    "<script type=\"importmap\">#{JSON.generate(map)}</script>"
-  end
+def data_uri(js)
+  "data:text/javascript;base64,#{Base64.strict_encode64(js)}"
 end
 
-# Inline same-origin <script src> (es-module-shims) so the shim loads too; drop
-# modulepreload hints (a data: URI can't be preloaded). Inline scripts stay as-is.
-def inline_scripts(html)
-  html
-    .gsub(/<link\b[^>]*rel=["']modulepreload["'][^>]*>/i, "")
-    .gsub(%r{<script\b([^>]*)\ssrc=["']([^"']+)["']([^>]*)>\s*</script>}i) do
-      tag, attrs, src = Regexp.last_match(0), "#{Regexp.last_match(1)}#{Regexp.last_match(3)}", Regexp.last_match(2)
-      next tag unless same_origin?(src)
+# Stimulus identifier -> importmap controller key, mirroring stimulus-loading's convention:
+# "ui--dropdown" => "controllers/ui/dropdown_controller", "form--file-upload" => ".../form/file_upload_controller".
+def controller_module(identifier)
+  "controllers/#{identifier.split("--").map { |segment| segment.tr("-", "_") }.join("/")}_controller"
+end
 
-      js = get(src, cache: true)
-      js ? "<script#{attrs}>\n#{js}\n</script>" : tag
-    end
+# Bare import specifiers a module references (static `from "x"` / `import "x"` and dynamic `import("x")`).
+def import_specifiers(js)
+  js.scan(/(?:from|import)\s*\(?\s*["']([^"']+)["']/).flatten
+end
+
+# Transitive closure of importmap keys reachable from the seeds. Same-origin modules are
+# fetched and scanned for further imports; CDN pins are kept as leaves (self-contained bundles).
+def module_closure(seeds, imports)
+  reached = {}
+  stack = seeds.dup
+  until stack.empty?
+    name = stack.pop
+    next if reached.key?(name) || !imports.key?(name)
+
+    reached[name] = imports[name]
+    next unless same_origin?(imports[name])
+
+    js = get(imports[name], cache: true)
+    import_specifiers(js).each { |specifier| stack << specifier } if js
+  end
+  reached
+end
+
+# Strip the server's importmap, module scripts, es-module-shims/mini-profiler (<script src>),
+# and modulepreload hints — replaced by a minimal per-card bootstrap when controllers are used.
+def strip_js(html)
+  html
+    .gsub(%r{<script\b[^>]*type=["'](?:importmap|module)["'][^>]*>.*?</script>}mi, "")
+    .gsub(%r{<script\b[^>]*\ssrc=["'][^"']*["'][^>]*>\s*</script>}i, "")
+    .gsub(/<link\b[^>]*rel=["']modulepreload["'][^>]*>/i, "")
+end
+
+# Rebuild JS as a minimal Stimulus bootstrap: register only the controllers this card uses,
+# importing them (and their transitive deps) from an importmap trimmed to that closure and
+# inlined as data: URIs. Sidesteps the app's fragile `application` entrypoint and stays small.
+def inline_js(html)
+  importmap = html[%r{<script\b[^>]*type=["']importmap["'][^>]*>(.*?)</script>}mi, 1]
+  imports = importmap ? JSON.parse(importmap).fetch("imports", {}) : {}
+
+  identifiers = html.scan(/data-controller=["']([^"']+)["']/i).flatten.join(" ").split.uniq
+  registrations = identifiers.filter_map do |identifier|
+    mod = controller_module(identifier)
+    [identifier, mod] if imports.key?(mod) && !EXCLUDED_CONTROLLERS.include?(mod)
+  end
+
+  html = strip_js(html)
+  return html if registrations.empty?
+
+  closure = module_closure(["@hotwired/stimulus", *registrations.map(&:last)], imports)
+  inlined = closure.to_h do |name, url|
+    js = same_origin?(url) ? get(url, cache: true) : nil
+    [name, js ? data_uri(js) : url]
+  end
+  inject_bootstrap(html, inlined, registrations)
+end
+
+# Inject the trimmed importmap and a module that starts Stimulus and registers each controller.
+def inject_bootstrap(html, imports, registrations)
+  importmap = %(<script type="importmap">#{JSON.generate("imports" => imports)}</script>)
+  loads = registrations.each_with_index.map { |(_id, mod), index| "import c#{index} from #{mod.to_json}" }
+  registers = registrations.each_with_index.map { |(id, _mod), index| "app.register(#{id.to_json}, c#{index})" }
+  bootstrap = <<~JS.chomp
+    import { Application } from "@hotwired/stimulus"
+    #{loads.join("\n")}
+    const app = Application.start()
+    #{registers.join("\n")}
+    window.Stimulus = app
+  JS
+  html.sub(%r{</head>}i) { %(#{importmap}\n<script type="module">#{bootstrap}</script>\n#{Regexp.last_match(0)}) }
 end
 
 def self_contain(html)
-  inline_scripts(inline_importmap(inline_stylesheets(html)))
+  inline_js(inline_stylesheets(html))
 end
 
 # Prepend a link to the live, interactive production Lookbook into the card body.
