@@ -39,7 +39,7 @@
 
     <% if current_organization.enabled?("bike_stickers") %>
       <div class="tw:mb-4">
-        <%= render Form::RadioButtonGroup::Component.new(
+        <%= render UI::Forms::RadioButtonGroup::Component.new(
           name: :search_kind,
           selected: search_kind,
           entries: [

@@ -5819,6 +5819,29 @@ it:
         year: anno
       chart_async_frame:
         loading_chart: Caricamento del grafico...
+      alerts:
+        object_error:
+          errors_prevented_this_from_being_saved: "%{errors_count} ha impedito il salvataggio
+            di questo %{object_name}:"
+      forms:
+        legacy_form_well:
+          address_record:
+            address: Indirizzo stradale
+            address_no_street: Indirizzo
+            address_or_intersection: Indirizzo o incrocio
+            address_school: Indirizzo postale del campus
+            choose_country: Seleziona il paese
+            city: Città
+            postal_code: Codice postale
+            region: regione / provincia
+            state: Stato
+            street_2: seconda riga dell'indirizzo (facoltativa)
+            where_was_it_status: Dove si trovava %{bike_status}?
+            your_full_address_is_required: Il tuo indirizzo completo è richiesto da
+              %{org_name}
+          address_record_with_default:
+            edit_my_account_path: modifica il mio account
+            use_account_address: Utilizzare l'indirizzo dell'account
     org:
       location_address_fields:
         address: Indirizzo
@@ -6037,26 +6060,3 @@ it:
         serial_label: 'Seriale:'
         view_all: visualizza tutto
         sticker_label: 'Adesivo:'
-      alerts:
-        object_error:
-          errors_prevented_this_from_being_saved: "%{errors_count} ha impedito il salvataggio
-            di questo %{object_name}:"
-    form:
-      legacy_form_well:
-        address_record:
-          address: Indirizzo stradale
-          address_no_street: Indirizzo
-          address_or_intersection: Indirizzo o incrocio
-          address_school: Indirizzo postale del campus
-          choose_country: Seleziona il paese
-          city: Città
-          postal_code: Codice postale
-          region: regione / provincia
-          state: Stato
-          street_2: seconda riga dell'indirizzo (facoltativa)
-          where_was_it_status: Dove si trovava %{bike_status}?
-          your_full_address_is_required: Il tuo indirizzo completo è richiesto da
-            %{org_name}
-        address_record_with_default:
-          edit_my_account_path: modifica il mio account
-          use_account_address: Utilizzare l'indirizzo dell'account
