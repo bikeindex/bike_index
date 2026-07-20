@@ -5637,7 +5637,7 @@ it:
         letter_opener_tooltip: Visualizza l'email inviata da questa app di recensioni
         pr_link: 'PR #%{number}'
         commit_tooltip: 'Commit corrente:'
-        label_staging: Allestimento
+        label_sandbox: Sandbox
         superadmin_button: Accedi come superamministratore
         superadmin_signed_in: accesso effettuato come superamministratore
       footer:

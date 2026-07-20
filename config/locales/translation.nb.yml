@@ -5373,7 +5373,7 @@ nb:
         letter_opener_tooltip: Se e-posten som ble sendt av denne anmeldelsesappen
         pr_link: PR-nummer %{number}
         commit_tooltip: 'nåværende forpliktelse:'
-        label_staging: Iscenesettelse
+        label_sandbox: Sandbox
         superadmin_button: logg inn som superadministrator
         superadmin_signed_in: logget inn som superadministrator
       footer:

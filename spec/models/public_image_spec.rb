@@ -24,7 +24,7 @@ RSpec.describe PublicImage, type: :model do
     let(:bike) { FactoryBot.create(:bike) }
     let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }
 
-    context "local file storage (staging/dev)" do
+    context "local file storage (sandbox/dev)" do
       it "generates versions inline and does not enqueue the background job" do
         expect(PublicImageUploader.storage).to eq CarrierWave::Storage::File
         PublicImageUploader.enable_processing = true
