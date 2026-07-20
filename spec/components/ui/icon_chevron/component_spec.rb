@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe UI::Chevron::Component, type: :component do
+RSpec.describe UI::IconChevron::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {} }

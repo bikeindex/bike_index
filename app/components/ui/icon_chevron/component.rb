@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UI
-  module Chevron
+  module IconChevron
     class Component < ApplicationComponent
       ROTATIONS = {
         right: nil,
