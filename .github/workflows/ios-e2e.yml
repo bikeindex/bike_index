@@ -11,12 +11,14 @@ permissions:
 # emit the downstream events (like workflow_run) that would fire this. Also
 # dispatchable manually (against whatever sandbox currently serves).
 #
-# status_sha (passed by sandbox.yml) is the bike_index commit under test. On
-# failure, report-failure publishes a red "iOS E2E CI" commit status so it shows
-# in that commit's checks list. Nothing is posted on success, and a failure is
-# written only after the ~15-min suite finishes — long after CI passed and Cloud
-# 66's redeploy fired — so this never adds a status during the deploy window and
-# can't affect the deploy. Blank (manual runs) skips reporting.
+# status_sha (passed by sandbox.yml) is the bike_index commit under test.
+# report-pending publishes a pending "iOS E2E CI" commit status as soon as the
+# suite is dispatched, then report-result replaces it with success or failure once
+# the ~15-min suite finishes — so the check surfaces in the tested commit's list
+# for the whole run, not just on failure at the end. This is safe because Cloud 66
+# deploys from CI's own deploy_production job (needs: [test, lint_and_scan]), which
+# doesn't wait on commit statuses — a pending E2E status can't hold up the deploy.
+# Blank status_sha (manual runs) skips reporting.
 on:
   workflow_dispatch:
     inputs:
@@ -26,6 +28,27 @@ on:
         default: ""
 
 jobs:
+  # Publish a pending "iOS E2E CI" commit status the moment the suite is
+  # dispatched, so the check appears in the tested commit's list while the
+  # ~15-min suite runs (report-result finalizes it). Skipped for manual runs.
+  report-pending:
+    name: Report iOS E2E pending
+    if: ${{ inputs.status_sha != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      STATUS_SHA: ${{ inputs.status_sha }}
+    steps:
+      - name: Publish pending commit status
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$STATUS_SHA" \
+            -f state=pending \
+            -f context="iOS E2E CI" \
+            -f description="iOS E2E running" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
   test-suite:
     name: "${{ matrix.device }} ${{ matrix.only-testing }}"
     runs-on: macos-26
@@ -91,14 +114,14 @@ jobs:
           path: "fastlane/test_output/*"
           compression-level: 9 # maximum compression
 
-  # On failure only, publish a red "iOS E2E CI" commit status so the failure
-  # surfaces in the tested commit's checks list. Nothing is posted on success,
-  # and this runs only after the suite completes — well after Cloud 66's post-CI
-  # redeploy — so it never touches the deploy path. Skipped for manual runs.
-  report-failure:
-    name: Report iOS E2E failure
+  # Once the suite completes, replace the pending status with the final
+  # "iOS E2E CI" result (success or failure) on the tested commit. Runs only
+  # after Cloud 66's post-CI redeploy, so it never touches the deploy path.
+  # Skipped for manual runs.
+  report-result:
+    name: Report iOS E2E result
     needs: test-suite
-    if: ${{ always() && inputs.status_sha != '' && needs.test-suite.result != 'success' }}
+    if: ${{ always() && inputs.status_sha != '' }}
     runs-on: ubuntu-latest
     permissions:
       statuses: write
@@ -107,10 +130,12 @@ jobs:
       STATUS_SHA: ${{ inputs.status_sha }}
       RESULT: ${{ needs.test-suite.result }}
     steps:
-      - name: Publish failing commit status
+      - name: Publish final commit status
         run: |
+          state=failure
+          [ "$RESULT" = "success" ] && state=success
           gh api "repos/$GITHUB_REPOSITORY/statuses/$STATUS_SHA" \
-            -f state=failure \
+            -f state="$state" \
             -f context="iOS E2E CI" \
             -f description="iOS E2E $RESULT" \
             -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
