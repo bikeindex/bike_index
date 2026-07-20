@@ -48,7 +48,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
 
     attach_file "registration_sequence_page[image]",
       Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true
-    # the Form::FileUpload Stimulus controller reflects the chosen file
+    # the UI::Forms::FileUpload Stimulus controller reflects the chosen file
     expect(page).to have_css("[data-form--file-upload-target='filename']", text: "bike.jpg")
 
     click_button "Save page"

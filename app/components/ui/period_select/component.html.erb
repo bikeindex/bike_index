@@ -40,7 +40,7 @@
       <div class="tw:flex tw:items-center tw:gap-2">
         <%= f.label :start_time_selector, translation(".from"), class: "twlabel tw:m-0" %>
 
-        <%= render Form::Input::Component.new(
+        <%= render UI::Forms::Input::Component.new(
           form_builder: f,
           attribute: :start_time_selector,
           kind: :datetime_local_field,
@@ -51,7 +51,7 @@
       <div class="tw:flex tw:items-center tw:gap-2">
         <%= f.label :end_time_selector, translation(".to"), class: "twlabel tw:m-0" %>
 
-        <%= render Form::Input::Component.new(
+        <%= render UI::Forms::Input::Component.new(
           form_builder: f,
           attribute: :end_time_selector,
           kind: :datetime_local_field,

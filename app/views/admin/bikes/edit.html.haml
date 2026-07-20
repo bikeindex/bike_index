@@ -11,13 +11,13 @@
     = render partial: "/bikes/credibility_score", locals: { bike: @bike }
 
 = form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|
-  = render(Alerts::ObjectErrors::Component.new(object: @bike))
+  = render(UI::Alerts::ObjectError::Component.new(object: @bike))
 
   .row
     .col-md-4.col-lg-3
       .form-group
         -# cycle_type is an integer-backed enum: pass enum *labels* as option values and an explicit value: to override hotwire_combobox's enum branch (which would emit cycle_type_before_type_cast)
-        = render Form::Combobox::Component.new(name: :cycle_type, form: f, value: @bike.cycle_type, label: "Cycle type", required: true, options: CycleType.select_options)
+        = render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, value: @bike.cycle_type, label: "Cycle type", required: true, options: CycleType.select_options)
     .col-6.col-md-4.col-lg-5
       .form-group
         = f.label :serial_number
@@ -36,7 +36,7 @@
           Manufacturer
           %em.small
             = link_to "mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name), class: "less-strong"
-        = render Form::ComboboxManufacturer::Component.new(frame_maker: true, form: f, label: manufacturer_label, required: true)
+        = render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, form: f, label: manufacturer_label, required: true)
     .col-6.col-md-4.col-lg-3
       .form-group
         = f.label :manufacturer_other do
@@ -53,7 +53,7 @@
         = f.text_field :year, class: "form-control"
     .col-6.col-md-4.col-lg-3
       .form-group
-        = render Form::Combobox::Component.new(name: :primary_frame_color_id, form: f, label: Bike.human_attribute_name(:primary_frame_color_id), placeholder: "Choose color", required: true, include_blank: true, options: Color.all.pluck(:name, :id))
+        = render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, form: f, label: Bike.human_attribute_name(:primary_frame_color_id), placeholder: "Choose color", required: true, include_blank: true, options: Color.all.pluck(:name, :id))
     .col-md-4.col-lg-3
       .form-group
         = f.label :frame_model
@@ -79,7 +79,7 @@
     - if @organizations.present?
       .col-md-4.col-lg-3
         .form-group
-          = render Form::Combobox::Component.new(name: :creation_organization_id, form: f, label: Bike.human_attribute_name(:creation_organization_id), placeholder: "Choose organization", include_blank: true, options: @organizations.pluck(:name, :id))
+          = render UI::Forms::Combobox::Component.new(name: :creation_organization_id, form: f, label: Bike.human_attribute_name(:creation_organization_id), placeholder: "Choose organization", include_blank: true, options: @organizations.pluck(:name, :id))
       .col-md-4.col-lg-3
         .form-group.fancy-select.unfancy
           = f.label :bike_organization_ids, 'Current orgs'
@@ -99,11 +99,11 @@
           .row
             #stolen-bike-location.form-group.col-6
               #country_select_container
-                = render Form::Combobox::Component.new(name: :country_id, form: s, label: "Country", placeholder: "Choose country", include_blank: true, options: Country.select_options)
+                = render UI::Forms::Combobox::Component.new(name: :country_id, form: s, label: "Country", placeholder: "Choose country", include_blank: true, options: Country.select_options)
                 %p.d-none
                   = Country.united_states_id
             .form-group.col-6
-              = render Form::Combobox::Component.new(name: :state_id, form: s, label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id))
+              = render UI::Forms::Combobox::Component.new(name: :state_id, form: s, label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id))
           .form-group
             = label :street, "Intersection or address"
             = s.text_field :street, placeholder: "Intersection or address", class: "form-control"

@@ -36,17 +36,17 @@ jobs:
             echo "No open PR with the 'review-app' label for branch '$GITHUB_REF_NAME' -> NOT dispatching review-app deploy"
           fi
 
-      # Staging tracks main: redeploy the persistent staging app on every push to
+      # Sandbox tracks main: redeploy the persistent sandbox app on every push to
       # main. Dispatched here (rather than via a workflow_run trigger in
-      # staging.yml) so both deploys fire from CI's single push run.
-      # NOTE: this runs in parallel with the `test` job, so staging does not wait
+      # sandbox.yml) so both deploys fire from CI's single push run.
+      # NOTE: this runs in parallel with the `test` job, so sandbox does not wait
       # for the test suite to pass.
-      - name: Dispatch staging deploy (main only)
+      - name: Dispatch sandbox deploy (main only)
         if: github.ref == 'refs/heads/main'
         run: |
           retry() { local n=1; until "$@"; do [ $n -ge 3 ] && return 1; echo "attempt $n failed; retrying in 15s..." >&2; n=$((n+1)); sleep 15; done; }
-          echo "Push to main -> dispatching staging deploy"
-          retry gh workflow run staging.yml --repo "$GITHUB_REPOSITORY" --ref main
+          echo "Push to main -> dispatching sandbox deploy"
+          retry gh workflow run sandbox.yml --repo "$GITHUB_REPOSITORY" --ref main
 
   lint_and_scan:
     runs-on: ubuntu-latest
