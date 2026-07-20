@@ -32,6 +32,14 @@ SQL
   fi
 
   ./bin/rails db:prepare
+
+  # Long-lived staging/review databases only seed on first boot (db:prepare
+  # seeds solely when it creates the database), so re-run the idempotent iOS
+  # OAuth seed every deploy to (re)provision and repair that app on databases
+  # that already exist. Staging env only; non-fatal so it can't block boot.
+  if [ "$RAILS_ENV" == "staging" ]; then
+    ./bin/rails runner db/seeds/seed_oauth_app.rb || true
+  fi
 fi
 
 exec "${@}"
