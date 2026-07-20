@@ -84,7 +84,7 @@
                 data-toggle="dropdown"
               >
                 <%= passive_organization.short_name %>
-                <%= inline_svg_tag "icons/chevron-right.svg", class: "tw:rotate-90 tw:inline-block tw:w-3 tw:h-3 tw:ml-1" %>
+                <%= render UI::Chevron::Component.new(direction: :down, html_class: "tw:ml-1") %>
               </a>
 
               <ul

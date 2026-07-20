@@ -38,7 +38,7 @@
                   data-disclosure-target="chevron"
                   class="tw:inline-block tw:transition-transform tw:duration-200"
                 >
-                  <%= helpers.inline_svg_tag "icons/chevron-right.svg", class: "tw:block tw:h-3 tw:w-3" %>
+                  <%= render UI::Chevron::Component.new(display: :block) %>
                 </span>
               </button>
 
