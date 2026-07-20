@@ -7,7 +7,7 @@ module UI
         # term: placement of each row's term (dt) relative to its definition (dd).
         # The non-default terms style the child Row divs/dt/dd via descendant
         # selectors (which out-specify the Row's own utility classes), so Rows
-        # need no term awareness. Spacing and fonts follow the bike show redesign.
+        # need no term awareness.
         #
         # :left_align  — term left, definition right-aligned (supports multi_columns)
         # :right_align — term right-aligned in a fixed column, definition beside it

@@ -102,7 +102,11 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).not_to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
-    expect(page).to have_field("search_email", with: "")
+    # The typed "alice" value we submitted above leaks into Turbo's restoration
+    # preview snapshot; wait for the real render (empty value attribute) before
+    # asserting the field cleared, or we race the stale preview.
+    wait_for_turbo_restore
+    expect(page).to have_field("search_email", with: "", wait: 10)
 
     # Re-apply alice filter for click-row/back-nav steps
     wait_for_turbo_restore
