@@ -1,5 +1,6 @@
-<details <% unless @collapsed %>  open<% end %>>
+<details data-controller="details" <% unless @collapsed %>  open<% end %>>
   <summary
+    data-action="click->details#toggle"
     class="
       tw:flex tw:cursor-pointer tw:list-none tw:items-center
       tw:justify-between tw:gap-3 tw:rounded-sm tw:border tw:border-gray-200
@@ -29,22 +30,14 @@
         <%= translation(".hide") %>
       </span>
 
-      <svg
-        class="tw:size-4 tw:transition-transform tw:[details[open]_&]:rotate-180"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="m6 9 6 6 6-6" />
-      </svg>
+      <%= render(UI::IconChevron::Component.new(html_class: "tw:size-4 tw:transition-transform tw:[details[open]_&]:rotate-180")) %>
     </span>
   </summary>
 
-  <div class="tw:mt-6 tw:flex tw:flex-col tw:gap-6">
+  <div
+    data-details-target="content"
+    class="tw:flex tw:flex-col tw:gap-6 tw:pt-6 <%= "tw:hidden!" if @collapsed %>"
+  >
     <% grouped_rows.each do |cgroup, rows| %>
       <%= render(UI::Card::Component.new) do %>
         <h2
