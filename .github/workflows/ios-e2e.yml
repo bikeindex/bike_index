@@ -72,6 +72,39 @@ jobs:
         working-directory: bike_index_ios
         run: fastlane scan --build_for_testing=true
 
+      # Ruby, Node, and datastores for the Rails dev server. macOS runners can't
+      # run service containers (Docker is Linux-only), so Postgres/Redis are
+      # installed via Homebrew rather than the `services:` blocks ci.yml uses.
+      #
+      # ruby/setup-ruby reads .tool-versions and restores prebuilt Ruby + a gem
+      # cache, so bin/setup's `bundle check` and version guard both no-op instead
+      # of compiling Ruby via mise.
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: bundle install
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          cache: 'npm'
+      - run: npm install
+
+      # config/database.yml forces host 127.0.0.1 / user rails / password
+      # `password` whenever CI is set (GitHub always sets it) — mirror ci.yml's
+      # postgres service (POSTGRES_USER: rails / POSTGRES_PASSWORD: password).
+      # bin/dev starts redis-server itself, so Redis only needs to be installed.
+      - name: Set up Postgres and Redis
+        run: |
+          brew install postgresql@16 redis
+          echo "$(brew --prefix postgresql@16)/bin" >> "$GITHUB_PATH"
+          export PATH="$(brew --prefix postgresql@16)/bin:$PATH"
+          brew services start postgresql@16
+          for i in $(seq 1 30); do pg_isready -h 127.0.0.1 -q && break; sleep 1; done
+          createuser -s -h 127.0.0.1 rails || true
+          psql -h 127.0.0.1 -d postgres -c "ALTER USER rails WITH PASSWORD 'password';"
+
       - name: Start Rails dev server
         env:
           RAILS_ENV: development
