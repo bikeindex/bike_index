@@ -1,7 +1,7 @@
 require "rails_helper"
 
-RSpec.describe SpamEstimator::String do
-  describe "string_spaminess" do
+RSpec.describe SpamEstimator::Text do
+  describe "estimate" do
     context "garbage" do
       let(:str) { "VhriBJhD1nuwH" }
       it "returns for garbage" do
@@ -9,19 +9,19 @@ RSpec.describe SpamEstimator::String do
         expect(described_class.send(:capital_count_suspiciousness, str)).to be_between(0, 20)
         expect(described_class.send(:space_count_suspiciousness, str)).to be_between(5, 15)
         expect(described_class.send(:non_letter_count_suspiciousness, str)).to be_between(0, 20)
-        expect(described_class.string_spaminess(str)).to be_between(60, 81)
+        expect(described_class.estimate(str)).to be_between(60, 81)
         # And double garbage
         expect(described_class.send(:vowel_frequency_suspiciousness, "#{str}#{str}")).to be_between(51, 80)
         expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str}")).to be_between(5, 30)
         expect(described_class.send(:space_count_suspiciousness, "#{str}#{str}")).to be_between(51, 80)
-        expect(described_class.string_spaminess("#{str}#{str}")).to eq 100
+        expect(described_class.estimate("#{str}#{str}")).to eq 100
       end
     end
     context "frame_model names" do
       it "returns for proper frame_model names" do
-        expect(described_class.string_spaminess("Cutthroat")).to eq 0
-        expect(described_class.string_spaminess("Diverge 1.0")).to eq 0
-        expect(described_class.string_spaminess("Skye S")).to eq 0
+        expect(described_class.estimate("Cutthroat")).to eq 0
+        expect(described_class.estimate("Diverge 1.0")).to eq 0
+        expect(described_class.estimate("Skye S")).to eq 0
       end
     end
     context "5434 N Mains St" do
@@ -32,7 +32,7 @@ RSpec.describe SpamEstimator::String do
         expect(described_class.send(:non_letter_count_suspiciousness, str)).to be < 15
         expect(described_class.send(:capital_count_suspiciousness, str)).to eq 0
         expect(described_class.send(:space_count_suspiciousness, str)).to eq 0
-        expect(described_class.string_spaminess(str)).to be < 65
+        expect(described_class.estimate(str)).to be < 65
       end
     end
     context "transliterate" do
@@ -42,7 +42,7 @@ RSpec.describe SpamEstimator::String do
         expect(described_class.send(:non_letter_count_suspiciousness, str)).to eq 0
         expect(described_class.send(:capital_count_suspiciousness, str)).to eq 0
         expect(described_class.send(:space_count_suspiciousness, str)).to eq 0
-        expect(described_class.string_spaminess(str)).to be < 30
+        expect(described_class.estimate(str)).to be < 30
       end
     end
     context "some troublesome ones" do
@@ -55,7 +55,7 @@ RSpec.describe SpamEstimator::String do
             # expect(described_class.send(:vowel_frequency_suspiciousness, str)).to be < 30
             # expect(described_class.send(:capital_count_suspiciousness, str)).to eq 0
             # expect(described_class.send(:space_count_suspiciousness, str)).to eq 0
-            expect(described_class.string_spaminess(str)).to be < 30
+            expect(described_class.estimate(str)).to be < 30
           end
         end
       end

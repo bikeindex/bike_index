@@ -6,20 +6,20 @@ RSpec.describe SpamEstimator::Bike do
       let(:bike) { Bike.new(frame_model: str) }
       let(:str) { "Cutthroat" }
       it "is 0" do
-        expect(SpamEstimator::String.string_spaminess(str)).to eq 0
+        expect(SpamEstimator::Text.estimate(str)).to eq 0
         expect(described_class.estimate(bike)).to eq 0
       end
       context "FX 1 Disc" do
         let(:str) { "FX 1 Disc" }
         it "is 0" do
-          expect(SpamEstimator::String.string_spaminess(str)).to be < 90
+          expect(SpamEstimator::Text.estimate(str)).to be < 90
           expect(described_class.estimate(bike)).to be < 40
         end
       end
       context "garbage" do
         let(:str) { "efgBz9pNdd7efgBz9pNdd7" }
         it "estimate is percentage" do
-          expect(SpamEstimator::String.string_spaminess(str)).to eq 100
+          expect(SpamEstimator::Text.estimate(str)).to eq 100
           expect(described_class.estimate(bike)).to be_between(9, 20)
         end
       end
@@ -29,14 +29,14 @@ RSpec.describe SpamEstimator::Bike do
       context "garbage" do
         let(:str) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
         it "estimate is percentage" do
-          expect(SpamEstimator::String.string_spaminess(str)).to eq 100
+          expect(SpamEstimator::Text.estimate(str)).to eq 100
           expect(described_class.estimate(bike)).to eq 40
         end
       end
       context "SON" do
         let(:str) { "SON Nabendynamo (Wilfried Schmidt Maschinenbau)" }
         it "returns" do
-          expect(SpamEstimator::String.string_spaminess(str)).to be < 10
+          expect(SpamEstimator::Text.estimate(str)).to be < 10
           expect(described_class.estimate(bike)).to be < 10
         end
       end

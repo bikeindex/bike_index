@@ -1,5 +1,5 @@
 module SpamEstimator
-  module String
+  module Text
     extend Functionable
 
     MALICIOUS_REGEX = /
@@ -28,7 +28,7 @@ module SpamEstimator
 
     # eariot are the most frequent letters - this could be incorporated into calculations
     # Currently, doing a weird vowel count thing
-    def string_spaminess(str)
+    def estimate(str)
       return 0 if str.blank?
       return 100 if looks_malicious?(str)
 
@@ -42,11 +42,7 @@ module SpamEstimator
         capital_count_suspiciousness(str, str_length, str_downlate) +
         non_letter_count_suspiciousness(str, str_length, str_downlate)
 
-      within_bounds(total)
-    end
-
-    def within_bounds(num)
-      num.clamp(0, 100)
+      total.clamp(0, 100)
     end
 
     #
@@ -87,7 +83,7 @@ module SpamEstimator
       else
         0
       end
-      within_bounds(susness)
+      susness.clamp(0, 100)
     end
 
     def vowel_ratio(str, str_length = nil, str_downlate = nil)
@@ -111,7 +107,7 @@ module SpamEstimator
         capital_ratio - 10
       end
       # People love capitalizing things on the internet :/
-      0.3 * within_bounds(susness)
+      0.3 * susness.clamp(0, 100)
     end
 
     def non_letter_count_suspiciousness(str, str_length = nil, str_downlate = nil)
@@ -128,7 +124,7 @@ module SpamEstimator
       else
         non_letter_count - 10
       end
-      within_bounds(susness)
+      susness.clamp(0, 100)
     end
 
     def space_count_suspiciousness(str, str_length = nil, str_downlate = nil)
@@ -146,7 +142,7 @@ module SpamEstimator
       multiplier = (str_length < 31) ? 40 : 60
       susness = (target_space_count - spaces_count) * multiplier
 
-      within_bounds(susness)
+      susness.clamp(0, 100)
     end
 
     def downcase_transliterate(str)

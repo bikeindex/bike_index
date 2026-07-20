@@ -14,16 +14,16 @@ module SpamEstimator
       estimate = 0
       return estimate if bike.blank?
       # serial_number isn't in cached_data, and it's the most common injection target
-      return 100 if String.looks_malicious?(bike.cached_data) || String.looks_malicious?(bike.serial_number)
+      return 100 if Text.looks_malicious?(bike.cached_data) || Text.looks_malicious?(bike.serial_number)
 
       estimate += 35 if bike.creation_organization&.spam_registrations
-      estimate += 0.2 * String.string_spaminess(bike.frame_model)
-      estimate += 0.4 * String.string_spaminess(bike.manufacturer_other)
+      estimate += 0.2 * Text.estimate(bike.frame_model)
+      estimate += 0.4 * Text.estimate(bike.manufacturer_other)
       estimate += 50 if low_entropy_fingerprint?(bike)
       estimate += domain_estimate(bike.owner_email)
       estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
 
-      String.within_bounds(estimate)
+      estimate.clamp(0, 100)
     end
 
     #
@@ -63,12 +63,12 @@ module SpamEstimator
       estimate = 0
       return 0 if stolen_record.blank?
 
-      estimate += String.string_spaminess(stolen_record.theft_description)
+      estimate += Text.estimate(stolen_record.theft_description)
       if stolen_record.street.present?
         street_letters = stolen_record.street.gsub(/[^a-z|\s]/, "") # Ignore non letter things from street
-        estimate += 0.3 * String.string_spaminess(street_letters)
+        estimate += 0.3 * Text.estimate(street_letters)
       end
-      String.within_bounds(estimate - 20)
+      (estimate - 20).clamp(0, 100)
     end
 
     conceal :low_entropy_fingerprint?, :reserved_email_domain?, :domain_estimate, :estimate_stolen_record
