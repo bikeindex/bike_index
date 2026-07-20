@@ -16,7 +16,12 @@ export default class extends Controller {
   static values = { token: String, lng: Number, lat: Number, radiusBase: Number }
 
   connect () {
-    loadMapbox().then(() => this.renderMap())
+    // WebGL can be unavailable (crawlers, headless browsers, disabled GPU); the
+    // map just doesn't render. Swallow it so it isn't reported as an unhandled
+    // promise rejection.
+    loadMapbox()
+      .then(() => this.renderMap())
+      .catch((error) => console.warn('Stolen map failed to render:', error))
   }
 
   disconnect () {
