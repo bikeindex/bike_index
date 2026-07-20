@@ -286,4 +286,18 @@ RSpec.describe EmailDomain, type: :model do
       end
     end
   end
+
+  describe "calculated_bikes" do
+    let(:email_domain) { FactoryBot.create(:email_domain, domain: "@example.com") }
+    let!(:bike) { FactoryBot.create(:bike, owner_email: "person@example.com") }
+    let!(:spam_bike) { FactoryBot.create(:bike, owner_email: "spammer@example.com", likely_spam: true) }
+
+    # Regression: Bike's default_scope applies `current`, which excludes likely_spam bikes.
+    # Without unscoping, banning a domain hides that domain's own bikes, dropping
+    # calculated_bike_count and bike_count_blocker?, which lets the domain auto-ban itself.
+    it "includes bikes the default scope hides (likely_spam)" do
+      expect(Bike.matching_domain(email_domain.domain).pluck(:id)).to eq([bike.id])
+      expect(email_domain.calculated_bikes.pluck(:id)).to match_array([bike.id, spam_bike.id])
+    end
+  end
 end

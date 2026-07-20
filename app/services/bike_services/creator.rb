@@ -189,7 +189,7 @@ module BikeServices
       return bike unless bike.present? && bike.id.present?
 
       # NOTE: spaminess is recalculated in Email::OwnershipInvitationJob as a failsafe
-      if SpamEstimator.estimate_bike(bike) > SpamEstimator::MARK_SPAM_PERCENT
+      if SpamEstimator::Bike.estimate(bike) > SpamEstimator::Bike::MARK_SPAM_PERCENT
         bike.update(likely_spam: true)
       end
       CallbackJob::AfterBikeSaveJob.perform_async(bike.id)

@@ -2,23 +2,28 @@
 
 module UI
   module IconChevron
-    # A down-pointing chevron (stroke SVG). Callers size and rotate it via
-    # html_class, e.g. `tw:size-4` plus a rotate variant to flip it when expanded.
     class Component < ApplicationComponent
-      def initialize(html_class: nil)
+      ROTATIONS = {
+        right: nil,
+        down: "tw:rotate-90",
+        left: "tw:rotate-180",
+        up: "tw:rotate-270"
+      }.freeze
+
+      SIZES = {
+        sm: "tw:h-3 tw:w-3",
+        md: "tw:h-4 tw:w-4"
+      }.freeze
+
+      def initialize(direction: :right, size: :sm, html_class: nil)
+        @direction = ROTATIONS.key?(direction) ? direction : :right
+        @size = SIZES.key?(size) ? size : :sm
         @html_class = html_class
       end
 
       def call
-        content_tag(:svg, tag.path(d: "m6 9 6 6 6-6"),
-          class: @html_class,
-          viewBox: "0 0 24 24",
-          fill: "none",
-          stroke: "currentColor",
-          "stroke-width": "2.2",
-          "stroke-linecap": "round",
-          "stroke-linejoin": "round",
-          "aria-hidden": "true")
+        helpers.inline_svg_tag("icons/chevron-right.svg",
+          class: ["tw:inline-block", SIZES[@size], ROTATIONS[@direction], @html_class].compact.join(" "))
       end
     end
   end
