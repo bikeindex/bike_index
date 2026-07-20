@@ -46,13 +46,11 @@ RSpec.describe UI::IconChevron::Component, type: :component do
     end
   end
 
-  context "with a custom display and extra classes" do
-    let(:options) { {display: :block, html_class: "tw:ml-1"} }
+  context "with extra classes" do
+    let(:options) { {html_class: "tw:ml-1"} }
 
-    it "applies the display and appends the classes" do
-      classes = component.css("svg").first[:class]
-      expect(classes).to include("tw:block")
-      expect(classes).to include("tw:ml-1")
+    it "appends the classes" do
+      expect(component.css("svg").first[:class]).to include("tw:ml-1")
     end
   end
 end

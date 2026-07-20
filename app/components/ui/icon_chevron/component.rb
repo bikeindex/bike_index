@@ -15,21 +15,15 @@ module UI
         md: "tw:h-4 tw:w-4"
       }.freeze
 
-      DISPLAYS = {
-        inline_block: "tw:inline-block",
-        block: "tw:block"
-      }.freeze
-
-      def initialize(direction: :right, size: :sm, display: :inline_block, html_class: nil)
+      def initialize(direction: :right, size: :sm, html_class: nil)
         @direction = ROTATIONS.key?(direction) ? direction : :right
         @size = SIZES.key?(size) ? size : :sm
-        @display = DISPLAYS.key?(display) ? display : :inline_block
         @html_class = html_class
       end
 
       def call
         helpers.inline_svg_tag("icons/chevron-right.svg",
-          class: [DISPLAYS[@display], SIZES[@size], ROTATIONS[@direction], @html_class].compact.join(" "))
+          class: ["tw:inline-block", SIZES[@size], ROTATIONS[@direction], @html_class].compact.join(" "))
       end
     end
   end
