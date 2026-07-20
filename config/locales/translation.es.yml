@@ -5627,7 +5627,7 @@ es:
           de reseñas.
         pr_link: 'PR #%{number}'
         commit_tooltip: 'Commit actual:'
-        label_staging: Puesta en escena
+        label_sandbox: Sandbox
         superadmin_button: Iniciar sesión como superadministrador
         superadmin_signed_in: Sesión iniciada como superadministrador
       footer:

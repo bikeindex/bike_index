@@ -5523,7 +5523,7 @@ nl:
         letter_opener_tooltip: Bekijk de e-mail die door deze review-app is verzonden.
         pr_link: 'PR #%{number}'
         commit_tooltip: 'huidige commit:'
-        label_staging: Enscenering
+        label_sandbox: Sandbox
         superadmin_button: Meld u aan als superbeheerder.
         superadmin_signed_in: ingelogd als superbeheerder
       footer:

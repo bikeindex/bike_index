@@ -16,17 +16,17 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
     let(:current_user) { nil }
     let(:return_to) { nil }
 
-    it "renders the staging label and disclaimer" do
-      # No pr_number is the persistent staging deploy, not a per-PR review app
-      expect(component.text).to include("Staging")
+    it "renders the sandbox label and disclaimer" do
+      # No pr_number is the persistent sandbox deploy, not a per-PR review app
+      expect(component.text).to include("Sandbox")
       expect(component.text).not_to include("Review app")
       expect(component.text).to include("data is ephemeral")
     end
 
-    it "keeps the Staging label visible on small screens but hides the disclaimer" do
-      # tw:hidden tw:sm:inline => display:none below the sm breakpoint. Staging has
+    it "keeps the Sandbox label visible on small screens but hides the disclaimer" do
+      # tw:hidden tw:sm:inline => display:none below the sm breakpoint. Sandbox has
       # no PR title, so the label itself carries the context on small screens.
-      label = component.css("span").find { |span| span.text.strip == "Staging" }
+      label = component.css("span").find { |span| span.text.strip == "Sandbox" }
       disclaimer = component.css("span").find { |span| span.text.include?("data is ephemeral") }
       expect(label[:class].to_s).not_to include("tw:hidden")
       expect(disclaimer[:class].to_s).to include("tw:hidden")
@@ -128,9 +128,9 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
         expect(link.text).to include("PR #1234")
       end
 
-      it "shows the review app label instead of the staging label, hidden on small screens" do
+      it "shows the review app label instead of the sandbox label, hidden on small screens" do
         expect(component.text).to include("Review app")
-        expect(component.text).not_to include("Staging")
+        expect(component.text).not_to include("Sandbox")
         # The PR title carries the context on small screens, so the label hides
         label = component.css("span").find { |span| span.text.strip == "Review app" }
         expect(label[:class].to_s).to include("tw:hidden")
