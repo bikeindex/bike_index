@@ -53,22 +53,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: write
-      statuses: write
     env:
       GH_TOKEN: ${{ github.token }}
-      STATUS_SHA: ${{ github.sha }}
     steps:
-      # Mark the commit pending immediately so "iOS E2E CI" shows up in its checks
-      # list right away; ios-e2e.yml's report-status job resolves it to
-      # success/failure. Without this the suite is invisible until it finishes.
-      - name: Mark iOS E2E pending on the deployed commit
-        run: |
-          gh api "repos/$GITHUB_REPOSITORY/statuses/$STATUS_SHA" \
-            -f state=pending \
-            -f context="iOS E2E CI" \
-            -f description="Running against sandbox" \
-            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/workflows/ios-e2e.yml"
       - name: Dispatch iOS E2E against the freshly deployed sandbox
         run: |
           retry() { local n=1; until "$@"; do [ $n -ge 3 ] && return 1; echo "attempt $n failed; retrying in 15s..." >&2; n=$((n+1)); sleep 15; done; }
-          retry gh workflow run ios-e2e.yml --repo "$GITHUB_REPOSITORY" --ref main -f status_sha="$STATUS_SHA"
+          retry gh workflow run ios-e2e.yml --repo "$GITHUB_REPOSITORY" --ref main
