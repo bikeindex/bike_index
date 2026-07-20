@@ -24,6 +24,10 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
         expect(user_ban.reason).to eq "seo_spam"
         expect(user.reload.banned?).to be_truthy
       end
+      it "accepts the user passed directly as the second arg" do
+        expect { instance.perform(user.id, user) }.to change(UserBan, :count).by(1)
+        expect(UserBan.last.reason).to eq "seo_spam"
+      end
     end
 
     context "crypto reference only in the profile link" do

@@ -62,7 +62,7 @@ class UserBan < ApplicationRecord
     user.update_auth_token("auth_token")
     # Remove (not delete) their marketplace listings, then flag bikes as likely spam
     # (listings first — the listing's bike-sync callback needs a still-visible bike)
-    user.marketplace_listings.current.each { |listing| listing.update(status: "removed") }
-    user.bikes(true).each { |bike| bike.update(likely_spam: true) }
+    user.marketplace_listings.current.each { it.update(status: "removed") }
+    user.bikes(true).each { it.update(likely_spam: true) }
   end
 end

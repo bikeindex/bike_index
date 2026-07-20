@@ -4,16 +4,12 @@ module Users
   class SeoSpamCheckJob < ApplicationJob
     sidekiq_options retry: false
 
-    def perform(user_id)
-      user = User.find_by(id: user_id)
+    # user can be passed directly (e.g. from AfterUserChangeJob, which is already backgrounded)
+    def perform(user_id, user = nil)
+      user ||= User.find_by(id: user_id)
       return if user.blank? || !user.show_bikes? || user.banned?
+      return unless SpamEstimator::User.estimate_user(user) > SpamEstimator::User::MARK_SPAM_PERCENT
 
-      ban_for_seo_spam(user) if SpamEstimator::User.estimate_user(user) > SpamEstimator::User::MARK_SPAM_PERCENT
-    end
-
-    private
-
-    def ban_for_seo_spam(user)
       # UserBan#update_user_on_create bans the user and flags their bikes
       UserBan.create(user:, reason: :seo_spam)
     end
