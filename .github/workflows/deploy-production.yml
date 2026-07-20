@@ -1,0 +1,31 @@
+name: Deploy production
+
+# Fires the Cloud 66 production redeploy after CI passes on main. Split out of
+# ci.yml (rather than a job gated with `if: github.ref == 'refs/heads/main'`) so
+# it doesn't leave a skipped "Deploy to production" check on every PR and branch.
+#
+# workflow_run — not `on: push` — because the deploy must wait for CI's test and
+# lint_and_scan jobs, which live in a separate workflow. CI is triggered by a real
+# push, so its completion emits the workflow_run event (the GITHUB_TOKEN
+# downstream-event limitation only applies to runs GITHUB_TOKEN itself started).
+# branches: [main] limits this to CI runs on main; the conclusion == 'success'
+# gate below requires the whole CI run to be green before deploying.
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy_production:
+    name: "Deploy to production"
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Cloud66 production
+        run: |
+          curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${{ secrets.CLOUD66_REDEPLOYMENT_KEY }}

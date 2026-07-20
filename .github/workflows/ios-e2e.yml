@@ -16,9 +16,9 @@ permissions:
 # suite is dispatched, then report-result replaces it with success or failure once
 # the ~15-min suite finishes — so the check surfaces in the tested commit's list
 # for the whole run, not just on failure at the end. This is safe because Cloud 66
-# deploys from CI's own deploy_production job (needs: [test, lint_and_scan]), which
-# doesn't wait on commit statuses — a pending E2E status can't hold up the deploy.
-# Blank status_sha (manual runs) skips reporting.
+# deploys from a separate workflow gated on CI's success (deploy-production.yml),
+# which doesn't wait on commit statuses — a pending E2E status can't hold up the
+# deploy. Blank status_sha (manual runs) skips reporting.
 on:
   workflow_dispatch:
     inputs:
