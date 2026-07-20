@@ -38,6 +38,15 @@ module UI
             ]
           ))
         end
+
+        def chips
+          render(UI::Forms::RadioButtonGroup::Component.new(
+            name: :frame_size,
+            variant: :chips,
+            selected: "m",
+            entries: %w[xs s m l xl].map { |size| {value: size, label: size.upcase} }
+          ))
+        end
         # @!endgroup
       end
     end

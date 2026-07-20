@@ -42,6 +42,27 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
     end
   end
 
+  context "when telephone_field" do
+    let(:kind) { :telephone_field }
+
+    it "renders a tel input" do
+      expect(component).to have_css("input[type='tel'][name='user[name]']")
+    end
+  end
+
+  context "when select" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, kind: :select,
+        choices: [["Red", "1"], ["Blue", "2"]], select_options: {selected: "2", include_blank: "Pick one"}))
+    end
+
+    it "renders a select with twinput, options, and the selected value" do
+      expect(component).to have_css("select.twinput[name='user[name]']")
+      expect(component).to have_css("option[value='2'][selected]", text: "Blue")
+      expect(component).to have_css("option[value='']", text: "Pick one")
+    end
+  end
+
   context "when invalid kind" do
     let(:kind) { :password_field }
 
@@ -55,6 +76,14 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
 
     it "passes options through" do
       expect(component).to have_css("input[placeholder='Enter name']")
+    end
+  end
+
+  context "with a class in html_options" do
+    let(:html_options) { {class: "tw:font-mono"} }
+
+    it "appends to twinput rather than replacing it" do
+      expect(component).to have_css("input.twinput.tw\\:font-mono")
     end
   end
 end

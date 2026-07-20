@@ -44,6 +44,19 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
+  context "with label_suffix" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, kind:, label_text: "Model",
+        label_suffix: "<em>opt</em>".html_safe))
+    end
+
+    it "renders the suffix inside the label, above the field" do
+      expect(component).to have_css("label", text: "Model")
+      expect(component).to have_css("label em", text: "opt")
+      expect(component).to have_css("input.twinput.tw\\:mt-1")
+    end
+  end
+
   context "when content_block" do
     let(:kind) { :content_block }
     let(:component) do
