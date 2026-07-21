@@ -10,7 +10,7 @@ module Org
       delegate :additional_registration_fields, :column_renames, to: :settings_component
 
       def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
-        cache_key: nil, sortable_search_params: {}, bike_sticker: nil)
+        cache_key: nil, sortable_search_params: {}, bike_sticker: nil, settings_component: nil)
         @organization = organization
         @bikes = bikes
         @current_user = current_user
@@ -18,12 +18,14 @@ module Org
         @cache_key = cache_key || "org-#{organization.id}-bikes_4"
         @sortable_search_params = sortable_search_params
         @bike_sticker = bike_sticker
+        @settings_component = settings_component
       end
 
       private
 
       # Column labels and additional fields derive from the organization alone, so
-      # a bare settings component is enough — no search params required.
+      # a bare settings component is enough when a caller (e.g. RegistrationSearch)
+      # doesn't pass its own already-built one in.
       def settings_component
         @settings_component ||= Org::RegistrationSearchSettings::Component.new(organization: @organization)
       end
