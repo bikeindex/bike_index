@@ -5444,17 +5444,79 @@ nl:
       result_view_select:
         bike_box_view: Bekijk als lijst
         thumbnail_view: Bekijken als miniaturen
-      form_organized:
+    search_org:
+      form:
         doesnt_look_like_serial: Dit lijkt geen serienummer. Serienummers bestaan
           meestal uit 6 of meer letters en cijfers en bevinden zich onder de trapas.
         search_for_serial_number: Zoek naar framenummer
         submit: Voorleggen
         search_notes: Zoeknotities
         search_owner_email_or_name: Zoek naar het e-mailadres of de naam van de eigenaar.
-      results_frame:
+      search_wrapper:
+        affiliation: Aansluiting
+        avery_exportable: Avery Exporteerbaar
+        bike: Registratie
+        e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
+        e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
+        link: Link
+        matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
+        mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
+        phone: Telefoon
+        reg_address: Adres
+        registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
+        student_id: Student-ID
+        vehicle: Registratie
+        view_matching_any_audit: weergave die overeenkomt met elke audit
+      settings:
+        address: 'Adres:'
+        all: Alle
+        avery_cell: Avery Exporteerbaar
+        bike: Registratie
+        color_cell: Kleur
+        create_export_of_vehicles: Export maken van gezochte %{cycle_type}
+        created_at_cell: Geregistreerd
+        creation_description_cell: Bron
+        cycle_type_cell: 'Voertuigtype:'
+        default: standaard
+        filter_impounded_html: alleen <strong>in beslag genomen</strong>
+        filter_no_address_html: alleen <strong>geen</strong> adres
+        filter_no_sticker_html: alleen <strong>geen</strong> sticker
+        filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
+        filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
+        filter_stolen_html: alleen gestolen
+        filter_with_address_html: alleen <strong>met</strong> adres
+        filter_with_stickers_html: alleen <strong>met</strong> stickers
+        impound_id_cell: Inbeslagname-ID
+        impounded_cell: In beslag genomen bij
+        manufacturer_cell: Fabrikant
+        model_cell: Model
+        none: geen
+        notes_cell: Notes
+        owner_email_cell: Verzonden naar
+        owner_name_cell: Eigenaar naam
+        propulsion_type_cell: Elektrisch voertuig (aandrijving)
+        reg_address_cell: Adres
+        reg_extra_registration_number_cell: Secundair#
+        reg_organization_affiliation_cell: Aansluiting
+        reg_phone_cell: Telefoon
+        reg_student_id_cell: Student-ID
+        serial_number_cell: Serie
+        settings: Instellingen
+        show_notes_search: notities weergeven zoeken
+        status: 'Toestand:'
+        status_cell: Toestand
+        sticker_cell: Sticker
+        stickers: 'stickers:'
+        stolen_cell: Gestolen
+        updated_at_cell: Bijgewerkt
+        url_cell: URL
+        vehicle: Registratie
+        visible_columns: Zichtbare kolommen
+        multi_search: multi serieel zoeken
+    search_results:
+      frame:
         rate_limited: Te veel zoekopdrachten te snel achter elkaar — je hebt een limiet
           bereikt. Wacht even en probeer het opnieuw.
-    search_results:
       bike_box:
         location: Plaats
         posted_at: Genoteerd
@@ -5470,8 +5532,18 @@ nl:
         member: Lid van Bike Index
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
+    search_results_org:
       multi_result_chip:
         no_results: geen overeenkomsten
+      multi_results:
+        first_n_shown_html: "— eerst %{limit} weergegeven,"
+        no_exact_matches: 'Geen exacte overeenkomsten. Serienummers die er dichtbij
+          liggen:'
+        no_matches_found: Geen overeenkomsten gevonden
+        result_count_html: "— %{count} %{results}"
+        serial_label: 'Serial:'
+        view_all: alles bekijken
+        sticker_label: 'Sticker:'
     page_block:
       marketplace_listing_panel:
         condition: Voorwaarde
@@ -5852,97 +5924,3 @@ nl:
         reprocess_instruction: Ga terug naar deze pagina en klik op de knop 'import
           opnieuw verwerken' hieronder.
         unknown_ascend_name: Onbekende Ascend-naam
-      registration_search:
-        affiliation: Aansluiting
-        assign_bike_sticker: Sticker toewijzen
-        avery: Avery?
-        avery_exportable: Avery Exporteerbaar
-        bike: Registratie
-        color: Kleur
-        e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
-        e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
-        email_hidden: email verborgen
-        impound_id: Inbeslagname-ID
-        impounded: In beslag genomen bij
-        link: Link
-        link_sticker: link sticker
-        manufacturer: Fabrikant
-        matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
-        mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
-        model: Model
-        notes: Notes
-        owner_name: Eigenaar naam
-        phone: Telefoon
-        propulsion_type: Voortstuwing
-        reg_address: Adres
-        registered: Geregistreerd
-        registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
-        secondary_number: Secundair#
-        sent_to: Verzonden naar
-        serial: Serie
-        source: Bron
-        status_cell: Toestand
-        sticker: Sticker
-        stolen: Gestolen
-        student_id: Student-ID
-        updated: Bijgewerkt
-        url: URL
-        vehicle: Registratie
-        vehicle_type: 'Voertuigtype:'
-        view_matching_any_audit: weergave die overeenkomt met elke audit
-        hidden_not_registered: verborgen, niet geregistreerd bij %{org_name}
-      registration_search_settings:
-        address: 'Adres:'
-        all: Alle
-        avery_cell: Avery Exporteerbaar
-        bike: Registratie
-        color_cell: Kleur
-        create_export_of_vehicles: Export maken van gezochte %{cycle_type}
-        created_at_cell: Geregistreerd
-        creation_description_cell: Bron
-        cycle_type_cell: 'Voertuigtype:'
-        default: standaard
-        filter_impounded_html: alleen <strong>in beslag genomen</strong>
-        filter_no_address_html: alleen <strong>geen</strong> adres
-        filter_no_sticker_html: alleen <strong>geen</strong> sticker
-        filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
-        filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
-        filter_stolen_html: alleen gestolen
-        filter_with_address_html: alleen <strong>met</strong> adres
-        filter_with_stickers_html: alleen <strong>met</strong> stickers
-        impound_id_cell: Inbeslagname-ID
-        impounded_cell: In beslag genomen bij
-        manufacturer_cell: Fabrikant
-        model_cell: Model
-        none: geen
-        notes_cell: Notes
-        owner_email_cell: Verzonden naar
-        owner_name_cell: Eigenaar naam
-        propulsion_type_cell: Elektrisch voertuig (aandrijving)
-        reg_address_cell: Adres
-        reg_extra_registration_number_cell: Secundair#
-        reg_organization_affiliation_cell: Aansluiting
-        reg_phone_cell: Telefoon
-        reg_student_id_cell: Student-ID
-        serial_number_cell: Serie
-        settings: Instellingen
-        show_notes_search: notities weergeven zoeken
-        status: 'Toestand:'
-        status_cell: Toestand
-        sticker_cell: Sticker
-        stickers: 'stickers:'
-        stolen_cell: Gestolen
-        updated_at_cell: Bijgewerkt
-        url_cell: URL
-        vehicle: Registratie
-        visible_columns: Zichtbare kolommen
-        multi_search: multi serieel zoeken
-      multi_search_results:
-        first_n_shown_html: "— eerst %{limit} weergegeven,"
-        no_exact_matches: 'Geen exacte overeenkomsten. Serienummers die er dichtbij
-          liggen:'
-        no_matches_found: Geen overeenkomsten gevonden
-        result_count_html: "— %{count} %{results}"
-        serial_label: 'Serial:'
-        view_all: alles bekijken
-        sticker_label: 'Sticker:'

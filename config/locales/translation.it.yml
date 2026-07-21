@@ -5557,7 +5557,8 @@ it:
       result_view_select:
         bike_box_view: Visualizza come elenco
         thumbnail_view: Visualizza come miniature
-      form_organized:
+    search_org:
+      form:
         doesnt_look_like_serial: Questo non sembra un numero di serie. I numeri di
           serie sono solitamente composti da 6 o più lettere e numeri, e si trovano
           sotto il movimento centrale.
@@ -5565,10 +5566,71 @@ it:
         submit: invia
         search_notes: Note di ricerca
         search_owner_email_or_name: Cerca l'indirizzo email o il nome del proprietario
-      results_frame:
+      search_wrapper:
+        affiliation: Affiliazione
+        avery_exportable: Avery Esportabile
+        bike: registrazione
+        e_vehicle_propulsion: Veicolo elettrico (propulsione)
+        e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
+        link: Collegamento
+        matching_bikes_html: "%{count} %{cycle_type} corrispondente"
+        mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
+        phone: Telefono
+        reg_address: Indirizzo
+        registered_bikes_html: "%{count} %{cycle_type} corrispondente a %{org_name}"
+        student_id: Tessera studentesca
+        vehicle: registrazione
+        view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
+      settings:
+        address: 'Indirizzo:'
+        all: Tutti
+        avery_cell: Avery Esportabile
+        bike: registrazione
+        color_cell: Colore
+        create_export_of_vehicles: Crea l'esportazione della ricerca %{cycle_type}
+        created_at_cell: Registrato
+        creation_description_cell: Fonte
+        cycle_type_cell: Tipo di veicolo
+        default: predefinito
+        filter_impounded_html: solo <strong>sequestrato</strong>
+        filter_no_address_html: solo <strong>nessun</strong> indirizzo
+        filter_no_sticker_html: solo <strong>senza</strong> adesivo
+        filter_not_impounded_html: solo <strong>non</strong> sequestrato
+        filter_not_stolen_or_impounded_html: non rubato o sequestrato
+        filter_stolen_html: solo rubato
+        filter_with_address_html: solo <strong>con</strong> indirizzo
+        filter_with_stickers_html: solo <strong>con</strong> adesivi
+        impound_id_cell: ID del sequestro
+        impounded_cell: Sequestrato
+        manufacturer_cell: Produttore
+        model_cell: Modello
+        none: nessuno
+        notes_cell: Note
+        owner_email_cell: Inviato a
+        owner_name_cell: Nome del proprietario
+        propulsion_type_cell: Veicolo elettrico (propulsione)
+        reg_address_cell: Indirizzo
+        reg_extra_registration_number_cell: Secondario#
+        reg_organization_affiliation_cell: Affiliazione
+        reg_phone_cell: Telefono
+        reg_student_id_cell: Tessera studentesca
+        serial_number_cell: Seriale
+        settings: impostazioni
+        show_notes_search: mostra le note cerca
+        status: 'Stato:'
+        status_cell: Stato
+        sticker_cell: Adesivo
+        stickers: 'Adesivi:'
+        stolen_cell: Rubata
+        updated_at_cell: Fatto
+        url_cell: URL
+        vehicle: registrazione
+        visible_columns: Colonne visibili
+        multi_search: ricerca seriale multipla
+    search_results:
+      frame:
         rate_limited: 'Troppe ricerche in troppo breve: il numero di ricerche è limitato.
           Attendi un attimo, poi riprova.'
-    search_results:
       bike_box:
         location: Luogo
         posted_at: Elencato
@@ -5584,8 +5646,17 @@ it:
         member: Membro di Bike Index
       container:
         no_results: Nessuna registrazione corrisponde esattamente alla tua ricerca
+    search_results_org:
       multi_result_chip:
         no_results: nessuna corrispondenza
+      multi_results:
+        first_n_shown_html: "— prima %{limit} mostrata,"
+        no_exact_matches: 'Nessuna corrispondenza esatta. Numeri di serie simili:'
+        no_matches_found: Nessuna corrispondenza trovata
+        result_count_html: "— %{count} %{results}"
+        serial_label: 'Seriale:'
+        view_all: visualizza tutto
+        sticker_label: 'Adesivo:'
     page_block:
       marketplace_listing_panel:
         condition: Condizione
@@ -5969,96 +6040,3 @@ it:
         reprocess_instruction: Torna qui e fai clic sul pulsante "rielabora l'importazione"
           qui sotto
         unknown_ascend_name: Nome di Ascend sconosciuto
-      registration_search:
-        affiliation: Affiliazione
-        assign_bike_sticker: Collegamento
-        avery: Avery?
-        avery_exportable: Avery Esportabile
-        bike: registrazione
-        color: Colore
-        e_vehicle_propulsion: Veicolo elettrico (propulsione)
-        e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
-        email_hidden: email nascosto
-        impound_id: ID del sequestro
-        impounded: Sequestrato
-        link: Collegamento
-        link_sticker: adesivo di collegamento
-        manufacturer: Produttore
-        matching_bikes_html: "%{count} %{cycle_type} corrispondente"
-        mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
-        model: Modello
-        notes: Note
-        owner_name: Nome del proprietario
-        phone: Telefono
-        propulsion_type: Propulsione
-        reg_address: Indirizzo
-        registered: Registrato
-        registered_bikes_html: "%{count} %{cycle_type} corrispondente a %{org_name}"
-        secondary_number: Secondario#
-        sent_to: Inviato a
-        serial: Seriale
-        source: Fonte
-        status_cell: Stato
-        sticker: Adesivo
-        stolen: Rubata
-        student_id: Tessera studentesca
-        updated: Fatto
-        url: URL
-        vehicle: registrazione
-        vehicle_type: Tipo di veicolo
-        view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
-        hidden_not_registered: nascosto, non registrato con %{org_name}
-      registration_search_settings:
-        address: 'Indirizzo:'
-        all: Tutti
-        avery_cell: Avery Esportabile
-        bike: registrazione
-        color_cell: Colore
-        create_export_of_vehicles: Crea l'esportazione della ricerca %{cycle_type}
-        created_at_cell: Registrato
-        creation_description_cell: Fonte
-        cycle_type_cell: Tipo di veicolo
-        default: predefinito
-        filter_impounded_html: solo <strong>sequestrato</strong>
-        filter_no_address_html: solo <strong>nessun</strong> indirizzo
-        filter_no_sticker_html: solo <strong>senza</strong> adesivo
-        filter_not_impounded_html: solo <strong>non</strong> sequestrato
-        filter_not_stolen_or_impounded_html: non rubato o sequestrato
-        filter_stolen_html: solo rubato
-        filter_with_address_html: solo <strong>con</strong> indirizzo
-        filter_with_stickers_html: solo <strong>con</strong> adesivi
-        impound_id_cell: ID del sequestro
-        impounded_cell: Sequestrato
-        manufacturer_cell: Produttore
-        model_cell: Modello
-        none: nessuno
-        notes_cell: Note
-        owner_email_cell: Inviato a
-        owner_name_cell: Nome del proprietario
-        propulsion_type_cell: Veicolo elettrico (propulsione)
-        reg_address_cell: Indirizzo
-        reg_extra_registration_number_cell: Secondario#
-        reg_organization_affiliation_cell: Affiliazione
-        reg_phone_cell: Telefono
-        reg_student_id_cell: Tessera studentesca
-        serial_number_cell: Seriale
-        settings: impostazioni
-        show_notes_search: mostra le note cerca
-        status: 'Stato:'
-        status_cell: Stato
-        sticker_cell: Adesivo
-        stickers: 'Adesivi:'
-        stolen_cell: Rubata
-        updated_at_cell: Fatto
-        url_cell: URL
-        vehicle: registrazione
-        visible_columns: Colonne visibili
-        multi_search: ricerca seriale multipla
-      multi_search_results:
-        first_n_shown_html: "— prima %{limit} mostrata,"
-        no_exact_matches: 'Nessuna corrispondenza esatta. Numeri di serie simili:'
-        no_matches_found: Nessuna corrispondenza trovata
-        result_count_html: "— %{count} %{results}"
-        serial_label: 'Seriale:'
-        view_all: visualizza tutto
-        sticker_label: 'Adesivo:'

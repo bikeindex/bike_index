@@ -17,7 +17,7 @@
   </div>
 <% end %>
 
-<%= render Search::ResultsFrame::Component.new(frame_id: :marketplace_results_frame,
+<%= render SearchResults::Frame::Component.new(frame_id: :marketplace_results_frame,
   render_results: @render_results, current_path: request.original_fullpath,
   loading_text: t(".loading_results")) do %>
   <%= turbo_frame_tag "page_#{@pagy.page}" do %>

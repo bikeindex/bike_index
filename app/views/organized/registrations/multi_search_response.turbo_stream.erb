@@ -1,5 +1,5 @@
 <%= turbo_stream.append :multi_serial_results do %>
-  <%= render Org::MultiSearchResults::Component.new(
+  <%= render SearchResultsOrg::MultiResults::Component.new(
     organization: current_organization,
     query: @query,
     chip_id: @chip_id,
@@ -12,7 +12,7 @@
 
 <% if @chip_id %>
   <%= turbo_stream.replace @chip_id do %>
-    <%= render SearchResults::MultiResultChip::Component.new(
+    <%= render SearchResultsOrg::MultiResultChip::Component.new(
       chip_id: @chip_id,
       result_count: @pagy.count,
       label: @query

@@ -5,7 +5,7 @@
   )) %>
 <% end %>
 
-<%= render(Org::RegistrationSearch::Component.new(
+<%= render(SearchOrg::SearchWrapper::Component.new(
   organization: current_organization,
   current_user:,
   pagy: @pagy,

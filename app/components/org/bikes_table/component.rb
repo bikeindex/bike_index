@@ -3,7 +3,7 @@
 module Org
   module BikesTable
     # The organization registrations table: bike rows with every org column.
-    # Extracted from Org::RegistrationSearch so it can render on its own, without
+    # Extracted from SearchOrg::SearchWrapper so it can render on its own, without
     # the search form, column-toggle settings, or pagination (e.g. a user's other
     # registrations on the show page). Pass render_sortable to enable sort links.
     class Component < ApplicationComponent
@@ -24,10 +24,10 @@ module Org
       private
 
       # Column labels and additional fields derive from the organization alone, so
-      # a bare settings component is enough when a caller (e.g. RegistrationSearch)
+      # a bare settings component is enough when a caller (e.g. SearchWrapper)
       # doesn't pass its own already-built one in.
       def settings_component
-        @settings_component ||= Org::RegistrationSearchSettings::Component.new(organization: @organization)
+        @settings_component ||= SearchOrg::Settings::Component.new(organization: @organization)
       end
 
       def hidden_not_registered_tag

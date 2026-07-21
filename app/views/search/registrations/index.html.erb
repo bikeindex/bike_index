@@ -15,7 +15,7 @@
   </div>
 <% end %>
 
-<%= render Search::ResultsFrame::Component.new(frame_id: :search_registrations_results_frame,
+<%= render SearchResults::Frame::Component.new(frame_id: :search_registrations_results_frame,
   render_results: @render_results, current_path: request.original_fullpath,
   loading_text: t(".loading_results")) do %>
   <%= render partial: "results" %>

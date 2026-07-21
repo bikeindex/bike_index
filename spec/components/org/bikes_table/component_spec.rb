@@ -40,7 +40,7 @@ RSpec.describe Org::BikesTable::Component, type: :component do
 
   context "with an injected settings_component" do
     let(:other_org) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[reg_phone]) }
-    let(:injected) { Org::RegistrationSearchSettings::Component.new(organization: other_org) }
+    let(:injected) { SearchOrg::Settings::Component.new(organization: other_org) }
     let(:options) { super().merge(settings_component: injected) }
 
     it "derives columns from the injected component, not a freshly built one" do

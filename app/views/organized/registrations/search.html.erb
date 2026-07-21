@@ -1,6 +1,6 @@
 <%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
 
-<% registration_search_settings = Org::RegistrationSearchSettings::Component.new(
+<% settings_component = SearchOrg::Settings::Component.new(
   organization: current_organization,
   interpreted_params: @interpreted_params,
   sortable_search_params:,
@@ -20,17 +20,17 @@
 <div
   class="org-registration-search-component"
   data-controller="org--registration-search org--registration-search-column-toggle"
-  data-org--registration-search-column-toggle-default-columns-value="<%= registration_search_settings.initially_checked_columns.to_json %>"
+  data-org--registration-search-column-toggle-default-columns-value="<%= settings_component.initially_checked_columns.to_json %>"
   data-org--registration-search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
 >
   <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
   <% unless turbo_frame_request? %>
     <div class="mb-4">
-      <%= render(Search::FormOrganized::Component.new(
+      <%= render(SearchOrg::Form::Component.new(
         target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
         target_frame: :organized_bikes_results_frame,
         interpreted_params: form_interpreted_params,
-        settings_component: registration_search_settings
+        settings_component:
       )) do %>
         <% if @bike_sticker.present? %>
           <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
@@ -39,7 +39,7 @@
     </div>
   <% end %>
 
-  <%= render Search::ResultsFrame::Component.new(frame_id: :organized_bikes_results_frame,
+  <%= render SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
     render_results: @render_results, current_path: request.original_fullpath) do %>
     <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
 

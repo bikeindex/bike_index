@@ -5544,7 +5544,8 @@ es:
       result_view_select:
         bike_box_view: Ver como lista
         thumbnail_view: Ver como miniaturas
-      form_organized:
+    search_org:
+      form:
         doesnt_look_like_serial: Esto no parece un número de serie. Los números de
           serie suelen tener 6 o más letras y números, y se encuentran debajo del
           corchete inferior.
@@ -5552,10 +5553,71 @@ es:
         submit: entregar
         search_notes: Notas de búsqueda
         search_owner_email_or_name: Buscar el correo electrónico o el nombre del propietario
-      results_frame:
+      search_wrapper:
+        affiliation: Afiliación
+        avery_exportable: Exportable de Avery
+        bike: registro
+        e_vehicle_propulsion: Vehículo eléctrico (propulsión)
+        e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
+        link: Enlace
+        matching_bikes_html: "%{count} %{cycle_type} coincidentes"
+        mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
+        phone: Teléfono
+        reg_address: DIRECCIÓN
+        registered_bikes_html: "%{count} %{cycle_type} coincidente para %{org_name}"
+        student_id: Carné de estudiante
+        vehicle: registro
+        view_matching_any_audit: ver coincidencia con cualquier auditoría
+      settings:
+        address: 'DIRECCIÓN:'
+        all: todo
+        avery_cell: Exportable de Avery
+        bike: registro
+        color_cell: Color
+        create_export_of_vehicles: Crear exportación de la búsqueda %{cycle_type}
+        created_at_cell: Registrado
+        creation_description_cell: Fuente
+        cycle_type_cell: Tipo de vehículo
+        default: por defecto
+        filter_impounded_html: únicamente <strong>confiscado</strong>
+        filter_no_address_html: "<strong>Sin</strong> dirección"
+        filter_no_sticker_html: "<strong>Sin</strong> pegatina"
+        filter_not_impounded_html: solo que <strong>no</strong> fue confiscado
+        filter_not_stolen_or_impounded_html: no robado ni confiscado
+        filter_stolen_html: solo robado
+        filter_with_address_html: solo <strong>con</strong> dirección
+        filter_with_stickers_html: solo <strong>con</strong> pegatinas
+        impound_id_cell: ID del depósito
+        impounded_cell: Incautado
+        manufacturer_cell: Fabricante
+        model_cell: Modelo
+        none: ninguno
+        notes_cell: Notas de registro
+        owner_email_cell: Enviado a
+        owner_name_cell: Nombre del propietario
+        propulsion_type_cell: Vehículo eléctrico (propulsión)
+        reg_address_cell: DIRECCIÓN
+        reg_extra_registration_number_cell: Secundario#
+        reg_organization_affiliation_cell: Afiliación
+        reg_phone_cell: Teléfono
+        reg_student_id_cell: Carné de estudiante
+        serial_number_cell: De serie
+        settings: ajustes
+        show_notes_search: mostrar notas de búsqueda
+        status: 'Estado:'
+        status_cell: Estado
+        sticker_cell: Etiqueta engomada
+        stickers: 'Pegatinas:'
+        stolen_cell: Robado
+        updated_at_cell: Actualizado
+        url_cell: URL
+        vehicle: registro
+        visible_columns: Columnas visibles
+        multi_search: búsqueda serial múltiple
+    search_results:
+      frame:
         rate_limited: Se han realizado demasiadas búsquedas demasiado rápido; se ha
           alcanzado el límite de solicitudes. Espere un momento y vuelva a intentarlo.
-    search_results:
       bike_box:
         location: Ubicación
         posted_at: Listado
@@ -5572,8 +5634,17 @@ es:
       container:
         no_results: No se encontraron registros que coincidieran exactamente con su
           búsqueda.
+    search_results_org:
       multi_result_chip:
         no_results: no hay coincidencias
+      multi_results:
+        first_n_shown_html: "— primero %{limit} mostrado,"
+        no_exact_matches: 'No hay coincidencias exactas. Números de serie cercanos:'
+        no_matches_found: No se encontraron coincidencias
+        result_count_html: "— %{count} %{results}"
+        serial_label: 'De serie:'
+        view_all: ver todo
+        sticker_label: 'Etiqueta engomada:'
     page_block:
       marketplace_listing_panel:
         condition: Condición
@@ -5955,96 +6026,3 @@ es:
         reprocess_instruction: Regrese aquí y haga clic en el botón "Reprocesar importación"
           que aparece a continuación.
         unknown_ascend_name: Nombre de Ascend desconocido
-      registration_search:
-        affiliation: Afiliación
-        assign_bike_sticker: Asignar pegatina
-        avery: "¿Avery?"
-        avery_exportable: Exportable de Avery
-        bike: registro
-        color: Color
-        e_vehicle_propulsion: Vehículo eléctrico (propulsión)
-        e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
-        email_hidden: Correo electrónico oculto
-        impound_id: ID del depósito
-        impounded: Incautado
-        link: Enlace
-        link_sticker: pegatina de enlace
-        manufacturer: Fabricante
-        matching_bikes_html: "%{count} %{cycle_type} coincidentes"
-        mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
-        model: Modelo
-        notes: Notas de registro
-        owner_name: Nombre del propietario
-        phone: Teléfono
-        propulsion_type: Propulsión
-        reg_address: DIRECCIÓN
-        registered: Registrado
-        registered_bikes_html: "%{count} %{cycle_type} coincidente para %{org_name}"
-        secondary_number: Secundario#
-        sent_to: Enviado a
-        serial: De serie
-        source: Fuente
-        status_cell: Estado
-        sticker: Etiqueta engomada
-        stolen: Robado
-        student_id: Carné de estudiante
-        updated: Actualizado
-        url: URL
-        vehicle: registro
-        vehicle_type: Tipo de vehículo
-        view_matching_any_audit: ver coincidencia con cualquier auditoría
-        hidden_not_registered: oculto, no registrado con %{org_name}
-      registration_search_settings:
-        address: 'DIRECCIÓN:'
-        all: todo
-        avery_cell: Exportable de Avery
-        bike: registro
-        color_cell: Color
-        create_export_of_vehicles: Crear exportación de la búsqueda %{cycle_type}
-        created_at_cell: Registrado
-        creation_description_cell: Fuente
-        cycle_type_cell: Tipo de vehículo
-        default: por defecto
-        filter_impounded_html: únicamente <strong>confiscado</strong>
-        filter_no_address_html: "<strong>Sin</strong> dirección"
-        filter_no_sticker_html: "<strong>Sin</strong> pegatina"
-        filter_not_impounded_html: solo que <strong>no</strong> fue confiscado
-        filter_not_stolen_or_impounded_html: no robado ni confiscado
-        filter_stolen_html: solo robado
-        filter_with_address_html: solo <strong>con</strong> dirección
-        filter_with_stickers_html: solo <strong>con</strong> pegatinas
-        impound_id_cell: ID del depósito
-        impounded_cell: Incautado
-        manufacturer_cell: Fabricante
-        model_cell: Modelo
-        none: ninguno
-        notes_cell: Notas de registro
-        owner_email_cell: Enviado a
-        owner_name_cell: Nombre del propietario
-        propulsion_type_cell: Vehículo eléctrico (propulsión)
-        reg_address_cell: DIRECCIÓN
-        reg_extra_registration_number_cell: Secundario#
-        reg_organization_affiliation_cell: Afiliación
-        reg_phone_cell: Teléfono
-        reg_student_id_cell: Carné de estudiante
-        serial_number_cell: De serie
-        settings: ajustes
-        show_notes_search: mostrar notas de búsqueda
-        status: 'Estado:'
-        status_cell: Estado
-        sticker_cell: Etiqueta engomada
-        stickers: 'Pegatinas:'
-        stolen_cell: Robado
-        updated_at_cell: Actualizado
-        url_cell: URL
-        vehicle: registro
-        visible_columns: Columnas visibles
-        multi_search: búsqueda serial múltiple
-      multi_search_results:
-        first_n_shown_html: "— primero %{limit} mostrado,"
-        no_exact_matches: 'No hay coincidencias exactas. Números de serie cercanos:'
-        no_matches_found: No se encontraron coincidencias
-        result_count_html: "— %{count} %{results}"
-        serial_label: 'De serie:'
-        view_all: ver todo
-        sticker_label: 'Etiqueta engomada:'
