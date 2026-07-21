@@ -35,7 +35,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   def settings_selector
-    "[data-org--registration-search-target='settings']"
+    "[data-org--search-target='settings']"
   end
 
   def expect_settings_open

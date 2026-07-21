@@ -72,8 +72,8 @@ module Org
 
         def component_wrapper_data_attributes
           return {} if @skip_settings
-          {controller: "org--registration-search org--registration-search-column-toggle",
-           "org--registration-search-column-toggle-default-columns-value": initially_checked_columns.to_json}
+          {controller: "org--search org--search-column-toggle",
+           "org--search-column-toggle-default-columns-value": initially_checked_columns.to_json}
         end
 
         def show_pagination?

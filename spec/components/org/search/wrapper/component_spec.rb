@@ -39,11 +39,11 @@ RSpec.describe Org::Search::Wrapper::Component, type: :component do
   it "renders table with form, checkboxes, and bike data" do
     expect(component).to have_css("table")
     expect(component).to have_css("tbody tr", count: 1)
-    expect(component).to have_css("[data-org--registration-search-target='settings']", visible: :all)
+    expect(component).to have_css("[data-org--search-target='settings']", visible: :all)
     # Search form
     expect(component).to have_css("#Search_Form")
     # checkboxes
-    expect(component).to have_css("[data-org--registration-search-target='settings'].tw\\:hidden\\!", visible: :all)
+    expect(component).to have_css("[data-org--search-target='settings'].tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)
     # pagination
     expect(component).to have_css(".paginate-container")

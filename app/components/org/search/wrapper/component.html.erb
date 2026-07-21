@@ -1,4 +1,4 @@
-<%= tag.div(class: "org-registration-search-component", data: component_wrapper_data_attributes) do %>
+<%= tag.div(class: "org-search-component", data: component_wrapper_data_attributes) do %>
   <% if @skip_search_and_filters %>
     <%= render(settings_component) unless @skip_settings %>
   <% else %>
@@ -72,8 +72,8 @@
           class: "form-control d-inline-block",
           style: "width: 100%; max-width: 15rem; margin-top:15px;",
           data: {
-            org__registration_search_target: "perPage",
-            action: "change->org--registration-search#perPageChanged"
+            org__search_target: "perPage",
+            action: "change->org--search#perPageChanged"
           } %>
       </div>
     </div>

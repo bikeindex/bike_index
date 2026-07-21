@@ -18,10 +18,10 @@
 ).compact %>
 
 <div
-  class="org-registration-search-component"
-  data-controller="org--registration-search org--registration-search-column-toggle"
-  data-org--registration-search-column-toggle-default-columns-value="<%= settings_component.initially_checked_columns.to_json %>"
-  data-org--registration-search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
+  class="org-search-component"
+  data-controller="org--search org--search-column-toggle"
+  data-org--search-column-toggle-default-columns-value="<%= settings_component.initially_checked_columns.to_json %>"
+  data-org--search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
 >
   <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
   <% unless turbo_frame_request? %>
