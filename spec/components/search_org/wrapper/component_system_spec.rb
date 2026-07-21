@@ -2,8 +2,8 @@
 
 require "rails_helper"
 
-RSpec.describe SearchOrg::SearchWrapper::Component, :js, type: :system do
-  let(:preview_path) { "/rails/view_components/search_org/search_wrapper/component/default" }
+RSpec.describe SearchOrg::Wrapper::Component, :js, type: :system do
+  let(:preview_path) { "/rails/view_components/search_org/wrapper/component/default" }
   let!(:organization) { FactoryBot.create(:organization_brakebills) }
   let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 

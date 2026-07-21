@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module SearchOrg
-  module SearchWrapper
+  module Wrapper
     class ComponentPreview < ApplicationComponentPreview
       # @display legacy_stylesheet true
       def default
         pagy = Pagy::Offset.new(count: bikes.count, page: 1, limit: 10)
-        render SearchOrg::SearchWrapper::Component.new(
+        render SearchOrg::Wrapper::Component.new(
           organization: lookbook_organization,
           pagy:,
           bikes:,

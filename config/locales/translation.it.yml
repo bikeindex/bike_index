@@ -5566,7 +5566,7 @@ it:
         submit: invia
         search_notes: Note di ricerca
         search_owner_email_or_name: Cerca l'indirizzo email o il nome del proprietario
-      search_wrapper:
+      wrapper:
         affiliation: Affiliazione
         avery_exportable: Avery Esportabile
         bike: registrazione

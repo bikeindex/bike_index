@@ -63,7 +63,7 @@ module SearchOrg
         @skip_search_and_filters = skip_search_and_filters
       end
 
-      # Called via delegation from SearchOrg::SearchWrapper
+      # Called via delegation from SearchOrg::Wrapper
       def active_search_filter_descriptions
         values = {search_stickers: @search_stickers, search_address: @search_address, search_status: @search_status}
 

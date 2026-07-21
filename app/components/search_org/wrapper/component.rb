@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module SearchOrg
-  module SearchWrapper
+  module Wrapper
     class Component < ApplicationComponent
       include Binxtils::SortableHelper
 

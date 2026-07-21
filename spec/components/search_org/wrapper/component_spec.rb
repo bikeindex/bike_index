@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe SearchOrg::SearchWrapper::Component, type: :component do
+RSpec.describe SearchOrg::Wrapper::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do

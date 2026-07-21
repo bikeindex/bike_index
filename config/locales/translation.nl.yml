@@ -5452,7 +5452,7 @@ nl:
         submit: Voorleggen
         search_notes: Zoeknotities
         search_owner_email_or_name: Zoek naar het e-mailadres of de naam van de eigenaar.
-      search_wrapper:
+      wrapper:
         affiliation: Aansluiting
         avery_exportable: Avery Exporteerbaar
         bike: Registratie

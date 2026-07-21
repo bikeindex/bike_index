@@ -3,7 +3,7 @@
 module SearchResultsOrg
   module BikesTable
     # The organization registrations table: bike rows with every org column.
-    # Extracted from SearchOrg::SearchWrapper so it can render on its own, without
+    # Extracted from SearchOrg::Wrapper so it can render on its own, without
     # the search form, column-toggle settings, or pagination (e.g. a user's other
     # registrations on the show page). Pass render_sortable to enable sort links.
     class Component < ApplicationComponent
@@ -24,7 +24,7 @@ module SearchResultsOrg
       private
 
       # Column labels and additional fields derive from the organization alone, so
-      # a bare settings component is enough when a caller (e.g. SearchWrapper)
+      # a bare settings component is enough when a caller (e.g. Wrapper)
       # doesn't pass its own already-built one in.
       def settings_component
         @settings_component ||= SearchOrg::Settings::Component.new(organization: @organization)

@@ -5303,7 +5303,7 @@ nb:
         submit: sende inn
         search_notes: Søk i notater
         search_owner_email_or_name: Søk etter eierens e-postadresse eller navn
-      search_wrapper:
+      wrapper:
         affiliation: Tilknytning
         avery_exportable: Avery eksporterbar
         bike: registrering

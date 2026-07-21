@@ -5553,7 +5553,7 @@ es:
         submit: entregar
         search_notes: Notas de búsqueda
         search_owner_email_or_name: Buscar el correo electrónico o el nombre del propietario
-      search_wrapper:
+      wrapper:
         affiliation: Afiliación
         avery_exportable: Exportable de Avery
         bike: registro
