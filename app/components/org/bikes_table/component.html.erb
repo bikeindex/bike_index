@@ -1,4 +1,5 @@
 <% organization = @organization %>
+<% current_user = @current_user %>
 
 <%= tag.div(data: table_wrapper_data_attributes) do %>
   <%= render(UI::Table::Component.new(records: @bikes, cache_key: @cache_key, render_sortable: @render_sortable)) do |table| %>
@@ -33,7 +34,7 @@
     <% end %>
 
     <% table.column(label: translation(".serial"), classes: "hideableColumn serial_number_cell") do |bike| %>
-      <%= helpers.render_serial_display(bike, @current_user) %>
+      <%= helpers.render_serial_display(bike, current_user) %>
     <% end %>
 
     <% table.column(sortable: "propulsion_type", label: translation(".propulsion_type"), classes: "hideableColumn propulsion_type_cell") do |bike| %>
@@ -155,7 +156,7 @@
       <% end %>
     <% end %>
 
-    <% if @organization.enabled?("avery_export") %>
+    <% if organization.enabled?("avery_export") %>
       <% table.column(label: translation(".avery"), classes: "hideableColumn avery_cell") do |bike| %>
         <% check_mark if bike.organized?(organization) && bike.avery_exportable? %>
       <% end %>

@@ -26,6 +26,18 @@ RSpec.describe Org::BikesTable::Component, type: :component do
     expect(component).not_to have_css("th a.twlink")
   end
 
+  context "with a hidden-serial bike and an authorized org member" do
+    let(:current_user) { FactoryBot.create(:organization_role_claimed, organization:).user }
+    let(:options) { super().merge(current_user:) }
+    let(:bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization).reload }
+
+    it "passes the current user through so the hidden serial is revealed" do
+      expect(bike.serial_hidden?).to be_truthy
+      expect(component).to have_css(".serial_number_cell .serial-span", text: bike.serial_number.upcase)
+      expect(component).to have_no_css(".serial_number_cell", text: "Hidden")
+    end
+  end
+
   context "with render_sortable" do
     let(:options) { {organization:, bikes:, render_sortable: true} }
 
