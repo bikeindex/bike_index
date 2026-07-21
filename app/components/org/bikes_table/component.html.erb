@@ -1,3 +1,5 @@
+<%# Locals, not @ivars: UI::Table instance_execs cell blocks against itself, %>
+<%# so instance variables resolve to nil inside them — closures capture these. %>
 <% organization = @organization %>
 <% current_user = @current_user %>
 
