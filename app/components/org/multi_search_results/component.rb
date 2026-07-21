@@ -6,15 +6,13 @@ module Org
       include Binxtils::SortableHelper
 
       def initialize(organization:, query:, chip_id:, pagy:, search_kind: "serials",
-        bikes: nil, interpreted_params: nil, per_page: nil, close_serials: nil)
+        bikes: nil, close_serials: nil)
         @organization = organization
         @query = query
         @chip_id = chip_id
         @pagy = pagy
         @search_kind = search_kind
         @bikes = bikes
-        @interpreted_params = interpreted_params
-        @per_page = per_page
         @close_serials = close_serials
       end
 
