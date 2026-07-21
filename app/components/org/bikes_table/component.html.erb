@@ -1,5 +1,7 @@
+<%# Locals, not @ivars: UI::Table instance_execs cell blocks against itself, %>
+<%# so instance variables resolve to nil inside them — closures capture these. %>
 <% organization = @organization %>
-<% bike_sticker = @bike_sticker %>
+<% current_user = @current_user %>
 
 <%= tag.div(data: table_wrapper_data_attributes) do %>
   <%= render(UI::Table::Component.new(records: @bikes, cache_key: @cache_key, render_sortable: @render_sortable)) do |table| %>
@@ -34,7 +36,7 @@
     <% end %>
 
     <% table.column(label: translation(".serial"), classes: "hideableColumn serial_number_cell") do |bike| %>
-      <%= helpers.render_serial_display(bike, @current_user) %>
+      <%= helpers.render_serial_display(bike, current_user) %>
     <% end %>
 
     <% table.column(sortable: "propulsion_type", label: translation(".propulsion_type"), classes: "hideableColumn propulsion_type_cell") do |bike| %>
@@ -156,7 +158,7 @@
       <% end %>
     <% end %>
 
-    <% if @organization.enabled?("avery_export") %>
+    <% if organization.enabled?("avery_export") %>
       <% table.column(label: translation(".avery"), classes: "hideableColumn avery_cell") do |bike| %>
         <% check_mark if bike.organized?(organization) && bike.avery_exportable? %>
       <% end %>
@@ -164,7 +166,7 @@
 
     <% if organization.enabled?("bike_stickers") %>
       <% table.column(label: translation(".sticker"), classes: "hideableColumn sticker_cell tw:pt-0", header_classes: "tw:pt-1") do |bike| %>
-        <% bike.bike_stickers.each_with_index do |bs, index| %>
+        <% bike.bike_stickers.each do |bs| %>
           <% if bs.organization.present? && bs.organization_id == organization.id %>
             <%= link_to bs.pretty_code, edit_organization_sticker_path(id: bs.code, organization_id: bs.organization&.to_param), class: "tw:text-xs tw:block tw:mt-1", data: {turbo_frame: "_top"} %>
           <% else %>

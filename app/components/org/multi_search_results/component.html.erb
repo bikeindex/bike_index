@@ -24,18 +24,11 @@
         <%= translation(".no_exact_matches") %>
       </p>
     <% end %>
-    <%= render(Org::RegistrationSearch::Component.new(
+    <%= render(Org::BikesTable::Component.new(
       organization: @organization,
-      pagy: @pagy,
       bikes: displayed_bikes,
-      interpreted_params: @interpreted_params,
-      sortable_search_params:,
-      per_page: @per_page,
-      params: helpers.params,
-      search_query_present: true,
-      skip_search_and_filters: true,
-      skip_settings: true,
-      skip_count: true
+      render_sortable: true,
+      sortable_search_params:
     )) %>
   <% else %>
     <p class="tw:text-gray-500"><%= translation(".no_matches_found") %></p>
