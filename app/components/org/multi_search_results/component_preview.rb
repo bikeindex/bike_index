@@ -11,9 +11,7 @@ module Org
           query: "SERIAL111",
           chip_id: "chip_0",
           pagy:,
-          bikes:,
-          interpreted_params: {},
-          per_page: 10
+          bikes:
         )
       end
 
@@ -26,8 +24,6 @@ module Org
           chip_id: "chip_0",
           pagy:,
           bikes: Bike.none,
-          interpreted_params: {},
-          per_page: 10,
           close_serials: close_serial_bikes
         )
       end
