@@ -1,5 +1,4 @@
 <% organization = @organization %>
-<% bike_sticker = @bike_sticker %>
 
 <%= tag.div(data: table_wrapper_data_attributes) do %>
   <%= render(UI::Table::Component.new(records: @bikes, cache_key: @cache_key, render_sortable: @render_sortable)) do |table| %>
@@ -164,7 +163,7 @@
 
     <% if organization.enabled?("bike_stickers") %>
       <% table.column(label: translation(".sticker"), classes: "hideableColumn sticker_cell tw:pt-0", header_classes: "tw:pt-1") do |bike| %>
-        <% bike.bike_stickers.each_with_index do |bs, index| %>
+        <% bike.bike_stickers.each do |bs| %>
           <% if bs.organization.present? && bs.organization_id == organization.id %>
             <%= link_to bs.pretty_code, edit_organization_sticker_path(id: bs.code, organization_id: bs.organization&.to_param), class: "tw:text-xs tw:block tw:mt-1", data: {turbo_frame: "_top"} %>
           <% else %>
