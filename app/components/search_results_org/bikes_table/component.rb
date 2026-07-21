@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Org
+module SearchResultsOrg
   module BikesTable
     # The organization registrations table: bike rows with every org column.
     # Extracted from SearchOrg::SearchWrapper so it can render on its own, without

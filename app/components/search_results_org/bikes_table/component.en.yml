@@ -1,7 +1,7 @@
 ---
 en:
   components:
-    org:
+    search_results_org:
       bikes_table:
         assign_bike_sticker: Assign sticker
         avery: Avery?

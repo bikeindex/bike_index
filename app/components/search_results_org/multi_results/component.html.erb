@@ -24,7 +24,7 @@
         <%= translation(".no_exact_matches") %>
       </p>
     <% end %>
-    <%= render(Org::BikesTable::Component.new(
+    <%= render(SearchResultsOrg::BikesTable::Component.new(
       organization: @organization,
       bikes: displayed_bikes,
       render_sortable: true,
