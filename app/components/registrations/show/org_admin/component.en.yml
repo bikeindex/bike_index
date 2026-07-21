@@ -19,7 +19,6 @@ en:
           impound: Impound
           impound_sub: Single confirmation
           internal_notes: Internal notes
-          law_enforcement_access: law-enforcement access
           link_sticker: Link sticker
           manufacturer: Manufacturer
           message_owner: Message owner
@@ -41,6 +40,7 @@ en:
           org_can_edit: "%{org_name} can edit this %{bike_type}"
           org_can_edit_sub: Including after the %{bike_type} is claimed.
           other_registrations: Other registrations by this user
+          other_registrations_count_html: "%{count} other registrations"
           owner_access: Owner & access
           owner_attestation: Owner attestation
           owner_email: Email
@@ -67,8 +67,10 @@ en:
           role_limited: Limited · RA
           role_staff: Admin / Staff
           serial: Serial
+          showing_recent: Showing the %{count} most recent
           start_audit: Start audit
           stolen: Stolen
+          view_all_registrations: view all →
           view_notifications: View notifications
           view_notifications_sub: Parking activity
           year: Year

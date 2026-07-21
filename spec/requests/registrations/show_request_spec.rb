@@ -136,6 +136,34 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
+    context "when the owner has other registrations" do
+      let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+      let(:owner) { FactoryBot.create(:user_confirmed) }
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: owner) }
+      let!(:other_bikes) { FactoryBot.create_list(:bike_organized, 2, :with_ownership_claimed, creation_organization: organization, user: owner) }
+
+      it "lists the owner's other registrations, excluding this bike" do
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("Other registrations by this user")
+        # The owner has 3 registrations; this bike is excluded from the count and table
+        expect(body).to match("2 other registrations")
+        other_bikes.each { |b| expect(response.body).to include(bike_path(b, organization_id: organization.to_param)) }
+        expect(body).to_not match("Showing the")
+      end
+
+      context "more than the display limit" do
+        before { stub_const("Registrations::Show::OrgAdmin::Component::OTHER_REGISTRATIONS_LIMIT", 1) }
+        it "caps the table and links to the org search for the full list" do
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match("2 other registrations")
+          expect(body).to match("Showing the 1 most recent")
+          expect(response.body).to include(organization_registrations_path(organization_id: organization.to_param, search_email: owner.email))
+        end
+      end
+    end
+
     context "limited role (member_no_bike_edit)" do
       let(:current_user) { FactoryBot.create(:organization_user, organization: organization, role: "member_no_bike_edit") }
       it "hides owner contact and shows the restricted card" do

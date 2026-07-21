@@ -266,29 +266,6 @@
       <% end %>
 
       <%= render(Registrations::Show::ComponentList::Component.new(bike: @bike, collapsed: true)) %>
-
-      <% if show_contact? && other_user_bikes.count > 1 %>
-        <%= render(UI::Card::Component.new) do %>
-          <div class="tw:flex tw:items-baseline tw:justify-between">
-            <h2
-              class="
-                tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-                tw:uppercase
-              "
-            >
-              <%= translation(".other_registrations") %>
-            </h2>
-
-            <span class="tw:text-xs tw:opacity-65">
-              <%= translation(".law_enforcement_access") %>
-            </span>
-          </div>
-
-          <div class="tw:mt-3">
-            <%= render(Org::BikesTable::Component.new(organization: @organization, bikes: other_user_bikes, current_user: @current_user)) %>
-          </div>
-        <% end %>
-      <% end %>
     </div>
 
     <div class="tw:flex tw:flex-col tw:gap-6">
@@ -459,4 +436,35 @@
       <% end %>
     </div>
   </div>
+
+  <% if show_contact? && other_registrations_count.positive? %>
+    <%= render(UI::Card::Component.new) do %>
+      <div class="tw:flex tw:items-baseline tw:justify-between">
+        <h2
+          class="
+            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+            tw:uppercase
+          "
+        >
+          <%= translation(".other_registrations") %>
+        </h2>
+
+        <span class="tw:text-xs tw:opacity-65">
+          <%= translation(".other_registrations_count_html", count: helpers.number_display(other_registrations_count)) %>
+        </span>
+      </div>
+
+      <div class="tw:mt-3">
+        <%= render(Org::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user)) %>
+      </div>
+
+      <% if more_other_registrations? %>
+        <p class="tw:mt-3 tw:text-xs tw:opacity-65">
+          <%= translation(".showing_recent", count: recent_other_registrations.size) %>
+          ·
+          <%= link_to translation(".view_all_registrations"), other_registrations_search_path, class: "twlink", data: {turbo_frame: "_top"} %>
+        </p>
+      <% end %>
+    <% end %>
+  <% end %>
 </div>

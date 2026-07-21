@@ -4,6 +4,8 @@ module Registrations
   module Show
     module OrgAdmin
       class Component < ApplicationComponent
+        OTHER_REGISTRATIONS_LIMIT = 10
+
         # staff: overrides the computed role so a superadmin can view the org
         # panel as staff or as limited (view_as)
         def initialize(bike:, current_user:, organization:, mapbox_key: nil, available_views: [], staff: nil)
@@ -238,9 +240,26 @@ module Registrations
           edit_bike_path(@bike, edit_template: @bike.default_edit_template)
         end
 
-        def other_user_bikes
-          @other_user_bikes ||= (@bike.user.presence&.bikes || Bike.where(owner_email: @bike.owner_email))
-            .reorder(id: :desc).limit(10)
+        def other_registrations
+          @other_registrations ||= (@bike.user.presence&.bikes || Bike.where(owner_email: @bike.owner_email))
+            .where.not(id: @bike.id)
+        end
+
+        def other_registrations_count
+          @other_registrations_count ||= other_registrations.count
+        end
+
+        # Most recent registrations only; the rest are reachable via the org search link
+        def recent_other_registrations
+          @recent_other_registrations ||= other_registrations.reorder(id: :desc).limit(OTHER_REGISTRATIONS_LIMIT)
+        end
+
+        def other_registrations_search_path
+          organization_registrations_path(organization_id: @organization.to_param, search_email: @bike.owner_email)
+        end
+
+        def more_other_registrations?
+          other_registrations_count > OTHER_REGISTRATIONS_LIMIT
         end
       end
     end
