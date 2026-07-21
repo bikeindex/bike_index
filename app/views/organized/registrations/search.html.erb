@@ -1,6 +1,6 @@
 <%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
 
-<% settings_component = SearchOrg::Settings::Component.new(
+<% settings_component = Org::Search::Settings::Component.new(
   organization: current_organization,
   interpreted_params: @interpreted_params,
   sortable_search_params:,
@@ -26,7 +26,7 @@
   <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
   <% unless turbo_frame_request? %>
     <div class="mb-4">
-      <%= render(SearchOrg::Form::Component.new(
+      <%= render(Org::Search::Form::Component.new(
         target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
         target_frame: :organized_bikes_results_frame,
         interpreted_params: form_interpreted_params,

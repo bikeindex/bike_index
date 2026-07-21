@@ -5295,75 +5295,6 @@ nb:
       result_view_select:
         bike_box_view: Vis som liste
         thumbnail_view: Vis som miniatyrbilder
-    search_org:
-      form:
-        doesnt_look_like_serial: Dette ser ikke ut som et serienummer. Serienumre
-          er vanligvis 6+ bokstaver og tall, plassert under kranklageret.
-        search_for_serial_number: Søk etter serienummer
-        submit: sende inn
-        search_notes: Søk i notater
-        search_owner_email_or_name: Søk etter eierens e-postadresse eller navn
-      wrapper:
-        affiliation: Tilknytning
-        avery_exportable: Avery eksporterbar
-        bike: registrering
-        e_vehicle_propulsion: Elbil (fremdrift)
-        e_vehicles_for_audit: 'Elbiler for revisjon:'
-        link: Link
-        matching_bikes_html: "%{count} %{cycle_type} samsvarende"
-        mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
-        phone: Telefon
-        reg_address: Adresse
-        registered_bikes_html: "%{count} %{cycle_type} samsvarer med %{org_name}"
-        student_id: Student ID
-        vehicle: registrering
-        view_matching_any_audit: visning som samsvarer med enhver revisjon
-      settings:
-        address: 'Adresse:'
-        all: Alle
-        avery_cell: Avery eksporterbar
-        bike: registrering
-        color_cell: Farge
-        create_export_of_vehicles: Opprett eksport av søkte %{cycle_type}
-        created_at_cell: Registrert
-        creation_description_cell: Kilde
-        cycle_type_cell: Bil type
-        default: misligholde
-        filter_impounded_html: bare <strong>beslaglagt</strong>
-        filter_no_address_html: bare <strong>ingen</strong> adresse
-        filter_no_sticker_html: bare <strong>uten</strong> klistremerke
-        filter_not_impounded_html: bare <strong>ikke</strong> beslaglagt
-        filter_not_stolen_or_impounded_html: ikke stjålet eller beslaglagt
-        filter_stolen_html: bare stjålet
-        filter_with_address_html: bare <strong>med</strong> adresse
-        filter_with_stickers_html: bare <strong>med</strong> klistremerker
-        impound_id_cell: Beslags-ID
-        impounded_cell: Beslaglagt
-        manufacturer_cell: Produsent
-        model_cell: Modell
-        none: ingen
-        notes_cell: Notater
-        owner_email_cell: Sendt til
-        owner_name_cell: Eiers navn
-        propulsion_type_cell: Elbil (fremdrift)
-        reg_address_cell: Adresse
-        reg_extra_registration_number_cell: Sekundærnr.
-        reg_organization_affiliation_cell: Tilknytning
-        reg_phone_cell: Telefon
-        reg_student_id_cell: Student ID
-        serial_number_cell: Serienummer
-        settings: innstillinger
-        show_notes_search: vis notatsøk
-        status: 'Status:'
-        status_cell: Status
-        sticker_cell: Klistremerke
-        stickers: 'Klistremerker:'
-        stolen_cell: Stjålet
-        updated_at_cell: Oppdatert
-        url_cell: URL-adresse
-        vehicle: registrering
-        visible_columns: Synlige kolonner
-        multi_search: søk i flere serier
     search_results:
       frame:
         rate_limited: For mange søk for raskt – du er frekvensbegrenset. Vent et øyeblikk,
@@ -5383,17 +5314,6 @@ nb:
         member: Medlem av sykkelindeksen
       container:
         no_results: Ingen registreringer samsvarte nøyaktig med søket ditt
-    search_results_org:
-      multi_result_chip:
-        no_results: ingen treff
-      multi_results:
-        first_n_shown_html: "— først vist %{limit},"
-        no_exact_matches: 'Ingen eksakte treff. Nære serier:'
-        no_matches_found: Ingen treff funnet
-        result_count_html: "— %{count} %{results}"
-        serial_label: 'Serie:'
-        view_all: se alle
-        sticker_label: 'Klistremerke:'
     page_block:
       marketplace_listing_panel:
         condition: Betingelse
@@ -5646,6 +5566,86 @@ nb:
             edit_my_account_path: redigering på kontoen min
             use_account_address: Bruk kontoadresse
     org:
+      search:
+        form:
+          doesnt_look_like_serial: Dette ser ikke ut som et serienummer. Serienumre
+            er vanligvis 6+ bokstaver og tall, plassert under kranklageret.
+          search_for_serial_number: Søk etter serienummer
+          submit: sende inn
+          search_notes: Søk i notater
+          search_owner_email_or_name: Søk etter eierens e-postadresse eller navn
+        wrapper:
+          affiliation: Tilknytning
+          avery_exportable: Avery eksporterbar
+          bike: registrering
+          e_vehicle_propulsion: Elbil (fremdrift)
+          e_vehicles_for_audit: 'Elbiler for revisjon:'
+          link: Link
+          matching_bikes_html: "%{count} %{cycle_type} samsvarende"
+          mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
+          phone: Telefon
+          reg_address: Adresse
+          registered_bikes_html: "%{count} %{cycle_type} samsvarer med %{org_name}"
+          student_id: Student ID
+          vehicle: registrering
+          view_matching_any_audit: visning som samsvarer med enhver revisjon
+        settings:
+          address: 'Adresse:'
+          all: Alle
+          avery_cell: Avery eksporterbar
+          bike: registrering
+          color_cell: Farge
+          create_export_of_vehicles: Opprett eksport av søkte %{cycle_type}
+          created_at_cell: Registrert
+          creation_description_cell: Kilde
+          cycle_type_cell: Bil type
+          default: misligholde
+          filter_impounded_html: bare <strong>beslaglagt</strong>
+          filter_no_address_html: bare <strong>ingen</strong> adresse
+          filter_no_sticker_html: bare <strong>uten</strong> klistremerke
+          filter_not_impounded_html: bare <strong>ikke</strong> beslaglagt
+          filter_not_stolen_or_impounded_html: ikke stjålet eller beslaglagt
+          filter_stolen_html: bare stjålet
+          filter_with_address_html: bare <strong>med</strong> adresse
+          filter_with_stickers_html: bare <strong>med</strong> klistremerker
+          impound_id_cell: Beslags-ID
+          impounded_cell: Beslaglagt
+          manufacturer_cell: Produsent
+          model_cell: Modell
+          none: ingen
+          notes_cell: Notater
+          owner_email_cell: Sendt til
+          owner_name_cell: Eiers navn
+          propulsion_type_cell: Elbil (fremdrift)
+          reg_address_cell: Adresse
+          reg_extra_registration_number_cell: Sekundærnr.
+          reg_organization_affiliation_cell: Tilknytning
+          reg_phone_cell: Telefon
+          reg_student_id_cell: Student ID
+          serial_number_cell: Serienummer
+          settings: innstillinger
+          show_notes_search: vis notatsøk
+          status: 'Status:'
+          status_cell: Status
+          sticker_cell: Klistremerke
+          stickers: 'Klistremerker:'
+          stolen_cell: Stjålet
+          updated_at_cell: Oppdatert
+          url_cell: URL-adresse
+          vehicle: registrering
+          visible_columns: Synlige kolonner
+          multi_search: søk i flere serier
+      search_results:
+        multi_result_chip:
+          no_results: ingen treff
+        multi_results:
+          first_n_shown_html: "— først vist %{limit},"
+          no_exact_matches: 'Ingen eksakte treff. Nære serier:'
+          no_matches_found: Ingen treff funnet
+          result_count_html: "— %{count} %{results}"
+          serial_label: 'Serie:'
+          view_all: se alle
+          sticker_label: 'Klistremerke:'
       location_address_fields:
         address: Adresse
         choose_country: Velg land

@@ -5557,76 +5557,6 @@ it:
       result_view_select:
         bike_box_view: Visualizza come elenco
         thumbnail_view: Visualizza come miniature
-    search_org:
-      form:
-        doesnt_look_like_serial: Questo non sembra un numero di serie. I numeri di
-          serie sono solitamente composti da 6 o più lettere e numeri, e si trovano
-          sotto il movimento centrale.
-        search_for_serial_number: Cerca il numero di serie
-        submit: invia
-        search_notes: Note di ricerca
-        search_owner_email_or_name: Cerca l'indirizzo email o il nome del proprietario
-      wrapper:
-        affiliation: Affiliazione
-        avery_exportable: Avery Esportabile
-        bike: registrazione
-        e_vehicle_propulsion: Veicolo elettrico (propulsione)
-        e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
-        link: Collegamento
-        matching_bikes_html: "%{count} %{cycle_type} corrispondente"
-        mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
-        phone: Telefono
-        reg_address: Indirizzo
-        registered_bikes_html: "%{count} %{cycle_type} corrispondente a %{org_name}"
-        student_id: Tessera studentesca
-        vehicle: registrazione
-        view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
-      settings:
-        address: 'Indirizzo:'
-        all: Tutti
-        avery_cell: Avery Esportabile
-        bike: registrazione
-        color_cell: Colore
-        create_export_of_vehicles: Crea l'esportazione della ricerca %{cycle_type}
-        created_at_cell: Registrato
-        creation_description_cell: Fonte
-        cycle_type_cell: Tipo di veicolo
-        default: predefinito
-        filter_impounded_html: solo <strong>sequestrato</strong>
-        filter_no_address_html: solo <strong>nessun</strong> indirizzo
-        filter_no_sticker_html: solo <strong>senza</strong> adesivo
-        filter_not_impounded_html: solo <strong>non</strong> sequestrato
-        filter_not_stolen_or_impounded_html: non rubato o sequestrato
-        filter_stolen_html: solo rubato
-        filter_with_address_html: solo <strong>con</strong> indirizzo
-        filter_with_stickers_html: solo <strong>con</strong> adesivi
-        impound_id_cell: ID del sequestro
-        impounded_cell: Sequestrato
-        manufacturer_cell: Produttore
-        model_cell: Modello
-        none: nessuno
-        notes_cell: Note
-        owner_email_cell: Inviato a
-        owner_name_cell: Nome del proprietario
-        propulsion_type_cell: Veicolo elettrico (propulsione)
-        reg_address_cell: Indirizzo
-        reg_extra_registration_number_cell: Secondario#
-        reg_organization_affiliation_cell: Affiliazione
-        reg_phone_cell: Telefono
-        reg_student_id_cell: Tessera studentesca
-        serial_number_cell: Seriale
-        settings: impostazioni
-        show_notes_search: mostra le note cerca
-        status: 'Stato:'
-        status_cell: Stato
-        sticker_cell: Adesivo
-        stickers: 'Adesivi:'
-        stolen_cell: Rubata
-        updated_at_cell: Fatto
-        url_cell: URL
-        vehicle: registrazione
-        visible_columns: Colonne visibili
-        multi_search: ricerca seriale multipla
     search_results:
       frame:
         rate_limited: 'Troppe ricerche in troppo breve: il numero di ricerche è limitato.
@@ -5646,17 +5576,6 @@ it:
         member: Membro di Bike Index
       container:
         no_results: Nessuna registrazione corrisponde esattamente alla tua ricerca
-    search_results_org:
-      multi_result_chip:
-        no_results: nessuna corrispondenza
-      multi_results:
-        first_n_shown_html: "— prima %{limit} mostrata,"
-        no_exact_matches: 'Nessuna corrispondenza esatta. Numeri di serie simili:'
-        no_matches_found: Nessuna corrispondenza trovata
-        result_count_html: "— %{count} %{results}"
-        serial_label: 'Seriale:'
-        view_all: visualizza tutto
-        sticker_label: 'Adesivo:'
     page_block:
       marketplace_listing_panel:
         condition: Condizione
@@ -5916,6 +5835,87 @@ it:
             edit_my_account_path: modifica il mio account
             use_account_address: Utilizzare l'indirizzo dell'account
     org:
+      search:
+        form:
+          doesnt_look_like_serial: Questo non sembra un numero di serie. I numeri di
+            serie sono solitamente composti da 6 o più lettere e numeri, e si trovano
+            sotto il movimento centrale.
+          search_for_serial_number: Cerca il numero di serie
+          submit: invia
+          search_notes: Note di ricerca
+          search_owner_email_or_name: Cerca l'indirizzo email o il nome del proprietario
+        wrapper:
+          affiliation: Affiliazione
+          avery_exportable: Avery Esportabile
+          bike: registrazione
+          e_vehicle_propulsion: Veicolo elettrico (propulsione)
+          e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
+          link: Collegamento
+          matching_bikes_html: "%{count} %{cycle_type} corrispondente"
+          mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
+          phone: Telefono
+          reg_address: Indirizzo
+          registered_bikes_html: "%{count} %{cycle_type} corrispondente a %{org_name}"
+          student_id: Tessera studentesca
+          vehicle: registrazione
+          view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
+        settings:
+          address: 'Indirizzo:'
+          all: Tutti
+          avery_cell: Avery Esportabile
+          bike: registrazione
+          color_cell: Colore
+          create_export_of_vehicles: Crea l'esportazione della ricerca %{cycle_type}
+          created_at_cell: Registrato
+          creation_description_cell: Fonte
+          cycle_type_cell: Tipo di veicolo
+          default: predefinito
+          filter_impounded_html: solo <strong>sequestrato</strong>
+          filter_no_address_html: solo <strong>nessun</strong> indirizzo
+          filter_no_sticker_html: solo <strong>senza</strong> adesivo
+          filter_not_impounded_html: solo <strong>non</strong> sequestrato
+          filter_not_stolen_or_impounded_html: non rubato o sequestrato
+          filter_stolen_html: solo rubato
+          filter_with_address_html: solo <strong>con</strong> indirizzo
+          filter_with_stickers_html: solo <strong>con</strong> adesivi
+          impound_id_cell: ID del sequestro
+          impounded_cell: Sequestrato
+          manufacturer_cell: Produttore
+          model_cell: Modello
+          none: nessuno
+          notes_cell: Note
+          owner_email_cell: Inviato a
+          owner_name_cell: Nome del proprietario
+          propulsion_type_cell: Veicolo elettrico (propulsione)
+          reg_address_cell: Indirizzo
+          reg_extra_registration_number_cell: Secondario#
+          reg_organization_affiliation_cell: Affiliazione
+          reg_phone_cell: Telefono
+          reg_student_id_cell: Tessera studentesca
+          serial_number_cell: Seriale
+          settings: impostazioni
+          show_notes_search: mostra le note cerca
+          status: 'Stato:'
+          status_cell: Stato
+          sticker_cell: Adesivo
+          stickers: 'Adesivi:'
+          stolen_cell: Rubata
+          updated_at_cell: Fatto
+          url_cell: URL
+          vehicle: registrazione
+          visible_columns: Colonne visibili
+          multi_search: ricerca seriale multipla
+      search_results:
+        multi_result_chip:
+          no_results: nessuna corrispondenza
+        multi_results:
+          first_n_shown_html: "— prima %{limit} mostrata,"
+          no_exact_matches: 'Nessuna corrispondenza esatta. Numeri di serie simili:'
+          no_matches_found: Nessuna corrispondenza trovata
+          result_count_html: "— %{count} %{results}"
+          serial_label: 'Seriale:'
+          view_all: visualizza tutto
+          sticker_label: 'Adesivo:'
       location_address_fields:
         address: Indirizzo
         choose_country: Seleziona il paese
