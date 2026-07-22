@@ -24,6 +24,9 @@ module Saml
       "#{base_url}/sso/#{slug(saml_configuration)}/callback"
     end
 
+    #
+    # private below here
+    #
     def single_logout_service_url(saml_configuration)
       "#{base_url}/sso/#{slug(saml_configuration)}/slo"
     end

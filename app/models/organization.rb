@@ -242,14 +242,6 @@ class Organization < ApplicationRecord
       where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
     end
 
-    def permitted_domain_passwordless_signin
-      where.not(user_email_domain: nil).with_enabled_feature_slugs("passwordless_users")
-    end
-
-    def permitted_domain_saml_signin
-      where.not(user_email_domain: nil).with_enabled_feature_slugs("saml_sso")
-    end
-
     def passwordless_email_matching(str)
       domain = email_domain(str)
       return nil if domain.blank?
@@ -269,21 +261,29 @@ class Organization < ApplicationRecord
         .detect { |org| org.organization_saml_configuration&.configured? }
     end
 
-    def email_domain(str)
-      normalized = EmailNormalizer.normalize(str)
-      return nil unless normalized.present? && normalized.count("@") == 1 && normalized.match?(/.@.*\../)
-
-      normalized.split("@").last
-    end
-
     def example
       # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
       found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
       found || Organization.create(name: "Example Bike Shop")
     end
 
+    private
+
     # Internal helpers for the *_email_matching entrypoints — not part of the public API.
-    private :permitted_domain_passwordless_signin, :permitted_domain_saml_signin, :email_domain
+    def permitted_domain_passwordless_signin
+      where.not(user_email_domain: nil).with_enabled_feature_slugs("passwordless_users")
+    end
+
+    def permitted_domain_saml_signin
+      where.not(user_email_domain: nil).with_enabled_feature_slugs("saml_sso")
+    end
+
+    def email_domain(str)
+      normalized = EmailNormalizer.normalize(str)
+      return nil unless normalized.present? && normalized.count("@") == 1 && normalized.match?(/.@.*\../)
+
+      normalized.split("@").last
+    end
   end
   # never geocode, use default_location lat/long
   def should_be_geocoded?

@@ -41,6 +41,9 @@ module Saml
       failure(e.message)
     end
 
+    #
+    # private below here
+    #
     def provider
       OrganizationSamlConfiguration::PROVIDER
     end
