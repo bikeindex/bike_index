@@ -281,6 +281,9 @@ class Organization < ApplicationRecord
       found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
       found || Organization.create(name: "Example Bike Shop")
     end
+
+    # Internal helpers for the *_email_matching entrypoints — not part of the public API.
+    private :permitted_domain_passwordless_signin, :permitted_domain_saml_signin, :email_domain
   end
   # never geocode, use default_location lat/long
   def should_be_geocoded?
