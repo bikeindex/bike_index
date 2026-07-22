@@ -15,6 +15,11 @@ module UI
       def h3
         render(UI::Header::Component.new(text: "Heading 3", tag: :h3))
       end
+
+      def with_subtitle
+        render(UI::Header::Component.new(text: "Register your bike!",
+          subtitle: "Just the essentials to start."))
+      end
       # @!endgroup
     end
   end
