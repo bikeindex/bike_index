@@ -1,0 +1,14 @@
+<div data-controller="registrations--show--action-panels">
+  <button
+    type="button"
+    data-registrations--show--action-panels-target="trigger"
+    data-panel-name="parking"
+    data-action="registrations--show--action-panels#toggle"
+    aria-expanded="false"
+    class="twbtn"
+  >
+    Parking notification
+  </button>
+
+  <%= render(Registrations::Show::OrgTopActionsParkingNotification::Component.new(bike:, organization:)) %>
+</div>

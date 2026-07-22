@@ -76,6 +76,10 @@ module Registrations
           @bike.unregistered_parking_notification?
         end
 
+        def impounded?
+          @bike.status_impounded?
+        end
+
         # Owner contact + law-enforcement data is only shown to full staff on a bike
         # registered with their organization
         def show_contact?
@@ -87,10 +91,6 @@ module Registrations
         def contactable?
           @bike.current_stolen_record.present? ||
             (@bike.status_with_owner? && @organization.enabled?("unstolen_notifications"))
-        end
-
-        def message_notification
-          @message_notification ||= StolenNotification.new(bike: @bike)
         end
 
         def role_label
@@ -229,6 +229,11 @@ module Registrations
           @organization.enabled?("parking_notifications")
         end
 
+        # No point filing a new parking notification against an already-impounded bike
+        def show_create_parking_notification?
+          show_parking_notifications? && !impounded?
+        end
+
         def parking_notifications
           @parking_notifications ||= @organization.parking_notifications.where(bike_id: @bike.id)
         end
@@ -252,20 +257,6 @@ module Registrations
           end
         end
 
-        def new_parking_notification
-          return @new_parking_notification if defined?(@new_parking_notification)
-
-          notification = ParkingNotification.new(bike_id: @bike.id, organization: @organization, use_entered_address: false)
-          notification.is_repeat = notification.likely_repeat?
-          notification.set_location_from_organization
-          notification.kind ||= notification.potential_initial_record&.kind || ParkingNotification.kinds.first
-          @new_parking_notification = notification
-        end
-
-        def create_parking_notifications_path
-          organization_parking_notifications_path(organization_id: @organization.to_param)
-        end
-
         def notifications_path
           organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
         end
@@ -282,8 +273,21 @@ module Registrations
           organization_impound_records_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
         end
 
-        def impound_label
+        # Staff create an impound before it's impounded, and update it after
+        def show_create_impound?
+          show_impound? && staff? && !impounded?
+        end
+
+        def show_update_impound?
+          show_impound? && staff? && impounded?
+        end
+
+        def impound_title
           staff? ? translation(".impound") : translation(".request_impound")
+        end
+
+        def impound_subtitle
+          translation(".record_impounding")
         end
 
         def edit_access_path

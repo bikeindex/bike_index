@@ -11,7 +11,9 @@ export default class extends Controller {
 
   connect () {
     const name = new URLSearchParams(window.location.search).get('panel')
-    if (name) this.open(name, null, 0)
+    // Defer so panel controllers finish connecting and their `shown` listeners
+    // are registered first (e.g. parking-notification's geolocation on open)
+    if (name) window.requestAnimationFrame(() => this.open(name, null, 0))
   }
 
   toggle (event) {

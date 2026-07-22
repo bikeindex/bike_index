@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    registrations:
+      show:
+        org_top_actions_parking_notification:
+          address_or_intersection: Address or intersection
+          create_parking_notification: Create a new parking notification
+          impound_this_vehicle: Impound this vehicle
+          parking_notification_notes_html: "%{org_name} internal notes <small>not
+            shown to user</small>"

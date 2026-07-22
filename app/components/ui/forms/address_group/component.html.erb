@@ -1,0 +1,31 @@
+<div
+  data-controller="ui--forms--address-group"
+  data-ui--forms--address-group-us-id-value="<%= us_country_id %>"
+>
+  <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :street, kind: :text_field, label_text: street_label)) %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :city, kind: :text_field, label_text: translation(".city"))) %>
+
+  <div class="tw:grid tw:grid-cols-2 tw:gap-x-2">
+    <div
+      data-ui--forms--address-group-target="state"
+      class="<%= state_hidden_class %>"
+    >
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :region_record_id, kind: :content_block, label_text: translation(".state"))) do %>
+        <%= @form.collection_select(:region_record_id, State.united_states, :id, :name, {include_blank: true}, {class: "twinput tw:w-full"}) %>
+      <% end %>
+    </div>
+
+    <div
+      data-ui--forms--address-group-target="region"
+      class="<%= region_hidden_class %>"
+    >
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :region_string, kind: :text_field, label_text: translation(".region"))) %>
+    </div>
+
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :postal_code, kind: :text_field, label_text: translation(".postal_code"))) %>
+
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :country_id, kind: :content_block, label_text: translation(".country"))) do %>
+      <%= @form.select(:country_id, Country.select_options, {prompt: translation(".choose_country"), selected: selected_country_id}, {class: "twinput tw:w-full", data: {action: "change->ui--forms--address-group#toggleCountry", "ui--forms--address-group-target": "country"}}) %>
+    <% end %>
+  </div>
+</div>

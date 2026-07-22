@@ -1,0 +1,7 @@
+<div
+  data-registrations--show--action-panels-target="panel"
+  data-panel-name="impound_update"
+  class="tw:hidden"
+>
+  <%= render(Org::ImpoundRecordUpdateForm::Component.new(current_organization: @organization, impound_record:)) %>
+</div>

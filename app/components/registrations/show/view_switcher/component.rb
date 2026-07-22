@@ -21,7 +21,7 @@ module Registrations
         private
 
         # The pill text: the org/audience name, optionally followed by the viewer's
-        # role (e.g. "Brakebills · Full access"), the role muted to read as secondary.
+        # role (e.g. "Brakebills · Staff"), the role muted to read as secondary.
         def display_label
           return @label if @role_label.blank?
 
