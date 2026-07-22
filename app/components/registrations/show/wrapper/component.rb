@@ -37,7 +37,8 @@ module Registrations
         # session varies across devices/logins) — the csrf-refresh controller reissues
         # them client-side from the meta tag.
         def cache_key
-          ["registrations/show", @current_user&.id, BikeServices::ShowViews.view_param(@view), @bike.cache_key_with_version]
+          ["registrations/show", @current_user&.id, Flipper.enabled?(:bike_show_redesign, @current_user),
+            BikeServices::ShowViews.view_param(@view), @bike.cache_key_with_version]
         end
       end
     end
