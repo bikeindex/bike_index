@@ -1,7 +1,7 @@
 class RegistrationsController < ApplicationController
   before_action :allow_x_frame, except: %i[new show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
-  before_action :simple_header, except: %i[show]
+  before_action :simple_header, except: %i[show edit]
   layout "reg_embed"
 
   def show
@@ -12,6 +12,11 @@ class RegistrationsController < ApplicationController
 
     render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view: current_view(available_views),
       available_views:), layout: "application")
+  end
+
+  # The redesign has no edit view of its own; edit still lives on the bike
+  def edit
+    redirect_to edit_bike_path(params[:id], request.query_parameters)
   end
 
   def new
