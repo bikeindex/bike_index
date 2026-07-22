@@ -62,7 +62,7 @@ class RegistrationsController < ApplicationController
   # perspective the user is allowed — otherwise it flashes and falls back.
   def current_view(available_views)
     requested = view_from_param(params[:view_as])
-    if params[:view_as].present? && !BikeServices::ShowViews.permitted?(requested, available_views:)
+    if params[:view_as].present? && !available_views.include?(requested)
       flash.now[:error] = "You're not allowed to view this registration that way"
       requested = nil
     end

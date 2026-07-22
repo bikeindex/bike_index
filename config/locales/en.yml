@@ -5218,7 +5218,13 @@ en:
       weve_sent_an_email: We've sent an email to the address you have on file with
         us.
     show:
+      banned_only_visible_to_superusers: Their profile is only visible because you're
+        a superuser.
+      banned_user: This user is banned
       bikes: Bikes
+      profile_hidden: This profile isn't shared publicly
+      profile_hidden_owner: It's only visible to you because it's your page.
+      profile_hidden_superuser: It's only visible because you're a superuser.
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes

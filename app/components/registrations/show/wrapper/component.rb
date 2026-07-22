@@ -13,6 +13,12 @@ module Registrations
           @available_views = available_views
         end
 
+        def call
+          capture do
+            cache(cache_key) { concat(render(inner_component)) }
+          end
+        end
+
         private
 
         def inner_component

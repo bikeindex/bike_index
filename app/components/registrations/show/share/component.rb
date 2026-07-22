@@ -9,6 +9,16 @@ module Registrations
           @text = text
           @url = url
         end
+
+        def call
+          render UI::Button::Component.new(color: :secondary, size: :md,
+            html_class: "tw:w-full tw:justify-center tw:py-2.5!",
+            data: {controller: "registrations--show--share",
+                   "registrations--show--share-url-value": @url,
+                   action: "registrations--show--share#share"}) do
+            content_tag(:span, @text, data: {"registrations--show--share-target": "label"})
+          end
+        end
       end
     end
   end

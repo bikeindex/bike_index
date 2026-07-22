@@ -4,7 +4,13 @@ module Registrations
   module Show
     module OrgAdmin
       class Component < ApplicationComponent
+        include BikeHelper
+
         OTHER_REGISTRATIONS_LIMIT = 10
+        # Parking-notification statuses that are still ongoing (vs replaced/retrieved/resolved)
+        ACTIVE_PARKING_STATUSES = %w[current impounded].freeze
+        # Registration fields shown with the owner (their tie to the org) rather than in registration info
+        OWNER_ACCESS_REG_FIELDS = %w[reg_organization_affiliation reg_student_id].freeze
 
         # staff: overrides the computed role so a superadmin can view the org
         # panel as staff or as limited (view_as)
@@ -22,6 +28,11 @@ module Registrations
         end
 
         private
+
+        # A definition-list row that always renders, showing a muted "-" when blank
+        def info_row(label, value = nil, &block)
+          render(UI::DefinitionList::Row::Component.new(label:, value:, render_with_no_value: true, no_value_text: "-"), &block)
+        end
 
         def action_icon(icon, tile: :purple)
           tile_bg, icon_color = case tile
@@ -65,10 +76,6 @@ module Registrations
           staff? ? translation(".role_staff") : translation(".role_limited")
         end
 
-        def org_chip_label
-          organization_registered? ? @organization.short_name : translation(".not_in_org")
-        end
-
         def org_chip_color
           organization_registered? ? :purple : :warning
         end
@@ -82,48 +89,7 @@ module Registrations
         end
 
         def title
-          helpers.bike_title_html(@bike)
-        end
-
-        def status_label
-          @bike.status_stolen? ? translation(".stolen") : translation(".not_stolen")
-        end
-
-        def status_color
-          @bike.status_stolen? ? :error : :success
-        end
-
-        def subtitle
-          parts = [@bike.year, manufacturer_name, @bike.frame_model].compact_blank
-          [parts.join(" "), @bike.frame_colors.to_sentence].compact_blank.join(" · ")
-        end
-
-        def manufacturer_name
-          @bike.manufacturer&.other? ? @bike.mnfg_name : @bike.manufacturer&.name
-        end
-
-        # Only vehicles that aren't a standard bike surface the type
-        def vehicle_type
-          @bike.cycle_type_name unless @bike.type == "bike"
-        end
-
-        def activity_name
-          @bike.primary_activity&.display_name
-        end
-
-        def frame_color_records
-          [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
-        end
-
-        def primary_colors_label
-          translation(".#{frame_color_records.many? ? "primary_colors" : "primary_color"}")
-        end
-
-        def color_swatches
-          frame_color_records.map do |color|
-            swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm, align: :baseline))
-            content_tag(:span, safe_join([swatch, " ", color.name]), class: "tw:whitespace-nowrap")
-          end
+          bike_title_html(@bike)
         end
 
         def credibility_scorer
@@ -150,15 +116,54 @@ module Registrations
           @bike.phone if @bike.phoneable_by?(@current_user)
         end
 
-        # The organization's additional registration fields (affiliation, student
-        # ID, etc.) for this bike, as [label, value] rows — blank values dropped
+        def current_ownership
+          @current_ownership ||= @bike.current_ownership
+        end
+
+        def bike_stickers
+          @bike_stickers ||= @bike.bike_stickers.reorder(claimed_at: :desc)
+        end
+
+        # Org-owned stickers link to their edit page; others show the code as text
+        def sticker_link(bike_sticker)
+          return bike_sticker.pretty_code unless bike_sticker.organization == @organization
+
+          link_to(bike_sticker.pretty_code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: @organization.to_param), class: "twlink")
+        end
+
+        def model_audit
+          return @model_audit if defined?(@model_audit)
+
+          @model_audit = @bike.model_audit_id.present? ? @bike.model_audit : nil
+        end
+
+        # The org's certification record for this bike's model, if any
+        def organization_model_audit
+          return @organization_model_audit if defined?(@organization_model_audit)
+
+          @organization_model_audit = model_audit &&
+            OrganizationModelAudit.find_by(organization_id: @organization.id, model_audit_id: @bike.model_audit_id)
+        end
+
+        # The organization's additional registration fields (address, etc.) for
+        # this bike, as [label, value] rows — blank values dropped. Sticker, phone,
+        # affiliation and student ID are shown elsewhere
         def org_registration_field_rows
-          (@organization.additional_registration_fields - ["reg_bike_sticker"]).filter_map do |reg_field|
+          (@organization.additional_registration_fields - %w[reg_bike_sticker reg_phone] - OWNER_ACCESS_REG_FIELDS).filter_map do |reg_field|
             bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
             value = org_registration_field_value(bike_attr)
             next if value.blank?
 
             [org_registration_field_label(reg_field, bike_attr), value]
+          end
+        end
+
+        # Affiliation & student ID [label, value] rows for owner & access; blank
+        # values render a muted "-" rather than dropping
+        def owner_reg_field_rows
+          (@organization.additional_registration_fields & OWNER_ACCESS_REG_FIELDS).map do |reg_field|
+            bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
+            [org_registration_field_label(reg_field, bike_attr), org_registration_field_value(bike_attr)]
           end
         end
 
@@ -183,7 +188,7 @@ module Registrations
           address = @bike.registration_address
           return if address.blank? || address == @organization.default_location&.address_hash_legacy
 
-          [address["address"], address["city"], [address["state"], address["zipcode"]].compact_blank.join(" ")]
+          [address["street"], address["city"], [address["state"], address["zipcode"]].compact_blank.join(" ")]
             .compact_blank.join(", ").presence
         end
 
@@ -207,16 +212,31 @@ module Registrations
           @parking_notifications ||= @organization.parking_notifications.where(bike_id: @bike.id)
         end
 
-        def current_notifications_count
-          @current_notifications_count ||= parking_notifications.current.count
+        def active_notifications_count
+          @active_notifications_count ||= parking_notifications.where(status: ACTIVE_PARKING_STATUSES).count
         end
 
         def resolved_notifications_count
-          @resolved_notifications_count ||= parking_notifications.resolved.count
+          @resolved_notifications_count ||= parking_notifications.where.not(status: ACTIVE_PARKING_STATUSES).count
+        end
+
+        # Boxed count + label; links to the search only when the count is non-zero
+        def parking_stat(count, path, label)
+          inner = safe_join([
+            content_tag(:span, count, class: "tw:block tw:text-2xl tw:font-bold"),
+            content_tag(:span, label, class: "tw:block tw:text-xs")
+          ])
+          content_tag(:div, class: "tw:rounded-lg tw:border tw:border-gray-200 tw:p-3 tw:text-center tw:dark:border-gray-700") do
+            count.positive? ? link_to(inner, path, class: "twlink tw:block") : inner
+          end
         end
 
         def notifications_path
           organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
+        end
+
+        def resolved_notifications_path
+          organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "resolved")
         end
 
         def show_impound?

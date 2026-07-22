@@ -38,6 +38,12 @@ module Registrations
           @available_views.select { |_kind, organization| organization }
         end
 
+        # Grouped by organization so dividers land between organizations, not
+        # between the roles of a single org (a superadmin sees staff + limited)
+        def org_view_groups
+          org_views.chunk_while { |a, b| a.last == b.last }.to_a
+        end
+
         def other_views
           @available_views.reject { |_kind, organization| organization }
         end
