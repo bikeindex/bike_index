@@ -107,7 +107,7 @@ module Admin
           :name,
           :opted_into_theft_survey_2023,
           :parent_organization_id,
-          :passwordless_user_domain,
+          :user_email_domain,
           :previous_slug,
           :search_radius_miles,
           :search_radius_kilometers,

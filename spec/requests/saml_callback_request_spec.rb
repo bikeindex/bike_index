@@ -6,7 +6,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
   let(:domain) { "example.edu" }
   let(:organization) do
     FactoryBot.create(:organization_with_organization_features,
-      enabled_feature_slugs: %w[saml_sso passwordless_users], passwordless_user_domain: domain)
+      enabled_feature_slugs: %w[saml_sso passwordless_users], user_email_domain: domain)
   end
   let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
   let(:slug) { organization.to_param }

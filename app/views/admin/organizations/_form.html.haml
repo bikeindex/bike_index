@@ -181,7 +181,7 @@
 
           - if @organization.enabled?("passwordless_users")
             .form-group
-              = f.label :passwordless_user_domain do
+              = f.label :user_email_domain do
                 %span
                 permitted domain for passwordless sign in
                 %small
@@ -189,7 +189,7 @@
               .input-group
                 .input-group-prepend
                   .input-group-text @
-                = f.text_field :passwordless_user_domain, placeholder: "something.gov", class: "form-control", disabled: !current_user.developer?
+                = f.text_field :user_email_domain, placeholder: "something.gov", class: "form-control", disabled: !current_user.developer?
               - unless current_user.developer?
                 %span.small.less-strong Ask Seth for help changing this, it's delicate
 
