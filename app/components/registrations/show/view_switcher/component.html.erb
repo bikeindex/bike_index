@@ -4,9 +4,13 @@
       <%= display_label %>
     <% end %>
 
-    <% org_views.each do |view| %>
-      <% dropdown.with_entry_item do %>
-        <%= entry_link(view) %>
+    <% org_view_groups.each_with_index do |group, index| %>
+      <% dropdown.with_entry_divider if index.positive? %>
+
+      <% group.each do |view| %>
+        <% dropdown.with_entry_item do %>
+          <%= entry_link(view) %>
+        <% end %>
       <% end %>
     <% end %>
 
