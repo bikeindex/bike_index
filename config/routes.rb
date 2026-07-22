@@ -322,7 +322,7 @@ Rails.application.routes.draw do
     resources :users, only: %i[index show edit update destroy]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
-      :constraints => DeveloperRestriction,
+      :constraints => SuperuserRestriction,
       :as => :feature_flags
   end
 
