@@ -127,4 +127,6 @@
   <% end %>
 
   <%= render(Registrations::Show::ComponentList::Component.new(bike: @bike)) %>
+
+  <%= render(Registrations::Show::LegacyViewLink::Component.new(bike: @bike, current_user: @current_user)) %>
 </div>

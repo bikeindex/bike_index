@@ -1,0 +1,3 @@
+<div class="tw:mt-2 tw:text-center">
+  <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_classic"), href: toggle_show_redesign_my_account_path, method: :post, params: {bike_id: @bike.id}, color: :link, class: "tw:text-sm")) %>
+</div>

@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    registrations:
+      show:
+        legacy_view_link:
+          switch_to_classic: Switch back to the classic view

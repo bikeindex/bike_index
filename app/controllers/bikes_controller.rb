@@ -1,9 +1,8 @@
 class BikesController < Bikes::BaseController
   skip_before_action :verify_authenticity_token, only: %i[create]
   before_action :sign_in_if_not!, only: %i[show]
-  before_action :authenticate_user, only: %i[toggle_show_redesign]
   before_action :render_ad, only: %i[show]
-  skip_before_action :find_bike, except: %i[show update pdf resolve_token toggle_show_redesign]
+  skip_before_action :find_bike, except: %i[show update pdf resolve_token]
   skip_before_action :assign_current_organization, except: %i[show]
   skip_before_action :ensure_user_allowed_to_edit, except: %i[update pdf]
   around_action :set_reading_role, only: %i[show]
@@ -206,17 +205,6 @@ class BikesController < Bikes::BaseController
     end
 
     redirect_to bike_path(@bike.id)
-  end
-
-  # Flip the redesign flag for the current user and send them to whichever view is now active
-  def toggle_show_redesign
-    if Flipper.enabled?(:bike_show_redesign, current_user)
-      Flipper.disable_actor(:bike_show_redesign, current_user)
-      redirect_to bike_path(@bike)
-    else
-      Flipper.enable_actor(:bike_show_redesign, current_user)
-      redirect_to registration_path(@bike)
-    end
   end
 
   private

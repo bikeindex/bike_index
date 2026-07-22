@@ -122,6 +122,7 @@ Rails.application.routes.draw do
     end
   end
   resource :my_account, only: %i[show update destroy] do
+    post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
   end
@@ -188,7 +189,6 @@ Rails.application.routes.draw do
       get :scanned
       get :pdf
       put :resolve_token
-      post :toggle_show_redesign
     end
     resource :recovery, only: %i[edit update], controller: "bikes/recovery"
     resource :theft_alert, only: %i[new create show], controller: "bikes/theft_alerts"
