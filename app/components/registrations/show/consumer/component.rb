@@ -58,6 +58,8 @@ module Registrations
         def status_label
           if @bike.status_stolen?
             translation(".stolen")
+          elsif @bike.status_found?
+            translation(".found")
           elsif @bike.status_impounded?
             translation(".impounded")
           else

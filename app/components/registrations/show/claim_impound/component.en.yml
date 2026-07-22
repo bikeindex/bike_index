@@ -6,6 +6,7 @@ en:
         claim_impound:
           add_a_stolen_bike: add a stolen bike
           choose_stolen_bike: Choose stolen bike
+          claim_found_bike: Claim found bike
           claim_impounded_bike: Claim impounded bike
           does_this_look_like_your_bike: Does this look like your bike?
           need_stolen_bike_html: You need a stolen bike registered to file a claim

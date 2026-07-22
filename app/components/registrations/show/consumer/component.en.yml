@@ -11,6 +11,7 @@ en:
           audience_sent_away: No longer your %{bike_type}
           bike_details: "%{bike_type} details"
           edit_this_bike: Edit this %{bike_type}
+          found: Found
           frame_material: Frame material
           frame_size: Frame size
           handlebar_type: Handlebar type

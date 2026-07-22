@@ -18,6 +18,10 @@ module Registrations
 
         private
 
+        def claim_button_text
+          translation(@bike.status_found? ? ".claim_found_bike" : ".claim_impounded_bike")
+        end
+
         def impound_record
           @impound_record ||= @bike.current_impound_record
         end

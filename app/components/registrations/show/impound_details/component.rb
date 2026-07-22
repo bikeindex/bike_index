@@ -15,6 +15,10 @@ module Registrations
 
         private
 
+        def found?
+          @bike.status_found?
+        end
+
         def impound_record
           @impound_record ||= @bike.current_impound_record
         end

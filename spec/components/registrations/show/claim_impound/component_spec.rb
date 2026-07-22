@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe Registrations::Show::ClaimImpound::Component, type: :component do
   let(:component) { described_class.new(bike:, current_user:, owner: false) }
-  let(:bike) { FactoryBot.create(:bike_organized, :impounded).reload }
+  let(:bike) { FactoryBot.create(:impound_record, :with_organization).bike.reload }
 
   context "impounded bike, logged out" do
     let(:current_user) { nil }
@@ -35,6 +35,16 @@ RSpec.describe Registrations::Show::ClaimImpound::Component, type: :component do
       render_inline(component)
       expect(page).to have_text("need a stolen bike")
       expect(page).to have_link("add a stolen bike")
+    end
+  end
+
+  context "found bike" do
+    let(:bike) { FactoryBot.create(:bike, :impounded).reload }
+    let(:current_user) { nil }
+
+    it "labels the button for a found bike" do
+      render_inline(component)
+      expect(page).to have_text("Claim found bike")
     end
   end
 

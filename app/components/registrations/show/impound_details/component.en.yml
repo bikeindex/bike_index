@@ -4,6 +4,8 @@ en:
     registrations:
       show:
         impound_details:
+          found_at: Found at
+          found_details: Found details
           impound_details: Impound details
           impounded_at: Impounded at
           location: Location

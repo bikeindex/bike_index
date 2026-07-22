@@ -11,10 +11,10 @@
 
     <div class="tw:mt-3">
       <% if sign_in_redirect %>
-        <%= render(UI::ButtonLink::Component.new(href: sign_in_redirect, text: translation(".claim_impounded_bike"), color: :purple)) %>
+        <%= render(UI::ButtonLink::Component.new(href: sign_in_redirect, text: claim_button_text, color: :purple)) %>
       <% elsif stolen_record_options.any? %>
         <%= render(UI::Button::Component.new(
-          text: translation(".claim_impounded_bike"),
+          text: claim_button_text,
           color: :purple,
           data: {"registrations--show--contact-owner-target": "trigger", action: "registrations--show--contact-owner#reveal"}
         )) %>
