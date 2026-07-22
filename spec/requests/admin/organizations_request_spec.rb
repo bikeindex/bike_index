@@ -233,15 +233,13 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       end
     end
     context "update user_email_domain" do
-      it "updates with a valid domain" do
+      it "updates a valid domain and rejects values with an @ or without a ." do
         put "#{base_url}/#{organization.to_param}", params: {organization: {user_email_domain: "bikeindex.org"}}
-        organization.reload
-        expect(organization.user_email_domain).to eq "bikeindex.org"
-      end
-      it "rejects a value with an @ or without a ." do
+        expect(organization.reload.user_email_domain).to eq "bikeindex.org"
         put "#{base_url}/#{organization.to_param}", params: {organization: {user_email_domain: "@bikeindex.org"}}
-        organization.reload
-        expect(organization.user_email_domain).to be_nil
+        expect(organization.reload.user_email_domain).to eq "bikeindex.org" # unchanged - invalid
+        put "#{base_url}/#{organization.to_param}", params: {organization: {user_email_domain: "bikeindexorg"}}
+        expect(organization.reload.user_email_domain).to eq "bikeindex.org" # unchanged - invalid
       end
     end
     context "update organization_saml_configuration" do
