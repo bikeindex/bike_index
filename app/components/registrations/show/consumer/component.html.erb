@@ -83,8 +83,10 @@
   </div>
 
   <%= render(Registrations::Show::ContactOwner::Component.new(bike: @bike, current_user: @current_user, owner: @owner)) %>
+  <%= render(Registrations::Show::ClaimImpound::Component.new(bike: @bike, current_user: @current_user, owner: @owner)) %>
 
   <%= render(Registrations::Show::StolenDetails::Component.new(bike: @bike, current_user: @current_user)) %>
+  <%= render(Registrations::Show::ImpoundDetails::Component.new(bike: @bike)) %>
 
   <%= render(UI::Card::Component.new) do %>
     <h2

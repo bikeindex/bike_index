@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    registrations:
+      show:
+        impound_details:
+          impound_details: Impound details
+          impounded_at: Impounded at
+          location: Location

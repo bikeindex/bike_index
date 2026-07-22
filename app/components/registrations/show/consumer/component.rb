@@ -56,11 +56,20 @@ module Registrations
         end
 
         def status_label
-          @bike.status_stolen? ? translation(".stolen") : translation(".not_stolen")
+          if @bike.status_stolen?
+            translation(".stolen")
+          elsif @bike.status_impounded?
+            translation(".impounded")
+          else
+            translation(".not_stolen")
+          end
         end
 
         def status_color
-          @bike.status_stolen? ? :error : :success
+          return :error if @bike.status_stolen?
+          return :warning if @bike.status_impounded?
+
+          :success
         end
 
         def activity_name

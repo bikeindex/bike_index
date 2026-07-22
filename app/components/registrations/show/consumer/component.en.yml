@@ -15,6 +15,7 @@ en:
           frame_size: Frame size
           handlebar_type: Handlebar type
           id: ID
+          impounded: Impounded
           manufacturer: Manufacturer
           mark_stolen: Mark stolen
           model: Model

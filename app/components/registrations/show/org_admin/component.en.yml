@@ -21,6 +21,7 @@ en:
           id: ID
           impound: Impound
           impound_sub: Single confirmation
+          impounded: Impounded
           internal_notes: Internal notes
           link_sticker: Link sticker
           manufacturer: Manufacturer
