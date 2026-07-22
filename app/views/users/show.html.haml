@@ -1,5 +1,7 @@
 .user-page
   .container
+    - if @user_banned
+      = render(UI::Alert::Component.new(kind: :error, header: t(".banned_user"), text: t(".banned_only_visible_to_superusers")))
     .row
       .col-md-6
         .row

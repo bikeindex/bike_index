@@ -520,6 +520,19 @@ RSpec.describe UsersController, type: :request do
         end
       end
     end
+
+    context "superuser viewing a banned user" do
+      include_context :request_spec_logged_in_as_superuser
+      let(:user) { FactoryBot.create(:user_confirmed, show_bikes:, banned: true) }
+
+      it "renders the profile with a banned alert" do
+        get "#{base_url}/#{user.username}"
+        expect(response.status).to eq 200
+        expect(response).to render_template :show
+        expect(assigns(:user_banned)).to be_truthy
+        expect(response.body).to match(/is banned/)
+      end
+    end
   end
 
   describe "unsubscribe" do
