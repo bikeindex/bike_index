@@ -52,7 +52,7 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 
 ## Tooltips: default `?` button trigger
 
-**Every `UI::Tooltip` uses the default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the tooltip's trigger content. See `app/components/ui/tooltip/` and `Org::OriginDisplay::Component`.
+**Every `UI::Tooltip` uses the default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the tooltip's trigger content. See `app/components/ui/tooltip/`.
 
 ## Typeaheads: always `Form::Combobox`
 
