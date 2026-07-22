@@ -734,6 +734,17 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "created_by_notification_or_impounding?" do
+    context "unregistered parking notification" do
+      let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered) }
+      let(:bike) { parking_notification.bike }
+      it "is truthy" do
+        expect(bike.current_ownership.origin).to eq "creator_unregistered_parking_notification"
+        expect(bike.created_by_notification_or_impounding?).to be_truthy
+      end
+    end
+  end
+
   describe "authorize_and_claim_for_user, authorized?" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let(:creator) { bike.creator }
