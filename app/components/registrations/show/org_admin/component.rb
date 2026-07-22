@@ -104,10 +104,7 @@ module Registrations
 
         def subtitle
           parts = [@bike.year, manufacturer_name, @bike.frame_model].compact_blank
-          text = [parts.join(" "), @bike.frame_colors.to_sentence].compact_blank.join(" · ")
-          return text if @bike.type == "bike"
-
-          safe_join([text, content_tag(:em, " #{@bike.type_titleize}")])
+          [parts.join(" "), @bike.frame_colors.to_sentence].compact_blank.join(" · ")
         end
 
         def manufacturer_name
