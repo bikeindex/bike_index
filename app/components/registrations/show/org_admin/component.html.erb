@@ -14,14 +14,16 @@
 
       <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
 
-      <p class="tw:opacity-65"><%= subtitle %></p>
+      <p class="tw:opacity-65">
+        <%= render(Registrations::Show::Subtitle::Component.new(bike: @bike)) %>
+      </p>
 
       <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
         <% if @bike.claimed? %>
           <%= render(UI::Badge::Component.new(text: translation(".claimed"), color: :notice, indicator: true)) %>
         <% end %>
 
-        <%= render(UI::Badge::Component.new(text: status_label, color: status_color, indicator: true)) %>
+        <%= render(Registrations::Show::Status::Component.new(bike: @bike)) %>
       </div>
     </div>
   </div>
@@ -114,14 +116,10 @@
 
         <div class="tw:mt-3">
           <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
-            <% if color_swatches.any? %>
-              <%= render(UI::DefinitionList::Row::Component.new(label: primary_colors_label)) do %>
-                <%= safe_join(color_swatches, content_tag(:span, " and ", class: "tw:font-normal tw:text-gray-400")) %>
-              <% end %>
-            <% end %>
+            <%= render(Registrations::Show::PrimaryColors::Component.new(bike: @bike)) %>
 
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".activity"), value: activity_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".activity"), value: BikeServices::Displayer.activity_name(@bike))) %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".id"))) { render(UI::ShortId::Component.new(record: @bike)) } %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered_since"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
 
@@ -182,8 +180,8 @@
           <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"))) { render_serial_display(@bike, @current_user) } %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".other_serial"), value: @bike.extra_registration_number)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".vehicle_type"), value: vehicle_type)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: manufacturer_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".vehicle_type"), value: BikeServices::Displayer.vehicle_type(@bike))) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: BikeServices::Displayer.manufacturer_name(@bike))) %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".model"), value: @bike.frame_model)) %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".year"), value: @bike.year)) %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>

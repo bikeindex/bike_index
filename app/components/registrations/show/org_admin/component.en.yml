@@ -14,7 +14,6 @@ en:
           current: Current
           e_vehicle_compliance: E-vehicle compliance
           edit_bike_type: Edit %{bike_type}
-          found: Found
           frame_material: Frame material
           frame_size: Frame size
           handlebar_type: Handlebar type
@@ -22,7 +21,6 @@ en:
           id: ID
           impound: Impound
           impound_sub: Single confirmation
-          impounded: Impounded
           internal_notes: Internal notes
           link_sticker: Link sticker
           manufacturer: Manufacturer
@@ -36,7 +34,6 @@ en:
             Owner contact isn't available for bikes outside your organization. You
             can still add internal notes.
           not_registered_title: Not registered with %{org_name}
-          not_stolen: Not stolen
           note_by: Note by %{user}
           notes_placeholder: New internal note — your previous notes are kept in the
             thread.
@@ -57,9 +54,6 @@ en:
           photo_archive: Photo archive
           post_note: Post note
           posts_as: Posts as %{user}
-          primary_color:
-            one: Primary color
-            other: Primary colors
           registered: Registered
           registered_since: Registered since
           registration_number: Bike Index Registration
@@ -76,7 +70,6 @@ en:
           serial: Serial
           showing_recent: Showing the %{count} most recent
           start_audit: Start audit
-          stolen: Stolen
           this_bike_on_bike_index: This %{bike_type} on Bike Index
           vehicle_type: Vehicle type
           view_all_registrations: view all →

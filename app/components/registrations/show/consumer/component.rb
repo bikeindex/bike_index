@@ -22,20 +22,6 @@ module Registrations
           @bike.name.presence || bike_title_html(@bike)
         end
 
-        def subtitle
-          parts = [@bike.year, manufacturer_name, @bike.frame_model].compact_blank
-          [parts.join(" "), @bike.frame_colors.to_sentence].compact_blank.join(" · ")
-        end
-
-        def manufacturer_name
-          @bike.manufacturer&.other? ? @bike.mnfg_name : @bike.manufacturer&.name
-        end
-
-        # Only vehicles that aren't a standard bike surface the type
-        def vehicle_type
-          @bike.cycle_type_name unless @bike.type == "bike"
-        end
-
         def audience_label
           return translation(".audience_owner", bike_type: @bike.type) if @owner
           return translation(".audience_sent_away", bike_type: @bike.type) if previously_owned?
@@ -55,46 +41,6 @@ module Registrations
           return false if @owner || @current_user.blank?
 
           @bike.ownerships.where(user_id: @current_user.id, current: false).exists?
-        end
-
-        def status_label
-          if @bike.status_stolen?
-            translation(".stolen")
-          elsif @bike.status_found?
-            translation(".found")
-          elsif @bike.status_impounded?
-            translation(".impounded")
-          else
-            translation(".not_stolen")
-          end
-        end
-
-        def status_color
-          return :error if @bike.status_stolen?
-          return :warning if @bike.status_impounded?
-
-          :success
-        end
-
-        def activity_name
-          @bike.primary_activity&.display_name
-        end
-
-        def primary_colors_label
-          translation(".primary_color", count: frame_color_records.count)
-        end
-
-        def frame_color_records
-          [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
-        end
-
-        # A non-breaking space keeps the swatch with the first word; the rest of a
-        # long color name wraps, and the " and " between colors still breaks.
-        def color_swatches
-          frame_color_records.map do |color|
-            swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm, align: :baseline))
-            safe_join([swatch, "\u00a0", color.name])
-          end
         end
 
         def show_marketplace_button?
