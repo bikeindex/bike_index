@@ -7,8 +7,9 @@ RSpec.describe "Viewing a registration", :js, type: :system do
   let!(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: owner) }
   let(:viewer) { FactoryBot.create(:user_confirmed, name: "Spotter Spotterson") }
 
-  # The flag keeps the post-send redirect (bike_path) on the redesigned show
-  before { Flipper.enable(:bike_show_redesign) }
+  # After sending, the controller redirects to the legacy bike show, which builds
+  # these gear records lazily — pre-create them so its readonly render doesn't write
+  before { RearGearType.fixed && FrontGearType.fixed }
 
   def sign_in(user)
     visit new_session_path
