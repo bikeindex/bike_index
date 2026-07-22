@@ -85,26 +85,6 @@ module Registrations
           bike_title_html(@bike)
         end
 
-        def credibility_scorer
-          @credibility_scorer ||= @bike.credibility_scorer
-        end
-
-        def credibility_score
-          credibility_scorer.score
-        end
-
-        # Matches the credibility_scorer_color used on bikes/show
-        def credibility_color
-          return "#dc3545" if credibility_score < 31
-          return "#ffc107" if credibility_score < 70
-
-          "#28a745"
-        end
-
-        def credibility_badges
-          CredibilityScorer.permitted_badges_hash(credibility_scorer.badges)
-        end
-
         def owner_phone
           @bike.phone if @bike.phoneable_by?(@current_user)
         end

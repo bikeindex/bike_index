@@ -104,67 +104,7 @@
       <%= render(Registrations::Show::StolenDetails::Component.new(bike: @bike, current_user: @current_user)) %>
       <%= render(Registrations::Show::ImpoundDetails::Component.new(bike: @bike)) %>
 
-      <%= render(UI::Card::Component.new) do %>
-        <h2
-          class="
-            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-            tw:uppercase
-          "
-        >
-          <%= translation(".this_bike_on_bike_index", bike_type: @bike.type) %>
-        </h2>
-
-        <div class="tw:mt-3">
-          <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
-            <%= render(Registrations::Show::PrimaryColors::Component.new(bike: @bike)) %>
-
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".activity"), value: BikeServices::Displayer.activity_name(@bike))) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".id"))) { render(UI::ShortId::Component.new(record: @bike)) } %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered_since"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
-
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".credibility"))) do %>
-              <span class="tw:inline-flex tw:items-center tw:gap-1.5">
-                <span
-                  class="
-                    tw:inline-block tw:rounded tw:px-2 tw:py-0.5
-                    tw:font-bold tw:text-white
-                  "
-                  style="background-color: <%= credibility_color %>"
-                >
-                  <%= credibility_score %>
-                </span>
-
-                <%= render(UI::Tooltip::Component.new(text: translation(".credibility"))) do |tooltip| %>
-                  <% tooltip.with_body do %>
-                    <span class="tw:block tw:text-left">
-                      <span class="tw:mb-1 tw:block tw:font-semibold">
-                        Factors in score
-                      </span>
-
-                      <% credibility_badges.each do |badge, value| %>
-                        <span class="tw:flex tw:justify-between tw:gap-4">
-                          <span>
-                            <%= CredibilityScorer.humanize_badge(badge) %>
-                          </span>
-
-                          <span class="<%= "tw:text-red-600" if value.negative? %>">
-                            <%= value %>
-                          </span>
-                        </span>
-                      <% end %>
-                    </span>
-                  <% end %>
-
-                  <% tooltip.with_tooltip_button(class: "tw:inline-flex tw:size-4 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-200 tw:text-[10px] tw:font-bold tw:text-gray-600 tw:hover:bg-gray-300 tw:dark:bg-gray-700 tw:dark:text-gray-200") do %>
-                    ?
-                  <% end %>
-                <% end %>
-              </span>
-            <% end %>
-          <% end %>
-        </div>
-      <% end %>
+      <%= render(Registrations::Show::BikeIndexCard::Component.new(bike: @bike, term: :below)) %>
 
       <%= render(UI::Card::Component.new) do %>
         <h2

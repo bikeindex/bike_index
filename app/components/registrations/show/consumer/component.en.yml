@@ -5,7 +5,6 @@ en:
       show:
         consumer:
           about_this_bike: About this %{bike_type}
-          activity: Activity
           audience_owner: Your %{bike_type}
           audience_public: Public view
           audience_sent_away: No longer your %{bike_type}
@@ -14,17 +13,14 @@ en:
           frame_material: Frame material
           frame_size: Frame size
           handlebar_type: Handlebar type
-          id: ID
           manufacturer: Manufacturer
           mark_stolen: Mark stolen
           model: Model
           other_serial: Other serial/registration/sticker
           registered_protected: Registered & protected
-          registered_since: Registered since
           sell_on_marketplace: Sell on Marketplace
           serial: Serial
           share: Share
           share_my_page: Share my page
-          this_bike_on_bike_index: This %{bike_type} on Bike Index
           vehicle_type: Vehicle type
           year: Year

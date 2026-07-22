@@ -6,19 +6,16 @@ en:
         org_admin:
           about_this_bike: About this %{bike_type}
           active: active
-          activity: Activity
           audit: Audit
           bike_details: "%{bike_type} details"
           claimed: Claimed
           coming_soon: Coming soon
-          credibility: Credibility
           e_vehicle_compliance: E-vehicle compliance
           edit_bike_type: Edit %{bike_type}
           frame_material: Frame material
           frame_size: Frame size
           handlebar_type: Handlebar type
           has_duplicate_serials: has dup. serials
-          id: ID
           impound: Impound
           impound_sub: Single confirmation
           internal_notes: Internal notes
@@ -52,7 +49,6 @@ en:
           post_note: Post note
           posts_as: Posts as %{user}
           registered: Registered
-          registered_since: Registered since
           registration_number: Bike Index Registration
           request_impound: Request impound
           request_impound_sub: Sent for approval
@@ -65,7 +61,6 @@ en:
           role_staff: Full access
           serial: Serial
           showing_recent: Showing the %{count} most recent
-          this_bike_on_bike_index: This %{bike_type} on Bike Index
           vehicle_type: Vehicle type
           view_all_registrations: view all →
           view_notifications: View notifications
