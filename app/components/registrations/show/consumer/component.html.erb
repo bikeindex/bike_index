@@ -98,7 +98,7 @@
 
     <div class="tw:mt-3">
       <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
-        <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"))) { helpers.render_serial_display(@bike, @current_user, skip_explanation: !@owner) } %>
+        <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"))) { render_serial_display(@bike, @current_user, skip_explanation: !@owner) } %>
         <%= render(UI::DefinitionList::Row::Component.new(label: translation(".other_serial"), value: @bike.extra_registration_number)) %>
         <%= render(UI::DefinitionList::Row::Component.new(label: translation(".vehicle_type"), value: vehicle_type)) %>
         <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: manufacturer_name)) %>

@@ -4,6 +4,8 @@ module Registrations
   module Show
     module Consumer
       class Component < ApplicationComponent
+        include BikeHelper
+
         # owner: overrides the computed ownership so the wrapper can force the
         # public or owner perspective (view_as)
         def initialize(bike:, current_user:, show_for_sale: false, owner: nil, available_views: [])
@@ -17,7 +19,7 @@ module Registrations
         private
 
         def title
-          @bike.name.presence || helpers.bike_title_html(@bike)
+          @bike.name.presence || bike_title_html(@bike)
         end
 
         def subtitle
