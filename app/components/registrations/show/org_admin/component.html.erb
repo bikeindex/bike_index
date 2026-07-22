@@ -52,9 +52,9 @@
 
     <% if show_parking_notifications? %>
       <%= link_to notifications_path, class: action_card_classes do %>
-        <% if current_notifications_count > 0 %>
+        <% if active_notifications_count > 0 %>
           <span class="tw:absolute tw:top-2 tw:right-2">
-            <%= render(UI::Badge::Component.new(text: current_notifications_count, color: :notice, size: :sm)) %>
+            <%= render(UI::Badge::Component.new(text: active_notifications_count, color: :notice, size: :sm)) %>
           </span>
         <% end %>
 
@@ -333,42 +333,28 @@
         </h2>
 
         <div class="tw:mt-3 tw:flex tw:flex-col tw:gap-3">
-          <div class="tw:flex tw:items-center tw:justify-between">
-            <div>
+          <div class="tw:flex tw:items-center tw:justify-between tw:gap-3">
+            <div class="tw:min-w-0">
               <p class="tw:text-sm tw:font-bold">
                 <%= translation(".audit") %>
               </p>
 
-              <p class="tw:text-xs tw:opacity-65">
-                <%= translation(".not_audited") %>
-              </p>
+              <% if organization_model_audit.present? %>
+                <%= link_to helpers.model_audit_display(model_audit), organization_model_audit_path(model_audit, organization_id: @organization.to_param), class: "twlink tw:text-xs" %>
+              <% else %>
+                <p class="tw:text-xs tw:opacity-65">
+                  <%= translation(".not_audited") %>
+                </p>
+              <% end %>
             </div>
 
-            <span class="tw:cursor-not-allowed tw:opacity-50 <%= UI::Button::Component.build_classes(color: :secondary, size: :sm) %>">
-              <%= translation(".start_audit") %>
-            </span>
-          </div>
-
-          <div class="tw:flex tw:items-center tw:justify-between">
-            <div>
-              <p class="tw:text-sm tw:font-bold">
-                <%= translation(".owner_attestation") %>
-              </p>
-
-              <p class="tw:text-xs tw:opacity-65">
-                <%= translation(".not_attested") %>
-              </p>
-            </div>
-
-            <span class="tw:cursor-not-allowed tw:opacity-50 <%= UI::Button::Component.build_classes(color: :secondary, size: :sm) %>">
-              <%= translation(".request") %>
-            </span>
+            <% if organization_model_audit.present? %>
+              <span class="tw:flex-none tw:text-xs tw:font-bold <%= helpers.status_display_class(organization_model_audit.certification_status) %>">
+                <%= organization_model_audit.certification_status_humanized %>
+              </span>
+            <% end %>
           </div>
         </div>
-
-        <p class="tw:mt-3 tw:text-xs tw:opacity-65">
-          <%= translation(".coming_soon") %>
-        </p>
       <% end %>
 
       <% if show_parking_notifications? %>
@@ -382,39 +368,11 @@
             <%= translation(".parking_notifications") %>
           </h2>
 
-          <div class="tw:mt-3 tw:grid tw:grid-cols-2 tw:gap-3">
-            <div
-              class="
-                tw:rounded-lg tw:border tw:border-gray-200 tw:p-3
-                tw:text-center tw:dark:border-gray-700
-              "
-            >
-              <p class="tw:text-2xl tw:font-bold">
-                <%= current_notifications_count %>
-              </p>
-
-              <p class="tw:text-xs tw:opacity-65">
-                <%= translation(".current") %>
-              </p>
-            </div>
-
-            <div
-              class="
-                tw:rounded-lg tw:border tw:border-gray-200 tw:p-3
-                tw:text-center tw:dark:border-gray-700
-              "
-            >
-              <p class="tw:text-2xl tw:font-bold">
-                <%= resolved_notifications_count %>
-              </p>
-
-              <p class="tw:text-xs tw:opacity-65">
-                <%= translation(".resolved") %>
-              </p>
-            </div>
-          </div>
-
-          <%= link_to translation(".open_notifications_page"), notifications_path, class: "twlink tw:mt-3 tw:inline-block tw:text-sm" %>
+          <p class="tw:mt-3 tw:text-sm">
+            <%= link_to "#{active_notifications_count} #{translation(".active")}", notifications_path, class: "twlink" %>
+            <span class="tw:mx-1 tw:text-gray-400">·</span>
+            <%= link_to "#{resolved_notifications_count} #{translation(".resolved")}", resolved_notifications_path, class: "twlink" %>
+          </p>
         <% end %>
       <% end %>
     </div>

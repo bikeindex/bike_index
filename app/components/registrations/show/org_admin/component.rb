@@ -7,6 +7,8 @@ module Registrations
         include BikeHelper
 
         OTHER_REGISTRATIONS_LIMIT = 10
+        # Parking-notification statuses that are still ongoing (vs replaced/retrieved/resolved)
+        ACTIVE_PARKING_STATUSES = %w[current impounded].freeze
 
         # staff: overrides the computed role so a superadmin can view the org
         # panel as staff or as limited (view_as)
@@ -107,6 +109,20 @@ module Registrations
           @bike.phone if @bike.phoneable_by?(@current_user)
         end
 
+        def model_audit
+          return @model_audit if defined?(@model_audit)
+
+          @model_audit = @bike.model_audit_id.present? ? @bike.model_audit : nil
+        end
+
+        # The org's certification record for this bike's model, if any
+        def organization_model_audit
+          return @organization_model_audit if defined?(@organization_model_audit)
+
+          @organization_model_audit = model_audit &&
+            OrganizationModelAudit.find_by(organization_id: @organization.id, model_audit_id: @bike.model_audit_id)
+        end
+
         # The organization's additional registration fields (affiliation, student
         # ID, etc.) for this bike, as [label, value] rows — blank values dropped
         def org_registration_field_rows
@@ -164,16 +180,20 @@ module Registrations
           @parking_notifications ||= @organization.parking_notifications.where(bike_id: @bike.id)
         end
 
-        def current_notifications_count
-          @current_notifications_count ||= parking_notifications.current.count
+        def active_notifications_count
+          @active_notifications_count ||= parking_notifications.where(status: ACTIVE_PARKING_STATUSES).count
         end
 
         def resolved_notifications_count
-          @resolved_notifications_count ||= parking_notifications.resolved.count
+          @resolved_notifications_count ||= parking_notifications.where.not(status: ACTIVE_PARKING_STATUSES).count
         end
 
         def notifications_path
           organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
+        end
+
+        def resolved_notifications_path
+          organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "resolved")
         end
 
         def show_impound?
