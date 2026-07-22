@@ -65,10 +65,6 @@ module Registrations
           staff? ? translation(".role_staff") : translation(".role_limited")
         end
 
-        def org_chip_label
-          organization_registered? ? @organization.short_name : translation(".not_in_org")
-        end
-
         def org_chip_color
           organization_registered? ? :purple : :warning
         end

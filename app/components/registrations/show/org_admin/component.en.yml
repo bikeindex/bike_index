@@ -30,7 +30,6 @@ en:
           no_duplicate_serials: no dup. serials
           not_attested: Not attested
           not_audited: Not audited
-          not_in_org: Not in your org
           not_registered_message: >-
             Owner contact isn't available for bikes outside your organization. You
             can still add internal notes.
