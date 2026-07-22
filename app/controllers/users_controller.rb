@@ -119,6 +119,10 @@ class UsersController < ApplicationController
       redirect_to(my_account_url, notice: translation(:user_not_sharing)) && return
     end
 
+    unless @user.show_bikes
+      @profile_hidden_reason = (user == current_user) ? :owner : :superuser
+    end
+
     @per_page = permitted_per_page(default: 15)
     @pagy, @bikes = pagy(:countish, user.bikes(false), limit: @per_page, page: permitted_page)
   end

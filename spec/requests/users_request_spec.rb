@@ -492,6 +492,19 @@ RSpec.describe UsersController, type: :request do
       end
     end
 
+    context "owner viewing their own hidden page" do
+      include_context :request_spec_logged_in_as_user
+      let(:current_user) { FactoryBot.create(:user_confirmed, show_bikes: false) }
+
+      it "renders with a notice that only they can see it" do
+        get "#{base_url}/#{current_user.username}"
+        expect(response.status).to eq 200
+        expect(response).to render_template :show
+        expect(assigns(:profile_hidden_reason)).to eq :owner
+        expect(response.body).to match(/only visible to you/i)
+      end
+    end
+
     context "user shows their page" do
       let(:show_bikes) { true }
 
@@ -531,6 +544,17 @@ RSpec.describe UsersController, type: :request do
         expect(response).to render_template :show
         expect(assigns(:user_banned)).to be_truthy
         expect(response.body).to match(/is banned/)
+      end
+    end
+
+    context "superuser viewing a hidden unbanned user" do
+      include_context :request_spec_logged_in_as_superuser
+
+      it "renders with a notice that only a superuser can see it" do
+        get "#{base_url}/#{user.username}"
+        expect(response.status).to eq 200
+        expect(assigns(:profile_hidden_reason)).to eq :superuser
+        expect(response.body).to match(/only visible because you/i)
       end
     end
   end

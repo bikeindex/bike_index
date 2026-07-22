@@ -2,6 +2,8 @@
   .container
     - if @user_banned
       = render(UI::Alert::Component.new(kind: :error, header: t(".banned_user"), text: t(".banned_only_visible_to_superusers")))
+    - elsif @profile_hidden_reason
+      = render(UI::Alert::Component.new(kind: :notice, header: t(".profile_hidden"), text: t(".profile_hidden_#{@profile_hidden_reason}")))
     .row
       .col-md-6
         .row
