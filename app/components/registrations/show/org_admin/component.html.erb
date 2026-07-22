@@ -19,7 +19,7 @@
       </p>
 
       <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
-        <% if @bike.claimed? && !@bike.unregistered_parking_notification? %>
+        <% if @bike.claimed? && !unregistered? %>
           <%= render(UI::Badge::Component.new(text: translation(".claimed"), color: :notice, indicator: true)) %>
         <% end %>
 
@@ -234,7 +234,7 @@
         </h2>
 
         <div class="tw:mt-3">
-          <% if @bike.unregistered_parking_notification? %>
+          <% if unregistered? %>
             <p class="tw:text-sm tw:opacity-65">
               <%= translation(".unregistered_owner", bike_type: @bike.type) %>
             </p>
@@ -257,7 +257,7 @@
           <% end %>
         </div>
 
-        <% if staff? && (@bike.unregistered_parking_notification? || show_contact?) %>
+        <% if staff? && (unregistered? || show_contact?) %>
           <div
             class="
               tw:mt-3 tw:flex tw:items-center tw:justify-between tw:gap-3
@@ -276,7 +276,7 @@
 
             <%= render(UI::ButtonLink::Component.new(href: edit_access_path, text: translation(".edit"), color: :secondary, size: :sm, class: "tw:flex-none")) %>
           </div>
-        <% elsif !show_contact? && !@bike.unregistered_parking_notification? %>
+        <% elsif !show_contact? && !unregistered? %>
           <div
             class="
               tw:mt-3 tw:rounded-lg tw:border tw:border-dashed
@@ -361,13 +361,7 @@
                   <% end %>
 
                   <% if staff? %>
-                    <button
-                      type="button"
-                      data-open-modal="link-sticker-modal"
-                      class="twlink tw:cursor-pointer tw:text-xs"
-                    >
-                      <%= translation(".link_sticker") %>
-                    </button>
+                    <%= render(UI::Button::Component.new(text: translation(".link_sticker"), color: :link, html_class: "tw:text-xs", data: {open_modal: "link-sticker-modal"})) %>
                   <% end %>
                 </div>
               <% end %>
@@ -377,7 +371,7 @@
               <%= info_row(translation(".organization_registered"), @bike.creation_organization&.name) %>
             <% end %>
 
-            <% unless @bike.unregistered_parking_notification? %>
+            <% unless unregistered? %>
               <%= info_row(translation(".claimed")) do %>
                 <% if @bike.claimed? %>
                   <%= render(UI::Time::Component.new(time: current_ownership.claimed_at)) %>
