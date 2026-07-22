@@ -119,6 +119,39 @@ found_locations.each_with_index do |loc, i|
   end
 end
 
+# --- 1 found bike reported by the primary test user (user@bikeindex.org) ---
+puts "Creating found bike reported by user@bikeindex.org..."
+found_bike_location = {latitude: 37.7691, longitude: -122.4449, street: "1000 Stanyan St", city: "San Francisco", zipcode: "94117"}
+specialized_manufacturer = Manufacturer.friendly_find("Specialized")
+
+user_found_bike = seed_bike(
+  creator:, user:, label: "Found bike",
+  params: {
+    bike: bike_params(owner_email: user.email, manufacturer_id: specialized_manufacturer&.id).merge(
+      frame_model: "Sirrus",
+      description: "Found unlocked near the Golden Gate Park tennis courts",
+      status: "status_impounded"
+    ),
+    impound_record: {
+      address_record_attributes: {
+        street: found_bike_location[:street],
+        city: found_bike_location[:city],
+        zipcode: found_bike_location[:zipcode],
+        state_id: ca_state&.id.to_s,
+        country_id: us&.id.to_s,
+        skip_geocoding: true
+      }
+    }
+  }
+)
+unless user_found_bike.errors.any?
+  impound_record = user_found_bike.current_impound_record
+  ProcessImpoundUpdatesJob.new.perform(impound_record.id)
+  impound_record.reload
+  impound_record.address_record&.update_columns(latitude: found_bike_location[:latitude], longitude: found_bike_location[:longitude])
+  puts "  Created found bike at #{found_bike_location[:street]}, #{found_bike_location[:city]}"
+end
+
 # --- 3 Cannondale bikes registered to Cannondale org ---
 cannondale_org = Organization.friendly_find("Cannondale")
 cannondale_manufacturer = Manufacturer.friendly_find("Cannondale")
