@@ -2,8 +2,8 @@
 
 require "rails_helper"
 
-RSpec.describe Registrations::Show::OrgTopActionsParkingNotification::Component, :js, type: :system do
-  let(:preview_path) { "/rails/view_components/registrations/show/org_top_actions_parking_notification/component/default" }
+RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Component, :js, type: :system do
+  let(:preview_path) { "/rails/view_components/registrations/show/org_top_actions_parking_notification_form/component/default" }
   let(:organization) { FactoryBot.create(:organization) }
   let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 

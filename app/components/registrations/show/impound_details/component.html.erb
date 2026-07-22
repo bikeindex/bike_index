@@ -3,7 +3,7 @@
     <%= heading %>
   </h2>
 
-  <%= render(Registrations::Show::Map::Component.new(latitude: map_latitude, longitude: map_longitude, precise: map_precise?)) %>
+  <%= render(Registrations::Show::Map::Component.new(latitude: map_latitude, longitude: map_longitude, precise: map_precise?, point: org_record?)) %>
 
   <% if org_record? %>
     <%= render(Registrations::Show::ImpoundRecordFields::Component.new(impound_record:)) %>

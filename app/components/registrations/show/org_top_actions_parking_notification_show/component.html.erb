@@ -1,0 +1,28 @@
+<div
+  data-registrations--show--action-panels-target="panel"
+  data-panel-name="notifications_show"
+  class="tw:hidden"
+>
+  <%= render(UI::Card::Component.new) do %>
+    <h2
+      class="
+        tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+        tw:uppercase
+      "
+    >
+      <%= translation(".parking_notification") %>
+    </h2>
+
+    <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".created"), value: parking_notification.created_at, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".type"), value: parking_notification.kind_humanized)) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".status"), value: parking_notification.status.humanize)) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".by"), value: parking_notification.user&.display_name, render_with_no_value: true, no_value_text: "-")) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".address"), value: parking_notification.formatted_address_string, render_with_no_value: true, no_value_text: "-")) %>
+    <% end %>
+
+    <div class="tw:mt-3">
+      <%= render(UI::ButtonLink::Component.new(href: notifications_path, text: translation(".view_all_notifications"), color: :purple)) %>
+    </div>
+  <% end %>
+</div>

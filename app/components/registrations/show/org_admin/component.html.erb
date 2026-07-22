@@ -66,14 +66,20 @@
         <% end %>
       <% end %>
 
-      <% if show_parking_notifications? %>
-        <%= render(UI::ButtonLink::Component.new(href: notifications_path, color: :purple_outline, class: action_button_classes)) do %>
+      <% if show_parking_notifications? && any_parking_notifications? %>
+        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "notifications_show", action: "registrations--show--action-panels#toggle"})) do %>
           <% if active_notifications_count > 0 %>
             <span class="tw:absolute tw:top-2 tw:right-2">
               <%= render(UI::Badge::Component.new(text: active_notifications_count, color: :notice, size: :sm)) %>
             </span>
           <% end %>
 
+          <%= action_icon("bell", tile: :blue) %>
+
+          <%= action_label(translation(".view_notifications"), translation(".view_notifications_sub")) %>
+        <% end %>
+      <% elsif show_parking_notifications? %>
+        <%= render(UI::ButtonLink::Component.new(href: notifications_path, color: :purple_outline, class: action_button_classes)) do %>
           <%= action_icon("bell", tile: :blue) %>
 
           <%= action_label(translation(".view_notifications"), translation(".view_notifications_sub")) %>
@@ -86,11 +92,15 @@
     <% end %>
 
     <% if staff? && (show_create_parking_notification? || show_create_impound?) %>
-      <%= render(Registrations::Show::OrgTopActionsParkingNotification::Component.new(bike: @bike, organization: @organization)) %>
+      <%= render(Registrations::Show::OrgTopActionsParkingNotificationForm::Component.new(bike: @bike, organization: @organization)) %>
     <% end %>
 
     <% if show_update_impound? %>
       <%= render(Registrations::Show::OrgTopActionsImpoundUpdate::Component.new(bike: @bike, organization: @organization)) %>
+    <% end %>
+
+    <% if show_parking_notifications? && any_parking_notifications? %>
+      <%= render(Registrations::Show::OrgTopActionsParkingNotificationShow::Component.new(bike: @bike, organization: @organization)) %>
     <% end %>
   </div>
 

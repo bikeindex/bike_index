@@ -2,7 +2,7 @@
 
 module Registrations
   module Show
-    module OrgTopActionsParkingNotification
+    module OrgTopActionsParkingNotificationForm
       # Org-admin parking-notification / impound form panel. Rendered inside the
       # org-admin action-panel accordion (data-panel-name="parking"); the Stimulus
       # `registrations--show--parking-notification` controller wires up geolocation

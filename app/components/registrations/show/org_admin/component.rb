@@ -238,6 +238,10 @@ module Registrations
           @parking_notifications ||= @organization.parking_notifications.where(bike_id: @bike.id)
         end
 
+        def any_parking_notifications?
+          parking_notifications.any?
+        end
+
         def active_notifications_count
           @active_notifications_count ||= parking_notifications.where(status: ACTIVE_PARKING_STATUSES).count
         end

@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    registrations:
+      show:
+        org_top_actions_parking_notification_show:
+          address: Address
+          by: By
+          created: Created
+          parking_notification: Parking notification
+          status: Status
+          type: Type
+          view_all_notifications: View all notifications

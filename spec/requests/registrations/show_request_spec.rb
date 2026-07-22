@@ -166,6 +166,18 @@ RSpec.describe "RegistrationsController#show", type: :request do
           expect(whitespace_normalized_body_text).to match("Create a new notification")
         end
 
+        context "with a parking notification" do
+          before { FactoryBot.create(:parking_notification, bike:, organization:, user: current_user) }
+
+          it "shows the View notifications panel with the current notification" do
+            get "#{base_url}/#{bike.id}"
+            body = whitespace_normalized_body_text
+            # The View notifications action opens the parking-notification show panel
+            expect(body).to match("View all notifications")
+            expect(body).to match("Parked incorrectly")
+          end
+        end
+
         context "impounded bike" do
           let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization).reload }
           before { FactoryBot.create(:impound_record, bike:, organization:, user: current_user) }
