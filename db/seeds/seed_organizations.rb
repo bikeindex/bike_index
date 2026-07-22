@@ -1,4 +1,4 @@
-# Seed organizations: Brakebills, Ike's Bikes, and Cannondale
+# Seed organizations: Brakebills, Ike's Bikes, Cannondale, and Bike Recovery Team
 
 # --- Organization Features ---
 # This list was created with:
@@ -53,6 +53,7 @@ feature_ids = []
 official_manufacturer_feature_id = nil
 skip_ownership_email_feature_id = nil
 avery_export_feature_id = nil
+law_enforcement_feature_id = nil
 
 feature_name_and_slugs.each do |attrs|
   org_feature = OrganizationFeature.find_by_name(attrs[:name]) ||
@@ -61,6 +62,7 @@ feature_name_and_slugs.each do |attrs|
   official_manufacturer_feature_id = org_feature.id if attrs[:name] == "Official manufacturer organization"
   skip_ownership_email_feature_id = org_feature.id if attrs[:name] == "Skip ownership email"
   avery_export_feature_id = org_feature.id if attrs[:name] == "Avery Export"
+  law_enforcement_feature_id = org_feature.id if attrs[:name] == "Law Enforcement functionality"
 end
 
 # --- Brakebills: all features except official_manufacturer, avery_export, with is_endless invoice - and skip_ownership_email ---
@@ -91,7 +93,12 @@ cannondale_user.confirm(cannondale_user.confirmation_token)
 cannondale_user.save
 OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user.id, role: "admin")
 
+# --- Bike Recovery Team: Law Enforcement functionality ---
+recovery_team = Organization.find_by_name("Bike Recovery Team") || Organization.create!(name: "Bike Recovery Team")
+recovery_team_invoice = Invoice.create(organization: recovery_team, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
+recovery_team_invoice.update(organization_feature_ids: [law_enforcement_feature_id].compact)
+
 # Make sure example organization exists
 Organization.example
 
-puts "Organizations seeded: Brakebills, Ikes Bike's, Cannondale\n"
+puts "Organizations seeded: Brakebills, Ikes Bike's, Cannondale, Bike Recovery Team\n"

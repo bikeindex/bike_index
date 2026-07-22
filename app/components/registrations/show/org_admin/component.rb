@@ -9,8 +9,8 @@ module Registrations
         OTHER_REGISTRATIONS_LIMIT = 10
         # Parking-notification statuses that are still ongoing (vs replaced/retrieved/resolved)
         ACTIVE_PARKING_STATUSES = %w[current impounded].freeze
-        # Registration fields shown with the owner (their tie to the org) rather than in registration info
-        OWNER_ACCESS_REG_FIELDS = %w[reg_organization_affiliation reg_student_id].freeze
+        # Registration fields shown with the owner rather than in registration info
+        OWNER_ACCESS_REG_FIELDS = %w[reg_address reg_organization_affiliation reg_student_id].freeze
 
         # staff: overrides the computed role so a superadmin can view the org
         # panel as staff or as limited (view_as)
@@ -25,6 +25,13 @@ module Registrations
         def render?
           @bike.present? && @organization.present? && @current_user.present? &&
             @current_user.authorized?(@organization) && @bike.visible_by?(@current_user)
+        end
+
+        # Org-scoped records shown in this panel that don't touch the bike (so the
+        # bike's own cache version wouldn't expire the fragment when they change)
+        def cache_version
+          [bike_organization_note&.updated_at, organization_model_audit&.updated_at,
+            other_registrations.maximum(:updated_at), other_registrations_count]
         end
 
         private
@@ -45,12 +52,11 @@ module Registrations
           end
         end
 
-        def action_label(title, subtitle)
+        def action_label(title, subtitle = nil)
           content_tag(:span, class: "tw:min-w-0") do
-            safe_join([
-              content_tag(:span, title, class: "tw:block tw:font-bold"),
-              content_tag(:span, subtitle, class: "tw:mt-0.5 tw:hidden tw:text-xs tw:opacity-60 tw:lg:block")
-            ])
+            rows = [content_tag(:span, title, class: "tw:block tw:font-bold")]
+            rows << content_tag(:span, subtitle, class: "tw:mt-0.5 tw:hidden tw:text-xs tw:opacity-60 tw:lg:block") if subtitle.present?
+            safe_join(rows)
           end
         end
 
@@ -66,10 +72,25 @@ module Registrations
           @organization_registered = @bike.organized?(@organization)
         end
 
+        def unregistered?
+          @bike.unregistered_parking_notification?
+        end
+
         # Owner contact + law-enforcement data is only shown to full staff on a bike
         # registered with their organization
         def show_contact?
           staff? && organization_registered?
+        end
+
+        # The owner can be messaged (via a stolen/unstolen notification) when the
+        # bike is stolen, or when the org can send unstolen notifications
+        def contactable?
+          @bike.current_stolen_record.present? ||
+            (@bike.status_with_owner? && @organization.enabled?("unstolen_notifications"))
+        end
+
+        def message_notification
+          @message_notification ||= StolenNotification.new(bike: @bike)
         end
 
         def role_label
@@ -97,7 +118,7 @@ module Registrations
         end
 
         def credibility_score
-          credibility_scorer.score
+          @credibility_score ||= credibility_scorer.score
         end
 
         # Matches the credibility_scorer_color used on bikes/show
@@ -109,7 +130,7 @@ module Registrations
         end
 
         def credibility_badges
-          CredibilityScorer.permitted_badges_hash(credibility_scorer.badges)
+          @credibility_badges ||= CredibilityScorer.permitted_badges_hash(credibility_scorer.badges)
         end
 
         def owner_phone
@@ -126,7 +147,7 @@ module Registrations
 
         # Org-owned stickers link to their edit page; others show the code as text
         def sticker_link(bike_sticker)
-          return bike_sticker.pretty_code unless bike_sticker.organization == @organization
+          return bike_sticker.pretty_code unless bike_sticker.organization_id == @organization.id
 
           link_to(bike_sticker.pretty_code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: @organization.to_param), class: "twlink")
         end
@@ -134,7 +155,7 @@ module Registrations
         def model_audit
           return @model_audit if defined?(@model_audit)
 
-          @model_audit = @bike.model_audit_id.present? ? @bike.model_audit : nil
+          @model_audit = @bike.model_audit
         end
 
         # The org's certification record for this bike's model, if any
@@ -158,10 +179,10 @@ module Registrations
           end
         end
 
-        # Affiliation & student ID [label, value] rows for owner & access; blank
-        # values render a muted "-" rather than dropping
+        # Address, affiliation & student ID [label, value] rows for owner & access;
+        # blank values render a muted "-" rather than dropping
         def owner_reg_field_rows
-          (@organization.additional_registration_fields & OWNER_ACCESS_REG_FIELDS).map do |reg_field|
+          (OWNER_ACCESS_REG_FIELDS & @organization.additional_registration_fields).map do |reg_field|
             bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
             [org_registration_field_label(reg_field, bike_attr), org_registration_field_value(bike_attr)]
           end
@@ -231,6 +252,20 @@ module Registrations
           end
         end
 
+        def new_parking_notification
+          return @new_parking_notification if defined?(@new_parking_notification)
+
+          notification = ParkingNotification.new(bike_id: @bike.id, organization: @organization, use_entered_address: false)
+          notification.is_repeat = notification.likely_repeat?
+          notification.set_location_from_organization
+          notification.kind ||= notification.potential_initial_record&.kind || ParkingNotification.kinds.first
+          @new_parking_notification = notification
+        end
+
+        def create_parking_notifications_path
+          organization_parking_notifications_path(organization_id: @organization.to_param)
+        end
+
         def notifications_path
           organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
         end
@@ -247,16 +282,18 @@ module Registrations
           organization_impound_records_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
         end
 
-        def impound_sub
-          staff? ? translation(".impound_sub") : translation(".request_impound_sub")
-        end
-
         def impound_label
           staff? ? translation(".impound") : translation(".request_impound")
         end
 
         def edit_access_path
           edit_bike_path(@bike, edit_template: @bike.default_edit_template)
+        end
+
+        # The owner's other registrations are law-enforcement data, feature-gated
+        # like the legacy access panel
+        def show_other_registrations?
+          show_contact? && @organization.enabled?("additional_registrations_information")
         end
 
         def other_registrations
