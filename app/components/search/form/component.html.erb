@@ -37,7 +37,7 @@
           >
             <% if render_primary_activity_field? %>
               <div class="tw:w-full tw:md:max-w-xl">
-                <%= render(::Form::Combobox::Component.new(
+                <%= render(::UI::Forms::Combobox::Component.new(
                   name: :primary_activity,
                   id: "primary_activity",
                   options: primary_activity_combobox_options,

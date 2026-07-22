@@ -1,20 +1,18 @@
 <%= turbo_stream.append :multi_serial_results do %>
-  <%= render Org::MultiSearchResults::Component.new(
+  <%= render Org::SearchResults::MultiResults::Component.new(
     organization: current_organization,
     query: @query,
     chip_id: @chip_id,
     pagy: @pagy,
     search_kind: @search_kind,
     bikes: @bikes,
-    interpreted_params: @interpreted_params,
-    per_page: @per_page,
     close_serials: @close_serials
   ) %>
 <% end %>
 
 <% if @chip_id %>
   <%= turbo_stream.replace @chip_id do %>
-    <%= render SearchResults::MultiResultChip::Component.new(
+    <%= render Org::SearchResults::MultiResultChip::Component.new(
       chip_id: @chip_id,
       result_count: @pagy.count,
       label: @query

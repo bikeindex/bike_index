@@ -86,7 +86,7 @@ class PublicImage < ApplicationRecord
 
   # CarrierWaveProcessJob generates versions by reading the stored original back
   # from remote storage, which only works with fog (production). With local file
-  # storage (staging/dev) the worker can't see the web box's disk, so process
+  # storage (sandbox/dev) the worker can't see the web box's disk, so process
   # versions inline — otherwise the job silently skips them and thumbnails 404.
   def process_image_upload
     return true unless remote_storage?
@@ -101,7 +101,7 @@ class PublicImage < ApplicationRecord
   end
 
   # To enable stream processing for both local and remote files.
-  # Returns nil when a local file is missing on disk (e.g. staging without synced uploads)
+  # Returns nil when a local file is missing on disk (e.g. sandbox without synced uploads)
   def open_file
     if local_file?
       File.open(image.path, "r") if File.exist?(image.path)

@@ -63,9 +63,7 @@ module Admin
             concat(content_tag(:em, " unregistered", class: "small text-warning"))
           elsif @bike.creation_description.present?
             concat(", ")
-            concat(content_tag(:small, class: "less-strong") do
-              content_tag(:span, @bike.creation_description, title: BikeServices::Displayer.origin_title(@bike.creation_description))
-            end)
+            concat(content_tag(:small, render(Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)), class: "less-strong"))
           end
         end
       end

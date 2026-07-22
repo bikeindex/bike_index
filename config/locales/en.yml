@@ -1296,6 +1296,9 @@ en:
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
       your_police_report: your Police Report Number
+    stolen_map:
+      unavailable: The map couldn't be loaded — your browser or device may not support
+        it.
     theft_alerts:
       new:
         best_value: Best value
@@ -1607,9 +1610,11 @@ en:
   controllers:
     application:
       handle_unverified_request:
-        csrf_invalid: >-
-          CSRF invalid. If you don't know why you're receiving this message, please
-          contact us.
+        invalid_authenticity_token: >-
+          Form submission failed, please try again. If this keeps happening, a VPN
+          or a privacy extension is probably stripping information we need — try turning
+          those off for bikeindex.org. Email contact@bikeindex.org if you're still
+          stuck.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: You must be signed in to do that.
@@ -5213,7 +5218,13 @@ en:
       weve_sent_an_email: We've sent an email to the address you have on file with
         us.
     show:
+      banned_only_visible_to_superusers: Their profile is only visible because you're
+        a superuser.
+      banned_user: This user is banned
       bikes: Bikes
+      profile_hidden: This profile isn't shared publicly
+      profile_hidden_owner: It's only visible to you because it's your page.
+      profile_hidden_superuser: It's only visible because you're a superuser.
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes

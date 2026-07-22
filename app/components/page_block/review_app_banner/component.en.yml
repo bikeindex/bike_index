@@ -6,7 +6,7 @@ en:
         commit_tooltip: 'current commit:'
         disclaimer: data is ephemeral
         label: Review app
-        label_staging: Staging
+        label_sandbox: Sandbox
         letter_opener_link: email outbox
         letter_opener_tooltip: View the email sent by this review app
         pr_link: 'PR #%{number}'

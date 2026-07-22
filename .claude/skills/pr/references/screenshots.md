@@ -15,6 +15,7 @@ From the changed files, infer the affected routes. Heuristics:
 - A view at `app/views/bikes/show.html.erb` → `/bikes/:id` (pick a representative id from the dev db, e.g. `Bike.last.id`)
 - A component touched by a specific page → screenshot that page
 - A shared component (header, footer, UI::Badge, etc.) → screenshot 1–2 representative pages that exercise it
+- A component with a Lookbook preview → its preview URL `/lookbook/preview/<component>/<scenario>` — a real responsive page, captured like any other URL
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
@@ -26,7 +27,7 @@ If `frontend-screenshots` returns failures it couldn't diagnose, surface them an
 
 ## 3. Upload branch screenshots and get inline URLs
 
-Invoke the `github-upload-image-to-pr` skill to upload each PNG from step 2 to the PR's comment textarea — GitHub mints persistent `user-attachments/assets/` URLs that render inline in the browser (release assets would force a download on click). The skill clears the textarea without submitting the comment.
+Invoke the `github-upload-image-to-pr` skill **for uploading only**: run it through its step 7 (upload each PNG from step 2, read back the `user-attachments/assets/` URLs, clear the textarea) and **stop there — do not run its step 8 posting.** This phase composes and posts one combined before/after comment itself in step 5, so the upload skill must not post its own. GitHub mints persistent URLs that render inline in the browser (release assets would force a download on click).
 
 Collect the returned URLs, keyed by `(page-slug, viewport)`.
 
@@ -36,9 +37,7 @@ Capture the **base-branch** (`$BASE` from SKILL.md step 0.5) version of every sc
 
 Skip per-page only when the URL didn't exist on `$BASE` (a brand-new route or page added in this PR) — there's nothing to compare to.
 
-Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against the base (its "Cross-branch comparison" section — checks out the base ref, captures into `...-main-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs.
-
-Caveat when `$BASE` isn't `main`: `frontend-screenshots` currently hardcodes `origin/main` for that capture, so it can't shoot a non-`main` base yet. Until it's parameterized, capture branch-only for a non-`main` base and say so in the comment rather than posting a mislabeled comparison.
+Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against the base — pass `$BASE` (from SKILL.md step 0.5) as its `BASE_REF` so it checks out `origin/$BASE`, whether or not that's `main` (its "Cross-branch comparison" section checks out the base ref, captures into `...-base-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
 
 ## 5. Post the Screenshots section as a PR comment
 
@@ -82,6 +81,7 @@ Brand-new page (URL didn't exist on `$BASE` — see step 4), no comparison row:
 
 Rules:
 - Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own table.
+- **Every** entry uses this table, with **no exceptions** — including `/lookbook/preview/...` component previews. A preview is a responsive page with a real URL, so it gets the same desktop+mobile before/after cells as any page. A width-invariant component (small icon, fixed-size control) just yields matching desktop and mobile shots — that's expected; keep both columns, never collapse to one image or special-case previews.
 - **Headers are always `| Desktop | Mobile |`** — never `| main | this branch |` or any per-PR variation. Reviewers should see the same column meaning across every PR.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 

@@ -3,13 +3,12 @@ require "rails_helper"
 RSpec.describe OrganizedHelper, type: :helper do
   describe "organized bike display" do
     let(:bike) { FactoryBot.create(:bike_organized) }
-    let(:target_origin) { "<span title=\"Registered with self registration process\">web</span>" }
-    let(:target_text) do
-      "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"less-strong\">#{target_origin}</small></span>"
-    end
+    let(:target_prefix) { "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"less-strong\">" }
     it "renders" do
       expect(organized_bike_text).to be_nil
-      expect(organized_bike_text(bike)).to eq target_text
+      result = organized_bike_text(bike)
+      expect(result).to start_with("#{target_prefix}web ") # origin_display label
+      expect(result).to include("Registered with self registration process") # origin_display tooltip
       expect(organized_bike_text(bike, skip_creation: true)).to eq "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong></span>"
     end
     context "unregistered" do
@@ -30,27 +29,6 @@ RSpec.describe OrganizedHelper, type: :helper do
       it "renders with deleted" do
         expect(bike.deleted?).to be_truthy
         expect(organized_bike_text(bike)).to eq target_text
-      end
-    end
-  end
-
-  describe "origin_display" do
-    let(:target) { "<span title=\"Registration began with incomplete registration, via organization landing page\">landing page</span>" }
-    it "renders with title" do
-      expect(origin_display("landing page")).to eq target
-    end
-    context "lightspeed" do
-      let(:target) { "<span title=\"Automatically registered by bike shop point of sale (Lightspeed POS)\">Lightspeed</span>" }
-      it "renders with title" do
-        expect(origin_display("Lightspeed")).to eq target
-      end
-    end
-    context "scanned_sticker" do
-      let(:target) { "<span title=\"Registered via sticker\">sticker</span>" }
-      let(:ownership) { Ownership.new(origin: "sticker") }
-      it "renders with title" do
-        expect(ownership.creation_description).to eq "sticker"
-        expect(origin_display(ownership.creation_description)).to eq target
       end
     end
   end

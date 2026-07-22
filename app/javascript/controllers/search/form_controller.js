@@ -109,7 +109,13 @@ export default class extends Controller {
     const frame = this.frameElement
     const src = frame?.getAttribute('src')
     if (!src) return
-    if (new URL(src, window.location.origin).search !== window.location.search) {
+    const srcUrl = new URL(src, window.location.origin)
+    // Only reconcile within the same search page. A back/forward restoration can
+    // briefly leave one page's frame (eg marketplace_results_frame) in the DOM
+    // while the address bar is another page (/search/registrations); pointing the
+    // frame there fetches a response without that frame, which Turbo discards.
+    if (srcUrl.pathname !== window.location.pathname) return
+    if (srcUrl.search !== window.location.search) {
       frame.setAttribute('src', window.location.href)
     }
   }

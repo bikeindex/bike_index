@@ -2124,10 +2124,6 @@ es:
       sync_not_finished: La sincronización con Strava aún no ha finalizado, por lo
         que es posible que no aparezcan todas las bicicletas en la lista.
   controllers:
-    application:
-      handle_unverified_request:
-        csrf_invalid: CSRF no válido. Si desconoce el motivo de este mensaje, póngase
-          en contacto con nosotros.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Para hacerlo, debes iniciar sesión.
@@ -2520,6 +2516,12 @@ es:
           we_dont_know_location: Lo sentimos, no conocemos la ubicación "%{location}".
             Por favor, intente buscar en otra ubicación para encontrar alojamientos
             cercanos.
+    application:
+      handle_unverified_request:
+        invalid_authenticity_token: El envío del formulario falló. Inténtelo de nuevo.
+          Si el problema persiste, es probable que una VPN o una extensión de privacidad
+          esté ocultando información necesaria. Intente desactivarlas para bikeindex.org.
+          Si el problema continúa, envíe un correo electrónico a contact@bikeindex.org.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4995,20 +4997,21 @@ es:
       you_should_be_signed_in_automatically: Deberías iniciar sesión automáticamente.
       your_email_address: Su dirección de correo electrónico
     new:
-      dont_have_an_account: "¿No tienes una cuenta?"
       email: correo electrónico
       forgot_your_password: "¿Olvidaste tu contraseña?"
       get_on_bike_index: Índice de bicicletas
       keep_me_logged_in: Mantenme conectado
       log_in: Acceso
-      no_bike_index_account: "¿No tienes cuenta en Bike Index?"
-      or: O
       password: contraseña
-      sign_in_using_facebook: Inicia sesión con Facebook
-      sign_in_using_globalid: Inicia sesión con globaliD
-      sign_in_using_magic_link: Enlace de inicio de sesión enviado por correo electrónico
-      sign_in_using_strava: Inicia sesión con Strava
-      sign_up: inscribirse
+      continue: Continuar
+      email_me_the_link: Envíame el enlace por correo electrónico.
+      log_in_or_sign_up: Inicia sesión o regístrate
+      org_uses_passwordless: Su organización inicia sesión sin contraseña.
+      passwordless_help: Te enviaremos por correo electrónico un enlace seguro para
+        que inicies sesión.
+      sign_in_without_password: Iniciar sesión sin contraseña
+    identify:
+      different_email: Inicia sesión con un correo electrónico diferente.
   shared:
     bike_search_form:
       anywhere: En cualquier lugar
@@ -5541,18 +5544,10 @@ es:
       result_view_select:
         bike_box_view: Ver como lista
         thumbnail_view: Ver como miniaturas
-      form_organized:
-        doesnt_look_like_serial: Esto no parece un número de serie. Los números de
-          serie suelen tener 6 o más letras y números, y se encuentran debajo del
-          corchete inferior.
-        search_for_serial_number: Buscar número de serie
-        submit: entregar
-        search_notes: Notas de búsqueda
-        search_owner_email_or_name: Buscar el correo electrónico o el nombre del propietario
-      results_frame:
+    search_results:
+      frame:
         rate_limited: Se han realizado demasiadas búsquedas demasiado rápido; se ha
           alcanzado el límite de solicitudes. Espere un momento y vuelva a intentarlo.
-    search_results:
       bike_box:
         location: Ubicación
         posted_at: Listado
@@ -5569,8 +5564,6 @@ es:
       container:
         no_results: No se encontraron registros que coincidieran exactamente con su
           búsqueda.
-      multi_result_chip:
-        no_results: no hay coincidencias
     page_block:
       marketplace_listing_panel:
         condition: Condición
@@ -5624,7 +5617,7 @@ es:
           de reseñas.
         pr_link: 'PR #%{number}'
         commit_tooltip: 'Commit actual:'
-        label_staging: Puesta en escena
+        label_sandbox: Sandbox
         superadmin_button: Iniciar sesión como superadministrador
         superadmin_signed_in: Sesión iniciada como superadministrador
       footer:
@@ -5805,7 +5798,110 @@ es:
         year: año
       chart_async_frame:
         loading_chart: Cargando gráfico...
+      alerts:
+        object_error:
+          errors_prevented_this_from_being_saved: "%{errors_count} impidió que se
+            guardara este %{object_name}:"
+      forms:
+        legacy_form_well:
+          address_record:
+            address: Dirección de la calle
+            address_no_street: DIRECCIÓN
+            address_or_intersection: Dirección o intersección
+            address_school: Dirección postal del campus
+            choose_country: Elige un país
+            city: Ciudad
+            postal_code: Código Postal
+            region: Región/Provincia
+            state: Estado
+            street_2: Línea de dirección postal 2 (opcional)
+            where_was_it_status: "¿Dónde estaba %{bike_status}?"
+            your_full_address_is_required: "%{org_name} requiere su dirección completa."
+          address_record_with_default:
+            edit_my_account_path: editar en mi cuenta
+            use_account_address: Utilice la dirección de la cuenta
     org:
+      search:
+        form:
+          doesnt_look_like_serial: Esto no parece un número de serie. Los números de
+            serie suelen tener 6 o más letras y números, y se encuentran debajo del
+            corchete inferior.
+          search_for_serial_number: Buscar número de serie
+          submit: entregar
+          search_notes: Notas de búsqueda
+          search_owner_email_or_name: Buscar el correo electrónico o el nombre del propietario
+        wrapper:
+          affiliation: Afiliación
+          avery_exportable: Exportable de Avery
+          bike: registro
+          e_vehicle_propulsion: Vehículo eléctrico (propulsión)
+          e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
+          link: Enlace
+          matching_bikes_html: "%{count} %{cycle_type} coincidentes"
+          mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
+          phone: Teléfono
+          reg_address: DIRECCIÓN
+          registered_bikes_html: "%{count} %{cycle_type} coincidente para %{org_name}"
+          student_id: Carné de estudiante
+          vehicle: registro
+          view_matching_any_audit: ver coincidencia con cualquier auditoría
+        settings:
+          address: 'DIRECCIÓN:'
+          all: todo
+          avery_cell: Exportable de Avery
+          bike: registro
+          color_cell: Color
+          create_export_of_vehicles: Crear exportación de la búsqueda %{cycle_type}
+          created_at_cell: Registrado
+          creation_description_cell: Fuente
+          cycle_type_cell: Tipo de vehículo
+          default: por defecto
+          filter_impounded_html: únicamente <strong>confiscado</strong>
+          filter_no_address_html: "<strong>Sin</strong> dirección"
+          filter_no_sticker_html: "<strong>Sin</strong> pegatina"
+          filter_not_impounded_html: solo que <strong>no</strong> fue confiscado
+          filter_not_stolen_or_impounded_html: no robado ni confiscado
+          filter_stolen_html: solo robado
+          filter_with_address_html: solo <strong>con</strong> dirección
+          filter_with_stickers_html: solo <strong>con</strong> pegatinas
+          impound_id_cell: ID del depósito
+          impounded_cell: Incautado
+          manufacturer_cell: Fabricante
+          model_cell: Modelo
+          none: ninguno
+          notes_cell: Notas de registro
+          owner_email_cell: Enviado a
+          owner_name_cell: Nombre del propietario
+          propulsion_type_cell: Vehículo eléctrico (propulsión)
+          reg_address_cell: DIRECCIÓN
+          reg_extra_registration_number_cell: Secundario#
+          reg_organization_affiliation_cell: Afiliación
+          reg_phone_cell: Teléfono
+          reg_student_id_cell: Carné de estudiante
+          serial_number_cell: De serie
+          settings: ajustes
+          show_notes_search: mostrar notas de búsqueda
+          status: 'Estado:'
+          status_cell: Estado
+          sticker_cell: Etiqueta engomada
+          stickers: 'Pegatinas:'
+          stolen_cell: Robado
+          updated_at_cell: Actualizado
+          url_cell: URL
+          vehicle: registro
+          visible_columns: Columnas visibles
+          multi_search: búsqueda serial múltiple
+      search_results:
+        multi_result_chip:
+          no_results: no hay coincidencias
+        multi_results:
+          first_n_shown_html: "— primero %{limit} mostrado,"
+          no_exact_matches: 'No hay coincidencias exactas. Números de serie cercanos:'
+          no_matches_found: No se encontraron coincidencias
+          result_count_html: "— %{count} %{results}"
+          serial_label: 'De serie:'
+          view_all: ver todo
+          sticker_label: 'Etiqueta engomada:'
       location_address_fields:
         address: DIRECCIÓN
         choose_country: Elige un país
@@ -5930,118 +6026,3 @@ es:
         reprocess_instruction: Regrese aquí y haga clic en el botón "Reprocesar importación"
           que aparece a continuación.
         unknown_ascend_name: Nombre de Ascend desconocido
-      registration_search:
-        affiliation: Afiliación
-        assign_bike_sticker: Asignar pegatina
-        avery: "¿Avery?"
-        avery_exportable: Exportable de Avery
-        bike: registro
-        color: Color
-        e_vehicle_propulsion: Vehículo eléctrico (propulsión)
-        e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
-        email_hidden: Correo electrónico oculto
-        impound_id: ID del depósito
-        impounded: Incautado
-        link: Enlace
-        link_sticker: pegatina de enlace
-        manufacturer: Fabricante
-        matching_bikes_html: "%{count} %{cycle_type} coincidentes"
-        mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
-        model: Modelo
-        notes: Notas de registro
-        owner_name: Nombre del propietario
-        phone: Teléfono
-        propulsion_type: Propulsión
-        reg_address: DIRECCIÓN
-        registered: Registrado
-        registered_bikes_html: "%{count} %{cycle_type} coincidente para %{org_name}"
-        secondary_number: Secundario#
-        sent_to: Enviado a
-        serial: De serie
-        source: Fuente
-        status_cell: Estado
-        sticker: Etiqueta engomada
-        stolen: Robado
-        student_id: Carné de estudiante
-        updated: Actualizado
-        url: URL
-        vehicle: registro
-        vehicle_type: Tipo de vehículo
-        view_matching_any_audit: ver coincidencia con cualquier auditoría
-        hidden_not_registered: oculto, no registrado con %{org_name}
-      registration_search_settings:
-        address: 'DIRECCIÓN:'
-        all: todo
-        avery_cell: Exportable de Avery
-        bike: registro
-        color_cell: Color
-        create_export_of_vehicles: Crear exportación de la búsqueda %{cycle_type}
-        created_at_cell: Registrado
-        creation_description_cell: Fuente
-        cycle_type_cell: Tipo de vehículo
-        default: por defecto
-        filter_impounded_html: únicamente <strong>confiscado</strong>
-        filter_no_address_html: "<strong>Sin</strong> dirección"
-        filter_no_sticker_html: "<strong>Sin</strong> pegatina"
-        filter_not_impounded_html: solo que <strong>no</strong> fue confiscado
-        filter_not_stolen_or_impounded_html: no robado ni confiscado
-        filter_stolen_html: solo robado
-        filter_with_address_html: solo <strong>con</strong> dirección
-        filter_with_stickers_html: solo <strong>con</strong> pegatinas
-        impound_id_cell: ID del depósito
-        impounded_cell: Incautado
-        manufacturer_cell: Fabricante
-        model_cell: Modelo
-        none: ninguno
-        notes_cell: Notas de registro
-        owner_email_cell: Enviado a
-        owner_name_cell: Nombre del propietario
-        propulsion_type_cell: Vehículo eléctrico (propulsión)
-        reg_address_cell: DIRECCIÓN
-        reg_extra_registration_number_cell: Secundario#
-        reg_organization_affiliation_cell: Afiliación
-        reg_phone_cell: Teléfono
-        reg_student_id_cell: Carné de estudiante
-        serial_number_cell: De serie
-        settings: ajustes
-        show_notes_search: mostrar notas de búsqueda
-        status: 'Estado:'
-        status_cell: Estado
-        sticker_cell: Etiqueta engomada
-        stickers: 'Pegatinas:'
-        stolen_cell: Robado
-        updated_at_cell: Actualizado
-        url_cell: URL
-        vehicle: registro
-        visible_columns: Columnas visibles
-        multi_search: búsqueda serial múltiple
-      multi_search_results:
-        first_n_shown_html: "— primero %{limit} mostrado,"
-        no_exact_matches: 'No hay coincidencias exactas. Números de serie cercanos:'
-        no_matches_found: No se encontraron coincidencias
-        result_count_html: "— %{count} %{results}"
-        serial_label: 'De serie:'
-        view_all: ver todo
-        sticker_label: 'Etiqueta engomada:'
-    alerts:
-      object_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} impidió que se guardara
-          este %{object_name}:"
-    form:
-      legacy_form_well:
-        address_record:
-          address: Dirección de la calle
-          address_no_street: DIRECCIÓN
-          address_or_intersection: Dirección o intersección
-          address_school: Dirección postal del campus
-          choose_country: Elige un país
-          city: Ciudad
-          postal_code: Código Postal
-          region: Región/Provincia
-          state: Estado
-          street_2: Línea de dirección postal 2 (opcional)
-          where_was_it_status: "¿Dónde estaba %{bike_status}?"
-          your_full_address_is_required: "%{org_name} requiere su dirección completa."
-        address_record_with_default:
-          edit_my_account_path: editar en mi cuenta
-          use_account_address: Utilice la dirección de la cuenta

@@ -18,7 +18,7 @@
       <div
         data-sortable-target="item"
         data-url="<%= organization_registration_sequence_page_path(organization_id: @organization.to_param, id: page.id) %>"
-        data-controller="disclosure"
+        data-controller="collapse"
         class="tw:py-1.5"
       >
         <div class="tw:flex tw:items-baseline">
@@ -28,17 +28,20 @@
             <div class="tw:flex tw:items-center tw:gap-2">
               <button
                 type="button"
-                data-action="disclosure#toggle"
+                data-action="collapse#toggle"
+                data-collapse-target="trigger"
                 aria-expanded="false"
                 class="tw:cursor-pointer tw:text-gray-400 tw:hover:text-gray-600"
               >
                 <span class="tw:sr-only">Toggle page details</span>
 
                 <span
-                  data-disclosure-target="chevron"
+                  data-collapse-target="chevron"
                   class="tw:inline-block tw:transition-transform tw:duration-200"
                 >
-                  <%= helpers.inline_svg_tag "icons/chevron-right.svg", class: "tw:block tw:h-3 tw:w-3" %>
+                  <span class="tw:flex">
+                    <%= render UI::IconChevron::Component.new %>
+                  </span>
                 </span>
               </button>
 
@@ -49,7 +52,7 @@
 
             <% if page.subtitle.present? %>
               <p
-                data-disclosure-target="content"
+                data-collapse-target="content"
                 class="
                   tw:mt-1 tw:mb-0 tw:hidden tw:pl-5 tw:text-sm
                   tw:text-gray-600
@@ -64,7 +67,7 @@
         </div>
 
         <div
-          data-disclosure-target="content"
+          data-collapse-target="content"
           class="
             tw:prose tw:mt-1 tw:hidden tw:max-w-none tw:py-2 tw:text-sm
             tw:[&_ul]:my-0 tw:[&_ul]:list-disc tw:[&_ul]:pl-5
