@@ -4,15 +4,29 @@ module SpamEstimator
 
     MARK_SPAM_PERCENT = 90 # May modify in the future!
 
-    # crypto and gambling terms that SEO-spam profiles exist to promote
-    SEO_SPAM_REGEX = /\b(?:
-      bitcoin | btc | ethereum | crypto(?:currency|\s?wallet)? | blockchain | binance |
-      coinbase | dogecoin | altcoin | memecoin | defi | web3 | metamask | airdrop |
-      presale | usdt | tether |
-      casino | gambling | roulette | blackjack | baccarat | poker | sportsbook |
-      jackpot | judi | togel | situs | gacor | bandar | slot\s?(?:gacor|online|88) |
-      bet365 | betting | wager
-    )\b/xi
+    # crypto, gambling and adult terms that SEO-spam profiles exist to promote.
+    # Indonesian and Vietnamese carry most of the volume — see the multi-word
+    # section below for why those require a literal space.
+    SEO_SPAM_REGEX = /(?:
+      \b(?:
+        bitcoin | btc | ethereum | crypto(?:currency|\s?wallet)? | blockchain | binance |
+        coinbase | dogecoin | altcoin | memecoin | defi | web3 | metamask | airdrop |
+        presale | usdt | tether |
+        casino | kasino | gambling | roulette | blackjack | baccarat | poker | sportsbook |
+        jackpot | judi | togel | toto | situs | gacor | bandar | slot | agen | maxwin |
+        terpercaya | taruhan | alternatif | pragmatic | gampang | scatter | rtp |
+        bet365 | betting | wager |
+        bokep | hentai | xvideo | (?:phim|clip|truyen|truyện)\s?sex
+      )\b |
+      # Word boundaries are load-bearing above: usernames are auto-generated 22-char
+      # random strings, so substring matches ("Judith", "Hagen", "Sloth", "Donohue")
+      # would ban real people. These phrases require a space for the same reason.
+      nh[àa]\s+c[áa]i | c[áa]\s+c[uư][ợo]c | đ[áa]\s+g[àa] | soi\s+k[èe]o |
+      n[ổo]\s+h[ũu] | x[óo]c\s+đ[ĩi]a | n[ạa]p\s+ti[ềe]n | đ[ăa]ng\s+nh[ậa]p |
+      tr[ựu]c\s+tuy[ếe]n | khuy[ếe]n\s+m[ãa]i | uy\s+t[íi]n |
+      game\s+b[àa]i | c[ờo]\s+b[ạa]c | s[òo]ng\s+b[ạa]c | x[ổo]\s+s[ốo] | l[ôo]\s+đ[ềe] |
+      link\s+truy\s+c[ậa]p | clip\s+(?:hot|n[óo]ng) | 18\+
+    )/xi
 
     def estimate(user)
       return 0 if user.blank?

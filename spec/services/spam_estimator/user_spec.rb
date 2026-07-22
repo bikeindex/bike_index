@@ -34,6 +34,36 @@ RSpec.describe SpamEstimator::User do
       end
     end
 
+    context "Indonesian gambling profile" do
+      let(:name) { "LGO234" }
+      let(:description) { "LGO234 merupakan situs resmi slot gacor ternama, terpercaya dan gampang menang" }
+
+      it "is above the spam threshold" do
+        expect(described_class.estimate(user)).to be > SpamEstimator::User::MARK_SPAM_PERCENT
+      end
+    end
+
+    context "Vietnamese gambling profile" do
+      let(:name) { "MU99" }
+      let(:description) { "Mu99 là link truy cập nhà cái Mu88, cá cược trực tuyến uy tín" }
+
+      it "is above the spam threshold" do
+        expect(described_class.estimate(user)).to be > SpamEstimator::User::MARK_SPAM_PERCENT
+      end
+    end
+
+    context "real names that contain spam terms as substrings" do
+      # usernames are auto-generated random strings, so substring matching would ban real people
+      let(:names) { %w[Judith Hagen Sloth Donohue Totonchy Sexton Bolanos] }
+
+      it "does not count them as references" do
+        names.each do |real_name|
+          rider = User.new(show_bikes: true, name: real_name, description: "I ride my bike to work most days")
+          expect(described_class.estimate(rider)).to be < SpamEstimator::User::MARK_SPAM_PERCENT
+        end
+      end
+    end
+
     context "gibberish description" do
       let(:description) { "efgBz9pNdd7efgBz9pNdd7 xzkqwrmlbnptvxz" }
       it "is above the spam threshold" do
