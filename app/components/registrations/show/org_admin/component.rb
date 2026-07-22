@@ -246,6 +246,25 @@ module Registrations
           end
         end
 
+        def new_parking_notification
+          return @new_parking_notification if defined?(@new_parking_notification)
+
+          notification = ParkingNotification.new(bike_id: @bike.id, organization: @organization, use_entered_address: false)
+          notification.is_repeat = notification.likely_repeat?
+          notification.set_location_from_organization
+          notification.kind ||= notification.potential_initial_record&.kind || ParkingNotification.kinds.first
+          @new_parking_notification = notification
+        end
+
+        def create_parking_notifications_path
+          organization_parking_notifications_path(organization_id: @organization.to_param)
+        end
+
+        # The seeded US id (Country.united_states_id is a stale constant in dev)
+        def us_country_id
+          @us_country_id ||= Country.united_states.id
+        end
+
         def notifications_path
           organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
         end
