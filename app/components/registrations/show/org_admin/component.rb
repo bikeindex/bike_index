@@ -92,7 +92,6 @@ module Registrations
           bike_title_html(@bike)
         end
 
-        # Credibility display is currently hidden, kept for when it returns
         def credibility_scorer
           @credibility_scorer ||= @bike.credibility_scorer
         end
