@@ -50,6 +50,10 @@ The `bin/dev` command handles building and updating Tailwind and JS.
 
 The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/form/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, badges, modals, pagination, tables…). If a `UI::*`/`Form::*` component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
 
+## Tooltips: default `?` button trigger
+
+**Every `UI::Tooltip` uses the default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the tooltip's trigger content. To keep a label visible, render it alongside the default-button tooltip. See `app/components/ui/tooltip/` and `Org::OriginDisplay::Component`.
+
 ## Typeaheads: always `Form::Combobox`
 
 **Every typeahead / autocomplete / combobox goes through `Form::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. See `app/components/form/combobox/` (component + `component_preview.rb`) and `spec/components/form/combobox` for how to invoke it.

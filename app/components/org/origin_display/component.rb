@@ -12,7 +12,7 @@ module Org
       end
 
       def call
-        render(UI::Tooltip::Component.new(text: BikeServices::Displayer.origin_title(@creation_description))) { @creation_description }
+        safe_join([@creation_description, render(UI::Tooltip::Component.new(text: BikeServices::Displayer.origin_title(@creation_description)))], " ")
       end
     end
   end
