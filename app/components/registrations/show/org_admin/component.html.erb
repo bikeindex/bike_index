@@ -28,45 +28,91 @@
     </div>
   </div>
 
-  <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:flex">
-    <% if show_contact? %>
-      <%= link_to "mailto:#{@bike.owner_email}", class: action_card_classes do %>
-        <%= action_icon("mail") %>
-        <%= action_label(translation(".message_owner"), translation(".message_owner_sub")) %>
+  <div
+    class="tw:flex tw:flex-col tw:gap-6"
+    data-controller="registrations--show--contact-owner"
+  >
+    <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:flex">
+      <% if contactable? %>
+        <button
+          type="button"
+          class="tw:text-left <%= action_card_classes %>"
+          data-action="registrations--show--contact-owner#reveal"
+        >
+          <%= action_icon("mail") %>
+          <%= action_label(translation(".message_owner"), translation(".message_owner_sub")) %>
+        </button>
       <% end %>
-    <% end %>
 
-    <% if show_impound? %>
-      <%= link_to impound_path, class: action_card_classes do %>
-        <%= action_icon("lock", tile: staff? ? :purple : :amber) %>
-        <%= action_label(impound_label, impound_sub) %>
-      <% end %>
-    <% end %>
-
-    <% if staff? && show_parking_notifications? %>
-      <%= link_to notifications_path, class: action_card_classes do %>
-        <%= action_icon("map-pin") %>
-        <%= action_label(translation(".parking_notice"), translation(".parking_notice_sub")) %>
-      <% end %>
-    <% end %>
-
-    <% if show_parking_notifications? %>
-      <%= link_to notifications_path, class: action_card_classes do %>
-        <% if active_notifications_count > 0 %>
-          <span class="tw:absolute tw:top-2 tw:right-2">
-            <%= render(UI::Badge::Component.new(text: active_notifications_count, color: :notice, size: :sm)) %>
-          </span>
+      <% if show_impound? %>
+        <%= link_to impound_path, class: action_card_classes do %>
+          <%= action_icon("lock", tile: staff? ? :purple : :amber) %>
+          <%= action_label(impound_label, impound_sub) %>
         <% end %>
-
-        <%= action_icon("bell", tile: :blue) %>
-
-        <%= action_label(translation(".view_notifications"), translation(".view_notifications_sub")) %>
       <% end %>
+
+      <% if staff? && show_parking_notifications? %>
+        <%= link_to notifications_path, class: action_card_classes do %>
+          <%= action_icon("map-pin") %>
+          <%= action_label(translation(".parking_notice"), translation(".parking_notice_sub")) %>
+        <% end %>
+      <% end %>
+
+      <% if show_parking_notifications? %>
+        <%= link_to notifications_path, class: action_card_classes do %>
+          <% if active_notifications_count > 0 %>
+            <span class="tw:absolute tw:top-2 tw:right-2">
+              <%= render(UI::Badge::Component.new(text: active_notifications_count, color: :notice, size: :sm)) %>
+            </span>
+          <% end %>
+
+          <%= action_icon("bell", tile: :blue) %>
+
+          <%= action_label(translation(".view_notifications"), translation(".view_notifications_sub")) %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <% if contactable? %>
+      <div
+        data-registrations--show--contact-owner-target="form"
+        class="tw:hidden"
+      >
+        <%= render(UI::Card::Component.new) do %>
+          <h2
+            class="
+              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+              tw:uppercase
+            "
+          >
+            <%= translation(".know_something_about_this_bike_type", bike_type: @bike.type) %>
+          </h2>
+
+          <div class="tw:mt-3">
+            <%= form_with(model: message_notification, url: stolen_notifications_path, data: {controller: "csrf-refresh"}) do |form| %>
+              <%= form.hidden_field :bike_id, value: @bike.id %>
+
+              <%= form.text_area :message, required: true, rows: 6, placeholder: translation(".where_did_you_see_this_bike", bike_type: @bike.type), class: "twinput tw:w-full" %>
+
+              <%= form.text_field :reference_url, placeholder: translation(".link_url"), class: "twinput tw:mt-2 tw:w-full" %>
+
+              <div class="tw:mt-3">
+                <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :purple, kind: :submit)) %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
     <% end %>
   </div>
 
+  <%#
+    On mobile the column wrappers collapse (tw:contents) so every card is a
+    single-column grid item, letting tw:order interleave the two desktop columns
+  %>
+
   <div class="tw:grid tw:gap-6 tw:lg:grid-cols-3">
-    <div class="tw:flex tw:flex-col tw:gap-6 tw:lg:col-span-2">
+    <div class="tw:contents tw:lg:col-span-2 tw:lg:flex tw:lg:flex-col tw:lg:gap-6">
       <% archive_images = @bike.public_images.select(&:image_url) %>
 
       <% if archive_images.any? %>
@@ -106,10 +152,12 @@
 
       <%= render(Registrations::Show::BikeIndexCard::Component.new(bike: @bike, term: :below)) %>
 
-      <%= render(Registrations::Show::BikeDetails::Component.new(bike: @bike, serial_user: @current_user)) %>
+      <div class="tw:order-5 tw:lg:order-none">
+        <%= render(Registrations::Show::BikeDetails::Component.new(bike: @bike, serial_user: @current_user)) %>
+      </div>
 
       <% if @bike.description.present? %>
-        <%= render(UI::Card::Component.new) do %>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:order-6 tw:lg:order-none")) do %>
           <h2
             class="
               tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
@@ -124,7 +172,7 @@
       <% end %>
 
       <% if show_notes? %>
-        <%= render(UI::Card::Component.new) do %>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:order-4 tw:lg:order-none")) do %>
           <h2
             class="
               tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
@@ -165,11 +213,17 @@
         <% end %>
       <% end %>
 
-      <%= render(Registrations::Show::ComponentList::Component.new(bike: @bike, collapsed: true)) %>
+      <% component_list = Registrations::Show::ComponentList::Component.new(bike: @bike, collapsed: true) %>
+
+      <% if component_list.render? %>
+        <div class="tw:order-7 tw:lg:order-none">
+          <%= render(component_list) %>
+        </div>
+      <% end %>
     </div>
 
-    <div class="tw:flex tw:flex-col tw:gap-6">
-      <%= render(UI::Card::Component.new) do %>
+    <div class="tw:contents tw:lg:flex tw:lg:flex-col tw:lg:gap-6">
+      <%= render(UI::Card::Component.new(additional_classes: "tw:order-1 tw:lg:order-none")) do %>
         <h2
           class="
             tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
@@ -234,7 +288,7 @@
         <% end %>
       <% end %>
 
-      <%= render(UI::Card::Component.new) do %>
+      <%= render(UI::Card::Component.new(additional_classes: "tw:order-2 tw:lg:order-none")) do %>
         <h2
           class="
             tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
@@ -306,7 +360,7 @@
               <%= info_row(translation(".creator"), @bike.creator&.display_name) %>
             <% end %>
 
-            <%= info_row(translation(".creation_source")) { helpers.origin_display(@bike.creation_description) } %>
+            <%= info_row(translation(".creation_source")) { render(Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) } %>
 
             <% if show_contact? %>
               <% org_registration_field_rows.each do |label, value| %>
@@ -335,7 +389,7 @@
       <% end %>
 
       <% if show_parking_notifications? %>
-        <%= render(UI::Card::Component.new) do %>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:order-3 tw:lg:order-none")) do %>
           <h2
             class="
               tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]

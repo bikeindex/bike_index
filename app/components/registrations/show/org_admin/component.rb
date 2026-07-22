@@ -72,6 +72,17 @@ module Registrations
           staff? && organization_registered?
         end
 
+        # The owner can be messaged (via a stolen/unstolen notification) when the
+        # bike is stolen, or when the org can send unstolen notifications
+        def contactable?
+          @bike.current_stolen_record.present? ||
+            (@bike.status_with_owner? && @organization.enabled?("unstolen_notifications"))
+        end
+
+        def message_notification
+          @message_notification ||= StolenNotification.new(bike: @bike)
+        end
+
         def role_label
           staff? ? translation(".role_staff") : translation(".role_limited")
         end
