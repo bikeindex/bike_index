@@ -60,31 +60,31 @@ module Registrations
         end
 
         def wheel_row(key, wheel_size)
-          [t("bikes.main_show_block.#{key}"), wheel_size&.name]
+          [translation(".#{key}"), wheel_size&.name]
         end
 
         def tire_row(key, narrow)
           return nil if narrow.nil?
 
-          [t("bikes.main_show_block.#{key}"), t("bikes.main_show_block.tire_width_narrow_#{narrow}")]
+          [translation(".#{key}"), translation(".tire_width_narrow_#{narrow}")]
         end
 
         def drivetrain_rows
           rows = if @bike.fixed_gear?
-            [[t("bikes.main_show_block.drivetrain"), t("bikes.main_show_block.drivetrain_fixed")]]
+            [[translation(".drivetrain"), translation(".drivetrain_fixed")]]
           else
-            [[t("bikes.main_show_block.drivetrain"), @bike.drivetrain_attributes],
-              [t("bikes.main_show_block.drivetrain_front"), @bike.front_gear_type&.name],
-              [t("bikes.main_show_block.drivetrain_rear"), @bike.rear_gear_type&.name]]
+            [[translation(".drivetrain"), @bike.drivetrain_attributes],
+              [translation(".drivetrain_front"), @bike.front_gear_type&.name],
+              [translation(".drivetrain_rear"), @bike.rear_gear_type&.name]]
           end
-          rows << [t("bikes.main_show_block.propulsion_type"), @bike.propulsion_type] unless @bike.propulsion_type == "foot-pedal"
+          rows << [translation(".propulsion_type"), @bike.propulsion_type] unless @bike.propulsion_type == "foot-pedal"
           rows
         end
 
         def frame_rows
           return [] unless BikeServices::Displayer.paint_description?(@bike)
 
-          [[t("bikes.main_show_block.paint_description"), @bike.paint_description]]
+          [[translation(".paint_description"), @bike.paint_description]]
         end
 
         # Teaser subtitle listing the spec groups present
@@ -94,17 +94,17 @@ module Registrations
 
         def component_label(component)
           position = if component.front && component.rear
-            t("bikes.main_show_block.front_rear")
+            translation(".front_rear")
           elsif component.front
-            t("bikes.main_show_block.front")
+            translation(".front")
           elsif component.rear
-            t("bikes.main_show_block.rear")
+            translation(".rear")
           else
             ""
           end
 
           if component.component_type == "unknown"
-            position + t("bikes.main_show_block.other")
+            position + translation(".other")
           elsif component.component_type.present?
             [position, component.component_type.titleize].reject(&:blank?).join(" ")
           else
@@ -114,9 +114,9 @@ module Registrations
 
         def component_value(component)
           parts = [component.description, component.component_model].reject(&:blank?)
-          parts << t("bikes.main_show_block.componentyear", componentyear: component.year) if component.year.present?
+          parts << translation(".componentyear", componentyear: component.year) if component.year.present?
           parts << "(#{component.mnfg_name})" if component.mnfg_name.present?
-          parts.any? ? parts.join(" ") : t("bikes.main_show_block.component_no_info")
+          parts.any? ? parts.join(" ") : translation(".component_no_info")
         end
       end
     end

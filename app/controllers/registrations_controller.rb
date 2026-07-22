@@ -1,16 +1,17 @@
 class RegistrationsController < ApplicationController
   before_action :allow_x_frame, except: %i[new show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
-  before_action :simple_header
-  before_action :assign_current_organization, only: %i[show]
+  before_action :simple_header, except: %i[show edit]
   layout "reg_embed"
 
   def show
     @bike = Bike.unscoped.find_id(params[:id])
     fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
 
-    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view: current_view,
-      available_views:, mapbox_key: ENV["MAPBOX_MAPPING"]), layout: "application")
+    available_views = BikeServices::ShowViews.available(bike: @bike, current_user:, organization: current_organization || passive_organization)
+
+    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view: current_view(available_views),
+      available_views:), layout: "application")
   end
 
   # The redesign has no edit view of its own; edit still lives on the bike
@@ -56,78 +57,33 @@ class RegistrationsController < ApplicationController
 
   private
 
-  # The resolved perspective: :public, :owner, or an [organization, role] pair
-  # (admin view). A ?view_as param overrides the default, but only to a
+  # The resolved [kind, organization] perspective (e.g. [:public, nil] or
+  # [:staff, organization]). A ?view_as param overrides the default, but only to a
   # perspective the user is allowed — otherwise it flashes and falls back.
-  def current_view
-    return @current_view if defined?(@current_view)
-
+  def current_view(available_views)
     requested = view_from_param(params[:view_as])
-    if params[:view_as].present? && !available_views.include?(requested)
+    if params[:view_as].present? && !BikeServices::ShowViews.permitted?(requested, available_views:)
       flash.now[:error] = "You're not allowed to view this registration that way"
       requested = nil
     end
-    @current_view = requested || default_view
+    requested || BikeServices::ShowViews.default_view_for(bike: @bike, current_user:, organization: current_organization || passive_organization)
   end
 
-  # The perspectives the current user may view this bike as
-  def available_views
-    @available_views ||= [
-      (:owner if (current_user.present? && @bike.owner == current_user) || current_user&.superuser?),
-      *organization_views,
-      :public
-    ].compact
-  end
-
-  # [organization, role] pairs. Superadmins may preview both staff and limited.
-  def organization_views
-    viewable_organizations.flat_map do |org|
-      roles = if current_user.superuser?
-        %i[staff limited]
-      else
-        [current_user.member_bike_edit_of?(org) ? :staff : :limited]
-      end
-      roles.map { |role| [org, role] }
-    end
-  end
-
-  def viewable_organizations
-    return [] if current_user.blank?
-
-    orgs = if current_user.superuser?
-      [passive_organization, @bike.organizations.first, Organization.friendly_find("brakebills")]
-    else
-      current_user.organizations.to_a
-    end
-    orgs.compact.uniq.select { |org| current_user.authorized?(org) }
-  end
-
-  def default_view
-    if passive_organization.present? && current_user&.authorized?(passive_organization)
-      return [passive_organization, current_user.member_bike_edit_of?(passive_organization) ? :staff : :limited]
-    end
-    return :owner if current_user.present? && @bike.owner == current_user
-
-    :public
-  end
-
+  # The [kind, organization] view requested via ?view_as, or nil when absent/unknown.
+  # A bare org slug (no explicit role) resolves to the user's own role for the org.
   def view_from_param(param)
     case param
-    when "public" then :public
-    when "owner" then :owner
+    when "public" then [:public, nil]
+    when "owner" then [:owner, nil]
     when nil, "" then nil
     else
       slug, role = param.split(".", 2)
       org = Organization.friendly_find(slug)
-      org && [org, (role == "limited") ? :limited : :staff]
-    end
-  end
+      return nil unless org
 
-  # Apply the organization_id param (e.g. ?organization_id=false) before the view
-  # reads passive_organization — otherwise it's memoized from the session and the
-  # switch only takes effect on the next request
-  def assign_current_organization
-    current_organization
+      role ||= current_user&.member_bike_edit_of?(org) ? "staff" : "limited"
+      [(role == "limited") ? :limited : :staff, org]
+    end
   end
 
   def simple_header

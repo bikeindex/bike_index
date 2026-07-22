@@ -1,8 +1,10 @@
 require "rails_helper"
 
 RSpec.describe Registrations::Show::Map::Component, type: :component do
-  let(:options) { {latitude: 40.7, longitude: -73.9, mapbox_key: "pk.test"} }
+  let(:options) { {latitude: 40.7, longitude: -73.9} }
   let(:component) { described_class.new(**options) }
+  let(:mapbox_key) { "pk.test" }
+  before { stub_const("#{described_class}::MAPBOX_KEY", mapbox_key) }
 
   it "renders the map container with the stimulus values and an unavailable fallback" do
     render_inline(component)
@@ -17,7 +19,7 @@ RSpec.describe Registrations::Show::Map::Component, type: :component do
   end
 
   context "precise (exact address public)" do
-    let(:options) { {latitude: 40.7, longitude: -73.9, mapbox_key: "pk.test", precise: true} }
+    let(:options) { {latitude: 40.7, longitude: -73.9, precise: true} }
     it "uses a larger radius base" do
       render_inline(component)
       expect(page.find("div[data-controller='registrations--show--map']")["data-registrations--show--map-radius-base-value"]).to eq "2"
@@ -25,7 +27,7 @@ RSpec.describe Registrations::Show::Map::Component, type: :component do
   end
 
   context "missing coordinates" do
-    let(:options) { {latitude: nil, longitude: nil, mapbox_key: "pk.test"} }
+    let(:options) { {latitude: nil, longitude: nil} }
     it "does not render" do
       render_inline(component)
       expect(page.native.text).to be_blank
@@ -33,7 +35,7 @@ RSpec.describe Registrations::Show::Map::Component, type: :component do
   end
 
   context "missing mapbox_key" do
-    let(:options) { {latitude: 40.7, longitude: -73.9, mapbox_key: nil} }
+    let(:mapbox_key) { nil }
     it "does not render" do
       render_inline(component)
       expect(page.native.text).to be_blank

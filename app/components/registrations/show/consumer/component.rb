@@ -6,11 +6,10 @@ module Registrations
       class Component < ApplicationComponent
         # owner: overrides the computed ownership so the wrapper can force the
         # public or owner perspective (view_as)
-        def initialize(bike:, current_user:, show_for_sale: false, mapbox_key: nil, owner: nil, available_views: [])
+        def initialize(bike:, current_user:, show_for_sale: false, owner: nil, available_views: [])
           @bike = bike
           @current_user = current_user
           @show_for_sale = show_for_sale
-          @mapbox_key = mapbox_key
           @available_views = available_views
           @owner = owner.nil? ? (@current_user.present? && @bike.owner == @current_user) : owner
         end

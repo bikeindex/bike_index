@@ -10,7 +10,7 @@ module Registrations
           bike = preview_bike(bike_id)
           view = preview_view(bike, view_as)
           render(Registrations::Show::Wrapper::Component.new(bike:, current_user: preview_user(view),
-            view:, available_views: [view], mapbox_key: ENV["MAPBOX_MAPPING"]))
+            view:, available_views: [view]))
         end
 
         private
@@ -26,17 +26,18 @@ module Registrations
         end
 
         def preview_view(bike, view_as)
-          return :public unless editable?
+          return [:public, nil] unless editable?
 
           case view_as
-          when "owner" then :owner
-          when "organization" then bike.organizations.first || :public
-          else :public
+          when "owner" then [:owner, nil]
+          when "organization" then (org = bike.organizations.first) ? [:staff, org] : [:public, nil]
+          else [:public, nil]
           end
         end
 
         def preview_user(view)
-          view.is_a?(Organization) ? view.users.first : nil
+          _kind, organization = view
+          organization&.users&.first
         end
       end
     end

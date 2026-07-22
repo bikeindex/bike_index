@@ -9,7 +9,7 @@
   <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-4">
     <div>
       <div class="tw:mb-2 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <%= render(Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view: [@organization, staff? ? :staff : :limited], available_views: @available_views, label: org_chip_label, color: org_chip_color, solid: false, role_label: role_label)) %>
+        <%= render(Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view: [staff? ? :staff : :limited, @organization], available_views: @available_views, label: org_chip_label, color: org_chip_color, solid: false, role_label: role_label)) %>
       </div>
 
       <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
@@ -114,7 +114,7 @@
         <% end %>
       <% end %>
 
-      <%= render(Registrations::Show::StolenDetails::Component.new(bike: @bike, current_user: @current_user, mapbox_key: @mapbox_key)) %>
+      <%= render(Registrations::Show::StolenDetails::Component.new(bike: @bike, current_user: @current_user)) %>
 
       <%= render(UI::Card::Component.new) do %>
         <h2
@@ -123,7 +123,7 @@
             tw:uppercase
           "
         >
-          <%= t("components.registrations.show.consumer.this_bike_on_bike_index", bike_type: @bike.type) %>
+          <%= translation(".this_bike_on_bike_index", bike_type: @bike.type) %>
         </h2>
 
         <div class="tw:mt-3">
@@ -134,10 +134,10 @@
               <% end %>
             <% end %>
 
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("components.registrations.show.consumer.frame_material"), value: @bike.frame_material_name)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("components.registrations.show.consumer.activity"), value: activity_name)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("components.registrations.show.consumer.id"))) { render(UI::ShortId::Component.new(record: @bike)) } %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("components.registrations.show.consumer.registered_since"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".activity"), value: activity_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".id"))) { render(UI::ShortId::Component.new(record: @bike)) } %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered_since"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
 
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".credibility"))) do %>
               <span class="tw:inline-flex tw:items-center tw:gap-1.5">
@@ -194,15 +194,15 @@
 
         <div class="tw:mt-3">
           <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.serial"))) { helpers.render_serial_display(@bike, @current_user) } %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.other_serial"), value: @bike.extra_registration_number)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.vehicle_type"), value: vehicle_type)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.manufacturer"), value: manufacturer_name)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.model"), value: @bike.frame_model)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.year"), value: @bike.year)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.frame_material"), value: @bike.frame_material_name)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.frame_size"), value: @bike.frame_size&.upcase)) %>
-            <%= render(UI::DefinitionList::Row::Component.new(label: t("bikes.main_show_block.handlebar_type"), value: @bike.handlebar_type_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"))) { helpers.render_serial_display(@bike, @current_user) } %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".other_serial"), value: @bike.extra_registration_number)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".vehicle_type"), value: vehicle_type)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: manufacturer_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".model"), value: @bike.frame_model)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".year"), value: @bike.year)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_size"), value: @bike.frame_size&.upcase)) %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".handlebar_type"), value: @bike.handlebar_type_name)) %>
           <% end %>
         </div>
       <% end %>

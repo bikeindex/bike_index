@@ -32,19 +32,19 @@ module Registrations
           @available_views.size > 1
         end
 
-        # Organization perspectives ([organization, role] pairs) lead the dropdown,
+        # Organization perspectives ([role, organization] pairs) lead the dropdown,
         # divided from the owner/public views
         def org_views
-          @available_views.select { |view| view.is_a?(Array) }
+          @available_views.select { |_kind, organization| organization }
         end
 
         def other_views
-          @available_views.reject { |view| view.is_a?(Array) }
+          @available_views.reject { |_kind, organization| organization }
         end
 
         def entry_link(view)
           active = view == @current_view
-          link_to(registration_path(@bike, view_as: view_param(view)), "aria-current": (active ? "true" : nil),
+          link_to(registration_path(@bike, view_as: BikeServices::ShowViews.view_param(view)), "aria-current": (active ? "true" : nil),
             class: "tw:block tw:whitespace-nowrap tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700 tw:no-underline tw:hover:bg-gray-100 tw:dark:text-gray-200 tw:dark:hover:bg-gray-800 #{"tw:bg-gray-100 tw:dark:bg-gray-800" if active}") do
             safe_join([(active ? "Viewing as" : "View as"), " ", entry_label(view)])
           end
@@ -55,22 +55,15 @@ module Registrations
         end
 
         # The part after "View as" in each dropdown entry. For organization views
-        # ([organization, role] pairs) only the org name is bold, not the role.
+        # only the org name is bold, not the role.
         def entry_label(view)
-          case view
+          kind, organization = view
+          case kind
           when :owner then content_tag(:span, "owner of bike", class: "tw:font-bold")
           when :public then content_tag(:span, "Public", class: "tw:font-bold")
           else
-            organization, role = view
-            safe_join([content_tag(:span, organization.short_name, class: "tw:font-bold"), " ", role.to_s])
+            safe_join([content_tag(:span, organization.short_name, class: "tw:font-bold"), " ", kind.to_s])
           end
-        end
-
-        def view_param(view)
-          return view.to_s unless view.is_a?(Array)
-
-          organization, role = view
-          "#{organization.to_param}.#{role}"
         end
       end
     end

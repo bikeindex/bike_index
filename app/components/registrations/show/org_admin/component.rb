@@ -8,11 +8,10 @@ module Registrations
 
         # staff: overrides the computed role so a superadmin can view the org
         # panel as staff or as limited (view_as)
-        def initialize(bike:, current_user:, organization:, mapbox_key: nil, available_views: [], staff: nil)
+        def initialize(bike:, current_user:, organization:, available_views: [], staff: nil)
           @bike = bike
           @current_user = current_user
           @organization = organization
-          @mapbox_key = mapbox_key
           @available_views = available_views
           @force_staff = staff
         end
@@ -117,7 +116,7 @@ module Registrations
         end
 
         def primary_colors_label
-          t("components.registrations.show.consumer.#{frame_color_records.many? ? "primary_colors" : "primary_color"}")
+          translation(".#{frame_color_records.many? ? "primary_colors" : "primary_color"}")
         end
 
         def color_swatches

@@ -6,15 +6,16 @@ module Registrations
       # A Mapbox map centered on a location, with a translucent circle marking it.
       # The registrations--show--map Stimulus controller lazy-loads Mapbox GL.
       class Component < ApplicationComponent
-        def initialize(latitude:, longitude:, mapbox_key:, precise: false)
+        MAPBOX_KEY = ENV["MAPBOX_MAPPING"]
+
+        def initialize(latitude:, longitude:, precise: false)
           @latitude = latitude
           @longitude = longitude
-          @mapbox_key = mapbox_key
           @precise = precise
         end
 
         def render?
-          @latitude.present? && @longitude.present? && @mapbox_key.present?
+          @latitude.present? && @longitude.present? && MAPBOX_KEY.present?
         end
 
         private
