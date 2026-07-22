@@ -24,21 +24,6 @@
         <%= render(UI::Badge::Component.new(text: status_label, color: status_color, indicator: true)) %>
       </div>
     </div>
-
-    <div class="tw:text-right">
-      <p
-        class="
-          tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-          tw:uppercase
-        "
-      >
-        <%= translation(".registration") %>
-      </p>
-
-      <p class="tw:text-sm tw:opacity-65">
-        <%= render(UI::Time::Component.new(time: @bike.created_at)) %>
-      </p>
-    </div>
   </div>
 
   <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:flex">
