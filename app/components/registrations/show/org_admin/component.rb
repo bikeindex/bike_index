@@ -27,6 +27,13 @@ module Registrations
             @current_user.authorized?(@organization) && @bike.visible_by?(@current_user)
         end
 
+        # Org-scoped records shown in this panel that don't touch the bike (so the
+        # bike's own cache version wouldn't expire the fragment when they change)
+        def cache_version
+          [bike_organization_note&.updated_at, organization_model_audit&.updated_at,
+            other_registrations.maximum(:updated_at), other_registrations_count]
+        end
+
         private
 
         # A definition-list row that always renders, showing a muted "-" when blank
