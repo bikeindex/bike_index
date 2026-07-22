@@ -79,7 +79,7 @@
     <% table.column(label: translation(".source"), classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
       <% if bike.creation_description %>
         <small class="tw:text-gray-400">
-          <%= helpers.origin_display(bike.creation_description) %>
+          <%= render(Org::OriginDisplay::Component.new(creation_description: bike.creation_description)) %>
         </small>
       <% end %>
     <% end %>

@@ -131,9 +131,9 @@
           <% if bike.creation_description %>
             <span class="tw:absolute tw:right-0 tw:bottom-0 tw:text-xs tw:text-gray-400">
               <% if bike.bulk_import.present? %>
-                <%= link_to helpers.origin_display(bike.creation_description), admin_bulk_import_path(bike.bulk_import), class: "tw:text-gray-400" %>
+                <%= link_to render(Org::OriginDisplay::Component.new(creation_description: bike.creation_description)), admin_bulk_import_path(bike.bulk_import), class: "tw:text-gray-400" %>
               <% else %>
-                <%= helpers.origin_display(bike.creation_description) %>
+                <%= render(Org::OriginDisplay::Component.new(creation_description: bike.creation_description)) %>
               <% end %>
             </span>
           <% end %>
