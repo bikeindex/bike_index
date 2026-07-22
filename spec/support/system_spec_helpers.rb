@@ -31,12 +31,21 @@ module SystemSpecHelpers
     field
   end
 
-  # Wait for Turbo Drive to finish a back/forward restoration before interacting.
-  # On restore Turbo shows a cached snapshot (html[data-turbo-preview]) first,
-  # then swaps in the real render -- typing during the preview loses the value
-  # when the real page lands. Returns once the preview attribute is gone.
-  def wait_for_turbo_restore(wait: 10)
-    expect(page).to have_no_css("html[data-turbo-preview]", wait:)
+  # Navigate back/forward and wait for Turbo Drive to finish the restoration
+  # visit before returning. Search pages reload their results turbo-frame from
+  # the URL independently of -- and faster than -- the page render, so tbody
+  # counts and the address bar can settle while the form still shows the previous
+  # query. Turbo fires exactly one turbo:load per restoration visit (after the
+  # popstate the search--form controller reconciles the fields on); register a
+  # one-shot listener, navigate, then wait for it so the whole restoration has
+  # landed before we read or fill the form.
+  def go_back_and_wait(wait: 10)
+    page.execute_script(<<~JS)
+      document.documentElement.removeAttribute("data-test-turbo-loaded")
+      document.addEventListener("turbo:load", () => document.documentElement.setAttribute("data-test-turbo-loaded", ""), {once: true})
+    JS
+    page.go_back
+    expect(page).to have_css("html[data-test-turbo-loaded]", wait:, visible: :all)
   end
 
   # capybara-playwright wraps click/find so a mid-action "Element is not attached
