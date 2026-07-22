@@ -9,8 +9,8 @@ module Registrations
         OTHER_REGISTRATIONS_LIMIT = 10
         # Parking-notification statuses that are still ongoing (vs replaced/retrieved/resolved)
         ACTIVE_PARKING_STATUSES = %w[current impounded].freeze
-        # Registration fields shown with the owner (their tie to the org) rather than in registration info
-        OWNER_ACCESS_REG_FIELDS = %w[reg_organization_affiliation reg_student_id].freeze
+        # Registration fields shown with the owner rather than in registration info
+        OWNER_ACCESS_REG_FIELDS = %w[reg_address reg_organization_affiliation reg_student_id].freeze
 
         # staff: overrides the computed role so a superadmin can view the org
         # panel as staff or as limited (view_as)
@@ -179,10 +179,10 @@ module Registrations
           end
         end
 
-        # Affiliation & student ID [label, value] rows for owner & access; blank
-        # values render a muted "-" rather than dropping
+        # Address, affiliation & student ID [label, value] rows for owner & access;
+        # blank values render a muted "-" rather than dropping
         def owner_reg_field_rows
-          (@organization.additional_registration_fields & OWNER_ACCESS_REG_FIELDS).map do |reg_field|
+          (OWNER_ACCESS_REG_FIELDS & @organization.additional_registration_fields).map do |reg_field|
             bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
             [org_registration_field_label(reg_field, bike_attr), org_registration_field_value(bike_attr)]
           end
@@ -288,6 +288,12 @@ module Registrations
 
         def edit_access_path
           edit_bike_path(@bike, edit_template: @bike.default_edit_template)
+        end
+
+        # The owner's other registrations are law-enforcement data, feature-gated
+        # like the legacy access panel
+        def show_other_registrations?
+          show_contact? && @organization.enabled?("additional_registrations_information")
         end
 
         def other_registrations

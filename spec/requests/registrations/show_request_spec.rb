@@ -111,13 +111,40 @@ RSpec.describe "RegistrationsController#show", type: :request do
 
     context "org staff (admin)" do
       let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
-      it "renders the admin redesign" do
+      it "renders the admin redesign, without feature-gated sections" do
         get "#{base_url}/#{bike.id}"
         body = whitespace_normalized_body_text
         expect(body).to match("Full access")
         expect(body).to match("Bike details")
         expect(body).to match("Owner & access")
+        expect(body).to match(bike.owner_name)
         expect(body).to match(bike.owner_email)
+        expect(body).to match("E-Vehicle Audit")
+        # Gated by credibility_badges and additional_registrations_information
+        expect(body).to_not match("Credibility")
+        expect(body).to_not match("Other registrations")
+      end
+
+      context "bike not registered with the org" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+        it "hides the owner rows and shows the not-registered card" do
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match("Not registered with #{organization.short_name}")
+          expect(body).to_not match(bike.owner_name)
+          expect(body).to_not match(bike.owner_email)
+          # Registration information rows (other than sticker & credibility) are
+          # only shown for bikes registered with the org
+          expect(body).to_not match("E-Vehicle Audit")
+        end
+      end
+
+      context "with credibility_badges" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"]) }
+        it "shows the credibility score" do
+          get "#{base_url}/#{bike.id}"
+          expect(whitespace_normalized_body_text).to match("Credibility #{bike.credibility_scorer.score}")
+        end
       end
 
       context "impounded bike" do
@@ -172,14 +199,18 @@ RSpec.describe "RegistrationsController#show", type: :request do
     end
 
     context "with organization registration fields" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[reg_organization_affiliation reg_student_id]) }
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[reg_address reg_organization_affiliation reg_student_id]) }
       let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
-      before { bike.current_ownership.update(registration_info: {"organization_affiliation" => "student", "student_id" => "sid-99"}) }
+      before do
+        bike.current_ownership.update(registration_info: {"organization_affiliation" => "student", "student_id" => "sid-99"},
+          address_record: FactoryBot.create(:address_record))
+      end
 
-      it "shows the org registration fields in owner & access" do
+      it "shows the org registration fields in owner & access, address beneath phone" do
         get "#{base_url}/#{bike.id}"
         body = whitespace_normalized_body_text
         expect(body).to match("Owner & access")
+        expect(body).to match(/Phone.*Address One Shields Ave, Davis, CA 95616/)
         expect(body).to match("Organization affiliation")
         expect(body).to match("Student") # the "student" affiliation, humanized
         expect(body).to match("sid-99")
@@ -187,6 +218,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
     end
 
     context "when the owner has other registrations" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["additional_registrations_information"]) }
       let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
       let(:owner) { FactoryBot.create(:user_confirmed) }
       let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: owner) }
@@ -212,6 +244,14 @@ RSpec.describe "RegistrationsController#show", type: :request do
           expect(response.body).to include(organization_registrations_path(organization_id: organization.to_param, search_email: owner.email))
         end
       end
+
+      context "without additional_registrations_information" do
+        let(:organization) { FactoryBot.create(:organization) }
+        it "hides the other registrations" do
+          get "#{base_url}/#{bike.id}"
+          expect(whitespace_normalized_body_text).to_not match("Other registrations")
+        end
+      end
     end
 
     context "limited role (member_no_bike_edit)" do
@@ -222,6 +262,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Limited")
         expect(body).to match("Restricted for your role")
         expect(body).to match("Bike details")
+        # Owner name shows for any member of the registering org, email is staff-only
+        expect(body).to match(bike.owner_name)
         expect(body).to_not match(bike.owner_email)
       end
 
