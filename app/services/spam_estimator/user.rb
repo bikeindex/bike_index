@@ -5,8 +5,8 @@ module SpamEstimator
     MARK_SPAM_PERCENT = 90 # May modify in the future!
 
     # crypto, gambling and adult terms that SEO-spam profiles exist to promote.
-    # Indonesian and Vietnamese carry most of the volume — see the multi-word
-    # section below for why those require a literal space.
+    # Word boundaries matter: usernames are auto-generated random strings, so
+    # unanchored substrings ("Judith", "Hagen", "Sloth", "Donohue") would ban real people.
     SEO_SPAM_REGEX = /(?:
       \b(?:
         bitcoin | btc | ethereum | crypto(?:currency|\s?wallet)? | blockchain | binance |
@@ -14,18 +14,14 @@ module SpamEstimator
         presale | usdt | tether |
         casino | kasino | gambling | roulette | blackjack | baccarat | poker | sportsbook |
         jackpot | judi | togel | toto | situs | gacor | bandar | slot | agen | maxwin |
-        terpercaya | taruhan | alternatif | pragmatic | gampang | scatter | rtp |
-        bet365 | betting | wager |
-        bokep | hentai | xvideo | (?:phim|clip|truyen|truyện)\s?sex
-      )\b |
-      # Word boundaries are load-bearing above: usernames are auto-generated 22-char
-      # random strings, so substring matches ("Judith", "Hagen", "Sloth", "Donohue")
-      # would ban real people. These phrases require a space for the same reason.
-      nh[àa]\s+c[áa]i | c[áa]\s+c[uư][ợo]c | đ[áa]\s+g[àa] | soi\s+k[èe]o |
-      n[ổo]\s+h[ũu] | x[óo]c\s+đ[ĩi]a | n[ạa]p\s+ti[ềe]n | đ[ăa]ng\s+nh[ậa]p |
-      tr[ựu]c\s+tuy[ếe]n | khuy[ếe]n\s+m[ãa]i | uy\s+t[íi]n |
-      game\s+b[àa]i | c[ờo]\s+b[ạa]c | s[òo]ng\s+b[ạa]c | x[ổo]\s+s[ốo] | l[ôo]\s+đ[ềe] |
-      link\s+truy\s+c[ậa]p | clip\s+(?:hot|n[óo]ng) | 18\+
+        terpercaya | taruhan | alternatif | gampang | pragmatic\s+play | scatter\s+hitam |
+        rtp | bet365 | betting | wager |
+        bokep | hentai | xvideo | (?:phim|clip|truyen)\s?sex |
+        nha\s+cai | ca\s+cuoc | da\s+ga | soi\s+keo | no\s+hu | xoc\s+dia |
+        nap\s+tien | dang\s+nhap | truc\s+tuyen | khuyen\s+mai | uy\s+tin |
+        game\s+bai | co\s+bac | song\s+bac | xo\s+so | lo\s+de |
+        link\s+truy\s+cap | clip\s+(?:hot|nong)
+      )\b | 18\+
     )/xi
 
     def estimate(user)
@@ -41,9 +37,15 @@ module SpamEstimator
     # private below here
     #
 
-    # count of references anywhere in the public profile, including link URLs and handles
+    # count of references anywhere in the public profile, including link URLs and handles.
+    # Vietnamese spam appears both with and without diacritics, so strip them first —
+    # I18n.transliterate can't (it renders Vietnamese vowels as "?")
     def seo_spam_reference_count(user)
-      scannable_strings(user).join(" ").scan(SEO_SPAM_REGEX).count
+      strip_diacritics(scannable_strings(user).join(" ")).scan(SEO_SPAM_REGEX).count
+    end
+
+    def strip_diacritics(str)
+      str.unicode_normalize(:nfd).gsub(/\p{Mn}/, "").tr("đĐ", "dD")
     end
 
     # description and title are the SEO-spam payload; weight them far above name/username
@@ -69,6 +71,7 @@ module SpamEstimator
       end
     end
 
-    conceal :seo_spam_reference_count, :spammy_text_estimate, :scannable_strings, :bike_ownership_reduction
+    conceal :seo_spam_reference_count, :strip_diacritics, :spammy_text_estimate,
+      :scannable_strings, :bike_ownership_reduction
   end
 end

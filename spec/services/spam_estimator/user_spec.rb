@@ -54,12 +54,10 @@ RSpec.describe SpamEstimator::User do
 
     context "real names that contain spam terms as substrings" do
       # usernames are auto-generated random strings, so substring matching would ban real people
-      let(:names) { %w[Judith Hagen Sloth Donohue Totonchy Sexton Bolanos] }
-
       it "does not count them as references" do
-        names.each do |real_name|
-          rider = User.new(show_bikes: true, name: real_name, description: "I ride my bike to work most days")
-          expect(described_class.estimate(rider)).to be < SpamEstimator::User::MARK_SPAM_PERCENT
+        %w[Judith Hagen Sloth Donohue Totonchy Sexton Bolanos].each do |real_name|
+          expect(described_class.estimate(User.new(show_bikes: true, name: real_name, description:)))
+            .to be < SpamEstimator::User::MARK_SPAM_PERCENT
         end
       end
     end
