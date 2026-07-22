@@ -247,7 +247,6 @@
 
           - if @organization.enabled?("saml_sso")
             - saml_configuration = @organization.organization_saml_configuration || @organization.build_organization_saml_configuration
-            - saml_settings = Saml::SettingsBuilder.new(saml_configuration)
             .form-group.mt-4
               %h4 SAML SSO
               %p.text-success
@@ -258,10 +257,10 @@
                   = link_to saml_metadata_url(org_slug: @organization.to_param), saml_metadata_url(org_slug: @organization.to_param)
                 %li
                   SP entityID:
-                  %code= saml_settings.sp_entity_id
+                  %code= Saml::SettingsBuilder.sp_entity_id(saml_configuration)
                 %li
                   ACS (callback) URL:
-                  %code= saml_settings.assertion_consumer_service_url
+                  %code= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration)
               = f.fields_for :organization_saml_configuration, saml_configuration do |saml_f|
                 .form-check.mt-2
                   = saml_f.check_box :enabled, class: "form-check-input"
