@@ -5,13 +5,13 @@ en:
       show:
         org_admin:
           about_this_bike: About this %{bike_type}
+          active: active
           activity: Activity
           audit: Audit
           bike_details: "%{bike_type} details"
           claimed: Claimed
           coming_soon: Coming soon
           credibility: Credibility
-          current: Current
           e_vehicle_compliance: E-vehicle compliance
           edit_bike_type: Edit %{bike_type}
           found: Found
@@ -30,7 +30,6 @@ en:
           message_owner_sub: Email & SMS
           model: Model
           no_duplicate_serials: no dup. serials
-          not_attested: Not attested
           not_audited: Not audited
           not_in_org: Not in your org
           not_registered_message: >-
@@ -41,14 +40,12 @@ en:
           note_by: Note by %{user}
           notes_placeholder: New internal note — your previous notes are kept in the
             thread.
-          open_notifications_page: Open notifications page →
           org_can_edit: "%{org_name} can edit this %{bike_type}"
           org_can_edit_sub: Including after the %{bike_type} is claimed.
           other_registrations: Other registrations by this user
           other_registrations_count_html: "%{count} other registrations"
           other_serial: Other serial/registration/sticker
           owner_access: Owner & access
-          owner_attestation: Owner attestation
           owner_email: Email
           owner_name: Name
           owner_phone: Phone
@@ -65,10 +62,9 @@ en:
           registered_since: Registered since
           registration: Registration
           registration_number: Bike Index Registration
-          request: Request
           request_impound: Request impound
           request_impound_sub: Sent for approval
-          resolved: Resolved
+          resolved: resolved
           restricted_message: >-
             Owner contact is available to admin & staff. You can add notes and request
             an impound.
@@ -77,7 +73,6 @@ en:
           role_staff: Full access
           serial: Serial
           showing_recent: Showing the %{count} most recent
-          start_audit: Start audit
           stolen: Stolen
           this_bike_on_bike_index: This %{bike_type} on Bike Index
           vehicle_type: Vehicle type
