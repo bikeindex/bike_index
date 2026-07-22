@@ -14,6 +14,7 @@ en:
           current: Current
           e_vehicle_compliance: E-vehicle compliance
           edit_bike_type: Edit %{bike_type}
+          found: Found
           frame_material: Frame material
           frame_size: Frame size
           handlebar_type: Handlebar type
@@ -21,6 +22,7 @@ en:
           id: ID
           impound: Impound
           impound_sub: Single confirmation
+          impounded: Impounded
           internal_notes: Internal notes
           link_sticker: Link sticker
           manufacturer: Manufacturer

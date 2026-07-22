@@ -119,6 +119,27 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Owner & access")
         expect(body).to match(bike.owner_email)
       end
+
+      context "impounded bike" do
+        let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization).reload }
+        before { FactoryBot.create(:impound_record, bike:, organization:, user: current_user) }
+        it "shows the impounded status, not not-stolen" do
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match("Impounded")
+          expect(body).to_not match("Not stolen")
+        end
+      end
+
+      context "found bike" do
+        let(:bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization).reload }
+        it "shows the found status, not not-stolen" do
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match("Found")
+          expect(body).to_not match("Not stolen")
+        end
+      end
     end
 
     context "with organization registration fields" do

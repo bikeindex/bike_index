@@ -66,6 +66,24 @@ def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organ
   bike
 end
 
+# Register an unknown-serial bike together with its parking notification, the way
+# the organized "unregistered" flow does (no ProcessParkingNotificationJob email).
+def seed_unregistered_parking_notification(creator:, member:, owner_email:, loc:, kind:, region_record_id:, country_id:)
+  b_param = BParam.create!(
+    creator: member,
+    params: {
+      bike: org_bike_params(owner_email:).merge(serial_number: "unknown"),
+      parking_notification: {kind:, street: loc[:street], city: loc[:city], postal_code: loc[:postal_code], region_record_id:, country_id:, skip_geocoding: true}
+    }
+  )
+  b_param.origin = "organization_form"
+  bike = creator.create_bike(b_param)
+  raise "Unregistered bike creation failed: #{b_param.bike_errors}" if bike.errors.any?
+  bike.parking_notifications.last&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
+  puts "  Created unregistered parking notification at #{loc[:street]}"
+  bike
+end
+
 puts "Creating parking notifications in San Francisco..."
 
 # Create 10 initial parking notifications
@@ -116,29 +134,11 @@ end
   puts "  Created impound notification ##{i + 1} with ImpoundRecord ##{pn.impound_record_id}"
 end
 
-# Create 1 unregistered_parking_notification via BikeServices::Creator
-loc = sf_locations[10]
-unreg_b_param = BParam.create!(
-  creator: member,
-  params: {
-    bike: org_bike_params(owner_email: member.email)
-      .merge(serial_number: "unknown"),
-    parking_notification: {
-      kind: "parked_incorrectly_notification",
-      street: loc[:street],
-      city: loc[:city],
-      postal_code: loc[:postal_code],
-      region_record_id: ca_state&.id,
-      country_id: us&.id,
-      skip_geocoding: true
-    }
-  }
-)
-unreg_b_param.origin = "organization_form"
-unreg_bike = creator.create_bike(unreg_b_param)
-raise "Unregistered bike creation failed: #{unreg_b_param.bike_errors}" if unreg_bike.errors.any?
-unreg_bike.parking_notifications.last&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
-puts "  Created unregistered parking notification at #{loc[:street]}"
+# Create 2 unregistered_parking_notifications: one for the member, one owned by the primary test user
+seed_unregistered_parking_notification(creator:, member:, owner_email: member.email, loc: sf_locations[10],
+  kind: "parked_incorrectly_notification", region_record_id: ca_state&.id, country_id: us&.id)
+seed_unregistered_parking_notification(creator:, member:, owner_email: user.email, loc: sf_locations[11],
+  kind: "appears_abandoned_notification", region_record_id: ca_state&.id, country_id: us&.id)
 
 puts "Parking notifications seeded successfully!"
 

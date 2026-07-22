@@ -106,14 +106,21 @@ class UsersController < ApplicationController
 
   def show
     user = User.find_by_username(params[:id])
-    if user.nil? || user.banned? || user.email_banned?
+    raise ActionController::RoutingError.new("Not Found") if user.nil?
+
+    @user_banned = user.banned? || user.email_banned?
+    if @user_banned && !current_user&.superuser?
       raise ActionController::RoutingError.new("Not Found")
     end
 
     @owner = user
     @user = user
-    unless user == current_user || @user.show_bikes
+    unless user == current_user || @user.show_bikes || current_user&.superuser?
       redirect_to(my_account_url, notice: translation(:user_not_sharing)) && return
+    end
+
+    unless @user.show_bikes
+      @profile_hidden_reason = (user == current_user) ? :owner : :superuser
     end
 
     @per_page = permitted_per_page(default: 15)
