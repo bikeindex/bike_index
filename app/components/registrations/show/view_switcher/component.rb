@@ -25,7 +25,7 @@ module Registrations
         def display_label
           return @label if @role_label.blank?
 
-          safe_join([@label, content_tag(:span, @role_label, class: "tw:font-normal tw:opacity-70")], " · ")
+          safe_join([@label, content_tag(:span, @role_label, class: "tw:font-normal tw:opacity-65")], " · ")
         end
 
         def switchable?

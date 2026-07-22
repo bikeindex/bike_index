@@ -21,7 +21,5 @@
     <% end %>
   <% end %>
 <% else %>
-  <%= render(UI::Badge::Component.new(text: @label, color: @color, size: :sm, solid: @solid)) do %>
-    <%= display_label %>
-  <% end %>
+  <%= render(UI::Badge::Component.new(text: display_label, color: @color, size: :sm, solid: @solid)) %>
 <% end %>
