@@ -76,6 +76,19 @@ RSpec.describe SpamEstimator::User do
       end
     end
 
+    context "seo_spam_matches" do
+      let(:user) { User.new(show_bikes: true, title: "Nhà cái uy tín", description: "nha cai casino") }
+
+      it "tallies matched terms, normalizing case and diacritics" do
+        expect(described_class.seo_spam_matches(user)).to eq({"nha cai" => 2, "uy tin" => 1, "casino" => 1})
+      end
+
+      it "is empty for a blank user" do
+        expect(described_class.seo_spam_matches(nil)).to eq({})
+        expect(described_class.seo_spam_matches(User.new)).to eq({})
+      end
+    end
+
     context "user owns bikes" do
       # 2 link references keep the base well under the clamp, so the reduction is observable
       let(:user) do

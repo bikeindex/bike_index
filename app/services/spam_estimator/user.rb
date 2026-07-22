@@ -33,15 +33,23 @@ module SpamEstimator
       (score - bike_ownership_reduction(user)).clamp(0, 100)
     end
 
+    # matched terms and their counts, recorded on the ban so false positives are auditable.
+    # Vietnamese spam appears both with and without diacritics, so strip them first —
+    # I18n.transliterate can't (it renders Vietnamese vowels as "?")
+    def seo_spam_matches(user)
+      return {} if user.blank?
+
+      strip_diacritics(scannable_strings(user).join(" ")).scan(SEO_SPAM_REGEX)
+        .map { |term| term.downcase.gsub(/\s+/, " ") }.tally
+    end
+
     #
     # private below here
     #
 
-    # count of references anywhere in the public profile, including link URLs and handles.
-    # Vietnamese spam appears both with and without diacritics, so strip them first —
-    # I18n.transliterate can't (it renders Vietnamese vowels as "?")
+    # counts references anywhere in the public profile, including link URLs and handles
     def seo_spam_reference_count(user)
-      strip_diacritics(scannable_strings(user).join(" ")).scan(SEO_SPAM_REGEX).count
+      seo_spam_matches(user).values.sum
     end
 
     def strip_diacritics(str)
