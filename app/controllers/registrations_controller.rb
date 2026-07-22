@@ -66,7 +66,7 @@ class RegistrationsController < ApplicationController
       flash.now[:error] = "You're not allowed to view this registration that way"
       requested = nil
     end
-    @current_view = requested || BikeServices::ShowViews.default_view_for(bike: @bike, current_user:, passive_organization:)
+    @current_view = requested || BikeServices::ShowViews.default_view_for(bike: @bike, current_user:, organization: current_organization || passive_organization)
   end
 
   # The [kind, organization] view requested via ?view_as, or nil when absent/unknown.

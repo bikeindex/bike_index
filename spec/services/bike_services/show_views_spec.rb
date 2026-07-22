@@ -63,8 +63,8 @@ RSpec.describe BikeServices::ShowViews do
   end
 
   describe ".default_view_for" do
-    subject(:default_view) { described_class.default_view_for(bike:, current_user:, passive_organization:) }
-    let(:passive_organization) { nil }
+    subject(:default_view) { described_class.default_view_for(bike:, current_user:, organization:) }
+    let(:organization) { nil }
 
     context "the bike's owner" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
@@ -77,10 +77,9 @@ RSpec.describe BikeServices::ShowViews do
       it { is_expected.to eq([:public, nil]) }
     end
 
-    context "a passive organization the user is authorized for" do
+    context "an organization the user is authorized for" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:current_user) { FactoryBot.create(:organization_user, organization:, role: "member_no_bike_edit") }
-      let(:passive_organization) { organization }
       it { is_expected.to eq([:limited, organization]) }
     end
   end

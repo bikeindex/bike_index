@@ -21,9 +21,9 @@ module BikeServices
     end
 
     # The perspective to render when no permitted ?view_as is requested.
-    def default_view_for(bike:, current_user:, passive_organization:)
-      if passive_organization.present? && current_user&.authorized?(passive_organization)
-        return [current_user.member_bike_edit_of?(passive_organization) ? :staff : :limited, passive_organization]
+    def default_view_for(bike:, current_user:, organization:)
+      if organization.present? && current_user&.authorized?(organization)
+        return [current_user.member_bike_edit_of?(organization) ? :staff : :limited, organization]
       end
       return [:owner, nil] if current_user.present? && bike.owner == current_user
 
