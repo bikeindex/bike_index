@@ -31,12 +31,7 @@ module Registrations
         # session varies across devices/logins) — the csrf-refresh controller reissues
         # them client-side from the meta tag.
         def cache_key
-          ["registrations/show", @current_user&.id, view_param, @bike.cache_key_with_version]
-        end
-
-        def view_param
-          kind, organization = @view
-          organization ? "#{organization.to_param}.#{kind}" : kind.to_s
+          ["registrations/show", @current_user&.id, BikeServices::ShowViews.view_param(@view), @bike.cache_key_with_version]
         end
       end
     end

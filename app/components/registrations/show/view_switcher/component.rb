@@ -44,7 +44,7 @@ module Registrations
 
         def entry_link(view)
           active = view == @current_view
-          link_to(registration_path(@bike, view_as: view_param(view)), "aria-current": (active ? "true" : nil),
+          link_to(registration_path(@bike, view_as: BikeServices::ShowViews.view_param(view)), "aria-current": (active ? "true" : nil),
             class: "tw:block tw:whitespace-nowrap tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700 tw:no-underline tw:hover:bg-gray-100 tw:dark:text-gray-200 tw:dark:hover:bg-gray-800 #{"tw:bg-gray-100 tw:dark:bg-gray-800" if active}") do
             safe_join([(active ? "Viewing as" : "View as"), " ", entry_label(view)])
           end
@@ -64,11 +64,6 @@ module Registrations
           else
             safe_join([content_tag(:span, organization.short_name, class: "tw:font-bold"), " ", kind.to_s])
           end
-        end
-
-        def view_param(view)
-          kind, organization = view
-          organization ? "#{organization.to_param}.#{kind}" : kind.to_s
         end
       end
     end
