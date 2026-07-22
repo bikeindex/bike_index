@@ -3,13 +3,13 @@ import { Controller } from '@hotwired/stimulus'
 /* global navigator */
 
 // Connects to data-controller='registrations--show--parking-notification'
-// Requests the device location on demand (so the browser prompts on the button
-// click), stamps it onto the form and enables submit; also supports entering the
-// address manually, and toggles the region fields by country.
+// Requests the device location when the panel opens (and on the button click),
+// stamps it onto the form and enables submit; also supports entering the address
+// manually, and toggles the region fields by country.
 export default class extends Controller {
   static targets = ['latitude', 'longitude', 'accuracy', 'submit', 'status',
     'addressGroup', 'manualField', 'useEnteredAddress', 'countrySelect',
-    'stateField', 'regionField', 'heading']
+    'stateField', 'regionField', 'heading', 'locationMode']
 
   static values = {
     usCountryId: Number,
@@ -18,7 +18,8 @@ export default class extends Controller {
     defaultKind: String
   }
 
-  // Fired when the accordion reveals this panel; impound preselects that kind
+  // Fired when the accordion reveals this panel; impound preselects that kind,
+  // and opening the panel requests the location so the browser prompts right away
   applyMode (event) {
     const impound = event.detail?.mode === 'impound'
     if (this.hasHeadingTarget) {
@@ -26,10 +27,16 @@ export default class extends Controller {
     }
     const radio = this.element.querySelector(`input[name$="[kind]"][value="${impound ? 'impound_notification' : this.defaultKindValue}"]`)
     if (radio) radio.checked = true
+    this.requestLocation()
   }
 
-  requestLocation (event) {
-    if (event) event.preventDefault()
+  // Segmented control: "current" geolocates, "entered" reveals the address fields
+  selectLocationMode (event) {
+    if (event.target.value === 'entered') this.enterManually()
+    else this.requestLocation()
+  }
+
+  requestLocation () {
     this.setStatus('Requesting your location…')
 
     if (!navigator.geolocation) return this.locationFailed()
@@ -44,6 +51,7 @@ export default class extends Controller {
     this.latitudeTarget.value = position.coords.latitude
     this.longitudeTarget.value = position.coords.longitude
     this.accuracyTarget.value = position.coords.accuracy
+    this.setLocationMode('current')
     this.setUseEntered(false)
     this.hide(this.addressGroupTarget)
     this.manualFieldTargets.forEach((field) => { field.required = false })
@@ -56,12 +64,17 @@ export default class extends Controller {
     this.enterManually()
   }
 
-  enterManually (event) {
-    if (event) event.preventDefault()
+  enterManually () {
+    this.setLocationMode('entered')
     this.setUseEntered(true)
     this.show(this.addressGroupTarget)
     this.manualFieldTargets.forEach((field) => { field.required = true })
     this.enableSubmit()
+  }
+
+  // Reflect programmatic mode changes (geolocation success/failure) in the radios
+  setLocationMode (value) {
+    this.locationModeTargets.forEach((radio) => { radio.checked = radio.value === value })
   }
 
   // The US uses a region select; other countries a free-text region field

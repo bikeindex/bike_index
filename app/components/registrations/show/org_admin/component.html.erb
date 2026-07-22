@@ -161,10 +161,7 @@
               <div class="tw:mb-4">
                 <p class="twlabel">Location</p>
 
-                <div class="tw:flex tw:flex-wrap tw:gap-2">
-                  <%= render(UI::Button::Component.new(text: "Use my current location", color: :purple, size: :sm, data: {action: "registrations--show--parking-notification#requestLocation"})) %>
-                  <%= render(UI::Button::Component.new(text: "Enter address manually", color: :secondary, size: :sm, data: {action: "registrations--show--parking-notification#enterManually"})) %>
-                </div>
+                <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", selected: "current", entries: [{value: "current", label: "Use my current location"}, {value: "entered", label: "Enter address manually"}], data: {action: "registrations--show--parking-notification#selectLocationMode", "registrations--show--parking-notification-target": "locationMode"})) %>
 
                 <p
                   data-registrations--show--parking-notification-target="status"
