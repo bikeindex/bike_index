@@ -114,7 +114,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       it "renders the admin redesign" do
         get "#{base_url}/#{bike.id}"
         body = whitespace_normalized_body_text
-        expect(body).to match("Admin / Staff")
+        expect(body).to match("Full access")
         expect(body).to match("Bike details")
         expect(body).to match("Owner & access")
         expect(body).to match(bike.owner_email)
@@ -169,7 +169,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       it "hides owner contact and shows the restricted card" do
         get "#{base_url}/#{bike.id}"
         body = whitespace_normalized_body_text
-        expect(body).to match("Limited · RA")
+        expect(body).to match("Limited")
         expect(body).to match("Restricted for your role")
         expect(body).to match("Bike details")
         expect(body).to_not match(bike.owner_email)
@@ -181,12 +181,12 @@ RSpec.describe "RegistrationsController#show", type: :request do
       it "drops the admin view on the same request, not only on reload" do
         # With the org in the session (their default), the admin view renders
         get "#{base_url}/#{bike.id}"
-        expect(whitespace_normalized_body_text).to match("Admin / Staff")
+        expect(whitespace_normalized_body_text).to match("Full access")
 
         # Removing the org should drop the admin view on this request, not only
         # after a subsequent reload
         get "#{base_url}/#{bike.id}", params: {organization_id: "false"}
-        expect(whitespace_normalized_body_text).to_not match("Admin / Staff")
+        expect(whitespace_normalized_body_text).to_not match("Full access")
       end
     end
 
@@ -194,19 +194,19 @@ RSpec.describe "RegistrationsController#show", type: :request do
       let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
       it "offers a switcher, applies an allowed view_as, and rejects a disallowed one" do
         get "#{base_url}/#{bike.id}"
-        expect(whitespace_normalized_body_text).to match("Admin / Staff")
+        expect(whitespace_normalized_body_text).to match("Full access")
         expect(response.body).to include("view_as=public")
 
         # An allowed view_as applies
         get "#{base_url}/#{bike.id}", params: {view_as: "public"}
         body = whitespace_normalized_body_text
-        expect(body).to_not match("Admin / Staff")
+        expect(body).to_not match("Full access")
         expect(body).to match("Public view")
 
         # A disallowed view_as flashes and falls back to the admin view
         get "#{base_url}/#{bike.id}", params: {view_as: "owner"}
         body = whitespace_normalized_body_text
-        expect(body).to match("Admin / Staff")
+        expect(body).to match("Full access")
         expect(body).to match("not allowed to view this registration")
       end
     end
@@ -234,7 +234,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
         get "#{base_url}/#{bike.id}", params: {view_as: "#{brakebills.to_param}.limited"}
         body = whitespace_normalized_body_text
         expect(body).to match("Limited")
-        expect(body).to_not match("Admin / Staff")
+        expect(body).to_not match("Full access")
       end
     end
   end

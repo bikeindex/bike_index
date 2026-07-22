@@ -1,5 +1,9 @@
 <% if switchable? %>
   <%= render(UI::Dropdown::Component.new(name: @label, button_class: button_class)) do |dropdown| %>
+    <% dropdown.with_button do %>
+      <%= display_label %>
+    <% end %>
+
     <% org_views.each do |view| %>
       <% dropdown.with_entry_item do %>
         <%= entry_link(view) %>
@@ -17,5 +21,7 @@
     <% end %>
   <% end %>
 <% else %>
-  <%= render(UI::Badge::Component.new(text: @label, color: @color, size: :sm, solid: @solid)) %>
+  <%= render(UI::Badge::Component.new(text: @label, color: @color, size: :sm, solid: @solid)) do %>
+    <%= display_label %>
+  <% end %>
 <% end %>

@@ -64,8 +64,8 @@ en:
             Owner contact is available to admin & staff. You can add notes and request
             an impound.
           restricted_title: Restricted for your role
-          role_limited: Limited · RA
-          role_staff: Admin / Staff
+          role_limited: Limited
+          role_staff: Full access
           serial: Serial
           showing_recent: Showing the %{count} most recent
           start_audit: Start audit

@@ -8,16 +8,25 @@ module Registrations
       # others via ?view_as=; otherwise it's a plain badge. The label/color are
       # passed in so the caller keeps nuances like "No longer your bike".
       class Component < ApplicationComponent
-        def initialize(bike:, current_view:, available_views:, label:, color:, solid: true)
+        def initialize(bike:, current_view:, available_views:, label:, color:, solid: true, role_label: nil)
           @bike = bike
           @current_view = current_view
           @available_views = available_views || []
           @label = label
           @color = color
           @solid = solid
+          @role_label = role_label
         end
 
         private
+
+        # The pill text: the org/audience name, optionally followed by the viewer's
+        # role (e.g. "Brakebills · Full access"), the role muted to read as secondary.
+        def display_label
+          return @label if @role_label.blank?
+
+          safe_join([@label, content_tag(:span, @role_label, class: "tw:font-normal tw:opacity-70")], " · ")
+        end
 
         def switchable?
           @available_views.size > 1
