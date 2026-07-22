@@ -6,8 +6,8 @@ module Registrations
       # The redesign's view-preference control. When the viewer has the redesign
       # enabled it's a link back to the classic bike show; when they're only
       # previewing it (the page renders regardless of the flag) it explains that and
-      # offers to opt in. ToggleView is its counterpart on the legacy page. Only for
-      # signed-in viewers, since toggling the flag requires a current user.
+      # offers to opt in. Gated on the bike_show_redesign_toggle flag, so only users
+      # in the rollout see it. ToggleView is its counterpart on the legacy page.
       class Component < ApplicationComponent
         def initialize(bike:, current_user:)
           @bike = bike
@@ -15,7 +15,7 @@ module Registrations
         end
 
         def render?
-          @current_user.present?
+          @current_user.present? && Flipper.enabled?(:bike_show_redesign_toggle, @current_user)
         end
 
         private
