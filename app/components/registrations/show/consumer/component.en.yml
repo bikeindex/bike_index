@@ -12,15 +12,23 @@ en:
           bike_details: "%{bike_type} details"
           edit_this_bike: Edit this %{bike_type}
           frame_material: Frame material
+          frame_size: Frame size
+          handlebar_type: Handlebar type
           id: ID
+          manufacturer: Manufacturer
           mark_stolen: Mark stolen
+          model: Model
           not_stolen: Not stolen
+          other_serial: Other serial/registration/sticker
           primary_color: Primary color
           primary_colors: Primary colors
           registered_protected: Registered & protected
           registered_since: Registered since
           sell_on_marketplace: Sell on Marketplace
+          serial: Serial
           share: Share
           share_my_page: Share my page
           stolen: Stolen
           this_bike_on_bike_index: This %{bike_type} on Bike Index
+          vehicle_type: Vehicle type
+          year: Year

@@ -6,15 +6,15 @@
         tw:uppercase
       "
     >
-      <%= t("bikes.show.know_something_about_this_bike_type", bike_type: @bike.type) %>
+      <%= translation(".know_something_about_this_bike_type", bike_type: @bike.type) %>
     </h2>
 
     <div class="tw:mt-3">
       <% if sign_in_redirect %>
-        <%= render(UI::ButtonLink::Component.new(href: sign_in_redirect, text: t("bikes.show.contact_the_owner"), color: :purple)) %>
+        <%= render(UI::ButtonLink::Component.new(href: sign_in_redirect, text: translation(".contact_the_owner"), color: :purple)) %>
       <% else %>
         <%= render(UI::Button::Component.new(
-          text: t("bikes.show.contact_the_owner"),
+          text: translation(".contact_the_owner"),
           color: :purple,
           data: {"registrations--show--contact-owner-target": "trigger", action: "registrations--show--contact-owner#reveal"}
         )) %>
@@ -28,15 +28,15 @@
             <%= form.text_area :message,
               required: true,
               rows: 6,
-              placeholder: t("bikes.show.where_did_you_see_this_bike", bike_type: @bike.type),
+              placeholder: translation(".where_did_you_see_this_bike", bike_type: @bike.type),
               class: "twinput tw:w-full" %>
 
             <%= form.text_field :reference_url,
-              placeholder: t("bikes.show.link_url"),
+              placeholder: translation(".link_url"),
               class: "twinput tw:mt-2 tw:w-full" %>
 
             <div class="tw:mt-3">
-              <%= render(UI::Button::Component.new(text: t("bikes.show.send_message"), color: :purple, kind: :submit)) %>
+              <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :purple, kind: :submit)) %>
             </div>
           <% end %>
         </div>
@@ -46,7 +46,7 @@
     <% if owner_phone.present? %>
       <p class="tw:mt-3 tw:text-sm">
         <span class="tw:italic tw:opacity-65">
-          <%= t("bikes.show.or_call") %>
+          <%= translation(".or_call") %>
         </span>
 
         <%= phone_link(owner_phone, class: "twlink tw:font-mono") %>

@@ -116,7 +116,7 @@ module Registrations
         end
 
         def primary_colors_label
-          t("components.registrations.show.consumer.#{frame_color_records.many? ? "primary_colors" : "primary_color"}")
+          translation(".#{frame_color_records.many? ? "primary_colors" : "primary_color"}")
         end
 
         def color_swatches

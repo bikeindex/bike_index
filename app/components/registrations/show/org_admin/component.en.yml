@@ -5,6 +5,7 @@ en:
       show:
         org_admin:
           about_this_bike: About this %{bike_type}
+          activity: Activity
           audit: Audit
           bike_details: "%{bike_type} details"
           claimed: Claimed
@@ -15,7 +16,9 @@ en:
           edit_bike_type: Edit %{bike_type}
           frame_material: Frame material
           frame_size: Frame size
+          handlebar_type: Handlebar type
           has_duplicate_serials: has dup. serials
+          id: ID
           impound: Impound
           impound_sub: Single confirmation
           internal_notes: Internal notes
@@ -41,6 +44,7 @@ en:
           org_can_edit_sub: Including after the %{bike_type} is claimed.
           other_registrations: Other registrations by this user
           other_registrations_count_html: "%{count} other registrations"
+          other_serial: Other serial/registration/sticker
           owner_access: Owner & access
           owner_attestation: Owner attestation
           owner_email: Email
@@ -52,8 +56,10 @@ en:
           photo_archive: Photo archive
           post_note: Post note
           posts_as: Posts as %{user}
+          primary_color: Primary color
           primary_colors: Primary colors
           registered: Registered
+          registered_since: Registered since
           registration: Registration
           registration_number: Bike Index Registration
           request: Request
@@ -70,6 +76,8 @@ en:
           showing_recent: Showing the %{count} most recent
           start_audit: Start audit
           stolen: Stolen
+          this_bike_on_bike_index: This %{bike_type} on Bike Index
+          vehicle_type: Vehicle type
           view_all_registrations: view all →
           view_notifications: View notifications
           view_notifications_sub: Parking activity
