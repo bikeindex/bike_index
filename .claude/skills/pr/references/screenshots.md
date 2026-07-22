@@ -39,8 +39,6 @@ Skip per-page only when the URL didn't exist on `$BASE` (a brand-new route or pa
 
 Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against the base — pass `$BASE` (from SKILL.md step 0.5) as its `BASE_REF` so it checks out `origin/$BASE`, whether or not that's `main` (its "Cross-branch comparison" section checks out the base ref, captures into `...-base-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
 
-Caveat for preview URLs: `frontend-screenshots` can't capture the base version of a Lookbook/ViewComponent preview (`/rails/view_components/...`, `/lookbook/...`) — the base checkout leaves the preview route 404ing until `bin/dev` restarts. So for preview-based captures, stay branch-only and say so in the comment rather than posting a mislabeled comparison. Real page URLs compare cleanly against any `$BASE`.
-
 ## 5. Post the Screenshots section as a PR comment
 
 On a fresh PR, this comment is naturally the first one. On an update, find the existing screenshots comment (the one authored by you whose body starts with `## Screenshots`) and edit it in place rather than posting a new one:
