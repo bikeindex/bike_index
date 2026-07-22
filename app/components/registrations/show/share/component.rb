@@ -11,8 +11,8 @@ module Registrations
         end
 
         def call
-          content_tag(:button, type: "button",
-            class: "tw:w-full #{UI::Button::Component.build_classes(color: :outline, size: :md, html_class: "tw:justify-center tw:py-2.5!")}",
+          render UI::Button::Component.new(color: :secondary, size: :md,
+            html_class: "tw:w-full tw:justify-center tw:py-2.5!",
             data: {controller: "registrations--show--share",
                    "registrations--show--share-url-value": @url,
                    action: "registrations--show--share#share"}) do

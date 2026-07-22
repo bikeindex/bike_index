@@ -4,6 +4,8 @@ module Registrations
   module Show
     module OrgAdmin
       class Component < ApplicationComponent
+        include BikeHelper
+
         OTHER_REGISTRATIONS_LIMIT = 10
         # Parking-notification statuses that are still ongoing (vs replaced/retrieved/resolved)
         ACTIVE_PARKING_STATUSES = %w[current impounded].freeze
@@ -74,10 +76,6 @@ module Registrations
           staff? ? translation(".role_staff") : translation(".role_limited")
         end
 
-        def org_chip_label
-          organization_registered? ? @organization.short_name : translation(".not_in_org")
-        end
-
         def org_chip_color
           organization_registered? ? :purple : :warning
         end
@@ -91,59 +89,7 @@ module Registrations
         end
 
         def title
-          helpers.bike_title_html(@bike)
-        end
-
-        def status_label
-          if @bike.status_stolen?
-            translation(".stolen")
-          elsif @bike.status_found?
-            translation(".found")
-          elsif @bike.status_impounded?
-            translation(".impounded")
-          else
-            translation(".not_stolen")
-          end
-        end
-
-        def status_color
-          return :error if @bike.status_stolen?
-          return :warning if @bike.status_impounded?
-
-          :success
-        end
-
-        def subtitle
-          parts = [@bike.year, manufacturer_name, @bike.frame_model].compact_blank
-          [parts.join(" "), @bike.frame_colors.to_sentence].compact_blank.join(" · ")
-        end
-
-        def manufacturer_name
-          @bike.manufacturer&.other? ? @bike.mnfg_name : @bike.manufacturer&.name
-        end
-
-        # Only vehicles that aren't a standard bike surface the type
-        def vehicle_type
-          @bike.cycle_type_name unless @bike.type == "bike"
-        end
-
-        def activity_name
-          @bike.primary_activity&.display_name
-        end
-
-        def frame_color_records
-          [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
-        end
-
-        def primary_colors_label
-          translation(".primary_color", count: frame_color_records.count)
-        end
-
-        def color_swatches
-          frame_color_records.map do |color|
-            swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm, align: :baseline))
-            content_tag(:span, safe_join([swatch, " ", color.name]), class: "tw:whitespace-nowrap")
-          end
+          bike_title_html(@bike)
         end
 
         def credibility_scorer
