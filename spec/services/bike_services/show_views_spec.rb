@@ -46,22 +46,6 @@ RSpec.describe BikeServices::ShowViews do
     end
   end
 
-  describe ".permitted?" do
-    let(:available_views) { [[:owner, nil], [:public, nil]] }
-
-    it "is true for a view in available_views" do
-      expect(described_class.permitted?([:owner, nil], available_views:)).to be(true)
-    end
-
-    it "is false for a view not in available_views" do
-      expect(described_class.permitted?([:staff, FactoryBot.create(:organization)], available_views:)).to be(false)
-    end
-
-    it "is false for nil" do
-      expect(described_class.permitted?(nil, available_views:)).to be(false)
-    end
-  end
-
   describe ".default_view_for" do
     subject(:default_view) { described_class.default_view_for(bike:, current_user:, organization:) }
     let(:organization) { nil }

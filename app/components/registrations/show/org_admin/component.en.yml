@@ -56,8 +56,9 @@ en:
           photo_archive: Photo archive
           post_note: Post note
           posts_as: Posts as %{user}
-          primary_color: Primary color
-          primary_colors: Primary colors
+          primary_color:
+            one: Primary color
+            other: Primary colors
           registered: Registered
           registered_since: Registered since
           registration: Registration

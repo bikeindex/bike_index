@@ -15,11 +15,6 @@ module BikeServices
       ].compact
     end
 
-    # Whether view is one the user may see (an entry from #available).
-    def permitted?(view, available_views:)
-      available_views.include?(view)
-    end
-
     # The ?view_as string for a [kind, organization] view.
     def view_param(view)
       kind, organization = view

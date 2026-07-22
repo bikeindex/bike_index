@@ -20,8 +20,9 @@ en:
           model: Model
           not_stolen: Not stolen
           other_serial: Other serial/registration/sticker
-          primary_color: Primary color
-          primary_colors: Primary colors
+          primary_color:
+            one: Primary color
+            other: Primary colors
           registered_protected: Registered & protected
           registered_since: Registered since
           sell_on_marketplace: Sell on Marketplace

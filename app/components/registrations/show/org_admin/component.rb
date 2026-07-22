@@ -116,7 +116,7 @@ module Registrations
         end
 
         def primary_colors_label
-          translation(".#{frame_color_records.many? ? "primary_colors" : "primary_color"}")
+          translation(".primary_color", count: frame_color_records.count)
         end
 
         def color_swatches

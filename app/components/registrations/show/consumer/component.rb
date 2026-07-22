@@ -68,7 +68,7 @@ module Registrations
         end
 
         def primary_colors_label
-          frame_color_records.many? ? translation(".primary_colors") : translation(".primary_color")
+          translation(".primary_color", count: frame_color_records.count)
         end
 
         def frame_color_records
