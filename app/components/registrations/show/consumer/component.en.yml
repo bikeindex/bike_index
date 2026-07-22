@@ -8,19 +8,9 @@ en:
           audience_owner: Your %{bike_type}
           audience_public: Public view
           audience_sent_away: No longer your %{bike_type}
-          bike_details: "%{bike_type} details"
           edit_this_bike: Edit this %{bike_type}
-          frame_material: Frame material
-          frame_size: Frame size
-          handlebar_type: Handlebar type
-          manufacturer: Manufacturer
           mark_stolen: Mark stolen
-          model: Model
-          other_serial: Other serial/registration/sticker
           registered_protected: Registered & protected
           sell_on_marketplace: Sell on Marketplace
-          serial: Serial
           share: Share
           share_my_page: Share my page
-          vehicle_type: Vehicle type
-          year: Year
