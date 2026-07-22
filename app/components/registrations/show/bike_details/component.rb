@@ -13,6 +13,17 @@ module Registrations
           @serial_user = serial_user
           @skip_serial_explanation = skip_serial_explanation
         end
+
+        private
+
+        def manufacturer_name
+          @bike.manufacturer&.other? ? @bike.mnfg_name : @bike.manufacturer&.name
+        end
+
+        # Only vehicles that aren't a standard bike surface the type
+        def vehicle_type
+          @bike.cycle_type_name unless @bike.type == "bike"
+        end
       end
     end
   end

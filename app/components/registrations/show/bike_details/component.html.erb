@@ -7,8 +7,8 @@
     <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"))) { render_serial_display(@bike, @serial_user, skip_explanation: @skip_serial_explanation) } %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".other_serial"), value: @bike.extra_registration_number)) %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".vehicle_type"), value: BikeServices::Displayer.vehicle_type(@bike))) %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: BikeServices::Displayer.manufacturer_name(@bike))) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".vehicle_type"), value: vehicle_type)) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".manufacturer"), value: manufacturer_name)) %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".model"), value: @bike.frame_model)) %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".year"), value: @bike.year)) %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>

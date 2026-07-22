@@ -10,7 +10,17 @@ RSpec.describe Registrations::Show::BikeDetails::Component, type: :component do
     expect(page).to have_text("Serial")
     expect(page).to have_text(bike.serial_number.upcase)
     expect(page).to have_text("Manufacturer")
+    expect(page).to have_text(bike.manufacturer.name)
     expect(page).to have_text("Rocket")
+  end
+
+  context "non-standard vehicle" do
+    let(:bike) { FactoryBot.create(:bike, cycle_type: :cargo) }
+    it "shows the vehicle type" do
+      render_inline(component)
+      expect(page).to have_text("Vehicle type")
+      expect(page).to have_text(bike.cycle_type_name)
+    end
   end
 
   context "hidden serial rendered for the public (nil user)" do

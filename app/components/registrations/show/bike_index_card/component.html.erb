@@ -8,7 +8,7 @@
       <%= render(Registrations::Show::PrimaryColors::Component.new(bike: @bike)) %>
 
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".activity"), value: BikeServices::Displayer.activity_name(@bike))) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".activity"), value: activity_name)) %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".id"))) { render(UI::ShortId::Component.new(record: @bike)) } %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered_since"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
     <% end %>

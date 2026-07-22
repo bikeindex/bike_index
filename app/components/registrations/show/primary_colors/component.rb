@@ -14,10 +14,16 @@ module Registrations
           frame_color_records.any?
         end
 
+        def call
+          render(UI::DefinitionList::Row::Component.new(label:)) do
+            safe_join(color_swatches, content_tag(:span, " and ", class: "tw:font-normal tw:text-gray-400"))
+          end
+        end
+
         private
 
         def frame_color_records
-          BikeServices::Displayer.frame_color_records(@bike)
+          [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
         end
 
         def label

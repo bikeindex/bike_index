@@ -543,44 +543,4 @@ RSpec.describe BikeServices::Displayer do
       end
     end
   end
-
-  describe "manufacturer_name" do
-    let(:bike) { FactoryBot.create(:bike) }
-    it "is the manufacturer name" do
-      expect(described_class.manufacturer_name(bike)).to eq(bike.manufacturer.name)
-    end
-  end
-
-  describe "vehicle_type" do
-    it "is nil for a standard bike" do
-      expect(described_class.vehicle_type(FactoryBot.create(:bike))).to be_nil
-    end
-
-    context "cargo bike" do
-      let(:bike) { FactoryBot.create(:bike, cycle_type: :cargo) }
-      it "is the cycle type name" do
-        expect(described_class.vehicle_type(bike)).to eq(bike.cycle_type_name)
-      end
-    end
-  end
-
-  describe "activity_name" do
-    it "is nil without a primary activity" do
-      expect(described_class.activity_name(FactoryBot.create(:bike))).to be_nil
-    end
-
-    context "with a primary activity" do
-      let(:bike) { FactoryBot.create(:bike, :with_primary_activity) }
-      it "is the activity display name" do
-        expect(described_class.activity_name(bike)).to eq(bike.primary_activity.display_name)
-      end
-    end
-  end
-
-  describe "frame_color_records" do
-    let(:bike) { FactoryBot.create(:bike, primary_frame_color: FactoryBot.create(:color, name: "Blue")) }
-    it "is the present frame colors" do
-      expect(described_class.frame_color_records(bike)).to eq([bike.primary_frame_color])
-    end
-  end
 end

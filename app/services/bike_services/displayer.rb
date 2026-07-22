@@ -131,23 +131,6 @@ module BikeServices
       end
     end
 
-    def frame_color_records(bike)
-      [bike.primary_frame_color, bike.secondary_frame_color, bike.tertiary_frame_color].compact
-    end
-
-    def manufacturer_name(bike)
-      bike.manufacturer&.other? ? bike.mnfg_name : bike.manufacturer&.name
-    end
-
-    # Only vehicles that aren't a standard bike surface the type
-    def vehicle_type(bike)
-      bike.cycle_type_name unless bike.type == "bike"
-    end
-
-    def activity_name(bike)
-      bike.primary_activity&.display_name
-    end
-
     #
     # private below here
     #

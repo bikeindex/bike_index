@@ -10,6 +10,12 @@ module Registrations
           @bike = bike
           @term = term
         end
+
+        private
+
+        def activity_name
+          @bike.primary_activity&.display_name
+        end
       end
     end
   end
