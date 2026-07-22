@@ -1,4 +1,4 @@
-<% action_button_classes = "tw:relative tw:w-full tw:min-h-[60px] tw:justify-start tw:gap-3 tw:rounded-xl tw:p-4 tw:text-left tw:lg:flex-1" %>
+<% action_button_classes = "tw:relative tw:w-full tw:min-h-[60px] tw:justify-start tw:gap-3 tw:rounded-xl tw:p-4! tw:text-base! tw:text-left tw:lg:flex-1" %>
 
 <div
   class="
@@ -34,7 +34,7 @@
   >
     <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:flex">
       <% if contactable? %>
-        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "message", action: "registrations--show--action-panels#toggle"})) do %>
+        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "message", action: "registrations--show--action-panels#toggle"})) do %>
           <%= action_icon("mail") %>
           <%= action_label(translation(".message_owner"), translation(".message_owner_sub")) %>
         <% end %>
@@ -48,7 +48,7 @@
       <% end %>
 
       <% if staff? && show_parking_notifications? %>
-        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "parking", action: "registrations--show--action-panels#toggle"})) do %>
+        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "parking", action: "registrations--show--action-panels#toggle"})) do %>
           <%= action_icon("map-pin") %>
           <%= action_label(translation(".parking_notice"), translation(".parking_notice_sub")) %>
         <% end %>

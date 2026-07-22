@@ -39,10 +39,10 @@ RSpec.describe Registrations::Show::ContactOwner::Component, type: :component do
         render_inline(described_class.new(bike:, current_user:))
 
         expect(page).to have_text("Know something about this bike")
-        expect(page).to have_css("[data-registrations--show--contact-owner-target='trigger']", text: "Contact the owner")
+        expect(page).to have_css("[data-collapse-target='trigger']", text: "Contact the owner")
         expect(page).not_to have_link("Contact the owner")
         # The form starts collapsed via the tw:hidden class (collapse_utils manages it)
-        expect(page).to have_css("[data-registrations--show--contact-owner-target='form'].tw\\:hidden")
+        expect(page).to have_css("[data-collapse-target='content'].tw\\:hidden")
         # The cached form's CSRF token is refreshed client-side (see cache concerns)
         expect(page).to have_css("form[data-controller~='csrf-refresh']", visible: :all)
         expect(page).to have_css("textarea[name='stolen_notification[message]'][required]", visible: :all)

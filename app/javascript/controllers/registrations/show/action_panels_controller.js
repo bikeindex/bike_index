@@ -24,19 +24,23 @@ export default class extends Controller {
     this.panelTargets.forEach((panel) => {
       collapse(panel.dataset.panelName === name ? 'show' : 'hide', panel, duration)
     })
-    // Mark the open panel's trigger as active
+    // Mark the open panel's trigger: aria-expanded for disclosure semantics,
+    // aria-pressed drives its active (solid) styling
     this.triggerTargets.forEach((trigger) => {
-      trigger.setAttribute('aria-pressed', String(trigger.dataset.panelName === name))
+      const active = String(trigger.dataset.panelName === name)
+      trigger.setAttribute('aria-expanded', active)
+      trigger.setAttribute('aria-pressed', active)
     })
     this.openName = name
-    this.trackOpen(name)
+    this.persist(name)
   }
 
-  // Reflect the open panel in the URL without adding a history entry
-  trackOpen (name) {
+  // Reflect the open panel in the URL, preserving history state (Turbo) and
+  // without adding a history entry
+  persist (name) {
     const url = new URL(window.location)
     if (name) url.searchParams.set('panel', name)
     else url.searchParams.delete('panel')
-    window.history.replaceState({}, '', url)
+    window.history.replaceState(window.history.state, '', url)
   }
 }
