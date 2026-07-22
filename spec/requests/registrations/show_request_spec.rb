@@ -174,6 +174,13 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Bike details")
         expect(body).to_not match(bike.owner_email)
       end
+
+      it "resolves a bare ?view_as org slug to the limited view, without an error" do
+        get "#{base_url}/#{bike.id}", params: {view_as: organization.to_param}
+        body = whitespace_normalized_body_text
+        expect(body).to match("Limited")
+        expect(body).to_not match("not allowed to view this registration")
+      end
     end
 
     context "removing the organization via organization_id=false" do

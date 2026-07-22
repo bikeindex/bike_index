@@ -9,7 +9,7 @@
   <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-4">
     <div>
       <div class="tw:mb-2 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <%= render(Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view: [@organization, staff? ? :staff : :limited], available_views: @available_views, label: org_chip_label, color: org_chip_color, solid: false, role_label: role_label)) %>
+        <%= render(Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view: [staff? ? :staff : :limited, @organization], available_views: @available_views, label: org_chip_label, color: org_chip_color, solid: false, role_label: role_label)) %>
       </div>
 
       <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
@@ -114,7 +114,7 @@
         <% end %>
       <% end %>
 
-      <%= render(Registrations::Show::StolenDetails::Component.new(bike: @bike, current_user: @current_user, mapbox_key: @mapbox_key)) %>
+      <%= render(Registrations::Show::StolenDetails::Component.new(bike: @bike, current_user: @current_user)) %>
 
       <%= render(UI::Card::Component.new) do %>
         <h2
