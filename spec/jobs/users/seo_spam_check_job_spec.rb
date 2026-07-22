@@ -17,11 +17,13 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
 
     context "crypto/gambling references" do
       let(:description) { "Best online casino, poker, blackjack, and roulette bonus, join now!" }
-      it "bans the user for seo_spam" do
+      it "bans the user for seo_spam, recording the estimate and matched terms" do
         expect { instance.perform(user.id) }.to change(UserBan, :count).by(1)
         user_ban = UserBan.last
         expect(user_ban.user_id).to eq user.id
         expect(user_ban.reason).to eq "seo_spam"
+        expect(user_ban.description).to match(/\AEstimate \d+\. matched: /)
+        expect(user_ban.description).to include "casino"
         expect(user.reload.banned?).to be_truthy
       end
       it "accepts the user passed directly as the second arg" do
@@ -45,10 +47,11 @@ RSpec.describe Users::SeoSpamCheckJob, type: :job do
     context "gibberish profile text" do
       let(:name) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
       let(:description) { "efgBz9pNdd7efgBz9pNdd7 xzkqwrmlbnptvxz" }
-      it "bans the user for seo_spam" do
+      it "bans the user for seo_spam, recording the estimate without a matched-terms list" do
         expect(SpamEstimator::Text.estimate([name, description].join(" ")))
           .to be > SpamEstimator::User::MARK_SPAM_PERCENT
         expect { instance.perform(user.id) }.to change(UserBan, :count).by(1)
+        expect(UserBan.last.description).to match(/\AEstimate \d+\z/)
       end
     end
 
