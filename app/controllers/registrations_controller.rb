@@ -1,7 +1,7 @@
 class RegistrationsController < ApplicationController
   before_action :allow_x_frame, except: %i[new show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
-  before_action :simple_header, except: %i[show edit]
+  before_action :simple_header, except: %i[show]
   layout "reg_embed"
 
   def show
