@@ -1,0 +1,30 @@
+# frozen_string_literal: true
+
+module Registrations
+  module Show
+    module Map
+      # A Mapbox map centered on a location, with a translucent circle marking it.
+      # The registrations--show--map Stimulus controller lazy-loads Mapbox GL.
+      class Component < ApplicationComponent
+        MAPBOX_KEY = ENV["MAPBOX_MAPPING"]
+
+        def initialize(latitude:, longitude:, precise: false)
+          @latitude = latitude
+          @longitude = longitude
+          @precise = precise
+        end
+
+        def render?
+          @latitude.present? && @longitude.present? && MAPBOX_KEY.present?
+        end
+
+        private
+
+        # The circle grows faster with zoom when the exact address is public
+        def radius_base
+          @precise ? 2 : 1.15
+        end
+      end
+    end
+  end
+end

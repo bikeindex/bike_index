@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    registrations:
+      show:
+        map:
+          unavailable: The map couldn't be loaded — your browser or device may not
+            support it.
