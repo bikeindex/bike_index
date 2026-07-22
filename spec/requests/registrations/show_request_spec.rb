@@ -140,6 +140,35 @@ RSpec.describe "RegistrationsController#show", type: :request do
           expect(body).to_not match("Not stolen")
         end
       end
+
+      context "unregistered bike" do
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, status: "unregistered_parking_notification").reload }
+        it "shows the unregistered status and no claim, even though claimed" do
+          expect(bike.claimed?).to be_truthy
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match("Unregistered")
+          expect(body).to_not match("Not stolen")
+          expect(body).to_not match("Claimed")
+          # Owner & access shows the parking-notification explanation, no owner rows
+          expect(body).to match("not registered to a user. It was added to track parking notifications")
+          expect(body).to_not match(bike.owner_email)
+        end
+      end
+
+      context "with a bike sticker" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["bike_stickers"]) }
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization:, bike:) }
+        it "shows the sticker with its claimed time and an always-present link-sticker action" do
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match(bike_sticker.pretty_code)
+          expect(body).to match("claimed")
+          expect(body).to match("Link sticker")
+          # The link-sticker modal posts to the org sticker update endpoint
+          expect(response.body).to include(organization_sticker_path(id: "code", organization_id: organization.to_param))
+        end
+      end
     end
 
     context "with organization registration fields" do
