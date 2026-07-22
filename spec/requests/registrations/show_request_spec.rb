@@ -140,6 +140,18 @@ RSpec.describe "RegistrationsController#show", type: :request do
           expect(body).to_not match("Not stolen")
         end
       end
+
+      context "unregistered bike" do
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, status: "unregistered_parking_notification").reload }
+        it "shows the unregistered status and no claim, even though claimed" do
+          expect(bike.claimed?).to be_truthy
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match("Unregistered")
+          expect(body).to_not match("Not stolen")
+          expect(body).to_not match("Claimed")
+        end
+      end
     end
 
     context "with organization registration fields" do

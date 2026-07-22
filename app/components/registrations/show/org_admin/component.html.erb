@@ -19,7 +19,7 @@
       </p>
 
       <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
-        <% if @bike.claimed? %>
+        <% if @bike.claimed? && !@bike.unregistered_parking_notification? %>
           <%= render(UI::Badge::Component.new(text: translation(".claimed"), color: :notice, indicator: true)) %>
         <% end %>
 
@@ -350,9 +350,11 @@
               <%= info_row(translation(".organization_registered"), @bike.creation_organization&.name) %>
             <% end %>
 
-            <%= info_row(translation(".claimed")) do %>
-              <% if @bike.claimed? %>
-                <%= render(UI::Time::Component.new(time: current_ownership.claimed_at)) %>
+            <% unless @bike.unregistered_parking_notification? %>
+              <%= info_row(translation(".claimed")) do %>
+                <% if @bike.claimed? %>
+                  <%= render(UI::Time::Component.new(time: current_ownership.claimed_at)) %>
+                <% end %>
               <% end %>
             <% end %>
 
