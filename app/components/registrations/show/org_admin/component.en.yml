@@ -72,7 +72,6 @@ en:
           view_all_registrations: view all →
           view_notifications: View notifications
           view_notifications_sub: Parking activity
-          waiting_on_device_location: Waiting on device location
           where_did_you_see_this_bike: >-
             Where did you see this %{bike_type}? If you're contacting about an ad
             you found online, include a link in the field below

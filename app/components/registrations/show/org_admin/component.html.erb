@@ -1,4 +1,4 @@
-<% action_card_classes = "tw:relative tw:flex tw:min-h-[60px] tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:transition tw:hover:border-[#715eb2] tw:hover:bg-[#f7f5fc] tw:lg:flex-1 tw:dark:border-gray-700 tw:dark:bg-gray-800 tw:dark:hover:bg-purple-950" %>
+<% action_button_classes = "tw:relative tw:w-full tw:min-h-[60px] tw:justify-start tw:gap-3 tw:rounded-xl tw:p-4 tw:text-left tw:lg:flex-1" %>
 
 <div
   class="
@@ -34,38 +34,28 @@
   >
     <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:flex">
       <% if contactable? %>
-        <button
-          type="button"
-          class="tw:text-left <%= action_card_classes %>"
-          data-action="registrations--show--action-panels#toggle"
-          data-registrations--show--action-panels-name-param="message"
-        >
+        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "message", action: "registrations--show--action-panels#toggle"})) do %>
           <%= action_icon("mail") %>
           <%= action_label(translation(".message_owner"), translation(".message_owner_sub")) %>
-        </button>
+        <% end %>
       <% end %>
 
       <% if show_impound? %>
-        <%= link_to impound_path, class: action_card_classes do %>
+        <%= render(UI::ButtonLink::Component.new(href: impound_path, color: :purple_outline, class: action_button_classes)) do %>
           <%= action_icon("lock", tile: staff? ? :purple : :amber) %>
           <%= action_label(impound_label, impound_sub) %>
         <% end %>
       <% end %>
 
       <% if staff? && show_parking_notifications? %>
-        <button
-          type="button"
-          class="tw:text-left <%= action_card_classes %>"
-          data-action="registrations--show--action-panels#toggle"
-          data-registrations--show--action-panels-name-param="parking"
-        >
+        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "parking", action: "registrations--show--action-panels#toggle"})) do %>
           <%= action_icon("map-pin") %>
           <%= action_label(translation(".parking_notice"), translation(".parking_notice_sub")) %>
-        </button>
+        <% end %>
       <% end %>
 
       <% if show_parking_notifications? %>
-        <%= link_to notifications_path, class: action_card_classes do %>
+        <%= render(UI::ButtonLink::Component.new(href: notifications_path, color: :purple_outline, class: action_button_classes)) do %>
           <% if active_notifications_count > 0 %>
             <span class="tw:absolute tw:top-2 tw:right-2">
               <%= render(UI::Badge::Component.new(text: active_notifications_count, color: :notice, size: :sm)) %>
@@ -117,8 +107,7 @@
         data-registrations--show--action-panels-target="panel"
         data-panel-name="parking"
         data-controller="registrations--show--parking-notification"
-        data-registrations--show--parking-notification-us-country-id-value="<%= us_country_id %>"
-        data-action="registrations--show--action-panels:shown->registrations--show--parking-notification#requestLocation"
+        data-registrations--show--parking-notification-us-country-id-value="<%= Country.united_states_id %>"
         class="tw:hidden"
       >
         <%= render(UI::Card::Component.new) do %>
@@ -158,31 +147,31 @@
               </div>
 
               <div class="tw:mb-4">
-                <p
-                  data-registrations--show--parking-notification-target="waiting"
-                  class="tw:text-sm tw:opacity-65"
-                >
-                  <%= translation(".waiting_on_device_location") %>
-                </p>
+                <p class="twlabel">Location</p>
 
-                <div
-                  data-registrations--show--parking-notification-target="choice"
-                  class="tw:mt-2 tw:hidden"
-                >
-                  <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "parking_notification[use_entered_address]", selected: false, entries: [{value: false, label: "Use current location"}, {value: true, label: "Enter address manually"}], data: {action: "change->registrations--show--parking-notification#toggleAddress"})) %>
+                <div class="tw:flex tw:flex-wrap tw:gap-2">
+                  <%= render(UI::Button::Component.new(text: "Use my current location", color: :purple, size: :sm, data: {action: "registrations--show--parking-notification#requestLocation"})) %>
+                  <%= render(UI::Button::Component.new(text: "Enter address manually", color: :secondary, size: :sm, data: {action: "registrations--show--parking-notification#enterManually"})) %>
                 </div>
+
+                <p
+                  data-registrations--show--parking-notification-target="status"
+                  class="tw:mt-2 tw:hidden tw:text-sm tw:opacity-65"
+                ></p>
 
                 <div
                   data-registrations--show--parking-notification-target="addressGroup"
                   class="tw:mt-3 tw:hidden"
                 >
+                  <%= form.hidden_field :use_entered_address, value: false, data: {"registrations--show--parking-notification-target": "useEnteredAddress"} %>
+
                   <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :street, kind: :text_field, label_text: translation(".address_or_intersection"), html_options: {data: {"registrations--show--parking-notification-target": "manualField"}})) %>
                   <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :city, kind: :text_field, label_text: translation(".city"), html_options: {data: {"registrations--show--parking-notification-target": "manualField"}})) %>
 
                   <div class="tw:grid tw:grid-cols-2 tw:gap-x-2">
                     <div
                       data-registrations--show--parking-notification-target="stateField"
-                      class="<%= "tw:hidden" unless new_parking_notification.country_id == us_country_id %>"
+                      class="<%= "tw:hidden" unless new_parking_notification.country_id == Country.united_states_id %>"
                     >
                       <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :region_record_id, kind: :content_block, label_text: translation(".state"))) do %>
                         <%= form.collection_select(:region_record_id, State.united_states, :id, :name, {include_blank: true}, {class: "twinput tw:w-full"}) %>
@@ -191,7 +180,7 @@
 
                     <div
                       data-registrations--show--parking-notification-target="regionField"
-                      class="<%= "tw:hidden" if new_parking_notification.country_id == us_country_id %>"
+                      class="<%= "tw:hidden" if new_parking_notification.country_id == Country.united_states_id %>"
                     >
                       <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :region_string, kind: :text_field, label_text: translation(".region"))) %>
                     </div>

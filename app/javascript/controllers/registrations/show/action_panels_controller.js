@@ -7,7 +7,7 @@ import { collapse } from 'utils/collapse_utils'
 // link) reopens it. Each panel declares its name via data-panel-name; each
 // trigger passes the name through the `name` action param.
 export default class extends Controller {
-  static targets = ['panel']
+  static targets = ['panel', 'trigger']
 
   connect () {
     const name = new URLSearchParams(window.location.search).get('panel')
@@ -16,15 +16,17 @@ export default class extends Controller {
 
   toggle (event) {
     event.preventDefault()
-    const name = event.params.name
+    const name = event.currentTarget.dataset.panelName
     this.open(this.openName === name ? null : name)
   }
 
   open (name, duration = 200) {
     this.panelTargets.forEach((panel) => {
-      const show = panel.dataset.panelName === name
-      collapse(show ? 'show' : 'hide', panel, duration)
-      if (show) this.dispatch('shown', { target: panel })
+      collapse(panel.dataset.panelName === name ? 'show' : 'hide', panel, duration)
+    })
+    // Mark the open panel's trigger as active
+    this.triggerTargets.forEach((trigger) => {
+      trigger.setAttribute('aria-pressed', String(trigger.dataset.panelName === name))
     })
     this.openName = name
     this.trackOpen(name)

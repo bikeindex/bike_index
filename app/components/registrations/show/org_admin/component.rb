@@ -256,11 +256,6 @@ module Registrations
           organization_parking_notifications_path(organization_id: @organization.to_param)
         end
 
-        # The seeded US id (Country.united_states_id is a stale constant in dev)
-        def us_country_id
-          @us_country_id ||= Country.united_states.id
-        end
-
         def notifications_path
           organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
         end

@@ -3,70 +3,50 @@ import { Controller } from '@hotwired/stimulus'
 /* global navigator */
 
 // Connects to data-controller='registrations--show--parking-notification'
-// Stamps the new-parking-notification form with the device location (enabling
-// submit once found), falling back to manual address entry on error/timeout, and
-// toggles the region fields by country. Replaces the legacy
-// renderParkingNotificationForm CoffeeScript.
+// Requests the device location on demand (so the browser prompts on the button
+// click), stamps it onto the form and enables submit; also supports entering the
+// address manually, and toggles the region fields by country.
 export default class extends Controller {
-  static targets = ['latitude', 'longitude', 'accuracy', 'submit', 'waiting',
-    'choice', 'addressGroup', 'manualField', 'countrySelect', 'stateField',
-    'regionField']
+  static targets = ['latitude', 'longitude', 'accuracy', 'submit', 'status',
+    'addressGroup', 'manualField', 'useEnteredAddress', 'countrySelect',
+    'stateField', 'regionField']
 
   static values = { usCountryId: Number }
 
-  // The "enter address manually" radio, rendered by UI::Forms::RadioButtonGroup
-  get useManualInput () {
-    return this.element.querySelector('input[name$="[use_entered_address]"][value="true"]')
-  }
+  requestLocation (event) {
+    if (event) event.preventDefault()
+    this.setStatus('Requesting your location…')
 
-  connect () {
-    // A panel opened via the URL is already visible when we connect
-    if (!this.element.classList.contains('tw:hidden')) this.requestLocation()
-  }
-
-  // Fired when the accordion reveals this panel
-  requestLocation () {
-    if (this.located || this.locating) return
-    this.locating = true
-
-    if (!navigator.geolocation) return this.fallback()
-    this.fallbackTimer = setTimeout(() => this.fallback(), 45000)
+    if (!navigator.geolocation) return this.locationFailed()
     navigator.geolocation.getCurrentPosition(
-      (position) => this.fillLocation(position),
-      () => this.fallback(),
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      (position) => this.locationFound(position),
+      () => this.locationFailed(),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     )
   }
 
-  fillLocation (position) {
-    clearTimeout(this.fallbackTimer)
-    this.located = true
+  locationFound (position) {
     this.latitudeTarget.value = position.coords.latitude
     this.longitudeTarget.value = position.coords.longitude
     this.accuracyTarget.value = position.coords.accuracy
-    this.enableSubmit()
-    this.hide(this.waitingTarget)
-    this.show(this.choiceTarget)
-  }
-
-  fallback () {
-    clearTimeout(this.fallbackTimer)
-    if (this.located) return
-
-    if (this.hasWaitingTarget) {
-      this.waitingTarget.textContent = 'Unable to determine current location automatically'
-    }
-    this.show(this.choiceTarget)
-    if (this.useManualInput) this.useManualInput.checked = true
-    this.toggleAddress()
+    this.setUseEntered(false)
+    this.hide(this.addressGroupTarget)
+    this.manualFieldTargets.forEach((field) => { field.required = false })
+    this.setStatus('Using your current location')
     this.enableSubmit()
   }
 
-  // "Use current location" / "Enter address manually"
-  toggleAddress () {
-    const manual = Boolean(this.useManualInput?.checked)
-    this.toggle(this.addressGroupTarget, manual)
-    this.manualFieldTargets.forEach((field) => { field.required = manual })
+  locationFailed () {
+    this.setStatus("Couldn't determine your location — enter the address below")
+    this.enterManually()
+  }
+
+  enterManually (event) {
+    if (event) event.preventDefault()
+    this.setUseEntered(true)
+    this.show(this.addressGroupTarget)
+    this.manualFieldTargets.forEach((field) => { field.required = true })
+    this.enableSubmit()
   }
 
   // The US uses a region select; other countries a free-text region field
@@ -74,6 +54,16 @@ export default class extends Controller {
     const isUs = Number(this.countrySelectTarget.value) === this.usCountryIdValue
     this.toggle(this.stateFieldTarget, isUs)
     this.toggle(this.regionFieldTarget, !isUs)
+  }
+
+  setUseEntered (value) {
+    if (this.hasUseEnteredAddressTarget) this.useEnteredAddressTarget.value = value
+  }
+
+  setStatus (text) {
+    if (!this.hasStatusTarget) return
+    this.statusTarget.textContent = text
+    this.show(this.statusTarget)
   }
 
   enableSubmit () {
