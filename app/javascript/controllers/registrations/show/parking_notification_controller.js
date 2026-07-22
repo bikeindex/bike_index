@@ -9,9 +9,24 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static targets = ['latitude', 'longitude', 'accuracy', 'submit', 'status',
     'addressGroup', 'manualField', 'useEnteredAddress', 'countrySelect',
-    'stateField', 'regionField']
+    'stateField', 'regionField', 'heading']
 
-  static values = { usCountryId: Number }
+  static values = {
+    usCountryId: Number,
+    notificationHeading: String,
+    impoundHeading: String,
+    defaultKind: String
+  }
+
+  // Fired when the accordion reveals this panel; impound preselects that kind
+  applyMode (event) {
+    const impound = event.detail?.mode === 'impound'
+    if (this.hasHeadingTarget) {
+      this.headingTarget.textContent = impound ? this.impoundHeadingValue : this.notificationHeadingValue
+    }
+    const radio = this.element.querySelector(`input[name$="[kind]"][value="${impound ? 'impound_notification' : this.defaultKindValue}"]`)
+    if (radio) radio.checked = true
+  }
 
   requestLocation (event) {
     if (event) event.preventDefault()

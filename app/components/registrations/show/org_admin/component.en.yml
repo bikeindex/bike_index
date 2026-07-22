@@ -20,7 +20,7 @@ en:
           edit: Edit
           has_duplicate_serials: has dup. serials
           impound: Impound
-          impound_sub: Single confirmation
+          impound_this_vehicle: Impound this vehicle
           internal_notes: Internal notes
           is_false: 'false'
           is_true: 'true'
@@ -59,7 +59,6 @@ en:
           registration_information: Registration information
           registration_number: Bike Index Registration
           request_impound: Request impound
-          request_impound_sub: Sent for approval
           resolved: Resolved
           restricted_message: >-
             Owner contact is available to admin & staff. You can add notes and request

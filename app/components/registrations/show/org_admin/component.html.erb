@@ -41,9 +41,16 @@
       <% end %>
 
       <% if show_impound? %>
-        <%= render(UI::ButtonLink::Component.new(href: impound_path, color: :purple_outline, class: action_button_classes)) do %>
-          <%= action_icon("lock", tile: staff? ? :purple : :amber) %>
-          <%= action_label(impound_label, impound_sub) %>
+        <% if staff? %>
+          <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "parking", "panel-mode": "impound", action: "registrations--show--action-panels#toggle"})) do %>
+            <%= action_icon("lock") %>
+            <%= action_label(impound_label) %>
+          <% end %>
+        <% else %>
+          <%= render(UI::ButtonLink::Component.new(href: impound_path, color: :purple_outline, class: action_button_classes)) do %>
+            <%= action_icon("lock", tile: :amber) %>
+            <%= action_label(impound_label) %>
+          <% end %>
         <% end %>
       <% end %>
 
@@ -102,16 +109,21 @@
       </div>
     <% end %>
 
-    <% if staff? && show_parking_notifications? %>
+    <% if staff? && (show_parking_notifications? || show_impound?) %>
       <div
         data-registrations--show--action-panels-target="panel"
         data-panel-name="parking"
         data-controller="registrations--show--parking-notification"
         data-registrations--show--parking-notification-us-country-id-value="<%= Country.united_states_id %>"
+        data-registrations--show--parking-notification-notification-heading-value="<%= translation(".create_parking_notification") %>"
+        data-registrations--show--parking-notification-impound-heading-value="<%= translation(".impound_this_vehicle") %>"
+        data-registrations--show--parking-notification-default-kind-value="<%= new_parking_notification.kind %>"
+        data-action="registrations--show--action-panels:shown->registrations--show--parking-notification#applyMode"
         class="tw:hidden"
       >
         <%= render(UI::Card::Component.new) do %>
           <h2
+            data-registrations--show--parking-notification-target="heading"
             class="
               tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
               tw:uppercase

@@ -45,12 +45,11 @@ module Registrations
           end
         end
 
-        def action_label(title, subtitle)
+        def action_label(title, subtitle = nil)
           content_tag(:span, class: "tw:min-w-0") do
-            safe_join([
-              content_tag(:span, title, class: "tw:block tw:font-bold"),
-              content_tag(:span, subtitle, class: "tw:mt-0.5 tw:hidden tw:text-xs tw:opacity-60 tw:lg:block")
-            ])
+            rows = [content_tag(:span, title, class: "tw:block tw:font-bold")]
+            rows << content_tag(:span, subtitle, class: "tw:mt-0.5 tw:hidden tw:text-xs tw:opacity-60 tw:lg:block") if subtitle.present?
+            safe_join(rows)
           end
         end
 
@@ -112,7 +111,7 @@ module Registrations
         end
 
         def credibility_score
-          credibility_scorer.score
+          @credibility_score ||= credibility_scorer.score
         end
 
         # Matches the credibility_scorer_color used on bikes/show
@@ -124,7 +123,7 @@ module Registrations
         end
 
         def credibility_badges
-          CredibilityScorer.permitted_badges_hash(credibility_scorer.badges)
+          @credibility_badges ||= CredibilityScorer.permitted_badges_hash(credibility_scorer.badges)
         end
 
         def owner_phone
@@ -149,7 +148,7 @@ module Registrations
         def model_audit
           return @model_audit if defined?(@model_audit)
 
-          @model_audit = @bike.model_audit_id.present? ? @bike.model_audit : nil
+          @model_audit = @bike.model_audit
         end
 
         # The org's certification record for this bike's model, if any
@@ -274,10 +273,6 @@ module Registrations
 
         def impound_path
           organization_impound_records_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
-        end
-
-        def impound_sub
-          staff? ? translation(".impound_sub") : translation(".request_impound_sub")
         end
 
         def impound_label
