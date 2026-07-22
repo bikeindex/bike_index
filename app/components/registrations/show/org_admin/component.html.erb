@@ -346,7 +346,30 @@
 
             <% if @organization.enabled?("bike_stickers") %>
               <%= info_row(translation(".sticker")) do %>
-                <%= safe_join(bike_stickers.map { |bike_sticker| sticker_link(bike_sticker) }, ", ") %>
+                <div class="tw:flex tw:flex-col tw:items-end tw:gap-0.5">
+                  <% bike_stickers.each do |bike_sticker| %>
+                    <span>
+                      <%= sticker_link(bike_sticker) %>
+
+                      <% if bike_sticker.claimed_at.present? %>
+                        <span class="tw:text-xs tw:opacity-65">
+                          <%= translation(".sticker_claimed") %>
+                          <%= render(UI::Time::Component.new(time: bike_sticker.claimed_at)) %>
+                        </span>
+                      <% end %>
+                    </span>
+                  <% end %>
+
+                  <% if staff? %>
+                    <button
+                      type="button"
+                      data-open-modal="link-sticker-modal"
+                      class="twlink tw:cursor-pointer tw:text-xs"
+                    >
+                      <%= translation(".link_sticker") %>
+                    </button>
+                  <% end %>
+                </div>
               <% end %>
             <% end %>
 
@@ -441,6 +464,23 @@
           ·
           <%= link_to translation(".view_all_registrations"), other_registrations_search_path, class: "twlink", data: {turbo_frame: "_top"} %>
         </p>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if staff? && @organization.enabled?("bike_stickers") %>
+    <%= render(UI::Modal::Component.new(id: "link-sticker-modal", title: translation(".link_sticker"))) do |modal| %>
+      <% modal.with_body do %>
+        <%= form_with model: BikeSticker.new, url: organization_sticker_path(id: "code", organization_id: @organization.to_param), method: :put, class: "tw:flex tw:flex-col tw:gap-3" do |form| %>
+          <%= form.hidden_field :bike_id, value: @bike.id %>
+
+          <div>
+            <%= form.label :code, translation(".sticker_code"), class: "twlabel" %>
+            <%= form.text_field :code, required: true, class: "twinput" %>
+          </div>
+
+          <%= render(UI::Button::Component.new(text: translation(".assign_sticker"), color: :purple, kind: :submit)) %>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>

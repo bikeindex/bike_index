@@ -6,6 +6,7 @@ en:
         org_admin:
           about_this_bike: About this %{bike_type}
           active: Active
+          assign_sticker: Assign sticker
           audit: E-Vehicle Audit
           avery_exportable: Avery Exportable
           claimed: Claimed
@@ -20,6 +21,7 @@ en:
           is_false: 'false'
           is_true: 'true'
           know_something_about_this_bike_type: Know something about this %{bike_type}?
+          link_sticker: Link sticker
           link_url: Link url
           message_owner: Message owner
           message_owner_sub: via Bike Index
@@ -61,7 +63,11 @@ en:
           send_message: Send message
           showing_recent: Showing the %{count} most recent
           sticker: Sticker
-          unregistered_owner: This %{bike_type} is not registered to a user. It was added to track parking notifications.
+          sticker_claimed: claimed
+          sticker_code: Sticker code
+          unregistered_owner: >-
+            This %{bike_type} is not registered to a user. It was added to track parking
+            notifications.
           view_all_registrations: view all →
           view_notifications: View notifications
           view_notifications_sub: Parking activity
