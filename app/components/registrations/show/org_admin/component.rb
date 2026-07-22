@@ -4,6 +4,8 @@ module Registrations
   module Show
     module OrgAdmin
       class Component < ApplicationComponent
+        include BikeHelper
+
         OTHER_REGISTRATIONS_LIMIT = 10
 
         # staff: overrides the computed role so a superadmin can view the org
@@ -78,7 +80,7 @@ module Registrations
         end
 
         def title
-          helpers.bike_title_html(@bike)
+          bike_title_html(@bike)
         end
 
         def status_label
