@@ -158,7 +158,7 @@ Rails.application.routes.draw do
     member { post :is_private }
   end
 
-  resources :registrations, only: %i[new create show] do
+  resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
   end
 
