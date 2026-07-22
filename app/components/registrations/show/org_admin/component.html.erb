@@ -30,14 +30,15 @@
 
   <div
     class="tw:flex tw:flex-col tw:gap-6"
-    data-controller="registrations--show--contact-owner"
+    data-controller="registrations--show--action-panels"
   >
     <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:flex">
       <% if contactable? %>
         <button
           type="button"
           class="tw:text-left <%= action_card_classes %>"
-          data-action="registrations--show--contact-owner#reveal"
+          data-action="registrations--show--action-panels#toggle"
+          data-registrations--show--action-panels-name-param="message"
         >
           <%= action_icon("mail") %>
           <%= action_label(translation(".message_owner"), translation(".message_owner_sub")) %>
@@ -52,10 +53,15 @@
       <% end %>
 
       <% if staff? && show_parking_notifications? %>
-        <%= link_to notifications_path, class: action_card_classes do %>
+        <button
+          type="button"
+          class="tw:text-left <%= action_card_classes %>"
+          data-action="registrations--show--action-panels#toggle"
+          data-registrations--show--action-panels-name-param="parking"
+        >
           <%= action_icon("map-pin") %>
           <%= action_label(translation(".parking_notice"), translation(".parking_notice_sub")) %>
-        <% end %>
+        </button>
       <% end %>
 
       <% if show_parking_notifications? %>
@@ -75,7 +81,8 @@
 
     <% if contactable? %>
       <div
-        data-registrations--show--contact-owner-target="form"
+        data-registrations--show--action-panels-target="panel"
+        data-panel-name="message"
         class="tw:hidden"
       >
         <%= render(UI::Card::Component.new) do %>
@@ -99,6 +106,108 @@
               <div class="tw:mt-3">
                 <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :purple, kind: :submit)) %>
               </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if staff? && show_parking_notifications? %>
+      <div
+        data-registrations--show--action-panels-target="panel"
+        data-panel-name="parking"
+        data-controller="registrations--show--parking-notification"
+        data-registrations--show--parking-notification-us-country-id-value="<%= us_country_id %>"
+        data-action="registrations--show--action-panels:shown->registrations--show--parking-notification#requestLocation"
+        class="tw:hidden"
+      >
+        <%= render(UI::Card::Component.new) do %>
+          <h2
+            class="
+              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+              tw:uppercase
+            "
+          >
+            <%= translation(".create_parking_notification") %>
+          </h2>
+
+          <div class="tw:mt-3">
+            <%= form_with(model: new_parking_notification, url: create_parking_notifications_path, data: {controller: "csrf-refresh"}) do |form| %>
+              <%= form.hidden_field :bike_id %>
+              <%= form.hidden_field :latitude, data: {"registrations--show--parking-notification-target": "latitude"} %>
+              <%= form.hidden_field :longitude, data: {"registrations--show--parking-notification-target": "longitude"} %>
+              <%= form.hidden_field :accuracy, data: {"registrations--show--parking-notification-target": "accuracy"} %>
+
+              <% if new_parking_notification.can_be_repeat? %>
+                <div class="tw:mb-4">
+                  <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "parking_notification[is_repeat]", selected: new_parking_notification.is_repeat, entries: [{value: false, label: "First notice"}, {value: true, label: "Repeat ##{new_parking_notification.earlier_bike_notifications.count} of earlier notification"}])) %>
+                </div>
+              <% end %>
+
+              <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :message, kind: :text_area, label_text: "Optional message to send to the owner", html_options: {rows: 3, placeholder: "Optional"})) %>
+
+              <div class="tw:mb-4">
+                <p class="twlabel">Notification because</p>
+                <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "parking_notification[kind]", selected: new_parking_notification.kind, entries: ParkingNotification.kinds.map { |kind| {value: kind, label: ParkingNotification.kinds_humanized[kind.to_sym]} })) %>
+              </div>
+
+              <div class="tw:mb-4">
+                <p class="twlabel">Photo</p>
+                <%= render(UI::Forms::FileUpload::Component.new(form_builder: form, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
+                <%= form.hidden_field :image_cache %>
+              </div>
+
+              <div class="tw:mb-4">
+                <p
+                  data-registrations--show--parking-notification-target="waiting"
+                  class="tw:text-sm tw:opacity-65"
+                >
+                  <%= translation(".waiting_on_device_location") %>
+                </p>
+
+                <div
+                  data-registrations--show--parking-notification-target="choice"
+                  class="tw:mt-2 tw:hidden"
+                >
+                  <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "parking_notification[use_entered_address]", selected: false, entries: [{value: false, label: "Use current location"}, {value: true, label: "Enter address manually"}], data: {action: "change->registrations--show--parking-notification#toggleAddress"})) %>
+                </div>
+
+                <div
+                  data-registrations--show--parking-notification-target="addressGroup"
+                  class="tw:mt-3 tw:hidden"
+                >
+                  <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :street, kind: :text_field, label_text: translation(".address_or_intersection"), html_options: {data: {"registrations--show--parking-notification-target": "manualField"}})) %>
+                  <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :city, kind: :text_field, label_text: translation(".city"), html_options: {data: {"registrations--show--parking-notification-target": "manualField"}})) %>
+
+                  <div class="tw:grid tw:grid-cols-2 tw:gap-x-2">
+                    <div
+                      data-registrations--show--parking-notification-target="stateField"
+                      class="<%= "tw:hidden" unless new_parking_notification.country_id == us_country_id %>"
+                    >
+                      <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :region_record_id, kind: :content_block, label_text: translation(".state"))) do %>
+                        <%= form.collection_select(:region_record_id, State.united_states, :id, :name, {include_blank: true}, {class: "twinput tw:w-full"}) %>
+                      <% end %>
+                    </div>
+
+                    <div
+                      data-registrations--show--parking-notification-target="regionField"
+                      class="<%= "tw:hidden" if new_parking_notification.country_id == us_country_id %>"
+                    >
+                      <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :region_string, kind: :text_field, label_text: translation(".region"))) %>
+                    </div>
+
+                    <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :postal_code, kind: :text_field, label_text: translation(".zipcode"))) %>
+
+                    <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :country_id, kind: :content_block, label_text: "Country")) do %>
+                      <%= form.select(:country_id, Country.select_options, {prompt: translation(".choose_country")}, {class: "twinput tw:w-full", data: {action: "change->registrations--show--parking-notification#toggleCountry", "registrations--show--parking-notification-target": "countrySelect"}}) %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+
+              <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :internal_notes, kind: :text_area, label_text: translation(".parking_notification_notes_html", org_name: @organization.short_name), html_options: {rows: 2})) %>
+
+              <%= render(UI::Button::Component.new(text: "Create parking notification", color: :purple, kind: :submit, disabled: true, data: {"registrations--show--parking-notification-target": "submit"})) %>
             <% end %>
           </div>
         <% end %>

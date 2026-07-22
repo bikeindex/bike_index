@@ -51,12 +51,13 @@ module UI
         classes.compact.join(" ")
       end
 
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, data: {}, aria: {})
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, disabled: false, data: {}, aria: {})
         @text = text
         @color = COLORS.key?(color) ? color : :secondary
         @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
         @active = active
         @html_class = html_class
+        @disabled = disabled
         @data = data
         @aria = aria
 
@@ -65,7 +66,7 @@ module UI
       end
 
       def call
-        content_tag(:button, @text || content, class: button_classes, type: (@kind == :submit) ? "submit" : "button", data: @data, aria: @aria)
+        content_tag(:button, @text || content, class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, data: @data, aria: @aria)
       end
 
       def button_classes
