@@ -14,10 +14,6 @@ module Registrations
           @mapbox_key = mapbox_key
         end
 
-        def call
-          capture { cache(cache_key) { concat(render(inner_component)) } }
-        end
-
         private
 
         def inner_component
