@@ -115,10 +115,12 @@ module Registrations
           translation(".primary_color", count: frame_color_records.count)
         end
 
+        # A non-breaking space keeps the swatch with the first word; the rest of a
+        # long color name wraps, and the " and " between colors still breaks.
         def color_swatches
           frame_color_records.map do |color|
             swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm, align: :baseline))
-            content_tag(:span, safe_join([swatch, " ", color.name]), class: "tw:whitespace-nowrap")
+            safe_join([swatch, "\u00a0", color.name])
           end
         end
 

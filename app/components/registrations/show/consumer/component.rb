@@ -75,11 +75,12 @@ module Registrations
           [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
         end
 
-        # Each color as its own swatch + name, kept together so only the "and" wraps
+        # A non-breaking space keeps the swatch with the first word; the rest of a
+        # long color name wraps, and the " and " between colors still breaks.
         def color_swatches
           frame_color_records.map do |color|
             swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm, align: :baseline))
-            content_tag(:span, safe_join([swatch, " ", color.name]), class: "tw:whitespace-nowrap")
+            safe_join([swatch, "\u00a0", color.name])
           end
         end
 
