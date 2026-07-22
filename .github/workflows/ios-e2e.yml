@@ -60,7 +60,7 @@ jobs:
 
     steps:
       - name: Checkout bike_index_ios
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: bikeindex/bike_index_ios
           ref: main

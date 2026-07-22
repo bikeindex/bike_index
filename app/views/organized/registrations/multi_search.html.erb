@@ -1,4 +1,4 @@
-<% settings = Org::RegistrationSearchSettings::Component.new(
+<% settings = Org::Search::Settings::Component.new(
   organization: current_organization,
   skip_search_and_filters: true
 ) %>
@@ -19,7 +19,7 @@
 <% end %>
 
 <div
-  data-controller="org--multi-search org--registration-search org--registration-search-column-toggle"
+  data-controller="org--multi-search org--search org--search-column-toggle"
   data-org--multi-search-url-value="<%= multi_search_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
   data-org--multi-search-search-kind-value="<%= search_kind %>"
   data-org--multi-search-serials-placeholder-value="<%= placeholders["serials"] %>"
@@ -32,7 +32,7 @@
   data-org--multi-search-error-class-value="<%= UI::Badge::Component.badge_classes(color: :error, size: :md, cursor: "tw:cursor-help") %>"
   data-org--multi-search-error-tooltip-value="<%= ERB::Util.html_escape(error_tooltip_template.to_str) %>"
   data-org--multi-search-spinner-value="<%= ERB::Util.html_escape(render(UI::LoadingSpinner::Component.new(size: :sm)).to_str) %>"
-  data-org--registration-search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
+  data-org--search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
 >
   <div class="tw:mx-auto tw:mb-6 tw:max-w-2xl">
     <h3 class="uncap tw:mb-4">Multi Search</h3>
