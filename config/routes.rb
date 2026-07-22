@@ -188,6 +188,7 @@ Rails.application.routes.draw do
       get :scanned
       get :pdf
       put :resolve_token
+      post :toggle_show_redesign
     end
     resource :recovery, only: %i[edit update], controller: "bikes/recovery"
     resource :theft_alert, only: %i[new create show], controller: "bikes/theft_alerts"

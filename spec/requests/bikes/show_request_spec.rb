@@ -710,6 +710,30 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+  describe "toggle_show_redesign" do
+    it "enables the flag and redirects to the redesign" do
+      expect(Flipper.enabled?(:bike_show_redesign, current_user)).to be_falsey
+      post "#{base_url}/#{bike.id}/toggle_show_redesign"
+      expect(response).to redirect_to(registration_path(bike))
+      expect(Flipper.enabled?(:bike_show_redesign, current_user)).to be_truthy
+    end
+    context "flag already enabled for the user" do
+      before { Flipper.enable_actor(:bike_show_redesign, current_user) }
+      it "disables the flag and redirects to the legacy page" do
+        post "#{base_url}/#{bike.id}/toggle_show_redesign"
+        expect(response).to redirect_to(bike_path(bike))
+        expect(Flipper.enabled?(:bike_show_redesign, current_user)).to be_falsey
+      end
+    end
+    context "not signed in" do
+      let(:current_user) { nil }
+      it "redirects to sign in without toggling" do
+        post "#{base_url}/#{bike.id}/toggle_show_redesign"
+        expect(response).to redirect_to(new_session_path)
+        expect(Flipper.enabled?(:bike_show_redesign)).to be_falsey
+      end
+    end
+  end
   context "qr code png" do
     it "renders" do
       get "#{base_url}/#{bike.id}.png"

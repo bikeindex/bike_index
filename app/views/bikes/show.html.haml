@@ -1,6 +1,12 @@
 = render partial: "bike_show_overlays"
 
 .container
+  - if current_user.present?
+    = render(UI::Alert::Component.new(kind: :purple)) do
+      .tw:flex.tw:flex-wrap.tw:items-center.tw:justify-between.tw:gap-3
+        %span.tw:font-semibold Try out the new view!
+        = render(UI::ButtonLink::Component.new(text: "Switch to the new view", href: toggle_show_redesign_bike_path(@bike), method: :post, color: :primary, size: :sm))
+
   - if current_user.present? # Header row is super admin stuff and credibility badges
     = render partial: "/bikes/header_row"
 
