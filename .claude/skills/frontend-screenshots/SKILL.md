@@ -94,6 +94,8 @@ The preview page loads Tailwind and renders the component standalone (no site ch
 
 Previews that query the dev DB (e.g. `User.admins.first`) render nothing when that data is missing — if the state doesn't appear, seed first with `bundle exec rails db:seed`. This is component-only: a preview can't show layout/stacking against the rest of the page (e.g. a navbar z-index fix), so use a real page for those.
 
+**Editing a component while capturing 404s its preview.** Any change to a component file under a running `bin/dev` — an edit you make mid-session, or a `git checkout` that swaps the files — de-registers the ViewComponent preview, so the route 404s (`Component preview '…' not found`) and stays 404 until the dev server restarts. So capture the preview *before* touching the component, or restart `bin/dev` after editing to reshoot. Ordinary page routes reload fine and aren't affected.
+
 ## Cross-branch comparison (optional)
 
 When the caller wants before/after, repeat the capture loop against the base ref. The caller passes the base — `origin/main` by default, or the PR's actual base when it isn't `main` (a stacked PR's base often isn't). Set `BASE_REF` to that remote ref (e.g. `origin/main`, `origin/sethherr/feature-x`) and use it throughout; `git fetch origin` first so it's current.
@@ -106,7 +108,7 @@ A `Gemfile.lock` diff is **not** a reason to abort.
 
 The seeded DB persists across checkouts, so the existing session usually still works.
 
-**Lookbook/ViewComponent preview URLs can't be captured on the base this way.** Ordinary page routes reload on the next request after the checkout, so their before/after works against any `$BASE_REF`. But preview routes (`/rails/view_components/...`, `/lookbook/...`) 404 once you check out a different ref while `bin/dev` is running — the preview registry goes stale and stays 404 even after checking back, until the dev server restarts. So the base capture of a preview URL fails outright. For preview-based captures, stay branch-only and say so in the comment; the parameterized base only enables before/after for real page URLs.
+**Lookbook/ViewComponent preview URLs can't be captured on the base this way.** Ordinary page routes reload on the next request after the checkout, so their before/after works against any `$BASE_REF`. But preview routes (`/rails/view_components/...`, `/lookbook/...`) 404 once a component file changes under a running `bin/dev` — the checkout here, but also any edit you make to a component mid-session (see "Component previews" above). The preview registry de-registers and stays 404 even after the files revert, until the dev server restarts. So the base capture of a preview URL fails outright. For preview-based captures, stay branch-only and say so in the comment; the parameterized base only enables before/after for real page URLs.
 
 ## Clean up
 
