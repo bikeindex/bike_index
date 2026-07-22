@@ -21,8 +21,8 @@ RSpec.describe SpamEstimator::User do
 
       context "a single reference" do
         let(:link_target) { "https://buy-bitcoin.example" }
-        it "adds 30, staying below the threshold" do
-          expect(described_class.estimate(user)).to eq 30
+        it "adds 30 on top of the link's 50, staying below the threshold" do
+          expect(described_class.estimate(user)).to eq 80
         end
       end
 
@@ -89,19 +89,41 @@ RSpec.describe SpamEstimator::User do
       end
     end
 
-    context "user owns bikes" do
-      # 2 link references keep the base well under the clamp, so the reduction is observable
-      let(:user) do
-        FactoryBot.create(:user_confirmed, show_bikes: true,
-          my_bikes_hash: {"link_target" => "https://bitcoin-ethereum.example"})
+    context "promotional link" do
+      let(:user) { User.new(show_bikes: true, my_bikes_hash: {"link_target" => link_target}) }
+      let(:link_target) { "https://my-bike-blog.example" }
+
+      it "adds 50, staying below the threshold on its own" do
+        expect(described_class.estimate(user)).to eq 50
       end
 
-      it "subtracts 30 for one bike and 50 for two" do
+      it "adds nothing without a link" do
+        expect(described_class.estimate(User.new(show_bikes: true))).to eq 0
+      end
+    end
+
+    context "user owns bikes" do
+      # one reference plus the link keeps the base under the clamp, so the reduction is observable
+      let(:user) do
+        FactoryBot.create(:user_confirmed, show_bikes: true, name:, username: "riderperson", description:,
+          my_bikes_hash: {"link_target" => "https://bitcoin.example"})
+      end
+
+      it "subtracts 40 for one bike and 80 for two" do
         base = described_class.estimate(user)
+        expect(base).to be < 100 # otherwise the clamp hides the reduction
         FactoryBot.create(:bike, :with_ownership_claimed, user:)
-        expect(described_class.estimate(user.reload)).to eq(base - 30)
+        expect(described_class.estimate(user.reload)).to eq(base - 40)
         FactoryBot.create(:bike, :with_ownership_claimed, user:)
-        expect(described_class.estimate(user.reload)).to eq(base - 50)
+        expect(described_class.estimate(user.reload)).to eq(base - 80)
+      end
+
+      it "ignores likely_spam bikes, so a junk registration earns no reduction" do
+        base = described_class.estimate(user)
+        bike = FactoryBot.create(:bike, :with_ownership_claimed, user:)
+        expect(described_class.estimate(user.reload)).to eq(base - 40)
+        bike.update(likely_spam: true)
+        expect(described_class.estimate(user.reload)).to eq base
       end
     end
   end

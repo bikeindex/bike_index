@@ -28,7 +28,8 @@ module SpamEstimator
       return 0 if user.blank?
 
       # each crypto/gambling reference is a strong signal, stacked onto the text score
-      score = spammy_text_estimate(user) + 30 * seo_spam_reference_count(user)
+      score = spammy_text_estimate(user) + 30 * seo_spam_reference_count(user) +
+        promotional_link_estimate(user)
 
       (score - bike_ownership_reduction(user)).clamp(0, 100)
     end
@@ -70,16 +71,23 @@ module SpamEstimator
         user.mb_link_target, user.twitter, user.instagram].select(&:present?)
     end
 
-    # real registrations are strong evidence against spam
+    # SEO farms exist to host the link — registering bikes is what separates them from riders,
+    # so ownership below more than cancels this out
+    def promotional_link_estimate(user)
+      user.mb_link_target.present? ? 50 : 0
+    end
+
+    # real registrations are strong evidence against spam — but only real ones,
+    # otherwise a junk registration buys the reduction that cancels the link above
     def bike_ownership_reduction(user)
-      case user.bikes.limit(2).count
+      case user.bikes.not_spam.limit(2).count
       when 0 then 0
-      when 1 then 30
-      else 50
+      when 1 then 40
+      else 80
       end
     end
 
     conceal :seo_spam_reference_count, :strip_diacritics, :spammy_text_estimate,
-      :scannable_strings, :bike_ownership_reduction
+      :scannable_strings, :promotional_link_estimate, :bike_ownership_reduction
   end
 end
