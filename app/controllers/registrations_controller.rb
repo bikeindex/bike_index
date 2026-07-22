@@ -8,9 +8,11 @@ class RegistrationsController < ApplicationController
     @bike = Bike.unscoped.find_id(params[:id])
     fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
 
-    available_views = BikeServices::ShowViews.available(bike: @bike, current_user:, organization: current_organization || passive_organization)
+    requested_view = view_from_param(params[:view_as])
+    available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,
+      organization: current_organization || passive_organization, requested_view:)
 
-    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view: current_view(available_views),
+    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view: current_view(available_views, requested_view),
       available_views:), layout: "application")
   end
 
@@ -60,13 +62,12 @@ class RegistrationsController < ApplicationController
   # The resolved [kind, organization] perspective (e.g. [:public, nil] or
   # [:staff, organization]). A ?view_as param overrides the default, but only to a
   # perspective the user is allowed — otherwise it flashes and falls back.
-  def current_view(available_views)
-    requested = view_from_param(params[:view_as])
-    if params[:view_as].present? && !available_views.include?(requested)
+  def current_view(available_views, requested_view)
+    if params[:view_as].present? && !available_views.include?(requested_view)
       flash.now[:error] = "You're not allowed to view this registration that way"
-      requested = nil
+      requested_view = nil
     end
-    requested || BikeServices::ShowViews.default_view_for(bike: @bike, current_user:, organization: current_organization || passive_organization)
+    requested_view || BikeServices::ShowViews.default_view_for(bike: @bike, current_user:, organization: current_organization || passive_organization)
   end
 
   # The [kind, organization] view requested via ?view_as, or nil when absent/unknown.
