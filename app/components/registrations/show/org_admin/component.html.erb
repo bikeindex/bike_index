@@ -454,7 +454,7 @@
       </div>
 
       <div class="tw:mt-3">
-        <%= render(Org::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user)) %>
+        <%= render(Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user)) %>
       </div>
 
       <% if more_other_registrations? %>
