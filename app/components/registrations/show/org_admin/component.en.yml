@@ -30,6 +30,7 @@ en:
           message_owner: Message owner
           message_owner_sub: via Bike Index
           no_duplicate_serials: no dup. serials
+          no_registration_information: No registration information visible to %{org_name}
           not_audited: Not audited
           not_registered_message: >-
             Owner contact isn't available for bikes outside your organization. You

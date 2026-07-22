@@ -136,6 +136,18 @@ RSpec.describe "RegistrationsController#show", type: :request do
           # Registration information rows (other than sticker & credibility) are
           # only shown for bikes registered with the org
           expect(body).to_not match("E-Vehicle Audit")
+          # With no visible rows, the card shows the muted empty-state note
+          expect(body).to match("No registration information visible to #{organization.short_name}")
+        end
+
+        context "with a registration-info feature enabled" do
+          let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"]) }
+          it "shows the card rather than the empty-state note" do
+            get "#{base_url}/#{bike.id}"
+            body = whitespace_normalized_body_text
+            expect(body).to match("Credibility")
+            expect(body).to_not match("No registration information")
+          end
         end
       end
 
