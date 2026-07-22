@@ -3,6 +3,12 @@
 module Org
   module OriginDisplay
     class Component < ApplicationComponent
+      EXTENDED_DESCRIPTIONS = {
+        "web" => "Registered with self registration process",
+        "org reg" => "Registered by internal, organization member form",
+        "landing page" => "Registration began with incomplete registration, via organization landing page",
+        "bulk reg" => "Registered by spreadsheet import"
+      }.freeze
       def initialize(creation_description:)
         @creation_description = creation_description
       end
@@ -12,7 +18,17 @@ module Org
       end
 
       def call
-        safe_join([@creation_description, render(UI::Tooltip::Component.new(text: BikeServices::Displayer.origin_title(@creation_description)))], " ")
+        safe_join([@creation_description, render(UI::Tooltip::Component.new(text: origin_title))], " ")
+      end
+
+      private
+
+      def origin_title
+        if %w[Lightspeed Ascend].include?(@creation_description)
+          "Automatically registered by bike shop point of sale (#{@creation_description} POS)"
+        else
+          EXTENDED_DESCRIPTIONS[@creation_description] || "Registered via #{@creation_description}"
+        end
       end
     end
   end
