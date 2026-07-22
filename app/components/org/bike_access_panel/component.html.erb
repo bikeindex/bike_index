@@ -197,7 +197,7 @@
 
                   <td>
                     <em>
-                      <%= origin_display(@bike.creation_description) %>
+                      <%= render(Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) %>
 
                       <% unless current_ownership.initial? %>
                         <span class="localizeTime">
@@ -211,7 +211,7 @@
                         <%= translation(".initial_registration") %>
 
                         <em>
-                          <%= origin_display(original_ownership.creation_description) %>
+                          <%= render(Org::OriginDisplay::Component.new(creation_description: original_ownership.creation_description)) %>
                         </em>
                       </small>
                     <% end %>
@@ -473,7 +473,7 @@
 
                     <td>
                       <em class="less-strong">
-                        <%= origin_display(@bike.creation_description) %>
+                        <%= render(Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) %>
                       </em>
                     </td>
 
