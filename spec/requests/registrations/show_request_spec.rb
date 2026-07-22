@@ -150,6 +150,9 @@ RSpec.describe "RegistrationsController#show", type: :request do
           expect(body).to match("Unregistered")
           expect(body).to_not match("Not stolen")
           expect(body).to_not match("Claimed")
+          # Owner & access shows the parking-notification explanation, no owner rows
+          expect(body).to match("not registered to a user. It was added to track parking notifications")
+          expect(body).to_not match(bike.owner_email)
         end
       end
     end

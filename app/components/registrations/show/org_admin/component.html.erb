@@ -234,45 +234,49 @@
         </h2>
 
         <div class="tw:mt-3">
-          <%= render(UI::DefinitionList::Container::Component.new(term: :right_align)) do %>
-            <%= info_row(translation(".owner_name"), @bike.owner_name) %>
+          <% if @bike.unregistered_parking_notification? %>
+            <p class="tw:text-sm tw:opacity-65">
+              <%= translation(".unregistered_owner", bike_type: @bike.type) %>
+            </p>
+          <% else %>
+            <%= render(UI::DefinitionList::Container::Component.new(term: :right_align)) do %>
+              <%= info_row(translation(".owner_name"), @bike.owner_name) %>
 
-            <% if show_contact? %>
-              <%= info_row(translation(".owner_email")) do %>
-                <% if @bike.owner_email.present? %>
-                  <%= link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") %>
+              <% if show_contact? %>
+                <%= info_row(translation(".owner_email")) do %>
+                  <% if @bike.owner_email.present? %>
+                    <%= link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") %>
+                  <% end %>
                 <% end %>
-              <% end %>
-              <%= info_row(translation(".owner_phone")) { helpers.phone_link(owner_phone, class: "twlink tw:font-mono") } %>
-              <% owner_reg_field_rows.each do |label, value| %>
-                <%= info_row(label, value) %>
+                <%= info_row(translation(".owner_phone")) { helpers.phone_link(owner_phone, class: "twlink tw:font-mono") } %>
+                <% owner_reg_field_rows.each do |label, value| %>
+                  <%= info_row(label, value) %>
+                <% end %>
               <% end %>
             <% end %>
           <% end %>
         </div>
 
-        <% if show_contact? %>
-          <% if staff? %>
-            <div
-              class="
-                tw:mt-3 tw:flex tw:items-center tw:justify-between tw:gap-3
-                tw:rounded-lg tw:bg-purple-50 tw:p-3 tw:dark:bg-purple-950
-              "
-            >
-              <div class="tw:min-w-0">
-                <p class="tw:text-sm tw:font-bold">
-                  <%= translation(".org_can_edit", org_name: @organization.short_name, bike_type: @bike.type) %>
-                </p>
+        <% if staff? && (@bike.unregistered_parking_notification? || show_contact?) %>
+          <div
+            class="
+              tw:mt-3 tw:flex tw:items-center tw:justify-between tw:gap-3
+              tw:rounded-lg tw:bg-purple-50 tw:p-3 tw:dark:bg-purple-950
+            "
+          >
+            <div class="tw:min-w-0">
+              <p class="tw:text-sm tw:font-bold">
+                <%= translation(".org_can_edit", org_name: @organization.short_name, bike_type: @bike.type) %>
+              </p>
 
-                <p class="tw:mt-1 tw:text-xs tw:opacity-65">
-                  <%= translation(".org_can_edit_sub", bike_type: @bike.type) %>
-                </p>
-              </div>
-
-              <%= render(UI::ButtonLink::Component.new(href: edit_access_path, text: translation(".edit"), color: :secondary, size: :sm, class: "tw:flex-none")) %>
+              <p class="tw:mt-1 tw:text-xs tw:opacity-65">
+                <%= translation(".org_can_edit_sub", bike_type: @bike.type) %>
+              </p>
             </div>
-          <% end %>
-        <% else %>
+
+            <%= render(UI::ButtonLink::Component.new(href: edit_access_path, text: translation(".edit"), color: :secondary, size: :sm, class: "tw:flex-none")) %>
+          </div>
+        <% elsif !show_contact? && !@bike.unregistered_parking_notification? %>
           <div
             class="
               tw:mt-3 tw:rounded-lg tw:border tw:border-dashed
