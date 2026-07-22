@@ -22,6 +22,8 @@ module Registrations
             translation(".found")
           elsif @bike.status_impounded?
             translation(".impounded")
+          elsif @bike.unregistered_parking_notification?
+            translation(".unregistered")
           else
             translation(".not_stolen")
           end
@@ -29,7 +31,7 @@ module Registrations
 
         def color
           return :error if @bike.status_stolen?
-          return :warning if @bike.status_impounded?
+          return :warning if @bike.status_impounded? || @bike.unregistered_parking_notification?
 
           :success
         end

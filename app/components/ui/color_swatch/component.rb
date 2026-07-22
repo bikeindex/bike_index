@@ -5,7 +5,9 @@ module UI
     # A small square showing a bike color. The display-less "cover-up" color
     # renders Color::COVER_UP_SWATCH's multicolor blend instead of a solid fill.
     class Component < ApplicationComponent
-      BASE_CLASSES = "tw:inline-block tw:rounded-xs tw:border tw:border-black/20"
+      # leading-[0] collapses the empty box's line-height strut so align-baseline
+      # sits its bottom on the text baseline instead of floating above it
+      BASE_CLASSES = "tw:inline-block tw:leading-[0] tw:rounded-xs tw:border tw:border-black/20"
 
       SIZES = {sm: "tw:h-3 tw:w-3", md: "tw:h-6 tw:w-6"}.freeze
 

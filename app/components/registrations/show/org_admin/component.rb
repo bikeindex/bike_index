@@ -66,6 +66,10 @@ module Registrations
           @organization_registered = @bike.organized?(@organization)
         end
 
+        def unregistered?
+          @bike.unregistered_parking_notification?
+        end
+
         # Owner contact + law-enforcement data is only shown to full staff on a bike
         # registered with their organization
         def show_contact?
@@ -137,7 +141,7 @@ module Registrations
 
         # Org-owned stickers link to their edit page; others show the code as text
         def sticker_link(bike_sticker)
-          return bike_sticker.pretty_code unless bike_sticker.organization == @organization
+          return bike_sticker.pretty_code unless bike_sticker.organization_id == @organization.id
 
           link_to(bike_sticker.pretty_code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: @organization.to_param), class: "twlink")
         end

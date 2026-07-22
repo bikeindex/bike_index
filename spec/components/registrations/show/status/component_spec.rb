@@ -19,6 +19,15 @@ RSpec.describe Registrations::Show::Status::Component, type: :component do
     end
   end
 
+  context "unregistered" do
+    let(:bike) { FactoryBot.create(:bike, status: "unregistered_parking_notification") }
+    it "shows unregistered in a warning (yellow) badge" do
+      render_inline(component)
+      expect(page).to have_text("Unregistered")
+      expect(page).to have_css("span.tw\\:text-amber-700")
+    end
+  end
+
   # Impounded and found (an impounded bike with a "found" impound record) need an
   # organization + impound record to set the status; those are covered end-to-end
   # in spec/requests/registrations/show_request_spec.rb.
