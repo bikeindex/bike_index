@@ -139,46 +139,6 @@
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".activity"), value: activity_name)) %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".id"))) { render(UI::ShortId::Component.new(record: @bike)) } %>
             <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered_since"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
-
-            <%= render(UI::DefinitionList::Row::Component.new(label: translation(".credibility"))) do %>
-              <span class="tw:inline-flex tw:items-center tw:gap-1.5">
-                <span
-                  class="
-                    tw:inline-block tw:rounded tw:px-2 tw:py-0.5
-                    tw:font-bold tw:text-white
-                  "
-                  style="background-color: <%= credibility_color %>"
-                >
-                  <%= credibility_score %>
-                </span>
-
-                <%= render(UI::Tooltip::Component.new(text: translation(".credibility"))) do |tooltip| %>
-                  <% tooltip.with_body do %>
-                    <span class="tw:block tw:text-left">
-                      <span class="tw:mb-1 tw:block tw:font-semibold">
-                        Factors in score
-                      </span>
-
-                      <% credibility_badges.each do |badge, value| %>
-                        <span class="tw:flex tw:justify-between tw:gap-4">
-                          <span>
-                            <%= CredibilityScorer.humanize_badge(badge) %>
-                          </span>
-
-                          <span class="<%= "tw:text-red-600" if value.negative? %>">
-                            <%= value %>
-                          </span>
-                        </span>
-                      <% end %>
-                    </span>
-                  <% end %>
-
-                  <% tooltip.with_tooltip_button(class: "tw:inline-flex tw:size-4 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-200 tw:text-[10px] tw:font-bold tw:text-gray-600 tw:hover:bg-gray-300 tw:dark:bg-gray-700 tw:dark:text-gray-200") do %>
-                    ?
-                  <% end %>
-                <% end %>
-              </span>
-            <% end %>
           <% end %>
         </div>
       <% end %>
@@ -279,48 +239,43 @@
           <%= translation(".owner_access") %>
         </h2>
 
-        <% if show_contact? %>
-          <div class="tw:mt-3">
-            <%= render(UI::DefinitionList::Container::Component.new(term: :right_align)) do %>
-              <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_name"), value: @bike.owner_name)) %>
-              <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_email"))) { link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") } %>
+        <div class="tw:mt-3">
+          <%= render(UI::DefinitionList::Container::Component.new(term: :right_align)) do %>
+            <%= info_row(translation(".owner_name"), @bike.owner_name) %>
 
-              <% if owner_phone.present? %>
-                <%= render(UI::DefinitionList::Row::Component.new(label: translation(".owner_phone"))) { link_to(owner_phone, "tel:#{owner_phone}", class: "twlink tw:font-mono") } %>
+            <% if show_contact? %>
+              <%= info_row(translation(".owner_email")) do %>
+                <% if @bike.owner_email.present? %>
+                  <%= link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") %>
+                <% end %>
               <% end %>
-
-              <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered"))) { render(UI::Time::Component.new(time: @bike.created_at)) } %>
-
-              <% org_registration_field_rows.each do |label, value| %>
-                <%= render(UI::DefinitionList::Row::Component.new(label: label, value: value)) %>
+              <%= info_row(translation(".owner_phone")) { helpers.phone_link(owner_phone, class: "twlink tw:font-mono") } %>
+              <% owner_reg_field_rows.each do |label, value| %>
+                <%= info_row(label, value) %>
               <% end %>
             <% end %>
-          </div>
+          <% end %>
+        </div>
+
+        <% if show_contact? %>
           <% if staff? %>
             <div
               class="
-                tw:mt-3 tw:rounded-lg tw:bg-purple-50 tw:p-3
-                tw:dark:bg-purple-950
+                tw:mt-3 tw:flex tw:items-center tw:justify-between tw:gap-3
+                tw:rounded-lg tw:bg-purple-50 tw:p-3 tw:dark:bg-purple-950
               "
             >
-              <p class="tw:text-sm tw:font-bold">
-                <%= translation(".org_can_edit", org_name: @organization.short_name, bike_type: @bike.type) %>
-              </p>
+              <div class="tw:min-w-0">
+                <p class="tw:text-sm tw:font-bold">
+                  <%= translation(".org_can_edit", org_name: @organization.short_name, bike_type: @bike.type) %>
+                </p>
 
-              <p class="tw:mt-1 tw:text-xs tw:opacity-65">
-                <%= translation(".org_can_edit_sub", bike_type: @bike.type) %>
-              </p>
-
-              <div class="tw:mt-2 tw:flex tw:gap-4">
-                <%= link_to translation(".edit_bike_type", bike_type: @bike.type), edit_access_path, class: "twlink tw:text-sm" %>
-
-                <span
-                  class="tw:cursor-not-allowed tw:text-sm tw:opacity-50"
-                  title="<%= translation(".coming_soon") %>"
-                >
-                  <%= translation(".link_sticker") %>
-                </span>
+                <p class="tw:mt-1 tw:text-xs tw:opacity-65">
+                  <%= translation(".org_can_edit_sub", bike_type: @bike.type) %>
+                </p>
               </div>
+
+              <%= render(UI::ButtonLink::Component.new(href: edit_access_path, text: translation(".edit"), color: :secondary, size: :sm, class: "tw:flex-none")) %>
             </div>
           <% end %>
         <% else %>
@@ -346,31 +301,96 @@
             tw:uppercase
           "
         >
-          <%= translation(".e_vehicle_compliance") %>
+          <%= translation(".registration_information") %>
         </h2>
 
-        <div class="tw:mt-3 tw:flex tw:flex-col tw:gap-3">
-          <div class="tw:flex tw:items-center tw:justify-between tw:gap-3">
-            <div class="tw:min-w-0">
-              <p class="tw:text-sm tw:font-bold">
-                <%= translation(".audit") %>
-              </p>
+        <div class="tw:mt-3">
+          <%= render(UI::DefinitionList::Container::Component.new(term: :right_align)) do %>
+            <%= info_row(translation(".credibility")) do %>
+              <span class="tw:inline-flex tw:items-center tw:gap-1.5">
+                <span
+                  class="
+                    tw:inline-block tw:rounded tw:px-2 tw:py-0.5
+                    tw:font-bold tw:text-white
+                  "
+                  style="background-color: <%= credibility_color %>"
+                >
+                  <%= credibility_score %>
+                </span>
 
-              <% if organization_model_audit.present? %>
-                <%= link_to helpers.model_audit_display(model_audit), organization_model_audit_path(model_audit, organization_id: @organization.to_param), class: "twlink tw:text-xs" %>
-              <% else %>
-                <p class="tw:text-xs tw:opacity-65">
-                  <%= translation(".not_audited") %>
-                </p>
-              <% end %>
-            </div>
+                <%= render(UI::Tooltip::Component.new(text: translation(".credibility"))) do |tooltip| %>
+                  <% tooltip.with_body do %>
+                    <span class="tw:block tw:text-left">
+                      <span class="tw:mb-1 tw:block tw:font-semibold">
+                        Factors in score
+                      </span>
 
-            <% if organization_model_audit.present? %>
-              <span class="tw:flex-none tw:text-xs tw:font-bold <%= helpers.status_display_class(organization_model_audit.certification_status) %>">
-                <%= organization_model_audit.certification_status_humanized %>
+                      <% credibility_badges.each do |badge, value| %>
+                        <span class="tw:flex tw:justify-between tw:gap-4">
+                          <span>
+                            <%= CredibilityScorer.humanize_badge(badge) %>
+                          </span>
+
+                          <span class="<%= "tw:text-red-600" if value.negative? %>">
+                            <%= value %>
+                          </span>
+                        </span>
+                      <% end %>
+                    </span>
+                  <% end %>
+
+                  <% tooltip.with_tooltip_button(class: "tw:inline-flex tw:size-4 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-200 tw:text-[10px] tw:font-bold tw:text-gray-600 tw:hover:bg-gray-300 tw:dark:bg-gray-700 tw:dark:text-gray-200") do %>
+                    ?
+                  <% end %>
+                <% end %>
               </span>
             <% end %>
-          </div>
+
+            <% if @organization.enabled?("bike_stickers") %>
+              <%= info_row(translation(".sticker")) do %>
+                <%= safe_join(bike_stickers.map { |bike_sticker| sticker_link(bike_sticker) }, ", ") %>
+              <% end %>
+            <% end %>
+
+            <% if @organization.parent? %>
+              <%= info_row(translation(".organization_registered"), @bike.creation_organization&.name) %>
+            <% end %>
+
+            <%= info_row(translation(".claimed")) do %>
+              <% if @bike.claimed? %>
+                <%= render(UI::Time::Component.new(time: current_ownership.claimed_at)) %>
+              <% end %>
+            <% end %>
+
+            <% if show_contact? %>
+              <%= info_row(translation(".creator"), @bike.creator&.display_name) %>
+            <% end %>
+
+            <%= info_row(translation(".creation_source")) { helpers.origin_display(@bike.creation_description) } %>
+
+            <% if show_contact? %>
+              <% org_registration_field_rows.each do |label, value| %>
+                <%= info_row(label, value) %>
+              <% end %>
+            <% end %>
+
+            <% if @organization.enabled?("avery_export") %>
+              <%= info_row(translation(".avery_exportable"), @bike.avery_exportable? ? translation(".is_true") : translation(".is_false")) %>
+            <% end %>
+
+            <%= info_row(translation(".audit")) do %>
+              <% if organization_model_audit.present? %>
+                <%= link_to helpers.model_audit_display(model_audit), organization_model_audit_path(model_audit, organization_id: @organization.to_param), class: "twlink" %>
+                <span class="tw:ml-2 tw:font-bold <%= helpers.status_display_class(organization_model_audit.certification_status) %>">
+                  <%= organization_model_audit.certification_status_humanized %>
+                </span>
+              <% else %>
+                <span class="tw:opacity-65">
+                  <%= translation(".not_audited") %>
+                </span>
+              <% end %>
+            <% end %>
+          <% end %>
         </div>
       <% end %>
 
@@ -385,11 +405,10 @@
             <%= translation(".parking_notifications") %>
           </h2>
 
-          <p class="tw:mt-3 tw:text-sm">
-            <%= link_to "#{active_notifications_count} #{translation(".active")}", notifications_path, class: "twlink" %>
-            <span class="tw:mx-1 tw:text-gray-400">·</span>
-            <%= link_to "#{resolved_notifications_count} #{translation(".resolved")}", resolved_notifications_path, class: "twlink" %>
-          </p>
+          <div class="tw:mt-3 tw:grid tw:grid-cols-2 tw:gap-3">
+            <%= parking_stat(active_notifications_count, notifications_path, translation(".active")) %>
+            <%= parking_stat(resolved_notifications_count, resolved_notifications_path, translation(".resolved")) %>
+          </div>
         <% end %>
       <% end %>
     </div>

@@ -5,15 +5,16 @@ en:
       show:
         org_admin:
           about_this_bike: About this %{bike_type}
-          active: active
+          active: Active
           activity: Activity
-          audit: Audit
+          audit: E-Vehicle Audit
+          avery_exportable: Avery Exportable
           bike_details: "%{bike_type} details"
           claimed: Claimed
-          coming_soon: Coming soon
+          creation_source: Source
+          creator: Creator
           credibility: Credibility
-          e_vehicle_compliance: E-vehicle compliance
-          edit_bike_type: Edit %{bike_type}
+          edit: Edit
           found: Found
           frame_material: Frame material
           frame_size: Frame size
@@ -24,7 +25,8 @@ en:
           impound_sub: Single confirmation
           impounded: Impounded
           internal_notes: Internal notes
-          link_sticker: Link sticker
+          is_false: 'false'
+          is_true: 'true'
           manufacturer: Manufacturer
           message_owner: Message owner
           message_owner_sub: Email & SMS
@@ -42,6 +44,7 @@ en:
             thread.
           org_can_edit: "%{org_name} can edit this %{bike_type}"
           org_can_edit_sub: Including after the %{bike_type} is claimed.
+          organization_registered: Organization
           other_registrations: Other registrations by this user
           other_registrations_count_html: "%{count} other registrations"
           other_serial: Other serial/registration/sticker
@@ -58,13 +61,13 @@ en:
           primary_color:
             one: Primary color
             other: Primary colors
-          registered: Registered
           registered_since: Registered since
           registration: Registration
+          registration_information: Registration information
           registration_number: Bike Index Registration
           request_impound: Request impound
           request_impound_sub: Sent for approval
-          resolved: resolved
+          resolved: Resolved
           restricted_message: >-
             Owner contact is available to admin & staff. You can add notes and request
             an impound.
@@ -73,6 +76,7 @@ en:
           role_staff: Full access
           serial: Serial
           showing_recent: Showing the %{count} most recent
+          sticker: Sticker
           stolen: Stolen
           this_bike_on_bike_index: This %{bike_type} on Bike Index
           vehicle_type: Vehicle type
