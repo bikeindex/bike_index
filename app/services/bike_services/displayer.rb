@@ -28,7 +28,10 @@ module BikeServices
 
     def display_impound_claim?(bike, user = nil)
       return false if bike.owner.present? && bike.owner == user
-      return true if bike.current_impound_record.present?
+      if (impound_record = bike.current_impound_record).present?
+        # Bikes impounded by an organization can't be claimed, unless unregistered
+        return impound_record.unregistered_bike? || !impound_record.organized?
+      end
       return false if user.blank?
 
       bike.impound_claims_submitting.active.where(user_id: user.id).any? ||
