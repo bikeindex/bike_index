@@ -38,6 +38,34 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
   def row_for(notification) = "tr[data-recordid='#{notification.id}']"
 
+  it "creates a parking notification through the redesigned registration show page" do
+    # The redesign is desktop-first; the mobile resize above is only for the
+    # legacy org-dropdown nav the other example needs.
+    page.current_window.resize_to(1400, 2000)
+    visit registration_path(bike)
+
+    # Open the parking-notification card in the org-admin action panel. The org
+    # also has impound enabled, so scope to the notification trigger by its label.
+    click_button "Parking Notification"
+
+    # Skip the geolocation prompt by entering the address by hand; this reveals the
+    # address fields and enables the (initially disabled) submit button.
+    choose "Enter address manually", allow_label_click: true
+    fill_in "parking_notification_street", with: "100 Main St"
+    fill_in "parking_notification_city", with: "New York"
+    choose "Parked incorrectly", allow_label_click: true
+
+    expect {
+      click_button "Create parking notification"
+      expect(page).to have_content("Parking Notification for #{bike.type} created", wait: 10)
+    }.to change(bike.parking_notifications, :count).by(1)
+
+    notification = bike.reload.parking_notifications.last
+    expect(notification.kind).to eq "parked_incorrectly_notification"
+    expect(notification.organization).to eq organization
+    expect(notification.user).to eq user
+  end
+
   it "creates a parking notification on the bike show page, then filters them through the dropdown menus" do
     # Create a parking notification through the bike show interface. Regression:
     # the "New parking notification" button must open the form (it was wired to
