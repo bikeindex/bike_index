@@ -45,6 +45,7 @@ export default class extends Controller {
     document.addEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.addEventListener('turbo:before-visit', this.handleBeforeVisit)
     window.addEventListener('search:rate-limited', this.showRateLimited)
+    window.addEventListener('popstate', this.handlePopstate)
   }
 
   disconnect () {
@@ -53,6 +54,7 @@ export default class extends Controller {
     document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.removeEventListener('turbo:before-visit', this.handleBeforeVisit)
     window.removeEventListener('search:rate-limited', this.showRateLimited)
+    window.removeEventListener('popstate', this.handlePopstate)
   }
 
   handleTurboLoad = () => {
@@ -74,6 +76,22 @@ export default class extends Controller {
     this.clearStaleFrameBusy()
     this.reloadFrameIfUrlStale()
     this.reloadRestoredFrame()
+  }
+
+  // The visible text filters live outside the results frame, so a back/forward
+  // that only reloads the frame (the form's DOM isn't re-rendered) leaves them
+  // showing the previous query while the results below match a different URL.
+  // Reconcile them from the address bar. Bound to popstate, which fires only on
+  // history navigation -- never on a link/form search -- so it can't revert what
+  // the user is typing; a full-page restoration re-renders the form from the
+  // server instead, so missing those (the controller reconnects after the
+  // popstate) is harmless.
+  handlePopstate = () => {
+    const params = new URLSearchParams(window.location.search)
+    ;['search_email', 'serial', 'search_notes'].forEach(name => {
+      const input = this.formTarget.querySelector(`input[name="${name}"]`)
+      if (input) input.value = params.get(name) || ''
+    })
   }
 
   // Turbo doesn't cache the eager results frame's contents and won't re-fetch a

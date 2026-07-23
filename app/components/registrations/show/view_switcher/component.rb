@@ -8,7 +8,7 @@ module Registrations
       # others via ?view_as=; otherwise it's a plain badge. The label/color are
       # passed in so the caller keeps nuances like "No longer your bike".
       class Component < ApplicationComponent
-        def initialize(bike:, current_view:, available_views:, label:, color:, solid: true, role_label: nil)
+        def initialize(bike:, current_view:, available_views:, label:, color:, solid: true, role_label: nil, current_user: nil)
           @bike = bike
           @current_view = current_view
           @available_views = available_views || []
@@ -16,12 +16,13 @@ module Registrations
           @color = color
           @solid = solid
           @role_label = role_label
+          @current_user = current_user
         end
 
         private
 
         # The pill text: the org/audience name, optionally followed by the viewer's
-        # role (e.g. "Brakebills · Full access"), the role muted to read as secondary.
+        # role (e.g. "Brakebills · Staff"), the role muted to read as secondary.
         def display_label
           return @label if @role_label.blank?
 
@@ -29,7 +30,18 @@ module Registrations
         end
 
         def switchable?
-          @available_views.size > 1
+          @available_views.size > 1 || superuser?
+        end
+
+        def superuser?
+          @current_user&.superuser?
+        end
+
+        # Superusers get a link to the admin bike page, ahead of the audience views
+        def super_admin_link
+          link_to(admin_bike_path(@bike.id), class: entry_class) do
+            safe_join(["View ", content_tag(:span, "Super Admin", class: "tw:font-bold")])
+          end
         end
 
         # Organization perspectives ([role, organization] pairs) lead the dropdown,
@@ -50,10 +62,13 @@ module Registrations
 
         def entry_link(view)
           active = view == @current_view
-          link_to(registration_path(@bike, view_as: BikeServices::ShowViews.view_param(view)), "aria-current": (active ? "true" : nil),
-            class: "tw:block tw:whitespace-nowrap tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700 tw:no-underline tw:hover:bg-gray-100 tw:dark:text-gray-200 tw:dark:hover:bg-gray-800 #{"tw:bg-gray-100 tw:dark:bg-gray-800" if active}") do
+          link_to(registration_path(@bike, view_as: BikeServices::ShowViews.view_param(view)), "aria-current": (active ? "true" : nil), class: entry_class(active:)) do
             safe_join([(active ? "Viewing as" : "View as"), " ", entry_label(view)])
           end
+        end
+
+        def entry_class(active: false)
+          "tw:block tw:whitespace-nowrap tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700 tw:no-underline tw:hover:bg-gray-100 tw:dark:text-gray-200 tw:dark:hover:bg-gray-800 #{"tw:bg-gray-100 tw:dark:bg-gray-800" if active}"
         end
 
         def button_class

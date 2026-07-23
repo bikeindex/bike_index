@@ -1,0 +1,37 @@
+<div
+  data-registrations--show--action-panels-target="panel"
+  data-panel-name="notifications_show"
+  class="tw:hidden"
+>
+  <%= render(UI::Card::Component.new) do %>
+    <h2
+      class="
+        tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+        tw:uppercase
+      "
+    >
+      <%= translation(".parking_notifications") %>
+    </h2>
+
+    <%= link_to translation(".view_all", bike_type: @bike.type), notifications_path, class: "twlink tw:mt-1 tw:inline-block tw:text-sm" %>
+
+    <div class="tw:mt-4">
+      <% if parking_notification.present? %>
+        <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".created"), value: parking_notification.created_at, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".type"), value: parking_notification.kind_humanized)) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".status"), value: parking_notification.status.humanize)) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".by"), value: parking_notification.user&.display_name, render_with_no_value: true, no_value_text: "-")) %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".address"), value: parking_notification.formatted_address_string, render_with_no_value: true, no_value_text: "-")) %>
+        <% end %>
+        <div class="tw:mt-3">
+          <%= render(UI::ButtonLink::Component.new(href: notification_path, text: translation(".view_notification"), color: :secondary)) %>
+        </div>
+      <% else %>
+        <p class="tw:text-sm tw:opacity-65">
+          <%= translation(".no_notifications", bike_type: @bike.type) %>
+        </p>
+      <% end %>
+    </div>
+  <% end %>
+</div>
