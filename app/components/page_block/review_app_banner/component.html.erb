@@ -24,9 +24,12 @@
     <% end %>
   <% end %>
 
-  <span class="tw:hidden tw:sm:inline">
-    &middot; <%= translation(".disclaimer") %>
-  </span>
+  <%# No ephemeral-data disclaimer in dev — the local database persists %>
+  <% unless development? %>
+    <span class="tw:hidden tw:sm:inline">
+      &middot; <%= translation(".disclaimer") %>
+    </span>
+  <% end %>
 
   <span>&middot;</span>
 

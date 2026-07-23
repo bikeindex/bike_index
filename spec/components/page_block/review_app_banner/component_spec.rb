@@ -16,6 +16,14 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
     # Purple accent (matching the dev favicon) instead of the review-app green
     expect(component.to_html).to include("tw:bg-[#ff40ff]")
     expect(component.to_html).not_to include("tw:bg-[#40ff40]")
+    # The local database persists, so the ephemeral-data disclaimer doesn't apply
+    expect(component.text).not_to include("data is ephemeral")
+  end
+
+  it "offers the superadmin sign-in button in development" do
+    FactoryBot.create(:superuser)
+    component = render_inline(described_class.new(review_app: "development"))
+    expect(component.css("form[action='/session/sign_in_with_magic_link'] button").text).to eq("sign in as superadmin")
   end
 
   context "when review_app is present" do
