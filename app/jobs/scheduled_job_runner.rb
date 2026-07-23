@@ -47,7 +47,7 @@ class ScheduledJobRunner < ScheduledJob
       ProcessGraduatedNotificationJob,
       ProcessHotSheetJob,
       ScheduledAutocompleteCheckJob,
-      ScheduledBikePossiblyFoundNotificationJob,
+      BikeJobs::ScheduledBikePossiblyFoundNotificationJob,
       ScheduledSearchForExternalRegistryBikesJob,
       ScheduledStoreLogSearchesJob,
       Spreadsheets::TsvCreatorJob,

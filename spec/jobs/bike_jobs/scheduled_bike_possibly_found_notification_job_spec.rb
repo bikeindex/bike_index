@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ScheduledBikePossiblyFoundNotificationJob, type: :job do
+RSpec.describe BikeJobs::ScheduledBikePossiblyFoundNotificationJob, type: :job do
   let(:instance) { described_class.new }
   include_context :scheduled_job
   include_examples :scheduled_job_tests

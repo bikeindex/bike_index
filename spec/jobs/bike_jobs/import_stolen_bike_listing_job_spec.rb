@@ -1,11 +1,11 @@
 require "rails_helper"
 
-RSpec.describe ImportStolenBikeListingJob, type: :lib do
+RSpec.describe BikeJobs::ImportStolenBikeListingJob, type: :lib do
   let(:subject) { described_class }
   let(:instance) { subject.new }
 
   def header_values(row)
-    ImportStolenBikeListingJob::HEADERS.map { |h| row[h] }.join(",")
+    BikeJobs::ImportStolenBikeListingJob::HEADERS.map { |h| row[h] }.join(",")
   end
 
   describe "perform row" do
