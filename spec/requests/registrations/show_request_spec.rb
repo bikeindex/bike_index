@@ -447,7 +447,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
         get "#{base_url}/#{bike.id}", params: {view_as: "#{other_organization.to_param}.staff"}
         expect(response.status).to eq(200)
         body = whitespace_normalized_body_text
-        expect(body).to match("Full access")
+        expect(body).to match("Staff")
         expect(body).to_not match("not allowed to view this registration")
         # The previewed org joins the switcher (staff is current, so limited is the
         # other offered role)
