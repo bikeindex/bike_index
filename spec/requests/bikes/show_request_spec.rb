@@ -708,6 +708,11 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.id}.png"
         expect(response.status).to eq(200)
       end
+
+      it "renders the legacy page when no_redesign is passed" do
+        get "#{base_url}/#{bike.id}?no_redesign=true"
+        expect(response).to render_template(:show)
+      end
     end
 
     context "flag enabled only for another user" do

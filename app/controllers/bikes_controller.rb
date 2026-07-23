@@ -209,8 +209,11 @@ class BikesController < Bikes::BaseController
 
   private
 
-  # Send the HTML page to the redesigned registration show when the flag is on
+  # Send the HTML page to the redesigned registration show when the flag is on,
+  # unless no_redesign is passed to force the classic view
   def show_redesign?
+    return false if Binxtils::InputNormalizer.boolean(params[:no_redesign])
+
     request.format.html? && Flipper.enabled?(:bike_show_redesign, current_user)
   end
 
