@@ -1,6 +1,8 @@
 = render partial: "bike_show_overlays"
 
 .container
+  = render(Registrations::Show::ToggleView::Component.new(bike: @bike, current_user:))
+
   - if current_user.present? # Header row is super admin stuff and credibility badges
     = render partial: "/bikes/header_row"
 
