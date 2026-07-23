@@ -920,7 +920,8 @@ CREATE TABLE public.bug_reports (
     updated_at timestamp(6) without time zone NOT NULL,
     received_at timestamp(6) without time zone,
     from_name text,
-    inbound_email_id bigint
+    inbound_email_id bigint,
+    status integer DEFAULT 0 NOT NULL
 );
 
 
@@ -7459,6 +7460,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260723000000'),
 ('20260713120000'),
 ('20260706180000'),
 ('20260706164500'),

@@ -12,6 +12,7 @@
 #  is_paid_organization       :boolean          default(FALSE), not null
 #  is_paid_organization_staff :boolean          default(FALSE), not null
 #  received_at                :datetime
+#  status                     :integer          default("unprioritized"), not null
 #  subject                    :text
 #  tags                       :text             default([]), not null, is an Array
 #  created_at                 :datetime         not null
@@ -33,6 +34,10 @@ class BugReport < ApplicationRecord
   include PgSearch::Model
 
   GITHUB_REPO_URL = "https://github.com/bikeindex/bike_index"
+  STATUS_ENUM = {unprioritized: 0, ignored: 1, investigate_priority_low: 2,
+                 investigate_priority_high: 3, resolved: 4}.freeze
+
+  enum :status, STATUS_ENUM
 
   belongs_to :user
   belongs_to :inbound_email, class_name: "ActionMailbox::InboundEmail"
