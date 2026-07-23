@@ -25,7 +25,6 @@
 #  manual_pos_kind                 :integer
 #  name                            :string(255)
 #  opted_into_theft_survey_2023    :boolean          default(FALSE)
-#  passwordless_user_domain        :string
 #  pos_kind                        :integer          default("no_pos")
 #  previous_slug                   :string
 #  regional_ids                    :jsonb
@@ -35,6 +34,7 @@
 #  show_on_map                     :boolean
 #  slug                            :string(255)      not null
 #  spam_registrations              :boolean          default(FALSE)
+#  user_email_domain               :string
 #  website                         :string(255)
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
@@ -135,6 +135,7 @@ class Organization < ApplicationRecord
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
+  validate :user_email_domain_format
 
   attr_accessor :embedable_user_email, :skip_update
 
@@ -240,7 +241,7 @@ class Organization < ApplicationRecord
     end
 
     def permitted_domain_passwordless_signin
-      where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("passwordless_users")
+      where.not(user_email_domain: nil).with_enabled_feature_slugs("passwordless_users")
     end
 
     def passwordless_email_matching(str)
@@ -248,7 +249,7 @@ class Organization < ApplicationRecord
       return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
 
       domain = str.split("@").last
-      permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
+      permitted_domain_passwordless_signin.detect { |o| o.user_email_domain == domain }
     end
 
     def example
@@ -271,7 +272,7 @@ class Organization < ApplicationRecord
   end
 
   def restrict_invitations?
-    !enabled?("passwordless_users") && !passwordless_user_domain.present?
+    !enabled?("passwordless_users") && !user_email_domain.present?
   end
 
   def sent_invitation_count
@@ -529,7 +530,7 @@ class Organization < ApplicationRecord
     self.ascend_name = nil if ascend_name.blank?
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
-    self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
+    self.user_email_domain = EmailNormalizer.normalize(user_email_domain)
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
@@ -597,6 +598,12 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  def user_email_domain_format
+    return if user_email_domain.blank?
+    errors.add(:user_email_domain, "must include a .") unless user_email_domain.include?(".")
+    errors.add(:user_email_domain, "must not include @") if user_email_domain.include?("@")
+  end
 
   def nearby_organizations_including_siblings
     return self.class.none unless regional? && search_coordinates_set?
