@@ -4,6 +4,13 @@
       <%= display_label %>
     <% end %>
 
+    <% if superuser? %>
+      <% dropdown.with_entry_item do %>
+        <%= super_admin_link %>
+      <% end %>
+      <% dropdown.with_entry_divider %>
+    <% end %>
+
     <% org_view_groups.each_with_index do |group, index| %>
       <% dropdown.with_entry_divider if index.positive? %>
 

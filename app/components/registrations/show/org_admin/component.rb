@@ -55,7 +55,7 @@ module Registrations
         def action_label(title, subtitle = nil)
           content_tag(:span, class: "tw:min-w-0") do
             rows = [content_tag(:span, title, class: "tw:block tw:font-bold")]
-            rows << content_tag(:span, subtitle, class: "tw:mt-0.5 tw:hidden tw:text-xs tw:opacity-60 tw:lg:block") if subtitle.present?
+            rows << content_tag(:span, subtitle, class: "tw:mt-0.5 tw:block tw:text-xs tw:opacity-60") if subtitle.present?
             safe_join(rows)
           end
         end
@@ -238,10 +238,6 @@ module Registrations
           @parking_notifications ||= @organization.parking_notifications.where(bike_id: @bike.id)
         end
 
-        def any_parking_notifications?
-          parking_notifications.any?
-        end
-
         def active_notifications_count
           @active_notifications_count ||= parking_notifications.where(status: ACTIVE_PARKING_STATUSES).count
         end
@@ -250,31 +246,8 @@ module Registrations
           @resolved_notifications_count ||= parking_notifications.where.not(status: ACTIVE_PARKING_STATUSES).count
         end
 
-        # Boxed count + label; links to the search only when the count is non-zero
-        def parking_stat(count, path, label)
-          inner = safe_join([
-            content_tag(:span, count, class: "tw:block tw:text-2xl tw:font-bold"),
-            content_tag(:span, label, class: "tw:block tw:text-xs")
-          ])
-          content_tag(:div, class: "tw:rounded-lg tw:border tw:border-gray-200 tw:p-3 tw:text-center tw:dark:border-gray-700") do
-            count.positive? ? link_to(inner, path, class: "twlink tw:block") : inner
-          end
-        end
-
-        def notifications_path
-          organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
-        end
-
-        def resolved_notifications_path
-          organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "resolved")
-        end
-
         def show_impound?
           @organization.enabled?("impound_bikes")
-        end
-
-        def impound_path
-          organization_impound_records_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
         end
 
         # Staff create an impound before it's impounded, and update it after
@@ -287,7 +260,7 @@ module Registrations
         end
 
         def impound_title
-          staff? ? translation(".impound") : translation(".request_impound")
+          translation(".impound")
         end
 
         def impound_subtitle

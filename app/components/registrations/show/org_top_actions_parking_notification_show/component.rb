@@ -11,10 +11,6 @@ module Registrations
           @organization = organization
         end
 
-        def render?
-          parking_notification.present?
-        end
-
         private
 
         # The current notification, falling back to the most recent one
@@ -23,6 +19,10 @@ module Registrations
 
           notifications = @organization.parking_notifications.where(bike_id: @bike.id).reorder(id: :desc)
           @parking_notification = notifications.detect(&:current?) || notifications.first
+        end
+
+        def notification_path
+          organization_parking_notification_path(parking_notification.id, organization_id: @organization.to_param)
         end
 
         def notifications_path

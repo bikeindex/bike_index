@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapse } from 'utils/collapse_utils'
 
 /* global navigator */
 
@@ -9,7 +10,7 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static targets = ['latitude', 'longitude', 'accuracy', 'submit', 'status',
     'statusText', 'statusDot', 'addressGroup', 'useEnteredAddress', 'heading',
-    'locationMode']
+    'locationMode', 'kindGroup', 'locationSection']
 
   static values = {
     notificationHeading: String,
@@ -21,13 +22,35 @@ export default class extends Controller {
   // Fired when the accordion reveals this panel; impound preselects that kind,
   // and opening the panel requests the location so the browser prompts right away
   applyMode (event) {
-    const impound = event.detail?.mode === 'impound'
+    const impound = event.detail?.name === 'impound'
     if (this.hasHeadingTarget) {
       this.headingTarget.textContent = impound ? this.impoundHeadingValue : this.notificationHeadingValue
     }
     const radio = this.element.querySelector(`input[name$="[kind]"][value="${impound ? 'impound_notification' : this.defaultKindValue}"]`)
     if (radio) radio.checked = true
+    // Impound preselects the kind, so hide the "Notification because" chooser
+    if (this.hasKindGroupTarget) this.toggle(this.kindGroupTarget, !impound)
     this.requestLocation()
+    // A recent earlier notification preselects "repeat", so sync on open (no animation)
+    this.applyRepeat(this.repeatSelected, 0)
+  }
+
+  selectRepeat (event) {
+    this.applyRepeat(event.target.value === 'true', 200)
+  }
+
+  get repeatSelected () {
+    return this.element.querySelector("input[name$='[is_repeat]'][value='true']")?.checked || false
+  }
+
+  // A repeat reuses the earlier notification's location, so collapse the location
+  // controls; a hidden required field would otherwise block submit
+  applyRepeat (repeat, duration) {
+    if (this.hasLocationSectionTarget) collapse(repeat ? 'hide' : 'show', this.locationSectionTarget, duration)
+    if (repeat) {
+      this.setManualRequired(false)
+      this.enableSubmit()
+    }
   }
 
   // Segmented control: "current" geolocates, "entered" reveals the address fields

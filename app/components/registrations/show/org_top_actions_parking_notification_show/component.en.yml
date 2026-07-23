@@ -7,7 +7,9 @@ en:
           address: Address
           by: By
           created: Created
-          parking_notification: Parking notification
+          no_notifications: No parking notifications for this %{bike_type}
+          parking_notifications: Parking notifications
           status: Status
           type: Type
-          view_all_notifications: View all notifications
+          view_all: view all notifications for this %{bike_type}
+          view_notification: View notification

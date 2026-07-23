@@ -9,7 +9,7 @@
   <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-4">
     <div>
       <div class="tw:mb-2 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <%= render(Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view: [staff? ? :staff : :limited, @organization], available_views: @available_views, label: @organization.short_name, color: org_chip_color, solid: false, role_label: role_label)) %>
+        <%= render(Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view: [staff? ? :staff : :limited, @organization], available_views: @available_views, label: @organization.short_name, color: org_chip_color, solid: false, role_label: role_label, current_user: @current_user)) %>
       </div>
 
       <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
@@ -29,7 +29,7 @@
   </div>
 
   <div
-    class="tw:flex tw:flex-col tw:gap-6"
+    class="tw:flex tw:flex-col tw:gap-3"
     data-controller="registrations--show--action-panels"
   >
     <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:flex">
@@ -41,13 +41,8 @@
       <% end %>
 
       <% if show_create_impound? %>
-        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "parking", "panel-mode": "impound", action: "registrations--show--action-panels#toggle"})) do %>
+        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "impound", action: "registrations--show--action-panels#toggle"})) do %>
           <%= action_icon("lock") %>
-          <%= action_label(impound_title, impound_subtitle) %>
-        <% end %>
-      <% elsif show_impound? && !impounded? %>
-        <%= render(UI::ButtonLink::Component.new(href: impound_path, color: :purple_outline, class: action_button_classes)) do %>
-          <%= action_icon("lock", tile: :amber) %>
           <%= action_label(impound_title, impound_subtitle) %>
         <% end %>
       <% end %>
@@ -55,34 +50,22 @@
       <% if show_update_impound? %>
         <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "impound_update", action: "registrations--show--action-panels#toggle"})) do %>
           <%= action_icon("lock", tile: :amber) %>
-          <%= action_label(translation(".update_impound")) %>
+          <%= action_label(translation(".impound_record"), translation(".update")) %>
         <% end %>
       <% end %>
 
-      <% if staff? && show_create_parking_notification? %>
+      <% if show_create_parking_notification? %>
         <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "parking", action: "registrations--show--action-panels#toggle"})) do %>
           <%= action_icon("map-pin") %>
           <%= action_label(translation(".parking_notice"), translation(".parking_notice_sub")) %>
         <% end %>
       <% end %>
 
-      <% if show_parking_notifications? && any_parking_notifications? %>
+      <% if show_parking_notifications? %>
         <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "notifications_show", action: "registrations--show--action-panels#toggle"})) do %>
-          <% if active_notifications_count > 0 %>
-            <span class="tw:absolute tw:top-2 tw:right-2">
-              <%= render(UI::Badge::Component.new(text: active_notifications_count, color: :notice, size: :sm)) %>
-            </span>
-          <% end %>
-
           <%= action_icon("bell", tile: :blue) %>
 
-          <%= action_label(translation(".view_notifications"), translation(".view_notifications_sub")) %>
-        <% end %>
-      <% elsif show_parking_notifications? %>
-        <%= render(UI::ButtonLink::Component.new(href: notifications_path, color: :purple_outline, class: action_button_classes)) do %>
-          <%= action_icon("bell", tile: :blue) %>
-
-          <%= action_label(translation(".view_notifications"), translation(".view_notifications_sub")) %>
+          <%= action_label(translation(".view_notifications"), translation(".view_notifications_activity_html", active: active_notifications_count, resolved: resolved_notifications_count)) %>
         <% end %>
       <% end %>
     </div>
@@ -91,7 +74,7 @@
       <%= render(Registrations::Show::OrgTopActionsMessageOwner::Component.new(bike: @bike)) %>
     <% end %>
 
-    <% if staff? && (show_create_parking_notification? || show_create_impound?) %>
+    <% if show_create_parking_notification? || show_create_impound? %>
       <%= render(Registrations::Show::OrgTopActionsParkingNotificationForm::Component.new(bike: @bike, organization: @organization)) %>
     <% end %>
 
@@ -99,7 +82,7 @@
       <%= render(Registrations::Show::OrgTopActionsImpoundUpdate::Component.new(bike: @bike, organization: @organization)) %>
     <% end %>
 
-    <% if show_parking_notifications? && any_parking_notifications? %>
+    <% if show_parking_notifications? %>
       <%= render(Registrations::Show::OrgTopActionsParkingNotificationShow::Component.new(bike: @bike, organization: @organization)) %>
     <% end %>
   </div>
@@ -205,7 +188,7 @@
                 <%= translation(".posts_as", user: @current_user.display_name) %>
               </small>
 
-              <%= f.submit translation(".post_note"), class: UI::Button::Component.build_classes(color: :purple, size: :sm) %>
+              <%= f.submit translation(".post_note"), class: UI::Button::Component.build_classes(color: :primary, size: :sm) %>
             </div>
           <% end %>
         <% end %>
@@ -407,24 +390,6 @@
             <% end %>
           <% end %>
         </div>
-      <% end %>
-
-      <% if show_parking_notifications? %>
-        <%= render(UI::Card::Component.new(additional_classes: "tw:order-3 tw:lg:order-none")) do %>
-          <h2
-            class="
-              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-              tw:uppercase
-            "
-          >
-            <%= translation(".parking_notifications") %>
-          </h2>
-
-          <div class="tw:mt-3 tw:grid tw:grid-cols-2 tw:gap-3">
-            <%= parking_stat(active_notifications_count, notifications_path, translation(".active")) %>
-            <%= parking_stat(resolved_notifications_count, resolved_notifications_path, translation(".resolved")) %>
-          </div>
-        <% end %>
       <% end %>
     </div>
   </div>

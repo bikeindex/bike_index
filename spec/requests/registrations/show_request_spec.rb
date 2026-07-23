@@ -38,6 +38,16 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
+    context "current_user is a superuser" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      it "offers a View Super Admin link to the admin bike page" do
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("View Super Admin")
+        expect(response.body).to match(admin_bike_path(bike.id))
+      end
+    end
+
     context "current_user previously owned the bike (sent away)" do
       let(:previous_owner) { bike.reload.user }
       let(:current_user) { previous_owner }
@@ -163,7 +173,15 @@ RSpec.describe "RegistrationsController#show", type: :request do
 
         it "shows the create parking notification button" do
           get "#{base_url}/#{bike.id}"
-          expect(whitespace_normalized_body_text).to match("Create a new notification")
+          expect(whitespace_normalized_body_text).to match("Create a New Notification")
+        end
+
+        it "shows the View notifications panel even with no notifications" do
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match("No parking notifications")
+          # The button subtitle summarizes activity counts
+          expect(body).to match("0 Active - 0 Resolved")
         end
 
         context "with a parking notification" do
@@ -173,8 +191,9 @@ RSpec.describe "RegistrationsController#show", type: :request do
             get "#{base_url}/#{bike.id}"
             body = whitespace_normalized_body_text
             # The View notifications action opens the parking-notification show panel
-            expect(body).to match("View all notifications")
+            expect(body).to match("View notification")
             expect(body).to match("Parked incorrectly")
+            expect(response.body).to match(organization_parking_notification_path(ParkingNotification.last.id, organization_id: organization.to_param))
           end
         end
 
@@ -186,7 +205,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
             get "#{base_url}/#{bike.id}"
             body = whitespace_normalized_body_text
             expect(body).to match("Impounded")
-            expect(body).to_not match("Create a new notification")
+            expect(body).to_not match("Create a New Notification")
           end
         end
       end
@@ -196,7 +215,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
 
         it "shows the impound action with a record-impounding subtitle" do
           get "#{base_url}/#{bike.id}"
-          expect(whitespace_normalized_body_text).to match("Record impounding")
+          expect(whitespace_normalized_body_text).to match("Record Impounding")
         end
 
         context "already impounded" do
@@ -208,7 +227,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
             body = whitespace_normalized_body_text
             # The Update impound action opens the impound-record update form
             expect(body).to match("Update impound record")
-            expect(body).to_not match("Record impounding")
+            expect(body).to_not match("Record Impounding")
             # The main-column card shows the org impound-record heading + fields
             expect(body).to include("#{organization.short_name} impound record")
             expect(body).to match("Impounded by")
@@ -330,6 +349,20 @@ RSpec.describe "RegistrationsController#show", type: :request do
         body = whitespace_normalized_body_text
         expect(body).to match("Limited")
         expect(body).to_not match("not allowed to view this registration")
+      end
+
+      context "with parking notifications and impound enabled" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+
+        it "offers create parking notification, not the impound action" do
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          # Limited members can create a parking notification
+          expect(body).to match("Create a New Notification")
+          # No impound action for limited (create is staff-only, request impound removed)
+          expect(body).to_not match("Record Impounding")
+          expect(body).to_not match("Request impound")
+        end
       end
     end
 

@@ -105,6 +105,52 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
     end
   end
 
+  # Opening via the Impound trigger preselects the impound kind
+  context "opened in impound mode" do
+    it "titles for the bike type, preselects impound, and hides the reason chooser" do
+      click_button "Impound"
+
+      # The heading is CSS-uppercased, so match case-insensitively
+      expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
+      expect(page).to have_no_content("Notification because")
+      expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
+    end
+
+    it "restores impound mode after a reload" do
+      click_button "Impound"
+      expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
+
+      # The impound trigger's panel name reopens the shared form in impound mode
+      visit "#{preview_path}?panel=impound"
+
+      expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
+      expect(page).to have_no_content("Notification because")
+      expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
+    end
+  end
+
+  # A bike with an earlier notification can mark the new one as a repeat
+  context "when the bike has an earlier notification" do
+    let!(:earlier_notification) { FactoryBot.create(:parking_notification, bike:, organization:) }
+
+    it "offers repeat first and collapses the location controls while it's selected" do
+      # Re-render now that the earlier notification exists (it's created after the outer visit)
+      visit preview_path
+      click_button "Parking notification"
+
+      # Repeat is offered first, before "First notice"
+      labels = all("label").map(&:text)
+      expect(labels.index { |t| t.start_with?("Repeat #") }).to be < labels.index("First notice")
+
+      # A recent earlier notification preselects repeat, so the location controls start collapsed
+      expect(page).to have_no_content("Use my current location")
+
+      # Choosing "First notice" reveals the location controls
+      find("label", text: "First notice").click
+      expect(page).to have_content("Use my current location")
+    end
+  end
+
   # The message + internal notes drafts survive a reload via form-persist
   context "draft persistence" do
     it "restores the message and internal notes after a reload" do
