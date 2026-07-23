@@ -432,7 +432,7 @@ class Bike < ApplicationRecord
   def created_by_notification_or_impounding?
     return false if current_ownership.blank?
 
-    %w[unregistered_parking_notification impound_import].include?(current_ownership.origin) ||
+    %w[creator_unregistered_parking_notification impound_import].include?(current_ownership.origin) ||
       current_ownership.status == "status_impounded"
   end
 

@@ -32,11 +32,15 @@ module UI
 
         # US shows the state select; other countries the free-text region field
         def state_hidden_class
-          "tw:hidden" unless selected_country_id == us_country_id
+          "tw:hidden" unless us_selected?
         end
 
         def region_hidden_class
-          "tw:hidden" if selected_country_id == us_country_id
+          "tw:hidden" if us_selected?
+        end
+
+        def us_selected?
+          selected_country_id == us_country_id
         end
       end
     end

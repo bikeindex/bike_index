@@ -3,9 +3,10 @@
   data-ui--forms--address-group-us-id-value="<%= us_country_id %>"
 >
   <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :street, kind: :text_field, label_text: street_label)) %>
-  <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :city, kind: :text_field, label_text: translation(".city"))) %>
 
   <div class="tw:grid tw:grid-cols-2 tw:gap-x-2">
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :city, kind: :text_field, label_text: translation(".city"))) %>
+
     <div
       data-ui--forms--address-group-target="state"
       class="<%= state_hidden_class %>"
@@ -21,7 +22,9 @@
     >
       <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :region_string, kind: :text_field, label_text: translation(".region"))) %>
     </div>
+  </div>
 
+  <div class="tw:grid tw:grid-cols-2 tw:gap-x-2">
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :postal_code, kind: :text_field, label_text: translation(".postal_code"))) %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :country_id, kind: :content_block, label_text: translation(".country"))) do %>

@@ -1,6 +1,6 @@
 # Country and ISO
 StatesAndCountries.countries.each do |c|
-  Country.create(name: c[:name], iso: c[:iso])
+  Country.create!(name: c[:name], iso: c[:iso])
 end
 
 # Pin the anchor country ids to the ids the Country model references
@@ -23,5 +23,5 @@ end
 # US States and territories
 us_id = Country.find_by_iso("US").id
 StatesAndCountries.states.each do |s|
-  State.create(country_id: us_id, name: s[:name], abbreviation: s[:abbr])
+  State.create!(country_id: us_id, name: s[:name], abbreviation: s[:abbr])
 end
