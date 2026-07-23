@@ -46,7 +46,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
     # Open the parking-notification card in the org-admin action panel. The org
     # also has impound enabled, so scope to the notification trigger by its label.
-    click_button "Parking notification"
+    click_button "Parking Notification"
 
     # Skip the geolocation prompt by entering the address by hand; this reveals the
     # address fields and enables the (initially disabled) submit button.
