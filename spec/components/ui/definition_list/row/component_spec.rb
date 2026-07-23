@@ -30,6 +30,14 @@ RSpec.describe UI::DefinitionList::Row::Component, type: :component do
         expect(component).to have_text label
         expect(component).to have_text "none" # no_value_content
       end
+
+      context "with no_value_text" do
+        let(:options) { {label:, render_with_no_value: true, no_value_text: "not provided"} }
+        it "renders the custom no_value_text instead of the default" do
+          expect(component).to have_text "not provided"
+          expect(component).to_not have_text "none"
+        end
+      end
     end
   end
 
