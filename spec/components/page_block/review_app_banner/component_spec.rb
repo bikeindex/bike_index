@@ -8,6 +8,16 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
     expect(described_class.new(review_app: "").render?).to be_falsey
   end
 
+  it "renders a purple development banner for the local dev server" do
+    component = render_inline(described_class.new(review_app: "development"))
+    expect(component.text).to include("Development")
+    expect(component.text).not_to include("Sandbox")
+    expect(component.css("a[href='/letter_opener']")).to be_present
+    # Purple accent (matching the dev favicon) instead of the review-app green
+    expect(component.to_html).to include("tw:bg-[#ff40ff]")
+    expect(component.to_html).not_to include("tw:bg-[#40ff40]")
+  end
+
   context "when review_app is present" do
     let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, commit:, current_user:, return_to:)) }
     let(:pr_number) { nil }

@@ -2,11 +2,11 @@
 
 module PageBlock
   module ReviewAppBanner
-    # Banner shown across the top of every page on review-app deploys, so
-    # there's no chance of confusing a review environment with production.
-    # Callers pass `ENV["REVIEW_APP"]`, `ENV["REVIEW_APP_PR_NUMBER"]`, and
-    # `ENV["REVIEW_APP_PR_TITLE"]`; the component renders only when `review_app`
-    # is present.
+    # Banner shown across the top of every page on review-app and local dev
+    # deploys, so there's no chance of confusing them with production. Callers
+    # pass `ENV["REVIEW_APP"]` (or the string "development" for the local dev
+    # server), `ENV["REVIEW_APP_PR_NUMBER"]`, and `ENV["REVIEW_APP_PR_TITLE"]`;
+    # the component renders only when `review_app` is present.
     class Component < ApplicationComponent
       def initialize(review_app:, pr_number: nil, pr_title: nil, commit: nil, current_user: nil, return_to: nil)
         @review_app = review_app
@@ -23,9 +23,22 @@ module PageBlock
 
       private
 
-      # No PR number means the persistent sandbox deploy, not a per-PR review app
+      def development?
+        @review_app == "development"
+      end
+
+      # "development" is the local dev server; no PR number is the persistent
+      # sandbox deploy; otherwise a per-PR review app
       def banner_label
+        return translation(".label_development") if development?
+
         @pr_number.present? ? translation(".label") : translation(".label_sandbox")
+      end
+
+      # Purple on the local dev server (matching the dev favicon), green on
+      # review apps. Full literal classes so tailwind's scanner emits both.
+      def banner_accent_class
+        development? ? "tw:border-[#881e88] tw:bg-[#ff40ff]" : "tw:border-[#1e881e] tw:bg-[#40ff40]"
       end
 
       # The PR title when known, falling back to "PR #<number>".
@@ -41,10 +54,12 @@ module PageBlock
         "https://github.com/bikeindex/bike_index/commit/#{@commit}"
       end
 
-      # Green pill styling shared by the commit and email-outbox "?" tooltip triggers
+      # Pill styling shared by the commit and email-outbox "?" tooltip triggers,
+      # matching the banner accent (purple in dev, green on review apps)
       def pill_button_class
+        pill_color = development? ? "tw:bg-[#881e88] tw:hover:bg-[#601660]" : "tw:bg-[#1e881e] tw:hover:bg-[#166016]"
         "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
-          "tw:bg-[#1e881e] tw:text-white tw:hover:bg-[#166016] tw:text-2xs tw:font-bold tw:cursor-help " \
+          "#{pill_color} tw:text-white tw:text-2xs tw:font-bold tw:cursor-help " \
           "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
       end
 
