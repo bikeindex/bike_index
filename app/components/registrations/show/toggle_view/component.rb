@@ -15,6 +15,14 @@ module Registrations
         def render?
           @current_user.present? && Flipper.enabled?(:bike_show_redesign_toggle, @current_user)
         end
+
+        private
+
+        # True when the viewer defaults to the redesign and reached the legacy page
+        # via no_redesign, so the invitation becomes a "back to new view" prompt.
+        def redesign_enabled?
+          Flipper.enabled?(:bike_show_redesign, @current_user)
+        end
       end
     end
   end
