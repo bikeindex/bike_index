@@ -2894,7 +2894,7 @@ CREATE TABLE public.organizations (
     location_longitude double precision,
     regional_ids jsonb,
     manual_pos_kind integer,
-    passwordless_user_domain character varying,
+    user_email_domain character varying,
     graduated_notification_interval bigint,
     lightspeed_register_with_phone boolean DEFAULT false,
     manufacturer_id bigint,
@@ -7459,6 +7459,8 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260722120000'),
+('20260716120000'),
 ('20260713120000'),
 ('20260706180000'),
 ('20260706164500'),
