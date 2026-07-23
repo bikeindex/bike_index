@@ -35,6 +35,10 @@ class ScheduledJobRunner < ScheduledJob
 
   def self.scheduled_jobs
     [
+      BikeJobs::DeactivateExpiredTheftAlertJob,
+      BikeJobs::RemoveOrphanedImagesJob,
+      BikeJobs::ScheduledBikePossiblyFoundNotificationJob,
+      BikeJobs::UpdateTheftAlertFacebookJob,
       CleanBParamsJob,
       CleanBulkImportJob,
       CreateGraduatedNotificationJob,
@@ -47,13 +51,9 @@ class ScheduledJobRunner < ScheduledJob
       ProcessGraduatedNotificationJob,
       ProcessHotSheetJob,
       ScheduledAutocompleteCheckJob,
-      BikeJobs::ScheduledBikePossiblyFoundNotificationJob,
       ScheduledSearchForExternalRegistryBikesJob,
       ScheduledStoreLogSearchesJob,
       Spreadsheets::TsvCreatorJob,
-      BikeJobs::DeactivateExpiredTheftAlertJob,
-      BikeJobs::RemoveOrphanedImagesJob,
-      BikeJobs::UpdateTheftAlertFacebookJob,
       StravaJobs::ScheduledRequestEnqueuer,
       StravaJobs::ScheduledRequestPriorityUpdator,
       # UnusedOwnershipRemovalJob,
