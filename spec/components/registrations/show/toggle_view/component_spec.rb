@@ -10,7 +10,7 @@ RSpec.describe Registrations::Show::ToggleView::Component, type: :component do
 
     it "renders the invitation alert that posts the bike to the toggle route" do
       render_inline(component)
-      expect(page).to have_text("Try out the new view!")
+      expect(page).to have_text("Try out the new bike viewer!")
       form = page.find("form[action='/my_account/toggle_show_redesign'][method='post']")
       expect(form).to have_css("input[name='bike_id'][value='#{bike.id}']", visible: :all)
       expect(form).to have_button("Switch to the new view")

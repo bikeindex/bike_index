@@ -5,4 +5,4 @@ en:
       show:
         toggle_view:
           switch_to_new: Switch to the new view
-          try_new_view: Try out the new view!
+          try_new_view: Try out the new %{bike_type} viewer!

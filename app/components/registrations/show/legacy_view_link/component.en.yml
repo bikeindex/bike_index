@@ -4,7 +4,6 @@ en:
     registrations:
       show:
         legacy_view_link:
-          preview_notice: You're previewing the new bike page — it isn't enabled on your account yet.
-          switch_to_classic: Switch back to the classic view
-          switch_to_new: Switch to the new view
+          switch_to_classic: Switch back to the legacy viewer
           using_new_view: You're trying out the new bike page.
+          view_in_legacy: view %{bike_type} in legacy viewer
