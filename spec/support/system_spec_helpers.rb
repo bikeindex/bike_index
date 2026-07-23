@@ -52,11 +52,25 @@ module SystemSpecHelpers
   # so the raw Playwright::Error escapes. Re-find and re-fill on detach, which is
   # what Capybara does for the wrapped actions.
   def fill_in(*args, **options, &block)
-    attempts = 0
+    retry_on_detach { super }
+  end
+
+  # Click an async hotwire_combobox option, re-finding it if a later async
+  # response re-renders the listbox and detaches the node between find and click.
+  def click_combobox_option(text)
+    retry_on_detach { find(".hw-combobox__option", text:, match: :first).click }
+  end
+
+  private
+
+  # Retry a Playwright action when the node detaches mid-action -- the raw
+  # Playwright::Error that Capybara's own retry doesn't rescue on this driver.
+  def retry_on_detach(attempts: 3)
+    tries = 0
     begin
-      super
+      yield
     rescue Playwright::Error => e
-      raise unless e.message.include?("not attached to the DOM") && (attempts += 1) <= 3
+      raise unless e.message.include?("not attached to the DOM") && (tries += 1) <= attempts
       sleep 0.1
       retry
     end

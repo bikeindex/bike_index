@@ -66,7 +66,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
     type_into(".hw-combobox__input", "Black")
     expect(page).to have_css(".hw-combobox__option", text: "Black", wait: 10)
-    find(".hw-combobox__option", text: "Black", match: :first).click
+    click_combobox_option("Black")
     find("#search-button").click
 
     expect(page).to have_current_path(/query_items/, wait: 10)
