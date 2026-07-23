@@ -36,11 +36,7 @@ module Org
         # Clear runs after validate so a blocked (empty) multi submit keeps the draft
         actions << "submit->form-persist#clear"
 
-        {controller: controllers.join(" "), "form-persist-key-value": persist_key, action: actions.join(" ")}
-      end
-
-      def persist_key
-        @multi ? "impound-update-multi-#{@current_organization.id}" : "impound-update-#{@impound_record.display_id}"
+        {controller: controllers.join(" "), action: actions.join(" ")}
       end
 
       # The kind <select> change is handled by org--impound-update (field

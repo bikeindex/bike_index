@@ -1,6 +1,6 @@
 <%= render(UI::Modal::Component.new(title: "Contact us for a free trial", id: @modal_id)) do |modal| %>
   <% modal.with_body do %>
-    <%= form_for @feedback, html: {data: {controller: "form-persist", "form-persist-key-value": @feedback_type, action: "input->form-persist#save submit->form-persist#clear"}} do |f| %>
+    <%= form_for @feedback, html: {data: {controller: "form-persist", action: "input->form-persist#save submit->form-persist#clear"}} do |f| %>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, label_text: @name_label, html_options: {required: true})) %>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: "Name")) %>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, kind: :email_field, html_options: {required: true, value: @current_user&.email})) %>

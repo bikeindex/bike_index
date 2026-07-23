@@ -4,8 +4,9 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller="form-persist"
 // Mirrors named text fields to localStorage so a draft survives page reloads.
-// Set data-form-persist-key-value to a stable per-form key, then wire
-// data-action="input->form-persist#save submit->form-persist#clear".
+// Wire data-action="input->form-persist#save submit->form-persist#clear". The
+// storage key defaults to pathname + the form's action (see derivedKey); set
+// data-form-persist-key-value only when that isn't unique per form.
 // Writes are debounced (DEBOUNCE_MS) and a restored draft is discarded once
 // older than TTL_MS.
 const DEBOUNCE_MS = 400
@@ -71,6 +72,13 @@ export default class extends Controller {
   }
 
   get storageKey () {
-    return `form-persist:${this.keyValue}`
+    return `form-persist:${this.keyValue || this.derivedKey}`
+  }
+
+  // Fallback when no key-value is set: the form's action is resource-specific and
+  // stable across reloads; pathname disambiguates forms that share an action.
+  get derivedKey () {
+    const action = this.element.getAttribute('action') || this.element.id || ''
+    return `${window.location.pathname}${action}`
   }
 }
