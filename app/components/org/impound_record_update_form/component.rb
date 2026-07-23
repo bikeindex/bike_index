@@ -27,12 +27,14 @@ module Org
       # (blocks empty submissions).
       def form_data
         controllers = ["form-persist"]
-        actions = ["input->form-persist#save", "submit->form-persist#clear"]
+        actions = ["input->form-persist#save"]
 
         if @multi
           controllers << "table-multi-checkbox"
           actions << "submit->org--impound-update-multi#validate"
         end
+        # Clear runs after validate so a blocked (empty) multi submit keeps the draft
+        actions << "submit->form-persist#clear"
 
         {controller: controllers.join(" "), "form-persist-key-value": persist_key, action: actions.join(" ")}
       end
