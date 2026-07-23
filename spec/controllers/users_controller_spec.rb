@@ -215,7 +215,7 @@ RSpec.describe UsersController, type: :controller do
         end
       end
       context "with auto passwordless users" do
-        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "ladot.online", available_invitation_count: 1) }
         let(:email) { "example@ladot.online" }
         it "Does not create a organization_role or automatically confirm the user" do
           expect(session[:passive_organization_id]).to be_blank
@@ -361,7 +361,7 @@ RSpec.describe UsersController, type: :controller do
       end
 
       context "with auto_passwordless organization" do
-        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "ladot.online", available_invitation_count: 1) }
         let(:user) { FactoryBot.create(:user, email: email) }
         let(:email) { "something@ladot.com" }
 

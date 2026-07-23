@@ -58,7 +58,7 @@ RSpec.describe SessionsController, type: :request do
     context "passwordless organization domain" do
       let!(:organization) do
         FactoryBot.create(:organization_with_organization_features,
-          enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "party.edu")
+          enabled_feature_slugs: ["passwordless_users"], user_email_domain: "party.edu")
       end
       it "renders the magic-link step for the org domain (even with no account yet)" do
         identify("newperson@party.edu")
@@ -118,12 +118,12 @@ RSpec.describe SessionsController, type: :request do
       end
     end
     context "passwordless email" do
-      let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "party.edu", available_invitation_count: 1) }
+      let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "party.edu", available_invitation_count: 1) }
       it "autogenerates" do
         ActionMailer::Base.deliveries = []
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
-          # Just throw this in here because we don't have anywhere else that tests signup with passwordless_user_domain present...
+          # Just throw this in here because we don't have anywhere else that tests signup with user_email_domain present...
           expect { post "/session/create_magic_link", params: {email: "somethingcool@ party.edu"} }.to_not change(User, :count)
           expect(current_organization.organization_roles.count).to eq 0
           expect {
