@@ -417,9 +417,11 @@
         </span>
       </div>
 
-      <div class="tw:mt-3">
-        <%= render(Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user)) %>
-      </div>
+      <%= tag.div(class: "org-search-component tw:mt-3", data: other_registrations_data_attributes) do %>
+        <%= render(other_registrations_settings) %>
+
+        <%= render(Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user, settings_component: other_registrations_settings)) %>
+      <% end %>
 
       <% if more_other_registrations? %>
         <p class="tw:mt-3 tw:text-xs tw:opacity-65">

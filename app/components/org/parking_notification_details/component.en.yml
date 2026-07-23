@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    org:
+      parking_notification_details:
+        address: Address
+        bike: Bike
+        by: Created by
+        created: Created at
+        internal_notes: Internal notes
+        message: Message
+        notification_number: Notification#
+        resolved: Resolved

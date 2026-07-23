@@ -4,12 +4,7 @@ en:
     registrations:
       show:
         org_top_actions_parking_notification_show:
-          address: Address
-          by: By
-          created: Created
           no_notifications: No parking notifications for this %{bike_type}
           parking_notifications: Parking notifications
-          status: Status
-          type: Type
           view_all: view all notifications for this %{bike_type}
           view_notification: View notification

@@ -288,6 +288,18 @@ module Registrations
             .where.not(id: @bike.id)
         end
 
+        # Shared with the BikesTable so its column set/labels match the toggle panel
+        def other_registrations_settings
+          @other_registrations_settings ||=
+            Org::Search::Settings::Component.new(organization: @organization, skip_search_and_filters: true)
+        end
+
+        # Wires the column-toggle Stimulus controllers, as Org::Search::Wrapper does
+        def other_registrations_data_attributes
+          {controller: "org--search org--search-column-toggle",
+           "org--search-column-toggle-default-columns-value": other_registrations_settings.initially_checked_columns.to_json}
+        end
+
         def other_registrations_count
           @other_registrations_count ||= other_registrations.count
         end
