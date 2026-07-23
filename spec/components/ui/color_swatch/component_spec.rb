@@ -20,6 +20,40 @@ RSpec.describe UI::ColorSwatch::Component, type: :component do
       expect(component.to_html).to include("tw:inline-block")
       expect(component.to_html).to include("tw:rounded-xs")
     end
+
+    it "defaults to the md size, middle alignment" do
+      tokens = component.css("span").first["class"].split
+      expect(tokens).to include("tw:h-6", "tw:w-6", "tw:align-middle")
+    end
+  end
+
+  context "with size: :sm" do
+    let(:options) { {display: "#386ed2", size: :sm} }
+
+    it "renders the small size" do
+      tokens = component.css("span").first["class"].split
+      expect(tokens).to include("tw:h-3", "tw:w-3")
+      expect(tokens).to_not include("tw:h-6")
+    end
+  end
+
+  context "with align: :baseline" do
+    let(:options) { {display: "#386ed2", align: :baseline} }
+
+    it "renders baseline alignment" do
+      tokens = component.css("span").first["class"].split
+      expect(tokens).to include("tw:align-baseline")
+      expect(tokens).to_not include("tw:align-middle")
+    end
+  end
+
+  context "with invalid size and align" do
+    let(:options) { {display: "#386ed2", size: :huge, align: :top} }
+
+    it "falls back to md and middle" do
+      tokens = component.css("span").first["class"].split
+      expect(tokens).to include("tw:h-6", "tw:w-6", "tw:align-middle")
+    end
   end
 
   context "with the cover-up color" do

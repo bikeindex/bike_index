@@ -22,12 +22,23 @@ module Org
         organization_impound_record_path(record_id, organization_id: @current_organization)
       end
 
-      # Multi mode: table-multi-checkbox drives select-all, and submit is
-      # validated by org--impound-update-multi (blocks empty submissions)
+      # form-persist keeps a draft of the notes/text fields across reloads. Multi
+      # mode adds table-multi-checkbox (select-all) and org--impound-update-multi
+      # (blocks empty submissions).
       def form_data
-        return {} unless @multi
+        controllers = ["form-persist"]
+        actions = ["input->form-persist#save", "submit->form-persist#clear"]
 
-        {controller: "table-multi-checkbox", action: "submit->org--impound-update-multi#validate"}
+        if @multi
+          controllers << "table-multi-checkbox"
+          actions << "submit->org--impound-update-multi#validate"
+        end
+
+        {controller: controllers.join(" "), "form-persist-key-value": persist_key, action: actions.join(" ")}
+      end
+
+      def persist_key
+        @multi ? "impound-update-multi-#{@current_organization.id}" : "impound-update-#{@impound_record.display_id}"
       end
 
       # The kind <select> change is handled by org--impound-update (field
