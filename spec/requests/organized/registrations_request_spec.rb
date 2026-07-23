@@ -239,6 +239,24 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(assigns(:bikes).pluck(:id)).to eq([])
       end
     end
+    context "claimed_ownerships without bike_search" do
+      let(:enabled_feature_slugs) { %w[claimed_ownerships] }
+
+      it "renders the claimedness dropdown, defaulting to all" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response).to render_template :index
+        expect(assigns(:search_claimedness)).to eq "all"
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id])
+      end
+
+      it "filters by search_claimedness" do
+        get base_url, params: {search_claimedness: "initial"}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_claimedness)).to eq "initial"
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id])
+      end
+    end
     context "unsupported format" do
       it "returns 406 for json" do
         get "#{base_url}.json", params: {period: "custom", start_time: "2025-04-01", end_time: "2026-04-30", per_page: "1"}

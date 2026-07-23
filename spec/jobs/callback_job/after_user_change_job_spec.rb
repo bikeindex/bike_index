@@ -9,6 +9,23 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
     end
   end
 
+  describe "SEO spam check" do
+    let(:user) { FactoryBot.create(:user_confirmed, show_bikes:, description: "Best online casino, poker, blackjack, and roulette bonus!") }
+    context "show_bikes" do
+      let(:show_bikes) { true }
+      it "runs the check inline and bans SEO spam" do
+        expect { instance.perform(user.id) }.to change(UserBan, :count).by(1)
+        expect(UserBan.last.reason).to eq "seo_spam"
+      end
+    end
+    context "not show_bikes" do
+      let(:show_bikes) { false }
+      it "does not run the check" do
+        expect { instance.perform(user.id) }.to_not change(UserBan, :count)
+      end
+    end
+  end
+
   describe "add_phones_for_verification" do
     let(:phone) { "4334445555" }
     let(:user) { FactoryBot.create(:user, phone: phone) }
@@ -103,6 +120,8 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
     let(:user_ban) { UserBan.create(user: user, reason: :extortion) }
     it "deletes if not banned" do
       expect(user_ban).to be_valid
+      # Creating the ban marks the user banned; unban to leave an orphaned ban record
+      user.update(banned: false)
       instance.perform(user.id)
       expect(user.reload.banned?).to be_falsey
       expect(UserBan.deleted.pluck(:user_id)).to eq([user.id])

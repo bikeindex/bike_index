@@ -185,6 +185,17 @@ RSpec.describe "BikesController#show", type: :request do
       expect(stolen_record.recovery_link_token).to be_present
     end
   end
+  context "stolen bike with a location" do
+    let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:stolen_bike)) }
+    it "renders the map through the stolen-map controller, without an inline mapboxgl script" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      expect(response.body).to include('data-controller="stolen-map"')
+      expect(response.body).to include('data-stolen-map-target="canvas"')
+      # The inline script referencing mapboxgl was the source of the Turbo race - it must be gone
+      expect(response.body).to_not include("mapboxgl")
+    end
+  end
   context "user hidden bike" do
     before { bike.update(marked_user_hidden: "true") }
     context "owner of bike viewing" do
@@ -678,6 +689,34 @@ RSpec.describe "BikesController#show", type: :request do
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_falsey
+      end
+    end
+  end
+  context "bike_show_redesign flag" do
+    it "renders the legacy page when the flag is disabled" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+    end
+
+    context "flag enabled for the current user" do
+      before { Flipper.enable_actor(:bike_show_redesign, current_user) }
+
+      it "redirects the html page but still renders the qr code png" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to redirect_to(registration_path(bike))
+
+        get "#{base_url}/#{bike.id}.png"
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context "flag enabled only for another user" do
+      let(:other_user) { FactoryBot.create(:user_confirmed) }
+      before { Flipper.enable_actor(:bike_show_redesign, other_user) }
+
+      it "renders the legacy page" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to render_template(:show)
       end
     end
   end

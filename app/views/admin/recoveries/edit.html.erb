@@ -65,40 +65,49 @@
   <em class="text-warning">Don't edit to make it displayable.</em>
 </p>
 
-<p>
-  Only edit if you want to change what is stored about this recovery -
-  <a class="gray-link" href="#editRecoveryForm" data-toggle="collapse" data-target="#editRecoveryForm">show edit form</a>.
-</p>
+<p>Only edit if you want to change what is stored about this recovery.</p>
 
-<div id="editRecoveryForm" class="collapse">
-  <hr class="mt-5 mb-4">
+<details data-controller="details">
+  <summary
+    data-action="click->details#toggle"
+    class="
+      gray-link tw:cursor-pointer tw:list-none
+      tw:[&::-webkit-details-marker]:hidden
+    "
+  >
+    show edit form
+  </summary>
 
-  <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }, html: { class: "form form-horizontal" }) do |f| %>
-    <%= render(Alerts::ObjectErrors::Component.new(name: "Recovery", object: @recovery)) %>
+  <div data-details-target="content" class="tw:hidden!">
+    <hr class="mt-5 mb-4">
 
-    <div class="row mt-4">
-      <div class="col-md-6">
-        <div class="form-group">
-          <%= f.label :recovered_description, "Recovery description" %>
-          <%= f.text_area :recovered_description, rows: 4, class: "form-control" %>
+    <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }, html: { class: "form form-horizontal" }) do |f| %>
+      <%= render(UI::Alerts::ObjectError::Component.new(name: "Recovery", object: @recovery)) %>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <div class="form-group">
+            <%= f.label :recovered_description, "Recovery description" %>
+            <%= f.text_area :recovered_description, rows: 4, class: "form-control" %>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group form-check">
+            <%= f.check_box :index_helped_recovery, class: "form-check-input" %>
+            <%= f.label :index_helped_recovery, class: "form-check-label" %>
+          </div>
+
+          <div class="form-group form-check">
+            <%= f.check_box :can_share_recovery, class: "form-check-input" %>
+            <%= f.label :can_share_recovery, class: "form-check-label" %>
+          </div>
+
+          <div class="form-group mt-4">
+            <%= submit_tag "Update the recovery", class: "btn btn-success" %>
+          </div>
         </div>
       </div>
-
-      <div class="col-md-6">
-        <div class="form-group form-check">
-          <%= f.check_box :index_helped_recovery, class: "form-check-input" %>
-          <%= f.label :index_helped_recovery, class: "form-check-label" %>
-        </div>
-
-        <div class="form-group form-check">
-          <%= f.check_box :can_share_recovery, class: "form-check-input" %>
-          <%= f.label :can_share_recovery, class: "form-check-label" %>
-        </div>
-
-        <div class="form-group mt-4">
-          <%= submit_tag "Update the recovery", class: "btn btn-success" %>
-        </div>
-      </div>
-    </div>
-  <% end %>
-</div>
+    <% end %>
+  </div>
+</details>

@@ -1296,6 +1296,9 @@ en:
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
       your_police_report: your Police Report Number
+    stolen_map:
+      unavailable: The map couldn't be loaded — your browser or device may not support
+        it.
     theft_alerts:
       new:
         best_value: Best value
@@ -1604,57 +1607,14 @@ en:
       wide: Wide
       wide_help: "> 38mm (1.5in)"
       wide_title: Tires that are at least 39mm (1.5 inches) wide
-  components:
-    emails:
-      partials:
-        bike_box:
-          bike_photo: Bike photo
-          color: Color
-          color_may_be_incorrect: Color may be incorrect because it was set during
-            POS import
-          found: 'Found:'
-          make: 'Make:'
-          serial: 'Serial:'
-          stolen_at: 'Stolen at:'
-          stolen_from: 'Stolen from:'
-    form:
-      legacy_form_well:
-        address_record:
-          address: Street address
-          address_no_street: Address
-          address_or_intersection: Address or intersection
-          address_school: Campus mailing address
-          choose_country: Choose country
-          city: City
-          postal_code: Postal Code
-          region: Region / Province
-          state: State
-          street_2: Street address line 2 (optional)
-          where_was_it_status: Where was it %{bike_status}?
-          your_full_address_is_required: Your full address is required by %{org_name}
-        address_record_with_default:
-          edit_my_account_path: edit on my account
-          use_account_address: Use account address
-    org:
-      impound_records_index:
-        matching_impound_record:
-          one: matching impound record
-          other: matching impound records
-    page_block:
-      strava_integration:
-        activities_synced:
-          one: activity synced
-          other: activities synced
-    ui:
-      definition_list:
-        row:
-          no_value: none
   controllers:
     application:
       handle_unverified_request:
-        csrf_invalid: >-
-          CSRF invalid. If you don't know why you're receiving this message, please
-          contact us.
+        invalid_authenticity_token: >-
+          Form submission failed, please try again. If this keeps happening, a VPN
+          or a privacy extension is probably stripping information we need — try turning
+          those off for bikeindex.org. Email contact@bikeindex.org if you're still
+          stuck.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: You must be signed in to do that.
@@ -5258,7 +5218,13 @@ en:
       weve_sent_an_email: We've sent an email to the address you have on file with
         us.
     show:
+      banned_only_visible_to_superusers: Their profile is only visible because you're
+        a superuser.
+      banned_user: This user is banned
       bikes: Bikes
+      profile_hidden: This profile isn't shared publicly
+      profile_hidden_owner: It's only visible to you because it's your page.
+      profile_hidden_superuser: It's only visible because you're a superuser.
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes

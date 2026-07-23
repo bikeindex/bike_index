@@ -23,10 +23,21 @@ data:
   # `i18n-tasks normalize -p` will force move the keys according to these rules
   write:
     - ["{doorkeeper}.*", 'config/locales/\1.%{locale}.yml']
-    # handle namespaced components manually.
-    # This is definitely hack :/
-    - ['components.{:}.{:}.:', 'app/components/\1/\2/component.%{locale}.yml']
-    - ['components.{:}.:', 'app/components/\1/component.%{locale}.yml']
+    # Deeply-namespaced components (namespace/sub-namespace/name) route to their
+    # own sidecar. These must precede the generic rules below, which can't tell a
+    # sub-namespace segment from a nested/plural key and would otherwise land
+    # these in the parent namespace's directory. Add a line here per sub-namespace.
+    - ['components.admin.badges.{:}.*', 'app/components/admin/badges/\1/component.%{locale}.yml']
+    - ['components.emails.partials.{:}.*', 'app/components/emails/partials/\1/component.%{locale}.yml']
+    - ['components.org.registration_sequence.{:}.*', 'app/components/org/registration_sequence/\1/component.%{locale}.yml']
+    - ['components.registrations.show.{:}.*', 'app/components/registrations/show/\1/component.%{locale}.yml']
+    - ['components.ui.alerts.{:}.*', 'app/components/ui/alerts/\1/component.%{locale}.yml']
+    - ['components.ui.definition_list.{:}.*', 'app/components/ui/definition_list/\1/component.%{locale}.yml']
+    - ['components.ui.forms.legacy_form_well.{:}.*', 'app/components/ui/forms/legacy_form_well/\1/component.%{locale}.yml']
+    - ['components.ui.forms.{:}.*', 'app/components/ui/forms/\1/component.%{locale}.yml']
+    # namespace/name components. `*` (not `:`) so nested/plural keys stay in the sidecar too.
+    - ['components.{:}.{:}.*', 'app/components/\1/\2/component.%{locale}.yml']
+    - ['components.{:}.*', 'app/components/\1/component.%{locale}.yml']
     ## Catch-all default:
     - config/locales/%{locale}.yml
 

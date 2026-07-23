@@ -8,7 +8,7 @@
       <tr>
         <% @columns.each do |col| %>
           <th class="<%= [col.th_classes(bordered: @bordered), sticky_th_classes].compact.join(" ") %>">
-            <%= col.render_header(render_sortable: @render_sortable, current_sort:, current_direction:, sortable_url: method(:sortable_url)) %>
+            <%= col.render_header(render_sortable: @render_sortable, current_sort:, current_direction:, sortable_url: method(:sortable_url), sort_icon: ->(direction) { render(UI::IconSorting::Component.new(direction:)) }) %>
           </th>
         <% end %>
       </tr>

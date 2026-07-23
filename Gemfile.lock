@@ -137,7 +137,7 @@ GEM
     bcrypt (3.1.22)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
-    binxtils (0.5.1)
+    binxtils (0.5.2)
       functionable
       loofah
       rails
@@ -148,7 +148,7 @@ GEM
       racc
     buftok (0.2.0)
     builder (3.3.0)
-    bullet (8.1.1)
+    bullet (8.1.3)
       activesupport (>= 3.0.0)
       uniform_notifier (~> 1.11)
     byebug (13.0.0)
@@ -173,7 +173,7 @@ GEM
       image_processing (~> 1.1)
       marcel (~> 1.0.0)
       ssrf_filter (~> 1.0)
-    cgi (0.5.1)
+    cgi (0.5.2)
     chartkick (5.2.1)
     chunky_png (1.4.0)
     coderay (1.1.3)
@@ -184,7 +184,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    concurrent-ruby (1.3.7)
+    concurrent-ruby (1.3.8)
     connection_pool (3.0.2)
     countries (3.1.0)
       i18n_data (~> 0.11.0)
@@ -244,7 +244,7 @@ GEM
       dry-logic (~> 1.4)
       zeitwerk (~> 2.6)
     equalizer (0.0.11)
-    erb (6.0.4)
+    erb (6.0.6)
     erubi (1.13.1)
     excon (0.76.0)
     execjs (2.7.0)
@@ -286,14 +286,14 @@ GEM
       rake
     fiddle (1.1.8)
     flamegraph (0.9.5)
-    flipper (1.3.6)
+    flipper (1.4.2)
       concurrent-ruby (< 2)
-    flipper-active_record (1.3.2)
+    flipper-active_record (1.4.2)
       activerecord (>= 4.2, < 9)
-      flipper (~> 1.3.2)
-    flipper-ui (1.3.6)
+      flipper (~> 1.4.2)
+    flipper-ui (1.4.2)
       erubi (>= 1.0.0, < 2.0.0)
-      flipper (~> 1.3.6)
+      flipper (~> 1.4.2)
       rack (>= 1.4, < 4)
       rack-protection (>= 1.5.3, < 5.0.0)
       rack-session (>= 1.0.2, < 3.0.0)
@@ -317,7 +317,7 @@ GEM
     formatador (1.2.3)
       reline
     forwardable (1.4.0)
-    functionable (1.2.0)
+    functionable (1.3.0)
     geocoder (1.8.6)
       base64 (>= 0.1.0)
       csv (>= 3.0.0)
@@ -327,7 +327,7 @@ GEM
       prime
       racc
       text (>= 1.3.0)
-    globalid (1.3.0)
+    globalid (1.4.0)
       activesupport (>= 6.1)
     google-protobuf (4.34.0-arm64-darwin)
       bigdecimal
@@ -371,7 +371,7 @@ GEM
     herb (0.10.1-x86_64-linux-gnu)
     highline (3.1.2)
       reline
-    honeybadger (6.9.0)
+    honeybadger (6.9.1)
       logger
       ostruct
     hotwire-livereload (1.4.1)
@@ -438,7 +438,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (2.20.0)
+    json (2.21.1)
     jwt (3.2.0)
       base64
     knapsack_pro (10.0.1)
@@ -446,7 +446,7 @@ GEM
       thor (~> 1.4)
     kramdown (2.5.2)
       rexml (>= 3.4.4)
-    language_server-protocol (3.17.0.5)
+    language_server-protocol (3.17.0.6)
     launchy (2.5.2)
       addressable (~> 2.8)
     letter_opener (1.10.0)
@@ -472,7 +472,7 @@ GEM
       railties (>= 4)
       request_store (~> 1.0)
     logstash-event (1.2.02)
-    loofah (2.25.1)
+    loofah (2.25.2)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     lookbook (2.3.14)
@@ -488,7 +488,7 @@ GEM
       yard (~> 0.9)
       zeitwerk (~> 2.5)
     lumberjack (1.4.2)
-    mail (2.9.0)
+    mail (2.9.1)
       logger
       mini_mime (>= 0.1.1)
       net-imap
@@ -529,7 +529,7 @@ GEM
       mustermann (>= 1.0.0)
     naught (1.1.0)
     nenv (0.3.0)
-    net-imap (0.6.4)
+    net-imap (0.6.4.1)
       date
       net-protocol
     net-pop (0.1.2)
@@ -563,7 +563,7 @@ GEM
       parallel
     paranoia (3.1.0)
       activerecord (>= 7, < 8.2)
-    parser (3.3.11.1)
+    parser (3.3.12.0)
       ast (~> 2.4.1)
       racc
     pg (1.6.3-arm64-darwin)
@@ -654,10 +654,10 @@ GEM
       activesupport (>= 5.0.0)
       minitest
       nokogiri (>= 1.6)
-    rails-html-sanitizer (1.7.0)
-      loofah (~> 2.25)
+    rails-html-sanitizer (1.7.1)
+      loofah (~> 2.25, >= 2.25.2)
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
-    rails-i18n (8.0.2)
+    rails-i18n (8.1.0)
       i18n (>= 0.7, < 2)
       railties (>= 8.0.0, < 9)
     railties (8.1.3)
@@ -741,7 +741,7 @@ GEM
     rspec-support (3.13.7)
     rspec_junit_formatter (0.6.0)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rubocop (1.87.0)
+    rubocop (1.88.2)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -752,7 +752,7 @@ GEM
       rubocop-ast (>= 1.49.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.49.1)
+    rubocop-ast (1.50.0)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
     rubocop-performance (1.26.1)
@@ -776,7 +776,7 @@ GEM
       google-protobuf (~> 4.29)
     sass-embedded (1.85.0-x86_64-linux-gnu)
       google-protobuf (~> 4.29)
-    secure_headers (7.2.0)
+    secure_headers (7.3.0)
       cgi (>= 0.1)
     securerandom (0.4.1)
     shellany (0.0.1)
@@ -799,7 +799,7 @@ GEM
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
     singleton (0.3.0)
-    sitemap_generator (6.1.2)
+    sitemap_generator (7.1.0)
       builder (~> 3.0)
     sixarm_ruby_unaccent (1.2.0)
     skylight (7.1.1)
@@ -813,10 +813,10 @@ GEM
       sprockets (>= 3.0.0)
     ssrf_filter (1.5.0)
     stackprof (0.2.28)
-    standard (1.55.0)
+    standard (1.56.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
-      rubocop (~> 1.87.0)
+      rubocop (~> 1.88.0)
       standard-custom (~> 1.0.0)
       standard-performance (~> 1.8)
     standard-custom (1.0.2)
@@ -889,7 +889,7 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    websocket-driver (0.8.1)
+    websocket-driver (0.8.2)
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -1008,13 +1008,13 @@ DEPENDENCIES
   rspec_junit_formatter
   ruby-lsp
   ruby-vips
-  secure_headers (~> 7.2)
+  secure_headers (~> 7.3)
   sidekiq
   sidekiq-failures
   sidekiq-logstash
   simplecov
   simplecov_json_formatter
-  sitemap_generator (~> 6)
+  sitemap_generator (~> 7)
   skylight
   sprockets-rails
   stackprof

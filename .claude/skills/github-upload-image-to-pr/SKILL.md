@@ -7,7 +7,7 @@ description: >-
   attach, embed, add, put, post, drop, show, document. Also covers visually documenting test runs,
   bug repros, UI states, or CI failures on an existing PR. The `gh` CLI cannot upload images;
   this skill drives a real browser to GitHub's user-attachments uploader.
-allowed-tools: Bash(gh:*), Bash(cp:*), ToolSearch, Read
+allowed-tools: Bash(gh:*), Bash(cp:*), ToolSearch, Read, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot
 ---
 
 # Upload Image to PR
@@ -126,13 +126,15 @@ Use the **standard textarea selector** from step 6, then assign `ta.value = ""`:
 
 ## Step 8: Embed images in the PR
 
+> **Upload-only callers:** if another workflow invoked this skill just to host images — e.g. the `pr` skill's screenshot phase, which gathers branch + base URLs and composes its own combined `## Screenshots` before/after comment — **stop after step 7**: hand the collected URLs back and do **not** post here. Otherwise the caller ends up with a premature, partial comment. Only run this step when you own the posting.
+
 Substitute whichever form (markdown `![](...)` or HTML `<img ...>`) GitHub returned in step 6 — preserve it verbatim instead of rewrapping.
 
 **Post as a comment** (the default). A comment keeps the description tight and skimmable, and avoids re-editing the body (and its notification noise) on every recapture.
 
 If a screenshots comment already exists (one authored by you whose body starts with `## Screenshots`), edit it in place instead of posting a new one:
 ```bash
-SCREENSHOT_COMMENT_ID=$(gh api repos/{owner}/{repo}/issues/{PR_NUMBER}/comments \
+SCREENSHOT_COMMENT_ID=$(gh api "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" \
   --jq '.[] | select(.body | startswith("## Screenshots")) | .id' | head -1)
 ```
 
@@ -143,14 +145,14 @@ Write the comment body to a temp file:
 <image markup from step 6>
 ```
 
-- If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment {PR_NUMBER} --body-file <tmp-comment-file>`.
-- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body=@<tmp-comment-file>`.
+- If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment $PR_NUMBER --body-file <tmp-comment-file>`.
+- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body="$(cat <tmp-comment-file>)" --jq .html_url`. Don't use `-f body=@<file>` — `gh api`'s `-f` stores the literal string `@<file>` rather than reading it, so the comment gets clobbered with the filename.
 
 Only edit the PR description instead when the user explicitly asks for it:
 ```bash
-EXISTING_BODY=$(gh pr view {PR_NUMBER} --json body -q .body)
+EXISTING_BODY=$(gh pr view $PR_NUMBER --json body -q .body)
 
-gh pr edit {PR_NUMBER} --body "$(printf '%s\n\n## Screenshots\n\n%s' "$EXISTING_BODY" "<image markup from step 6>")"
+gh pr edit $PR_NUMBER --body "$(printf '%s\n\n## Screenshots\n\n%s' "$EXISTING_BODY" "<image markup from step 6>")"
 ```
 
 If `$EXISTING_BODY` already contains a `## Screenshots` heading (e.g., on re-runs), this will create a duplicate section. Check first with `grep -q "^## Screenshots" <<< "$EXISTING_BODY"` and either replace the existing section or post as a comment instead.

@@ -35,7 +35,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   def settings_selector
-    "[data-org--registration-search-target='settings']"
+    "[data-org--search-target='settings']"
   end
 
   def expect_settings_open
@@ -223,11 +223,15 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_link "past 30 days"
     expect(page).to have_current_path(/period=month/, wait: 10)
     # "Render chart" lives inside the results frame the period change above
-    # replaces. Wait for that swap to settle (bob is the only match in the past
-    # 30 days) before clicking, so the advance nav isn't superseded mid-swap.
+    # replaces. Fully settle that frame navigation before clicking, so the
+    # advance nav isn't superseded mid-swap: rows in (bob is the only past-30-day
+    # match), Turbo's `busy` flag cleared, and the freshly-rendered link (its href
+    # now toggles to render_chart=true) present -- then click that exact link.
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
+    expect(page).to have_link("Render chart", href: /render_chart=true/, wait: 10)
 
-    click_link "Render chart"
+    click_link "Render chart", href: /render_chart=true/
     expect(page).to have_current_path(/render_chart=true/, wait: 10)
     expect(page).to have_css("table", wait: 10)
     # Chart loads async via a lazy turbo-frame; wait for the chartkick element
@@ -389,6 +393,35 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
       expect(page).to have_content("owner-beta@example.com", wait: 10)
       expect(page).not_to have_content("owner-alpha@example.com")
+
+      # Close serials: a serial with no exact match but a bike within Levenshtein
+      # distance renders in the results table. Regression: sortAndFilterResults
+      # dropped the whole result a frame after it rendered because the exact-match
+      # count was 0, so the close serials flashed then disappeared.
+      find("textarea#serials").set("SERIAL119")
+      click_button "Search serials"
+
+      expect(page).to have_content("No exact matches. Close serials:", wait: 15)
+      expect(page).to have_css(".multi-search-serial-result", count: 1)
+      within(".multi-search-serial-result") do
+        expect(page).to have_css("table")
+        expect(page).to have_link(href: %r{/bikes/#{bike_a.id}})
+      end
+
+      # Back/forward re-syncs the search box and results to the URL
+      find("textarea#serials").set("SERIAL111")
+      click_button "Search serials"
+      expect(page).to have_css(".multi-search-serial-result", count: 1)
+      expect(page).to have_current_path(/serials=SERIAL111(&|\z)/, wait: 10)
+
+      find("textarea#serials").set("SERIAL111, SERIAL222")
+      click_button "Search serials"
+      expect(page).to have_css(".multi-search-serial-result", count: 2)
+
+      page.go_back
+      expect(page).to have_current_path(/serials=SERIAL111(&|\z)/, wait: 10)
+      expect(page).to have_field("serials", with: "SERIAL111")
+      expect(page).to have_css(".multi-search-serial-result", count: 1)
     end
 
     context "with bike_stickers enabled" do

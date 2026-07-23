@@ -43,7 +43,7 @@ RSpec.describe "Bike search", :js, type: :system do
   def search_color_and_submit(color)
     type_into(".hw-combobox__input", color)
     expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
-    find(".hw-combobox__option", text: color, match: :first).click
+    click_combobox_option(color)
     find("#search-button").click
   end
 

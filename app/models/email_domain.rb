@@ -218,7 +218,7 @@ class EmailDomain < ApplicationRecord
   end
 
   def calculated_bikes
-    Bike.matching_domain(domain)
+    Bike.unscoped.matching_domain(domain)
   end
 
   def calculated_b_params

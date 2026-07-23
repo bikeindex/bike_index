@@ -9,9 +9,15 @@ module UI
       TRIGGER_CLASS = "tw:inline-block tw:rounded tw:cursor-help " \
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
 
+      BUTTON_CLASS = "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
+        "tw:bg-gray-200 tw:text-gray-700 tw:hover:bg-gray-300 " \
+        "tw:dark:bg-gray-700 tw:dark:text-gray-200 tw:dark:hover:bg-gray-600 " \
+        "tw:text-2xs tw:font-bold tw:cursor-help " \
+        "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+
       renders_one :body
       renders_one :tooltip_button, ->(**attrs, &block) {
-        tag.button(**trigger_attrs(**attrs)) { block ? capture(&block) : "" }
+        tag.button(**trigger_attrs(class: BUTTON_CLASS, **attrs)) { block ? capture(&block) : "?" }
       }
 
       def initialize(text: nil)
@@ -29,8 +35,11 @@ module UI
 
       private
 
+      # With no trigger content, fall back to the "?" button — the default way
+      # tooltips are rendered.
       def trigger
         return tooltip_button if tooltip_button?
+        return tag.button(**trigger_attrs(class: BUTTON_CLASS)) { "?" } if content.blank?
 
         tag.button(**trigger_attrs(class: TRIGGER_CLASS)) { content }
       end
