@@ -13,6 +13,7 @@ RSpec.describe Registrations::Show::Map::Component, type: :component do
     expect(node["data-registrations--show--map-latitude-value"]).to eq "40.7"
     expect(node["data-registrations--show--map-longitude-value"]).to eq "-73.9"
     expect(node["data-registrations--show--map-radius-base-value"]).to eq "1.15"
+    expect(node["data-registrations--show--map-point-value"]).to eq "false"
     expect(node).to have_css("[data-registrations--show--map-target='canvas']")
     # Shown by the controller when Mapbox/WebGL is unavailable
     expect(node).to have_css("p[hidden][data-registrations--show--map-target='unavailable']", text: "map couldn't be loaded", visible: :all)
@@ -23,6 +24,14 @@ RSpec.describe Registrations::Show::Map::Component, type: :component do
     it "uses a larger radius base" do
       render_inline(component)
       expect(page.find("div[data-controller='registrations--show--map']")["data-registrations--show--map-radius-base-value"]).to eq "2"
+    end
+  end
+
+  context "point (exact spot)" do
+    let(:options) { {latitude: 40.7, longitude: -73.9, point: true} }
+    it "marks the location as a point" do
+      render_inline(component)
+      expect(page.find("div[data-controller='registrations--show--map']")["data-registrations--show--map-point-value"]).to eq "true"
     end
   end
 

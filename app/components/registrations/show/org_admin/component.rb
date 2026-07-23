@@ -55,7 +55,7 @@ module Registrations
         def action_label(title, subtitle = nil)
           content_tag(:span, class: "tw:min-w-0") do
             rows = [content_tag(:span, title, class: "tw:block tw:font-bold")]
-            rows << content_tag(:span, subtitle, class: "tw:mt-0.5 tw:hidden tw:text-xs tw:opacity-60 tw:lg:block") if subtitle.present?
+            rows << content_tag(:span, subtitle, class: "tw:mt-0.5 tw:block tw:text-xs tw:opacity-60") if subtitle.present?
             safe_join(rows)
           end
         end
@@ -76,6 +76,10 @@ module Registrations
           @bike.unregistered_parking_notification?
         end
 
+        def impounded?
+          @bike.status_impounded?
+        end
+
         # Owner contact + law-enforcement data is only shown to full staff on a bike
         # registered with their organization
         def show_contact?
@@ -87,10 +91,6 @@ module Registrations
         def contactable?
           @bike.current_stolen_record.present? ||
             (@bike.status_with_owner? && @organization.enabled?("unstolen_notifications"))
-        end
-
-        def message_notification
-          @message_notification ||= StolenNotification.new(bike: @bike)
         end
 
         def role_label
@@ -235,6 +235,11 @@ module Registrations
           @organization.enabled?("parking_notifications")
         end
 
+        # No point filing a new parking notification against an already-impounded bike
+        def show_create_parking_notification?
+          show_parking_notifications? && !impounded?
+        end
+
         def parking_notifications
           @parking_notifications ||= @organization.parking_notifications.where(bike_id: @bike.id)
         end
@@ -247,49 +252,25 @@ module Registrations
           @resolved_notifications_count ||= parking_notifications.where.not(status: ACTIVE_PARKING_STATUSES).count
         end
 
-        # Boxed count + label; links to the search only when the count is non-zero
-        def parking_stat(count, path, label)
-          inner = safe_join([
-            content_tag(:span, count, class: "tw:block tw:text-2xl tw:font-bold"),
-            content_tag(:span, label, class: "tw:block tw:text-xs")
-          ])
-          content_tag(:div, class: "tw:rounded-lg tw:border tw:border-gray-200 tw:p-3 tw:text-center tw:dark:border-gray-700") do
-            count.positive? ? link_to(inner, path, class: "twlink tw:block") : inner
-          end
-        end
-
-        def new_parking_notification
-          return @new_parking_notification if defined?(@new_parking_notification)
-
-          notification = ParkingNotification.new(bike_id: @bike.id, organization: @organization, use_entered_address: false)
-          notification.is_repeat = notification.likely_repeat?
-          notification.set_location_from_organization
-          notification.kind ||= notification.potential_initial_record&.kind || ParkingNotification.kinds.first
-          @new_parking_notification = notification
-        end
-
-        def create_parking_notifications_path
-          organization_parking_notifications_path(organization_id: @organization.to_param)
-        end
-
-        def notifications_path
-          organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
-        end
-
-        def resolved_notifications_path
-          organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "resolved")
-        end
-
         def show_impound?
           @organization.enabled?("impound_bikes")
         end
 
-        def impound_path
-          organization_impound_records_path(organization_id: @organization.to_param, search_bike_id: @bike.id, search_status: "all")
+        # Staff create an impound before it's impounded, and update it after
+        def show_create_impound?
+          show_impound? && staff? && !impounded?
         end
 
-        def impound_label
-          staff? ? translation(".impound") : translation(".request_impound")
+        def show_update_impound?
+          show_impound? && staff? && impounded?
+        end
+
+        def impound_title
+          translation(".impound")
+        end
+
+        def impound_subtitle
+          translation(".record_impounding")
         end
 
         def edit_access_path

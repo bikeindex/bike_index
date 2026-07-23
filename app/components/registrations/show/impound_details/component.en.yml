@@ -9,3 +9,4 @@ en:
           impound_details: Impound details
           impounded_at: Impounded at
           location: Location
+          org_impound_record: "%{org_name} impound record"
