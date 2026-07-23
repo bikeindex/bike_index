@@ -18,6 +18,8 @@ module PageBlock
       end
 
       def render?
+        return false if development? && ENV["NO_DEV_TOPBAR"] == "true"
+
         @review_app.present?
       end
 
