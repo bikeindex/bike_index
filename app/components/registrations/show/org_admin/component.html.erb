@@ -286,108 +286,114 @@
         </h2>
 
         <div class="tw:mt-3">
-          <%= render(UI::DefinitionList::Container::Component.new(term: :right_align)) do %>
-            <% if @organization.enabled?("credibility_badges") %>
-              <%= info_row(translation(".credibility")) do %>
-                <span class="tw:inline-flex tw:items-center tw:gap-1.5">
-                  <span
-                    class="
-                      tw:inline-block tw:rounded tw:px-2 tw:py-0.5
-                      tw:font-bold tw:text-white
-                    "
-                    style="background-color: <%= credibility_color %>"
-                  >
-                    <%= credibility_score %>
-                  </span>
+          <% if registration_information? %>
+            <%= render(UI::DefinitionList::Container::Component.new(term: :right_align)) do %>
+              <% if @organization.enabled?("credibility_badges") %>
+                <%= info_row(translation(".credibility")) do %>
+                  <span class="tw:inline-flex tw:items-center tw:gap-1.5">
+                    <span
+                      class="
+                        tw:inline-block tw:rounded tw:px-2 tw:py-0.5
+                        tw:font-bold tw:text-white
+                      "
+                      style="background-color: <%= credibility_color %>"
+                    >
+                      <%= credibility_score %>
+                    </span>
 
-                  <%= render(UI::Tooltip::Component.new(text: translation(".credibility"))) do |tooltip| %>
-                    <% tooltip.with_body do %>
-                      <span class="tw:block tw:text-left">
-                        <span class="tw:mb-1 tw:block tw:font-semibold">
-                          Factors in score
+                    <%= render(UI::Tooltip::Component.new(text: translation(".credibility"))) do |tooltip| %>
+                      <% tooltip.with_body do %>
+                        <span class="tw:block tw:text-left">
+                          <span class="tw:mb-1 tw:block tw:font-semibold">
+                            Factors in score
+                          </span>
+
+                          <% credibility_badges.each do |badge, value| %>
+                            <span class="tw:flex tw:justify-between tw:gap-4">
+                              <span>
+                                <%= CredibilityScorer.humanize_badge(badge) %>
+                              </span>
+
+                              <span class="<%= "tw:text-red-600" if value.negative? %>">
+                                <%= value %>
+                              </span>
+                            </span>
+                          <% end %>
                         </span>
+                      <% end %>
 
-                        <% credibility_badges.each do |badge, value| %>
-                          <span class="tw:flex tw:justify-between tw:gap-4">
-                            <span>
-                              <%= CredibilityScorer.humanize_badge(badge) %>
-                            </span>
+                      <% tooltip.with_tooltip_button(class: "tw:inline-flex tw:size-4 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-200 tw:text-[10px] tw:font-bold tw:text-gray-600 tw:hover:bg-gray-300 tw:dark:bg-gray-700 tw:dark:text-gray-200") do %>
+                        ?
+                      <% end %>
+                    <% end %>
+                  </span>
+                <% end %>
+              <% end %>
 
-                            <span class="<%= "tw:text-red-600" if value.negative? %>">
-                              <%= value %>
-                            </span>
+              <% if @organization.enabled?("bike_stickers") %>
+                <%= info_row(translation(".sticker")) do %>
+                  <div class="tw:flex tw:flex-col tw:items-end tw:gap-0.5">
+                    <% bike_stickers.each do |bike_sticker| %>
+                      <span>
+                        <%= sticker_link(bike_sticker) %>
+
+                        <% if bike_sticker.claimed_at.present? %>
+                          <span class="tw:text-xs tw:opacity-65">
+                            <%= translation(".sticker_claimed") %>
+                            <%= render(UI::Time::Component.new(time: bike_sticker.claimed_at)) %>
                           </span>
                         <% end %>
                       </span>
                     <% end %>
 
-                    <% tooltip.with_tooltip_button(class: "tw:inline-flex tw:size-4 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-200 tw:text-[10px] tw:font-bold tw:text-gray-600 tw:hover:bg-gray-300 tw:dark:bg-gray-700 tw:dark:text-gray-200") do %>
-                      ?
+                    <% if staff? %>
+                      <%= render(UI::Button::Component.new(text: translation(".link_sticker"), color: :link, html_class: "tw:text-xs", data: {open_modal: "link-sticker-modal"})) %>
+                    <% end %>
+                  </div>
+                <% end %>
+              <% end %>
+
+              <% if organization_registered? %>
+                <% if @organization.parent? %>
+                  <%= info_row(translation(".organization_registered"), @bike.creation_organization&.name) %>
+                <% end %>
+                <% unless unregistered? %>
+                  <%= info_row(translation(".claimed")) do %>
+                    <% if @bike.claimed? %>
+                      <%= render(UI::Time::Component.new(time: current_ownership.claimed_at)) %>
                     <% end %>
                   <% end %>
-                </span>
-              <% end %>
-            <% end %>
-
-            <% if @organization.enabled?("bike_stickers") %>
-              <%= info_row(translation(".sticker")) do %>
-                <div class="tw:flex tw:flex-col tw:items-end tw:gap-0.5">
-                  <% bike_stickers.each do |bike_sticker| %>
-                    <span>
-                      <%= sticker_link(bike_sticker) %>
-
-                      <% if bike_sticker.claimed_at.present? %>
-                        <span class="tw:text-xs tw:opacity-65">
-                          <%= translation(".sticker_claimed") %>
-                          <%= render(UI::Time::Component.new(time: bike_sticker.claimed_at)) %>
-                        </span>
-                      <% end %>
+                <% end %>
+                <% if show_contact? %>
+                  <%= info_row(translation(".creator"), @bike.creator&.display_name) %>
+                <% end %>
+                <%= info_row(translation(".creation_source")) { render(Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) } %>
+                <% if show_contact? %>
+                  <% org_registration_field_rows.each do |label, value| %>
+                    <%= info_row(label, value) %>
+                  <% end %>
+                <% end %>
+                <% if @organization.enabled?("avery_export") %>
+                  <%= info_row(translation(".avery_exportable"), @bike.avery_exportable? ? translation(".is_true") : translation(".is_false")) %>
+                <% end %>
+                <%= info_row(translation(".audit")) do %>
+                  <% if organization_model_audit.present? %>
+                    <%= link_to helpers.model_audit_display(model_audit), organization_model_audit_path(model_audit, organization_id: @organization.to_param), class: "twlink" %>
+                    <span class="tw:ml-2 tw:font-bold <%= helpers.status_display_class(organization_model_audit.certification_status) %>">
+                      <%= organization_model_audit.certification_status_humanized %>
+                    </span>
+                  <% else %>
+                    <span class="tw:opacity-65">
+                      <%= translation(".not_audited") %>
                     </span>
                   <% end %>
-
-                  <% if staff? %>
-                    <%= render(UI::Button::Component.new(text: translation(".link_sticker"), color: :link, html_class: "tw:text-xs", data: {open_modal: "link-sticker-modal"})) %>
-                  <% end %>
-                </div>
-              <% end %>
-            <% end %>
-
-            <% if organization_registered? %>
-              <% if @organization.parent? %>
-                <%= info_row(translation(".organization_registered"), @bike.creation_organization&.name) %>
-              <% end %>
-              <% unless unregistered? %>
-                <%= info_row(translation(".claimed")) do %>
-                  <% if @bike.claimed? %>
-                    <%= render(UI::Time::Component.new(time: current_ownership.claimed_at)) %>
-                  <% end %>
-                <% end %>
-              <% end %>
-              <% if show_contact? %>
-                <%= info_row(translation(".creator"), @bike.creator&.display_name) %>
-              <% end %>
-              <%= info_row(translation(".creation_source")) { render(Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) } %>
-              <% if show_contact? %>
-                <% org_registration_field_rows.each do |label, value| %>
-                  <%= info_row(label, value) %>
-                <% end %>
-              <% end %>
-              <% if @organization.enabled?("avery_export") %>
-                <%= info_row(translation(".avery_exportable"), @bike.avery_exportable? ? translation(".is_true") : translation(".is_false")) %>
-              <% end %>
-              <%= info_row(translation(".audit")) do %>
-                <% if organization_model_audit.present? %>
-                  <%= link_to helpers.model_audit_display(model_audit), organization_model_audit_path(model_audit, organization_id: @organization.to_param), class: "twlink" %>
-                  <span class="tw:ml-2 tw:font-bold <%= helpers.status_display_class(organization_model_audit.certification_status) %>">
-                    <%= organization_model_audit.certification_status_humanized %>
-                  </span>
-                <% else %>
-                  <span class="tw:opacity-65">
-                    <%= translation(".not_audited") %>
-                  </span>
                 <% end %>
               <% end %>
             <% end %>
+          <% else %>
+            <p class="tw:text-sm tw:opacity-65">
+              <%= translation(".no_registration_information", org_name: @organization.short_name) %>
+            </p>
           <% end %>
         </div>
       <% end %>

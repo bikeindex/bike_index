@@ -146,6 +146,18 @@ RSpec.describe "RegistrationsController#show", type: :request do
           # Registration information rows (other than sticker & credibility) are
           # only shown for bikes registered with the org
           expect(body).to_not match("E-Vehicle Audit")
+          # With no visible rows, the card shows the muted empty-state note
+          expect(body).to match("No registration information visible to #{organization.short_name}")
+        end
+
+        context "with a registration-info feature enabled" do
+          let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"]) }
+          it "shows the card rather than the empty-state note" do
+            get "#{base_url}/#{bike.id}"
+            body = whitespace_normalized_body_text
+            expect(body).to match("Credibility")
+            expect(body).to_not match("No registration information")
+          end
         end
       end
 
@@ -404,6 +416,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
     context "superuser view_as options" do
       let(:current_user) { FactoryBot.create(:superuser) }
       let!(:brakebills) { FactoryBot.create(:organization, name: "Brakebills") }
+      let!(:ikes) { FactoryBot.create(:organization, name: "Ikes Bikes") }
       it "offers every view and renders the owner and org-limited perspectives" do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
@@ -411,6 +424,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("View as owner of bike")
         expect(body).to match("View as #{brakebills.short_name} staff")
         expect(body).to match("View as #{brakebills.short_name} limited")
+        # ikes-bikes is the seeded unpaid default alongside the paid brakebills
+        expect(body).to match("View as #{ikes.short_name} limited")
         # public is the superuser's default/current view
         expect(body).to match("Viewing as Public")
 
@@ -425,6 +440,19 @@ RSpec.describe "RegistrationsController#show", type: :request do
         body = whitespace_normalized_body_text
         expect(body).to match("Limited")
         expect(body).to_not match("Staff")
+      end
+
+      it "previews an arbitrary organization named in view_as, outside the seeded defaults" do
+        other_organization = FactoryBot.create(:organization, name: "Cannondale")
+        get "#{base_url}/#{bike.id}", params: {view_as: "#{other_organization.to_param}.staff"}
+        expect(response.status).to eq(200)
+        body = whitespace_normalized_body_text
+        expect(body).to match("Staff")
+        expect(body).to_not match("not allowed to view this registration")
+        # The previewed org joins the switcher (staff is current, so limited is the
+        # other offered role)
+        expect(body).to match("Viewing as #{other_organization.short_name} staff")
+        expect(body).to match("View as #{other_organization.short_name} limited")
       end
     end
   end

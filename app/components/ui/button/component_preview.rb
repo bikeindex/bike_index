@@ -30,6 +30,15 @@ module UI
         render(UI::Button::Component.new(text: "Error Active", color: :error, active: true))
       end
 
+      # White button with a soft danger outline
+      def danger_outline
+        render(UI::Button::Component.new(text: "Mark stolen", color: :danger_outline))
+      end
+
+      def danger_outline_active
+        render(UI::Button::Component.new(text: "Danger Outline Active", color: :danger_outline, active: true))
+      end
+
       def link
         render(UI::Button::Component.new(text: "Link style", color: :link))
       end
@@ -43,9 +52,17 @@ module UI
         render(UI::Button::Component.new(text: "Purple", color: :purple))
       end
 
-      # White button with a soft danger outline
-      def danger_outline
-        render(UI::Button::Component.new(text: "Mark stolen", color: :danger_outline))
+      def purple_active
+        render(UI::Button::Component.new(text: "Purple Active", color: :purple, active: true))
+      end
+
+      # White button with a purple outline (toggles to a purple tint when active)
+      def purple_outline
+        render(UI::Button::Component.new(text: "Purple outline", color: :purple_outline))
+      end
+
+      def purple_outline_active
+        render(UI::Button::Component.new(text: "Purple Outline Active", color: :purple_outline, active: true))
       end
 
       # @!endgroup

@@ -15,11 +15,22 @@ allowed-tools: Bash, Read, Glob, Grep
 
 # Resolving merge conflicts
 
-This repo's target base is `origin/main`. When a branch needs to catch up with the base, or a merge/cherry-pick/pull leaves conflict markers, follow this — the goal is a clean, honest integration that a reviewer can trust and that never rewrites shared history.
+When a branch needs to catch up with its base, or a merge/cherry-pick/pull leaves conflict markers, follow this — the goal is a clean, honest integration that a reviewer can trust and that never rewrites shared history.
+
+## Determine the base branch first — don't assume `main`
+
+"Update from base", "sync with main", "this branch is behind", "merge the base in" all need a base branch to merge *from*. **Don't default to `main`.** A branch is often stacked on another feature branch, and merging `main` instead silently pulls the wrong history — the diff looks "already up to date" against `main` while the real base has commits you're missing. Resolve the base in this order:
+
+1. **A branch the user names** — "update from X" / "base is X" wins outright.
+2. **An open PR's base** — `gh pr view <branch> --json baseRefName`. Also check the base of any feature branch you recently merged into this one (`gh pr view <that-branch> --json baseRefName`); a stack's branches usually share the same base.
+3. **The upstream tracking ref**, if it names a branch other than this one's own remote mirror (`git rev-parse --abbrev-ref @{u}`).
+4. **The Conductor workspace target branch** (from the workspace/system instructions) — a default hint, *not* the last word.
+
+If 1–3 turn up nothing and the branch clearly builds on another feature branch — it was created by merging one in, was cut from `main` but layers work that lives on an unmerged branch, or the user talks about it as part of a stack — **ask which branch to update from (offer the likely candidate) rather than merging `main`.** Confirm before running the merge; a wrong base is expensive to unwind. Note that being 0-behind `main` proves nothing here — a stacked branch is normally 0-behind `main` and still far behind its real base.
 
 ## Bring a branch up to date
 
-- `git fetch origin`, then `git merge --no-edit origin/main`.
+- `git fetch origin`, then `git merge --no-edit origin/<base>` (the base resolved above, not reflexively `main`).
 - **Merge, never rebase.** Rebasing rewrites the branch's history; if the branch is already pushed, republishing it needs a force-push, and we never force-push. A merge commit keeps the real history and is always safe to push on top of.
 - If uncommitted work blocks the merge, commit that work first (it belongs to the branch anyway), then merge.
 - Already up to date → nothing to do.
