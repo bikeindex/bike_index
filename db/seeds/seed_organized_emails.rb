@@ -231,7 +231,7 @@ unless transferred_bike_exists
     bike: bike,
     permitted_params: {bike: {owner_email: "new-owner@bikeindex.org"}}.as_json
   ).update_available_attributes
-  CallbackJob::AfterBikeSaveJob.new.perform(bike.id, true, true)
+  CallbackJobs::AfterBikeSaveJob.new.perform(bike.id, true, true)
   puts "  Created transferred bike ##{bike.id}"
 end
 

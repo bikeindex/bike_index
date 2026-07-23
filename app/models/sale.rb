@@ -121,6 +121,6 @@ class Sale < ApplicationRecord
   end
 
   def enqueue_callback_job
-    CallbackJob::AfterSaleCreateJob.perform_async(id)
+    CallbackJobs::AfterSaleCreateJob.perform_async(id)
   end
 end

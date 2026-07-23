@@ -8,7 +8,7 @@ module Users
 
       old_user = find_old_user(user_email.email, user_email.user_id)
       merge_old_user(user_email, old_user) if old_user.present?
-      CallbackJob::AfterUserCreateJob.new.perform(user_email.user_id, "merged", user: user_email.user, email: user_email.email)
+      CallbackJobs::AfterUserCreateJob.new.perform(user_email.user_id, "merged", user: user_email.user, email: user_email.email)
     end
 
     def merge_old_user(user_email, old_user)
