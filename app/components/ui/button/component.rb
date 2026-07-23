@@ -30,7 +30,7 @@ module UI
         error: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-700 tw:dark:bg-red-600",
         danger_outline: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-100 tw:border-[#c0392b] tw:dark:bg-red-950 tw:dark:border-red-700",
         purple: "tw:ring-2 tw:ring-[#715eb2]/40 tw:bg-[#5d4b9c]",
-        purple_outline: "tw:ring-2 tw:ring-[#715eb2]/40 tw:bg-purple-100 tw:border-[#715eb2] tw:dark:bg-purple-950 tw:dark:border-[#715eb2]",
+        purple_outline: "tw:ring-2 tw:ring-[#715eb2]/40 tw:bg-[#715eb2] tw:text-white tw:border-[#715eb2]",
         link: "tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold tw:underline"
       }.freeze
 
@@ -41,7 +41,7 @@ module UI
         error: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-red-500/40 tw:active:ring-red-500/40 tw:aria-pressed:bg-red-700 tw:active:bg-red-700 tw:aria-pressed:dark:bg-red-600 tw:active:dark:bg-red-600",
         danger_outline: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-red-500/40 tw:active:ring-red-500/40 tw:aria-pressed:bg-red-100 tw:active:bg-red-100 tw:aria-pressed:border-[#c0392b] tw:active:border-[#c0392b] tw:aria-pressed:dark:bg-red-950 tw:active:dark:bg-red-950 tw:aria-pressed:dark:border-red-700 tw:active:dark:border-red-700",
         purple: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-[#715eb2]/40 tw:active:ring-[#715eb2]/40 tw:aria-pressed:bg-[#5d4b9c] tw:active:bg-[#5d4b9c]",
-        purple_outline: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-[#715eb2]/40 tw:active:ring-[#715eb2]/40 tw:aria-pressed:bg-purple-100 tw:active:bg-purple-100 tw:aria-pressed:border-[#715eb2] tw:active:border-[#715eb2] tw:aria-pressed:dark:bg-purple-950 tw:active:dark:bg-purple-950 tw:aria-pressed:dark:border-[#715eb2] tw:active:dark:border-[#715eb2]",
+        purple_outline: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-[#715eb2]/40 tw:active:ring-[#715eb2]/40 tw:aria-pressed:bg-[#715eb2] tw:active:bg-[#715eb2] tw:aria-pressed:text-white tw:active:text-white tw:aria-pressed:border-[#715eb2] tw:active:border-[#715eb2]",
         link: "tw:aria-pressed:text-blue-800 tw:active:text-blue-800 tw:aria-pressed:dark:text-blue-300 tw:active:dark:text-blue-300 tw:aria-pressed:font-bold tw:active:font-bold tw:aria-pressed:underline tw:active:underline"
       }.freeze
 
