@@ -212,7 +212,7 @@ RSpec.describe Organized::UsersController, type: :request do
         end
       end
       context "restrict_invitations? is false" do
-        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "example.gov", available_invitation_count: 1) }
         it "just creates the user" do
           Sidekiq::Testing.inline! do
             ActionMailer::Base.deliveries = []
@@ -260,7 +260,7 @@ RSpec.describe Organized::UsersController, type: :request do
             end
           end
           context "restrict_invitations? is false" do
-            let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
+            let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "example.gov", available_invitation_count: 1) }
             it "creates organization_roles" do
               Sidekiq::Testing.inline! do
                 ActionMailer::Base.deliveries = []
