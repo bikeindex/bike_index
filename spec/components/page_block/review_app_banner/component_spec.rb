@@ -26,11 +26,10 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
     expect(component.css("form[action='/session/sign_in_with_magic_link'] button").text).to eq("sign in as superadmin")
   end
 
-  it "suppresses the development banner when NO_DEV_TOPBAR is set" do
-    stub_const("ENV", ENV.to_hash.merge("NO_DEV_TOPBAR" => "true"))
+  it "suppresses every topbar when NO_REVIEW_TOPBAR is set" do
+    stub_const("#{described_class}::NO_REVIEW_TOPBAR", true)
     expect(described_class.new(review_app: "development").render?).to be_falsey
-    # Review-app deploys are unaffected by the dev-only opt-out
-    expect(described_class.new(review_app: "1").render?).to be_truthy
+    expect(described_class.new(review_app: "1").render?).to be_falsey
   end
 
   context "when review_app is present" do

@@ -8,6 +8,10 @@ module PageBlock
     # server), `ENV["REVIEW_APP_PR_NUMBER"]`, and `ENV["REVIEW_APP_PR_TITLE"]`;
     # the component renders only when `review_app` is present.
     class Component < ApplicationComponent
+      # Set NO_REVIEW_TOPBAR=true to suppress the banner everywhere it would
+      # otherwise show (dev, review apps, sandbox)
+      NO_REVIEW_TOPBAR = ENV["NO_REVIEW_TOPBAR"] == "true"
+
       def initialize(review_app:, pr_number: nil, pr_title: nil, commit: nil, current_user: nil, return_to: nil)
         @review_app = review_app
         @pr_number = pr_number
@@ -18,7 +22,7 @@ module PageBlock
       end
 
       def render?
-        return false if development? && ENV["NO_DEV_TOPBAR"] == "true"
+        return false if NO_REVIEW_TOPBAR
 
         @review_app.present?
       end
