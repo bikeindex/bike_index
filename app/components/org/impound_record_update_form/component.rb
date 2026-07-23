@@ -5,7 +5,7 @@ module Org
     class Component < ApplicationComponent
       # Pass an impound_record for a single-record update, or omit it for the
       # multi-update form (which wraps the records table passed as a block).
-      def initialize(current_organization:, impound_record: nil, impound_record_update: nil, approved_impound_claim: nil, parking_notification: nil, multi_update_open: false)
+      def initialize(current_organization:, impound_record: nil, impound_record_update: nil, approved_impound_claim: nil, parking_notification: nil, multi_update_open: false, card: true)
         @current_organization = current_organization
         @impound_record = impound_record
         @impound_record_update = impound_record_update || ImpoundRecordUpdate.new
@@ -13,6 +13,7 @@ module Org
         @parking_notification = parking_notification
         @multi = impound_record.blank?
         @multi_update_open = multi_update_open
+        @card = card
       end
 
       private

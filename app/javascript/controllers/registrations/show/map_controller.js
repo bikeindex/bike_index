@@ -1,11 +1,27 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='registrations--show--map'
-// Lazy-loads Mapbox GL and renders a map centered on the coordinates, with a
-// translucent red circle marking the (public, possibly obscured) location.
+// Lazy-loads Mapbox GL and renders a map centered on the coordinates, marking
+// them with a dot (point) or a translucent red circle (approximate area).
 const MAPBOX_VERSION = 'v1.11.0'
 const MAPBOX_SRC = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-gl.js`
 const MAPBOX_CSS = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-gl.css`
+
+// A fixed dot marking the exact spot
+const POINT_PAINT = {
+  'circle-radius': 7,
+  'circle-color': 'red',
+  'circle-opacity': 0.9,
+  'circle-stroke-width': 2,
+  'circle-stroke-color': 'white'
+}
+
+// A translucent circle approximating the area; grows with zoom
+const CIRCLE_PAINT = (radiusBase) => ({
+  'circle-radius': { stops: [[5, 5], [16, 240]], base: radiusBase },
+  'circle-color': 'red',
+  'circle-opacity': 0.4
+})
 
 export default class extends Controller {
   static targets = ['canvas', 'unavailable']
@@ -13,7 +29,8 @@ export default class extends Controller {
     apiKey: String,
     latitude: Number,
     longitude: Number,
-    radiusBase: { type: Number, default: 1.15 }
+    radiusBase: { type: Number, default: 1.15 },
+    point: Boolean
   }
 
   async connect () {
@@ -64,11 +81,7 @@ export default class extends Controller {
         id: 'location',
         type: 'circle',
         source: 'location',
-        paint: {
-          'circle-radius': { stops: [[5, 5], [16, 240]], base: this.radiusBaseValue },
-          'circle-color': 'red',
-          'circle-opacity': 0.4
-        }
+        paint: this.pointValue ? POINT_PAINT : CIRCLE_PAINT(this.radiusBaseValue)
       })
     })
   }

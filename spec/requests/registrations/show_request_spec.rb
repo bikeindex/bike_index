@@ -38,6 +38,16 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
+    context "current_user is a superuser" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      it "offers a View Super Admin link to the admin bike page" do
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("View Super Admin")
+        expect(response.body).to match(admin_bike_path(bike.id))
+      end
+    end
+
     context "current_user previously owned the bike (sent away)" do
       let(:previous_owner) { bike.reload.user }
       let(:current_user) { previous_owner }
@@ -114,7 +124,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       it "renders the admin redesign, without feature-gated sections" do
         get "#{base_url}/#{bike.id}"
         body = whitespace_normalized_body_text
-        expect(body).to match("Full access")
+        expect(body).to match("Staff")
         expect(body).to match("Bike details")
         expect(body).to match("Owner & access")
         expect(body).to match(bike.owner_name)
@@ -155,6 +165,73 @@ RSpec.describe "RegistrationsController#show", type: :request do
           body = whitespace_normalized_body_text
           expect(body).to match("Impounded")
           expect(body).to_not match("Not stolen")
+        end
+      end
+
+      context "with parking notifications enabled" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["parking_notifications"]) }
+
+        it "shows the create parking notification button" do
+          get "#{base_url}/#{bike.id}"
+          expect(whitespace_normalized_body_text).to match("Create a New Notification")
+        end
+
+        it "shows the View notifications panel even with no notifications" do
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match("No parking notifications")
+          # The button subtitle summarizes activity counts
+          expect(body).to match("0 Active - 0 Resolved")
+        end
+
+        context "with a parking notification" do
+          before { FactoryBot.create(:parking_notification, bike:, organization:, user: current_user) }
+
+          it "shows the View notifications panel with the current notification" do
+            get "#{base_url}/#{bike.id}"
+            body = whitespace_normalized_body_text
+            # The View notifications action opens the parking-notification show panel
+            expect(body).to match("View notification")
+            expect(body).to match("Parked incorrectly")
+            expect(response.body).to match(organization_parking_notification_path(ParkingNotification.last.id, organization_id: organization.to_param))
+          end
+        end
+
+        context "impounded bike" do
+          let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization).reload }
+          before { FactoryBot.create(:impound_record, bike:, organization:, user: current_user) }
+
+          it "hides the create parking notification button" do
+            get "#{base_url}/#{bike.id}"
+            body = whitespace_normalized_body_text
+            expect(body).to match("Impounded")
+            expect(body).to_not match("Create a New Notification")
+          end
+        end
+      end
+
+      context "with impound bikes enabled" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["impound_bikes"]) }
+
+        it "shows the impound action with a record-impounding subtitle" do
+          get "#{base_url}/#{bike.id}"
+          expect(whitespace_normalized_body_text).to match("Record Impounding")
+        end
+
+        context "already impounded" do
+          let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization).reload }
+          before { FactoryBot.create(:impound_record, bike:, organization:, user: current_user) }
+
+          it "shows the Update impound action, its form, and the impound-record card" do
+            get "#{base_url}/#{bike.id}"
+            body = whitespace_normalized_body_text
+            # The Update impound action opens the impound-record update form
+            expect(body).to match("Update impound record")
+            expect(body).to_not match("Record Impounding")
+            # The main-column card shows the org impound-record heading + fields
+            expect(body).to include("#{organization.short_name} impound record")
+            expect(body).to match("Impounded by")
+          end
         end
       end
 
@@ -273,6 +350,20 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Limited")
         expect(body).to_not match("not allowed to view this registration")
       end
+
+      context "with parking notifications and impound enabled" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+
+        it "offers create parking notification, not the impound action" do
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          # Limited members can create a parking notification
+          expect(body).to match("Create a New Notification")
+          # No impound action for limited (create is staff-only, request impound removed)
+          expect(body).to_not match("Record Impounding")
+          expect(body).to_not match("Request impound")
+        end
+      end
     end
 
     context "removing the organization via organization_id=false" do
@@ -280,12 +371,12 @@ RSpec.describe "RegistrationsController#show", type: :request do
       it "drops the admin view on the same request, not only on reload" do
         # With the org in the session (their default), the admin view renders
         get "#{base_url}/#{bike.id}"
-        expect(whitespace_normalized_body_text).to match("Full access")
+        expect(whitespace_normalized_body_text).to match("Staff")
 
         # Removing the org should drop the admin view on this request, not only
         # after a subsequent reload
         get "#{base_url}/#{bike.id}", params: {organization_id: "false"}
-        expect(whitespace_normalized_body_text).to_not match("Full access")
+        expect(whitespace_normalized_body_text).to_not match("Staff")
       end
     end
 
@@ -293,19 +384,19 @@ RSpec.describe "RegistrationsController#show", type: :request do
       let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
       it "offers a switcher, applies an allowed view_as, and rejects a disallowed one" do
         get "#{base_url}/#{bike.id}"
-        expect(whitespace_normalized_body_text).to match("Full access")
+        expect(whitespace_normalized_body_text).to match("Staff")
         expect(response.body).to include("view_as=public")
 
         # An allowed view_as applies
         get "#{base_url}/#{bike.id}", params: {view_as: "public"}
         body = whitespace_normalized_body_text
-        expect(body).to_not match("Full access")
+        expect(body).to_not match("Staff")
         expect(body).to match("Public view")
 
         # A disallowed view_as flashes and falls back to the admin view
         get "#{base_url}/#{bike.id}", params: {view_as: "owner"}
         body = whitespace_normalized_body_text
-        expect(body).to match("Full access")
+        expect(body).to match("Staff")
         expect(body).to match("not allowed to view this registration")
       end
     end
@@ -333,7 +424,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
         get "#{base_url}/#{bike.id}", params: {view_as: "#{brakebills.to_param}.limited"}
         body = whitespace_normalized_body_text
         expect(body).to match("Limited")
-        expect(body).to_not match("Full access")
+        expect(body).to_not match("Staff")
       end
     end
   end
