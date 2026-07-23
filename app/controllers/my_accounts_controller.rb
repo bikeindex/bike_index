@@ -65,6 +65,18 @@ class MyAccountsController < ApplicationController
     end
   end
 
+  # Flip the redesign flag for the current user, returning to the bike in whichever view is now active
+  def toggle_show_redesign
+    bike = Bike.unscoped.find_id(params[:bike_id])
+    if Flipper.enabled?(:bike_show_redesign, current_user)
+      Flipper.disable_actor(:bike_show_redesign, current_user)
+      redirect_to bike_path(bike)
+    else
+      Flipper.enable_actor(:bike_show_redesign, current_user)
+      redirect_to registration_path(bike)
+    end
+  end
+
   private
 
   def edit_templates

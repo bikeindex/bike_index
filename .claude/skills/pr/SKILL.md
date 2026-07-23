@@ -6,17 +6,17 @@ description: >-
   description, body, summary, or title — including bare update phrasings like
   "update pr", "update this pr", or "update the PR" with no other object — for
   both new PRs (`gh pr create`) and existing ones (`gh pr edit`). For frontend
-  diffs, delegates to the `frontend-screenshots` skill to capture
-  desktop+mobile screenshots and embeds them under a `## Screenshots` section.
+  diffs, delegates the screenshot phase to `references/screenshots.md`, which
+  captures desktop+mobile shots and posts them as a `## Screenshots` PR comment.
   Use for any verb that lands on a PR's text content: "open a PR", "make a PR",
   "update pr", "update this pr", "update the PR description", "rewrite the PR
   body", "fix the description".
-allowed-tools: Bash, Read, Glob, Grep
+allowed-tools: Bash, Read, Glob, Grep, Skill
 ---
 
 # Pull request workflow
 
-Create or update a pull request for the current branch. If the diff contains frontend changes, delegate screenshot capture to the `frontend-screenshots` skill and embed the results in the PR body under a `## Screenshots` section.
+Create or update a pull request for the current branch. If the diff contains frontend changes, delegate the screenshot phase to `references/screenshots.md`, which posts them as a `## Screenshots` PR comment.
 
 The workflow below (steps 0–3) always runs and creates or updates the PR. When the diff is frontend, a second phase captures before/after screenshots and posts them as a PR comment — that machinery lives in `references/screenshots.md`, read only when step 3 sends you there.
 

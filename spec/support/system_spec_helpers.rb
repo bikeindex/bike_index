@@ -31,12 +31,19 @@ module SystemSpecHelpers
     field
   end
 
-  # Wait for Turbo Drive to finish a back/forward restoration before interacting.
-  # On restore Turbo shows a cached snapshot (html[data-turbo-preview]) first,
-  # then swaps in the real render -- typing during the preview loses the value
-  # when the real page lands. Returns once the preview attribute is gone.
-  def wait_for_turbo_restore(wait: 10)
-    expect(page).to have_no_css("html[data-turbo-preview]", wait:)
+  # search--form#handlePopstate reconciles these to the address bar on a
+  # back/forward; the results frame reloads separately and faster.
+  RESTORED_FILTER_FIELDS = %w[search_email serial search_notes].freeze
+
+  # Navigate back, then wait for the filters to settle to the address bar so
+  # callers don't read or fill against the restoration preview.
+  def go_back_and_wait(wait: 10)
+    page.go_back
+    restored = Rack::Utils.parse_query(URI.parse(page.current_url).query)
+    RESTORED_FILTER_FIELDS.each do |name|
+      next unless page.has_selector?("input[name='#{name}']", wait: 0)
+      expect(page).to have_field(name, with: restored[name].to_s, wait:)
+    end
   end
 
   # capybara-playwright wraps click/find so a mid-action "Element is not attached
@@ -45,11 +52,25 @@ module SystemSpecHelpers
   # so the raw Playwright::Error escapes. Re-find and re-fill on detach, which is
   # what Capybara does for the wrapped actions.
   def fill_in(*args, **options, &block)
-    attempts = 0
+    retry_on_detach { super }
+  end
+
+  # Click an async hotwire_combobox option, re-finding it if a later async
+  # response re-renders the listbox and detaches the node between find and click.
+  def click_combobox_option(text)
+    retry_on_detach { find(".hw-combobox__option", text:, match: :first).click }
+  end
+
+  private
+
+  # Retry a Playwright action when the node detaches mid-action -- the raw
+  # Playwright::Error that Capybara's own retry doesn't rescue on this driver.
+  def retry_on_detach(attempts: 3)
+    tries = 0
     begin
-      super
+      yield
     rescue Playwright::Error => e
-      raise unless e.message.include?("not attached to the DOM") && (attempts += 1) <= 3
+      raise unless e.message.include?("not attached to the DOM") && (tries += 1) <= attempts
       sleep 0.1
       retry
     end

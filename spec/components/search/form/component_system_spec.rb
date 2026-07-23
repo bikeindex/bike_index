@@ -37,7 +37,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     def combobox_select(query, option_text)
       type_into(".hw-combobox__input", query)
       expect(page).to have_css(".hw-combobox__option", text: option_text, wait: 30)
-      find(".hw-combobox__option", text: option_text, match: :first).click
+      click_combobox_option(option_text)
     end
 
     def expect_count(kind_scope, value = :greater_than_zero)

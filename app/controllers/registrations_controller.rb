@@ -1,8 +1,25 @@
 class RegistrationsController < ApplicationController
-  before_action :allow_x_frame, except: [:new]
+  before_action :allow_x_frame, except: %i[new show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
-  before_action :simple_header
+  before_action :simple_header, except: %i[show edit]
   layout "reg_embed"
+
+  def show
+    @bike = Bike.unscoped.find_id(params[:id])
+    fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
+
+    requested_view = view_from_param(params[:view_as])
+    available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,
+      organization: current_organization || passive_organization, preview_organization: requested_view&.last)
+
+    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view: current_view(available_views, requested_view),
+      available_views:), layout: "application")
+  end
+
+  # The redesign has no edit view of its own; edit still lives on the bike
+  def edit
+    redirect_to edit_bike_path(params[:id], request.query_parameters)
+  end
 
   def new
     @stolen = params[:stolen] # Passed into embed form
@@ -41,6 +58,34 @@ class RegistrationsController < ApplicationController
   end
 
   private
+
+  # The resolved [kind, organization] perspective (e.g. [:public, nil] or
+  # [:staff, organization]). A ?view_as param overrides the default, but only to a
+  # perspective the user is allowed — otherwise it flashes and falls back.
+  def current_view(available_views, requested_view)
+    if params[:view_as].present? && !available_views.include?(requested_view)
+      flash.now[:error] = "You're not allowed to view this registration that way"
+      requested_view = nil
+    end
+    requested_view || BikeServices::ShowViews.default_view_for(bike: @bike, current_user:, organization: current_organization || passive_organization)
+  end
+
+  # The [kind, organization] view requested via ?view_as, or nil when absent/unknown.
+  # A bare org slug (no explicit role) resolves to the user's own role for the org.
+  def view_from_param(param)
+    case param
+    when "public" then [:public, nil]
+    when "owner" then [:owner, nil]
+    when nil, "" then nil
+    else
+      slug, role = param.split(".", 2)
+      org = Organization.friendly_find(slug)
+      return nil unless org
+
+      role ||= current_user&.member_bike_edit_of?(org) ? "staff" : "limited"
+      [(role == "limited") ? :limited : :staff, org]
+    end
+  end
 
   def simple_header
     @simple_header ||= Binxtils::InputNormalizer.boolean(params[:simple_header])

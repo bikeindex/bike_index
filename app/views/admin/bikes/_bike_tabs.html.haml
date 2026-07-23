@@ -109,7 +109,7 @@
                     \-
                     %em
                       Via
-                      = origin_display(bike.creation_description)
+                      = render(Org::OriginDisplay::Component.new(creation_description: bike.creation_description))
                     - if bike.current_ownership&.doorkeeper_app_id.present?
                       %small.less-strong
                         oauth app

@@ -28,7 +28,10 @@ module BikeServices
 
     def display_impound_claim?(bike, user = nil)
       return false if bike.owner.present? && bike.owner == user
-      return true if bike.current_impound_record.present?
+      if (impound_record = bike.current_impound_record).present?
+        # Bikes impounded by an organization can't be claimed, unless unregistered
+        return impound_record.unregistered_bike? || !impound_record.organized?
+      end
       return false if user.blank?
 
       bike.impound_claims_submitting.active.where(user_id: user.id).any? ||
@@ -110,22 +113,6 @@ module BikeServices
         end
       end
       single_image_hash(bike.public_images.limit(1)&.first&.image_url(:large))
-    end
-
-    def origin_title(creation_description)
-      return nil unless creation_description.present?
-
-      extended_description = {
-        "web" => "Registered with self registration process",
-        "org reg" => "Registered by internal, organization member form",
-        "landing page" => "Registration began with incomplete registration, via organization landing page",
-        "bulk reg" => "Registered by spreadsheet import"
-      }
-      if %w[Lightspeed Ascend].include?(creation_description)
-        "Automatically registered by bike shop point of sale (#{creation_description} POS)"
-      else
-        extended_description[creation_description] || "Registered via #{creation_description}"
-      end
     end
 
     #
