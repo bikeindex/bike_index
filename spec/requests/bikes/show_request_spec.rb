@@ -692,6 +692,39 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+  context "bike_show_redesign flag" do
+    it "renders the legacy page when the flag is disabled" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+    end
+
+    context "flag enabled for the current user" do
+      before { Flipper.enable_actor(:bike_show_redesign, current_user) }
+
+      it "redirects the html page but still renders the qr code png" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to redirect_to(registration_path(bike))
+
+        get "#{base_url}/#{bike.id}.png"
+        expect(response.status).to eq(200)
+      end
+
+      it "renders the legacy page when no_redesign is passed" do
+        get "#{base_url}/#{bike.id}?no_redesign=true"
+        expect(response).to render_template(:show)
+      end
+    end
+
+    context "flag enabled only for another user" do
+      let(:other_user) { FactoryBot.create(:user_confirmed) }
+      before { Flipper.enable_actor(:bike_show_redesign, other_user) }
+
+      it "renders the legacy page" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to render_template(:show)
+      end
+    end
+  end
   context "qr code png" do
     it "renders" do
       get "#{base_url}/#{bike.id}.png"

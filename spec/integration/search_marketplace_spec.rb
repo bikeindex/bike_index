@@ -80,7 +80,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   def search_primary_activity(display_name)
     type_into("#primary_activity", display_name)
     expect(page).to have_css(".hw-combobox__option", text: display_name, wait: 5)
-    find(".hw-combobox__option", text: display_name, match: :first).click
+    click_combobox_option(display_name)
     find("#search-button").click
   end
 
@@ -134,7 +134,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
       type_into(".hw-combobox__input", "Yuba")
       # Wait for the combobox autocomplete to load
       expect(page).to have_css(".hw-combobox__option", text: "Listings made by Yuba", wait: 5)
-      find(".hw-combobox__option", text: "Listings made by Yuba", match: :first).click
+      click_combobox_option("Listings made by Yuba")
     end
     find("#search-button").click
     # Should load new results

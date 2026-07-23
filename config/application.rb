@@ -56,7 +56,9 @@ module Bikeindex
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
-    config.i18n.load_path += Dir[Rails.root.join("app", "components", "**", "*.{yml}").to_s]
+    # Component sidecar translations. A reloadable path (not a static glob) so dev reloads
+    # re-scan the tree — picking up renamed/added keys and files without a server restart.
+    config.i18n.railties_load_path << config.paths.add("app/components", glob: "**/*.yml")
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = :en
     config.i18n.available_locales = %i[en es it nl nb]

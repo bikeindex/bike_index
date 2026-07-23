@@ -9,6 +9,7 @@ class BikesController < Bikes::BaseController
 
   def show
     redirect_to(format: "png") && return if request.format == "gif"
+    redirect_to(registration_path(@bike)) && return if show_redesign?
 
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
@@ -207,6 +208,14 @@ class BikesController < Bikes::BaseController
   end
 
   private
+
+  # Send the HTML page to the redesigned registration show when the flag is on,
+  # unless no_redesign is passed to force the classic view
+  def show_redesign?
+    return false if Binxtils::InputNormalizer.boolean(params[:no_redesign])
+
+    request.format.html? && Flipper.enabled?(:bike_show_redesign, current_user)
+  end
 
   def show_for_sale?(bike)
     return false unless bike.status_with_owner?

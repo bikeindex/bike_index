@@ -53,12 +53,34 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with purple_outline color" do
+    let(:color) { :purple_outline }
+
+    it "renders purple_outline styles" do
+      expect(component.to_html).to include("tw:hover:border-[#715eb2]")
+    end
+  end
+
   context "with invalid color" do
     let(:color) { :invalid }
 
     it "falls back to secondary" do
       expect(component.to_html).to include("tw:bg-white")
     end
+  end
+
+  context "with disabled" do
+    let(:options) { {text: "Click", disabled: true} }
+
+    it "disables the button and applies disabled styling" do
+      expect(component).to have_css("button[disabled]")
+      tokens = component.css("button").first["class"].split
+      expect(tokens).to include(*described_class::DISABLED_CLASSES.split)
+    end
+  end
+
+  it "is not disabled by default" do
+    expect(component).to have_no_css("button[disabled]")
   end
 
   describe "sizes" do

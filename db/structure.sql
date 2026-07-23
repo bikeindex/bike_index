@@ -2835,8 +2835,7 @@ CREATE TABLE public.organization_saml_configurations (
     email_attribute_name character varying,
     name_id_format character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    want_assertions_encrypted boolean DEFAULT false NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 

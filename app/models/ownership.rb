@@ -189,7 +189,7 @@ class Ownership < ApplicationRecord
     elsif origin.present?
       return "org reg" if %w[embed_extended organization_form].include?(origin)
       return "landing page" if origin == "embed_partial"
-      return "parking notification" if origin == "unregistered_parking_notification"
+      return "parking notification" if origin == "creator_unregistered_parking_notification"
 
       self.class.origin_humanized(origin)
     end
