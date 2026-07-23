@@ -216,8 +216,7 @@ module Registrations
         # The registration-information card's rows are all feature- or
         # registration-gated; show a muted note when none apply
         def registration_information?
-          organization_registered? || @organization.enabled?("credibility_badges") ||
-            @organization.enabled?("bike_stickers")
+          organization_registered? || @organization.any_enabled?(%w[credibility_badges bike_stickers])
         end
 
         def show_notes?

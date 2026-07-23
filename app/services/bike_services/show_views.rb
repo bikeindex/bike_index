@@ -6,12 +6,12 @@ module BikeServices
 
     # The perspectives the given user may view this bike as, each a [kind, org]
     # pair: [:owner, nil] (owners and superadmins), [:staff|:limited, org] admin
-    # views, and always [:public, nil]. requested_view is the ?view_as target, so a
-    # superuser can preview any organization it names.
-    def available(bike:, current_user:, organization:, requested_view: nil)
+    # views, and always [:public, nil]. preview_organization is the ?view_as target
+    # org, so a superuser can preview any organization it names.
+    def available(bike:, current_user:, organization:, preview_organization: nil)
       [
         ([:owner, nil] if (current_user.present? && bike.owner == current_user) || current_user&.superuser?),
-        *organization_views(bike:, current_user:, organization:, requested_view:),
+        *organization_views(bike:, current_user:, organization:, preview_organization:),
         [:public, nil]
       ].compact
     end
@@ -37,8 +37,8 @@ module BikeServices
     #
 
     # [role, organization] pairs. Superadmins may preview both staff and limited.
-    def organization_views(bike:, current_user:, organization:, requested_view: nil)
-      viewable_organizations(bike:, current_user:, organization:, requested_view:).flat_map do |org|
+    def organization_views(bike:, current_user:, organization:, preview_organization: nil)
+      viewable_organizations(bike:, current_user:, organization:, preview_organization:).flat_map do |org|
         roles = current_user.superuser? ? %i[staff limited] : [role_for(current_user, org)]
         roles.map { |role| [role, org] }
       end
@@ -49,13 +49,13 @@ module BikeServices
       current_user.member_bike_edit_of?(organization) ? :staff : :limited
     end
 
-    def viewable_organizations(bike:, current_user:, organization:, requested_view: nil)
+    def viewable_organizations(bike:, current_user:, organization:, preview_organization: nil)
       return [] if current_user.blank?
 
       orgs = if current_user.superuser?
         # A superuser may preview any org it names in ?view_as; brakebills (fully
         # paid) and ikes-bikes (unpaid) are seeded defaults for the switcher
-        [organization, bike.organizations.first, requested_view&.last,
+        [organization, bike.organizations.first, preview_organization,
           Organization.friendly_find("brakebills"), Organization.friendly_find("ikes-bikes")]
       else
         current_user.organizations.to_a

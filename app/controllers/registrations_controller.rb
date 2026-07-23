@@ -10,7 +10,7 @@ class RegistrationsController < ApplicationController
 
     requested_view = view_from_param(params[:view_as])
     available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,
-      organization: current_organization || passive_organization, requested_view:)
+      organization: current_organization || passive_organization, preview_organization: requested_view&.last)
 
     render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view: current_view(available_views, requested_view),
       available_views:), layout: "application")
