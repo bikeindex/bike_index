@@ -70,7 +70,7 @@
           </div>
         </div>
 
-        <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :message, kind: :text_area, label_text: "Optional message to send to the owner", html_options: {rows: 3, placeholder: "Optional", data: {"form-persist-target": "field"}})) %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :message, kind: :text_area, label_text: "Optional message to send to the owner", html_options: {rows: 3, placeholder: "Optional"})) %>
 
         <div
           class="tw:mb-4"
@@ -86,7 +86,7 @@
           <%= form.hidden_field :image_cache %>
         </div>
 
-        <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :internal_notes, kind: :text_area, label_text: translation(".parking_notification_notes_html", org_name: @organization.short_name), html_options: {rows: 2, data: {"form-persist-target": "field"}})) %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :internal_notes, kind: :text_area, label_text: translation(".parking_notification_notes_html", org_name: @organization.short_name), html_options: {rows: 2})) %>
 
         <%= render(UI::Button::Component.new(text: "Create parking notification", color: :primary, kind: :submit, disabled: true, data: {"registrations--show--parking-notification-target": "submit"})) %>
       <% end %>

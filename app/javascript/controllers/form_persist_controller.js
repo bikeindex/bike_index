@@ -6,16 +6,13 @@ import { Controller } from '@hotwired/stimulus'
 // Mirrors named text fields to localStorage so a draft survives page reloads.
 // Wire data-action="input->form-persist#save submit->form-persist#clear". The
 // storage key defaults to pathname + the form's action (see derivedKey); set
-// data-form-persist-key-value only when that isn't unique per form. Mark
-// specific fields with data-form-persist-target="field" to persist only those;
-// otherwise every named text field in the form is persisted.
+// data-form-persist-key-value only when that isn't unique per form.
 // Writes are debounced (DEBOUNCE_MS) and a restored draft is discarded once
 // older than TTL_MS.
 const DEBOUNCE_MS = 400
 const TTL_MS = 604800000 // 1 week
 
 export default class extends Controller {
-  static targets = ['field']
   static values = { key: String }
 
   connect () {
@@ -71,8 +68,6 @@ export default class extends Controller {
   }
 
   get fields () {
-    if (this.hasFieldTarget) return this.fieldTargets
-
     return this.element.querySelectorAll('textarea, input:not([type=hidden]):not([type=submit]):not([type=button])')
   }
 
