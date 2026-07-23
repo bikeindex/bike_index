@@ -6,8 +6,8 @@ Rails.application.routes.draw do
   # Liveness endpoint (200 if the app boots). Used by the review-app kamal-proxy health check
   get "up", to: "rails/health#show", as: :rails_health_check
 
-  mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
-  mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
+  mount Sidekiq::Web => "/sidekiq", :constraints => AuthRestriction::Developer
+  mount PgHero::Engine, at: "/pghero", constraints: AuthRestriction::Developer
   # letter_opener_web inbox — the gem's Bundler group (:development, :sandbox)
   # decides where it's mounted. Unrestricted — sandbox runs seeded data with no PII.
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if defined?(LetterOpenerWeb)
@@ -122,6 +122,7 @@ Rails.application.routes.draw do
     end
   end
   resource :my_account, only: %i[show update destroy] do
+    post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
   end
@@ -157,7 +158,7 @@ Rails.application.routes.draw do
     member { post :is_private }
   end
 
-  resources :registrations, only: %i[new create] do
+  resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
   end
 
@@ -330,7 +331,7 @@ Rails.application.routes.draw do
     resources :users, only: %i[index show edit update destroy]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
-      :constraints => DeveloperRestriction,
+      :constraints => AuthRestriction::Superuser,
       :as => :feature_flags
   end
 

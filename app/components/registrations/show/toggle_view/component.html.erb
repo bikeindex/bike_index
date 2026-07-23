@@ -1,0 +1,9 @@
+<%= render(UI::Alert::Component.new(kind: :purple)) do %>
+  <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
+    <span class="tw:font-semibold">
+      <%= translation(".try_new_view", bike_type: @bike.type) %>
+    </span>
+
+    <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_new"), href: toggle_show_redesign_my_account_path, method: :post, params: {bike_id: @bike.id}, color: :primary, size: :sm)) %>
+  </div>
+<% end %>

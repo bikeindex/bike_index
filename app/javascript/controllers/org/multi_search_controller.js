@@ -129,7 +129,7 @@ export default class extends Controller {
   }
 
   alignTableColumns () {
-    const tables = Array.from(this.resultsTarget.querySelectorAll('.org-registration-search-component table.ui-table'))
+    const tables = Array.from(this.resultsTarget.querySelectorAll('.multi-search-serial-result table.ui-table'))
     if (tables.length < 2) return
 
     tables.forEach(table => {

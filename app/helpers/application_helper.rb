@@ -49,8 +49,10 @@ module ApplicationHelper
       "content_skeleton" if %w[goodbye].include?(action_name)
     when "organizations"
       "content_skeleton" if %w[lightspeed_integration].include?(action_name)
-    when "news", "feedbacks", "manufacturers", "errors", "registrations"
+    when "news", "feedbacks", "manufacturers", "errors"
       "content_skeleton"
+    when "registrations"
+      "content_skeleton" unless action_name == "show"
     end
   end
 
@@ -74,6 +76,8 @@ module ApplicationHelper
       "kelsey_landing-page-body"
     elsif current_page_skeleton == "organized_skeleton"
       "organized-body"
+    elsif controller_name == "registrations" && action_name == "show"
+      "tw:bg-[#f7f6fb]"
     end
   end
 

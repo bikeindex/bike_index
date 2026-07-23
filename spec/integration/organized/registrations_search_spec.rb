@@ -35,7 +35,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   def settings_selector
-    "[data-org--registration-search-target='settings']"
+    "[data-org--search-target='settings']"
   end
 
   def expect_settings_open
@@ -223,11 +223,15 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_link "past 30 days"
     expect(page).to have_current_path(/period=month/, wait: 10)
     # "Render chart" lives inside the results frame the period change above
-    # replaces. Wait for that swap to settle (bob is the only match in the past
-    # 30 days) before clicking, so the advance nav isn't superseded mid-swap.
+    # replaces. Fully settle that frame navigation before clicking, so the
+    # advance nav isn't superseded mid-swap: rows in (bob is the only past-30-day
+    # match), Turbo's `busy` flag cleared, and the freshly-rendered link (its href
+    # now toggles to render_chart=true) present -- then click that exact link.
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
+    expect(page).to have_link("Render chart", href: /render_chart=true/, wait: 10)
 
-    click_link "Render chart"
+    click_link "Render chart", href: /render_chart=true/
     expect(page).to have_current_path(/render_chart=true/, wait: 10)
     expect(page).to have_css("table", wait: 10)
     # Chart loads async via a lazy turbo-frame; wait for the chartkick element

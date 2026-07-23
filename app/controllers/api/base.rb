@@ -79,15 +79,15 @@ module API
 
     def self.respond_to_error(e)
       logger.error e unless Rails.env.test? # Breaks tests...
-      eclass = e.class.to_s
-      message = "OAuth error: #{e}" if /APIAuthorization::Errors/.match?(eclass)
-      opts = {error: message || e.message}
-      status_code = status_code_for(e, eclass)
-      if Rails.env.production?
-        Honeybadger.notify(e) if status_code > 450 # Only notify in production for 500s
-      else
-        opts[:trace] = e.backtrace[0, 10]
-      end
+      # Exception messages can carry invalid UTF-8 (scanner probe URLs, malformed
+      # params). Scrub before matching or serializing — an unscrubbed bad byte
+      # raises here and suppresses the Honeybadger notify below, leaving a bare 500.
+      message = e.message.to_s.dup.force_encoding(Encoding::UTF_8).scrub
+      status_code = status_code_for(e, message)
+      Honeybadger.notify(e) if Rails.env.production? && status_code > 450 # Only notify for 500s
+      message = "OAuth error: #{message}" if /APIAuthorization::Errors/.match?(e.class.to_s)
+      opts = {error: message}
+      opts[:trace] = e.backtrace[0, 10] unless Rails.env.production?
       Rack::Response.new(opts.to_json, status_code, {
         "Content-Type" => "application/json",
         "Access-Control-Allow-Origin" => "*",
@@ -95,17 +95,18 @@ module API
       })
     end
 
-    def self.status_code_for(error, eclass)
+    def self.status_code_for(error, message)
+      eclass = error.class.to_s
       if /OAuthUnauthorizedError/.match?(eclass)
         401
       elsif /OAuthForbiddenError/.match?(eclass)
         403
-      elsif (eclass =~ /RecordNotFound/) || (error.message =~ /unable to find/i)
+      elsif eclass.match?(/RecordNotFound/) || message.match?(/unable to find/i)
         404
       elsif error.is_a?(Rack::BadRequest) # malformed request body (e.g. empty multipart)
         400
       else
-        (error.respond_to? :status) && error.status || 500
+        (error.respond_to?(:status) && error.status) || 500
       end
     end
   end
