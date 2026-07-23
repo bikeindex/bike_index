@@ -42,19 +42,6 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect_render_donation(true, mail)
         expect_render_supporters(true, mail)
         expect(mail.deliver_now.text_part.body.to_s).to include("Almost Done").and include("Finish it")
-        expect(mail.html_part.decoded).to include "bikes/new?b_param_token=#{b_param.id_token}"
-      end
-    end
-    context "registration_flow" do
-      let(:b_param) do
-        BParam.create(origin: "registration_flow",
-          params: {bike: {owner_email: "owner@example.com"}}.as_json)
-      end
-      it "links to the register confirm endpoint" do
-        mail = OrganizedMailer.partial_registration(b_param)
-        expect(mail.to).to eq(["owner@example.com"])
-        expect(mail.deliver_now.html_part.decoded)
-          .to include "register/confirm?b_param_token=#{b_param.id_token}&amp;confirmation_token=#{b_param.confirmation_token}"
       end
     end
     context "with organization" do

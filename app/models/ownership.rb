@@ -62,8 +62,7 @@ class Ownership < ApplicationRecord
     impound_import: 9,
     impound_process: 11,
     transferred_ownership: 10,
-    sticker: 13,
-    registration_flow: 14
+    sticker: 13
   }.freeze
 
   enum :status, Bike::STATUS_ENUM

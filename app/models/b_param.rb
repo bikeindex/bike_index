@@ -31,7 +31,6 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
-  PARTIAL_REGISTRATION_ORIGINS = %w[embed_partial registration_flow].freeze
   REGISTRATION_INFO_ATTRS = %w[
     accuracy
     bike_code
@@ -83,13 +82,12 @@ class BParam < ApplicationRecord
   serialize :bike_errors, coder: YAML
 
   before_create :generate_id_token
-  before_create :generate_confirmation_token, if: :registration_flow?
   before_save :clean_params
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
-  scope :partial_registrations, -> { where(origin: PARTIAL_REGISTRATION_ORIGINS) }
+  scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
@@ -163,16 +161,6 @@ class BParam < ApplicationRecord
 
       without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
         .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
-    end
-
-    # Resume a registration by token (/register flow): anonymous or created by the passed user
-    def find_for_token(toke, user_id: nil)
-      return nil if toke.blank?
-
-      # Once the bike exists the token only ever renders the completion page,
-      # so access doesn't require matching the creator assigned at creation
-      where(id_token: toke).where("created_at >= ?", Time.current - 1.month)
-        .detect { |b| b.creator_id.blank? || b.creator_id == user_id || b.created_bike_id.present? }
     end
 
     def email_search(str)
@@ -409,38 +397,7 @@ class BParam < ApplicationRecord
   end
 
   def partial_registration?
-    PARTIAL_REGISTRATION_ORIGINS.include?(origin)
-  end
-
-  def registration_flow?
-    origin == "registration_flow"
-  end
-
-  # Only sent in the partial registration email - unlike id_token, the anonymous
-  # registrant never sees it, so presenting it proves control of the email
-  def confirmation_token
-    params["confirmation_token"]
-  end
-
-  def email_confirmed?
-    params["email_confirmed_at"].present?
-  end
-
-  # Once the email is confirmed, the email's own account (or the AUTO_ORG_MEMBER
-  # system user) can stand in as the creator the Ownership requires
-  def confirmed_email_creator_id
-    return nil unless email_confirmed?
-
-    (User.fuzzy_email_find(owner_email) || User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"]))&.id
-  end
-
-  def confirm_email!
-    email_confirmed? || update(params: params.merge("email_confirmed_at" => Time.current))
-  end
-
-  # Set once the details step (registration flow step 2) has been submitted
-  def details_completed?
-    params["details_completed"].present?
+    origin == "embed_partial"
   end
 
   def primary_frame_color
@@ -620,10 +577,6 @@ class BParam < ApplicationRecord
 
   def generate_id_token
     self.id_token ||= SecurityTokenizer.new_token
-  end
-
-  def generate_confirmation_token
-    self.params = params.merge("confirmation_token" => SecurityTokenizer.new_token)
   end
 
   def parking_notification_params

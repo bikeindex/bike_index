@@ -12,18 +12,7 @@ RSpec.describe UI::Header::Component, type: :component do
     expect(component).to have_text("Page Title")
     html = component.to_html
     expect(html).to include("tw:text-2xl")
-    expect(html).to include("tw:font-extrabold")
-    expect(html).to include("tw:mb-6")
-    expect(component).to_not have_css("p")
-  end
-
-  context "with subtitle" do
-    let(:options) { {text: "Page Title", subtitle: "The finer print"} }
-
-    it "renders the subtitle below a tight heading" do
-      expect(component.css("h1").first["class"]).to include("tw:mb-1")
-      expect(component.css("p").text.strip).to eq "The finer print"
-    end
+    expect(html).to include("tw:font-bold")
   end
 
   context "with h2 tag" do
