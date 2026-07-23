@@ -11,7 +11,7 @@ RSpec.describe Registrations::Show::LegacyViewLink::Component, type: :component 
     context "redesign not enabled for the user" do
       it "renders the invitation alert with a plain link to the legacy viewer" do
         render_inline(component)
-        expect(page).to have_text("You're trying out the new bike page")
+        expect(page).to have_text("You're trying out the new bike viewer.")
         expect(page).to have_link("view bike in legacy viewer", href: "/bikes/#{bike.id}")
         expect(page).to have_no_css("form[action='/my_account/toggle_show_redesign']")
       end
@@ -22,7 +22,7 @@ RSpec.describe Registrations::Show::LegacyViewLink::Component, type: :component 
 
       it "renders the invitation alert with a button that posts the bike to the toggle route" do
         render_inline(component)
-        expect(page).to have_text("You're trying out the new bike page")
+        expect(page).to have_text("You're trying out the new bike viewer.")
         form = page.find("form[action='/my_account/toggle_show_redesign'][method='post']")
         expect(form).to have_css("input[name='bike_id'][value='#{bike.id}']", visible: :all)
         expect(form).to have_button("Switch back to the legacy viewer")

@@ -30,6 +30,13 @@
         <%= entry_link(view) %>
       <% end %>
     <% end %>
+
+    <% if show_legacy_link? %>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item do %>
+        <%= legacy_view_link %>
+      <% end %>
+    <% end %>
   <% end %>
 <% else %>
   <%= render(UI::Badge::Component.new(text: display_label, color: @color, size: :sm, solid: @solid)) %>

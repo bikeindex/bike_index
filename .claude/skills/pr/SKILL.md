@@ -81,7 +81,7 @@ Describe the end state, not the journey. Reviewers want to know what the PR does
 
 **No Claude Code attribution footer.** Don't append the "🤖 Generated with [Claude Code](https://claude.com/claude-code)" line (or any variant of it) to the body. The PR body should read like the human author wrote it.
 
-Push the branch: `git push -u origin HEAD`.
+Push the branch: `git push -u origin HEAD`. Don't report the local branch name differing from the name mentioned in the invocation/instructions when the branch has no upstream — pushing `HEAD` creates a matching remote, so it's benign; push and move on silently. Only flag a branch mismatch when the local branch already tracks a differently-named or unexpected upstream (per `feedback_branch_must_match_origin`).
 
 - If `$EXISTING_PR` from step 1 was non-empty: `gh pr edit "$PR_NUMBER" --title "..." --body-file <tmp-body-file>` (`$PR_NUMBER` was parsed in step 1). Refresh the title to match the current diff (this is what an "update pr" request expects) unless the user already gave the PR a deliberate custom title you'd be clobbering — if unsure, keep the existing title and only update the body.
 - Otherwise: `gh pr create --draft --base "$BASE" --title "..." --body-file <tmp-body-file>` (`$BASE` from step 0.5). Create as a draft by default; only omit `--draft` (or mark ready) if the user explicitly asks for a ready-for-review PR. Capture the new PR number into `PR_NUMBER` from the output for the screenshot phase.
