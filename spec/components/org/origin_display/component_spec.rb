@@ -28,7 +28,7 @@ RSpec.describe Org::OriginDisplay::Component, type: :component do
     let(:creation_description) { Ownership.new(origin: "creator_unregistered_parking_notification").creation_description }
 
     it "renders the humanized label with the flow tooltip" do
-      expect(creation_description).to eq "creator unregistered parking notification"
+      expect(creation_description).to eq "parking notification"
       expect(component).to have_content("Unregistered Parking Notification")
       expect(component).to have_css("[role=tooltip]", text: "Registered via the Unregistered Parking Notification flow", visible: :all)
     end
