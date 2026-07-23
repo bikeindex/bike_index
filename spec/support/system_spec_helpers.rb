@@ -31,21 +31,23 @@ module SystemSpecHelpers
     field
   end
 
-  # Navigate back/forward and wait for Turbo Drive to finish the restoration
-  # visit before returning. Search pages reload their results turbo-frame from
-  # the URL independently of -- and faster than -- the page render, so tbody
-  # counts and the address bar can settle while the form still shows the previous
-  # query. Turbo fires exactly one turbo:load per restoration visit (after the
-  # popstate the search--form controller reconciles the fields on); register a
-  # one-shot listener, navigate, then wait for it so the whole restoration has
-  # landed before we read or fill the form.
+  # The visible text filters live outside the results turbo-frame, so a
+  # back/forward leaves them showing the previous query until search--form's
+  # popstate handler reconciles them to the address bar -- and the frame reloads
+  # its results independently of, and faster than, that. Reading or filling the
+  # form before the reconciliation lands races the restoration preview.
+  RESTORED_FILTER_FIELDS = %w[search_email serial search_notes].freeze
+
+  # Navigate back and wait for the restored filters to match the address bar
+  # before returning, so callers read or fill a settled form. Waits on the real
+  # reconciliation (search--form#handlePopstate) rather than a synthetic marker.
   def go_back_and_wait(wait: 10)
-    page.execute_script(<<~JS)
-      document.documentElement.removeAttribute("data-test-turbo-loaded")
-      document.addEventListener("turbo:load", () => document.documentElement.setAttribute("data-test-turbo-loaded", ""), {once: true})
-    JS
     page.go_back
-    expect(page).to have_css("html[data-test-turbo-loaded]", wait:, visible: :all)
+    restored = Rack::Utils.parse_query(URI.parse(page.current_url).query)
+    RESTORED_FILTER_FIELDS.each do |name|
+      next unless page.has_selector?("input[name='#{name}']", wait: 0)
+      expect(page).to have_field(name, with: restored[name].to_s, wait:)
+    end
   end
 
   # capybara-playwright wraps click/find so a mid-action "Element is not attached
