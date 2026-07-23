@@ -18,3 +18,7 @@ class IpSpoofAttackFilter
     [403, {"content-type" => "text/plain"}, ["Forbidden"]]
   end
 end
+
+# Must sit below DebugExceptions/ShowExceptions: those rescue the raised IpSpoofAttackError
+# and render it as a 500 before it can reach this filter. Above them it never fires.
+Rails.application.config.middleware.insert_after ActionDispatch::DebugExceptions, IpSpoofAttackFilter
