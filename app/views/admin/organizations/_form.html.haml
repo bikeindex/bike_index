@@ -179,13 +179,23 @@
                   %code.d-inline nearby_organizations
                   will search within this radius for other organizations in the same area
 
-          - if @organization.enabled?("passwordless_users")
+          - passwordless_enabled = @organization.enabled?("passwordless_users")
+          - saml_sso_enabled = @organization.enabled?("saml_sso")
+          - if passwordless_enabled || saml_sso_enabled
             .form-group
               = f.label :user_email_domain do
                 %span
-                permitted domain for passwordless sign in
+                - if passwordless_enabled && saml_sso_enabled
+                  permitted domain for passwordless sign in and SAML SSO
+                - elsif saml_sso_enabled
+                  permitted domain for SAML SSO sign in
+                - else
+                  permitted domain for passwordless sign in
                 %small
-                  <span class="text-success">passwordless user feature</span>
+                  - if passwordless_enabled
+                    <span class="text-success">passwordless user feature</span>
+                  - if saml_sso_enabled
+                    <span class="text-success">SAML SSO feature</span>
               .input-group
                 .input-group-prepend
                   .input-group-text @
