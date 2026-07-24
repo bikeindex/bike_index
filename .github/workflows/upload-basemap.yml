@@ -8,10 +8,9 @@
 # disk (ingress is free). The one-time assets block seeds style, glyphs and
 # sprites; comment it out after the first run.
 #
-# Run it from the Actions tab - no input needed, it resolves the latest Protomaps
-# planet build automatically (or paste a specific
-# https://build.protomaps.com/<date>.pmtiles URL to override). Refresh the tiles
-# quarterly. After it runs, purge the Cloudflare cache for maps.bikeindex.org.
+# Run it from the Actions tab - no input needed, it resolves and streams the
+# latest Protomaps planet build automatically. Refresh the tiles quarterly. After
+# it runs, purge the Cloudflare cache for maps.bikeindex.org.
 #
 # Secrets (on the maps-upload environment): R2_MAPS_ENDPOINT, R2_MAPS_ACCESS_KEY,
 # R2_MAPS_ACCESS_KEY_SECRET - the token must be scoped to ONLY the bikeindex-maps
@@ -34,10 +33,6 @@ name: Upload basemap
 
 on:
   workflow_dispatch:
-    inputs:
-      source:
-        description: Optional build URL override; defaults to the latest Protomaps planet build
-        required: false
 
 jobs:
   upload:
@@ -56,24 +51,19 @@ jobs:
       - name: Install rclone
         run: curl -fsSL https://rclone.org/install.sh | sudo bash
 
-      # Use the pasted override, or resolve the newest daily planet build from
-      # Protomaps' build metadata. Builds are retained ~1 week, so "latest" is
-      # always fresh and there's no date to keep up to date. Split the URL into an
-      # http-remote base + key so rclone can multi-thread the download by range.
+      # Resolve the newest daily planet build from Protomaps' build metadata.
+      # Builds are retained ~1 week, so "latest" is always fresh and there's no
+      # date to keep up to date. Set the http-remote base + key so rclone can
+      # multi-thread the download by range.
       - name: Resolve build URL
-        env:
-          SOURCE: ${{ inputs.source }}
         run: |
-          if [ -z "$SOURCE" ]; then
-            key=$(curl -fsSL https://build-metadata.protomaps.dev/builds.json | jq -r '.[-1].key')
-            SOURCE="https://build.protomaps.com/$key"
-          fi
+          key=$(curl -fsSL https://build-metadata.protomaps.dev/builds.json | jq -r '.[-1].key')
           {
             echo "RCLONE_CONFIG_SRC_TYPE=http"
-            echo "RCLONE_CONFIG_SRC_URL=${SOURCE%/*}"
-            echo "KEY=${SOURCE##*/}"
+            echo "RCLONE_CONFIG_SRC_URL=https://build.protomaps.com"
+            echo "KEY=$key"
           } >> "$GITHUB_ENV"
-          echo "Streaming build: $SOURCE"
+          echo "Streaming build: https://build.protomaps.com/$key"
 
       - name: Stream tiles to R2
         run: |
