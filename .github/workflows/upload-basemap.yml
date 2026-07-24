@@ -1,8 +1,12 @@
-# Streams a Protomaps .pmtiles build straight into the maps R2 bucket from a
-# GitHub runner - fast, free bandwidth (R2 ingress is free), and rclone pipes the
-# file through without it ever landing on disk or on anyone's local connection.
-# The one-time assets block also seeds the style, glyphs and sprites the tiles
-# need to render; comment that block out after the first run.
+# Copies the full Protomaps planet (~137 GB, all zoom levels) into the maps R2
+# bucket from a GitHub runner. build.protomaps.com throttles a single connection
+# to a few MiB/s - too slow to move 137 GB inside the 6-hour job limit (a
+# single-stream `rclone copyurl` timed out at 80%). So rclone reads the build
+# through an `http` remote with --multi-thread-streams: many parallel range
+# requests, spread across the file, that together run far faster than one
+# connection, piped straight into R2's multipart upload so the file never lands on
+# disk (ingress is free). The one-time assets block seeds style, glyphs and
+# sprites; comment it out after the first run.
 #
 # Run it from the Actions tab - no input needed, it resolves the latest Protomaps
 # planet build automatically (or paste a specific
@@ -54,7 +58,8 @@ jobs:
 
       # Use the pasted override, or resolve the newest daily planet build from
       # Protomaps' build metadata. Builds are retained ~1 week, so "latest" is
-      # always fresh and there's no date to keep up to date.
+      # always fresh and there's no date to keep up to date. Split the URL into an
+      # http-remote base + key so rclone can multi-thread the download by range.
       - name: Resolve build URL
         env:
           SOURCE: ${{ inputs.source }}
@@ -63,53 +68,59 @@ jobs:
             key=$(curl -fsSL https://build-metadata.protomaps.dev/builds.json | jq -r '.[-1].key')
             SOURCE="https://build.protomaps.com/$key"
           fi
-          echo "SOURCE=$SOURCE" >> "$GITHUB_ENV"
+          {
+            echo "RCLONE_CONFIG_SRC_TYPE=http"
+            echo "RCLONE_CONFIG_SRC_URL=${SOURCE%/*}"
+            echo "KEY=${SOURCE##*/}"
+          } >> "$GITHUB_ENV"
           echo "Streaming build: $SOURCE"
 
       - name: Stream tiles to R2
         run: |
-          rclone copyurl "$SOURCE" "$BUCKET/tiles.pmtiles" \
-            --s3-chunk-size 100M \
+          rclone copyto "src:$KEY" "$BUCKET/tiles.pmtiles" \
+            --multi-thread-streams 16 \
+            --multi-thread-cutoff 100Mi \
+            --s3-chunk-size 128M \
             --s3-no-check-bucket \
             --header-upload "Cache-Control: public, max-age=86400" \
             --progress
 
       # === One-time basemap assets (light-theme style, glyphs, sprites) ===
-      # Comment out these three steps after the first successful run - they seed
-      # assets that rarely change, unlike the quarterly tiles stream above.
-      - name: Generate light-theme style.json
-        run: |
-          npm install protomaps-themes-base >/dev/null 2>&1
-          cat > gen-style.mjs <<'JS'
-          import layers from "protomaps-themes-base"
-          import { writeFileSync } from "node:fs"
-          const HOST = process.env.HOST
-          const style = {
-            version: 8,
-            glyphs: `${HOST}/fonts/{fontstack}/{range}.pbf`,
-            sprite: `${HOST}/sprites/v4/light`,
-            sources: {
-              protomaps: {
-                type: "vector",
-                url: `pmtiles://${HOST}/tiles.pmtiles`,
-                attribution: "© OpenStreetMap contributors"
-              }
-            },
-            layers: layers("protomaps", "light")
-          }
-          writeFileSync("style.json", JSON.stringify(style))
-          JS
-          node gen-style.mjs
-      - name: Fetch Protomaps glyphs + sprites
-        run: git clone --depth 1 https://github.com/protomaps/basemaps-assets.git
-      - name: Upload style, glyphs and sprites to R2
-        run: |
-          rclone copyto style.json "$BUCKET/style.json" \
-            --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
-          rclone copy basemaps-assets/fonts "$BUCKET/fonts" \
-            --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
-          rclone copy basemaps-assets/sprites "$BUCKET/sprites" \
-            --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
+      # Seeded once (2026-07); the assets rarely change, so these steps are
+      # commented out. Uncomment for a theme swap or basemap-version bump.
+      # - name: Generate light-theme style.json
+      #   run: |
+      #     npm install protomaps-themes-base >/dev/null 2>&1
+      #     cat > gen-style.mjs <<'JS'
+      #     import layers from "protomaps-themes-base"
+      #     import { writeFileSync } from "node:fs"
+      #     const HOST = process.env.HOST
+      #     const style = {
+      #       version: 8,
+      #       glyphs: `${HOST}/fonts/{fontstack}/{range}.pbf`,
+      #       sprite: `${HOST}/sprites/v4/light`,
+      #       sources: {
+      #         protomaps: {
+      #           type: "vector",
+      #           url: `pmtiles://${HOST}/tiles.pmtiles`,
+      #           attribution: "© OpenStreetMap contributors"
+      #         }
+      #       },
+      #       layers: layers("protomaps", "light")
+      #     }
+      #     writeFileSync("style.json", JSON.stringify(style))
+      #     JS
+      #     node gen-style.mjs
+      # - name: Fetch Protomaps glyphs + sprites
+      #   run: git clone --depth 1 https://github.com/protomaps/basemaps-assets.git
+      # - name: Upload style, glyphs and sprites to R2
+      #   run: |
+      #     rclone copyto style.json "$BUCKET/style.json" \
+      #       --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
+      #     rclone copy basemaps-assets/fonts "$BUCKET/fonts" \
+      #       --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
+      #     rclone copy basemaps-assets/sprites "$BUCKET/sprites" \
+      #       --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
       # === end one-time assets ===
 
       - name: Done
