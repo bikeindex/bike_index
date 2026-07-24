@@ -47,15 +47,16 @@ jobs:
       RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_MAPS_ACCESS_KEY_SECRET }}
     steps:
       - name: Install rclone
-        run: sudo apt-get update && sudo apt-get install -y rclone
+        run: curl -fsSL https://rclone.org/install.sh | sudo bash
 
       - name: Stream basemap to R2
+        env:
+          SOURCE: ${{ inputs.source }}
         run: |
-          rclone copyurl "${{ inputs.source }}" "$DEST" \
+          rclone copyurl "$SOURCE" "$DEST" \
             --s3-chunk-size 100M \
             --s3-no-check-bucket \
             --header-upload "Cache-Control: public, max-age=86400" \
-            --header-upload "Content-Type: application/octet-stream" \
             --progress
 
       - name: Done
