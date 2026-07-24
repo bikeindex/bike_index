@@ -1,0 +1,18 @@
+---
+en:
+  components:
+    registrations:
+      show:
+        org_top_actions:
+          wrapper:
+            impound: Impound
+            impound_record: Impound Record
+            message_owner: Message Owner
+            message_owner_sub: Via Bike Index
+            parking_notice: Parking Notification
+            parking_notice_sub: Create a New Notification
+            record_impounding: Record Impounding
+            update: Update
+            view_notifications: View Notifications
+            view_notifications_activity_html: "<strong>%{active}</strong> Active - <strong>%{resolved}</strong>
+              Resolved"
