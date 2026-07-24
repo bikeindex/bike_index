@@ -103,7 +103,7 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
   # The ?panel=parking load path auto-opens the panel on connect; geolocation
   # must still fire despite the accordion/panel controller connect order
   context "when loaded with the panel already open" do
-    it "geolocates on load, without a click" do
+    it "geolocates on load, without a click, and prefers a pin carried in the URL" do
       visit "#{preview_path}?panel=parking"
 
       expect(page).to have_content(located_status, wait: 10)
@@ -111,13 +111,9 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
       expect(coordinate("longitude")).to eq(longitude)
       expect(page).to have_button("Create parking notification", disabled: false)
       expect_axe_clean
-    end
-  end
 
-  # A shared link / reload carries the pin coordinates in the URL; they win over
-  # the (slower, less intentional) device geolocation
-  context "when the URL carries a stored pin" do
-    it "restores the pin from the URL instead of geolocating" do
+      # A shared link / reload carries the pin coordinates; they win over the
+      # (slower, less intentional) device geolocation
       visit "#{preview_path}?panel=parking&map_lat=40.5&map_lng=-74.25&map_zoom=12"
 
       expect(page).to have_button("Create parking notification", disabled: false, wait: 10)
