@@ -4,7 +4,7 @@
 # so we need at least one of each kind tied to Brakebills.
 
 brakebills = Organization.find_by_name("Brakebills")
-member = User.find_by_email("member@bikeindex.org")
+member = User.find_by_email("member@brakebills.edu")
 user = User.find_by_email("user@bikeindex.org")
 
 raise "missing Brakebills org or test users" if brakebills.blank? || member.blank? || user.blank?

@@ -70,7 +70,7 @@ brakebills = Organization.find_by_name("Brakebills") || Organization.create!(nam
 brakebills_invoice = Invoice.create(organization: brakebills, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
 brakebills_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_ownership_email_feature_id, avery_export_feature_id]
 brakebills_invoice.update(organization_feature_ids: brakebills_feature_ids)
-OrganizationRole.create(organization_id: brakebills.id, user_id: User.find_by_email("member@bikeindex.org").id, role: "member")
+OrganizationRole.create(organization_id: brakebills.id, user_id: User.find_by_email("member@brakebills.edu").id, role: "member")
 
 # Logo (rasterized from db/seeds/images/brakebills.svg — CarrierWave rejects SVG)
 if brakebills.avatar.blank?

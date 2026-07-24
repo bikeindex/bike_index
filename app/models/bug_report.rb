@@ -12,6 +12,7 @@
 #  is_paid_organization       :boolean          default(FALSE), not null
 #  is_paid_organization_staff :boolean          default(FALSE), not null
 #  received_at                :datetime
+#  status                     :integer          default("unprioritized"), not null
 #  subject                    :text
 #  tags                       :text             default([]), not null, is an Array
 #  created_at                 :datetime         not null
@@ -22,6 +23,7 @@
 # Indexes
 #
 #  index_bug_reports_on_inbound_email_id  (inbound_email_id)
+#  index_bug_reports_on_status            (status)
 #  index_bug_reports_on_tags              (tags) USING gin
 #  index_bug_reports_on_user_id           (user_id)
 #
@@ -33,6 +35,16 @@ class BugReport < ApplicationRecord
   include PgSearch::Model
 
   GITHUB_REPO_URL = "https://github.com/bikeindex/bike_index"
+  STATUS_ENUM = {unprioritized: 0, investigate_priority_high: 1, investigate_priority_low: 2,
+                 resolved: 19, ignored: 20}.freeze
+  INTERNAL_NOTIFICATION_TAG = "bike_index_notification"
+  AUTO_REPLY_TAG = "auto_replies"
+  ORGANIZATION_AUTO_REPLY_TAG = "auto_replies_organization"
+  SPAM_TAG = "spam"
+  # Tags marking reports that aren't real bug reports and can be auto-ignored
+  IGNORED_TAGS = [INTERNAL_NOTIFICATION_TAG, AUTO_REPLY_TAG, ORGANIZATION_AUTO_REPLY_TAG, SPAM_TAG].freeze
+
+  enum :status, STATUS_ENUM
 
   belongs_to :user
   belongs_to :inbound_email, class_name: "ActionMailbox::InboundEmail"
@@ -46,8 +58,14 @@ class BugReport < ApplicationRecord
   validates :email, presence: true
 
   before_validation :set_calculated_attributes
+  after_commit :enqueue_prioritizing_job, on: :create
 
   scope :with_tag, ->(tag) { where("tags @> ARRAY[?]::text[]", tag) }
+  scope :member, -> { where(is_member: true) }
+  scope :paid_organization, -> { where(is_paid_organization: true) }
+  scope :paid_organization_staff, -> { where(is_paid_organization_staff: true) }
+  # Includes unprioritized so reports the auto-prioritize job hasn't reached yet stay visible
+  scope :investigate, -> { where(status: %i[unprioritized investigate_priority_high investigate_priority_low]) }
 
   def self.all_tags
     distinct.pluck(Arel.sql("unnest(tags)")).sort
@@ -72,6 +90,10 @@ class BugReport < ApplicationRecord
     subject.presence || "(no subject)"
   end
 
+  def ignored_tag?
+    tags.intersect?(IGNORED_TAGS)
+  end
+
   private
 
   def set_calculated_attributes
@@ -84,5 +106,9 @@ class BugReport < ApplicationRecord
     self.is_paid_organization = user.paid_org?
     self.is_paid_organization_staff = user.organization_roles.admin
       .where(organization_id: Organization.paid).limit(1).any?
+  end
+
+  def enqueue_prioritizing_job
+    BugReportAutoPrioritizeJob.perform_async(id)
   end
 end

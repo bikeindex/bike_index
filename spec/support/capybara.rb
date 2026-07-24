@@ -30,6 +30,19 @@ Capybara.server_port = CAPYBARA_PORT
 Capybara.app_host = "http://#{Capybara.server_host}:#{CAPYBARA_PORT}"
 Capybara.always_include_port = true
 
+# The application layout pulls Google Fonts and analytics from external hosts
+# (app/views/layouts/application.html.erb and shared/_analytics.html). Playwright's
+# `visit` waits for the page `load` event, which stalls for the full navigation
+# timeout when those hosts are unreachable from CI -- a flaky `visit` failure on
+# any page. Abort the requests so `load` fires on the app's own assets. Spec-level
+# routes (e.g. Mapbox stubs) register later and take precedence.
+BLOCKED_EXTERNAL_HOSTS = %w[
+  fonts.googleapis.com
+  fonts.gstatic.com
+  www.googletagmanager.com
+  www.google-analytics.com
+].freeze
+
 # Keep BASE_URL aligned with Capybara's server for `:js` specs so any
 # `*_url` helper rendered during the example -- or ERB-interpolated asset
 # (`<%= ENV['BASE_URL'] %>...`) that gets sprockets-compiled on demand --
@@ -41,5 +54,13 @@ RSpec.configure do |config|
     example.run
   ensure
     ENV["BASE_URL"] = original_base_url
+  end
+
+  config.before(:each, :js) do
+    Capybara.current_session.driver.with_playwright_page do |playwright_page|
+      BLOCKED_EXTERNAL_HOSTS.each do |host|
+        playwright_page.route("https://#{host}/**", ->(route, _request) { route.abort })
+      end
+    end
   end
 end
