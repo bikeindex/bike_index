@@ -50,12 +50,18 @@ class BugReportAutoPrioritizeJob < ApplicationJob
     [BugReport::ORGANIZATION_AUTO_REPLY_TAG]
   end
 
+  # A From header isn't required to contain "@" - without the guard, a domain-only sender
+  # would match a configured domain and get auto-ignored
   def organization_auto_reply_sender?(email)
     email = email.to_s.downcase
-    return false if email.blank?
+    return false unless email.include?("@")
 
     domain = email.split("@").last
-    ORGANIZATION_AUTO_REPLY_SENDERS.any? { |sender| sender.include?("@") ? email == sender : domain == sender }
+    ORGANIZATION_AUTO_REPLY_SENDERS.any? do |sender|
+      next email == sender if sender.include?("@")
+
+      domain == sender || domain.end_with?(".#{sender}")
+    end
   end
 
   def calculated_status(bug_report)

@@ -91,6 +91,25 @@ RSpec.describe BugReportAutoPrioritizeJob, type: :job do
           instance.perform(other.id)
           expect(other.reload.tags).to eq([])
         end
+
+        it "tags a subdomain of a configured domain" do
+          bug_report.update_column(:email, "noreply@mail.tickets.example.org")
+          instance.perform(bug_report.id)
+          expect(bug_report.reload.tags).to eq(["auto_replies_organization"])
+        end
+
+        it "does not match a domain that merely ends with the configured one" do
+          bug_report.update_column(:email, "noreply@nottickets.example.org")
+          instance.perform(bug_report.id)
+          expect(bug_report.reload.tags).to eq([])
+        end
+
+        # A From header without "@" parses through the mailbox as-is
+        it "does not match a sender missing an @" do
+          bug_report.update_column(:email, "tickets.example.org")
+          instance.perform(bug_report.id)
+          expect(bug_report.reload.tags).to eq([])
+        end
       end
     end
 
