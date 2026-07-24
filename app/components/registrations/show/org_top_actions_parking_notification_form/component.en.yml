@@ -7,5 +7,7 @@ en:
           address_or_intersection: Address or intersection
           create_parking_notification: Create a new parking notification
           impound_this_bike_type: Impound this %{bike_type}
+          map_hint: Drag the pin or tap the map to set the location
+          map_unavailable: The map couldn't be loaded — the location was still set from your device.
           parking_notification_notes_html: "%{org_name} internal notes <small>not
             shown to user</small>"

@@ -28,6 +28,11 @@ module Registrations
         def create_parking_notifications_path
           organization_parking_notifications_path(organization_id: @organization.to_param)
         end
+
+        # Seeds the map pin when the browser location is unavailable
+        def org_map_coordinates
+          @organization.map_focus_coordinates
+        end
       end
     end
   end

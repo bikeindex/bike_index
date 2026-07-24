@@ -1,11 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
+import { loadMapbox } from 'utils/mapbox'
 
 // Connects to data-controller='registrations--show--map'
 // Lazy-loads Mapbox GL and renders a map centered on the coordinates, marking
 // them with a dot (point) or a translucent red circle (approximate area).
-const MAPBOX_VERSION = 'v1.11.0'
-const MAPBOX_SRC = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-gl.js`
-const MAPBOX_CSS = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-gl.css`
 
 // A fixed dot marking the exact spot
 const POINT_PAINT = {
@@ -85,27 +83,4 @@ export default class extends Controller {
       })
     })
   }
-}
-
-// Load Mapbox GL (script + stylesheet) once, shared across controller instances.
-let mapboxPromise
-function loadMapbox () {
-  if (window.mapboxgl) return Promise.resolve(window.mapboxgl)
-  if (mapboxPromise) return mapboxPromise
-
-  if (!document.querySelector(`link[href="${MAPBOX_CSS}"]`)) {
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = MAPBOX_CSS
-    document.head.appendChild(link)
-  }
-
-  mapboxPromise = new Promise((resolve, reject) => {
-    const script = document.createElement('script')
-    script.src = MAPBOX_SRC
-    script.onload = () => resolve(window.mapboxgl)
-    script.onerror = reject
-    document.head.appendChild(script)
-  })
-  return mapboxPromise
 }

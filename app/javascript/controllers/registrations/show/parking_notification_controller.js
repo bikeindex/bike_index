@@ -1,26 +1,32 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
+import { loadMapbox } from 'utils/mapbox'
 
 /* global navigator */
 
 // Connects to data-controller='registrations--show--parking-notification'
-// Requests the device location when the panel opens (and on the button click),
-// stamps it onto the form and enables submit; also supports entering the address
-// manually via the UI::Forms::AddressGroup fields.
+// "Set on map" mode drops a draggable pin: it seeds from the browser location
+// (falling back to the organization's location), stamps the coordinates onto the
+// form, and keeps the pin + zoom in the URL so a reload restores them. "Enter
+// address manually" reveals the UI::Forms::AddressGroup fields instead.
+const DEFAULT_ZOOM = 15
+
 export default class extends Controller {
   static targets = ['latitude', 'longitude', 'accuracy', 'submit', 'status',
     'statusText', 'statusDot', 'addressGroup', 'useEnteredAddress', 'heading',
-    'locationMode', 'kindGroup', 'locationSection']
+    'locationMode', 'kindGroup', 'locationSection', 'mapSection', 'map', 'mapUnavailable']
 
   static values = {
     notificationHeading: String,
     impoundHeading: String,
     defaultKind: String,
-    mapboxKey: String
+    mapboxKey: String,
+    orgLatitude: Number,
+    orgLongitude: Number
   }
 
   // Fired when the accordion reveals this panel; impound preselects that kind,
-  // and opening the panel requests the location so the browser prompts right away
+  // and opening the panel seeds the location so the map appears right away
   applyMode (event) {
     const impound = event.detail?.name === 'impound'
     if (this.hasHeadingTarget) {
@@ -30,7 +36,7 @@ export default class extends Controller {
     if (radio) radio.checked = true
     // Impound preselects the kind, so hide the "Notification because" chooser
     if (this.hasKindGroupTarget) this.toggle(this.kindGroupTarget, !impound)
-    this.requestLocation()
+    this.startLocation()
     // A recent earlier notification preselects "repeat", so sync on open (no animation)
     this.applyRepeat(this.repeatSelected, 0)
   }
@@ -50,15 +56,48 @@ export default class extends Controller {
     if (repeat) {
       this.setManualRequired(false)
       this.enableSubmit()
+    } else {
+      this.map?.resize()
     }
   }
 
-  // Segmented control: "current" geolocates, "entered" reveals the address fields
+  // Segmented control: "current" places a pin on the map, "entered" reveals the
+  // address fields
   selectLocationMode (event) {
     if (event.target.value === 'entered') {
-      this.hide(this.statusTarget) // the current-location readout is irrelevant in manual entry
+      this.hide(this.statusTarget)
+      this.hide(this.mapSectionTarget)
       this.enterManually()
     } else {
+      this.startLocation()
+    }
+  }
+
+  // Show the map and seed the pin. Once a location has resolved this session the
+  // pin is already placed, so just re-reveal the map; otherwise restore it from
+  // the URL, or seed the org location and ask the browser for a better fix.
+  startLocation () {
+    this.setLocationMode('current')
+    this.setUseEntered(false)
+    this.setManualRequired(false)
+    this.hide(this.addressGroupTarget)
+    this.show(this.mapSectionTarget)
+
+    if (this.located) {
+      this.show(this.statusTarget)
+      this.map?.resize()
+      return
+    }
+
+    const stored = this.storedMapState
+    if (stored) {
+      this.locate(stored.latitude, stored.longitude, { zoom: stored.zoom })
+      this.reverseGeocode(stored.latitude, stored.longitude)
+    } else {
+      // The org location makes the form submittable at once; the map itself waits
+      // for the device fix so it doesn't load tiles it's about to pan away from
+      this.setCoordinates(this.orgLatitudeValue, this.orgLongitudeValue)
+      this.pinZoom = DEFAULT_ZOOM
       this.requestLocation()
     }
   }
@@ -75,16 +114,134 @@ export default class extends Controller {
   }
 
   locationFound (position) {
-    this.latitudeTarget.value = position.coords.latitude
-    this.longitudeTarget.value = position.coords.longitude
-    this.accuracyTarget.value = position.coords.accuracy
-    this.setLocationMode('current')
-    this.setUseEntered(false)
-    this.hide(this.addressGroupTarget)
-    this.setManualRequired(false)
+    if (this.manualMode) return // they switched to manual entry while we waited
+    const { latitude, longitude, accuracy } = position.coords
+    this.locate(latitude, longitude, { zoom: DEFAULT_ZOOM, accuracy })
     this.setStatus('Using your current location', { dot: true })
-    this.reverseGeocode(position.coords.latitude, position.coords.longitude)
+    this.reverseGeocode(latitude, longitude)
+  }
+
+  locationFailed () {
+    if (this.manualMode) return
+    // The org location already seeded the form, so drop the pin there to drag
+    this.locate(this.orgLatitudeValue, this.orgLongitudeValue, { zoom: DEFAULT_ZOOM, persist: false })
+    this.setStatus('Drag the pin to set the location', { dot: true })
+  }
+
+  // A resolved location: stamp it onto the form and drop/move the pin
+  locate (latitude, longitude, { zoom, accuracy = '', persist = true } = {}) {
+    if (latitude == null || longitude == null) return
+    this.located = true
+    this.setCoordinates(latitude, longitude, accuracy)
+    if (zoom != null) this.pinZoom = zoom
+    this.syncMap()
+    if (persist) this.persistMapState()
+  }
+
+  // The user placed the pin themselves (drag or map click); the marker is already
+  // where they left it, so adopt the coordinates without recentering the map
+  pickLocation (latitude, longitude) {
+    this.located = true
+    this.setCoordinates(latitude, longitude)
+    this.persistMapState()
+    this.setStatus('Locating the pin…', { dot: true })
+    this.reverseGeocode(latitude, longitude)
+  }
+
+  // The hidden fields are the source of truth for the coordinates
+  setCoordinates (latitude, longitude, accuracy = '') {
+    this.latitudeTarget.value = latitude
+    this.longitudeTarget.value = longitude
+    this.accuracyTarget.value = accuracy
     this.enableSubmit()
+  }
+
+  get pinLatitude () { return parseFloat(this.latitudeTarget.value) }
+  get pinLongitude () { return parseFloat(this.longitudeTarget.value) }
+
+  syncMap () {
+    if (!this.hasMapTarget || !this.mapboxKeyValue) return
+    if (Number.isNaN(this.pinLatitude) || Number.isNaN(this.pinLongitude)) return
+    if (this.map) {
+      this.marker.setLngLat([this.pinLongitude, this.pinLatitude])
+      this.map.easeTo({ center: [this.pinLongitude, this.pinLatitude], zoom: this.pinZoom ?? this.map.getZoom() })
+    } else {
+      this.buildMap()
+    }
+  }
+
+  async buildMap () {
+    if (this.mapLoading) return
+    this.mapLoading = true
+    try {
+      const mapboxgl = await loadMapbox()
+      if (!this.element.isConnected) return
+
+      // Read the coordinates now (not when buildMap was queued) so a fix that
+      // arrived while Mapbox was loading is reflected in the initial center
+      const center = [this.pinLongitude, this.pinLatitude]
+      mapboxgl.accessToken = this.mapboxKeyValue
+      this.map = new mapboxgl.Map({
+        container: this.mapTarget,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center,
+        zoom: this.pinZoom ?? DEFAULT_ZOOM,
+        maxZoom: 18
+      })
+      this.marker = new mapboxgl.Marker({ draggable: true, color: '#dc2626' })
+        .setLngLat(center)
+        .addTo(this.map)
+
+      this.marker.on('dragend', () => {
+        const { lat, lng } = this.marker.getLngLat()
+        this.pickLocation(lat, lng)
+      })
+      this.map.on('click', (event) => {
+        this.marker.setLngLat(event.lngLat)
+        this.pickLocation(event.lngLat.lat, event.lngLat.lng)
+      })
+      // Only user pans/zooms carry originalEvent; a programmatic easeTo doesn't
+      this.map.on('moveend', (event) => { if (event.originalEvent) this.persistMapState() })
+      // The container may have been collapsed when the map was built
+      this.map.on('load', () => this.map.resize())
+    } catch (error) {
+      this.mapUnavailable(error)
+    }
+  }
+
+  // WebGL/Mapbox can be unavailable (crawlers, headless browsers, disabled GPU,
+  // blocked CDN). The coordinates are already stamped, so the form still submits;
+  // just reveal a message instead of a blank box
+  mapUnavailable (error) {
+    console.warn('Parking-notification map failed to render:', error)
+    this.map = null
+    if (this.hasMapTarget) this.mapTarget.hidden = true
+    if (this.hasMapUnavailableTarget) this.mapUnavailableTarget.hidden = false
+  }
+
+  disconnect () {
+    this.map?.remove()
+    this.map = null
+  }
+
+  // The pin + zoom live in the URL so a reload (or shared link) restores them
+  persistMapState () {
+    if (Number.isNaN(this.pinLatitude) || Number.isNaN(this.pinLongitude)) return
+    const zoom = this.map ? this.map.getZoom() : this.pinZoom
+    const url = new URL(window.location)
+    url.searchParams.set('map_lat', this.pinLatitude.toFixed(6))
+    url.searchParams.set('map_lng', this.pinLongitude.toFixed(6))
+    if (zoom != null) url.searchParams.set('map_zoom', Number(zoom).toFixed(2))
+    window.history.replaceState(window.history.state, '', url)
+  }
+
+  get storedMapState () {
+    const params = new URLSearchParams(window.location.search)
+    const latitude = parseFloat(params.get('map_lat'))
+    const longitude = parseFloat(params.get('map_lng'))
+    if (Number.isNaN(latitude) || Number.isNaN(longitude)) return null
+    const zoom = parseFloat(params.get('map_zoom'))
+    return { latitude, longitude, zoom: Number.isNaN(zoom) ? undefined : zoom }
   }
 
   // Reverse-geocode the coordinates into a human-readable place and split address
@@ -100,8 +257,8 @@ export default class extends Controller {
       const place = feature.place_name.replace(/,\s*United States$/, '')
       // In manual entry, seed the fields instead of showing the readout
       if (this.manualMode) this.fillAddress()
-      else this.setStatus(`Using your current location · ${place}`, { dot: true })
-    } catch { /* keep the plain "current location" status */ }
+      else this.setStatus(place, { dot: true })
+    } catch { /* keep the plain status */ }
   }
 
   // Split a Mapbox feature into street/city/region/postal/country parts
@@ -117,14 +274,10 @@ export default class extends Controller {
     }
   }
 
-  locationFailed () {
-    this.setStatus("Couldn't determine your location — enter the address below")
-    this.enterManually()
-  }
-
   enterManually () {
     this.setLocationMode('entered')
     this.setUseEntered(true)
+    this.hide(this.mapSectionTarget)
     this.show(this.addressGroupTarget)
     this.fillAddress()
     this.setManualRequired(true)
@@ -177,7 +330,7 @@ export default class extends Controller {
     }
   }
 
-  // Manual entry requires the street and city; geolocation doesn't
+  // Manual entry requires the street and city; the map pin doesn't
   setManualRequired (required) {
     this.element.querySelectorAll("input[name$='[street]'], input[name$='[city]']")
       .forEach((field) => { field.required = required })

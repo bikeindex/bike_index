@@ -1,15 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
+import { loadMapbox } from 'utils/mapbox'
 
 // Renders the Mapbox map showing a stolen/impounded bike's location.
 // Connects to data-controller='stolen-map'
-//
-// Mapbox GL is loaded dynamically from the CDN here rather than via a plain
-// <script src> in the view: under Turbo, a re-inserted external script loads
-// async and no longer blocks the following inline script, so init ran before
-// mapboxgl was defined (ReferenceError: mapboxgl is not defined).
-const MAPBOX_VERSION = 'v1.11.0'
-const MAPBOX_JS = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-gl.js`
-const MAPBOX_CSS = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-gl.css`
 
 export default class extends Controller {
   static targets = ['canvas', 'unavailable']
@@ -71,26 +64,4 @@ export default class extends Controller {
       })
     })
   }
-}
-
-// Load the Mapbox GL script + stylesheet once, sharing the promise across maps.
-let mapboxLoading
-
-function loadMapbox () {
-  if (window.mapboxgl) return Promise.resolve()
-
-  mapboxLoading ||= new Promise((resolve, reject) => {
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = MAPBOX_CSS
-    document.head.appendChild(link)
-
-    const script = document.createElement('script')
-    script.src = MAPBOX_JS
-    script.onload = resolve
-    script.onerror = reject
-    document.head.appendChild(script)
-  })
-
-  return mapboxLoading
 }

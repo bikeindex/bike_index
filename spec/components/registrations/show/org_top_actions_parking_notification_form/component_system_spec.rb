@@ -11,8 +11,8 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
   let(:latitude) { "37.8698" }
   let(:longitude) { "-122.2585" }
   let(:place_name) { "2363a Bryant Street, San Francisco, California 94110, United States" }
-  # The status drops the trailing ", United States"
-  let(:located_status) { "Using your current location · 2363a Bryant Street, San Francisco, California 94110" }
+  # Once reverse-geocoded, the status reads the pin's address (minus ", United States")
+  let(:located_status) { "2363a Bryant Street, San Francisco, California 94110" }
   let(:geocode_feature) do
     {
       place_name:,
@@ -44,8 +44,9 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
       context = playwright_page.context
       context.grant_permissions(["geolocation"])
       context.set_geolocation({latitude: latitude.to_f, longitude: longitude.to_f, accuracy: 20})
-      # Stub Mapbox reverse-geocode so the address resolves without the network
-      context.route("https://api.mapbox.com/**", proc { |route, _request|
+      # Stub Mapbox reverse-geocode so the address resolves without the network.
+      # Scoped to geocoding so the Mapbox GL script/CSS still load (or fail) normally.
+      context.route("https://api.mapbox.com/geocoding/**", proc { |route, _request|
         route.fulfill(status: 200, json: {features: [feature]})
       })
     end
@@ -64,6 +65,8 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
     expect(coordinate("latitude")).to eq(latitude)
     expect(coordinate("longitude")).to eq(longitude)
     expect(page).to have_button("Create parking notification", disabled: false)
+    # The pin + zoom are mirrored into the URL so a reload restores them
+    expect(page.current_url).to include("map_lat=37.8698").and include("map_lng=-122.2585").and include("map_zoom=")
     expect_axe_clean
 
     # Manual entry hides the readout and splits the location across the fields
@@ -80,7 +83,7 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
     # A hand-edited address survives toggling modes (the seed only fills when blank)
     fill_in "Address or intersection", with: "NE corner of 24th & Bryant"
 
-    find("label", text: "Use my current location").click
+    find("label", text: "Set on map").click
 
     expect(page).to have_content(located_status)
     expect(page).to have_no_field("Address or intersection")
@@ -102,6 +105,18 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
       expect(coordinate("longitude")).to eq(longitude)
       expect(page).to have_button("Create parking notification", disabled: false)
       expect_axe_clean
+    end
+  end
+
+  # A shared link / reload carries the pin coordinates in the URL; they win over
+  # the (slower, less intentional) device geolocation
+  context "when the URL carries a stored pin" do
+    it "restores the pin from the URL instead of geolocating" do
+      visit "#{preview_path}?panel=parking&map_lat=40.5&map_lng=-74.25&map_zoom=12"
+
+      expect(page).to have_button("Create parking notification", disabled: false, wait: 10)
+      expect(coordinate("latitude")).to eq("40.5")
+      expect(coordinate("longitude")).to eq("-74.25")
     end
   end
 
@@ -143,11 +158,11 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
       expect(labels.index { |t| t.start_with?("Repeat #") }).to be < labels.index("First notice")
 
       # A recent earlier notification preselects repeat, so the location controls start collapsed
-      expect(page).to have_no_content("Use my current location")
+      expect(page).to have_no_content("Set on map")
 
       # Choosing "First notice" reveals the location controls
       find("label", text: "First notice").click
-      expect(page).to have_content("Use my current location")
+      expect(page).to have_content("Set on map")
     end
   end
 
