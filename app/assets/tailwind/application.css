@@ -17,6 +17,12 @@
  * ancestor activates tw:dark:* utilities. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* The selected/pressed state of a button, link or menu item, however it's flagged.
+ * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
+ * order, and sorting after `dark` is what lets tw:is-active:* beat the resting,
+ * hover and dark colors it overrides without `!important`. */
+@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active));
+
 @theme {
   --font-sans: "Open Sans", sans-serif;
   --font-header: "Montserrat", sans-serif;
@@ -70,6 +76,20 @@
   --color-slate-800: #2f475d;
   --color-slate-900: #2c3e50; /* OG Bike Index blue-dark */
   --color-slate-950: #1d2834;
+
+  /* OG Bike Index purple — replaces Tailwind's default `purple`. 50–600 are the
+     existing design values; 400 and 700–950 are derived to complete the ramp. */
+  --color-purple-50: #f7f5fc;
+  --color-purple-100: #f0edfa;
+  --color-purple-200: #d6d4e0;
+  --color-purple-300: #9a8fc4;
+  --color-purple-400: #8574bb;
+  --color-purple-500: #715eb2;
+  --color-purple-600: #5d4b9c;
+  --color-purple-700: #4a3c7d;
+  --color-purple-800: #3a2f62;
+  --color-purple-900: #2c244b;
+  --color-purple-950: #1c162f;
 }
 
 @layer components {
