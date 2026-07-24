@@ -81,7 +81,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
 
       it "filters by the membership snapshot" do
         expect(bug_report.is_paid_organization).to be_falsey
-        get "#{base_url}.json", params: {search_membership: "paid_organization", search_status: "all"}
+        get "#{base_url}.json", params: {search_membership: "is_paid_organization", search_status: "all"}
         expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_paid.id])
       end
 

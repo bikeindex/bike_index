@@ -2,8 +2,9 @@ module Admin
   class BugReportsController < Admin::BaseController
     include Binxtils::SortableTable
 
-    MEMBERSHIP_FILTERS = {"member" => "Only members", "paid_organization" => "Only paid org",
-                          "paid_organization_staff" => "Only paid org staff"}.freeze
+    # Keyed by the column each filter checks, so the query never interpolates a column name
+    MEMBERSHIP_FILTERS = {"is_member" => "Only members", "is_paid_organization" => "Only paid org",
+                          "is_paid_organization_staff" => "Only paid org staff"}.freeze
     STATUS_FILTER_ALL = "all"
     STATUS_FILTER_INVESTIGATE = "investigate"
     # Includes unprioritized so reports the auto-prioritize job hasn't reached yet are never
@@ -99,10 +100,20 @@ module Admin
       bug_reports = bug_reports.with_tag(@searched_tag) if @searched_tag.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
       @searched_membership = params[:search_membership] if MEMBERSHIP_FILTERS.key?(params[:search_membership])
-      bug_reports = bug_reports.where("is_#{@searched_membership}" => true) if @searched_membership.present?
+      bug_reports = filter_by_membership(bug_reports)
       bug_reports = filter_by_status(bug_reports)
       bug_reports = bug_reports.text_search(params[:query]) if params[:query].present?
       bug_reports.where(created_at: @time_range)
+    end
+
+    # Literal column names - passing the param through as a key reads as SQL injection to brakeman
+    def filter_by_membership(bug_reports)
+      case @searched_membership
+      when "is_member" then bug_reports.where(is_member: true)
+      when "is_paid_organization" then bug_reports.where(is_paid_organization: true)
+      when "is_paid_organization_staff" then bug_reports.where(is_paid_organization_staff: true)
+      else bug_reports
+      end
     end
 
     def filter_by_status(bug_reports)
