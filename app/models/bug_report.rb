@@ -34,8 +34,14 @@ class BugReport < ApplicationRecord
   include PgSearch::Model
 
   GITHUB_REPO_URL = "https://github.com/bikeindex/bike_index"
-  STATUS_ENUM = {unprioritized: 0, ignored: 1, investigate_priority_low: 2,
-                 investigate_priority_high: 3, resolved: 4}.freeze
+  STATUS_ENUM = {unprioritized: 0, investigate_priority_high: 1, investigate_priority_low: 2,
+                 resolved: 19, ignored: 20}.freeze
+  INTERNAL_NOTIFICATION_TAG = "bike_index_notification"
+  AUTO_REPLY_TAG = "auto_replies"
+  ORGANIZATION_AUTO_REPLY_TAG = "auto_replies_organization"
+  SPAM_TAG = "spam"
+  # Tags marking reports that aren't real bug reports and can be auto-ignored
+  IGNORED_TAGS = [INTERNAL_NOTIFICATION_TAG, AUTO_REPLY_TAG, ORGANIZATION_AUTO_REPLY_TAG, SPAM_TAG].freeze
 
   enum :status, STATUS_ENUM
 
@@ -51,6 +57,7 @@ class BugReport < ApplicationRecord
   validates :email, presence: true
 
   before_validation :set_calculated_attributes
+  after_commit :enqueue_prioritizing_job, on: :create
 
   scope :with_tag, ->(tag) { where("tags @> ARRAY[?]::text[]", tag) }
 
@@ -77,6 +84,10 @@ class BugReport < ApplicationRecord
     subject.presence || "(no subject)"
   end
 
+  def ignored_tag?
+    tags.intersect?(IGNORED_TAGS)
+  end
+
   private
 
   def set_calculated_attributes
@@ -89,5 +100,9 @@ class BugReport < ApplicationRecord
     self.is_paid_organization = user.paid_org?
     self.is_paid_organization_staff = user.organization_roles.admin
       .where(organization_id: Organization.paid).limit(1).any?
+  end
+
+  def enqueue_prioritizing_job
+    BugReportAutoPrioritizeJob.perform_async(id)
   end
 end

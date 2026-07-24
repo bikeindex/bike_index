@@ -107,4 +107,11 @@ RSpec.describe BugReport, type: :model do
       expect(bug_report.display_subject).to eq "(no subject)"
     end
   end
+
+  describe "ignored_tag?" do
+    it "is true when a tag is in IGNORED_TAGS" do
+      expect(FactoryBot.build(:bug_report, tags: ["bike_index_notification"]).ignored_tag?).to be true
+      expect(FactoryBot.build(:bug_report, tags: %w[search broken]).ignored_tag?).to be false
+    end
+  end
 end

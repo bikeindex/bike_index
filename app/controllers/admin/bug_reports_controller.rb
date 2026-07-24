@@ -2,6 +2,11 @@ module Admin
   class BugReportsController < Admin::BaseController
     include Binxtils::SortableTable
 
+    MEMBERSHIP_FILTERS = {"member" => "Only members", "paid_organization" => "Only paid org",
+                          "paid_organization_staff" => "Only paid org staff"}.freeze
+    STATUS_FILTER_ALL = "all"
+    STATUS_FILTER_INVESTIGATE = "investigate"
+
     before_action :find_bug_report, only: %i[show update]
 
     def index
@@ -54,16 +59,31 @@ module Admin
       redirect_back(fallback_location: admin_bug_reports_path)
     end
 
-    helper_method :matching_bug_reports, :searchable_tags
+    helper_method :matching_bug_reports, :searchable_tags, :membership_filters,
+      :status_filters, :status_only_filters
 
     def searchable_tags
       @searchable_tags ||= BugReport.all_tags
     end
 
+    def membership_filters
+      MEMBERSHIP_FILTERS
+    end
+
+    # Ordered value => label. "Status: investigate" and "All" sit above the per-status options
+    def status_filters
+      {STATUS_FILTER_INVESTIGATE => "Status: investigate", STATUS_FILTER_ALL => "All"}
+        .merge(status_only_filters)
+    end
+
+    def status_only_filters
+      BugReport.statuses.keys.index_with { |status| "Only #{status.humanize.downcase}" }
+    end
+
     protected
 
     def sortable_columns
-      %w[created_at received_at updated_at email user_id github_pull_request].freeze
+      %w[created_at received_at updated_at email user_id github_pull_request status].freeze
     end
 
     def earliest_period_date
@@ -75,8 +95,20 @@ module Admin
       @searched_tag = params[:search_tag] if searchable_tags.include?(params[:search_tag])
       bug_reports = bug_reports.with_tag(@searched_tag) if @searched_tag.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
+      @searched_membership = params[:search_membership] if MEMBERSHIP_FILTERS.key?(params[:search_membership])
+      bug_reports = bug_reports.where("is_#{@searched_membership}" => true) if @searched_membership.present?
+      bug_reports = filter_by_status(bug_reports)
       bug_reports = bug_reports.text_search(params[:query]) if params[:query].present?
       bug_reports.where(created_at: @time_range)
+    end
+
+    def filter_by_status(bug_reports)
+      @searched_status = status_filters.key?(params[:search_status]) ? params[:search_status] : STATUS_FILTER_INVESTIGATE
+      case @searched_status
+      when STATUS_FILTER_ALL then bug_reports
+      when STATUS_FILTER_INVESTIGATE then bug_reports.where(status: BugReport.statuses.keys.grep(/\Ainvestigate/))
+      else bug_reports.where(status: @searched_status)
+      end
     end
 
     private

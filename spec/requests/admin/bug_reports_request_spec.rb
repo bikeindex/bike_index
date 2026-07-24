@@ -21,7 +21,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
 
       it "renders a paginated list" do
         expect(bug_report).to be_present
-        get "#{base_url}.json", params: {per_page: 1}
+        get "#{base_url}.json", params: {per_page: 1, search_status: "all"}
         expect(response.status).to eq(200)
         expect(json_result["bug_reports"]).to eq([target_json])
         expect(json_result).to match(hash_including("page" => 1, "per_page" => 1))
@@ -33,8 +33,60 @@ RSpec.describe Admin::BugReportsController, type: :request do
 
       it "full text searches" do
         expect(bug_report).to be_present
-        get "#{base_url}.json", params: {query: "payments timeout"}
+        get "#{base_url}.json", params: {query: "payments timeout", search_status: "all"}
         expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_other.id])
+      end
+    end
+
+    context "sorted by status" do
+      let!(:bug_report_resolved) { FactoryBot.create(:bug_report, status: :resolved) }
+      let!(:bug_report_ignored) { FactoryBot.create(:bug_report, status: :ignored) }
+
+      it "orders by the enum integer" do
+        expect(bug_report.status).to eq "unprioritized"
+        expected = [bug_report, bug_report_resolved, bug_report_ignored]
+          .sort_by { BugReport.statuses[it.status] }.map(&:id)
+        get "#{base_url}.json", params: {sort: "status", direction: "asc", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq(expected)
+      end
+    end
+
+    context "with search_status" do
+      let!(:bug_report_investigate) { FactoryBot.create(:bug_report, status: :investigate_priority_high) }
+      let!(:bug_report_resolved) { FactoryBot.create(:bug_report, status: :resolved) }
+
+      it "defaults to the investigate statuses" do
+        expect(bug_report).to be_present # unprioritized, excluded by the default
+        get "#{base_url}.json"
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_investigate.id])
+      end
+
+      it "filters to a single status" do
+        get "#{base_url}.json", params: {search_status: "resolved"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_resolved.id])
+      end
+
+      it "shows everything with all" do
+        expect(bug_report).to be_present
+        get "#{base_url}.json", params: {search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] })
+          .to match_array([bug_report.id, bug_report_investigate.id, bug_report_resolved.id])
+      end
+    end
+
+    context "with search_membership" do
+      let!(:bug_report_paid) { FactoryBot.create(:bug_report, is_paid_organization: true) }
+
+      it "filters by the membership snapshot" do
+        expect(bug_report.is_paid_organization).to be_falsey
+        get "#{base_url}.json", params: {search_membership: "paid_organization", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_paid.id])
+      end
+
+      it "ignores an unknown membership filter" do
+        expect(bug_report).to be_present
+        get "#{base_url}.json", params: {search_membership: "nonsense", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to match_array([bug_report.id, bug_report_paid.id])
       end
     end
   end
