@@ -4528,15 +4528,6 @@ en:
       index:
         matches_visible: visible
         parking_notifications: Parking notifications
-      show_details:
-        address: Address
-        bike: Bike
-        by: Created by
-        created: Created at
-        internal_notes: Internal notes
-        message: Message
-        notification_number: Notification#
-        resolved: Resolved
       table:
         address: Address
         bike: Bike
