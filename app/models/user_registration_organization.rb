@@ -116,10 +116,10 @@ class UserRegistrationOrganization < ApplicationRecord
     create_or_update_bike_organizations
     return true if skip_after_user_change_worker
 
-    CallbackJob::AfterUserChangeJob.perform_async(user_id)
+    CallbackJobs::AfterUserChangeJob.perform_async(user_id)
   end
 
-  # Manually called from CallbackJob::AfterUserChangeJob
+  # Manually called from CallbackJobs::AfterUserChangeJob
   def create_or_update_bike_organizations
     return true unless all_bikes # only overrides bike_organizations if all_bikes is checked
 
