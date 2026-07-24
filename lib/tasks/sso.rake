@@ -19,7 +19,7 @@ namespace :sso do
     keycloak_url = ENV.fetch("KEYCLOAK_URL", "http://localhost:8080")
     realm = "bikeindex-test"
     domain = "ssotest.example"
-    feature_slugs = %w[saml_sso passwordless_users] # SSO provisioning reuses the passwordless path
+    feature_slugs = %w[saml_sso] # implies passwordless_users, which provisioning runs through
 
     descriptor_url = "#{keycloak_url}/realms/#{realm}/protocol/saml/descriptor"
     puts "→ Reading IdP descriptor: #{descriptor_url}"
