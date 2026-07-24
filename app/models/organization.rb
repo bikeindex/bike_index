@@ -645,7 +645,7 @@ class Organization < ApplicationRecord
 
   # Only guards SSO orgs - non-SSO orgs sharing a domain don't affect SSO login routing
   def user_email_domain_unclaimed
-    return unless enabled?("saml_sso")
+    return unless will_save_change_to_user_email_domain? && enabled?("saml_sso")
 
     conflict = self.class.saml_domain_conflict(user_email_domain, excluded_id: id)
     return if conflict.blank?

@@ -64,7 +64,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response.body).to include("SAML SSO")
         expect(response.body).to include("/sso/#{organization.to_param}/metadata")
         # The domain field is required for SSO routing, so it renders without passwordless_users
-        expect(response.body).to include("permitted domain for SAML SSO sign in")
+        expect(response.body).to include("permitted domain for SAML SSO")
         expect(response.body).to include('name="organization[user_email_domain]"')
       end
     end

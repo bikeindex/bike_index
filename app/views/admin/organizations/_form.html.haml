@@ -181,16 +181,12 @@
 
           - passwordless_enabled = @organization.enabled?("passwordless_users")
           - saml_sso_enabled = @organization.enabled?("saml_sso")
-          - if passwordless_enabled || saml_sso_enabled
+          - sign_in_kinds = [("passwordless sign in" if passwordless_enabled), ("SAML SSO" if saml_sso_enabled)].compact
+          - if sign_in_kinds.any?
             .form-group
               = f.label :user_email_domain do
                 %span
-                - if passwordless_enabled && saml_sso_enabled
-                  permitted domain for passwordless sign in and SAML SSO
-                - elsif saml_sso_enabled
-                  permitted domain for SAML SSO sign in
-                - else
-                  permitted domain for passwordless sign in
+                permitted domain for #{sign_in_kinds.to_sentence}
                 %small
                   - if passwordless_enabled
                     <span class="text-success">passwordless user feature</span>
