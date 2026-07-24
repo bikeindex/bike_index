@@ -7,8 +7,8 @@
 #
 #   bundle exec rails "maps:upload_basemap[https://build.protomaps.com/<date>.pmtiles]"
 #
-# Refresh the tiles quarterly (see MAPS_TILES_MAX_AGE); Cloudflare caches the
-# object, so purge MAPS_HOST after replacing it.
+# Refresh the tiles quarterly (spec/lib/tasks/maps_spec.rb re-checks the live
+# tiles); Cloudflare caches the object, so purge MAPS_HOST after replacing it.
 #
 # One-time R2 + Cloudflare setup (dashboard), before the first upload:
 #
