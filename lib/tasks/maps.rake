@@ -83,11 +83,12 @@ namespace :maps do
     buffer = "".b
 
     begin
-      flush = proc do
+      # R2 (unlike S3) requires every part but the last to be the same size, so
+      # upload exactly part_size bytes at a time and keep the remainder buffered.
+      flush = proc do |body|
         number = parts.size + 1
-        result = client.upload_part(bucket:, key:, upload_id:, part_number: number, body: buffer)
+        result = client.upload_part(bucket:, key:, upload_id:, part_number: number, body:)
         parts << {etag: result.etag, part_number: number}
-        buffer.clear
         print "\rUploaded #{parts.size} parts"
       end
 
@@ -96,11 +97,11 @@ namespace :maps do
           response.value
           response.read_body do |chunk|
             buffer << chunk
-            flush.call if buffer.bytesize >= part_size
+            flush.call(buffer.slice!(0, part_size)) while buffer.bytesize >= part_size
           end
         end
       end
-      flush.call unless buffer.empty?
+      flush.call(buffer) unless buffer.empty?
       client.complete_multipart_upload(bucket:, key:, upload_id:, multipart_upload: {parts:})
     rescue
       client.abort_multipart_upload(bucket:, key:, upload_id:)
