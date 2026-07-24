@@ -58,13 +58,15 @@ RSpec.describe BugReportsMailbox do
     end
   end
 
-  context "not addressed to bugs@" do
-    it "does not route to a bug report" do
-      inbound_email = create_inbound_email_from_mail(
-        from: user.email, to: "somewhere-else@bikeindex.org", subject: "Hi", body: "Hello"
-      )
-      expect { inbound_email.route }.to raise_error(ActionMailbox::Router::RoutingError)
-      expect(BugReport.count).to eq 0
+  context "addressed to another address" do
+    it "still routes to a bug report" do
+      expect do
+        receive_inbound_email_from_mail(
+          from: user.email, to: "support@bikeindex.org", subject: "Hi", body: "Hello"
+        )
+      end.to change(BugReport, :count).by 1
+
+      expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id, subject: "Hi")
     end
   end
 end
