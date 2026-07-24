@@ -1,11 +1,17 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='registrations--show--map'
-// Lazy-loads Mapbox GL and renders a map centered on the coordinates, marking
-// them with a dot (point) or a translucent red circle (approximate area).
-const MAPBOX_VERSION = 'v1.11.0'
-const MAPBOX_SRC = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-gl.js`
-const MAPBOX_CSS = `https://api.mapbox.com/mapbox-gl-js/${MAPBOX_VERSION}/mapbox-gl.css`
+// Lazy-loads MapLibre GL + the PMTiles protocol and renders a map centered on
+// the coordinates, marking them with a dot (point) or a translucent red circle
+// (approximate area).
+const MAPLIBRE_VERSION = '4.7.1'
+const PMTILES_VERSION = '3.2.1'
+const MAPLIBRE_JS = `https://cdn.jsdelivr.net/npm/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.js`
+const MAPLIBRE_CSS = `https://cdn.jsdelivr.net/npm/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.css`
+const PMTILES_JS = `https://cdn.jsdelivr.net/npm/pmtiles@${PMTILES_VERSION}/dist/pmtiles.js`
+
+// OpenStreetMap's ODbL license requires crediting contributors on the map
+const ATTRIBUTION = '© OpenStreetMap contributors'
 
 // A fixed dot marking the exact spot
 const POINT_PAINT = {
@@ -26,7 +32,7 @@ const CIRCLE_PAINT = (radiusBase) => ({
 export default class extends Controller {
   static targets = ['canvas', 'unavailable']
   static values = {
-    apiKey: String,
+    styleUrl: String,
     latitude: Number,
     longitude: Number,
     radiusBase: { type: Number, default: 1.15 },
@@ -34,13 +40,12 @@ export default class extends Controller {
   }
 
   async connect () {
-    if (!this.apiKeyValue) return
+    if (!this.styleUrlValue) return
     try {
-      const mapboxgl = await loadMapbox()
+      const maplibregl = await loadMapLibre()
       if (!this.element.isConnected) return // disconnected while loading
 
-      mapboxgl.accessToken = this.apiKeyValue
-      this.#render(mapboxgl)
+      this.#render(maplibregl)
     } catch (error) {
       this.#showUnavailable(error)
     }
@@ -51,7 +56,7 @@ export default class extends Controller {
     this.map = null
   }
 
-  // WebGL/Mapbox can be unavailable (crawlers, headless browsers, disabled GPU,
+  // WebGL/MapLibre can be unavailable (crawlers, headless browsers, disabled GPU,
   // blocked CDN). Reveal a message instead of leaving a blank box, and swallow the
   // rejection so it isn't reported as unhandled.
   #showUnavailable (error) {
@@ -62,14 +67,15 @@ export default class extends Controller {
     this.unavailableTarget.hidden = false
   }
 
-  #render (mapboxgl) {
+  #render (maplibregl) {
     const center = [this.longitudeValue, this.latitudeValue]
-    this.map = new mapboxgl.Map({
+    this.map = new maplibregl.Map({
       container: this.canvasTarget,
-      style: 'mapbox://styles/mapbox/streets-v11',
+      style: this.styleUrlValue,
       center,
       zoom: 13,
-      maxZoom: 16
+      maxZoom: 16,
+      attributionControl: { customAttribution: ATTRIBUTION }
     })
 
     this.map.on('load', () => {
@@ -87,25 +93,39 @@ export default class extends Controller {
   }
 }
 
-// Load Mapbox GL (script + stylesheet) once, shared across controller instances.
-let mapboxPromise
-function loadMapbox () {
-  if (window.mapboxgl) return Promise.resolve(window.mapboxgl)
-  if (mapboxPromise) return mapboxPromise
+// Load MapLibre GL + the PMTiles protocol once, shared across controller instances.
+let mapLibrePromise
+function loadMapLibre () {
+  if (window.maplibregl) return Promise.resolve(window.maplibregl)
+  if (mapLibrePromise) return mapLibrePromise
 
-  if (!document.querySelector(`link[href="${MAPBOX_CSS}"]`)) {
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = MAPBOX_CSS
-    document.head.appendChild(link)
-  }
+  mapLibrePromise = (async () => {
+    if (!document.querySelector(`link[href="${MAPLIBRE_CSS}"]`)) {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = MAPLIBRE_CSS
+      document.head.appendChild(link)
+    }
+    await Promise.all([loadScript(MAPLIBRE_JS), loadScript(PMTILES_JS)])
 
-  mapboxPromise = new Promise((resolve, reject) => {
+    const { maplibregl, pmtiles } = window
+    // Teach MapLibre to read pmtiles:// sources (the single-file vector tiles)
+    maplibregl.addProtocol('pmtiles', new pmtiles.Protocol().tile)
+    return maplibregl
+  })()
+  return mapLibrePromise
+}
+
+function loadScript (src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve()
+      return
+    }
     const script = document.createElement('script')
-    script.src = MAPBOX_SRC
-    script.onload = () => resolve(window.mapboxgl)
+    script.src = src
+    script.onload = resolve
     script.onerror = reject
     document.head.appendChild(script)
   })
-  return mapboxPromise
 }
