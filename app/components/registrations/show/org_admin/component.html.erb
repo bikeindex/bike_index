@@ -28,10 +28,7 @@
     </div>
   </div>
 
-  <div
-    class="tw:flex tw:flex-col tw:gap-3"
-    data-controller="registrations--show--action-panels"
-  >
+  <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new) do %>
     <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:flex">
       <% if contactable? %>
         <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "message", action: "registrations--show--action-panels#toggle"})) do %>
@@ -71,21 +68,21 @@
     </div>
 
     <% if contactable? %>
-      <%= render(Registrations::Show::OrgTopActionsMessageOwner::Component.new(bike: @bike)) %>
+      <%= render(Registrations::Show::OrgTopActions::MessageOwner::Component.new(bike: @bike)) %>
     <% end %>
 
     <% if show_create_parking_notification? || show_create_impound? %>
-      <%= render(Registrations::Show::OrgTopActionsParkingNotificationForm::Component.new(bike: @bike, organization: @organization)) %>
+      <%= render(Registrations::Show::OrgTopActions::ParkingNotificationForm::Component.new(bike: @bike, organization: @organization)) %>
     <% end %>
 
     <% if show_update_impound? %>
-      <%= render(Registrations::Show::OrgTopActionsImpoundUpdate::Component.new(bike: @bike, organization: @organization)) %>
+      <%= render(Registrations::Show::OrgTopActions::ImpoundUpdate::Component.new(bike: @bike, organization: @organization)) %>
     <% end %>
 
     <% if show_parking_notifications? %>
-      <%= render(Registrations::Show::OrgTopActionsParkingNotificationShow::Component.new(bike: @bike, organization: @organization)) %>
+      <%= render(Registrations::Show::OrgTopActions::ParkingNotificationShow::Component.new(bike: @bike, organization: @organization)) %>
     <% end %>
-  </div>
+  <% end %>
 
   <%#
     On mobile the column wrappers collapse (tw:contents) so every card is a
