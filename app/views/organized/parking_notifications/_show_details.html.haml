@@ -64,9 +64,9 @@
             .card-body
               -# Matching form is on parking notification index
               .row#sendRepeatOrRetrieveFields
-                .col-xs-6
+                .col-xs-12.col-sm-6
                   = select_tag :kind, options_for_select(parking_notification_repeat_kinds, selected: @parking_notification.kind), class: "form-control"
-                .col-xs-6.text-center
+                .col-xs-12.col-sm-6.text-center
                   = submit_tag "Create notification", class: "btn btn-success btn-md-lg"
 
 - if related_notifications.any?
