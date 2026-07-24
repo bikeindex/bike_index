@@ -18,31 +18,44 @@ module Registrations
 
           private
 
-          # A grid rather than the button's default flex, so below sm the icon, title
-          # and subtitle each take a full-width row, while from sm the icon spans the
-          # title and subtitle rows beside them. The title's margin only applies to
-          # the stacked layout, separating it from the icon above rather than the
-          # subtitle below.
+          # A grid rather than the button's default flex, so the two layouts can share
+          # one DOM order: below sm the subtitle sits beside the icon with the title
+          # across the row underneath, and from sm the icon spans a title/subtitle
+          # column. The title's margin only applies to the stacked layout, separating
+          # it from the row above rather than the subtitle below.
           def action_button(panel_name, icon:, title:, tile: :purple, subtitle: nil)
-            classes = "tw:relative tw:grid! tw:w-full tw:min-h-[60px] tw:grid-cols-1 tw:content-center tw:gap-y-0.5 tw:rounded-xl tw:p-4! tw:text-base! tw:text-left tw:sm:grid-cols-[auto_1fr] tw:sm:gap-x-3 tw:lg:flex-1"
+            classes = "tw:relative tw:grid! tw:w-full tw:min-h-[60px] tw:grid-cols-[auto_1fr] tw:content-center tw:gap-x-3 tw:gap-y-0.5 tw:rounded-xl tw:p-4! tw:text-base! tw:text-left tw:lg:flex-1"
             render(UI::Button::Component.new(color: :purple_outline, html_class: classes, aria: {expanded: false},
               data: {"registrations--show--action-panels-target": "trigger", "panel-name": panel_name,
                      action: "registrations--show--action-panels#toggle"})) do
               safe_join([
-                action_icon(icon, tile:),
-                content_tag(:span, title, class: "tw:mt-1.5 tw:min-w-0 tw:font-bold tw:sm:mt-0"),
-                (content_tag(:span, subtitle, class: "tw:text-xs tw:opacity-60") if subtitle.present?)
+                # Spanning an absent subtitle's row would stretch it to fit the icon,
+                # dropping the title above the icon's center
+                action_icon(icon, tile:, html_class: ("tw:sm:row-span-2 tw:sm:self-center" if subtitle.present?)),
+                content_tag(:span, title, class: "tw:col-span-2 tw:row-start-2 tw:mt-1.5 tw:min-w-0 tw:font-bold tw:sm:col-span-1 tw:sm:col-start-2 tw:sm:row-start-1 tw:sm:mt-0"),
+                (content_tag(:span, subtitle, class: "tw:col-start-2 tw:row-start-1 tw:text-xs tw:opacity-60 tw:sm:row-start-2") if subtitle.present?)
               ].compact)
             end
           end
 
-          def action_icon(icon, tile:)
+          # The counts don't fit on one line beside the icon below sm, so the active
+          # count blocks there — dropping the resolved count onto its own line and
+          # hiding the separator that only reads as one on a single line
+          def notifications_activity
+            safe_join([
+              content_tag(:span, translation(".view_notifications_active_html", count: active_notifications_count), class: "tw:block tw:sm:inline"),
+              content_tag(:span, " - ", class: "tw:hidden tw:sm:inline"),
+              translation(".view_notifications_resolved_html", count: resolved_notifications_count)
+            ])
+          end
+
+          def action_icon(icon, tile:, html_class: nil)
             tile_bg, icon_color = case tile
             when :blue then ["tw:bg-[#e7f3fb]", "tw:text-[#016ec2]"]
             when :amber then ["tw:bg-[#fff8e1]", "tw:text-[#caa11a]"]
             else ["tw:bg-[#f0edfa]", "tw:text-[#715eb2]"]
             end
-            content_tag(:span, class: "tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-lg tw:sm:row-span-2 tw:sm:self-center #{tile_bg}") do
+            content_tag(:span, class: "tw:col-start-1 tw:row-start-1 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-lg #{tile_bg} #{html_class}") do
               helpers.inline_svg_tag("kelsey/registration_show/#{icon}.svg", class: "tw:h-[19px] tw:w-[19px] #{icon_color}")
             end
           end

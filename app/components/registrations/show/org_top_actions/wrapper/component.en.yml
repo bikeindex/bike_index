@@ -10,5 +10,5 @@ en:
             new_parking_notice: New Parking Notification
             update_impound_record: Update Impound record
             view_notifications: View Notifications
-            view_notifications_activity_html: "<strong>%{active}</strong> Active - <strong>%{resolved}</strong>
-              Resolved"
+            view_notifications_active_html: "<strong>%{count}</strong> Active"
+            view_notifications_resolved_html: "<strong>%{count}</strong> Resolved"

@@ -12,8 +12,7 @@
     <%= action_button("parking", icon: "map-pin", title: translation(".new_parking_notice")) if show_create_parking_notification? %>
 
     <% if show_parking_notifications? %>
-      <%= action_button("notifications_show", icon: "bell", tile: :blue, title: translation(".view_notifications"),
-        subtitle: translation(".view_notifications_activity_html", active: active_notifications_count, resolved: resolved_notifications_count)) %>
+      <%= action_button("notifications_show", icon: "bell", tile: :blue, title: translation(".view_notifications"), subtitle: notifications_activity) %>
     <% end %>
   </div>
 
