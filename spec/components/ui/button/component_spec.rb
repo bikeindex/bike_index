@@ -101,14 +101,6 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  context "with active state" do
-    let(:options) { {text: "Active", color: :primary, active: true} }
-
-    it "includes active ring classes" do
-      expect(component.to_html).to include("tw:ring-2")
-    end
-  end
-
   context "with submit kind" do
     let(:options) { {text: "Submit", kind: :submit} }
 
@@ -132,10 +124,15 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  it "always applies the prefixed active classes (inert until pressed/toggled)" do
+  it "always applies the active classes (inert until data-active/pressed)" do
     tokens = component.css("button").first["class"].split
-    expect(tokens).to include("tw:aria-pressed:ring-2", "tw:active:ring-2")
-    expect(tokens).not_to include("tw:ring-2", "tw:bg-gray-200")
+    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-gray-200")
+    expect(component).to have_no_css("button[data-active]")
+  end
+
+  it "keeps focus visible on an active button, whose ring would otherwise mask it" do
+    tokens = component.css("button").first["class"].split
+    expect(tokens).to include(*described_class::FOCUS_CLASSES.split)
   end
 
   context "with aria-controls" do
@@ -147,25 +144,19 @@ RSpec.describe UI::Button::Component, type: :component do
 
   context "active: true" do
     let(:options) { {active: true} }
-    it "swaps in the active color set, dropping the resting fill" do
-      tokens = component.css("button").first["class"].split
-      expect(tokens).to include("tw:ring-2", "tw:bg-gray-200")
-      expect(tokens).not_to include("tw:bg-white")
+    it "flags the button data-active, leaving the classes unchanged" do
+      expect(component).to have_css("button[data-active='true']")
+      expect(component.css("button").first["class"].split).to eq(instance.class.build_classes(color: :secondary, size: :md).split)
     end
   end
 
-  describe "ACTIVE_PREFIXED" do
-    # A strict mirror of ACTIVE_COLORS under aria-pressed:/active:, so a resting button
-    # shows the active look while pressed or toggled (these variants win over COLORS by
-    # precedence). No `!` here or in ACTIVE_COLORS — the states never coexist.
-    it "prefixes every ACTIVE_COLORS class with aria-pressed: and active: for each color" do
-      expect(described_class::ACTIVE_PREFIXED.keys).to eq(described_class::ACTIVE_COLORS.keys)
-      described_class::ACTIVE_COLORS.each do |color, classes|
-        expected = classes.split.flat_map do |variant|
-          base = variant.delete_prefix("tw:")
-          ["tw:aria-pressed:#{base}", "tw:active:#{base}"]
-        end
-        expect(described_class::ACTIVE_PREFIXED[color].split).to eq(expected)
+  describe "ACTIVE_COLORS" do
+    # Every active class is variant-prefixed, so it can never compete with the resting
+    # color it overrides — that's what lets both sets be emitted without `!` important.
+    it "covers every color, prefixed with tw:is-active:" do
+      expect(described_class::ACTIVE_COLORS.keys).to eq(described_class::COLORS.keys)
+      described_class::ACTIVE_COLORS.each_value do |classes|
+        expect(classes.split.grep_v(/\Atw:is-active:/)).to eq([])
       end
     end
   end

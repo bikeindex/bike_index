@@ -17,6 +17,12 @@
  * ancestor activates tw:dark:* utilities. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* The selected/pressed state of a button, link or menu item, however it's flagged.
+ * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
+ * order, and sorting after `dark` is what lets tw:is-active:* beat the resting,
+ * hover and dark colors it overrides without `!important`. */
+@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active));
+
 @theme {
   --font-sans: "Open Sans", sans-serif;
   --font-header: "Montserrat", sans-serif;
