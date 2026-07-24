@@ -21,6 +21,7 @@ module Registrations
               "Stolen" => component(stolen_bike),
               "Impounded" => component(preview_bike(:status_impounded)),
               "Unregistered parking notification" => component(preview_bike(:unregistered_parking_notification)),
+              "With parking notification" => component(bike_with_parking_notification),
               "Limited (non-staff) member" => component(preview_bike(:status_with_owner), staff: false),
               "No features" => component(preview_bike(:status_with_owner), organization: ::Organization.new(short_name: "Preview", enabled_feature_slugs: []))
             }
@@ -37,6 +38,14 @@ module Registrations
           # Stolen is the one state carried by an association rather than the status
           def stolen_bike
             preview_bike(:status_stolen).tap { |bike| bike.current_stolen_record = ::StolenRecord.new }
+          end
+
+          # A live count and the notification panel are DB queries, so this variety
+          # needs a real org bike that already carries a notification
+          def bike_with_parking_notification
+            notifications = lookbook_organization.parking_notifications
+            (notifications.where(status: "current").last || notifications.last)&.bike ||
+              preview_bike(:status_with_owner)
           end
         end
       end
