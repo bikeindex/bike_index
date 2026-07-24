@@ -9,6 +9,20 @@ const PMTILES_JS = `https://cdn.jsdelivr.net/npm/pmtiles@${PMTILES_VERSION}/dist
 // OpenStreetMap's ODbL license requires crediting contributors on the map
 export const OSM_ATTRIBUTION = '© OpenStreetMap contributors'
 
+// Web Mercator meters per pixel at zoom 0 on the equator (MapLibre uses 512px tiles)
+const METERS_PER_PIXEL_Z0 = 40075016.686 / 512
+
+// circle-radius is in screen pixels, so it has to double every zoom level to keep
+// covering the same ground. Returns interpolation stops for a fixed ground radius.
+export function groundRadiusStops (radiusMeters, latitude) {
+  const pixelsAtZoom0 = radiusMeters / (METERS_PER_PIXEL_Z0 * Math.cos(latitude * Math.PI / 180))
+  return [
+    'interpolate', ['exponential', 2], ['zoom'],
+    0, pixelsAtZoom0,
+    22, pixelsAtZoom0 * 2 ** 22
+  ]
+}
+
 let mapLibrePromise
 
 export function loadMapLibre () {

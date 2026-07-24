@@ -79,8 +79,12 @@
                 class="tw:h-full tw:w-full"
               ></div>
 
-              <%# A fixed pin marks the map center; moving the map places the pin %>
-              <%= helpers.inline_svg_tag("kelsey/registration_show/map-pin.svg", class: "tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-1/2 tw:z-10 tw:h-9 tw:w-9 tw:-translate-x-1/2 tw:-translate-y-full tw:text-red-600 tw:drop-shadow-md", aria_hidden: true) %>
+              <%#
+                A fixed pin marks the map center; moving the map places the pin.
+                Its tip is at 21/24 of the viewBox, so shift by that much (not the
+                full height) to land the tip — not the empty box below it — on centre
+              %>
+              <%= helpers.inline_svg_tag("kelsey/registration_show/map-pin.svg", class: "tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-1/2 tw:z-10 tw:h-9 tw:w-9 tw:-translate-x-1/2 tw:-translate-y-[87.5%] tw:text-red-600 tw:drop-shadow-md", aria_hidden: true) %>
             </div>
 
             <p

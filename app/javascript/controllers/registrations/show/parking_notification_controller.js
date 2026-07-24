@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
-import { loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { groundRadiusStops, loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 /* global navigator */
 
@@ -12,6 +12,21 @@ import { loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
 // the UI::Forms::AddressGroup fields instead. Tiles come from our self-hosted
 // MapLibre basemap; the mapboxKey is only for reverse-geocoding the pin.
 const DEFAULT_ZOOM = 15
+
+// The device's own position, so a dragged pin can be judged against where the
+// phone thinks it is. The halo covers the accuracy the browser reported.
+const DEVICE_ACCURACY_PAINT = (accuracy, latitude) => ({
+  'circle-radius': groundRadiusStops(accuracy, latitude),
+  'circle-color': '#2563eb',
+  'circle-opacity': 0.15
+})
+
+const DEVICE_DOT_PAINT = {
+  'circle-radius': 5,
+  'circle-color': '#2563eb',
+  'circle-stroke-width': 2,
+  'circle-stroke-color': 'white'
+}
 
 export default class extends Controller {
   static targets = ['latitude', 'longitude', 'accuracy', 'submit', 'status',
@@ -120,9 +135,32 @@ export default class extends Controller {
   locationFound (position) {
     if (this.manualMode) return // they switched to manual entry while we waited
     const { latitude, longitude, accuracy } = position.coords
+    this.deviceLocation = { latitude, longitude, accuracy }
     this.locate(latitude, longitude, { accuracy })
+    this.renderDeviceLocation()
     this.setStatus('Using your current location', { dot: true })
     this.reverseGeocode(latitude, longitude)
+  }
+
+  // Mark where the device actually is, distinct from the pin the user places. Only
+  // a real fix is drawn — the org fallback isn't "your location"
+  renderDeviceLocation () {
+    if (!this.mapLoaded || !this.deviceLocation) return
+    const { latitude, longitude, accuracy } = this.deviceLocation
+    const data = { type: 'Feature', geometry: { type: 'Point', coordinates: [longitude, latitude] } }
+    const source = this.map.getSource('device-location')
+    if (source) return source.setData(data)
+
+    this.map.addSource('device-location', { type: 'geojson', data })
+    if (accuracy > 0) {
+      this.map.addLayer({
+        id: 'device-accuracy',
+        type: 'circle',
+        source: 'device-location',
+        paint: DEVICE_ACCURACY_PAINT(accuracy, latitude)
+      })
+    }
+    this.map.addLayer({ id: 'device-dot', type: 'circle', source: 'device-location', paint: DEVICE_DOT_PAINT })
   }
 
   locationFailed () {
@@ -214,8 +252,11 @@ export default class extends Controller {
       this.map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true } }), 'top-right')
 
       this.map.on('moveend', () => this.centerAdopted())
-      // The container may have been collapsed when the map was built
-      this.map.on('load', () => this.map.resize())
+      this.map.on('load', () => {
+        this.mapLoaded = true
+        this.map.resize() // the container may have been collapsed when the map was built
+        this.renderDeviceLocation() // a fix that landed before the style was ready
+      })
     } catch (error) {
       this.mapUnavailable(error)
     }
@@ -235,6 +276,7 @@ export default class extends Controller {
     window.clearTimeout(this.geocodeTimer)
     this.map?.remove()
     this.map = null
+    this.mapLoaded = false // a pending geolocation callback must not touch the removed map
   }
 
   // The pin + zoom live in the URL so a reload (or shared link) restores them

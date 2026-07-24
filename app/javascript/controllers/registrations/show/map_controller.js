@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { groundRadiusStops, loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 // Connects to data-controller='registrations--show--map'
 // Renders a map centered on the coordinates, marking them with a dot (point) or
@@ -14,23 +14,12 @@ const POINT_PAINT = {
   'circle-stroke-color': 'white'
 }
 
-// Web Mercator meters per pixel at zoom 0 on the equator (MapLibre uses 512px tiles)
-const METERS_PER_PIXEL_Z0 = 40075016.686 / 512
-
-// A translucent circle covering the approximate area. circle-radius is in screen
-// pixels, so it has to double every zoom level to keep covering the same ground.
-const CIRCLE_PAINT = (radiusMeters, latitude) => {
-  const pixelsAtZoom0 = radiusMeters / (METERS_PER_PIXEL_Z0 * Math.cos(latitude * Math.PI / 180))
-  return {
-    'circle-radius': [
-      'interpolate', ['exponential', 2], ['zoom'],
-      0, pixelsAtZoom0,
-      22, pixelsAtZoom0 * 2 ** 22
-    ],
-    'circle-color': 'red',
-    'circle-opacity': 0.4
-  }
-}
+// A translucent circle covering the approximate area
+const CIRCLE_PAINT = (radiusMeters, latitude) => ({
+  'circle-radius': groundRadiusStops(radiusMeters, latitude),
+  'circle-color': 'red',
+  'circle-opacity': 0.4
+})
 
 export default class extends Controller {
   static targets = ['canvas', 'unavailable']
