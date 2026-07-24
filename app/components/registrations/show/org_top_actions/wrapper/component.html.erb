@@ -13,7 +13,7 @@
     <% if show_create_impound? %>
       <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "impound", action: "registrations--show--action-panels#toggle"})) do %>
         <%= action_icon("lock") %>
-        <%= action_label(impound_title, impound_subtitle) %>
+        <%= action_label(translation(".impound"), translation(".record_impounding")) %>
       <% end %>
     <% end %>
 

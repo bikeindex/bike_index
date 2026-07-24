@@ -65,14 +65,6 @@ module Registrations
             show_impound? && @staff && impounded?
           end
 
-          def impound_title
-            translation(".impound")
-          end
-
-          def impound_subtitle
-            translation(".record_impounding")
-          end
-
           def show_parking_notifications?
             @organization.enabled?("parking_notifications")
           end
