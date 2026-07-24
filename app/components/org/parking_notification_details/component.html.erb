@@ -3,7 +3,7 @@
     <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".created"), value: @parking_notification.created_at, render_with_no_value: true)) %>
 
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".by"), value: @parking_notification.user.display_name, render_with_no_value: true)) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".by"), value: @parking_notification.user&.display_name, render_with_no_value: true)) %>
 
       <%= render(UI::DefinitionList::Row::Component.new(label: "Type", render_with_no_value: true)) do %>
         <strong><%= @parking_notification.kind_humanized %></strong>
