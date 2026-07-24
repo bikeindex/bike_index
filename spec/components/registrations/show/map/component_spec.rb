@@ -11,7 +11,7 @@ RSpec.describe Registrations::Show::Map::Component, type: :component do
     expect(node["data-registrations--show--map-style-url-value"]).to eq "https://maps.example.com/style.json"
     expect(node["data-registrations--show--map-latitude-value"]).to eq "40.7"
     expect(node["data-registrations--show--map-longitude-value"]).to eq "-73.9"
-    expect(node["data-registrations--show--map-radius-base-value"]).to eq "1.15"
+    expect(node["data-registrations--show--map-radius-meters-value"]).to eq "1000"
     expect(node["data-registrations--show--map-point-value"]).to eq "false"
     expect(node).to have_css("[data-registrations--show--map-target='canvas']")
     # Shown by the controller when MapLibre/WebGL is unavailable
@@ -20,9 +20,9 @@ RSpec.describe Registrations::Show::Map::Component, type: :component do
 
   context "precise (exact address public)" do
     let(:options) { {latitude: 40.7, longitude: -73.9, precise: true} }
-    it "uses a larger radius base" do
+    it "uses a tighter radius" do
       render_inline(component)
-      expect(page.find("div[data-controller='registrations--show--map']")["data-registrations--show--map-radius-base-value"]).to eq "2"
+      expect(page.find("div[data-controller='registrations--show--map']")["data-registrations--show--map-radius-meters-value"]).to eq "250"
     end
   end
 

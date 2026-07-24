@@ -20,9 +20,10 @@ module Registrations
 
         private
 
-        # The circle grows faster with zoom when the exact address is public
-        def radius_base
-          @precise ? 2 : 1.15
+        # Non-precise coordinates are rounded to Bike::PUBLIC_COORD_LENGTH decimals,
+        # so the circle has to be wide enough to hide where in that square they fell
+        def radius_meters
+          @precise ? 250 : 1000
         end
       end
     end
