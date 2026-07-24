@@ -55,7 +55,7 @@ module Admin
             @user.user_ban&.update(ban_params.slice(:reason, :description))
           end
           @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
-          CallbackJob::AfterUserChangeJob.perform_async(@user.id)
+          CallbackJobs::AfterUserChangeJob.perform_async(@user.id)
           redirect_to admin_users_url, notice: "User Updated"
         else
           calculate_user_bikes

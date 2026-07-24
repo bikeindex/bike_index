@@ -56,7 +56,7 @@ module BikeServices
           .update_records
         update_impound_record
       end
-      CallbackJob::AfterBikeSaveJob.perform_async(@bike.id) if @bike.present? # run immediately
+      CallbackJobs::AfterBikeSaveJob.perform_async(@bike.id) if @bike.present? # run immediately
       remove_blank_components
       @bike
     end

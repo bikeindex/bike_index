@@ -183,7 +183,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.deliver_now.text_part.body.to_s).to include(bike.creation_organization.name).and include("Protect your bike")
           # Transferred registration
           BikeServices::Updator.new(user: user, bike: bike, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json).update_available_attributes
-          CallbackJob::AfterBikeSaveJob.new.perform(bike.id, true, true)
+          CallbackJobs::AfterBikeSaveJob.new.perform(bike.id, true, true)
           ownership2 = bike.reload.current_ownership
           expect(ownership2.id).to_not eq ownership.id
           expect(ownership.reload.current).to be_falsey

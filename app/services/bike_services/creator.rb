@@ -192,7 +192,7 @@ module BikeServices
       if SpamEstimator::Bike.estimate(bike) > SpamEstimator::Bike::MARK_SPAM_PERCENT
         bike.update(likely_spam: true)
       end
-      CallbackJob::AfterBikeSaveJob.perform_async(bike.id)
+      CallbackJobs::AfterBikeSaveJob.perform_async(bike.id)
       if b_param.bike_sticker_code.present? && bike.creation_organization.present?
         bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
         bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,
