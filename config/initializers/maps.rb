@@ -5,8 +5,6 @@
 # maps R2 bucket. See lib/tasks/maps.rake for uploading the tiles.
 MAPS_HOST = ENV.fetch("MAPS_HOST", "https://maps.bikeindex.org")
 MAPS_STYLE_URL = "#{MAPS_HOST}/basemap/style.json"
-# R2 bucket the tiles are uploaded to (separate and public - see maps:bucket_setup)
-MAPS_BUCKET = ENV.fetch("R2_MAPS_BUCKET", "bikeindex-maps")
 
 # The tiles object. The geography under bike-location markers changes slowly, so
 # we refresh quarterly - spec/lib/tasks/maps_spec.rb re-checks the live tiles on

@@ -47,7 +47,7 @@ namespace :maps do
     abort "Missing #{missing.join(", ")} - see the one-time R2 setup at the top of #{__FILE__}." if missing.any?
 
     key = args[:key].presence || MAPS_TILES_KEY
-    bucket = MAPS_BUCKET
+    bucket = ENV.fetch("R2_MAPS_BUCKET", "bikeindex-maps")
     uri = URI.parse(source)
 
     length = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") { |http| http.head(uri.request_uri)["content-length"] }
