@@ -13,4 +13,9 @@ Rake::Task["db:schema:dump"].enhance do
     }.join
     File.write(file, cleaned) if cleaned != content
   end
+
+  # primary_replica is a replica of the primary database (same physical database
+  # everywhere), so its schema always matches structure.sql. Rails skips replica
+  # configs when dumping, which left this file to rot — mirror it so it can't drift.
+  File.write("db/primary_replica_structure.sql", File.read("db/structure.sql"))
 end

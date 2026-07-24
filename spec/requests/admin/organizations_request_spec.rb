@@ -222,11 +222,14 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(organization.reload.manufacturer_id).to be_blank
       end
     end
-    context "update passwordless_user_domain" do
-      it "updates (only blocking non-developers in frontend because whateves)" do
-        put "#{base_url}/#{organization.to_param}", params: {organization: {passwordless_user_domain: "@bikeindex.org"}}
-        organization.reload
-        expect(organization.passwordless_user_domain).to eq "@bikeindex.org"
+    context "update user_email_domain" do
+      it "updates a valid domain and rejects values with an @ or without a ." do
+        put "#{base_url}/#{organization.to_param}", params: {organization: {user_email_domain: "bikeindex.org"}}
+        expect(organization.reload.user_email_domain).to eq "bikeindex.org"
+        put "#{base_url}/#{organization.to_param}", params: {organization: {user_email_domain: "@bikeindex.org"}}
+        expect(organization.reload.user_email_domain).to eq "bikeindex.org" # unchanged - invalid
+        put "#{base_url}/#{organization.to_param}", params: {organization: {user_email_domain: "bikeindexorg"}}
+        expect(organization.reload.user_email_domain).to eq "bikeindex.org" # unchanged - invalid
       end
     end
     context "updating graduated notifications" do
@@ -289,7 +292,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           name: "other namE",
           search_radius_miles: 1222.2,
           graduated_notification_interval_days: 4444,
-          passwordless_user_domain: "stuff.com"
+          user_email_domain: "stuff.com"
         }
       end
       it "updates the organization attributes" do

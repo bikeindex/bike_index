@@ -1,6 +1,6 @@
 # Seed parking notifications and impound records around San Francisco for the Brakebills organization
 brakebills = Organization.find_by_name("Brakebills")
-member = User.find_by_email("member@bikeindex.org")
+member = User.find_by_email("member@brakebills.edu")
 user = User.find_by_email("user@bikeindex.org")
 
 raise "missing Brakebills org, test users, or manufacturers" if member.blank? || user.blank? || Manufacturer.none?
