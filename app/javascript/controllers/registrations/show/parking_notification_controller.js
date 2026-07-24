@@ -15,11 +15,10 @@ const DEFAULT_ZOOM = 15
 
 // The device's own position, so a dragged pin can be judged against where the
 // phone thinks it is. The halo covers the accuracy the browser reported.
-const DEVICE_ACCURACY_PAINT = (accuracy, latitude) => ({
-  'circle-radius': groundRadiusStops(accuracy, latitude),
+const DEVICE_ACCURACY_PAINT = {
   'circle-color': '#2563eb',
   'circle-opacity': 0.15
-})
+}
 
 const DEVICE_DOT_PAINT = {
   'circle-radius': 5,
@@ -148,18 +147,21 @@ export default class extends Controller {
     if (!this.mapLoaded || !this.deviceLocation) return
     const { latitude, longitude, accuracy } = this.deviceLocation
     const data = { type: 'Feature', geometry: { type: 'Point', coordinates: [longitude, latitude] } }
-    const source = this.map.getSource('device-location')
-    if (source) return source.setData(data)
+    const radius = groundRadiusStops(accuracy || 0, latitude)
+
+    if (this.map.getSource('device-location')) {
+      this.map.getSource('device-location').setData(data)
+      this.map.setPaintProperty('device-accuracy', 'circle-radius', radius)
+      return
+    }
 
     this.map.addSource('device-location', { type: 'geojson', data })
-    if (accuracy > 0) {
-      this.map.addLayer({
-        id: 'device-accuracy',
-        type: 'circle',
-        source: 'device-location',
-        paint: DEVICE_ACCURACY_PAINT(accuracy, latitude)
-      })
-    }
+    this.map.addLayer({
+      id: 'device-accuracy',
+      type: 'circle',
+      source: 'device-location',
+      paint: { ...DEVICE_ACCURACY_PAINT, 'circle-radius': radius }
+    })
     this.map.addLayer({ id: 'device-dot', type: 'circle', source: 'device-location', paint: DEVICE_DOT_PAINT })
   }
 
@@ -249,7 +251,21 @@ export default class extends Controller {
       // buttons' job; the geolocate button re-centres on the device location
       this.map.scrollZoom.disable()
       this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
-      this.map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true } }), 'top-right')
+
+      // showUserLocation off: we draw the device marker ourselves, and two of them
+      // drift apart the moment the control gets a newer fix than our own
+      const geolocate = new maplibregl.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        showUserLocation: false
+      })
+      this.map.addControl(geolocate, 'top-right')
+      // The control re-centres the map (which moves the pin via moveend); adopt its
+      // fresher fix for the marker too
+      geolocate.on('geolocate', (position) => {
+        const { latitude, longitude, accuracy } = position.coords
+        this.deviceLocation = { latitude, longitude, accuracy }
+        this.renderDeviceLocation()
+      })
 
       this.map.on('moveend', () => this.centerAdopted())
       this.map.on('load', () => {
