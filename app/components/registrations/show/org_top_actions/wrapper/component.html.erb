@@ -6,28 +6,28 @@
     <% if contactable? %>
       <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "message", action: "registrations--show--action-panels#toggle"})) do %>
         <%= action_icon("mail") %>
-        <%= action_label(translation(".message_owner"), translation(".message_owner_sub")) %>
+        <%= action_label(translation(".message_owner")) %>
       <% end %>
     <% end %>
 
     <% if show_create_impound? %>
       <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "impound", action: "registrations--show--action-panels#toggle"})) do %>
         <%= action_icon("lock") %>
-        <%= action_label(translation(".impound"), translation(".record_impounding")) %>
+        <%= action_label(translation(".impound")) %>
       <% end %>
     <% end %>
 
     <% if show_update_impound? %>
       <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "impound_update", action: "registrations--show--action-panels#toggle"})) do %>
         <%= action_icon("lock", tile: :amber) %>
-        <%= action_label(translation(".impound_record"), translation(".update")) %>
+        <%= action_label(translation(".update_impound_record")) %>
       <% end %>
     <% end %>
 
     <% if show_create_parking_notification? %>
       <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "parking", action: "registrations--show--action-panels#toggle"})) do %>
         <%= action_icon("map-pin") %>
-        <%= action_label(translation(".parking_notice"), translation(".parking_notice_sub")) %>
+        <%= action_label(translation(".new_parking_notice")) %>
       <% end %>
     <% end %>
 

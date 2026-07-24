@@ -185,7 +185,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
 
         it "shows the create parking notification button" do
           get "#{base_url}/#{bike.id}"
-          expect(whitespace_normalized_body_text).to match("Create a New Notification")
+          expect(whitespace_normalized_body_text).to match("New Parking Notification")
         end
 
         it "shows the View notifications panel even with no notifications" do
@@ -217,7 +217,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
             get "#{base_url}/#{bike.id}"
             body = whitespace_normalized_body_text
             expect(body).to match("Impounded")
-            expect(body).to_not match("Create a New Notification")
+            expect(body).to_not match("New Parking Notification")
           end
         end
       end
@@ -225,9 +225,9 @@ RSpec.describe "RegistrationsController#show", type: :request do
       context "with impound bikes enabled" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["impound_bikes"]) }
 
-        it "shows the impound action with a record-impounding subtitle" do
+        it "shows the impound action" do
           get "#{base_url}/#{bike.id}"
-          expect(whitespace_normalized_body_text).to match("Record Impounding")
+          expect(response.body).to match('data-panel-name="impound"')
         end
 
         context "already impounded" do
@@ -238,8 +238,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
             get "#{base_url}/#{bike.id}"
             body = whitespace_normalized_body_text
             # The Update impound action opens the impound-record update form
-            expect(body).to match("Update impound record")
-            expect(body).to_not match("Record Impounding")
+            expect(body).to match("Update Impound record")
+            expect(response.body).to_not match('data-panel-name="impound"')
             # The main-column card shows the org impound-record heading + fields
             expect(body).to include("#{organization.short_name} impound record")
             expect(body).to match("Impounded by")
@@ -370,9 +370,9 @@ RSpec.describe "RegistrationsController#show", type: :request do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
           # Limited members can create a parking notification
-          expect(body).to match("Create a New Notification")
+          expect(body).to match("New Parking Notification")
           # No impound action for limited (create is staff-only, request impound removed)
-          expect(body).to_not match("Record Impounding")
+          expect(response.body).to_not match('data-panel-name="impound"')
           expect(body).to_not match("Request impound")
         end
       end

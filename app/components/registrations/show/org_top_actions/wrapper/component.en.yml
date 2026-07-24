@@ -6,13 +6,9 @@ en:
         org_top_actions:
           wrapper:
             impound: Impound
-            impound_record: Impound Record
             message_owner: Message Owner
-            message_owner_sub: Via Bike Index
-            parking_notice: Parking Notification
-            parking_notice_sub: Create a New Notification
-            record_impounding: Record Impounding
-            update: Update
+            new_parking_notice: New Parking Notification
+            update_impound_record: Update Impound record
             view_notifications: View Notifications
             view_notifications_activity_html: "<strong>%{active}</strong> Active - <strong>%{resolved}</strong>
               Resolved"
