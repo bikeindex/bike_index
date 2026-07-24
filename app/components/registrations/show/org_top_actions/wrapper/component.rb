@@ -18,6 +18,10 @@ module Registrations
 
           private
 
+          def action_button_classes
+            "tw:relative tw:w-full tw:min-h-[60px] tw:justify-start tw:gap-3 tw:rounded-xl tw:p-4! tw:text-base! tw:text-left tw:lg:flex-1"
+          end
+
           def action_icon(icon, tile: :purple)
             tile_bg, icon_color = case tile
             when :blue then ["tw:bg-[#e7f3fb]", "tw:text-[#016ec2]"]
