@@ -34,7 +34,7 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
 
     it "applies the bare active classes statically" do
       tokens = component.css("a").first["class"].split
-      expect(tokens).to include("tw:ring-2", "tw:bg-gray-200")
+      expect(tokens).to include("tw:ring-2", "tw:bg-gray-200!")
     end
   end
 
