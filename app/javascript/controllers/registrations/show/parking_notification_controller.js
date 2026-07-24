@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
-import { loadMapbox } from 'utils/mapbox'
+import { loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 /* global navigator */
 
@@ -9,7 +9,8 @@ import { loadMapbox } from 'utils/mapbox'
 // browser location (falling back to the organization's location), stamps the
 // coordinates onto the form, and keeps the pin + zoom in the URL so a reload
 // restores them. Moving the map moves the pin. "Enter address manually" reveals
-// the UI::Forms::AddressGroup fields instead.
+// the UI::Forms::AddressGroup fields instead. Tiles come from our self-hosted
+// MapLibre basemap; the mapboxKey is only for reverse-geocoding the pin.
 const DEFAULT_ZOOM = 15
 
 export default class extends Controller {
@@ -22,6 +23,7 @@ export default class extends Controller {
     impoundHeading: String,
     defaultKind: String,
     mapboxKey: String,
+    styleUrl: String,
     orgLatitude: Number,
     orgLongitude: Number
   }
@@ -179,7 +181,7 @@ export default class extends Controller {
   get hasPin () { return !Number.isNaN(this.pinLatitude) && !Number.isNaN(this.pinLongitude) }
 
   syncMap () {
-    if (!this.hasMapTarget || !this.mapboxKeyValue || !this.hasPin) return
+    if (!this.hasMapTarget || !this.styleUrlValue || !this.hasPin) return
     if (this.map) {
       this.map.easeTo({ center: [this.pinLongitude, this.pinLatitude], zoom: this.pinZoom ?? this.map.getZoom() })
     } else {
@@ -191,25 +193,25 @@ export default class extends Controller {
     if (this.mapLoading) return
     this.mapLoading = true
     try {
-      const mapboxgl = await loadMapbox()
+      const maplibregl = await loadMapLibre()
       if (!this.element.isConnected) return
 
       // Read the coordinates now (not when buildMap was queued) so a fix that
-      // arrived while Mapbox was loading is reflected in the initial center
+      // arrived while MapLibre was loading is reflected in the initial center
       const center = [this.pinLongitude, this.pinLatitude]
-      mapboxgl.accessToken = this.mapboxKeyValue
-      this.map = new mapboxgl.Map({
+      this.map = new maplibregl.Map({
         container: this.mapTarget,
-        style: 'mapbox://styles/mapbox/streets-v11',
+        style: this.styleUrlValue,
         center,
         zoom: this.pinZoom ?? DEFAULT_ZOOM,
-        maxZoom: 18
+        maxZoom: 18,
+        attributionControl: { customAttribution: OSM_ATTRIBUTION }
       })
       // Scroll over the map should scroll the page, not zoom it — zooming is the
       // buttons' job; the geolocate button re-centres on the device location
       this.map.scrollZoom.disable()
-      this.map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right')
-      this.map.addControl(new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true } }), 'top-right')
+      this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
+      this.map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true } }), 'top-right')
 
       this.map.on('moveend', () => this.centerAdopted())
       // The container may have been collapsed when the map was built
@@ -219,7 +221,7 @@ export default class extends Controller {
     }
   }
 
-  // WebGL/Mapbox can be unavailable (crawlers, headless browsers, disabled GPU,
+  // WebGL/MapLibre can be unavailable (crawlers, headless browsers, disabled GPU,
   // blocked CDN). The coordinates are already stamped, so the form still submits;
   // just reveal a message instead of a blank box
   mapUnavailable (error) {

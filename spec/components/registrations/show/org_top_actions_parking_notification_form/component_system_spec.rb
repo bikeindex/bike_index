@@ -44,10 +44,13 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
       context = playwright_page.context
       context.grant_permissions(["geolocation"])
       context.set_geolocation({latitude: latitude.to_f, longitude: longitude.to_f, accuracy: 20})
-      # Stub Mapbox reverse-geocode so the address resolves without the network.
-      # Scoped to geocoding so the Mapbox GL script/CSS still load (or fail) normally.
+      # Stub Mapbox reverse-geocode so the address resolves without the network
       context.route("https://api.mapbox.com/geocoding/**", proc { |route, _request|
         route.fulfill(status: 200, json: {features: [feature]})
+      })
+      # Serve an empty MapLibre style so the map builds without fetching basemap tiles
+      context.route("#{MAPS_HOST}/**", proc { |route, _request|
+        route.fulfill(status: 200, json: {version: 8, sources: {}, layers: []})
       })
     end
   end
@@ -65,6 +68,9 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
     expect(coordinate("latitude")).to eq(latitude)
     expect(coordinate("longitude")).to eq(longitude)
     expect(page).to have_button("Create parking notification", disabled: false)
+    # The MapLibre map renders under the centre pin, with its zoom controls
+    expect(page).to have_css(".maplibregl-canvas")
+    expect(page).to have_css(".maplibregl-ctrl-zoom-in", visible: :all)
     # The pin + zoom are mirrored into the URL so a reload restores them
     expect(page.current_url).to include("map_lat=37.8698").and include("map_lng=-122.2585").and include("map_zoom=")
     expect_axe_clean

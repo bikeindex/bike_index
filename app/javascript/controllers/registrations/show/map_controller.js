@@ -1,17 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
+import { loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 // Connects to data-controller='registrations--show--map'
 // Lazy-loads MapLibre GL + the PMTiles protocol and renders a map centered on
 // the coordinates, marking them with a dot (point) or a translucent red circle
 // (approximate area).
-const MAPLIBRE_VERSION = '4.7.1'
-const PMTILES_VERSION = '3.2.1'
-const MAPLIBRE_JS = `https://cdn.jsdelivr.net/npm/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.js`
-const MAPLIBRE_CSS = `https://cdn.jsdelivr.net/npm/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.css`
-const PMTILES_JS = `https://cdn.jsdelivr.net/npm/pmtiles@${PMTILES_VERSION}/dist/pmtiles.js`
-
-// OpenStreetMap's ODbL license requires crediting contributors on the map
-const ATTRIBUTION = '© OpenStreetMap contributors'
 
 // A fixed dot marking the exact spot
 const POINT_PAINT = {
@@ -75,7 +68,7 @@ export default class extends Controller {
       center,
       zoom: 13,
       maxZoom: 16,
-      attributionControl: { customAttribution: ATTRIBUTION }
+      attributionControl: { customAttribution: OSM_ATTRIBUTION }
     })
 
     this.map.on('load', () => {
@@ -91,41 +84,4 @@ export default class extends Controller {
       })
     })
   }
-}
-
-// Load MapLibre GL + the PMTiles protocol once, shared across controller instances.
-let mapLibrePromise
-function loadMapLibre () {
-  if (window.maplibregl) return Promise.resolve(window.maplibregl)
-  if (mapLibrePromise) return mapLibrePromise
-
-  mapLibrePromise = (async () => {
-    if (!document.querySelector(`link[href="${MAPLIBRE_CSS}"]`)) {
-      const link = document.createElement('link')
-      link.rel = 'stylesheet'
-      link.href = MAPLIBRE_CSS
-      document.head.appendChild(link)
-    }
-    await Promise.all([loadScript(MAPLIBRE_JS), loadScript(PMTILES_JS)])
-
-    const { maplibregl, pmtiles } = window
-    // Teach MapLibre to read pmtiles:// sources (the single-file vector tiles)
-    maplibregl.addProtocol('pmtiles', new pmtiles.Protocol().tile)
-    return maplibregl
-  })()
-  return mapLibrePromise
-}
-
-function loadScript (src) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve()
-      return
-    }
-    const script = document.createElement('script')
-    script.src = src
-    script.onload = resolve
-    script.onerror = reject
-    document.head.appendChild(script)
-  })
 }
