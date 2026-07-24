@@ -1,0 +1,61 @@
+# Streams a Protomaps .pmtiles build straight into the maps R2 bucket from a
+# GitHub runner - fast, free bandwidth (R2 ingress is free), and rclone pipes the
+# file through without it ever landing on disk or on anyone's local connection.
+#
+# Run it from the Actions tab, pasting the build URL
+# (https://build.protomaps.com/<date>.pmtiles). Refresh quarterly. After it runs,
+# purge the Cloudflare cache for maps.bikeindex.org.
+#
+# Secrets (on the maps-upload environment): R2_MAPS_ENDPOINT, R2_MAPS_ACCESS_KEY,
+# R2_MAPS_ACCESS_KEY_SECRET - the token must be scoped to ONLY the bikeindex-maps
+# bucket (Object Read & Write). Add required reviewers to the environment to gate
+# who can run it.
+#
+# One-time R2 + Cloudflare setup, before the first run:
+#   Bucket:      bikeindex-maps  (SEPARATE from the uploads bucket - this one is public)
+#   Public host: https://maps.bikeindex.org  (R2 custom domain, never the S3 endpoint)
+#   1. Create the bucket. It holds only the public basemap (tiles, style.json,
+#      glyphs, sprites under basemap/) - no user data, no secrets.
+#   2. Connect maps.bikeindex.org as a custom domain and serve all reads from it.
+#   3. CORS: allow GET, HEAD and Range from any origin (["*"]). The tiles are
+#      public OSM data; rate limiting and caching cap abuse, not CORS.
+#   4. Cache Rule on the host: cache and respect the object's Cache-Control (the
+#      upload sets max-age), keeping R2 read ops - and the bill - low.
+#   5. Rate-limit the host per IP (R2 egress is free, ops are not).
+#   6. Upload the style.json, glyphs and sprites under basemap/ too.
+name: Upload basemap
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: Protomaps .pmtiles build URL
+        required: true
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    environment: maps-upload
+    env:
+      DEST: "r2:bikeindex-maps/basemap/tiles.pmtiles"
+      RCLONE_CONFIG_R2_TYPE: s3
+      RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+      RCLONE_CONFIG_R2_REGION: auto
+      RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.R2_MAPS_ENDPOINT }}
+      RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_MAPS_ACCESS_KEY }}
+      RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_MAPS_ACCESS_KEY_SECRET }}
+    steps:
+      - name: Install rclone
+        run: sudo apt-get update && sudo apt-get install -y rclone
+
+      - name: Stream basemap to R2
+        run: |
+          rclone copyurl "${{ inputs.source }}" "$DEST" \
+            --s3-chunk-size 100M \
+            --s3-no-check-bucket \
+            --header-upload "Cache-Control: public, max-age=86400" \
+            --header-upload "Content-Type: application/octet-stream" \
+            --progress
+
+      - name: Done
+        run: echo "Uploaded $DEST. Purge the Cloudflare cache for https://maps.bikeindex.org so clients fetch the new tiles."
