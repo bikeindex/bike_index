@@ -50,20 +50,10 @@ RSpec.describe "maps rake tasks" do
     context "without the R2 credentials" do
       before { stub_const("ENV", ENV.to_hash.merge(env).except("R2_MAPS_ACCESS_KEY")) }
 
-      it "prints the bucket setup and aborts without uploading" do
-        expect { expect { task.invoke(source) }.to raise_error(SystemExit) }
-          .to output(/one-time setup.*bikeindex-maps/m).to_stdout
+      it "aborts without uploading" do
+        expect { task.invoke(source) }.to raise_error(SystemExit)
         expect(s3.api_requests).to be_empty
       end
-    end
-  end
-
-  describe "maps:bucket_setup" do
-    let(:task) { Rake::Task["maps:bucket_setup"] }
-    after { task.reenable }
-
-    it "prints the bucket name and public host" do
-      expect { task.invoke }.to output(a_string_including("bikeindex-maps", MAPS_HOST, "CORS")).to_stdout
     end
   end
 

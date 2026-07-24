@@ -7,41 +7,32 @@
 #
 #   bundle exec rails "maps:upload_basemap[https://build.protomaps.com/<date>.pmtiles]"
 #
-# Run maps:bucket_setup for the one-time R2/Cloudflare configuration. Refresh the
-# tiles quarterly (see MAPS_TILES_MAX_AGE); Cloudflare caches the object, so purge
-# MAPS_HOST after replacing it.
+# Refresh the tiles quarterly (see MAPS_TILES_MAX_AGE); Cloudflare caches the
+# object, so purge MAPS_HOST after replacing it.
+#
+# One-time R2 + Cloudflare setup (dashboard), before the first upload:
+#
+#   Bucket:       bikeindex-maps  (keep SEPARATE from the uploads bucket - this one is public)
+#   Public host:  https://maps.bikeindex.org  (R2 custom domain, never the S3 endpoint)
+#   Tiles object: basemap/tiles.pmtiles  ->  https://maps.bikeindex.org/basemap/tiles.pmtiles
+#
+#   1. Create the R2 bucket "bikeindex-maps". It holds only the public basemap
+#      (tiles, style.json, glyphs, sprites under basemap/) - no user data, no secrets.
+#   2. Connect the custom domain maps.bikeindex.org to the bucket and serve all
+#      reads from it. Do not expose the raw S3 endpoint.
+#   3. CORS: allow GET, HEAD and Range from any origin (AllowedOrigins ["*"]). The
+#      tiles are public OSM data and CORS won't stop non-browser abuse anyway -
+#      rate limiting and caching (below) are what cap abuse, not CORS. "*" also
+#      keeps dev/staging config-free.
+#   4. Cache Rule on maps.bikeindex.org: cache and respect the object's
+#      Cache-Control (the upload sets max-age). Edge caching keeps R2 read ops - and
+#      the bill - low.
+#   5. Rate-limit maps.bikeindex.org per IP to cap abuse (R2 egress is free, ops are not).
+#   6. Create an R2 API token scoped to ONLY "bikeindex-maps" (Object Read & Write)
+#      and set R2_MAPS_ENDPOINT, R2_MAPS_ACCESS_KEY, R2_MAPS_ACCESS_KEY_SECRET
+#      (R2_MAPS_BUCKET defaults to bikeindex-maps).
+#   7. Upload the style.json, glyphs and sprites under basemap/ too (see MAPS_STYLE_URL).
 namespace :maps do
-  print_bucket_setup = lambda do
-    bucket = MAPS_BUCKET
-    puts <<~SETUP
-      Maps R2 bucket - one-time setup (R2 + Cloudflare dashboard)
-
-        Bucket:       #{bucket}          (keep SEPARATE from the uploads bucket - this one is public)
-        Public host:  #{MAPS_HOST}        (R2 custom domain, never the S3 endpoint)
-        Tiles object: #{MAPS_TILES_KEY}  ->  #{MAPS_TILES_URL}
-
-        1. Create the R2 bucket "#{bucket}". It holds only the public basemap
-           (tiles, style.json, glyphs, sprites under basemap/) - no user data, no secrets.
-        2. Connect the custom domain #{MAPS_HOST} to the bucket and serve all reads
-           from it. Do not expose the raw S3 endpoint.
-        3. CORS: allow GET, HEAD and Range from any origin (AllowedOrigins ["*"]). The tiles are
-           public OSM data and CORS won't stop non-browser abuse anyway - rate limiting and
-           caching (below) are what cap abuse, not CORS. "*" also keeps dev/staging config-free.
-        4. Cache Rule on #{MAPS_HOST}: cache and respect the object's Cache-Control
-           (the upload sets max-age). Edge caching keeps R2 read ops - and the bill - low.
-        5. Rate-limit #{MAPS_HOST} per IP to cap abuse (R2 egress is free, ops are not).
-        6. Create an R2 API token scoped to ONLY "#{bucket}" (Object Read & Write) and set
-           R2_MAPS_ENDPOINT, R2_MAPS_ACCESS_KEY, R2_MAPS_ACCESS_KEY_SECRET
-           (R2_MAPS_BUCKET defaults to #{bucket}).
-        7. Upload the style.json, glyphs and sprites under basemap/ too (see MAPS_STYLE_URL).
-    SETUP
-  end
-
-  desc "Print the one-time R2/Cloudflare setup for the maps bucket"
-  task bucket_setup: :environment do
-    print_bucket_setup.call
-  end
-
   desc "Stream a remote .pmtiles basemap into the maps R2 bucket"
   task :upload_basemap, [:source, :key] => :environment do |_task, args|
     require "aws-sdk-s3"
@@ -53,10 +44,7 @@ namespace :maps do
     abort "Usage: rails 'maps:upload_basemap[https://build.protomaps.com/<date>.pmtiles]'" if source.blank?
 
     missing = %w[R2_MAPS_ENDPOINT R2_MAPS_ACCESS_KEY R2_MAPS_ACCESS_KEY_SECRET].reject { |name| ENV[name].present? }
-    if missing.any?
-      print_bucket_setup.call
-      abort "\nMissing #{missing.join(", ")} - set up the bucket (above) before uploading."
-    end
+    abort "Missing #{missing.join(", ")} - see the one-time R2 setup at the top of #{__FILE__}." if missing.any?
 
     key = args[:key].presence || MAPS_TILES_KEY
     bucket = MAPS_BUCKET
