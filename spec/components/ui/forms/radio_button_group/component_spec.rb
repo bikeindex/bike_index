@@ -14,10 +14,13 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
   end
 
   it "uses the same purple palette as UI::Button's purple_outline" do
-    button = UI::Button::Component.build_classes(color: :purple_outline, size: :md, active: true)
+    # The label carries resting (hover) and checked (active) purple in one class string,
+    # while the button splits them across states, so compare against both sets combined.
+    resting = UI::Button::Component.build_classes(color: :purple_outline, size: :md)
+    active = UI::Button::Component.build_classes(color: :purple_outline, size: :md, active: true)
     label = component.css("label").first["class"]
 
     expect(purple_tokens(label)).not_to be_empty
-    expect(purple_tokens(label)).to eq(purple_tokens(button))
+    expect(purple_tokens(label)).to eq(purple_tokens("#{resting} #{active}"))
   end
 end
