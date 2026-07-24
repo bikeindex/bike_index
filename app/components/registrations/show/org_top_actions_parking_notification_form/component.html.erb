@@ -67,12 +67,35 @@
             class="tw:mt-3"
           >
             <div
-              data-registrations--show--parking-notification-target="map"
+              data-registrations--show--parking-notification-target="mapFrame"
               class="
-                tw:h-72 tw:w-full tw:overflow-hidden tw:rounded-sm
-                tw:bg-gray-100 tw:dark:bg-gray-900
+                tw:relative tw:h-72 tw:w-full tw:overflow-hidden
+                tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900
               "
-            ></div>
+            >
+              <div
+                data-registrations--show--parking-notification-target="map"
+                class="tw:h-full tw:w-full"
+              ></div>
+
+              <%# A fixed pin marks the map center; moving the map places the pin %>
+              <svg
+                class="
+                  tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-1/2
+                  tw:z-10 tw:h-9 tw:w-9 tw:-translate-x-1/2
+                  tw:-translate-y-full tw:text-red-600 tw:drop-shadow-md
+                "
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M11.54 22.35a.75.75 0 0 0 .92 0c.14-.1.29-.22.46-.36a19.6 19.6 0 0 0 2.68-2.65c1.62-1.9 3.15-4.55 3.15-7.59a6.75 6.75 0 1 0-13.5 0c0 3.04 1.53 5.7 3.15 7.6a19.6 19.6 0 0 0 2.68 2.64l.46.36ZM12 12.75a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
 
             <p
               hidden
