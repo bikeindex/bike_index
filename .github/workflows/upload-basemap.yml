@@ -1,10 +1,12 @@
 # Streams a Protomaps .pmtiles build straight into the maps R2 bucket from a
 # GitHub runner - fast, free bandwidth (R2 ingress is free), and rclone pipes the
 # file through without it ever landing on disk or on anyone's local connection.
+# The one-time assets block also seeds the style, glyphs and sprites the tiles
+# need to render; comment that block out after the first run.
 #
 # Run it from the Actions tab, pasting the build URL
-# (https://build.protomaps.com/<date>.pmtiles). Refresh quarterly. After it runs,
-# purge the Cloudflare cache for maps.bikeindex.org.
+# (https://build.protomaps.com/<date>.pmtiles). Refresh the tiles quarterly. After
+# it runs, purge the Cloudflare cache for maps.bikeindex.org.
 #
 # Secrets (on the maps-upload environment): R2_MAPS_ENDPOINT, R2_MAPS_ACCESS_KEY,
 # R2_MAPS_ACCESS_KEY_SECRET - the token must be scoped to ONLY the bikeindex-maps
@@ -23,7 +25,6 @@
 #   4. Cache Rule on the host: cache and respect the object's Cache-Control (the
 #      upload sets max-age), keeping R2 read ops - and the bill - low.
 #   5. Rate-limit the host per IP (R2 egress is free, ops are not).
-#   6. Upload the style.json, glyphs and sprites under basemap/ too.
 name: Upload basemap
 
 on:
@@ -38,7 +39,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: maps-upload
     env:
-      DEST: "r2:bikeindex-maps/basemap/tiles.pmtiles"
+      HOST: https://maps.bikeindex.org/basemap
+      BUCKET: "r2:bikeindex-maps/basemap"
       RCLONE_CONFIG_R2_TYPE: s3
       RCLONE_CONFIG_R2_PROVIDER: Cloudflare
       RCLONE_CONFIG_R2_REGION: auto
@@ -49,15 +51,53 @@ jobs:
       - name: Install rclone
         run: curl -fsSL https://rclone.org/install.sh | sudo bash
 
-      - name: Stream basemap to R2
+      # === One-time basemap assets (light-theme style, glyphs, sprites) ===
+      # Comment out these three steps after the first successful run - they seed
+      # assets that rarely change, unlike the quarterly tiles stream below.
+      - name: Generate light-theme style.json
+        run: |
+          npm install protomaps-themes-base >/dev/null 2>&1
+          cat > gen-style.mjs <<'JS'
+          import layers from "protomaps-themes-base"
+          import { writeFileSync } from "node:fs"
+          const HOST = process.env.HOST
+          const style = {
+            version: 8,
+            glyphs: `${HOST}/fonts/{fontstack}/{range}.pbf`,
+            sprite: `${HOST}/sprites/v4/light`,
+            sources: {
+              protomaps: {
+                type: "vector",
+                url: `pmtiles://${HOST}/tiles.pmtiles`,
+                attribution: "© OpenStreetMap contributors"
+              }
+            },
+            layers: layers("protomaps", "light")
+          }
+          writeFileSync("style.json", JSON.stringify(style))
+          JS
+          node gen-style.mjs
+      - name: Fetch Protomaps glyphs + sprites
+        run: git clone --depth 1 https://github.com/protomaps/basemaps-assets.git
+      - name: Upload style, glyphs and sprites to R2
+        run: |
+          rclone copyto style.json "$BUCKET/style.json" \
+            --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
+          rclone copy basemaps-assets/fonts "$BUCKET/fonts" \
+            --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
+          rclone copy basemaps-assets/sprites "$BUCKET/sprites" \
+            --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
+      # === end one-time assets ===
+
+      - name: Stream tiles to R2
         env:
           SOURCE: ${{ inputs.source }}
         run: |
-          rclone copyurl "$SOURCE" "$DEST" \
+          rclone copyurl "$SOURCE" "$BUCKET/tiles.pmtiles" \
             --s3-chunk-size 100M \
             --s3-no-check-bucket \
             --header-upload "Cache-Control: public, max-age=86400" \
             --progress
 
       - name: Done
-        run: echo "Uploaded $DEST. Purge the Cloudflare cache for https://maps.bikeindex.org so clients fetch the new tiles."
+        run: echo "Uploaded to $BUCKET. Purge the Cloudflare cache for https://maps.bikeindex.org so clients fetch the new tiles."
