@@ -1,25 +1,32 @@
-<div data-controller="registrations--show--action-panels">
-  <button
-    type="button"
-    data-registrations--show--action-panels-target="trigger"
-    data-panel-name="parking"
-    data-action="registrations--show--action-panels#toggle"
-    aria-expanded="false"
-    class="twbtn"
-  >
-    Parking notification
-  </button>
+<% if bike.present? && organization.present? %>
+  <div data-controller="registrations--show--action-panels">
+    <button
+      type="button"
+      data-registrations--show--action-panels-target="trigger"
+      data-panel-name="parking"
+      data-action="registrations--show--action-panels#toggle"
+      aria-expanded="false"
+      class="twbtn"
+    >
+      Parking notification
+    </button>
 
-  <button
-    type="button"
-    data-registrations--show--action-panels-target="trigger"
-    data-panel-name="impound"
-    data-action="registrations--show--action-panels#toggle"
-    aria-expanded="false"
-    class="twbtn"
-  >
-    Impound
-  </button>
+    <button
+      type="button"
+      data-registrations--show--action-panels-target="trigger"
+      data-panel-name="impound"
+      data-action="registrations--show--action-panels#toggle"
+      aria-expanded="false"
+      class="twbtn"
+    >
+      Impound
+    </button>
 
-  <%= render(Registrations::Show::OrgTopActions::ParkingNotificationForm::Component.new(bike:, organization:)) %>
-</div>
+    <%= render(Registrations::Show::OrgTopActions::ParkingNotificationForm::Component.new(bike:, organization:)) %>
+  </div>
+<% else %>
+  <p>
+    This preview needs a bike registered to an organization. Seed the
+    development database (<code>bin/rails db:seed</code>) to render the form.
+  </p>
+<% end %>
