@@ -85,6 +85,12 @@ module Org
           end
         end
 
+        # Stimulus wiring for the column-toggle panel, shared by every caller that renders it
+        def column_toggle_data_attributes
+          {controller: "org--search org--search-column-toggle",
+           "org--search-column-toggle-default-columns-value": initially_checked_columns.to_json}
+        end
+
         def column_renames
           @column_renames ||= COLUMN_RENAME_KEYS.map { |key|
             name = translation(".#{key}")
