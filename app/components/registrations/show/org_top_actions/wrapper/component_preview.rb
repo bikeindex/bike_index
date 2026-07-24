@@ -4,46 +4,39 @@ module Registrations
   module Show
     module OrgTopActions
       module Wrapper
-        # Each variety is an in-memory bike rendered against the persisted
-        # lookbook_organization, so the action buttons render for every bike
-        # state without creating records
+        # One page stacking every action-button setup. Each variety is an in-memory
+        # bike rendered against the persisted lookbook_organization (a featureless
+        # org for the no-features case), so nothing is written to the database
         class ComponentPreview < ApplicationComponentPreview
-          # Message, create-impound, create-parking, and view-notifications buttons
-          def with_owner
-            render_scenario(preview_bike(:status_with_owner))
-          end
-
-          # Message button comes from the stolen record even when the org can't
-          # send unstolen notifications
-          def stolen
-            bike = preview_bike(:status_stolen)
-            bike.current_stolen_record = ::StolenRecord.new
-            render_scenario(bike)
-          end
-
-          # Swaps the create-impound button for the amber update-impound button
-          def impounded
-            render_scenario(preview_bike(:status_impounded))
-          end
-
-          # No message button (no owner to contact), still impound/parking/view
-          def unregistered_parking_notification
-            render_scenario(preview_bike(:unregistered_parking_notification))
-          end
-
-          # A limited (non-staff) member can't create or update impounds
-          def limited_member
-            render_scenario(preview_bike(:status_with_owner), staff: false)
+          def default
+            render_with_template(template: "registrations/show/org_top_actions/wrapper/preview/default",
+              locals: {scenarios:})
           end
 
           private
 
-          def render_scenario(bike, staff: true)
-            render(Component.new(bike:, organization: lookbook_organization, staff:))
+          def scenarios
+            {
+              "With owner" => component(preview_bike(:status_with_owner)),
+              "Stolen" => component(stolen_bike),
+              "Impounded" => component(preview_bike(:status_impounded)),
+              "Unregistered parking notification" => component(preview_bike(:unregistered_parking_notification)),
+              "Limited (non-staff) member" => component(preview_bike(:status_with_owner), staff: false),
+              "No features" => component(preview_bike(:status_with_owner), organization: ::Organization.new(short_name: "Preview", enabled_feature_slugs: []))
+            }
+          end
+
+          def component(bike, staff: true, organization: lookbook_organization)
+            Component.new(bike:, organization:, staff:)
           end
 
           def preview_bike(status)
             ::Bike.new(status:, cycle_type: "bike")
+          end
+
+          # Stolen is the one state carried by an association rather than the status
+          def stolen_bike
+            preview_bike(:status_stolen).tap { |bike| bike.current_stolen_record = ::StolenRecord.new }
           end
         end
       end
