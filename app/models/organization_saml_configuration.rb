@@ -31,7 +31,6 @@ class OrganizationSamlConfiguration < ApplicationRecord
   validates :organization_id, presence: true, uniqueness: true
   validates :idp_entity_id, :idp_sso_target_url, :idp_cert, presence: true, if: :enabled?
   validate :idp_certificates_parseable
-  validate :organization_domain_unclaimed, if: :enabled?
 
   before_validation :set_calculated_attributes
   after_commit :update_organization
@@ -71,14 +70,6 @@ class OrganizationSamlConfiguration < ApplicationRecord
     rescue OpenSSL::X509::CertificateError
       errors.add(attribute, "is not a valid X.509 certificate")
     end
-  end
-
-  # Catches the other way in: enabling SSO for an org whose domain another SSO org already routes
-  def organization_domain_unclaimed
-    conflict = Organization.saml_domain_conflict(organization&.user_email_domain, excluded_id: organization_id)
-    return if conflict.blank?
-
-    errors.add(:base, "Email domain is already used for SSO by #{conflict.name}")
   end
 
   def update_organization

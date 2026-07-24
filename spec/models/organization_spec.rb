@@ -477,7 +477,7 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "user_email_domain_unclaimed" do
+  describe "user_email_domain uniqueness" do
     let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled) }
     let!(:sso_organization) { saml_configuration.organization }
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
