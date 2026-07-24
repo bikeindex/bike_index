@@ -76,11 +76,13 @@
           </span>
         </div>
 
+        <%# Searching is JS-only, so org--multi-search enables this on connect %>
         <%= render UI::Button::Component.new(
           text: button_texts[search_kind],
           color: :primary,
           size: :lg,
           kind: :submit,
+          disabled: true,
           data: {"org--multi-search-target": "button"}
         ) %>
       </div>
