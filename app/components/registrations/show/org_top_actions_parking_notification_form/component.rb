@@ -31,7 +31,7 @@ module Registrations
 
         # Seeds the map pin when the browser location is unavailable
         def org_map_coordinates
-          @organization.map_focus_coordinates
+          @org_map_coordinates ||= @organization.map_focus_coordinates
         end
       end
     end

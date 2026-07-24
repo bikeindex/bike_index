@@ -28,8 +28,7 @@ export default class extends Controller {
     orgLongitude: Number
   }
 
-  // Fired when the accordion reveals this panel; impound preselects that kind,
-  // and opening the panel seeds the location so the map appears right away
+  // Fired when the accordion reveals this panel; impound preselects that kind
   applyMode (event) {
     const impound = event.detail?.name === 'impound'
     if (this.hasHeadingTarget) {
@@ -39,7 +38,6 @@ export default class extends Controller {
     if (radio) radio.checked = true
     // Impound preselects the kind, so hide the "Notification because" chooser
     if (this.hasKindGroupTarget) this.toggle(this.kindGroupTarget, !impound)
-    this.startLocation()
     // A recent earlier notification preselects "repeat", so sync on open (no animation)
     this.applyRepeat(this.repeatSelected, 0)
   }
@@ -53,42 +51,45 @@ export default class extends Controller {
   }
 
   // A repeat reuses the earlier notification's location, so collapse the location
-  // controls; a hidden required field would otherwise block submit
+  // controls; a hidden required field would otherwise block submit. Deferring the
+  // map until the controls are actually revealed keeps a repeat from loading tiles
+  // (and burning a geocode) for a map nobody sees
   applyRepeat (repeat, duration) {
     if (this.hasLocationSectionTarget) collapse(repeat ? 'hide' : 'show', this.locationSectionTarget, duration)
     if (repeat) {
       this.setManualRequired(false)
       this.enableSubmit()
-    } else {
-      this.map?.resize()
+    } else if (!this.manualMode) {
+      this.startLocation(duration)
     }
   }
 
   // Segmented control: "current" places a pin on the map, "entered" reveals the
   // address fields
   selectLocationMode (event) {
-    if (event.target.value === 'entered') {
-      this.hide(this.statusTarget)
-      this.hide(this.mapSectionTarget)
-      this.enterManually()
-    } else {
-      this.startLocation()
-    }
+    if (event.target.value === 'entered') this.enterManually()
+    else this.startLocation()
+  }
+
+  // Reflect the chosen mode across the radios, the hidden flag, the required
+  // fields and which of the map / address panels is showing
+  applyLocationMode (manual) {
+    this.setLocationMode(manual ? 'entered' : 'current')
+    this.setUseEntered(manual)
+    this.setManualRequired(manual)
+    this.toggle(this.addressGroupTarget, manual)
+    this.toggle(this.mapSectionTarget, !manual)
   }
 
   // Show the map and seed the pin. Once a location has resolved this session the
-  // pin is already placed, so just re-reveal the map; otherwise restore it from
-  // the URL, or seed the org location and ask the browser for a better fix.
-  startLocation () {
-    this.setLocationMode('current')
-    this.setUseEntered(false)
-    this.setManualRequired(false)
-    this.hide(this.addressGroupTarget)
-    this.show(this.mapSectionTarget)
+  // pin is already placed, so just re-reveal the map.
+  startLocation (revealDuration = 0) {
+    this.applyLocationMode(false)
 
     if (this.located) {
       this.show(this.statusTarget)
-      this.map?.resize()
+      // The frame may still be mid-collapse, so measure once it has settled
+      window.setTimeout(() => this.map?.resize(), revealDuration)
       return
     }
 
@@ -119,7 +120,7 @@ export default class extends Controller {
   locationFound (position) {
     if (this.manualMode) return // they switched to manual entry while we waited
     const { latitude, longitude, accuracy } = position.coords
-    this.locate(latitude, longitude, { zoom: DEFAULT_ZOOM, accuracy })
+    this.locate(latitude, longitude, { accuracy })
     this.setStatus('Using your current location', { dot: true })
     this.reverseGeocode(latitude, longitude)
   }
@@ -127,17 +128,16 @@ export default class extends Controller {
   locationFailed () {
     if (this.manualMode) return
     // Fall back to the org location; the user drags the map to adjust it
-    this.locate(this.orgLatitudeValue, this.orgLongitudeValue, { zoom: DEFAULT_ZOOM, persist: false })
+    this.locate(this.orgLatitudeValue, this.orgLongitudeValue, { persist: false })
     this.setStatus('Drag the map to set the location', { dot: true })
   }
 
-  // A resolved location: stamp it onto the form and drop/move the pin
-  locate (latitude, longitude, { zoom, accuracy = '', persist = true } = {}) {
-    if (latitude == null || longitude == null) return
+  locate (latitude, longitude, { zoom = DEFAULT_ZOOM, accuracy = '', persist = true } = {}) {
     this.located = true
     this.setCoordinates(latitude, longitude, accuracy)
-    if (zoom != null) this.pinZoom = zoom
+    this.pinZoom = zoom
     this.syncMap()
+    // The org fallback isn't a location the user chose, so it stays out of the URL
     if (persist) this.persistMapState()
   }
 
@@ -147,7 +147,6 @@ export default class extends Controller {
     if (!this.map) return
     const { lat, lng } = this.map.getCenter()
     if (this.centerMoved(lat, lng)) {
-      this.located = true
       this.setCoordinates(lat, lng)
       this.setStatus('Updating the location…', { dot: true })
       this.scheduleGeocode(lat, lng)
@@ -183,7 +182,7 @@ export default class extends Controller {
   syncMap () {
     if (!this.hasMapTarget || !this.styleUrlValue || !this.hasPin) return
     if (this.map) {
-      this.map.easeTo({ center: [this.pinLongitude, this.pinLatitude], zoom: this.pinZoom ?? this.map.getZoom() })
+      this.map.easeTo({ center: [this.pinLongitude, this.pinLatitude], zoom: this.pinZoom })
     } else {
       this.buildMap()
     }
@@ -203,7 +202,7 @@ export default class extends Controller {
         container: this.mapTarget,
         style: this.styleUrlValue,
         center,
-        zoom: this.pinZoom ?? DEFAULT_ZOOM,
+        zoom: this.pinZoom,
         maxZoom: 18,
         attributionControl: { customAttribution: OSM_ATTRIBUTION }
       })
@@ -240,11 +239,12 @@ export default class extends Controller {
   // The pin + zoom live in the URL so a reload (or shared link) restores them
   persistMapState () {
     if (!this.hasPin) return
-    const zoom = this.map ? this.map.getZoom() : this.pinZoom
     const url = new URL(window.location)
     url.searchParams.set('map_lat', this.pinLatitude.toFixed(6))
     url.searchParams.set('map_lng', this.pinLongitude.toFixed(6))
-    if (zoom != null) url.searchParams.set('map_zoom', Number(zoom).toFixed(2))
+    url.searchParams.set('map_zoom', (this.map?.getZoom() ?? this.pinZoom).toFixed(2))
+    // Revealing the map fires a moveend that changed nothing; skip the no-op write
+    if (url.search === window.location.search) return
     window.history.replaceState(window.history.state, '', url)
   }
 
@@ -254,7 +254,7 @@ export default class extends Controller {
     const longitude = parseFloat(params.get('map_lng'))
     if (Number.isNaN(latitude) || Number.isNaN(longitude)) return null
     const zoom = parseFloat(params.get('map_zoom'))
-    return { latitude, longitude, zoom: Number.isNaN(zoom) ? undefined : zoom }
+    return { latitude, longitude, zoom: Number.isNaN(zoom) ? DEFAULT_ZOOM : zoom }
   }
 
   // Reverse-geocode the coordinates into a human-readable place and split address
@@ -288,12 +288,9 @@ export default class extends Controller {
   }
 
   enterManually () {
-    this.setLocationMode('entered')
-    this.setUseEntered(true)
-    this.hide(this.mapSectionTarget)
-    this.show(this.addressGroupTarget)
+    this.applyLocationMode(true)
+    this.hide(this.statusTarget) // the located readout is irrelevant in manual entry
     this.fillAddress()
-    this.setManualRequired(true)
     this.enableSubmit()
   }
 
