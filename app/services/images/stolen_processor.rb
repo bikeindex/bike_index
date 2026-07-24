@@ -22,7 +22,7 @@ module Images
     # ... It looks better when the image doesn't overlap with the bar
     TOPBAR_VERTICAL_WIDTH = 190
 
-    # NOTE: This doesn't delete images - that's handled by StolenBike::RemoveOrphanedImagesJob
+    # NOTE: This doesn't delete images - that's handled by BikeJobs::RemoveOrphanedImagesJob
 
     # Previously, we would set the image via passing it. That's a pain to track!
     # Instead, when overriding the image in admin, let's update the image we're overriding with

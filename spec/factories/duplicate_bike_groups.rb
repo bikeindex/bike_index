@@ -14,7 +14,7 @@ FactoryBot.define do
     after(:create) do |duplicate_bike_group, evaluator|
       evaluator.normalized_serial_segments1.update(duplicate_bike_group: duplicate_bike_group)
       evaluator.bike2.create_normalized_serial_segments
-      DuplicateBikeFinderJob.new.perform(evaluator.bike2.id)
+      BikeJobs::DuplicateBikeFinderJob.new.perform(evaluator.bike2.id)
       duplicate_bike_group.reload
     end
   end

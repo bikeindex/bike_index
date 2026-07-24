@@ -9,7 +9,7 @@ RSpec.describe Sale, type: :model do
     it "is valid" do
       expect(sale).to be_valid
       expect(sale.ownership_id).to be_present
-      expect(CallbackJob::AfterSaleCreateJob.jobs.count).to eq 1
+      expect(CallbackJobs::AfterSaleCreateJob.jobs.count).to eq 1
     end
   end
 
@@ -78,7 +78,7 @@ RSpec.describe Sale, type: :model do
         it "returns valid" do
           expect(marketplace_message).to be_valid
           expect(sale_initial).to be_valid
-          CallbackJob::AfterSaleCreateJob.new.perform(sale_initial.id)
+          CallbackJobs::AfterSaleCreateJob.new.perform(sale_initial.id)
           expect(item.reload.ownerships.count).to eq 2
           expect(marketplace_listing.reload.status).to eq "sold"
           expect(marketplace_listing.bike_ownership&.id).to eq ownership.id

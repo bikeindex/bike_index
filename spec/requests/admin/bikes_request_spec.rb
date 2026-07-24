@@ -285,7 +285,7 @@ RSpec.describe Admin::BikesController, type: :request do
       }.to change(Bike, :count).by(-1)
       expect(response).to redirect_to(:admin_bikes)
       expect(flash[:success]).to match(/deleted/i)
-      expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
+      expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
     end
     context "get_destroy" do
       it "destroys" do
@@ -295,11 +295,11 @@ RSpec.describe Admin::BikesController, type: :request do
         }.to change(Bike, :count).by(-1)
         expect(response).to redirect_to(:admin_bikes)
         expect(flash[:success]).to match(/deleted/i)
-        expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
+        expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
       end
     end
     context "multi_destroy" do
-      it "enqueues BikeDeleterJob for each bike" do
+      it "enqueues BikeJobs::BikeDeleterJob for each bike" do
         bike1 = FactoryBot.create(:bike)
         bike2 = FactoryBot.create(:bike, example: true)
         bike3 = FactoryBot.create(:bike)
@@ -309,8 +309,8 @@ RSpec.describe Admin::BikesController, type: :request do
           bikes_selected: {bike1.id => bike1.id, bike2.id => bike2.id}
         }
         expect(flash[:success]).to eq "2 bikes deleted!"
-        expect(BikeDeleterJob).to have_enqueued_sidekiq_job(bike1.id, false, current_user.id)
-        expect(BikeDeleterJob).to have_enqueued_sidekiq_job(bike2.id, false, current_user.id)
+        expect(BikeJobs::BikeDeleterJob).to have_enqueued_sidekiq_job(bike1.id, false, current_user.id)
+        expect(BikeJobs::BikeDeleterJob).to have_enqueued_sidekiq_job(bike2.id, false, current_user.id)
       end
     end
   end

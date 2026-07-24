@@ -18,6 +18,7 @@
       <th><%= sortable "received_at", "Received", render_sortable: %></th>
       <th><%= sortable "email", "Sender", render_sortable: %></th>
       <th>Subject</th>
+      <th><%= sortable "status", "Status", render_sortable: %></th>
       <th>Tags</th>
       <th>Member</th>
       <th>Paid org</th>
@@ -52,7 +53,14 @@
             <%= link_to bug_report.display_subject, admin_bug_report_path(bug_report) %>
           </td>
 
-          <td><%= bug_report.tags.join(", ") %></td>
+          <td><%= bug_report.status.humanize %></td>
+
+          <td>
+            <% bug_report.tags.each do |tag| %>
+              <code class="tw:text-xs tw:text-black"><%= tag %></code>
+            <% end %>
+          </td>
+
           <td><%= check_mark if bug_report.is_member %></td>
 
           <td>

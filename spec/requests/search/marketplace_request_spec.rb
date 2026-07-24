@@ -94,7 +94,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
           # End the membership and run AfterUserChangeJob to refresh the cached seller_member
           membership.update(status: :ended, end_at: Time.current - 1.day)
-          CallbackJob::AfterUserChangeJob.new.perform(paid_seller.id)
+          CallbackJobs::AfterUserChangeJob.new.perform(paid_seller.id)
           expect(promoted_listing.reload.seller_member).to be false
 
           get base_url, as: :turbo_stream

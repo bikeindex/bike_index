@@ -65,7 +65,7 @@ module Admin
       if params[:id] == "multi_delete"
         bike_ids = params[:bikes_selected].respond_to?(:keys) ? params[:bikes_selected].keys : Array(params[:bikes_selected])
         if bike_ids.any?
-          bike_ids.each { |id| BikeDeleterJob.perform_async(id.to_i, false, current_user.id) }
+          bike_ids.each { |id| BikeJobs::BikeDeleterJob.perform_async(id.to_i, false, current_user.id) }
           flash[:success] = "#{bike_ids.count} #{"bike".pluralize(bike_ids.count)} deleted!"
         else
           flash[:error] = "No bikes selected to delete!"
@@ -143,7 +143,7 @@ module Admin
 
     def destroy_bike
       find_bike
-      BikeDeleterJob.new.perform(@bike.id, false, current_user.id)
+      BikeJobs::BikeDeleterJob.new.perform(@bike.id, false, current_user.id)
       flash[:success] = "Bike deleted!"
       redirect_to admin_bikes_url
     end
