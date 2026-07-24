@@ -24,13 +24,16 @@ module UI
         link: "twlink tw:p-0"
       }.freeze
 
+      # `!` important on the fill/border/text so the active color wins over the resting
+      # color regardless of Tailwind's compiled source order (arbitrary values like
+      # bg-[#715eb2] otherwise sort before named ones like bg-white and lose).
       ACTIVE_COLORS = {
-        primary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-blue-700 tw:dark:bg-blue-600",
-        secondary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-gray-200 tw:border-gray-400 tw:dark:bg-gray-800 tw:dark:border-gray-600",
-        error: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-700 tw:dark:bg-red-600",
-        danger_outline: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-100 tw:border-[#c0392b] tw:dark:bg-red-950 tw:dark:border-red-700",
-        purple: "tw:ring-2 tw:ring-[#715eb2]/40 tw:bg-[#5d4b9c]",
-        purple_outline: "tw:ring-2 tw:ring-[#715eb2]/40 tw:bg-[#715eb2] tw:text-white tw:border-[#715eb2]",
+        primary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-blue-700! tw:dark:bg-blue-600!",
+        secondary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-gray-200! tw:border-gray-400! tw:dark:bg-gray-800! tw:dark:border-gray-600!",
+        error: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-700! tw:dark:bg-red-600!",
+        danger_outline: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-100! tw:border-[#c0392b]! tw:dark:bg-red-950! tw:dark:border-red-700!",
+        purple: "tw:ring-2 tw:ring-[#715eb2]/40 tw:bg-[#5d4b9c]!",
+        purple_outline: "tw:ring-2 tw:ring-[#715eb2]/40 tw:bg-[#715eb2]! tw:text-white! tw:border-[#715eb2]!",
         link: "tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold tw:underline"
       }.freeze
 
