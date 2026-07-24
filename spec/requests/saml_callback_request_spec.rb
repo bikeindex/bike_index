@@ -5,8 +5,9 @@ require "rails_helper"
 RSpec.describe "SAML SSO login", :saml_env, type: :request do
   let(:domain) { "example.edu" }
   let(:organization) do
+    # saml_sso alone - it implies passwordless_users, which provisioning runs through
     FactoryBot.create(:organization_with_organization_features,
-      enabled_feature_slugs: %w[saml_sso passwordless_users], user_email_domain: domain)
+      enabled_feature_slugs: "saml_sso", user_email_domain: domain)
   end
   let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
   let(:slug) { organization.to_param }

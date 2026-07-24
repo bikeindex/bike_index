@@ -477,6 +477,14 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "saml_sso implies passwordless_users" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+    it "enables the passwordless path SSO provisioning runs through" do
+      expect(organization.enabled_feature_slugs).to match_array(%w[saml_sso passwordless_users])
+      expect(organization.enabled?("passwordless_users")).to be_truthy
+    end
+  end
+
   describe "user_email_domain uniqueness" do
     let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled) }
     let!(:sso_organization) { saml_configuration.organization }

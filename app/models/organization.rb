@@ -678,6 +678,10 @@ class Organization < ApplicationRecord
     # If it has stickers, add reg_bike_sticker field
     fslugs += ["reg_bike_sticker"] if fslugs.include?("bike_stickers")
 
+    # SSO provisions its first-time users through the passwordless path (the IdP authenticates
+    # them, so they never set a password) - without it an SSO org silently can't onboard anyone
+    fslugs += ["passwordless_users"] if fslugs.include?("saml_sso")
+
     if fslugs.include?("impound_bikes")
       # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations
       fslugs += ["impound_bikes_locations"] if locations.impound_locations.any?
