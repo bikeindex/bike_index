@@ -17,8 +17,9 @@
 #   1. Create the bucket. It holds only the public basemap (tiles, style.json,
 #      glyphs, sprites under basemap/) - no user data, no secrets.
 #   2. Connect maps.bikeindex.org as a custom domain and serve all reads from it.
-#   3. CORS: allow GET, HEAD and Range from any origin (["*"]). The tiles are
-#      public OSM data; rate limiting and caching cap abuse, not CORS.
+#   3. CORS: any origin (["*"]), methods GET + HEAD, allow the Range request
+#      header, and expose ETag (pmtiles reads it to detect the archive changing).
+#      Public OSM data - rate limiting and caching cap abuse, not CORS.
 #   4. Cache Rule on the host: cache and respect the object's Cache-Control (the
 #      upload sets max-age), keeping R2 read ops - and the bill - low.
 #   5. Rate-limit the host per IP (R2 egress is free, ops are not).
