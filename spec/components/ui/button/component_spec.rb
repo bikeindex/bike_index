@@ -57,7 +57,7 @@ RSpec.describe UI::Button::Component, type: :component do
     let(:color) { :purple_outline }
 
     it "renders purple_outline styles" do
-      expect(component.to_html).to include("tw:hover:border-[#715eb2]")
+      expect(component.to_html).to include("tw:hover:border-purple-500")
     end
   end
 
@@ -149,16 +149,18 @@ RSpec.describe UI::Button::Component, type: :component do
     let(:options) { {active: true} }
     it "applies the bare active classes statically" do
       tokens = component.css("button").first["class"].split
-      expect(tokens).to include("tw:ring-2", "tw:bg-gray-200")
+      expect(tokens).to include("tw:ring-2", "tw:bg-gray-200!")
     end
   end
 
   describe "ACTIVE_PREFIXED" do
-    it "prefixes every ACTIVE_COLORS class with aria-pressed: and active: for each color" do
+    # The aria-pressed:/active: variants win by precedence, so they drop the `!`
+    # important that ACTIVE_COLORS needs for the persistent active: true state.
+    it "prefixes every ACTIVE_COLORS class (sans `!`) with aria-pressed: and active: for each color" do
       expect(described_class::ACTIVE_PREFIXED.keys).to eq(described_class::ACTIVE_COLORS.keys)
       described_class::ACTIVE_COLORS.each do |color, classes|
         expected = classes.split.flat_map do |variant|
-          base = variant.delete_prefix("tw:")
+          base = variant.delete_prefix("tw:").delete_suffix("!")
           ["tw:aria-pressed:#{base}", "tw:active:#{base}"]
         end
         expect(described_class::ACTIVE_PREFIXED[color].split).to eq(expected)
