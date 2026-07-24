@@ -19,6 +19,7 @@ RSpec.describe BugReportsMailbox do
       subject: "Search is broken", body: "I searched and nothing happened",
       inbound_email_id: ActionMailbox::InboundEmail.last.id)
     expect(BugReport.last.received_at).to be_present
+    expect(BugReportAutoPrioritizeJob.jobs.map { it["args"] }).to eq([[BugReport.last.id]])
   end
 
   it "creates a bug report from an email to contact@" do

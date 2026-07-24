@@ -12,14 +12,45 @@
       end
     end %>
   </li>
+
+  <li class="nav-item tw:text-sm">
+    <%= render(UI::Dropdown::Component.new(
+      name: @searched_membership.present? ? membership_filters[@searched_membership] : "All membership status",
+      button_size: :sm,
+      active: @searched_membership.present?
+    )) do |dropdown|
+      dropdown.with_entry_item(active: @searched_membership.blank?) { link_to "All membership status", url_for(sortable_search_params.merge(search_membership: nil)) }
+      dropdown.with_entry_divider
+      membership_filters.each do |value, label|
+        dropdown.with_entry_item(active: @searched_membership == value) { link_to label, url_for(sortable_search_params.merge(search_membership: value)) }
+      end
+    end %>
+  </li>
+
+  <li class="nav-item tw:text-sm">
+    <%= render(UI::Dropdown::Component.new(
+      name: status_filters[@searched_status],
+      button_size: :sm,
+      active: @searched_status != "investigate"
+    )) do |dropdown|
+      dropdown.with_entry_item(active: @searched_status == "investigate") { link_to status_filters["investigate"], url_for(sortable_search_params.merge(search_status: "investigate")) }
+      dropdown.with_entry_item(active: @searched_status == "all") { link_to status_filters["all"], url_for(sortable_search_params.merge(search_status: "all")) }
+      dropdown.with_entry_divider
+      status_only_filters.each do |value, label|
+        dropdown.with_entry_item(active: @searched_status == value) { link_to label, url_for(sortable_search_params.merge(search_status: value)) }
+      end
+    end %>
+  </li>
 <% end %>
 
 <% admin_search_form = capture do %>
   <%= form_tag admin_bug_reports_path, method: :get, class: "form-inline mt-4 mb-4 justify-content-md-end" do %>
     <%= hidden_field_tag :search_tag, params[:search_tag] %>
+    <%= hidden_field_tag :search_membership, params[:search_membership] %>
+    <%= hidden_field_tag :search_status, params[:search_status] %>
 
     <div class="form-group mr-2 mb-2">
-      <%= text_field_tag :query, params[:query], placeholder: "Search subject, body and sender", class: "form-control" %>
+      <%= text_field_tag :query, params[:query], placeholder: "Search subject, body and sender", class: "form-control tw:w-96" %>
     </div>
 
     <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
@@ -28,7 +59,7 @@
 
 <% table_view = capture do %>
   <%= form_tag assign_tags_admin_bug_reports_path, method: :post, data: {controller: "table-multi-checkbox"} do %>
-    <div class="row">
+    <div class="row align-items-end">
       <div class="col-md-4">
         <%= render UI::Forms::Combobox::Component.new(name: :tags, label: "Tag to assign", free_text: true, options: searchable_tags, placeholder: "Select or create a tag") %>
       </div>
