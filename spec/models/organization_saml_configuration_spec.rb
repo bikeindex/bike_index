@@ -42,6 +42,24 @@ RSpec.describe OrganizationSamlConfiguration, type: :model do
       end
     end
 
+    context "email domain claimed by another SSO organization" do
+      let!(:existing) { FactoryBot.create(:organization_saml_configuration, :enabled) }
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      before { existing.organization.update!(user_email_domain: "example.edu") }
+      it "can't enable SSO for the same domain twice" do
+        # update_column: the organization validation blocks this earlier, so skip it to reach this guard
+        organization.update_column(:user_email_domain, "example.edu")
+        saml_configuration = FactoryBot.build(:organization_saml_configuration, :enabled, organization:)
+        expect(saml_configuration).to_not be_valid
+        expect(saml_configuration.errors.full_messages.join).to match(/already used for sso/i)
+      end
+
+      it "permits a domain no other SSO organization claims" do
+        organization.update!(user_email_domain: "other.edu")
+        expect(FactoryBot.build(:organization_saml_configuration, :enabled, organization:)).to be_valid
+      end
+    end
+
     context "invalid certificate" do
       it "adds an error" do
         saml_configuration.assign_attributes(idp_entity_id: "https://idp.example.edu/",

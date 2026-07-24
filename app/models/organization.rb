@@ -138,6 +138,7 @@ class Organization < ApplicationRecord
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
   validate :user_email_domain_format
+  validate :user_email_domain_unclaimed
 
   attr_accessor :embedable_user_email, :skip_update
 
@@ -259,6 +260,16 @@ class Organization < ApplicationRecord
       permitted_domain_saml_signin.where(user_email_domain: domain)
         .includes(:organization_saml_configuration)
         .detect { |org| org.organization_saml_configuration&.configured? }
+    end
+
+    # A different SSO org already routing this domain. Two would make saml_email_matching's
+    # pick arbitrary (name order), silently sending logins to the wrong org's IdP.
+    def saml_domain_conflict(domain, excluded_id: nil)
+      return nil if domain.blank?
+
+      matching = permitted_domain_saml_signin.where(user_email_domain: domain)
+      matching = matching.where.not(id: excluded_id) if excluded_id.present?
+      matching.first
     end
 
     def example
@@ -630,6 +641,16 @@ class Organization < ApplicationRecord
     return if user_email_domain.blank?
     errors.add(:user_email_domain, "must include a .") unless user_email_domain.include?(".")
     errors.add(:user_email_domain, "must not include @") if user_email_domain.include?("@")
+  end
+
+  # Only guards SSO orgs - non-SSO orgs sharing a domain don't affect SSO login routing
+  def user_email_domain_unclaimed
+    return unless enabled?("saml_sso")
+
+    conflict = self.class.saml_domain_conflict(user_email_domain, excluded_id: id)
+    return if conflict.blank?
+
+    errors.add(:user_email_domain, "is already used for SSO by #{conflict.name}")
   end
 
   def nearby_organizations_including_siblings

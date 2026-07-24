@@ -477,6 +477,32 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "user_email_domain_unclaimed" do
+    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled) }
+    let!(:sso_organization) { saml_configuration.organization }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+    before { sso_organization.update!(user_email_domain: "example.edu") }
+
+    it "blocks a second SSO organization from claiming the domain" do
+      organization.user_email_domain = "example.edu"
+      expect(organization).to_not be_valid
+      expect(organization.errors.attribute_names).to include(:user_email_domain)
+      expect(Organization.saml_email_matching("someone@example.edu")).to eq sso_organization
+    end
+
+    it "permits the claiming organization to keep its own domain" do
+      expect(sso_organization.update(name: "Renamed")).to be_truthy
+    end
+
+    context "organization without saml_sso" do
+      let(:organization) { FactoryBot.create(:organization) }
+      it "permits the shared domain, since it doesn't affect SSO routing" do
+        expect(organization.update(user_email_domain: "example.edu")).to be_truthy
+        expect(Organization.saml_email_matching("someone@example.edu")).to eq sso_organization
+      end
+    end
+  end
+
   describe "organization bikes and recoveries" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:stolen_bike, creation_organization_id: organization.id) }
