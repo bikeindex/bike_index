@@ -30,11 +30,23 @@ module Registrations
         end
 
         def switchable?
-          @available_views.size > 1 || superuser?
+          @available_views.size > 1 || superuser? || show_legacy_link?
         end
 
         def superuser?
           @current_user&.superuser?
+        end
+
+        # The redesign rollout's escape hatch back to the classic bike show. Uses
+        # no_redesign so the flag doesn't just redirect back to this page.
+        def show_legacy_link?
+          @current_user.present? && Flipper.enabled?(:bike_show_redesign_toggle, @current_user)
+        end
+
+        def legacy_view_link
+          link_to(bike_path(@bike, no_redesign: true), class: entry_class) do
+            safe_join(["View in ", content_tag(:span, "Legacy Viewer", class: "tw:font-bold")])
+          end
         end
 
         # Superusers get a link to the admin bike page, ahead of the audience views

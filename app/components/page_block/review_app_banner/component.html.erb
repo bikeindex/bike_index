@@ -3,12 +3,7 @@
   letter_opener tooltip renders over it instead of behind when it flips down.
 %>
 
-<div
-  class="
-    tw:relative tw:z-[1040] tw:border-b tw:border-[#1e881e] tw:bg-[#40ff40]
-    tw:px-4 tw:py-2 tw:text-center tw:font-semibold tw:text-black
-  "
->
+<div class="tw:relative tw:z-[1040] tw:border-b tw:px-4 tw:py-2 tw:text-center tw:font-semibold tw:text-black <%= banner_accent_class %>">
   <%# Hide the "Review app" label on small screens — the PR title carries the context there; "Sandbox" has no title, so it stays %>
   <span class="<%= "tw:hidden tw:sm:inline" if @pr_number %>">
     <%= banner_label %>
@@ -29,9 +24,12 @@
     <% end %>
   <% end %>
 
-  <span class="tw:hidden tw:sm:inline">
-    &middot; <%= translation(".disclaimer") %>
-  </span>
+  <%# No ephemeral-data disclaimer in dev — the local database persists %>
+  <% unless development? %>
+    <span class="tw:hidden tw:sm:inline">
+      &middot; <%= translation(".disclaimer") %>
+    </span>
+  <% end %>
 
   <span>&middot;</span>
 
