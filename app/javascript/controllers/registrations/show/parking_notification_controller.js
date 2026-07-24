@@ -137,7 +137,8 @@ export default class extends Controller {
     this.setCoordinates(latitude, longitude, accuracy)
     this.pinZoom = zoom
     this.syncMap()
-    // The org fallback isn't a location the user chose, so it stays out of the URL
+    // The org fallback isn't a location the user chose, so don't write it to the
+    // URL here — only once the map settles on it, or the user moves the pin
     if (persist) this.persistMapState()
   }
 
