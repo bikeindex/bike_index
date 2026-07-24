@@ -61,6 +61,11 @@ class BugReport < ApplicationRecord
   after_commit :enqueue_prioritizing_job, on: :create
 
   scope :with_tag, ->(tag) { where("tags @> ARRAY[?]::text[]", tag) }
+  scope :member, -> { where(is_member: true) }
+  scope :paid_organization, -> { where(is_paid_organization: true) }
+  scope :paid_organization_staff, -> { where(is_paid_organization_staff: true) }
+  # Includes unprioritized so reports the auto-prioritize job hasn't reached yet stay visible
+  scope :investigate, -> { where(status: %i[unprioritized investigate_priority_high investigate_priority_low]) }
 
   def self.all_tags
     distinct.pluck(Arel.sql("unnest(tags)")).sort

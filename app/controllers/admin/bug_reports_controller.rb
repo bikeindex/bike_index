@@ -2,14 +2,11 @@ module Admin
   class BugReportsController < Admin::BaseController
     include Binxtils::SortableTable
 
-    # Keyed by the column each filter checks, so the query never interpolates a column name
-    MEMBERSHIP_FILTERS = {"is_member" => "Only members", "is_paid_organization" => "Only paid org",
-                          "is_paid_organization_staff" => "Only paid org staff"}.freeze
+    # Keyed by the BugReport scope each filter applies
+    MEMBERSHIP_FILTERS = {"member" => "Only members", "paid_organization" => "Only paid org",
+                          "paid_organization_staff" => "Only paid org staff"}.freeze
     STATUS_FILTER_ALL = "all"
     STATUS_FILTER_INVESTIGATE = "investigate"
-    # Includes unprioritized so reports the auto-prioritize job hasn't reached yet are never
-    # hidden from the default view
-    INVESTIGATE_STATUSES = %w[unprioritized investigate_priority_high investigate_priority_low].freeze
 
     before_action :find_bug_report, only: %i[show update]
 
@@ -106,12 +103,12 @@ module Admin
       bug_reports.where(created_at: @time_range)
     end
 
-    # Literal column names - passing the param through as a key reads as SQL injection to brakeman
+    # Explicit scopes rather than a dynamic key, so no user input reaches the query
     def filter_by_membership(bug_reports)
       case @searched_membership
-      when "is_member" then bug_reports.where(is_member: true)
-      when "is_paid_organization" then bug_reports.where(is_paid_organization: true)
-      when "is_paid_organization_staff" then bug_reports.where(is_paid_organization_staff: true)
+      when "member" then bug_reports.member
+      when "paid_organization" then bug_reports.paid_organization
+      when "paid_organization_staff" then bug_reports.paid_organization_staff
       else bug_reports
       end
     end
@@ -120,7 +117,7 @@ module Admin
       @searched_status = status_filters.key?(params[:search_status]) ? params[:search_status] : STATUS_FILTER_INVESTIGATE
       case @searched_status
       when STATUS_FILTER_ALL then bug_reports
-      when STATUS_FILTER_INVESTIGATE then bug_reports.where(status: INVESTIGATE_STATUSES)
+      when STATUS_FILTER_INVESTIGATE then bug_reports.investigate
       else bug_reports.where(status: @searched_status)
       end
     end

@@ -108,6 +108,19 @@ RSpec.describe BugReport, type: :model do
     end
   end
 
+  describe "scopes" do
+    let!(:paid_staff) { FactoryBot.create(:bug_report, is_paid_organization: true, is_paid_organization_staff: true, status: :resolved) }
+    let!(:member) { FactoryBot.create(:bug_report, is_member: true, status: :investigate_priority_low) }
+
+    it "filters by membership and investigate status" do
+      expect(BugReport.member.pluck(:id)).to eq([member.id])
+      expect(BugReport.paid_organization.pluck(:id)).to eq([paid_staff.id])
+      expect(BugReport.paid_organization_staff.pluck(:id)).to eq([paid_staff.id])
+      # investigate includes unprioritized, excludes resolved/ignored
+      expect(BugReport.investigate.pluck(:id)).to eq([member.id])
+    end
+  end
+
   describe "ignored_tag?" do
     it "is true when a tag is in IGNORED_TAGS" do
       expect(FactoryBot.build(:bug_report, tags: ["bike_index_notification"]).ignored_tag?).to be true
