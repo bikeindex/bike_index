@@ -10,6 +10,7 @@ Rails.application.configure do
     policy.font_src :self, "https://fonts.gstatic.com", "http://fonts.gstatic.com", "https://themes.googleusercontent.com", :data
     policy.img_src :self, "https://files.bikeindex.org",
       "https://uploads.bikeindex.org",
+      "https://maps.bikeindex.org",
       "https://bikebook.s3.amazonaws.com",
       "https://www.googletagmanager.com",
       "https://maps.googleapis.com",
@@ -54,6 +55,8 @@ Rails.application.configure do
       "https://events.mapbox.com",
       # Our own image CDNs — third-party scripts (Facebook Pixel) fetch bike photos, not just <img> them
       "https://files.bikeindex.org",
+      # Self-hosted MapLibre basemap tiles for the registration map (range requests)
+      "https://maps.bikeindex.org",
       "https://maps.googleapis.com",
       "https://translate.googleapis.com", # Google Translate API
       "https://uploads.bikeindex.org",
