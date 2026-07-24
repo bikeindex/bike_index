@@ -70,6 +70,15 @@
   --color-slate-800: #2f475d;
   --color-slate-900: #2c3e50; /* OG Bike Index blue-dark */
   --color-slate-950: #1d2834;
+
+  /* OG Bike Index purple accent — distinct from Tailwind's default `purple`
+     (a more violet hue still used for some badges/dark-mode tints). */
+  --color-purple-brand-50: #f7f5fc;
+  --color-purple-brand-100: #f0edfa;
+  --color-purple-brand-200: #d6d4e0;
+  --color-purple-brand-300: #9a8fc4;
+  --color-purple-brand-500: #715eb2;
+  --color-purple-brand-600: #5d4b9c;
 }
 
 @layer components {
