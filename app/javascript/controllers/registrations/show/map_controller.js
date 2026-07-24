@@ -1,17 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
+import { loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 // Connects to data-controller='registrations--show--map'
-// Lazy-loads MapLibre GL + the PMTiles protocol and renders a map centered on
-// the coordinates, marking them with a dot (point) or a translucent red circle
-// (approximate area).
-const MAPLIBRE_VERSION = '4.7.1'
-const PMTILES_VERSION = '3.2.1'
-const MAPLIBRE_JS = `https://cdn.jsdelivr.net/npm/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.js`
-const MAPLIBRE_CSS = `https://cdn.jsdelivr.net/npm/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.css`
-const PMTILES_JS = `https://cdn.jsdelivr.net/npm/pmtiles@${PMTILES_VERSION}/dist/pmtiles.js`
-
-// OpenStreetMap's ODbL license requires crediting contributors on the map
-const ATTRIBUTION = '© OpenStreetMap contributors'
+// Renders a map centered on the coordinates, marking them with a dot (point) or
+// a translucent red circle (approximate area).
 
 // A fixed dot marking the exact spot
 const POINT_PAINT = {
@@ -22,12 +14,23 @@ const POINT_PAINT = {
   'circle-stroke-color': 'white'
 }
 
-// A translucent circle approximating the area; grows with zoom
-const CIRCLE_PAINT = (radiusBase) => ({
-  'circle-radius': { stops: [[5, 5], [16, 240]], base: radiusBase },
-  'circle-color': 'red',
-  'circle-opacity': 0.4
-})
+// Web Mercator meters per pixel at zoom 0 on the equator (MapLibre uses 512px tiles)
+const METERS_PER_PIXEL_Z0 = 40075016.686 / 512
+
+// A translucent circle covering the approximate area. circle-radius is in screen
+// pixels, so it has to double every zoom level to keep covering the same ground.
+const CIRCLE_PAINT = (radiusMeters, latitude) => {
+  const pixelsAtZoom0 = radiusMeters / (METERS_PER_PIXEL_Z0 * Math.cos(latitude * Math.PI / 180))
+  return {
+    'circle-radius': [
+      'interpolate', ['exponential', 2], ['zoom'],
+      0, pixelsAtZoom0,
+      22, pixelsAtZoom0 * 2 ** 22
+    ],
+    'circle-color': 'red',
+    'circle-opacity': 0.4
+  }
+}
 
 export default class extends Controller {
   static targets = ['canvas', 'unavailable']
@@ -35,7 +38,7 @@ export default class extends Controller {
     styleUrl: String,
     latitude: Number,
     longitude: Number,
-    radiusBase: { type: Number, default: 1.15 },
+    radiusMeters: Number,
     point: Boolean
   }
 
@@ -75,7 +78,7 @@ export default class extends Controller {
       center,
       zoom: 13,
       maxZoom: 16,
-      attributionControl: { customAttribution: ATTRIBUTION }
+      attributionControl: { customAttribution: OSM_ATTRIBUTION }
     })
 
     this.map.on('load', () => {
@@ -87,45 +90,8 @@ export default class extends Controller {
         id: 'location',
         type: 'circle',
         source: 'location',
-        paint: this.pointValue ? POINT_PAINT : CIRCLE_PAINT(this.radiusBaseValue)
+        paint: this.pointValue ? POINT_PAINT : CIRCLE_PAINT(this.radiusMetersValue, this.latitudeValue)
       })
     })
   }
-}
-
-// Load MapLibre GL + the PMTiles protocol once, shared across controller instances.
-let mapLibrePromise
-function loadMapLibre () {
-  if (window.maplibregl) return Promise.resolve(window.maplibregl)
-  if (mapLibrePromise) return mapLibrePromise
-
-  mapLibrePromise = (async () => {
-    if (!document.querySelector(`link[href="${MAPLIBRE_CSS}"]`)) {
-      const link = document.createElement('link')
-      link.rel = 'stylesheet'
-      link.href = MAPLIBRE_CSS
-      document.head.appendChild(link)
-    }
-    await Promise.all([loadScript(MAPLIBRE_JS), loadScript(PMTILES_JS)])
-
-    const { maplibregl, pmtiles } = window
-    // Teach MapLibre to read pmtiles:// sources (the single-file vector tiles)
-    maplibregl.addProtocol('pmtiles', new pmtiles.Protocol().tile)
-    return maplibregl
-  })()
-  return mapLibrePromise
-}
-
-function loadScript (src) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve()
-      return
-    }
-    const script = document.createElement('script')
-    script.src = src
-    script.onload = resolve
-    script.onerror = reject
-    document.head.appendChild(script)
-  })
 }
