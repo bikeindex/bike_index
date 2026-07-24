@@ -124,7 +124,7 @@ export default class extends Controller {
 
   locationFailed () {
     if (this.manualMode) return
-    // The org location already seeded the form, so drop the pin there to drag
+    // Fall back to the org location; the user drags the map to adjust it
     this.locate(this.orgLatitudeValue, this.orgLongitudeValue, { zoom: DEFAULT_ZOOM, persist: false })
     this.setStatus('Drag the map to set the location', { dot: true })
   }
@@ -144,22 +144,26 @@ export default class extends Controller {
   centerAdopted () {
     if (!this.map) return
     const { lat, lng } = this.map.getCenter()
-    const moved = this.centerMoved(lat, lng)
-    if (moved) {
+    if (this.centerMoved(lat, lng)) {
       this.located = true
       this.setCoordinates(lat, lng)
+      this.setStatus('Updating the location…', { dot: true })
+      this.scheduleGeocode(lat, lng)
     }
     this.persistMapState() // also captures a zoom change that left the centre put
-    if (moved) {
-      this.setStatus('Updating the location…', { dot: true })
-      this.reverseGeocode(lat, lng)
-    }
   }
 
   // Whether the map centre differs from the coordinates already on the form —
   // true after a user pan, false after our own recenter or a pure zoom
   centerMoved (latitude, longitude) {
     return Math.abs(this.pinLatitude - latitude) > 1e-5 || Math.abs(this.pinLongitude - longitude) > 1e-5
+  }
+
+  // Debounce the geocode so lining the pin up fires one request for the resting
+  // spot, not one per nudge
+  scheduleGeocode (latitude, longitude) {
+    window.clearTimeout(this.geocodeTimer)
+    this.geocodeTimer = window.setTimeout(() => this.reverseGeocode(latitude, longitude), 400)
   }
 
   // The hidden fields are the source of truth for the coordinates
@@ -172,10 +176,10 @@ export default class extends Controller {
 
   get pinLatitude () { return parseFloat(this.latitudeTarget.value) }
   get pinLongitude () { return parseFloat(this.longitudeTarget.value) }
+  get hasPin () { return !Number.isNaN(this.pinLatitude) && !Number.isNaN(this.pinLongitude) }
 
   syncMap () {
-    if (!this.hasMapTarget || !this.mapboxKeyValue) return
-    if (Number.isNaN(this.pinLatitude) || Number.isNaN(this.pinLongitude)) return
+    if (!this.hasMapTarget || !this.mapboxKeyValue || !this.hasPin) return
     if (this.map) {
       this.map.easeTo({ center: [this.pinLongitude, this.pinLatitude], zoom: this.pinZoom ?? this.map.getZoom() })
     } else {
@@ -226,13 +230,14 @@ export default class extends Controller {
   }
 
   disconnect () {
+    window.clearTimeout(this.geocodeTimer)
     this.map?.remove()
     this.map = null
   }
 
   // The pin + zoom live in the URL so a reload (or shared link) restores them
   persistMapState () {
-    if (Number.isNaN(this.pinLatitude) || Number.isNaN(this.pinLongitude)) return
+    if (!this.hasPin) return
     const zoom = this.map ? this.map.getZoom() : this.pinZoom
     const url = new URL(window.location)
     url.searchParams.set('map_lat', this.pinLatitude.toFixed(6))
