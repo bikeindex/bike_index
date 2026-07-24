@@ -909,7 +909,7 @@ class Bike < ApplicationRecord
   end
 
   def enqueue_duplicate_bike_finder_worker
-    DuplicateBikeFinderJob.perform_async(id)
+    BikeJobs::DuplicateBikeFinderJob.perform_async(id)
   end
 
   def remove_address_record_if_deleted
