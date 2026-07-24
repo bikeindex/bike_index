@@ -308,6 +308,13 @@ class Organization < ApplicationRecord
     !enabled?("passwordless_users") && !user_email_domain.present?
   end
 
+  # Members of these organizations authenticate somewhere other than a Bike Index password
+  # prompt - a magic link, or the organization's IdP - so an invitation mints the account
+  # outright rather than emailing a request to pick a password.
+  def passwordless_user_creation?
+    any_enabled?(%w[passwordless_users saml_sso])
+  end
+
   def sent_invitation_count
     organization_roles.count
   end
@@ -677,10 +684,6 @@ class Organization < ApplicationRecord
     end
     # If it has stickers, add reg_bike_sticker field
     fslugs += ["reg_bike_sticker"] if fslugs.include?("bike_stickers")
-
-    # SSO provisions its first-time users through the passwordless path (the IdP authenticates
-    # them, so they never set a password) - without it an SSO org silently can't onboard anyone
-    fslugs += ["passwordless_users"] if fslugs.include?("saml_sso")
 
     if fslugs.include?("impound_bikes")
       # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations

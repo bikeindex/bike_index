@@ -63,8 +63,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response.status).to eq(200)
         expect(response.body).to include("SAML SSO")
         expect(response.body).to include("/sso/#{organization.to_param}/metadata")
-        # saml_sso implies passwordless_users, so the domain field names both sign-in kinds
-        expect(response.body).to include("permitted domain for passwordless sign in and SAML SSO")
+        expect(response.body).to include("permitted domain for SAML SSO")
         expect(response.body).to include('name="organization[user_email_domain]"')
       end
     end

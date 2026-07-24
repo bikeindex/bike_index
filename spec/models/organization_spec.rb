@@ -477,11 +477,22 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "saml_sso implies passwordless_users" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
-    it "enables the passwordless path SSO provisioning runs through" do
-      expect(organization.enabled_feature_slugs).to match_array(%w[saml_sso passwordless_users])
-      expect(organization.enabled?("passwordless_users")).to be_truthy
+  describe "passwordless_user_creation?" do
+    it "is falsey" do
+      expect(Organization.new.passwordless_user_creation?).to be_falsey
+    end
+    context "saml_sso" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      it "is truthy without granting the passwordless feature" do
+        expect(organization.passwordless_user_creation?).to be_truthy
+        expect(organization.enabled_feature_slugs).to eq(["saml_sso"])
+      end
+    end
+    context "passwordless_users" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "passwordless_users") }
+      it "is truthy" do
+        expect(organization.passwordless_user_creation?).to be_truthy
+      end
     end
   end
 
