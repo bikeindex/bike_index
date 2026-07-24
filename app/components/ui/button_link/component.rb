@@ -19,19 +19,23 @@ module UI
       def call
         return button_to_form if @method
 
-        helpers.link_to(@text || content, @href, @html_options.merge(class: link_classes))
+        helpers.link_to(@text || content, @href, html_attributes)
       end
 
       private
 
       def button_to_form
-        helpers.button_to(@href, @html_options.merge(class: link_classes, method: @method)) do
+        helpers.button_to(@href, html_attributes.merge(method: @method)) do
           @text || content
         end
       end
 
+      def html_attributes
+        @html_options.merge(class: link_classes, data: (@html_options[:data] || {}).merge(active: @active || nil))
+      end
+
       def link_classes
-        UI::Button::Component.build_classes(color: @color, size: @size, active: @active, html_class: @html_options[:class])
+        UI::Button::Component.build_classes(color: @color, size: @size, html_class: @html_options[:class])
       end
     end
   end
