@@ -3,40 +3,17 @@
   data-controller="registrations--show--action-panels"
 >
   <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:flex">
-    <% if contactable? %>
-      <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "message", action: "registrations--show--action-panels#toggle"})) do %>
-        <%= action_icon("mail") %>
-        <%= action_label(translation(".message_owner")) %>
-      <% end %>
-    <% end %>
+    <%= action_button("message", icon: "mail", title: translation(".message_owner")) if contactable? %>
 
-    <% if show_create_impound? %>
-      <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "impound", action: "registrations--show--action-panels#toggle"})) do %>
-        <%= action_icon("lock") %>
-        <%= action_label(translation(".impound")) %>
-      <% end %>
-    <% end %>
+    <%= action_button("impound", icon: "lock", title: translation(".impound")) if show_create_impound? %>
 
-    <% if show_update_impound? %>
-      <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "impound_update", action: "registrations--show--action-panels#toggle"})) do %>
-        <%= action_icon("lock", tile: :amber) %>
-        <%= action_label(translation(".update_impound_record")) %>
-      <% end %>
-    <% end %>
+    <%= action_button("impound_update", icon: "lock", tile: :amber, title: translation(".update_impound_record")) if show_update_impound? %>
 
-    <% if show_create_parking_notification? %>
-      <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "parking", action: "registrations--show--action-panels#toggle"})) do %>
-        <%= action_icon("map-pin") %>
-        <%= action_label(translation(".new_parking_notice")) %>
-      <% end %>
-    <% end %>
+    <%= action_button("parking", icon: "map-pin", title: translation(".new_parking_notice")) if show_create_parking_notification? %>
 
     <% if show_parking_notifications? %>
-      <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "notifications_show", action: "registrations--show--action-panels#toggle"})) do %>
-        <%= action_icon("bell", tile: :blue) %>
-
-        <%= action_label(translation(".view_notifications"), translation(".view_notifications_activity_html", active: active_notifications_count, resolved: resolved_notifications_count)) %>
-      <% end %>
+      <%= action_button("notifications_show", icon: "bell", tile: :blue, title: translation(".view_notifications"),
+        subtitle: translation(".view_notifications_activity_html", active: active_notifications_count, resolved: resolved_notifications_count)) %>
     <% end %>
   </div>
 

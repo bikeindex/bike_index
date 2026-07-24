@@ -18,13 +18,25 @@ module Registrations
 
           private
 
-          # Grid rather than the button's default flex: below sm every child gets its
-          # own row, and from sm the icon spans the title and subtitle rows beside them
-          def action_button_classes
-            "tw:relative tw:grid! tw:w-full tw:min-h-[60px] tw:grid-cols-1 tw:content-center tw:gap-y-0.5 tw:rounded-xl tw:p-4! tw:text-base! tw:text-left tw:sm:grid-cols-[auto_1fr] tw:sm:gap-x-3 tw:lg:flex-1"
+          # A grid rather than the button's default flex, so below sm the icon, title
+          # and subtitle each take a full-width row, while from sm the icon spans the
+          # title and subtitle rows beside them. The title's margin only applies to
+          # the stacked layout, separating it from the icon above rather than the
+          # subtitle below.
+          def action_button(panel_name, icon:, title:, tile: :purple, subtitle: nil)
+            classes = "tw:relative tw:grid! tw:w-full tw:min-h-[60px] tw:grid-cols-1 tw:content-center tw:gap-y-0.5 tw:rounded-xl tw:p-4! tw:text-base! tw:text-left tw:sm:grid-cols-[auto_1fr] tw:sm:gap-x-3 tw:lg:flex-1"
+            render(UI::Button::Component.new(color: :purple_outline, html_class: classes, aria: {expanded: false},
+              data: {"registrations--show--action-panels-target": "trigger", "panel-name": panel_name,
+                     action: "registrations--show--action-panels#toggle"})) do
+              safe_join([
+                action_icon(icon, tile:),
+                content_tag(:span, title, class: "tw:mt-1.5 tw:min-w-0 tw:font-bold tw:sm:mt-0"),
+                (content_tag(:span, subtitle, class: "tw:text-xs tw:opacity-60") if subtitle.present?)
+              ].compact)
+            end
           end
 
-          def action_icon(icon, tile: :purple)
+          def action_icon(icon, tile:)
             tile_bg, icon_color = case tile
             when :blue then ["tw:bg-[#e7f3fb]", "tw:text-[#016ec2]"]
             when :amber then ["tw:bg-[#fff8e1]", "tw:text-[#caa11a]"]
@@ -33,15 +45,6 @@ module Registrations
             content_tag(:span, class: "tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-lg tw:sm:row-span-2 tw:sm:self-center #{tile_bg}") do
               helpers.inline_svg_tag("kelsey/registration_show/#{icon}.svg", class: "tw:h-[19px] tw:w-[19px] #{icon_color}")
             end
-          end
-
-          # Grid siblings of the icon, not a nested column, so each can take its own
-          # row below sm. The title's margin only applies there, where it separates
-          # the title from the icon above it rather than the subtitle below.
-          def action_label(title, subtitle = nil)
-            spans = [content_tag(:span, title, class: "tw:mt-1.5 tw:min-w-0 tw:font-bold tw:sm:mt-0")]
-            spans << content_tag(:span, subtitle, class: "tw:text-xs tw:opacity-60") if subtitle.present?
-            safe_join(spans)
           end
 
           def impounded?
