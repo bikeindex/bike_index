@@ -6366,6 +6366,13 @@ CREATE INDEX index_bug_reports_on_inbound_email_id ON public.bug_reports USING b
 
 
 --
+-- Name: index_bug_reports_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_status ON public.bug_reports USING btree (status);
+
+
+--
 -- Name: index_bug_reports_on_tags; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7460,8 +7467,10 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260723120000'),
 ('20260723000000'),
 ('20260722120000'),
+('20260716120000'),
 ('20260713120000'),
 ('20260706180000'),
 ('20260706164500'),

@@ -55,10 +55,12 @@ RSpec.describe Admin::BugReportsController, type: :request do
       let!(:bug_report_investigate) { FactoryBot.create(:bug_report, status: :investigate_priority_high) }
       let!(:bug_report_resolved) { FactoryBot.create(:bug_report, status: :resolved) }
 
-      it "defaults to the investigate statuses" do
-        expect(bug_report).to be_present # unprioritized, excluded by the default
+      it "defaults to the investigate statuses, including untriaged reports" do
+        expect(bug_report.status).to eq "unprioritized"
         get "#{base_url}.json"
-        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_investigate.id])
+        expect(json_result["bug_reports"].map { it["id"] })
+          .to match_array([bug_report.id, bug_report_investigate.id])
+        expect(json_result["bug_reports"].map { it["id"] }).not_to include(bug_report_resolved.id)
       end
 
       it "filters to a single status" do

@@ -23,6 +23,7 @@
 # Indexes
 #
 #  index_bug_reports_on_inbound_email_id  (inbound_email_id)
+#  index_bug_reports_on_status            (status)
 #  index_bug_reports_on_tags              (tags) USING gin
 #  index_bug_reports_on_user_id           (user_id)
 #

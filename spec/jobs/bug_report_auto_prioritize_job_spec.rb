@@ -94,17 +94,21 @@ RSpec.describe BugReportAutoPrioritizeJob, type: :job do
       end
     end
 
-    context "when the spam estimator flags it" do
-      before { allow(SpamEstimator::BugReport).to receive(:estimate).and_return(95) }
+    context "with a marketing HTML body" do
+      # Marketing blasts arrive as HTML-only, which the estimator scores as spam
+      let(:html_body) { '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"><title></title></head><body><a href="https://t.co/x?utm=1">' }
+      let(:bug_report) { FactoryBot.create(:bug_report, body: html_body) }
 
       it "tags it spam and ignores it" do
+        expect(SpamEstimator::BugReport.estimate(bug_report))
+          .to be > SpamEstimator::BugReport::MARK_SPAM_PERCENT
         instance.perform(bug_report.id)
         expect(bug_report.reload.tags).to eq(["spam"])
         expect(bug_report.status).to eq("ignored")
       end
 
       context "when it is also an auto-reply" do
-        let(:bug_report) { FactoryBot.create(:bug_report, subject: "Automatic reply: out today") }
+        let(:bug_report) { FactoryBot.create(:bug_report, subject: "Automatic reply: out today", body: html_body) }
 
         it "tags it auto_replies but not spam" do
           instance.perform(bug_report.id)
