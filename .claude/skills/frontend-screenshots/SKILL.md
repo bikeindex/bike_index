@@ -61,12 +61,13 @@ Two viewports — resize once each, then walk every URL:
 1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
 2. `browser_resize` 390×844 → same loop → `...-mobile.png`.
 
-**Full page, minus the footer, no `target:` arg.** Capture the whole page (`fullPage: true`) so nothing below the fold is cut off, but hide the site footer first — it's identical on every page and just pads every capture. After each navigation (hiding doesn't persist across page loads), run:
+**Full page, minus the footer and review-app banner, no `target:` arg.** Capture the whole page (`fullPage: true`) so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding) and the `#review-app-banner` topbar (dev/review-app-only chrome that isn't part of the real page). After each navigation (hiding doesn't persist across page loads), run:
 
 ```js
 browser_evaluate: () => {
   document.querySelector('.primary-footer, footer, [role="contentinfo"]')?.style.setProperty('display', 'none');
-  return document.body.scrollHeight; // content height with the footer gone
+  document.getElementById('review-app-banner')?.style.setProperty('display', 'none');
+  return document.body.scrollHeight; // content height with the footer + banner gone
 }
 ```
 
