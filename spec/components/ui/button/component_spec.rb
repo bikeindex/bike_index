@@ -101,6 +101,15 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with active state" do
+    let(:options) { {text: "Active", color: :primary, active: true} }
+
+    it "includes active ring classes" do
+      expect(component).to have_css("button[data-active='true']")
+      expect(component.to_html).to include("tw:is-active:ring-2", "tw:is-active:ring-blue-500/40")
+    end
+  end
+
   context "with submit kind" do
     let(:options) { {text: "Submit", kind: :submit} }
 
@@ -132,7 +141,7 @@ RSpec.describe UI::Button::Component, type: :component do
 
   it "keeps focus visible on an active button, whose ring would otherwise mask it" do
     tokens = component.css("button").first["class"].split
-    expect(tokens).to include(*described_class::FOCUS_CLASSES.split)
+    expect(tokens).to include("tw:focus:ring-3", "tw:is-active:focus:ring-3")
   end
 
   context "with aria-controls" do
@@ -158,6 +167,21 @@ RSpec.describe UI::Button::Component, type: :component do
       described_class::ACTIVE_COLORS.each_value do |classes|
         expect(classes.split.grep_v(/\Atw:is-active:/)).to eq([])
       end
+    end
+  end
+
+  # ACTIVE_COLORS is inert without this variant, which is what the deleted
+  # aria-pressed:/active: mirror used to spell out class by class.
+  describe "the is-active variant" do
+    let(:stylesheet) { Rails.root.join("app/assets/tailwind/application.css").read }
+
+    it "triggers on the persistent, toggled and pressed states" do
+      selectors = stylesheet[/^@custom-variant is-active \((.*)\);/, 1]
+      expect(selectors).to include('[data-active="true"]', '[aria-pressed="true"]', "[aria-current]", ":active")
+    end
+
+    it "is declared last, so it outranks the colors it overrides" do
+      expect(stylesheet.scan(/^@custom-variant (\S+)/).flatten.last).to eq("is-active")
     end
   end
 end
