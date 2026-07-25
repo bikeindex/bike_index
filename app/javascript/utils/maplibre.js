@@ -23,6 +23,78 @@ export function groundRadiusStops (radiusMeters, latitude) {
   ]
 }
 
+// Desktop expands the map over the page, so the site chrome stays reachable; on a
+// phone that leaves too little map, so small screens get real fullscreen instead
+const PAGE_EXPAND_QUERY = '(min-width: 48rem)'
+// Above the header's 1040, since the expanded map covers the page. `fixed!` because
+// MapLibre's stylesheet loads after Tailwind's and pins the map to position: relative
+const EXPANDED_CLASSES = ['tw:fixed!', 'tw:inset-0', 'tw:z-[1050]']
+
+// A MapLibre control that expands the map to fill the page (or the screen, on
+// mobile). Borrows MapLibre's own fullscreen button classes so it looks native.
+export class ExpandControl {
+  onAdd (map) {
+    this.map = map
+    this.expanded = false
+    this.button = document.createElement('button')
+    this.button.type = 'button'
+    this.button.appendChild(document.createElement('span')).className = 'maplibregl-ctrl-icon'
+    this.button.firstChild.setAttribute('aria-hidden', 'true')
+    this.button.addEventListener('click', () => this.toggle())
+    this.label(false)
+
+    this.onFullscreenChange = () => this.reflect(document.fullscreenElement === this.element)
+    // Escape leaves an expanded map the way it leaves fullscreen
+    this.onKeydown = (event) => { if (event.key === 'Escape') this.expandPage(false) }
+    document.addEventListener('fullscreenchange', this.onFullscreenChange)
+
+    this.container = document.createElement('div')
+    this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group'
+    this.container.appendChild(this.button)
+    return this.container
+  }
+
+  onRemove () {
+    document.removeEventListener('fullscreenchange', this.onFullscreenChange)
+    document.removeEventListener('keydown', this.onKeydown)
+    this.container.remove()
+    this.map = null
+  }
+
+  get element () { return this.map.getContainer() }
+
+  // Collapse the way we expanded — the viewport may have crossed the breakpoint
+  // since (a rotated tablet, a resized window), and the other exit is a no-op
+  toggle () {
+    // fullscreenchange reflects the result, including an Escape the browser handles
+    if (document.fullscreenElement === this.element) return document.exitFullscreen()
+    if (this.expanded) return this.expandPage(false)
+    if (window.matchMedia(PAGE_EXPAND_QUERY).matches) return this.expandPage(true)
+    this.element.requestFullscreen().catch(() => this.expandPage(true))
+  }
+
+  expandPage (expand) {
+    if (expand === this.expanded) return
+    EXPANDED_CLASSES.forEach((klass) => this.element.classList.toggle(klass, expand))
+    if (expand) document.addEventListener('keydown', this.onKeydown)
+    else document.removeEventListener('keydown', this.onKeydown)
+    this.reflect(expand)
+  }
+
+  reflect (expanded) {
+    this.expanded = expanded
+    this.label(expanded)
+    this.map.resize()
+  }
+
+  label (expanded) {
+    const text = expanded ? 'Exit expanded map' : 'Expand map'
+    this.button.className = expanded ? 'maplibregl-ctrl-shrink' : 'maplibregl-ctrl-fullscreen'
+    this.button.title = text
+    this.button.setAttribute('aria-label', text)
+  }
+}
+
 let mapLibrePromise
 
 export function loadMapLibre () {

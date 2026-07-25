@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { groundRadiusStops, loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { ExpandControl, groundRadiusStops, loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 // Connects to data-controller='registrations--show--map'
 // Renders a map centered on the coordinates, marking them with a dot (point) or
@@ -69,6 +69,7 @@ export default class extends Controller {
       maxZoom: 16,
       attributionControl: { customAttribution: OSM_ATTRIBUTION }
     })
+    this.map.addControl(new ExpandControl(), 'top-right')
 
     this.map.on('load', () => {
       this.map.addSource('location', {

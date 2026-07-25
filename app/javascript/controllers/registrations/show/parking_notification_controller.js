@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
-import { groundRadiusStops, loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { ExpandControl, groundRadiusStops, loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 /* global navigator */
 
@@ -11,7 +11,7 @@ import { groundRadiusStops, loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre
 // restores them. Moving the map moves the pin. "Enter address manually" reveals
 // the UI::Forms::AddressGroup fields instead. Tiles come from our self-hosted
 // MapLibre basemap; the mapboxKey is only for reverse-geocoding the pin.
-const DEFAULT_ZOOM = 15
+const DEFAULT_ZOOM = 16
 
 // The device's own position, so a dragged pin can be judged against where the
 // phone thinks it is. The halo covers the accuracy the browser reported.
@@ -28,9 +28,9 @@ const DEVICE_DOT_PAINT = {
 }
 
 export default class extends Controller {
-  static targets = ['latitude', 'longitude', 'accuracy', 'submit', 'status',
-    'statusText', 'statusDot', 'addressGroup', 'useEnteredAddress', 'heading',
-    'locationMode', 'kindGroup', 'locationSection', 'mapSection', 'mapFrame', 'map', 'mapUnavailable']
+  static targets = ['latitude', 'longitude', 'accuracy', 'submit', 'addressGroup',
+    'useEnteredAddress', 'heading', 'locationMode', 'kindGroup', 'locationSection',
+    'mapSection', 'mapFrame', 'map', 'mapUnavailable']
 
   static values = {
     notificationHeading: String,
@@ -101,7 +101,6 @@ export default class extends Controller {
     this.applyLocationMode(false)
 
     if (this.located) {
-      this.show(this.statusTarget)
       // The frame may still be mid-collapse, so measure once it has settled
       window.setTimeout(() => this.map?.resize(), revealDuration)
       return
@@ -110,7 +109,6 @@ export default class extends Controller {
     const stored = this.storedMapState
     if (stored) {
       this.locate(stored.latitude, stored.longitude, { zoom: stored.zoom })
-      this.setStatus(this.coordinateStatus, { dot: true })
     } else {
       // The org location makes the form submittable at once; the map itself waits
       // for the device fix so it doesn't load tiles it's about to pan away from
@@ -121,8 +119,6 @@ export default class extends Controller {
   }
 
   requestLocation () {
-    this.setStatus('Requesting your location…')
-
     if (!navigator.geolocation) return this.locationFailed()
     navigator.geolocation.getCurrentPosition(
       (position) => this.locationFound(position),
@@ -137,7 +133,6 @@ export default class extends Controller {
     this.deviceLocation = { latitude, longitude, accuracy }
     this.locate(latitude, longitude, { accuracy })
     this.renderDeviceLocation()
-    this.setStatus(`Using your current location · ${this.coordinateStatus}`, { dot: true })
   }
 
   // Mark where the device actually is, distinct from the pin the user places. Only
@@ -167,18 +162,18 @@ export default class extends Controller {
   locationFailed () {
     if (this.manualMode) return
     // Fall back to the org location; the user drags the map to adjust it
-    this.locate(this.orgLatitudeValue, this.orgLongitudeValue, { persist: false })
-    this.setStatus('Drag the map to set the location', { dot: true })
+    this.locate(this.orgLatitudeValue, this.orgLongitudeValue, { chosen: false })
   }
 
-  locate (latitude, longitude, { zoom = DEFAULT_ZOOM, accuracy = '', persist = true } = {}) {
+  // `chosen` is false for the org fallback: it's somewhere to point the map, not a
+  // spot anyone picked, so it stays out of the URL and out of the address fields
+  locate (latitude, longitude, { zoom = DEFAULT_ZOOM, accuracy = '', chosen = true } = {}) {
     this.located = true
+    this.pinChosen = chosen
     this.setCoordinates(latitude, longitude, accuracy)
     this.pinZoom = zoom
     this.syncMap()
-    // The org fallback isn't a location the user chose, so don't write it to the
-    // URL here — only once the map settles on it, or the user moves the pin
-    if (persist) this.persistMapState()
+    this.persistMapState()
   }
 
   // The map settled after the user moved it (or tapped the geolocate button); the
@@ -187,16 +182,10 @@ export default class extends Controller {
     if (!this.map) return
     const { lat, lng } = this.map.getCenter()
     if (this.centerMoved(lat, lng)) {
+      this.pinChosen = true
       this.setCoordinates(lat, lng)
-      this.setStatus(this.coordinateStatus, { dot: true })
     }
     this.persistMapState() // also captures a zoom change that left the centre put
-  }
-
-  // The pin is the location, so report the coordinates it sits on. An address here
-  // would have to re-resolve on every nudge, and lag behind the pin while it did
-  get coordinateStatus () {
-    return `${this.pinLatitude.toFixed(5)}, ${this.pinLongitude.toFixed(5)}`
   }
 
   // Whether the map centre differs from the coordinates already on the form —
@@ -250,10 +239,8 @@ export default class extends Controller {
       // layers and paint properties through this.
       this.mapTarget.map = this.map
 
-      // Scroll over the map should scroll the page, not zoom it — zooming is the
-      // buttons' job; the geolocate button re-centres on the device location
-      this.map.scrollZoom.disable()
       this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
+      this.map.addControl(new ExpandControl(), 'top-right')
 
       // showUserLocation off: we draw the device marker ourselves, and two of them
       // drift apart the moment the control gets a newer fix than our own
@@ -297,9 +284,10 @@ export default class extends Controller {
     this.mapLoaded = false // a pending geolocation callback must not touch the removed map
   }
 
-  // The pin + zoom live in the URL so a reload (or shared link) restores them
+  // The pin + zoom live in the URL so a reload (or shared link) restores them. An
+  // unchosen pin isn't worth restoring, and restoring it would make it look chosen
   persistMapState () {
-    if (!this.hasPin) return
+    if (!this.pinChosen || !this.hasPin) return
     const url = new URL(window.location)
     url.searchParams.set('map_lat', this.pinLatitude.toFixed(6))
     url.searchParams.set('map_lng', this.pinLongitude.toFixed(6))
@@ -331,8 +319,10 @@ export default class extends Controller {
       const feature = (await response.json()).features?.[0]
       if (!feature) return
       this.geocodedAddress = this.addressFromFeature(feature)
-      this.fillAddress()
-    } catch { /* the fields stay blank for them to fill in */ }
+      // The pin has moved since the fields were seeded, so whatever they hold
+      // describes the old spot — replace it
+      this.fillAddress({ overwrite: true })
+    } catch { /* leave the fields for them to fill in */ }
   }
 
   // Split a Mapbox feature into street/city/region/postal/country parts
@@ -350,9 +340,10 @@ export default class extends Controller {
 
   enterManually () {
     this.applyLocationMode(true)
-    this.hide(this.statusTarget) // the located readout is irrelevant in manual entry
-    this.fillAddress() // whatever's already resolved, without waiting on the network
-    if (this.hasPin) this.reverseGeocode(this.pinLatitude, this.pinLongitude)
+    // Seed from the resolved address while it still describes the pin, without
+    // waiting on the network; a pin that has moved gets a fresh geocode instead
+    if (this.geocodedFor === this.pinKey) this.fillAddress()
+    else if (this.pinChosen) this.reverseGeocode(this.pinLatitude, this.pinLongitude)
     this.enableSubmit()
   }
 
@@ -361,29 +352,30 @@ export default class extends Controller {
     return this.locationModeTargets.some((radio) => radio.value === 'entered' && radio.checked)
   }
 
-  // Seed the AddressGroup fields from the located place, without clobbering input.
-  // Fields are reached by name (not targets) to stay decoupled from AddressGroup.
-  fillAddress () {
+  // Write the located place into the AddressGroup fields. Without `overwrite` it
+  // only fills blanks, so it can't clobber what they typed. Fields are reached by
+  // name (not targets) to stay decoupled from AddressGroup.
+  fillAddress ({ overwrite = false } = {}) {
     const address = this.geocodedAddress
     if (!address) return
-    this.setField('street', address.street)
-    this.setField('city', address.city)
-    this.setField('postal_code', address.postalCode)
-    this.selectCountry(address.country)
-    this.selectRegion(address.region)
+    this.setField('street', address.street, overwrite)
+    this.setField('city', address.city, overwrite)
+    this.setField('postal_code', address.postalCode, overwrite)
+    this.selectCountry(address.country, overwrite)
+    this.selectRegion(address.region, overwrite)
   }
 
-  setField (attribute, value) {
+  setField (attribute, value, overwrite) {
     if (!value) return
     const field = this.element.querySelector(`[name$='[${attribute}]']`)
-    if (field && !field.value) field.value = value
+    if (field && (overwrite || !field.value)) field.value = value
   }
 
   // Match the country by name and let AddressGroup toggle the state/region field
-  selectCountry (name) {
+  selectCountry (name, overwrite) {
     if (!name) return
     const select = this.element.querySelector("select[name$='[country_id]']")
-    if (!select || select.value) return
+    if (!select || (select.value && !overwrite)) return
     const option = [...select.options].find((entry) => entry.text === name)
     if (!option) return
     select.value = option.value
@@ -391,14 +383,14 @@ export default class extends Controller {
   }
 
   // A matching US state fills the select; otherwise the free-text region field
-  selectRegion (name) {
+  selectRegion (name, overwrite) {
     if (!name) return
     const stateSelect = this.element.querySelector("select[name$='[region_record_id]']")
     const stateOption = stateSelect && [...stateSelect.options].find((entry) => entry.text === name)
     if (stateOption) {
-      if (!stateSelect.value) stateSelect.value = stateOption.value
+      if (overwrite || !stateSelect.value) stateSelect.value = stateOption.value
     } else {
-      this.setField('region_string', name)
+      this.setField('region_string', name, overwrite)
     }
   }
 
@@ -417,19 +409,9 @@ export default class extends Controller {
     if (this.hasUseEnteredAddressTarget) this.useEnteredAddressTarget.value = value
   }
 
-  // The dot only shows once we have a location; other states are plain text
-  setStatus (text, { dot = false } = {}) {
-    if (!this.hasStatusTarget) return
-    if (this.hasStatusTextTarget) this.statusTextTarget.textContent = text
-    if (this.hasStatusDotTarget) this.toggle(this.statusDotTarget, dot)
-    this.show(this.statusTarget)
-  }
-
   enableSubmit () {
     if (this.hasSubmitTarget) this.submitTarget.disabled = false
   }
 
-  show (el) { if (el) el.classList.remove('tw:hidden') }
-  hide (el) { if (el) el.classList.add('tw:hidden') }
   toggle (el, visible) { if (el) el.classList.toggle('tw:hidden', !visible) }
 }

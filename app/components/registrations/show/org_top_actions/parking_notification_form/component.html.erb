@@ -43,48 +43,37 @@
         >
           <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", selected: "current", entries: [{value: "current", label: "Set on map"}, {value: "entered", label: "Enter address manually"}], data: {action: "registrations--show--parking-notification#selectLocationMode", "registrations--show--parking-notification-target": "locationMode"})) %>
 
-          <p
-            data-registrations--show--parking-notification-target="status"
-            class="
-              tw:mt-2 tw:flex tw:hidden tw:items-center tw:gap-1.5
-              tw:text-sm tw:opacity-65
-            "
-          >
-            <span
-              data-registrations--show--parking-notification-target="statusDot"
-              class="
-                tw:hidden tw:size-2 tw:flex-none tw:rounded-full
-                tw:bg-green-500
-              "
-            ></span>
-
-            <span
-              data-registrations--show--parking-notification-target="statusText"
-            ></span>
-          </p>
-
           <div
             data-registrations--show--parking-notification-target="mapSection"
             class="tw:mt-3"
           >
+            <%# The map and the hint for using it stand or fall together %>
             <div
               data-registrations--show--parking-notification-target="mapFrame"
-              class="
-                tw:relative tw:h-72 tw:w-full tw:overflow-hidden
-                tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900
-              "
             >
               <div
-                data-registrations--show--parking-notification-target="map"
-                class="tw:h-full tw:w-full"
-              ></div>
+                class="
+                  tw:h-72 tw:w-full tw:overflow-hidden tw:rounded-sm
+                  tw:bg-gray-100 tw:dark:bg-gray-900
+                "
+              >
+                <%# The pin lives inside the map so it comes along into fullscreen %>
+                <div
+                  data-registrations--show--parking-notification-target="map"
+                  class="tw:relative tw:h-full tw:w-full"
+                >
+                  <%#
+                    A fixed pin marks the map center; moving the map places the pin.
+                    Its tip is at 21/24 of the viewBox, so shift by that much (not the
+                    full height) to land the tip — not the empty box below it — on centre
+                  %>
+                  <%= helpers.inline_svg_tag("kelsey/registration_show/map-pin.svg", class: "tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-1/2 tw:z-10 tw:h-9 tw:w-9 tw:-translate-x-1/2 tw:-translate-y-[87.5%] tw:text-red-600 tw:drop-shadow-md", aria_hidden: true) %>
+                </div>
+              </div>
 
-              <%#
-                A fixed pin marks the map center; moving the map places the pin.
-                Its tip is at 21/24 of the viewBox, so shift by that much (not the
-                full height) to land the tip — not the empty box below it — on centre
-              %>
-              <%= helpers.inline_svg_tag("kelsey/registration_show/map-pin.svg", class: "tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-1/2 tw:z-10 tw:h-9 tw:w-9 tw:-translate-x-1/2 tw:-translate-y-[87.5%] tw:text-red-600 tw:drop-shadow-md", aria_hidden: true) %>
+              <p class="tw:mt-1 tw:text-xs tw:opacity-65">
+                <%= translation(".map_hint") %>
+              </p>
             </div>
 
             <p
@@ -93,10 +82,6 @@
               class="tw:mt-2 tw:text-sm tw:opacity-65"
             >
               <%= translation(".map_unavailable") %>
-            </p>
-
-            <p class="tw:mt-1 tw:text-xs tw:opacity-65">
-              <%= translation(".map_hint") %>
             </p>
           </div>
 
