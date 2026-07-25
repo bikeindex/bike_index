@@ -26,7 +26,7 @@ RSpec.describe Images::ExternalUrlStoreJob, type: :job do
       end
       # AfterBikeSaveJob + backgrounded version generation (process_in_background :image)
       expect(Sidekiq::Job.jobs.count).to eq 2
-      expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+      expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
       expect(CarrierWaveProcessJob).to have_enqueued_sidekiq_job("PublicImage", public_image.id.to_s, "image")
     end
     context "is_private true" do
@@ -42,7 +42,7 @@ RSpec.describe Images::ExternalUrlStoreJob, type: :job do
         end
         # AfterBikeSaveJob + backgrounded version generation (process_in_background :image)
         expect(Sidekiq::Job.jobs.count).to eq 2
-        expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+        expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
         expect(CarrierWaveProcessJob).to have_enqueued_sidekiq_job("PublicImage", public_image.id.to_s, "image")
       end
     end

@@ -1,5 +1,3 @@
-<% action_button_classes = "tw:relative tw:w-full tw:min-h-[60px] tw:justify-start tw:gap-3 tw:rounded-xl tw:p-4! tw:text-base! tw:text-left tw:lg:flex-1" %>
-
 <div
   class="
     tw:mx-auto tw:flex tw:w-full tw:max-w-[1440px] tw:flex-col tw:gap-6
@@ -28,64 +26,7 @@
     </div>
   </div>
 
-  <div
-    class="tw:flex tw:flex-col tw:gap-3"
-    data-controller="registrations--show--action-panels"
-  >
-    <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:flex">
-      <% if contactable? %>
-        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "message", action: "registrations--show--action-panels#toggle"})) do %>
-          <%= action_icon("mail") %>
-          <%= action_label(translation(".message_owner"), translation(".message_owner_sub")) %>
-        <% end %>
-      <% end %>
-
-      <% if show_create_impound? %>
-        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "impound", action: "registrations--show--action-panels#toggle"})) do %>
-          <%= action_icon("lock") %>
-          <%= action_label(impound_title, impound_subtitle) %>
-        <% end %>
-      <% end %>
-
-      <% if show_update_impound? %>
-        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "impound_update", action: "registrations--show--action-panels#toggle"})) do %>
-          <%= action_icon("lock", tile: :amber) %>
-          <%= action_label(translation(".impound_record"), translation(".update")) %>
-        <% end %>
-      <% end %>
-
-      <% if show_create_parking_notification? %>
-        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "parking", action: "registrations--show--action-panels#toggle"})) do %>
-          <%= action_icon("map-pin") %>
-          <%= action_label(translation(".parking_notice"), translation(".parking_notice_sub")) %>
-        <% end %>
-      <% end %>
-
-      <% if show_parking_notifications? %>
-        <%= render(UI::Button::Component.new(color: :purple_outline, html_class: action_button_classes, aria: {expanded: false}, data: {"registrations--show--action-panels-target": "trigger", "panel-name": "notifications_show", action: "registrations--show--action-panels#toggle"})) do %>
-          <%= action_icon("bell", tile: :blue) %>
-
-          <%= action_label(translation(".view_notifications"), translation(".view_notifications_activity_html", active: active_notifications_count, resolved: resolved_notifications_count)) %>
-        <% end %>
-      <% end %>
-    </div>
-
-    <% if contactable? %>
-      <%= render(Registrations::Show::OrgTopActionsMessageOwner::Component.new(bike: @bike)) %>
-    <% end %>
-
-    <% if show_create_parking_notification? || show_create_impound? %>
-      <%= render(Registrations::Show::OrgTopActionsParkingNotificationForm::Component.new(bike: @bike, organization: @organization)) %>
-    <% end %>
-
-    <% if show_update_impound? %>
-      <%= render(Registrations::Show::OrgTopActionsImpoundUpdate::Component.new(bike: @bike, organization: @organization)) %>
-    <% end %>
-
-    <% if show_parking_notifications? %>
-      <%= render(Registrations::Show::OrgTopActionsParkingNotificationShow::Component.new(bike: @bike, organization: @organization)) %>
-    <% end %>
-  </div>
+  <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new(bike: @bike, organization: @organization, staff: staff?)) %>
 
   <%#
     On mobile the column wrappers collapse (tw:contents) so every card is a
@@ -417,9 +358,13 @@
         </span>
       </div>
 
-      <div class="tw:mt-3">
-        <%= render(Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user)) %>
-      </div>
+      <%= tag.div(class: "org-search-component tw:mt-3", data: other_registrations_settings.column_toggle_data_attributes) do %>
+        <%= render(other_registrations_settings) %>
+
+        <div class="tw:mt-3">
+          <%= render(Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user, settings_component: other_registrations_settings)) %>
+        </div>
+      <% end %>
 
       <% if more_other_registrations? %>
         <p class="tw:mt-3 tw:text-xs tw:opacity-65">

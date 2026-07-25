@@ -63,8 +63,8 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(stolen_record.approved).to be_truthy
         expect(flash[:success]).to be_present
         expect(response).to redirect_to(:edit_admin_stolen_bike)
-        expect(StolenBike::ApproveStolenListingJob.jobs.count).to eq 1
-        expect(StolenBike::ApproveStolenListingJob.jobs.map { |j| j["args"] }.last.flatten).to eq([bike.id])
+        expect(BikeJobs::ApproveStolenListingJob.jobs.count).to eq 1
+        expect(BikeJobs::ApproveStolenListingJob.jobs.map { |j| j["args"] }.last.flatten).to eq([bike.id])
       end
       context "with a theft_alert" do
         let!(:alert_image) { FactoryBot.create(:alert_image, :with_image, stolen_record: stolen_record) }
@@ -84,14 +84,14 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           expect(stolen_record.approved).to be_truthy
           expect(flash[:success]).to be_present
           expect(response).to redirect_to(:edit_admin_stolen_bike)
-          expect(StolenBike::ApproveStolenListingJob.jobs.count).to eq 1
-          expect(StolenBike::ApproveStolenListingJob.jobs.map { |j| j["args"] }.last.flatten).to eq([bike.id])
+          expect(BikeJobs::ApproveStolenListingJob.jobs.count).to eq 1
+          expect(BikeJobs::ApproveStolenListingJob.jobs.map { |j| j["args"] }.last.flatten).to eq([bike.id])
 
-          expect(CallbackJob::AfterUserChangeJob.jobs.count).to eq 1
-          CallbackJob::AfterUserChangeJob.drain
+          expect(CallbackJobs::AfterUserChangeJob.jobs.count).to eq 1
+          CallbackJobs::AfterUserChangeJob.drain
 
-          expect(StolenBike::ActivateTheftAlertJob.jobs.count).to eq 1
-          expect(StolenBike::ActivateTheftAlertJob.jobs.map { |j| j["args"] }.last.flatten).to eq([theft_alert.id])
+          expect(BikeJobs::ActivateTheftAlertJob.jobs.count).to eq 1
+          expect(BikeJobs::ActivateTheftAlertJob.jobs.map { |j| j["args"] }.last.flatten).to eq([theft_alert.id])
         end
       end
       context "multi_approve" do
@@ -113,8 +113,8 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           # Sanity check!
           expect(stolen_record3.reload.approved).to be_falsey
           expect(flash[:success]).to be_present
-          expect(StolenBike::ApproveStolenListingJob.jobs.count).to eq 2
-          expect(StolenBike::ApproveStolenListingJob.jobs.map { |j| j["args"] }.flatten).to eq([bike.id, stolen_record2.bike_id])
+          expect(BikeJobs::ApproveStolenListingJob.jobs.count).to eq 2
+          expect(BikeJobs::ApproveStolenListingJob.jobs.map { |j| j["args"] }.flatten).to eq([bike.id, stolen_record2.bike_id])
         end
       end
     end

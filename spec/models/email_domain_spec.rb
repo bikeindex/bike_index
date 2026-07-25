@@ -204,6 +204,24 @@ RSpec.describe EmailDomain, type: :model do
       end
     end
 
+    context "with a second-level ccTLD (.br)" do
+      # .br registers at the second level (org.br, com.br), so the registrable domain is the last 3 labels
+      it "resolves the registrable domain, not the public suffix" do
+        expect(EmailDomain.tld_for("contact@fadems.org.br")).to eq "fadems.org.br"
+        expect(EmailDomain.tld_for("someone@shop.com.br")).to eq "shop.com.br"
+        expect(EmailDomain.tld_for("org.br")).to eq "org.br"
+      end
+
+      context "with a public-suffix record banned" do
+        let!(:email_domain_suffix) { FactoryBot.create(:email_domain, domain: "org.br", status: "provisional_ban", skip_processing: true) }
+        it "does not cascade the ban to unrelated registrable domains" do
+          email_domain = EmailDomain.find_or_create_for("contact@fadems.org.br", skip_processing: true)
+          expect(email_domain.tld).to eq "fadems.org.br"
+          expect(email_domain.status).to eq "permitted"
+        end
+      end
+    end
+
     context "with three subdomains" do
       let!(:email_domain_sub) { FactoryBot.create(:email_domain, domain: "zzzz.hotmail.co.jp") }
       let!(:email_domain_at) { FactoryBot.create(:email_domain, domain: "@hotmail.co.jp") }

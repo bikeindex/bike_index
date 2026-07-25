@@ -3,12 +3,10 @@
 module Registrations
   module Show
     module Map
-      # A Mapbox map centered on a location. Marks it with a translucent circle
+      # A MapLibre map centered on a location. Marks it with a translucent circle
       # (an approximate area) or, when point: is set, a dot at the exact spot.
-      # The registrations--show--map Stimulus controller lazy-loads Mapbox GL.
+      # The registrations--show--map Stimulus controller lazy-loads MapLibre GL.
       class Component < ApplicationComponent
-        MAPBOX_KEY = ENV["MAPBOX_MAPPING"]
-
         def initialize(latitude:, longitude:, precise: false, point: false)
           @latitude = latitude
           @longitude = longitude
@@ -17,14 +15,15 @@ module Registrations
         end
 
         def render?
-          @latitude.present? && @longitude.present? && MAPBOX_KEY.present?
+          @latitude.present? && @longitude.present?
         end
 
         private
 
-        # The circle grows faster with zoom when the exact address is public
-        def radius_base
-          @precise ? 2 : 1.15
+        # Non-precise coordinates are rounded to Bike::PUBLIC_COORD_LENGTH decimals,
+        # so the circle has to be wide enough to hide where in that square they fell
+        def radius_meters
+          @precise ? 250 : 1000
         end
       end
     end

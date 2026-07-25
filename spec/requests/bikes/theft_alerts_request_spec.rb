@@ -179,7 +179,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
 
       expect(theft_alert.reload.paid?).to be_truthy
       expect(theft_alert.activateable?).to be_falsey
-      expect(StolenBike::ActivateTheftAlertJob.jobs.count).to eq 0
+      expect(BikeJobs::ActivateTheftAlertJob.jobs.count).to eq 0
     end
     context "with an activateable theft_alert" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
@@ -206,7 +206,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
         expect(theft_alert.reload.paid?).to be_truthy
         expect(theft_alert.activateable_except_approval?).to be_truthy
         expect(theft_alert.activateable?).to be_truthy
-        expect(StolenBike::ActivateTheftAlertJob.jobs.count).to eq 1
+        expect(BikeJobs::ActivateTheftAlertJob.jobs.count).to eq 1
       end
     end
   end

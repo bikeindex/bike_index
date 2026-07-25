@@ -113,7 +113,7 @@ class Membership < ApplicationRecord
   # Membership changes don't otherwise touch the user, so enqueue the job that
   # recalculates the user's cached membership state (e.g. MarketplaceListing#seller_member)
   def enqueue_after_user_change_job
-    CallbackJob::AfterUserChangeJob.perform_async(user_id) if user_id.present?
+    CallbackJobs::AfterUserChangeJob.perform_async(user_id) if user_id.present?
   end
 
   def calculated_status

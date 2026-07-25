@@ -356,13 +356,19 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       ActionController::Base.cache_store = :null_store
     end
 
+    # Clicking before org--multi-search connects submits the form and reloads the
+    # page, so wait for the controller to enable the (initially disabled) button
+    def wait_for_multi_search_controller
+      expect(page).to have_button("Search serials", disabled: false, wait: 15)
+    end
+
     it "searches multiple serials, shows results, and caches rows by updated_at" do
       find("#passive_organization_submenu").click
       within(".current-organization-submenu") { click_link "Multi search" }
       expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
 
       expect(page).to have_content(/multi search/i)
-      expect(page).to have_css("[data-controller~='org--multi-search']", wait: 5)
+      wait_for_multi_search_controller
 
       # Kind toggle radios should not be present without bike_stickers feature
       expect(page).not_to have_field("Serials", visible: :all)
@@ -433,6 +439,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
       it "toggles to sticker search and shows results" do
         visit multi_serial_path
+        wait_for_multi_search_controller
 
         # Kind toggle radios are present
         expect(page).to have_field("Serials", visible: :all)

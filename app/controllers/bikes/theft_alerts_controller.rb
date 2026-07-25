@@ -23,7 +23,7 @@ module Bikes
 
       @payment&.update_from_stripe!
       if @payment.theft_alert&.activateable?
-        StolenBike::ActivateTheftAlertJob.perform_async(@payment.theft_alert.id)
+        BikeJobs::ActivateTheftAlertJob.perform_async(@payment.theft_alert.id)
       end
     end
 
@@ -40,7 +40,7 @@ module Bikes
       theft_alert.update(payment: @payment)
 
       # Enqueue creation of the image with the specified image
-      StolenBike::AfterStolenRecordSaveJob.perform_async(@bike.current_stolen_record_id, false,
+      BikeJobs::AfterStolenRecordSaveJob.perform_async(@bike.current_stolen_record_id, false,
         params[:selected_bike_image_id])
 
       redirect_to @payment.stripe_checkout_session.url, allow_other_host: true
