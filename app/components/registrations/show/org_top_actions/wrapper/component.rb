@@ -17,13 +17,17 @@ module Registrations
             amber: ["tw:bg-[#fff8e1]", "tw:text-[#caa11a]"]
           }.freeze
 
-          def initialize(bike:, organization:, staff:)
+          def initialize(bike:, organization:, org_role:)
             @bike = bike
             @organization = organization
-            @staff = staff
+            @org_role = org_role
           end
 
           private
+
+          def staff?
+            @org_role == :staff
+          end
 
           # A grid rather than the button's default flex, so the two layouts can share
           # one DOM order: below sm the subtitle sits beside the icon with the title
@@ -78,11 +82,11 @@ module Registrations
 
           # Staff create an impound before it's impounded, and update it after
           def show_create_impound?
-            show_impound? && @staff && !impounded?
+            show_impound? && staff? && !impounded?
           end
 
           def show_update_impound?
-            show_impound? && @staff && impounded?
+            show_impound? && staff? && impounded?
           end
 
           def show_parking_notifications?

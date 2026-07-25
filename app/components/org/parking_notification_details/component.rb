@@ -16,11 +16,6 @@ module Org
       def passed_bike
         @bike || @parking_notification.bike
       end
-
-      # A ControllerHelpers method, absent from the Lookbook preview view context
-      def display_dev_info?
-        helpers.respond_to?(:display_dev_info?) && helpers.display_dev_info?
-      end
     end
   end
 end

@@ -26,7 +26,7 @@ module Registrations
             kind, organization = @view
             if organization
               OrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
-                staff: kind == :staff, available_views: @available_views)
+                org_role: kind, available_views: @available_views)
             else
               Consumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
                 show_for_sale: @bike.is_for_sale?, available_views: @available_views)
@@ -44,7 +44,7 @@ module Registrations
         # templates, so bump the -v2 suffix whenever their markup changes.
         def cache_key
           ["registrations/show-v2", @current_user&.id,
-            Flipper.enabled?(:bike_show_redesign, @current_user), Flipper.enabled?(:bike_show_redesign_toggle, @current_user),
+            @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view),
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
         end
