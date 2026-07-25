@@ -40,5 +40,10 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
       expect(component).to have_css("input.tw\\:peer[value='m'][checked]", visible: :all)
       expect(component).to have_css("label span", text: "M")
     end
+
+    it "tints the checked chip with the shared purple palette" do
+      label = component.css("label span").first["class"]
+      expect(purple_tokens(label)).to include("bg-purple-100", "border-purple-500", "text-purple-500")
+    end
   end
 end

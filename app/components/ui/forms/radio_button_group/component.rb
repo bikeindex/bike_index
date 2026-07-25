@@ -6,12 +6,12 @@ module UI
       class Component < ApplicationComponent
         VARIANTS = %i[pills chips].freeze
 
-        # Card-style chips (frame-size XS-XL style); the checked chip uses the redesign purple.
+        # Card-style chips (frame-size XS-XL style); the checked chip tints with the shared purple palette.
         CHIP_CLASSES = "tw:block tw:rounded-sm tw:border tw:border-gray-300 tw:bg-white tw:py-2 " \
           "tw:text-center tw:text-sm tw:font-medium tw:text-gray-700 " \
-          "tw:peer-checked:border-[#715eb2] tw:peer-checked:bg-[#f3f1fa] tw:peer-checked:font-bold tw:peer-checked:text-[#715eb2] " \
+          "tw:peer-checked:border-purple-500 tw:peer-checked:bg-purple-100 tw:peer-checked:font-bold tw:peer-checked:text-purple-500 " \
           "tw:dark:border-gray-600 tw:dark:bg-gray-800 tw:dark:text-gray-300 " \
-          "tw:dark:peer-checked:bg-[#2b2543] tw:dark:peer-checked:text-[#b3a6e3]"
+          "tw:dark:peer-checked:bg-purple-900 tw:dark:peer-checked:text-purple-300"
 
         def initialize(name:, entries:, selected: nil, form: nil, data: {}, variant: :pills)
           @name = name
