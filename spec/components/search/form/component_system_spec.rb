@@ -70,14 +70,15 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     end
 
     # kind_select_fields_controller writes these on turbo:submit-end, which fires
-    # after the URL changes; it namespaces the keys inside a component preview
+    # after the URL changes; it namespaces the keys inside a component preview.
+    # Raise Capybara's error, not RSpec's: synchronize rescues StandardError, and
+    # an RSpec expectation failure descends from Exception, so it would never retry.
     def expect_localstorage_location(location:, distance:)
       expected = {"preview-searchLocation" => location, "preview-searchDistance" => distance}
-      deadline = Time.current + 5
-      stored = local_storage
-      until expected.keys.all? { |key| stored[key] } || Time.current > deadline
-        sleep 0.1
-        stored = local_storage
+      stored = page.document.synchronize(5) do
+        local_storage.tap do |storage|
+          raise Capybara::ExpectationNotMet unless expected.keys.all? { |key| storage[key] }
+        end
       end
       expect(stored).to match_hash_indifferently(expected)
     end
