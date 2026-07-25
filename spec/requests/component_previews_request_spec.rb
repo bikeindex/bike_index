@@ -7,8 +7,8 @@ RSpec.describe "ComponentPreviews", type: :request do
   let(:organization) { FactoryBot.create(:organization_brakebills) }
   let!(:parking_notification) { FactoryBot.create(:parking_notification, organization:) }
 
-  # Previews go through ComponentPreviewsController so components can call the
-  # ControllerHelpers methods they use everywhere else (here: display_dev_info?)
+  # ParkingNotificationDetails calls display_dev_info?, so it's the canary for
+  # previews rendering through a controller with the helper methods
   it "renders a preview of a component that uses the controller helpers" do
     get "/rails/view_components/registrations/show/org_top_actions/wrapper/component/default"
 

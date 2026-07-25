@@ -58,20 +58,20 @@ RSpec.describe Registrations::Show::OrgTopActions::Wrapper::Component, type: :co
     end
   end
 
-  context "when stolen, without unstolen_notifications" do
-    let(:enabled_feature_slugs) { %w[impound_bikes parking_notifications] }
-    let(:bike) { Bike.new(status: :status_stolen, cycle_type: "bike", current_stolen_record: StolenRecord.new) }
-
-    it "renders the message action" do
-      expect(action_panels).to eq(%w[message impound parking notifications_show])
-    end
-  end
-
-  context "when with owner, without unstolen_notifications" do
+  context "without unstolen_notifications" do
     let(:enabled_feature_slugs) { %w[impound_bikes parking_notifications] }
 
     it "renders no message action" do
       expect(action_panels).to eq(%w[impound parking notifications_show])
+    end
+
+    context "and stolen" do
+      let(:bike) { Bike.new(status: :status_stolen, cycle_type: "bike", current_stolen_record: StolenRecord.new) }
+
+      # A stolen bike's owner is messageable without the feature
+      it "renders the message action" do
+        expect(action_panels).to eq(%w[message impound parking notifications_show])
+      end
     end
   end
 end

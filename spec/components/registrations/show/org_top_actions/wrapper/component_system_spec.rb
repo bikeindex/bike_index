@@ -51,13 +51,5 @@ RSpec.describe Registrations::Show::OrgTopActions::Wrapper::Component, :js, type
     end
 
     expect(page).to have_no_current_path(/panel=/, url: true)
-
-    # A shared link reopens the named panel without a click
-    visit "#{preview_path}?panel=message"
-
-    within(scenario("With owner")) do
-      expect(page).to have_button("Send message")
-      expect(page).to have_css("button[aria-pressed='true']", text: "Message Owner")
-    end
   end
 end

@@ -10,9 +10,9 @@ module Registrations
         # Registration fields shown with the owner rather than in registration info
         OWNER_ACCESS_REG_FIELDS = %w[reg_address reg_organization_affiliation reg_student_id].freeze
 
-        # org_role: overrides the computed role so a superadmin can view the org
-        # panel as staff or as limited (view_as)
-        def initialize(bike:, current_user:, organization:, available_views: [], org_role: nil)
+        # org_role is the role this panel renders as - a superadmin can view any
+        # organization as :staff or as :limited (view_as)
+        def initialize(bike:, current_user:, organization:, org_role:, available_views: [])
           @bike = bike
           @current_user = current_user
           @organization = organization
@@ -39,12 +39,8 @@ module Registrations
           render(UI::DefinitionList::Row::Component.new(label:, value:, render_with_no_value: true, no_value_text: "-"), &block)
         end
 
-        def org_role
-          @org_role ||= BikeServices::ShowViews.role_for(@current_user, @organization)
-        end
-
         def staff?
-          org_role == :staff
+          @org_role == :staff
         end
 
         def organization_registered?

@@ -32,11 +32,6 @@ module BikeServices
       [:public, nil]
     end
 
-    # An org member's role: :staff when they can edit bikes, else :limited.
-    def role_for(current_user, organization)
-      current_user.member_bike_edit_of?(organization) ? :staff : :limited
-    end
-
     #
     # private below here
     #
@@ -47,6 +42,11 @@ module BikeServices
         roles = current_user.superuser? ? %i[staff limited] : [role_for(current_user, org)]
         roles.map { |role| [role, org] }
       end
+    end
+
+    # An org member's role: :staff when they can edit bikes, else :limited.
+    def role_for(current_user, organization)
+      current_user.member_bike_edit_of?(organization) ? :staff : :limited
     end
 
     def viewable_organizations(bike:, current_user:, organization:, preview_organization: nil)
@@ -63,6 +63,6 @@ module BikeServices
       orgs.compact.uniq.select { |org| current_user.authorized?(org) }
     end
 
-    conceal :organization_views, :viewable_organizations
+    conceal :organization_views, :viewable_organizations, :role_for
   end
 end
