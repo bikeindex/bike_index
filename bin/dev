@@ -11,8 +11,7 @@ eval "$(ruby bin/env --export)"
 echo "Starting server on http://localhost:$DEV_PORT"
 echo
 
-# Point the review banner at this branch's PR. Empty (banner shows no link) when
-# there's no PR or no gh.
+# Point the review banner at this branch's PR
 if [ -f .workspace_id ] && [ "$NO_REVIEW_TOPBAR" != "true" ] &&
   ! grep -qs "^NO_REVIEW_TOPBAR=true" .env.development; then
   eval "$(gh pr view --json number,title --jq '@sh "export REVIEW_APP_PR_NUMBER=\(.number) REVIEW_APP_PR_TITLE=\(.title)"' 2>/dev/null)"
