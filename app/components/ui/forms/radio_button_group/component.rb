@@ -43,6 +43,8 @@ module UI
             "tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950",
             "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
             "tw:has-[:checked]:hover:bg-purple-500 tw:has-[:checked]:hover:border-purple-500",
+            # relative/z-10 keeps the ring above the neighboring labels, which overlap it by a pixel
+            "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40 tw:has-[:checked]:relative tw:has-[:checked]:z-10",
             "tw:has-[:focus-visible]:ring-2 tw:has-[:focus-visible]:ring-purple-500/40 tw:has-[:focus-visible]:ring-offset-1 tw:dark:has-[:focus-visible]:ring-offset-gray-900",
             round, border_l
           ].join(" ")) do
