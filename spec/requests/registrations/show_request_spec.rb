@@ -414,6 +414,25 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
+    context "view_as another organization" do
+      let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+      let(:other_organization) { FactoryBot.create(:organization) }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: other_organization, user: current_user) }
+
+      it "sets the passive_organization, so the organization sticks on the next request" do
+        # Which organization is default_organization isn't ordered, so put one in the session
+        get "#{base_url}/#{bike.id}", params: {organization_id: organization.to_param}
+        expect(session[:passive_organization_id]).to eq organization.id
+
+        get "#{base_url}/#{bike.id}", params: {view_as: "#{other_organization.to_param}.staff"}
+        expect(whitespace_normalized_body_text).to match("Viewing as #{other_organization.short_name} staff")
+        expect(session[:passive_organization_id]).to eq other_organization.id
+
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("Viewing as #{other_organization.short_name} staff")
+      end
+    end
+
     context "superuser view_as options" do
       let(:current_user) { FactoryBot.create(:superuser) }
       let!(:brakebills) { FactoryBot.create(:organization, name: "Brakebills") }
