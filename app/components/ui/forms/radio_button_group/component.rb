@@ -37,10 +37,8 @@ module UI
 
           # Mirrors UI::Button color: :purple_outline (resting + active), driving the
           # active state off the checked radio so the two stay visually in lockstep.
-          #
-          # Segments overlap by a pixel, so a later sibling paints over its neighbor's
-          # right border and ring. The z-index ladder decides who wins that pixel:
-          # pointer/keyboard focus outranks the checked segment, which outranks the rest.
+          # Segments overlap by a pixel; z-index breaks the tie for it: hover/focus,
+          # then checked, then the rest.
           tag.label(class: [
             "tw:relative tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:mb-0! tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
             "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700",
