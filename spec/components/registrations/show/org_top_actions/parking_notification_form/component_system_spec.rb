@@ -145,7 +145,10 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     Timeout.timeout(20) do
       while coordinate("longitude") == start
         drag_map(160, 60)
-        10.times { (coordinate("longitude") == start) ? sleep(0.05) : break }
+        10.times {
+          break if coordinate("longitude") != start
+          sleep 0.05
+        }
       end
     end
   end
@@ -172,15 +175,16 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     expect_axe_clean
   end
 
+  # No visit here — the driver boots its page on demand, so the routes and
+  # permissions install against a blank page and every example visits its own URL
   before do
     stub_const("ENV", ENV.to_hash.merge("MAPBOX_MAPPING" => "pk.test-token"))
-    visit preview_path
+    move_device_to(latitude: latitude.to_f, longitude: longitude.to_f, accuracy: 20)
     # capture for the cross-thread route handler
     feature, moved, device_longitude = geocode_feature, moved_feature, longitude
     page.driver.with_playwright_page do |playwright_page|
       context = playwright_page.context
       context.grant_permissions(["geolocation"])
-      context.set_geolocation({latitude: latitude.to_f, longitude: longitude.to_f, accuracy: 20})
       # Stub Mapbox reverse-geocode so the address resolves without the network
       context.route("https://api.mapbox.com/geocoding/**", proc { |route, request|
         route.fulfill(status: 200, json: {features: [request.url.include?("/#{device_longitude},") ? feature : moved]})
@@ -193,6 +197,8 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
   end
 
   it "geolocates, splits the address into fields, toggles modes, and keeps drafts across a reload" do
+    visit preview_path
+
     # Submit is disabled until a location is chosen
     expect(page).to have_button("Create parking notification", disabled: true, visible: :all)
 
@@ -370,6 +376,7 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
 
   # Opening via the Impound trigger preselects the impound kind
   it "titles for the bike type, preselects impound, hides the reason chooser, and survives a reload" do
+    visit preview_path
     click_button "Impound"
 
     # The heading is CSS-uppercased, so match case-insensitively
@@ -390,7 +397,6 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     let!(:earlier_notification) { FactoryBot.create(:parking_notification, bike:, organization:) }
 
     it "offers repeat first and collapses the location controls while it's selected" do
-      # Re-render now that the earlier notification exists (it's created after the outer visit)
       visit preview_path
       click_button "Parking notification"
 

@@ -117,11 +117,15 @@ export default class extends Controller {
     }
   }
 
+  // A high-accuracy fix can take the full timeout, and reopening the panel or
+  // toggling modes re-enters this — one acquisition at a time
   requestLocation () {
+    if (this.locating) return
     if (!navigator.geolocation) return this.locationFailed()
+    this.locating = true
     navigator.geolocation.getCurrentPosition(
-      (position) => this.locationFound(position),
-      () => this.locationFailed(),
+      (position) => { this.locating = false; this.locationFound(position) },
+      () => { this.locating = false; this.locationFailed() },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     )
   }
@@ -129,7 +133,7 @@ export default class extends Controller {
   locationFound (position) {
     if (this.manualMode) return // they switched to manual entry while we waited
     const { latitude, longitude, accuracy } = position.coords
-    this.deviceLocation = { latitude, longitude, accuracy }
+    this.deviceLocation = position.coords
     this.locate(latitude, longitude, { accuracy })
     this.renderDeviceLocation()
   }
@@ -142,20 +146,15 @@ export default class extends Controller {
     const data = { type: 'Feature', geometry: { type: 'Point', coordinates: [longitude, latitude] } }
     const radius = groundRadiusStops(accuracy || 0, latitude)
 
-    if (this.map.getSource('device-location')) {
-      this.map.getSource('device-location').setData(data)
-      this.map.setPaintProperty('device-accuracy', 'circle-radius', radius)
-      return
+    const source = this.map.getSource('device-location')
+    if (source) {
+      source.setData(data)
+    } else {
+      this.map.addSource('device-location', { type: 'geojson', data })
+      this.map.addLayer({ id: 'device-accuracy', type: 'circle', source: 'device-location', paint: DEVICE_ACCURACY_PAINT })
+      this.map.addLayer({ id: 'device-dot', type: 'circle', source: 'device-location', paint: DEVICE_DOT_PAINT })
     }
-
-    this.map.addSource('device-location', { type: 'geojson', data })
-    this.map.addLayer({
-      id: 'device-accuracy',
-      type: 'circle',
-      source: 'device-location',
-      paint: { ...DEVICE_ACCURACY_PAINT, 'circle-radius': radius }
-    })
-    this.map.addLayer({ id: 'device-dot', type: 'circle', source: 'device-location', paint: DEVICE_DOT_PAINT })
+    this.map.setPaintProperty('device-accuracy', 'circle-radius', radius)
   }
 
   locationFailed () {
@@ -203,11 +202,10 @@ export default class extends Controller {
 
   get pinLatitude () { return parseFloat(this.latitudeTarget.value) }
   get pinLongitude () { return parseFloat(this.longitudeTarget.value) }
-  get hasPin () { return !Number.isNaN(this.pinLatitude) && !Number.isNaN(this.pinLongitude) }
   get pinKey () { return `${this.pinLatitude},${this.pinLongitude}` }
 
   syncMap () {
-    if (!this.hasMapTarget || !this.styleUrlValue || !this.hasPin) return
+    if (!this.hasMapTarget || !this.styleUrlValue) return
     if (this.map) {
       this.map.easeTo({ center: [this.pinLongitude, this.pinLatitude], zoom: this.pinZoom })
     } else {
@@ -246,8 +244,7 @@ export default class extends Controller {
       // The control re-centres the map (which moves the pin via moveend); adopt its
       // fresher fix for the marker too
       geolocate.on('geolocate', (position) => {
-        const { latitude, longitude, accuracy } = position.coords
-        this.deviceLocation = { latitude, longitude, accuracy }
+        this.deviceLocation = position.coords
         this.renderDeviceLocation()
       })
 
@@ -284,7 +281,7 @@ export default class extends Controller {
   // The pin + zoom live in the URL so a reload (or shared link) restores them. An
   // unchosen pin isn't worth restoring, and restoring it would make it look chosen
   persistMapState () {
-    if (!this.pinChosen || !this.hasPin) return
+    if (!this.pinChosen) return
     const url = new URL(window.location)
     url.searchParams.set('map_lat', this.pinLatitude.toFixed(6))
     url.searchParams.set('map_lng', this.pinLongitude.toFixed(6))

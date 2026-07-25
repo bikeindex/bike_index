@@ -26,10 +26,12 @@ export function groundRadiusStops (radiusMeters, latitude) {
 // Desktop expands the map over the page, so the site chrome stays reachable; on a
 // phone that leaves too little map, so small screens get real fullscreen instead
 const PAGE_EXPAND_QUERY = '(min-width: 48rem)'
-// Above the header's 1040, since the expanded map covers the page. `fixed!` because
-// the parking-notification map also carries `tw:relative` (it positions the centre
-// pin before MapLibre attaches), and same-layer utilities fall back to source order
-const EXPANDED_CLASSES = ['tw:fixed!', 'tw:inset-0', 'tw:z-[1050]']
+// MapLibre's stylesheet is unlayered and our utilities live in @layer utilities, and
+// unlayered rules win outright — so `.maplibregl-map { position: relative }` beats a
+// plain `tw:fixed` on either map. Hence the important modifier.
+const EXPANDED_CLASS = 'tw:fixed!'
+// Above the header's 1040, since the expanded map covers the page
+const EXPANDED_CLASSES = [EXPANDED_CLASS, 'tw:inset-0', 'tw:z-[1050]']
 
 // A MapLibre control that expands the map to fill the page (or the screen, on
 // mobile). Borrows MapLibre's own fullscreen button classes so it looks native.
@@ -42,7 +44,15 @@ export class ExpandControl {
     this.button.addEventListener('click', () => this.toggle())
     this.label(false)
 
-    this.onFullscreenChange = () => this.reflect(document.fullscreenElement === this.element)
+    // Document-scoped, so ignore anything else on the page going fullscreen —
+    // two maps share this page and each resize costs a canvas repaint
+    this.fullscreened = false
+    this.onFullscreenChange = () => {
+      const fullscreen = document.fullscreenElement === this.element
+      if (fullscreen === this.fullscreened) return
+      this.fullscreened = fullscreen
+      this.reflect(fullscreen)
+    }
     // Escape leaves an expanded map the way it leaves fullscreen
     this.onKeydown = (event) => { if (event.key === 'Escape') this.expandPage(false) }
     document.addEventListener('fullscreenchange', this.onFullscreenChange)
@@ -62,7 +72,7 @@ export class ExpandControl {
 
   get element () { return this.map.getContainer() }
 
-  get pageExpanded () { return this.element.classList.contains(EXPANDED_CLASSES[0]) }
+  get pageExpanded () { return this.element.classList.contains(EXPANDED_CLASS) }
 
   // Collapse the way we expanded — the viewport may have crossed the breakpoint
   // since (a rotated tablet, a resized window), and the other exit is a no-op
