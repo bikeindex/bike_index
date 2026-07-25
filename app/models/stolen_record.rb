@@ -272,9 +272,8 @@ class StolenRecord < ApplicationRecord
     self.phone = Phonifyer.phonify(phone)
     self.secondary_phone = Phonifyer.phonify(secondary_phone)
     self.date_stolen = self.class.corrected_date_stolen(date_stolen)
-    self.street = street.strip.gsub(/\s*,\z/, "") if street.present?
     if city.present?
-      self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.gsub(/\s*,\z/, "").titleize
+      self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize
     end
     update_tsved_at
     @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
