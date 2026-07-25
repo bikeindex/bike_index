@@ -148,10 +148,13 @@ module Geocodeable
     RENDER_COUNTRY_OPTIONS.first unless RENDER_COUNTRY_OPTIONS.include?(render_sym)
 
     if current_country_iso.present?
-      country_iso != current_country_iso&.strip&.upcase
+      country_iso != current_country_iso.strip.upcase
+    elsif current_country_id.present?
+      country_id != current_country_id
     else
-      # default to US if no current country is passed
-      country_id != (current_country_id || Country.united_states_id)
+      # Default to US if no current country is passed. Compare iso rather than
+      # Country.united_states_id - which lazily creates and errors on the read replica
+      country_iso != "US"
     end
   end
 
