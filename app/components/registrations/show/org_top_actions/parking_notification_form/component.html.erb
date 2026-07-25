@@ -51,10 +51,15 @@
             <div
               data-registrations--show--parking-notification-target="mapFrame"
             >
+              <%#
+                Capped against the viewport so the map doesn't crowd out the rest
+                of the form on a short screen
+              %>
+
               <div
                 class="
-                  tw:h-72 tw:w-full tw:overflow-hidden tw:rounded-sm
-                  tw:bg-gray-100 tw:dark:bg-gray-900
+                  tw:h-100 tw:max-h-[90vh] tw:w-full tw:overflow-hidden
+                  tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900
                 "
               >
                 <%# The pin lives inside the map so it comes along into fullscreen %>
