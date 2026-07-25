@@ -61,10 +61,10 @@ module SearchResults
       end
 
       def address_formatted
-        @address_formatted ||= if @event_record.is_a?(MarketplaceListing)
-          @event_record.formatted_address_string
+        @address_formatted ||= if @event_record.is_a?(StolenRecord)
+          @event_record.formatted_address_string_with_iso
         else
-          @event_record&.address(country: [:iso])
+          @event_record&.formatted_address_string
         end
       end
     end
