@@ -110,7 +110,7 @@ export default class extends Controller {
     const stored = this.storedMapState
     if (stored) {
       this.locate(stored.latitude, stored.longitude, { zoom: stored.zoom })
-      this.reverseGeocode(stored.latitude, stored.longitude)
+      this.setStatus(this.coordinateStatus, { dot: true })
     } else {
       // The org location makes the form submittable at once; the map itself waits
       // for the device fix so it doesn't load tiles it's about to pan away from
@@ -137,8 +137,7 @@ export default class extends Controller {
     this.deviceLocation = { latitude, longitude, accuracy }
     this.locate(latitude, longitude, { accuracy })
     this.renderDeviceLocation()
-    this.setStatus('Using your current location', { dot: true })
-    this.reverseGeocode(latitude, longitude)
+    this.setStatus(`Using your current location · ${this.coordinateStatus}`, { dot: true })
   }
 
   // Mark where the device actually is, distinct from the pin the user places. Only
@@ -189,23 +188,21 @@ export default class extends Controller {
     const { lat, lng } = this.map.getCenter()
     if (this.centerMoved(lat, lng)) {
       this.setCoordinates(lat, lng)
-      this.setStatus('Updating the location…', { dot: true })
-      this.scheduleGeocode(lat, lng)
+      this.setStatus(this.coordinateStatus, { dot: true })
     }
     this.persistMapState() // also captures a zoom change that left the centre put
+  }
+
+  // The pin is the location, so report the coordinates it sits on. An address here
+  // would have to re-resolve on every nudge, and lag behind the pin while it did
+  get coordinateStatus () {
+    return `${this.pinLatitude.toFixed(5)}, ${this.pinLongitude.toFixed(5)}`
   }
 
   // Whether the map centre differs from the coordinates already on the form —
   // true after a user pan, false after our own recenter or a pure zoom
   centerMoved (latitude, longitude) {
     return Math.abs(this.pinLatitude - latitude) > 1e-5 || Math.abs(this.pinLongitude - longitude) > 1e-5
-  }
-
-  // Debounce the geocode so lining the pin up fires one request for the resting
-  // spot, not one per nudge
-  scheduleGeocode (latitude, longitude) {
-    window.clearTimeout(this.geocodeTimer)
-    this.geocodeTimer = window.setTimeout(() => this.reverseGeocode(latitude, longitude), 400)
   }
 
   // The hidden fields are the source of truth for the coordinates
@@ -219,6 +216,7 @@ export default class extends Controller {
   get pinLatitude () { return parseFloat(this.latitudeTarget.value) }
   get pinLongitude () { return parseFloat(this.longitudeTarget.value) }
   get hasPin () { return !Number.isNaN(this.pinLatitude) && !Number.isNaN(this.pinLongitude) }
+  get pinKey () { return `${this.pinLatitude},${this.pinLongitude}` }
 
   syncMap () {
     if (!this.hasMapTarget || !this.styleUrlValue || !this.hasPin) return
@@ -289,7 +287,6 @@ export default class extends Controller {
   }
 
   disconnect () {
-    window.clearTimeout(this.geocodeTimer)
     this.map?.remove()
     this.map = null
     this.mapLoaded = false // a pending geolocation callback must not touch the removed map
@@ -316,9 +313,12 @@ export default class extends Controller {
     return { latitude, longitude, zoom: Number.isNaN(zoom) ? DEFAULT_ZOOM : zoom }
   }
 
-  // Reverse-geocode the coordinates into a human-readable place and split address
+  // Split the pin's coordinates into address parts, to seed the manual-entry
+  // fields. Marked before the request so toggling modes doesn't re-ask for a
+  // spot we've already looked up
   async reverseGeocode (latitude, longitude) {
-    if (!this.mapboxKeyValue) return
+    if (!this.mapboxKeyValue || this.geocodedFor === this.pinKey) return
+    this.geocodedFor = this.pinKey
     try {
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${this.mapboxKeyValue}&types=address&limit=1`
       const response = await window.fetch(url)
@@ -326,11 +326,8 @@ export default class extends Controller {
       const feature = (await response.json()).features?.[0]
       if (!feature) return
       this.geocodedAddress = this.addressFromFeature(feature)
-      const place = feature.place_name.replace(/,\s*United States$/, '')
-      // In manual entry, seed the fields instead of showing the readout
-      if (this.manualMode) this.fillAddress()
-      else this.setStatus(place, { dot: true })
-    } catch { /* keep the plain status */ }
+      this.fillAddress()
+    } catch { /* the fields stay blank for them to fill in */ }
   }
 
   // Split a Mapbox feature into street/city/region/postal/country parts
@@ -349,7 +346,8 @@ export default class extends Controller {
   enterManually () {
     this.applyLocationMode(true)
     this.hide(this.statusTarget) // the located readout is irrelevant in manual entry
-    this.fillAddress()
+    this.fillAddress() // whatever's already resolved, without waiting on the network
+    if (this.hasPin) this.reverseGeocode(this.pinLatitude, this.pinLongitude)
     this.enableSubmit()
   }
 

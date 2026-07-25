@@ -11,8 +11,8 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
   let(:latitude) { "37.8698" }
   let(:longitude) { "-122.2585" }
   let(:place_name) { "2363a Bryant Street, San Francisco, California 94110, United States" }
-  # Once reverse-geocoded, the status reads the pin's address (minus ", United States")
-  let(:located_status) { "2363a Bryant Street, San Francisco, California 94110" }
+  # The readout is the pin's coordinates, never a reverse-geocoded address
+  let(:located_status) { "Using your current location · 37.86980, -122.25850" }
   let(:geocode_feature) do
     {
       place_name:,
@@ -59,12 +59,14 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
     # Submit is disabled until a location is chosen
     expect(page).to have_button("Create parking notification", disabled: true, visible: :all)
 
-    # Opening the panel geolocates and reverse-geocodes into the status
+    # Opening the panel geolocates and reads the coordinates back
     click_button "Parking notification"
 
     expect(page).to have_content(located_status, wait: 10)
     # The green status dot appears alongside the location readout
     expect(page).to have_css("[data-registrations--show--parking-notification-target='statusDot']", visible: true)
+    # Map mode never surfaces a geocoded address — the pin is the location
+    expect(page).to have_no_content("Bryant Street")
     expect(coordinate("latitude")).to eq(latitude)
     expect(coordinate("longitude")).to eq(longitude)
     expect(page).to have_button("Create parking notification", disabled: false)
@@ -75,7 +77,7 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
     expect(page.current_url).to include("map_lat=37.8698").and include("map_lng=-122.2585").and include("map_zoom=")
     expect_axe_clean
 
-    # Manual entry hides the readout and splits the location across the fields
+    # Manual entry hides the readout and geocodes the pin into the fields
     find("label", text: "Enter address manually").click
 
     expect(page).to have_field("Address or intersection", with: "2363a Bryant Street")
