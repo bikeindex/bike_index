@@ -12,7 +12,7 @@ RSpec.describe UserAlert, type: :model do
         expect(user_alert).to be_valid
         bike = user_alert.reload.bike
         expect(bike.current_stolen_record&.id).to be_present
-        expect(bike.current_stolen_record&.without_location?).to be_truthy
+        expect(bike.current_stolen_record&.without_street?).to be_truthy
         # Running the process doesn't create a new alert
         expect {
           expect(UserAlert.update_stolen_bike_without_location(user: user_alert.user, bike: user_alert.bike)).to be_truthy

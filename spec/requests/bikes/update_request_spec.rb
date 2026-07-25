@@ -204,7 +204,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.claimed?).to be_truthy
         expect(bike.owner&.id).to eq current_user.id
         # It no longer has an address, the stolen record has updated it
-        expect(bike.address_hash.values.compact).to eq(["US"])
+        expect(bike.address_hash.values.compact).to eq([])
 
         stolen_record = bike.current_stolen_record
         expect(stolen_record).to be_present
@@ -346,8 +346,8 @@ RSpec.describe "BikesController#update", type: :request do
         country_id: Country.united_states.id,
         street: "278 Broadway",
         city: "New York",
-        zipcode: "10007",
-        state_id: state.id,
+        postal_code: "10007",
+        region_record_id: state.id,
         show_address: "1",
         estimated_value: "2101",
         locking_description: "party",
@@ -364,6 +364,21 @@ RSpec.describe "BikesController#update", type: :request do
       }
     end
 
+    context "with legacy stolen attribute names" do
+      let(:legacy_stolen_params) do
+        stolen_params.except(:postal_code, :region_record_id).merge(zipcode: "10007", state_id: state.id)
+      end
+      it "updates with the renamed attributes" do
+        expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
+        patch base_url, params: {bike: {stolen: "true", stolen_records_attributes: {"0" => legacy_stolen_params}}}
+        expect(flash[:success]).to be_present
+        stolen_record.reload
+        expect(stolen_record.street).to eq "278 Broadway"
+        expect(stolen_record.postal_code).to eq "10007"
+        expect(stolen_record.region_record_id).to eq state.id
+      end
+    end
+
     it "clears the existing alert image" do
       # Cassette required for alert image
       VCR.use_cassette("bike_request-stolen", match_requests_on: [:method], re_record_interval: 1.month) do
@@ -372,7 +387,7 @@ RSpec.describe "BikesController#update", type: :request do
         FactoryBot.create(:alert_image, stolen_record:)
         stolen_record.reload
         expect(bike.current_stolen_record_id).to eq stolen_record.id
-        expect(stolen_record.without_location?).to be_truthy
+        expect(stolen_record.without_street?).to be_truthy
         og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
         expect(og_alert_image_id).to be_present
         # Test stolen record phoning
@@ -403,7 +418,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone).to eq "1111111111"
         expect(stolen_record.secondary_phone).to eq "1231231234"
         expect(stolen_record.country_id).to eq Country.united_states.id
-        expect(stolen_record.state_id).to eq state.id
+        expect(stolen_record.region_record_id).to eq state.id
         expect(stolen_record.show_address).to be_falsey
         expect(stolen_record.estimated_value).to eq 2101
         expect(stolen_record.locking_description).to eq "party"
