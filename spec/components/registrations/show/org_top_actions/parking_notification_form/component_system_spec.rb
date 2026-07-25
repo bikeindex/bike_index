@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Component, :js, type: :system do
-  let(:controller_id) { "registrations--show--parking-notification" }
+  let(:controller_id) { "registrations--show--parking-notification-form" }
   let(:map_selector) { "[data-#{controller_id}-target='map']" }
   let(:preview_path) { "/rails/view_components/registrations/show/org_top_actions/parking_notification_form/component/default" }
   let(:organization) { FactoryBot.create(:organization) }
