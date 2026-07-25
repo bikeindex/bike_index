@@ -11,17 +11,7 @@ if Rails.env.development? && ENV["PARALLEL_MIGRATIONS"].present?
     puts "Running parallel:migrate for test databases..."
     system("rake parallel:migrate")
     system("rake parallel:prepare")
-
-    # Remove postgres 17 additions that cause CI failures
-    Dir.glob("db/*.sql").each do |file|
-      content = File.read(file)
-      cleaned = content.lines.reject { |line|
-        line.include?("SET transaction_timeout = 0;") ||
-          line.start_with?("\\restrict ") ||
-          line.start_with?("\\unrestrict ")
-      }.join
-      File.write(file, cleaned) if cleaned != content
-    end
+    # Postgres 17 pg_dump artifacts are stripped by the db:schema:dump enhancement
   end
 
   Rake::Task["db:drop"].enhance do

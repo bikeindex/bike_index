@@ -83,7 +83,6 @@ class User < ApplicationRecord
   has_many :feedbacks
   has_many :impound_claims
   has_many :impound_records
-  has_many :integrations, dependent: :destroy
   has_many :locks, dependent: :destroy
   has_many :marketplace_listings, foreign_key: :seller_id
   has_many :marketplace_messages_received, class_name: "MarketplaceMessage", foreign_key: :receiver_id
@@ -139,7 +138,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :user_ban
 
-  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password, :skip_update
+  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password, :skip_update, :additional
   # stripe_id, is_paid_member, paid_organization_role_info
 
   before_validation :set_calculated_attributes
@@ -263,11 +262,11 @@ class User < ApplicationRecord
 
   # Performed inline
   def perform_create_jobs
-    CallbackJob::AfterUserCreateJob.new.perform(id, "new", user: self)
+    CallbackJobs::AfterUserCreateJob.new.perform(id, "new", user: self)
   end
 
   def perform_user_update_jobs
-    CallbackJob::AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
+    CallbackJobs::AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
   end
 
   def superuser?(controller_name: nil, action_name: nil)
@@ -284,6 +283,11 @@ class User < ApplicationRecord
 
   def banned?
     banned
+  end
+
+  # `additional` is a honeypot field on the sign up form - only bots fill it in
+  def looks_like_spam?
+    additional.present?
   end
 
   def ambassador?
@@ -398,6 +402,14 @@ class User < ApplicationRecord
     Email::MagicLoginLinkJob.perform_async(id)
   end
 
+  # Unlike send_magic_link_email, reuses an unexpired token and sends no email
+  def refreshed_magic_link_token
+    if magic_link_token.blank? || auth_token_expired?("magic_link_token")
+      update_auth_token("magic_link_token")
+    end
+    magic_link_token
+  end
+
   def update_last_login(ip_address)
     save! unless id.present? # throw an error that shows why the user isn't created
     update_columns(last_login_at: Time.current, last_login_ip: ip_address)
@@ -410,7 +422,7 @@ class User < ApplicationRecord
     self.confirmed = true
     save
     reload
-    CallbackJob::AfterUserCreateJob.new.perform(id, "confirmed", user: self)
+    CallbackJobs::AfterUserCreateJob.new.perform(id, "confirmed", user: self)
     true
   end
 

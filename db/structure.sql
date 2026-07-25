@@ -73,6 +73,73 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: action_mailbox_inbound_emails; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.action_mailbox_inbound_emails (
+    id bigint NOT NULL,
+    status integer DEFAULT 0 NOT NULL,
+    message_id character varying NOT NULL,
+    message_checksum character varying NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: action_mailbox_inbound_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.action_mailbox_inbound_emails_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: action_mailbox_inbound_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.action_mailbox_inbound_emails_id_seq OWNED BY public.action_mailbox_inbound_emails.id;
+
+
+--
+-- Name: action_text_rich_texts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.action_text_rich_texts (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    body text,
+    record_type character varying NOT NULL,
+    record_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: action_text_rich_texts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.action_text_rich_texts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: action_text_rich_texts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.action_text_rich_texts_id_seq OWNED BY public.action_text_rich_texts.id;
+
+
+--
 -- Name: active_storage_attachments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -832,6 +899,49 @@ CREATE SEQUENCE public.blogs_id_seq
 --
 
 ALTER SEQUENCE public.blogs_id_seq OWNED BY public.blogs.id;
+
+
+--
+-- Name: bug_reports; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bug_reports (
+    id bigint NOT NULL,
+    user_id bigint,
+    email text,
+    subject text,
+    body text,
+    is_member boolean DEFAULT false NOT NULL,
+    is_paid_organization boolean DEFAULT false NOT NULL,
+    is_paid_organization_staff boolean DEFAULT false NOT NULL,
+    github_pull_request integer,
+    tags text[] DEFAULT '{}'::text[] NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    received_at timestamp(6) without time zone,
+    from_name text,
+    inbound_email_id bigint,
+    status integer DEFAULT 0 NOT NULL
+);
+
+
+--
+-- Name: bug_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bug_reports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bug_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bug_reports_id_seq OWNED BY public.bug_reports.id;
 
 
 --
@@ -1796,40 +1906,6 @@ ALTER SEQUENCE public.impound_records_id_seq OWNED BY public.impound_records.id;
 
 
 --
--- Name: integrations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.integrations (
-    id integer NOT NULL,
-    user_id integer,
-    access_token text,
-    provider_name character varying(255),
-    information text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: integrations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.integrations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: integrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.integrations_id_seq OWNED BY public.integrations.id;
-
-
---
 -- Name: invoice_organization_features; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2234,7 +2310,8 @@ CREATE TABLE public.marketplace_listings (
     updated_at timestamp(6) without time zone NOT NULL,
     price_negotiable boolean DEFAULT false,
     description text,
-    sale_id bigint
+    sale_id bigint,
+    seller_member boolean DEFAULT false NOT NULL
 );
 
 
@@ -2818,7 +2895,7 @@ CREATE TABLE public.organizations (
     location_longitude double precision,
     regional_ids jsonb,
     manual_pos_kind integer,
-    passwordless_user_domain character varying,
+    user_email_domain character varying,
     graduated_notification_interval bigint,
     lightspeed_register_with_phone boolean DEFAULT false,
     manufacturer_id bigint,
@@ -3218,6 +3295,74 @@ CREATE SEQUENCE public.recovery_displays_id_seq
 --
 
 ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays.id;
+
+
+--
+-- Name: registration_sequence_pages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.registration_sequence_pages (
+    id bigint NOT NULL,
+    registration_sequence_id bigint NOT NULL,
+    title character varying,
+    subtitle text,
+    body text,
+    listing_order integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: registration_sequence_pages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.registration_sequence_pages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: registration_sequence_pages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.registration_sequence_pages_id_seq OWNED BY public.registration_sequence_pages.id;
+
+
+--
+-- Name: registration_sequences; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.registration_sequences (
+    id bigint NOT NULL,
+    organization_id bigint,
+    start_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: registration_sequences_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.registration_sequences_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: registration_sequences_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.registration_sequences_id_seq OWNED BY public.registration_sequences.id;
 
 
 --
@@ -4210,6 +4355,20 @@ ALTER SEQUENCE public.wheel_sizes_id_seq OWNED BY public.wheel_sizes.id;
 
 
 --
+-- Name: action_mailbox_inbound_emails id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.action_mailbox_inbound_emails ALTER COLUMN id SET DEFAULT nextval('public.action_mailbox_inbound_emails_id_seq'::regclass);
+
+
+--
+-- Name: action_text_rich_texts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.action_text_rich_texts ALTER COLUMN id SET DEFAULT nextval('public.action_text_rich_texts_id_seq'::regclass);
+
+
+--
 -- Name: active_storage_attachments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4333,6 +4492,13 @@ ALTER TABLE ONLY public.blog_content_tags ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.blogs ALTER COLUMN id SET DEFAULT nextval('public.blogs_id_seq'::regclass);
+
+
+--
+-- Name: bug_reports id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bug_reports ALTER COLUMN id SET DEFAULT nextval('public.bug_reports_id_seq'::regclass);
 
 
 --
@@ -4515,13 +4681,6 @@ ALTER TABLE ONLY public.impound_record_updates ALTER COLUMN id SET DEFAULT nextv
 --
 
 ALTER TABLE ONLY public.impound_records ALTER COLUMN id SET DEFAULT nextval('public.impound_records_id_seq'::regclass);
-
-
---
--- Name: integrations id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.integrations ALTER COLUMN id SET DEFAULT nextval('public.integrations_id_seq'::regclass);
 
 
 --
@@ -4770,6 +4929,20 @@ ALTER TABLE ONLY public.recovery_displays ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
+-- Name: registration_sequence_pages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registration_sequence_pages ALTER COLUMN id SET DEFAULT nextval('public.registration_sequence_pages_id_seq'::regclass);
+
+
+--
+-- Name: registration_sequences id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registration_sequences ALTER COLUMN id SET DEFAULT nextval('public.registration_sequences_id_seq'::regclass);
+
+
+--
 -- Name: sales id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4931,6 +5104,22 @@ ALTER TABLE ONLY public.wheel_sizes ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: action_mailbox_inbound_emails action_mailbox_inbound_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.action_mailbox_inbound_emails
+    ADD CONSTRAINT action_mailbox_inbound_emails_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: action_text_rich_texts action_text_rich_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.action_text_rich_texts
+    ADD CONSTRAINT action_text_rich_texts_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: active_storage_attachments active_storage_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5080,6 +5269,14 @@ ALTER TABLE ONLY public.blog_content_tags
 
 ALTER TABLE ONLY public.blogs
     ADD CONSTRAINT blogs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bug_reports bug_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bug_reports
+    ADD CONSTRAINT bug_reports_pkey PRIMARY KEY (id);
 
 
 --
@@ -5288,14 +5485,6 @@ ALTER TABLE ONLY public.impound_record_updates
 
 ALTER TABLE ONLY public.impound_records
     ADD CONSTRAINT impound_records_pkey PRIMARY KEY (id);
-
-
---
--- Name: integrations integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.integrations
-    ADD CONSTRAINT integrations_pkey PRIMARY KEY (id);
 
 
 --
@@ -5579,6 +5768,22 @@ ALTER TABLE ONLY public.recovery_displays
 
 
 --
+-- Name: registration_sequence_pages registration_sequence_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registration_sequence_pages
+    ADD CONSTRAINT registration_sequence_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: registration_sequences registration_sequences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registration_sequences
+    ADD CONSTRAINT registration_sequences_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: sales sales_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5763,6 +5968,20 @@ ALTER TABLE ONLY public.wheel_sizes
 
 
 --
+-- Name: index_action_mailbox_inbound_emails_uniqueness; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_action_mailbox_inbound_emails_uniqueness ON public.action_mailbox_inbound_emails USING btree (message_id, message_checksum);
+
+
+--
+-- Name: index_action_text_rich_texts_uniqueness; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_action_text_rich_texts_uniqueness ON public.action_text_rich_texts USING btree (record_type, record_id, name);
+
+
+--
 -- Name: index_active_storage_attachments_on_blob_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5851,6 +6070,13 @@ CREATE INDEX index_b_params_on_created_bike_id ON public.b_params USING btree (c
 --
 
 CREATE INDEX index_b_params_on_email_trgm ON public.b_params USING gin (email public.gin_trgm_ops) WHERE (created_bike_id IS NULL);
+
+
+--
+-- Name: index_b_params_on_id_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_id_token ON public.b_params USING btree (id_token);
 
 
 --
@@ -6134,6 +6360,34 @@ CREATE INDEX index_blog_content_tags_on_content_tag_id ON public.blog_content_ta
 
 
 --
+-- Name: index_bug_reports_on_inbound_email_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_inbound_email_id ON public.bug_reports USING btree (inbound_email_id);
+
+
+--
+-- Name: index_bug_reports_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_status ON public.bug_reports USING btree (status);
+
+
+--
+-- Name: index_bug_reports_on_tags; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_tags ON public.bug_reports USING gin (tags);
+
+
+--
+-- Name: index_bug_reports_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_user_id ON public.bug_reports USING btree (user_id);
+
+
+--
 -- Name: index_components_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6400,13 +6654,6 @@ CREATE INDEX index_impound_records_on_user_id ON public.impound_records USING bt
 
 
 --
--- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_integrations_on_user_id ON public.integrations USING btree (user_id);
-
-
---
 -- Name: index_invoice_organization_features_on_invoice_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6481,6 +6728,13 @@ CREATE INDEX index_marketplace_listings_on_item ON public.marketplace_listings U
 --
 
 CREATE INDEX index_marketplace_listings_on_seller_id ON public.marketplace_listings USING btree (seller_id);
+
+
+--
+-- Name: index_marketplace_listings_on_seller_member; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_seller_member ON public.marketplace_listings USING btree (seller_member) WHERE seller_member;
 
 
 --
@@ -6841,6 +7095,41 @@ CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_disp
 
 
 --
+-- Name: index_registration_sequence_pages_on_registration_sequence_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequence_pages_on_registration_sequence_id ON public.registration_sequence_pages USING btree (registration_sequence_id);
+
+
+--
+-- Name: index_registration_sequences_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequences_on_organization_id ON public.registration_sequences USING btree (organization_id);
+
+
+--
+-- Name: index_registration_sequences_one_active_per_org; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_registration_sequences_one_active_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NOT NULL) AND (end_at IS NULL));
+
+
+--
+-- Name: index_registration_sequences_one_draft_per_org; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_registration_sequences_one_draft_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL));
+
+
+--
+-- Name: index_registration_sequences_single_template; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_registration_sequences_single_template ON public.registration_sequences USING btree (((organization_id IS NULL))) WHERE (organization_id IS NULL);
+
+
+--
 -- Name: index_social_accounts_on_screen_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7165,14 +7454,33 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 
 
 --
+-- Name: bug_reports fk_rails_fd37ef25f8; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bug_reports
+    ADD CONSTRAINT fk_rails_fd37ef25f8 FOREIGN KEY (inbound_email_id) REFERENCES public.action_mailbox_inbound_emails(id) ON DELETE SET NULL;
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260723000000'),
+('20260722120000'),
+('20260716120000'),
+('20260713120000'),
+('20260706180000'),
+('20260706164500'),
+('20260706164435'),
+('20260628175839'),
+('20260628175838'),
+('20260626162049'),
 ('20260528152450'),
 ('20260525162548'),
+('20260518093158'),
 ('20260514182008'),
 ('20260514085900'),
 ('20260430122735'),

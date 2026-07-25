@@ -2,6 +2,8 @@
 
 module API
   class StravaProxyController < ApplicationController
+    include API::TokenAuthenticatable
+
     respond_to :json
     wrap_parameters false
     skip_before_action :verify_authenticity_token
@@ -10,7 +12,7 @@ module API
     rescue_from ArgumentError, with: :render_bad_request
 
     def create
-      auth_response = Integrations::Strava::ProxyRequester.authorize_user_and_strava_integration(doorkeeper_token)
+      auth_response = authorize_user_and_strava_integration
       if auth_response[:error].present?
         render json: {error: auth_response[:error]}, status: auth_response[:status]
         return
@@ -40,16 +42,26 @@ module API
 
     private
 
+    # returns {user:, strava_integration:} if valid, otherwise {error:, status:}
+    def authorize_user_and_strava_integration
+      auth = authorize_user(doorkeeper_token)
+      return auth if auth[:error]
+
+      strava_integration = auth[:user].strava_integration
+      return {error: "No Strava integration", status: 404} unless strava_integration
+      return {error: "Strava authorization failed. Please re-authenticate with Strava.", status: 401} if strava_integration.error?
+
+      {user: auth[:user], strava_integration:}
+    end
+
+    def authorized_app?(access_token)
+      access_token.application_id == Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID
+    end
+
     def enriched_since_from_url(url)
       return nil unless url&.match?(/enriched_since=/)
       match = url.match(/enriched_since=(\d+)/)
       match ? match[1].to_i : nil
-    end
-
-    def doorkeeper_token
-      @doorkeeper_token ||= Doorkeeper::OAuth::Token.authenticate(
-        request, *Doorkeeper.configuration.access_token_methods
-      )
     end
 
     def permitted_params

@@ -24,7 +24,8 @@ module AdminHelper
       {title: "Dev: Strava Requests", path: admin_strava_requests_path, match_controller: true},
       {title: "Dev: Strava Activities", path: admin_strava_activities_path, match_controller: true},
       {title: "Dev: Strava Gear", path: admin_strava_gears_path, match_controller: true},
-      {title: "Dev: Paper Trail Versions", path: admin_paper_trail_versions_path, match_controller: true}
+      {title: "Dev: Paper Trail Versions", path: admin_paper_trail_versions_path, match_controller: true},
+      {title: "Dev: Registration Sequences", path: admin_registration_sequences_path, match_controller: true}
     ]
   end
 
@@ -63,6 +64,7 @@ module AdminHelper
       {title: "Graphs", path: admin_graphs_path, match_controller: true},
       {title: "Paints", path: admin_paints_path, match_controller: true},
       {title: "Feedback & Messages", path: admin_feedbacks_path, match_controller: true},
+      {title: "Bug Reports", path: admin_bug_reports_path, match_controller: true},
       {title: "Social Accounts", path: admin_social_accounts_path, match_controller: true},
       {title: "Social Posts", path: admin_social_posts_path, match_controller: true},
       {title: "Stickers", path: admin_bike_stickers_path, match_controller: true},

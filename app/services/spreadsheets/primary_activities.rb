@@ -9,7 +9,7 @@ module Spreadsheets
     EXPORT_COLUMNS = %i[flavor families].freeze
 
     def to_csv(primary_activities = nil)
-      primary_activities ||= PrimaryActivity.by_priority
+      primary_activities ||= PrimaryActivity.by_priority.includes(:primary_activity_family)
 
       CSV.generate do |csv|
         csv << EXPORT_COLUMNS
@@ -29,8 +29,15 @@ module Spreadsheets
 
     def names_and_families(primary_activities)
       flavors_families = {}
+      # A family exports as a flavor-less row; import upserts the family and creates no flavor
+      family_rows = []
 
-      primary_activities.flavor.each do |primary_activity|
+      primary_activities.each do |primary_activity|
+        if primary_activity.family?
+          family_rows << [nil, primary_activity.name]
+          next
+        end
+
         family_name = primary_activity.top_level? ? nil : primary_activity.family_name
         flavors_families[primary_activity.name] ||= family_name
         next if flavors_families[primary_activity.name] == family_name
@@ -39,25 +46,35 @@ module Spreadsheets
         flavors_families[primary_activity.name] += " & #{family_name}"
       end
 
-      flavors_families.to_a
+      family_rows + flavors_families.to_a
     end
 
     def update_or_create_for!(row)
-      family_ids = if row[:families].present?
-        # Find or create the matching families
-        row[:families].split("&").map do |name|
-          PrimaryActivity.family.friendly_find(name)&.id ||
-            PrimaryActivity.create!(name:, family: true).id
-        end
+      family_ids = row[:families].presence&.split("&")&.map do |name|
+        upsert!(PrimaryActivity.family, name, family: true).id
       end
       return if row[:flavor].blank?
 
       (family_ids || [nil]).each do |primary_activity_family_id|
-        PrimaryActivity.where(primary_activity_family_id:).friendly_find(row[:flavor]) ||
-          PrimaryActivity.create(name: row[:flavor], primary_activity_family_id:, family: false)
+        # Top-level flavors self-reference their id, so nil never matches them
+        scope = primary_activity_family_id ? PrimaryActivity.where(primary_activity_family_id:) : PrimaryActivity.flavor.top_level
+        upsert!(scope, row[:flavor], primary_activity_family_id:, family: false)
       end
     end
 
-    conceal :names_and_families, :update_or_create_for!
+    # Match by slug or exact name (not friendly_find's substring search), correct the stored name, or create
+    def upsert!(scope, name, **create_attrs)
+      name = name.strip
+      existing = scope.find_by(slug: Slugifyer.slugify(name)) ||
+        scope.where("lower(name) = ?", name.downcase).first
+      return PrimaryActivity.create!(name:, **create_attrs) unless existing
+
+      existing.update!(name:) unless existing.name == name
+      existing
+    rescue ActiveRecord::RecordInvalid => e
+      raise "PrimaryActivity #{name.inspect} — #{e.message}"
+    end
+
+    conceal :names_and_families, :update_or_create_for!, :upsert!
   end
 end

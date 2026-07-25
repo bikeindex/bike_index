@@ -1,0 +1,7 @@
+<%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+  <%= render(UI::DefinitionList::Row::Component.new(label: translation(".created"), value: @impound_record.created_at, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
+  <%= render(UI::DefinitionList::Row::Component.new(label: translation(".impounded_by"), value: impounded_by, render_with_no_value: true, no_value_text: "-")) %>
+  <%= render(UI::DefinitionList::Row::Component.new(label: translation(".status"), value: @impound_record.status_humanized)) %>
+  <%= render(UI::DefinitionList::Row::Component.new(label: translation(".last_update_by"), value: last_update_by, render_with_no_value: true, no_value_text: "-")) %>
+  <%= render(UI::DefinitionList::Row::Component.new(label: translation(".impounded_from"), value: @impound_record.formatted_address_string, render_with_no_value: true, no_value_text: "-")) %>
+<% end %>

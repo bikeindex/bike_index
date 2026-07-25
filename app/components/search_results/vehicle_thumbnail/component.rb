@@ -34,6 +34,10 @@ module SearchResults
         @event_record.is_a?(MarketplaceListing)
       end
 
+      def render_member_badge?
+        render_for_sale_info? && @event_record.seller_member?
+      end
+
       def render_event_date?
         @event_record.present? && !@event_record.is_a?(MarketplaceListing)
       end

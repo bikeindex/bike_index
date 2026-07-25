@@ -7,7 +7,7 @@ default_local: &default_local
   <<: *default
   port: <%= ENV.fetch("PGPORT", 5432) %>
   <% if ENV["CI"] %>
-  host: 127.0.0.1
+  host: <%= ENV.fetch("PGHOST", "127.0.0.1") %>
   username: rails
   password: password
   <% else %>
@@ -75,12 +75,12 @@ production:
     password: "<%= ENV['ANALYTICS_DB_PASSWORD'] %>"
     port: "<%= ENV['ANALYTICS_DB_PORT'] %>"
 
-# Staging mirrors production except the primary database name is taken from
-# POSTGRESQL_DATABASE so the staging database can be addressed independently. The
-# replica points at the same database as the primary (staging runs a single
+# Sandbox mirrors production except the primary database name is taken from
+# POSTGRESQL_DATABASE so the sandbox database can be addressed independently. The
+# replica points at the same database as the primary (sandbox runs a single
 # Postgres, like development).
-staging:
-  primary: &staging_primary
+sandbox:
+  primary: &sandbox_primary
     <<: *default
     database: "<%= ENV['POSTGRESQL_DATABASE'] %>"
     host: "<%= ENV['POSTGRESQL_ADDRESS'] %>"
@@ -88,7 +88,7 @@ staging:
     password: "<%= ENV['POSTGRESQL_PASSWORD'] %>"
 
   primary_replica:
-    <<: *staging_primary
+    <<: *sandbox_primary
     # Using primary database, replica not actually replicating (as in development)
     replica: true
 

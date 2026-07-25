@@ -1,0 +1,53 @@
+---
+name: merge-conflicts
+description: >-
+  How to bring a branch up to date and resolve git merge conflicts the way this
+  repo expects — merge (never rebase or force-push), understand each side's
+  intent before choosing, ask when a resolution isn't clear-cut, and keep the
+  merge commit to just the merge. Trigger whenever you're about to run
+  `git merge`/`git pull`, sync a branch with `main`, "update from main", or
+  resolve conflict markers left by a merge, cherry-pick, or interrupted pull —
+  including bare phrasings like "fix the conflicts", "merge main in", or "this
+  branch is behind". Not for merging data/files (PDFs, CSVs) or algorithms
+  (merge sort) — this is strictly about git branch integration.
+allowed-tools: Bash, Read, Glob, Grep
+---
+
+# Resolving merge conflicts
+
+When a branch needs to catch up with its base, or a merge/cherry-pick/pull leaves conflict markers, follow this — the goal is a clean, honest integration that a reviewer can trust and that never rewrites shared history.
+
+## Determine the base branch first — don't assume `main`
+
+"Update from base", "sync with main", "this branch is behind", "merge the base in" all need a base branch to merge *from*. **Don't default to `main`.** A branch is often stacked on another feature branch, and merging `main` instead silently pulls the wrong history — the diff looks "already up to date" against `main` while the real base has commits you're missing. Resolve the base in this order:
+
+1. **A branch the user names** — "update from X" / "base is X" wins outright.
+2. **An open PR's base** — `gh pr view <branch> --json baseRefName`. Also check the base of any feature branch you recently merged into this one (`gh pr view <that-branch> --json baseRefName`); a stack's branches usually share the same base.
+3. **The upstream tracking ref**, if it names a branch other than this one's own remote mirror (`git rev-parse --abbrev-ref @{u}`).
+4. **The Conductor workspace target branch** (from the workspace/system instructions) — a default hint, *not* the last word.
+
+If 1–3 turn up nothing and the branch clearly builds on another feature branch — it was created by merging one in, was cut from `main` but layers work that lives on an unmerged branch, or the user talks about it as part of a stack — **ask which branch to update from (offer the likely candidate) rather than merging `main`.** Confirm before running the merge; a wrong base is expensive to unwind. Note that being 0-behind `main` proves nothing here — a stacked branch is normally 0-behind `main` and still far behind its real base.
+
+## Bring a branch up to date
+
+- `git fetch origin`, then `git merge --no-edit origin/<base>` (the base resolved above, not reflexively `main`).
+- **Merge, never rebase.** Rebasing rewrites the branch's history; if the branch is already pushed, republishing it needs a force-push, and we never force-push. A merge commit keeps the real history and is always safe to push on top of.
+- If uncommitted work blocks the merge, commit that work first (it belongs to the branch anyway), then merge.
+- Already up to date → nothing to do.
+
+## Keep the merge commit to *just* the merge
+
+A merge commit should contain **only** the reconciliation of the two histories — nothing else. Don't fold in lint fixes, refactors, renames, or "while I'm here" cleanups. Those are real changes a reviewer needs to see on their own; buried inside a merge they're invisible in most diff views and impossible to revert independently. Land them as separate commits *after* the merge.
+
+## Resolving conflicts
+
+When git leaves `<<<<<<<` / `=======` / `>>>>>>>` markers:
+
+- **Understand each side before choosing.** The version on `main` and the version on the branch each exist for a reason. Read enough of both to know what each is trying to do — don't mechanically keep "ours" or "theirs." The correct resolution is often a combination, not one side wholesale.
+- **Consider the branch's purpose.** What is this branch trying to accomplish? A conflict resolution that quietly drops the branch's intent (or reverts something `main` deliberately changed) is a bug, even if it compiles.
+- **Ask when it isn't clear-cut.** If you can't confidently tell which side should win, or the two changes are semantically entangled, stop and ask the user rather than guessing. A wrong silent resolution is worse than a question.
+- After resolving, verify the result actually makes sense — the merged code should reflect both intents, not just parse. Run the relevant tests if the conflict touched logic.
+
+## Never force-push
+
+No exceptions, even on a personal branch. If history has already diverged from the remote and you're tempted to force-push, stop — recover with `git reset --soft <origin-branch>` to get the pushed commits back, then add follow-up work as new commits and push normally.

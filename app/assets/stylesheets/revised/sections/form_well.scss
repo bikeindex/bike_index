@@ -64,6 +64,8 @@
     @extend .form-circle-item;
 
     display: block;
+    background: none;
+    font-family: inherit;
     border: 2px solid $gray;
     position: absolute;
     right: 1.5em;
@@ -72,12 +74,25 @@
     z-index: 100;
     transition: all 0.05s linear;
 
+    // Hover and keyboard focus: blue circle (border) only — the ? glyph keeps
+    // its text color. Active (pressed / popover open) also turns the glyph blue.
     &:hover,
+    &:focus-visible,
     &:active,
     &.active {
       text-decoration: none;
       border-color: $link-color;
+    }
+
+    &:active,
+    &.active {
       color: $link-color;
+    }
+
+    // It's a <button> now (keyboard-operable); drop the native focus ring — the
+    // blue border is the focus indicator.
+    &:focus {
+      outline: none;
     }
   }
 

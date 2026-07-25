@@ -140,6 +140,24 @@ RSpec.describe StravaActivity, type: :model do
       expect(strava_integration.strava_activities.count).to eq(1)
     end
 
+    context "when a concurrent import races the insert" do
+      it "rescues RecordNotUnique and updates the existing row" do
+        existing = FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543", title: "Old Title")
+        # Simulate the TOCTOU race: the first find_or_initialize_by misses (its insert hits the
+        # unique index), then the retry finds the row a concurrent import committed
+        activities = strava_integration.strava_activities
+        allow(strava_integration).to receive(:strava_activities).and_return(activities)
+        fresh = activities.build(strava_id: "9876543")
+        allow(activities).to receive(:find_or_initialize_by).and_return(fresh, existing)
+        allow(fresh).to receive(:update).and_raise(ActiveRecord::RecordNotUnique)
+
+        strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
+        expect(strava_activity.id).to eq(existing.id)
+        expect(strava_activity.title).to eq("Morning Ride")
+        expect(strava_integration.strava_activities.count).to eq(1)
+      end
+    end
+
     context "with id-only response" do
       let(:existing) do
         FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543",

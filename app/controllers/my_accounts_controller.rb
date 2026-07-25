@@ -65,6 +65,18 @@ class MyAccountsController < ApplicationController
     end
   end
 
+  # Flip the redesign flag for the current user, returning to the bike in whichever view is now active
+  def toggle_show_redesign
+    bike = Bike.unscoped.find_id(params[:bike_id])
+    if Flipper.enabled?(:bike_show_redesign, current_user)
+      Flipper.disable_actor(:bike_show_redesign, current_user)
+      redirect_to bike_path(bike)
+    else
+      Flipper.enable_actor(:bike_show_redesign, current_user)
+      redirect_to registration_path(bike)
+    end
+  end
+
   private
 
   def edit_templates
@@ -113,7 +125,7 @@ class MyAccountsController < ApplicationController
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
         registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
-    @user.update(updated_at: Time.current) # Bump user to enqueue CallbackJob::AfterUserChangeJob
+    @user.update(updated_at: Time.current) # Bump user to enqueue CallbackJobs::AfterUserChangeJob
     @user
   end
 
@@ -128,7 +140,7 @@ class MyAccountsController < ApplicationController
         user.address_set_manually = true
         user.address_record = address_record.reload
         # Updates the user association, user needs to be assigned
-        CallbackJob::AddressRecordUpdateAssociationsJob.perform_in(5, address_record.id)
+        CallbackJobs::AddressRecordUpdateAssociationsJob.perform_in(5, address_record.id)
       end
     end
     user.update(pparams)

@@ -45,7 +45,7 @@
                   = location.address_record&.city
             .shop-info.collapse{ id: "shop#{location.org_location_id}" }
               - if location.address_record&.street.present?
-                %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
+                %a.where-shop-location{href: "#map_canvas", data: { lat: location.latitude, long: location.longitude } }
                   = t(".show_location_on_map", location_name: location.display_name)
                 %p= [location.address_record.street, location.address_record.city, "#{location.address_record.region_record&.abbreviation} #{location.address_record.postal_code}"].compact.join(", ")
               - if location.phone.present?
@@ -82,7 +82,7 @@
                   = location.address_record&.city
             .shop-info.collapse{ id: "shop#{location.org_location_id}" }
               - if location.address_record&.street.present?
-                %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
+                %a.where-shop-location{href: "#map_canvas", data: { lat: location.latitude, long: location.longitude } }
                   = t(".show_location_on_map", location_name: location.display_name)
                 %p= [location.address_record.street, location.address_record.city, location.address_record.postal_code, location.address_record.country&.name].compact.join(", ")
 

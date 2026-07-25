@@ -67,10 +67,10 @@ export default class extends Controller {
     } else {
       collapse('show', this.errorTarget)
       event.preventDefault()
-      // Stop the event reaching rails-ujs, which would otherwise disable the
-      // data-disable-with submit button and leave it stuck (the form never
-      // navigates away to get a fresh one).
-      event.stopPropagation()
+      // stopImmediatePropagation keeps the event from reaching rails-ujs (which
+      // would disable the data-disable-with button and leave it stuck) and from
+      // reaching form-persist#clear (which would wipe the draft on a blocked submit).
+      event.stopImmediatePropagation()
     }
   }
 

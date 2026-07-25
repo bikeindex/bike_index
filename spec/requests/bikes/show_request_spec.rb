@@ -19,6 +19,26 @@ RSpec.describe "BikesController#show", type: :request do
       expect(assigns(:claim_message)).to be_blank
     end
   end
+  context "short_id" do
+    let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:bike, id: 35)) }
+    it "finds the bike from any short_id form and the /r/ short URL" do
+      expect(bike.short_id).to eq "r/35"
+      ["#{base_url}/35", "#{base_url}/z", "#{base_url}/r/z", "#{base_url}/R/Z", "#{base_url}/r/35", "#{base_url}/R.Z-", "/r/z", "/R/Z", "/r/Z"].each do |path|
+        get path
+        expect(response).to render_template(:show)
+        expect(assigns(:bike)).to eq bike
+      end
+    end
+    context "short_id body starting with the prefix letter" do
+      let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:bike, id: 34992)) }
+      it "does not double-strip the prefix" do
+        expect(bike.short_id).to eq "r/R00"
+        get "/#{bike.short_id}"
+        expect(response).to render_template(:show)
+        expect(assigns(:bike)).to eq bike
+      end
+    end
+  end
   context "likely_spam bike" do
     it "shows the bike" do
       ownership.bike.update(likely_spam: true)
@@ -156,13 +176,24 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.id}"
         expect(assigns(:bike).id).to eq bike.id
         expect(response).to render_template(:show)
-      }.to change(StolenBike::AfterStolenRecordSaveJob.jobs, :count).by 0
+      }.to change(BikeJobs::AfterStolenRecordSaveJob.jobs, :count).by 0
       expect {
-        StolenBike::AfterStolenRecordSaveJob.new.perform(stolen_record.id)
-      }.to change(StolenBike::AfterStolenRecordSaveJob.jobs, :count).by 0
+        BikeJobs::AfterStolenRecordSaveJob.new.perform(stolen_record.id)
+      }.to change(BikeJobs::AfterStolenRecordSaveJob.jobs, :count).by 0
       expect(stolen_record.reload.alert_image).to be_blank
       expect(stolen_record.reload.images_attached?).to be_truthy
       expect(stolen_record.recovery_link_token).to be_present
+    end
+  end
+  context "stolen bike with a location" do
+    let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:stolen_bike)) }
+    it "renders the map through the stolen-map controller, without an inline mapboxgl script" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      expect(response.body).to include('data-controller="stolen-map"')
+      expect(response.body).to include('data-stolen-map-target="canvas"')
+      # The inline script referencing mapboxgl was the source of the Turbo race - it must be gone
+      expect(response.body).to_not include("mapboxgl")
     end
   end
   context "user hidden bike" do
@@ -658,6 +689,39 @@ RSpec.describe "BikesController#show", type: :request do
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_falsey
+      end
+    end
+  end
+  context "bike_show_redesign flag" do
+    it "renders the legacy page when the flag is disabled" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+    end
+
+    context "flag enabled for the current user" do
+      before { Flipper.enable_actor(:bike_show_redesign, current_user) }
+
+      it "redirects the html page but still renders the qr code png" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to redirect_to(registration_path(bike))
+
+        get "#{base_url}/#{bike.id}.png"
+        expect(response.status).to eq(200)
+      end
+
+      it "renders the legacy page when no_redesign is passed" do
+        get "#{base_url}/#{bike.id}?no_redesign=true"
+        expect(response).to render_template(:show)
+      end
+    end
+
+    context "flag enabled only for another user" do
+      let(:other_user) { FactoryBot.create(:user_confirmed) }
+      before { Flipper.enable_actor(:bike_show_redesign, other_user) }
+
+      it "renders the legacy page" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to render_template(:show)
       end
     end
   end

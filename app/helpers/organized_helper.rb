@@ -24,15 +24,9 @@ module OrganizedHelper
         concat(content_tag(:em, " unregistered", class: "small text-warning"))
       elsif !skip_creation && bike.creation_description.present?
         concat(", ")
-        concat(content_tag(:small, origin_display(bike.creation_description), class: "less-strong"))
+        concat(content_tag(:small, render(Org::OriginDisplay::Component.new(creation_description: bike.creation_description)), class: "less-strong"))
       end
     end
-  end
-
-  def origin_display(creation_description)
-    return "" unless creation_description.present?
-
-    content_tag(:span, creation_description, title: BikeServices::Displayer.origin_title(creation_description))
   end
 
   # Used in two places, so... putting it here. Probably is a better place somewhere else
@@ -44,6 +38,20 @@ module OrganizedHelper
     return "text-danger" if export.calculated_progress == "errored"
 
     (export.calculated_progress == "finished") ? "text-success" : "text-warning"
+  end
+
+  # Whether the export's sticker assignment is still in effect
+  def export_stickers_badge_attributes(export)
+    if export.bike_codes_undone?
+      {text: t("organized.exports.index.stickers_unassigned"),
+       title: t("organized.exports.index.stickers_undone_title"), color: :warning}
+    elsif export.bike_codes_removed?
+      {text: t("organized.exports.index.stickers_removed"),
+       title: t("organized.exports.index.stickers_removed_title"), color: :orange}
+    else
+      {text: t("organized.exports.index.stickers"),
+       title: t("organized.exports.index.stickers_title"), color: :cyan}
+    end
   end
 
   def organized_container

@@ -26,10 +26,31 @@ RSpec.describe PublicImagesController, type: :request do
           bike.update_column :updated_at, Time.current - 1.hour
           Sidekiq::Job.clear_all
           post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
-          expect(CallbackJob::AfterBikeSaveJob.jobs.count).to eq 1
-          CallbackJob::AfterBikeSaveJob.drain
+          expect(CallbackJobs::AfterBikeSaveJob.jobs.count).to eq 1
+          CallbackJobs::AfterBikeSaveJob.drain
           expect(bike.reload.updated_at).to be_within(1).of Time.current
           expect(bike.public_images.first.name).to eq "cool name"
+        end
+        context "with an image file" do
+          let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
+          # Versions only defer to the job with remote (fog) storage; simulate production
+          # since test uses local file storage, which processes inline
+          before { allow_any_instance_of(PublicImage).to receive(:remote_storage?).and_return(true) }
+          it "renders the original and wires the image-fallback for the backgrounded versions" do
+            Sidekiq::Job.clear_all
+            post base_url, params: {bike_id: bike.id, public_image: {image: file}, format: :js}
+            expect(response).to have_http_status(:ok)
+            public_image = bike.reload.public_images.first
+            expect(public_image.image).to be_present
+            expect(CarrierWaveProcessJob.jobs.count).to eq 1 # version generation deferred
+            # freshly stored original is shown immediately; if a version url 404s before the
+            # worker finishes, image_fallback_controller swaps back to this original
+            expect(response.body).to include("/uploads/Pu/#{public_image.id}/bike.jpg")
+            expect(response.body).to_not include("small_bike.jpg")
+            expect(response.body).to include("image-fallback")
+            expect(response.body).to include("useOriginal")
+            public_image.image.remove!
+          end
         end
         context "user hidden" do
           it "creates an image" do
@@ -39,8 +60,8 @@ RSpec.describe PublicImagesController, type: :request do
             expect(bike.thumb_path).to be_blank
             Sidekiq::Job.clear_all
             post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
-            expect(CallbackJob::AfterBikeSaveJob.jobs.count).to eq 1
-            CallbackJob::AfterBikeSaveJob.drain
+            expect(CallbackJobs::AfterBikeSaveJob.jobs.count).to eq 1
+            CallbackJobs::AfterBikeSaveJob.drain
             expect(bike.reload.updated_at).to be_within(1).of Time.current
             expect(bike.public_images.first.name).to eq "cool name"
           end
@@ -73,7 +94,7 @@ RSpec.describe PublicImagesController, type: :request do
           }.to change(PublicImage, :count).by 1
           bike.reload
           expect(bike.public_images.first.name).to eq "cool name"
-          expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+          expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
         end
       end
       context "no user" do
@@ -94,7 +115,7 @@ RSpec.describe PublicImagesController, type: :request do
           Sidekiq::Job.clear_all
           post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
                                   public_image: {name: "cool name"}, format: :js}
-          expect(CallbackJob::AfterBikeSaveJob.jobs.count).to eq 0
+          expect(CallbackJobs::AfterBikeSaveJob.jobs.count).to eq 0
           expect(bike_version.reload.updated_at).to be_within(1).of Time.current
           expect(bike_version.public_images.first.name).to eq "cool name"
         end
@@ -105,7 +126,7 @@ RSpec.describe PublicImagesController, type: :request do
             Sidekiq::Job.clear_all
             post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
                                     public_image: {name: "cool name"}, format: :js}
-            expect(CallbackJob::AfterBikeSaveJob.jobs.count).to eq 0
+            expect(CallbackJobs::AfterBikeSaveJob.jobs.count).to eq 0
             expect(bike_version.reload.updated_at).to be_within(1).of Time.current
             expect(bike_version.public_images.first.name).to eq "cool name"
             expect(bike_version.public_images.first.is_private).to be_falsey
@@ -334,7 +355,7 @@ RSpec.describe PublicImagesController, type: :request do
         expect(bike.reload.owner).to eq(current_user)
         expect {
           put "#{base_url}/#{public_image.id}", params: {public_image: {name: "Food"}}
-        }.to change(CallbackJob::AfterBikeSaveJob.jobs, :count).by(1)
+        }.to change(CallbackJobs::AfterBikeSaveJob.jobs, :count).by(1)
         expect(response).to redirect_to(edit_bike_url(bike))
         expect(public_image.reload.name).to eq("Food")
       end
@@ -345,7 +366,7 @@ RSpec.describe PublicImagesController, type: :request do
           expect(bike.authorized?(current_user)).to be_falsey
           expect {
             put "#{base_url}/#{public_image.id}", params: {public_image: {name: "Food"}}
-          }.to change(CallbackJob::AfterBikeSaveJob.jobs, :count).by(0)
+          }.to change(CallbackJobs::AfterBikeSaveJob.jobs, :count).by(0)
           expect(public_image.reload.name).to eq(og_name)
         end
       end
@@ -354,7 +375,7 @@ RSpec.describe PublicImagesController, type: :request do
           expect(public_image.kind).to eq "photo_uncategorized"
           expect {
             patch "#{base_url}/#{public_image.id}", params: {kind: "photo_of_user_with_bike"}
-          }.to change(CallbackJob::AfterBikeSaveJob.jobs, :count).by(1)
+          }.to change(CallbackJobs::AfterBikeSaveJob.jobs, :count).by(1)
           expect(public_image.reload.kind).to eq("photo_of_user_with_bike")
           # And changing from a non-default kind
           put "#{base_url}/#{public_image.id}", params: {kind: "photo_of_serial"}
@@ -373,7 +394,7 @@ RSpec.describe PublicImagesController, type: :request do
           post "#{base_url}/#{public_image.id}/is_private", params: {is_private: "true"}
           public_image.reload
           expect(public_image.is_private).to be_truthy
-          expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+          expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
         end
       end
       context "is_private false" do
@@ -384,7 +405,7 @@ RSpec.describe PublicImagesController, type: :request do
           post "#{base_url}/#{public_image.id}/is_private", params: {is_private: false}
           public_image.reload
           expect(public_image.is_private).to be_falsey
-          expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+          expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
         end
       end
       context "non owner" do
@@ -417,7 +438,7 @@ RSpec.describe PublicImagesController, type: :request do
         expect(public_image_2.reload.listing_order).to eq 4
         expect(public_image_1.reload.listing_order).to eq 2
         expect(public_image_other.reload.listing_order).to eq 0
-        expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+        expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
       end
     end
   end

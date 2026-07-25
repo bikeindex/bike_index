@@ -12,6 +12,10 @@ en:
           on donations to operate
         before_locking_check: Before locking, check that what you are locking to can't
           be easily removed.
+        bike_details: Bike details
+        bike_love_one: Bike love comic one
+        bike_love_three: Bike love comic three
+        bike_love_two: Bike love comic two
         bike_register_with_bike_index: Congrats on registering your %{bike_type} with
           Bike Index
         bike_register_with_bike_index_and_org: Congrats on registering your %{bike_type}
@@ -20,6 +24,7 @@ en:
         cable_locks_should_never_be_used: Cable locks should never be used as a primary
           means of locking a bike in a city.
         claim_the_bike_type: Claim the %{bike_type}
+        claim_your_bike_type: Claim your %{bike_type}
         confirm_this_bike_type: Confirm this %{bike_type}
         correctly_locking_a_bike: Image of a correctly locked a bike
         donating: donating
@@ -27,7 +32,12 @@ en:
         hopefully_you_find_the_bike: Hopefully you find the %{bike_type} soon.
         hopefully_you_find_the_owner_prefix: Hopefully you find the owner soon.
         hopefully_you_find_the_owner_suffix: when you do!
+        indoor_storage_tip: >-
+          We always recommend bringing your bike indoors or storing it in a secure
+          location when possible, especially overnight.
+        keep_your_registration_updated: Keep your registration updated
         mark_your_bike_recovered: Mark your bike recovered
+        marketplace_illustration: Marketplace illustration
         org_added_a_bike: added a %{bike_type} on Bike Index for you
         org_sent_a_bike: sent you a %{bike_type} on Bike Index
         pink_power_ulocks_tm: Pink Power U-Locks are a registered trademark of Bike
@@ -35,23 +45,44 @@ en:
         please_consider_prefix: Please consider
         please_consider_suffix: to Bike Index!
         prioritize_your_listing: prioritize your listing
+        pro_tip_illustration: Pro tip illustration
         protect_your_bike_by_following_these_lock: Protect your bike by following
           these locking guidelines.
         protecting_your_bike_here: protecting your bike here
         read_more_about_prefix: Read more about
         recovered_bike_type: recovered/found %{bike_type}
+        registered_animation: Registered animation
+        registration_complete_message: >-
+          Your bike is now part of the world's most effective bike registry. You are
+          protecting your bike and helping prevent bike theft in your community.
+        registration_confirm_message: >-
+          You are one step away from activating the most effective bike registry and
+          protecting your bike in your community.
         secure_both_wheels_either_with_two_ulocks: >-
           Secure both wheels - either with two U-locks, or one U-lock and one heavy
           duty cable.
         sign_up_on_bikeindexorg_to_claim_your_bik: >-
           Sign up on BikeIndex.org to claim your %{bike_type} and edit it, upload
           photos and make sure you never lose track of your trusty steed!
+        spread_the_word_body: Encourage your friends and family to register their
+          bikes too.
+        spread_the_word_title: Spread the word about Bike Index!
         stolen_bike_type: stolen %{bike_type}
+        stolen_guidance: >-
+          If your bike is ever stolen, log in to Bike Index immediately and mark it
+          as stolen to activate our recovery network.
         thanks_for_adding_this_bike_type_you_found: Thanks for adding this %{bike_type}
           you found to Bike Index
+        theft_victims_illustration: Theft victims illustration
+        ulock_illustration: U-Lock illustration
+        updated_registration_guidance: >-
+          If you move, sell, or make any changes to your bike, update the registration
+          so the record stays accurate and useful.
         use_a_ulock: Use a U-Lock.
-        welcome_to_bike_index: Welcome to Bike Index
+        view_your_bike: View your bike
         were_sorry_your_bike_type_was_stolen: We're sorry your %{bike_type} was stolen.
+        what_if_my_bike_gets_stolen: What if my bike gets stolen?
+        whats_next: What's next?
         when_you_do: when you do!
         you_added_a_bike_type_on_bike_index: You added a %{bike_type} on Bike Index
         youre_almost_done_registering: You're almost done registering!

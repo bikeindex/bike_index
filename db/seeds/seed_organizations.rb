@@ -1,4 +1,4 @@
-# Seed organizations: Hogwarts, Ike's Bikes, and Cannondale
+# Seed organizations: Brakebills, Ike's Bikes, Cannondale, and Bike Recovery Team
 
 # --- Organization Features ---
 # This list was created with:
@@ -52,6 +52,8 @@ feature_name_and_slugs = [
 feature_ids = []
 official_manufacturer_feature_id = nil
 skip_ownership_email_feature_id = nil
+avery_export_feature_id = nil
+law_enforcement_feature_id = nil
 
 feature_name_and_slugs.each do |attrs|
   org_feature = OrganizationFeature.find_by_name(attrs[:name]) ||
@@ -59,14 +61,22 @@ feature_name_and_slugs.each do |attrs|
   feature_ids << org_feature.id
   official_manufacturer_feature_id = org_feature.id if attrs[:name] == "Official manufacturer organization"
   skip_ownership_email_feature_id = org_feature.id if attrs[:name] == "Skip ownership email"
+  avery_export_feature_id = org_feature.id if attrs[:name] == "Avery Export"
+  law_enforcement_feature_id = org_feature.id if attrs[:name] == "Law Enforcement functionality"
 end
 
-# --- Hogwarts: all features except official_manufacturer, with is_endless invoice - and skip_ownership_email ---
-hogwarts = Organization.find_by_name("Hogwarts") || Organization.create!(name: "Hogwarts")
-hogwarts_invoice = Invoice.create(organization: hogwarts, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
-hogwarts_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_ownership_email_feature_id]
-hogwarts_invoice.update(organization_feature_ids: hogwarts_feature_ids)
-OrganizationRole.create(organization_id: hogwarts.id, user_id: User.find_by_email("member@bikeindex.org").id, role: "member")
+# --- Brakebills: all features except official_manufacturer, avery_export, with is_endless invoice - and skip_ownership_email ---
+brakebills = Organization.find_by_name("Brakebills") || Organization.create!(name: "Brakebills")
+brakebills_invoice = Invoice.create(organization: brakebills, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
+brakebills_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_ownership_email_feature_id, avery_export_feature_id]
+brakebills_invoice.update(organization_feature_ids: brakebills_feature_ids)
+OrganizationRole.create(organization_id: brakebills.id, user_id: User.find_by_email("member@brakebills.edu").id, role: "member")
+
+# Logo (rasterized from db/seeds/images/brakebills.svg — CarrierWave rejects SVG)
+if brakebills.avatar.blank?
+  File.open(Rails.root.join("db/seeds/images/brakebills.png")) { |file| brakebills.avatar = file }
+  brakebills.save!
+end
 
 # --- Ike's Bikes ---
 ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
@@ -83,7 +93,12 @@ cannondale_user.confirm(cannondale_user.confirmation_token)
 cannondale_user.save
 OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user.id, role: "admin")
 
+# --- Bike Recovery Team: Law Enforcement functionality ---
+recovery_team = Organization.find_by_name("Bike Recovery Team") || Organization.create!(name: "Bike Recovery Team")
+recovery_team_invoice = Invoice.create(organization: recovery_team, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
+recovery_team_invoice.update(organization_feature_ids: [law_enforcement_feature_id].compact)
+
 # Make sure example organization exists
 Organization.example
 
-puts "Organizations seeded: Hogwarts, Ikes Bike's, Cannondale\n"
+puts "Organizations seeded: Brakebills, Ikes Bike's, Cannondale, Bike Recovery Team\n"

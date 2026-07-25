@@ -16,7 +16,9 @@ module Admin
         time_range_column: nil,
         admin_search_form: nil,
         table_view: nil,
-        chart_collection: nil
+        chart_collection: nil,
+        header_content: nil,
+        count_detail: nil
       )
         @collection = collection
         @viewing = viewing
@@ -29,6 +31,8 @@ module Admin
         @admin_search_form = admin_search_form
         @table_view = table_view
         @chart_collection = chart_collection
+        @header_content = header_content
+        @count_detail = count_detail
       end
 
       def before_render
@@ -78,6 +82,7 @@ module Admin
       def pagination_component(skip_total: false)
         Admin::PaginationWithCount::Component.new(
           collection: @collection, viewing:, skip_total:,
+          count_detail: skip_total ? nil : @count_detail,
           pagy: @pagy, per_page: @per_page, time_range: @time_range,
           period: @period, time_range_column: @time_range_column, params: @params
         )
@@ -99,10 +104,8 @@ module Admin
         end
       end
 
-      def deleted_item_class(value)
-        if value.nil? ? !deleted_active? : @render_deleted == value
-          "active"
-        end
+      def deleted_item_active?(value)
+        value.nil? ? !deleted_active? : @render_deleted == value
       end
 
       def default_table_view

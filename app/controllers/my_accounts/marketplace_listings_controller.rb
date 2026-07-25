@@ -60,7 +60,7 @@ module MyAccounts
     end
 
     def find_marketplace_listing
-      @bike = Bike.unscoped.find(params[:id].delete_prefix("b"))
+      @bike = Bike.unscoped.find_id(params[:id].delete_prefix("b"))
       ml_id = params.dig(:marketplace_listing, :id)
 
       @marketplace_listing = @bike.marketplace_listings.find_by(id: ml_id) if ml_id.present?

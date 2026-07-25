@@ -1,5 +1,10 @@
-<div id="map_canvas"></div>
+<div
+  id="map_canvas"
+  role="region"
+  aria-label="<%= t(".map_of_partner_locations") %>"
+></div>
 
+<%# user-scalable=no keeps pinch-zoom on the map from also scaling the whole page %>
 <meta
   name="viewport"
   content="width=device-width, initial-scale=1.0, user-scalable=no"
@@ -40,7 +45,12 @@
       })(marker, i));
       window.markers.push(marker);
 
-      $(marker.shopTarget).find('.where-shop-location').attr('href', "javascript:clickLocation(" + i + ")")
+      $(marker.shopTarget).find('.where-shop-location').on('click', (function(i) {
+        return function(e) {
+          e.preventDefault();
+          clickLocation(i);
+        }
+      })(i));
     }
   }
 

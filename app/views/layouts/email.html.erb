@@ -31,29 +31,31 @@
       <% end %>
 
       <% unless @skip_header %>
-        <table class="binx-header">
-          <tbody>
-            <tr>
-              <td class="<%= @partner.present? ? "partner-header" : "" %>">
-                <% if @partner %>
+        <% if @partner %>
+          <table class="binx-header">
+            <tbody>
+              <tr>
+                <td class="partner-header">
                   <span class="partner-logo-wrapper">
                     <%= image_tag "https://files.bikeindex.org/email_assets/bikehub_logo_plus.png",
                       alt: "BikeHub",
                       height: "50",
                       class: "partner-header-logo" %>
                   </span>
-                <% end %>
 
-                <img
-                  class="bike-index-logo"
-                  src="https://files.bikeindex.org/email_assets/logo.png"
-                  height="70"
-                  alt="Bike Index"
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  <img
+                    class="bike-index-logo"
+                    src="https://files.bikeindex.org/email_assets/logo.png"
+                    height="70"
+                    alt="Bike Index"
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        <% else %>
+          <%= render "layouts/email_banner_header" %>
+        <% end %>
       <% end %>
 
       <div class="binx-body">

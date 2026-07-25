@@ -100,6 +100,7 @@ class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
   include BikeAttributable
+  include ShortIdable
   include AddressRecorded
   include AddressRecordedWithinBoundingBox
   include PgSearch::Model
@@ -431,7 +432,7 @@ class Bike < ApplicationRecord
   def created_by_notification_or_impounding?
     return false if current_ownership.blank?
 
-    %w[unregistered_parking_notification impound_import].include?(current_ownership.origin) ||
+    %w[creator_unregistered_parking_notification impound_import].include?(current_ownership.origin) ||
       current_ownership.status == "status_impounded"
   end
 
@@ -909,7 +910,7 @@ class Bike < ApplicationRecord
   end
 
   def enqueue_duplicate_bike_finder_worker
-    DuplicateBikeFinderJob.perform_async(id)
+    BikeJobs::DuplicateBikeFinderJob.perform_async(id)
   end
 
   def remove_address_record_if_deleted

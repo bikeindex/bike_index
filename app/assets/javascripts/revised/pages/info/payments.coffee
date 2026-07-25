@@ -7,15 +7,25 @@ class BikeIndex.Payments extends BikeIndex
     $('#new-payment-form').submit (e) =>
       return @submitDonation()
 
-    $('.amount-list a').click (e) =>
+    $('.amount-list button[data-amount]').click (e) =>
       @selectPaymentOption(e)
 
-    # If the arbitrary amount is selected (and on keyboard movement), select the appropriate target
+    # Focusing the arbitrary "Other amount" input shouldn't change the active
+    # amount unless it already holds a value; typing into it (below) selects it.
     $('.amount-list input').focus (e) =>
       $target = $(e.target)
-      if $target.attr("data-amount") || $target.attr("id") == "arbitrary-amount"
+      is_arbitrary_with_value = $target.attr("id") == "arbitrary-amount" && $target.val()
+      if $target.attr("data-amount") || is_arbitrary_with_value
         @selectPaymentOption(e)
       true
+
+    # Typing a value into the arbitrary input selects it; clearing it deselects
+    $('.amount-list input').on 'input', (e) =>
+      $target = $(e.target)
+      if $target.val()
+        @selectPaymentOption(e)
+      else
+        $target.removeClass('active')
 
   # Returns null if there isn't a valid value selected
   getAmountCentsSelected: ->
@@ -32,7 +42,7 @@ class BikeIndex.Payments extends BikeIndex
     null
 
   selectPaymentOption: (e) ->
-    $target = $(e.target)
+    $target = $(e.currentTarget)
     e.preventDefault()
     $('.amount-list .active').removeClass('active')
     $target.addClass('active')

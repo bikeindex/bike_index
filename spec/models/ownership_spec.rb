@@ -559,6 +559,12 @@ RSpec.describe Ownership, type: :model do
         expect(ownership.creation_description).to eq "landing page"
       end
     end
+    context "creator_unregistered_parking_notification" do
+      let(:ownership) { Ownership.new(origin: "creator_unregistered_parking_notification") }
+      it "returns parking notification" do
+        expect(ownership.creation_description).to eq "parking notification"
+      end
+    end
   end
 
   describe "owner_name" do

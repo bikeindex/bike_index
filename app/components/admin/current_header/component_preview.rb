@@ -10,7 +10,7 @@ module Admin
       end
 
       def with_current_organization
-        current_organization = Organization.friendly_find "hogwarts"
+        current_organization = Organization.friendly_find "brakebills"
         primary_activity = PrimaryActivity.friendly_find "Gravel"
         render(Admin::CurrentHeader::Component.new(current_organization:, params: passed_params, primary_activity:, viewing: "Notifications"))
       end

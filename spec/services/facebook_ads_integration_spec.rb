@@ -202,6 +202,21 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
             end
           end
         end
+        context "insights missing unique_clicks" do
+          let(:amount_cents_facebook) { 3800 }
+          let(:facebook_data) { {ad_id: "6720937606414", adset_id: "6720937162214", campaign_id: "6720937063014", activating_at: Time.current.to_i, effective_object_story_id: "500198263370025_1118473403646138"} }
+          # Regression: reading a requested-but-unreturned field via the SDK reader raised
+          # "load! is not supported for this object"
+          it "sets engagement with a nil unique_clicks" do
+            VCR.use_cassette("facebook/ads_integration-update_facebook_data-no_unique_clicks", match_requests_on: [:method]) do
+              expect { instance.update_facebook_data(theft_alert) }.not_to raise_error
+              theft_alert.reload
+              expect(theft_alert.reach).to eq 16_092
+              expect(theft_alert.engagement["unique_clicks"]).to be_nil
+              expect(theft_alert.engagement["link_click"]).to eq "17"
+            end
+          end
+        end
       end
     end
   end

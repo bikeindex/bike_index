@@ -7,7 +7,7 @@ description: >-
   attach, embed, add, put, post, drop, show, document. Also covers visually documenting test runs,
   bug repros, UI states, or CI failures on an existing PR. The `gh` CLI cannot upload images;
   this skill drives a real browser to GitHub's user-attachments uploader.
-allowed-tools: Bash(gh:*), Bash(cp:*), ToolSearch, Read
+allowed-tools: Bash(gh:*), Bash(cp:*), ToolSearch, Read, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot
 ---
 
 # Upload Image to PR
@@ -40,17 +40,11 @@ cp /path/to/CleanShot*keyword*.png /tmp/screenshot.png
 
 Use `ToolSearch` with a query like `"browser navigate upload"` to confirm `mcp__playwright__*` tools are registered.
 
-Playwright MCP reuses a persistent profile (`--user-data-dir`), so the github.com session persists across reuse once signed in. If GitHub logs the user out and you hit a 404 / login screen mid-task, see [references/headless-relogin.md](references/headless-relogin.md) — full login can't be driven headlessly.
+Playwright MCP runs isolated (`--isolated --storage-state=…/mcp-auth.json`), loading github.com cookies from that shared storage-state file at startup — so the session persists across sessions once the file is populated. It's load-only: the MCP never writes it back, so login can't be refreshed through the MCP browser. If GitHub logs the user out and you hit a 404 / login screen mid-task, see [references/headless-relogin.md](references/headless-relogin.md) — full login can't be driven headlessly.
 
-### If Playwright MCP is not installed
+### If Playwright MCP is not registered
 
-Recommend the user install it:
-
-```bash
-claude mcp add playwright -- npx -y @playwright/mcp@latest
-```
-
-After install, the Claude Code session must be restarted for `mcp__playwright__*` tools to register.
+The project ships a `.mcp.json` registering Playwright MCP (isolated, shared storage-state file, headless). Claude Code prompts to approve project MCP servers on first entry — if the `mcp__playwright__*` tools aren't registered, approve the `playwright` server there and restart the session (or `/mcp` → **playwright** → **reconnect**). On first use `mcp-auth.json` won't exist yet — populate it via the login helper in the re-login guide.
 
 ## Step 3: Navigate to PR page and check login state
 
@@ -132,13 +126,15 @@ Use the **standard textarea selector** from step 6, then assign `ta.value = ""`:
 
 ## Step 8: Embed images in the PR
 
+> **Upload-only callers:** if another workflow invoked this skill just to host images — e.g. the `pr` skill's screenshot phase, which gathers branch + base URLs and composes its own combined `## Screenshots` before/after comment — **stop after step 7**: hand the collected URLs back and do **not** post here. Otherwise the caller ends up with a premature, partial comment. Only run this step when you own the posting.
+
 Substitute whichever form (markdown `![](...)` or HTML `<img ...>`) GitHub returned in step 6 — preserve it verbatim instead of rewrapping.
 
 **Post as a comment** (the default). A comment keeps the description tight and skimmable, and avoids re-editing the body (and its notification noise) on every recapture.
 
 If a screenshots comment already exists (one authored by you whose body starts with `## Screenshots`), edit it in place instead of posting a new one:
 ```bash
-SCREENSHOT_COMMENT_ID=$(gh api repos/{owner}/{repo}/issues/{PR_NUMBER}/comments \
+SCREENSHOT_COMMENT_ID=$(gh api "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" \
   --jq '.[] | select(.body | startswith("## Screenshots")) | .id' | head -1)
 ```
 
@@ -149,14 +145,14 @@ Write the comment body to a temp file:
 <image markup from step 6>
 ```
 
-- If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment {PR_NUMBER} --body-file <tmp-comment-file>`.
-- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body=@<tmp-comment-file>`.
+- If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment $PR_NUMBER --body-file <tmp-comment-file>`.
+- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body="$(cat <tmp-comment-file>)" --jq .html_url`. Don't use `-f body=@<file>` — `gh api`'s `-f` stores the literal string `@<file>` rather than reading it, so the comment gets clobbered with the filename.
 
 Only edit the PR description instead when the user explicitly asks for it:
 ```bash
-EXISTING_BODY=$(gh pr view {PR_NUMBER} --json body -q .body)
+EXISTING_BODY=$(gh pr view $PR_NUMBER --json body -q .body)
 
-gh pr edit {PR_NUMBER} --body "$(printf '%s\n\n## Screenshots\n\n%s' "$EXISTING_BODY" "<image markup from step 6>")"
+gh pr edit $PR_NUMBER --body "$(printf '%s\n\n## Screenshots\n\n%s' "$EXISTING_BODY" "<image markup from step 6>")"
 ```
 
 If `$EXISTING_BODY` already contains a `## Screenshots` heading (e.g., on re-runs), this will create a duplicate section. Check first with `grep -q "^## Screenshots" <<< "$EXISTING_BODY"` and either replace the existing section or post as a comment instead.
@@ -179,7 +175,7 @@ Reload the page in the Playwright browser and take a screenshot to confirm the i
 | File upload fails | Ensure the file path is absolute |
 | Textarea doesn't contain URLs yet | Wait 3–5 seconds after upload before running JS eval; retry once if needed |
 | Textarea selector not found | GitHub UI changes occasionally — use the multi-selector JS in Step 4 to find the current element |
-| Playwright MCP not registered | `claude mcp add playwright -- npx -y @playwright/mcp@latest`, then restart the Claude Code session |
+| Playwright MCP not registered | Approve the `playwright` server from the project `.mcp.json` (Claude Code prompts on project entry), then restart the session or `/mcp` → reconnect |
 | PR not found / 404 | Private repos return 404 for unauthenticated users — check login state |
 
 ## Notes
@@ -187,4 +183,4 @@ Reload the page in the Playwright browser and take a screenshot to confirm the i
 - GitHub `user-attachments/assets/` URLs are **persistent** — images remain accessible even without submitting the comment
 - Editing the description directly in the browser UI is fragile due to GitHub UI structure changes — updating via `gh pr edit` is strongly preferred
 - Multiple images can be uploaded in a single session before extracting URLs
-- Playwright MCP attaches to a browser instance and preserves cookies/login state across calls
+- Playwright MCP preserves cookies/login state across calls within a session; across sessions the login comes from the shared `--storage-state` file (`mcp-auth.json`), loaded at startup

@@ -4,10 +4,25 @@ require "rails_helper"
 
 RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   let(:seller) { FactoryBot.create(:user, :with_address_record) }
+  let(:paid_seller) { FactoryBot.create(:user, :with_address_record) }
+  let!(:membership) { FactoryBot.create(:membership, user: paid_seller) }
   let!(:manufacturer1) { FactoryBot.create(:manufacturer, name: "Yuba", id: 1003, frame_maker: true) }
   let!(:manufacturer2) { FactoryBot.create(:manufacturer, name: "Salsa", id: 764, frame_maker: true) }
   let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Mountain biking") }
   let!(:other_primary_activity) { FactoryBot.create(:primary_activity, name: "Road cycling") }
+  let!(:promoted_listings) do
+    # Two Salsa listings (priced under $1300) from a seller with an active membership.
+    # Their bikes get a distinct, sequence-named primary_activity, so they never match
+    # the "Mountain biking"/"Road cycling" filters used below.
+    Array.new(2) do |i|
+      item = FactoryBot.create(:bike, :with_primary_activity, manufacturer: manufacturer2)
+      listing = FactoryBot.create(:marketplace_listing, :for_sale,
+        address_record: paid_seller.address_record, seller: paid_seller, item:,
+        amount_cents: 500_00 + 100_00 * i)
+      listing.update(published_at: Time.current + (i + 1).minutes)
+      listing
+    end
+  end
 
   before do
     # Create enough listings to span multiple pages (12 per page)
@@ -34,14 +49,18 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   def scroll_to_lazy_load
     # Scroll the lazy-loading frame into view to trigger its IntersectionObserver.
     # Use an instant scroll (not "smooth") so the observer fires deterministically
-    # in headless Chrome; capybara-lockstep then holds the next assertion until the
-    # frame's in-flight fetch completes, so no manual sleep is needed.
+    # in headless Chrome; the waiting `have_css` assertions that follow then hold
+    # until the frame's in-flight fetch completes, so no manual sleep is needed.
     page.execute_script(<<~JS)
       const lazyFrame = document.querySelector('turbo-frame#page_2[loading="lazy"]');
       if (lazyFrame) {
         lazyFrame.scrollIntoView({ block: "end" });
       }
     JS
+  end
+
+  def visible_bike_ids
+    page.all("[data-test-id^='vehicle-thumbnail-linkspan-']").map { |el| el["data-test-id"].split("-").last.to_i }
   end
 
   # Reach the marketplace the way a user does: from the homepage, click the
@@ -59,17 +78,10 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # matching option, then submit. Works whether the combobox starts empty or
   # already has a selection (set replaces the existing text).
   def search_primary_activity(display_name)
-    find("#primary_activity").set(display_name)
+    type_into("#primary_activity", display_name)
     expect(page).to have_css(".hw-combobox__option", text: display_name, wait: 5)
-    find(".hw-combobox__option", text: display_name, match: :first).click
+    click_combobox_option(display_name)
     find("#search-button").click
-  end
-
-  # Clear the browser's back/forward stack. Capybara never resets history between
-  # examples, so it accumulates across the suite, and WebDriver back/forward only
-  # behave reliably on a shallow stack.
-  def reset_browser_history
-    page.driver.browser.execute_cdp("Page.resetNavigationHistory")
   end
 
   it "loads the kind counts on initial render" do
@@ -78,60 +90,56 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # Counts populate from /search/marketplace/counts once the search--kind-select-fields
     # controller connects - no form submit required. The eager turbo-frame flow no
     # longer auto-submits on load, so this guards that initial render still fills them.
-    # All 15 published listings are for_sale, so the for_sale count shows (15).
-    expect(page).to have_css("[data-count-target='for_sale']", text: "(15)", wait: 10)
+    # All 17 listings (15 standard + 2 promoted) are for_sale, so the for_sale count shows (17).
+    expect(page).to have_css("[data-count-target='for_sale']", text: "(17)", wait: 10)
   end
 
   it "automatically loads the next page when scrolling to bottom" do
     expect(manufacturer1.reload.id).to eq 1003 # sanity check - otherwise the search won't work
     expect(manufacturer2.reload.id).to eq 764 # sanity check - otherwise the search won't work
+    promoted_bike_ids = promoted_listings.map(&:item_id)
     visit_marketplace_via_nav
 
-    # Wait for the initial results to load
+    # Page 1 holds the first 12: the 2 members sort first, then standard listings
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+    # The 2 promoted bikes show the member badge and appear above the standard listings
+    expect(page).to have_text("Bike Index member")
+    expect(visible_bike_ids.first(2)).to match_array(promoted_bike_ids)
     expect_axe_clean
-    # Get the initial bike IDs visible on page 1
-    initial_bikes = page.all("[data-test-id^='vehicle-thumbnail-linkspan-']").map do |el|
-      el["data-test-id"].split("-").last
-    end
-    expect(initial_bikes.count).to eq(12)
-    # Verify the lazy-loading frame for page 2 exists
+    # Verify the lazy-loading frame for page 2 exists (5 listings remain)
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
     scroll_to_lazy_load
-    # Wait for page 2 to load (3 more items should appear)
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, minimum: 13)
-    # Get all bike IDs now visible
-    all_bikes = page.all("[data-test-id^='vehicle-thumbnail-linkspan-']").map do |el|
-      el["data-test-id"].split("-").last
-    end
-    # Verify that we have more bikes than initially
-    expect(all_bikes.count).to be > initial_bikes.count
+    # All 17 listings now visible (2 promoted + 15 standard); promoted bikes are not duplicated
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 17)
+    expect(visible_bike_ids).to match_array(visible_bike_ids.uniq)
 
     # Change the search filters By adding a max price and submit via pressing enter
     # and verify that infinite scroll still works
     fill_in "price_max_amount", with: "1300"
     find_field("price_max_amount").send_keys(:return)
-    # Wait for filtered results to load
+    # Page 1 holds the first 12 (2 members ≤ $1300 sort first, then standard)
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
     # Verify lazy frame exists
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
     scroll_to_lazy_load
-    # Should load more results
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 14)
+    # 2 promoted + 14 standard ≤ $1300 = 16 total
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 16)
 
     # And then search "Yuba" without price filter
     # Which will return 8 bikes - so the page won't have the ability to scroll. Verify that it works correctly
+    # The Salsa promoted listings shouldn't match, so the member badges disappear
     fill_in "price_max_amount", with: ""
     # Scope to the everything-combobox - the primary_activity field is also a combobox
     within("[data-controller~='search--everything-combobox']") do
-      find(".hw-combobox__input").set("Yuba")
+      type_into(".hw-combobox__input", "Yuba")
       # Wait for the combobox autocomplete to load
       expect(page).to have_css(".hw-combobox__option", text: "Listings made by Yuba", wait: 5)
-      find(".hw-combobox__option", text: "Listings made by Yuba", match: :first).click
+      click_combobox_option("Listings made by Yuba")
     end
     find("#search-button").click
     # Should load new results
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 8)
+    expect(page).not_to have_text("Bike Index member")
     # Should NOT have a lazy-loading frame for page 2
     expect(page).not_to have_css("turbo-frame#page_2")
 
@@ -158,6 +166,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # so retry on CI.
   it "keeps results and the primary_activity form in sync across back/forward", :flaky do
     visit_marketplace_via_nav
+    # First 12 on the unfiltered page (the 2 members sort first)
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
     # Drop history accumulated by earlier examples so go_back/go_forward operate on
     # this example's own short stack, not a stale foreign entry.

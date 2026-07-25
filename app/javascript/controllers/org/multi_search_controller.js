@@ -4,19 +4,80 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--multi-search'
 export default class extends Controller {
-  static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll']
-  static values = { url: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
+  static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll', 'searchAllHint']
+  static values = { url: String, searchKind: String, serialsPlaceholder: String, stickersPlaceholder: String, serialsButton: String, stickersButton: String, emptyClass: String, successClass: String, grayClass: String, errorClass: String, errorTooltip: String, spinner: String }
 
   connect () {
     if (this.searching) return
+    this.onPopState = () => this.syncFromUrl()
+    window.addEventListener('popstate', this.onPopState)
+    // Renders disabled: clicking before connect submits the form and reloads
+    this.buttonTarget.disabled = false
+    this.syncFromUrl({ preserveInput: true })
+  }
+
+  disconnect () {
+    window.removeEventListener('popstate', this.onPopState)
+  }
+
+  // Restore the form + results from the URL, on initial load and on back/forward.
+  // The URL already reflects this state, so don't push another history entry.
+  syncFromUrl ({ preserveInput = false } = {}) {
     const params = new URL(window.location).searchParams
-    if (this.hasSearchAllTarget && params.get('search_all') === '1') {
-      this.searchAllTarget.checked = true
+    const kind = params.get('search_kind') === 'stickers' ? 'stickers' : 'serials'
+    if (this.searchKindValue !== kind) this.applyKind(kind)
+    if (this.hasSearchAllTarget && !this.searchAllTarget.disabled) {
+      this.searchAllTarget.checked = params.get('search_all') === '1'
     }
-    const serialsParam = params.get('serials')
-    if (serialsParam) {
-      this.textareaTarget.value = serialsParam
-      this.search(this.parseSerials(serialsParam))
+    this.syncSearchAll()
+    const serialsParam = params.get('serials') || ''
+    // On connect, keep anything typed while the controller was still loading
+    if (!preserveInput || serialsParam) this.textareaTarget.value = serialsParam
+    const serials = this.parseSerials(serialsParam)
+    if (serials.length) {
+      this.search(serials, { pushHistory: false })
+    } else {
+      this.resultsTarget.innerHTML = ''
+      this.serialChipsTarget.innerHTML = ''
+    }
+  }
+
+  switchKind (event) {
+    const value = event.target.value
+    if (this.searchKindValue === value) return
+    this.applyKind(value)
+    this.resultsTarget.innerHTML = ''
+    this.serialChipsTarget.innerHTML = ''
+
+    const url = new URL(window.location.pathname, window.location.origin)
+    url.searchParams.set('search_kind', value)
+    window.history.pushState({}, '', url)
+  }
+
+  applyKind (kind) {
+    this.searchKindValue = kind
+    this.updatePlaceholderAndButton()
+    const radio = this.element.querySelector(`input[name='search_kind'][value='${kind}']`)
+    if (radio) radio.checked = true
+    this.syncSearchAll()
+  }
+
+  updatePlaceholderAndButton () {
+    this.textareaTarget.placeholder = this[`${this.searchKindValue}PlaceholderValue`]
+    this.buttonTarget.textContent = this[`${this.searchKindValue}ButtonValue`]
+  }
+
+  // Sticker search always spans every organization, so lock "search all" on while it's active
+  syncSearchAll () {
+    if (!this.hasSearchAllTarget) return
+    if (this.searchKindValue === 'stickers') {
+      this.searchAllTarget.checked = true
+      this.searchAllTarget.disabled = true
+      if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.remove('tw:hidden')
+    } else if (this.searchAllTarget.disabled) {
+      this.searchAllTarget.checked = false
+      this.searchAllTarget.disabled = false
+      if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.add('tw:hidden')
     }
   }
 
@@ -37,22 +98,27 @@ export default class extends Controller {
     )]
   }
 
-  async search (serials) {
+  async search (serials, { pushHistory = true } = {}) {
     this.searching = true
-    const url = new URL(window.location.pathname, window.location.origin)
-    url.searchParams.set('serials', serials.join(','))
-    if (this.searchAll) {
-      url.searchParams.set('search_all', '1')
-    } else {
-      url.searchParams.delete('search_all')
+    if (pushHistory) {
+      const url = new URL(window.location.pathname, window.location.origin)
+      url.searchParams.set('serials', serials.join(','))
+      if (this.searchKindValue === 'stickers') {
+        url.searchParams.set('search_kind', 'stickers')
+      }
+      if (this.searchAll) {
+        url.searchParams.set('search_all', '1')
+      } else {
+        url.searchParams.delete('search_all')
+      }
+      window.history.pushState({}, '', url)
     }
-    window.history.pushState({}, '', url)
 
     this.resultsTarget.innerHTML = ''
     this.renderPlaceholderChips(serials)
     this.buttonTarget.disabled = true
 
-    await Promise.all(serials.map((serial, index) => this.searchSerial(serial, index)))
+    await Promise.all(serials.map((serial, index) => this.searchItem(serial, index)))
 
     // Wait a frame for Turbo stream DOM updates to complete
     await new Promise(resolve => requestAnimationFrame(resolve))
@@ -66,7 +132,7 @@ export default class extends Controller {
   }
 
   alignTableColumns () {
-    const tables = Array.from(this.resultsTarget.querySelectorAll('.org-registration-search-component table.ui-table'))
+    const tables = Array.from(this.resultsTarget.querySelectorAll('.multi-search-serial-result table.ui-table'))
     if (tables.length < 2) return
 
     tables.forEach(table => {
@@ -106,24 +172,30 @@ export default class extends Controller {
     return span
   }
 
+  // Drop results the component flagged empty (no exact matches and no close serials).
   sortAndFilterResults () {
     const results = Array.from(this.resultsTarget.querySelectorAll('.multi-search-serial-result'))
     results
       .sort((a, b) => parseInt(a.dataset.serialIndex) - parseInt(b.dataset.serialIndex))
       .forEach(result => {
-        if (result.dataset.resultCount === '0') {
-          result.remove()
-        } else {
+        if (result.dataset.hasResults === 'true') {
           this.resultsTarget.appendChild(result)
+        } else {
+          result.remove()
         }
       })
   }
 
-  async searchSerial (serial, index) {
+  async searchItem (query, index) {
+    const stickers = this.searchKindValue === 'stickers'
     const url = new URL(this.urlValue, window.location.origin)
-    url.searchParams.set('serial', serial)
+    url.searchParams.set(stickers ? 'query' : 'serial', query)
     url.searchParams.set('chip_id', `chip_${index}`)
-    if (this.searchAll) url.searchParams.set('search_all', '1')
+    if (stickers) {
+      url.searchParams.set('search_kind', 'stickers')
+    } else if (this.searchAll) {
+      url.searchParams.set('search_all', '1')
+    }
 
     try {
       const response = await fetch(url, {
@@ -133,10 +205,10 @@ export default class extends Controller {
       if (response.ok) {
         Turbo.renderStreamMessage(await response.text())
       } else {
-        this.showChipError(serial, index, `Server error ${response.status}`)
+        this.showChipError(query, index, `Server error ${response.status}`)
       }
     } catch {
-      this.showChipError(serial, index, 'Network error')
+      this.showChipError(query, index, 'Network error')
     }
   }
 

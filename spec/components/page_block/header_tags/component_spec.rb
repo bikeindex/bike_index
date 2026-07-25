@@ -299,7 +299,7 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
         let!(:public_image) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
         before do
           bike.reload.save
-          # bike.reload
+          public_image.reload # version URLs reconstruct from the stored identifier (generation is backgrounded)
         end
         it "returns expected thing" do
           expect_matching_tags(title:, description:, image: public_image.image_url(:large), updated_at: bike.updated_at)

@@ -124,9 +124,9 @@ RSpec.describe SalesController, type: :request do
           expect(response).to redirect_to my_account_path
           expect(flash[:success]).to be_present
         end.to change(Sale, :count).by(1)
-          .and change(CallbackJob::AfterSaleCreateJob.jobs, :count).by 1
+          .and change(CallbackJobs::AfterSaleCreateJob.jobs, :count).by 1
 
-        expect { CallbackJob::AfterSaleCreateJob.drain }
+        expect { CallbackJobs::AfterSaleCreateJob.drain }
           .to change(Ownership, :count).by(ownership_change)
           .and change(BikeVersion, :count).by(1)
 
@@ -187,7 +187,7 @@ RSpec.describe SalesController, type: :request do
           expect(ownership).to be_present
           expect(sale_initial).to be_valid
           expect(sale_initial.marketplace_listing&.id).to eq marketplace_listing&.id
-          expect { CallbackJob::AfterSaleCreateJob.new.perform(sale_initial.id) }.to change(BikeVersion, :count).by(1)
+          expect { CallbackJobs::AfterSaleCreateJob.new.perform(sale_initial.id) }.to change(BikeVersion, :count).by(1)
           Sidekiq::Job.clear_all
           expect(sale_initial.reload.new_ownership).to be_present
           expect(item.reload.is_for_sale).to be_falsey
@@ -201,9 +201,9 @@ RSpec.describe SalesController, type: :request do
             expect(response).to redirect_to my_account_path
             expect(flash[:success]).to be_present
           end.to change(Sale, :count).by(1)
-            .and change(CallbackJob::AfterSaleCreateJob.jobs, :count).by 1
+            .and change(CallbackJobs::AfterSaleCreateJob.jobs, :count).by 1
 
-          expect { CallbackJob::AfterSaleCreateJob.drain }
+          expect { CallbackJobs::AfterSaleCreateJob.drain }
             .to change(Ownership, :count).by(0)
             .and change(BikeVersion, :count).by(0)
 

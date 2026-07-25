@@ -3,11 +3,6 @@
 module UI
   module Button
     class ComponentPreview < ApplicationComponentPreview
-      # @label legacy (using twbtn classes)
-      def legacy
-        {template: "ui/button/component_preview/default"}
-      end
-
       # @!group Colors
       def primary
         render(UI::Button::Component.new(text: "Primary", color: :primary))
@@ -35,6 +30,15 @@ module UI
         render(UI::Button::Component.new(text: "Error Active", color: :error, active: true))
       end
 
+      # White button with a soft danger outline
+      def danger_outline
+        render(UI::Button::Component.new(text: "Mark stolen", color: :danger_outline))
+      end
+
+      def danger_outline_active
+        render(UI::Button::Component.new(text: "Danger Outline Active", color: :danger_outline, active: true))
+      end
+
       def link
         render(UI::Button::Component.new(text: "Link style", color: :link))
       end
@@ -42,6 +46,25 @@ module UI
       def link_active
         render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
       end
+
+      # Filled purple primary
+      def purple
+        render(UI::Button::Component.new(text: "Purple", color: :purple))
+      end
+
+      def purple_active
+        render(UI::Button::Component.new(text: "Purple Active", color: :purple, active: true))
+      end
+
+      # White button with a purple outline (toggles to a purple tint when active)
+      def purple_outline
+        render(UI::Button::Component.new(text: "Purple outline", color: :purple_outline))
+      end
+
+      def purple_outline_active
+        render(UI::Button::Component.new(text: "Purple Outline Active", color: :purple_outline, active: true))
+      end
+
       # @!endgroup
 
       # @!group Sizes

@@ -4,7 +4,7 @@
 # This Dockerfile is used only by review apps (and any future Kamal-based deploys).
 # Production runs on Cloud66 — not from this file.
 
-ARG RUBY_VERSION=4.0.2
+ARG RUBY_VERSION=4.0.5
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 WORKDIR /rails
@@ -20,8 +20,6 @@ WORKDIR /rails
 # - nodejs: JS runtime for execjs. coffee-rails (deprecated, still in the default
 #   group) needs a runtime to load at boot — both during assets:precompile in the
 #   build stage and at server boot in the final stage. Cloud66 provides node too.
-# - wget: db/seeds runs `rake setup:import_manufacturers_csv` etc., which download
-#   CSVs via wget (lib/tasks/setup_tasks.rake) during db:prepare's seed step.
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
       cron \
@@ -32,15 +30,14 @@ RUN apt-get update -qq && \
       libyaml-0-2 \
       nodejs \
       postgresql-client \
-      ripgrep \
-      wget && \
+      ripgrep && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-# This image only ships to review apps, which run RAILS_ENV=staging
-# (see config/deploy.review.yml + config/environments/staging.rb). Building in
-# staging keeps build-time (asset precompile, bootsnap) and run-time consistent.
-ENV RAILS_ENV="staging" \
+# This image only ships to review apps, which run RAILS_ENV=sandbox
+# (see config/deploy.review.yml + config/environments/sandbox.rb). Building in
+# sandbox keeps build-time (asset precompile, bootsnap) and run-time consistent.
+ENV RAILS_ENV="sandbox" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_WITHOUT="development:test" \
@@ -84,10 +81,19 @@ FROM base
 
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
-USER 1000:1000
 
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
+
+# Ensure the volume mountpoints exist owned by rails BEFORE the per-PR named
+# volumes (config/deploy.review.yml) mount over them. Docker copies each dir's
+# rails ownership into an empty volume on first mount; without it Docker creates
+# them root-owned and the rails user hits Errno::EACCES on mkdir — letter_opener_web's
+# inbox under /rails/storage, CarrierWave's tsv/json dirs under /rails/public/uploads.
+# Runs as root: WORKDIR created /rails root-owned, so the rails user can't mkdir here.
+RUN mkdir -p /rails/storage /rails/public/uploads && \
+    chown rails:rails /rails/storage /rails/public/uploads
+USER 1000:1000
 
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 

@@ -37,29 +37,22 @@
   <% end %>
 <% end %>
 
+<% count_detail = capture do %>
+  &mdash;
+  <%= number_display(matching_b_params.where("created_at > ?", Time.current - 24.hours).count) %>
+  today
+<% end if request.query_parameters.blank? %>
+
 <% admin_search_form = capture do %>
-  <div class="row mt-4">
-    <div class="col-md-5">
-      <p>
-        <%= number_with_delimiter(matching_b_params.count, delimiter: ',') %>
-        partial bikes <em><%= humanized_time_range(@time_range) %>,</em>
-        <strong><%= number_with_delimiter(matching_b_params.where("created_at > ?", Time.current - 24.hours).count) %></strong>
-        today
-      </p>
+  <%= form_tag admin_b_params_path, method: :get, class: "form-inline mt-4 mb-4 justify-content-md-end" do %>
+    <%= hidden_field_tag :search_completeness, params[:search_completeness] %>
+
+    <div class="form-group mr-2 mb-2">
+      <%= text_field_tag :query, params[:query], placeholder: "Find by email", class: "form-control" %>
     </div>
 
-    <div class="col-md-7">
-      <%= form_tag admin_b_params_path, method: :get, class: "form-inline" do %>
-        <%= hidden_field_tag :search_completeness, params[:search_completeness] %>
-
-        <div class="form-group ml-auto mr-2 mb-2">
-          <%= text_field_tag :query, params[:query], placeholder: "Find by email", class: "form-control" %>
-        </div>
-
-        <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
-      <% end %>
-    </div>
-  </div>
+    <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+  <% end %>
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
@@ -67,5 +60,6 @@
   viewing: "Partial bikes",
   rendered_chart:,
   nav_header_list_items:,
-  admin_search_form:
+  admin_search_form:,
+  count_detail:
 )) %>

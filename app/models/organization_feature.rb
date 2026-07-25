@@ -65,6 +65,7 @@ class OrganizationFeature < ApplicationRecord
     passwordless_users
     regional_bike_counts
     registration_notes
+    registration_sequences
     require_reg_address
     require_reg_student_id
     show_bulk_import

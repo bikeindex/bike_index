@@ -46,4 +46,3 @@ else
 end
 
 system(File.join(APP_ROOT, "bin/setup"), *ARGV) || abort("bin/setup failed")
-exec File.join(APP_ROOT, "bin/fix_structure")

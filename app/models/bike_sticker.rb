@@ -221,6 +221,11 @@ class BikeSticker < ApplicationRecord
     ].compact.join("")
   end
 
+  # Short_id is the sticker code, e.g. "s/A1029"; the /s/<code> route redirects to the scanned lookup
+  def short_id
+    "#{ShortId::PREFIXES.fetch(self.class.name)}/#{code}"
+  end
+
   def next_unclaimed_code
     BikeSticker.where(organization_id: organization_id).next_unclaimed_code(id)
   end

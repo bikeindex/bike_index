@@ -44,7 +44,7 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record_instance = StolenRecord.find(stolen_record.id)
         Sidekiq::Job.clear_all
         stolen_record_instance.update(phone: "1112223333")
-        expect(StolenBike::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
+        expect(BikeJobs::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
           .to eq([stolen_record_instance.id, false])
       end
     end
@@ -54,7 +54,7 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record_instance = StolenRecord.find(stolen_record.id)
         Sidekiq::Job.clear_all
         stolen_record_instance.update(city: "New city")
-        expect(StolenBike::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
+        expect(BikeJobs::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
           .to eq([stolen_record_instance.id, true])
       end
     end

@@ -58,6 +58,7 @@ class BikeVersion < ApplicationRecord
   include BikeSearchable
   include BikeAttributable
   include PgSearch::Model
+  include ShortIdable
 
   acts_as_paranoid without_default_scope: true
 

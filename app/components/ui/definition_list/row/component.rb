@@ -4,10 +4,11 @@ module UI
   module DefinitionList
     module Row
       class Component < ApplicationComponent
-        def initialize(label:, value: nil, render_with_no_value: false, full_width: false, time_localizer_settings: nil)
+        def initialize(label:, value: nil, render_with_no_value: false, no_value_text: nil, full_width: false, time_localizer_settings: nil)
           @label = label
           @value = value
           @render_with_no_value = render_with_no_value
+          @no_value_text = no_value_text
           @full_width = full_width
 
           # TODO: actually support originalTimeZone. When this is set currently, we show the timezone,
@@ -30,14 +31,14 @@ module UI
         end
 
         def no_value_content
-          translation(".no_value")
+          @no_value_text || translation(".no_value")
         end
 
         def wrapper_classes
           if @full_width
             "tw:col-span-full"
           else
-            "tw:items-center tw:@sm:flex tw:@sm:gap-x-2 tw:@sm:pt-2"
+            "tw:flex tw:items-baseline tw:justify-between tw:gap-x-4"
           end + " tw:pt-3 tw:leading-tight"
         end
 
@@ -45,8 +46,12 @@ module UI
           if @full_width
             "tw:pb-1"
           else
-            "tw:@sm:text-right tw:@sm:w-1/4 tw:min-w-[100px]"
-          end + " tw:text-sm tw:leading-none tw:opacity-65 tw:font-bold!"
+            "tw:flex-none"
+          end + " tw:text-sm tw:leading-tight tw:opacity-65"
+        end
+
+        def dd_classes
+          @full_width ? "tw:mb-0!" : "tw:mb-0! tw:text-right"
         end
 
         def time_localizer_classes(time_localizer_settings)

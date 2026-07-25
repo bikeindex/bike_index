@@ -52,7 +52,7 @@ task trigger_honeybadger_deploy: :environment do
   Honeybadger.track_deployment(environment:, revision:, local_username:, repository:)
 
   raise "Missing HONEYBADGER_FRONTEND_API_KEY" if ENV["HONEYBADGER_FRONTEND_API_KEY"].blank?
-  # The CSP key is only required in production — staging deploys without one.
+  # The CSP key is only required in production — sandbox deploys without one.
   raise "Missing HONEYBADGER_CSP_API_KEY" if environment == "production" && ENV["HONEYBADGER_CSP_API_KEY"].blank?
 
   require "net/http"

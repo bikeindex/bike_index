@@ -27,7 +27,8 @@ class CycleType
     "non-e-scooter": 19,
     "non-e-skateboard": 20,
     "e-motorcycle": 21,
-    elliptical: 22
+    elliptical: 22,
+    "balance-bike": 23
   }.freeze
 
   DEFAULT = "Bike"
@@ -53,7 +54,8 @@ class CycleType
     "non-e-scooter": "Scooter (not electric)",
     "non-e-skateboard": "Skateboard (not electric)",
     "e-motorcycle": "e-Motorcycle (e-Dirt bike, e-bike with no pedals)",
-    elliptical: "Elliptical bike"
+    elliptical: "Elliptical bike",
+    "balance-bike": "Balance Bike"
   }.freeze
 
   MODEST_PRIORITY = %i[personal-mobility recumbent tandem tricycle].freeze
@@ -61,7 +63,7 @@ class CycleType
   PEDAL = %i[bike cargo cargo-rear cargo-trike cargo-trike-rear pedi-cab penny-farthing
     recumbent tall-bike tandem trail-behind tricycle unicycle].freeze
   ALWAYS_MOTORIZED = %i[e-scooter personal-mobility e-motorcycle].freeze
-  NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind].freeze
+  NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind balance-bike].freeze
   NOT_CYCLE_TYPE = %i[e-scooter non-e-skateboard personal-mobility stroller wheelchair e-motorcycle].freeze
 
   class << self
@@ -95,7 +97,7 @@ class CycleType
     end
 
     def not_cycle_drivetrain?(slug)
-      (NOT_CYCLE_TYPE + %i[trail-behind trailer unicycle]).include?(slug&.to_sym)
+      (NOT_CYCLE_TYPE + %i[trail-behind trailer unicycle balance-bike]).include?(slug&.to_sym)
     end
 
     def select_options(traditional_bike: false)

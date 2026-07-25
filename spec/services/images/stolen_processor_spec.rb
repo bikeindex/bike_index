@@ -47,7 +47,7 @@ RSpec.describe Images::StolenProcessor do
       expect(stolen_record.reload.image_four_by_five.blob.metadata["image_id"]).to eq public_image.id
       expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
       # No new jobs are enqueued
-      expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
+      expect(BikeJobs::AfterStolenRecordSaveJob.jobs.count).to eq 0
 
       stolen_record.bike.update_column :updated_at, Time.current - 1.hour
       # It doesn't create again
@@ -59,7 +59,7 @@ RSpec.describe Images::StolenProcessor do
       # It doesn't update the updated_at
       expect(stolen_record.reload.bike.updated_at).to be_within(1).of(Time.current - 1.hour)
       # No new jobs are enqueued
-      expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
+      expect(BikeJobs::AfterStolenRecordSaveJob.jobs.count).to eq 0
     end
 
     context "public_image deleted" do
@@ -156,6 +156,17 @@ RSpec.describe Images::StolenProcessor do
         end.to change(ActiveStorage::Blob, :count).by 3
         expect(stolen_record.reload.images_attached?).to be_truthy
         expect(stolen_record.images_attached_id).to eq public_image.id
+      end
+    end
+
+    context "public_image file missing on disk" do
+      it "does not raise and skips attaching images" do
+        expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
+        FileUtils.rm(public_image.image.path)
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 0
+        expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
       end
     end
 

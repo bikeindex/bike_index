@@ -44,7 +44,7 @@ RSpec.describe BikeServices::Displayer do
     it "is falsey if bike doesn't have impounded" do
       expect(BikeServices::Displayer.display_impound_claim?(bike)).to be_falsey
     end
-    context "impound bike" do
+    context "found bike (no organization)" do
       let(:impound_record) { ImpoundRecord.new(bike: bike) }
       before { allow(bike).to receive(:current_impound_record) { impound_record } }
       it "is truthy" do
@@ -52,6 +52,25 @@ RSpec.describe BikeServices::Displayer do
         expect(BikeServices::Displayer.display_impound_claim?(bike, User.new)).to be_truthy
         expect(BikeServices::Displayer.display_impound_claim?(bike, admin)).to be_truthy
         expect(BikeServices::Displayer.display_impound_claim?(bike, owner)).to be_falsey
+      end
+    end
+    context "impounded by an organization" do
+      let(:impound_record) { ImpoundRecord.new(bike: bike, organization: Organization.new) }
+      before { allow(bike).to receive(:current_impound_record) { impound_record } }
+      it "is falsey" do
+        expect(BikeServices::Displayer.display_impound_claim?(bike)).to be_falsey
+        expect(BikeServices::Displayer.display_impound_claim?(bike, User.new)).to be_falsey
+        expect(BikeServices::Displayer.display_impound_claim?(bike, admin)).to be_falsey
+        expect(BikeServices::Displayer.display_impound_claim?(bike, owner)).to be_falsey
+      end
+      context "unregistered parking notification" do
+        let(:impound_record) { ImpoundRecord.new(bike: bike, organization: Organization.new, unregistered_bike: true) }
+        it "is truthy" do
+          expect(BikeServices::Displayer.display_impound_claim?(bike)).to be_truthy
+          expect(BikeServices::Displayer.display_impound_claim?(bike, User.new)).to be_truthy
+          expect(BikeServices::Displayer.display_impound_claim?(bike, admin)).to be_truthy
+          expect(BikeServices::Displayer.display_impound_claim?(bike, owner)).to be_falsey
+        end
       end
     end
     context "impound_claim for bike" do

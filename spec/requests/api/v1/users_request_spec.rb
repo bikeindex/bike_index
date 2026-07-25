@@ -96,44 +96,54 @@ RSpec.describe API::V1::UsersController, type: :request do
         end
       end
     end
-    context "manufacturer_update_manufacturer present" do
-      it "updates the manufacturer" do
-        o = FactoryBot.create(:ownership)
-        manufacturer = FactoryBot.create(:manufacturer)
-        user = o.creator
-        bike = o.bike
-        update_manufacturer_request = {
+    describe "manufacturer_update_manufacturer present" do
+      let(:ownership) { FactoryBot.create(:ownership) }
+      let(:user) { ownership.creator }
+      let(:bike) { ownership.bike }
+      let(:update_manufacturer_request) do
+        {
           request_type: "manufacturer_update_manufacturer",
           user_id: user.id,
           request_bike_id: bike.id,
           request_reason: "Need to update manufacturer",
-          manufacturer_update_manufacturer: manufacturer.slug
+          manufacturer_update_manufacturer: manufacturer_slug
         }
-        log_in(user)
-        post "#{base_url}/send_request", params: update_manufacturer_request
-        expect(response.code).to eq("200")
-        bike.reload
-        expect(bike.manufacturer).to eq manufacturer
       end
-    end
+      before { log_in(user) }
 
-    context "manufacturer_update_manufacturer present" do
-      it "does not make nil manufacturer" do
-        o = FactoryBot.create(:ownership)
-        user = o.creator
-        bike = o.bike
-        update_manufacturer_request = {
-          request_type: "manufacturer_update_manufacturer",
-          user_id: user.id,
-          request_bike_id: bike.id,
-          request_reason: "Need to update manufacturer",
-          manufacturer_update_manufacturer: "doadsfizxcv"
-        }
-        log_in(user)
-        post "#{base_url}/send_request", params: update_manufacturer_request
-        expect(response.code).to eq("200")
-        bike.reload
-        expect(bike.manufacturer).to be_present
+      context "with a known manufacturer" do
+        let!(:manufacturer) { FactoryBot.create(:manufacturer) }
+        let(:manufacturer_slug) { manufacturer.slug }
+        it "updates the manufacturer" do
+          post "#{base_url}/send_request", params: update_manufacturer_request
+          expect(response.code).to eq("200")
+          bike.reload
+          expect(bike.manufacturer).to eq manufacturer
+        end
+      end
+
+      context "with other and a manual name" do
+        let!(:manufacturer) { Manufacturer.other }
+        let(:manufacturer_slug) { "other" }
+        let(:update_manufacturer_request) { super().merge(manufacturer_update_manufacturer_other: "Some obscure brand") }
+        it "sets the manufacturer to other with the manual name" do
+          post "#{base_url}/send_request", params: update_manufacturer_request
+          expect(response.code).to eq("200")
+          bike.reload
+          expect(bike.manufacturer).to eq Manufacturer.other
+          expect(bike.manufacturer_other).to eq "Some obscure brand"
+          expect(bike.mnfg_name).to eq "Some obscure brand"
+        end
+      end
+
+      context "with an unknown manufacturer" do
+        let(:manufacturer_slug) { "doadsfizxcv" }
+        it "does not make nil manufacturer" do
+          post "#{base_url}/send_request", params: update_manufacturer_request
+          expect(response.code).to eq("200")
+          bike.reload
+          expect(bike.manufacturer).to be_present
+        end
       end
     end
 

@@ -8,6 +8,10 @@
 //= link i18n.js
 //= link kelsey_styles.css
 
+//= link lexxy.js
+//= link lexxy.css
+//= link activestorage.esm.js
+
 //= link_tree ../../javascript
 //= link_tree ../../components/ .js
 //= link_tree ../builds

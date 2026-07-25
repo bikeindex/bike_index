@@ -22,7 +22,7 @@ module Images
     # ... It looks better when the image doesn't overlap with the bar
     TOPBAR_VERTICAL_WIDTH = 190
 
-    # NOTE: This doesn't delete images - that's handled by StolenBike::RemoveOrphanedImagesJob
+    # NOTE: This doesn't delete images - that's handled by BikeJobs::RemoveOrphanedImagesJob
 
     # Previously, we would set the image via passing it. That's a pain to track!
     # Instead, when overriding the image in admin, let's update the image we're overriding with
@@ -63,7 +63,8 @@ module Images
         return image_and_id(stolen_record, stolen_record.images_attached_id)
       end
       public_image ||= stolen_record.bike_main_image
-      return [public_image&.open_file, public_image.id] if public_image.present?
+      image = public_image&.open_file
+      return [image, public_image.id] if image.present?
 
       stock_photo_url = Bike.unscoped.find_by(id: stolen_record.bike_id)&.stock_photo_url
       if stock_photo_url.present?

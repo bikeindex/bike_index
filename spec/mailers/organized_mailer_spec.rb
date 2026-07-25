@@ -98,6 +98,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       it "renders email" do
         expect(mail.subject).to match "Confirm your Bike Index registration"
         expect(mail.tag).to eq "finished_registration"
+        expect(mail.body.encoded).to match "binx-header-banner" # shared blue banner header
         expect_render_donation(true, mail)
         expect_render_supporters(true, mail)
         expect(mail.deliver_now.text_part.body.to_s).to include("Confirm this").and include("Protect your bike")
@@ -182,7 +183,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.deliver_now.text_part.body.to_s).to include(bike.creation_organization.name).and include("Protect your bike")
           # Transferred registration
           BikeServices::Updator.new(user: user, bike: bike, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json).update_available_attributes
-          CallbackJob::AfterBikeSaveJob.new.perform(bike.id, true, true)
+          CallbackJobs::AfterBikeSaveJob.new.perform(bike.id, true, true)
           ownership2 = bike.reload.current_ownership
           expect(ownership2.id).to_not eq ownership.id
           expect(ownership.reload.current).to be_falsey
@@ -239,6 +240,18 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect_render_donation(true, mail)
           expect_render_supporters(true, mail)
           expect(mail.deliver_now.text_part.body.to_s).to include(bike.current_stolen_record.find_or_create_recovery_link_token)
+        end
+      end
+      context "impounded" do
+        let(:bike) { FactoryBot.create(:impounded_bike, :with_ownership_claimed) }
+        let(:ownership) { bike.current_ownership }
+        it "renders email with found bike messaging" do
+          expect(bike.status_impounded?).to be_truthy
+          expect(mail.subject).to eq("Bike Index registration successful")
+          expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+          expect(mail.tag).to eq "finished_registration"
+          expect(mail.deliver_now.text_part.body.to_s).to include("Thanks for adding this #{bike.type} you found to Bike Index")
+          expect(mail.deliver_now.text_part.body.to_s).to include("Give us a heads up")
         end
       end
     end
@@ -315,6 +328,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
     before { expect(header_mail_snippet).to be_present }
     it "renders email" do
       expect(mail.body.encoded).to match header_mail_snippet.body
+      expect(mail.body.encoded).to match "binx-header-banner" # shared blue banner header
       expect(mail.subject).to eq("Join #{organization.short_name} on Bike Index")
       expect(mail.reply_to).to eq([organization.auto_user.email])
       expect(mail.tag).to eq "organization_invitation"

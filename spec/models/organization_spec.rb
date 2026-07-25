@@ -354,8 +354,8 @@ RSpec.describe Organization, type: :model do
     context "paid" do
       let(:enabled_feature_slugs) { ["regional_bike_counts"] }
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-      # Ensure auto-increment is past the hardcoded excluded IDs (1 and 36)
-      before { FactoryBot.create_list(:organization, 2) if Organization.maximum(:id).to_i < 37 }
+      # Excluded IDs are real prod orgs (SBR/BikeIndex); stub them so the test org's auto-increment id can't collide
+      before { stub_const("Organization::USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS", []) }
       it "is truthy" do
         expect(organization.user_registration_all_bikes?).to be_truthy
       end
@@ -463,8 +463,8 @@ RSpec.describe Organization, type: :model do
     it "is truthy" do
       expect(Organization.new.restrict_invitations?).to be_truthy
     end
-    context "passwordless_users with passwordless_user_domain" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov") }
+    context "passwordless_users with user_email_domain" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "example.gov") }
       it "is falsey" do
         expect(organization.restrict_invitations?).to be_falsey
         expect(Organization.permitted_domain_passwordless_signin.pluck(:id)).to eq([organization.id])

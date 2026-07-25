@@ -168,8 +168,8 @@ RSpec.describe UsersController, type: :controller do
             expect(user.user_emails.first.email).to eq email
             expect(User.fuzzy_email_find(email)).to eq user
             # bike association is processed async, so we have to drain the queue
-            expect(CallbackJob::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
-            CallbackJob::AfterUserCreateJob.drain
+            expect(CallbackJobs::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+            CallbackJobs::AfterUserCreateJob.drain
             bike.reload
             expect(bike.user).to eq user
           }.to change(Email::WelcomeJob.jobs, :count)
@@ -215,7 +215,7 @@ RSpec.describe UsersController, type: :controller do
         end
       end
       context "with auto passwordless users" do
-        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "ladot.online", available_invitation_count: 1) }
         let(:email) { "example@ladot.online" }
         it "Does not create a organization_role or automatically confirm the user" do
           expect(session[:passive_organization_id]).to be_blank
@@ -269,6 +269,21 @@ RSpec.describe UsersController, type: :controller do
           expect(assigns(:page_errors)).to be_present
           expect(response).to render_template("layouts/application_bikehub")
         end
+      end
+    end
+    context "honeypot filled" do
+      it "creates the user but email bans them as spam" do
+        expect {
+          post :create, params: {user: user_attributes.merge(additional: "http://spam.example.com")}
+        }.to change(User, :count).by(1)
+        user = User.order(:created_at).last
+        expect(user.email_banned?).to be_truthy
+        email_ban = user.email_bans.last
+        expect(email_ban.reason).to eq "honeypot"
+        # The ban blocks the confirmation email, so the account can't be activated
+        expect {
+          Email::ConfirmationJob.new.perform(user.id)
+        }.to_not change(ActionMailer::Base.deliveries, :count)
       end
     end
     context "revised" do
@@ -346,7 +361,7 @@ RSpec.describe UsersController, type: :controller do
       end
 
       context "with auto_passwordless organization" do
-        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "ladot.online", available_invitation_count: 1) }
         let(:user) { FactoryBot.create(:user, email: email) }
         let(:email) { "something@ladot.com" }
 

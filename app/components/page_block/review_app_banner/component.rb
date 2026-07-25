@@ -2,23 +2,50 @@
 
 module PageBlock
   module ReviewAppBanner
-    # Banner shown across the top of every page on review-app deploys, so
-    # there's no chance of confusing a review environment with production.
-    # Callers pass `ENV["REVIEW_APP"]`, `ENV["REVIEW_APP_PR_NUMBER"]`, and
-    # `ENV["REVIEW_APP_PR_TITLE"]`; the component renders only when `review_app`
-    # is present.
+    # Banner shown across the top of every page on review-app and local dev
+    # deploys, so there's no chance of confusing them with production. Callers
+    # pass `ENV["REVIEW_APP"]` (or the string "development" for the local dev
+    # server), `ENV["REVIEW_APP_PR_NUMBER"]`, and `ENV["REVIEW_APP_PR_TITLE"]`;
+    # the component renders only when `review_app` is present.
     class Component < ApplicationComponent
-      def initialize(review_app:, pr_number: nil, pr_title: nil)
+      # Set NO_REVIEW_TOPBAR=true to suppress the banner everywhere it would
+      # otherwise show (dev, review apps, sandbox)
+      NO_REVIEW_TOPBAR = ENV["NO_REVIEW_TOPBAR"] == "true"
+
+      def initialize(review_app:, pr_number: nil, pr_title: nil, commit: nil, current_user: nil, return_to: nil)
         @review_app = review_app
         @pr_number = pr_number
         @pr_title = pr_title
+        @commit = commit
+        @current_user = current_user
+        @return_to = return_to
       end
 
       def render?
+        return false if NO_REVIEW_TOPBAR
+
         @review_app.present?
       end
 
       private
+
+      def development?
+        @review_app == "development"
+      end
+
+      # "development" is the local dev server; no PR number is the persistent
+      # sandbox deploy; otherwise a per-PR review app
+      def banner_label
+        return translation(".label_development") if development?
+
+        @pr_number.present? ? translation(".label") : translation(".label_sandbox")
+      end
+
+      # Purple on the local dev server (matching the dev favicon), green on
+      # review apps. Full literal classes so tailwind's scanner emits both.
+      def banner_accent_class
+        development? ? "tw:border-[#881e88] tw:bg-[#ff40ff]" : "tw:border-[#1e881e] tw:bg-[#40ff40]"
+      end
 
       # The PR title when known, falling back to "PR #<number>".
       def pr_link_text
@@ -27,6 +54,38 @@ module PageBlock
 
       def pr_url
         "https://github.com/bikeindex/bike_index/pull/#{@pr_number}"
+      end
+
+      def commit_url
+        "https://github.com/bikeindex/bike_index/commit/#{@commit}"
+      end
+
+      # Pill styling shared by the commit and email-outbox "?" tooltip triggers,
+      # matching the banner accent (purple in dev, green on review apps)
+      def pill_button_class
+        pill_color = development? ? "tw:bg-[#881e88] tw:hover:bg-[#601660]" : "tw:bg-[#1e881e] tw:hover:bg-[#166016]"
+        "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
+          "#{pill_color} tw:text-white tw:text-2xs tw:font-bold tw:cursor-help " \
+          "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+      end
+
+      # The seeded superadmin, signed in via the existing magic link flow
+      def superadmin
+        return @superadmin if defined?(@superadmin)
+
+        @superadmin = User.admins.first
+      end
+
+      def signed_in_as_superadmin?
+        @current_user.present? && @current_user == superadmin
+      end
+
+      # Refreshing the token persists it, so force the writing role: the banner
+      # renders on pages (e.g. bikes#show) served under set_reading_role.
+      def superadmin_magic_link_token
+        ActiveRecord::Base.connected_to(role: :writing) do
+          superadmin.refreshed_magic_link_token
+        end
       end
     end
   end

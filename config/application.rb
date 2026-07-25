@@ -8,7 +8,9 @@ require "active_model/railtie"
 require "active_record/railtie"
 require "active_storage/engine"
 require "action_controller/railtie"
+require "action_mailbox/engine"
 require "action_mailer/railtie"
+require "action_text/engine"
 require "action_view/railtie"
 # require "action_cable/engine"
 require "sprockets/railtie"
@@ -24,15 +26,7 @@ module Bikeindex
   class Application < Rails::Application
     config.redis_default_url = ENV["REDIS_URL"]
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
-    # Prefer a separate Redis instance for Rack::Attack so cache eviction can't
-    # drop rate-limit keys. Falls back to the next database on the cache Redis.
-    config.redis_rack_attack_url = ENV.fetch("REDIS_RACK_ATTACK_URL") do
-      if config.redis_cache_url.match?(%r{/\d+\z})
-        config.redis_cache_url.sub(%r{/(\d+)\z}) { "/#{$1.to_i + 1}" }
-      else
-        "#{config.redis_cache_url}/1"
-      end
-    end
+    config.redis_rack_attack_url = ENV.fetch("REDIS_RACK_ATTACK_URL", config.redis_cache_url)
 
     config.load_defaults 8.0
 
@@ -62,13 +56,17 @@ module Bikeindex
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
-    config.i18n.load_path += Dir[Rails.root.join("app", "components", "**", "*.{yml}").to_s]
+    # Component sidecar translations. A reloadable path (not a static glob) so dev reloads
+    # re-scan the tree — picking up renamed/added keys and files without a server restart.
+    config.i18n.railties_load_path << config.paths.add("app/components", glob: "**/*.yml")
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = :en
     config.i18n.available_locales = %i[en es it nl nb]
     config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
 
-    config.middleware.insert_after ActionDispatch::RemoteIp, IpSpoofAttackFilter
+    # Must sit below DebugExceptions/ShowExceptions: those rescue the raised IpSpoofAttackError
+    # and render it as a 500 before it can reach this filter. Above them it never fires.
+    config.middleware.insert_after ActionDispatch::DebugExceptions, IpSpoofAttackFilter
     config.middleware.use Rack::Deflater
     config.middleware.insert 0, Rack::UTF8Sanitizer
 

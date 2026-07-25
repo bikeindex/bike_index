@@ -20,6 +20,7 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
 - prefer un-abbreviated variable names
 - Keep comments pithy — often they aren't necessary. Explain *why* for a future reader; don't narrate the change that introduced the code
+- **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Reach for a `class` only when the object genuinely holds instance state across methods (e.g. a multi-step builder/updater). Don't write a stateless service as a `class` with `def self.` methods.
 
 ## Testing
 

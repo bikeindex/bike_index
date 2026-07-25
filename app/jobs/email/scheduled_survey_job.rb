@@ -12,7 +12,7 @@ module Email
     def perform(bike_id = nil, force_send = false)
       return enqueue_workers(SURVEY_COUNT) if bike_id.blank?
 
-      bike = Bike.unscoped.find(bike_id)
+      bike = Bike.unscoped.find_id(bike_id)
       return if !force_send && no_survey?(bike)
 
       notification = Notification.create(kind: :theft_survey_2023, bike: bike, user: bike.user)

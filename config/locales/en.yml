@@ -702,6 +702,7 @@ en:
         mxn: MXN
         usd: USD
       cycle_type:
+        balance_bike: Balance Bike
         bike: Bike
         cargo: Cargo Bike (front storage)
         cargo_rear: Cargo Bike Rear (e.g. longtail)
@@ -1296,6 +1297,9 @@ en:
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
       your_police_report: your Police Report Number
+    stolen_map:
+      unavailable: The map couldn't be loaded — your browser or device may not support
+        it.
     theft_alerts:
       new:
         best_value: Best value
@@ -1351,12 +1355,14 @@ en:
       manufacturer: Manufacturer
       model_year: Model year
       nevermind: Nevermind
+      other_manufacturer: Other manufacturer
       other_serial_or_registration_number: Other serial or registration number
       please_fill_in_both_fields: Please fill in both fields
       reason_for_update: Reason for update
       remove_end: Remove end
       remove_start: Remove start
       seat_tube_length: Seat tube length
+      select_other: Select 'Other' if manufacturer doesn't show up when entered
       submit_manufacturer_correction: Submit Manufacturer Correction
       submit_serial_correction: Submit serial correction
       submit_update: Submit update
@@ -1532,6 +1538,7 @@ en:
       its_how_we_get_better_at_recovering_bikes: It"s how we get better at recovering
         bikes.
       mark_recovered: Mark recovered
+      marking_recovered: Marking your bike recovered…
       nevermind: Nevermind
       not_enough_info: Not enough information!
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}
@@ -1601,57 +1608,14 @@ en:
       wide: Wide
       wide_help: "> 38mm (1.5in)"
       wide_title: Tires that are at least 39mm (1.5 inches) wide
-  components:
-    emails:
-      partials:
-        bike_box:
-          bike_photo: Bike photo
-          color: Color
-          color_may_be_incorrect: Color may be incorrect because it was set during
-            POS import
-          found: 'Found:'
-          make: 'Make:'
-          serial: 'Serial:'
-          stolen_at: 'Stolen at:'
-          stolen_from: 'Stolen from:'
-    form:
-      legacy_form_well:
-        address_record:
-          address: Street address
-          address_no_street: Address
-          address_or_intersection: Address or intersection
-          address_school: Campus mailing address
-          choose_country: Choose country
-          city: City
-          postal_code: Postal Code
-          region: Region / Province
-          state: State
-          street_2: Street address line 2 (optional)
-          where_was_it_status: Where was it %{bike_status}?
-          your_full_address_is_required: Your full address is required by %{org_name}
-        address_record_with_default:
-          edit_my_account_path: edit on my account
-          use_account_address: Use account address
-    org:
-      impound_records_index:
-        matching_impound_record:
-          one: matching impound record
-          other: matching impound records
-    page_block:
-      strava_integration:
-        activities_synced:
-          one: activity synced
-          other: activities synced
-    ui:
-      definition_list:
-        row:
-          no_value: none
   controllers:
     application:
       handle_unverified_request:
-        csrf_invalid: >-
-          CSRF invalid. If you don't know why you're receiving this message, please
-          contact us.
+        invalid_authenticity_token: >-
+          Form submission failed, please try again. If this keeps happening, a VPN
+          or a privacy extension is probably stripping information we need — try turning
+          those off for bikeindex.org. Email contact@bikeindex.org if you're still
+          stuck.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: You must be signed in to do that.
@@ -1878,7 +1842,9 @@ en:
         destroy:
           export_deleted: Export was successfully deleted!
         update:
-          bike_stickers_removed: Bike codes removed!
+          bike_stickers_undone: >-
+            Bike stickers restoring to their previous bikes (or unassigned). This
+            will take a few minutes
           unknown_update_action: Unknown update action!
       impound_records:
         available_impound_records:
@@ -4465,7 +4431,13 @@ en:
         new_export: New Export
         org_exports_html: "%{org_name} Exports"
         progress: Progress
+        stickers: stickers
         stickers_assigned: Stickers assigned?
+        stickers_removed: stickers removed
+        stickers_removed_title: Stickers assigned by this export were unassigned
+        stickers_title: Assigned stickers
+        stickers_unassigned: stickers unassigned
+        stickers_undone_title: Stickers were assigned, then the assignment was undone
       show:
         avery_export: Avery Export
         bikes_exported: Bikes exported
@@ -4486,12 +4458,21 @@ en:
           is finished
         show_bikes_in_export: Show bikes in export
         show_first_100_bikes_in_export: Show first 100 bikes in export
+        show_previously_assigned_stickers: Show previously assigned stickers
         specific_bikes: Specific bikes
         stickers: Stickers
         stickers_exported: "%{bike_stickers_count} Stickers exported"
-        stickers_have_been_unassigned: Stickers have been unassigned
+        stickers_have_been_restored: have now been restored to their previous bikes
+        stickers_have_been_unassigned: Stickers have been unassigned (legacy version
+          of 'Undo sticker assignment')
+        stickers_initially_assigned: Stickers initially assigned, but
+        stickers_not_undone: 'These stickers were assigned again after this export,
+          so they were not undone:'
         unable_to_export: Unable to export, not part of your organization
-        unassign_stickers: Unassign stickers
+        undo_sticker_assignment: Undo sticker assignment
+        undo_sticker_assignment_confirm: >-
+          Are you sure you want to undo the sticker assignment? This will remove the
+          history of having assigned these stickers. This can not be undone.
         view_avery_labels: View Avery Labels
     impound_records:
       index:
@@ -4548,15 +4529,6 @@ en:
       index:
         matches_visible: visible
         parking_notifications: Parking notifications
-      show_details:
-        address: Address
-        bike: Bike
-        by: Created by
-        created: Created at
-        internal_notes: Internal notes
-        message: Message
-        notification_number: Notification#
-        resolved: Resolved
       table:
         address: Address
         bike: Bike
@@ -4773,6 +4745,8 @@ en:
         no_matched: No registrations with serial numbers similar to %{serial}
         with_similar_serials: Registrations with serials similar to %{serial}
   sessions:
+    identify:
+      different_email: Sign in with a different email
     magic_link:
       enter_email_address: Enter your email address, we'll send you an email with
         a link to log in.
@@ -4785,20 +4759,18 @@ en:
       you_should_be_signed_in_automatically: You should be automatically signed in.
       your_email_address: your email address
     new:
-      dont_have_an_account: don't have an account?
+      continue: Continue
       email: email
+      email_me_the_link: Email me the link
       forgot_your_password: Forgot your password?
       get_on_bike_index: Get on Bike Index
       keep_me_logged_in: Keep me logged in
       log_in: Log in
-      no_bike_index_account: No Bike Index account?
-      or: Or
+      log_in_or_sign_up: Log in or sign up
+      org_uses_passwordless: Your organization signs in without a password.
       password: password
-      sign_in_using_facebook: Sign in using Facebook
-      sign_in_using_globalid: Sign in using globaliD
-      sign_in_using_magic_link: Emailed sign in link
-      sign_in_using_strava: Sign in using Strava
-      sign_up: sign up
+      passwordless_help: We'll email you a secure link to sign in.
+      sign_in_without_password: Sign in without a password
   shared:
     bike_search_form:
       anywhere: Anywhere
@@ -5031,6 +5003,7 @@ en:
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
       manage_impounding: Manage impounding
+      manage_registration_sequences: Manage Registration sequences
       manage_users: Manage users
       model_audits: E-Vehicle audits
       multi_search: Multi search
@@ -5075,6 +5048,8 @@ en:
       bike: Bike
       recovered_date: recovered %{date}
       translated_from_english: translated from English
+    shops_map:
+      map_of_partner_locations: Map of partner locations
     user_general_alert:
       add_location_theft_bike_title_html: Add the location of the theft of your <strong>%{bike_title}</strong>
       add_photo_theft_bike_title_html: Add a photo to your <strong>%{bike_title}</strong>
@@ -5235,7 +5210,13 @@ en:
       weve_sent_an_email: We've sent an email to the address you have on file with
         us.
     show:
+      banned_only_visible_to_superusers: Their profile is only visible because you're
+        a superuser.
+      banned_user: This user is banned
       bikes: Bikes
+      profile_hidden: This profile isn't shared publicly
+      profile_hidden_owner: It's only visible to you because it's your page.
+      profile_hidden_superuser: It's only visible because you're a superuser.
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes

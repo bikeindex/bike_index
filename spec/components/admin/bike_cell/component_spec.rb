@@ -64,10 +64,10 @@ RSpec.describe Admin::BikeCell::Component, type: :component do
     context "with creation_description" do
       let(:bike) { FactoryBot.create(:bike_lightspeed_pos) }
 
-      it "renders origin with title" do
+      it "renders origin with tooltip" do
         expect(bike.creation_description).to eq "Lightspeed"
-        expect(component.css("small.less-strong span").text).to eq "Lightspeed"
-        expect(component.css("small.less-strong span").first["title"]).to eq "Automatically registered by bike shop point of sale (Lightspeed POS)"
+        expect(component.css("small.less-strong").text).to include("Lightspeed")
+        expect(component.css("small.less-strong [role=tooltip]").text).to eq "Automatically registered by bike shop point of sale (Lightspeed POS)"
       end
     end
   end

@@ -55,7 +55,7 @@ module API
       end
 
       def show
-        render json: Bike.unscoped.find(params[:id]), serializer: SingleBikeSerializer
+        render json: Bike.unscoped.find_id(params[:id]), serializer: SingleBikeSerializer
       end
 
       def create

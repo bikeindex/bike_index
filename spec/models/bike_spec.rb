@@ -65,6 +65,15 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    describe "short_id and find_id" do
+      let(:bike) { FactoryBot.create(:bike, id: 3431156) }
+      it "round-trips through find_id" do
+        expect(bike.short_id).to eq "r/21J-HW"
+        expect(Bike.find_id(bike.short_id)).to eq bike
+        expect(Bike.find_id(bike.id)).to eq bike
+      end
+    end
+
     describe ".currently_stolen_in" do
       context "given no matching state or country" do
         it "returns none" do
@@ -122,7 +131,7 @@ RSpec.describe Bike, type: :model do
       let!(:stolen_record3) { FactoryBot.create(:stolen_record, phone: "2223334444", secondary_phone: "111222333") }
       let(:bike2) { stolen_record3.bike }
       it "finds by stolen_record" do
-        StolenBike::AfterStolenRecordSaveJob.new.perform(stolen_record2.id)
+        BikeJobs::AfterStolenRecordSaveJob.new.perform(stolen_record2.id)
         expect(stolen_record1.reload.current?).to be_falsey
         stolen_record1.update_column :current, true
         bike1.reload
@@ -721,6 +730,17 @@ RSpec.describe Bike, type: :model do
       it "responds with status" do
         expect(bike.status_humanized).to eq "with owner"
         expect(bike.status_humanized_translated).to eq "with owner"
+      end
+    end
+  end
+
+  describe "created_by_notification_or_impounding?" do
+    context "unregistered parking notification" do
+      let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered) }
+      let(:bike) { parking_notification.bike }
+      it "is truthy" do
+        expect(bike.current_ownership.origin).to eq "creator_unregistered_parking_notification"
+        expect(bike.created_by_notification_or_impounding?).to be_truthy
       end
     end
   end
@@ -1703,7 +1723,8 @@ RSpec.describe Bike, type: :model do
         expect(bike.reload.thumb_path).to be_present
         expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
         expect(bike.image_url).to eq public_image.image_url
-        expect(bike.image_url(:medium)).to eq public_image.image_url(:medium)
+        # reload so the version URL reconstructs from the stored identifier (generation is backgrounded)
+        expect(bike.image_url(:medium)).to eq public_image.reload.image_url(:medium)
       end
       # On Fog storage, CarrierWave's Uploader#blank? issues an S3 HEAD per call
       # (via Fog::File#exists? → directory.files.head). image_url is invoked twice

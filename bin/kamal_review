@@ -11,13 +11,17 @@
 #   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 #
 # Passthrough sends everything else straight to kamal; --app may go anywhere and
-# defaults to PR 0 (the shared accessories aren't PR-specific), e.g.
-#   bin/kamal_review app logs -f --app 3594
-#   bin/kamal_review accessory reboot db
+# defaults to the persistent `sandbox` app, e.g.
+#   bin/kamal_review app logs -f              # sandbox (default)
+#   bin/kamal_review app logs -f --app 3594   # a PR
+# Accessory commands need an explicit `--app 0` (or any PR): the shared-db /
+# shared-redis accessories live only in the pr-* config, not sandbox's.
+#   bin/kamal_review accessory reboot db --app 0
 #
 # deploy/destroy require an explicit --app and run the per-PR lifecycle:
 #   deploy  — kamal deploy --version <tag> --skip-push (tag via --version or IMAGE_TAG)
-#   destroy — kamal app remove, drop the per-PR databases + role, flush its redis db
+#   destroy — purge the PR's ActiveStorage objects from the shared R2 bucket, kamal
+#             app remove, drop the per-PR databases + role, flush its redis db
 # deploy is idempotent — same path on first and subsequent deploys;
 # bin/docker-entrypoint creates the per-PR Postgres role on first boot and
 # db:prepare handles schema/seed-or-migrate.
@@ -42,12 +46,13 @@ Usage:
 <review-app> is a PR, in any of these equivalent forms:
   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 
-Passthrough defaults --app to 0 when omitted; deploy/destroy require it.
+Passthrough defaults --app to the persistent 'sandbox' app; deploy/destroy require it.
 
 Examples:
+  bin/kamal_review app logs -f                       # sandbox (default)
   bin/kamal_review app logs -f --app 3594
   bin/kamal_review app exec --reuse "bin/rails runner 'puts Bike.count'" --app pr-3594
-  bin/kamal_review accessory reboot db
+  bin/kamal_review accessory reboot db --app 0       # accessories live in the pr-* config
   bin/kamal_review deploy  --app 3594 --version pr-3594-abc123
   bin/kamal_review destroy --app 3594
 
@@ -80,6 +85,27 @@ export_review_app_env() {
   export REVIEW_APP_REDIS_DB="$((($1 % REDIS_DATABASES) + 1))"
 }
 
+# The persistent sandbox app: no PR number (config/deploy.review.yml's ERB then
+# resolves the `sandbox` slug), Redis DB 0 — the one the mod-N PR allocation
+# reserves.
+export_sandbox_env() {
+  unset REVIEW_APP_PR_NUMBER
+  export REVIEW_APP_HOST="${REVIEW_APP_HOST:-host.review.bikeindex.org}"
+  export REVIEW_APP_REDIS_DB="0"
+}
+
+# True when the app id refers to sandbox, in any of review_app_pr_number's forms
+# (bare `sandbox`, host, or URL).
+is_sandbox() {
+  local s
+  s="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
+  s="${s#http://}"
+  s="${s#https://}"
+  s="${s%%/*}"   # drop any /path
+  s="${s%%.*}"   # drop the .review.bikeindex.org domain
+  [[ "$s" == "sandbox" ]]
+}
+
 not_a_review_app() {
   echo "Error: '$1' is not a review app (expected e.g. 3594, pr-3594, or pr-3594.review.bikeindex.org)" >&2
   echo >&2
@@ -97,10 +123,10 @@ case "$1" in
   deploy | destroy) mode="$1"; shift ;;
 esac
 
-# Passthrough: any kamal command, --app anywhere, defaults to PR 0. Always execs,
-# so control never reaches the lifecycle code below.
+# Passthrough: any kamal command, --app anywhere, defaults to sandbox. Always
+# execs, so control never reaches the lifecycle code below.
 if [[ -z "$mode" ]]; then
-  app="0"
+  app="sandbox"
   kamal_args=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -109,9 +135,15 @@ if [[ -z "$mode" ]]; then
       *) kamal_args+=("$1"); shift ;;
     esac
   done
-  pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
-  export_review_app_env "$pr_number"
-  echo "==> [pr-${pr_number} on ${REVIEW_APP_HOST}] kamal ${kamal_args[*]} --config-file ${CONFIG}" >&2
+  if is_sandbox "$app"; then
+    export_sandbox_env
+    slug="sandbox"
+  else
+    pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
+    export_review_app_env "$pr_number"
+    slug="pr-${pr_number}"
+  fi
+  echo "==> [${slug} on ${REVIEW_APP_HOST}] kamal ${kamal_args[*]} --config-file ${CONFIG}" >&2
   exec kamal "${kamal_args[@]}" --config-file "$CONFIG"
 fi
 
@@ -132,9 +164,10 @@ done
 pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
 export_review_app_env "$pr_number"
 
-# Role/database names must stay in lockstep with config/deploy.review.yml's env
-# section — destroy drops whatever names are derived here.
+# Role/database/volume names must stay in lockstep with config/deploy.review.yml
+# — destroy drops whatever names are derived here.
 slug="pr-${pr_number}"
+appname="bike-index-${slug}"
 role="bike_index_pr_${pr_number}"
 primary_db="bike_index_review_pr_${pr_number}_primary"
 analytics_db="bike_index_review_pr_${pr_number}_analytics"
@@ -150,10 +183,32 @@ case "$mode" in
     # It also avoids kamal cloning the repo --recurse-submodules, which fails on
     # the private app/services/facebook submodule (see config/deploy.review.yml).
     kamal deploy --version "$version" --skip-push
+
+    # Start each review-app deploy with a clean Rails cache so new code never
+    # serves stale cached fragments. Runs only here, so sandbox (which deploys
+    # via `kamal deploy` directly, not this script) is left untouched. --reuse
+    # execs in the running web container; --roles web runs it once. Best-effort:
+    # a failed clear must never fail the deploy.
+    # NOTE: cache, Sidekiq, and rack_attack share this PR's one Redis logical DB
+    # and the cache store is un-namespaced, so this clear is a FLUSHDB of that DB.
+    echo "==> Clearing Rails cache"
+    kamal app exec --reuse --roles web "bin/rails runner 'Rails.cache.clear'" ||
+      echo "Rails cache clear skipped/failed (non-fatal)"
+
     echo "==> Done. URL: https://${slug}.review.bikeindex.org"
     ;;
 
   destroy)
+    # ActiveStorage attachments land in the shared R2 dev bucket (cloudflare_dev)
+    # at the bucket root with random keys — no per-PR prefix to drop — so delete
+    # them through the running app, whose database lists exactly this PR's blobs
+    # (keys are globally unique, so no other app's objects are touched). Must run
+    # before `app remove` drops the container and its R2 credentials. Best-effort
+    # like the rest of destroy: a broken/already-gone app just leaves the blobs.
+    echo "==> Purging this PR's ActiveStorage objects from R2"
+    kamal app exec --reuse --roles web \
+      "bin/rails runner 'ActiveStorage::Blob.find_each { |blob| blob.service.delete(blob.key) }'" || true
+
     echo "==> Destroying review app $slug"
     kamal app remove || true
 
@@ -170,6 +225,13 @@ case "$mode" in
     echo "==> Flushing redis logical DB $REVIEW_APP_REDIS_DB"
     kamal accessory exec redis --reuse \
       "redis-cli -n ${REVIEW_APP_REDIS_DB} FLUSHDB" || true
+
+    # Named volumes outlive `kamal app remove`, so drop them or they leak on the
+    # host. The app containers are gone by now, so the volumes are free to remove.
+    # `server exec` runs on the host (as root) rather than inside a container.
+    echo "==> Removing per-PR volumes (${appname}_storage, ${appname}_uploads)"
+    kamal server exec \
+      "docker volume rm ${appname}_storage ${appname}_uploads" || true
 
     echo "==> Done."
     ;;
