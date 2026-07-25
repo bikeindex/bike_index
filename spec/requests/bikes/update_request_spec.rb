@@ -364,6 +364,21 @@ RSpec.describe "BikesController#update", type: :request do
       }
     end
 
+    context "with legacy stolen attribute names" do
+      let(:legacy_stolen_params) do
+        stolen_params.except(:postal_code, :region_record_id).merge(zipcode: "10007", state_id: state.id)
+      end
+      it "updates with the renamed attributes" do
+        expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
+        patch base_url, params: {bike: {stolen: "true", stolen_records_attributes: {"0" => legacy_stolen_params}}}
+        expect(flash[:success]).to be_present
+        stolen_record.reload
+        expect(stolen_record.street).to eq "278 Broadway"
+        expect(stolen_record.postal_code).to eq "10007"
+        expect(stolen_record.region_record_id).to eq state.id
+      end
+    end
+
     it "clears the existing alert image" do
       # Cassette required for alert image
       VCR.use_cassette("bike_request-stolen", match_requests_on: [:method], re_record_interval: 1.month) do

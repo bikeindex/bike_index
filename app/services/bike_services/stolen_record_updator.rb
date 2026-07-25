@@ -5,12 +5,12 @@ module BikeServices
     # Used to be in StolenRecord - but now it's here. Eventually, I'd like to actually do permitted params handling in here
     def self.old_attr_accessible
       # recovery_tweet, recovery_share # We edit this in the admin panel
-      %i[police_report_number police_report_department locking_description lock_defeat_description
+      (%i[police_report_number police_report_department locking_description lock_defeat_description
         timezone date_stolen bike creation_organization_id country_id region_record_id street postal_code city latitude
         longitude theft_description current phone secondary_phone phone_for_everyone
         phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
         approved recovered_at recovered_description index_helped_recovery can_share_recovery
-        recovery_posted tsved_at estimated_value].freeze
+        recovery_posted tsved_at estimated_value] + BParam::LEGACY_STOLEN_ATTRS.keys.map(&:to_sym)).freeze
     end
 
     def initialize(bike: nil, b_param: nil, params: nil)

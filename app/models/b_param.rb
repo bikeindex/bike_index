@@ -31,6 +31,8 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
+  # Stolen record attrs that were renamed - keep accepting the old names, forms are often submitted long after render
+  LEGACY_STOLEN_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
   REGISTRATION_INFO_ATTRS = %w[
     accuracy
     bike_code
@@ -127,7 +129,6 @@ class BParam < ApplicationRecord
       if stolen_attrs.present? && stolen_attrs.delete_if { |k, v| v.blank? } && stolen_attrs.keys.any?
         h["stolen_record"] = stolen_attrs
         h["stolen_record"]["street"] = h["stolen_record"].delete("address") if h["stolen_record"]["address"].present?
-        h["stolen_record"]["postal_code"] = h["stolen_record"].delete("zipcode") if h["stolen_record"]["zipcode"].present?
       end
       h
     end
@@ -288,7 +289,7 @@ class BParam < ApplicationRecord
     # Set the date_stolen if it was passed, if something else didn't already set date_stolen
     date_stolen = params.dig("bike", "date_stolen")
     s_attrs["date_stolen"] ||= date_stolen if date_stolen.present?
-    s_attrs.except("phone_no_show", "show_address")
+    rename_legacy_stolen_attrs(s_attrs.except("phone_no_show", "show_address"))
   end
 
   def impound_attrs
@@ -625,6 +626,13 @@ class BParam < ApplicationRecord
   end
 
   private
+
+  def rename_legacy_stolen_attrs(s_attrs)
+    LEGACY_STOLEN_ATTRS.each_with_object(s_attrs) do |(legacy, renamed), attrs|
+      value = attrs.delete(legacy)
+      attrs[renamed] = value if value.present? && attrs[renamed].blank?
+    end
+  end
 
   def ensure_valid_params
     self.params ||= {"bike" => {}}

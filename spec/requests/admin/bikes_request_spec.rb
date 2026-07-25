@@ -172,7 +172,8 @@ RSpec.describe Admin::BikesController, type: :request do
           stolen_records_attributes: {
             "0" => {
               street: "Cortland and Ashland",
-              city: "Chicago"
+              city: "Chicago",
+              zipcode: "60622"
             }
           }
         }
@@ -197,6 +198,7 @@ RSpec.describe Admin::BikesController, type: :request do
         stolen_record.reload
         expect(stolen_record.street).to eq "Cortland and Ashland"
         expect(stolen_record.city).to eq "Chicago"
+        expect(stolen_record.postal_code).to eq "60622"
         expect(bike.bike_organization_ids).to eq([organization.id])
       end
 
