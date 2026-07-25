@@ -245,6 +245,11 @@ export default class extends Controller {
         maxZoom: 18,
         attributionControl: { customAttribution: OSM_ATTRIBUTION }
       })
+      // The map paints to a canvas, so its state is unreachable from the DOM.
+      // Hang it off the container: specs (and the console) read the centre,
+      // layers and paint properties through this.
+      this.mapTarget.map = this.map
+
       // Scroll over the map should scroll the page, not zoom it — zooming is the
       // buttons' job; the geolocate button re-centres on the device location
       this.map.scrollZoom.disable()

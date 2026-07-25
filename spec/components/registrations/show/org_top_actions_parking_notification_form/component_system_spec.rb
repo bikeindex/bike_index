@@ -36,6 +36,69 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
     find("[name$='[#{attribute}]']", visible: :all).value
   end
 
+  # The map paints to a canvas, so none of its state reaches the DOM. The controller
+  # hangs the MapLibre instance off the container; read it back through the public API.
+  # No JS comments in here — the driver collapses the script onto one line, so a
+  # `//` would comment out everything after it.
+  # accuracyRadius is stop 4 of the interpolation: the zoom-0 pixel radius, which
+  # scales with the accuracy the browser reported.
+  def map_snapshot
+    page.evaluate_script(<<~JS)
+      (() => {
+        const el = document.querySelector("[data-registrations--show--parking-notification-target='map']")
+        const map = el && el.map
+        if (!map || !map.loaded() || !map.getLayer("device-dot")) { return null }
+        const dot = map.queryRenderedFeatures({layers: ["device-dot"]})[0]
+        return {
+          center: map.getCenter().toArray(),
+          layers: ["device-accuracy", "device-dot"].filter((id) => Boolean(map.getLayer(id))),
+          device: dot ? dot.geometry.coordinates : null,
+          accuracyRadius: map.getPaintProperty("device-accuracy", "circle-radius")[4]
+        }
+      })()
+    JS
+  end
+
+  # MapLibre keeps painting after the DOM has settled, so poll for the condition.
+  # A not-ready snapshot arrives as {} (the driver maps a JS null to an empty hash,
+  # which is truthy), so test it with present? rather than for nil.
+  def map_settling_on
+    snapshot = nil
+    Timeout.timeout(15) do
+      loop do
+        snapshot = map_snapshot
+        break if snapshot.present? && yield(snapshot)
+        sleep 0.25
+      end
+    end
+    snapshot
+  rescue Timeout::Error
+    raise "map never settled; last snapshot: #{snapshot.inspect}"
+  end
+
+  # Pan the map the way a user does — press, move, release over the canvas
+  def drag_map(x_offset, y_offset)
+    page.driver.with_playwright_page do |playwright_page|
+      box = playwright_page.locator("[data-registrations--show--parking-notification-target='map']").bounding_box
+      center_x = box["x"] + box["width"] / 2
+      center_y = box["y"] + box["height"] / 2
+      playwright_page.mouse.move(center_x, center_y)
+      playwright_page.mouse.down
+      playwright_page.mouse.move(center_x + x_offset, center_y + y_offset, steps: 12)
+      playwright_page.mouse.up
+    end
+  end
+
+  def move_device_to(latitude:, longitude:, accuracy:)
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.set_geolocation({latitude:, longitude:, accuracy:})
+    end
+  end
+
+  def rounded(coordinates, digits = 4)
+    coordinates.map { |coordinate| coordinate.round(digits) }
+  end
+
   before do
     stub_const("ENV", ENV.to_hash.merge("MAPBOX_MAPPING" => "pk.test-token"))
     visit preview_path
@@ -121,6 +184,50 @@ RSpec.describe Registrations::Show::OrgTopActionsParkingNotificationForm::Compon
       expect(page).to have_button("Create parking notification", disabled: false, wait: 10)
       expect(coordinate("latitude")).to eq("40.5")
       expect(coordinate("longitude")).to eq("-74.25")
+    end
+  end
+
+  # Everything below the canvas can regress silently — the pin, the device marker
+  # and the submitted coordinates leave no DOM behind
+  context "the map itself" do
+    it "moves the pin with the map, keeps the device marker on the latest fix, and never geocodes" do
+      visit "#{preview_path}?panel=parking"
+      expect(page).to have_content(located_status, wait: 10)
+
+      # The device marker sits on the reported fix, haloed by its accuracy
+      placed = map_settling_on { |snapshot| snapshot["layers"].sort == %w[device-accuracy device-dot] }
+      expect(rounded(placed["device"])).to eq([longitude.to_f, latitude.to_f])
+      expect(rounded(placed["center"])).to eq([longitude.to_f, latitude.to_f])
+      loose_accuracy_radius = placed["accuracyRadius"]
+
+      # Dragging moves the pin: the coordinates follow the map centre
+      drag_map(160, 60)
+
+      # Wait for moveend to stamp the new centre, then check the form tracks it
+      dragged = map_settling_on { (coordinate("latitude").to_f - latitude.to_f).abs > 1e-5 }
+      expect(coordinate("latitude").to_f.round(5)).to eq(dragged["center"][1].round(5))
+      expect(coordinate("longitude").to_f.round(5)).to eq(dragged["center"][0].round(5))
+      # The device marker is not the pin, so it stays where the device is
+      expect(rounded(dragged["device"])).to eq([longitude.to_f, latitude.to_f])
+      # Panning never resolves an address — the readout is coordinates throughout
+      expect(page).to have_no_content("Bryant Street")
+      expect(find("[data-registrations--show--parking-notification-target='statusText']").text)
+        .to match(/\A-?\d+\.\d+, -?\d+\.\d+\z/)
+
+      # The locate button returns to the device, adopting a newer and tighter fix
+      move_device_to(latitude: 37.7749, longitude: -122.4194, accuracy: 5)
+      find(".maplibregl-ctrl-geolocate").click
+
+      # Wait for the flight to land and stamp the form. The control fitBounds() to
+      # the accuracy circle rather than centring exactly, so allow ~500m against
+      # what is a ~15km jump from Berkeley
+      relocated = map_settling_on { (coordinate("longitude").to_f + 122.4194).abs < 0.005 }
+      expect(coordinate("latitude").to_f).to be_within(0.005).of(37.7749)
+      expect(relocated["center"][0]).to be_within(0.005).of(-122.4194)
+      # The marker moved with it, onto the exact fix the control reported
+      expect(rounded(relocated["device"], 3)).to eq([-122.419, 37.775])
+      # The halo tracks the reported accuracy: 20m -> 5m shrinks it
+      expect(relocated["accuracyRadius"]).to be < loose_accuracy_radius
     end
   end
 
