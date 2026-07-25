@@ -31,7 +31,7 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
-  # Stolen record attrs that were renamed - keep accepting the old names, forms are often submitted long after render
+  # TODO: #3952 - stolen record legacy attrs, to support accepting the old names
   LEGACY_STOLEN_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
   REGISTRATION_INFO_ATTRS = %w[
     accuracy
@@ -132,6 +132,7 @@ class BParam < ApplicationRecord
       h
     end
 
+    # TODO: #3952 - stolen record legacy attrs
     def rename_legacy_stolen_attrs(s_attrs)
       LEGACY_STOLEN_ATTRS.each_with_object(s_attrs) do |(legacy, renamed), attrs|
         value = attrs.delete(legacy)

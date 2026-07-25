@@ -7,7 +7,8 @@ module BikeServices
       longitude theft_description current phone secondary_phone phone_for_everyone
       phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
       approved recovered_at recovered_description index_helped_recovery can_share_recovery
-      recovery_posted tsved_at estimated_value] + BParam::LEGACY_STOLEN_ATTRS.keys.map(&:to_sym)).freeze
+      recovery_posted tsved_at estimated_value] +
+      BParam::LEGACY_STOLEN_ATTRS.keys.map(&:to_sym)).freeze # TODO: #3952 - stolen record legacy attrs
 
     attr_reader :stolen_params
 
