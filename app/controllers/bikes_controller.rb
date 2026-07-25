@@ -9,7 +9,7 @@ class BikesController < Bikes::BaseController
 
   def show
     redirect_to(format: "png") && return if request.format == "gif"
-    redirect_to(registration_path(@bike)) && return if show_redesign?
+    redirect_to(registration_path(@bike, request.query_parameters)) && return if show_redesign?
 
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in

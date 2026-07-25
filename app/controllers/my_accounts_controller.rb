@@ -70,8 +70,14 @@ class MyAccountsController < ApplicationController
   def toggle_show_redesign
     bike = Bike.unscoped.find_id(params[:bike_id])
     show_legacy = !current_user.feature_registration_show_legacy?
-    current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
-    redirect_to(show_legacy ? bike_path(bike) : registration_path(bike))
+    if current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
+      redirect_to(show_legacy ? bike_path(bike) : registration_path(bike))
+    else
+      # Unrelated validations (e.g. a preferred_language no longer available) can block
+      # the update, so return to the view they came from rather than bouncing them
+      flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
+      redirect_to(show_legacy ? registration_path(bike) : bike_path(bike))
+    end
   end
 
   private

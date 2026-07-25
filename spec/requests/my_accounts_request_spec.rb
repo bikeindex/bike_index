@@ -774,6 +774,16 @@ RSpec.describe MyAccountsController, type: :request do
           expect(current_user.reload.feature_registration_show_legacy).to be_falsey
         end
       end
+
+      context "user invalid for an unrelated reason" do
+        before { current_user.update_column(:preferred_language, "xx") }
+        it "flashes an error and returns to the view they came from" do
+          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
+          expect(response).to redirect_to(registration_path(bike))
+          expect(flash[:error]).to match(/unable to update/i)
+          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
+        end
+      end
     end
   end
 
