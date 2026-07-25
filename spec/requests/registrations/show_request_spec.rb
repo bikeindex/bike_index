@@ -237,8 +237,9 @@ RSpec.describe "RegistrationsController#show", type: :request do
           it "shows the Update impound action, its form, and the impound-record card" do
             get "#{base_url}/#{bike.id}"
             body = whitespace_normalized_body_text
-            # The Update impound action opens the impound-record update form
-            expect(body).to match("Update Impound record")
+            # The Update impound action opens a panel holding the impound-record update form
+            expect(body).to match("Update Impound Record")
+            expect(response.body).to include("impoundRecordUpdateForm")
             expect(response.body).to_not match('data-panel-name="impound"')
             # The main-column card shows the org impound-record heading + fields
             expect(body).to include("#{organization.short_name} impound record")
