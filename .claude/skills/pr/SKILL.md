@@ -44,7 +44,7 @@ Every migration this branch adds must be dated within the past 2 days. List them
 
 For each stale migration, in this order (rollback must happen while the old version is still on disk):
 
-1. Roll it back: `bin/rails db:migrate:down VERSION=<old-timestamp>` (`db:migrate:down:analytics` for `db/analytics_migrate` files).
+1. Roll it back: `bin/rails db:migrate:down:primary VERSION=<old-timestamp>` (`db:migrate:down:analytics` for `db/analytics_migrate` files) — the un-namespaced `db:migrate:down` refuses in this multi-database app.
 2. `git mv` the file to the same name with a fresh `date +%Y%m%d%H%M%S` timestamp — when re-dating several, keep their relative order with incrementing timestamps.
 3. `bin/rails db:migrate` to re-apply and regenerate the structure files — never hand-edit `db/structure.sql`.
 4. Commit the renames together with the regenerated structure files.
