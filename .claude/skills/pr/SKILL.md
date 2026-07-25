@@ -88,4 +88,15 @@ Push the branch: `git push -u origin HEAD`. Don't report the local branch name d
 
 Always pass the body via `--body-file` (not inline `--body`) to preserve formatting.
 
+### 3.5. Point the local dev banner at the PR
+
+Only when `.workspace_id` exists at the repo root (a Conductor workspace) — on both step 3 paths, since a retitled PR needs `REVIEW_APP_PR_TITLE` refreshed just as much as a new one. Upsert the PR's current number and title into `.env.development`; never Read or Edit that file, it holds live API tokens:
+
+```bash
+sed -i '' '/^REVIEW_APP_PR_\(NUMBER\|TITLE\)=/d' .env.development
+gh pr view --json number,title --jq '"REVIEW_APP_PR_NUMBER=\(.number)\nREVIEW_APP_PR_TITLE=\(.title|tojson)"' >> .env.development
+```
+
+`.env.*` is gitignored, so this stays local. `app/views/layouts/application.html.erb` passes both into the dev banner, and dotenv reads the file only at boot — mention in the final report that `bin/dev` needs a restart to pick them up; never restart it yourself.
+
 **If `FRONTEND=false`, stop here and return the PR URL.** If `FRONTEND=true`, read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment (it uses `$EXISTING_PR`/`$PR_NUMBER` from the steps above). Screenshot tooling never blocks the PR — if it fails, return the PR URL and report the failure.
