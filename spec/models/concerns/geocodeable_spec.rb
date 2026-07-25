@@ -90,4 +90,31 @@ RSpec.describe Geocodeable do
       end
     end
   end
+
+  describe "clean_city" do
+    let(:address_record) { AddressRecord.new(city:, country_id:, skip_geocoding: true) }
+    let(:country_id) { nil }
+    let(:city) { "INDIANAPOLIS, IN USA" }
+
+    it "removes USA and trailing state abbreviation, titleizes" do
+      address_record.valid?
+      expect(address_record.city).to eq "Indianapolis"
+    end
+
+    context "city with trailing lowercase word" do
+      let(:city) { "Georgian la" }
+      it "titleizes without removing the word" do
+        address_record.valid?
+        expect(address_record.city).to eq "Georgian La"
+      end
+    end
+
+    context "bare trailing capitalized state" do
+      let(:city) { "Chicago IL" }
+      it "removes it" do
+        address_record.valid?
+        expect(address_record.city).to eq "Chicago"
+      end
+    end
+  end
 end

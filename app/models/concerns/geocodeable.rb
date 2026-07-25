@@ -155,25 +155,28 @@ module Geocodeable
     end
   end
 
-  # Remove ", CA" from city like "Sacramento, CA" and assign region if not assigned.
-  # Only works for USA because states only work in US
+  # Clean "INDIANAPOLIS, IN USA" type cities: strip "USA" and trailing state abbreviations
+  # (assigning region if not assigned), then titleize. US-only - regions only work in the US,
+  # and non-US cities are left alone
   def clean_city(str)
-    unless country_id == Country.united_states_id && str&.match?(/(,|\.)\s*\w\w\s*\z/)
-      return Binxtils::InputNormalizer.string(str)
-    end
+    str = Binxtils::InputNormalizer.string(str&.gsub("USA", ""))
+    return str if str.blank?
+    return str if country_id.present? && country_id != Country.united_states_id
 
-    state_abbr = str[/(,|\.)\s*\w\w\s*\z/].gsub(/,|\./, "").strip.downcase
-    city_without_state = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
-    if region_record_id.present?
-      str = city_without_state if region_record.abbreviation.downcase == state_abbr
-    else
-      matched_state = State.fuzzy_abbr_find(state_abbr)
-      if matched_state.present?
+    if str.match?(/(,|\.)\s*\w\w\s*\z/) && country_id.present?
+      state_abbr = str[/(,|\.)\s*\w\w\s*\z/].gsub(/,|\./, "").strip.downcase
+      if region_record_id.present?
+        # Keep an abbreviation that disagrees with the assigned region
+        return str unless region_record.abbreviation.downcase == state_abbr
+      else
+        matched_state = State.fuzzy_abbr_find(state_abbr)
+        return str if matched_state.blank?
+
         self.region_record_id = matched_state.id
-        str = city_without_state
       end
+      str = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
     end
-    str.strip.gsub(/\s*,\z/, "")
+    str.gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.gsub(/\s*,\z/, "").titleize
   end
 
   def assign_region_record

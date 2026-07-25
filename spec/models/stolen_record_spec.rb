@@ -268,20 +268,6 @@ RSpec.describe StolenRecord, type: :model do
       end
     end
 
-    describe "titleize_city" do
-      it "it should titleize_city" do
-        stolen_record = StolenRecord.new(city: "INDIANAPOLIS, IN USA")
-        stolen_record.set_calculated_attributes
-        expect(stolen_record.city).to eq("Indianapolis")
-      end
-
-      it "it shouldn't remove other things" do
-        stolen_record = StolenRecord.new(city: "Georgian la")
-        stolen_record.set_calculated_attributes
-        expect(stolen_record.city).to eq("Georgian La")
-      end
-    end
-
     describe "set_date" do
       let(:date) { Date.strptime("07-22-0014", "%m-%d-%Y") }
       let(:stolen_record) { StolenRecord.new(date_stolen: date) }
