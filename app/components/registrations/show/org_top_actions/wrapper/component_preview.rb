@@ -22,13 +22,13 @@ module Registrations
               "Impounded" => component(preview_bike(:status_impounded)),
               "Unregistered parking notification" => component(preview_bike(:unregistered_parking_notification)),
               "With parking notification" => component(bike_with_parking_notification),
-              "Limited (non-staff) member" => component(preview_bike(:status_with_owner), staff: false),
+              "Limited (non-staff) member" => component(preview_bike(:status_with_owner), org_role: :limited),
               "No features" => component(preview_bike(:status_with_owner), organization: ::Organization.new(short_name: "Preview", enabled_feature_slugs: []))
             }
           end
 
-          def component(bike, staff: true, organization: lookbook_organization)
-            Component.new(bike:, organization:, staff:)
+          def component(bike, org_role: :staff, organization: lookbook_organization)
+            Component.new(bike:, organization:, org_role:)
           end
 
           def preview_bike(status)

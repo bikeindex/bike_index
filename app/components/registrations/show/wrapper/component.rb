@@ -26,7 +26,7 @@ module Registrations
             kind, organization = @view
             if organization
               OrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
-                staff: kind == :staff, available_views: @available_views)
+                org_role: kind, available_views: @available_views)
             else
               Consumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
                 show_for_sale: @bike.is_for_sale?, available_views: @available_views)

@@ -11,7 +11,7 @@ RSpec.describe Registrations::Show::OrgAdmin::Component, type: :component do
   # don't touch the bike still expire the cached panel when they change
   describe "#cache_version" do
     def cache_version
-      described_class.new(bike: bike.reload, current_user:, organization:).cache_version
+      described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff).cache_version
     end
 
     it "changes when an organization note is added" do
@@ -30,7 +30,7 @@ RSpec.describe Registrations::Show::OrgAdmin::Component, type: :component do
     let!(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: bike.user) }
 
     it "renders the column-toggle settings inside the card" do
-      render_inline(described_class.new(bike: bike.reload, current_user:, organization:))
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
 
       expect(page).to have_css("[data-controller~='org--search-column-toggle']")
       expect(page).to have_text("Visible columns")
