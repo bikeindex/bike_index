@@ -18,7 +18,7 @@ module UI
 
         def with_html_labels
           render(UI::Forms::RadioButtonGroup::Component.new(
-            name: :search_status,
+            name: :search_impounded,
             entries: [
               {value: "", label: "All"},
               {value: "not_impounded", label: "only <strong>not</strong> impounded"},
