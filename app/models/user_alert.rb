@@ -121,7 +121,7 @@ class UserAlert < ApplicationRecord
   def self.update_stolen_bike_without_location(user:, bike:)
     user_alert = UserAlert.find_or_build_by(kind: "stolen_bike_without_location",
       user_id: user.id, bike_id: bike.id)
-    if bike.current_stolen_record&.without_location?
+    if bike.current_stolen_record&.without_street?
       user_alert.save
     else # Don't create just to resolve
       user_alert.id.blank? || user_alert.resolve!

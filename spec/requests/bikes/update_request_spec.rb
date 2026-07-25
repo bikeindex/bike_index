@@ -387,7 +387,7 @@ RSpec.describe "BikesController#update", type: :request do
         FactoryBot.create(:alert_image, stolen_record:)
         stolen_record.reload
         expect(bike.current_stolen_record_id).to eq stolen_record.id
-        expect(stolen_record.without_location?).to be_truthy
+        expect(stolen_record.without_street?).to be_truthy
         og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
         expect(og_alert_image_id).to be_present
         # Test stolen record phoning

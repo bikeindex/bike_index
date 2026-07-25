@@ -134,7 +134,6 @@ class StolenRecord < ApplicationRecord
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
   scope :without_street, -> { where(street: ["", nil]) }
-  scope :without_location, -> { without_street }
 
   class << self
     def permitted_visible_attribute(string_or_sym = nil, default: nil)
@@ -265,8 +264,7 @@ class StolenRecord < ApplicationRecord
     address_present?
   end
 
-  # Overrides geocodeable without_location, we need more specificity
-  def without_location?
+  def without_street?
     street.blank?
   end
 

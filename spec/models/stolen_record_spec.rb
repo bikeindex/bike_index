@@ -186,7 +186,7 @@ RSpec.describe StolenRecord, type: :model do
         country_id: country.id,
         skip_geocoding: true)
       expect(stolen_record.formatted_address_string).to eq("60647, Neverland")
-      expect(stolen_record.without_location?).to be_falsey
+      expect(stolen_record.without_street?).to be_falsey
       expect(stolen_record.formatted_address_string).to eq("60647, Neverland")
     end
     it "returns blank if there is no address" do
@@ -514,7 +514,7 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.formatted_address_string).to eq("New York, NY 10007")
         expect(stolen_record.formatted_address_string(render_country: true)).to eq("New York, NY 10007, United States")
         stolen_record.street = ""
-        expect(stolen_record.without_location?).to be_truthy
+        expect(stolen_record.without_street?).to be_truthy
 
         ca = FactoryBot.create(:state_california)
         stolen_record = FactoryBot.create(:stolen_record, city: nil, region_record: ca, country: Country.united_states)
