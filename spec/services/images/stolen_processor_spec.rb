@@ -207,12 +207,12 @@ RSpec.describe Images::StolenProcessor do
       end
     end
     context "Edmonton" do
-      let(:location_attrs) { {street: "7935 Gateway Blvd", city: "Edmonton", postal_code: "T6E 3X8", latitude: 53.515072, longitude: -113.494412, region_record: nil, country: Country.canada} }
+      let(:location_attrs) { {street: "7935 Gateway Blvd", city: "Edmonton", postal_code: "T6E 3X8", latitude: 53.515072, longitude: -113.494412, region_record: nil, region_string: "AB", country: Country.canada} }
       let(:stolen_record) { FactoryBot.create(:stolen_record, location_attrs.merge(skip_geocoding: true)) }
       it "returns edmonton" do
         stolen_record.reload
         expect(stolen_record.to_coordinates).to eq([location_attrs[:latitude], location_attrs[:longitude]])
-        expect(described_class.send(:stolen_record_location, stolen_record)).to eq("Edmonton, Canada")
+        expect(described_class.send(:stolen_record_location, stolen_record)).to eq("Edmonton, AB, Canada")
       end
     end
   end
