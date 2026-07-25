@@ -27,8 +27,8 @@ export function groundRadiusStops (radiusMeters, latitude) {
 // phone that leaves too little map, so small screens get real fullscreen instead
 const PAGE_EXPAND_QUERY = '(min-width: 48rem)'
 // Above the header's 1040, since the expanded map covers the page. `fixed!` because
-// MapLibre's stylesheet is unlayered and ours isn't, so its `.maplibregl-map`
-// position:relative outranks the utility whatever order they load in
+// the parking-notification map also carries `tw:relative` (it positions the centre
+// pin before MapLibre attaches), and same-layer utilities fall back to source order
 const EXPANDED_CLASSES = ['tw:fixed!', 'tw:inset-0', 'tw:z-[1050]']
 
 // A MapLibre control that expands the map to fill the page (or the screen, on
