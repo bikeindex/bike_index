@@ -13,7 +13,7 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
   let(:latitude) { "37.8698" }
   let(:longitude) { "-122.2585" }
   # A resolved pin is mirrored into the URL — there is no on-page location readout
-  let(:located_url) { /map_lat=37\.8698.*map_lng=-122\.2585.*map_zoom=16/ }
+  let(:located_url) { /map_lat=37\.8698.*map_lng=-122\.2585.*map_zoom=15\.50/ }
   let(:geocode_feature) do
     {
       address: "2363a",

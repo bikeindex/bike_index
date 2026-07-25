@@ -11,7 +11,7 @@ import { ExpandControl, groundRadiusStops, loadMapLibre, OSM_ATTRIBUTION } from 
 // restores them. Moving the map moves the pin. "Enter address manually" reveals
 // the UI::Forms::AddressGroup fields instead. Tiles come from our self-hosted
 // MapLibre basemap; the mapboxKey is only for reverse-geocoding the pin.
-const DEFAULT_ZOOM = 16
+const DEFAULT_ZOOM = 15.5
 
 // The device's own position, so a dragged pin can be judged against where the
 // phone thinks it is. The halo covers the accuracy the browser reported.
