@@ -224,11 +224,6 @@ class StolenRecord < ApplicationRecord
 
   def longitude_public = longitude&.round(Bike::PUBLIC_COORD_LENGTH)
 
-  # Legacy v2 API location format (ISO country suffix)
-  def formatted_address_string_with_iso
-    [formatted_address_string(render_country: false), country_iso].reject(&:blank?).join(", ").presence
-  end
-
   # Override to add reverse geocoding functionality
   def bike_index_geocode
     if address_changed?
