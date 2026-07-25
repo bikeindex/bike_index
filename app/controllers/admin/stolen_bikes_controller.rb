@@ -106,7 +106,7 @@ module Admin
       if @unapproved_only
         available_stolen_records = StolenRecord.current.unapproved
         unless @only_without_location
-          @unapproved_without_location_count = available_stolen_records.without_location.count
+          @unapproved_without_location_count = available_stolen_records.without_street.count
           available_stolen_records = available_stolen_records.with_location
         end
       else

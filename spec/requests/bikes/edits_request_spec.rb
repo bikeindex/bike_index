@@ -228,7 +228,7 @@ RSpec.describe Bikes::EditsController, type: :request do
 
       it "renders with stolen as first template, different description" do
         expect(bike.reload.status).to eq "status_stolen"
-        expect(bike.current_stolen_record.without_location?).to be_truthy
+        expect(bike.current_stolen_record.without_street?).to be_truthy
         get base_url
         expect(response).to be_ok
         expect(assigns(:edit_template)).to eq "theft_details"
@@ -255,7 +255,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         stolen_record.reload
         bike.reload
         expect(bike.current_stolen_record).to eq stolen_record
-        expect(bike.current_stolen_record.without_location?).to be_truthy
+        expect(bike.current_stolen_record.without_street?).to be_truthy
         expect(stolen_record.theft_alert_missing_photo?).to be_falsey
         templates.each do |template|
           get base_url, params: {id: bike.id, edit_template: template}

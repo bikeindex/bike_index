@@ -74,7 +74,7 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     expect(stolen_record.country_id).to eq united_states.id
     expect(stolen_record.street).to eq "100 Main St"
     expect(stolen_record.city).to eq "New York"
-    expect(stolen_record.zipcode).to eq "10001"
+    expect(stolen_record.postal_code).to eq "10001"
     expect(stolen_record.phone).to eq "3125551234"
     expect(stolen_record.theft_description).to eq "Cut lock outside the cafe"
     expect(stolen_record.date_stolen).to be_present

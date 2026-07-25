@@ -255,8 +255,8 @@ RSpec.describe Organized::BulkImportsController, type: :request do
                 country_id: Country.united_states.id.to_s,
                 street: "2143412",
                 city: "San Francisco",
-                zipcode: "94141",
-                state_id: "",
+                postal_code: "94141",
+                region_record_id: "",
                 theft_description: "Someone something",
                 police_report_number: "333444",
                 police_report_department: "555666",
@@ -313,6 +313,27 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(stolen_record2.date_stolen.to_i).to be_within(1).of 1649804400 # 2022-04-12 18:00 CT
               expect(stolen_record2.proof_of_ownership).to be_truthy
               expect(stolen_record2.receive_notifications).to be_truthy
+            end
+            context "with legacy stolen attribute names" do
+              let(:legacy_stolen_record_params) do
+                stolen_record_params.except(:postal_code, :region_record_id).merge(zipcode: "94141", state_id: "")
+              end
+              it "creates with the renamed stolen attributes" do
+                Sidekiq::Job.clear_all
+                expect {
+                  post base_url, params: {
+                    bulk_import: {file: file, kind: "stolen"},
+                    stolen_record: legacy_stolen_record_params
+                  }
+                }.to change(BulkImport, :count).by 1
+                bulk_import = BulkImport.last
+                expect(bulk_import.kind).to eq "stolen"
+                expect(bulk_import.data["stolen_record"]).to match_hash_indifferently legacy_stolen_record_params.except(:bad_attribute)
+
+                expect { BulkImportJob.drain }.to change(Bike, :count).by 2
+                stolen_record1 = bulk_import.bikes.reorder(:created_at).first.current_stolen_record
+                expect(stolen_record1).to match_hash_indifferently stolen_record_attrs
+              end
             end
           end
         end

@@ -47,14 +47,6 @@ module SearchResults
         @bike.occurred_at || @event_record&.updated_at || @bike.updated_at
       end
 
-      def address_string
-        if @event_record.is_a?(ImpoundRecord)
-          @event_record.formatted_address_string # It's address_record
-        else
-          @event_record.address(country: [:iso])
-        end
-      end
-
       # copies from application_helper
       # TODO: replace with DefinitionList::Container::Component
       def attr_list_item(desc, title)
