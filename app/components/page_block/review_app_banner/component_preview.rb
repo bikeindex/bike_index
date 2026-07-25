@@ -13,6 +13,11 @@ module PageBlock
         render(PageBlock::ReviewAppBanner::Component.new(review_app: "1", commit: "a1b2c3d"))
       end
 
+      # Local dev server — the label reads "Development".
+      def development
+        render(PageBlock::ReviewAppBanner::Component.new(review_app: "development"))
+      end
+
       # No title available — link falls back to "PR #<number>".
       def without_pr_title
         render(PageBlock::ReviewAppBanner::Component.new(review_app: "1", pr_number: 3664))

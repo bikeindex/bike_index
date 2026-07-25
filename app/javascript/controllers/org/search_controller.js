@@ -10,7 +10,7 @@ export default class extends Controller {
   connect () {
     if (localStorage.getItem('orgRegistrationSettingsOpen') === 'true') {
       collapse('show', this.settingsTarget, 0)
-      if (this.hasSettingsButtonTarget) this.settingsButtonTarget.classList.add('active')
+      if (this.hasSettingsButtonTarget) this.settingsButtonTarget.setAttribute('aria-pressed', 'true')
     }
     this.initNotesSearch()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
@@ -29,7 +29,7 @@ export default class extends Controller {
       this.settingsTarget.classList.contains('tw:hidden')
     collapse('toggle', this.settingsTarget)
     localStorage.setItem('orgRegistrationSettingsOpen', wasHidden ? 'true' : 'false')
-    if (this.hasSettingsButtonTarget) this.settingsButtonTarget.classList.toggle('active', wasHidden)
+    if (this.hasSettingsButtonTarget) this.settingsButtonTarget.setAttribute('aria-pressed', String(wasHidden))
   }
 
   initNotesSearch () {

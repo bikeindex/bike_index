@@ -4,7 +4,7 @@
 # so we need at least one of each kind tied to Brakebills.
 
 brakebills = Organization.find_by_name("Brakebills")
-member = User.find_by_email("member@bikeindex.org")
+member = User.find_by_email("member@brakebills.edu")
 user = User.find_by_email("user@bikeindex.org")
 
 raise "missing Brakebills org or test users" if brakebills.blank? || member.blank? || user.blank?
@@ -231,7 +231,7 @@ unless transferred_bike_exists
     bike: bike,
     permitted_params: {bike: {owner_email: "new-owner@bikeindex.org"}}.as_json
   ).update_available_attributes
-  CallbackJob::AfterBikeSaveJob.new.perform(bike.id, true, true)
+  CallbackJobs::AfterBikeSaveJob.new.perform(bike.id, true, true)
   puts "  Created transferred bike ##{bike.id}"
 end
 

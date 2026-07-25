@@ -4,7 +4,7 @@
 user_attrs = {
   admin: {name: "Admin User", email: "admin@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current},
   dev: {name: "Dev User", email: "dev@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current, developer: true},
-  member: {name: "Member User", email: "member@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current},
+  member: {name: "Member User", email: "member@brakebills.edu", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current},
   user: {name: "Test User", email: "user@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
   api_accessor: {name: "Api Accessor", email: "api@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
   example_user: {name: "Example User", email: "example_user@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true}
@@ -19,5 +19,9 @@ end
 # Create superuser ability for admin user
 admin = User.find_by(email: "admin@bikeindex.org")
 SuperuserAbility.create!(user: admin)
+
+# Actor gates, not the :superusers group — the in-app toggle disables per-actor
+Flipper.enable_actor(:bike_show_redesign, admin)
+Flipper.enable_actor(:bike_show_redesign_toggle, admin)
 
 puts "Users added successfully\n"

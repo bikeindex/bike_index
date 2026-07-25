@@ -1,0 +1,138 @@
+# Copies the full Protomaps planet (~137 GB, all zoom levels) into the maps R2
+# bucket from a GitHub runner. build.protomaps.com throttles a single connection
+# to a few MiB/s - too slow to move 137 GB inside the 6-hour job limit (a
+# single-stream `rclone copyurl` timed out at 80%). So rclone reads the build
+# through an `http` remote with --multi-thread-streams: many parallel range
+# requests, spread across the file, that together run far faster than one
+# connection, piped straight into R2's multipart upload so the file never lands on
+# disk (ingress is free). The one-time assets block seeds style, glyphs and
+# sprites; comment it out after the first run.
+#
+# Run it from the Actions tab - no input needed, it resolves and streams the
+# latest Protomaps planet build automatically. Refresh the tiles quarterly; the last
+# step purges the Cloudflare cache for you.
+#
+# No outage during this ~hour stream: R2 swaps the object only at multipart
+# completion, so reads keep getting the old archive (first-ever seed aside).
+#
+#
+# Secrets (on the maps-upload environment): R2_MAPS_ENDPOINT, R2_MAPS_ACCESS_KEY,
+# R2_MAPS_ACCESS_KEY_SECRET - the token must be scoped to ONLY the bikeindex-maps
+# bucket (Object Read & Write). Plus CLOUDFLARE_ZONE_ID and CLOUDFLARE_PURGE_TOKEN
+# (a token scoped to Cache Purge on the bikeindex.org zone) for the final purge.
+# Add required reviewers to the environment to gate who can run it.
+#
+# One-time R2 + Cloudflare setup, before the first run:
+#   Bucket:      bikeindex-maps  (SEPARATE from the uploads bucket - this one is public)
+#   Public host: https://maps.bikeindex.org  (R2 custom domain, never the S3 endpoint)
+#   1. Create the bucket. It holds only the public basemap (tiles, style.json,
+#      glyphs, sprites under basemap/) - no user data, no secrets.
+#   2. Connect maps.bikeindex.org as a custom domain and serve all reads from it.
+#   3. CORS: any origin (["*"]), methods GET + HEAD, allow the Range request
+#      header, and expose ETag (pmtiles reads it to detect the archive changing).
+#      Public OSM data - rate limiting and caching cap abuse, not CORS.
+#   4. Cache Rule on the host: cache and respect the object's Cache-Control (the
+#      upload sets max-age), keeping R2 read ops - and the bill - low.
+#   5. Rate-limit the host per IP (R2 egress is free, ops are not).
+name: Upload basemap
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    environment: maps-upload
+    env:
+      HOST: https://maps.bikeindex.org/basemap
+      BUCKET: "r2:bikeindex-maps/basemap"
+      RCLONE_CONFIG_R2_TYPE: s3
+      RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+      RCLONE_CONFIG_R2_REGION: auto
+      RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.R2_MAPS_ENDPOINT }}
+      RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_MAPS_ACCESS_KEY }}
+      RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_MAPS_ACCESS_KEY_SECRET }}
+    steps:
+      - name: Install rclone
+        run: curl -fsSL https://rclone.org/install.sh | sudo bash
+
+      # Resolve the newest daily planet build from Protomaps' build metadata.
+      # Builds are retained ~1 week, so "latest" is always fresh and there's no
+      # date to keep up to date. Set the http-remote base + key so rclone can
+      # multi-thread the download by range.
+      - name: Resolve build URL
+        run: |
+          key=$(curl -fsSL https://build-metadata.protomaps.dev/builds.json | jq -r '.[-1].key')
+          {
+            echo "RCLONE_CONFIG_SRC_TYPE=http"
+            echo "RCLONE_CONFIG_SRC_URL=https://build.protomaps.com"
+            echo "KEY=$key"
+          } >> "$GITHUB_ENV"
+          echo "Streaming build: https://build.protomaps.com/$key"
+
+      - name: Stream tiles to R2
+        run: |
+          rclone copyto "src:$KEY" "$BUCKET/tiles.pmtiles" \
+            --multi-thread-streams 16 \
+            --multi-thread-cutoff 100Mi \
+            --s3-chunk-size 128M \
+            --s3-no-check-bucket \
+            --header-upload "Cache-Control: public, max-age=86400" \
+            --progress
+
+      # === One-time basemap assets (light-theme style, glyphs, sprites) ===
+      # Seeded once (2026-07); the assets rarely change, so these steps are
+      # commented out. Uncomment for a theme swap or basemap-version bump.
+      # - name: Generate light-theme style.json
+      #   run: |
+      #     npm install protomaps-themes-base >/dev/null 2>&1
+      #     cat > gen-style.mjs <<'JS'
+      #     import layers from "protomaps-themes-base"
+      #     import { writeFileSync } from "node:fs"
+      #     const HOST = process.env.HOST
+      #     const style = {
+      #       version: 8,
+      #       glyphs: `${HOST}/fonts/{fontstack}/{range}.pbf`,
+      #       sprite: `${HOST}/sprites/v4/light`,
+      #       sources: {
+      #         protomaps: {
+      #           type: "vector",
+      #           url: `pmtiles://${HOST}/tiles.pmtiles`,
+      #           attribution: "© OpenStreetMap contributors"
+      #         }
+      #       },
+      #       layers: layers("protomaps", "light")
+      #     }
+      #     writeFileSync("style.json", JSON.stringify(style))
+      #     JS
+      #     node gen-style.mjs
+      # - name: Fetch Protomaps glyphs + sprites
+      #   run: git clone --depth 1 https://github.com/protomaps/basemaps-assets.git
+      # - name: Upload style, glyphs and sprites to R2
+      #   run: |
+      #     rclone copyto style.json "$BUCKET/style.json" \
+      #       --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
+      #     rclone copy basemaps-assets/fonts "$BUCKET/fonts" \
+      #       --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
+      #     rclone copy basemaps-assets/sprites "$BUCKET/sprites" \
+      #       --s3-no-check-bucket --header-upload "Cache-Control: public, max-age=86400"
+      # === end one-time assets ===
+
+      # Purge the refreshed objects from Cloudflare so clients fetch them instead of
+      # waiting out max-age. Purge by URL (not the whole zone - maps.bikeindex.org
+      # shares the bikeindex.org zone). style.json only moves with the assets block,
+      # but purging an unchanged URL is harmless.
+      - name: Purge Cloudflare cache
+        env:
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
+        run: |
+          curl -fsS -X POST \
+            "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CLOUDFLARE_PURGE_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data "$(jq -nc --arg h "$HOST" '{files: [$h + "/tiles.pmtiles", $h + "/style.json"]}')" \
+            | jq -e '.success'
+
+      - name: Done
+        run: echo "Uploaded to $BUCKET and purged the Cloudflare cache for $HOST/tiles.pmtiles."

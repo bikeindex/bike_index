@@ -39,22 +39,22 @@ RSpec.describe Membership, type: :model do
     it "enqueues AfterUserChangeJob only when the status changes, and performing it doesn't re-enqueue" do
       Sidekiq::Job.clear_all
       membership = FactoryBot.build(:membership, user:, creator:, start_at: Time.current - 1.hour)
-      expect { membership.save! }.to change(CallbackJob::AfterUserChangeJob.jobs, :count).by(1)
+      expect { membership.save! }.to change(CallbackJobs::AfterUserChangeJob.jobs, :count).by(1)
       expect(membership.reload.status).to eq "active"
-      CallbackJob::AfterUserChangeJob.drain
-      expect(CallbackJob::AfterUserChangeJob.jobs.count).to eq 0 # performing it doesn't re-enqueue itself
+      CallbackJobs::AfterUserChangeJob.drain
+      expect(CallbackJobs::AfterUserChangeJob.jobs.count).to eq 0 # performing it doesn't re-enqueue itself
 
       expect {
         membership.update!(status: :ended, end_at: Time.current - 1.day)
-      }.to change(CallbackJob::AfterUserChangeJob.jobs, :count).by(1)
+      }.to change(CallbackJobs::AfterUserChangeJob.jobs, :count).by(1)
       expect(membership.status).to eq "ended"
-      CallbackJob::AfterUserChangeJob.drain
-      expect(CallbackJob::AfterUserChangeJob.jobs.count).to eq 0
+      CallbackJobs::AfterUserChangeJob.drain
+      expect(CallbackJobs::AfterUserChangeJob.jobs.count).to eq 0
 
       # A save that doesn't change the status doesn't enqueue
       expect {
         membership.update!(level: :patron)
-      }.to_not change(CallbackJob::AfterUserChangeJob.jobs, :count)
+      }.to_not change(CallbackJobs::AfterUserChangeJob.jobs, :count)
     end
   end
 

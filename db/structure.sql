@@ -920,7 +920,8 @@ CREATE TABLE public.bug_reports (
     updated_at timestamp(6) without time zone NOT NULL,
     received_at timestamp(6) without time zone,
     from_name text,
-    inbound_email_id bigint
+    inbound_email_id bigint,
+    status integer DEFAULT 0 NOT NULL
 );
 
 
@@ -2894,7 +2895,7 @@ CREATE TABLE public.organizations (
     location_longitude double precision,
     regional_ids jsonb,
     manual_pos_kind integer,
-    passwordless_user_domain character varying,
+    user_email_domain character varying,
     graduated_notification_interval bigint,
     lightspeed_register_with_phone boolean DEFAULT false,
     manufacturer_id bigint,
@@ -6365,6 +6366,13 @@ CREATE INDEX index_bug_reports_on_inbound_email_id ON public.bug_reports USING b
 
 
 --
+-- Name: index_bug_reports_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_status ON public.bug_reports USING btree (status);
+
+
+--
 -- Name: index_bug_reports_on_tags; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7459,6 +7467,9 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260723000000'),
+('20260722120000'),
+('20260716120000'),
 ('20260713120000'),
 ('20260706180000'),
 ('20260706164500'),

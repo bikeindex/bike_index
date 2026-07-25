@@ -81,7 +81,7 @@ class PublicImage < ApplicationRecord
     imageable&.update(updated_at: Time.current)
     return true unless bike?
 
-    CallbackJob::AfterBikeSaveJob.perform_async(imageable_id, false, true)
+    CallbackJobs::AfterBikeSaveJob.perform_async(imageable_id, false, true)
   end
 
   # CarrierWaveProcessJob generates versions by reading the stored original back

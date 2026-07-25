@@ -176,10 +176,10 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.id}"
         expect(assigns(:bike).id).to eq bike.id
         expect(response).to render_template(:show)
-      }.to change(StolenBike::AfterStolenRecordSaveJob.jobs, :count).by 0
+      }.to change(BikeJobs::AfterStolenRecordSaveJob.jobs, :count).by 0
       expect {
-        StolenBike::AfterStolenRecordSaveJob.new.perform(stolen_record.id)
-      }.to change(StolenBike::AfterStolenRecordSaveJob.jobs, :count).by 0
+        BikeJobs::AfterStolenRecordSaveJob.new.perform(stolen_record.id)
+      }.to change(BikeJobs::AfterStolenRecordSaveJob.jobs, :count).by 0
       expect(stolen_record.reload.alert_image).to be_blank
       expect(stolen_record.reload.images_attached?).to be_truthy
       expect(stolen_record.recovery_link_token).to be_present
@@ -707,6 +707,11 @@ RSpec.describe "BikesController#show", type: :request do
 
         get "#{base_url}/#{bike.id}.png"
         expect(response.status).to eq(200)
+      end
+
+      it "renders the legacy page when no_redesign is passed" do
+        get "#{base_url}/#{bike.id}?no_redesign=true"
+        expect(response).to render_template(:show)
       end
     end
 

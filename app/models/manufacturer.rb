@@ -169,7 +169,7 @@ class Manufacturer < ApplicationRecord
   def run_callback_job
     return unless @run_callback_job
 
-    CallbackJob::AfterManufacturerChangeJob.perform_async(id)
+    CallbackJobs::AfterManufacturerChangeJob.perform_async(id)
   end
 
   def b_count

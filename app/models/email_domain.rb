@@ -28,7 +28,7 @@ class EmailDomain < ApplicationRecord
   INVALID_DOMAIN = "(invalid).domain"
   EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 3).to_i
   STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2, ignored: 3}.freeze
-  TLD_HAS_SUBDOMAIN = %w[.au .hk .il .in .jp .mx .nz .tw .uk .us .za].freeze
+  TLD_HAS_SUBDOMAIN = %w[.au .br .hk .il .in .jp .mx .nz .tw .uk .us .za].freeze
   SPAM_SCORE_AUTO_BAN = 5
   # We don't verify with EmailDomains in most tests because it slows things down.
   # This also includes an env to turn if off in case things block up
