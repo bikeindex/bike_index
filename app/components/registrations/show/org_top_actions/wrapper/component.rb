@@ -29,11 +29,12 @@ module Registrations
             @org_role == :staff
           end
 
-          # A grid rather than the button's default flex, so the two layouts can share
-          # one DOM order: below sm the subtitle sits beside the icon with the title
-          # across the row underneath, and from sm the icon spans a title/subtitle column
+          # Below sm the button's flex wraps, so the icon and subtitle center together on
+          # one line with the full-width title beneath; from sm a grid of content-sized
+          # columns puts the icon beside a title/subtitle column. justify-center centers
+          # the cluster either way — a grid `1fr` column would swallow the free space
           def action_button(panel_name, icon:, title:, tile: :purple, subtitle: nil)
-            classes = "tw:grid! tw:min-h-15 tw:grid-cols-[auto_1fr] tw:content-center tw:gap-x-3 tw:gap-y-2 tw:rounded-xl tw:p-4! tw:text-left tw:sm:gap-y-0.5 tw:lg:flex-1"
+            classes = "tw:min-h-15 tw:flex-wrap tw:content-center tw:justify-center tw:gap-x-3 tw:gap-y-2 tw:rounded-xl tw:p-4! tw:text-center tw:sm:grid! tw:sm:grid-cols-[auto_auto] tw:sm:gap-y-0.5 tw:lg:flex-1"
             render(UI::Button::Component.new(color: :purple_outline, size: :lg, html_class: classes, aria: {expanded: false},
               data: {"registrations--show--action-panels-target": "trigger", "panel-name": panel_name,
                      action: "registrations--show--action-panels#toggle"})) do
@@ -41,8 +42,9 @@ module Registrations
                 # Spanning an absent subtitle's row would stretch it to fit the icon,
                 # dropping the title above the icon's center
                 action_icon(icon, tile:, html_class: ("tw:sm:row-span-2" if subtitle.present?)),
-                content_tag(:span, title, class: "tw:col-span-2 tw:row-start-2 tw:min-w-0 tw:font-bold tw:sm:col-span-1 tw:sm:col-start-2 tw:sm:row-start-1"),
-                (content_tag(:span, subtitle, class: "tw:col-start-2 tw:row-start-1 tw:text-xs tw:opacity-60 tw:sm:row-start-2") if subtitle.present?)
+                # Ordered last and full-width so it wraps below the icon/subtitle line
+                content_tag(:span, title, class: "tw:order-1 tw:w-full tw:font-bold tw:sm:order-none tw:sm:col-start-2 tw:sm:row-start-1 tw:sm:w-auto"),
+                (content_tag(:span, subtitle, class: "tw:text-xs tw:opacity-60 tw:sm:col-start-2 tw:sm:row-start-2") if subtitle.present?)
               ].compact)
             end
           end
