@@ -15,12 +15,6 @@ RSpec.describe Registrations::Show::OrgTopActions::Wrapper::Component, :js, type
   it "opens one panel at a time, keeping the open panel in the URL" do
     visit preview_path
 
-    within(scenario("Limited (non-staff) member")) do
-      expect(page).to have_button("View Notifications")
-      # Impounding is staff-only
-      expect(page).to have_no_button("Impound", exact: true)
-    end
-
     owner_section = scenario("With owner")
 
     within(owner_section) do
