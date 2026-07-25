@@ -128,9 +128,15 @@ class BParam < ApplicationRecord
       stolen_attrs = h["bike"].delete "stolen_record"
       if stolen_attrs.present? && stolen_attrs.delete_if { |k, v| v.blank? } && stolen_attrs.keys.any?
         h["stolen_record"] = stolen_attrs
-        h["stolen_record"]["street"] = h["stolen_record"].delete("address") if h["stolen_record"]["address"].present?
       end
       h
+    end
+
+    def rename_legacy_stolen_attrs(s_attrs)
+      LEGACY_STOLEN_ATTRS.each_with_object(s_attrs) do |(legacy, renamed), attrs|
+        value = attrs.delete(legacy)
+        attrs[renamed] = value if value.present? && attrs[renamed].blank?
+      end
     end
 
     def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil, bike_sticker: nil)
@@ -289,7 +295,7 @@ class BParam < ApplicationRecord
     # Set the date_stolen if it was passed, if something else didn't already set date_stolen
     date_stolen = params.dig("bike", "date_stolen")
     s_attrs["date_stolen"] ||= date_stolen if date_stolen.present?
-    rename_legacy_stolen_attrs(s_attrs.except("phone_no_show", "show_address"))
+    self.class.rename_legacy_stolen_attrs(s_attrs.except("phone_no_show", "show_address"))
   end
 
   def impound_attrs
@@ -626,13 +632,6 @@ class BParam < ApplicationRecord
   end
 
   private
-
-  def rename_legacy_stolen_attrs(s_attrs)
-    LEGACY_STOLEN_ATTRS.each_with_object(s_attrs) do |(legacy, renamed), attrs|
-      value = attrs.delete(legacy)
-      attrs[renamed] = value if value.present? && attrs[renamed].blank?
-    end
-  end
 
   def ensure_valid_params
     self.params ||= {"bike" => {}}

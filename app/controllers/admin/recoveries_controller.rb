@@ -87,7 +87,9 @@ module Admin
     end
 
     def permitted_parameters
-      params.require(:stolen_record).permit(BikeServices::StolenRecordUpdator.old_attr_accessible)
+      BParam.rename_legacy_stolen_attrs(
+        params.require(:stolen_record).permit(BikeServices::StolenRecordUpdator.old_attr_accessible)
+      )
     end
   end
 end

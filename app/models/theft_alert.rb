@@ -63,7 +63,7 @@ class TheftAlert < ApplicationRecord
   validate :alert_cannot_begin_in_past_or_after_ends
 
   delegate :duration_days, :duration_days_facebook, :amount_cents, to: :theft_alert_plan
-  delegate :country, :city, :region_record, :postal_code, :street, to: :stolen_record, allow_nil: true
+  delegate :country, :city, :region, :postal_code, :street, to: :stolen_record, allow_nil: true
 
   before_validation :set_calculated_attributes
 

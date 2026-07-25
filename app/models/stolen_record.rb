@@ -133,16 +133,12 @@ class StolenRecord < ApplicationRecord
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
-  scope :with_location, -> { where.not(latitude: nil) }
-  scope :with_street, -> { with_location.where.not(street: nil) }
   scope :without_street, -> { where(street: ["", nil]) }
   scope :without_location, -> { without_street }
 
   class << self
     def permitted_visible_attribute(string_or_sym = nil, default: nil)
-      return string_or_sym.to_sym if string_or_sym.present?
-
-      default&.to_sym
+      AddressRecord.permitted_visible_attribute(string_or_sym, default:)
     end
 
     def recovery_display_statuses
@@ -217,31 +213,20 @@ class StolenRecord < ApplicationRecord
     image_four_by_five&.blob&.metadata&.dig("image_id")
   end
 
-  def skip_geocoding?
-    skip_geocoding.present?
-  end
+  def should_be_geocoded? = skip_geocoding.blank?
 
-  # override to enable reverse geocoding if applicable
-  def should_be_geocoded?
-    !skip_geocoding?
-  end
-
-  def street_2
-  end
+  def street_2 = nil
 
   def publicly_visible_attribute = :postal_code
   def show_address = false
 
-  def latitude_public
-    return nil if latitude.blank?
+  def latitude_public = latitude&.round(Bike::PUBLIC_COORD_LENGTH)
 
-    latitude.round(Bike::PUBLIC_COORD_LENGTH)
-  end
+  def longitude_public = longitude&.round(Bike::PUBLIC_COORD_LENGTH)
 
-  def longitude_public
-    return nil if longitude.blank?
-
-    longitude.round(Bike::PUBLIC_COORD_LENGTH)
+  # Legacy v2 API location format (ISO country suffix)
+  def formatted_address_string_with_iso
+    [formatted_address_string(render_country: false), country_iso].reject(&:blank?).join(", ").presence
   end
 
   # Override to add reverse geocoding functionality
