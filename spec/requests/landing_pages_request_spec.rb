@@ -45,6 +45,18 @@ RSpec.describe LandingPagesController, type: :request do
     end
   end
 
+  describe "review app banner" do
+    it "renders the banner, and suppresses it with NO_REVIEW_TOPBAR" do
+      stub_const("ENV", ENV.to_hash.merge("REVIEW_APP" => "1"))
+      get "/for_bike_shops"
+      expect(response.body).to include("review-app-banner")
+
+      stub_const("ENV", ENV.to_hash.merge("REVIEW_APP" => "1", "NO_REVIEW_TOPBAR" => "true"))
+      get "/for_bike_shops"
+      expect(response.body).not_to include("review-app-banner")
+    end
+  end
+
   describe "organization show" do
     let(:title) { response.body[/<title[^>]*>([^<]*)/, 1] }
     let!(:organization) { FactoryBot.create(:organization, short_name: "University") }

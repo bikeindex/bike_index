@@ -4297,7 +4297,8 @@ CREATE TABLE public.users (
     time_single_format boolean DEFAULT false,
     deleted_at timestamp without time zone,
     address_record_id bigint,
-    can_send_many_marketplace_messages boolean DEFAULT false NOT NULL
+    can_send_many_marketplace_messages boolean DEFAULT false NOT NULL,
+    feature_registration_show_legacy boolean DEFAULT false NOT NULL
 );
 
 
@@ -7468,6 +7469,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260725155657'),
 ('20260723000000'),
 ('20260722120000'),
 ('20260716120000'),
