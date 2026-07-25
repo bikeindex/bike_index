@@ -116,5 +116,14 @@ RSpec.describe Geocodeable do
         expect(address_record.city).to eq "Chicago"
       end
     end
+
+    context "trailing commas, non-US country" do
+      let(:address_record) { AddressRecord.new(city: "Vancouver ,", street: "123 Main St ,", country_id: Country.canada_id, skip_geocoding: true) }
+      it "strips the commas" do
+        address_record.valid?
+        expect(address_record.city).to eq "Vancouver"
+        expect(address_record.street).to eq "123 Main St"
+      end
+    end
   end
 end
