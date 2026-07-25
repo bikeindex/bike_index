@@ -65,16 +65,13 @@ class MyAccountsController < ApplicationController
     end
   end
 
-  # Flip the redesign flag for the current user, returning to the bike in whichever view is now active
+  # Returns to the bike in whichever view is now active. skip_update because a view
+  # preference doesn't warrant the mailchimp/address recalculation of AfterUserChangeJob
   def toggle_show_redesign
     bike = Bike.unscoped.find_id(params[:bike_id])
-    if Flipper.enabled?(:bike_show_redesign, current_user)
-      Flipper.disable_actor(:bike_show_redesign, current_user)
-      redirect_to bike_path(bike)
-    else
-      Flipper.enable_actor(:bike_show_redesign, current_user)
-      redirect_to registration_path(bike)
-    end
+    show_legacy = !current_user.feature_registration_show_legacy?
+    current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
+    redirect_to(show_legacy ? bike_path(bike) : registration_path(bike))
   end
 
   private

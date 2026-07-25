@@ -43,7 +43,7 @@ module Registrations
         # client-side from the meta tag.
         def cache_key
           ["registrations/show", @current_user&.id,
-            Flipper.enabled?(:bike_show_redesign, @current_user), Flipper.enabled?(:bike_show_redesign_toggle, @current_user),
+            @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view),
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
         end

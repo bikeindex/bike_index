@@ -754,26 +754,24 @@ RSpec.describe MyAccountsController, type: :request do
       it "redirects to sign in without toggling" do
         post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
         expect(response).to redirect_to(/session\/new/)
-        expect(Flipper.enabled?(:bike_show_redesign)).to be_falsey
       end
     end
     context "user logged in" do
       include_context :request_spec_logged_in_as_user
       let(:current_user) { FactoryBot.create(:user_confirmed) }
 
-      it "enables the flag and redirects to the redesign" do
-        expect(Flipper.enabled?(:bike_show_redesign, current_user)).to be_falsey
+      it "opts into the legacy view and redirects to the legacy page" do
         post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-        expect(response).to redirect_to(registration_path(bike))
-        expect(Flipper.enabled?(:bike_show_redesign, current_user)).to be_truthy
+        expect(response).to redirect_to(bike_path(bike))
+        expect(current_user.reload.feature_registration_show_legacy).to be_truthy
       end
 
-      context "flag already enabled for the user" do
-        before { Flipper.enable_actor(:bike_show_redesign, current_user) }
-        it "disables the flag and redirects to the legacy page" do
+      context "user opted into the legacy view" do
+        let(:current_user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
+        it "opts back out and redirects to the redesign" do
           post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-          expect(response).to redirect_to(bike_path(bike))
-          expect(Flipper.enabled?(:bike_show_redesign, current_user)).to be_falsey
+          expect(response).to redirect_to(registration_path(bike))
+          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
         end
       end
     end
