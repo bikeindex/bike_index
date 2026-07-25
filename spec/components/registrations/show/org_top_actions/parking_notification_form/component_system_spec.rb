@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Component, :js, type: :system do
+  let(:controller_id) { "registrations--show--parking-notification" }
+  let(:map_selector) { "[data-#{controller_id}-target='map']" }
   let(:preview_path) { "/rails/view_components/registrations/show/org_top_actions/parking_notification_form/component/default" }
   let(:organization) { FactoryBot.create(:organization) }
   let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
@@ -10,12 +12,10 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
   # Coordinates the mocked device reports (SF Bay) and the address Mapbox returns
   let(:latitude) { "37.8698" }
   let(:longitude) { "-122.2585" }
-  let(:place_name) { "2363a Bryant Street, San Francisco, California 94110, United States" }
   # A resolved pin is mirrored into the URL — there is no on-page location readout
   let(:located_url) { /map_lat=37\.8698.*map_lng=-122\.2585.*map_zoom=16/ }
   let(:geocode_feature) do
     {
-      place_name:,
       address: "2363a",
       text: "Bryant Street",
       context: [
@@ -49,8 +49,8 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     find("[name$='[#{attribute}]']", visible: :all).value
   end
 
-  # The map paints to a canvas, so none of its state reaches the DOM. The controller
-  # hangs the MapLibre instance off the container; read it back through the public API.
+  # The map paints to a canvas, so none of its state reaches the DOM. Reach the
+  # MapLibre instance through the Stimulus registry and read it back via its API.
   # The pin's hidden fields are read in the same tick as the centre, so comparing the
   # two can't race the moveend that stamps them.
   # No JS comments in here — the driver collapses the script onto one line, so a
@@ -60,8 +60,8 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
   def map_snapshot
     page.evaluate_script(<<~JS)
       (() => {
-        const el = document.querySelector("[data-registrations--show--parking-notification-target='map']")
-        const map = el && el.map
+        const el = document.querySelector("[data-controller~='#{controller_id}']")
+        const map = el && window.Stimulus.getControllerForElementAndIdentifier(el, "#{controller_id}")?.map
         if (!map || !map.loaded() || !map.getLayer("device-dot")) { return null }
         const dot = map.queryRenderedFeatures({layers: ["device-dot"]})[0]
         const field = (name) => parseFloat(document.querySelector("input[name='parking_notification[" + name + "]']").value)
@@ -94,13 +94,18 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     raise "map never settled; last snapshot: #{snapshot.inspect}"
   end
 
+  # Put the mouse on the middle of the map, where both gestures below start
+  def at_map_center(playwright_page)
+    box = playwright_page.locator(map_selector).bounding_box
+    center = [box["x"] + box["width"] / 2, box["y"] + box["height"] / 2]
+    playwright_page.mouse.move(*center)
+    center
+  end
+
   # Pan the map the way a user does — press, move, release over the canvas
   def drag_map(x_offset, y_offset)
     page.driver.with_playwright_page do |playwright_page|
-      box = playwright_page.locator("[data-registrations--show--parking-notification-target='map']").bounding_box
-      center_x = box["x"] + box["width"] / 2
-      center_y = box["y"] + box["height"] / 2
-      playwright_page.mouse.move(center_x, center_y)
+      center_x, center_y = at_map_center(playwright_page)
       playwright_page.mouse.down
       playwright_page.mouse.move(center_x + x_offset, center_y + y_offset, steps: 12)
       playwright_page.mouse.up
@@ -108,12 +113,12 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
   end
 
   # Whether the expanded map actually covers the page. The class that expands it is
-  # not enough to assert: MapLibre's stylesheet loads after Tailwind's and pins the
-  # map to position:relative, so the class can apply while nothing moves.
+  # not enough to assert: MapLibre sets position:relative on the same element, so
+  # the class can apply while nothing moves.
   def map_geometry
     page.evaluate_script(<<~JS)
       (() => {
-        const el = document.querySelector("[data-registrations--show--parking-notification-target='map']")
+        const el = document.querySelector("#{map_selector}")
         const rect = el.getBoundingClientRect()
         const root = document.documentElement
         return {
@@ -128,8 +133,7 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
   # Zoom the way a user does — a wheel/trackpad scroll over the centre of the map
   def scroll_map(delta)
     page.driver.with_playwright_page do |playwright_page|
-      box = playwright_page.locator("[data-registrations--show--parking-notification-target='map']").bounding_box
-      playwright_page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+      at_map_center(playwright_page)
       playwright_page.mouse.wheel(0, delta)
     end
   end
@@ -141,7 +145,7 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     Timeout.timeout(20) do
       while coordinate("longitude") == start
         drag_map(160, 60)
-        sleep 0.5
+        10.times { (coordinate("longitude") == start) ? sleep(0.05) : break }
       end
     end
   end
@@ -154,6 +158,18 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
 
   def rounded(coordinates, digits = 4)
     coordinates.map { |coordinate| coordinate.round(digits) }
+  end
+
+  # The device fix has landed: the pin is on it and mirrored into the URL. MapLibre
+  # names the locate button only once its async permission check resolves, and axe
+  # fails a button that has no name yet — so wait for that before auditing.
+  def expect_located_pin
+    expect(page).to have_current_path(located_url, url: true, wait: 10)
+    expect(coordinate("latitude")).to eq(latitude)
+    expect(coordinate("longitude")).to eq(longitude)
+    expect(page).to have_button("Create parking notification", disabled: false)
+    expect(page).to have_button("Find my location")
+    expect_axe_clean
   end
 
   before do
@@ -176,7 +192,7 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     end
   end
 
-  it "geolocates, splits the address into fields, and toggles between modes" do
+  it "geolocates, splits the address into fields, toggles modes, and keeps drafts across a reload" do
     # Submit is disabled until a location is chosen
     expect(page).to have_button("Create parking notification", disabled: true, visible: :all)
 
@@ -184,15 +200,11 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     # only trace of it, so a reload restores them
     click_button "Parking notification"
 
-    expect(page).to have_current_path(located_url, url: true, wait: 10)
-    expect(coordinate("latitude")).to eq(latitude)
-    expect(coordinate("longitude")).to eq(longitude)
-    expect(page).to have_button("Create parking notification", disabled: false)
-    # The MapLibre map renders under the centre pin, with its zoom + fullscreen controls
+    expect_located_pin
+    # The MapLibre map renders under the centre pin, with its zoom + expand controls
     expect(page).to have_css(".maplibregl-canvas")
     expect(page).to have_css(".maplibregl-ctrl-zoom-in", visible: :all)
     expect(page).to have_css(".maplibregl-ctrl-fullscreen", visible: :all)
-    expect_axe_clean
 
     # Manual entry reveals the fields and geocodes the pin into them
     find("label", text: "Enter address manually").click
@@ -226,94 +238,83 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     expect(page).to have_field("Address or intersection", with: "1200 Valencia Street")
     expect(page).to have_field("City", with: "Oakland")
     expect(page).to have_field("Postal code", with: "94612")
+
+    # The message + internal notes drafts survive a reload via form-persist
+    find("textarea[name='parking_notification[internal_notes]']").set("Third report this week")
+    fill_in "Optional message to send to the owner", with: "Blocking the bike lane"
+
+    visit "#{preview_path}?panel=parking"
+
+    expect(page).to have_field("Optional message to send to the owner", with: "Blocking the bike lane")
+    expect(address_field("internal_notes")).to eq("Third report this week")
   end
 
-  # The ?panel=parking load path auto-opens the panel on connect; geolocation
-  # must still fire despite the accordion/panel controller connect order
-  context "when loaded with the panel already open" do
-    it "geolocates on load, without a click, and prefers a pin carried in the URL" do
-      visit "#{preview_path}?panel=parking"
+  # The ?panel=parking load path auto-opens the panel on connect, so geolocation
+  # must fire despite the accordion/panel controller connect order. Everything
+  # below the canvas can regress silently too — the pin, the device marker and the
+  # submitted coordinates leave no DOM behind.
+  it "geolocates on load, tracks the pin through zoom, drag and the locate button, expands, and prefers a URL pin" do
+    visit "#{preview_path}?panel=parking"
 
-      expect(page).to have_current_path(located_url, url: true, wait: 10)
-      expect(coordinate("latitude")).to eq(latitude)
-      expect(coordinate("longitude")).to eq(longitude)
-      expect(page).to have_button("Create parking notification", disabled: false)
-      expect_axe_clean
+    expect_located_pin
 
-      # A shared link / reload carries the pin coordinates; they win over the
-      # (slower, less intentional) device geolocation
-      visit "#{preview_path}?panel=parking&map_lat=40.5&map_lng=-74.25&map_zoom=12"
+    # The device marker sits on the reported fix, haloed by its accuracy
+    placed = map_settling_on { |snapshot| snapshot["layers"].sort == %w[device-accuracy device-dot] }
+    expect(rounded(placed["device"])).to eq([longitude.to_f, latitude.to_f])
+    expect(rounded(placed["center"])).to eq([longitude.to_f, latitude.to_f])
+    loose_accuracy_radius = placed["accuracyRadius"]
 
-      expect(page).to have_current_path(/map_lat=40\.500000/, url: true, wait: 10)
-      expect(coordinate("latitude")).to eq("40.5")
-      expect(coordinate("longitude")).to eq("-74.25")
-    end
-  end
+    # Scrolling over the map zooms it, leaving the pin where it is
+    scroll_map(-240)
 
-  # Everything below the canvas can regress silently — the pin, the device marker
-  # and the submitted coordinates leave no DOM behind
-  context "the map itself" do
-    it "moves the pin with the map, keeps the device marker on the latest fix, and never geocodes" do
-      visit "#{preview_path}?panel=parking"
+    zoomed = map_settling_on { |snapshot| snapshot["zoom"] > placed["zoom"] }
+    expect(rounded(zoomed["pin"])).to eq(rounded(placed["pin"]))
 
-      # The device marker sits on the reported fix, haloed by its accuracy
-      placed = map_settling_on { |snapshot| snapshot["layers"].sort == %w[device-accuracy device-dot] }
-      expect(rounded(placed["device"])).to eq([longitude.to_f, latitude.to_f])
-      expect(rounded(placed["center"])).to eq([longitude.to_f, latitude.to_f])
-      loose_accuracy_radius = placed["accuracyRadius"]
+    # Dragging moves the pin: the coordinates follow the map centre
+    drag_map(160, 60)
 
-      # Scrolling over the map zooms it, leaving the pin where it is
-      scroll_map(-240)
+    # Wait for moveend to stamp the new centre, then check the form tracks it
+    dragged = map_settling_on { |snapshot| (snapshot["pin"][1] - latitude.to_f).abs > 1e-5 }
+    expect(rounded(dragged["pin"], 5)).to eq(rounded(dragged["center"], 5))
+    # The device marker is not the pin, so it stays where the device is
+    expect(rounded(dragged["device"])).to eq([longitude.to_f, latitude.to_f])
+    # Panning never resolves an address — the pin itself is the location
+    expect(address_field("street")).to eq("")
 
-      zoomed = map_settling_on { |snapshot| snapshot["zoom"] > placed["zoom"] }
-      expect(rounded(zoomed["pin"])).to eq(rounded(placed["pin"]))
+    # The locate button returns to the device, adopting a newer and tighter fix
+    move_device_to(latitude: 37.7749, longitude: -122.4194, accuracy: 5)
+    find(".maplibregl-ctrl-geolocate").click
 
-      # Dragging moves the pin: the coordinates follow the map centre
-      drag_map(160, 60)
+    # Wait for the flight to land and stamp the form. The control fitBounds() to
+    # the accuracy circle rather than centring exactly, so allow ~500m against
+    # what is a ~15km jump from Berkeley
+    relocated = map_settling_on { |snapshot| (snapshot["pin"][0] + 122.4194).abs < 0.005 }
+    expect(relocated["pin"][1]).to be_within(0.005).of(37.7749)
+    expect(relocated["center"][0]).to be_within(0.005).of(-122.4194)
+    # The marker moved with it, onto the exact fix the control reported
+    expect(rounded(relocated["device"], 3)).to eq([-122.419, 37.775])
+    # The halo tracks the reported accuracy: 20m -> 5m shrinks it
+    expect(relocated["accuracyRadius"]).to be < loose_accuracy_radius
 
-      # Wait for moveend to stamp the new centre, then check the form tracks it
-      dragged = map_settling_on { |snapshot| (snapshot["pin"][1] - latitude.to_f).abs > 1e-5 }
-      expect(rounded(dragged["pin"], 5)).to eq(rounded(dragged["center"], 5))
-      # The device marker is not the pin, so it stays where the device is
-      expect(rounded(dragged["device"])).to eq([longitude.to_f, latitude.to_f])
-      # Panning never resolves an address — the pin itself is the location
-      expect(address_field("street")).to eq("")
+    # At this viewport expanding covers the page rather than calling for browser
+    # fullscreen, so the site chrome stays reachable (phones get fullscreen)
+    click_button "Expand map"
 
-      # The locate button returns to the device, adopting a newer and tighter fix
-      move_device_to(latitude: 37.7749, longitude: -122.4194, accuracy: 5)
-      find(".maplibregl-ctrl-geolocate").click
+    expect(page).to have_button("Exit expanded map")
+    expect(map_geometry).to eq("position" => "fixed", "coversPage" => true, "nativeFullscreen" => false)
 
-      # Wait for the flight to land and stamp the form. The control fitBounds() to
-      # the accuracy circle rather than centring exactly, so allow ~500m against
-      # what is a ~15km jump from Berkeley
-      relocated = map_settling_on { |snapshot| (snapshot["pin"][0] + 122.4194).abs < 0.005 }
-      expect(relocated["pin"][1]).to be_within(0.005).of(37.7749)
-      expect(relocated["center"][0]).to be_within(0.005).of(-122.4194)
-      # The marker moved with it, onto the exact fix the control reported
-      expect(rounded(relocated["device"], 3)).to eq([-122.419, 37.775])
-      # The halo tracks the reported accuracy: 20m -> 5m shrinks it
-      expect(relocated["accuracyRadius"]).to be < loose_accuracy_radius
-    end
-  end
+    click_button "Exit expanded map"
 
-  # At this viewport the expand button covers the page rather than calling for
-  # browser fullscreen, so the site chrome stays reachable (phones get fullscreen)
-  context "expanding the map" do
-    it "covers the page without entering fullscreen, and restores on collapse" do
-      visit "#{preview_path}?panel=parking"
-      expect(page).to have_css(".maplibregl-canvas", wait: 10)
-      expect(map_geometry).to include("position" => "relative", "coversPage" => false)
+    expect(page).to have_button("Expand map")
+    expect(map_geometry).to include("position" => "relative", "coversPage" => false)
 
-      click_button "Expand map"
+    # A shared link / reload carries the pin coordinates; they win over the
+    # (slower, less intentional) device geolocation
+    visit "#{preview_path}?panel=parking&map_lat=40.5&map_lng=-74.25&map_zoom=12"
 
-      expect(page).to have_button("Exit expanded map")
-      expect(map_geometry).to eq("position" => "fixed", "coversPage" => true, "nativeFullscreen" => false)
-
-      click_button "Exit expanded map"
-
-      expect(page).to have_button("Expand map")
-      expect(map_geometry).to include("position" => "relative", "coversPage" => false)
-    end
+    expect(page).to have_current_path(/map_lat=40\.500000/, url: true, wait: 10)
+    expect(coordinate("latitude")).to eq("40.5")
+    expect(coordinate("longitude")).to eq("-74.25")
   end
 
   # WebGL/MapLibre can be unavailable (disabled GPU, blocked CDN); the coordinates
@@ -368,27 +369,20 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
   end
 
   # Opening via the Impound trigger preselects the impound kind
-  context "opened in impound mode" do
-    it "titles for the bike type, preselects impound, and hides the reason chooser" do
-      click_button "Impound"
+  it "titles for the bike type, preselects impound, hides the reason chooser, and survives a reload" do
+    click_button "Impound"
 
-      # The heading is CSS-uppercased, so match case-insensitively
-      expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
-      expect(page).to have_no_content("Notification because")
-      expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
-    end
+    # The heading is CSS-uppercased, so match case-insensitively
+    expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
+    expect(page).to have_no_content("Notification because")
+    expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
 
-    it "restores impound mode after a reload" do
-      click_button "Impound"
-      expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
+    # The impound trigger's panel name reopens the shared form in impound mode
+    visit "#{preview_path}?panel=impound"
 
-      # The impound trigger's panel name reopens the shared form in impound mode
-      visit "#{preview_path}?panel=impound"
-
-      expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
-      expect(page).to have_no_content("Notification because")
-      expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
-    end
+    expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
+    expect(page).to have_no_content("Notification because")
+    expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
   end
 
   # A bike with an earlier notification can mark the new one as a repeat
@@ -410,22 +404,6 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
       # Choosing "First notice" reveals the location controls
       find("label", text: "First notice").click
       expect(page).to have_content("Set on map")
-    end
-  end
-
-  # The message + internal notes drafts survive a reload via form-persist
-  context "draft persistence" do
-    it "restores the message and internal notes after a reload" do
-      click_button "Parking notification"
-
-      find("textarea[name='parking_notification[internal_notes]']").set("Third report this week")
-      fill_in "Optional message to send to the owner", with: "Blocking the bike lane"
-
-      # Reload with the panel open; form-persist rehydrates the two marked fields
-      visit "#{preview_path}?panel=parking"
-
-      expect(page).to have_field("Optional message to send to the owner", with: "Blocking the bike lane")
-      expect(address_field("internal_notes")).to eq("Third report this week")
     end
   end
 end

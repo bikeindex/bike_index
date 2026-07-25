@@ -27,7 +27,8 @@ export function groundRadiusStops (radiusMeters, latitude) {
 // phone that leaves too little map, so small screens get real fullscreen instead
 const PAGE_EXPAND_QUERY = '(min-width: 48rem)'
 // Above the header's 1040, since the expanded map covers the page. `fixed!` because
-// MapLibre's stylesheet loads after Tailwind's and pins the map to position: relative
+// MapLibre's stylesheet is unlayered and ours isn't, so its `.maplibregl-map`
+// position:relative outranks the utility whatever order they load in
 const EXPANDED_CLASSES = ['tw:fixed!', 'tw:inset-0', 'tw:z-[1050]']
 
 // A MapLibre control that expands the map to fill the page (or the screen, on
@@ -35,11 +36,9 @@ const EXPANDED_CLASSES = ['tw:fixed!', 'tw:inset-0', 'tw:z-[1050]']
 export class ExpandControl {
   onAdd (map) {
     this.map = map
-    this.expanded = false
     this.button = document.createElement('button')
     this.button.type = 'button'
-    this.button.appendChild(document.createElement('span')).className = 'maplibregl-ctrl-icon'
-    this.button.firstChild.setAttribute('aria-hidden', 'true')
+    this.button.innerHTML = '<span class="maplibregl-ctrl-icon" aria-hidden="true"></span>'
     this.button.addEventListener('click', () => this.toggle())
     this.label(false)
 
@@ -63,18 +62,19 @@ export class ExpandControl {
 
   get element () { return this.map.getContainer() }
 
+  get pageExpanded () { return this.element.classList.contains(EXPANDED_CLASSES[0]) }
+
   // Collapse the way we expanded — the viewport may have crossed the breakpoint
   // since (a rotated tablet, a resized window), and the other exit is a no-op
   toggle () {
     // fullscreenchange reflects the result, including an Escape the browser handles
     if (document.fullscreenElement === this.element) return document.exitFullscreen()
-    if (this.expanded) return this.expandPage(false)
+    if (this.pageExpanded) return this.expandPage(false)
     if (window.matchMedia(PAGE_EXPAND_QUERY).matches) return this.expandPage(true)
     this.element.requestFullscreen().catch(() => this.expandPage(true))
   }
 
   expandPage (expand) {
-    if (expand === this.expanded) return
     EXPANDED_CLASSES.forEach((klass) => this.element.classList.toggle(klass, expand))
     if (expand) document.addEventListener('keydown', this.onKeydown)
     else document.removeEventListener('keydown', this.onKeydown)
@@ -82,7 +82,6 @@ export class ExpandControl {
   }
 
   reflect (expanded) {
-    this.expanded = expanded
     this.label(expanded)
     this.map.resize()
   }

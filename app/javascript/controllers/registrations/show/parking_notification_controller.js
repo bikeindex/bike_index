@@ -113,7 +113,6 @@ export default class extends Controller {
       // The org location makes the form submittable at once; the map itself waits
       // for the device fix so it doesn't load tiles it's about to pan away from
       this.setCoordinates(this.orgLatitudeValue, this.orgLongitudeValue)
-      this.pinZoom = DEFAULT_ZOOM
       this.requestLocation()
     }
   }
@@ -234,11 +233,6 @@ export default class extends Controller {
         maxZoom: 18,
         attributionControl: { customAttribution: OSM_ATTRIBUTION }
       })
-      // The map paints to a canvas, so its state is unreachable from the DOM.
-      // Hang it off the container: specs (and the console) read the centre,
-      // layers and paint properties through this.
-      this.mapTarget.map = this.map
-
       this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
       this.map.addControl(new ExpandControl(), 'top-right')
 
@@ -273,6 +267,9 @@ export default class extends Controller {
   // just reveal a message instead of a blank box
   mapUnavailable (error) {
     console.warn('Parking-notification map failed to render:', error)
+    // A control may have thrown after the map was built — dispose it, or its WebGL
+    // context and our controls' document listeners outlive the page
+    this.map?.remove()
     this.map = null
     if (this.hasMapFrameTarget) this.mapFrameTarget.hidden = true
     if (this.hasMapUnavailableTarget) this.mapUnavailableTarget.hidden = false
@@ -309,11 +306,11 @@ export default class extends Controller {
   // Split the pin's coordinates into address parts, to seed the manual-entry
   // fields. Marked before the request so toggling modes doesn't re-ask for a
   // spot we've already looked up
-  async reverseGeocode (latitude, longitude) {
-    if (!this.mapboxKeyValue || this.geocodedFor === this.pinKey) return
+  async reverseGeocode () {
+    if (!this.mapboxKeyValue) return
     this.geocodedFor = this.pinKey
     try {
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${this.mapboxKeyValue}&types=address&limit=1`
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${this.pinLongitude},${this.pinLatitude}.json?access_token=${this.mapboxKeyValue}&types=address&limit=1`
       const response = await window.fetch(url)
       if (!response.ok) return
       const feature = (await response.json()).features?.[0]
@@ -343,7 +340,7 @@ export default class extends Controller {
     // Seed from the resolved address while it still describes the pin, without
     // waiting on the network; a pin that has moved gets a fresh geocode instead
     if (this.geocodedFor === this.pinKey) this.fillAddress()
-    else if (this.pinChosen) this.reverseGeocode(this.pinLatitude, this.pinLongitude)
+    else if (this.pinChosen) this.reverseGeocode()
     this.enableSubmit()
   }
 
