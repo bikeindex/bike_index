@@ -11,7 +11,7 @@ RSpec.describe Email::ScheduledSurveyJob, type: :job do
   let(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, creation_organization: organization) }
   let!(:stolen_record1) { FactoryBot.create(:stolen_record, bike: bike1, date_stolen: stolen_at) }
   let(:bike_unclaimed) { FactoryBot.create(:bike, :with_ownership, owner_email: user.email, creation_organization: organization) }
-  let!(:stolen_record_unclaimed) { FactoryBot.create(:stolen_record, :in_nyc_legacy, bike: bike_unclaimed, date_stolen: stolen_at) }
+  let!(:stolen_record_unclaimed) { FactoryBot.create(:stolen_record, :in_nyc, bike: bike_unclaimed, date_stolen: stolen_at) }
 
   describe "enqueue workers" do
     let(:user2) { FactoryBot.create(:user, no_non_theft_notification: true) }
@@ -24,7 +24,7 @@ RSpec.describe Email::ScheduledSurveyJob, type: :job do
         date_stolen: stolen_at, user: user, stolen_no_notify: true)
     end
     let(:bike_recovered) { FactoryBot.create(:bike, :with_ownership, owner_email: "phoebe@example.com") }
-    let!(:stolen_record_recovered) { FactoryBot.create(:stolen_record_recovered, :in_nyc_legacy, bike: bike_recovered, date_stolen: stolen_at) }
+    let!(:stolen_record_recovered) { FactoryBot.create(:stolen_record_recovered, :in_nyc, bike: bike_recovered, date_stolen: stolen_at) }
     let!(:bike_outside_survey_period) do
       FactoryBot.create(:bike, :with_stolen_record, :with_ownership, date_stolen: Time.current)
     end

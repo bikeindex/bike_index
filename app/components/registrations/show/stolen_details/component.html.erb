@@ -6,7 +6,7 @@
   <%= render(Registrations::Show::Map::Component.new(latitude: stolen_record.latitude_public, longitude: stolen_record.longitude_public, precise: stolen_record.show_address)) %>
 
   <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
-    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".location"), value: stolen_record.address(country: [:skip_default]).presence || "No location given")) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".location"), value: stolen_record.formatted_address_string.presence || "No location given")) %>
 
     <% if owner_phone.present? %>
       <%= render(UI::DefinitionList::Row::Component.new(label: StolenRecord.human_attribute_name(:phone))) { link_to(owner_phone, "tel:#{owner_phone}", class: "twlink tw:font-mono") } %>

@@ -183,7 +183,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
     end
     context "with an activateable theft_alert" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
-      let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_chicago_legacy, :with_images, bike:) }
+      let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_chicago, :with_images, bike:) }
       it "marks as paid and enqueues activation" do
         bike.update(current_stolen_record: stolen_record)
         expect(stolen_record.reload.images_attached?).to be_truthy
