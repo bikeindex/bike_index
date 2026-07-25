@@ -44,7 +44,9 @@ module Registrations
                 action_icon(icon, tile:, html_class: ("tw:sm:row-span-2" if subtitle.present?)),
                 # Ordered last and full-width so it wraps below the icon/subtitle line
                 content_tag(:span, title, class: "tw:order-1 tw:w-full tw:font-bold tw:sm:order-none tw:sm:col-start-2 tw:sm:row-start-1 tw:sm:w-auto"),
-                (content_tag(:span, subtitle, class: "tw:text-xs tw:opacity-60 tw:sm:col-start-2 tw:sm:row-start-2") if subtitle.present?)
+                # Left-aligned so its lines line up with each other, the block itself
+                # still centered by the button's justify-center
+                (content_tag(:span, subtitle, class: "tw:text-left tw:text-xs tw:opacity-60 tw:sm:col-start-2 tw:sm:row-start-2") if subtitle.present?)
               ].compact)
             end
           end
