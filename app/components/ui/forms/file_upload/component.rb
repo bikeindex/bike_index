@@ -4,13 +4,14 @@ module UI
   module Forms
     module FileUpload
       class Component < ApplicationComponent
-        def initialize(form_builder:, attribute:, accept: nil, button_text: nil, camera: nil, camera_text: nil,
+        def initialize(form_builder:, attribute:, accept: nil, camera: nil, camera_text: nil,
           multiple: false, placeholder: nil, html_options: {})
           @form_builder = form_builder
           @attribute = attribute
-          @button_text = button_text || translation(".choose_file")
+          # Two labels, swapped by pointer type -- a touch device can't click or drop
+          @choose_text = translation(".choose_file")
+          @choose_or_drop_text = translation(".choose_or_drop_file")
           @camera_text = camera_text || translation(".take_picture")
-          @drop_text = translation(".drop_file", count: multiple ? 2 : 1)
           @placeholder = placeholder || translation(".no_file_chosen")
 
           accept_list = Array(accept).flat_map { it.to_s.split(",") }.filter_map { it.strip.presence }
@@ -33,6 +34,15 @@ module UI
         end
 
         private
+
+        # Both wordings ship; the pointer media query picks one. A coarse pointer can
+        # neither click nor drop, so it gets the short one.
+        def label_content
+          safe_join([
+            tag.span(@choose_or_drop_text, class: "tw:pointer-coarse:hidden"),
+            tag.span(@choose_text, class: "tw:hidden tw:pointer-coarse:inline")
+          ])
+        end
 
         def image?(accept_entry)
           accept_entry.start_with?("image/") || ApplicationUploader.permitted_extensions.include?(accept_entry.downcase)

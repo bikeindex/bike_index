@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/file_upload/component/" }
-  let(:drop_zone) { "[data-form--file-upload-target='dropZone']" }
+  let(:drop_frame) { "[data-form--file-upload-target='dropZone']" }
   # Dragging a file has no Capybara equivalent -- the drag source is the OS, not the
   # page -- so the events carry a hand-built DataTransfer, per Playwright's docs.
   let(:start_drag) do
@@ -15,48 +15,54 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
     JS
   end
 
-  it "takes a file from the picker or a drag, and only offers Take picture on a coarse pointer" do
+  it "takes a file from the picker or a drag, and adapts its labels to the pointer" do
     visit("#{base_path}default")
 
     expect(page).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
-    expect(page).to have_no_css(drop_zone)
+    # a fine pointer can click and drop, and the frame is idle until something is dragged
+    expect(page).to have_css("label", text: "Click or drop to choose file")
+    expect(page).to have_no_css("#{drop_frame}[data-dragging]")
     expect_axe_clean
 
     attach_file("file", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
 
     expect(page).to have_css("[data-form--file-upload-target='filename']", text: "bike.jpg")
 
-    # twice: dragover repeats per pointer move, and the reveal guard has to absorb that
+    # twice: dragover repeats per pointer move, and the guard has to absorb that
     page.execute_script(start_drag)
     page.execute_script(start_drag)
 
-    expect(page).to have_css(drop_zone, text: "Drop a file here")
+    expect(page).to have_css("#{drop_frame}[data-dragging='true']")
     expect_axe_clean
 
-    # dragging back off the window closes it again
+    # dragging back off the window settles the frame again
     page.execute_script("document.dispatchEvent(new DragEvent('dragleave', {bubbles: true, relatedTarget: null}))")
 
-    expect(page).to have_no_css(drop_zone)
+    expect(page).to have_no_css("#{drop_frame}[data-dragging]")
 
     page.execute_script(start_drag)
-    # onto the label, not the zone: the button says you can drop on it
+    # onto the label, not the frame around it: the button says you can drop on it
     page.execute_script(<<~JS)
       document.querySelector("[data-controller='form--file-upload'] label")
         .dispatchEvent(new DragEvent("drop", {bubbles: true, dataTransfer: window.fileTransfer}))
     JS
 
     expect(page).to have_css("[data-form--file-upload-target='filename']", text: "dropped.jpg")
-    expect(page).to have_no_css(drop_zone)
+    expect(page).to have_no_css("#{drop_frame}[data-dragging]")
     expect(page).to have_no_button("Take picture")
 
     # everything below runs touch-emulated -- fine-pointer assertions must come first
     emulate_touch_device
 
+    # a touch device can neither click nor drop, so the wording drops back
+    expect(page).to have_css("label", text: "Choose file")
+    expect(page).to have_no_css("label", text: "Click or drop to choose file")
+
     click_on "Take picture"
 
     expect(page).to have_css("input[type='file'][capture='environment']", visible: :all)
 
-    find(:label, "Click or drop to choose file").click
+    find(:label, "Choose file").click
 
     expect(page).to have_no_css("input[type='file'][capture]", visible: :all)
   end

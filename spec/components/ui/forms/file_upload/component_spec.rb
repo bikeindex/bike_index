@@ -11,14 +11,14 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
   let(:attribute) { :avatar }
   let(:options) { {} }
 
-  it "renders the input, label and collapsed drop zone -- but no camera or thumbnail" do
+  it "renders the input, both labels and the drop frame -- but no camera or thumbnail" do
     expect(component).to have_css("input#user_avatar[type='file'][name='user[avatar]']")
-    expect(component).to have_css("label[for='user_avatar']", text: "Click or drop to choose file")
     expect(component).to have_css("[data-controller='form--file-upload']")
     expect(component).to have_css("[data-form--file-upload-target='input']")
     expect(component).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
     expect(component).to have_css("label[data-action='click->form--file-upload#chooseFile']")
-    expect(component).to have_css("[data-form--file-upload-target='dropZone'].tw\\:hidden", text: "Drop a file here")
+    # the frame is always rendered -- only its border reacts to a drag
+    expect(component).to have_css("[data-form--file-upload-target='dropZone'].tw\\:border-transparent")
     # the full string: a typo in either handler name would leave the highlight inert
     expect(component).to have_css("[data-form--file-upload-target='dropZone'][data-action='dragenter->form--file-upload#highlightDropZone dragleave->form--file-upload#unhighlightDropZone']")
     # dropping is bound to the whole component, so a drop on the button lands too
@@ -28,20 +28,24 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
     expect(component).to have_no_css("img")
   end
 
+  # Both are in the DOM; the pointer media query decides which one shows
+  it "offers the drop wording to a fine pointer and the short one to a coarse pointer" do
+    expect(component).to have_css("label span.tw\\:pointer-coarse\\:hidden", text: "Click or drop to choose file")
+    expect(component).to have_css("label span.tw\\:hidden.tw\\:pointer-coarse\\:inline", text: "Choose file")
+  end
+
   context "with multiple" do
     let(:options) { {multiple: true} }
 
-    it "sets the input attribute and pluralizes the drop zone text" do
+    it "sets the input attribute" do
       expect(component).to have_css("input[type='file'][multiple]")
-      expect(component).to have_css("[data-form--file-upload-target='dropZone']", text: "Drop files here")
     end
   end
 
-  context "with custom button_text, camera_text and placeholder" do
-    let(:options) { {accept: "image/*", button_text: "Browse", camera_text: "Use camera", placeholder: "Pick an image"} }
+  context "with custom camera_text and placeholder" do
+    let(:options) { {accept: "image/*", camera_text: "Use camera", placeholder: "Pick an image"} }
 
     it "uses the provided text" do
-      expect(component).to have_css("label[for='user_avatar']", text: "Browse")
       expect(component).to have_css("button[data-action='form--file-upload#takePicture']", text: "Use camera")
       expect(component).to have_css("[data-form--file-upload-target='filename']", text: "Pick an image")
     end

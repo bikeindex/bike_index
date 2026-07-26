@@ -2,7 +2,7 @@
   data-controller="form--file-upload"
   data-form--file-upload-placeholder-value="<%= @placeholder %>"
   <%#
-    drop is bound here, not on the zone, so a drop anywhere on the component
+    drop is bound here, not on the frame, so a drop anywhere on the component
     lands -- the button says you can drop, so dropping on it has to work.
   %>
   data-action="drop->form--file-upload#drop dragover@document->form--file-upload#dragOver dragleave@document->form--file-upload#dragLeave drop@document->form--file-upload#endDrag"
@@ -12,50 +12,54 @@
   <% end %>
 
   <%#
-    flex-wrap: the label is long enough that it, the camera button and the
-    filename don't fit a phone's width on one line.
+    The drop target wraps the controls rather than sitting below them. Its border is
+    transparent until a file is dragged, so revealing it doesn't shift the layout.
+    data-over rather than is-active: that variant also matches :active, which would
+    flash the frame every time the button inside it is pressed.
   %>
 
-  <div class="tw:relative tw:inline-flex tw:flex-wrap tw:items-center tw:gap-3">
-    <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
-    <%= @form_builder.file_field(@attribute, @html_options) %>
-
-    <%# Stimulus has no default event for a label, so name click explicitly. %>
-    <%= @form_builder.label @attribute, @button_text, class: @label_classes, data: {action: "click->form--file-upload#chooseFile"} %>
-
-    <% if @camera %>
-      <%# `capture` only reaches a camera on touch devices; a fine pointer would just reopen the file picker. %>
-      <%= render UI::Button::Component.new(
-            html_class: "tw:whitespace-nowrap tw:pointer-fine:hidden",
-            data: {action: "form--file-upload#takePicture"}
-          ) do %>
-        <%# hidden from AT: the button's own text already names it %>
-        <%= helpers.inline_svg_tag("icons/camera.svg", class: "tw:h-4 tw:w-4", aria_hidden: true) %>
-        <%= @camera_text %>
-      <% end %>
-    <% end %>
-
-    <span
-      class="tw:min-w-0 tw:truncate tw:text-gray-500 tw:dark:text-gray-400"
-      data-form--file-upload-target="filename"
-    >
-      <%= @placeholder %>
-    </span>
-  </div>
-
-  <%# tw:hidden is the collapse helper's contract; the controller reveals this once a file is dragged over the page. %>
   <div
     class="
-      tw:mt-2 tw:hidden tw:rounded-lg tw:border-2 tw:border-dashed
-      tw:border-gray-300 tw:px-4 tw:py-6 tw:text-center tw:text-sm
-      tw:text-gray-500 tw:dark:border-gray-600 tw:dark:text-gray-400
-      tw:is-active:border-blue-500 tw:is-active:bg-blue-50
-      tw:is-active:text-blue-700 tw:dark:is-active:bg-blue-950
-      tw:dark:is-active:text-blue-300
+      tw:inline-block tw:rounded-lg tw:border-2 tw:border-dashed
+      tw:border-transparent tw:p-2 tw:transition-colors
+      tw:data-[dragging=true]:border-gray-300
+      tw:data-[over=true]:border-blue-500 tw:data-[over=true]:bg-blue-50
+      tw:dark:data-[dragging=true]:border-gray-600
+      tw:dark:data-[over=true]:bg-blue-950
     "
     data-form--file-upload-target="dropZone"
     data-action="dragenter->form--file-upload#highlightDropZone dragleave->form--file-upload#unhighlightDropZone"
   >
-    <%= @drop_text %>
+    <%#
+      flex-wrap so a narrow column doesn't overflow: the long label and the camera
+      button coincide on a `pointer: none` device, and filenames are unbounded.
+    %>
+
+    <div class="tw:relative tw:inline-flex tw:flex-wrap tw:items-center tw:gap-3">
+      <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
+      <%= @form_builder.file_field(@attribute, @html_options) %>
+
+      <%# Stimulus has no default event for a label, so name click explicitly. %>
+      <%= @form_builder.label @attribute, label_content, class: @label_classes, data: {action: "click->form--file-upload#chooseFile"} %>
+
+      <% if @camera %>
+        <%# `capture` only reaches a camera on touch devices; a fine pointer would just reopen the file picker. %>
+        <%= render UI::Button::Component.new(
+              html_class: "tw:whitespace-nowrap tw:pointer-fine:hidden",
+              data: {action: "form--file-upload#takePicture"}
+            ) do %>
+          <%# hidden from AT: the button's own text already names it %>
+          <%= helpers.inline_svg_tag("icons/camera.svg", class: "tw:h-4 tw:w-4", aria_hidden: true) %>
+          <%= @camera_text %>
+        <% end %>
+      <% end %>
+
+      <span
+        class="tw:min-w-0 tw:truncate tw:text-gray-500 tw:dark:text-gray-400"
+        data-form--file-upload-target="filename"
+      >
+        <%= @placeholder %>
+      </span>
+    </div>
   </div>
 </div>

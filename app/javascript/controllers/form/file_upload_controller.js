@@ -1,9 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
-import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='form--file-upload'
 // Shows the selected filename (or a count for multiple files) in the field, and
-// reveals a drop zone while a file is dragged anywhere over the page.
+// frames the controls as a drop target while a file is dragged over the page.
 export default class extends Controller {
   static targets = ['input', 'filename', 'dropZone']
   static values = { placeholder: String }
@@ -19,15 +18,14 @@ export default class extends Controller {
     this.inputTarget.removeAttribute('capture')
   }
 
-  // Fires on every pointer move of the drag, so the reveal is guarded: collapse()
-  // re-measures and cancels its own cleanup timer when called mid-animation.
+  // Fires on every pointer move of the drag, so the write is guarded.
   dragOver (event) {
     if (!draggingFile(event)) return
     event.preventDefault() // without this the browser opens the file instead
     if (this.dragging) return
 
     this.dragging = true
-    collapse('show', this.dropZoneTarget)
+    this.dropZoneTarget.dataset.dragging = 'true'
   }
 
   // dragleave fires for every element crossed; relatedTarget is null only on leaving the window.
@@ -35,23 +33,26 @@ export default class extends Controller {
     if (!event.relatedTarget) this.endDrag()
   }
 
-  // Also runs for a drop on the zone, which prevented the event on its way past.
+  // Also runs for a drop on the frame, which prevented the event on its way past.
   endDrag (event) {
     event?.preventDefault()
     if (!this.dragging) return
 
     this.dragging = false
-    collapse('hide', this.dropZoneTarget)
+    delete this.dropZoneTarget.dataset.dragging
     this.unhighlightDropZone()
   }
 
-  // is-active styles the zone under the cursor (see application.css).
   highlightDropZone () {
-    this.dropZoneTarget.dataset.active = 'true'
+    this.dropZoneTarget.dataset.over = 'true'
   }
 
-  unhighlightDropZone () {
-    delete this.dropZoneTarget.dataset.active
+  // The frame wraps the controls, so dragging onto one of them leaves the frame
+  // in the event's terms -- only a relatedTarget outside it is a real exit.
+  unhighlightDropZone (event) {
+    if (event?.relatedTarget && this.dropZoneTarget.contains(event.relatedTarget)) return
+
+    delete this.dropZoneTarget.dataset.over
   }
 
   drop (event) {
