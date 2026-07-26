@@ -163,6 +163,15 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     coordinates.map { |coordinate| coordinate.round(digits) }
   end
 
+  # The panel opened in impound mode: retitled by the panel controller, kind
+  # preselected and the reason chooser hidden by the form controller
+  def expect_impound_mode
+    # The heading is CSS-uppercased, so match case-insensitively
+    expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
+    expect(page).to have_no_content("Notification because")
+    expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
+  end
+
   # The device fix has landed: the pin is on it and mirrored into the URL. MapLibre
   # names the locate button only once its async permission check resolves, and axe
   # fails a button that has no name yet — so wait for that before auditing.
@@ -379,17 +388,12 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     visit preview_path
     click_button "Impound"
 
-    # The heading is CSS-uppercased, so match case-insensitively
-    expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
-    expect(page).to have_no_content("Notification because")
-    expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
+    expect_impound_mode
 
     # The impound trigger's panel name reopens the shared form in impound mode
     visit "#{preview_path}?panel=impound"
 
-    expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
-    expect(page).to have_no_content("Notification because")
-    expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
+    expect_impound_mode
   end
 
   # A bike with an earlier notification can mark the new one as a repeat

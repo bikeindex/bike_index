@@ -43,7 +43,7 @@ export default class extends Controller {
   // Relayed by the panel controller when the accordion reveals it, carrying which
   // trigger opened it; impound preselects that kind
   applyMode (event) {
-    const impound = Boolean(event.detail?.impound)
+    const impound = event.detail.impound
     const radio = this.element.querySelector(`input[name$="[kind]"][value="${impound ? 'impound_notification' : this.defaultKindValue}"]`)
     if (radio) radio.checked = true
     // Impound preselects the kind, so hide the "Notification because" chooser
@@ -84,8 +84,9 @@ export default class extends Controller {
   // Reflect the chosen mode across the radios, the hidden flag, the required
   // fields and which of the map / address panels is showing
   applyLocationMode (manual) {
-    this.setLocationMode(manual ? 'entered' : 'current')
-    this.setUseEntered(manual)
+    const value = manual ? 'entered' : 'current'
+    this.locationModeTargets.forEach((radio) => { radio.checked = radio.value === value })
+    if (this.hasUseEnteredAddressTarget) this.useEnteredAddressTarget.value = manual
     this.setManualRequired(manual)
     this.toggle(this.addressGroupTarget, manual)
     this.toggle(this.mapSectionTarget, !manual)
@@ -388,15 +389,6 @@ export default class extends Controller {
   setManualRequired (required) {
     this.element.querySelectorAll("input[name$='[street]'], input[name$='[city]']")
       .forEach((field) => { field.required = required })
-  }
-
-  // Reflect programmatic mode changes (geolocation success/failure) in the radios
-  setLocationMode (value) {
-    this.locationModeTargets.forEach((radio) => { radio.checked = radio.value === value })
-  }
-
-  setUseEntered (value) {
-    if (this.hasUseEnteredAddressTarget) this.useEnteredAddressTarget.value = value
   }
 
   enableSubmit () {

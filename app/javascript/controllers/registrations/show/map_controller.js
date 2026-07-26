@@ -53,6 +53,10 @@ export default class extends Controller {
   // rejection so it isn't reported as unhandled.
   #showUnavailable (error) {
     console.warn('Stolen map failed to render:', error)
+    // A control may have thrown after the map was built — dispose it, or its WebGL
+    // context and our controls' document listeners outlive the page
+    this.map?.remove()
+    this.map = null
     if (!this.hasUnavailableTarget) return
 
     this.canvasTarget.hidden = true

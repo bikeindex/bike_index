@@ -19,7 +19,7 @@
     </h2>
 
     <div class="tw:mt-3">
-      <%= form_with(model: new_parking_notification, url: create_parking_notifications_path, data: {controller: "csrf-refresh form-persist registrations--show--parking-notification-form", "form-persist-key-value": "parking-notification-#{@bike.id}", "registrations--show--parking-notification-form-default-kind-value": new_parking_notification.kind, "registrations--show--parking-notification-form-mapbox-key-value": ENV["MAPBOX_MAPPING"], "registrations--show--parking-notification-form-style-url-value": MAPS_STYLE_URL, "registrations--show--parking-notification-form-org-latitude-value": org_map_coordinates[:latitude], "registrations--show--parking-notification-form-org-longitude-value": org_map_coordinates[:longitude], action: "input->form-persist#save submit->form-persist#clear registrations--show--parking-notification-show:mode@window->registrations--show--parking-notification-form#applyMode"}) do |form| %>
+      <%= form_with(model: new_parking_notification, url: create_parking_notifications_path, data: form_data) do |form| %>
         <%= form.hidden_field :bike_id %>
         <%= form.hidden_field :latitude, data: {"registrations--show--parking-notification-form-target": "latitude"} %>
         <%= form.hidden_field :longitude, data: {"registrations--show--parking-notification-form-target": "longitude"} %>
