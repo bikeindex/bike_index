@@ -19,19 +19,23 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # mobile org dropdown is the only menu path. Chrome's --window-size flag
     # is unreliable in headless mode, so resize explicitly.
     page.current_window.resize_to(720, 2000)
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
-    find(".alert-success .close").click
-    # Wait for the flash to finish dismissing -- otherwise it overlaps and
-    # intercepts the click on the nav link below. The Bootstrap fade-out can
-    # exceed Capybara's default 2s wait on slow CI runners.
-    expect(page).to have_no_css(".alert-success", wait: 10)
-    find("#passive_organization_submenu").click
-    within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
-    expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/, wait: 10)
+    # The two-step login, the flash and the org submenu all animate, and a click
+    # waits for its target to settle before it lands. That wait is Capybara's,
+    # so the 2s default is what times out here on a loaded machine.
+    using_wait_time(10) do
+      visit new_session_path
+      fill_in "Email", with: user.email
+      click_button "Continue"
+      fill_in "Password", with: "testthisthing7$"
+      click_button "Log in"
+      find(".alert-success .close").click
+      # Wait for the flash to finish dismissing -- otherwise it overlaps and
+      # intercepts the click on the nav link below.
+      expect(page).to have_no_css(".alert-success")
+      find("#passive_organization_submenu").click
+      within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
+      expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/)
+    end
   end
 
   def settings_selector
@@ -155,6 +159,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 10, wait: 10)
     # Open settings to reveal the export link
     open_settings_if_not
+    # go_back re-renders the results frame, and while it's busy the wrapper grows
+    # a min-height -- the table lands over the link and swallows the click
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
     click_link "Create export of searched registrations"
 
     expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
@@ -251,6 +258,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Runs after the chart test because the Stimulus submit posts a timezone param that pins
     # session[:timezone], which would otherwise override the cookie set above.
     click_link "past year"
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    # Let the period navigation land before submitting. The search posts the
+    # period the frame currently holds, so submitting mid-swap searches the past
+    # 30 days again -- and the URL already says year, so only the count shows it.
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
     fill_in "search_email", with: ""
     find("#search-button").click
     expect(page).to have_current_path(/period=year/, wait: 10)
@@ -528,6 +540,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_text("only with address")
 
       expect_settings_open
+      expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
       click_link "Create export of searched registrations"
       expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
       export_ids = find("#export_custom_bike_ids", visible: :all).value.split(", ").map(&:to_i).sort
