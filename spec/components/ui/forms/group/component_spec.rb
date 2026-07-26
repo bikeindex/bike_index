@@ -57,6 +57,32 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
+  context "by default" do
+    it "appends an optional badge for a non-required field" do
+      expect(component).to have_css("label", text: "optional")
+      expect(component).to_not have_css("label span", text: "*")
+    end
+
+    context "when required" do
+      let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, required: true)) }
+
+      it "marks the input required and appends an asterisk instead of the badge" do
+        expect(component).to have_css("input[required]")
+        expect(component).to have_css("label span", text: "*")
+        expect(component).to_not have_text("optional")
+      end
+    end
+
+    context "when label_suffix is nil" do
+      let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, label_suffix: nil)) }
+
+      it "omits the suffix" do
+        expect(component).to_not have_text("optional")
+        expect(component).to_not have_css("label span", text: "*")
+      end
+    end
+  end
+
   context "when content_block" do
     let(:kind) { :content_block }
     let(:component) do

@@ -86,4 +86,12 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
       expect(component).to have_css("input.twinput.tw\\:font-mono")
     end
   end
+
+  context "when required" do
+    let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, required: true)) }
+
+    it "renders the required attribute" do
+      expect(component).to have_css("input[type='text'][required]")
+    end
+  end
 end
