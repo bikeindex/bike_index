@@ -47,7 +47,7 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
     expect(utilities_for(label, "has-[:focus-visible]")).to eq(utilities_for(button, "focus"))
   end
 
-  it "sizes each chip to its label, wrapping rather than filling the row" do
+  it "sizes each chip to its label" do
     expect(label).to_not include("tw:flex-1")
     expect(component).to have_css("div.tw\\:flex-wrap")
   end
@@ -62,7 +62,13 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
       expect(component).to have_css("input[type='radio'][name='bike[frame_size]']", count: 5, visible: :all)
       expect(component).to have_css("input[value='m'][checked]", visible: :all)
       expect(label).to include("tw:flex-1")
-      expect(component).to_not have_css("div.tw\\:flex-wrap")
+    end
+
+    # flex-1 resolves to a zero basis, so without min-w-fit the row would shrink
+    # the chips past their labels rather than ever breaking
+    it "still wraps once the chips no longer fit" do
+      expect(component).to have_css("div.tw\\:flex-wrap")
+      expect(label).to include("tw:min-w-fit")
     end
   end
 end

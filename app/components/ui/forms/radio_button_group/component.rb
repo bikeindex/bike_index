@@ -16,6 +16,10 @@ module UI
           "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
         ].join(" ").freeze
 
+        # min-w-fit is what lets a full-width row wrap: flex-1 alone resolves every
+        # chip to a zero basis, so they'd shrink past their labels instead of breaking.
+        FULL_WIDTH_CLASSES = "tw:flex-1 tw:min-w-fit"
+
         # full_width: chips share the row evenly (the frame-size XS-XL selector),
         # rather than each taking only the width of its label.
         def initialize(name:, entries:, selected: nil, form: nil, data: {}, full_width: false)
@@ -28,7 +32,7 @@ module UI
         end
 
         def call
-          tag.div(class: ["tw:flex tw:gap-2", ("tw:flex-wrap" unless @full_width)].compact.join(" ")) do
+          tag.div(class: "tw:flex tw:flex-wrap tw:gap-2") do
             safe_join(@entries.map { |option| chip(option) })
           end
         end
@@ -38,7 +42,7 @@ module UI
         def chip(option)
           value = option[:value].to_s
 
-          tag.label(class: [CHIP_CLASSES, ("tw:flex-1" if @full_width)].compact.join(" ")) do
+          tag.label(class: [CHIP_CLASSES, (FULL_WIDTH_CLASSES if @full_width)].compact.join(" ")) do
             radio_button_tag(@name, value, value == @selected, class: "tw:sr-only", form: @form, data: @data) +
               tag.span(option[:label].html_safe)
           end
