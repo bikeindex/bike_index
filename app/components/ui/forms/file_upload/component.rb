@@ -13,6 +13,7 @@ module UI
           @attribute = attribute
           @button_text = button_text || translation(".choose_file")
           @camera_text = camera_text || translation(".take_picture")
+          @drop_text = translation(html_options[:multiple] ? ".drop_files" : ".drop_file")
           @placeholder = placeholder || translation(".no_file_chosen")
 
           accept_list = Array(accept).join(",").split(",").map(&:strip).reject(&:empty?)

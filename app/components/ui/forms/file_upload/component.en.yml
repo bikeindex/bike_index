@@ -5,5 +5,7 @@ en:
       forms:
         file_upload:
           choose_file: Choose file
+          drop_file: Drop a file here
+          drop_files: Drop files here
           no_file_chosen: No file chosen
           take_picture: Take picture

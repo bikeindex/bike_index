@@ -21,6 +21,19 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
     expect(component).to have_no_css("label[data-action]")
   end
 
+  it "renders a drop zone, collapsed until a drag starts" do
+    expect(component).to have_css("[data-form--file-upload-target='dropZone'].tw\\:hidden", text: "Drop a file here")
+    expect(component).to have_css("[data-form--file-upload-target='dropZone'][data-action*='drop->form--file-upload#drop']")
+  end
+
+  context "with multiple" do
+    let(:options) { {html_options: {multiple: true}} }
+
+    it "pluralizes the drop zone text" do
+      expect(component).to have_css("[data-form--file-upload-target='dropZone']", text: "Drop files here")
+    end
+  end
+
   context "with custom button_text, camera_text and placeholder" do
     let(:options) { {accept: "image/*", button_text: "Browse", camera_text: "Use camera", placeholder: "Pick an image"} }
 

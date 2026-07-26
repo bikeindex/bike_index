@@ -1,27 +1,44 @@
 <div
-  class="tw:relative tw:inline-flex tw:items-center tw:gap-3"
   data-controller="form--file-upload"
   data-form--file-upload-placeholder-value="<%= @placeholder %>"
 >
-  <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
-  <%= @form_builder.file_field(@attribute, @html_options) %>
+  <div class="tw:relative tw:inline-flex tw:items-center tw:gap-3">
+    <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
+    <%= @form_builder.file_field(@attribute, @html_options) %>
 
-  <%# @label_data names the click event explicitly -- Stimulus has no default event for a label. %>
-  <%= @form_builder.label @attribute, @button_text, class: @label_classes, data: @label_data %>
+    <%# @label_data names the click event explicitly -- Stimulus has no default event for a label. %>
+    <%= @form_builder.label @attribute, @button_text, class: @label_classes, data: @label_data %>
 
-  <% if @camera %>
-    <%# `capture` only reaches a camera on touch devices; a fine pointer would just reopen the file picker. %>
-    <%= render UI::Button::Component.new(
-          text: @camera_text,
-          html_class: "tw:whitespace-nowrap tw:pointer-fine:hidden",
-          data: {action: "form--file-upload#takePicture"}
-        ) %>
-  <% end %>
+    <% if @camera %>
+      <%# `capture` only reaches a camera on touch devices; a fine pointer would just reopen the file picker. %>
+      <%= render UI::Button::Component.new(
+            text: @camera_text,
+            html_class: "tw:whitespace-nowrap tw:pointer-fine:hidden",
+            data: {action: "form--file-upload#takePicture"}
+          ) %>
+    <% end %>
 
-  <span
-    class="tw:min-w-0 tw:truncate tw:text-gray-500 tw:dark:text-gray-400"
-    data-form--file-upload-target="filename"
+    <span
+      class="tw:min-w-0 tw:truncate tw:text-gray-500 tw:dark:text-gray-400"
+      data-form--file-upload-target="filename"
+    >
+      <%= @placeholder %>
+    </span>
+  </div>
+
+  <%# tw:hidden is the collapse helper's contract; the controller reveals this once a file is dragged over the page. %>
+  <div
+    class="
+      tw:mt-2 tw:hidden tw:rounded-lg tw:border-2 tw:border-dashed
+      tw:border-gray-300 tw:px-4 tw:py-6 tw:text-center tw:text-sm
+      tw:text-gray-500 tw:dark:border-gray-600 tw:dark:text-gray-400
+      tw:is-active:border-blue-500 tw:is-active:bg-blue-50
+      tw:is-active:text-blue-700 tw:dark:is-active:bg-blue-950
+      tw:dark:is-active:text-blue-300
+    "
+    data-form--file-upload-target="dropZone"
+    data-action="drop->form--file-upload#drop dragenter->form--file-upload#highlightDropZone dragleave->form--file-upload#unhighlightDropZone"
   >
-    <%= @placeholder %>
-  </span>
+    <%= @drop_text %>
+  </div>
 </div>
