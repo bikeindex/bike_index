@@ -3,6 +3,8 @@
 module UI
   module Header
     class Component < ApplicationComponent
+      TAG_CLASSES = {h2: "tw:text-xl", h3: "tw:text-lg"}.freeze
+
       def initialize(text:, subtitle: nil, tag: :h1, html_class: nil)
         @text = text
         @subtitle = subtitle
@@ -21,13 +23,8 @@ module UI
       private
 
       def header_classes
-        base = case @tag
-        when :h2 then "tw:text-xl"
-        when :h3 then "tw:text-lg"
-        else "tw:text-2xl"
-        end
-        margin = @subtitle.present? ? "tw:mb-1" : "tw:mb-6"
-        [base, margin, "tw:font-extrabold tw:tracking-tight tw:text-gray-900 tw:dark:text-gray-100",
+        [TAG_CLASSES.fetch(@tag, "tw:text-2xl"), @subtitle.present? ? "tw:mb-1" : "tw:mb-6",
+          "tw:font-extrabold tw:tracking-tight tw:text-gray-900 tw:dark:text-gray-100",
           @html_class].compact.join(" ")
       end
     end

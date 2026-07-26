@@ -20,8 +20,7 @@ end
 admin = User.find_by(email: "admin@bikeindex.org")
 SuperuserAbility.create!(user: admin)
 
-# Actor gates, not the :superusers group — the in-app toggle disables per-actor
-Flipper.enable_actor(:bike_show_redesign, admin)
-Flipper.enable_actor(:bike_show_redesign_toggle, admin)
+# Group gate rather than per-actor — opting out writes users.feature_registration_show_legacy
+Flipper.enable_group(:bike_show_redesign_toggle, :superusers)
 
 puts "Users added successfully\n"

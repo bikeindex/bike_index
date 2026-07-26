@@ -54,5 +54,10 @@
       <%= hidden_field_tag :return_to, @return_to if @return_to.present? %>
       <%= render UI::Button::Component.new(text: translation(".superadmin_button"), kind: :submit, size: :sm) %>
     <% end %>
+  <% else %>
+    &middot;
+    <span class="tw:font-normal tw:text-black/60 tw:italic">
+      <%= translation(".no_superadmin") %>
+    </span>
   <% end %>
 </div>

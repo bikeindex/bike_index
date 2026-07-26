@@ -277,8 +277,8 @@
               %td
                 Location
               %td
-                = stolen_record.address(force_show_address: true)
-                - if stolen_record.without_location?
+                = stolen_record.formatted_address_string(visible_attribute: :street)
+                - if stolen_record.without_street?
                   %em.small.text-warning missing address (user alerted)
             %tr
               %td

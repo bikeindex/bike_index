@@ -27,7 +27,7 @@ module UI
         end
 
         def call
-          tag.label(class: ["twlabel tw:flex tw:items-center tw:gap-2", @class_name].compact.join(" "), data: @data) do
+          tag.label(class: ["twlabel tw:flex tw:cursor-pointer tw:items-center tw:gap-2", @class_name].compact.join(" "), data: @data) do
             checkbox_input + tag.span(@label)
           end
         end
@@ -35,7 +35,7 @@ module UI
         private
 
         def checkbox_input
-          base = {class: "tw:h-4 tw:w-4", data: @input_data}
+          base = {class: "tw:h-4 tw:w-4 tw:cursor-pointer", data: @input_data}
           if @form_builder
             @form_builder.check_box(@attribute, base.merge(@checked.nil? ? {} : {checked: @checked}), @value, "0")
           else

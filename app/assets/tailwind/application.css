@@ -29,17 +29,21 @@
   --breakpoint-xs: 23rem; /* 368px (iphone mini is 375px) */
 
   /* OG Bike Index brand palettes (formerly config/tailwind.config.js) */
+  /* Blue 500 and up carry the redesign's saturation (kelsey_styles.css's
+   * --redesign-blue-500/-800 are 500 and 600 here). Same hue and lightness as
+   * the OG ramp, just fully saturated; 800-950 continue it so the dark end
+   * doesn't fall back to the duller mix. */
   --color-blue-50: #f2f8fd;
   --color-blue-100: #e3effb;
   --color-blue-200: #c1dff6;
   --color-blue-300: #8ac5ef;
   --color-blue-400: #4ca7e4;
-  --color-blue-500: #3498db; /* OG Bike Index blue */
-  --color-blue-600: #176fb2;
-  --color-blue-700: #145990;
-  --color-blue-800: #144c78;
-  --color-blue-900: #164064;
-  --color-blue-950: #0f2942;
+  --color-blue-500: #3397dc; /* OG Bike Index blue */
+  --color-blue-600: #016ec2;
+  --color-blue-700: #015a9e;
+  --color-blue-800: #014e89;
+  --color-blue-900: #01457a;
+  --color-blue-950: #002e51;
 
   --color-green-50: #f1fcf5;
   --color-green-100: #defaea;

@@ -62,6 +62,19 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
+  context "when select" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, kind: :select,
+        choices: [["Red", "1"], ["Blue", "2"]], select_options: {selected: "2"}))
+    end
+
+    it "forwards the choices through to UI::Forms::Input" do
+      expect(component).to have_css("label[for='user_name']", text: "Name")
+      expect(component).to have_css("select.twinput[name='user[name]']")
+      expect(component).to have_css("option[value='2'][selected]", text: "Blue")
+    end
+  end
+
   context "when content_block" do
     let(:kind) { :content_block }
     let(:component) do

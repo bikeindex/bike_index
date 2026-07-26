@@ -38,9 +38,9 @@ module Registrations
         end
 
         # The redesign rollout's escape hatch back to the classic bike show. Uses
-        # no_redesign so the flag doesn't just redirect back to this page.
+        # no_redesign so the viewer isn't redirected straight back to this page.
         def show_legacy_link?
-          @current_user.present? && Flipper.enabled?(:bike_show_redesign_toggle, @current_user)
+          @current_user&.registration_show_toggleable?
         end
 
         def legacy_view_link

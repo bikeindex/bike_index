@@ -224,6 +224,33 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "registration_show_redesign?" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "is falsey when not in the rollout" do
+      expect(user.registration_show_toggleable?).to be_falsey
+      expect(user.registration_show_redesign?).to be_falsey
+    end
+
+    context "in the rollout" do
+      before { Flipper.enable_actor(:bike_show_redesign_toggle, user) }
+
+      it "is truthy" do
+        expect(user.registration_show_toggleable?).to be_truthy
+        expect(user.registration_show_redesign?).to be_truthy
+      end
+
+      context "switched to the legacy view" do
+        let(:user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
+
+        it "is toggleable, but not the redesign" do
+          expect(user.registration_show_toggleable?).to be_truthy
+          expect(user.registration_show_redesign?).to be_falsey
+        end
+      end
+    end
+  end
+
   describe "superuser?" do
     let(:user) { User.new }
     it "is true for superuser attribute" do

@@ -4,14 +4,16 @@ module UI
   module Forms
     module Group
       class Component < ApplicationComponent
-        def initialize(form_builder:, attribute:, kind: :text_field, label_text: nil,
-          required: false, wrapper_class: "tw:mb-4", html_options: {})
+        def initialize(form_builder:, attribute:, kind: :text_field, label_text: nil, required: false,
+          wrapper_class: "tw:mb-4", choices: nil, select_options: {}, html_options: {})
           @form_builder = form_builder
           @attribute = attribute
           @kind = kind.to_sym
           @label_text = label_text || attribute.to_s.humanize
           @required = required
           @wrapper_class = wrapper_class
+          @choices = choices
+          @select_options = select_options
           @html_options = html_options
         end
 
