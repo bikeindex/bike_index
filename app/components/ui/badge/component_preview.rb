@@ -28,6 +28,10 @@ module UI
         render(UI::Badge::Component.new(text: "Default", color: :gray, size: :sm))
       end
 
+      def gray_xs
+        render(UI::Badge::Component.new(text: "optional", size: :xs))
+      end
+
       def error_md
         render(UI::Badge::Component.new(text: "Banned", color: :error, size: :md))
       end

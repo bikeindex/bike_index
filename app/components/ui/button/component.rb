@@ -21,8 +21,13 @@ module UI
         purple: "tw:text-white tw:bg-purple-500 tw:border tw:border-purple-500 tw:hover:bg-purple-600 tw:hover:border-purple-600 tw:focus:ring-purple-500/40",
         danger_outline: "tw:text-[#c0392b] tw:bg-white tw:border tw:border-[#f3c9c9] tw:hover:bg-red-50 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:hover:bg-red-950",
         purple_outline: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950",
-        link: "twlink tw:p-0"
+        link: "twlink tw:p-0",
+        # Redesign: quiet bold blue link, no underline (Where's my serial number?)
+        blue_link: "tw:text-blue-600 tw:hover:text-blue-700 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:font-bold tw:p-0 tw:focus:outline-none"
       }.freeze
+
+      # Text-only colors: no size padding, focus ring or font-medium override
+      LINK_COLORS = %i[link blue_link].freeze
 
       # The active look, as a delta over COLORS — always emitted alongside it and inert
       # until the element flags itself active (see the is-active variant in application.css,
@@ -35,7 +40,8 @@ module UI
         purple: "tw:is-active:bg-purple-600 tw:is-active:border-purple-600 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
         danger_outline: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
         purple_outline: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
-        link: "tw:is-active:text-blue-800 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
+        link: "tw:is-active:text-blue-800 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline",
+        blue_link: "tw:is-active:text-blue-700 tw:is-active:dark:text-blue-300"
       }.freeze
 
       KINDS = %i[button submit]
@@ -47,7 +53,7 @@ module UI
       FOCUS_CLASSES = "tw:focus:outline-none tw:focus:ring-3 tw:is-active:focus:ring-3"
 
       def self.build_classes(color:, size:, html_class: nil)
-        unless color == :link
+        unless LINK_COLORS.include?(color)
           extras = [SIZES[size], FOCUS_CLASSES, "tw:font-medium tw:no-underline", DISABLED_CLASSES]
         end
         [BASE_CLASSES, html_class, *extras, COLORS[color], ACTIVE_COLORS[color]].compact.join(" ")
@@ -64,7 +70,7 @@ module UI
         @aria = aria
 
         @size = SIZES.key?(size) ? size : :md
-        raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
+        raise ArgumentError, "size is not supported for link colors" if LINK_COLORS.include?(@color) && @size != :md
       end
 
       def call
