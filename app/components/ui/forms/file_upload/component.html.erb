@@ -3,6 +3,10 @@
   data-form--file-upload-placeholder-value="<%= @placeholder %>"
   data-action="dragover@document->form--file-upload#dragOver dragleave@document->form--file-upload#dragLeave drop@document->form--file-upload#endDrag"
 >
+  <% if @thumbnail_url %>
+    <%= link_to image_tag(@thumbnail_url, class: "tw:max-h-24 tw:rounded"), @attachment_url, class: "tw:mb-2 tw:inline-block" %>
+  <% end %>
+
   <div class="tw:relative tw:inline-flex tw:items-center tw:gap-3">
     <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
     <%= @form_builder.file_field(@attribute, @html_options) %>

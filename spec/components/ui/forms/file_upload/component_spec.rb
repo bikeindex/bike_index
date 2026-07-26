@@ -20,6 +20,10 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
     expect(component).to have_css("label[data-action='click->form--file-upload#chooseFile']")
   end
 
+  it "renders no thumbnail when nothing is attached" do
+    expect(component).to have_no_css("img")
+  end
+
   it "renders a drop zone, collapsed until a drag starts" do
     expect(component).to have_css("[data-form--file-upload-target='dropZone'].tw\\:hidden", text: "Drop a file here")
     expect(component).to have_css("[data-form--file-upload-target='dropZone'][data-action*='drop->form--file-upload#drop']")
@@ -73,6 +77,40 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
     context "when omitted" do
       it "renders no accept attribute" do
         expect(component).to have_no_css("input[type='file'][accept]")
+      end
+    end
+  end
+
+  describe "thumbnail of what's already attached" do
+    let(:fixture) { Rails.root.join("spec/fixtures/bike.jpg") }
+
+    context "with a CarrierWave uploader" do
+      let(:user) { Organization.new(avatar: File.open(fixture)) }
+      let(:attribute) { :avatar }
+
+      it "previews the smallest version, linked to the full size" do
+        expect(component).to have_css("img[src*='thumb_bike.jpg']")
+        expect(component).to have_css("a[href$='bike.jpg'] img")
+      end
+
+      context "when thumbnail is false" do
+        let(:options) { {thumbnail: false} }
+
+        it "renders no thumbnail" do
+          expect(component).to have_no_css("img")
+        end
+      end
+    end
+
+    context "with an ActiveStorage attachment" do
+      # persisted: a blob has no signed_id, and so no URL, until it's saved
+      let(:user) { FactoryBot.create(:registration_sequence_page) }
+      let(:attribute) { :image }
+
+      before { user.image.attach(io: File.open(fixture), filename: "bike.jpg", content_type: "image/jpeg") }
+
+      it "previews the attached blob" do
+        expect(component).to have_css("a img")
       end
     end
   end
