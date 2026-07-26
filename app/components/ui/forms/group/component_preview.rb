@@ -25,6 +25,10 @@ module UI
           {template: "ui/forms/group/component_preview/select"}
         end
 
+        def radio_button_group
+          {template: "ui/forms/group/component_preview/radio_button_group"}
+        end
+
         def file_upload
           {template: "ui/forms/group/component_preview/file_upload"}
         end
