@@ -11,19 +11,22 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
   let(:attribute) { :avatar }
   let(:options) { {} }
 
-  it "renders a file input with an associated label and filename display" do
+  it "renders a file input with an associated label and filename display, and no camera button" do
     expect(component).to have_css("input#user_avatar[type='file'][name='user[avatar]']")
     expect(component).to have_css("label[for='user_avatar']", text: "Choose file")
     expect(component).to have_css("[data-controller='form--file-upload']")
     expect(component).to have_css("[data-form--file-upload-target='input']")
     expect(component).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
+    expect(component).to have_no_css("button[data-action='form--file-upload#takePicture']")
+    expect(component).to have_no_css("label[data-action]")
   end
 
-  context "with custom button_text and placeholder" do
-    let(:options) { {button_text: "Browse", placeholder: "Pick an image"} }
+  context "with custom button_text, camera_text and placeholder" do
+    let(:options) { {accept: "image/*", button_text: "Browse", camera_text: "Use camera", placeholder: "Pick an image"} }
 
     it "uses the provided text" do
       expect(component).to have_css("label[for='user_avatar']", text: "Browse")
+      expect(component).to have_css("button[data-action='form--file-upload#takePicture']", text: "Use camera")
       expect(component).to have_css("[data-form--file-upload-target='filename']", text: "Pick an image")
     end
   end
@@ -57,6 +60,41 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
     context "when omitted" do
       it "renders no accept attribute" do
         expect(component).to have_no_css("input[type='file'][accept]")
+      end
+    end
+  end
+
+  describe "camera" do
+    context "when only images are accepted" do
+      let(:options) { {accept: ImageUploader.permitted_extensions} }
+
+      it "renders a camera button, hidden for fine pointers, and resets capture from the label" do
+        expect(component).to have_css("button[data-action='form--file-upload#takePicture'].tw\\:pointer-fine\\:hidden", text: "Take picture")
+        expect(component).to have_css("label[data-action='click->form--file-upload#chooseFile']")
+      end
+    end
+
+    context "when a non-image is accepted" do
+      let(:options) { {accept: PdfUploader.permitted_extensions} }
+
+      it "renders no camera button" do
+        expect(component).to have_no_css("button[data-action='form--file-upload#takePicture']")
+      end
+    end
+
+    context "when forced on for a non-image accept" do
+      let(:options) { {accept: ".csv", camera: true} }
+
+      it "renders a camera button" do
+        expect(component).to have_css("button[data-action='form--file-upload#takePicture']", text: "Take picture")
+      end
+    end
+
+    context "when forced off for an image accept" do
+      let(:options) { {accept: "image/*", camera: false} }
+
+      it "renders no camera button" do
+        expect(component).to have_no_css("button[data-action='form--file-upload#takePicture']")
       end
     end
   end

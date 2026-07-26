@@ -6,7 +6,17 @@
   <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
   <%= @form_builder.file_field(@attribute, @html_options) %>
 
-  <%= @form_builder.label @attribute, @button_text, class: @label_classes %>
+  <%# @label_data names the click event explicitly -- Stimulus has no default event for a label. %>
+  <%= @form_builder.label @attribute, @button_text, class: @label_classes, data: @label_data %>
+
+  <% if @camera %>
+    <%# `capture` only reaches a camera on touch devices; a fine pointer would just reopen the file picker. %>
+    <%= render UI::Button::Component.new(
+          text: @camera_text,
+          html_class: "tw:whitespace-nowrap tw:pointer-fine:hidden",
+          data: {action: "form--file-upload#takePicture"}
+        ) %>
+  <% end %>
 
   <span
     class="tw:min-w-0 tw:truncate tw:text-gray-500 tw:dark:text-gray-400"
