@@ -16,7 +16,7 @@ module UI
           @option_tags = option_tags
           @options = options
           @html_options = html_options.merge(
-            {class: ["twinput tw:mt-1", html_options[:class]].compact.join(" ")},
+            {class: ["twinput", html_options[:class]].compact.join(" ")},
             (required ? {required: true} : {})
           )
         end

@@ -8,8 +8,10 @@ module UI
         # active state off the checked radio so the two stay visually in lockstep.
         CHIP_CLASSES = [
           "tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:justify-center tw:mb-0! tw:rounded tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
-          "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700",
-          "tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950",
+          # The resting half comes straight from the button, so retuning its grays
+          # reaches the chips. Only the checked/focus states have to be restated,
+          # since those hang off the radio rather than :active/:focus.
+          UI::Button::Component::COLORS[:purple_outline],
           "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
           "tw:has-[:checked]:hover:bg-purple-500 tw:has-[:checked]:hover:border-purple-500",
           "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40",
