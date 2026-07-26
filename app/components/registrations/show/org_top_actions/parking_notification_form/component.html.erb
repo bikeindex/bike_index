@@ -1,15 +1,20 @@
 <div
   data-registrations--show--action-panels-target="panel"
   data-panel-name="parking impound"
-  data-controller="registrations--show--parking-notification-show"
-  data-registrations--show--parking-notification-show-notification-heading-value="<%= translation(".create_parking_notification") %>"
-  data-registrations--show--parking-notification-show-impound-heading-value="<%= translation(".impound_this_bike_type", bike_type: @bike.type) %>"
-  data-action="registrations--show--action-panels:shown->registrations--show--parking-notification-show#applyMode"
+  data-controller="registrations--show--parking-notification-form"
+  data-registrations--show--parking-notification-form-notification-heading-value="<%= translation(".create_parking_notification") %>"
+  data-registrations--show--parking-notification-form-impound-heading-value="<%= translation(".impound_this_bike_type", bike_type: @bike.type) %>"
+  data-registrations--show--parking-notification-form-default-kind-value="<%= new_parking_notification.kind %>"
+  data-registrations--show--parking-notification-form-mapbox-key-value="<%= ENV["MAPBOX_MAPPING"] %>"
+  data-registrations--show--parking-notification-form-style-url-value="<%= MAPS_STYLE_URL %>"
+  data-registrations--show--parking-notification-form-org-latitude-value="<%= org_map_coordinates[:latitude] %>"
+  data-registrations--show--parking-notification-form-org-longitude-value="<%= org_map_coordinates[:longitude] %>"
+  data-action="registrations--show--action-panels:shown->registrations--show--parking-notification-form#applyMode"
   class="tw:hidden"
 >
   <%= render(UI::Card::Component.new) do %>
     <h2
-      data-registrations--show--parking-notification-show-target="heading"
+      data-registrations--show--parking-notification-form-target="heading"
       class="
         tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
         tw:uppercase
@@ -19,7 +24,7 @@
     </h2>
 
     <div class="tw:mt-3">
-      <%= form_with(model: new_parking_notification, url: create_parking_notifications_path, data: form_data) do |form| %>
+      <%= form_with(model: new_parking_notification, url: create_parking_notifications_path, data: {controller: "csrf-refresh form-persist", "form-persist-key-value": "parking-notification-#{@bike.id}", action: "input->form-persist#save submit->form-persist#clear"}) do |form| %>
         <%= form.hidden_field :bike_id %>
         <%= form.hidden_field :latitude, data: {"registrations--show--parking-notification-form-target": "latitude"} %>
         <%= form.hidden_field :longitude, data: {"registrations--show--parking-notification-form-target": "longitude"} %>

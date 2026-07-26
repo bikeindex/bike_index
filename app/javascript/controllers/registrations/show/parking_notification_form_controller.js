@@ -5,12 +5,14 @@ import { ExpandControl, groundRadiusStops, loadMapLibre, OSM_ATTRIBUTION } from 
 /* global navigator */
 
 // Connects to data-controller='registrations--show--parking-notification-form'
-// Everything inside the form. "Set on map" mode shows a map under a fixed centre
-// pin: it seeds from the browser location (falling back to the organization's
-// location), stamps the coordinates onto the form, and keeps the pin + zoom in the
-// URL so a reload restores them. Moving the map moves the pin. "Enter address
-// manually" reveals the UI::Forms::AddressGroup fields instead. Tiles come from our
-// self-hosted MapLibre basemap; the mapboxKey is only for reverse-geocoding the pin.
+// The whole org-admin parking-notification panel: the accordion says which trigger
+// opened it, which retitles the heading and preselects the impound kind. "Set on
+// map" mode shows a map under a fixed centre pin: it seeds from the browser
+// location (falling back to the organization's location), stamps the coordinates
+// onto the form, and keeps the pin + zoom in the URL so a reload restores them.
+// Moving the map moves the pin. "Enter address manually" reveals the
+// UI::Forms::AddressGroup fields instead. Tiles come from our self-hosted MapLibre
+// basemap; the mapboxKey is only for reverse-geocoding the pin.
 const DEFAULT_ZOOM = 15.5
 
 // The device's own position, so a dragged pin can be judged against where the
@@ -29,10 +31,12 @@ const DEVICE_DOT_PAINT = {
 
 export default class extends Controller {
   static targets = ['latitude', 'longitude', 'accuracy', 'submit', 'addressGroup',
-    'useEnteredAddress', 'locationMode', 'kindGroup', 'locationSection',
+    'useEnteredAddress', 'heading', 'locationMode', 'kindGroup', 'locationSection',
     'mapSection', 'mapFrame', 'map', 'mapUnavailable']
 
   static values = {
+    notificationHeading: String,
+    impoundHeading: String,
     defaultKind: String,
     mapboxKey: String,
     styleUrl: String,
@@ -40,10 +44,13 @@ export default class extends Controller {
     orgLongitude: Number
   }
 
-  // Relayed by the panel controller when the accordion reveals it, carrying which
-  // trigger opened it; impound preselects that kind
+  // Fired when the accordion reveals this panel; impound retitles and preselects
+  // that kind
   applyMode (event) {
-    const impound = event.detail.impound
+    const impound = event.detail?.name === 'impound'
+    if (this.hasHeadingTarget) {
+      this.headingTarget.textContent = impound ? this.impoundHeadingValue : this.notificationHeadingValue
+    }
     const radio = this.element.querySelector(`input[name$="[kind]"][value="${impound ? 'impound_notification' : this.defaultKindValue}"]`)
     if (radio) radio.checked = true
     // Impound preselects the kind, so hide the "Notification because" chooser
