@@ -4,6 +4,7 @@ class AddUniqueIndexToBikeOrganizations < ActiveRecord::Migration[8.0]
   INDEX_NAME = :index_bike_organizations_on_bike_id_and_organization_id_unique
 
   def up
+    drop_invalid_index
     # Parallel jobs race past the model's uniqueness validation, so collapse the
     # duplicates they created before the database starts rejecting them
     create_duplicates_table
@@ -25,6 +26,18 @@ class AddUniqueIndexToBikeOrganizations < ActiveRecord::Migration[8.0]
   end
 
   private
+
+  # A duplicate created while this runs fails the index build and leaves behind an
+  # index that enforces nothing - which if_not_exists would take for a finished job
+  def drop_invalid_index
+    invalid = select_value(<<~SQL)
+      SELECT 1
+      FROM pg_index
+      INNER JOIN pg_class ON pg_class.oid = pg_index.indexrelid
+      WHERE pg_class.relname = '#{INDEX_NAME}' AND NOT pg_index.indisvalid
+    SQL
+    remove_index(:bike_organizations, name: INDEX_NAME) if invalid.present?
+  end
 
   # Grouping 1.8 million rows is the expensive part, so only do it once.
   # The keeper is the oldest row, which is the one first_or_initialize finds
