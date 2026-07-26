@@ -6,6 +6,14 @@ Lookbook.configure do |config|
   config.preview_paths = ["#{Rails.root}/app/components/"]
 end
 
+# Append the review-app topbar's title to the navbar, so a Lookbook tab is
+# identifiable as dev/sandbox/a PR. after_initialize because component
+# translations aren't on the I18n load path while initializers run.
+Rails.application.config.after_initialize do
+  title = PageBlock::ReviewAppBanner::Component.from_env.topbar_title
+  Lookbook.config.project_name = ["Bike Index", title].compact.join(" · ")
+end
+
 # Fix preview breakage during development code reloading. Both patches re-resolve
 # preview classes through the autoloader after Zeitwerk unloads constants on reload.
 if Rails.env.development?

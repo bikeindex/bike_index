@@ -39,10 +39,10 @@ module UI
           ))
         end
 
-        def chips
+        def full_width
           render(UI::Forms::RadioButtonGroup::Component.new(
             name: :frame_size,
-            variant: :chips,
+            full_width: true,
             selected: "m",
             entries: %w[xs s m l xl].map { |size| {value: size, label: size.upcase} }
           ))

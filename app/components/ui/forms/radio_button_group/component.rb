@@ -4,80 +4,50 @@ module UI
   module Forms
     module RadioButtonGroup
       class Component < ApplicationComponent
-        VARIANTS = %i[pills chips].freeze
-
         # Mirrors UI::Button color: :purple_outline (resting + active), driving the
         # active state off the checked radio so the two stay visually in lockstep.
-        # Segments overlap by a pixel; z-index breaks the tie for it: hover/focus,
-        # then checked, then the rest.
-        PILL_CLASSES = [
-          "tw:relative tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:mb-0! tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
-          "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700",
-          "tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:hover:z-20 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950",
+        CHIP_CLASSES = [
+          "tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:justify-center tw:mb-0! tw:rounded tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
+          # The resting half comes straight from the button, so retuning its grays
+          # reaches the chips. Only the checked/focus states have to be restated,
+          # since those hang off the radio rather than :active/:focus.
+          UI::Button::Component::COLORS[:purple_outline],
           "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
           "tw:has-[:checked]:hover:bg-purple-500 tw:has-[:checked]:hover:border-purple-500",
-          "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40 tw:has-[:checked]:z-10",
-          "tw:has-[:focus-visible]:ring-2 tw:has-[:focus-visible]:ring-purple-500/40 tw:has-[:focus-visible]:ring-offset-1 tw:has-[:focus-visible]:z-20 tw:dark:has-[:focus-visible]:ring-offset-gray-900"
+          "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40",
+          "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
         ].join(" ").freeze
 
-        # Card-style chips (frame-size XS-XL style); the checked chip tints with the shared purple palette.
-        CHIP_CLASSES = "tw:block tw:rounded-sm tw:border tw:border-gray-300 tw:bg-white tw:py-2 " \
-          "tw:text-center tw:text-sm tw:font-medium tw:text-gray-700 " \
-          "tw:peer-checked:border-purple-500 tw:peer-checked:bg-purple-100 tw:peer-checked:font-bold tw:peer-checked:text-purple-500 " \
-          "tw:dark:border-gray-600 tw:dark:bg-gray-800 tw:dark:text-gray-300 " \
-          "tw:dark:peer-checked:bg-purple-900 tw:dark:peer-checked:text-purple-300"
+        # Equal columns that wrap, staying the same width on every line — flex would
+        # size each line independently. auto-fit needs a definite minimum to count
+        # repetitions, and a column still grows past 4rem for a label that needs it.
+        FULL_WIDTH_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))]"
 
-        def initialize(name:, entries:, selected: nil, form: nil, data: {}, variant: :pills)
+        # full_width: chips share the row evenly (the frame-size XS-XL selector),
+        # rather than each taking only the width of its label.
+        def initialize(name:, entries:, selected: nil, form: nil, data: {}, full_width: false)
           @name = name
           @entries = entries
           @selected = selected.to_s
           @form = form
           @data = data
-          @variant = VARIANTS.include?(variant&.to_sym) ? variant.to_sym : :pills
+          @full_width = full_width
         end
 
         def call
-          return chips if @variant == :chips
-
-          tag.div(class: "tw:flex tw:flex-wrap") do
-            safe_join(@entries.each_with_index.map { |option, i|
-              pill(option, first: i == 0, last: i == @entries.size - 1)
-            })
+          tag.div(class: [@full_width ? FULL_WIDTH_CLASSES : "tw:flex tw:flex-wrap", "tw:gap-2"].join(" ")) do
+            safe_join(@entries.map { |option| chip(option) })
           end
         end
 
         private
 
-        def chips
-          tag.div(class: "tw:flex tw:gap-2") do
-            safe_join(@entries.map { |option| chip(option) })
-          end
-        end
-
         def chip(option)
-          entry(option, label_class: "tw:flex-1 tw:cursor-pointer", input_class: "tw:peer tw:sr-only",
-            span_class: CHIP_CLASSES)
-        end
-
-        def pill(option, first:, last:)
-          round = if first
-            "tw:rounded-l"
-          elsif last
-            "tw:rounded-r"
-          else
-            ""
-          end
-          border_l = first ? "" : "tw:-ml-px"
-
-          entry(option, label_class: [PILL_CLASSES, round, border_l].join(" "))
-        end
-
-        def entry(option, label_class:, input_class: "tw:sr-only", span_class: nil)
           value = option[:value].to_s
 
-          tag.label(class: label_class) do
-            radio_button_tag(@name, value, value == @selected, class: input_class, form: @form, data: @data) +
-              tag.span(option[:label].html_safe, class: span_class)
+          tag.label(class: CHIP_CLASSES) do
+            radio_button_tag(@name, value, value == @selected, class: "tw:sr-only", form: @form, data: @data) +
+              tag.span(option[:label].html_safe)
           end
         end
       end

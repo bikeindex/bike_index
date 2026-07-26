@@ -20,6 +20,8 @@ module UI
         success: "tw:bg-green-50 tw:text-green-700 tw:border-transparent tw:dark:bg-green-950 tw:dark:text-green-200",
         # Special badge classes:
         cyan: "tw:bg-cyan-50 tw:text-cyan-700 tw:border-transparent tw:dark:bg-cyan-950 tw:dark:text-cyan-200",
+        # The redesign's quiet pill. Text is --redesign-gray-500 rather than the
+        # mockup's #9a9aa2, which sat at 2.45:1 on this background.
         gray: "tw:bg-[#f0f0f2] tw:text-[#666666] tw:border-transparent tw:dark:bg-gray-800 tw:dark:text-gray-400",
         purple: "tw:bg-purple-50 tw:text-purple-700 tw:border-transparent tw:dark:bg-purple-950 tw:dark:text-purple-200",
         rose: "tw:bg-rose-50 tw:text-rose-700 tw:border-transparent tw:dark:bg-rose-950 tw:dark:text-rose-200",

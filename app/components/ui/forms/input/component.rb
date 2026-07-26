@@ -4,15 +4,14 @@ module UI
   module Forms
     module Input
       class Component < ApplicationComponent
-        KINDS = %i[text_field text_area email_field number_field telephone_field datetime_local_field select].freeze
+        # Every kind takes (attribute, html_options) — a select doesn't, so it's
+        # UI::Forms::Select instead.
+        KINDS = %i[text_field text_area email_field number_field telephone_field datetime_local_field].freeze
 
-        # For select, pass `choices` (and `select_options` for selected:/include_blank:)
-        def initialize(form_builder:, attribute:, kind: :text_field, required: false, choices: nil, select_options: {}, html_options: {})
+        def initialize(form_builder:, attribute:, kind: :text_field, required: false, html_options: {})
           @form_builder = form_builder
           @attribute = attribute
           @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : :text_field
-          @choices = choices
-          @select_options = select_options
           @html_options = html_options.merge(
             {class: ["twinput", html_options[:class]].compact.join(" ")},
             (required ? {required: true} : {})
@@ -20,8 +19,6 @@ module UI
         end
 
         def call
-          return @form_builder.select(@attribute, @choices, @select_options, @html_options) if @kind == :select
-
           @form_builder.send(@kind, @attribute, @html_options)
         end
       end

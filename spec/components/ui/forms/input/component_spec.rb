@@ -7,13 +7,9 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
   let(:form_builder) do
     BikeIndexFormBuilder.new(:user, user, ActionView::Base.new(ActionView::LookupContext.new([]), {}, nil), {})
   end
-  let(:component) do
-    render_inline(described_class.new(form_builder:, attribute:, kind:, choices:, select_options:, html_options:))
-  end
+  let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, html_options:)) }
   let(:attribute) { :name }
   let(:kind) { :text_field }
-  let(:choices) { nil }
-  let(:select_options) { {} }
   let(:html_options) { {} }
 
   it "renders a text field" do
@@ -54,15 +50,13 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
     end
   end
 
+  # select goes through UI::Forms::Select — its arity doesn't fit KINDS
   context "when select" do
     let(:kind) { :select }
-    let(:choices) { [["Red", "1"], ["Blue", "2"]] }
-    let(:select_options) { {selected: "2", include_blank: "Pick one"} }
 
-    it "renders a select with twinput, options, and the selected value" do
-      expect(component).to have_css("select.twinput[name='user[name]']")
-      expect(component).to have_css("option[value='2'][selected]", text: "Blue")
-      expect(component).to have_css("option[value='']", text: "Pick one")
+    it "falls back to text_field" do
+      expect(component).to have_css("input[type='text']")
+      expect(component).to_not have_css("select")
     end
   end
 
