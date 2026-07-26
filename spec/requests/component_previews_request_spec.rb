@@ -15,4 +15,14 @@ RSpec.describe "ComponentPreviews", type: :request do
     expect(response.status).to eq 200
     expect(response.body).to match("Notification#")
   end
+
+  # FileUpload's preview renders whatever that same org has attached
+  it "renders a preview built from a record's attachment" do
+    organization.update(avatar: File.open(Rails.root.join("spec/fixtures/bike.jpg")))
+
+    get "/rails/view_components/ui/forms/file_upload/component/with_existing_image"
+
+    expect(response.status).to eq 200
+    expect(response.body).to match("thumb_bike.jpg")
+  end
 end

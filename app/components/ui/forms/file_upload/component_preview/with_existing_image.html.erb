@@ -1,0 +1,4 @@
+<%# The component previews the avatar the organization already has, as /o/:slug/manage does. %>
+<%= form_with(model: organization, url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :avatar, accept: ImageUploader.permitted_extensions)) %>
+<% end %>
