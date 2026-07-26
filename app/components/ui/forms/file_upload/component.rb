@@ -4,15 +4,14 @@ module UI
   module Forms
     module FileUpload
       class Component < ApplicationComponent
-        def initialize(form_builder:, attribute:, accept: nil, camera: nil, camera_text: nil,
-          multiple: false, placeholder: nil, html_options: {})
+        # mb-0 cancels legacy bootstrap's `label` margin, which items-center would
+        # otherwise center along with the button next to it.
+        LABEL_CLASSES = "tw:mb-0 tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-blue-500/40"
+
+        def initialize(form_builder:, attribute:, accept: nil, camera: nil, html_options: {})
           @form_builder = form_builder
           @attribute = attribute
-          # Two labels, swapped by pointer type -- a touch device can't click or drop
-          @choose_text = translation(".choose_file")
-          @choose_or_drop_text = translation(".choose_or_drop_file")
-          @camera_text = camera_text || translation(".take_picture")
-          @placeholder = placeholder || translation(".no_file_chosen")
+          @placeholder = translation(".no_file_chosen")
 
           accept_list = Array(accept).flat_map { it.to_s.split(",") }.filter_map { it.strip.presence }
           # `capture` hands back a photo, so the camera is only offered when nothing
@@ -25,22 +24,21 @@ module UI
           @html_options = {
             class: "tw:peer tw:sr-only",
             accept: accept_list.join(",").presence,
-            multiple:,
             data: {"form--file-upload-target": "input", action: "form--file-upload#display"}
           }.merge(html_options)
 
           # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.
-          @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: "tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-blue-500/40")
+          @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: LABEL_CLASSES)
         end
 
         private
 
-        # Both wordings ship; the pointer media query picks one. A coarse pointer can
-        # neither click nor drop, so it gets the short one.
+        # Both wordings ship and the pointer media query picks one -- a coarse pointer
+        # can neither click nor drop, so it gets the short one.
         def label_content
           safe_join([
-            tag.span(@choose_or_drop_text, class: "tw:pointer-coarse:hidden"),
-            tag.span(@choose_text, class: "tw:hidden tw:pointer-coarse:inline")
+            tag.span(translation(".choose_or_drop_file"), class: "tw:pointer-coarse:hidden"),
+            tag.span(translation(".choose_file"), class: "tw:hidden tw:pointer-coarse:inline")
           ])
         end
 
@@ -52,28 +50,28 @@ module UI
           @form_builder.object
         end
 
-        # The attached file, or nil. CarrierWave's `<attribute>_url` falls back to a
-        # placeholder, so presence comes from its `<attribute>?` predicate; ActiveStorage
-        # answers `attached?`. Either way the record's own `<attribute>_url` wins when it
-        # defines one -- several add a dev fallback or serve a processed copy.
+        def attachment
+          record.try(@attribute)
+        end
+
+        # The record's own `<attribute>_url` wins where it defines one -- several add a
+        # dev fallback or serve a processed copy that reaching for the blob would skip.
         def attached_url
           return unless attached?
 
           record.respond_to?(:"#{@attribute}_url") ? record.public_send(:"#{@attribute}_url") : BlobUrl.for(attachment.blob)
         end
 
+        # Keyed off the uploader rather than a `<attribute>?` predicate, which would also
+        # match a boolean column of the same name. CarrierWave hands one back either way.
         def attached?
           return false if record.blank?
-          return record.public_send(:"#{@attribute}?") if record.respond_to?(:"#{@attribute}?")
+          return attachment.present? if attachment.respond_to?(:versions)
 
           attachment.respond_to?(:attached?) && attachment.attached?
         end
 
-        def attachment
-          record.try(@attribute)
-        end
-
-        # Only CarrierWave has versions, and which one is smallest is the uploader's to say.
+        # Only CarrierWave has versions, and which is smallest is the uploader's to say.
         def thumbnail_version_url
           return unless @attachment_url && attachment.respond_to?(:versions)
 

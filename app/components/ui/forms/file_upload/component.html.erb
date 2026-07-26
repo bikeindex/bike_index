@@ -1,21 +1,17 @@
+<%# drop is bound to the root, not the frame, so dropping on the button works too. %>
 <div
   data-controller="form--file-upload"
   data-form--file-upload-placeholder-value="<%= @placeholder %>"
-  <%#
-    drop is bound here, not on the frame, so a drop anywhere on the component
-    lands -- the button says you can drop, so dropping on it has to work.
-  %>
-  data-action="drop->form--file-upload#drop dragover@document->form--file-upload#dragOver dragleave@document->form--file-upload#dragLeave drop@document->form--file-upload#endDrag"
+  data-action="drop->form--file-upload#drop dragover@document->form--file-upload#dragOver dragleave@document->form--file-upload#endDrag drop@document->form--file-upload#endDrag"
 >
-  <% if @thumbnail_url %>
+  <% if @attachment_url %>
     <%= link_to image_tag(@thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded"), @attachment_url, class: "tw:mb-2 tw:inline-block" %>
   <% end %>
 
   <%#
-    The drop target wraps the controls rather than sitting below them. Its border is
-    transparent until a file is dragged, so revealing it doesn't shift the layout.
-    data-over rather than is-active: that variant also matches :active, which would
-    flash the frame every time the button inside it is pressed.
+    The drop target frames the controls; its border is transparent until a drag starts,
+    so revealing it shifts nothing. data-over rather than is-active, which also matches
+    :active and would flash the frame whenever the button inside it is pressed.
   %>
 
   <div
@@ -30,11 +26,7 @@
     data-form--file-upload-target="dropZone"
     data-action="dragenter->form--file-upload#highlightDropZone dragleave->form--file-upload#unhighlightDropZone"
   >
-    <%#
-      flex-wrap so a narrow column doesn't overflow: the long label and the camera
-      button coincide on a `pointer: none` device, and filenames are unbounded.
-    %>
-
+    <%# flex-wrap: the long label and the camera button coincide on a `pointer: none` device %>
     <div class="tw:relative tw:inline-flex tw:flex-wrap tw:items-center tw:gap-3">
       <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
       <%= @form_builder.file_field(@attribute, @html_options) %>
@@ -50,7 +42,7 @@
             ) do %>
           <%# hidden from AT: the button's own text already names it %>
           <%= helpers.inline_svg_tag("icons/camera.svg", class: "tw:h-4 tw:w-4", aria_hidden: true) %>
-          <%= @camera_text %>
+          <%= translation(".take_picture") %>
         <% end %>
       <% end %>
 

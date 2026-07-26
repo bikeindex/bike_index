@@ -18,27 +18,19 @@ export default class extends Controller {
     this.inputTarget.removeAttribute('capture')
   }
 
-  // Fires on every pointer move of the drag, so the write is guarded.
   dragOver (event) {
     if (!draggingFile(event)) return
     event.preventDefault() // without this the browser opens the file instead
-    if (this.dragging) return
 
-    this.dragging = true
     this.dropZoneTarget.dataset.dragging = 'true'
   }
 
-  // dragleave fires for every element crossed; relatedTarget is null only on leaving the window.
-  dragLeave (event) {
-    if (!event.relatedTarget) this.endDrag()
-  }
-
-  // Also runs for a drop on the frame, which prevented the event on its way past.
+  // Bound to both dragleave and drop. dragleave fires for every element crossed, but
+  // relatedTarget is null only on leaving the window -- and on a drop, which ends it too.
   endDrag (event) {
-    event?.preventDefault()
-    if (!this.dragging) return
+    if (event.relatedTarget) return
+    event.preventDefault()
 
-    this.dragging = false
     delete this.dropZoneTarget.dataset.dragging
     this.unhighlightDropZone()
   }

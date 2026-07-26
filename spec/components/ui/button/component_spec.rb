@@ -165,12 +165,6 @@ RSpec.describe UI::Button::Component, type: :component do
     expect(tokens).to include("tw:focus:ring-3", "tw:is-active:focus:ring-3")
   end
 
-  # A <label> wearing these classes (UI::Forms::FileUpload) otherwise keeps legacy
-  # bootstrap's `label` bottom margin, which items-center centers along with the button.
-  it "cancels the margin a button-styled label would inherit" do
-    expect(described_class.build_classes(color: :secondary, size: :md).split).to include("tw:mb-0")
-  end
-
   context "with aria-controls" do
     let(:options) { {aria: {controls: "panel"}} }
     it "renders aria-controls" do

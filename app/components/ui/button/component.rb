@@ -6,10 +6,7 @@ module UI
     # submits a request to a URL (button_to), use UI::ButtonLink instead — it reuses
     # this component's build_classes, so the two stay visually in lockstep.
     class Component < ApplicationComponent
-      # mb-0 is inert on a <button>; it cancels legacy bootstrap's `label` margin for the
-      # labels that wear these classes (see UI::Forms::FileUpload), which items-center
-      # would otherwise center along with the button.
-      BASE_CLASSES = "tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-lg tw:cursor-pointer tw:transition-colors tw:mb-0"
+      BASE_CLASSES = "tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-lg tw:cursor-pointer tw:transition-colors"
 
       SIZES = {
         sm: "tw:px-2.5 tw:py-1 tw:text-xs",

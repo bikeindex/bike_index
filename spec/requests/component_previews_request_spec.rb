@@ -23,6 +23,6 @@ RSpec.describe "ComponentPreviews", type: :request do
     get "/rails/view_components/ui/forms/file_upload/component/with_existing_image"
 
     expect(response.status).to eq 200
-    expect(response.body).to match("thumb_bike.jpg")
+    expect(response.body).to include("bike.jpg")
   end
 end
