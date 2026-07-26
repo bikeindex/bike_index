@@ -48,7 +48,6 @@ RSpec.describe UI::Badge::Component, type: :component do
       cyan: "tw:bg-cyan-50",
       error: "tw:bg-red-50",
       gray: "tw:bg-gray-100",
-      muted: "tw:bg-[#f0f0f2]",
       rose: "tw:bg-rose-50",
       orange: "tw:bg-orange-50",
       empty: "tw:bg-white"
