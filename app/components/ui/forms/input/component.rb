@@ -6,8 +6,7 @@ module UI
       class Component < ApplicationComponent
         KINDS = %i[text_field text_area email_field number_field telephone_field datetime_local_field select].freeze
 
-        # For select, pass `choices` (and `select_options` for selected:/include_blank:).
-        # `html_options[:class]` is appended to twinput rather than replacing it.
+        # For select, pass `choices` (and `select_options` for selected:/include_blank:)
         def initialize(form_builder:, attribute:, kind: :text_field, choices: nil, select_options: {}, html_options: {})
           @form_builder = form_builder
           @attribute = attribute
@@ -18,11 +17,9 @@ module UI
         end
 
         def call
-          if @kind == :select
-            @form_builder.select(@attribute, @choices, @select_options, @html_options)
-          else
-            @form_builder.send(@kind, @attribute, @html_options)
-          end
+          return @form_builder.select(@attribute, @choices, @select_options, @html_options) if @kind == :select
+
+          @form_builder.send(@kind, @attribute, @html_options)
         end
       end
     end

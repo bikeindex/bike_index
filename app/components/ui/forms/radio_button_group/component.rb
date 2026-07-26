@@ -6,6 +6,20 @@ module UI
       class Component < ApplicationComponent
         VARIANTS = %i[pills chips].freeze
 
+        # Mirrors UI::Button color: :purple_outline (resting + active), driving the
+        # active state off the checked radio so the two stay visually in lockstep.
+        # Segments overlap by a pixel; z-index breaks the tie for it: hover/focus,
+        # then checked, then the rest.
+        PILL_CLASSES = [
+          "tw:relative tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:mb-0! tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
+          "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700",
+          "tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:hover:z-20 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950",
+          "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
+          "tw:has-[:checked]:hover:bg-purple-500 tw:has-[:checked]:hover:border-purple-500",
+          "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40 tw:has-[:checked]:z-10",
+          "tw:has-[:focus-visible]:ring-2 tw:has-[:focus-visible]:ring-purple-500/40 tw:has-[:focus-visible]:ring-offset-1 tw:has-[:focus-visible]:z-20 tw:dark:has-[:focus-visible]:ring-offset-gray-900"
+        ].join(" ").freeze
+
         # Card-style chips (frame-size XS-XL style); the checked chip tints with the shared purple palette.
         CHIP_CLASSES = "tw:block tw:rounded-sm tw:border tw:border-gray-300 tw:bg-white tw:py-2 " \
           "tw:text-center tw:text-sm tw:font-medium tw:text-gray-700 " \
@@ -41,18 +55,11 @@ module UI
         end
 
         def chip(option)
-          value = option[:value].to_s
-
-          tag.label(class: "tw:flex-1 tw:cursor-pointer") do
-            radio_button_tag(@name, value, value == @selected, class: "tw:peer tw:sr-only", form: @form, data: @data) +
-              tag.span(option[:label].html_safe, class: CHIP_CLASSES)
-          end
+          entry(option, label_class: "tw:flex-1 tw:cursor-pointer", input_class: "tw:peer tw:sr-only",
+            span_class: CHIP_CLASSES)
         end
 
         def pill(option, first:, last:)
-          value = option[:value].to_s
-          checked = value == @selected
-
           round = if first
             "tw:rounded-l"
           elsif last
@@ -62,25 +69,15 @@ module UI
           end
           border_l = first ? "" : "tw:-ml-px"
 
-          # Mirrors UI::Button color: :purple_outline (resting + active), driving the
-          # active state off the checked radio so the two stay visually in lockstep.
-          # Segments overlap by a pixel; z-index breaks the tie for it: hover/focus,
-          # then checked, then the rest.
-          tag.label(class: [
-            "tw:relative tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:mb-0! tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
-            "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700",
-            "tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:hover:z-20 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950",
-            "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
-            "tw:has-[:checked]:hover:bg-purple-500 tw:has-[:checked]:hover:border-purple-500",
-            "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40 tw:has-[:checked]:z-10",
-            "tw:has-[:focus-visible]:ring-2 tw:has-[:focus-visible]:ring-purple-500/40 tw:has-[:focus-visible]:ring-offset-1 tw:has-[:focus-visible]:z-20 tw:dark:has-[:focus-visible]:ring-offset-gray-900",
-            round, border_l
-          ].join(" ")) do
-            radio_button_tag(@name, value, checked,
-              class: "tw:sr-only",
-              form: @form,
-              data: @data) +
-              tag.span(option[:label].html_safe)
+          entry(option, label_class: [PILL_CLASSES, round, border_l].join(" "))
+        end
+
+        def entry(option, label_class:, input_class: "tw:sr-only", span_class: nil)
+          value = option[:value].to_s
+
+          tag.label(class: label_class) do
+            radio_button_tag(@name, value, value == @selected, class: input_class, form: @form, data: @data) +
+              tag.span(option[:label].html_safe, class: span_class)
           end
         end
       end

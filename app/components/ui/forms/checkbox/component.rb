@@ -18,8 +18,8 @@ module UI
         end
 
         def call
-          tag.label(class: ["twlabel tw:flex tw:items-center tw:gap-2", @class_name].compact.join(" "), data: @data) do
-            check_box_tag(@name, @value, @checked, class: "tw:h-4 tw:w-4", data: @input_data) +
+          tag.label(class: ["twlabel tw:flex tw:cursor-pointer tw:items-center tw:gap-2", @class_name].compact.join(" "), data: @data) do
+            check_box_tag(@name, @value, @checked, class: "tw:h-4 tw:w-4 tw:cursor-pointer", data: @input_data) +
               tag.span(@label)
           end
         end

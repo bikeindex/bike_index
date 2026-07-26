@@ -7,10 +7,11 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
   let(:form_builder) do
     BikeIndexFormBuilder.new(:user, user, ActionView::Base.new(ActionView::LookupContext.new([]), {}, nil), {})
   end
-  let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, label_text:)) }
+  let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, label_text:, label_suffix:)) }
   let(:attribute) { :name }
   let(:kind) { :text_field }
   let(:label_text) { nil }
+  let(:label_suffix) { nil }
 
   it "renders label and input" do
     expect(component).to have_css("label[for='user_name']", text: "Name")
@@ -45,15 +46,26 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
   end
 
   context "with label_suffix" do
-    let(:component) do
-      render_inline(described_class.new(form_builder:, attribute:, kind:, label_text: "Model",
-        label_suffix: "<em>opt</em>".html_safe))
-    end
+    let(:label_text) { "Model" }
+    let(:label_suffix) { "<em>opt</em>".html_safe }
 
     it "renders the suffix inside the label, above the field" do
       expect(component).to have_css("label", text: "Model")
       expect(component).to have_css("label em", text: "opt")
       expect(component).to have_css("input.twinput.tw\\:mt-1")
+    end
+  end
+
+  context "when select" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, kind: :select,
+        choices: [["Red", "1"], ["Blue", "2"]], select_options: {selected: "2"}))
+    end
+
+    it "forwards the choices through to UI::Forms::Input" do
+      expect(component).to have_css("label[for='user_name']", text: "Name")
+      expect(component).to have_css("select.twinput[name='user[name]']")
+      expect(component).to have_css("option[value='2'][selected]", text: "Blue")
     end
   end
 
