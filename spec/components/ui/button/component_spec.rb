@@ -53,6 +53,27 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with blue_link color" do
+    let(:color) { :blue_link }
+
+    it "renders an unpadded bold link off the blue palette" do
+      html = component.to_html
+      expect(html).to include("tw:text-blue-600")
+      expect(html).to include("tw:font-bold")
+      expect(html).to_not include("tw:underline")
+      # Text-only, so it skips the size padding the filled colors get
+      expect(html).to_not include(UI::Button::Component::SIZES[:md])
+    end
+
+    context "with non-default size" do
+      let(:size) { :lg }
+
+      it "raises ArgumentError" do
+        expect { instance }.to raise_error(ArgumentError, /size is not supported for link colors/)
+      end
+    end
+  end
+
   context "with purple_outline color" do
     let(:color) { :purple_outline }
 
