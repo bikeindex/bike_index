@@ -122,6 +122,11 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
       it "renders a camera button, hidden for fine pointers" do
         expect(component).to have_css("button[data-action='form--file-upload#takePicture'].tw\\:pointer-fine\\:hidden", text: "Take picture")
       end
+
+      # legacy bootstrap gives `label` a bottom margin, which items-center would center
+      it "keeps the label flush with the camera button" do
+        expect(component).to have_css("label.tw\\:mb-0")
+      end
     end
 
     context "when a non-image is also accepted" do

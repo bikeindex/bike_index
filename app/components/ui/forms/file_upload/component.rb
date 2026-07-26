@@ -33,7 +33,9 @@ module UI
           }.merge(html_options)
 
           # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.
-          @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: "tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-blue-500/40")
+          # mb-0 because legacy bootstrap's `label` margin outranks preflight (the legacy layer
+          # sorts after base), and items-center would center that margin, not the button.
+          @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: "tw:mb-0 tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-blue-500/40")
         end
 
         private
