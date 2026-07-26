@@ -38,6 +38,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     "[data-org--search-target='settings']"
   end
 
+  # multi_search paints the chips from UI::Badge's palette via JS, so take the
+  # background off the component rather than restating it here
+  def badge_background(color)
+    UI::Badge::Component::COLORS.fetch(color).split.first
+  end
+
   def expect_settings_open
     expect(find(settings_selector, visible: :all)["class"]).not_to include("tw:hidden!")
   end
@@ -179,7 +185,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     fill_in "search_notes", with: ""
     find("#search-button").click
     expect(page).to have_current_path(/period=year/, wait: 10)
-    expect(page).to have_text("11 registrations matching")
+    expect(page).to have_text("11 registrations matching", wait: 10)
 
     # "past day" additionally excludes bike2 (3 days ago)
     click_link "past day"
@@ -252,7 +258,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # replaces. Wait for the swap to finish (count reflects the cleared email)
     # before toggling it -- otherwise Playwright grabs the old button and it
     # detaches mid-click ("Element is not attached to the DOM").
-    expect(page).to have_text("11 registrations matching")
+    expect(page).to have_text("11 registrations matching", wait: 10)
 
     click_button "custom"
     start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
@@ -378,7 +384,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       click_button "Search serials"
 
       # Chips update with results
-      expect(page).to have_css("#chip_2.tw\\:bg-gray-100", wait: 15)
+      expect(page).to have_css("#chip_2", class: badge_background(:gray), wait: 15)
 
       # Results sorted by chip order, empty results removed
       expect(page).to have_css(".multi-search-serial-result", count: 2)
@@ -466,11 +472,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
         click_button "Search stickers"
 
         # Chips for unclaimed and non-org stickers show gray (no bikes)
-        expect(page).to have_css("#chip_1.tw\\:bg-gray-100", wait: 15)
-        expect(page).to have_css("#chip_2.tw\\:bg-gray-100")
+        expect(page).to have_css("#chip_1", class: badge_background(:gray), wait: 15)
+        expect(page).to have_css("#chip_2", class: badge_background(:gray))
 
         # Only claimed org sticker has a bike result
-        expect(page).to have_css("#chip_0.tw\\:bg-green-50")
+        expect(page).to have_css("#chip_0", class: badge_background(:success))
 
         # Switch back to serials
         choose "Serials", allow_label_click: true, visible: :all
