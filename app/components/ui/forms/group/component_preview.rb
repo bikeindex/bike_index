@@ -21,6 +21,10 @@ module UI
           {template: "ui/forms/group/component_preview/content_block"}
         end
 
+        def select
+          {template: "ui/forms/group/component_preview/select"}
+        end
+
         def file_upload
           {template: "ui/forms/group/component_preview/file_upload"}
         end
