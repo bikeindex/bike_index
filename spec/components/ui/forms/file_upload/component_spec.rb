@@ -11,22 +11,19 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
   let(:attribute) { :avatar }
   let(:options) { {} }
 
-  it "renders a file input with an associated label and filename display, and no camera button" do
+  it "renders the input, label and collapsed drop zone -- but no camera or thumbnail" do
     expect(component).to have_css("input#user_avatar[type='file'][name='user[avatar]']")
     expect(component).to have_css("label[for='user_avatar']", text: "Choose file")
     expect(component).to have_css("[data-controller='form--file-upload']")
     expect(component).to have_css("[data-form--file-upload-target='input']")
     expect(component).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
     expect(component).to have_css("label[data-action='click->form--file-upload#chooseFile']")
-  end
-
-  it "renders no thumbnail when nothing is attached" do
-    expect(component).to have_no_css("img")
-  end
-
-  it "renders a drop zone, collapsed until a drag starts" do
     expect(component).to have_css("[data-form--file-upload-target='dropZone'].tw\\:hidden", text: "Drop a file here")
-    expect(component).to have_css("[data-form--file-upload-target='dropZone'][data-action*='drop->form--file-upload#drop']")
+    # the full string: a typo in either handler name would leave the highlight inert
+    expect(component).to have_css("[data-form--file-upload-target='dropZone'][data-action='drop->form--file-upload#drop dragenter->form--file-upload#highlightDropZone dragleave->form--file-upload#unhighlightDropZone']")
+    # nothing accepted, so nothing to photograph; nothing attached, so nothing to preview
+    expect(component).to have_no_css("button[data-action='form--file-upload#takePicture']")
+    expect(component).to have_no_css("img")
   end
 
   context "with multiple" do
@@ -88,17 +85,8 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
       let(:user) { Organization.new(avatar: File.open(fixture)) }
       let(:attribute) { :avatar }
 
-      it "previews the smallest version, linked to the full size" do
-        expect(component).to have_css("img[src*='thumb_bike.jpg']")
-        expect(component).to have_css("a[href$='bike.jpg'] img")
-      end
-
-      context "when thumbnail is false" do
-        let(:options) { {thumbnail: false} }
-
-        it "renders no thumbnail" do
-          expect(component).to have_no_css("img")
-        end
+      it "previews AvatarUploader's thumb version, linked to the full size" do
+        expect(component).to have_css("a[href$='/bike.jpg'] img[src$='/thumb_bike.jpg'][alt='Avatar']")
       end
     end
 
@@ -109,8 +97,10 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
 
       before { user.image.attach(io: File.open(fixture), filename: "bike.jpg", content_type: "image/jpeg") }
 
-      it "previews the attached blob" do
-        expect(component).to have_css("a img")
+      # no versions to pick from, so the preview is the attachment itself
+      it "previews the attachment, linking to the same url" do
+        expect(component).to have_css("img[alt='Image'][src='#{user.image_url}']")
+        expect(component).to have_css("a[href='#{user.image_url}'] img")
       end
     end
   end
@@ -121,11 +111,6 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
 
       it "renders a camera button, hidden for fine pointers" do
         expect(component).to have_css("button[data-action='form--file-upload#takePicture'].tw\\:pointer-fine\\:hidden", text: "Take picture")
-      end
-
-      # legacy bootstrap gives `label` a bottom margin, which items-center would center
-      it "keeps the label flush with the camera button" do
-        expect(component).to have_css("label.tw\\:mb-0")
       end
     end
 

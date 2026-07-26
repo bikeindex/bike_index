@@ -5,46 +5,58 @@ require "rails_helper"
 RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/file_upload/component/" }
   let(:drop_zone) { "[data-form--file-upload-target='dropZone']" }
+  # Dragging a file has no Capybara equivalent -- the drag source is the OS, not the
+  # page -- so the events carry a hand-built DataTransfer, per Playwright's docs.
+  let(:start_drag) do
+    <<~JS
+      window.fileTransfer = new DataTransfer()
+      window.fileTransfer.items.add(new File(["x"], "dropped.jpg", {type: "image/jpeg"}))
+      document.dispatchEvent(new DragEvent("dragover", {bubbles: true, dataTransfer: window.fileTransfer}))
+    JS
+  end
 
-  context "default" do
-    it "takes a file from the picker or a drag, and only offers Take picture on a coarse pointer" do
-      visit("#{base_path}default")
+  it "takes a file from the picker or a drag, and only offers Take picture on a coarse pointer" do
+    visit("#{base_path}default")
 
-      expect(page).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
-      expect(page).to have_no_css(drop_zone)
+    expect(page).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
+    expect(page).to have_no_css(drop_zone)
+    expect_axe_clean
 
-      attach_file("file", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
+    attach_file("file", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
 
-      expect(page).to have_css("[data-form--file-upload-target='filename']", text: "bike.jpg")
+    expect(page).to have_css("[data-form--file-upload-target='filename']", text: "bike.jpg")
 
-      # Dragging a file has no Capybara equivalent -- the drag source is the OS, not
-      # the page -- so the events carry a hand-built DataTransfer, per Playwright's docs.
-      page.execute_script(<<~JS)
-        window.fileTransfer = new DataTransfer()
-        window.fileTransfer.items.add(new File(["x"], "dropped.jpg", {type: "image/jpeg"}))
-        document.dispatchEvent(new DragEvent("dragover", {bubbles: true, dataTransfer: window.fileTransfer}))
-      JS
+    # twice: dragover repeats per pointer move, and the reveal guard has to absorb that
+    page.execute_script(start_drag)
+    page.execute_script(start_drag)
 
-      expect(page).to have_css(drop_zone, text: "Drop a file here")
+    expect(page).to have_css(drop_zone, text: "Drop a file here")
+    expect_axe_clean
 
-      page.execute_script(<<~JS)
-        document.querySelector("#{drop_zone}")
-          .dispatchEvent(new DragEvent("drop", {bubbles: true, dataTransfer: window.fileTransfer}))
-      JS
+    # dragging back off the window closes it again
+    page.execute_script("document.dispatchEvent(new DragEvent('dragleave', {bubbles: true, relatedTarget: null}))")
 
-      expect(page).to have_css("[data-form--file-upload-target='filename']", text: "dropped.jpg")
-      expect(page).to have_no_css(drop_zone)
-      expect(page).to have_no_button("Take picture")
+    expect(page).to have_no_css(drop_zone)
 
-      emulate_touch_device
+    page.execute_script(start_drag)
+    page.execute_script(<<~JS)
+      document.querySelector("#{drop_zone}")
+        .dispatchEvent(new DragEvent("drop", {bubbles: true, dataTransfer: window.fileTransfer}))
+    JS
 
-      click_on "Take picture"
+    expect(page).to have_css("[data-form--file-upload-target='filename']", text: "dropped.jpg")
+    expect(page).to have_no_css(drop_zone)
+    expect(page).to have_no_button("Take picture")
 
-      expect(page).to have_css("input[type='file'][capture='environment']", visible: :all)
+    # everything below runs touch-emulated -- fine-pointer assertions must come first
+    emulate_touch_device
 
-      find("label", text: "Choose file").click
+    click_on "Take picture"
 
-      expect(page).to have_no_css("input[type='file'][capture]", visible: :all)
-    end
+    expect(page).to have_css("input[type='file'][capture='environment']", visible: :all)
+
+    find(:label, "Choose file").click
+
+    expect(page).to have_no_css("input[type='file'][capture]", visible: :all)
   end
 end

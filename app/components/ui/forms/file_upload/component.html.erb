@@ -4,7 +4,7 @@
   data-action="dragover@document->form--file-upload#dragOver dragleave@document->form--file-upload#dragLeave drop@document->form--file-upload#endDrag"
 >
   <% if @thumbnail_url %>
-    <%= link_to image_tag(@thumbnail_url, class: "tw:max-h-24 tw:rounded"), @attachment_url, class: "tw:mb-2 tw:inline-block" %>
+    <%= link_to image_tag(@thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded"), @attachment_url, class: "tw:mb-2 tw:inline-block" %>
   <% end %>
 
   <div class="tw:relative tw:inline-flex tw:items-center tw:gap-3">
