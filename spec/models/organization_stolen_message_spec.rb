@@ -105,13 +105,13 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["organization_stolen_message"]) }
       let!(:organization_stolen_message2) { OrganizationStolenMessage.where(organization_id: organization2.id).first_or_create }
       before { organization_stolen_message2.update(attrs) }
-      it "returns first", :flaky do
+      it "returns first" do
         expect(organization_stolen_message.id).to be_present
         expect(organization_stolen_message2).to be_valid
         expect(OrganizationStolenMessage.count).to eq 2
         bike.bike_organizations.create(organization: organization2)
         expect(stolen_record).to be_valid
-        expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id, organization2.id])
+        expect(bike.reload.bike_organizations.order(:id).pluck(:organization_id)).to eq([organization.id, organization2.id])
         expect(stolen_record.organization_stolen_message_id).to eq nil
         expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
         expect(stolen_record.reload.organization_stolen_message_id).to eq nil
@@ -119,7 +119,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         expect(stolen_record2).to be_valid
         expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
         bike2.bike_organizations.create(organization: organization)
-        expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization2.id, organization.id])
+        expect(bike2.reload.bike_organizations.order(:id).pluck(:organization_id)).to eq([organization2.id, organization.id])
         expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
       end
     end

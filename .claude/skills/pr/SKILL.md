@@ -42,6 +42,8 @@ When updating an **existing** PR, leave its base untouched — run `gh pr edit` 
 
 Every migration this branch adds must be dated within the past 2 days. List them with `git diff "origin/$BASE"...HEAD --name-only --diff-filter=A -- db/migrate db/analytics_migrate` and compare each filename's leading timestamp against `date -v-2d +%Y%m%d%H%M%S`.
 
+A migration timestamped in the future isn't stale — leave it alone.
+
 For each stale migration, in this order (rollback must happen while the old version is still on disk):
 
 1. Roll it back: `bin/rails db:migrate:down:primary VERSION=<old-timestamp>` (`db:migrate:down:analytics` for `db/analytics_migrate` files) — the un-namespaced `db:migrate:down` refuses in this multi-database app.

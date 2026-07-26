@@ -98,12 +98,12 @@
 
 @layer components {
   .twlink {
-    @apply tw:text-blue-600 tw:hover:text-blue-800 tw:hover:underline tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition-colors;
+    @apply tw:text-blue-600 tw:hover:text-blue-700 tw:hover:underline tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition-colors;
   }
 
   .twlink.active,
   .twlink:active {
-    @apply tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold tw:underline;
+    @apply tw:text-blue-700 tw:dark:text-blue-300 tw:font-bold tw:underline;
   }
 
   .twless-strong {

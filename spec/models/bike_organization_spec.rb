@@ -11,6 +11,26 @@ RSpec.describe BikeOrganization, type: :model do
     end
   end
 
+  describe "uniqueness" do
+    let!(:bike_organization) { FactoryBot.create(:bike_organization) }
+    let(:duplicate) { BikeOrganization.new(bike_id: bike_organization.bike_id, organization_id: bike_organization.organization_id) }
+
+    # The unique index is what stops parallel jobs from racing past the validation
+    it "is invalid and is rejected by the database" do
+      expect(duplicate.valid?).to be_falsey
+      expect(duplicate.errors.full_messages.join).to match(/already been taken/)
+      expect { duplicate.save(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+
+    context "deleted bike_organization" do
+      before { bike_organization.destroy }
+
+      it "creates a new bike_organization" do
+        expect { duplicate.save! }.to change(BikeOrganization.unscoped, :count).by(1)
+      end
+    end
+  end
+
   describe "delete_bike_organization_note" do
     let(:bike_organization) { FactoryBot.create(:bike_organization) }
     let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike: bike_organization.bike, organization: bike_organization.organization) }
