@@ -99,7 +99,7 @@ module Spreadsheets
       out_file = File.join(Rails.root, filename)
       output = File.open(out_file, "w")
       output.puts stolen_with_reports_header
-      stolen_records.joins(:bike, :state).merge(Bike.with_known_serial).find_each do |sr|
+      stolen_records.joins(:bike, :region_record).merge(Bike.with_known_serial).find_each do |sr|
         next unless sr.police_report_number.present?
 
         row = sr.tsv_row(false, with_stolen_locations: true)
