@@ -19,6 +19,8 @@ export default class extends Controller {
   remove (event) {
     const row = this.rowTargets.find(target => target.contains(event.target))
     row.querySelectorAll('input').forEach(input => { input.value = '' })
+    // Let the combobox-display overlay clear now that the value is gone
+    row.querySelector('.hw-combobox__input')?.dispatchEvent(new Event('hw-combobox:selection', { bubbles: true }))
     collapse('hide', row)
     if (!CollapseUtils.isVisible(this.addButtonTarget)) collapse('show', this.addButtonTarget)
   }

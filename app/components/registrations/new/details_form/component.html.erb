@@ -40,9 +40,22 @@
         <%= render UI::Badge::Component.new(text: translation(".up_to_3"), size: :xs) %>
       <% end %>
 
-      <%= render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, form: f,
-          value: @b_param.primary_frame_color_id, options: color_combobox_options,
-          placeholder: translation(".primary_color_blank")) %>
+      <div
+        class="tw:relative tw:mt-1"
+        data-controller="registrations--new--combobox-display"
+      >
+        <%= render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, form: f,
+            value: @b_param.primary_frame_color_id, options: color_combobox_options,
+            placeholder: translation(".primary_color_blank")) %>
+
+        <div
+          class="
+            tw:pointer-events-none tw:absolute tw:hidden tw:truncate
+            tw:text-gray-900 tw:dark:text-gray-200
+          "
+          data-registrations--new--combobox-display-target="overlay"
+        ></div>
+      </div>
 
       <% {secondary_frame_color_id: translation(".second_color_blank"), tertiary_frame_color_id: translation(".third_color_blank")}.each do |field, blank_label| %>
         <% value = bike[field.to_s] %>
@@ -51,8 +64,21 @@
           class="tw:mt-2 tw:flex tw:items-center tw:gap-3 <%= "tw:hidden" if value.blank? %>"
           data-registrations--new--additional-colors-target="row"
         >
-          <%= render UI::Forms::Combobox::Component.new(name: field, form: f,
-              value:, options: color_combobox_options, placeholder: blank_label) %>
+          <div
+            class="tw:relative tw:flex-1"
+            data-controller="registrations--new--combobox-display"
+          >
+            <%= render UI::Forms::Combobox::Component.new(name: field, form: f,
+                value:, options: color_combobox_options, placeholder: blank_label) %>
+
+            <div
+              class="
+                tw:pointer-events-none tw:absolute tw:hidden tw:truncate
+                tw:text-gray-900 tw:dark:text-gray-200
+              "
+              data-registrations--new--combobox-display-target="overlay"
+            ></div>
+          </div>
 
           <%= render UI::Button::Component.new(text: "×", color: :blue_link,
               html_class: "tw:shrink-0 tw:text-xl tw:leading-none",
