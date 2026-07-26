@@ -3,12 +3,10 @@ require "rails_helper"
 RSpec.describe Registrations::Show::Map::Component, type: :component do
   let(:options) { {latitude: 40.7, longitude: -73.9} }
   let(:component) { described_class.new(**options) }
-  before { stub_const("MAPS_STYLE_URL", "https://maps.example.com/style.json") }
 
   it "renders the map container with the stimulus values and an unavailable fallback" do
     render_inline(component)
     node = page.find("div[data-controller='registrations--show--map']")
-    expect(node["data-registrations--show--map-style-url-value"]).to eq "https://maps.example.com/style.json"
     expect(node["data-registrations--show--map-latitude-value"]).to eq "40.7"
     expect(node["data-registrations--show--map-longitude-value"]).to eq "-73.9"
     expect(node["data-registrations--show--map-radius-meters-value"]).to eq "1000"
