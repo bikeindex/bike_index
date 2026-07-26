@@ -68,7 +68,7 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
         form_for User.new, url: "#", method: :patch, builder: BikeIndexFormBuilder do |f|
           render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, kind: :content_block)) do
             render(UI::Forms::Select::Component.new(form_builder: f, attribute: :name,
-              choices: [["Red", "1"], ["Blue", "2"]], select_options: {selected: "2"}))
+              option_tags: [["Red", "1"], ["Blue", "2"]], options: {selected: "2"}))
           end
         end
       end

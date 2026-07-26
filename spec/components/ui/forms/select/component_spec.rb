@@ -8,10 +8,10 @@ RSpec.describe UI::Forms::Select::Component, type: :component do
     BikeIndexFormBuilder.new(:user, user, ActionView::Base.new(ActionView::LookupContext.new([]), {}, nil), {})
   end
   let(:component) do
-    render_inline(described_class.new(form_builder:, attribute: :name, choices:, select_options:, required:, html_options:))
+    render_inline(described_class.new(form_builder:, attribute: :name, option_tags:, options:, required:, html_options:))
   end
-  let(:choices) { [["Red", "1"], ["Blue", "2"]] }
-  let(:select_options) { {} }
+  let(:option_tags) { [["Red", "1"], ["Blue", "2"]] }
+  let(:options) { {} }
   let(:required) { false }
   let(:html_options) { {} }
 
@@ -22,8 +22,8 @@ RSpec.describe UI::Forms::Select::Component, type: :component do
     expect(component).to_not have_css("select[required]")
   end
 
-  context "with select_options" do
-    let(:select_options) { {selected: "2", include_blank: "Pick one"} }
+  context "with options" do
+    let(:options) { {selected: "2", include_blank: "Pick one"} }
 
     it "marks the selected option and prepends the blank" do
       expect(component).to have_css("option[value='2'][selected]", text: "Blue")
