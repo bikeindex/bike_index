@@ -24,6 +24,24 @@ RSpec.describe Spreadsheets::TsvCreator do
     end
   end
 
+  describe "create_stolen_with_reports" do
+    let!(:stolen_record) do
+      FactoryBot.create(:stolen_record, :in_nyc, approved: true,
+        police_report_number: "XXX999", police_report_department: "New York")
+    end
+
+    it "creates a tsv of the records with a region_record" do
+      # In approveds_with_reports, but Amsterdam has no region_record
+      FactoryBot.create(:stolen_record, :in_amsterdam, approved: true,
+        police_report_number: "YYY888", police_report_department: "Amsterdam")
+      expect_any_instance_of(TsvUploader).to receive(:store!)
+      expect_any_instance_of(TsvUploader).to receive(:current_path) { "some-file.tsv" }
+      output = instance.create_stolen_with_reports
+      expect(File.read(output))
+        .to eq("#{instance.stolen_with_reports_header}#{stolen_record.tsv_row(false, with_stolen_locations: true)}")
+    end
+  end
+
   describe "create_daily_tsvs" do
     it "calls create_stolen and create_stolen_with_reports with scoped query" do
       stolen_record = FactoryBot.create(:stolen_record, current: true, tsved_at: nil)
