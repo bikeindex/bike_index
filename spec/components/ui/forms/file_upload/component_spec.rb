@@ -111,6 +111,8 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
 
       it "renders a camera button, hidden for fine pointers" do
         expect(component).to have_css("button[data-action='form--file-upload#takePicture'].tw\\:pointer-fine\\:hidden", text: "Take picture")
+        # decorative -- the button text is what names it
+        expect(component).to have_css("button svg[aria-hidden='true']")
       end
     end
 

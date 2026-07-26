@@ -17,10 +17,13 @@
     <% if @camera %>
       <%# `capture` only reaches a camera on touch devices; a fine pointer would just reopen the file picker. %>
       <%= render UI::Button::Component.new(
-            text: @camera_text,
             html_class: "tw:whitespace-nowrap tw:pointer-fine:hidden",
             data: {action: "form--file-upload#takePicture"}
-          ) %>
+          ) do %>
+        <%# hidden from AT: the button's own text already names it %>
+        <%= helpers.inline_svg_tag("icons/camera.svg", class: "tw:h-4 tw:w-4", aria_hidden: true) %>
+        <%= @camera_text %>
+      <% end %>
     <% end %>
 
     <span
