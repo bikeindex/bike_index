@@ -160,9 +160,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Open settings to reveal the export link
     open_settings_if_not
     # go_back re-renders the results frame, and while it's busy the wrapper grows
-    # a min-height -- the table lands over the link and swallows the click
+    # a min-height -- the table lands over the link and swallows the click. The
+    # click then waits out a full page navigation, which also outruns the 2s default.
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
-    click_link "Create export of searched registrations"
+    using_wait_time(10) { click_link "Create export of searched registrations" }
 
     expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
     all_bike_ids = organization.bikes.pluck(:id).sort
@@ -541,7 +542,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
       expect_settings_open
       expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
-      click_link "Create export of searched registrations"
+      using_wait_time(10) { click_link "Create export of searched registrations" }
       expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
       export_ids = find("#export_custom_bike_ids", visible: :all).value.split(", ").map(&:to_i).sort
       expect(export_ids).to eq([avery_bike.id])
