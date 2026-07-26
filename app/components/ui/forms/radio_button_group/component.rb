@@ -4,25 +4,52 @@ module UI
   module Forms
     module RadioButtonGroup
       class Component < ApplicationComponent
-        def initialize(name:, entries:, selected: nil, form: nil, data: {})
+        VARIANTS = %i[pills chips].freeze
+
+        # Card-style chips (frame-size XS-XL style); the checked chip tints with the shared purple palette.
+        CHIP_CLASSES = "tw:block tw:rounded-sm tw:border tw:border-gray-300 tw:bg-white tw:py-2 " \
+          "tw:text-center tw:text-sm tw:font-medium tw:text-gray-700 " \
+          "tw:peer-checked:border-purple-500 tw:peer-checked:bg-purple-100 tw:peer-checked:font-bold tw:peer-checked:text-purple-500 " \
+          "tw:dark:border-gray-600 tw:dark:bg-gray-800 tw:dark:text-gray-300 " \
+          "tw:dark:peer-checked:bg-purple-900 tw:dark:peer-checked:text-purple-300"
+
+        def initialize(name:, entries:, selected: nil, form: nil, data: {}, variant: :pills)
           @name = name
           @entries = entries
           @selected = selected.to_s
           @form = form
           @data = data
+          @variant = VARIANTS.include?(variant&.to_sym) ? variant.to_sym : :pills
         end
 
         def call
+          return chips if @variant == :chips
+
           tag.div(class: "tw:flex tw:flex-wrap") do
             safe_join(@entries.each_with_index.map { |option, i|
-              radio_button(option, first: i == 0, last: i == @entries.size - 1)
+              pill(option, first: i == 0, last: i == @entries.size - 1)
             })
           end
         end
 
         private
 
-        def radio_button(option, first:, last:)
+        def chips
+          tag.div(class: "tw:flex tw:gap-2") do
+            safe_join(@entries.map { |option| chip(option) })
+          end
+        end
+
+        def chip(option)
+          value = option[:value].to_s
+
+          tag.label(class: "tw:flex-1 tw:cursor-pointer") do
+            radio_button_tag(@name, value, value == @selected, class: "tw:peer tw:sr-only", form: @form, data: @data) +
+              tag.span(option[:label].html_safe, class: CHIP_CLASSES)
+          end
+        end
+
+        def pill(option, first:, last:)
           value = option[:value].to_s
           checked = value == @selected
 
