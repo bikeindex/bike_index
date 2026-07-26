@@ -7,13 +7,16 @@ module UI
         KINDS = %i[text_field text_area email_field number_field telephone_field datetime_local_field select].freeze
 
         # For select, pass `choices` (and `select_options` for selected:/include_blank:)
-        def initialize(form_builder:, attribute:, kind: :text_field, choices: nil, select_options: {}, html_options: {})
+        def initialize(form_builder:, attribute:, kind: :text_field, required: false, choices: nil, select_options: {}, html_options: {})
           @form_builder = form_builder
           @attribute = attribute
           @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : :text_field
           @choices = choices
           @select_options = select_options
-          @html_options = html_options.merge(class: ["twinput", html_options[:class]].compact.join(" "))
+          @html_options = html_options.merge(
+            {class: ["twinput", html_options[:class]].compact.join(" ")},
+            (required ? {required: true} : {})
+          )
         end
 
         def call

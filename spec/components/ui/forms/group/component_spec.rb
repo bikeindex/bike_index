@@ -7,11 +7,10 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
   let(:form_builder) do
     BikeIndexFormBuilder.new(:user, user, ActionView::Base.new(ActionView::LookupContext.new([]), {}, nil), {})
   end
-  let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, label_text:, label_suffix:)) }
+  let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, label_text:)) }
   let(:attribute) { :name }
   let(:kind) { :text_field }
   let(:label_text) { nil }
-  let(:label_suffix) { nil }
 
   it "renders label and input" do
     expect(component).to have_css("label[for='user_name']", text: "Name")
@@ -45,14 +44,21 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
-  context "with label_suffix" do
-    let(:label_text) { "Model" }
-    let(:label_suffix) { "<em>opt</em>".html_safe }
-
-    it "renders the suffix inside the label, above the field" do
-      expect(component).to have_css("label", text: "Model")
-      expect(component).to have_css("label em", text: "opt")
+  context "by default" do
+    it "appends an optional badge for a non-required field, above the mt-1 field" do
+      expect(component).to have_css("label", text: "optional")
+      expect(component).to_not have_css("label span", text: "*")
       expect(component).to have_css("input.twinput.tw\\:mt-1")
+    end
+
+    context "when required" do
+      let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, required: true)) }
+
+      it "marks the input required and appends an asterisk instead of the badge" do
+        expect(component).to have_css("input[required]")
+        expect(component).to have_css("label span", text: "*")
+        expect(component).to_not have_text("optional")
+      end
     end
   end
 
