@@ -21,41 +21,48 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
     class_string.split.filter_map { it[/\Atw:#{Regexp.escape(variant)}:(.+)\z/, 1] }.sort
   end
 
-  context "default pills variant" do
-    let(:component) { render_inline(described_class.new(name: :status, entries:, selected: "active")) }
-    let(:label) { component.css("label").first["class"] }
+  let(:component) { render_inline(described_class.new(name: :status, entries:, selected: "active")) }
+  let(:label) { component.css("label").first["class"] }
 
-    it "renders radios with the selected one checked" do
-      expect(component).to have_css("input[type='radio'][name='status']", count: 2, visible: :all)
-      expect(component).to have_css("input[value='active'][checked]", visible: :all)
-    end
-
-    it "uses the same purple palette as UI::Button's purple_outline" do
-      expect(purple_tokens(label)).not_to be_empty
-      expect(purple_tokens(label)).to eq(purple_tokens(button))
-    end
-
-    it "applies the button's active utilities when checked" do
-      expect(utilities_for(button_active, "is-active")).not_to be_empty
-      expect(utilities_for(label, "has-[:checked]")).to include(*utilities_for(button_active, "is-active"))
-    end
+  it "renders radios with the selected one checked" do
+    expect(component).to have_css("input[type='radio'][name='status']", count: 2, visible: :all)
+    expect(component).to have_css("input[value='active'][checked]", visible: :all)
+    expect(component).to have_css("label span", text: "Active")
   end
 
-  context "chips variant" do
+  it "uses the same purple palette as UI::Button's purple_outline" do
+    expect(purple_tokens(label)).not_to be_empty
+    expect(purple_tokens(label)).to eq(purple_tokens(button))
+  end
+
+  it "applies the button's active utilities when checked" do
+    expect(utilities_for(button_active, "is-active")).not_to be_empty
+    expect(utilities_for(label, "has-[:checked]")).to include(*utilities_for(button_active, "is-active"))
+  end
+
+  # Equality, not include: an extra utility here (a ring offset, say) is a visual
+  # difference from the button, so it has to fail too.
+  it "focuses exactly like the button, with nothing extra" do
+    expect(utilities_for(button, "focus")).not_to be_empty
+    expect(utilities_for(label, "has-[:focus-visible]")).to eq(utilities_for(button, "focus"))
+  end
+
+  it "sizes each chip to its label, wrapping rather than filling the row" do
+    expect(label).to_not include("tw:flex-1")
+    expect(component).to have_css("div.tw\\:flex-wrap")
+  end
+
+  context "full_width" do
     let(:component) do
-      render_inline(described_class.new(name: "bike[frame_size]", variant: :chips, selected: "m",
+      render_inline(described_class.new(name: "bike[frame_size]", full_width: true, selected: "m",
         entries: %w[xs s m l xl].map { |size| {value: size, label: size.upcase} }))
     end
 
-    it "renders chip radios with the selected one checked" do
+    it "shares the row evenly between the chips" do
       expect(component).to have_css("input[type='radio'][name='bike[frame_size]']", count: 5, visible: :all)
-      expect(component).to have_css("input.tw\\:peer[value='m'][checked]", visible: :all)
-      expect(component).to have_css("label span", text: "M")
-    end
-
-    it "tints the checked chip with the shared purple palette" do
-      label = component.css("label span").first["class"]
-      expect(purple_tokens(label)).to include("bg-purple-100", "border-purple-500", "text-purple-500")
+      expect(component).to have_css("input[value='m'][checked]", visible: :all)
+      expect(label).to include("tw:flex-1")
+      expect(component).to_not have_css("div.tw\\:flex-wrap")
     end
   end
 end
