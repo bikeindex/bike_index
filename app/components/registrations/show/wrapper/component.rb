@@ -40,9 +40,10 @@ module Registrations
         # folds their versions in via #cache_version. This key can't keep cached
         # forms' CSRF tokens valid (they're session-scoped, and a user's session
         # varies across devices/logins) — the csrf-refresh controller reissues them
-        # client-side from the meta tag.
+        # client-side from the meta tag. Nothing digests the nested components'
+        # templates, so bump the -v2 suffix whenever their markup changes.
         def cache_key
-          ["registrations/show", @current_user&.id,
+          ["registrations/show-v2", @current_user&.id,
             @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view),
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
