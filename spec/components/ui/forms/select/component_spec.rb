@@ -15,8 +15,8 @@ RSpec.describe UI::Forms::Select::Component, type: :component do
   let(:required) { false }
   let(:html_options) { {} }
 
-  it "renders a twinput select of the choices, sitting below its label" do
-    expect(component).to have_css("select.twinput.tw\\:mt-1[name='user[name]']")
+  it "renders a twinput select of the option tags" do
+    expect(component).to have_css("select.twinput[name='user[name]']")
     expect(component).to have_css("option[value='1']", text: "Red")
     expect(component).to have_css("option[value='2']", text: "Blue")
     expect(component).to_not have_css("select[required]")

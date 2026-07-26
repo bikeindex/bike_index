@@ -7,10 +7,11 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
   let(:form_builder) do
     BikeIndexFormBuilder.new(:user, user, ActionView::Base.new(ActionView::LookupContext.new([]), {}, nil), {})
   end
-  let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, label_text:)) }
+  let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, label_text:, required:)) }
   let(:attribute) { :name }
   let(:kind) { :text_field }
   let(:label_text) { nil }
+  let(:required) { false }
 
   it "renders label and input" do
     expect(component).to have_css("label[for='user_name']", text: "Name")
@@ -46,21 +47,19 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
-  context "by default" do
-    it "appends an optional badge for a non-required field, above the mt-1 field" do
-      expect(component).to have_css("label", text: "optional")
-      expect(component).to_not have_css("label span", text: "*")
-      expect(component).to have_css("input.twinput.tw\\:mt-1")
-    end
+  it "appends an optional badge for a non-required field, above the mt-1 field" do
+    expect(component).to have_css("label", text: "optional")
+    expect(component).to_not have_css("label span", text: "*")
+    expect(component).to have_css("input.twinput.tw\\:mt-1")
+  end
 
-    context "when required" do
-      let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, required: true)) }
+  context "when required" do
+    let(:required) { true }
 
-      it "marks the input required and appends an asterisk instead of the badge" do
-        expect(component).to have_css("input[required]")
-        expect(component).to have_css("label span", text: "*")
-        expect(component).to_not have_text("optional")
-      end
+    it "marks the input required and appends an asterisk instead of the badge" do
+      expect(component).to have_css("input[required]")
+      expect(component).to have_css("label span", text: "*")
+      expect(component).to_not have_text("optional")
     end
   end
 
@@ -76,10 +75,11 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
       end
     end
 
+    # What the select itself renders is UI::Forms::Select's spec; this is about
+    # the label pointing at a field the Group didn't render
     it "labels the select rendered in the block" do
       expect(component).to have_css("label[for='user_name']", text: "Name")
       expect(component).to have_css("select.twinput[name='user[name]']")
-      expect(component).to have_css("option[value='2'][selected]", text: "Blue")
     end
   end
 
