@@ -1,5 +1,6 @@
 <div class="<%= @wrapper_class %>">
-  <%= @form_builder.label @attribute, label_content, class: "twlabel" %>
+  <%# block so a content_block starts on its own line, even when its content is inline. %>
+  <%= @form_builder.label @attribute, label_content, class: "twlabel tw:block" %>
 
   <% unless @kind == :content_block %>
     <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: @attribute, kind: @kind, required: required?, choices: @choices, select_options: @select_options, html_options: input_html_options)) %>
