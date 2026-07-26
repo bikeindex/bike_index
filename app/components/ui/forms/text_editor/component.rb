@@ -47,9 +47,7 @@ module UI
 
         def editor_class
           [
-            # mt-1 matches what UI::Forms::Group gives its inputs, so a labelled
-            # editor sits the same distance below its label as a text field
-            "lexxy-content tw:mt-1 tw:w-full",
+            "lexxy-content tw:w-full",
             ("lexxy-editor--compact" if @size == :single_line),
             *hidden_button_classes
           ].compact.join(" ")

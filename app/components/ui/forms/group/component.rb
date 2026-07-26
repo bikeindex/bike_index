@@ -17,6 +17,13 @@ module UI
 
         private
 
+        # A content block supplies its own field, so the gap the input's mt-1 would
+        # have left has to come from the label instead. twlabel is display:inline,
+        # which drops margin-bottom on the floor, hence block.
+        def label_class
+          ["twlabel", ("tw:mb-1 tw:block" if @kind == :content_block)].compact.join(" ")
+        end
+
         # The label carries a required "*" or an "optional" badge, keyed off required?.
         def label_content
           safe_join([@label_text, label_suffix_markup], " ")

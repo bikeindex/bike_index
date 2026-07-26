@@ -48,8 +48,8 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
   end
 
   it "sizes each chip to its label" do
-    expect(label).to_not include("tw:flex-1")
     expect(component).to have_css("div.tw\\:flex-wrap")
+    expect(component).to_not have_css("div.tw\\:grid")
   end
 
   context "full_width" do
@@ -58,17 +58,16 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
         entries: %w[xs s m l xl].map { |size| {value: size, label: size.upcase} }))
     end
 
-    it "shares the row evenly between the chips" do
+    it "renders the chips" do
       expect(component).to have_css("input[type='radio'][name='bike[frame_size]']", count: 5, visible: :all)
       expect(component).to have_css("input[value='m'][checked]", visible: :all)
-      expect(label).to include("tw:flex-1")
     end
 
-    # flex-1 resolves to a zero basis, so without min-w-fit the row would shrink
-    # the chips past their labels rather than ever breaking
-    it "still wraps once the chips no longer fit" do
-      expect(component).to have_css("div.tw\\:flex-wrap")
-      expect(label).to include("tw:min-w-fit")
+    # Equal columns rather than a flex row, so a wrapped line's chips stay the
+    # same width as the first line's
+    it "lays the chips out as evenly sized columns that wrap" do
+      expect(component).to have_css("div.tw\\:grid")
+      expect(component.css("div").first["class"]).to include("repeat(auto-fit,minmax(4rem,1fr))")
     end
   end
 end
