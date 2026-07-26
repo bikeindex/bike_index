@@ -15,6 +15,8 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
   it "renders label and input" do
     expect(component).to have_css("label[for='user_name']", text: "Name")
     expect(component).to have_css("input[type='text'][name='user[name]']")
+    # The input's own mt-1 opens the gap here, so the label doesn't
+    expect(component).to_not have_css("label.tw\\:mb-1")
   end
 
   context "with custom label" do
@@ -94,6 +96,11 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
       expect(component).to have_css("my-field")
       expect(component).to_not have_css("input")
       expect(component).to_not have_css("textarea")
+    end
+
+    # No input to carry mt-1, so the label opens the gap instead
+    it "spaces the label off the block" do
+      expect(component).to have_css("label.tw\\:mb-1")
     end
   end
 end
