@@ -80,7 +80,7 @@ module CallbackJobs
         ownership.save
         if matching_b_param.organization_id.present?
           bike.update(creation_organization_id: matching_b_param.organization_id)
-          bike.bike_organizations.create(organization_id: matching_b_param.organization_id)
+          bike.bike_organizations.where(organization_id: matching_b_param.organization_id).first_or_create
         end
       end
     end
