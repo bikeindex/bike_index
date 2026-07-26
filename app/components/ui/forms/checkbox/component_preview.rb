@@ -12,6 +12,10 @@ module UI
         def checked
           render(UI::Forms::Checkbox::Component.new(name: :subscribe, label: "Email me updates", checked: true))
         end
+
+        def form_builder
+          {template: "ui/forms/checkbox/component_preview/form_builder"}
+        end
         # @!endgroup
       end
     end

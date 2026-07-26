@@ -24,4 +24,25 @@ RSpec.describe UI::Forms::Checkbox::Component, type: :component do
       expect(component).to have_css("input[data-action='change->serial#toggle']", visible: :all)
     end
   end
+
+  context "with a form builder" do
+    let(:form_builder) do
+      BikeIndexFormBuilder.new(:user, User.new, ActionView::Base.new(ActionView::LookupContext.new([]), {}, nil), {})
+    end
+    let(:options) { {form_builder:, attribute: :terms_of_service, label: "I agree"} }
+
+    it "renders a model-scoped checkbox with the hidden companion input" do
+      expect(component).to have_css("label.twlabel input[type='checkbox'][name='user[terms_of_service]']", visible: :all)
+      expect(component).to have_css("input[type='hidden'][name='user[terms_of_service]'][value='0']", visible: :all)
+      expect(component).to have_css("label", text: "I agree")
+    end
+  end
+
+  context "with neither name nor form builder" do
+    let(:options) { {label: "Orphan"} }
+
+    it "raises" do
+      expect { component }.to raise_error(ArgumentError)
+    end
+  end
 end

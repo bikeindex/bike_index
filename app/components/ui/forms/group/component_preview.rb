@@ -17,10 +17,6 @@ module UI
           {template: "ui/forms/group/component_preview/text_area"}
         end
 
-        def check_box
-          {template: "ui/forms/group/component_preview/check_box"}
-        end
-
         def content_block
           {template: "ui/forms/group/component_preview/content_block"}
         end
