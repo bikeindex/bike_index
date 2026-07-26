@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 // Connects to data-controller='registrations--show--map'
 // Renders a map centered on the coordinates, marking them with a dot (point) or
@@ -35,7 +35,6 @@ const CIRCLE_PAINT = (radiusMeters, latitude) => {
 export default class extends Controller {
   static targets = ['canvas', 'unavailable']
   static values = {
-    styleUrl: String,
     latitude: Number,
     longitude: Number,
     radiusMeters: Number,
@@ -43,7 +42,6 @@ export default class extends Controller {
   }
 
   async connect () {
-    if (!this.styleUrlValue) return
     try {
       const maplibregl = await loadMapLibre()
       if (!this.element.isConnected) return // disconnected while loading
@@ -74,7 +72,7 @@ export default class extends Controller {
     const center = [this.longitudeValue, this.latitudeValue]
     this.map = new maplibregl.Map({
       container: this.canvasTarget,
-      style: this.styleUrlValue,
+      style: MAPS_STYLE_URL,
       center,
       zoom: 13,
       maxZoom: 16,

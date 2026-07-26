@@ -22,9 +22,9 @@
   .form-group.row
     %label.form-well-label
     .form-well-input
-      = srecord.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
+      = srecord.text_field :postal_code, placeholder: t(".zipcode"), class: "form-control"
 
   .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
     %label.form-well-label
     .form-well-input
-      = srecord.collection_select(:state_id, State.united_states, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })
+      = srecord.collection_select(:region_record_id, State.united_states, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })

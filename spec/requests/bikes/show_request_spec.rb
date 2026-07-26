@@ -692,14 +692,14 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
-  context "bike_show_redesign flag" do
+  context "bike_show_redesign_toggle flag" do
     it "renders the legacy page when the flag is disabled" do
       get "#{base_url}/#{bike.id}"
       expect(response).to render_template(:show)
     end
 
     context "flag enabled for the current user" do
-      before { Flipper.enable_actor(:bike_show_redesign, current_user) }
+      before { Flipper.enable_actor(:bike_show_redesign_toggle, current_user) }
 
       it "redirects the html page but still renders the qr code png" do
         get "#{base_url}/#{bike.id}"
@@ -709,15 +709,29 @@ RSpec.describe "BikesController#show", type: :request do
         expect(response.status).to eq(200)
       end
 
+      it "redirects with the query params, so scanned stickers aren't lost" do
+        get "#{base_url}/#{bike.id}?scanned_id=XD8888&organization_id=cool-org"
+        expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
+      end
+
       it "renders the legacy page when no_redesign is passed" do
         get "#{base_url}/#{bike.id}?no_redesign=true"
         expect(response).to render_template(:show)
+      end
+
+      context "user opted into the legacy view" do
+        before { current_user.update(feature_registration_show_legacy: true) }
+
+        it "renders the legacy page" do
+          get "#{base_url}/#{bike.id}"
+          expect(response).to render_template(:show)
+        end
       end
     end
 
     context "flag enabled only for another user" do
       let(:other_user) { FactoryBot.create(:user_confirmed) }
-      before { Flipper.enable_actor(:bike_show_redesign, other_user) }
+      before { Flipper.enable_actor(:bike_show_redesign_toggle, other_user) }
 
       it "renders the legacy page" do
         get "#{base_url}/#{bike.id}"

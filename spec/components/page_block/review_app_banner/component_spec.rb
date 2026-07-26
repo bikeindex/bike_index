@@ -26,12 +26,6 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
     expect(component.css("form[action='/session/sign_in_with_magic_link'] button").text).to eq("sign in as superadmin")
   end
 
-  it "suppresses every topbar when NO_REVIEW_TOPBAR is set" do
-    stub_const("#{described_class}::NO_REVIEW_TOPBAR", true)
-    expect(described_class.new(review_app: "development").render?).to be_falsey
-    expect(described_class.new(review_app: "1").render?).to be_falsey
-  end
-
   context "when review_app is present" do
     let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, commit:, current_user:, return_to:)) }
     let(:pr_number) { nil }
@@ -56,8 +50,9 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       expect(disclaimer[:class].to_s).to include("tw:hidden")
     end
 
-    it "doesn't render the superadmin button when there is no superadmin" do
+    it "says signing in isn't possible when there is no superadmin" do
       expect(component.css("form[action='/session/sign_in_with_magic_link']")).to be_empty
+      expect(component.text).to include("no superuser (can't signin)")
     end
 
     context "with a superadmin" do

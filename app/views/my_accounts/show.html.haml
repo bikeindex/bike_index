@@ -76,7 +76,7 @@
                           - if bike.current_event_record.is_a?(ImpoundRecord)
                             = attr_list_item(bike.current_event_record.address_record&.formatted_address_string(visible_attribute: :street), t(".location"))
                           - else
-                            = attr_list_item(bike.current_event_record.address(country: [:skip_default]), t(".location"))
+                            = attr_list_item(bike.current_event_record.formatted_address_string, t(".location"))
 
                         %li= link_to t(".edit_registration", bike_type: bike.type_titleize&.downcase), edit_bike_path(bike, edit_template: bike.default_edit_template)
                         - if bike.status_stolen?

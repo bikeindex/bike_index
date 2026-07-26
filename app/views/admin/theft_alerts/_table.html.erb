@@ -149,10 +149,8 @@
           <td>
             <%= theft_alert.city %>
 
-            <% if theft_alert.state.present? %>
-              <small class="less-strong">
-                <%= theft_alert.state.abbreviation %>
-              </small>
+            <% if theft_alert.region.present? %>
+              <small class="less-strong"><%= theft_alert.region %></small>
             <% elsif theft_alert.country.present? && theft_alert.country != Country.united_states %>
               <small class="less-strong"><%= theft_alert.country.name %></small>
             <% end %>

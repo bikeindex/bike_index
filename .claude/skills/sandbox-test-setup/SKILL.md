@@ -277,44 +277,31 @@ Two extra hurdles in the sandbox:
 
 ### 2. `cdn.jsdelivr.net` is firewalled
 
-The importmap pins six modules (jquery, select2, luxon,
-@bikeindex/time-localizer, @floating-ui/dom, @honeybadger-io/js) from
-`cdn.jsdelivr.net` (403'd) — without them, pages render empty. Fetch
-from `registry.npmjs.org` (allowed) and serve locally over TLS at the
-same path layout. Versions below mirror `config/importmap.rb`; bump
-when that changes.
+The importmap pins three modules (jquery, select2, @honeybadger-io/js)
+from `cdn.jsdelivr.net` (403'd) — without them, pages render empty.
+Everything else is vendored under `vendor/javascript` and served by the
+app itself. Fetch these from `registry.npmjs.org` (allowed) and serve
+locally over TLS at the same path layout. Versions below mirror
+`config/importmap.rb`; bump when that changes.
 
 ```bash
 mkdir -p /tmp/cdn
-for pkg in "jquery@3.6.3" "select2@4.0.8" "luxon@3.5.0"; do
+for pkg in "jquery@3.6.3" "select2@4.0.8"; do
   name=${pkg%@*}; ver=${pkg#*@}
   rm -rf /tmp/cdn/$name; mkdir -p /tmp/cdn/$name
   curl -sL "https://registry.npmjs.org/${name}/-/${name}-${ver}.tgz" \
     | tar -xz -C /tmp/cdn/$name --strip-components=1
 done
-mkdir -p /tmp/cdn/bikeindex-time-localizer /tmp/cdn/floating-ui-dom \
-         /tmp/cdn/honeybadger-io-js
-curl -sL "https://registry.npmjs.org/@bikeindex/time-localizer/-/time-localizer-0.2.1.tgz" \
-  | tar -xz -C /tmp/cdn/bikeindex-time-localizer --strip-components=1
-curl -sL "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.7.3.tgz" \
-  | tar -xz -C /tmp/cdn/floating-ui-dom --strip-components=1
+mkdir -p /tmp/cdn/honeybadger-io-js
 curl -sL "https://registry.npmjs.org/@honeybadger-io/js/-/js-6.12.3.tgz" \
   | tar -xz -C /tmp/cdn/honeybadger-io-js --strip-components=1
 
 # Reproduce the jsdelivr URL layout
-mkdir -p /tmp/cdn/serve/npm \
-         '/tmp/cdn/serve/npm/@bikeindex' \
-         '/tmp/cdn/serve/npm/@honeybadger-io' \
-         '/tmp/cdn/serve/npm/@floating-ui/dom@1.7.3'
+mkdir -p /tmp/cdn/serve/npm '/tmp/cdn/serve/npm/@honeybadger-io'
 ln -sf /tmp/cdn/jquery /tmp/cdn/serve/npm/jquery@3.6.3
 ln -sf /tmp/cdn/select2 /tmp/cdn/serve/npm/select2@4.0.8
-ln -sf /tmp/cdn/luxon /tmp/cdn/serve/npm/luxon@3.5.0
-ln -sf /tmp/cdn/bikeindex-time-localizer \
-       '/tmp/cdn/serve/npm/@bikeindex/time-localizer@0.2.1'
 ln -sf /tmp/cdn/honeybadger-io-js \
        '/tmp/cdn/serve/npm/@honeybadger-io/js@6.12.3'
-cp /tmp/cdn/floating-ui-dom/dist/floating-ui.dom.mjs \
-   '/tmp/cdn/serve/npm/@floating-ui/dom@1.7.3/+esm'
 
 # Self-signed cert for *.jsdelivr.net
 openssl req -x509 -newkey rsa:2048 -keyout /tmp/cdn/key.pem \

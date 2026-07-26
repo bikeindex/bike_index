@@ -41,7 +41,7 @@
   <% end %>
 <% elsif current_user.alert_slugs.include?("stolen_bike_without_location") %>
   <%# TODO: use existing user_alert to select correct stolen bike %>
-  <% without_location_bikes = current_user.bikes.status_stolen.select { |bike| bike.current_stolen_record&.without_location? } %>
+  <% without_location_bikes = current_user.bikes.status_stolen.select { |bike| bike.current_stolen_record&.without_street? } %>
   <% if without_location_bikes.present? %>
     <% modal_body = capture do %>
       <div class="modal-body">

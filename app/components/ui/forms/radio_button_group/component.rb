@@ -37,13 +37,16 @@ module UI
 
           # Mirrors UI::Button color: :purple_outline (resting + active), driving the
           # active state off the checked radio so the two stay visually in lockstep.
+          # Segments overlap by a pixel; z-index breaks the tie for it: hover/focus,
+          # then checked, then the rest.
           tag.label(class: [
-            "tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:mb-0! tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
+            "tw:relative tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:mb-0! tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
             "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700",
-            "tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950",
+            "tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:hover:z-20 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950",
             "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
             "tw:has-[:checked]:hover:bg-purple-500 tw:has-[:checked]:hover:border-purple-500",
-            "tw:has-[:focus-visible]:ring-2 tw:has-[:focus-visible]:ring-purple-500/40 tw:has-[:focus-visible]:ring-offset-1 tw:dark:has-[:focus-visible]:ring-offset-gray-900",
+            "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40 tw:has-[:checked]:z-10",
+            "tw:has-[:focus-visible]:ring-2 tw:has-[:focus-visible]:ring-purple-500/40 tw:has-[:focus-visible]:ring-offset-1 tw:has-[:focus-visible]:z-20 tw:dark:has-[:focus-visible]:ring-offset-gray-900",
             round, border_l
           ].join(" ")) do
             radio_button_tag(@name, value, checked,

@@ -12,7 +12,11 @@ class RegistrationsController < ApplicationController
     available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,
       organization: current_organization || passive_organization, preview_organization: requested_view&.last)
 
-    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view: current_view(available_views, requested_view),
+    view = current_view(available_views, requested_view)
+    # So the view_as organization sticks on the next request
+    set_passive_organization(view.last) if view.last
+
+    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view:,
       available_views:), layout: "application")
   end
 

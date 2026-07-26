@@ -56,8 +56,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       end
     end
 
-    def expect_localstorage_location(location:, distance:)
-      local_storage = page.evaluate_script(<<~JS)
+    def local_storage
+      page.evaluate_script(<<~JS)
         (() => {
           let storage = {};
           for (let i = 0; i < localStorage.length; i++) {
@@ -67,11 +67,20 @@ RSpec.describe Search::Form::Component, :js, type: :system do
           return storage;
         })()
       JS
+    end
 
-      location_key = local_storage.find { |k, _| k.match?(/location/i) }&.first
-      distance_key = local_storage.find { |k, _| k.match?(/distance/i) }&.first
-      # pp local_storage
-      expect(local_storage).to match_hash_indifferently({location_key => location, distance_key => distance})
+    # kind_select_fields_controller writes these on turbo:submit-end, which fires
+    # after the URL changes; it namespaces the keys inside a component preview.
+    # Raise Capybara's error, not RSpec's: synchronize rescues StandardError, and
+    # an RSpec expectation failure descends from Exception, so it would never retry.
+    def expect_localstorage_location(location:, distance:)
+      expected = {"preview-searchLocation" => location, "preview-searchDistance" => distance}
+      stored = page.document.synchronize(5) do
+        local_storage.tap do |storage|
+          raise Capybara::ExpectationNotMet unless expected.keys.all? { |key| storage[key] }
+        end
+      end
+      expect(stored).to match_hash_indifferently(expected)
     end
 
     it "submits after selecting a color" do

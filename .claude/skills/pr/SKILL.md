@@ -38,6 +38,17 @@ The base is the branch this PR goes off of — `main` by default, or a specific 
 
 When updating an **existing** PR, leave its base untouched — run `gh pr edit` without `--base` (which preserves the current base). Only retarget an existing PR's base when the user explicitly asks.
 
+### 0.7. Freshen stale migration timestamps
+
+Every migration this branch adds must be dated within the past 2 days. List them with `git diff "origin/$BASE"...HEAD --name-only --diff-filter=A -- db/migrate db/analytics_migrate` and compare each filename's leading timestamp against `date -v-2d +%Y%m%d%H%M%S`.
+
+For each stale migration, in this order (rollback must happen while the old version is still on disk):
+
+1. Roll it back: `bin/rails db:migrate:down:primary VERSION=<old-timestamp>` (`db:migrate:down:analytics` for `db/analytics_migrate` files) — the un-namespaced `db:migrate:down` refuses in this multi-database app.
+2. `git mv` the file to the same name with a fresh `date +%Y%m%d%H%M%S` timestamp — when re-dating several, keep their relative order with incrementing timestamps.
+3. `bin/rails db:migrate` to re-apply and regenerate the structure files — never hand-edit `db/structure.sql`.
+4. Commit the renames together with the regenerated structure files.
+
 ### 1. Update from the base, then gather branch state
 
 First bring the branch up to date with the base (`$BASE` from step 0.5) so the PR reflects the current base and merges without surprises. Follow the `merge-conflicts` skill: `git fetch origin` then `git merge --no-edit "origin/$BASE"`, merge (never rebase), keep the merge commit to just the merge (the step 0 edits ride along as ordinary commits), and resolve any conflicts per that skill.
