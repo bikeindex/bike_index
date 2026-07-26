@@ -1,13 +1,14 @@
 <div
   data-controller="form--file-upload"
   data-form--file-upload-placeholder-value="<%= @placeholder %>"
+  data-action="dragover@document->form--file-upload#dragOver dragleave@document->form--file-upload#dragLeave drop@document->form--file-upload#endDrag"
 >
   <div class="tw:relative tw:inline-flex tw:items-center tw:gap-3">
     <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
     <%= @form_builder.file_field(@attribute, @html_options) %>
 
-    <%# @label_data names the click event explicitly -- Stimulus has no default event for a label. %>
-    <%= @form_builder.label @attribute, @button_text, class: @label_classes, data: @label_data %>
+    <%# Stimulus has no default event for a label, so name click explicitly. %>
+    <%= @form_builder.label @attribute, @button_text, class: @label_classes, data: {action: "click->form--file-upload#chooseFile"} %>
 
     <% if @camera %>
       <%# `capture` only reaches a camera on touch devices; a fine pointer would just reopen the file picker. %>

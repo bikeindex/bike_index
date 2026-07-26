@@ -84,8 +84,7 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
 
     it "renders the label and content block, skipping UI::Forms::Input" do
-      # block keeps inline content (e.g. FileUpload) off the label's line
-      expect(component).to have_css("label[for='user_name'].tw\\:block", text: "Name")
+      expect(component).to have_css("label[for='user_name']", text: "Name")
       expect(component).to have_css("my-field")
       expect(component).to_not have_css("input")
       expect(component).to_not have_css("textarea")

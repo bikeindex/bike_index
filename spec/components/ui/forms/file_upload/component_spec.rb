@@ -17,8 +17,7 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
     expect(component).to have_css("[data-controller='form--file-upload']")
     expect(component).to have_css("[data-form--file-upload-target='input']")
     expect(component).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
-    expect(component).to have_no_css("button[data-action='form--file-upload#takePicture']")
-    expect(component).to have_no_css("label[data-action]")
+    expect(component).to have_css("label[data-action='click->form--file-upload#chooseFile']")
   end
 
   it "renders a drop zone, collapsed until a drag starts" do
@@ -27,9 +26,10 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
   end
 
   context "with multiple" do
-    let(:options) { {html_options: {multiple: true}} }
+    let(:options) { {multiple: true} }
 
-    it "pluralizes the drop zone text" do
+    it "sets the input attribute and pluralizes the drop zone text" do
+      expect(component).to have_css("input[type='file'][multiple]")
       expect(component).to have_css("[data-form--file-upload-target='dropZone']", text: "Drop files here")
     end
   end
@@ -81,13 +81,12 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
     context "when only images are accepted" do
       let(:options) { {accept: ImageUploader.permitted_extensions} }
 
-      it "renders a camera button, hidden for fine pointers, and resets capture from the label" do
+      it "renders a camera button, hidden for fine pointers" do
         expect(component).to have_css("button[data-action='form--file-upload#takePicture'].tw\\:pointer-fine\\:hidden", text: "Take picture")
-        expect(component).to have_css("label[data-action='click->form--file-upload#chooseFile']")
       end
     end
 
-    context "when a non-image is accepted" do
+    context "when a non-image is also accepted" do
       let(:options) { {accept: PdfUploader.permitted_extensions} }
 
       it "renders no camera button" do

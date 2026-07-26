@@ -8,20 +8,6 @@ export default class extends Controller {
   static targets = ['input', 'filename', 'dropZone']
   static values = { placeholder: String }
 
-  connect () {
-    this.dragOver = this.dragOver.bind(this)
-    this.dragEnd = this.dragEnd.bind(this)
-    document.addEventListener('dragover', this.dragOver)
-    document.addEventListener('dragleave', this.dragEnd)
-    document.addEventListener('drop', this.dragEnd)
-  }
-
-  disconnect () {
-    document.removeEventListener('dragover', this.dragOver)
-    document.removeEventListener('dragleave', this.dragEnd)
-    document.removeEventListener('drop', this.dragEnd)
-  }
-
   // Both buttons open the one input; `capture` is what sends it to the camera.
   takePicture () {
     this.inputTarget.setAttribute('capture', 'environment')
@@ -33,19 +19,28 @@ export default class extends Controller {
     this.inputTarget.removeAttribute('capture')
   }
 
-  // Repeats while the file is over the page. Preventing dragover (and drop
-  // below) is what stops the browser from navigating to the dropped file.
+  // Fires on every pointer move of the drag, so the reveal is guarded: collapse()
+  // re-measures and cancels its own cleanup timer when called mid-animation.
   dragOver (event) {
     if (!draggingFile(event)) return
-    event.preventDefault()
+    event.preventDefault() // without this the browser opens the file instead
+    if (this.dragging) return
+
+    this.dragging = true
     collapse('show', this.dropZoneTarget)
   }
 
-  dragEnd (event) {
-    if (event.type === 'drop') event.preventDefault()
-    // dragleave fires for every element crossed; relatedTarget is null only on leaving the window
-    else if (event.relatedTarget) return
+  // dragleave fires for every element crossed; relatedTarget is null only on leaving the window.
+  dragLeave (event) {
+    if (!event.relatedTarget) this.endDrag()
+  }
 
+  // Also runs for a drop on the zone, which prevented the event on its way past.
+  endDrag (event) {
+    event?.preventDefault()
+    if (!this.dragging) return
+
+    this.dragging = false
     collapse('hide', this.dropZoneTarget)
     this.unhighlightDropZone()
   }
@@ -86,5 +81,5 @@ export default class extends Controller {
 
 // Dragged text and page elements fire these events too; only files matter here.
 function draggingFile (event) {
-  return [...(event.dataTransfer?.types || [])].includes('Files')
+  return event.dataTransfer?.types?.includes('Files')
 }
