@@ -13,8 +13,9 @@
 #
 # Indexes
 #
-#  index_bike_organizations_on_bike_id          (bike_id)
-#  index_bike_organizations_on_organization_id  (organization_id)
+#  index_bike_organizations_on_bike_id                             (bike_id)
+#  index_bike_organizations_on_bike_id_and_organization_id_unique  (bike_id,organization_id) UNIQUE WHERE (deleted_at IS NULL)
+#  index_bike_organizations_on_organization_id                     (organization_id)
 #
 class BikeOrganization < ApplicationRecord
   acts_as_paranoid
