@@ -62,13 +62,19 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
-  context "when select" do
+  context "when content_block wrapping a select" do
     let(:component) do
-      render_inline(described_class.new(form_builder:, attribute:, kind: :select,
-        choices: [["Red", "1"], ["Blue", "2"]], select_options: {selected: "2"}))
+      render_in_view_context do
+        form_for User.new, url: "#", method: :patch, builder: BikeIndexFormBuilder do |f|
+          render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, kind: :content_block)) do
+            render(UI::Forms::Select::Component.new(form_builder: f, attribute: :name,
+              option_tags: [["Red", "1"], ["Blue", "2"]], options: {selected: "2"}))
+          end
+        end
+      end
     end
 
-    it "forwards the choices through to UI::Forms::Input" do
+    it "labels the select rendered in the block" do
       expect(component).to have_css("label[for='user_name']", text: "Name")
       expect(component).to have_css("select.twinput[name='user[name]']")
       expect(component).to have_css("option[value='2'][selected]", text: "Blue")
