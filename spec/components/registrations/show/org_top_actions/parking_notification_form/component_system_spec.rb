@@ -5,6 +5,8 @@ require "rails_helper"
 RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Component, :js, type: :system do
   let(:controller_id) { "registrations--show--parking-notification-form" }
   let(:map_selector) { "[data-#{controller_id}-target='map']" }
+  # Defined in utils/maplibre.js since #3954, so there is no Ruby constant to reuse
+  let(:maps_host) { "https://maps.bikeindex.org" }
   let(:preview_path) { "/rails/view_components/registrations/show/org_top_actions/parking_notification_form/component/default" }
   let(:organization) { FactoryBot.create(:organization) }
   let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
@@ -199,7 +201,7 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
         route.fulfill(status: 200, json: {features: [request.url.include?("/#{device_longitude},") ? feature : moved]})
       })
       # Serve an empty MapLibre style so the map builds without fetching basemap tiles
-      context.route("#{MAPS_HOST}/**", proc { |route, _request|
+      context.route("#{maps_host}/**", proc { |route, _request|
         route.fulfill(status: 200, json: {version: 8, sources: {}, layers: []})
       })
     end

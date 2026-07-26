@@ -6,6 +6,12 @@ const MAPLIBRE_JS = `https://cdn.jsdelivr.net/npm/maplibre-gl@${MAPLIBRE_VERSION
 const MAPLIBRE_CSS = `https://cdn.jsdelivr.net/npm/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.css`
 const PMTILES_JS = `https://cdn.jsdelivr.net/npm/pmtiles@${PMTILES_VERSION}/dist/pmtiles.js`
 
+// Our self-hosted basemap. The style.json - and the vector tiles (.pmtiles),
+// glyphs and sprites it references - live in the maps R2 bucket, see
+// .github/workflows/upload-basemap.yml for uploading the tiles.
+const MAPS_HOST = 'https://maps.bikeindex.org'
+export const MAPS_STYLE_URL = `${MAPS_HOST}/basemap/style.json`
+
 // OpenStreetMap's ODbL license requires crediting contributors on the map
 export const OSM_ATTRIBUTION = '© OpenStreetMap contributors'
 

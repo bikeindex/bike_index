@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
-import { ExpandControl, groundRadiusStops, loadMapLibre, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 /* global navigator */
 
@@ -39,7 +39,6 @@ export default class extends Controller {
     impoundHeading: String,
     defaultKind: String,
     mapboxKey: String,
-    styleUrl: String,
     orgLatitude: Number,
     orgLongitude: Number
   }
@@ -209,7 +208,7 @@ export default class extends Controller {
   get pinKey () { return `${this.pinLatitude},${this.pinLongitude}` }
 
   syncMap () {
-    if (!this.hasMapTarget || !this.styleUrlValue) return
+    if (!this.hasMapTarget) return
     if (this.map) {
       this.map.easeTo({ center: [this.pinLongitude, this.pinLatitude], zoom: this.pinZoom })
     } else {
@@ -229,7 +228,7 @@ export default class extends Controller {
       const center = [this.pinLongitude, this.pinLatitude]
       this.map = new maplibregl.Map({
         container: this.mapTarget,
-        style: this.styleUrlValue,
+        style: MAPS_STYLE_URL,
         center,
         zoom: this.pinZoom,
         maxZoom: 18,
