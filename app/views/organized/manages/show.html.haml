@@ -63,7 +63,7 @@
     %label.org-form-label
       = t(".organization_logo")
     .col-sm-4
-      = render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :avatar, button_text: t(".choose_file"), accept: ImageUploader.permitted_extensions))
+      = render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :avatar, accept: ImageUploader.permitted_extensions))
       = f.hidden_field :avatar_cache
       %span.below-input-help
         = t(".square_image")

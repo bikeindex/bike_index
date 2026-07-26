@@ -13,14 +13,16 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
 
   it "renders the input, label and collapsed drop zone -- but no camera or thumbnail" do
     expect(component).to have_css("input#user_avatar[type='file'][name='user[avatar]']")
-    expect(component).to have_css("label[for='user_avatar']", text: "Choose file")
+    expect(component).to have_css("label[for='user_avatar']", text: "Click or drop to choose file")
     expect(component).to have_css("[data-controller='form--file-upload']")
     expect(component).to have_css("[data-form--file-upload-target='input']")
     expect(component).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
     expect(component).to have_css("label[data-action='click->form--file-upload#chooseFile']")
     expect(component).to have_css("[data-form--file-upload-target='dropZone'].tw\\:hidden", text: "Drop a file here")
     # the full string: a typo in either handler name would leave the highlight inert
-    expect(component).to have_css("[data-form--file-upload-target='dropZone'][data-action='drop->form--file-upload#drop dragenter->form--file-upload#highlightDropZone dragleave->form--file-upload#unhighlightDropZone']")
+    expect(component).to have_css("[data-form--file-upload-target='dropZone'][data-action='dragenter->form--file-upload#highlightDropZone dragleave->form--file-upload#unhighlightDropZone']")
+    # dropping is bound to the whole component, so a drop on the button lands too
+    expect(component).to have_css("[data-controller='form--file-upload'][data-action^='drop->form--file-upload#drop ']")
     # nothing accepted, so nothing to photograph; nothing attached, so nothing to preview
     expect(component).to have_no_css("button[data-action='form--file-upload#takePicture']")
     expect(component).to have_no_css("img")

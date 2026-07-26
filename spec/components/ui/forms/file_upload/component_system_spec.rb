@@ -39,8 +39,9 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
     expect(page).to have_no_css(drop_zone)
 
     page.execute_script(start_drag)
+    # onto the label, not the zone: the button says you can drop on it
     page.execute_script(<<~JS)
-      document.querySelector("#{drop_zone}")
+      document.querySelector("[data-controller='form--file-upload'] label")
         .dispatchEvent(new DragEvent("drop", {bubbles: true, dataTransfer: window.fileTransfer}))
     JS
 
@@ -55,7 +56,7 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
 
     expect(page).to have_css("input[type='file'][capture='environment']", visible: :all)
 
-    find(:label, "Choose file").click
+    find(:label, "Click or drop to choose file").click
 
     expect(page).to have_no_css("input[type='file'][capture]", visible: :all)
   end

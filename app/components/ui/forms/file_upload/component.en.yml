@@ -4,7 +4,7 @@ en:
     ui:
       forms:
         file_upload:
-          choose_file: Choose file
+          choose_file: Click or drop to choose file
           drop_file:
             one: Drop a file here
             other: Drop files here
