@@ -16,8 +16,9 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
   it "renders label and input" do
     expect(component).to have_css("label[for='user_name']", text: "Name")
     expect(component).to have_css("input[type='text'][name='user[name]']")
-    # The input's own mt-1 opens the gap here, so the label doesn't
-    expect(component).to_not have_css("label.tw\\:mb-1")
+    # .twlabel carries the gap to the field, so neither side spaces itself
+    expect(component).to have_css("label.twlabel")
+    expect(component).to_not have_css("[class*='tw:mt-1'], [class*='tw:mb-1']")
   end
 
   context "with custom label" do
@@ -47,10 +48,10 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
-  it "appends an optional badge for a non-required field, above the mt-1 field" do
+  it "appends an optional badge for a non-required field" do
     expect(component).to have_css("label", text: "optional")
     expect(component).to_not have_css("label span", text: "*")
-    expect(component).to have_css("input.twinput.tw\\:mt-1")
+    expect(component).to have_css("input.twinput")
   end
 
   context "when required" do
@@ -97,10 +98,18 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
       expect(component).to_not have_css("input")
       expect(component).to_not have_css("textarea")
     end
+  end
 
-    # No input to carry mt-1, so the label opens the gap instead
-    it "spaces the label off the block" do
-      expect(component).to have_css("label.tw\\:mb-1")
+  # The gap to the field lives on .twlabel rather than on either side, so it
+  # applies to a content block too -- Group can't reach the field there. It also
+  # has to beat Bootstrap's `.container label`, which is inline-block with a
+  # .5rem margin and only applies inside a container.
+  describe ".twlabel" do
+    let(:rule) { Rails.root.join("app/assets/tailwind/application.css").read[/^\s*\.twlabel \{(.*?)\}/m, 1] }
+
+    it "is block, with the gap to its field" do
+      expect(rule).to include("tw:block")
+      expect(rule).to include("tw:mb-1")
     end
   end
 end
