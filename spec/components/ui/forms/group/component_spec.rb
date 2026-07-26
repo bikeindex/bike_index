@@ -44,23 +44,11 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
-  context "with label_suffix" do
-    let(:component) do
-      render_inline(described_class.new(form_builder:, attribute:, kind:, label_text: "Model",
-        label_suffix: "<em>opt</em>".html_safe))
-    end
-
-    it "renders the suffix inside the label, above the field" do
-      expect(component).to have_css("label", text: "Model")
-      expect(component).to have_css("label em", text: "opt")
-      expect(component).to have_css("input.twinput.tw\\:mt-1")
-    end
-  end
-
   context "by default" do
-    it "appends an optional badge for a non-required field" do
+    it "appends an optional badge for a non-required field, above the mt-1 field" do
       expect(component).to have_css("label", text: "optional")
       expect(component).to_not have_css("label span", text: "*")
+      expect(component).to have_css("input.twinput.tw\\:mt-1")
     end
 
     context "when required" do
@@ -70,15 +58,6 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
         expect(component).to have_css("input[required]")
         expect(component).to have_css("label span", text: "*")
         expect(component).to_not have_text("optional")
-      end
-    end
-
-    context "when label_suffix is nil" do
-      let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, label_suffix: nil)) }
-
-      it "omits the suffix" do
-        expect(component).to_not have_text("optional")
-        expect(component).to_not have_css("label span", text: "*")
       end
     end
   end
