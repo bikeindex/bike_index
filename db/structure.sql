@@ -6102,6 +6102,13 @@ CREATE INDEX index_bike_organizations_on_bike_id ON public.bike_organizations US
 
 
 --
+-- Name: index_bike_organizations_on_bike_id_and_organization_id_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_bike_organizations_on_bike_id_and_organization_id_unique ON public.bike_organizations USING btree (bike_id, organization_id) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_bike_organizations_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7469,11 +7476,11 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260725213000'),
 ('20260725155657'),
 ('20260725155259'),
 ('20260723000000'),
 ('20260722120000'),
-('20260716120000'),
 ('20260713120000'),
 ('20260706180000'),
 ('20260706164500'),
