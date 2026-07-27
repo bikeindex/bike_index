@@ -4,6 +4,3 @@ breadcrumbs:
 exceptions:
   ignore:
     - ActionDispatch::RemoteIp::IpSpoofAttackError
-sidekiq:
-  # Skip every retryable job's first failure - transient blips succeed on retry
-  attempt_threshold: <%= ENV.fetch("HONEYBADGER_SIDEKIQ_ATTEMPT_THRESHOLD", 1) %>
