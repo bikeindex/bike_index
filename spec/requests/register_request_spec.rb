@@ -14,7 +14,9 @@ RSpec.describe RegisterController, type: :request do
     it "renders" do
       get "/register/new"
       expect(response.status).to eq 200
-      expect(response).to render_template(:new)
+      expect(response.body).to include "Register your bike!"
+      # Controller-rendered components still wrap in the application layout
+      expect(response.body).to include "</html>"
     end
 
     it "redirects the bare /register" do
@@ -69,7 +71,7 @@ RSpec.describe RegisterController, type: :request do
       it "renders new with an error" do
         expect { post base_url, params: create_params }.to_not change(BParam, :count)
         expect(response.status).to eq 422
-        expect(response).to render_template(:new)
+        expect(response.body).to include "Register your bike!"
       end
     end
   end
@@ -78,7 +80,7 @@ RSpec.describe RegisterController, type: :request do
     it "renders, showing the email from step 1" do
       get details_register_path(b_param_token: b_param.id_token)
       expect(response.status).to eq 200
-      expect(response).to render_template(:details)
+      expect(response.body).to include "Add your bike"
       expect(response.body).to include owner_email
     end
 

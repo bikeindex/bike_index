@@ -2,7 +2,8 @@ class RegisterController < ApplicationController
   before_action :find_b_param, only: %i[details update confirm complete]
 
   def new
-    @b_param = BParam.new(params: {bike: BParam.status_hash_from_params(params)}.as_json)
+    b_param = BParam.new(params: {bike: BParam.status_hash_from_params(params)}.as_json)
+    render Registrations::New::StartForm::Component.new(b_param:)
   end
 
   def create
@@ -10,17 +11,18 @@ class RegisterController < ApplicationController
       params: create_params.as_json)
     if @b_param.owner_email.blank?
       @b_param.errors.add(:owner_email, translation(:email_required))
-      render :new, status: :unprocessable_entity
+      render Registrations::New::StartForm::Component.new(b_param: @b_param), status: :unprocessable_entity
     elsif @b_param.save
       Email::PartialRegistrationJob.perform_async(@b_param.id)
       redirect_to details_register_path(b_param_token: @b_param.id_token)
     else
       @b_param.errors.add(:base, translation(:unable_to_save))
-      render :new, status: :unprocessable_entity
+      render Registrations::New::StartForm::Component.new(b_param: @b_param), status: :unprocessable_entity
     end
   end
 
   def details
+    render Registrations::New::DetailsForm::Component.new(b_param: @b_param)
   end
 
   def update
@@ -53,7 +55,7 @@ class RegisterController < ApplicationController
   end
 
   def complete
-    @bike = @b_param.created_bike
+    render Registrations::New::Complete::Component.new(b_param: @b_param, bike: @b_param.created_bike)
   end
 
   private
