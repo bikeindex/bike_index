@@ -162,13 +162,9 @@ Rails.application.routes.draw do
     collection { get :embed }
   end
 
-  # Redesigned registration flow: quick start, then complete on-site or via email
-  resource :register, only: %i[new create update], controller: :register do
-    get :details
-    get :confirm
-    get :complete
-  end
-  get "register", to: redirect("/register/new")
+  # Redesigned registration flow: quick start, then complete on-site or via email.
+  # show renders the screen matching the registration's progress
+  resource :register, only: %i[new create show update], controller: :register
 
   namespace :search do
     get "/", to: redirect("/search/registrations")

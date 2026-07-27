@@ -26,7 +26,7 @@ module Emails
         return OrganizedServices::EmailPreview::TOKEN_PATH if @email_preview
 
         if @b_param.registration_flow?
-          confirm_register_url(b_param_token: @b_param.id_token,
+          register_url(b_param_token: @b_param.id_token,
             confirmation_token: @b_param.confirmation_token)
         else
           new_bike_url(b_param_token: @b_param.id_token)

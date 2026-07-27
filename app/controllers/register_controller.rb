@@ -1,5 +1,5 @@
 class RegisterController < ApplicationController
-  before_action :find_b_param, only: %i[details update confirm complete]
+  before_action :find_b_param, only: %i[show update]
 
   def new
     b_param = BParam.new(params: {bike: BParam.status_hash_from_params(params)}.as_json)
@@ -14,18 +14,28 @@ class RegisterController < ApplicationController
       render Registrations::New::StartForm::Component.new(b_param: @b_param), status: :unprocessable_entity
     elsif @b_param.save
       Email::PartialRegistrationJob.perform_async(@b_param.id)
-      redirect_to details_register_path(b_param_token: @b_param.id_token)
+      redirect_to register_path(b_param_token: @b_param.id_token)
     else
       @b_param.errors.add(:base, translation(:unable_to_save))
       render Registrations::New::StartForm::Component.new(b_param: @b_param), status: :unprocessable_entity
     end
   end
 
-  def details
-    render Registrations::New::DetailsForm::Component.new(b_param: @b_param)
+  # Everything after the start shares this URL - render the screen matching the
+  # registration's progress, or confirm the email when the token is present
+  def show
+    return confirm if params[:confirmation_token].present? && !@b_param.with_bike?
+
+    if @b_param.with_bike? || (@b_param.details_completed? && !creator_available?)
+      render Registrations::New::Complete::Component.new(b_param: @b_param, bike: @b_param.created_bike)
+    else
+      render Registrations::New::DetailsForm::Component.new(b_param: @b_param)
+    end
   end
 
   def update
+    return redirect_to(register_path(b_param_token: @b_param.id_token)) if @b_param.with_bike?
+
     @b_param.creator_id ||= current_user&.id
     @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
     @b_param.clean_params(update_params.as_json)
@@ -35,40 +45,33 @@ class RegisterController < ApplicationController
     else
       # Everything is saved on the b_param - the bike is created once the
       # confirmation link from the partial registration email is clicked
-      redirect_to complete_register_path(b_param_token: @b_param.id_token)
+      redirect_to register_path(b_param_token: @b_param.id_token)
     end
   end
+
+  private
 
   # The tokenized link from the partial registration email - proves control of the email
   def confirm
     unless secure_compare?(params[:confirmation_token], @b_param.confirmation_token)
       flash[:error] = translation(:invalid_confirmation_link)
-      redirect_to(new_register_path) && return
+      return redirect_to(new_register_path)
     end
     @b_param.confirm_email!
     if @b_param.details_completed?
       create_bike_and_redirect
     else
       flash[:success] = translation(:email_confirmed_add_details)
-      redirect_to details_register_path(b_param_token: @b_param.id_token)
+      redirect_to register_path(b_param_token: @b_param.id_token)
     end
   end
-
-  def complete
-    render Registrations::New::Complete::Component.new(b_param: @b_param, bike: @b_param.created_bike)
-  end
-
-  private
 
   def find_b_param
     @b_param = BParam.find_for_token(params[:b_param_token], user_id: current_user&.id)
-    if @b_param.blank?
-      flash[:info] = translation(:registration_not_found)
-      redirect_to(new_register_path) && return
-    end
-    if @b_param.with_bike? && action_name != "complete"
-      redirect_to complete_register_path(b_param_token: @b_param.id_token)
-    end
+    return if @b_param.present?
+
+    flash[:info] = translation(:registration_not_found) if params[:b_param_token].present?
+    redirect_to new_register_path
   end
 
   def creator_available?
@@ -85,12 +88,8 @@ class RegisterController < ApplicationController
   def create_bike_and_redirect
     @b_param.creator_id ||= confirmed_email_creator_id
     bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
-    if bike.errors.any?
-      flash[:error] = @b_param.bike_errors&.to_sentence
-      redirect_to details_register_path(b_param_token: @b_param.id_token)
-    else
-      redirect_to complete_register_path(b_param_token: @b_param.id_token)
-    end
+    flash[:error] = @b_param.bike_errors&.to_sentence if bike.errors.any?
+    redirect_to register_path(b_param_token: @b_param.id_token)
   end
 
   def create_params

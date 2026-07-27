@@ -50,11 +50,11 @@ RSpec.describe OrganizedMailer, type: :mailer do
         BParam.create(origin: "registration_flow",
           params: {bike: {owner_email: "owner@example.com"}}.as_json)
       end
-      it "links to the register confirm endpoint" do
+      it "links to the register confirmation url" do
         mail = OrganizedMailer.partial_registration(b_param)
         expect(mail.to).to eq(["owner@example.com"])
         expect(mail.deliver_now.html_part.decoded)
-          .to include "register/confirm?b_param_token=#{b_param.id_token}&amp;confirmation_token=#{b_param.confirmation_token}"
+          .to include "register?b_param_token=#{b_param.id_token}&amp;confirmation_token=#{b_param.confirmation_token}"
       end
     end
     context "with organization" do
