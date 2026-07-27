@@ -10,7 +10,7 @@ RSpec.describe UI::Forms::ComboboxManufacturer::Component, type: :component do
 
   it "renders a manufacturer_id combobox that autocompletes every manufacturer, accepting free text" do
     expect(component).to have_css("input[type='hidden'][name='manufacturer_id']", visible: :all)
-    expect(component).to have_css("label", text: "Manufacturer")
+    expect(component).to_not have_css("label.hw-combobox__label", visible: :all, text: /\S/)
     placeholder = component.css("input[role='combobox']").first["placeholder"]
     expect(described_class::PLACEHOLDER_NAMES).to include placeholder.delete_prefix("Start typing e.g. ")
     expect(component).to have_css("[data-hw-combobox-name-when-new-value='manufacturer_id']")
@@ -60,11 +60,10 @@ RSpec.describe UI::Forms::ComboboxManufacturer::Component, type: :component do
   end
 
   context "with forwarded options" do
-    let(:options) { {name: :cmp_manufacturer_id, label: "Frame manufacturer", placeholder: "Choose"} }
+    let(:options) { {name: :cmp_manufacturer_id, placeholder: "Choose"} }
 
-    it "forwards name and label, but keeps its own placeholder" do
+    it "forwards name, but keeps its own placeholder" do
       expect(component).to have_css("input[type='hidden'][name='cmp_manufacturer_id']", visible: :all)
-      expect(component).to have_css("label", text: "Frame manufacturer")
       expect(component).to_not have_css("input[placeholder='Choose']")
     end
   end

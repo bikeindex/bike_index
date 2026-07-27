@@ -6,10 +6,11 @@ module UI
       class ComponentPreview < ApplicationComponentPreview
         # @!group Variants
 
-        # Autocompletes every manufacturer, keyed to :manufacturer_id. A manufacturer
-        # that isn't indexed is entered through the "Unknown manufacturer" option
+        # Autocompletes every manufacturer, keyed to :manufacturer_id and labeled by a
+        # UI::Forms::Group. An unindexed manufacturer is entered through the
+        # "Unknown manufacturer" option
         def default
-          render(UI::Forms::ComboboxManufacturer::Component.new)
+          {template: "ui/forms/combobox_manufacturer/component_preview/default"}
         end
 
         # Limited to manufacturers that make frames
@@ -22,10 +23,9 @@ module UI
           render(UI::Forms::ComboboxManufacturer::Component.new(no_manufacturer_other: true))
         end
 
-        # Pre-selected manufacturer, custom label
+        # Pre-selected manufacturer
         def preselected
           render(UI::Forms::ComboboxManufacturer::Component.new(
-            label: "Frame manufacturer",
             form: bike_form("preselected_bike", Bike.new(manufacturer: Manufacturer.frame_makers.first))
           ))
         end

@@ -38,17 +38,20 @@ RSpec.describe UI::Forms::ComboboxManufacturer::Component, :js, type: :system do
   end
 
   context "with no_manufacturer_other" do
+    # This preview renders the bare component, which has no label of its own
+    let(:combobox) { find("input[role='combobox']") }
+
     it "only selects an indexed manufacturer" do
       visit "/rails/view_components/ui/forms/combobox_manufacturer/component/no_manufacturer_other"
 
       expect(page).to have_css('[aria-expanded="false"]', wait: 10)
 
-      type_into(find_field("Manufacturer"), "sur")
+      type_into(combobox, "sur")
 
       expect(page).to have_css('[role="option"]', text: "Surly")
       expect(page).to_not have_css('[role="option"]', text: "Unknown manufacturer")
 
-      type_into(find_field("Manufacturer"), "Bikes by Seth")
+      type_into(combobox, "Bikes by Seth")
 
       expect(page).to_not have_css('[role="option"]')
 

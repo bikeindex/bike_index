@@ -46,7 +46,8 @@
 = form_tag update_manufacturers_admin_bikes_path, data: {controller: "table-multi-checkbox"} do
   .row
     .col-md-4
-      = render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true)
+      = render(UI::Forms::Group::Component.new(attribute: :manufacturer_id, label_text: Manufacturer.model_name.human)) do
+        = render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true)
     .col-md-2
       = submit_tag 'Update selected', class: 'btn btn-primary'
 

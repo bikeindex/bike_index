@@ -80,6 +80,11 @@ module Search
       def primary_activity_combobox_options
         PrimaryActivity.by_priority.map { |pa| {display: pa.display_name_search, value: pa.id} }
       end
+
+      # Doubles as the visually hidden label, the placeholder and the mobile dialog's label
+      def primary_activity_label
+        translation(".search_for_primary_activity")
+      end
     end
   end
 end

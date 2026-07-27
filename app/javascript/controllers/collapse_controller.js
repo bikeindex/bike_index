@@ -4,7 +4,8 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='collapse'
 // Animates [data-collapse-target=content] open/closed. Optionally rotates a
 // [data-collapse-target=chevron] and keeps [data-collapse-target=trigger]'s
-// aria-expanded in sync. With data-collapse-param-value set, the open state
+// aria-expanded and data-active (the is-active variant) in sync. With
+// data-collapse-param-value set, the open state
 // persists to the URL query (?param=1) so it survives reloads and navigation.
 export default class extends Controller {
   static targets = ['content', 'chevron', 'trigger']
@@ -39,7 +40,10 @@ export default class extends Controller {
   setExpanded (expanding, duration) {
     collapse(expanding ? 'show' : 'hide', this.contentTargets, duration)
     this.chevronTargets.forEach((chevron) => chevron.classList.toggle('tw:rotate-90', expanding))
-    this.triggerTargets.forEach((trigger) => trigger.setAttribute('aria-expanded', String(expanding)))
+    this.triggerTargets.forEach((trigger) => {
+      trigger.setAttribute('aria-expanded', String(expanding))
+      trigger.dataset.active = String(expanding)
+    })
     this.persist(expanding)
   }
 

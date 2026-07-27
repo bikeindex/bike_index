@@ -8,8 +8,9 @@ module UI
       # Defaults `name` to :manufacturer_id, autocompleting against the Autocomplete
       # index (Search::ComboboxController#manufacturers) rather than rendering every
       # manufacturer; pass `frame_maker: true` to limit it to manufacturers that make
-      # frames. Every other keyword (form:, label:, value:, required:, placeholder:,
-      # etc.) is forwarded to UI::Forms::Combobox::Component.
+      # frames. Every other keyword (form:, value:, required:, etc.) is forwarded to
+      # UI::Forms::Combobox::Component, which renders no label -- wrap it in a
+      # UI::Forms::Group block to get one.
       #
       # A manufacturer that isn't in the index is entered as free text through the
       # "Unknown manufacturer" option, which BParam resolves to Manufacturer.other plus
@@ -36,7 +37,6 @@ module UI
         def combobox_arguments
           {
             name: @name,
-            label: Manufacturer.model_name.human,
             src: search_combobox_manufacturers_path(frame_maker: @frame_maker.presence,
               no_manufacturer_other: @no_manufacturer_other.presence),
             **free_text_options,

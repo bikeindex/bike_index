@@ -41,6 +41,16 @@ RSpec.describe Admin::BikesController, type: :request do
     end
   end
 
+  describe "missing_manufacturer" do
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes") }
+    it "renders" do
+      get "#{base_url}/missing_manufacturer"
+      expect(response.code).to eq("200")
+      expect(response).to render_template("missing_manufacturer")
+      expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+    end
+  end
+
   describe "edit" do
     let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:stolen_record) { bike.current_stolen_record }
