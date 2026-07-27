@@ -100,12 +100,12 @@ RSpec.describe "RegistrationsController#show", type: :request do
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike:, user: current_user) }
       it "renders the scanned sticker with the re-link form, only with scanned_id" do
         get "#{base_url}/#{bike.id}"
-        expect(whitespace_normalized_body_text).to_not match("You scanned the sticker")
+        expect(whitespace_normalized_body_text).to_not match("You scanned")
 
         get "#{base_url}/#{bike.id}", params: {scanned_id: bike_sticker.code}
         expect(response.status).to eq(200)
         body = whitespace_normalized_body_text
-        expect(body).to match("You scanned the sticker")
+        expect(body).to match("You scanned")
         expect(body).to match(bike_sticker.pretty_code)
         expect(body).to match("Change the bike it links to")
         expect(response.body).to match(bike_sticker_path(id: bike_sticker.code))

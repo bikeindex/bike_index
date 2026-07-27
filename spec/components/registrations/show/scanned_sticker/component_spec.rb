@@ -13,7 +13,7 @@ RSpec.describe Registrations::Show::ScannedSticker::Component, type: :component 
 
     it "shows the scanned sticker without the re-link form" do
       render_inline(component)
-      expect(page).to have_text("You scanned the sticker")
+      expect(page).to have_text("You scanned")
       expect(page).to have_text(bike_sticker.pretty_code)
       expect(page).to_not have_button("Change the bike it links to")
     end

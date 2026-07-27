@@ -10,5 +10,5 @@ en:
           switch_to_new_bike_id: Switch to a new %{bike_type} ID
           update: Update
           you_scanned_this_sticker_html: >-
-            You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
-            to this %{bike_type}.
+            You scanned <strong>%{pretty_code}</strong>, which is assigned to this
+            %{bike_type}.
