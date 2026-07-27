@@ -94,6 +94,8 @@ class BParam < ApplicationRecord
   scope :partial_registrations, -> { where(origin: PARTIAL_REGISTRATION_ORIGINS) }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
+  # The blank shell register/new creates - nothing worth keeping if the form was never submitted
+  scope :without_bike_values, -> { where("(params -> 'bike') IS NULL OR (params -> 'bike') - 'status' = '{}'::jsonb") }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }

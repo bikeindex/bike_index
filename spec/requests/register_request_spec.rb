@@ -36,6 +36,22 @@ RSpec.describe RegisterController, type: :request do
       end
     end
 
+    it "creates a registration that CleanBParamsJob deletes once stale, if never submitted" do
+      get "/register/new?status=stolen" # status alone doesn't count as a submitted value
+      new_b_param = BParam.last
+      expect(CleanBParamsJob.new.b_params.pluck(:id)).to eq []
+      new_b_param.update_column(:updated_at, CleanBParamsJob.clean_before - 1.hour)
+      expect(CleanBParamsJob.new.b_params.pluck(:id)).to eq([new_b_param.id])
+      expect { CleanBParamsJob.new.perform }.to change(BParam, :count).by(-1)
+
+      # Submitting step 1 makes it worth keeping
+      get "/register/new"
+      submitted_b_param = BParam.last
+      post base_url, params: {b_param_token: submitted_b_param.id_token,
+                              b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:}}
+      submitted_b_param.update_column(:updated_at, CleanBParamsJob.clean_before - 1.hour)
+      expect { CleanBParamsJob.new.perform }.to_not change(BParam, :count)
+    end
 
     it "redirects the bare /register" do
       get base_url
