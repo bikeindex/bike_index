@@ -5,12 +5,11 @@ module Atom
     # Renders a bike sticker's code as a monospace code block. Pass a BikeSticker,
     # or a raw pretty_code string; url links the code.
     class Component < ApplicationComponent
-      BASE_CLASSES = "tw:font-mono tw:text-sm tw:font-semibold tw:p-0 tw:bg-transparent tw:text-inherit tw:rounded-none"
+      BASE_CLASSES = "#{ShortId::Component::BASE_CLASSES} tw:font-semibold"
 
-      def initialize(bike_sticker: nil, pretty_code: nil, url: nil, html_class: nil)
+      def initialize(bike_sticker: nil, pretty_code: nil, url: nil)
         @pretty_code = pretty_code || bike_sticker&.pretty_code
         @url = url
-        @html_class = html_class
       end
 
       def render?
@@ -26,7 +25,7 @@ module Atom
       private
 
       def code_block
-        content_tag(:code, @pretty_code, class: [BASE_CLASSES, @html_class].compact.join(" "))
+        content_tag(:code, @pretty_code, class: BASE_CLASSES)
       end
     end
   end

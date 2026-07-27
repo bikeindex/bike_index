@@ -50,7 +50,7 @@ The `bin/dev` command handles building and updating Tailwind and JS.
 
 The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atom/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, badges, modals, pagination, tables…). If a component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
 
-`UI::*` is domain-agnostic presentation. `Atom::*` renders a single Bike Index value in its canonical form — see `app/components/atom/` (`Atom::Serial`, `Atom::Sticker`, `Atom::ShortId`). New code renders a serial with `Atom::Serial::Component`, not `BikeHelper#render_serial_display`.
+`Atom::*` (`app/components/atom/`) holds the small value-rendering components — `Atom::Serial`, `Atom::Sticker`, `Atom::ShortId`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atom::Serial::Component`, not `BikeHelper#render_serial_display`.
 
 ## Tooltips: default `?` button trigger
 

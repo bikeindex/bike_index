@@ -56,7 +56,7 @@ RSpec.describe Atom::Serial::Component, type: :component do
       end
 
       context "with skip_explanation" do
-        let(:options) { {user: FactoryBot.create(:superuser), skip_explanation: true} }
+        let(:options) { super().merge(skip_explanation: true) }
 
         it "shows the serial alone" do
           expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
