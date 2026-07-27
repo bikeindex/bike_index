@@ -1,36 +1,58 @@
 class RegisterController < ApplicationController
-  before_action :find_b_param, only: %i[show update]
+  before_action :find_b_param, except: %i[new]
 
+  # Redirects into step_1 with a token (reusing the session's registration when
+  # it's still blank), so going back from step_2 lands on the same registration
   def new
-    b_param = BParam.new(params: {bike: BParam.status_hash_from_params(params)}.as_json)
-    render Register::StartForm::Component.new(b_param:)
+    b_param = reusable_b_param || BParam.create(origin: "registration_flow",
+      creator_id: current_user&.id, params: {bike: BParam.status_hash_from_params(params)}.as_json)
+    session[:register_b_param_token] = b_param.id_token
+    redirect_to step_1_register_path(b_param_token: b_param.id_token)
+  end
+
+  def step_1
+    return redirect_to(register_path(b_param_token: @b_param.id_token)) if @b_param.with_bike?
+
+    render Register::StartForm::Component.new(b_param: @b_param)
   end
 
   def create
-    @b_param = BParam.new(origin: "registration_flow", creator_id: current_user&.id,
-      params: create_params.as_json)
+    return redirect_to(register_path(b_param_token: @b_param.id_token)) if @b_param.with_bike?
+
+    previous_email = @b_param.owner_email
+    @b_param.clean_params(create_params.as_json)
     @b_param.errors.add(:base, translation(:email_required)) if @b_param.owner_email.blank?
     @b_param.errors.add(:base, translation(:manufacturer_required)) if @b_param.manufacturer_id.blank?
     if @b_param.errors.any?
       render Register::StartForm::Component.new(b_param: @b_param), status: :unprocessable_entity
     elsif @b_param.save
-      Email::PartialRegistrationJob.perform_async(@b_param.id)
-      redirect_to register_path(b_param_token: @b_param.id_token)
+      # Resubmitting step 1 only resends the confirmation email to a new address
+      Email::PartialRegistrationJob.perform_async(@b_param.id) if @b_param.owner_email != previous_email
+      redirect_to step_2_register_path(b_param_token: @b_param.id_token)
     else
       @b_param.errors.add(:base, translation(:unable_to_save))
       render Register::StartForm::Component.new(b_param: @b_param), status: :unprocessable_entity
     end
   end
 
-  # Everything after the start shares this URL - render the screen matching the
-  # registration's progress, or confirm the email when the token is present
+  def step_2
+    return redirect_to(register_path(b_param_token: @b_param.id_token)) if @b_param.with_bike?
+    return redirect_to(step_1_register_path(b_param_token: @b_param.id_token)) if @b_param.owner_email.blank?
+
+    render Register::DetailsForm::Component.new(b_param: @b_param)
+  end
+
+  # The completion screen - or the emailed confirmation link. A registration
+  # that isn't far enough along redirects back to the step it's on.
   def show
     return confirm if params[:confirmation_token].present? && !@b_param.with_bike?
 
     if @b_param.with_bike? || (@b_param.details_completed? && !creator_available?)
       render Register::Complete::Component.new(b_param: @b_param, bike: @b_param.created_bike)
+    elsif @b_param.owner_email.blank?
+      redirect_to step_1_register_path(b_param_token: @b_param.id_token)
     else
-      render Register::DetailsForm::Component.new(b_param: @b_param)
+      redirect_to step_2_register_path(b_param_token: @b_param.id_token)
     end
   end
 
@@ -63,7 +85,7 @@ class RegisterController < ApplicationController
       create_bike_and_redirect
     else
       flash[:success] = translation(:email_confirmed_add_details)
-      redirect_to register_path(b_param_token: @b_param.id_token)
+      redirect_to step_2_register_path(b_param_token: @b_param.id_token)
     end
   end
 
@@ -73,6 +95,16 @@ class RegisterController < ApplicationController
 
     flash[:info] = translation(:registration_not_found) if params[:b_param_token].present?
     redirect_to new_register_path
+  end
+
+  # The session's registration, as long as it hasn't gotten anywhere - step 1
+  # never submitted, so redirecting into it can't surprise anyone
+  def reusable_b_param
+    token = session[:register_b_param_token]
+    return if token.blank?
+
+    b_param = BParam.find_for_token(token, user_id: current_user&.id)
+    b_param if b_param.present? && !b_param.with_bike? && b_param.owner_email.blank?
   end
 
   def creator_available?
@@ -89,8 +121,12 @@ class RegisterController < ApplicationController
   def create_bike_and_redirect
     @b_param.creator_id ||= confirmed_email_creator_id
     bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
-    flash[:error] = @b_param.bike_errors&.to_sentence if bike.errors.any?
-    redirect_to register_path(b_param_token: @b_param.id_token)
+    if bike.errors.any?
+      flash[:error] = @b_param.bike_errors&.to_sentence
+      redirect_to step_2_register_path(b_param_token: @b_param.id_token)
+    else
+      redirect_to register_path(b_param_token: @b_param.id_token)
+    end
   end
 
   def create_params

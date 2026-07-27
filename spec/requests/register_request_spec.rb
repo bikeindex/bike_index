@@ -11,13 +11,31 @@ RSpec.describe RegisterController, type: :request do
   end
 
   describe "new" do
-    it "renders" do
-      get "/register/new"
-      expect(response.status).to eq 200
-      expect(response.body).to include "Register your bike!"
-      # Controller-rendered components still wrap in the application layout
-      expect(response.body).to include "</html>"
+    it "creates an empty registration and redirects to its step_1" do
+      expect { get "/register/new" }.to change(BParam, :count).by 1
+      new_b_param = BParam.last
+      expect(new_b_param.origin).to eq "registration_flow"
+      expect(new_b_param.confirmation_token).to be_present
+      expect(response).to redirect_to step_1_register_path(b_param_token: new_b_param.id_token)
+
+      # Revisiting reuses the session's still-blank registration
+      expect { get "/register/new" }.to_not change(BParam, :count)
+      expect(response).to redirect_to step_1_register_path(b_param_token: new_b_param.id_token)
+
+      # Once step 1 is submitted, register/new starts a fresh registration
+      new_b_param.clean_params({bike: {owner_email:}}.as_json)
+      new_b_param.save
+      expect { get "/register/new" }.to change(BParam, :count).by 1
+      expect(response).to_not redirect_to step_1_register_path(b_param_token: new_b_param.id_token)
     end
+
+    context "stolen status param" do
+      it "stores the status" do
+        get "/register/new?status=stolen"
+        expect(BParam.last.status).to eq "status_stolen"
+      end
+    end
+
 
     it "redirects the bare /register" do
       get base_url
@@ -26,73 +44,128 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
-  describe "create" do
-    let(:create_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:}} }
+  describe "step_1" do
+    it "renders" do
+      get step_1_register_path(b_param_token: b_param.id_token)
+      expect(response.status).to eq 200
+      expect(response.body).to include "Register your bike!"
+      # Controller-rendered components still wrap in the application layout
+      expect(response.body).to include "</html>"
+      # Prefilled from the registration, so going back to step 1 keeps the values
+      expect(response.body).to include owner_email
+    end
 
-    it "creates a partial registration, sends the email and redirects to details" do
-      expect { post base_url, params: create_params }.to change(BParam, :count).by 1
-      new_b_param = BParam.last
-      expect(new_b_param).to have_attributes(origin: "registration_flow", owner_email:,
+    context "unknown token" do
+      it "redirects to the start" do
+        get step_1_register_path(b_param_token: "unknown-token")
+        expect(response).to redirect_to new_register_path
+        expect(flash[:info]).to be_present
+      end
+    end
+  end
+
+  describe "create" do
+    let!(:empty_b_param) { BParam.create(origin: "registration_flow") }
+    let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:}} }
+    let(:create_params) { step_1_params.merge(b_param_token: empty_b_param.id_token) }
+
+    it "saves step 1, sends the email and redirects to step_2" do
+      expect { post base_url, params: create_params }.to_not change(BParam, :count)
+      empty_b_param.reload
+      expect(empty_b_param).to have_attributes(origin: "registration_flow", owner_email:,
         manufacturer_id: manufacturer.id, creator_id: nil, cycle_type: "cargo")
-      expect(new_b_param.partial_registration?).to be_truthy
-      expect(new_b_param.confirmation_token).to be_present
-      expect(new_b_param.motorized?).to be_falsey
-      expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(new_b_param.id)
-      expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token)
+      expect(empty_b_param.partial_registration?).to be_truthy
+      expect(empty_b_param.motorized?).to be_falsey
+      expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(empty_b_param.id)
+      expect(response).to redirect_to step_2_register_path(b_param_token: empty_b_param.id_token)
+
+      # Resubmitting with the same email doesn't resend the confirmation
+      expect {
+        post base_url, params: create_params
+      }.to_not change { Email::PartialRegistrationJob.jobs.size }
+
+      # Changing the email does - the old link only proved control of the old address
+      expect {
+        post base_url, params: create_params.deep_merge(b_param: {owner_email: "new@example.com"})
+      }.to change { Email::PartialRegistrationJob.jobs.size }.by 1
     end
 
     context "motorized, stolen, manufacturer not in the list" do
-      let(:create_params) do
+      let(:step_1_params) do
         {b_param: {manufacturer_id: "Fancy Cycles", owner_email:},
          propulsion_type_motorized: "1", status: "stolen"}
       end
 
       it "self-reports the manufacturer and keeps motorized and status" do
-        expect { post base_url, params: create_params }.to change(BParam, :count).by 1
-        new_b_param = BParam.last
-        expect(new_b_param).to have_attributes(owner_email:, manufacturer_id: Manufacturer.other.id,
+        post base_url, params: create_params
+        empty_b_param.reload
+        expect(empty_b_param).to have_attributes(owner_email:, manufacturer_id: Manufacturer.other.id,
           status: "status_stolen")
-        expect(new_b_param.bike["manufacturer_other"]).to eq "Fancy Cycles"
-        expect(new_b_param.motorized?).to be_truthy
+        expect(empty_b_param.bike["manufacturer_other"]).to eq "Fancy Cycles"
+        expect(empty_b_param.motorized?).to be_truthy
       end
     end
 
     context "always-motorized cycle type" do
-      let(:create_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}} }
+      let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}} }
 
       it "is motorized without the checkbox" do
         post base_url, params: create_params
-        expect(BParam.last.motorized?).to be_truthy
+        expect(empty_b_param.reload.motorized?).to be_truthy
       end
     end
 
     context "blank email" do
-      let(:create_params) { {b_param: {manufacturer_id: "Trek", owner_email: " "}} }
+      let(:step_1_params) { {b_param: {manufacturer_id: "Trek", owner_email: " "}} }
 
-      it "renders new with an error" do
-        expect { post base_url, params: create_params }.to_not change(BParam, :count)
+      it "renders step 1 with an error, saving nothing" do
+        post base_url, params: create_params
         expect(response.status).to eq 422
         expect(response.body).to include "Email is required to register"
+        expect(empty_b_param.reload.manufacturer_id).to be_nil
       end
     end
 
     context "blank manufacturer" do
-      let(:create_params) { {b_param: {manufacturer_id: "", owner_email:}} }
+      let(:step_1_params) { {b_param: {manufacturer_id: "", owner_email:}} }
 
-      it "renders new with an error" do
-        expect { post base_url, params: create_params }.to_not change(BParam, :count)
+      it "renders step 1 with an error" do
+        post base_url, params: create_params
         expect(response.status).to eq 422
         expect(response.body).to include "Manufacturer is required"
+      end
+    end
+
+    context "unknown token" do
+      it "redirects to the start" do
+        post base_url, params: step_1_params.merge(b_param_token: "unknown-token")
+        expect(response).to redirect_to new_register_path
+      end
+    end
+  end
+
+  describe "step_2" do
+    it "renders the details form, showing the email from step 1" do
+      get step_2_register_path(b_param_token: b_param.id_token)
+      expect(response.status).to eq 200
+      expect(response.body).to include "Add your bike"
+      expect(response.body).to include owner_email
+    end
+
+    context "step 1 not submitted" do
+      let(:b_param) { BParam.create(origin: "registration_flow") }
+
+      it "redirects to step_1" do
+        get step_2_register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to step_1_register_path(b_param_token: b_param.id_token)
       end
     end
   end
 
   describe "show" do
-    it "renders the details form, showing the email from step 1" do
+    it "redirects an in-progress registration to its step" do
       get register_path(b_param_token: b_param.id_token)
-      expect(response.status).to eq 200
-      expect(response.body).to include "Add your bike"
-      expect(response.body).to include owner_email
+      expect(response).to redirect_to step_2_register_path(b_param_token: b_param.id_token)
     end
 
     context "unknown token" do
@@ -223,9 +296,13 @@ RSpec.describe RegisterController, type: :request do
         follow_redirect!
         expect(response.body).to include "Registration complete"
 
-        # Revisiting after completion shows complete instead of the details form
+        # Revisiting any step after completion shows complete instead
         get register_path(b_param_token: b_param.id_token)
         expect(response.body).to include "Registration complete"
+        get step_2_register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+        get step_1_register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
       end
 
       context "blank serial" do
@@ -297,10 +374,10 @@ RSpec.describe RegisterController, type: :request do
     end
 
     context "details not completed" do
-      it "confirms the email and sends them to the details step" do
+      it "confirms the email and sends them to step_2" do
         expect { get confirm_path }.to_not change(Bike, :count)
         expect(b_param.reload.email_confirmed?).to be_truthy
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to step_2_register_path(b_param_token: b_param.id_token)
         expect(flash[:success]).to be_present
       end
     end

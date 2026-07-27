@@ -347,7 +347,7 @@
         color: :primary, size: :lg, kind: :submit, spinner: true, html_class: "tw:w-full") %>
 
     <p class="tw:mt-3 tw:mb-0 tw:text-center">
-      <%= link_to "← #{translation(".back")}", new_register_path,
+      <%= link_to "← #{translation(".back")}", step_1_register_path(b_param_token: @b_param.id_token),
           class: "tw:text-sm tw:font-medium tw:text-gray-500 tw:no-underline tw:hover:text-gray-700 tw:dark:text-gray-400" %>
     </p>
   <% end %>
