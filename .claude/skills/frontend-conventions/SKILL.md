@@ -56,7 +56,7 @@ The same instinct applies beyond buttons: **check `app/components/ui/` before ha
 
 ## Form fields: the label comes from `UI::Forms::Group`
 
-**A `UI::Forms::*` field renders no label of its own** — wrap it in a `UI::Forms::Group` with `kind: :content_block`, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, and `TextEditor`. See `app/components/ui/forms/group/component_preview/` and `app/components/ui/forms/combobox/component_preview/`.
+**A `UI::Forms::*` field renders no label of its own** — wrap it in a `UI::Forms::Group` with `kind: :content_block`, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, and `TextEditor`. A visually hidden label is the exception — `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Search::Form` does. See `app/components/ui/forms/group/component_preview/` and `app/components/ui/forms/combobox/component_preview/`.
 
 ## Typeaheads: always `UI::Forms::Combobox`
 
