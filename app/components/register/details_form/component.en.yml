@@ -1,0 +1,74 @@
+en:
+  components:
+    register:
+      details_form:
+        add_another_color: Add another color
+        add_your_bikes_details: Add your bike's details
+        additional_contact_info: Additional contact info
+        are_you_certain: Are you certain?
+        attach_photo: Attach photo of bike
+        back: Back
+        bike_details: Bike details
+        bottom_bracket: Bottom bracket
+        cm: cm
+        color: Color
+        complete_registration: Complete Bike Registration
+        confirmation_link_sent: We've sent a confirmation link to your email. No
+          need to wait — you can finish registering right now.
+        database_public_note: Our database is public! You can adjust privacy settings
+          on individual photos from your account later.
+        easier_to_recover: The more you add, the easier your bike is to recover.
+        email: Email
+        enter_size: Enter size
+        found: Found/Abandoned
+        found_description: I found this bike
+        frame_size: Frame size
+        from_step_1: From step 1
+        head_tube: Head tube
+        how_to_find_serial: how to find your serial number
+        i_just_dont_know_the_serial: I just don't know the serial
+        im_100_sure: I'm 100% sure
+        inches: inches
+        is_a_handmade_frame: Is a handmade frame
+        it_probably_has_a_serial_number: It probably has a serial number.
+        missing_serial: Missing serial
+        model: Model
+        model_placeholder: e.g. Marlin 7
+        model_year: Model year
+        model_year_placeholder: e.g. 2023
+        nevermind: Nevermind
+        optional: optional
+        or: or
+        owner_registration: Owner Registration
+        owner_registration_description: Registering for myself or on behalf of owner
+        phone: Phone
+        phone_placeholder: "(555) 000-0000"
+        primary_color_blank: Primary color — e.g. Black
+        read_how_to_find_html: Read about %{how_to_find_link} <small>(opens in a
+          separate window)</small>
+        rear_dropouts: Rear dropouts
+        registration_type: Registration type
+        remove_additional_color: Remove color
+        second_color_blank: Second color — e.g. Red
+        serial_help_intro: 'Most bicycles have their serial number engraved on the
+          frame. Look for your serial number:'
+        serial_location_bottom_bracket: underside of the bottom bracket
+        serial_location_head_tube: on the head tube
+        serial_location_rear_dropouts: on rear dropouts
+        serial_number: Serial number
+        serial_placeholder: Required — or mark missing
+        sticker_number: Bike Index sticker number
+        sticker_placeholder: e.g. A 471 829
+        stolen: Stolen
+        stolen_description: This bike has been stolen
+        take_photo: Take Photo
+        third_color_blank: Third color
+        up_to_3: up to 3
+        upload: Upload
+        very_very_few_bikes_html: 'Very <em>very</em> few bikes are made without
+          serials. Unless this bike:'
+        view_serial_guide: View the full serial number guide
+        was_made_before_1970: Was made before 1970
+        wheres_my_serial: Where's my serial number?
+        without_serial: This bike was made without a serial
+        without_serial_number: This bike was made without a serial number

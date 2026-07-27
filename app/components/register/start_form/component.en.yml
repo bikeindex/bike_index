@@ -1,0 +1,18 @@
+en:
+  components:
+    register:
+      start_form:
+        bike_info: Bike info
+        electric_helper: Check electric so we flag e-bikes and verify certification.
+        electric_motorized: "⚡️ Electric (motorized)"
+        email: Email
+        email_placeholder: you@example.com
+        just_the_essentials: Just the essentials to start. We'll email you the next
+          steps — but you can keep going right now.
+        manufacturer_placeholder: Start typing e.g. Trek
+        next: Next
+        no_need_to_wait: We'll email a confirmation link too — you don't have to
+          wait for it to continue.
+        register_your_bike: Register your bike!
+        vehicle_type: Vehicle type
+        your_info: Your info

@@ -1,0 +1,42 @@
+<%= render Register::Page::Component.new do %>
+  <div class="tw:px-1 tw:py-6 tw:text-center">
+    <div
+      class="
+        tw:mx-auto tw:mb-4 tw:flex tw:h-16 tw:w-16 tw:items-center
+        tw:justify-center tw:rounded-full tw:bg-green-100 tw:text-green-600
+        tw:dark:bg-green-950 tw:dark:text-green-400
+      "
+    >
+      <svg
+        width="30"
+        height="30"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M20 6 9 17l-5-5"></path>
+      </svg>
+    </div>
+
+    <% subtitle = if @bike.present?
+      translation(".we_will_keep_watch", bike_display: @bike.mnfg_name)
+    else
+      translation(".verify_your_email_html", email: content_tag(:strong, @b_param.owner_email))
+    end %>
+
+    <%= render UI::Header::Component.new(text: translation(".registration_complete"), subtitle:) %>
+
+    <div class="tw:flex tw:flex-col tw:gap-2.5">
+      <% if @bike.present? %>
+        <%= render UI::ButtonLink::Component.new(text: translation(".view_your_registration"), href: bike_path(@bike),
+            color: :primary, size: :lg, class: "tw:w-full") %>
+      <% end %>
+
+      <%= render UI::ButtonLink::Component.new(text: translation(".register_another"), href: new_register_path,
+          color: :secondary, size: :lg, class: "tw:w-full tw:justify-center tw:font-bold tw:text-blue-600!") %>
+    </div>
+  </div>
+<% end %>
