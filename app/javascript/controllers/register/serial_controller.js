@@ -1,6 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 
+/* global window */
+
 // Connects to data-controller='register--serial'
 //
 // Mirrors bikes/new serial handling: "Missing serial" fills the input with
@@ -11,6 +13,28 @@ export default class extends Controller {
   static targets = ['input', 'missing', 'madeWithoutLink', 'serialSection', 'madeWithoutRow', 'madeWithoutCheckbox']
 
   ABSENT_VALUES = ['unknown', 'made_without_serial']
+
+  connect () {
+    this.boundSync = this.syncRestored.bind(this)
+    window.addEventListener('form-persist:restored', this.boundSync)
+  }
+
+  disconnect () {
+    window.removeEventListener('form-persist:restored', this.boundSync)
+  }
+
+  // Reconcile the sections with an absent serial form-persist restored
+  syncRestored () {
+    if (this.inputTarget.value === 'made_without_serial') {
+      this.madeWithoutCheckboxTarget.checked = true
+      collapse('hide', this.serialSectionTarget, 0)
+      collapse('show', this.madeWithoutRowTarget, 0)
+    } else if (this.inputTarget.value === 'unknown') {
+      this.missingTarget.checked = true
+      this.inputTarget.classList.add('tw:text-gray-400')
+      collapse('show', this.madeWithoutLinkTarget, 0)
+    }
+  }
 
   toggleMissing () {
     if (this.missingTarget.checked) {
