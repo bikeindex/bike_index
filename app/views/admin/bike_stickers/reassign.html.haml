@@ -30,7 +30,7 @@
               .col-12
                 - opt_vals = BikeStickerBatch.includes(:organization).order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id] }
                 = render(UI::Forms::Group::Component.new(attribute: :search_bike_sticker_batch_id, kind: :content_block, label_text: "Sticker Batch")) do
-                  = render UI::Forms::Combobox::Component.new(name: :search_bike_sticker_batch_id, placeholder: "Select batch", value: @bike_sticker_batch&.id, include_blank: true, options: opt_vals)
+                  = render UI::Forms::Combobox::Component.new(name: :search_bike_sticker_batch_id, dialog_label: "Sticker Batch", placeholder: "Select batch", value: @bike_sticker_batch&.id, include_blank: true, options: opt_vals)
             .col-sm-6
               .form-group
                 = label_tag :search_sticker1, "Starting Sticker code"

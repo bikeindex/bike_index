@@ -87,15 +87,15 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
   context "when content_block wrapping a combobox, without a form_builder" do
     let(:component) do
       render_in_view_context do
-        render(UI::Forms::Group::Component.new(attribute: :manufacturer, kind: :content_block)) do
-          render(UI::Forms::Combobox::Component.new(name: :manufacturer, options: %w[Trek Surly]))
+        render(UI::Forms::Group::Component.new(attribute: :cycle_type, kind: :content_block)) do
+          render(UI::Forms::Combobox::Component.new(name: :cycle_type, options: %w[Bike Tandem]))
         end
       end
     end
 
     it "labels the combobox by its name" do
-      expect(component).to have_css("label[for='manufacturer']", text: "Manufacturer")
-      expect(component).to have_css("input[role='combobox'][id='manufacturer']")
+      expect(component).to have_css("label[for='cycle_type']", text: "Cycle type")
+      expect(component).to have_css("input[role='combobox'][id='cycle_type']")
     end
   end
 

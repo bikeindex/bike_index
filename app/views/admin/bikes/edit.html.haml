@@ -104,7 +104,7 @@
                 %p.d-none
                   = Country.united_states_id
             = render(UI::Forms::Group::Component.new(form_builder: s, attribute: :region_record_id, kind: :content_block, label_text: "State", wrapper_class: "form-group col-6")) do
-              = render UI::Forms::Combobox::Component.new(name: :region_record_id, form: s, placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id))
+              = render UI::Forms::Combobox::Component.new(name: :region_record_id, form: s, dialog_label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id))
           .form-group
             = label :street, "Intersection or address"
             = s.text_field :street, placeholder: "Intersection or address", class: "form-control"

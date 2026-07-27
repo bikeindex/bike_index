@@ -11,7 +11,7 @@ RSpec.describe UI::Forms::ComboboxManufacturer::Component, type: :component do
 
   it "renders a manufacturer_id combobox of every manufacturer" do
     expect(component).to have_css("input[type='hidden'][name='manufacturer_id']", visible: :all)
-    expect(component).to_not have_css("label", visible: :all, text: /\S/)
+    expect(component).to_not have_css("label.hw-combobox__label", visible: :all, text: /\S/)
     expect(component).to have_css("[role='option'][data-value='#{frame_maker.id}']", text: "Surly", visible: :all)
     expect(component).to have_css("[role='option'][data-value='#{component_maker.id}']", text: "Shimano", visible: :all)
   end
