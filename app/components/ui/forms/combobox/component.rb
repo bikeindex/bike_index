@@ -10,8 +10,7 @@ module UI
       #   - hashes:  [{display: "Trek", value: "1"}, ...]
       #   - records: any object with a public #to_combobox_display method
       #
-      # It renders no label -- wrap it in a UI::Forms::Group (kind: :content_block)
-      # to get one.
+      # It renders no label -- wrap it in a UI::Forms::Group block to get one.
       #
       # Any other keyword (id:, value:, open:, free_text:, autocomplete:,
       # placeholder:, etc.) is forwarded to `hw_combobox_tag`.

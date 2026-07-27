@@ -21,7 +21,7 @@
               Account
               %small.less-strong
                 will send the original post
-            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :social_account_id, kind: :content_block, label_text: account_label, wrapper_class: "form-group")) do
+            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :social_account_id, label_text: account_label, wrapper_class: "form-group")) do
               = render UI::Forms::Combobox::Component.new(name: :social_account_id, form: f, placeholder: "Choose  ", include_blank: true, options: SocialAccount.all.pluck(:screen_name, :id))
             .form-group.avatar-upload
               = f.label :image, 'Post photo', class: 'control-label'

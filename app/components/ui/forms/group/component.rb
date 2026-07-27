@@ -4,19 +4,23 @@ module UI
   module Forms
     module Group
       class Component < ApplicationComponent
-        # Without a form_builder (a form_tag form) the label points at whatever the
-        # content block renders with the attribute's id.
+        # Pass a block (a UI::Forms::Combobox, Select, TextEditor...) and it renders in
+        # place of the input -- `kind` is then unused. Without a form_builder that block
+        # is the only valid shape: the label falls back to label_tag, so it points at
+        # whatever the block renders with the attribute's id.
         def initialize(attribute:, form_builder: nil, kind: :text_field, label_text: nil, required: false,
           wrapper_class: "tw:mb-4", html_options: {})
-          @kind = kind.to_sym
-          raise ArgumentError, "pass form_builder, or kind: :content_block" if form_builder.nil? && @kind != :content_block
-
           @form_builder = form_builder
           @attribute = attribute
+          @kind = kind.to_sym
           @label_text = label_text || attribute.to_s.humanize
           @required = required
           @wrapper_class = wrapper_class
           @html_options = html_options
+        end
+
+        def before_render
+          raise ArgumentError, "pass form_builder, or a content block" if @form_builder.nil? && !content?
         end
 
         private
