@@ -4,6 +4,8 @@
     tw:gap-6 tw:px-2 tw:min-[992px]:-mt-[60px]
   "
 >
+  <%= render(Registrations::Show::ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)) %>
+
   <div class="tw:grid tw:gap-6 tw:lg:grid-cols-3">
     <div class="tw:lg:col-span-2">
       <div
