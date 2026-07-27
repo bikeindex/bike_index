@@ -72,7 +72,7 @@ RSpec.describe RegisterController, type: :request do
       it "renders new with an error" do
         expect { post base_url, params: create_params }.to_not change(BParam, :count)
         expect(response.status).to eq 422
-        expect(response.body).to include "Register your bike!"
+        expect(response.body).to include "Email is required to register"
       end
     end
 
