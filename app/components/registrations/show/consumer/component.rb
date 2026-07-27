@@ -8,11 +8,12 @@ module Registrations
 
         # owner: overrides the computed ownership so the wrapper can force the
         # public or owner perspective (view_as)
-        def initialize(bike:, current_user:, show_for_sale: false, owner: nil, available_views: [])
+        def initialize(bike:, current_user:, show_for_sale: false, owner: nil, available_views: [], bike_sticker: nil)
           @bike = bike
           @current_user = current_user
           @show_for_sale = show_for_sale
           @available_views = available_views
+          @bike_sticker = bike_sticker
           @owner = owner.nil? ? (@current_user.present? && @bike.owner == @current_user) : owner
         end
 

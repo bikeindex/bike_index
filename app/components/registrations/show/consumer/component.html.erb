@@ -41,6 +41,8 @@
         <%= render(Registrations::Show::Status::Component.new(bike: @bike)) %>
       </div>
 
+      <%= render(Registrations::Show::ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)) %>
+
       <%= render(Registrations::Show::BikeIndexCard::Component.new(bike: @bike, term: :right_align)) %>
 
       <div class="tw:mt-auto tw:flex tw:flex-col tw:gap-2">
