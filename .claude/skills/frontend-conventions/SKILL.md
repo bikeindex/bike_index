@@ -54,6 +54,10 @@ The same instinct applies beyond buttons: **check `app/components/ui/` before ha
 
 **Every `UI::Tooltip` uses the default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the tooltip's trigger content. See `app/components/ui/tooltip/`.
 
+## Form fields: the label comes from `UI::Forms::Group`
+
+**A `UI::Forms::*` field renders no label of its own** — wrap it in a `UI::Forms::Group` with `kind: :content_block`, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, and `TextEditor`. See `app/components/ui/forms/group/component_preview/` and `app/components/ui/forms/combobox/component_preview/`.
+
 ## Typeaheads: always `UI::Forms::Combobox`
 
 **Every typeahead / autocomplete / combobox goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. See `app/components/ui/forms/combobox/` (component + `component_preview.rb`) and `spec/components/ui/forms/combobox` for how to invoke it.

@@ -55,8 +55,8 @@
 
   .row.mt-4
     .col-md-6.col-lg-3
-      .form-group
-        = render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, label: BikeStickerBatch.human_attribute_name(:organization_id), placeholder: "Choose organization", required: true, include_blank: true, options: @organizations.pluck(:name, :id))
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, kind: :content_block, label_text: BikeStickerBatch.human_attribute_name(:organization_id), required: true)) do
+        = render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, placeholder: "Choose organization", required: true, include_blank: true, options: @organizations.pluck(:name, :id))
     .col-md-6.col-lg-9
       .form-group
         = f.label :notes, "Notes"

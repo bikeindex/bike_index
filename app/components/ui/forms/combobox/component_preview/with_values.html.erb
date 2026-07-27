@@ -1,0 +1,7 @@
+<%= render(UI::Forms::Group::Component.new(attribute: :color, kind: :content_block)) do %>
+  <%= render(UI::Forms::Combobox::Component.new(name: :color, options: [
+    {display: "Black", value: "1"},
+    {display: "Blue", value: "2"},
+    {display: "Red", value: "3"}
+  ])) %>
+<% end %>

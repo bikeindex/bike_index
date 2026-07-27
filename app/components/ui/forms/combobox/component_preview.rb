@@ -6,47 +6,29 @@ module UI
       class ComponentPreview < ApplicationComponentPreview
         # @!group Variants
 
-        # Plain string options
+        # Plain string options, labeled by a UI::Forms::Group
         def default
-          render(UI::Forms::Combobox::Component.new(
-            name: "manufacturer",
-            label: "Manufacturer",
-            options: %w[Trek Giant Specialized Cannondale Surly Bianchi]
-          ))
+          {template: "ui/forms/combobox/component_preview/default"}
         end
 
         # Hash options with separate display and submitted value
         def with_values
-          render(UI::Forms::Combobox::Component.new(
-            name: "color",
-            label: "Color",
-            options: [
-              {display: "Black", value: "1"},
-              {display: "Blue", value: "2"},
-              {display: "Red", value: "3"}
-            ]
-          ))
+          {template: "ui/forms/combobox/component_preview/with_values"}
         end
 
         # Pre-selected value, listbox open on load
         def preselected
-          render(UI::Forms::Combobox::Component.new(
-            name: "manufacturer",
-            label: "Manufacturer",
-            value: "Surly",
-            open: true,
-            options: %w[Trek Giant Specialized Cannondale Surly Bianchi]
-          ))
+          {template: "ui/forms/combobox/component_preview/preselected"}
         end
 
         # Allows submitting a value that is not in the options list
         def free_text
-          render(UI::Forms::Combobox::Component.new(
-            name: "manufacturer",
-            label: "Manufacturer (or type your own)",
-            free_text: true,
-            options: %w[Trek Giant Specialized Cannondale Surly Bianchi]
-          ))
+          {template: "ui/forms/combobox/component_preview/free_text"}
+        end
+
+        # Inside a form, where the form builder ids the input and labels it
+        def form_builder
+          {template: "ui/forms/combobox/component_preview/form_builder"}
         end
 
         # @!endgroup

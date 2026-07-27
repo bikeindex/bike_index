@@ -7,8 +7,8 @@
     = form_for [:admin, @bulk_import] do |f|
       = render(UI::Alerts::ObjectError::Component.new(object: @bulk_import))
 
-      .form-group
-        = render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, label: BulkImport.human_attribute_name(:organization_id), placeholder: "Choose organization", required: true, include_blank: true, options: Organization.all.pluck(:name, :id))
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, kind: :content_block, label_text: BulkImport.human_attribute_name(:organization_id), required: true)) do
+        = render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, placeholder: "Choose organization", required: true, include_blank: true, options: Organization.all.pluck(:name, :id))
       .form-group
         .input-group
           .custom-file

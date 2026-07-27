@@ -1,0 +1,6 @@
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer, kind: :content_block)) do %>
+    <%= render(UI::Forms::Combobox::Component.new(name: :manufacturer, form: f,
+      options: %w[Trek Giant Specialized Cannondale Surly Bianchi])) %>
+  <% end %>
+<% end %>

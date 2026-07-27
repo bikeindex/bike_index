@@ -17,6 +17,11 @@ RSpec.describe UI::Forms::Combobox::Component, type: :component do
     expect(component).to have_css("[role='option'][data-value='Trek']", text: "Trek", visible: :all)
   end
 
+  it "renders no label of its own, and ids the input with the name so a Group label can target it" do
+    expect(component).to_not have_css("label", visible: :all, text: /\S/)
+    expect(component).to have_css("input[role='combobox'][id='manufacturer']")
+  end
+
   context "with hash options" do
     let(:combobox_options) { [{display: "Black", value: "1"}, {display: "Blue", value: "2"}] }
 
@@ -26,13 +31,27 @@ RSpec.describe UI::Forms::Combobox::Component, type: :component do
     end
   end
 
-  context "with a label and a preselected value" do
-    let(:extra) { {label: "Manufacturer", value: "Surly"} }
+  context "with a preselected value" do
+    let(:extra) { {value: "Surly"} }
 
-    it "renders the label and prefills the value" do
-      expect(component).to have_css("label", text: "Manufacturer")
+    it "prefills the value" do
       expect(component).to have_css("[data-hw-combobox-prefilled-display-value='Surly']")
       expect(component).to have_css("input[type='hidden'][value='Surly']", visible: :all)
+    end
+  end
+
+  context "with a form builder" do
+    let(:component) do
+      render_in_view_context do
+        form_for Bike.new, url: "#", builder: BikeIndexFormBuilder do |f|
+          render(UI::Forms::Combobox::Component.new(name: :manufacturer, form: f, options: %w[Trek Giant Surly]))
+        end
+      end
+    end
+
+    it "leaves the input id to the form builder, matching a Group label's for" do
+      expect(component).to have_css("input[role='combobox'][id='bike_manufacturer']")
+      expect(component).to have_css("input[type='hidden'][name='bike[manufacturer]']", visible: :all)
     end
   end
 

@@ -24,8 +24,8 @@
 
         .row
           .col-lg-6
-            .form-group
-              = render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, label: Payment.human_attribute_name(:organization_id), placeholder: "Choose organization", include_blank: true, options: Organization.approved.pluck(:name, :id))
+            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, kind: :content_block, label_text: Payment.human_attribute_name(:organization_id))) do
+              = render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, placeholder: "Choose organization", include_blank: true, options: Organization.approved.pluck(:name, :id))
           .col-lg-6
             .form-group
               = f.label :invoice_id, "Invoice #"

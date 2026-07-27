@@ -1,0 +1,4 @@
+<%= render(UI::Forms::Group::Component.new(attribute: :manufacturer, kind: :content_block, required: true)) do %>
+  <%= render(UI::Forms::Combobox::Component.new(name: :manufacturer, value: "Surly", open: true, required: true,
+    options: %w[Trek Giant Specialized Cannondale Surly Bianchi])) %>
+<% end %>
