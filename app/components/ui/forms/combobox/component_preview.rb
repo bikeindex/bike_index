@@ -26,11 +26,6 @@ module UI
           {template: "ui/forms/combobox/component_preview/free_text"}
         end
 
-        # Inside a form, where the form builder ids the input and labels it
-        def form_builder
-          {template: "ui/forms/combobox/component_preview/form_builder"}
-        end
-
         # @!endgroup
       end
     end

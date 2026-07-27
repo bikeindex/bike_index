@@ -1,0 +1,8 @@
+<%# kind: :content_block renders the label, then yields to a content block -- here a combobox. %>
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer, kind: :content_block, required: true)) do %>
+    <%= render(UI::Forms::Combobox::Component.new(name: :manufacturer, form: f, required: true,
+      include_blank: true, placeholder: "Choose a manufacturer",
+      options: %w[Trek Giant Specialized Cannondale Surly Bianchi])) %>
+  <% end %>
+<% end %>
