@@ -50,6 +50,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
   def expect_settings_open
     expect(find(settings_selector, visible: :all)["class"]).not_to include("tw:hidden!")
+    expect(page).to have_css("[data-org--search-target='settingsButton'][data-active='true']")
   end
 
   def open_settings_if_not

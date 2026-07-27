@@ -15,7 +15,8 @@ export default class extends Controller {
 
   openFromTrigger (event) {
     this.trigger = event.currentTarget
-    this.trigger.classList.add('active')
+    // data-active, not an `active` class: that's what the is-active variant matches
+    this.trigger.dataset.active = 'true'
     this.open()
   }
 
@@ -29,7 +30,7 @@ export default class extends Controller {
     this.element.close()
     document.body.classList.remove('tw:overflow-hidden')
     if (this.trigger) {
-      this.trigger.classList.remove('active')
+      delete this.trigger.dataset.active
       this.trigger = null
     }
     this.persist(false)
