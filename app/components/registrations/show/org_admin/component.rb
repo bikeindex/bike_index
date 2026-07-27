@@ -114,9 +114,11 @@ module Registrations
 
         # Org-owned stickers link to their edit page; others show the code as text
         def sticker_link(bike_sticker)
-          return bike_sticker.pretty_code unless bike_sticker.organization_id == @organization.id
+          url = if bike_sticker.organization_id == @organization.id
+            edit_organization_sticker_path(id: bike_sticker.code, organization_id: @organization.to_param)
+          end
 
-          link_to(bike_sticker.pretty_code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: @organization.to_param), class: "twlink")
+          render(Atom::Sticker::Component.new(bike_sticker:, url:))
         end
 
         def model_audit

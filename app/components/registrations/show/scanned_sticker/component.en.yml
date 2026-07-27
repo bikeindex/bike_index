@@ -9,6 +9,5 @@ en:
             %{bike_type}?
           switch_to_new_bike_id: Switch to a new %{bike_type} ID
           update: Update
-          you_scanned_this_sticker_html: >-
-            You scanned <strong>%{pretty_code}</strong>, which is assigned to this
-            %{bike_type}.
+          you_scanned_this_sticker_html: You scanned %{sticker}, which is assigned
+            to this %{bike_type}.

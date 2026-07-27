@@ -1,6 +1,6 @@
 <%= render(UI::Alert::Component.new(kind: :success, margin_classes: "", icon: qr_icon)) do %>
   <p>
-    <%= translation(".you_scanned_this_sticker_html", pretty_code: @bike_sticker.pretty_code, bike_type: @bike.type) %>
+    <%= translation(".you_scanned_this_sticker_html", sticker: render(Atom::Sticker::Component.new(bike_sticker: @bike_sticker)), bike_type: @bike.type) %>
   </p>
 
   <% if relinkable? %>

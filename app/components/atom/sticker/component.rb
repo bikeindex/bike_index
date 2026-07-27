@@ -1,0 +1,33 @@
+# frozen_string_literal: true
+
+module Atom
+  module Sticker
+    # Renders a bike sticker's code as a monospace code block. Pass a BikeSticker,
+    # or a raw pretty_code string; url links the code.
+    class Component < ApplicationComponent
+      BASE_CLASSES = "tw:font-mono tw:text-sm tw:font-semibold tw:p-0 tw:bg-transparent tw:text-inherit tw:rounded-none"
+
+      def initialize(bike_sticker: nil, pretty_code: nil, url: nil, html_class: nil)
+        @pretty_code = pretty_code || bike_sticker&.pretty_code
+        @url = url
+        @html_class = html_class
+      end
+
+      def render?
+        @pretty_code.present?
+      end
+
+      def call
+        return code_block if @url.blank?
+
+        link_to(code_block, @url, class: "twlink")
+      end
+
+      private
+
+      def code_block
+        content_tag(:code, @pretty_code, class: [BASE_CLASSES, @html_class].compact.join(" "))
+      end
+    end
+  end
+end
