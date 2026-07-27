@@ -35,7 +35,7 @@ RSpec.describe Org::SearchResults::MultiResultChip::Component, type: :component 
     end
 
     it "uses gray badge classes" do
-      expect(component.to_html).to include("tw:bg-gray-100")
+      expect(component.to_html).to include("tw:bg-[#f0f0f2]")
     end
 
     it "does not underline the serial span" do

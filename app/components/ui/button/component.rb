@@ -35,7 +35,7 @@ module UI
         purple: "tw:is-active:bg-purple-600 tw:is-active:border-purple-600 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
         danger_outline: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
         purple_outline: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
-        link: "tw:is-active:text-blue-800 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
+        link: "tw:is-active:text-blue-700 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
       }.freeze
 
       KINDS = %i[button submit]

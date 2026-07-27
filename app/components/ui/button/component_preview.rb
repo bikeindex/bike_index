@@ -47,6 +47,10 @@ module UI
         render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
       end
 
+      def link_bold
+        render(UI::Button::Component.new(text: "Where's my serial number?", color: :link, html_class: "tw:text-xs tw:font-bold"))
+      end
+
       # Filled purple primary
       def purple
         render(UI::Button::Component.new(text: "Purple", color: :purple))

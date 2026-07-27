@@ -4,8 +4,6 @@ require "rails_helper"
 
 RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
   let(:entries) { [{value: "", label: "All"}, {value: "active", label: "Active"}] }
-  let(:component) { render_inline(described_class.new(name: :search_status, entries:)) }
-  let(:label) { component.css("label").first["class"] }
   let(:button) { UI::Button::Component.build_classes(color: :purple_outline, size: :md) }
   let(:button_active) { UI::Button::Component::ACTIVE_COLORS[:purple_outline] }
 
@@ -23,6 +21,15 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
     class_string.split.filter_map { it[/\Atw:#{Regexp.escape(variant)}:(.+)\z/, 1] }.sort
   end
 
+  let(:component) { render_inline(described_class.new(name: :status, entries:, selected: "active")) }
+  let(:label) { component.css("label").first["class"] }
+
+  it "renders radios with the selected one checked" do
+    expect(component).to have_css("input[type='radio'][name='status']", count: 2, visible: :all)
+    expect(component).to have_css("input[value='active'][checked]", visible: :all)
+    expect(component).to have_css("label span", text: "Active")
+  end
+
   it "uses the same purple palette as UI::Button's purple_outline" do
     expect(purple_tokens(label)).not_to be_empty
     expect(purple_tokens(label)).to eq(purple_tokens(button))
@@ -31,5 +38,36 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
   it "applies the button's active utilities when checked" do
     expect(utilities_for(button_active, "is-active")).not_to be_empty
     expect(utilities_for(label, "has-[:checked]")).to include(*utilities_for(button_active, "is-active"))
+  end
+
+  # Equality, not include: an extra utility here (a ring offset, say) is a visual
+  # difference from the button, so it has to fail too.
+  it "focuses exactly like the button, with nothing extra" do
+    expect(utilities_for(button, "focus")).not_to be_empty
+    expect(utilities_for(label, "has-[:focus-visible]")).to eq(utilities_for(button, "focus"))
+  end
+
+  it "sizes each chip to its label" do
+    expect(component).to have_css("div.tw\\:flex-wrap")
+    expect(component).to_not have_css("div.tw\\:grid")
+  end
+
+  context "full_width" do
+    let(:component) do
+      render_inline(described_class.new(name: "bike[frame_size]", full_width: true, selected: "m",
+        entries: %w[xs s m l xl].map { |size| {value: size, label: size.upcase} }))
+    end
+
+    it "renders the chips" do
+      expect(component).to have_css("input[type='radio'][name='bike[frame_size]']", count: 5, visible: :all)
+      expect(component).to have_css("input[value='m'][checked]", visible: :all)
+    end
+
+    # Equal columns rather than a flex row, so a wrapped line's chips stay the
+    # same width as the first line's
+    it "lays the chips out as evenly sized columns that wrap" do
+      expect(component).to have_css("div.tw\\:grid")
+      expect(component.css("div").first["class"]).to include("repeat(auto-fit,minmax(4rem,1fr))")
+    end
   end
 end
