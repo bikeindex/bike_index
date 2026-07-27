@@ -12,10 +12,6 @@
   <div>
     <%= @form_builder.label :image, "Image", class: "twlabel" %>
 
-    <% if @form_builder.object.image.attached? %>
-      <%= image_tag @form_builder.object.image_url, class: "tw:mb-2 tw:w-48 tw:rounded" %>
-    <% end %>
-
     <%= render UI::Forms::FileUpload::Component.new(form_builder: @form_builder, attribute: :image, accept: "image/*") %>
   </div>
 

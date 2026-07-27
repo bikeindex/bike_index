@@ -15,6 +15,18 @@ module SystemSpecHelpers
     end
   end
 
+  # Turn on touch emulation, which is what makes `(pointer: coarse)` match, so
+  # touch-only styles render (Playwright's emulate_media doesn't cover pointer).
+  # The override lives as long as the CDP session, so unlike reset_browser_history
+  # this one is left attached -- the browser context is recreated between
+  # examples, which is teardown enough.
+  def emulate_touch_device
+    page.driver.with_playwright_page do |playwright_page|
+      session = playwright_page.context.new_cdp_session(playwright_page)
+      session.send_message("Emulation.setTouchEmulationEnabled", params: {enabled: true, maxTouchPoints: 1})
+    end
+  end
+
   def browser_cookie_value(name)
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.context.cookies.find { |cookie| cookie["name"] == name }&.fetch("value")

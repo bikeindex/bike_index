@@ -29,17 +29,21 @@
   --breakpoint-xs: 23rem; /* 368px (iphone mini is 375px) */
 
   /* OG Bike Index brand palettes (formerly config/tailwind.config.js) */
+  /* Blue 500 and up carry the redesign's saturation (kelsey_styles.css's
+   * --redesign-blue-500/-800 are 500 and 600 here). Same hue and lightness as
+   * the OG ramp, just fully saturated; 800-950 continue it so the dark end
+   * doesn't fall back to the duller mix. */
   --color-blue-50: #f2f8fd;
   --color-blue-100: #e3effb;
   --color-blue-200: #c1dff6;
   --color-blue-300: #8ac5ef;
   --color-blue-400: #4ca7e4;
-  --color-blue-500: #3498db; /* OG Bike Index blue */
-  --color-blue-600: #176fb2;
-  --color-blue-700: #145990;
-  --color-blue-800: #144c78;
-  --color-blue-900: #164064;
-  --color-blue-950: #0f2942;
+  --color-blue-500: #3397dc; /* OG Bike Index blue */
+  --color-blue-600: #016ec2;
+  --color-blue-700: #015a9e;
+  --color-blue-800: #014e89;
+  --color-blue-900: #01457a;
+  --color-blue-950: #002e51;
 
   --color-green-50: #f1fcf5;
   --color-green-100: #defaea;
@@ -94,12 +98,12 @@
 
 @layer components {
   .twlink {
-    @apply tw:text-blue-600 tw:hover:text-blue-800 tw:hover:underline tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition-colors;
+    @apply tw:text-blue-600 tw:hover:text-blue-700 tw:hover:underline tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition-colors;
   }
 
   .twlink.active,
   .twlink:active {
-    @apply tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold tw:underline;
+    @apply tw:text-blue-700 tw:dark:text-blue-300 tw:font-bold tw:underline;
   }
 
   .twless-strong {
@@ -112,8 +116,13 @@
       tw:focus-visible:outline-0 tw:focus-visible:ring tw:focus-visible:ring-blue-400 tw:focus-visible:border-blue-400 tw:dark:focus-visible:ring-blue-500 tw:dark:focus:border-blue-500
       tw:w-full tw:py-1.5 tw:px-2.5 tw:block;
   }
+  /* block + the gap to its field, so a label spaces the same whatever renders
+   * below it. Bootstrap's `.container label` is inline-block with a .5rem
+   * margin, and it only applies inside a container -- owning both here is what
+   * stops the spacing depending on where the field sits. Utilities still win,
+   * so `twlabel tw:m-0` and the checkbox's `tw:flex` override as before. */
   .twlabel {
-    @apply tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
+    @apply tw:block tw:mb-1 tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
   }
 
   [aria-expanded="true"] .twdropdown-chevron {

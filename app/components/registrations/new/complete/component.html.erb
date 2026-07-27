@@ -32,11 +32,11 @@
     <div class="tw:flex tw:flex-col tw:gap-2.5">
       <% if @bike.present? %>
         <%= render UI::ButtonLink::Component.new(text: translation(".view_your_registration"), href: bike_path(@bike),
-            color: :blue, size: :lg, class: "tw:w-full") %>
+            color: :primary, size: :lg, class: "tw:w-full") %>
       <% end %>
 
       <%= render UI::ButtonLink::Component.new(text: translation(".register_another"), href: new_register_path,
-          color: :secondary, size: :lg, class: "tw:w-full tw:justify-center tw:font-bold tw:text-[#016ec2]!") %>
+          color: :secondary, size: :lg, class: "tw:w-full tw:justify-center tw:font-bold tw:text-blue-600!") %>
     </div>
   </div>
 <% end %>

@@ -42,6 +42,24 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
     end
   end
 
+  context "when telephone_field" do
+    let(:kind) { :telephone_field }
+
+    it "renders a tel input" do
+      expect(component).to have_css("input[type='tel'][name='user[name]']")
+    end
+  end
+
+  # select goes through UI::Forms::Select — its arity doesn't fit KINDS
+  context "when select" do
+    let(:kind) { :select }
+
+    it "falls back to text_field" do
+      expect(component).to have_css("input[type='text']")
+      expect(component).to_not have_css("select")
+    end
+  end
+
   context "when invalid kind" do
     let(:kind) { :password_field }
 
@@ -55,6 +73,22 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
 
     it "passes options through" do
       expect(component).to have_css("input[placeholder='Enter name']")
+    end
+  end
+
+  context "with a class in html_options" do
+    let(:html_options) { {class: "tw:font-mono"} }
+
+    it "appends to twinput rather than replacing it" do
+      expect(component).to have_css("input.twinput.tw\\:font-mono")
+    end
+  end
+
+  context "when required" do
+    let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, required: true)) }
+
+    it "renders the required attribute" do
+      expect(component).to have_css("input[type='text'][required]")
     end
   end
 end
