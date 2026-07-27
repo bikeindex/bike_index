@@ -25,6 +25,10 @@ module Registrations
         def update_sticker_path
           bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id)
         end
+
+        def qr_icon
+          helpers.inline_svg_tag("icons/qr-code.svg", class: "tw:h-4 tw:w-4", aria_hidden: true)
+        end
       end
     end
   end
