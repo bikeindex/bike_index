@@ -26,7 +26,7 @@ module UI
         def preselected
           render(UI::Forms::ComboboxManufacturer::Component.new(
             label: "Frame manufacturer",
-            form: bike_form(Bike.new(manufacturer: Manufacturer.frame_makers.first))
+            form: bike_form("preselected_bike", Bike.new(manufacturer: Manufacturer.frame_makers.first))
           ))
         end
 
@@ -34,7 +34,7 @@ module UI
         # displayed, since Manufacturer.other isn't selectable
         def unknown_manufacturer
           render(UI::Forms::ComboboxManufacturer::Component.new(
-            form: bike_form(Bike.new(manufacturer: Manufacturer.other, manufacturer_other: "Bikes by Seth"))
+            form: bike_form("unknown_bike", Bike.new(manufacturer: Manufacturer.other, manufacturer_other: "Bikes by Seth"))
           ))
         end
 
@@ -42,8 +42,10 @@ module UI
 
         private
 
-        def bike_form(bike)
-          ActionView::Helpers::FormBuilder.new("bike", bike, template, {})
+        # The combobox ids come from the form's object name, so each variant needs its
+        # own - they render together on the group page
+        def bike_form(object_name, bike)
+          ActionView::Helpers::FormBuilder.new(object_name, bike, template, {})
         end
       end
     end
