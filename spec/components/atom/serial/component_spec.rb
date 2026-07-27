@@ -2,49 +2,48 @@
 
 require "rails_helper"
 
+# The rendered HTML matches BikeHelper#render_serial_display exactly - this replaces
+# that helper in the redesign, so the assertions mirror spec/helpers/bike_helper_spec
 RSpec.describe Atom::Serial::Component, type: :component do
   let(:instance) { described_class.new(bike:, **options) }
   let(:component) { render_inline(instance) }
   let(:options) { {} }
   let(:bike) { FactoryBot.create(:bike, serial_number: "FFF333") }
 
-  it "renders the serial in a monospace code block" do
-    expect(component).to have_css("code", text: "FFF333")
-    expect(component.to_html).to include("tw:font-mono")
+  it "renders the serial" do
+    expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
   end
 
   context "serial unknown" do
     let(:bike) { FactoryBot.create(:bike, serial_number: "unknown") }
 
-    it "renders the word rather than a code block" do
-      expect(component).to have_css("span", text: "unknown")
-      expect(component).to have_no_css("code")
+    it "renders the word rather than the number" do
+      expect(component.to_html.strip).to eq '<span class="less-strong">unknown</span>'
     end
   end
 
   context "made without serial" do
     let(:bike) { FactoryBot.create(:bike, made_without_serial: true) }
 
-    it "renders the made-without-serial text" do
-      expect(component).to have_text("made without serial")
+    it "renders made without serial" do
+      expect(component.to_html.strip).to eq '<span class="less-strong">made without serial</span>'
     end
   end
 
   context "hidden serial" do
+    let(:bike) { FactoryBot.create(:bike, serial_number: "FFF333", cycle_type: :tandem) }
     before { bike.status = "status_impounded" }
 
     it "hides the serial and explains why" do
-      expect(component).to have_no_text("FFF333")
-      expect(component).to have_text("hidden")
-      expect(component).to have_css("em", text: "because bike is impounded")
+      expect(component.to_html.strip)
+        .to eq '<span class="less-strong">hidden</span> <em class="small less-less-strong">because tandem is impounded</em>'
     end
 
     context "with skip_explanation" do
       let(:options) { {skip_explanation: true} }
 
       it "hides the serial without the explanation" do
-        expect(component).to have_no_text("FFF333")
-        expect(component).to have_no_css("em")
+        expect(component.to_html.strip).to eq '<span class="less-strong">hidden</span>'
       end
     end
 
@@ -52,9 +51,25 @@ RSpec.describe Atom::Serial::Component, type: :component do
       let(:options) { {user: FactoryBot.create(:superuser)} }
 
       it "shows the serial with the unauthorized-users note" do
-        expect(component).to have_css("code", text: "FFF333")
-        expect(component).to have_css("em", text: "hidden for unauthorized users")
+        expect(component.to_html.strip)
+          .to eq '<span class="serial-span">FFF333</span> <em class="small less-less-strong">hidden for unauthorized users</em>'
       end
+
+      context "with skip_explanation" do
+        let(:options) { {user: FactoryBot.create(:superuser), skip_explanation: true} }
+
+        it "shows the serial alone" do
+          expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
+        end
+      end
+    end
+  end
+
+  context "no serial" do
+    let(:bike) { Bike.new }
+
+    it "renders nothing" do
+      expect(component.to_html).to be_blank
     end
   end
 end

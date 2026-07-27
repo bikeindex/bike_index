@@ -6,11 +6,8 @@ module Atom
     # absent serial renders that word in place of the number, and a hidden serial
     # is followed by why it's hidden unless skip_explanation.
     class Component < ApplicationComponent
-      BASE_CLASSES = "tw:font-mono tw:p-0 tw:bg-transparent tw:text-inherit tw:rounded-none"
       # What serial_display returns in place of a number
       PLACEHOLDERS = ["hidden", "unknown", "made without serial"].freeze
-      # BikeHelper#render_serial_display renders serials everywhere else, so borrow its keys
-      TRANSLATION_SCOPE = %i[helpers bike_helper].freeze
 
       def initialize(bike:, user: nil, skip_explanation: false)
         @bike = bike
@@ -23,7 +20,9 @@ module Atom
       end
 
       def call
-        safe_join([serial_block, explanation].compact, " ")
+        return serial_block unless explanation?
+
+        safe_join([serial_block, " ", explanation])
       end
 
       private
@@ -37,22 +36,23 @@ module Atom
       end
 
       def serial_block
-        return content_tag(:span, translation(serial.downcase.tr(" ", "_"), scope: TRANSLATION_SCOPE), class: "tw:opacity-65") if placeholder?
+        return content_tag(:span, serial, class: "serial-span") unless placeholder?
 
-        content_tag(:code, serial, class: BASE_CLASSES)
+        content_tag(:span, translation(".#{serial.downcase.tr(" ", "_")}"), class: "less-strong")
+      end
+
+      def explanation?
+        @bike.serial_hidden? && !@skip_explanation
       end
 
       def explanation
-        return unless @bike.serial_hidden? && !@skip_explanation
-
-        content_tag(:em, explanation_text, class: "tw:text-sm tw:opacity-65")
+        content_tag(:em, explanation_text, class: "small less-less-strong")
       end
 
       def explanation_text
-        return translation(:hidden_for_unauthorized_users, scope: TRANSLATION_SCOPE) if @bike.authorized?(@user)
+        return translation(".hidden_for_unauthorized_users") if @bike.authorized?(@user)
 
-        translation(:hidden_because_status, bike_type: @bike.type,
-          status: @bike.status_humanized_translated, scope: TRANSLATION_SCOPE)
+        translation(".hidden_because_status", bike_type: @bike.type, status: @bike.status_humanized_translated)
       end
     end
   end
