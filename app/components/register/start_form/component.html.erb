@@ -12,15 +12,13 @@
     <% bike = @b_param.bike %>
     <%= render Register::SectionLabel::Component.new(text: translation(".bike_info")) %>
 
-    <% required_asterisk = tag.span("*", class: "tw:text-red-600") %>
-
-    <div class="tw:mb-4">
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer_id,
+        label_text: Manufacturer.model_name.human, required: true)) do %>
       <%= render UI::Forms::ComboboxManufacturer::Component.new(form: f,
-          frame_maker: true, label_class: "twlabel", free_text: true, required: true,
-          label: safe_join([Manufacturer.model_name.human, required_asterisk], " "),
+          frame_maker: true, free_text: true, required: true,
           value: bike["manufacturer_other"].presence || bike["manufacturer_id"],
           placeholder: translation(".manufacturer_placeholder")) %>
-    </div>
+    <% end %>
 
     <div
       class="tw:mb-4"
@@ -38,20 +36,21 @@
           {display: label, value: slug, content:}
         end %>
 
-      <div class="tw:relative" data-controller="register--combobox-display">
-        <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f,
-            label: safe_join([translation(".vehicle_type"), required_asterisk], " "),
-            label_class: "twlabel", required: true,
-            value: @b_param.cycle_type, options: cycle_type_options) %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cycle_type,
+          label_text: translation(".vehicle_type"), required: true, wrapper_class: "tw:mb-0")) do %>
+        <div class="tw:relative" data-controller="register--combobox-display">
+          <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, required: true,
+              value: @b_param.cycle_type, options: cycle_type_options) %>
 
-        <div
-          class="
-            tw:pointer-events-none tw:absolute tw:hidden tw:truncate
-            tw:text-gray-900 tw:dark:text-gray-200
-          "
-          data-register--combobox-display-target="overlay"
-        ></div>
-      </div>
+          <div
+            class="
+              tw:pointer-events-none tw:absolute tw:hidden tw:truncate
+              tw:text-gray-900 tw:dark:text-gray-200
+            "
+            data-register--combobox-display-target="overlay"
+          ></div>
+        </div>
+      <% end %>
 
       <%= render UI::Forms::Checkbox::Component.new(name: :propulsion_type_motorized, value: true,
           checked: @b_param.motorized?, label: translation(".electric_motorized"), class_name: "tw:mt-3",
