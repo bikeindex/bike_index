@@ -115,8 +115,11 @@ RSpec.describe "Bikes API V3", type: :request do
     describe "short_id" do
       # The short_id "/" is a real path separator here (e.g. /api/v3/bikes/r/35); the "_" and
       # "-" separators (see ShortId.decode) are accepted equivalents.
+      # Pin the id: ShortId.encode only stays decimal below 1296 (see its spec)
+      let(:bike) { FactoryBot.create(:bike, id: 35) }
+
       it "finds the bike from its short_id (r/ and r_)" do
-        expect(bike.short_id).to eq "r/#{bike.id}"
+        expect(bike.short_id).to eq "r/35"
         [bike.short_id, bike.short_id.tr("/", "_")].each do |short_id|
           get "/api/v3/bikes/#{short_id}", params: {format: :json}
           expect(response.code).to eq("200")

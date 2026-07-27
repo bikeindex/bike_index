@@ -6,8 +6,6 @@ module Registrations
       # The "Bike details" spec-sheet card. The serial is rendered for the given
       # user, so the public view passes nil to keep a hidden serial hidden.
       class Component < ApplicationComponent
-        include BikeHelper
-
         def initialize(bike:, serial_user: nil, skip_serial_explanation: false)
           @bike = bike
           @serial_user = serial_user
