@@ -4,8 +4,6 @@
     tw:px-2
   "
 >
-  <%= render(Registrations::Show::ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)) %>
-
   <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-4">
     <div>
       <div class="tw:mb-2 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
@@ -27,6 +25,8 @@
       </div>
     </div>
   </div>
+
+  <%= render(Registrations::Show::ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)) %>
 
   <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new(bike: @bike, organization: @organization, org_role: @org_role)) %>
 
