@@ -4,19 +4,10 @@
   data-form--file-upload-placeholder-value="<%= @placeholder %>"
   data-action="drop->form--file-upload#drop dragover@document->form--file-upload#dragOver dragleave@document->form--file-upload#endDrag drop@document->form--file-upload#endDrag"
 >
-  <% if @attachment_url %>
-    <%#
-      block, so the controls below start a new line at the left rather than sitting beside
-      it. ml-2.5 clears the frame's border plus padding, lining the image up with the
-      button under it.
-    %>
-    <%= link_to image_tag(@thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded"), @attachment_url, class: "tw:mb-2 tw:ml-2.5 tw:block tw:w-fit" %>
-  <% end %>
-
   <%#
-    The drop target frames the controls; its border is transparent until a drag starts,
-    so revealing it shifts nothing. data-over rather than is-active, which also matches
-    :active and would flash the frame whenever the button inside it is pressed.
+    The drop target frames the preview and controls; its border is transparent until a drag
+    starts, so revealing it shifts nothing. data-over rather than is-active, which also
+    matches :active and would flash the frame whenever the button inside it is pressed.
   %>
 
   <div
@@ -31,6 +22,11 @@
     data-form--file-upload-target="dropZone"
     data-action="dragenter->form--file-upload#highlightDropZone dragleave->form--file-upload#unhighlightDropZone"
   >
+    <% if @attachment_url %>
+      <%# block so the controls start a new line, w-fit so the link doesn't stretch past the image %>
+      <%= link_to image_tag(@thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded"), @attachment_url, class: "tw:mb-2 tw:block tw:w-fit" %>
+    <% end %>
+
     <%# flex-wrap: the long label and the camera button coincide on a `pointer: none` device %>
     <div class="tw:relative tw:inline-flex tw:flex-wrap tw:items-center tw:gap-3">
       <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
