@@ -142,10 +142,10 @@
 
       <div class="tw:mt-2 tw:grid tw:grid-cols-2 tw:gap-2">
         <%= render UI::Button::Component.new(text: translation(".take_photo"), color: :secondary,
-            html_class: "tw:justify-center", data: {action: "register--photo#takePhoto"}) %>
+            data: {action: "register--photo#takePhoto"}) %>
 
         <%= render UI::Button::Component.new(text: translation(".upload"), color: :secondary,
-            html_class: "tw:justify-center", data: {action: "register--photo#upload"}) %>
+            data: {action: "register--photo#upload"}) %>
       </div>
 
       <p
@@ -232,7 +232,7 @@
           <div class="tw:grid tw:grid-cols-2 tw:gap-4">
             <div>
               <%= render UI::Button::Component.new(text: translation(".nevermind"), color: :secondary,
-                  html_class: "tw:w-full tw:justify-center", data: {action: "ui--modal#close"}) %>
+                  html_class: "tw:w-full", data: {action: "ui--modal#close"}) %>
 
               <p class="tw:mt-1 tw:mb-0 tw:text-center tw:text-xs tw:text-gray-500">
                 <%= translation(".i_just_dont_know_the_serial") %>
@@ -241,7 +241,7 @@
 
             <div>
               <%= render UI::Button::Component.new(text: translation(".im_100_sure"), color: :error,
-                  html_class: "tw:w-full tw:justify-center",
+                  html_class: "tw:w-full",
                   data: {action: "register--serial#confirmMadeWithout ui--modal#close"}) %>
 
               <p class="tw:mt-1 tw:mb-0 tw:text-center tw:text-xs tw:text-gray-500">
