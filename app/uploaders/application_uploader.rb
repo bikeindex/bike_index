@@ -13,6 +13,12 @@ class ApplicationUploader < CarrierWave::Uploader::Base
     permitted_extensions - [".jpg", ".tif"]
   end
 
+  # Smallest version to preview an upload with -- uploaders don't share version names.
+  # nil means there's nothing smaller than the original.
+  def self.thumbnail_version
+    %i[thumb small medium].find { versions.key?(it) }
+  end
+
   after :remove, :delete_empty_upstream_dirs
 
   def store_dir
