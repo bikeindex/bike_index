@@ -69,7 +69,7 @@ module UI
       end
 
       def call
-        content_tag(:button, button_content, class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, data: @data.merge(active: @active || nil), aria: @aria)
+        content_tag(:button, button_content, class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, data: button_data, aria: @aria)
       end
 
       def button_classes
@@ -78,13 +78,20 @@ module UI
 
       private
 
+      def button_data
+        data = @data.merge(active: @active || nil)
+        return data unless @spinner
+
+        data.merge(controller: [data[:controller], "ui--buttons--submit-spinner"].compact.join(" "))
+      end
+
       def button_content
         return @text || content unless @spinner
 
         # Hidden until the submit-spinner controller reveals it on form submit;
         # no color_class so the svg spins in the button's own text color.
         spinner = content_tag(:span, render(UI::LoadingSpinner::Component.new(size: :sm, color_class: "")),
-          class: "tw:hidden", data: {submit_spinner_target: "spinner"})
+          class: "tw:hidden", data: {"ui--buttons--submit-spinner-target": "spinner"})
         safe_join([spinner, @text || content])
       end
     end
