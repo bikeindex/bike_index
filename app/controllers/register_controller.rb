@@ -9,8 +9,9 @@ class RegisterController < ApplicationController
   def create
     @b_param = BParam.new(origin: "registration_flow", creator_id: current_user&.id,
       params: create_params.as_json)
-    if @b_param.owner_email.blank?
-      @b_param.errors.add(:owner_email, translation(:email_required))
+    @b_param.errors.add(:owner_email, translation(:email_required)) if @b_param.owner_email.blank?
+    @b_param.errors.add(:base, translation(:manufacturer_required)) if @b_param.manufacturer_id.blank?
+    if @b_param.errors.any?
       render Register::StartForm::Component.new(b_param: @b_param), status: :unprocessable_entity
     elsif @b_param.save
       Email::PartialRegistrationJob.perform_async(@b_param.id)

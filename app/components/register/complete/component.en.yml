@@ -1,13 +1,14 @@
+---
 en:
   components:
     register:
       complete:
         register_another: Register another bike
         registration_complete: Registration complete!
-        verify_your_email_html: One more step — verify your email. We sent a confirmation
-          link to %{email}; click it to finish your registration. Everything you've
-          entered is saved.
+        verify_your_email_html: >-
+          One more step — verify your email. We sent a confirmation link to %{email};
+          click it to finish your registration. Everything you've entered is saved.
         view_your_registration: View your registration
-        we_will_keep_watch: Your %{bike_display} is registered with Bike Index.
-          We'll keep watch — if it's ever reported stolen, the whole community is
-          looking.
+        we_will_keep_watch: >-
+          Your %{bike_display} is registered with Bike Index. We'll keep watch — if
+          it's ever reported stolen, the whole community is looking.

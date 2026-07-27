@@ -1,3 +1,4 @@
+---
 en:
   components:
     register:
@@ -13,10 +14,12 @@ en:
         cm: cm
         color: Color
         complete_registration: Complete Bike Registration
-        confirmation_link_sent: We've sent a confirmation link to your email. No
-          need to wait — you can finish registering right now.
-        database_public_note: Our database is public! You can adjust privacy settings
-          on individual photos from your account later.
+        confirmation_link_sent: >-
+          We've sent a confirmation link to your email. No need to wait — you can
+          finish registering right now.
+        database_public_note: >-
+          Our database is public! You can adjust privacy settings on individual photos
+          from your account later.
         easier_to_recover: The more you add, the easier your bike is to recover.
         email: Email
         enter_size: Enter size
@@ -44,14 +47,15 @@ en:
         phone: Phone
         phone_placeholder: "(555) 000-0000"
         primary_color_blank: Primary color — e.g. Black
-        read_how_to_find_html: Read about %{how_to_find_link} <small>(opens in a
-          separate window)</small>
+        read_how_to_find_html: Read about %{how_to_find_link} <small>(opens in a separate
+          window)</small>
         rear_dropouts: Rear dropouts
         registration_type: Registration type
         remove_additional_color: Remove color
         second_color_blank: Second color — e.g. Red
-        serial_help_intro: 'Most bicycles have their serial number engraved on the
-          frame. Look for your serial number:'
+        serial_help_intro: >-
+          Most bicycles have their serial number engraved on the frame. Look for your
+          serial number:
         serial_location_bottom_bracket: underside of the bottom bracket
         serial_location_head_tube: on the head tube
         serial_location_rear_dropouts: on rear dropouts
@@ -65,8 +69,8 @@ en:
         third_color_blank: Third color
         up_to_3: up to 3
         upload: Upload
-        very_very_few_bikes_html: 'Very <em>very</em> few bikes are made without
-          serials. Unless this bike:'
+        very_very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.
+          Unless this bike:'
         view_serial_guide: View the full serial number guide
         was_made_before_1970: Was made before 1970
         wheres_my_serial: Where's my serial number?

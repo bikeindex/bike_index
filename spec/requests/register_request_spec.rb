@@ -75,6 +75,16 @@ RSpec.describe RegisterController, type: :request do
         expect(response.body).to include "Register your bike!"
       end
     end
+
+    context "blank manufacturer" do
+      let(:create_params) { {b_param: {manufacturer_id: "", owner_email:}} }
+
+      it "renders new with an error" do
+        expect { post base_url, params: create_params }.to_not change(BParam, :count)
+        expect(response.status).to eq 422
+        expect(response.body).to include "Manufacturer is required"
+      end
+    end
   end
 
   describe "show" do

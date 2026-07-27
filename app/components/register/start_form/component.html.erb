@@ -10,9 +10,12 @@
     <% bike = @b_param.bike %>
     <%= render Register::SectionLabel::Component.new(text: translation(".bike_info")) %>
 
+    <% required_asterisk = tag.span("*", class: "tw:text-red-600") %>
+
     <div class="tw:mb-4">
       <%= render UI::Forms::ComboboxManufacturer::Component.new(form: f,
-          frame_maker: true, label_class: "twlabel", free_text: true,
+          frame_maker: true, label_class: "twlabel", free_text: true, required: true,
+          label: safe_join([Manufacturer.model_name.human, required_asterisk], " "),
           value: bike["manufacturer_other"].presence || bike["manufacturer_id"],
           placeholder: translation(".manufacturer_placeholder")) %>
     </div>
@@ -35,7 +38,8 @@
 
       <div class="tw:relative" data-controller="register--combobox-display">
         <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f,
-            label: translation(".vehicle_type"), label_class: "twlabel",
+            label: safe_join([translation(".vehicle_type"), required_asterisk], " "),
+            label_class: "twlabel", required: true,
             value: @b_param.cycle_type, options: cycle_type_options) %>
 
         <div

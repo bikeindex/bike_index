@@ -1924,6 +1924,7 @@ en:
           registration below
       create:
         email_required: Email is required to register
+        manufacturer_required: Manufacturer is required to register
         unable_to_save: We're unable to save that registration, please try again
       find_b_param:
         registration_not_found: We couldn't find that registration — start a new one
