@@ -48,7 +48,9 @@ The `bin/dev` command handles building and updating Tailwind and JS.
 - A link styled as a button: `UI::ButtonLink::Component.new(href:, text:, color:, size:)` — same palette, renders an `<a>`.
 - A standalone action button (POST/DELETE/etc. to a URL) — a link that performs an action: pass `method:` to `ButtonLink` and it renders `button_to` for you (`render UI::ButtonLink::Component.new(text: "Delete", color: :error, href: bike_path(@bike), method: :delete)`), so don't hand-roll a `button_to` or wrap a submit button in a bare form. Extra `html_options` flow through: pass `params:` for a POST that carries params (they render as hidden fields — no manual `form_with`/`hidden_field_tag` needed), and `form: {onsubmit: …}` for a confirm on the wrapping form.
 
-The same instinct applies beyond buttons: **check `app/components/ui/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, badges, modals, pagination, tables…). If a `UI::*` component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
+The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atom/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, badges, modals, pagination, tables…). If a component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
+
+`UI::*` is domain-agnostic presentation. `Atom::*` renders a single Bike Index value in its canonical form — see `app/components/atom/` (`Atom::Serial`, `Atom::Sticker`, `Atom::ShortId`). New code renders a serial with `Atom::Serial::Component`, not `BikeHelper#render_serial_display`.
 
 ## Tooltips: default `?` button trigger
 
