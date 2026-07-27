@@ -34,7 +34,7 @@ module Registrations
           # flush-left grid: the icon beside a title/subtitle column, which the `1fr`
           # stretches to the button's width
           def action_button(panel_name, icon:, title:, tile: :purple, subtitle: nil)
-            classes = "tw:min-h-15 tw:flex-wrap tw:content-center tw:justify-center tw:gap-x-3 tw:gap-y-2 tw:rounded-xl tw:p-4! tw:text-center tw:sm:grid! tw:sm:grid-cols-[auto_1fr] tw:sm:gap-y-0.5 tw:sm:text-left tw:lg:flex-1"
+            classes = "tw:min-h-15 tw:flex-wrap tw:content-center tw:gap-x-3 tw:gap-y-2 tw:rounded-xl tw:p-4! tw:text-center tw:sm:grid! tw:sm:grid-cols-[auto_1fr] tw:sm:gap-y-0.5 tw:sm:text-left tw:lg:flex-1"
             render(UI::Button::Component.new(color: :purple_outline, size: :lg, html_class: classes, aria: {expanded: false},
               data: {"registrations--show--action-panels-target": "trigger", "panel-name": panel_name,
                      action: "registrations--show--action-panels#toggle"})) do
@@ -43,9 +43,9 @@ module Registrations
                 # dropping the title above the icon's center
                 action_icon(icon, tile:, html_class: ("tw:sm:row-span-2" if subtitle.present?)),
                 # Ordered last and full-width so it wraps below the icon/subtitle line
-                content_tag(:span, title, class: "tw:order-1 tw:w-full tw:font-bold tw:sm:order-none tw:sm:col-start-2 tw:sm:row-start-1 tw:sm:w-auto"),
+                content_tag(:span, title, class: "tw:order-1 tw:w-full tw:min-w-0 tw:font-bold tw:sm:col-start-2 tw:sm:row-start-1"),
                 # Left-aligned below sm too, so its stacked lines line up with each other
-                # inside the block justify-center centers
+                # inside the centered block
                 (content_tag(:span, subtitle, class: "tw:text-left tw:text-xs tw:opacity-60 tw:sm:col-start-2 tw:sm:row-start-2") if subtitle.present?)
               ].compact)
             end
