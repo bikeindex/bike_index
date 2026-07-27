@@ -5,7 +5,12 @@
   data-action="drop->form--file-upload#drop dragover@document->form--file-upload#dragOver dragleave@document->form--file-upload#endDrag drop@document->form--file-upload#endDrag"
 >
   <% if @attachment_url %>
-    <%= link_to image_tag(@thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded"), @attachment_url, class: "tw:mb-2 tw:inline-block" %>
+    <%#
+      block, so the controls below start a new line at the left rather than sitting beside
+      it. ml-2.5 clears the frame's border plus padding, lining the image up with the
+      button under it.
+    %>
+    <%= link_to image_tag(@thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded"), @attachment_url, class: "tw:mb-2 tw:ml-2.5 tw:block tw:w-fit" %>
   <% end %>
 
   <%#
