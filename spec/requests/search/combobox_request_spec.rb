@@ -71,6 +71,77 @@ RSpec.describe Search::ComboboxController, type: :request do
     end
   end
 
+  describe "manufacturers" do
+    let!(:trek) { FactoryBot.create(:manufacturer, name: "Trek", frame_maker: true) }
+    let!(:trek_components) { FactoryBot.create(:manufacturer, name: "Trek Parts", frame_maker: false) }
+    let!(:avantrek) { FactoryBot.create(:manufacturer, name: "AVANTREK", frame_maker: true) }
+    # Matcher results are cached in redis for 10 minutes, which outlives the example
+    before { Autocomplete::Loader.clear_redis && Autocomplete::Loader.load_all(%w[Manufacturer]) }
+
+    it "renders the matching manufacturers, plus the unknown manufacturer synthetic" do
+      get "/search/combobox/manufacturers", params: {q: "tre", for_id: "test"}, as: :turbo_stream
+
+      expect(response.code).to eq("200")
+      expect(response.body).to include("data-value=\"#{trek.id}\"")
+      expect(response.body).to include("data-value=\"#{trek_components.id}\"")
+      # AVANTREK isn't a match - the autocomplete index matches on word prefixes
+      expect(response.body).to_not include("data-value=\"#{avantrek.id}\"")
+      # Manufacturer.other is never selectable
+      expect(response.body).to_not include("data-value=\"#{Manufacturer.other.id}\"")
+      expect(response.body).to include("Unknown manufacturer")
+      expect(response.body).to include("hw_unknown_manufacturer_option")
+    end
+
+    context "with matches of differing priority" do
+      let!(:bike) { FactoryBot.create(:bike, manufacturer: trek_components) }
+
+      before do
+        # bike creation doesn't trigger Manufacturer#before_save, so update to
+        # recompute calculated_priority with the new b_count
+        Manufacturer.find(trek_components.id).update(updated_at: Time.current)
+        Autocomplete::Loader.load_all(%w[Manufacturer])
+      end
+
+      it "orders by priority, then alphabetically" do
+        expect(Manufacturer.find(trek_components.id).priority).to be > trek.reload.priority
+
+        get "/search/combobox/manufacturers", params: {q: "tre", for_id: "test"}, as: :turbo_stream
+
+        expect(response.body.index("data-value=\"#{trek_components.id}\""))
+          .to be < response.body.index("data-value=\"#{trek.id}\"")
+      end
+    end
+
+    context "with frame_maker" do
+      it "only renders frame makers" do
+        get "/search/combobox/manufacturers", params: {q: "tre", frame_maker: "true", for_id: "test"}, as: :turbo_stream
+
+        expect(response.body).to include("data-value=\"#{trek.id}\"")
+        expect(response.body).to_not include("data-value=\"#{trek_components.id}\"")
+      end
+    end
+
+    context "with no_manufacturer_other" do
+      it "doesn't render the unknown manufacturer synthetic" do
+        get "/search/combobox/manufacturers",
+          params: {q: "nonesuch", no_manufacturer_other: "true", for_id: "test"}, as: :turbo_stream
+
+        expect(response.code).to eq("200")
+        expect(response.body).to_not include("Unknown manufacturer")
+      end
+    end
+
+    context "with an exact match" do
+      it "doesn't render the unknown manufacturer synthetic" do
+        get "/search/combobox/manufacturers", params: {q: "tre", for_id: "test"}, as: :turbo_stream
+        expect(response.body).to include("hw_unknown_manufacturer_option")
+
+        get "/search/combobox/manufacturers", params: {q: "Trek", for_id: "test"}, as: :turbo_stream
+        expect(response.body).to_not include("hw_unknown_manufacturer_option")
+      end
+    end
+  end
+
   describe "chips" do
     let!(:color) { FactoryBot.create(:color, name: "Burgundy") }
     let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Cool Bikes") }

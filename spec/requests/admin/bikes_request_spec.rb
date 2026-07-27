@@ -44,6 +44,8 @@ RSpec.describe Admin::BikesController, type: :request do
   describe "edit" do
     let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:stolen_record) { bike.current_stolen_record }
+    # Stimulus unhides it when free text is entered
+    let(:manufacturer_warning) { Nokogiri::HTML(response.body).at_css("[data-admin--bike-manufacturer-target='warning']") }
     context "standard" do
       it "renders" do
         get "#{base_url}/#{FactoryBot.create(:bike).id}/edit"
@@ -51,6 +53,17 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(response).to render_template("edit")
         expect(flash).to_not be_present
         expect(assigns(:page_id)).to eq "admin_bikes_edit"
+        expect(manufacturer_warning.key?("hidden")).to be_truthy
+      end
+    end
+    context "with an unknown manufacturer" do
+      let(:bike) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Bikes by Seth") }
+      it "renders the manufacturer combobox with the free text, and warns that the manufacturer is other" do
+        get "#{base_url}/#{bike.id}/edit"
+        expect(response.code).to eq("200")
+        expect(response.body).to match(/data-hw-combobox-prefilled-display-value="Bikes by Seth"/)
+        expect(manufacturer_warning.text.strip).to match(/Manufacturer is Other/)
+        expect(manufacturer_warning.key?("hidden")).to be_falsey
       end
     end
     context "with recovery" do
@@ -148,6 +161,33 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
+    context "manufacturer" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
+
+      it "assigns a manufacturer that isn't listed to Manufacturer.other" do
+        put "#{base_url}/#{bike.id}", params: {bike: {manufacturer_id: "Bikes by Seth"}}
+        expect(flash[:success]).to be_present
+        bike.reload
+        expect(bike.manufacturer_id).to eq Manufacturer.other.id
+        expect(bike.manufacturer_other).to eq "Bikes by Seth"
+        expect(bike.mnfg_name).to eq "Bikes by Seth"
+      end
+
+      context "with an unknown manufacturer" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership, manufacturer: Manufacturer.other, manufacturer_other: "Bikes by Seth") }
+
+        it "removes manufacturer_other when a listed manufacturer is selected" do
+          expect(bike.reload.mnfg_name).to eq "Bikes by Seth"
+          put "#{base_url}/#{bike.id}", params: {bike: {manufacturer_id: manufacturer.id.to_s}}
+          expect(flash[:success]).to be_present
+          bike.reload
+          expect(bike.manufacturer_id).to eq manufacturer.id
+          expect(bike.manufacturer_other).to be_nil
+          expect(bike.mnfg_name).to eq "Surly"
+        end
+      end
+    end
+
     context "made without serial" do
       let(:bike) { FactoryBot.create(:bike, serial_number: "og serial") }
       it "makes it made without serial" do

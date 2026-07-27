@@ -1,7 +1,5 @@
 = render partial: "/admin/bikes/bike_tabs", locals: { bike: @bike, active_tab: "bikes-edit" }
 
-.d-none{ data: { url: ENV['BASE_URL'] } }
-
 .admin-subnav.midpage-subnav
   .col-4.col-md-6
     %h1
@@ -31,22 +29,14 @@
         = f.label :made_without_serial
   .row
     .col-6.col-md-4.col-lg-3
-      .form-group
+      .form-group{ data: { controller: "admin--bike-manufacturer", action: "hw-combobox:preselection->admin--bike-manufacturer#toggleWarning" } }
         - manufacturer_label = capture do
           Manufacturer
           %em.small
             = link_to "mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name), class: "less-strong"
         = render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, form: f, label: manufacturer_label, required: true)
-    .col-6.col-md-4.col-lg-3
-      .form-group
-        = f.label :manufacturer_other do
-          %span.d-none.d-sm-inline
-            Other mnfg
-          %small.less-strong
-            %span.d-none.d-xl-inline
-              Only necessary
-            if Manufacturer <em>Other</em>
-        = f.text_field :manufacturer_other, class: "form-control"
+        %small{class: UI::Alert::Component::TEXT_CLASSES[:warning], hidden: !@bike.manufacturer&.other?, data: { "admin--bike-manufacturer-target": "warning" }}
+          Manufacturer is <em>Other</em>, this isn't a listed manufacturer
     .col-6.col-md-4.col-lg-3
       .form-group
         = f.label :year
@@ -98,10 +88,7 @@
         .col-md-4
           .row
             #stolen-bike-location.form-group.col-6
-              #country_select_container
-                = render UI::Forms::Combobox::Component.new(name: :country_id, form: s, label: "Country", placeholder: "Choose country", include_blank: true, options: Country.select_options)
-                %p.d-none
-                  = Country.united_states_id
+              = render UI::Forms::Combobox::Component.new(name: :country_id, form: s, label: "Country", placeholder: "Choose country", include_blank: true, options: Country.select_options)
             .form-group.col-6
               = render UI::Forms::Combobox::Component.new(name: :region_record_id, form: s, label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id))
           .form-group
