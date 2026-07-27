@@ -25,13 +25,13 @@ module UI
 
         # full_width: chips share the row evenly (the frame-size XS-XL selector),
         # rather than each taking only the width of its label.
-        def initialize(name:, entries:, selected: nil, form: nil, data: {}, full_width: false)
+        def initialize(name:, entries:, selected: nil, form: nil, full_width: false, data: {})
           @name = name
           @entries = entries
           @selected = selected.to_s
           @form = form
-          @data = data
           @full_width = full_width
+          @data = data
         end
 
         def call
