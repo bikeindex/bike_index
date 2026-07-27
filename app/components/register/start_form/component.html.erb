@@ -6,7 +6,8 @@
     <%= render UI::Alert::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
   <% end %>
 
-  <%= form_with(url: register_path, method: :post, scope: :b_param) do |f| %>
+  <%= form_with(url: register_path, method: :post, scope: :b_param,
+      data: {controller: "submit-spinner", action: "submit->submit-spinner#start"}) do |f| %>
     <% bike = @b_param.bike %>
     <%= render Register::SectionLabel::Component.new(text: translation(".bike_info")) %>
 
@@ -68,7 +69,7 @@
         html_options: {value: @b_param.owner_email, placeholder: translation(".email_placeholder")}) %>
 
     <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
-        kind: :submit, html_class: "tw:w-full") %>
+        kind: :submit, spinner: true, html_class: "tw:w-full") %>
 
     <p
       class="
