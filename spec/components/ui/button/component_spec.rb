@@ -42,11 +42,10 @@ RSpec.describe UI::Button::Component, type: :component do
       expect(html).to include("twlink")
       expect(html).not_to include("tw:text-blue-600")
       expect(html).not_to include("tw:bg-blue-600")
-      # Text-only, so it skips the size padding the filled colors get
+      # Text-only, so no size padding
       expect(html).to_not include(UI::Button::Component::SIZES[:md])
     end
 
-    # How the redesign's bold link (Where's my serial number?) is built
     context "with html_class" do
       let(:options) { {text:, color:, html_class: "tw:text-xs tw:font-bold"} }
 
