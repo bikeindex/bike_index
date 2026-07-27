@@ -345,8 +345,8 @@ GEM
     grape_logging (3.0.0)
       grape (>= 2.4.0)
       rack
-    groupdate (6.7.0)
-      activesupport (>= 7.1)
+    groupdate (6.8.0)
+      activesupport (>= 7.2)
     guard (2.20.1)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
