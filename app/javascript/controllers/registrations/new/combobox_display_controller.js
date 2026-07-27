@@ -29,7 +29,7 @@ export default class extends Controller {
     if (document.activeElement === this.input) return
 
     const selectedOption = this.selectedOption()
-    if (!selectedOption) return
+    if (!selectedOption) { this.hide(); return }
 
     this.overlayTarget.innerHTML = selectedOption.innerHTML
     this.reposition()

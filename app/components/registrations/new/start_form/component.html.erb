@@ -50,19 +50,10 @@
         ></div>
       </div>
 
-      <label
-        class="twlabel tw:mt-3 tw:flex tw:items-center tw:gap-2"
-        data-registrations--new--propulsion-target="motorizedWrapper"
-      >
-        <%= check_box_tag :propulsion_type_motorized, true, @b_param.motorized?,
-            class: "tw:h-4 tw:w-4",
-            data: {
-              "registrations--new--propulsion-target": "motorized",
-              action: "change->registrations--new--propulsion#update"
-            } %>
-
-        <%= translation(".electric_motorized") %>
-      </label>
+      <%= render UI::Forms::Checkbox::Component.new(name: :propulsion_type_motorized, value: true,
+          checked: @b_param.motorized?, label: translation(".electric_motorized"), class_name: "tw:mt-3",
+          data: {"registrations--new--propulsion-target": "motorizedWrapper"},
+          input_data: {"registrations--new--propulsion-target": "motorized", action: "change->registrations--new--propulsion#update"}) %>
 
       <p class="tw:mt-1.5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
         <%= translation(".electric_helper") %>
@@ -71,15 +62,9 @@
 
     <%= render Registrations::New::SectionLabel::Component.new(text: translation(".your_info"), divider: true) %>
 
-    <div class="tw:mb-6">
-      <%= f.label :owner_email, class: "twlabel" do %>
-        <%= translation(".email") %>
-        <span class="tw:text-red-600">*</span>
-      <% end %>
-
-      <%= f.email_field :owner_email, value: @b_param.owner_email, required: true,
-          placeholder: translation(".email_placeholder"), class: "twinput tw:mt-1" %>
-    </div>
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email, kind: :email_field,
+        label_text: translation(".email"), required: true, wrapper_class: "tw:mb-6",
+        html_options: {value: @b_param.owner_email, placeholder: translation(".email_placeholder")}) %>
 
     <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
         kind: :submit, html_class: "tw:w-full") %>
