@@ -16,6 +16,10 @@ module UI
       # manufacturer_other. Pass `no_manufacturer_other: true` where only an indexed
       # manufacturer is acceptable.
       class Component < ApplicationComponent
+        # One is sampled for the placeholder, to show what the field autocompletes
+        PLACEHOLDER_NAMES = ["Trek", "Specialized", "Giant Bikes", "Rad Power Bikes", "Cannondale",
+          "Lectric eBikes", "Aventón", "Canyon", "Orbea"].freeze
+
         def initialize(name: :manufacturer_id, frame_maker: false, no_manufacturer_other: false, **combobox_options)
           @name = name
           @frame_maker = frame_maker
@@ -37,6 +41,7 @@ module UI
               no_manufacturer_other: @no_manufacturer_other.presence),
             **free_text_options,
             **@combobox_options,
+            placeholder: translation(".placeholder", name: PLACEHOLDER_NAMES.sample),
             **manufacturer_other_options
           }
         end
