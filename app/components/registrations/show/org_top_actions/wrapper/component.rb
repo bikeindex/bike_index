@@ -13,7 +13,7 @@ module Registrations
           # [tile background, icon color] per action-icon tile
           TILES = {
             purple: ["tw:bg-purple-100", "tw:text-purple-500"],
-            blue: ["tw:bg-[#e7f3fb]", "tw:text-[#016ec2]"],
+            blue: ["tw:bg-[#e7f3fb]", "tw:text-blue-600"],
             amber: ["tw:bg-[#fff8e1]", "tw:text-[#caa11a]"]
           }.freeze
 

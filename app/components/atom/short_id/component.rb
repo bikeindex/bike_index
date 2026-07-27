@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module UI
+module Atom
   module ShortId
     # Renders a record's short_id (see ShortIdable) as a monospace code block.
     # Pass a record that responds to short_id, or a raw short_id string.

@@ -12,7 +12,7 @@ module Registrations
 
         def call
           render UI::Button::Component.new(color: :secondary, size: :md,
-            html_class: "tw:w-full tw:justify-center tw:py-2.5!",
+            html_class: "tw:w-full tw:py-2.5!",
             data: {controller: "registrations--show--share",
                    "registrations--show--share-url-value": @url,
                    action: "registrations--show--share#share"}) do

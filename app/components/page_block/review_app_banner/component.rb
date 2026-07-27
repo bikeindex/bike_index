@@ -3,11 +3,21 @@
 module PageBlock
   module ReviewAppBanner
     # Banner shown across the top of every page on review-app and local dev
-    # deploys, so there's no chance of confusing them with production. Callers
-    # pass `ENV["REVIEW_APP"]` (or the string "development" for the local dev
-    # server), `ENV["REVIEW_APP_PR_NUMBER"]`, and `ENV["REVIEW_APP_PR_TITLE"]`;
-    # the component renders only when `review_app` is present.
+    # deploys, so there's no chance of confusing them with production. Deploys
+    # build it with `.from_env`; the component renders only when `review_app` is
+    # present, so previews can pass one explicitly.
     class Component < ApplicationComponent
+      # `review_app` is nil — so nothing renders — in production and when
+      # NO_REVIEW_TOPBAR=true. The Lookbook navbar is scoped through here too
+      # (config/initializers/lookbook.rb)
+      def self.from_env(current_user: nil, return_to: nil)
+        review_app = ENV["REVIEW_APP"] || (Rails.env.development? && "development")
+        review_app = nil if Rails.env.production? || ENV["NO_REVIEW_TOPBAR"] == "true"
+
+        new(review_app:, pr_number: ENV["REVIEW_APP_PR_NUMBER"], pr_title: ENV["REVIEW_APP_PR_TITLE"],
+          commit: ENV["REVIEW_APP_COMMIT"], current_user:, return_to:)
+      end
+
       def initialize(review_app:, pr_number: nil, pr_title: nil, commit: nil, current_user: nil, return_to: nil)
         @review_app = review_app
         @pr_number = pr_number
@@ -19,6 +29,14 @@ module PageBlock
 
       def render?
         @review_app.present?
+      end
+
+      # Plain-text title, also shown in the Lookbook navbar (config/initializers/lookbook.rb)
+      def topbar_title
+        return nil unless render?
+        return banner_label if @pr_number.blank?
+
+        "#{banner_label} · #{pr_link_text}"
       end
 
       private

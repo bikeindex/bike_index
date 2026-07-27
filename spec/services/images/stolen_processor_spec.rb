@@ -186,6 +186,20 @@ RSpec.describe Images::StolenProcessor do
           expect(stolen_record.images_attached_id).to eq "b#{bike.id}"
         end
       end
+
+      # URI.open returns a StringIO (rather than a file) for photos under 10kb
+      context "under 10kb" do
+        let(:stock_photo_url) { "https://bikeindex.org/apple-touch-icon.png" }
+        it "creates" do
+          VCR.use_cassette("Images-StolenProcessor-small_stock_photo") do
+            expect do
+              described_class.update_alert_images(stolen_record)
+            end.to change(ActiveStorage::Blob, :count).by 3
+            expect(stolen_record.reload.images_attached?).to be_truthy
+            expect(stolen_record.images_attached_id).to eq "b#{bike.id}"
+          end
+        end
+      end
     end
   end
 
@@ -232,14 +246,6 @@ RSpec.describe Images::StolenProcessor do
 
       it "creates an image matching target" do
         expect_images_to_match(generated_image, target_image)
-      end
-
-      context "when image is a StringIO" do
-        let(:image) { StringIO.new(File.binread(Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg"))) }
-
-        it "creates an image matching target" do
-          expect_images_to_match(generated_image, target_image)
-        end
       end
     end
 

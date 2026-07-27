@@ -8,11 +8,12 @@ module Registrations
 
         # owner: overrides the computed ownership so the wrapper can force the
         # public or owner perspective (view_as)
-        def initialize(bike:, current_user:, show_for_sale: false, owner: nil, available_views: [])
+        def initialize(bike:, current_user:, show_for_sale: false, owner: nil, available_views: [], bike_sticker: nil)
           @bike = bike
           @current_user = current_user
           @show_for_sale = show_for_sale
           @available_views = available_views
+          @bike_sticker = bike_sticker
           @owner = owner.nil? ? (@current_user.present? && @bike.owner == @current_user) : owner
         end
 
@@ -51,7 +52,7 @@ module Registrations
         # Half-width next to "Sell on Marketplace" when it shows, full-width otherwise
         def edit_bike_button
           render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: @bike.default_edit_template),
-            text: translation(".edit_this_bike", bike_type: @bike.type), color: :purple, size: :lg, class: "tw:justify-center tw:text-center tw:py-2.5!"))
+            text: translation(".edit_this_bike", bike_type: @bike.type), color: :purple, size: :lg, class: "tw:text-center tw:py-2.5!"))
         end
       end
     end

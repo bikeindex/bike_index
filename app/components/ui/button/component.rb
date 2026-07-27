@@ -6,7 +6,7 @@ module UI
     # submits a request to a URL (button_to), use UI::ButtonLink instead — it reuses
     # this component's build_classes, so the two stay visually in lockstep.
     class Component < ApplicationComponent
-      BASE_CLASSES = "tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-lg tw:cursor-pointer tw:transition-colors"
+      BASE_CLASSES = "tw:inline-flex tw:items-center tw:justify-center tw:gap-1.5 tw:rounded-lg tw:cursor-pointer tw:transition-colors"
 
       SIZES = {
         sm: "tw:px-2.5 tw:py-1 tw:text-xs",
@@ -35,7 +35,7 @@ module UI
         purple: "tw:is-active:bg-purple-600 tw:is-active:border-purple-600 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
         danger_outline: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
         purple_outline: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
-        link: "tw:is-active:text-blue-800 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
+        link: "tw:is-active:text-blue-700 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
       }.freeze
 
       KINDS = %i[button submit]

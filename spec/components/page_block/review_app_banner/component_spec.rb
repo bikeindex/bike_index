@@ -6,10 +6,38 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   it "doesn't render when review_app is blank" do
     expect(described_class.new(review_app: nil).render?).to be_falsey
     expect(described_class.new(review_app: "").render?).to be_falsey
+    expect(described_class.new(review_app: nil).topbar_title).to be_nil
+  end
+
+  describe ".from_env" do
+    it "doesn't render without REVIEW_APP outside of development" do
+      expect(described_class.from_env.render?).to be_falsey
+    end
+
+    context "with the review app env" do
+      let(:review_app_env) do
+        {"REVIEW_APP" => "1", "REVIEW_APP_PR_NUMBER" => "1234", "REVIEW_APP_PR_TITLE" => "Add Promoted section",
+         "REVIEW_APP_COMMIT" => "a1b2c3d"}
+      end
+
+      before { stub_const("ENV", ENV.to_hash.merge(review_app_env)) }
+
+      it "reads the deploy's PR from the env" do
+        expect(described_class.from_env.topbar_title).to eq "Review app · Add Promoted section"
+      end
+
+      it "doesn't render with NO_REVIEW_TOPBAR" do
+        stub_const("ENV", ENV.to_hash.merge(review_app_env, "NO_REVIEW_TOPBAR" => "true"))
+        expect(described_class.from_env.render?).to be_falsey
+        expect(described_class.from_env.topbar_title).to be_nil
+      end
+    end
   end
 
   it "renders a purple development banner for the local dev server" do
-    component = render_inline(described_class.new(review_app: "development"))
+    banner = described_class.new(review_app: "development")
+    component = render_inline(banner)
+    expect(banner.topbar_title).to eq "Development"
     expect(component.text).to include("Development")
     expect(component.text).not_to include("Sandbox")
     expect(component.css("a[href='/letter_opener']")).to be_present
@@ -27,7 +55,8 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   end
 
   context "when review_app is present" do
-    let(:component) { render_inline(described_class.new(review_app: "1", pr_number:, pr_title:, commit:, current_user:, return_to:)) }
+    let(:banner) { described_class.new(review_app: "1", pr_number:, pr_title:, commit:, current_user:, return_to:) }
+    let(:component) { render_inline(banner) }
     let(:pr_number) { nil }
     let(:pr_title) { nil }
     let(:commit) { nil }
@@ -36,6 +65,7 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
 
     it "renders the sandbox label and disclaimer" do
       # No pr_number is the persistent sandbox deploy, not a per-PR review app
+      expect(banner.topbar_title).to eq "Sandbox"
       expect(component.text).to include("Sandbox")
       expect(component.text).not_to include("Review app")
       expect(component.text).to include("data is ephemeral")
@@ -148,6 +178,7 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       end
 
       it "shows the review app label instead of the sandbox label, hidden on small screens" do
+        expect(banner.topbar_title).to eq "Review app · PR #1234"
         expect(component.text).to include("Review app")
         expect(component.text).not_to include("Sandbox")
         # The PR title carries the context on small screens, so the label hides
@@ -159,6 +190,7 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
         let(:pr_title) { "Add Promoted section" }
 
         it "uses the title as the PR link text" do
+          expect(banner.topbar_title).to eq "Review app · Add Promoted section"
           link = component.css("a[href^='https://github.com']").first
           expect(link[:href]).to eq("https://github.com/bikeindex/bike_index/pull/1234")
           expect(link.text.strip).to eq("Add Promoted section")

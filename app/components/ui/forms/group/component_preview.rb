@@ -17,12 +17,20 @@ module UI
           {template: "ui/forms/group/component_preview/text_area"}
         end
 
-        def check_box
-          {template: "ui/forms/group/component_preview/check_box"}
-        end
-
         def content_block
           {template: "ui/forms/group/component_preview/content_block"}
+        end
+
+        def select
+          {template: "ui/forms/group/component_preview/select"}
+        end
+
+        def combobox
+          {template: "ui/forms/group/component_preview/combobox"}
+        end
+
+        def radio_button_group
+          {template: "ui/forms/group/component_preview/radio_button_group"}
         end
 
         def file_upload
