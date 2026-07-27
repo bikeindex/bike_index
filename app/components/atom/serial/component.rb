@@ -7,9 +7,9 @@ module Atom
     # is followed by why it's hidden unless skip_explanation.
     class Component < ApplicationComponent
       BASE_CLASSES = "tw:font-mono tw:p-0 tw:bg-transparent tw:text-inherit tw:rounded-none"
-      # Serials the model reports in words rather than as a number
-      UNSET = ["hidden", "unknown", "made without serial"].freeze
-      # Shared with BikeHelper#render_serial_display, which renders this outside the redesign
+      # What serial_display returns in place of a number
+      PLACEHOLDERS = ["hidden", "unknown", "made without serial"].freeze
+      # BikeHelper#render_serial_display renders serials everywhere else, so borrow its keys
       TRANSLATION_SCOPE = %i[helpers bike_helper].freeze
 
       def initialize(bike:, user: nil, skip_explanation: false)
@@ -32,12 +32,12 @@ module Atom
         @serial ||= @bike.serial_display(@user)
       end
 
-      def unset?
-        UNSET.include?(serial.downcase)
+      def placeholder?
+        PLACEHOLDERS.include?(serial.downcase)
       end
 
       def serial_block
-        return content_tag(:span, translation(serial.downcase.tr(" ", "_"), scope: TRANSLATION_SCOPE), class: "tw:opacity-65") if unset?
+        return content_tag(:span, translation(serial.downcase.tr(" ", "_"), scope: TRANSLATION_SCOPE), class: "tw:opacity-65") if placeholder?
 
         content_tag(:code, serial, class: BASE_CLASSES)
       end
