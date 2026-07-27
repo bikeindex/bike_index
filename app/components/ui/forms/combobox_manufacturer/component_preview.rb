@@ -15,12 +15,13 @@ module UI
 
         # Limited to manufacturers that make frames
         def frame_makers
-          render(UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true))
+          render(UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, id: "frame_makers_manufacturer_id"))
         end
 
         # Only an indexed manufacturer is selectable
         def no_manufacturer_other
-          render(UI::Forms::ComboboxManufacturer::Component.new(no_manufacturer_other: true))
+          render(UI::Forms::ComboboxManufacturer::Component.new(no_manufacturer_other: true,
+            id: "no_manufacturer_other_manufacturer_id"))
         end
 
         # Pre-selected manufacturer
@@ -42,8 +43,8 @@ module UI
 
         private
 
-        # The combobox ids come from the form's object name, so each variant needs its
-        # own - they render together on the group page
+        # The variants render together on the group page, so each needs its own ids -
+        # which the combobox derives from the field name, or the form's object name
         def bike_form(object_name, bike)
           ActionView::Helpers::FormBuilder.new(object_name, bike, template, {})
         end
