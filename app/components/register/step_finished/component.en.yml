@@ -2,8 +2,8 @@
 en:
   components:
     register:
-      complete:
-        register_another: Register another bike
+      step_finished:
+        register_another: Register another %{cycle_type}
         registration_complete: Registration complete!
         verify_your_email_html: >-
           One more step — verify your email. We sent a confirmation link to %{email};

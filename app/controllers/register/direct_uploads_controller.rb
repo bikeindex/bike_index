@@ -10,7 +10,7 @@ module Register
     private
 
     def require_registration
-      return if BParam.find_for_token(params[:b_param_token], user_id: current_user&.id).present?
+      return if BikeServices::Register.find_token(user: current_user, params_token: params[:b_param_token]).present?
 
       head :forbidden
     end

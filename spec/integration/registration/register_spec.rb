@@ -66,7 +66,8 @@ RSpec.describe "Register flow", :js, type: :system do
     click_combobox_option("Green")
     find("label", text: "M", exact_text: true).click
     check "Missing serial"
-    expect(page).to have_field("bike[serial_number]", with: "unknown")
+    # readonly rather than disabled, so "unknown" still submits
+    expect(page).to have_field("bike[serial_number]", with: "unknown", readonly: true)
     fill_in "bike[bike_sticker]", with: "A 471 829"
     fill_in "bike[phone]", with: "(555) 000-0000"
 
@@ -83,11 +84,22 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_no_button("+ Add another color")
     expect(find("input[name='bike[frame_size]'][value='m']", visible: :all)).to be_checked
     # The restored missing serial re-reveals the made-without link
-    expect(page).to have_field("bike[serial_number]", with: "unknown")
+    expect(page).to have_field("bike[serial_number]", with: "unknown", readonly: true)
     expect(page).to have_checked_field("Missing serial")
     expect(page).to have_button("This bike was made without a serial number")
     expect(page).to have_field("bike[bike_sticker]", with: "A 471 829")
     expect(page).to have_field("bike[phone]", with: "(555) 000-0000")
+
+    # The modal's made-without confirm mutates fields programmatically - that
+    # state survives a reload too
+    click_button "This bike was made without a serial number"
+    click_button "I'm 100% sure"
+    expect(page).to have_checked_field("This bike was made without a serial")
+
+    visit details_url
+
+    expect(page).to have_checked_field("This bike was made without a serial")
+    expect(page).to have_no_field("bike[serial_number]") # the serial section stays swapped out
 
     # Picking a photo uploads it straight to storage; the form carries only the signed id
     attach_file("register_photo", Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg"), make_visible: true)
@@ -102,7 +114,7 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(b_param.bike).to include("frame_model" => "Marlin 7", "year" => "2023",
       "primary_frame_color_id" => red.id.to_s, "secondary_frame_color_id" => blue.id.to_s,
       "tertiary_frame_color_id" => green.id.to_s, "frame_size" => "m",
-      "serial_number" => "unknown", "phone" => "(555) 000-0000")
+      "serial_number" => "made_without_serial", "phone" => "(555) 000-0000")
     expect(b_param.details_completed?).to be_truthy
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"

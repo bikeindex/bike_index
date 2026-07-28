@@ -7,6 +7,12 @@ module Register
       def initialize(b_param:)
         @b_param = b_param
       end
+
+      private
+
+      def cycle_type
+        @b_param.type
+      end
     end
   end
 end

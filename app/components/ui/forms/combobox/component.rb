@@ -33,7 +33,7 @@ module UI
           combobox = helpers.hw_combobox_tag(@name, @options_or_src, **defaults, **@combobox_options)
           return combobox unless @rich_display
 
-          tag.div(class: ["tw:relative", (@rich_display if @rich_display.is_a?(String))].compact.join(" "),
+          tag.div(class: ["tw:relative", (@rich_display if @rich_display.is_a?(String))],
             data: {controller: "ui--forms--combobox-display"}) do
             combobox + tag.div("", class: OVERLAY_CLASSES, data: {"ui--forms--combobox-display-target": "overlay"})
           end
