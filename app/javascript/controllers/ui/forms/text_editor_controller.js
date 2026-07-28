@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='lexxy'
+// Connects to data-controller='ui--forms--text-editor'
 // Lazily loads the Lexxy editor bundle and its gem stylesheet only on pages that use it (both are
 // large / gem-served). Importing the module registers the <lexxy-editor> custom element, upgrading
 // every editor on the page; the stylesheet is injected once (deduped by href) so the editor works
