@@ -35,6 +35,23 @@ RSpec.describe UI::Forms::Combobox::Component, type: :component do
     end
   end
 
+  context "with rich_display" do
+    let(:extra) { {rich_display: true} }
+
+    it "wraps the combobox with the overlay the display controller paints on" do
+      expect(component).to have_css("div.tw\\:relative[data-controller='ui--forms--combobox-display'] fieldset.hw-combobox")
+      expect(component).to have_css("[data-ui--forms--combobox-display-target='overlay'].tw\\:hidden", visible: :all)
+    end
+
+    context "with a class string" do
+      let(:extra) { {rich_display: "tw:flex-1"} }
+
+      it "puts it on the wrapper" do
+        expect(component).to have_css("div.tw\\:relative.tw\\:flex-1[data-controller='ui--forms--combobox-display']")
+      end
+    end
+  end
+
   context "with hash options" do
     let(:combobox_options) { [{display: "[622] 700c", value: "1"}, {display: "[559] 26in", value: "2"}] }
 

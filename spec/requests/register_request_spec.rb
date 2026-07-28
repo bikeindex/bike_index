@@ -11,22 +11,22 @@ RSpec.describe RegisterController, type: :request do
   end
 
   describe "new" do
-    it "creates an empty registration and redirects to its step_1" do
+    it "creates an empty registration and redirects to its step 1" do
       expect { get "/register/new" }.to change(BParam, :count).by 1
       new_b_param = BParam.last
       expect(new_b_param.origin).to eq "registration_flow"
       expect(new_b_param.confirmation_token).to be_present
-      expect(response).to redirect_to step_1_register_path(b_param_token: new_b_param.id_token)
+      expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
 
       # Revisiting reuses the session's still-blank registration
       expect { get "/register/new" }.to_not change(BParam, :count)
-      expect(response).to redirect_to step_1_register_path(b_param_token: new_b_param.id_token)
+      expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
 
       # Once step 1 is submitted, register/new starts a fresh registration
       new_b_param.clean_params({bike: {owner_email:}}.as_json)
       new_b_param.save
       expect { get "/register/new" }.to change(BParam, :count).by 1
-      expect(response).to_not redirect_to step_1_register_path(b_param_token: new_b_param.id_token)
+      expect(response).to_not redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
     end
 
     context "stolen status param" do
@@ -60,9 +60,9 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
-  describe "step_1" do
+  describe "show step: 1" do
     it "renders" do
-      get step_1_register_path(b_param_token: b_param.id_token)
+      get register_path(b_param_token: b_param.id_token, step: 1)
       expect(response.status).to eq 200
       expect(response.body).to include "Register your bike!"
       # Controller-rendered components still wrap in the application layout
@@ -73,7 +73,7 @@ RSpec.describe RegisterController, type: :request do
 
     context "unknown token" do
       it "redirects to the start" do
-        get step_1_register_path(b_param_token: "unknown-token")
+        get register_path(b_param_token: "unknown-token", step: 1)
         expect(response).to redirect_to new_register_path
         expect(flash[:info]).to be_present
       end
@@ -85,7 +85,7 @@ RSpec.describe RegisterController, type: :request do
     let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:}} }
     let(:create_params) { step_1_params.merge(b_param_token: empty_b_param.id_token) }
 
-    it "saves step 1, sends the email and redirects to step_2" do
+    it "saves step 1, sends the email and redirects to step 2" do
       expect { post base_url, params: create_params }.to_not change(BParam, :count)
       empty_b_param.reload
       expect(empty_b_param).to have_attributes(origin: "registration_flow", owner_email:,
@@ -93,7 +93,7 @@ RSpec.describe RegisterController, type: :request do
       expect(empty_b_param.partial_registration?).to be_truthy
       expect(empty_b_param.motorized?).to be_falsey
       expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(empty_b_param.id)
-      expect(response).to redirect_to step_2_register_path(b_param_token: empty_b_param.id_token)
+      expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
 
       # Resubmitting with the same email doesn't resend the confirmation
       expect {
@@ -160,9 +160,9 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
-  describe "step_2" do
+  describe "show step: 2" do
     it "renders the details form, showing the email from step 1" do
-      get step_2_register_path(b_param_token: b_param.id_token)
+      get register_path(b_param_token: b_param.id_token, step: 2)
       expect(response.status).to eq 200
       expect(response.body).to include "Add your bike"
       expect(response.body).to include owner_email
@@ -171,9 +171,9 @@ RSpec.describe RegisterController, type: :request do
     context "step 1 not submitted" do
       let(:b_param) { BParam.create(origin: "registration_flow") }
 
-      it "redirects to step_1" do
-        get step_2_register_path(b_param_token: b_param.id_token)
-        expect(response).to redirect_to step_1_register_path(b_param_token: b_param.id_token)
+      it "redirects to step 1" do
+        get register_path(b_param_token: b_param.id_token, step: 2)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 1)
       end
     end
   end
@@ -181,7 +181,7 @@ RSpec.describe RegisterController, type: :request do
   describe "show" do
     it "redirects an in-progress registration to its step" do
       get register_path(b_param_token: b_param.id_token)
-      expect(response).to redirect_to step_2_register_path(b_param_token: b_param.id_token)
+      expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 2)
     end
 
     context "unknown token" do
@@ -204,7 +204,7 @@ RSpec.describe RegisterController, type: :request do
         expect {
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
         }.to_not change(Bike, :count)
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
         b_param.reload
         expect(b_param.details_completed?).to be_truthy
         # IDs pass through as posted strings; they're cast when the bike is created
@@ -236,7 +236,7 @@ RSpec.describe RegisterController, type: :request do
         it "stores the direct upload's signed id on the b_param" do
           patch base_url, params: {b_param_token: b_param.id_token, image_signed_id: blob.signed_id,
                                    bike: bike_details}
-          expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
           expect(b_param.reload.image_signed_id).to eq blob.signed_id
         end
 
@@ -288,7 +288,7 @@ RSpec.describe RegisterController, type: :request do
             patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
           }.to change(Bike, :count).by 1
           expect(Bike.last).to have_attributes(owner_email:, creator_id: user.id)
-          expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
         end
       end
 
@@ -300,7 +300,7 @@ RSpec.describe RegisterController, type: :request do
 
         it "completes directly, keeping motorized" do
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-          expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
           expect(b_param.reload.motorized?).to be_truthy
         end
       end
@@ -319,17 +319,15 @@ RSpec.describe RegisterController, type: :request do
           owner_email:, creator_id: current_user.id)
         expect(bike.current_ownership.origin).to eq "registration_flow"
         expect(b_param.reload.created_bike_id).to eq bike.id
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
         follow_redirect!
         expect(response.body).to include "Registration complete"
 
-        # Revisiting any step after completion shows complete instead
-        get register_path(b_param_token: b_param.id_token)
-        expect(response.body).to include "Registration complete"
-        get step_2_register_path(b_param_token: b_param.id_token)
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
-        get step_1_register_path(b_param_token: b_param.id_token)
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+        # Revisiting any step after completion redirects to complete
+        get register_path(b_param_token: b_param.id_token, step: 2)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
+        get register_path(b_param_token: b_param.id_token, step: 1)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
       end
 
       context "blank serial" do
@@ -379,13 +377,13 @@ RSpec.describe RegisterController, type: :request do
         expect(bike).to have_attributes(owner_email:, creator_id: user.id,
           manufacturer_id: manufacturer.id)
         expect(b_param.reload.email_confirmed?).to be_truthy
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
         follow_redirect!
         expect(response.body).to include "Registration complete"
 
-        # Clicking the link again just shows complete
+        # Clicking the link again just redirects to complete
         expect { get confirm_path }.to_not change(Bike, :count)
-        expect(response.body).to include "Registration complete"
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
       end
     end
 
@@ -401,10 +399,10 @@ RSpec.describe RegisterController, type: :request do
     end
 
     context "details not completed" do
-      it "confirms the email and sends them to step_2" do
+      it "confirms the email and sends them to step 2" do
         expect { get confirm_path }.to_not change(Bike, :count)
         expect(b_param.reload.email_confirmed?).to be_truthy
-        expect(response).to redirect_to step_2_register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 2)
         expect(flash[:success]).to be_present
       end
     end

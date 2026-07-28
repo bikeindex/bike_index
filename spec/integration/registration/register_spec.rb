@@ -33,8 +33,8 @@ RSpec.describe "Register flow", :js, type: :system do
   it "starts a registration, keeps a full details draft across a reload, and completes" do
     visit "/register/new"
 
-    # new creates the registration and lands on its tokenized step_1
-    expect(page).to have_current_path(/register\/step_1\?b_param_token=/, url: true)
+    # new creates the registration and lands on its tokenized step 1
+    expect(page).to have_current_path(/register\?b_param_token=.+&step=1/, url: true)
 
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
@@ -43,9 +43,9 @@ RSpec.describe "Register flow", :js, type: :system do
 
     expect(page).to have_content("Add your bike")
     details_url = page.current_url
-    expect(details_url).to match(/register\/step_2\?b_param_token=/)
+    expect(details_url).to match(/register\?b_param_token=.+&step=2/)
 
-    # The browser back button returns to step_1 on the same registration, prefilled
+    # The browser back button returns to step 1 on the same registration, prefilled
     page.go_back
     expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
     expect(page).to have_field("b_param[owner_email]", with: owner_email)
