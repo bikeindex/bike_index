@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "collapse controller", :js, type: :system do
+RSpec.describe "ui--collapse controller", :js, type: :system do
   let(:preview_path) { "/rails/view_components/ui/collapse/component/with_url_param" }
 
   it "toggles, persists open state to the URL, and restores it on load" do

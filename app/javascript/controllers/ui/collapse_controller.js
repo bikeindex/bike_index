@@ -5,8 +5,8 @@ import { collapse } from 'utils/collapse_utils'
 // Animates [data-ui--collapse-target=content] open/closed. Optionally rotates a
 // [data-ui--collapse-target=chevron] and keeps [data-ui--collapse-target=trigger]'s
 // aria-expanded and data-active (the is-active variant) in sync. With
-// data-ui--collapse-param-value set, the open state
-// persists to the URL query (?param=1) so it survives reloads and navigation.
+// data-ui--collapse-param-value set, the open state persists to the URL query
+// (?param=1) so it survives reloads and navigation.
 export default class extends Controller {
   static targets = ['content', 'chevron', 'trigger']
   static values = { duration: { type: Number, default: 200 }, param: String }
