@@ -50,6 +50,25 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
     expect { instance.perform(FactoryBot.create(:public_image, imageable: bike).id) }.to_not raise_error
   end
 
+  context "tiff" do
+    let(:image_path) { "spec/fixtures/bike_photo.tif" }
+    let(:target_metadata) do
+      {"identified" => true, "stripped" => true, "width" => 800, "height" => 600,
+       "analyzed" => true, "processed" => true}
+    end
+
+    it "rewrites it as webp" do
+      expect(blob.content_type).to eq "image/tiff"
+
+      instance.perform(public_image.id)
+
+      expect(blob.reload.metadata).to eq target_metadata
+      expect(blob.content_type).to eq "image/webp"
+      expect(blob.filename.to_s).to eq "bike_photo.webp"
+      expect(Vips::Image.new_from_buffer(blob.download, "").get("vips-loader")).to start_with "webpload"
+    end
+  end
+
   it "finishes the variants on a retry, without re-encoding the original" do
     instance.perform(public_image.id)
     variant_key = public_image.file.variant(:small).key

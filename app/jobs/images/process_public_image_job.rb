@@ -6,8 +6,8 @@ module Images
   class ProcessPublicImageJob < ApplicationJob
     sidekiq_options queue: "med_priority"
 
-    # Safari is the only browser that renders HEIC, and the original is served directly
-    WEBP_SOURCE_TYPES = %w[image/heic image/heif].freeze
+    # No browser renders TIFF and only Safari renders HEIC, and the original is served directly
+    WEBP_SOURCE_TYPES = %w[image/heic image/heif image/tiff].freeze
 
     def perform(public_image_id)
       public_image = PublicImage.unscoped.find_by(id: public_image_id)
