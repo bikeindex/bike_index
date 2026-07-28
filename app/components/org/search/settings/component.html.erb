@@ -125,7 +125,7 @@
 </div>
 
 <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-4">
-  <%= render(UI::Button::Component.new(color: :primary, size: :sm, aria: {pressed: settings_default_open?}, data: {action: "click->org--search#toggleSettings", "org--search-target": "settingsButton"})) do %>
+  <%= render(UI::Button::Component.new(color: :primary, size: :sm, active: settings_default_open?, aria: {expanded: settings_default_open?}, data: {action: "click->org--search#toggleSettings", "org--search-target": "settingsButton"})) do %>
     <%= translation(".settings") %>
     <%= helpers.inline_svg_tag "icons/settings_slider.svg", class: "tw:inline", alt: "settings icon" %>
   <% end %>

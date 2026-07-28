@@ -66,7 +66,7 @@
                 <%= number_field_tag :price_min_amount,
                 @price_min_amount,
                 placeholder: translation(".min"),
-                class: "twinput tw:min-w-20 fieldResetsCounts" %>
+                class: "twinput tw:min-w-16 fieldResetsCounts" %>
 
                 <span class="tw:mr-1 tw:ml-2 tw:block tw:min-w-6 tw:py-1.5">
                   &ndash; <%= @currency_sym %>
@@ -79,14 +79,15 @@
                 <%= number_field_tag :price_max_amount,
                 @price_max_amount,
                 placeholder: translation(".max"),
-                class: "twinput tw:min-w-20 fieldResetsCounts" %>
+                class: "twinput tw:min-w-16 fieldResetsCounts" %>
               </span>
             <% end %>
           </div>
         <% end %>
       </div>
 
-      <div class="tw:w-20">
+      <%# shrink-0: the fields column would otherwise squeeze this to a sliver on phones %>
+      <div class="tw:w-20 tw:shrink-0">
         <%= render UI::Button::Component.new(color: :primary, kind: :submit, html_class: "tw:w-full tw:h-full tw:disabled:cursor-wait") do %>
           <%= helpers.inline_svg_tag "icons/searcher.svg",
             id: "search-button",
