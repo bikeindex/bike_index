@@ -8,6 +8,13 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
   let(:image_path) { "spec/fixtures/exif_orientation.jpg" }
   let(:blob) { public_image.reload.file.blob }
 
+  # Tags that identify the photographer, their camera or where they stood
+  let(:identifying) { /gps|make|model|serial|lens|software|datetime|makernote/i }
+  # Dimensions are autorotated - the orientation tag claimed 1173x1071
+  let(:target_metadata) do
+    {"identified" => true, "stripped" => true, "width" => 1071, "height" => 1173, "analyzed" => true}
+  end
+
   def exif_fields(data)
     Vips::Image.new_from_buffer(data, "").get_fields.grep(/exif|gps/i)
   end
@@ -19,7 +26,7 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
 
     instance.perform(public_image.id)
 
-    expect(blob.reload.metadata["stripped"]).to be_truthy
+    expect(blob.reload.metadata).to eq target_metadata
     stripped_data = blob.download
     expect(exif_fields(stripped_data)).to be_empty
     # Rewritten in place so variant keys and CDN urls stay stable
@@ -39,15 +46,49 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
     expect { instance.perform(FactoryBot.create(:public_image, imageable: bike).id) }.to_not raise_error
   end
 
-  describe "enqueueing" do
-    it "enqueues for an attached file, not for carrierwave" do
-      expect {
-        FactoryBot.create(:public_image, :with_attached_file, imageable: bike)
-      }.to change(described_class.jobs, :size).by(1)
-
-      expect {
-        FactoryBot.create(:public_image, :with_image_file, imageable: bike)
-      }.to_not change(described_class.jobs, :size)
+  # Recorded against the real bikeindex-dev R2 bucket; re-record with R2_DEV_* from .env.development
+  context "iphone heic on R2", vcr: {cassette_name: "process_public_image_job-heic_r2", preserve_exact_body_bytes: true} do
+    let(:image_path) { "spec/fixtures/bike_photo-gps.heic" }
+    let(:public_image) { FactoryBot.create(:public_image, imageable: bike, file: r2_blob) }
+    let(:target_metadata) do
+      {"identified" => true, "stripped" => true, "width" => 2400, "height" => 1800, "analyzed" => true}
     end
+    # Fixed key - blob keys are random, and the cassette matches on path (the variant keys hang
+    # off it too), so a generated one would never replay
+    let(:r2_blob) do
+      ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join(image_path)),
+        filename: "bike_photo-gps.heic", key: "spec-process-public-image-heic", service_name: :cloudflare_dev)
+    end
+
+    it "strips exif from the original and from every variant" do
+      source_fields = exif_fields(File.binread(Rails.root.join(image_path)))
+      expect(source_fields.grep(identifying).count).to eq 25 # 15 of them GPS, down to the bearing
+      expect(blob.service_name).to eq "cloudflare_dev"
+
+      instance.perform(public_image.id)
+
+      expect(blob.reload.metadata).to eq target_metadata
+      expect(exif_fields(blob.download)).to be_empty
+
+      # vips copies exif through a transform - a variant is only clean because the original was
+      # rewritten first. It re-synthesizes orientation/resolution/colorspace, so expect those.
+      PublicImage::VARIANTS.each_key do |size|
+        variant_fields = exif_fields(public_image.file.variant(size).download)
+        expect(variant_fields.grep(identifying)).to be_empty
+        expect(variant_fields).to include("exif-ifd0-Orientation")
+      end
+    end
+  end
+
+  it "enqueues for an attached file, not for carrierwave" do
+    expect {
+      FactoryBot.create(:public_image, :with_attached_file, imageable: bike)
+    }.to change(described_class.jobs, :size).by(1)
+    # AnalyzeJob would merge into the same metadata column from a stale read, dropping "stripped"
+    expect(Sidekiq::ActiveJob::Wrapper.jobs).to be_empty
+
+    expect {
+      FactoryBot.create(:public_image, :with_image_file, imageable: bike)
+    }.to_not change(described_class.jobs, :size)
   end
 end

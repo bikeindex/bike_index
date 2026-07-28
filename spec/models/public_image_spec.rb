@@ -55,8 +55,6 @@ RSpec.describe PublicImage, type: :model do
   end
 
   describe "image_url" do
-    let(:bike) { FactoryBot.create(:bike) }
-
     context "carrierwave image" do
       let(:public_image) { FactoryBot.create(:public_image, :with_image_file) }
 
@@ -68,20 +66,16 @@ RSpec.describe PublicImage, type: :model do
     end
 
     context "attached file" do
-      let(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike) }
+      let(:public_image) { FactoryBot.create(:public_image, :with_attached_file) }
 
-      it "returns the blob url for a blank or unknown size" do
+      it "returns a variant url per size, and the blob for a blank or unknown one" do
         expect(public_image.reload.file.attached?).to be_truthy
 
         expect(public_image.image_url).to eq BlobUrl.for(public_image.file.blob)
         expect(public_image.image_url(:unknown)).to eq public_image.image_url
-      end
-
-      it "is what bike#image_url returns" do
-        bike.reload.update(thumb_path: public_image.image_url(:small))
-
-        expect(bike.image_url(:large)).to eq public_image.image_url(:large)
-        expect(bike.image_url(:large)).to_not eq public_image.image_url
+        # Strings resolve too - named variants are looked up by symbol
+        expect(public_image.image_url("large")).to eq public_image.image_url(:large)
+        expect(public_image.image_url(:large)).to_not eq public_image.image_url
       end
     end
   end

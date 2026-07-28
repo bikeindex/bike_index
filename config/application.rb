@@ -41,7 +41,8 @@ module Bikeindex
     # Overrides load_defaults. Untracked variant keys are a pure digest of the blob key plus the
     # transformation, so BlobUrl builds them without touching the database - tracking would add
     # active_storage_variant_records plus a nested attachment and blob to every image URL.
-    # Tradeoff: purging a blob leaves its variants behind, so they're swept alongside unattached blobs.
+    # Purging still cleans them up (Blob#delete delete_prefixed's "variants/#{key}/"); what's lost
+    # is enumerating them from the database - counting variants means listing the bucket.
     config.active_storage.track_variants = false
 
     # Use our custom error pages

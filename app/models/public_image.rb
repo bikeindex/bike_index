@@ -90,7 +90,7 @@ class PublicImage < ApplicationRecord
   def image_url(size = nil)
     return image.url(*size) unless file.attached?
 
-    BlobUrl.for_variant(file, (size if VARIANTS.key?(size&.to_sym)))
+    BlobUrl.for_variant(file, size&.to_sym&.presence_in(VARIANTS.keys))
   end
 
   def file_needs_processing?
@@ -111,7 +111,12 @@ class PublicImage < ApplicationRecord
       return Images::ExternalUrlStoreJob.perform_async(id)
     end
 
-    Images::ProcessPublicImageJob.perform_async(id) if file_needs_processing?
+    if file_needs_processing?
+      # Stops the attachment's after_commit from enqueueing AnalyzeJob, whose metadata merge runs
+      # off a stale read and would drop "stripped". ProcessPublicImageJob analyzes instead.
+      file.blob.analyzed = true
+      Images::ProcessPublicImageJob.perform_async(id)
+    end
 
     imageable&.update(updated_at: Time.current)
     return true unless bike?
