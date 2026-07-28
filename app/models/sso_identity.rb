@@ -7,12 +7,12 @@
 #  email           :string
 #  last_sign_in_at :datetime
 #  name_id_format  :string
-#  provider        :string
-#  uid             :string
+#  provider        :string           not null
+#  uid             :string           not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  organization_id :bigint
-#  user_id         :bigint
+#  organization_id :bigint           not null
+#  user_id         :bigint           not null
 #
 # Indexes
 #

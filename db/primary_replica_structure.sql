@@ -2825,8 +2825,8 @@ ALTER SEQUENCE public.organization_roles_id_seq OWNED BY public.organization_rol
 
 CREATE TABLE public.organization_saml_configurations (
     id bigint NOT NULL,
-    organization_id bigint,
-    enabled boolean DEFAULT false,
+    organization_id bigint NOT NULL,
+    enabled boolean DEFAULT false NOT NULL,
     idp_entity_id character varying,
     idp_sso_target_url character varying,
     idp_slo_target_url character varying,
@@ -3554,10 +3554,10 @@ ALTER SEQUENCE public.social_posts_id_seq OWNED BY public.social_posts.id;
 
 CREATE TABLE public.sso_identities (
     id bigint NOT NULL,
-    user_id bigint,
-    organization_id bigint,
-    provider character varying,
-    uid character varying,
+    user_id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    provider character varying NOT NULL,
+    uid character varying NOT NULL,
     email character varying,
     last_sign_in_at timestamp(6) without time zone,
     name_id_format character varying,

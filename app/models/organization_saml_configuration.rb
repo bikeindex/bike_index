@@ -5,7 +5,7 @@
 #
 #  id                   :bigint           not null, primary key
 #  email_attribute_name :string
-#  enabled              :boolean          default(FALSE)
+#  enabled              :boolean          default(FALSE), not null
 #  idp_cert             :text
 #  idp_cert_fingerprint :string
 #  idp_cert_multi       :text
@@ -15,7 +15,7 @@
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  idp_entity_id        :string
-#  organization_id      :bigint
+#  organization_id      :bigint           not null
 #
 # Indexes
 #

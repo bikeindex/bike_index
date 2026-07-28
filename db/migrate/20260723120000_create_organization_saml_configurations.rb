@@ -1,8 +1,8 @@
 class CreateOrganizationSamlConfigurations < ActiveRecord::Migration[8.1]
   def change
     create_table :organization_saml_configurations do |t|
-      t.references :organization, index: {unique: true}
-      t.boolean :enabled, default: false
+      t.references :organization, null: false, index: {unique: true}
+      t.boolean :enabled, default: false, null: false
       t.string :idp_entity_id
       t.string :idp_sso_target_url
       t.string :idp_slo_target_url
