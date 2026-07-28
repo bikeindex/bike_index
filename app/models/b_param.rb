@@ -94,8 +94,9 @@ class BParam < ApplicationRecord
   scope :partial_registrations, -> { where(origin: PARTIAL_REGISTRATION_ORIGINS) }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
-  # The blank shell register/new creates - nothing worth keeping if the form was never submitted
-  scope :without_bike_values, -> { bike_params_empty.or(where("(params -> 'bike') - 'status' = '{}'::jsonb")) }
+  # register/new shells whose step 1 was never submitted (manufacturer is required
+  # at submit) - only seeds and a prefilled email, nothing worth keeping
+  scope :without_bike_values, -> { bike_params_empty.or(where(origin: "registration_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
@@ -176,16 +177,6 @@ class BParam < ApplicationRecord
 
       without_bike.recent_with_token(toke)
         .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
-    end
-
-    # Resume a registration by token (/register flow): anonymous or created by the passed user
-    def find_for_token(toke, user_id: nil)
-      return nil if toke.blank?
-
-      # Once the bike exists the token only ever renders the completion page,
-      # so access doesn't require matching the creator assigned at creation
-      recent_with_token(toke)
-        .detect { |b| b.creator_id.blank? || b.creator_id == user_id || b.created_bike_id.present? }
     end
 
     def email_search(str)
@@ -373,6 +364,19 @@ class BParam < ApplicationRecord
 
   def manufacturer_id
     bike["manufacturer_id"]
+  end
+
+  def manufacturer_other
+    bike["manufacturer_other"]
+  end
+
+  # Mirrors Bike#type - the cycle_type for display
+  def type
+    type_titleize&.downcase
+  end
+
+  def type_titleize
+    CycleType.new(cycle_type).short_name_translation
   end
 
   def is_pos

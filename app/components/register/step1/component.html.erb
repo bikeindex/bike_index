@@ -1,6 +1,6 @@
 <%= render Register::Page::Component.new do %>
   <%= render Register::Progress::Component.new(step: 1, total: 2) %>
-  <%= render UI::Header::Component.new(text: translation(".register_your_bike"), subtitle: translation(".just_the_essentials")) %>
+  <%= render UI::Header::Component.new(text: translation(".register_your_bike", cycle_type:), subtitle: translation(".just_the_essentials")) %>
 
   <% if @b_param.errors.any? %>
     <%= render UI::Alert::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
@@ -9,7 +9,7 @@
   <%= form_with(model: @b_param, url: register_path, method: :post, scope: :b_param) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 
-    <%= render Register::SectionLabel::Component.new(text: translation(".bike_info")) %>
+    <%= render Register::SectionLabel::Component.new(text: translation(".bike_info", cycle_type:)) %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer_id,
         label_text: Manufacturer.model_name.human, required: true)) do %>
@@ -59,13 +59,15 @@
     <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
         kind: :submit, spinner: true, html_class: "tw:w-full") %>
 
-    <p
-      class="
-        tw:mt-3 tw:text-center tw:text-xs tw:text-gray-500
-        tw:dark:text-gray-400
-      "
-    >
-      <%= translation(".no_need_to_wait") %>
-    </p>
+    <% if confirmation_email_pending? %>
+      <p
+        class="
+          tw:mt-3 tw:text-center tw:text-xs tw:text-gray-500
+          tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".no_need_to_wait") %>
+      </p>
+    <% end %>
   <% end %>
 <% end %>

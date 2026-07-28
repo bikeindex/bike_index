@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 
-/* global window */
+/* global window, Event */
 
 // Connects to data-controller='register--serial'
 //
@@ -50,7 +50,8 @@ export default class extends Controller {
   }
 
   applyMissing (duration) {
-    this.inputTarget.classList.add('tw:text-gray-400')
+    this.inputTarget.readOnly = true
+    this.inputTarget.classList.add('tw:text-gray-400', 'tw:cursor-not-allowed')
     collapse('show', this.madeWithoutLinkTarget, duration)
   }
 
@@ -76,13 +77,24 @@ export default class extends Controller {
       this.stashedSerial = this.inputTarget.value
     }
     this.inputTarget.value = value
-    this.inputTarget.classList.add('tw:text-gray-400')
+    // readonly rather than disabled, so the value still submits
+    this.inputTarget.readOnly = true
+    this.inputTarget.classList.add('tw:text-gray-400', 'tw:cursor-not-allowed')
+    this.dispatchInput()
   }
 
   restoreSerial () {
     if (this.ABSENT_VALUES.includes(this.inputTarget.value)) {
       this.inputTarget.value = this.stashedSerial || ''
     }
-    this.inputTarget.classList.remove('tw:text-gray-400')
+    this.inputTarget.readOnly = false
+    this.inputTarget.classList.remove('tw:text-gray-400', 'tw:cursor-not-allowed')
+    this.dispatchInput()
+  }
+
+  // Programmatic writes fire no events, so form-persist wouldn't see them -
+  // notably the modal's confirm, where nothing else fires one either
+  dispatchInput () {
+    this.inputTarget.dispatchEvent(new Event('input', { bubbles: true }))
   }
 }

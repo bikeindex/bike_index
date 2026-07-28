@@ -3,7 +3,7 @@ en:
   components:
     register:
       step1:
-        bike_info: Bike info
+        bike_info: "%{cycle_type} info"
         electric_helper: Check electric so we flag e-bikes and verify certification.
         electric_motorized: "⚡️ Electric (motorized)"
         email: Email
@@ -14,6 +14,6 @@ en:
         next: Next
         no_need_to_wait: We'll email a confirmation link too — you don't have to wait
           for it to continue.
-        register_your_bike: Register your bike!
+        register_your_bike: Register your %{cycle_type}!
         vehicle_type: Vehicle type
         your_info: Your info

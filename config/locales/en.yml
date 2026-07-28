@@ -1918,8 +1918,8 @@ en:
         image_updated: Image was successfully updated.
     register:
       confirm:
-        email_confirmed_add_details: Email confirmed! Add your bike's details to finish
-          your registration
+        email_confirmed_add_details: Email confirmed! Add your %{cycle_type}'s details
+          to finish your registration
         invalid_confirmation_link: That confirmation link isn't valid — start a new
           registration below
       create:
@@ -3877,10 +3877,10 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
-    register_create: Register your bike!
-    register_show: Bike registration
-    register_step_1: Register your bike!
-    register_step_2: Add your bike's details
+    register_create: Register your %{cycle_type}!
+    register_show: "%{cycle_type} registration"
+    register_step_1: Register your %{cycle_type}!
+    register_step_2: Add your %{cycle_type}'s details
     registrations_embed: Register a bike with %{organization}
     search_registrations_index: Search results
     sessions_create: Log in

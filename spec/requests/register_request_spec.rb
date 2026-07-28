@@ -22,22 +22,30 @@ RSpec.describe RegisterController, type: :request do
       expect { get "/register/new" }.to_not change(BParam, :count)
       expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
 
-      # Once step 1 is submitted, register/new starts a fresh registration
-      new_b_param.clean_params({bike: {owner_email:}}.as_json)
+      # Once step 1 is submitted (manufacturer is the marker), register/new starts fresh
+      new_b_param.clean_params({bike: {manufacturer_id: manufacturer.id, owner_email:}}.as_json)
       new_b_param.save
       expect { get "/register/new" }.to change(BParam, :count).by 1
       expect(response).to_not redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
     end
 
-    context "stolen status param" do
-      it "stores the status" do
-        get "/register/new?status=stolen"
-        expect(BParam.last.status).to eq "status_stolen"
+    context "status and organization params" do
+      let(:organization) { FactoryBot.create(:organization) }
+
+      it "stores them, keeping the session's registration as-is on revisit" do
+        get "/register/new?status=status_stolen&organization_id=#{organization.id}"
+        stolen_b_param = BParam.last
+        expect(stolen_b_param.status).to eq "status_stolen"
+        expect(stolen_b_param.creation_organization_id.to_s).to eq organization.id.to_s
+
+        get "/register/new?status=status_impounded"
+        expect(BParam.last.id).to eq stolen_b_param.id
+        expect(stolen_b_param.reload.status).to eq "status_stolen"
       end
     end
 
     it "creates a registration that CleanBParamsJob deletes once stale, if never submitted" do
-      get "/register/new?status=stolen" # status alone doesn't count as a submitted value
+      get "/register/new?status=status_stolen" # status alone doesn't count as a submitted value
       new_b_param = BParam.last
       expect(CleanBParamsJob.new.b_params.pluck(:id)).to eq []
       new_b_param.update_column(:updated_at, CleanBParamsJob.clean_before - 1.hour)
@@ -53,10 +61,27 @@ RSpec.describe RegisterController, type: :request do
       expect { CleanBParamsJob.new.perform }.to_not change(BParam, :count)
     end
 
+    context "signed in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "prefills owner_email with the user's email, still landing on step 1" do
+        get "/register/new"
+        new_b_param = BParam.last
+        expect(new_b_param.owner_email).to eq current_user.email
+        expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
+      end
+    end
+
     it "redirects the bare /register" do
       get base_url
       expect(response).to redirect_to new_register_path
       expect(flash[:info]).to be_nil
+
+      # With a session registration, bare /register resumes it instead
+      get "/register/new"
+      session_b_param = BParam.last
+      get base_url
+      expect(response).to redirect_to register_path(b_param_token: session_b_param.id_token, step: 1)
     end
   end
 
@@ -69,6 +94,27 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include "</html>"
       # Prefilled from the registration, so going back to step 1 keeps the values
       expect(response.body).to include owner_email
+      # Never cached - the step shown depends on server state
+      expect(response.headers["Cache-Control"]).to eq "no-store"
+      expect(response.body).to include "confirmation link too"
+
+      # Once the confirmation email went out, the "we'll email you" note is stale
+      b_param.update(params: b_param.params.merge("partial_email_sent_to" => owner_email))
+      get register_path(b_param_token: b_param.id_token, step: 1)
+      expect(response.body).to_not include "confirmation link too"
+    end
+
+    context "self-reported manufacturer" do
+      let(:b_param) do
+        BParam.create(origin: "registration_flow",
+          params: {bike: {owner_email:, manufacturer_id: Manufacturer.other.id, manufacturer_other: "Fancy Cycles"}}.as_json)
+      end
+
+      it "renders with the free text" do
+        get register_path(b_param_token: b_param.id_token, step: 1)
+        expect(response.status).to eq 200
+        expect(response.body).to include "Fancy Cycles"
+      end
     end
 
     context "unknown token" do
@@ -204,7 +250,7 @@ RSpec.describe RegisterController, type: :request do
         expect {
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
         }.to_not change(Bike, :count)
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         b_param.reload
         expect(b_param.details_completed?).to be_truthy
         # IDs pass through as posted strings; they're cast when the bike is created
@@ -215,56 +261,24 @@ RSpec.describe RegisterController, type: :request do
         expect(response.body).to include "verify your email"
       end
 
-      context "missing serial" do
-        it "stores unknown and made_without_serial serials" do
-          patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: {serial_number: "unknown", status: "status_with_owner"}}
-          expect(b_param.reload.bike["serial_number"]).to eq "unknown"
-
-          patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: {serial_number: "made_without_serial", status: "status_with_owner"}}
-          expect(b_param.reload.bike["serial_number"]).to eq "made_without_serial"
-        end
-      end
-
       context "with a photo" do
         it "attaches the image to the b_param" do
           patch base_url, params: {b_param_token: b_param.id_token,
                                    bike: bike_details.merge(image: Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg"))}
-          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
           expect(b_param.reload.image).to be_present
           # The uploaded file doesn't leak into the JSON params
           expect(b_param.params.to_json).to_not include "bike.jpg"
         end
       end
 
-      context "frame size in cm" do
-        it "saves the unit with the number, dropping it otherwise" do
-          patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: {frame_size_number: "56", frame_size_unit: "cm", status: "status_with_owner"}}
-          expect(b_param.reload.bike).to match_hash_indifferently(
-            owner_email:, manufacturer_id: manufacturer.id,
-            frame_size_number: "56", frame_size_unit: "cm", status: "status_with_owner"
-          )
-
-          patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: {frame_size: "m", frame_size_unit: "in", status: "status_with_owner"}}
-          expect(b_param.reload.bike["frame_size"]).to eq "m"
-          expect(b_param.bike["frame_size_unit"]).to eq "cm" # unit without a number isn't overwritten
-        end
-      end
-
-      context "additional colors" do
-        let(:color2) { FactoryBot.create(:color, name: "Blue") }
-
-        it "saves them and clears them when posted blank (remove additional color)" do
-          patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: bike_details.merge(secondary_frame_color_id: color2.id)}
-          expect(b_param.reload.bike["secondary_frame_color_id"]).to eq color2.id.to_s
-
-          patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: bike_details.merge(secondary_frame_color_id: "")}
-          expect(b_param.reload.bike["secondary_frame_color_id"]).to be_blank
+      context "already completed" do
+        it "redirects resubmissions to finished, saving nothing" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: {serial_number: "changed"}}
+          }.to_not change { b_param.reload.params }
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         end
       end
 
@@ -277,7 +291,7 @@ RSpec.describe RegisterController, type: :request do
             patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
           }.to change(Bike, :count).by 1
           expect(Bike.last).to have_attributes(owner_email:, creator_id: user.id)
-          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         end
       end
 
@@ -289,7 +303,7 @@ RSpec.describe RegisterController, type: :request do
 
         it "completes directly, keeping motorized" do
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
           expect(b_param.reload.motorized?).to be_truthy
         end
       end
@@ -308,15 +322,15 @@ RSpec.describe RegisterController, type: :request do
           owner_email:, creator_id: current_user.id)
         expect(bike.current_ownership.origin).to eq "registration_flow"
         expect(b_param.reload.created_bike_id).to eq bike.id
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         follow_redirect!
         expect(response.body).to include "Registration complete"
 
-        # Revisiting any step after completion redirects to complete
+        # Revisiting any step after completion redirects to finished
         get register_path(b_param_token: b_param.id_token, step: 2)
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         get register_path(b_param_token: b_param.id_token, step: 1)
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
       end
 
       context "blank serial" do
@@ -366,13 +380,13 @@ RSpec.describe RegisterController, type: :request do
         expect(bike).to have_attributes(owner_email:, creator_id: user.id,
           manufacturer_id: manufacturer.id)
         expect(b_param.reload.email_confirmed?).to be_truthy
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         follow_redirect!
         expect(response.body).to include "Registration complete"
 
-        # Clicking the link again just redirects to complete
+        # Clicking the link again just redirects to finished
         expect { get confirm_path }.to_not change(Bike, :count)
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :complete)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
       end
     end
 

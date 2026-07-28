@@ -4,27 +4,27 @@ en:
     register:
       step2:
         add_another_color: Add another color
-        add_your_bikes_details: Add your bike's details
+        add_your_bikes_details: Add your %{cycle_type}'s details
         additional_contact_info: Additional contact info
         are_you_certain: Are you certain?
-        attach_photo: Attach photo of bike
+        attach_photo: Attach photo of %{cycle_type}
         back: Back
-        bike_details: Bike details
+        bike_details: "%{cycle_type} details"
         bottom_bracket: Bottom bracket
         cm: cm
         color: Color
-        complete_registration: Complete Bike Registration
+        complete_registration: Complete %{cycle_type} Registration
         confirmation_link_sent: >-
           We've sent a confirmation link to your email. No need to wait — you can
           finish registering right now.
         database_public_note: >-
           Our database is public! You can adjust privacy settings on individual photos
-          from your account later.
-        easier_to_recover: The more you add, the easier your bike is to recover.
+          from your registration later.
+        easier_to_recover: The more you add, the easier your %{cycle_type} is to recover.
         email: Email
         enter_size: Enter size
         found: Found/Abandoned
-        found_description: I found this bike
+        found_description: I found this %{cycle_type}
         frame_size: Frame size
         from_step_1: From step 1
         head_tube: Head tube
@@ -64,15 +64,16 @@ en:
         sticker_number: Bike Index sticker number
         sticker_placeholder: e.g. A 471 829
         stolen: Stolen
-        stolen_description: This bike has been stolen
+        stolen_description: This %{cycle_type} has been stolen
         take_photo: Take Photo
         third_color_blank: Third color
         up_to_3: up to 3
         upload: Upload
-        very_very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.
-          Unless this bike:'
+        very_very_few_bikes_html: >-
+          Very <em>very</em> few %{cycle_types} are made without serials. Unless this
+          %{cycle_type}:
         view_serial_guide: View the full serial number guide
         was_made_before_1970: Was made before 1970
         wheres_my_serial: Where's my serial number?
-        without_serial: This bike was made without a serial
-        without_serial_number: This bike was made without a serial number
+        without_serial: This %{cycle_type} was made without a serial
+        without_serial_number: This %{cycle_type} was made without a serial number

@@ -9,7 +9,8 @@ module Register
       def call
         content_tag(:div,
           content_tag(:div, content, class: "tw:mx-auto tw:max-w-md"),
-          class: "tw:-mt-9 tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:min-[992px]:-mt-15 tw:dark:bg-gray-900")
+          class: "tw:-mt-9 tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:min-[992px]:-mt-15 tw:dark:bg-gray-900",
+          data: {controller: "register--revalidate"})
       end
     end
   end
