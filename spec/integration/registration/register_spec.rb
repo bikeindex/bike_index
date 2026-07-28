@@ -15,12 +15,12 @@ RSpec.describe "Register flow", :js, type: :system do
     Autocomplete::Loader.load_all(%w[Manufacturer])
   end
 
-  # Through step_1 and onto step_2, the way a rider gets there
+  # Through step 1 and onto step 2, the way a rider gets there
   def start_registration
     visit "/register/new"
 
-    # new creates the registration and lands on its tokenized step_1
-    expect(page).to have_current_path(/register\/step_1\?b_param_token=/, url: true)
+    # new creates the registration and lands on its tokenized step 1
+    expect(page).to have_current_path(/register\?b_param_token=.+&step=1/, url: true)
 
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
