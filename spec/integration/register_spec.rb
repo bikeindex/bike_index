@@ -113,46 +113,18 @@ RSpec.describe "Register flow", :js, type: :system do
   # it needs credentials and the network. Kept separate so an R2 blip can't take the whole flow's
   # coverage with it - and signed in, because a bike (and so a PublicImage) is what has a url.
   describe "uploading to R2" do
+    include_context :cloudflare_test_storage
+
     let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
     before do
-      skip "needs the bikeindex-test R2 credentials (R2_TEST_* in .env.test)" if ENV["R2_TEST_ACCESS_KEY"].blank?
       visit new_session_path
       fill_in "Email", with: current_user.email
       click_button "Continue"
       fill_in "Password", with: "testthisthing7$"
       click_button "Log in"
       expect(page).to have_current_path("/my_account", wait: 5)
-    end
-
-    # class_attribute, so the Capybara server thread picks it up too. VCR blocks un-cassetted
-    # http, and the browser's PUT can't be cassetted anyway - it isn't a ruby request.
-    around do |example|
-      default_service = ActiveStorage::Blob.service
-      ActiveStorage::Blob.service = ActiveStorage::Blob.services.fetch(:cloudflare_test)
-      # disable!/enable! rather than allow_net_connect!, which would restore a different
-      # config than VCR installed and leak that to later examples
-      VCR.turned_off(ignore_cassettes: true) do
-        WebMock.disable!
-        example.run
-      ensure
-        WebMock.enable!
-      end
-    ensure
-      ActiveStorage::Blob.service = default_service
-    end
-
-    # However far the example got, don't leave objects in the bucket. `delete` rather than
-    # `purge`: the blob is attached, so purge's destroy hits a foreign key, gets rescued, and
-    # never reaches storage - the rows go with the transaction anyway.
-    after do
-      VCR.turned_off(ignore_cassettes: true) do
-        WebMock.disable!
-        ActiveStorage::Blob.where(service_name: "cloudflare_test").each(&:delete)
-      ensure
-        WebMock.enable!
-      end
     end
 
     it "PUTs the photo to the bucket and serves it from the storage domain" do
