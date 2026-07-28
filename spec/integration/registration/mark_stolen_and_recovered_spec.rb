@@ -88,7 +88,7 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     # form end-to-end; the component spec guards the csrf-refresh hook. ----
     RearGearType.fixed # bike-details render creates this lazily, which is read-only mid-request
     visit registration_path(bike, view_as: "public")
-    within("[data-controller~='collapse']") do
+    within("[data-controller~='ui--collapse']") do
       click_on "Contact the owner"
       fill_in "stolen_notification[message]", with: "Saw this locked up outside the library"
       click_on "Send message"

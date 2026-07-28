@@ -410,6 +410,8 @@ Rails.application.routes.draw do
   get "strava_search", to: "strava_search#index"
   post "strava_search/token", to: "strava_search#create_token", as: :strava_search_token
 
+  get "reverse_geocode", to: "reverse_geocode#index", defaults: {format: "json"}
+
   mount Lookbook::Engine, at: "/lookbook"
 
   get "/400", to: "errors#bad_request", via: :all

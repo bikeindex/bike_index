@@ -12,7 +12,7 @@ import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATT
 // onto the form, and keeps the pin + zoom in the URL so a reload restores them.
 // Moving the map moves the pin. "Enter address manually" reveals the
 // UI::Forms::AddressGroup fields instead. Tiles come from our self-hosted MapLibre
-// basemap; the mapboxKey is only for reverse-geocoding the pin.
+// basemap.
 const DEFAULT_ZOOM = 15.5
 
 // The device's own position, so a dragged pin can be judged against where the
@@ -38,7 +38,6 @@ export default class extends Controller {
     notificationHeading: String,
     impoundHeading: String,
     defaultKind: String,
-    mapboxKey: String,
     orgLatitude: Number,
     orgLongitude: Number
   }
@@ -305,34 +304,20 @@ export default class extends Controller {
 
   // Split the pin's coordinates into address parts, to seed the manual-entry
   // fields. Marked before the request so toggling modes doesn't re-ask for a
-  // spot we've already looked up
+  // spot we've already looked up. Our endpoint resolves the country and region the
+  // way the server does, so what we prefill is what a save would store
   async reverseGeocode () {
-    if (!this.mapboxKeyValue) return
     this.geocodedFor = this.pinKey
+    // What the fields hold now — anything typed while we wait is theirs, not ours to replace
+    const replaceable = new Map([...this.addressGroupTarget.querySelectorAll('[name]')].map((field) => [field, field.value]))
     try {
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${this.pinLongitude},${this.pinLatitude}.json?access_token=${this.mapboxKeyValue}&types=address&limit=1`
-      const response = await window.fetch(url)
+      const url = `/reverse_geocode?latitude=${this.pinLatitude}&longitude=${this.pinLongitude}`
+      // Accept json so a rack-attack 429 comes back as json rather than plain text
+      const response = await window.fetch(url, { headers: { Accept: 'application/json' } })
       if (!response.ok) return
-      const feature = (await response.json()).features?.[0]
-      if (!feature) return
-      this.geocodedAddress = this.addressFromFeature(feature)
-      // The pin has moved since the fields were seeded, so whatever they hold
-      // describes the old spot — replace it
-      this.fillAddress({ overwrite: true })
+      this.geocodedAddress = await response.json()
+      this.fillAddress(replaceable)
     } catch { /* leave the fields for them to fill in */ }
-  }
-
-  // Split a Mapbox feature into street/city/region/postal/country parts
-  addressFromFeature (feature) {
-    const context = feature.context || []
-    const part = (prefix) => context.find((entry) => entry.id.startsWith(`${prefix}.`))?.text
-    return {
-      street: [feature.address, feature.text].filter(Boolean).join(' '),
-      city: part('place') || part('locality'),
-      region: part('region'),
-      postalCode: part('postcode'),
-      country: part('country')
-    }
   }
 
   enterManually () {
@@ -349,46 +334,27 @@ export default class extends Controller {
     return this.locationModeTargets.some((radio) => radio.value === 'entered' && radio.checked)
   }
 
-  // Write the located place into the AddressGroup fields. Without `overwrite` it
-  // only fills blanks, so it can't clobber what they typed. Fields are reached by
-  // name (not targets) to stay decoupled from AddressGroup.
-  fillAddress ({ overwrite = false } = {}) {
+  addressField (attribute) {
+    return this.addressGroupTarget.querySelector(`[name$='[${attribute}]']`)
+  }
+
+  // Write the located place into the AddressGroup fields, which the endpoint names
+  // its response after. A blank field is always filled; a field with something in it
+  // only when `replaceable` says it still holds what the geocode was asked against.
+  fillAddress (replaceable = new Map()) {
     const address = this.geocodedAddress
     if (!address) return
-    this.setField('street', address.street, overwrite)
-    this.setField('city', address.city, overwrite)
-    this.setField('postal_code', address.postalCode, overwrite)
-    this.selectCountry(address.country, overwrite)
-    this.selectRegion(address.region, overwrite)
-  }
-
-  setField (attribute, value, overwrite) {
-    if (!value) return
-    const field = this.element.querySelector(`[name$='[${attribute}]']`)
-    if (field && (overwrite || !field.value)) field.value = value
-  }
-
-  // Match the country by name and let AddressGroup toggle the state/region field
-  selectCountry (name, overwrite) {
-    if (!name) return
-    const select = this.element.querySelector("select[name$='[country_id]']")
-    if (!select || (select.value && !overwrite)) return
-    const option = [...select.options].find((entry) => entry.text === name)
-    if (!option) return
-    select.value = option.value
-    select.dispatchEvent(new Event('change', { bubbles: true }))
-  }
-
-  // A matching US state fills the select; otherwise the free-text region field
-  selectRegion (name, overwrite) {
-    if (!name) return
-    const stateSelect = this.element.querySelector("select[name$='[region_record_id]']")
-    const stateOption = stateSelect && [...stateSelect.options].find((entry) => entry.text === name)
-    if (stateOption) {
-      if (overwrite || !stateSelect.value) stateSelect.value = stateOption.value
-    } else {
-      this.setField('region_string', name, overwrite)
-    }
+    const country = this.addressField('country_id')
+    const countryBefore = country?.value
+    Object.entries(address).forEach(([attribute, value]) => {
+      const field = this.addressField(attribute)
+      if (!field || !value) return
+      if (field.value && field.value !== replaceable.get(field)) return
+      field.value = value
+    })
+    // Let AddressGroup swap the state select for the free-text region field. Only on
+    // an actual change — it clears the state select for a non-US country
+    if (country && country.value !== countryBefore) country.dispatchEvent(new Event('change', { bubbles: true }))
   }
 
   // Manual entry requires the street and city; the map pin doesn't
