@@ -17,7 +17,7 @@ module BikeServices
         status: (status if Bike.statuses.include?(status)),
         creation_organization_id: organization_id
       }.compact
-      BParam.create(origin: "registration_flow", creator_id: user&.id, params: {bike: bike_params}.as_json)
+      BParam.create(origin: "register_flow", creator_id: user&.id, params: {bike: bike_params}.as_json)
     end
 
     # Resume a registration by token: anonymous or created by the passed user
@@ -29,6 +29,16 @@ module BikeServices
       # access doesn't require matching the creator assigned at creation
       BParam.recent_with_token(token)
         .detect { |b| b.creator_id.blank? || b.creator_id == user&.id || b.created_bike_id.present? }
+    end
+
+    # An organization can be named in the URL after the registration starts
+    # (/register?...&organization_id=slug), right up until the bike is created
+    def assign_organization(b_param, organization)
+      return if organization.blank? || b_param.with_bike? ||
+        b_param.creation_organization_id.to_s == organization.id.to_s
+
+      b_param.clean_params({bike: {creation_organization_id: organization.id}}.as_json)
+      b_param.save
     end
 
     # The step to show: finished once the bike exists (or it's awaiting the
@@ -45,14 +55,14 @@ module BikeServices
 
     # The bike exists, or everything's entered and awaiting the email
     def finished?(b_param)
-      b_param.with_bike? || (b_param.details_completed? && !creator_available?(b_param))
+      b_param.with_bike? || (details_completed?(b_param) && !creator_available?(b_param))
     end
 
     # Whether a bike can be created now - Ownership requires a creator, so
     # anonymous registrations wait for the confirmation email to prove one
     def creator_available?(b_param)
       b_param.creator_id.present? || b_param.creation_organization&.auto_user_id.present? ||
-        b_param.confirmed_email_creator_id.present?
+        confirmed_email_creator_id(b_param).present?
     end
 
     # Step 2 merges over step 1 - creator claimed for signed-in users, the
@@ -73,15 +83,16 @@ module BikeServices
       end
 
       b_param.confirm_email!
-      return :details_pending unless b_param.details_completed?
+      return :details_pending unless details_completed?(b_param)
 
       create_bike(b_param, ip_address:)
     end
 
     # Saves, sending the partial-registration email when this address hasn't
-    # gotten one - so resubmitting step 1 only re-sends to a new address
-    def save_step_1(b_param)
-      send_email = b_param.partial_email_sent_to != b_param.owner_email
+    # gotten one - so resubmitting step 1 only re-sends to a new address. A
+    # signed-in registration creates the bike at step 2, with nothing to confirm
+    def save_step_1(b_param, user:)
+      send_email = user.blank? && b_param.partial_email_sent_to != b_param.owner_email
       b_param.params = b_param.params.merge("partial_email_sent_to" => b_param.owner_email) if send_email
       return false unless b_param.save
 
@@ -90,7 +101,7 @@ module BikeServices
     end
 
     def create_bike(b_param, ip_address:)
-      b_param.creator_id ||= b_param.confirmed_email_creator_id
+      b_param.creator_id ||= confirmed_email_creator_id(b_param)
       BikeServices::Creator.new(ip_address:).create_bike(b_param)
     end
 
@@ -102,12 +113,24 @@ module BikeServices
       b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank?
     end
 
+    # The confirmed email's own account, or the AUTO_ORG_MEMBER system user standing in
+    def confirmed_email_creator_id(b_param)
+      return nil unless b_param.email_confirmed?
+
+      (User.fuzzy_email_find(b_param.owner_email) || User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"]))&.id
+    end
+
     def prefill_owner_email(b_param, user)
       return b_param if user.nil? || b_param.owner_email.present?
 
       b_param.owner_email = user.email
       b_param.save
       b_param
+    end
+
+    # The marker step_2_params sets, that step 2 has been submitted
+    def details_completed?(b_param)
+      b_param.params["details_completed"].present?
     end
 
     # Blank values keep what step 1 saved - except the additional colors, where
@@ -119,6 +142,7 @@ module BikeServices
       {details_completed: true, bike: bike_params}
     end
 
-    conceal :reusable?, :prefill_owner_email, :step_2_params
+    conceal :reusable?, :confirmed_email_creator_id, :prefill_owner_email,
+      :details_completed?, :step_2_params
   end
 end

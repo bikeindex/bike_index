@@ -25,7 +25,7 @@ module Emails
       def tokenized_url
         return OrganizedServices::EmailPreview::TOKEN_PATH if @email_preview
 
-        if @b_param.registration_flow?
+        if @b_param.register_flow?
           register_url(b_param_token: @b_param.id_token,
             confirmation_token: @b_param.confirmation_token)
         else

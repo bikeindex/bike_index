@@ -1,14 +1,16 @@
 <%= render Register::Page::Component.new do %>
   <%= render Register::Progress::Component.new(step: 2, total: 2) %>
 
-  <%= render UI::Alert::Component.new(kind: :purple, text: translation(".confirmation_link_sent"),
-      icon: helpers.inline_svg_tag("icons/envelope.svg", class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)) %>
+  <% if awaiting_confirmation? %>
+    <%= render UI::Alert::Component.new(kind: :purple, text: translation(".confirmation_link_sent"),
+        icon: helpers.inline_svg_tag("icons/envelope.svg", class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)) %>
+  <% end %>
 
-  <%= render UI::Header::Component.new(text: translation(".add_your_bikes_details", cycle_type:), subtitle: translation(".easier_to_recover", cycle_type:)) %>
+  <%= render UI::Header::Component.new(text: translation(".add_your_bikes_details", cycle_type:), subtitle: translation(".more_useful_registration")) %>
 
   <%= form_with(url: register_path, method: :patch, scope: :bike,
-      data: {controller: "form-persist", form_persist_key_value: "register-details-#{@b_param.id_token}",
-        action: "input->form-persist#save hw-combobox:selection->form-persist#save submit->form-persist#clear"}) do |f| %>
+      data: {controller: "autofocus form-persist register--status-fields", form_persist_key_value: "register-details-#{@b_param.id_token}",
+        action: "input->form-persist#save hw-combobox:selection->form-persist#save hw-combobox:selection->register--status-fields#update submit->form-persist#clear"}) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 
     <% bike = @b_param.bike %>
@@ -298,27 +300,49 @@
       </div>
     </div>
 
+    <% if show_extra_registration_number? %>
+      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :extra_registration_number,
+          label_text: reg_label("reg_extra_registration_number", translation(".additional_serial_sticker_number")),
+          html_options: {value: bike["extra_registration_number"], autocomplete: "off", class: "tw:font-mono"}) %>
+    <% end %>
+
+    <% if show_organization_affiliation? %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_affiliation,
+          label_text: reg_label("reg_organization_affiliation", translation(".affiliation", org_name: organization.short_name)))) do %>
+        <%= render UI::Forms::Select::Component.new(form_builder: f, attribute: :organization_affiliation,
+            option_tags: organization.organization_affiliation_options,
+            options: {selected: bike["organization_affiliation"], include_blank: true}) %>
+      <% end %>
+    <% end %>
+
+    <% if show_student_id? %>
+      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :student_id,
+          label_text: reg_label("reg_student_id", translation(".student_id")),
+          required: organization.enabled?("require_reg_student_id"),
+          html_options: {value: bike["student_id"], autocomplete: "off"}) %>
+    <% end %>
+
+    <%# Unlike bikes/new this isn't org-gated - anyone can buy a Bike Index sticker %>
     <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :bike_sticker,
-        label_text: translation(".sticker_number"),
+        label_text: reg_label("reg_bike_sticker", translation(".sticker_number")),
         html_options: {value: @b_param.bike_sticker_code, placeholder: translation(".sticker_placeholder"),
           autocomplete: "off", class: "tw:font-mono"}) %>
 
-    <div class="tw:mb-4">
-      <%= f.label :status, translation(".registration_type"), class: "twlabel" %>
+    <% status_options = {"status_with_owner" => [translation(".owner_registration"), translation(".owner_registration_description")],
+        "status_stolen" => [translation(".stolen"), translation(".stolen_description", cycle_type:)],
+        "status_impounded" => [translation(".found"), translation(".found_description", cycle_type:)]}.map do |status, (title, description)|
+        content = safe_join([content_tag(:span, title, class: "tw:block tw:font-semibold"),
+          content_tag(:span, description, class: "tw:block tw:text-xs tw:text-[#9a9aa2] tw:dark:text-gray-500")])
+        {display: title, value: status, content:}
+      end %>
 
-      <% status_options = {"status_with_owner" => [translation(".owner_registration"), translation(".owner_registration_description")],
-          "status_stolen" => [translation(".stolen"), translation(".stolen_description", cycle_type:)],
-          "status_impounded" => [translation(".found"), translation(".found_description", cycle_type:)]}.map do |status, (title, description)|
-          content = safe_join([content_tag(:span, title, class: "tw:block tw:font-semibold"),
-            content_tag(:span, description, class: "tw:block tw:text-xs tw:text-[#9a9aa2] tw:dark:text-gray-500")])
-          {display: title, value: status, content:}
-        end %>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :status,
+        label_text: translation(".registration_type"), required: true)) do %>
+      <%= render UI::Forms::Combobox::Component.new(name: :status, form: f, required: true,
+          value: @b_param.status, options: status_options, rich_display: :stacked) %>
+    <% end %>
 
-      <%= render UI::Forms::Combobox::Component.new(name: :status, form: f,
-          value: @b_param.status || "status_with_owner", options: status_options) %>
-    </div>
-
-    <%= render Register::SectionLabel::Component.new(text: translation(".additional_contact_info"), divider: true) %>
+    <%= render Register::SectionLabel::Component.new(text: contact_section_text, divider: true) %>
 
     <div class="tw:mb-4">
       <span class="twlabel"><%= translation(".email") %></span>
@@ -338,9 +362,26 @@
       </p>
     </div>
 
-    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :phone, kind: :telephone_field,
-        label_text: translation(".phone"), wrapper_class: "tw:mb-6",
-        html_options: {value: bike["phone"], placeholder: translation(".phone_placeholder")}) %>
+    <div
+      class="<%= "tw:hidden" unless show_phone? %>"
+      data-register--status-fields-target="field"
+      data-statuses="<%= phone_statuses.to_json %>"
+    >
+      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :phone, kind: :telephone_field,
+          label_text: translation(".phone"), wrapper_class: "tw:mb-6",
+          html_options: {value: bike["phone"], placeholder: translation(".phone_placeholder")}) %>
+    </div>
+
+    <div
+      class="tw:mb-6 <%= "tw:hidden" unless show_address? %>"
+      data-register--status-fields-target="field"
+      data-statuses="<%= address_statuses.to_json %>"
+    >
+      <%# _attributes explicitly: form_with has no model to infer nested attributes from %>
+      <%= f.fields_for :address_record_attributes, address_record do |address_form| %>
+        <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form) %>
+      <% end %>
+    </div>
 
     <%= render UI::Button::Component.new(text: translation(".complete_registration", cycle_type: @b_param.type_titleize),
         color: :primary, size: :lg, kind: :submit, spinner: true, html_class: "tw:w-full") %>

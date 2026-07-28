@@ -15,8 +15,8 @@ RSpec.describe CleanBParamsJob, type: :job do
     let(:bike) { FactoryBot.create(:bike) }
     let!(:b_param_with_bike) { FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: stale) }
     let!(:b_param_with_recent_bike) { FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: Time.current - 2.days) }
-    let!(:b_param_blank) { BParam.create(origin: "registration_flow", params: {bike: {}}.as_json, updated_at: stale) }
-    let!(:b_param_blank_recent) { BParam.create(origin: "registration_flow", params: {bike: {}}.as_json) }
+    let!(:b_param_blank) { BParam.create(origin: "register_flow", params: {bike: {}}.as_json, updated_at: stale) }
+    let!(:b_param_blank_recent) { BParam.create(origin: "register_flow", params: {bike: {}}.as_json) }
 
     it "deletes stale created-bike and never-submitted registrations" do
       expect(BParam.without_bike_values.pluck(:id)).to match_array([b_param_blank.id, b_param_blank_recent.id])

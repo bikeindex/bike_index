@@ -45,9 +45,9 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.html_part.decoded).to include "bikes/new?b_param_token=#{b_param.id_token}"
       end
     end
-    context "registration_flow" do
+    context "register_flow" do
       let(:b_param) do
-        BParam.create(origin: "registration_flow",
+        BParam.create(origin: "register_flow",
           params: {bike: {owner_email: "owner@example.com"}}.as_json)
       end
       it "links to the register confirmation url" do

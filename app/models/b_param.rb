@@ -31,7 +31,7 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
-  PARTIAL_REGISTRATION_ORIGINS = %w[embed_partial registration_flow].freeze
+  PARTIAL_REGISTRATION_ORIGINS = %w[embed_partial register_flow].freeze
   # TODO: #3952 - stolen record legacy attrs, to support accepting the old names
   LEGACY_STOLEN_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
   REGISTRATION_INFO_ATTRS = %w[
@@ -85,7 +85,7 @@ class BParam < ApplicationRecord
   serialize :bike_errors, coder: YAML
 
   before_create :generate_id_token
-  before_create :generate_confirmation_token, if: :registration_flow?
+  before_create :generate_confirmation_token, if: :register_flow?
   before_save :clean_params
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
@@ -96,7 +96,7 @@ class BParam < ApplicationRecord
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   # register/new shells whose step 1 was never submitted (manufacturer is required
   # at submit) - only seeds and a prefilled email, nothing worth keeping
-  scope :without_bike_values, -> { bike_params_empty.or(where(origin: "registration_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
+  scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
@@ -434,8 +434,8 @@ class BParam < ApplicationRecord
     PARTIAL_REGISTRATION_ORIGINS.include?(origin)
   end
 
-  def registration_flow?
-    origin == "registration_flow"
+  def register_flow?
+    origin == "register_flow"
   end
 
   # Only sent in the partial registration email - unlike id_token, the anonymous
@@ -448,27 +448,8 @@ class BParam < ApplicationRecord
     params["email_confirmed_at"].present?
   end
 
-  # Once the email is confirmed, the email's own account (or the AUTO_ORG_MEMBER
-  # system user) can stand in as the creator the Ownership requires
-  def confirmed_email_creator_id
-    return @confirmed_email_creator_id if defined?(@confirmed_email_creator_id)
-
-    @confirmed_email_creator_id = calculated_confirmed_email_creator_id
-  end
-
-  def calculated_confirmed_email_creator_id
-    return nil unless email_confirmed?
-
-    (User.fuzzy_email_find(owner_email) || User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"]))&.id
-  end
-
   def confirm_email!
     email_confirmed? || update(params: params.merge("email_confirmed_at" => Time.current))
-  end
-
-  # Set once the details step (registration flow step 2) has been submitted
-  def details_completed?
-    params["details_completed"].present?
   end
 
   def primary_frame_color
