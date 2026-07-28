@@ -61,7 +61,9 @@
   <%= form_tag assign_tags_admin_bug_reports_path, method: :post, data: {controller: "table-multi-checkbox"} do %>
     <div class="row align-items-end">
       <div class="col-md-4">
-        <%= render UI::Forms::Combobox::Component.new(name: :tags, label: "Tag to assign", free_text: true, options: searchable_tags, placeholder: "Select or create a tag") %>
+        <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign")) do %>
+          <%= render UI::Forms::Combobox::Component.new(name: :tags, free_text: true, options: searchable_tags, placeholder: "Select or create a tag") %>
+        <% end %>
       </div>
 
       <div class="col-md-2">

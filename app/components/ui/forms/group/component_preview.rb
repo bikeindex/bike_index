@@ -25,6 +25,10 @@ module UI
           {template: "ui/forms/group/component_preview/select"}
         end
 
+        def combobox
+          {template: "ui/forms/group/component_preview/combobox"}
+        end
+
         def radio_button_group
           {template: "ui/forms/group/component_preview/radio_button_group"}
         end

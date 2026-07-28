@@ -15,9 +15,9 @@
 
   .row
     .col-md-4.col-lg-3
-      .form-group
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cycle_type, label_text: "Cycle type", required: true)) do
         -# cycle_type is an integer-backed enum: pass enum *labels* as option values and an explicit value: to override hotwire_combobox's enum branch (which would emit cycle_type_before_type_cast)
-        = render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, value: @bike.cycle_type, label: "Cycle type", required: true, options: CycleType.select_options)
+        = render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, value: @bike.cycle_type, required: true, options: CycleType.select_options)
     .col-6.col-md-4.col-lg-5
       .form-group
         = f.label :serial_number
@@ -31,12 +31,12 @@
         = f.label :made_without_serial
   .row
     .col-6.col-md-4.col-lg-3
-      .form-group
-        - manufacturer_label = capture do
-          Manufacturer
-          %em.small
-            = link_to "mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name), class: "less-strong"
-        = render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, form: f, label: manufacturer_label, required: true)
+      - manufacturer_label = capture do
+        Manufacturer
+        %em.small
+          = link_to "mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name), class: "less-strong"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer_id, label_text: manufacturer_label, required: true)) do
+        = render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, form: f, required: true)
     .col-6.col-md-4.col-lg-3
       .form-group
         = f.label :manufacturer_other do
@@ -52,8 +52,8 @@
         = f.label :year
         = f.text_field :year, class: "form-control"
     .col-6.col-md-4.col-lg-3
-      .form-group
-        = render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, form: f, label: Bike.human_attribute_name(:primary_frame_color_id), placeholder: "Choose color", required: true, include_blank: true, options: Color.all.pluck(:name, :id))
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :primary_frame_color_id, label_text: Bike.human_attribute_name(:primary_frame_color_id), required: true)) do
+        = render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, form: f, placeholder: "Choose color", required: true, include_blank: true, options: Color.all.pluck(:name, :id))
     .col-md-4.col-lg-3
       .form-group
         = f.label :frame_model
@@ -78,8 +78,8 @@
         = f.email_field :owner_email, required: true, class: "form-control"
     - if @organizations.present?
       .col-md-4.col-lg-3
-        .form-group
-          = render UI::Forms::Combobox::Component.new(name: :creation_organization_id, form: f, label: Bike.human_attribute_name(:creation_organization_id), placeholder: "Choose organization", include_blank: true, options: @organizations.pluck(:name, :id))
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :creation_organization_id, label_text: Bike.human_attribute_name(:creation_organization_id))) do
+          = render UI::Forms::Combobox::Component.new(name: :creation_organization_id, form: f, placeholder: "Choose organization", include_blank: true, options: @organizations.pluck(:name, :id))
       .col-md-4.col-lg-3
         .form-group.fancy-select.unfancy
           = f.label :bike_organization_ids, 'Current orgs'
@@ -99,11 +99,12 @@
           .row
             #stolen-bike-location.form-group.col-6
               #country_select_container
-                = render UI::Forms::Combobox::Component.new(name: :country_id, form: s, label: "Country", placeholder: "Choose country", include_blank: true, options: Country.select_options)
+                = render(UI::Forms::Group::Component.new(form_builder: s, attribute: :country_id, label_text: "Country", wrapper_class: "")) do
+                  = render UI::Forms::Combobox::Component.new(name: :country_id, form: s, placeholder: "Choose country", include_blank: true, options: Country.select_options)
                 %p.d-none
                   = Country.united_states_id
-            .form-group.col-6
-              = render UI::Forms::Combobox::Component.new(name: :region_record_id, form: s, label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id))
+            = render(UI::Forms::Group::Component.new(form_builder: s, attribute: :region_record_id, label_text: "State", wrapper_class: "form-group col-6")) do
+              = render UI::Forms::Combobox::Component.new(name: :region_record_id, form: s, dialog_label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id))
           .form-group
             = label :street, "Intersection or address"
             = s.text_field :street, placeholder: "Intersection or address", class: "form-control"
