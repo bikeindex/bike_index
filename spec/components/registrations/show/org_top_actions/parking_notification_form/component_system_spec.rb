@@ -11,35 +11,22 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
   let(:organization) { FactoryBot.create(:organization) }
   let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 
-  # Coordinates the mocked device reports (SF Bay) and the address Mapbox returns
+  # Coordinates the mocked device reports (SF Bay) and the address /reverse_geocode returns
   let(:latitude) { "37.8698" }
   let(:longitude) { "-122.2585" }
   # A resolved pin is mirrored into the URL — there is no on-page location readout
   let(:located_url) { /map_lat=37\.8698.*map_lng=-122\.2585.*map_zoom=15\.50/ }
-  let(:geocode_feature) do
-    {
-      address: "2363a",
-      text: "Bryant Street",
-      context: [
-        {id: "postcode.1", text: "94110"},
-        {id: "place.1", text: "San Francisco"},
-        {id: "region.1", text: "California"},
-        {id: "country.1", text: "United States"}
-      ]
-    }
+  let(:country) { Country.united_states }
+  let!(:state) { FactoryBot.create(:state_california) }
+  # How long the stubbed endpoint takes to answer
+  let(:geocode_delay) { 0 }
+  let(:geocode_address) do
+    {street: "2363a Bryant Street", city: "San Francisco", postal_code: "94110",
+     region_record_id: state.id, region_string: nil, country_id: country.id}
   end
-  # Mapbox answers a pin anywhere else with a different address, so the two can be told apart
-  let(:moved_feature) do
-    geocode_feature.merge(
-      address: "1200",
-      text: "Valencia Street",
-      context: [
-        {id: "postcode.1", text: "94612"},
-        {id: "place.1", text: "Oakland"},
-        {id: "region.1", text: "California"},
-        {id: "country.1", text: "United States"}
-      ]
-    )
+  # A pin anywhere else resolves to a different address, so the two can be told apart
+  let(:moved_address) do
+    geocode_address.merge(street: "1200 Valencia Street", city: "Oakland", postal_code: "94612")
   end
 
   def coordinate(field)
@@ -189,16 +176,16 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
   # No visit here — the driver boots its page on demand, so the routes and
   # permissions install against a blank page and every example visits its own URL
   before do
-    stub_const("ENV", ENV.to_hash.merge("MAPBOX_MAPPING" => "pk.test-token"))
     move_device_to(latitude: latitude.to_f, longitude: longitude.to_f, accuracy: 20)
     # capture for the cross-thread route handler
-    feature, moved, device_longitude = geocode_feature, moved_feature, longitude
+    address, moved, device_longitude, delay = geocode_address, moved_address, longitude, geocode_delay
     page.driver.with_playwright_page do |playwright_page|
       context = playwright_page.context
       context.grant_permissions(["geolocation"])
-      # Stub Mapbox reverse-geocode so the address resolves without the network
-      context.route("https://api.mapbox.com/geocoding/**", proc { |route, request|
-        route.fulfill(status: 200, json: {features: [request.url.include?("/#{device_longitude},") ? feature : moved]})
+      # Stub our reverse-geocode endpoint so the address resolves without hitting Google
+      context.route("**/reverse_geocode?**", proc { |route, request|
+        sleep delay
+        route.fulfill(status: 200, json: request.url.include?("longitude=#{device_longitude}") ? address : moved)
       })
       # Serve an empty MapLibre style so the map builds without fetching basemap tiles
       context.route("#{maps_host}/**", proc { |route, _request|
@@ -229,7 +216,9 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     expect(page).to have_field("Address or intersection", with: "2363a Bryant Street")
     expect(page).to have_field("City", with: "San Francisco")
     expect(page).to have_field("Postal code", with: "94110")
-    expect(address_field("region_string")).to eq("California")
+    # The endpoint hands back ids, so the selects are set directly rather than matched by label
+    expect(address_field("region_record_id")).to eq(state.id.to_s)
+    expect(address_field("country_id")).to eq(country.id.to_s)
     expect(coordinate("use_entered_address")).to eq("true")
     expect_axe_clean
 
@@ -264,6 +253,23 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
 
     expect(page).to have_field("Optional message to send to the owner", with: "Blocking the bike lane")
     expect(address_field("internal_notes")).to eq("Third report this week")
+  end
+
+  # The response can land after they've started typing
+  context "when the geocode is slow to answer" do
+    let(:geocode_delay) { 2 }
+
+    it "fills the blanks but leaves the field they typed into while it was in flight" do
+      visit "#{preview_path}?panel=parking"
+
+      expect(page).to have_current_path(located_url, url: true, wait: 10)
+
+      find("label", text: "Enter address manually").click
+      fill_in "Address or intersection", with: "NE corner of 24th & Bryant"
+
+      expect(page).to have_field("City", with: "San Francisco", wait: 10)
+      expect(page).to have_field("Address or intersection", with: "NE corner of 24th & Bryant")
+    end
   end
 
   # The ?panel=parking load path auto-opens the panel on connect, so geolocation
