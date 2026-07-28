@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "details controller", :js, type: :system do
+RSpec.describe "ui--details controller", :js, type: :system do
   let(:preview_path) { "/rails/view_components/ui/details/component/with_animation" }
 
   it "toggles the native <details> open/closed and animates the content" do
@@ -14,7 +14,7 @@ RSpec.describe "details controller", :js, type: :system do
 
     find("summary").click
 
-    # details#toggle opens the native element and animates the content in.
+    # ui--details#toggle opens the native element and animates the content in.
     expect(page).to have_content("Native <details> body")
     expect(page).to have_css("details[open]")
 

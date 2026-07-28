@@ -22,9 +22,9 @@ RSpec.describe UI::Forms::TextEditor::Component, type: :component do
     expect(component).to_not have_css("lexxy-editor.lexxy-editor--compact")
   end
 
-  it "adds the lexxy controller and stylesheet value by default" do
+  it "adds the controller and stylesheet value by default" do
     expect(rendered_component(record))
-      .to have_css("lexxy-editor[data-controller='lexxy'][data-lexxy-stylesheet-value*='lexxy']")
+      .to have_css("lexxy-editor[data-controller='ui--forms--text-editor'][data-ui--forms--text-editor-stylesheet-value*='lexxy']")
   end
 
   it "derives the standalone editor's accessible name from the attribute (Lexxy copies aria-label onto the box)" do
