@@ -66,11 +66,8 @@ RSpec.describe BlobUrl do
         expect(described_class.for_variant(attached, :large))
           .to eq "https://uploads.bikeindex.org/#{variant.key}"
         expect(variant.key).to start_with "variants/#{attached.blob.key}/"
-      end
 
-      it "differs per size" do
         urls = PublicImage::VARIANTS.keys.map { described_class.for_variant(attached, it) }
-
         expect(urls.uniq.count).to eq PublicImage::VARIANTS.count
       end
     end

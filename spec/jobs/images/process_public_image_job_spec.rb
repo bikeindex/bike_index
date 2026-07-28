@@ -39,15 +39,13 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
     expect { instance.perform(FactoryBot.create(:public_image, imageable: bike).id) }.to_not raise_error
   end
 
-  describe "enqueueing" do
-    it "enqueues for an attached file, not for carrierwave" do
-      expect {
-        FactoryBot.create(:public_image, :with_attached_file, imageable: bike)
-      }.to change(described_class.jobs, :size).by(1)
+  it "enqueues for an attached file, not for carrierwave" do
+    expect {
+      FactoryBot.create(:public_image, :with_attached_file, imageable: bike)
+    }.to change(described_class.jobs, :size).by(1)
 
-      expect {
-        FactoryBot.create(:public_image, :with_image_file, imageable: bike)
-      }.to_not change(described_class.jobs, :size)
-    end
+    expect {
+      FactoryBot.create(:public_image, :with_image_file, imageable: bike)
+    }.to_not change(described_class.jobs, :size)
   end
 end

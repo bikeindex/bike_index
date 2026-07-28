@@ -50,8 +50,8 @@ module Images
       stolen_record.bike&.update(updated_at: Time.current)
       stolen_record
     ensure
-      # open_file and the stock-photo fallback both hand back tempfiles, which otherwise sit in
-      # /tmp until GC runs their finalizer - a batch regenerate holds one original apiece.
+      # Tempfiles (stock-photo fallback, activestorage) need close! or they sit in /tmp until GC
+      # runs their finalizer; a local carrierwave File is the stored image itself, so only close it.
       image.respond_to?(:close!) ? image.close! : image&.close
     end
 

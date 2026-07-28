@@ -83,7 +83,7 @@ class PublicImage < ApplicationRecord
   def image_url(size = nil)
     return image.url(*size) unless file.attached?
 
-    BlobUrl.for_variant(file, (size if VARIANTS.key?(size&.to_sym)))
+    BlobUrl.for_variant(file, size&.to_sym&.presence_in(VARIANTS.keys))
   end
 
   def file_needs_processing?
