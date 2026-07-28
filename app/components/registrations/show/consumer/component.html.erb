@@ -41,17 +41,19 @@
         <%= render(Registrations::Show::Status::Component.new(bike: @bike)) %>
       </div>
 
+      <%= render(Registrations::Show::ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)) %>
+
       <%= render(Registrations::Show::BikeIndexCard::Component.new(bike: @bike, term: :right_align)) %>
 
       <div class="tw:mt-auto tw:flex tw:flex-col tw:gap-2">
         <% if @owner %>
           <%= edit_bike_button %>
           <% if show_marketplace_button? %>
-            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "marketplace"), text: translation(".sell_on_marketplace"), color: :primary, size: :lg, class: "tw:justify-center tw:text-center tw:py-2.5!")) %>
+            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "marketplace"), text: translation(".sell_on_marketplace"), color: :primary, size: :lg, class: "tw:text-center tw:py-2.5!")) %>
           <% end %>
           <%= render(Registrations::Show::Share::Component.new(text: translation(".share_my_page"), url: bike_url(@bike))) %>
           <% if @bike.status_with_owner? %>
-            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :danger_outline, class: "tw:justify-center tw:text-center tw:py-2.5!")) %>
+            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :danger_outline, class: "tw:text-center tw:py-2.5!")) %>
           <% end %>
         <% else %>
           <%= render(Registrations::Show::Share::Component.new(text: translation(".share"), url: bike_url(@bike))) %>

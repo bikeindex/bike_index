@@ -5,7 +5,7 @@ module UI
     module Select
       # A twinput-styled select. Rails' `select` takes its option tags and options as
       # positional arguments, so it doesn't fit UI::Forms::Input's kind contract —
-      # pair this with UI::Forms::Group (kind: :content_block) for a label.
+      # pair this with a UI::Forms::Group block for a label.
       #
       # option_tags and options are named for select_tag: options carries Rails'
       # selected:/include_blank:/prompt:.

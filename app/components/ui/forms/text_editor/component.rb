@@ -3,7 +3,7 @@
 module UI
   module Forms
     module TextEditor
-      # Bare Lexxy editor; pair with UI::Forms::Group (kind: :content_block, standalone: false) for a label.
+      # Bare Lexxy editor; pair with a UI::Forms::Group block (and standalone: false) for a label.
       # Carries data-controller="ui--forms--text-editor", which loads the editor JS and stylesheet on demand.
       class Component < ApplicationComponent
         SIZE = %i[default single_line].freeze

@@ -64,11 +64,11 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
-  context "when content_block wrapping a select" do
+  context "when a content block wraps a select" do
     let(:component) do
       render_in_view_context do
         form_for User.new, url: "#", method: :patch, builder: BikeIndexFormBuilder do |f|
-          render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, kind: :content_block)) do
+          render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name)) do
             render(UI::Forms::Select::Component.new(form_builder: f, attribute: :name,
               option_tags: [["Red", "1"], ["Blue", "2"]], options: {selected: "2"}))
           end
@@ -84,10 +84,24 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
-  context "when content_block" do
-    let(:kind) { :content_block }
+  context "when a content block wraps a combobox, without a form_builder" do
     let(:component) do
-      render_inline(described_class.new(form_builder:, attribute:, kind:, label_text:)) do
+      render_in_view_context do
+        render(UI::Forms::Group::Component.new(attribute: :cycle_type)) do
+          render(UI::Forms::Combobox::Component.new(name: :cycle_type, options: %w[Bike Tandem]))
+        end
+      end
+    end
+
+    it "labels the combobox by its name" do
+      expect(component).to have_css("label[for='cycle_type']", text: "Cycle type")
+      expect(component).to have_css("input[role='combobox'][id='cycle_type']")
+    end
+  end
+
+  context "when given a content block" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, label_text:)) do
         "<my-field></my-field>".html_safe
       end
     end
@@ -98,6 +112,11 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
       expect(component).to_not have_css("input")
       expect(component).to_not have_css("textarea")
     end
+  end
+
+  it "raises without a form_builder or a content block, since there'd be no field to render" do
+    expect { render_inline(described_class.new(attribute: :name)) }
+      .to raise_error(ArgumentError, /form_builder/)
   end
 
   # The gap to the field lives on .twlabel rather than on either side, so it
