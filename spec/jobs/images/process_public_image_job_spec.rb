@@ -19,7 +19,9 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
 
     instance.perform(public_image.id)
 
-    expect(blob.reload.metadata["stripped"]).to be_truthy
+    # Analyzed here rather than by ActiveStorage, off the stripped bytes - so the dimensions are
+    # the autorotated ones, not the 1173x1071 the orientation tag claimed
+    expect(blob.reload.metadata).to include("stripped" => true, "analyzed" => true, "width" => 1071, "height" => 1173)
     stripped_data = blob.download
     expect(exif_fields(stripped_data)).to be_empty
     # Rewritten in place so variant keys and CDN urls stay stable
@@ -43,6 +45,9 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
     expect {
       FactoryBot.create(:public_image, :with_attached_file, imageable: bike)
     }.to change(described_class.jobs, :size).by(1)
+    # This job analyzes, so ActiveStorage's AnalyzeJob mustn't - two writers merging into the same
+    # metadata column from stale reads lose each other's keys
+    expect(Sidekiq::ActiveJob::Wrapper.jobs).to be_empty
 
     expect {
       FactoryBot.create(:public_image, :with_image_file, imageable: bike)
