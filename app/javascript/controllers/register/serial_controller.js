@@ -26,20 +26,17 @@ export default class extends Controller {
   // Reconcile the sections with an absent serial form-persist restored
   syncRestored () {
     if (this.inputTarget.value === 'made_without_serial') {
-      this.madeWithoutCheckboxTarget.checked = true
-      collapse('hide', this.serialSectionTarget, 0)
-      collapse('show', this.madeWithoutRowTarget, 0)
+      this.applyMadeWithout(0)
     } else if (this.inputTarget.value === 'unknown') {
       this.missingTarget.checked = true
-      this.inputTarget.classList.add('tw:text-gray-400')
-      collapse('show', this.madeWithoutLinkTarget, 0)
+      this.applyMissing(0)
     }
   }
 
   toggleMissing () {
     if (this.missingTarget.checked) {
       this.setSerial('unknown')
-      collapse('show', this.madeWithoutLinkTarget)
+      this.applyMissing()
     } else {
       this.restoreSerial()
       collapse('hide', this.madeWithoutLinkTarget)
@@ -49,9 +46,18 @@ export default class extends Controller {
   // The modal's "I'm 100% sure" button
   confirmMadeWithout () {
     this.setSerial('made_without_serial')
+    this.applyMadeWithout()
+  }
+
+  applyMissing (duration) {
+    this.inputTarget.classList.add('tw:text-gray-400')
+    collapse('show', this.madeWithoutLinkTarget, duration)
+  }
+
+  applyMadeWithout (duration) {
     this.madeWithoutCheckboxTarget.checked = true
-    collapse('hide', this.serialSectionTarget)
-    collapse('show', this.madeWithoutRowTarget)
+    collapse('hide', this.serialSectionTarget, duration)
+    collapse('show', this.madeWithoutRowTarget, duration)
   }
 
   // Unchecking "This bike was made without a serial" brings the serial section back
