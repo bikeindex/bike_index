@@ -46,7 +46,7 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
     expect { instance.perform(FactoryBot.create(:public_image, imageable: bike).id) }.to_not raise_error
   end
 
-  # Recorded against the real bikeindex-dev R2 bucket; re-record with R2_DEV_* from .env.development
+  # Recorded against the real bikeindex-test R2 bucket; re-record with R2_TEST_* from .env.test
   context "iphone heic on R2", vcr: {cassette_name: "process_public_image_job-heic_r2", preserve_exact_body_bytes: true} do
     let(:image_path) { "spec/fixtures/bike_photo-gps.heic" }
     let(:public_image) { FactoryBot.create(:public_image, imageable: bike, file: r2_blob) }
@@ -57,13 +57,13 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
     # off it too), so a generated one would never replay
     let(:r2_blob) do
       ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join(image_path)),
-        filename: "bike_photo-gps.heic", key: "spec-process-public-image-heic", service_name: :cloudflare_dev)
+        filename: "bike_photo-gps.heic", key: "spec-process-public-image-heic", service_name: :cloudflare_test)
     end
 
     it "strips exif from the original and from every variant" do
       source_fields = exif_fields(File.binread(Rails.root.join(image_path)))
       expect(source_fields.grep(identifying).count).to eq 25 # 15 of them GPS, down to the bearing
-      expect(blob.service_name).to eq "cloudflare_dev"
+      expect(blob.service_name).to eq "cloudflare_test"
 
       instance.perform(public_image.id)
 

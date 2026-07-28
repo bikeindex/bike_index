@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: put
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -2357,7 +2357,7 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - ce838a02-6c05-456f-8601-591758397e62
+      - 01aa4b88-6a16-480f-8fad-c613fb8c65b0
       X-Amz-Acl:
       - public-read
       Content-Disposition:
@@ -2372,7 +2372,7 @@ http_interactions:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155339Z
+      - 20260728T184114Z
       X-Amz-Content-Sha256:
       - 9c9f4c7bec23a6d6fb1a334ef19fc289d91574b2b46e0efcb1e13fceff754d13
       Content-Length:
@@ -2385,7 +2385,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
       Content-Type:
       - text/plain;charset=UTF-8
       Content-Length:
@@ -2396,19 +2396,21 @@ http_interactions:
       - '"37538860d641dec574a1f7acdcf7fe98"'
       X-Amz-Checksum-Crc64nvme:
       - bY7+oLznKFA=
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:14 GMT", rule-id="Auto%20delete"
       X-Amz-Version-Id:
-      - 7e6056917cc95dfdebb97a19f35a11b6
+      - 7e6055f80fbbe600cbf5c4b577a3161a
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ed80a9bed36-SJC
+      - a22604533e962523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:40 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:14 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -2416,12 +2418,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 8b92f85b-9289-4fea-bdf7-03b6038e227b
+      - b6c595ed-ebc7-4554-8c4d-8ddbc833a3bd
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,B,N,D
       X-Amz-Date:
-      - 20260728T155340Z
+      - 20260728T184115Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -2432,7 +2434,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -2446,18 +2448,20 @@ http_interactions:
       Etag:
       - '"37538860d641dec574a1f7acdcf7fe98"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:14 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:14 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ed99e02ed36-SJC
+      - a2260454ff242523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:40 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:15 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -2465,12 +2469,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 51e50e54-e633-4c4a-95cd-7061d26056de
+      - 32f8b674-9bcc-4d0b-8ffc-391c5e98fd78
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155340Z
+      - 20260728T184115Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -2481,7 +2485,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -2495,18 +2499,20 @@ http_interactions:
       Etag:
       - '"37538860d641dec574a1f7acdcf7fe98"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:14 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:14 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ed9fef8ed36-SJC
+      - a22604557f602523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:40 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:15 GMT
 - request:
     method: get
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -2514,14 +2520,14 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 54629e2c-4a19-44b0-829a-3233b877c255
+      - 6d84067e-1839-4542-91e1-5b3c638e36a3
       Range:
       - bytes=0-5242879
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155340Z
+      - 20260728T184115Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -2532,7 +2538,7 @@ http_interactions:
       message: Partial Content
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -2548,11 +2554,13 @@ http_interactions:
       Etag:
       - '"37538860d641dec574a1f7acdcf7fe98"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:14 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:14 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250eda3f96ed36-SJC
+      - a2260455ef922523-SJC
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -4903,10 +4911,10 @@ http_interactions:
         AAsQAAAAAAAAACUAAAABAAAAMAAAAAEAAAsvAAAAZAAAAHoAAAABAAAAEgAA
         AAEAAAnCAAAAZAAGD+MAAMX4AAAAAgAAAAEAAAABAAAAAQAAEyMAAABkAAFj
         nwAAC8MACtfZAAAJvgAK19kAAAm+MjAyNjowNjoxNwAAAACRzwAAG9A=
-  recorded_at: Tue, 28 Jul 2026 15:53:40 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:15 GMT
 - request:
     method: put
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -8404,7 +8412,7 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - b5afe064-577c-4d28-aa32-16f23bfe8521
+      - 1e87c288-18ac-4fc0-96d5-a181c0da6d3f
       X-Amz-Acl:
       - public-read
       Content-Disposition:
@@ -8419,7 +8427,7 @@ http_interactions:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155340Z
+      - 20260728T184115Z
       X-Amz-Content-Sha256:
       - 973b82dd6d0e897f6f9e4e7d74d547f8c60877f64d0e84fc05f7da7df8f68df5
       Content-Length:
@@ -8432,7 +8440,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
       Content-Type:
       - text/plain;charset=UTF-8
       Content-Length:
@@ -8443,19 +8451,21 @@ http_interactions:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       X-Amz-Checksum-Crc64nvme:
       - AdDIyfr2gk8=
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       X-Amz-Version-Id:
-      - 7e60569179b643477148e548a21bbe15
+      - 7e6055f80bf8b6de68901fd2b320bbef
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250edd0dfaed36-SJC
+      - a226045939732523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:40 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:15 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -8463,12 +8473,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - a3036f76-2de0-4279-9ccc-23626a33a506
+      - b0bc6392-3ebe-4c66-9025-158db26ef70b
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,B,N,D
       X-Amz-Date:
-      - 20260728T155340Z
+      - 20260728T184115Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -8479,7 +8489,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:16 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -8493,18 +8503,20 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250eddffdeed36-SJC
+      - a226045ada462523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:40 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:16 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -8512,12 +8524,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - c7e24b92-4886-4350-a0f7-94ab910f8d86
+      - 48d94e6f-f04f-4cc1-860e-2c5209afd7ac
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155340Z
+      - 20260728T184116Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -8528,7 +8540,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:16 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -8542,18 +8554,20 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ede28c3ed36-SJC
+      - a226045b6a902523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:40 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:16 GMT
 - request:
     method: get
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -8561,14 +8575,14 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 4fc7379d-424e-473b-a412-9fe28b96acee
+      - 2fb19b1c-2ea1-4381-9c5c-2554567de336
       Range:
       - bytes=0-5242879
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155340Z
+      - 20260728T184116Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -8579,7 +8593,7 @@ http_interactions:
       message: Partial Content
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:16 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -8595,11 +8609,13 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ede6982ed36-SJC
+      - a226045c0aca2523-SJC
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -12093,10 +12109,10 @@ http_interactions:
         d/knnfXD2h67vqG+68ik1jLVHyrkCtHyg2ZoRrMPABSCIlgb4P2P35NKOFgs
         kK7Hd8JUQJHJQuUvnZIDZhXabrRGa5q9+7hwm0kD0O9UzJ4SX4c7kEuS7dfy
         ePV9YimIk6Ux1zDIPX6YR8k/
-  recorded_at: Tue, 28 Jul 2026 15:53:40 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:16 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/variants/spec-process-public-image-heic/1092127a2085247b6312a1f43521988b86462b50121dfb5af06fdfc0fb3edd62
+    uri: https://bikeindex-test.<R2_TEST_HOST>/variants/spec-process-public-image-heic/1092127a2085247b6312a1f43521988b86462b50121dfb5af06fdfc0fb3edd62
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -12104,12 +12120,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - c8de14e0-2baf-47a3-82db-4b7a3d7d905a
+      - 0cd26f3d-ffd7-47bd-8e2e-4dfc7d47952d
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,B,N,D
       X-Amz-Date:
-      - 20260728T155340Z
+      - 20260728T184116Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -12120,7 +12136,7 @@ http_interactions:
       message: Not Found
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:16 GMT
       Content-Type:
       - text/plain;charset=UTF-8
       Connection:
@@ -12128,14 +12144,14 @@ http_interactions:
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250edf4bc2ed36-SJC
+      - a226045d6b502523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:16 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -12143,12 +12159,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 971a2671-ef8c-46ca-adeb-75aa4d43d355
+      - 90b6e97b-6be8-4558-a058-c12f9f0f9934
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,B,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184116Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -12159,7 +12175,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:16 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -12173,18 +12189,20 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250edf9c80ed36-SJC
+      - a226045dfb802523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:16 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -12192,12 +12210,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 97328e1b-e8ad-40ce-98a2-3e4b018d699f
+      - 6630f315-192c-41ff-b40e-18b2748388cd
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184116Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -12208,7 +12226,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:16 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -12222,18 +12240,20 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250edfdd3fed36-SJC
+      - a226045e8bad2523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:16 GMT
 - request:
     method: get
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -12241,14 +12261,14 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - a07080b3-1845-4ba0-8966-0dbe47a28216
+      - 8b376274-de24-4f06-b15a-8634902ac2fb
       Range:
       - bytes=0-5242879
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184116Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -12259,7 +12279,7 @@ http_interactions:
       message: Partial Content
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:16 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -12275,11 +12295,13 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee02e3eed36-SJC
+      - a226045efbd62523-SJC
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -15773,10 +15795,10 @@ http_interactions:
         d/knnfXD2h67vqG+68ik1jLVHyrkCtHyg2ZoRrMPABSCIlgb4P2P35NKOFgs
         kK7Hd8JUQJHJQuUvnZIDZhXabrRGa5q9+7hwm0kD0O9UzJ4SX4c7kEuS7dfy
         ePV9YimIk6Ux1zDIPX6YR8k/
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:16 GMT
 - request:
     method: put
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/variants/spec-process-public-image-heic/1092127a2085247b6312a1f43521988b86462b50121dfb5af06fdfc0fb3edd62
+    uri: https://bikeindex-test.<R2_TEST_HOST>/variants/spec-process-public-image-heic/1092127a2085247b6312a1f43521988b86462b50121dfb5af06fdfc0fb3edd62
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -16208,7 +16230,7 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 3d331441-e635-42be-bbf4-6a7bf306f291
+      - 408e4ba2-f5f7-4a6e-8723-c1ebbb2ec893
       X-Amz-Acl:
       - public-read
       Content-Type:
@@ -16221,7 +16243,7 @@ http_interactions:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184116Z
       X-Amz-Content-Sha256:
       - cb88d0828884c40cc103f77bb3a08d28ef2f32fd54fbff16c6e342d58aabc0ee
       Content-Length:
@@ -16234,7 +16256,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:17 GMT
       Content-Type:
       - text/plain;charset=UTF-8
       Content-Length:
@@ -16245,19 +16267,21 @@ http_interactions:
       - '"a803ccf26fd9b892b5400d57c89d4641"'
       X-Amz-Checksum-Crc64nvme:
       - G319g5vzSBU=
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:16 GMT", rule-id="Auto%20delete"
       X-Amz-Version-Id:
-      - 7e6056917729165a5295e1411f7729c4
+      - 7e6055f807bfe6515590d89d3273708e
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee1186bed36-SJC
+      - a226045ffc212523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:17 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/variants/spec-process-public-image-heic/441f8de90087587c5dca4f0f891008a378af63b6673a7cdad178e8899c043297
+    uri: https://bikeindex-test.<R2_TEST_HOST>/variants/spec-process-public-image-heic/441f8de90087587c5dca4f0f891008a378af63b6673a7cdad178e8899c043297
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -16265,12 +16289,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 660d636b-c809-46b7-93f0-0ad1afa2e4ef
+      - b888b990-b7c7-4e05-a06a-d67fd0002787
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,B,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184117Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -16281,7 +16305,7 @@ http_interactions:
       message: Not Found
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:17 GMT
       Content-Type:
       - text/plain;charset=UTF-8
       Connection:
@@ -16289,14 +16313,14 @@ http_interactions:
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee21af3ed36-SJC
+      - a22604617cba2523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:17 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -16304,12 +16328,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 476b72aa-77ea-4b3b-bbfe-a67a90c55fa9
+      - 5986b409-9610-48fa-b448-a8395ad1c8a1
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,B,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184117Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -16320,7 +16344,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:17 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -16334,18 +16358,20 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee25b8eed36-SJC
+      - a2260461fcf92523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:17 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -16353,12 +16379,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 18b74741-8f13-4730-afbb-29f376bb6ebd
+      - 99ff787d-30f7-4854-b6a2-9fefe13908b1
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184117Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -16369,7 +16395,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:17 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -16383,18 +16409,20 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee29c3ced36-SJC
+      - a22604627d342523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:17 GMT
 - request:
     method: get
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -16402,14 +16430,14 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 9dd91566-b62c-4770-bbe3-87f5f8092532
+      - c38db27a-363e-476e-9db7-3f93c6384ace
       Range:
       - bytes=0-5242879
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184117Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -16420,7 +16448,7 @@ http_interactions:
       message: Partial Content
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:17 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -16436,11 +16464,13 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee2dcc3ed36-SJC
+      - a2260462ed722523-SJC
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -19934,10 +19964,10 @@ http_interactions:
         d/knnfXD2h67vqG+68ik1jLVHyrkCtHyg2ZoRrMPABSCIlgb4P2P35NKOFgs
         kK7Hd8JUQJHJQuUvnZIDZhXabrRGa5q9+7hwm0kD0O9UzJ4SX4c7kEuS7dfy
         ePV9YimIk6Ux1zDIPX6YR8k/
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:17 GMT
 - request:
     method: put
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/variants/spec-process-public-image-heic/441f8de90087587c5dca4f0f891008a378af63b6673a7cdad178e8899c043297
+    uri: https://bikeindex-test.<R2_TEST_HOST>/variants/spec-process-public-image-heic/441f8de90087587c5dca4f0f891008a378af63b6673a7cdad178e8899c043297
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -21610,7 +21640,7 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - e7a361aa-04ab-4611-bbf8-81fb5e7d038b
+      - 2e6df00d-9ee0-450a-b74f-314b03030362
       X-Amz-Acl:
       - public-read
       Content-Type:
@@ -21623,7 +21653,7 @@ http_interactions:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184117Z
       X-Amz-Content-Sha256:
       - 8b57076ba685e710523fb3cbd6e2ce64c003bac0d13fae23cd1a38dabe6b5f8a
       Content-Length:
@@ -21636,7 +21666,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:17 GMT
       Content-Type:
       - text/plain;charset=UTF-8
       Content-Length:
@@ -21647,19 +21677,21 @@ http_interactions:
       - '"5ea7ab01ddc3eeae8978d1f41f6c71ff"'
       X-Amz-Checksum-Crc64nvme:
       - DLIfFW0P3/4=
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:17 GMT", rule-id="Auto%20delete"
       X-Amz-Version-Id:
-      - 7e60569175466a38fa178aa6160eecaf
+      - 7e6055f805052cfd3c2c6e7f4ad6ec95
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee41fe1ed36-SJC
+      - a22604646e492523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:17 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/variants/spec-process-public-image-heic/81fea863334dc0ed84b9561166891445c0f4cb463281486363277d6c38a83169
+    uri: https://bikeindex-test.<R2_TEST_HOST>/variants/spec-process-public-image-heic/81fea863334dc0ed84b9561166891445c0f4cb463281486363277d6c38a83169
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -21667,12 +21699,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - e76c78be-4a98-4b22-bb7f-4a4ffa9ee0d3
+      - e47da7a8-b07c-48b2-b140-9e6adbfd5a20
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,B,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184117Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -21683,7 +21715,7 @@ http_interactions:
       message: Not Found
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:17 GMT
       Content-Type:
       - text/plain;charset=UTF-8
       Connection:
@@ -21691,14 +21723,14 @@ http_interactions:
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee4f9f9ed36-SJC
+      - a22604667f5b2523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:17 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -21706,12 +21738,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 3ac3dad2-33fc-4e43-8f50-6f167ccbff9c
+      - 4d6e76e2-04e8-45fc-96d9-8dc7e99a5143
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,B,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184117Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -21722,7 +21754,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:18 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -21736,18 +21768,20 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee53aaeed36-SJC
+      - a22604675fcb2523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:41 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:18 GMT
 - request:
     method: head
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -21755,12 +21789,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 7a7ffe56-ceab-4cc5-8ce2-31dbd3c632f9
+      - 12fb5073-a98f-4405-b25c-0e7f69e380ea
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155341Z
+      - 20260728T184118Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -21771,7 +21805,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:42 GMT
+      - Tue, 28 Jul 2026 18:41:18 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -21785,18 +21819,20 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee58b54ed36-SJC
+      - a2260467c8002523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:42 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:18 GMT
 - request:
     method: get
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -21804,14 +21840,14 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - d8fe405b-9fc4-4eec-b92d-91dcb0847e0c
+      - 0c4b51f2-b452-46b1-9159-44d34899b34b
       Range:
       - bytes=0-5242879
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155342Z
+      - 20260728T184118Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -21822,7 +21858,7 @@ http_interactions:
       message: Partial Content
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:42 GMT
+      - Tue, 28 Jul 2026 18:41:18 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -21838,11 +21874,13 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee5cbefed36-SJC
+      - a226046858392523-SJC
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -25336,10 +25374,10 @@ http_interactions:
         d/knnfXD2h67vqG+68ik1jLVHyrkCtHyg2ZoRrMPABSCIlgb4P2P35NKOFgs
         kK7Hd8JUQJHJQuUvnZIDZhXabrRGa5q9+7hwm0kD0O9UzJ4SX4c7kEuS7dfy
         ePV9YimIk6Ux1zDIPX6YR8k/
-  recorded_at: Tue, 28 Jul 2026 15:53:42 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:18 GMT
 - request:
     method: put
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/variants/spec-process-public-image-heic/81fea863334dc0ed84b9561166891445c0f4cb463281486363277d6c38a83169
+    uri: https://bikeindex-test.<R2_TEST_HOST>/variants/spec-process-public-image-heic/81fea863334dc0ed84b9561166891445c0f4cb463281486363277d6c38a83169
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -29453,7 +29491,7 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - e16b7452-cd39-47c4-bd94-93b42b1437c9
+      - 8cea5fb2-c117-4bc6-a6e3-2e4549aecc05
       X-Amz-Acl:
       - public-read
       Content-Type:
@@ -29466,7 +29504,7 @@ http_interactions:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155342Z
+      - 20260728T184118Z
       X-Amz-Content-Sha256:
       - baf31a38a1ab4bfc234ae9e575842ab672c51e00bf38871879836e2e6fbcadb6
       Content-Length:
@@ -29479,7 +29517,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:42 GMT
+      - Tue, 28 Jul 2026 18:41:18 GMT
       Content-Type:
       - text/plain;charset=UTF-8
       Content-Length:
@@ -29490,19 +29528,21 @@ http_interactions:
       - '"500ee37713b29d6df3f2ccb8feaf3b3f"'
       X-Amz-Checksum-Crc64nvme:
       - JtAVjEiopgg=
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:18 GMT", rule-id="Auto%20delete"
       X-Amz-Version-Id:
-      - 7e60569173320f64b61c238427c2b856
+      - 7e6055f8014817dc2397d5d5c7e59bc6
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee7782ded36-SJC
+      - a226046a49302523-SJC
     body:
       encoding: UTF-8
       base64_string: ''
-  recorded_at: Tue, 28 Jul 2026 15:53:42 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:18 GMT
 - request:
     method: get
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/spec-process-public-image-heic
+    uri: https://bikeindex-test.<R2_TEST_HOST>/spec-process-public-image-heic
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -29510,12 +29550,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 751aeaf6-3755-468c-9c1a-6bfccd4bad5c
+      - 1acca3e9-a63f-4b61-8092-f738684a133f
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155342Z
+      - 20260728T184118Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -29526,7 +29566,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:42 GMT
+      - Tue, 28 Jul 2026 18:41:18 GMT
       Content-Type:
       - image/heic
       Content-Length:
@@ -29540,11 +29580,13 @@ http_interactions:
       Etag:
       - '"41499b7a14350c483eaf8882fa2b21b8"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:40 GMT
+      - Tue, 28 Jul 2026 18:41:15 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:15 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee85a47ed36-SJC
+      - a226046c6a212523-SJC
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -33038,10 +33080,10 @@ http_interactions:
         d/knnfXD2h67vqG+68ik1jLVHyrkCtHyg2ZoRrMPABSCIlgb4P2P35NKOFgs
         kK7Hd8JUQJHJQuUvnZIDZhXabrRGa5q9+7hwm0kD0O9UzJ4SX4c7kEuS7dfy
         ePV9YimIk6Ux1zDIPX6YR8k/
-  recorded_at: Tue, 28 Jul 2026 15:53:42 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:18 GMT
 - request:
     method: get
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/variants/spec-process-public-image-heic/1092127a2085247b6312a1f43521988b86462b50121dfb5af06fdfc0fb3edd62
+    uri: https://bikeindex-test.<R2_TEST_HOST>/variants/spec-process-public-image-heic/1092127a2085247b6312a1f43521988b86462b50121dfb5af06fdfc0fb3edd62
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -33049,12 +33091,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - 50ba8930-098c-43ae-a311-f9068021cb3e
+      - 9cb1042c-1efe-4475-95eb-19c58c25a808
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155342Z
+      - 20260728T184118Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -33065,7 +33107,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:42 GMT
+      - Tue, 28 Jul 2026 18:41:18 GMT
       Content-Type:
       - image/jpeg
       Content-Length:
@@ -33077,11 +33119,13 @@ http_interactions:
       Etag:
       - '"a803ccf26fd9b892b5400d57c89d4641"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:16 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:16 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee8aaf1ed36-SJC
+      - a226046cfa632523-SJC
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -33509,10 +33553,10 @@ http_interactions:
         pByR8oz780MSBx607eSOQOBQA3HPvS4zj+lG4kAcYPNOJ9hQAgGOB/KlUk4H
         FJngcDnr704kg7QeMdKYD1yCBg/hRtwecn0oT5t2ewyPzpEOevamBKuAvU56
         YxSggAjPemAnNO3EZIJ5NMRIny7sk4NSYBJ5wPrUKOSpPFSKPlBoEf/Z
-  recorded_at: Tue, 28 Jul 2026 15:53:42 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:18 GMT
 - request:
     method: get
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/variants/spec-process-public-image-heic/441f8de90087587c5dca4f0f891008a378af63b6673a7cdad178e8899c043297
+    uri: https://bikeindex-test.<R2_TEST_HOST>/variants/spec-process-public-image-heic/441f8de90087587c5dca4f0f891008a378af63b6673a7cdad178e8899c043297
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -33520,12 +33564,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - adff75be-2612-45de-8057-02758130e4fe
+      - df47f0be-0f77-4b86-bbdb-a04cd5db838a
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155342Z
+      - 20260728T184118Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -33536,7 +33580,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:42 GMT
+      - Tue, 28 Jul 2026 18:41:19 GMT
       Content-Type:
       - image/webp
       Content-Length:
@@ -33548,11 +33592,13 @@ http_interactions:
       Etag:
       - '"5ea7ab01ddc3eeae8978d1f41f6c71ff"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:41 GMT
+      - Tue, 28 Jul 2026 18:41:17 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:17 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250ee98d5ced36-SJC
+      - a226046d9ab52523-SJC
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -35221,10 +35267,10 @@ http_interactions:
         AAABAAAAaYcEAAEAAABmAAAAAAAAADhjAADoAwAAOGMAAOgDAAAGAACQBwAE
         AAAAMDIxMAGRBwAEAAAAAQIDAACgBwAEAAAAMDEwMAGgAwABAAAA//8AAAKg
         BAABAAAA6AMAAAOgBAABAAAA7gIAAAAAAAA=
-  recorded_at: Tue, 28 Jul 2026 15:53:42 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:19 GMT
 - request:
     method: get
-    uri: https://bikeindex-dev.<R2_DEV_HOST>/variants/spec-process-public-image-heic/81fea863334dc0ed84b9561166891445c0f4cb463281486363277d6c38a83169
+    uri: https://bikeindex-test.<R2_TEST_HOST>/variants/spec-process-public-image-heic/81fea863334dc0ed84b9561166891445c0f4cb463281486363277d6c38a83169
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -35232,12 +35278,12 @@ http_interactions:
       Accept-Encoding:
       - ''
       Amz-Sdk-Invocation-Id:
-      - faea055b-8664-4290-87c4-07517d00b034
+      - 9479c8bc-5905-41df-a66c-c1daa14ef074
       User-Agent:
       - aws-sdk-ruby3/3.211.0 ua/2.1 api/s3#1.177.0 os/macos#25 md/arm64 lang/ruby#4.0.5
         md/4.0.5 m/A,N,D
       X-Amz-Date:
-      - 20260728T155342Z
+      - 20260728T184119Z
       X-Amz-Content-Sha256:
       - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       Accept:
@@ -35248,7 +35294,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 28 Jul 2026 15:53:42 GMT
+      - Tue, 28 Jul 2026 18:41:19 GMT
       Content-Type:
       - image/webp
       Content-Length:
@@ -35260,11 +35306,13 @@ http_interactions:
       Etag:
       - '"500ee37713b29d6df3f2ccb8feaf3b3f"'
       Last-Modified:
-      - Tue, 28 Jul 2026 15:53:42 GMT
+      - Tue, 28 Jul 2026 18:41:18 GMT
+      X-Amz-Expiration:
+      - expiry-date="Fri, 31 Jul 2026 18:41:18 GMT", rule-id="Auto%20delete"
       Server:
       - cloudflare
       Cf-Ray:
-      - a2250eea7ff1ed36-SJC
+      - a226046e4af52523-SJC
     body:
       encoding: ASCII-8BIT
       base64_string: |
@@ -39374,5 +39422,5 @@ http_interactions:
         AAAAAQAAAGmHBAABAAAAZgAAAAAAAAA4YwAA6AMAADhjAADoAwAABgAAkAcA
         BAAAADAyMTABkQcABAAAAAECAwAAoAcABAAAADAxMDABoAMAAQAAAP//AAAC
         oAQAAQAAANAHAAADoAQAAQAAANwFAAAAAAAA
-  recorded_at: Tue, 28 Jul 2026 15:53:42 GMT
+  recorded_at: Tue, 28 Jul 2026 18:41:19 GMT
 recorded_with: VCR 6.4.0
