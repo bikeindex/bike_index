@@ -112,7 +112,8 @@ module BikeServices
       return if b_param.image_signed_id.blank? && b_param.image.blank?
 
       if b_param.image_signed_id.present?
-        PublicImage.create(imageable: bike, file: b_param.image_signed_id)
+        blob = b_param.image_blob # nil once reaped - drop the photo, not the registration
+        PublicImage.create(imageable: bike, file: blob) if blob
       else
         PublicImage.create(imageable: bike, image: b_param.image)
         b_param.update(image_processed: true)

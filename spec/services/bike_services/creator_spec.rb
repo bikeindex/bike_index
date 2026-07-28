@@ -634,6 +634,16 @@ RSpec.describe BikeServices::Creator do
         expect(public_image.file.blob).to eq blob
         expect(public_image.image).to_not be_present
       end
+
+      # CleanUnattachedBlobsJob can beat a long-delayed confirmation to the blob
+      context "blob already reaped" do
+        before { blob.purge }
+
+        it "drops the photo rather than the registration" do
+          instance.attach_photo(b_param, bike)
+          expect(bike.public_images.count).to eq 0
+        end
+      end
     end
   end
 

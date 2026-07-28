@@ -1,0 +1,31 @@
+# frozen_string_literal: true
+
+# Direct uploads reach the bucket the moment a file is picked, so a registration the user
+# then abandons leaves a blob nothing will ever reference.
+class CleanUnattachedBlobsJob < ScheduledJob
+  prepend ScheduledJobRecorder
+
+  BATCH_SIZE = 1000 # Bounds a run; the rest keeps until tomorrow
+
+  def self.frequency
+    25.hours
+  end
+
+  # A registration's blob stays unattached until its bike is created, which for a partial
+  # registration waits on an email confirmation that may sit for weeks
+  def self.clean_before
+    Time.current - 30.days
+  end
+
+  def perform
+    blobs.each { it.purge_later }
+  end
+
+  # Alert images are unattached on purpose - StolenRecord attaches them with dependent: false
+  # so links to a superseded one keep resolving. BikeJobs::RemoveOrphanedImagesJob owns those,
+  # and knows when they're safe to drop.
+  def blobs
+    ActiveStorage::Blob.unattached.where(created_at: ...self.class.clean_before)
+      .where.not("filename ILIKE ?", "stolen-%").limit(BATCH_SIZE)
+  end
+end

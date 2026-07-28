@@ -41,6 +41,7 @@ class ScheduledJobRunner < ScheduledJob
       BikeJobs::UpdateTheftAlertFacebookJob,
       CleanBParamsJob,
       CleanBulkImportJob,
+      CleanUnattachedBlobsJob,
       CreateGraduatedNotificationJob,
       CreateStolenGeojsonJob,
       CreateUserAlertNotificationJob,
