@@ -1,5 +1,8 @@
 <%= render(UI::Card::Component.new) do %>
-  <div data-controller="collapse" data-collapse-param-value="contact_owner">
+  <div
+    data-controller="ui--collapse"
+    data-ui--collapse-param-value="contact_owner"
+  >
     <h2
       class="
         tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
@@ -17,9 +20,9 @@
           text: claim_button_text,
           color: :purple,
           aria: {expanded: false},
-          data: {"collapse-target": "trigger", action: "collapse#toggle"}
+          data: {"ui--collapse-target": "trigger", action: "ui--collapse#toggle"}
         )) %>
-        <div data-collapse-target="content" class="tw:hidden">
+        <div data-ui--collapse-target="content" class="tw:hidden">
           <%= form_with(model: impound_claim, url: impound_claims_path, data: {controller: "csrf-refresh"}) do |form| %>
             <%= form.hidden_field :impound_record_id, value: impound_record.id %>
 

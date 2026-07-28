@@ -240,16 +240,16 @@
                   </p>
                 <% end %>
                 <div
-                  data-controller="collapse"
-                  data-collapse-param-value="show_assigned_stickers"
+                  data-controller="ui--collapse"
+                  data-ui--collapse-param-value="show_assigned_stickers"
                 >
                   <%= render UI::Button::Component.new(
                     text: t(".show_previously_assigned_stickers"),
                     color: :link,
-                    data: {action: "collapse#toggle", collapse_target: "trigger"},
+                    data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"},
                     aria: {expanded: false}) %>
 
-                  <div data-collapse-target="content" class="tw:hidden">
+                  <div data-ui--collapse-target="content" class="tw:hidden">
                     <%= assigned_stickers %>
                   </div>
                 </div>
