@@ -13,7 +13,7 @@ RSpec.describe "collapse controller", :js, type: :system do
 
     click_button("Toggle details")
 
-    # collapse#show reveals the body, writes ?details=1 via history.replaceState,
+    # ui--collapse#show reveals the body, writes ?details=1 via history.replaceState,
     # and flips the trigger's aria-expanded and data-active.
     expect(page).to have_content("Persisted panel body")
     expect(page).to have_current_path(/details=1/, url: true)

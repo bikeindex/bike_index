@@ -1,4 +1,4 @@
-<div data-controller="collapse ui--period-select">
+<div data-controller="ui--collapse ui--period-select">
   <div
     class="text-right tw:flex tw:flex-wrap tw:justify-end tw:gap-1 tw:sm:gap-2"
     role="group"
@@ -26,7 +26,7 @@
       size: :sm,
       active: @period == "custom",
       html_class: period_button_class,
-      data: {period: "custom", action: "click->collapse#toggle"}
+      data: {period: "custom", action: "click->ui--collapse#toggle"}
     ) %>
   </div>
 
@@ -34,7 +34,7 @@
     url: "#",
     method: :get,
     builder: BikeIndexFormBuilder,
-    html: {class: custom_form_classes, data: {collapse_target: "content", action: "submit->ui--period-select#submit"}}
+    html: {class: custom_form_classes, data: {"ui--collapse-target": "content", action: "submit->ui--period-select#submit"}}
   ) do |f| %>
     <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-3">
       <div class="tw:flex tw:items-center tw:gap-2">
