@@ -42,4 +42,27 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
 
     expect(page).to have_css('[aria-expanded="false"]')
   end
+
+  context "with rich_display" do
+    let(:overlay) { "[data-ui--forms--combobox-display-target='overlay']" }
+
+    it "mirrors the selected option's two-tone content onto the closed input" do
+      visit "/rails/view_components/ui/forms/combobox/component/rich_display"
+
+      # Nothing selected yet, so there is no rich content to mirror
+      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+      expect(page).to have_no_css(overlay)
+
+      find_field("Cycle type").click
+      find('[role="option"]', text: "Cargo Bike (front storage)").click
+
+      expect(page).to have_css(overlay, text: "Cargo Bike (front storage)")
+      expect(page).to have_css("#{overlay} span", text: "(front storage)")
+
+      # Clicking in to filter again hands the plain input back to the user
+      find_field("Cycle type").click
+
+      expect(page).to have_no_css(overlay)
+    end
+  end
 end

@@ -21,6 +21,11 @@ module UI
           {template: "ui/forms/combobox/component_preview/preselected"}
         end
 
+        # Two-tone option content, mirrored onto the closed input by an overlay
+        def rich_display
+          {template: "ui/forms/combobox/component_preview/rich_display"}
+        end
+
         # Allows submitting a value that is not in the options list
         def free_text
           {template: "ui/forms/combobox/component_preview/free_text"}
