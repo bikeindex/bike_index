@@ -34,12 +34,10 @@ lexxy-editor.lexxy-editor--compact .lexxy-editor__content p {
 }
 
 /* Per-instance toolbar trimming: the component adds a lexxy-editor--hide-<button> class per button
-   omitted from toolbar_buttons:. Each button gets two selectors so the rules survive the gem moving
-   a control between shapes (`heading` became a `format` dropdown in 0.9.27, and lists are next --
-   lexxy.js already presses a `lists` button its template doesn't render yet). The first is a
-   descendant, since the overflow observer sweeps trailing <button>s into the "..." menu; the second
-   hides a wrapper the trigger sits directly inside, taking its panel and flex gap along. Matching
-   the wrapper on a *direct* child is what keeps a relocated button from hiding the "..." menu. */
+   omitted from toolbar_buttons:. Two selectors each, so a control moving between shapes needs no
+   edit (`heading` became a `format` dropdown in 0.9.27): a descendant, since the overflow observer
+   sweeps trailing <button>s into the "..." menu, plus a direct-child wrapper match -- direct so a
+   relocated button never hides the "..." menu itself. */
 .lexxy-editor--hide-bold lexxy-toolbar [name="bold"], .lexxy-editor--hide-bold lexxy-toolbar > :has(> [name="bold"]),
 .lexxy-editor--hide-italic lexxy-toolbar [name="italic"], .lexxy-editor--hide-italic lexxy-toolbar > :has(> [name="italic"]),
 .lexxy-editor--hide-strikethrough lexxy-toolbar [name="strikethrough"], .lexxy-editor--hide-strikethrough lexxy-toolbar > :has(> [name="strikethrough"]),
