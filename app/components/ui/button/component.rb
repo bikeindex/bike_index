@@ -6,7 +6,7 @@ module UI
     # submits a request to a URL (button_to), use UI::ButtonLink instead — it reuses
     # this component's build_classes, so the two stay visually in lockstep.
     class Component < ApplicationComponent
-      BASE_CLASSES = "tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-lg tw:cursor-pointer tw:transition-colors"
+      BASE_CLASSES = "tw:inline-flex tw:items-center tw:justify-center tw:gap-1.5 tw:rounded-lg tw:cursor-pointer tw:transition-colors"
 
       SIZES = {
         sm: "tw:px-2.5 tw:py-1 tw:text-xs",

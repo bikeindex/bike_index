@@ -8,13 +8,14 @@ module Registrations
       class Component < ApplicationComponent
         # Nothing digests the nested components' templates, so bump this whenever
         # their markup changes
-        CACHE_VERSION = "registrations/show-v2"
+        CACHE_VERSION = "registrations/show-v3"
 
-        def initialize(bike:, current_user:, view:, available_views:)
+        def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil)
           @bike = bike
           @current_user = current_user
           @view = view
           @available_views = available_views
+          @bike_sticker = bike_sticker
         end
 
         def call
@@ -30,10 +31,10 @@ module Registrations
             kind, organization = @view
             if organization
               OrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
-                org_role: kind, available_views: @available_views)
+                org_role: kind, available_views: @available_views, bike_sticker: @bike_sticker)
             else
               Consumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
-                show_for_sale: @bike.is_for_sale?, available_views: @available_views)
+                show_for_sale: @bike.is_for_sale?, available_views: @available_views, bike_sticker: @bike_sticker)
             end
           end
         end
@@ -48,7 +49,7 @@ module Registrations
         def cache_key
           [CACHE_VERSION, @current_user&.id,
             @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
-            BikeServices::ShowViews.view_param(@view),
+            BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
         end
       end
