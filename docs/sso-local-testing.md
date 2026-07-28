@@ -3,8 +3,8 @@
 To exercise the SP-initiated SSO login flow end-to-end against a real Identity
 Provider on your machine, use the throwaway Keycloak IdP in
 [bikeindex/saml-idp-test](https://github.com/bikeindex/saml-idp-test). Its README
-is a step-by-step runbook (generate a dev SP keypair, boot Keycloak, configure a
-local org, log in).
+is a step-by-step runbook (point the SP at its committed keypair, boot Keycloak,
+configure a local org, log in).
 
 The SP signs its AuthnRequests, so `SAML_SP_CERTIFICATE` / `SAML_SP_PRIVATE_KEY` must be set
 in `.env.local` — without them the IdP rejects every login (`SigAlg was null`). Keep those
