@@ -33,9 +33,9 @@ export default class extends Controller {
     })
     this.triggerTargets.forEach((trigger) => {
       const active = String(trigger.dataset.panelName === name)
-      // aria-expanded for disclosure semantics, aria-pressed drives active styling
+      // aria-expanded for disclosure semantics, data-active drives UI::Button's styling
       trigger.setAttribute('aria-expanded', active)
-      trigger.setAttribute('aria-pressed', active)
+      trigger.dataset.active = active
     })
     this.openName = name
     this.persist(name)
