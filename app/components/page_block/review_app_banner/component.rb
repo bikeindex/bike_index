@@ -31,11 +31,9 @@ module PageBlock
         @review_app.present?
       end
 
-      # A PR identifies the deploy on its own, so the label is only a fallback.
+      # Only a PR is worth the navbar space; dev and sandbox deploys get nothing.
       def lookbook_navbar_title
-        return nil unless render?
-
-        @pr_number.blank? ? banner_label : pr_link_text
+        pr_link_text if render? && @pr_number.present?
       end
 
       private

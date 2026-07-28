@@ -37,7 +37,8 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   it "renders a purple development banner for the local dev server" do
     banner = described_class.new(review_app: "development")
     component = render_inline(banner)
-    expect(banner.lookbook_navbar_title).to eq "Development"
+    # The label is on-page only — without a PR the Lookbook navbar gets no suffix
+    expect(banner.lookbook_navbar_title).to be_nil
     expect(component.text).to include("Development")
     expect(component.text).not_to include("Sandbox")
     expect(component.css("a[href='/letter_opener']")).to be_present
@@ -65,7 +66,7 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
 
     it "renders the sandbox label and disclaimer" do
       # No pr_number is the persistent sandbox deploy, not a per-PR review app
-      expect(banner.lookbook_navbar_title).to eq "Sandbox"
+      expect(banner.lookbook_navbar_title).to be_nil
       expect(component.text).to include("Sandbox")
       expect(component.text).not_to include("Review app")
       expect(component.text).to include("data is ephemeral")
@@ -178,7 +179,7 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       end
 
       it "shows the review app label instead of the sandbox label, hidden on small screens" do
-        # The banner keeps the label; the Lookbook navbar drops it for the PR alone
+        # The banner keeps the label; the Lookbook navbar shows only the PR
         expect(banner.lookbook_navbar_title).to eq "PR #1234"
         expect(component.text).to include("Review app")
         expect(component.text).not_to include("Sandbox")
