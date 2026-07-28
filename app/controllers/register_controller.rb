@@ -60,7 +60,6 @@ class RegisterController < ApplicationController
     return redirect_to(register_path(b_param_token: @b_param.id_token)) if @b_param.with_bike?
 
     @b_param.creator_id ||= current_user&.id
-    @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
     @b_param.clean_params(update_params.as_json)
     @b_param.save
     if creator_available?
@@ -145,6 +144,9 @@ class RegisterController < ApplicationController
       .reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
     # The unit only means something alongside a numeric size
     bike_params.delete("frame_size_unit") if bike_params["frame_size_number"].blank?
-    {details_completed: true, bike: bike_params}
+    # The photo went browser -> bucket before submit, so only its signed id rides along.
+    # Dropped when blank rather than merged, which would clobber an id already stored.
+    {details_completed: true, bike: bike_params,
+     image_signed_id: params[:image_signed_id].presence}.compact
   end
 end

@@ -454,6 +454,13 @@ class BParam < ApplicationRecord
     params["details_completed"].present?
   end
 
+  # An ActiveStorage blob the browser uploaded straight to the bucket. Held as a signed id
+  # rather than an attachment so the blob's only owner is the PublicImage created from it -
+  # a b_param attachment would purge the blob out from under the bike when it's cleaned up.
+  def image_signed_id
+    params["image_signed_id"]
+  end
+
   def primary_frame_color
     primary_frame_color_id.present? && Color.find_by_id(primary_frame_color_id)&.name
   end

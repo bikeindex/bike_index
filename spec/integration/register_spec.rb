@@ -68,6 +68,11 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_field("bike[bike_sticker]", with: "A 471 829")
     expect(page).to have_field("bike[phone]", with: "(555) 000-0000")
 
+    # Picking a photo uploads it straight to storage; the form carries only the signed id
+    attach_file("register_photo", Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg"), make_visible: true)
+    expect(page).to have_content("bike_photo-landscape.jpeg")
+    expect(page).to have_no_content("uploading")
+
     click_button "Complete Bike Registration"
 
     expect(page).to have_content("Registration complete")
@@ -78,5 +83,7 @@ RSpec.describe "Register flow", :js, type: :system do
       "tertiary_frame_color_id" => green.id.to_s, "frame_size" => "m",
       "serial_number" => "unknown", "phone" => "(555) 000-0000")
     expect(b_param.details_completed?).to be_truthy
+    expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
+      .to eq "bike_photo-landscape.jpeg"
   end
 end

@@ -228,13 +228,24 @@ RSpec.describe RegisterController, type: :request do
       end
 
       context "with a photo" do
-        it "attaches the image to the b_param" do
-          patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: bike_details.merge(image: Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg"))}
+        let(:blob) do
+          ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),
+            filename: "bike.jpg", content_type: "image/jpeg")
+        end
+
+        it "stores the direct upload's signed id on the b_param" do
+          patch base_url, params: {b_param_token: b_param.id_token, image_signed_id: blob.signed_id,
+                                   bike: bike_details}
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
-          expect(b_param.reload.image).to be_present
-          # The uploaded file doesn't leak into the JSON params
-          expect(b_param.params.to_json).to_not include "bike.jpg"
+          expect(b_param.reload.image_signed_id).to eq blob.signed_id
+        end
+
+        it "keeps a stored signed id when a later submit posts none" do
+          patch base_url, params: {b_param_token: b_param.id_token, image_signed_id: blob.signed_id,
+                                   bike: bike_details}
+          patch base_url, params: {b_param_token: b_param.id_token, image_signed_id: "",
+                                   bike: bike_details}
+          expect(b_param.reload.image_signed_id).to eq blob.signed_id
         end
       end
 

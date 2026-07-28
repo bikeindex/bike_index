@@ -37,6 +37,10 @@ class PublicImage < ApplicationRecord
     large: {resize_to_fit: [2000, 1600], format: :webp}
   }.freeze
 
+  # Direct uploads bypass the uploader, so nothing else holds an attached file to the
+  # extension whitelist the file picker offers, or to the size PublicImagesController caps
+  FILE_CONTENT_TYPES = ApplicationUploader.extensions.map { Marcel::MimeType.for(name: "f.#{it}") }.uniq.freeze
+
   mount_uploader :image, PublicImageUploader # Legacy, migrating to :file
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
@@ -48,6 +52,9 @@ class PublicImage < ApplicationRecord
 
   belongs_to :imageable, polymorphic: true
 
+  # Only when a file is being assigned - otherwise every legacy carrierwave save pays a
+  # query to load an attachment it doesn't have
+  validate :file_permitted, if: -> { attachment_changes["file"].present? }
   attr_writer :image_cache
   attr_accessor :skip_update
 
@@ -143,6 +150,14 @@ class PublicImage < ApplicationRecord
   end
 
   private
+
+  def file_permitted
+    blob = attachment_changes["file"].blob
+    return if FILE_CONTENT_TYPES.include?(blob.content_type) &&
+      blob.byte_size <= PublicImageUploader::MAX_FILE_SIZE
+
+    errors.add(:file, :invalid)
+  end
 
   # Not blob.open, which unlinks its tempfile when the block exits - the caller needs the file to
   # outlive this method. Plain download is one GET; the chunked form adds two HEADs on S3.

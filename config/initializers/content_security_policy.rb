@@ -58,6 +58,9 @@ Rails.application.configure do
       # Self-hosted MapLibre basemap tiles for the registration map (range requests)
       "https://maps.bikeindex.org",
       "https://maps.googleapis.com",
+      # Direct uploads PUT to a presigned R2 URL, not the uploads CDN. Wildcard because the
+      # presigner addresses the bucket virtual-host style: <bucket>.<account>.r2.cloudflarestorage.com
+      "https://*.r2.cloudflarestorage.com",
       "https://translate.googleapis.com", # Google Translate API
       "https://uploads.bikeindex.org",
       "https://www.facebook.com",

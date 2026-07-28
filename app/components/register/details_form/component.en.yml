@@ -69,6 +69,8 @@ en:
         third_color_blank: Third color
         up_to_3: up to 3
         upload: Upload
+        upload_failed: upload failed
+        uploading: uploading…
         very_very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.
           Unless this bike:'
         view_serial_guide: View the full serial number guide

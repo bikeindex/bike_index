@@ -86,6 +86,50 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  # Direct uploads land in the bucket before the server sees them, so this is the only
+  # thing keeping a registration from publishing a non-image or an enormous one
+  describe "file_permitted" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:public_image) { PublicImage.new(imageable: bike, file: blob.signed_id) }
+    let(:filename) { "bike.jpg" }
+    let(:content_type) { "image/jpeg" }
+    let(:blob) do
+      ActiveStorage::Blob.create_and_upload!(io: StringIO.new("not really an image"),
+        filename:, content_type:)
+    end
+
+    it "is valid" do
+      expect(public_image).to be_valid
+    end
+
+    context "a pdf" do
+      let(:filename) { "invoice.pdf" }
+      let(:content_type) { "application/pdf" }
+
+      it "is invalid" do
+        expect(public_image).to_not be_valid
+        expect(public_image.errors.full_messages.join).to match(/file.*invalid/i)
+      end
+    end
+
+    context "over the uploader's size cap" do
+      before { blob.update(byte_size: PublicImageUploader::MAX_FILE_SIZE + 1) }
+
+      it "is invalid" do
+        expect(public_image).to_not be_valid
+      end
+    end
+
+    context "a carrierwave image" do
+      let(:public_image) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
+
+      it "skips the validation rather than loading an attachment" do
+        expect(public_image.attachment_changes).to be_empty
+        expect(public_image).to be_valid
+      end
+    end
+  end
+
   describe "open_file" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec", "fixtures", "bike.jpg"))) }

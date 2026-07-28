@@ -617,6 +617,24 @@ RSpec.describe BikeServices::Creator do
       instance.attach_photo(b_param, bike)
       expect(bike.public_images.count).to eq(1)
     end
+
+    context "direct upload signed id" do
+      let(:bike) { FactoryBot.create(:bike) }
+      let(:blob) do
+        ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),
+          filename: "bike.jpg", content_type: "image/jpeg")
+      end
+      let(:b_param) { FactoryBot.create(:b_param, params: {"image_signed_id" => blob.signed_id}) }
+
+      it "creates a public image holding the already-uploaded blob" do
+        instance.attach_photo(b_param, bike)
+        public_image = bike.public_images.first
+        expect(bike.public_images.count).to eq 1
+        expect(public_image.file.attached?).to be_truthy
+        expect(public_image.file.blob).to eq blob
+        expect(public_image.image).to_not be_present
+      end
+    end
   end
 
   # Private method (legacy spec)

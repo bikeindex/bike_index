@@ -129,18 +129,31 @@
       </div>
     </div>
 
-    <div class="tw:mb-4" data-controller="register--photo">
+    <div
+      class="tw:mb-4"
+      data-controller="register--photo"
+      data-register--photo-url-value="<%= rails_direct_uploads_path %>"
+      data-register--photo-uploading-value="<%= translation(".uploading") %>"
+      data-register--photo-failed-value="<%= translation(".upload_failed") %>"
+    >
       <span class="twlabel">
         <%= translation(".attach_photo") %>
         <%= optional_badge %>
       </span>
 
-      <%= f.file_field :image, accept: ImageUploader.permitted_extensions.join(","),
+      <%#
+        Nameless (so the form doesn't go multipart for a file it never posts) - the photo
+        goes browser -> bucket and the signed id below is what submits
+      %>
+
+      <%= tag.input type: "file", id: "register_photo", accept: ImageUploader.permitted_extensions.join(","),
           class: "tw:hidden",
           data: {
             "register--photo-target": "input",
             action: "change->register--photo#changed"
           } %>
+
+      <%= hidden_field_tag :image_signed_id, nil, data: {"register--photo-target": "signedId"} %>
 
       <div class="tw:mt-2 tw:grid tw:grid-cols-2 tw:gap-2">
         <%= render UI::Button::Component.new(text: translation(".take_photo"), color: :secondary,

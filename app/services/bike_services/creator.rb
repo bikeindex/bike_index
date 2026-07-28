@@ -109,12 +109,14 @@ module BikeServices
 
     # Called from ImageAssociatorJob, so can't be private
     def attach_photo(b_param, bike)
-      return true unless b_param.image.present?
+      return if b_param.image_signed_id.blank? && b_param.image.blank?
 
-      public_image = PublicImage.new(image: b_param.image)
-      public_image.imageable = bike
-      public_image.save
-      b_param.update(image_processed: true)
+      if b_param.image_signed_id.present?
+        PublicImage.create(imageable: bike, file: b_param.image_signed_id)
+      else
+        PublicImage.create(imageable: bike, image: b_param.image)
+        b_param.update(image_processed: true)
+      end
       bike.reload
     end
 
