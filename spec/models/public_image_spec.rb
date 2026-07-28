@@ -109,9 +109,7 @@ RSpec.describe PublicImage, type: :model do
       let(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike) }
 
       it "returns a readable file on disk that outlives the method" do
-        expect(public_image.reload.local_file?).to be_truthy # Disk service in test
-
-        file = public_image.open_file
+        file = public_image.reload.open_file
         # blob.open would have unlinked by now - image processors need a path, not a StringIO
         expect(File.exist?(file.path)).to be_truthy
         expect(Vips::Image.new_from_file(file.path).width).to be > 0

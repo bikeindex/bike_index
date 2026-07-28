@@ -123,10 +123,9 @@ class PublicImage < ApplicationRecord
   end
 
   # Because the way we load the file is different if it's remote or local
-  # This is hacky, but whatever
+  # This is hacky, but whatever. Only asked of carrierwave images - activestorage downloads
+  # the same way whichever service it's on.
   def local_file?
-    return file.blob.service.is_a?(ActiveStorage::Service::DiskService) if file.attached?
-
     image&._storage&.to_s == "CarrierWave::Storage::File"
   end
 
