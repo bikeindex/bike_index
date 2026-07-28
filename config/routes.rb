@@ -170,6 +170,11 @@ Rails.application.routes.draw do
     get :step_2
   end
 
+  # Shadows ActiveStorage's own route (drawn last, so this wins) to put the registration and
+  # file checks in DirectUploadsController. Deliberately unnamed - rails_direct_uploads_path
+  # still resolves here.
+  post "/rails/active_storage/direct_uploads" => "direct_uploads#create"
+
   namespace :search do
     get "/", to: redirect("/search/registrations")
     # Autocomplete + selection chips for the search query items combobox

@@ -132,7 +132,8 @@
     <div
       class="tw:mb-4"
       data-controller="register--photo"
-      data-register--photo-url-value="<%= rails_direct_uploads_path %>"
+      <%# The token rides the query string - DirectUpload posts to this url verbatim %>
+      data-register--photo-url-value="<%= rails_direct_uploads_path(b_param_token: @b_param.id_token) %>"
       data-register--photo-uploading-value="<%= translation(".uploading") %>"
       data-register--photo-failed-value="<%= translation(".upload_failed") %>"
     >

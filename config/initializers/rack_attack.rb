@@ -9,6 +9,9 @@ class Rack::Attack
   # /session (password), so both share the sign-in throttles below.
   SIGN_IN_PATHS = ["/session", "/session/identify"].freeze
   CSP_REPORTS_PATH = "/csp_reports"
+  DIRECT_UPLOADS_PATH = "/rails/active_storage/direct_uploads"
+  DIRECT_UPLOAD_USER_MAX = ENV.fetch("RACK_ATTACK_DIRECT_UPLOAD_USER_LIMIT", 20).to_i
+  DIRECT_UPLOAD_IP_MAX = ENV.fetch("RACK_ATTACK_DIRECT_UPLOAD_IP_LIMIT", 10).to_i
 
   SENSITIVE_AUTH_PATHS = %w[
     /session/create_magic_link
@@ -76,6 +79,28 @@ class Rack::Attack
   # Account password update: 5 per minute per IP
   throttle("account_update/ip", limit: 5, period: 1.minute) do |request|
     request.ip if request.patch? && request.path == "/my_account"
+  end
+
+  # Each direct upload hands out a presigned URL to write into our bucket. A registration
+  # needs exactly one, so anonymous callers get an hourly IP budget; signed-in users are
+  # attributable and may be working through a pile of bikes, so they get a per-minute one.
+  throttle("direct_uploads/user", limit: DIRECT_UPLOAD_USER_MAX, period: 1.minute) do |request|
+    direct_upload_user_id(request) if direct_upload?(request)
+  end
+
+  throttle("direct_uploads/ip", limit: DIRECT_UPLOAD_IP_MAX, period: 1.hour) do |request|
+    request.ip if direct_upload?(request) && direct_upload_user_id(request).blank?
+  end
+
+  def self.direct_upload?(request)
+    request.post? && request.path == DIRECT_UPLOADS_PATH
+  end
+
+  # Resolved through AuthRestriction so the signed cookie is actually verified - trusting the
+  # cookie's presence would hand anyone the larger budget. Rack::Attack::Request is a bare
+  # Rack::Request, hence rebuilding the ActionDispatch one it needs for the cookie jar.
+  def self.direct_upload_user_id(request)
+    AuthRestriction.user_from(ActionDispatch::Request.new(request.env))&.id
   end
 
   self.throttled_responder = lambda do |request|
