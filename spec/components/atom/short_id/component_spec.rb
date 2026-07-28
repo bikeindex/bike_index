@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe UI::ShortId::Component, type: :component do
+RSpec.describe Atom::ShortId::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {short_id: "r/21J-HW"} }

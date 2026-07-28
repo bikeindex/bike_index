@@ -6,9 +6,9 @@ module UI
       class ComponentPreview < ApplicationComponentPreview
         # @!group Variants
 
-        # Every manufacturer, keyed to :manufacturer_id
+        # Every manufacturer, keyed to :manufacturer_id, labeled by a UI::Forms::Group
         def default
-          render(UI::Forms::ComboboxManufacturer::Component.new)
+          {template: "ui/forms/combobox_manufacturer/component_preview/default"}
         end
 
         # Limited to frame makers
@@ -16,12 +16,9 @@ module UI
           render(UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true))
         end
 
-        # Pre-selected value, custom label
+        # Pre-selected value
         def preselected
-          render(UI::Forms::ComboboxManufacturer::Component.new(
-            label: "Frame manufacturer",
-            value: Manufacturer.frame_makers.first&.id
-          ))
+          render(UI::Forms::ComboboxManufacturer::Component.new(value: Manufacturer.frame_makers.first&.id))
         end
 
         # @!endgroup

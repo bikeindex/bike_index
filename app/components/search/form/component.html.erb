@@ -37,15 +37,15 @@
           >
             <% if render_primary_activity_field? %>
               <div class="tw:w-full tw:md:max-w-xl">
+                <%= label_tag :primary_activity, primary_activity_label, class: "twlabel tw:sr-only" %>
+
                 <%= render(::UI::Forms::Combobox::Component.new(
                   name: :primary_activity,
-                  id: "primary_activity",
                   options: primary_activity_combobox_options,
                   value: @interpreted_params[:primary_activity],
                   include_blank: true,
-                  placeholder: translation(".search_for_primary_activity"),
-                  label: translation(".search_for_primary_activity"),
-                  label_class: "tw:sr-only",
+                  placeholder: primary_activity_label,
+                  dialog_label: primary_activity_label,
                 )) %>
               </div>
             <% end %>
@@ -87,7 +87,7 @@
       </div>
 
       <div class="tw:w-20">
-        <%= render UI::Button::Component.new(color: :primary, kind: :submit, html_class: "tw:w-full tw:h-full tw:justify-center tw:disabled:cursor-wait") do %>
+        <%= render UI::Button::Component.new(color: :primary, kind: :submit, html_class: "tw:w-full tw:h-full tw:disabled:cursor-wait") do %>
           <%= helpers.inline_svg_tag "icons/searcher.svg",
             id: "search-button",
             class: "tw:text-white",

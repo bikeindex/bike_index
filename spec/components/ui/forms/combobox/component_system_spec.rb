@@ -12,29 +12,29 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
     expect_axe_clean
 
     # Opens the listbox on click
-    find_field("Manufacturer").click
+    find_field("Cycle type").click
 
     expect(page).to have_css('[aria-expanded="true"]')
-    expect(page).to have_css('[role="option"]', count: 6)
+    expect(page).to have_css('[role="option"]', count: CycleType.slugs.count)
     expect_axe_clean
 
     # Filters the options as you type
-    fill_in "Manufacturer", with: "an"
+    fill_in "Cycle type", with: "cargo"
 
-    expect(page).to have_css('[role="option"]', text: "Giant")
-    expect(page).to have_css('[role="option"]', text: "Cannondale")
-    expect(page).not_to have_css('[role="option"]', text: "Trek")
+    expect(page).to have_css('[role="option"]', text: "Cargo Bike (front storage)")
+    expect(page).to have_css('[role="option"]', text: "Cargo Tricycle (trike with rear storage)")
+    expect(page).not_to have_css('[role="option"]', text: "Unicycle")
 
     # Selecting an option closes the listbox and fills the visible input
     # and the hidden field that carries the form value
-    find('[role="option"]', text: "Cannondale").click
+    find('[role="option"]', text: "Cargo Bike (front storage)").click
 
     expect(page).to have_css('[aria-expanded="false"]')
-    expect(find_field("Manufacturer").value).to eq "Cannondale"
-    expect(find("input[name='manufacturer']", visible: :hidden).value).to eq "Cannondale"
+    expect(find_field("Cycle type").value).to eq "Cargo Bike (front storage)"
+    expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "Cargo Bike (front storage)"
 
     # Reopen, then close with the Escape key
-    find_field("Manufacturer").click
+    find_field("Cycle type").click
 
     expect(page).to have_css('[aria-expanded="true"]')
 
