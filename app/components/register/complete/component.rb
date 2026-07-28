@@ -4,9 +4,9 @@ module Register
   module Complete
     # The completion card: bike created, or awaiting email verification
     class Component < ApplicationComponent
-      def initialize(b_param:, bike:)
+      def initialize(b_param:)
         @b_param = b_param
-        @bike = bike
+        @bike = b_param.created_bike
       end
     end
   end

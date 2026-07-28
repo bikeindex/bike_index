@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-/* global localStorage, setTimeout, clearTimeout, Date, window, CustomEvent */
+/* global localStorage, setTimeout, clearTimeout, Date, window, CustomEvent, CSS */
 
 // Connects to data-controller="form-persist"
 // Mirrors form fields to localStorage so a draft survives page reloads —
@@ -108,7 +108,7 @@ export default class extends Controller {
   }
 
   radioGroupChecked (name) {
-    return [...this.fields].some((field) => field.type === 'radio' && field.name === name && field.checked)
+    return this.element.querySelector(`input[type=radio][name="${CSS.escape(name)}"]:checked`)
   }
 
   get fields () {

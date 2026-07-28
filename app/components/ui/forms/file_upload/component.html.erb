@@ -1,8 +1,8 @@
 <%# drop is bound to the root, not the frame, so dropping on the button works too. %>
 <div
-  data-controller="form--file-upload"
-  data-form--file-upload-placeholder-value="<%= @placeholder %>"
-  data-action="drop->form--file-upload#drop dragover@document->form--file-upload#dragOver dragleave@document->form--file-upload#endDrag drop@document->form--file-upload#endDrag"
+  data-controller="ui--forms--file-upload"
+  data-ui--forms--file-upload-placeholder-value="<%= @placeholder %>"
+  data-action="drop->ui--forms--file-upload#drop dragover@document->ui--forms--file-upload#dragOver dragleave@document->ui--forms--file-upload#endDrag drop@document->ui--forms--file-upload#endDrag"
 >
   <%#
     The drop target frames the preview and controls; its border is transparent until a drag
@@ -19,8 +19,8 @@
       tw:dark:data-[dragging=true]:border-gray-600
       tw:dark:data-[over=true]:bg-blue-950
     "
-    data-form--file-upload-target="dropZone"
-    data-action="dragenter->form--file-upload#highlightDropZone dragleave->form--file-upload#unhighlightDropZone"
+    data-ui--forms--file-upload-target="dropZone"
+    data-action="dragenter->ui--forms--file-upload#highlightDropZone dragleave->ui--forms--file-upload#unhighlightDropZone"
   >
     <% if @attachment_url %>
       <%# block so the controls start a new line, w-fit so the link doesn't stretch past the image %>
@@ -33,13 +33,13 @@
       <%= @form_builder.file_field(@attribute, @html_options) %>
 
       <%# Stimulus has no default event for a label, so name click explicitly. %>
-      <%= @form_builder.label @attribute, label_content, class: @label_classes, data: {action: "click->form--file-upload#chooseFile"} %>
+      <%= @form_builder.label @attribute, label_content, class: @label_classes, data: {action: "click->ui--forms--file-upload#chooseFile"} %>
 
       <% if @camera %>
         <%# `capture` only reaches a camera on touch devices; a fine pointer would just reopen the file picker. %>
         <%= render UI::Button::Component.new(
               html_class: "tw:whitespace-nowrap tw:pointer-fine:hidden",
-              data: {action: "form--file-upload#takePicture"}
+              data: {action: "ui--forms--file-upload#takePicture"}
             ) do %>
           <%# hidden from AT: the button's own text already names it %>
           <%= helpers.inline_svg_tag("icons/camera.svg", class: "tw:h-4 tw:w-4", aria_hidden: true) %>
@@ -49,7 +49,7 @@
 
       <span
         class="tw:min-w-0 tw:truncate tw:text-gray-500 tw:dark:text-gray-400"
-        data-form--file-upload-target="filename"
+        data-ui--forms--file-upload-target="filename"
       >
         <%= @placeholder %>
       </span>

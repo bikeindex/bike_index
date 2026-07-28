@@ -95,7 +95,9 @@ class BParam < ApplicationRecord
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   # The blank shell register/new creates - nothing worth keeping if the form was never submitted
-  scope :without_bike_values, -> { where("(params -> 'bike') IS NULL OR (params -> 'bike') - 'status' = '{}'::jsonb") }
+  scope :without_bike_values, -> { bike_params_empty.or(where("(params -> 'bike') - 'status' = '{}'::jsonb")) }
+  # Tokenized lookups resume registrations for up to a month
+  scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -172,7 +174,7 @@ class BParam < ApplicationRecord
     def with_organization_or_no_creator(toke)
       return if toke.blank?
 
-      without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
+      without_bike.recent_with_token(toke)
         .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
     end
 
@@ -182,7 +184,7 @@ class BParam < ApplicationRecord
 
       # Once the bike exists the token only ever renders the completion page,
       # so access doesn't require matching the creator assigned at creation
-      where(id_token: toke).where("created_at >= ?", Time.current - 1.month)
+      recent_with_token(toke)
         .detect { |b| b.creator_id.blank? || b.creator_id == user_id || b.created_bike_id.present? }
     end
 

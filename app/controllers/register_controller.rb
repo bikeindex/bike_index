@@ -1,5 +1,6 @@
 class RegisterController < ApplicationController
   before_action :find_b_param, except: %i[new]
+  before_action :redirect_registered, only: %i[step_1 create step_2 update]
 
   # Redirects into step_1 with a token (reusing the session's registration when
   # it's still blank), so going back from step_2 lands on the same registration
@@ -11,14 +12,10 @@ class RegisterController < ApplicationController
   end
 
   def step_1
-    return redirect_to(register_path(b_param_token: @b_param.id_token)) if @b_param.with_bike?
-
     render Register::StartForm::Component.new(b_param: @b_param)
   end
 
   def create
-    return redirect_to(register_path(b_param_token: @b_param.id_token)) if @b_param.with_bike?
-
     previous_email = @b_param.owner_email
     @b_param.clean_params(create_params.as_json)
     @b_param.errors.add(:base, translation(:email_required)) if @b_param.owner_email.blank?
@@ -36,7 +33,6 @@ class RegisterController < ApplicationController
   end
 
   def step_2
-    return redirect_to(register_path(b_param_token: @b_param.id_token)) if @b_param.with_bike?
     return redirect_to(step_1_register_path(b_param_token: @b_param.id_token)) if @b_param.owner_email.blank?
 
     render Register::DetailsForm::Component.new(b_param: @b_param)
@@ -48,7 +44,7 @@ class RegisterController < ApplicationController
     return confirm if params[:confirmation_token].present? && !@b_param.with_bike?
 
     if @b_param.with_bike? || (@b_param.details_completed? && !creator_available?)
-      render Register::Complete::Component.new(b_param: @b_param, bike: @b_param.created_bike)
+      render Register::Complete::Component.new(b_param: @b_param)
     elsif @b_param.owner_email.blank?
       redirect_to step_1_register_path(b_param_token: @b_param.id_token)
     else
@@ -57,8 +53,6 @@ class RegisterController < ApplicationController
   end
 
   def update
-    return redirect_to(register_path(b_param_token: @b_param.id_token)) if @b_param.with_bike?
-
     @b_param.creator_id ||= current_user&.id
     @b_param.clean_params(update_params.as_json)
     @b_param.save
@@ -94,6 +88,11 @@ class RegisterController < ApplicationController
 
     flash[:info] = translation(:registration_not_found) if params[:b_param_token].present?
     redirect_to new_register_path
+  end
+
+  # Once the bike exists the token only ever shows the completion page
+  def redirect_registered
+    redirect_to register_path(b_param_token: @b_param.id_token) if @b_param.with_bike?
   end
 
   # The session's registration, as long as it hasn't gotten anywhere - step 1

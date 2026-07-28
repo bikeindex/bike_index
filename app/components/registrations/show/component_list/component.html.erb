@@ -1,6 +1,6 @@
-<details data-controller="details" <% unless @collapsed %>  open<% end %>>
+<details data-controller="ui--details" <% unless @collapsed %>  open<% end %>>
   <summary
-    data-action="click->details#toggle"
+    data-action="click->ui--details#toggle"
     class="
       tw:flex tw:cursor-pointer tw:list-none tw:items-center
       tw:justify-between tw:gap-3 tw:rounded-sm tw:border tw:border-gray-200
@@ -35,7 +35,7 @@
   </summary>
 
   <div
-    data-details-target="content"
+    data-ui--details-target="content"
     class="tw:flex tw:flex-col tw:gap-6 tw:pt-6 <%= "tw:hidden!" if @collapsed %>"
   >
     <% grouped_rows.each do |cgroup, rows| %>

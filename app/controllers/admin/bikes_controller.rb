@@ -139,6 +139,19 @@ module Admin
 
     def permitted_parameters
       params.require(:bike).permit(BikeServices::Creator.old_attr_accessible + [bike_organization_ids: []])
+        .merge(manufacturer_parameters)
+    end
+
+    # The manufacturer combobox submits the name of a manufacturer that isn't listed,
+    # which becomes Manufacturer.other plus manufacturer_other (matching BParam)
+    def manufacturer_parameters
+      manufacturer_param = params.dig(:bike, :manufacturer_id)
+      return {} if manufacturer_param.blank?
+
+      manufacturer = Manufacturer.friendly_find(manufacturer_param)
+      return {"manufacturer_id" => manufacturer.id, "manufacturer_other" => nil} if manufacturer.present?
+
+      {"manufacturer_id" => Manufacturer.other.id, "manufacturer_other" => manufacturer_param}
     end
 
     def destroy_bike

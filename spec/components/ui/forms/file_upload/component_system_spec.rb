@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/file_upload/component/" }
-  let(:drop_frame) { "[data-form--file-upload-target='dropZone']" }
+  let(:drop_frame) { "[data-ui--forms--file-upload-target='dropZone']" }
   # Dragging a file has no Capybara equivalent -- the drag source is the OS, not the
   # page -- so the events carry a hand-built DataTransfer, per Playwright's docs.
   let(:start_drag) do
@@ -18,14 +18,14 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
   it "takes a file from the picker or a drag, and adapts its labels to the pointer" do
     visit("#{base_path}default")
 
-    expect(page).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
+    expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "No file chosen")
     # a fine pointer can click and drop, and the frame is idle until something is dragged
     expect(page).to have_css("label", text: "Click or drop to choose file")
     expect(page).to have_no_css("#{drop_frame}[data-dragging]")
 
     attach_file("file", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
 
-    expect(page).to have_css("[data-form--file-upload-target='filename']", text: "bike.jpg")
+    expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "bike.jpg")
 
     # dragging text rather than a file leaves the frame alone
     page.execute_script(<<~JS)
@@ -62,11 +62,11 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
     # Two files into a single-file input -- only the first should land.
     page.execute_script(<<~JS)
       window.fileTransfer.items.add(new File(["y"], "second.jpg", {type: "image/jpeg"}))
-      document.querySelector("[data-controller='form--file-upload'] label")
+      document.querySelector("[data-controller='ui--forms--file-upload'] label")
         .dispatchEvent(new DragEvent("drop", {bubbles: true, dataTransfer: window.fileTransfer}))
     JS
 
-    expect(page).to have_css("[data-form--file-upload-target='filename']", text: "dropped.jpg")
+    expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "dropped.jpg")
     expect(page).to have_no_css("#{drop_frame}[data-dragging]")
     # rendered, but the media query keeps it from a mouse
     expect(page).to have_button("Take picture", visible: :hidden)

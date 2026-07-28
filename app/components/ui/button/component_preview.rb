@@ -3,6 +3,13 @@
 module UI
   module Button
     class ComponentPreview < ApplicationComponentPreview
+      # The mid-submit state: disabled, with the spinner span force-shown (the
+      # controller reveals it on a real submit)
+      def submitting
+        render(UI::Button::Component.new(text: "Next", color: :primary, kind: :submit,
+          spinner: true, disabled: true, html_class: "tw:[&_span]:inline-flex!"))
+      end
+
       # @!group Colors
       # Shown disabled with the spinner revealed, as the submit-spinner controller leaves it mid-submit
       def submitting
