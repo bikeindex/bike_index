@@ -173,6 +173,8 @@ Rails.application.routes.draw do
     # Autocomplete + selection chips for the search query items combobox
     get "combobox/options", to: "combobox#options", as: :combobox_options
     post "combobox/chips", to: "combobox#chips", as: :combobox_chips
+    # Autocomplete for the manufacturer combobox (UI::Forms::ComboboxManufacturer)
+    get "combobox/manufacturers", to: "combobox#manufacturers", as: :combobox_manufacturers
     resources :registrations, only: %i[index] do
       collection do
         get :similar_serials
@@ -408,6 +410,8 @@ Rails.application.routes.draw do
 
   get "strava_search", to: "strava_search#index"
   post "strava_search/token", to: "strava_search#create_token", as: :strava_search_token
+
+  get "reverse_geocode", to: "reverse_geocode#index", defaults: {format: "json"}
 
   mount Lookbook::Engine, at: "/lookbook"
 

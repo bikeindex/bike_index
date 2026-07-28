@@ -103,6 +103,11 @@ class Manufacturer < ApplicationRecord
     slug
   end
 
+  # How an async combobox displays an already selected manufacturer
+  def to_combobox_display
+    name
+  end
+
   def official_organization
     @official_organization ||= Organization.find_by_manufacturer_id(id)
   end

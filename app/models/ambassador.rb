@@ -18,6 +18,7 @@
 #  description                        :text
 #  developer                          :boolean          default(FALSE), not null
 #  email                              :string(255)
+#  feature_registration_show_legacy   :boolean          default(FALSE), not null
 #  instagram                          :string
 #  last_login_at                      :datetime
 #  last_login_ip                      :string

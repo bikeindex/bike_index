@@ -1,0 +1,7 @@
+<%# A content block renders in place of the input -- here a radio button group. %>
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :frame_size)) do %>
+    <%= render(UI::Forms::RadioButtonGroup::Component.new(name: :frame_size, selected: "m", full_width: true,
+      entries: %w[xs s m l xl].map { |size| {value: size, label: size.upcase} })) %>
+  <% end %>
+<% end %>

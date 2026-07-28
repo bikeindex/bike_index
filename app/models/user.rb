@@ -18,6 +18,7 @@
 #  description                        :text
 #  developer                          :boolean          default(FALSE), not null
 #  email                              :string(255)
+#  feature_registration_show_legacy   :boolean          default(FALSE), not null
 #  instagram                          :string
 #  last_login_at                      :datetime
 #  last_login_ip                      :string
@@ -293,6 +294,16 @@ class User < ApplicationRecord
 
   def ambassador?
     organization_roles.ambassador_organizations.limit(1).any?
+  end
+
+  # In the bike show redesign rollout, so sees the controls for switching views
+  def registration_show_toggleable?
+    Flipper.enabled?(:bike_show_redesign_toggle, self)
+  end
+
+  # Defaults to the redesigned registration page, rather than the legacy bike show
+  def registration_show_redesign?
+    registration_show_toggleable? && !feature_registration_show_legacy?
   end
 
   def can_create_listing?

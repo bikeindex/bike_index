@@ -38,6 +38,19 @@ The base is the branch this PR goes off of — `main` by default, or a specific 
 
 When updating an **existing** PR, leave its base untouched — run `gh pr edit` without `--base` (which preserves the current base). Only retarget an existing PR's base when the user explicitly asks.
 
+### 0.7. Freshen stale migration timestamps
+
+Every migration this branch adds must be dated within the past 2 days. List them with `git diff "origin/$BASE"...HEAD --name-only --diff-filter=A -- db/migrate db/analytics_migrate` and compare each filename's leading timestamp against `date -v-2d +%Y%m%d%H%M%S`.
+
+A migration timestamped in the future isn't stale — leave it alone.
+
+For each stale migration, in this order (rollback must happen while the old version is still on disk):
+
+1. Roll it back: `bin/rails db:migrate:down:primary VERSION=<old-timestamp>` (`db:migrate:down:analytics` for `db/analytics_migrate` files) — the un-namespaced `db:migrate:down` refuses in this multi-database app.
+2. `git mv` the file to the same name with a fresh `date +%Y%m%d%H%M%S` timestamp — when re-dating several, keep their relative order with incrementing timestamps.
+3. `bin/rails db:migrate` to re-apply and regenerate the structure files — never hand-edit `db/structure.sql`.
+4. Commit the renames together with the regenerated structure files.
+
 ### 1. Update from the base, then gather branch state
 
 First bring the branch up to date with the base (`$BASE` from step 0.5) so the PR reflects the current base and merges without surprises. Follow the `merge-conflicts` skill: `git fetch origin` then `git merge --no-edit "origin/$BASE"`, merge (never rebase), keep the merge commit to just the merge (the step 0 edits ride along as ordinary commits), and resolve any conflicts per that skill.
@@ -74,6 +87,8 @@ Bias hard toward brevity — default to a one-line intro plus ~2-3 bullets, not 
 Cut anything the reviewer can see in the diff. Implementation mechanics — which HTTP client, file-mode flags, helper-method names, column renames, the exact tasks/files removed — belong to the diff, not the body. Keep only what the diff *doesn't* make obvious: what the PR adds, the single entry point a reviewer would use, and any non-obvious behavior or decision they'd otherwise have to reverse-engineer. When in doubt, leave it out and let the code speak. Aim for under ~6 bullets total including nested ones; if you're past that, regroup by category — but most PRs should land well under that.
 
 Describe the end state, not the journey. Reviewers want to know what the PR does *now* — the diff that will land — not the order in which it was built. Avoid framings like "first pass" / "second pass", commit-hash references for stages of work that all merge into the same shipped diff, "originally we tried X then switched to Y", or play-by-play of how the conversation evolved. The git log preserves that. If a discarded approach is genuinely load-bearing context for the reviewer (e.g., explains why the chosen approach is structured oddly), one line is enough; otherwise omit. The same applies when *updating* an existing PR body: rewrite to describe the current diff, don't append a changelog of edits made since the last revision.
+
+**Reference branches by PR number.** When the body mentions another branch — a stacked base, a branch this builds on — write its PR (`#3918`) instead of the branch name. Look it up with `gh pr list --head <branch> --state all --json number --jq '.[0].number'`; name the branch only when it has no PR.
 
 **No "Test plan" section unless the user asks.** Don't list things CI already covers — `bundle exec rspec ...`, `bin/lint`, `bin/dev` boots cleanly, etc. Those belong to CI, not the PR body. Only add a Test plan when there's reviewer-facing manual verification a human needs to do (e.g. "click X, confirm Y appears"), and only when the user requests it.
 

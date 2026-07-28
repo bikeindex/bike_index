@@ -1,4 +1,12 @@
 class StolenRecordV2Serializer < ApplicationSerializer
+  # Legacy v2 API location format (ISO country suffix)
+  def self.formatted_address_string_with_iso(stolen_record)
+    return nil if stolen_record.blank?
+
+    [stolen_record.formatted_address_string(render_country: false), stolen_record.country_iso]
+      .reject(&:blank?).join(", ").presence
+  end
+
   attributes :date_stolen,
     :location,
     :latitude,
@@ -21,7 +29,7 @@ class StolenRecordV2Serializer < ApplicationSerializer
   end
 
   def location
-    object.address
+    self.class.formatted_address_string_with_iso(object)
   end
 
   def latitude

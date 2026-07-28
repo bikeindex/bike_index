@@ -67,9 +67,9 @@
 
 <p>Only edit if you want to change what is stored about this recovery.</p>
 
-<details data-controller="details">
+<details data-controller="ui--details">
   <summary
-    data-action="click->details#toggle"
+    data-action="click->ui--details#toggle"
     class="
       gray-link tw:cursor-pointer tw:list-none
       tw:[&::-webkit-details-marker]:hidden
@@ -78,7 +78,7 @@
     show edit form
   </summary>
 
-  <div data-details-target="content" class="tw:hidden!">
+  <div data-ui--details-target="content" class="tw:hidden!">
     <hr class="mt-5 mb-4">
 
     <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }, html: { class: "form form-horizontal" }) do |f| %>

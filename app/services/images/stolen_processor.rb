@@ -68,7 +68,7 @@ module Images
 
       stock_photo_url = Bike.unscoped.find_by(id: stolen_record.bike_id)&.stock_photo_url
       if stock_photo_url.present?
-        [URI.parse(stock_photo_url).open, "b#{stolen_record.bike_id}"]
+        [Down.download(stock_photo_url), "b#{stolen_record.bike_id}"]
       else
         [nil, nil]
       end
@@ -112,9 +112,6 @@ module Images
     def generate_alert(template:, image:, location_text:, convert: "jpeg")
       config = TEMPLATE_CONFIG[template]
       raise "Unknown template (#{template})!" unless config.present?
-
-      # URI.open returns StringIO for small files, which Vips can't process directly
-      image = to_tempfile(image) if image.is_a?(StringIO)
 
       bike_image = ImageProcessing::Vips.source(image)
         .resize_to_limit(*bike_image_dimensions_for(config))
@@ -222,20 +219,12 @@ module Images
     def stolen_record_location(stolen_record)
       return nil unless stolen_record.to_coordinates.any?
 
-      GeocodeableLegacy.address(stolen_record, street: false, zipcode: false, country: [:skip_default, :name])
+      stolen_record.formatted_address_string(visible_attribute: :city, render_country: :if_different)
         .gsub("'", "\\'")
-    end
-
-    def to_tempfile(string_io)
-      tempfile = Tempfile.new(["stolen_image", ".jpeg"])
-      tempfile.binmode
-      tempfile.write(string_io.read)
-      tempfile.rewind
-      tempfile
     end
 
     conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :generate_alert,
       :template_path, :topbar_path, :bike_image_dimensions_for, :bike_image_offset,
-      :caption_overlay, :font, :fc_list_output, :fc_list_has?, :stolen_record_location, :to_tempfile
+      :caption_overlay, :font, :fc_list_output, :fc_list_has?, :stolen_record_location
   end
 end

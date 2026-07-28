@@ -129,6 +129,9 @@ class UserRegistrationOrganization < ApplicationRecord
       BikeOrganization.unscoped
         .where(organization_id:, bike_id:).first_or_initialize
         .update(deleted_at: nil, can_not_edit_claimed:)
+    rescue ActiveRecord::RecordNotUnique
+      # A parallel job won the insert; retry to merge our attributes onto its row
+      retry
     end
   end
 end

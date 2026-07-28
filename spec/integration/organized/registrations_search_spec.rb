@@ -19,27 +19,38 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # mobile org dropdown is the only menu path. Chrome's --window-size flag
     # is unreliable in headless mode, so resize explicitly.
     page.current_window.resize_to(720, 2000)
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
-    find(".alert-success .close").click
-    # Wait for the flash to finish dismissing -- otherwise it overlaps and
-    # intercepts the click on the nav link below. The Bootstrap fade-out can
-    # exceed Capybara's default 2s wait on slow CI runners.
-    expect(page).to have_no_css(".alert-success", wait: 10)
-    find("#passive_organization_submenu").click
-    within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
-    expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/, wait: 10)
+    # The two-step login, the flash and the org submenu all animate, and a click
+    # waits for its target to settle before it lands. That wait is Capybara's,
+    # so the 2s default is what times out here on a loaded machine.
+    using_wait_time(10) do
+      visit new_session_path
+      fill_in "Email", with: user.email
+      click_button "Continue"
+      fill_in "Password", with: "testthisthing7$"
+      click_button "Log in"
+      find(".alert-success .close").click
+      # Wait for the flash to finish dismissing -- otherwise it overlaps and
+      # intercepts the click on the nav link below.
+      expect(page).to have_no_css(".alert-success")
+      find("#passive_organization_submenu").click
+      within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
+      expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/)
+    end
   end
 
   def settings_selector
     "[data-org--search-target='settings']"
   end
 
+  # multi_search paints the chips from UI::Badge's palette via JS, so take the
+  # background off the component rather than restating it here
+  def badge_background(color)
+    UI::Badge::Component::COLORS.fetch(color).split.first
+  end
+
   def expect_settings_open
     expect(find(settings_selector, visible: :all)["class"]).not_to include("tw:hidden!")
+    expect(page).to have_css("[data-org--search-target='settingsButton'][data-active='true']")
   end
 
   def open_settings_if_not
@@ -149,7 +160,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 10, wait: 10)
     # Open settings to reveal the export link
     open_settings_if_not
-    click_link "Create export of searched registrations"
+    # go_back re-renders the results frame, and while it's busy the wrapper grows
+    # a min-height -- the table lands over the link and swallows the click. The
+    # click then waits out a full page navigation, which also outruns the 2s default.
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
+    using_wait_time(10) { click_link "Create export of searched registrations" }
 
     expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
     all_bike_ids = organization.bikes.pluck(:id).sort
@@ -179,7 +194,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     fill_in "search_notes", with: ""
     find("#search-button").click
     expect(page).to have_current_path(/period=year/, wait: 10)
-    expect(page).to have_text("11 registrations matching")
+    expect(page).to have_text("11 registrations matching", wait: 10)
 
     # "past day" additionally excludes bike2 (3 days ago)
     click_link "past day"
@@ -245,6 +260,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Runs after the chart test because the Stimulus submit posts a timezone param that pins
     # session[:timezone], which would otherwise override the cookie set above.
     click_link "past year"
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    # Let the period navigation land before submitting. The search posts the
+    # period the frame currently holds, so submitting mid-swap searches the past
+    # 30 days again -- and the URL already says year, so only the count shows it.
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
     fill_in "search_email", with: ""
     find("#search-button").click
     expect(page).to have_current_path(/period=year/, wait: 10)
@@ -252,7 +272,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # replaces. Wait for the swap to finish (count reflects the cleared email)
     # before toggling it -- otherwise Playwright grabs the old button and it
     # detaches mid-click ("Element is not attached to the DOM").
-    expect(page).to have_text("11 registrations matching")
+    expect(page).to have_text("11 registrations matching", wait: 10)
 
     click_button "custom"
     start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
@@ -356,13 +376,19 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       ActionController::Base.cache_store = :null_store
     end
 
+    # Clicking before org--multi-search connects submits the form and reloads the
+    # page, so wait for the controller to enable the (initially disabled) button
+    def wait_for_multi_search_controller
+      expect(page).to have_button("Search serials", disabled: false, wait: 15)
+    end
+
     it "searches multiple serials, shows results, and caches rows by updated_at" do
       find("#passive_organization_submenu").click
       within(".current-organization-submenu") { click_link "Multi search" }
       expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
 
       expect(page).to have_content(/multi search/i)
-      expect(page).to have_css("[data-controller~='org--multi-search']", wait: 5)
+      wait_for_multi_search_controller
 
       # Kind toggle radios should not be present without bike_stickers feature
       expect(page).not_to have_field("Serials", visible: :all)
@@ -372,7 +398,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       click_button "Search serials"
 
       # Chips update with results
-      expect(page).to have_css("#chip_2.tw\\:bg-gray-100", wait: 15)
+      expect(page).to have_css("#chip_2", class: badge_background(:gray), wait: 15)
 
       # Results sorted by chip order, empty results removed
       expect(page).to have_css(".multi-search-serial-result", count: 2)
@@ -433,6 +459,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
       it "toggles to sticker search and shows results" do
         visit multi_serial_path
+        wait_for_multi_search_controller
 
         # Kind toggle radios are present
         expect(page).to have_field("Serials", visible: :all)
@@ -459,11 +486,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
         click_button "Search stickers"
 
         # Chips for unclaimed and non-org stickers show gray (no bikes)
-        expect(page).to have_css("#chip_1.tw\\:bg-gray-100", wait: 15)
-        expect(page).to have_css("#chip_2.tw\\:bg-gray-100")
+        expect(page).to have_css("#chip_1", class: badge_background(:gray), wait: 15)
+        expect(page).to have_css("#chip_2", class: badge_background(:gray))
 
         # Only claimed org sticker has a bike result
-        expect(page).to have_css("#chip_0.tw\\:bg-green-50")
+        expect(page).to have_css("#chip_0", class: badge_background(:success))
 
         # Switch back to serials
         choose "Serials", allow_label_click: true, visible: :all
@@ -515,7 +542,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_text("only with address")
 
       expect_settings_open
-      click_link "Create export of searched registrations"
+      expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
+      using_wait_time(10) { click_link "Create export of searched registrations" }
       expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
       export_ids = find("#export_custom_bike_ids", visible: :all).value.split(", ").map(&:to_i).sort
       expect(export_ids).to eq([avery_bike.id])

@@ -3714,7 +3714,7 @@ ALTER SEQUENCE public.stolen_notifications_id_seq OWNED BY public.stolen_notific
 
 CREATE TABLE public.stolen_records (
     id integer NOT NULL,
-    zipcode character varying(255),
+    postal_code character varying(255),
     city character varying(255),
     theft_description text,
     created_at timestamp without time zone NOT NULL,
@@ -3735,7 +3735,7 @@ CREATE TABLE public.stolen_records (
     lock_defeat_description character varying(255),
     country_id integer,
     police_report_department character varying(255),
-    state_id integer,
+    region_record_id integer,
     creation_organization_id integer,
     secondary_phone character varying(255),
     approved boolean DEFAULT false NOT NULL,
@@ -3756,7 +3756,8 @@ CREATE TABLE public.stolen_records (
     recovery_display_status integer DEFAULT 0,
     neighborhood character varying,
     no_notify boolean DEFAULT false,
-    organization_stolen_message_id bigint
+    organization_stolen_message_id bigint,
+    region_string character varying
 );
 
 
@@ -4373,7 +4374,8 @@ CREATE TABLE public.users (
     time_single_format boolean DEFAULT false,
     deleted_at timestamp without time zone,
     address_record_id bigint,
-    can_send_many_marketplace_messages boolean DEFAULT false NOT NULL
+    can_send_many_marketplace_messages boolean DEFAULT false NOT NULL,
+    feature_registration_show_legacy boolean DEFAULT false NOT NULL
 );
 
 
@@ -6207,6 +6209,13 @@ CREATE INDEX index_bike_organizations_on_bike_id ON public.bike_organizations US
 
 
 --
+-- Name: index_bike_organizations_on_bike_id_and_organization_id_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_bike_organizations_on_bike_id_and_organization_id_unique ON public.bike_organizations USING btree (bike_id, organization_id) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_bike_organizations_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7602,6 +7611,9 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260725192133'),
+('20260725155657'),
+('20260725155259'),
 ('20260723120001'),
 ('20260723120000'),
 ('20260723000000'),

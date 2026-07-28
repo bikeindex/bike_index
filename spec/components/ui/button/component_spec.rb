@@ -34,6 +34,17 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with spinner" do
+    let(:options) { {text:, kind: :submit, spinner: true} }
+
+    it "renders a self-wired hidden spinner that inherits the button's text color" do
+      expect(component).to have_css("button[data-controller='ui--button--submit-spinner']")
+      expect(component).to have_css("span.tw\\:hidden[data-ui--button--submit-spinner-target='spinner'] svg", visible: :all)
+      expect(component.css("svg").first["class"]).to_not include("tw:text-slate-400")
+      expect(component).to have_text("Click me")
+    end
+  end
+
   context "with link color" do
     let(:color) { :link }
 
@@ -42,6 +53,16 @@ RSpec.describe UI::Button::Component, type: :component do
       expect(html).to include("twlink")
       expect(html).not_to include("tw:text-blue-600")
       expect(html).not_to include("tw:bg-blue-600")
+      # Text-only, so no size padding
+      expect(html).to_not include(UI::Button::Component::SIZES[:md])
+    end
+
+    context "with html_class" do
+      let(:options) { {text:, color:, html_class: "tw:text-xs tw:font-bold"} }
+
+      it "renders the passed classes alongside twlink" do
+        expect(component).to have_css("button.twlink.tw\\:font-bold.tw\\:text-xs")
+      end
     end
 
     context "with non-default size" do
@@ -57,7 +78,7 @@ RSpec.describe UI::Button::Component, type: :component do
     let(:color) { :purple_outline }
 
     it "renders purple_outline styles" do
-      expect(component.to_html).to include("tw:hover:border-[#715eb2]")
+      expect(component.to_html).to include("tw:hover:border-purple-500")
     end
   end
 
@@ -105,7 +126,8 @@ RSpec.describe UI::Button::Component, type: :component do
     let(:options) { {text: "Active", color: :primary, active: true} }
 
     it "includes active ring classes" do
-      expect(component.to_html).to include("tw:ring-2")
+      expect(component).to have_css("button[data-active='true']")
+      expect(component.to_html).to include("tw:is-active:ring-2", "tw:is-active:ring-blue-500/40")
     end
   end
 
@@ -132,10 +154,15 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  it "always applies the prefixed active classes (inert until pressed/toggled)" do
+  it "always applies the active classes (inert until data-active/pressed)" do
     tokens = component.css("button").first["class"].split
-    expect(tokens).to include("tw:aria-pressed:ring-2", "tw:active:ring-2")
-    expect(tokens).not_to include("tw:ring-2", "tw:bg-gray-200")
+    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-gray-200")
+    expect(component).to have_no_css("button[data-active]")
+  end
+
+  it "keeps focus visible on an active button, whose ring would otherwise mask it" do
+    tokens = component.css("button").first["class"].split
+    expect(tokens).to include("tw:focus:ring-3", "tw:is-active:focus:ring-3")
   end
 
   context "with aria-controls" do
@@ -147,22 +174,35 @@ RSpec.describe UI::Button::Component, type: :component do
 
   context "active: true" do
     let(:options) { {active: true} }
-    it "applies the bare active classes statically" do
-      tokens = component.css("button").first["class"].split
-      expect(tokens).to include("tw:ring-2", "tw:bg-gray-200")
+    it "flags the button data-active, leaving the classes unchanged" do
+      expect(component).to have_css("button[data-active='true']")
+      expect(component.css("button").first["class"].split).to eq(instance.class.build_classes(color: :secondary, size: :md).split)
     end
   end
 
-  describe "ACTIVE_PREFIXED" do
-    it "prefixes every ACTIVE_COLORS class with aria-pressed: and active: for each color" do
-      expect(described_class::ACTIVE_PREFIXED.keys).to eq(described_class::ACTIVE_COLORS.keys)
-      described_class::ACTIVE_COLORS.each do |color, classes|
-        expected = classes.split.flat_map do |variant|
-          base = variant.delete_prefix("tw:")
-          ["tw:aria-pressed:#{base}", "tw:active:#{base}"]
-        end
-        expect(described_class::ACTIVE_PREFIXED[color].split).to eq(expected)
+  describe "ACTIVE_COLORS" do
+    # Every active class is variant-prefixed, so it can never compete with the resting
+    # color it overrides — that's what lets both sets be emitted without `!` important.
+    it "covers every color, prefixed with tw:is-active:" do
+      expect(described_class::ACTIVE_COLORS.keys).to eq(described_class::COLORS.keys)
+      described_class::ACTIVE_COLORS.each_value do |classes|
+        expect(classes.split.grep_v(/\Atw:is-active:/)).to eq([])
       end
+    end
+  end
+
+  # ACTIVE_COLORS is inert without this variant, which is what the deleted
+  # aria-pressed:/active: mirror used to spell out class by class.
+  describe "the is-active variant" do
+    let(:stylesheet) { Rails.root.join("app/assets/tailwind/application.css").read }
+
+    it "triggers on the persistent, toggled and pressed states" do
+      selectors = stylesheet[/^@custom-variant is-active \((.*)\);/, 1]
+      expect(selectors).to include('[data-active="true"]', '[aria-pressed="true"]', "[aria-current]", ":active")
+    end
+
+    it "is declared last, so it outranks the colors it overrides" do
+      expect(stylesheet.scan(/^@custom-variant (\S+)/).flatten.last).to eq("is-active")
     end
   end
 end

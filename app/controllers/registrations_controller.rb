@@ -12,8 +12,15 @@ class RegistrationsController < ApplicationController
     available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,
       organization: current_organization || passive_organization, preview_organization: requested_view&.last)
 
-    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view: current_view(available_views, requested_view),
-      available_views:), layout: "application")
+    view = current_view(available_views, requested_view)
+    # So the view_as organization sticks on the next request
+    set_passive_organization(view.last) if view.last
+
+    bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id],
+      organization_id: params[:organization_id], user: current_user)
+
+    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view:,
+      available_views:, bike_sticker:), layout: "application")
   end
 
   # The redesign has no edit view of its own; edit still lives on the bike

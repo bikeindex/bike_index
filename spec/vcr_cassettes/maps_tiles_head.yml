@@ -1,0 +1,51 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: https://maps.bikeindex.org/basemap/tiles.pmtiles
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 24 Jul 2026 17:33:31 GMT
+      Content-Type:
+      - application/octet-stream
+      Content-Length:
+      - '136995388316'
+      Connection:
+      - keep-alive
+      Etag:
+      - '"60cd5ce506f51c9ddd4e35193b3719ba-1021"'
+      Last-Modified:
+      - Fri, 24 Jul 2026 16:13:49 GMT
+      Accept-Ranges:
+      - bytes
+      Cache-Control:
+      - public, max-age=86400
+      Server:
+      - cloudflare
+      Cf-Cache-Status:
+      - DYNAMIC
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=8b8vJPtAf%2BYe1KZbSif%2BaynVncomgTCf6rsSvWP4eGJlF465j9eT8p1mde7EkQMTnqN6l7cnKVCDM8rOt5Ao6k99JsDr5dvNIA8Rx4KrXVvPVWwTdTQtaEe6FmKpDWbG6aTmyg%3D%3D"}]}'
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Cf-Ray:
+      - a204aba0efc61576-SJC
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Fri, 24 Jul 2026 17:33:31 GMT
+recorded_with: VCR 6.4.0

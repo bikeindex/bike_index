@@ -8,9 +8,11 @@ module UI
         md: "tw:h-15 tw:w-15"
       }.freeze
 
-      def initialize(text: nil, size: :md)
+      # A nil color_class leaves the svg inheriting currentColor from its surroundings
+      def initialize(text: nil, size: :md, color_class: "tw:text-slate-400 tw:dark:text-blue-800")
         @text = text
         @size = SIZES.key?(size) ? size : :md
+        @color_class = color_class
       end
 
       def call
@@ -30,7 +32,7 @@ module UI
       private
 
       def spinner_svg
-        classes = "tw:animate-spin tw:text-slate-400 tw:dark:text-blue-800 #{SIZES[@size]}"
+        classes = ["tw:animate-spin", @color_class.presence, SIZES[@size]].compact.join(" ")
         classes = "tw:inline #{classes}" if inline?
         classes = "tw:mx-auto tw:mt-4 #{classes}" unless inline?
 

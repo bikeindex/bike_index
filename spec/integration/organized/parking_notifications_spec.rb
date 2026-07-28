@@ -66,6 +66,55 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     expect(notification.user).to eq user
   end
 
+  # A pin in the middle of a park has no address of its own, so the reverse geocode
+  # answers with somewhere else entirely (the suite-wide New York stub). The pin is
+  # the location; the geocoded address only describes it, and must not move it.
+  context "with the pin somewhere that has no address" do
+    # Middle of Golden Gate Park
+    let(:latitude) { 37.759681 }
+    let(:longitude) { -122.4275348 }
+
+    def coordinate(field)
+      find("input[name='parking_notification[#{field}]']", visible: false).value.to_f
+    end
+
+    it "creates the notification at the pin, not at the geocoded address" do
+      page.current_window.resize_to(1400, 2000)
+      page.driver.with_playwright_page do |playwright_page|
+        browser_context = playwright_page.context
+        browser_context.grant_permissions(["geolocation"])
+        browser_context.set_geolocation({latitude:, longitude:, accuracy: 20})
+        # Serve an empty MapLibre style so the map builds without fetching basemap tiles
+        browser_context.route("https://maps.bikeindex.org/**", proc { |route, _request|
+          route.fulfill(status: 200, json: {version: 8, sources: {}, layers: []})
+        })
+      end
+      visit registration_path(bike)
+
+      # Opening the panel geolocates, which stamps the hidden coordinate fields and
+      # enables the (initially disabled) submit button
+      click_button "Parking Notification"
+      choose "Parked incorrectly", allow_label_click: true
+
+      expect(page).to have_button("Create parking notification", disabled: false, wait: 15)
+      expect(coordinate("latitude")).to be_within(0.000001).of(latitude)
+      expect(coordinate("longitude")).to be_within(0.000001).of(longitude)
+
+      expect {
+        click_button "Create parking notification"
+        expect(page).to have_content("Parking Notification for #{bike.type} created", wait: 10)
+      }.to change(bike.parking_notifications, :count).by(1)
+
+      notification = bike.reload.parking_notifications.last
+      expect(notification.latitude).to be_within(0.000001).of(latitude)
+      expect(notification.longitude).to be_within(0.000001).of(longitude)
+      # The geocode ran and described a different place — its address is kept, its
+      # coordinates are discarded
+      expect(notification.street).to eq "278 Broadway"
+      expect(notification.city).to eq "New York"
+    end
+  end
+
   it "creates a parking notification on the bike show page, then filters them through the dropdown menus" do
     # Create a parking notification through the bike show interface. Regression:
     # the "New parking notification" button must open the form (it was wired to

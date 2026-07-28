@@ -18,7 +18,7 @@ module UI
 
         def with_html_labels
           render(UI::Forms::RadioButtonGroup::Component.new(
-            name: :search_status,
+            name: :search_impounded,
             entries: [
               {value: "", label: "All"},
               {value: "not_impounded", label: "only <strong>not</strong> impounded"},
@@ -36,6 +36,15 @@ module UI
               {value: "active", label: "Active"},
               {value: "inactive", label: "Inactive"}
             ]
+          ))
+        end
+
+        def full_width
+          render(UI::Forms::RadioButtonGroup::Component.new(
+            name: :frame_size,
+            full_width: true,
+            selected: "m",
+            entries: %w[xs s m l xl].map { |size| {value: size, label: size.upcase} }
           ))
         end
         # @!endgroup

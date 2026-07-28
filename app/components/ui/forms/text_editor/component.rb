@@ -3,8 +3,8 @@
 module UI
   module Forms
     module TextEditor
-      # Bare Lexxy editor; pair with UI::Forms::Group (kind: :content_block, standalone: false) for a label.
-      # Carries data-controller="lexxy", which loads the editor JS and stylesheet on demand.
+      # Bare Lexxy editor; pair with a UI::Forms::Group block (and standalone: false) for a label.
+      # Carries data-controller="ui--forms--text-editor", which loads the editor JS and stylesheet on demand.
       class Component < ApplicationComponent
         SIZE = %i[default single_line].freeze
 
@@ -42,7 +42,8 @@ module UI
         end
 
         def asset_data
-          {controller: "lexxy", action: "click->lexxy#focusEditor", lexxy_stylesheet_value: helpers.stylesheet_path("lexxy")}
+          {controller: "ui--forms--text-editor", action: "click->ui--forms--text-editor#focusEditor",
+           "ui--forms--text-editor-stylesheet-value": helpers.stylesheet_path("lexxy")}
         end
 
         def editor_class
