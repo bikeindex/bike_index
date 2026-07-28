@@ -43,6 +43,26 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
     expect(page).to have_css('[aria-expanded="false"]')
   end
 
+  context "inside a form" do
+    it "submits on enter once the listbox is closed" do
+      visit "/rails/view_components/ui/forms/combobox/component/in_form"
+
+      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+
+      # Enter while picking belongs to the combobox, and only closes it
+      find_field("Cycle type").click
+      fill_in "Cycle type", with: "unicycle"
+      send_keys(:enter)
+
+      expect(page).to have_css('[aria-expanded="false"]')
+      expect(page).to have_current_path("/rails/view_components/ui/forms/combobox/component/in_form")
+
+      send_keys(:enter)
+
+      expect(page).to have_current_path(/cycle_type=Unicycle/)
+    end
+  end
+
   context "with rich_display" do
     let(:overlay) { "[data-ui--forms--combobox-display-target='overlay']" }
 

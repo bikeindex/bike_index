@@ -21,6 +21,11 @@ module UI
           {template: "ui/forms/combobox/component_preview/preselected"}
         end
 
+        # Enter submits the form when the listbox is closed
+        def in_form
+          {template: "ui/forms/combobox/component_preview/in_form"}
+        end
+
         # Two-tone option content, mirrored onto the closed input by an overlay
         def rich_display
           {template: "ui/forms/combobox/component_preview/rich_display"}
