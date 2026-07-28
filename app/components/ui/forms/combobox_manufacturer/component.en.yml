@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        combobox_manufacturer:
+          placeholder: Start typing e.g. %{name}

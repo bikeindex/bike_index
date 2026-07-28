@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 
-// Connects to data-controller='details'
+// Connects to data-controller='ui--details'
 // Animates a native <details> open/close via collapse_utils while keeping its
 // `open` attribute (and the CSS keyed off it) in sync. Closing stays open until
 // the animation finishes, otherwise the browser hides the content instantly.

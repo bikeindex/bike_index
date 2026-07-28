@@ -13,17 +13,17 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
 
   it "renders the input, both labels and the drop frame -- but no camera or thumbnail" do
     expect(component).to have_css("input#user_avatar[type='file'][name='user[avatar]']")
-    expect(component).to have_css("[data-controller='form--file-upload']")
-    expect(component).to have_css("[data-form--file-upload-target='input']")
-    expect(component).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
-    expect(component).to have_css("label[data-action='click->form--file-upload#chooseFile']")
+    expect(component).to have_css("[data-controller='ui--forms--file-upload']")
+    expect(component).to have_css("[data-ui--forms--file-upload-target='input']")
+    expect(component).to have_css("[data-ui--forms--file-upload-target='filename']", text: "No file chosen")
+    expect(component).to have_css("label[data-action='click->ui--forms--file-upload#chooseFile']")
     # both wordings ship, and the pointer media query picks one (see the system spec)
     expect(component).to have_css("label span", text: "Click or drop to choose file")
     expect(component).to have_css("label span", text: "Choose file")
     # the frame is always rendered -- only its border reacts to a drag
-    expect(component).to have_css("[data-form--file-upload-target='dropZone'].tw\\:border-transparent")
+    expect(component).to have_css("[data-ui--forms--file-upload-target='dropZone'].tw\\:border-transparent")
     # nothing accepted, so nothing to photograph; nothing attached, so nothing to preview
-    expect(component).to have_no_css("button[data-action='form--file-upload#takePicture']")
+    expect(component).to have_no_css("button[data-action='ui--forms--file-upload#takePicture']")
     expect(component).to have_no_css("img")
   end
 
@@ -75,7 +75,7 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
       let(:options) { {accept: ImageUploader.permitted_extensions} }
 
       it "renders a camera button with the camera icon" do
-        expect(component).to have_css("button[data-action='form--file-upload#takePicture']", text: "Take picture")
+        expect(component).to have_css("button[data-action='ui--forms--file-upload#takePicture']", text: "Take picture")
         # decorative -- the button text is what names it
         expect(component).to have_css("button svg[aria-hidden='true']")
       end
@@ -85,7 +85,7 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
       let(:options) { {accept: PdfUploader.permitted_extensions} }
 
       it "renders no camera button" do
-        expect(component).to have_no_css("button[data-action='form--file-upload#takePicture']")
+        expect(component).to have_no_css("button[data-action='ui--forms--file-upload#takePicture']")
       end
     end
 
@@ -93,7 +93,7 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
       let(:options) { {accept: ".csv", camera: true} }
 
       it "renders a camera button" do
-        expect(component).to have_css("button[data-action='form--file-upload#takePicture']", text: "Take picture")
+        expect(component).to have_css("button[data-action='ui--forms--file-upload#takePicture']", text: "Take picture")
       end
     end
 
@@ -101,7 +101,7 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
       let(:options) { {accept: "image/*", camera: false} }
 
       it "renders no camera button" do
-        expect(component).to have_no_css("button[data-action='form--file-upload#takePicture']")
+        expect(component).to have_no_css("button[data-action='ui--forms--file-upload#takePicture']")
       end
     end
   end

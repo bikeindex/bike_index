@@ -1,6 +1,6 @@
 <div
   class="related-fields"
-  data-controller="form--legacy-form-well--address-record-with-default"
+  data-controller="ui--forms--legacy-form-well--address-record-with-default"
 >
   <%= render(
     UI::Forms::LegacyFormWell::AddressRecord::Component.new(
@@ -18,12 +18,8 @@
       <div class="form-well-input form-well-input-checks">
         <label>
           <%= @builder.check_box :user_account_address,
-                             {
-                               "data-action" =>
-                                 "change->form--legacy-form-well--address-record-with-default#toggleUseAccount",
-                               "data-form--legacy-form-well--address-record-with-default-target" =>
-                                 "useAccountCheckbox",
-                             } %>
+                data: {action: "change->ui--forms--legacy-form-well--address-record-with-default#toggleUseAccount",
+                       "ui--forms--legacy-form-well--address-record-with-default-target": "useAccountCheckbox"} %>
           
           <span class="tw:cursor-pointer"><%= translation(".use_account_address") %></span>
           (<%= link_to translation(".edit_my_account_path"), edit_my_account_path %>)

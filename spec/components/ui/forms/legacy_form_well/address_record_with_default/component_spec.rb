@@ -52,6 +52,10 @@ RSpec.describe UI::Forms::LegacyFormWell::AddressRecordWithDefault::Component, t
 
       expect(component).to have_text("Use account address")
       expect(component).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
+
+      # A mistyped identifier silently no-ops in Stimulus, so assert the wiring
+      expect(component).to have_css("input[data-action='change->ui--forms--legacy-form-well--address-record-with-default#toggleUseAccount']" \
+        "[data-ui--forms--legacy-form-well--address-record-with-default-target='useAccountCheckbox']", visible: :all)
     end
   end
 end

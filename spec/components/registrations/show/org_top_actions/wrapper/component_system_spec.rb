@@ -26,7 +26,7 @@ RSpec.describe Registrations::Show::OrgTopActions::Wrapper::Component, :js, type
       click_button "Message Owner"
 
       expect(page).to have_button("Send message")
-      expect(page).to have_css("button[aria-pressed='true']", text: "Message Owner")
+      expect(page).to have_css("button[data-active='true']", text: "Message Owner")
     end
 
     expect(page).to have_current_path(/panel=message/, url: true)
@@ -38,7 +38,7 @@ RSpec.describe Registrations::Show::OrgTopActions::Wrapper::Component, :js, type
 
       expect(page).to have_content("No parking notifications for this bike")
       expect(page).to have_no_button("Send message")
-      expect(page).to have_css("button[aria-pressed='false']", text: "Message Owner")
+      expect(page).to have_css("button[data-active='false']", text: "Message Owner")
     end
 
     expect(page).to have_current_path(/panel=notifications_show/, url: true)

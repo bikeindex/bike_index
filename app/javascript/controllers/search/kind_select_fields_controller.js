@@ -6,10 +6,9 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='search--kind-select-fields'
 export default class extends Controller {
   static targets = ['distance', 'location', 'locationWrap']
-  static values = { apiCountUrl: String, optionKinds: String, storageKeyLocation: String, storageKeyDistance: String }
+  static values = { apiCountUrl: String, optionKinds: String }
 
   connect () {
-    this.setLocalstorageKeys()
     this.setSearchProximity()
     this.updateForSaleLink()
     this.form?.addEventListener('change', this.updateForSaleLink.bind(this))
@@ -55,14 +54,9 @@ export default class extends Controller {
     return new URLSearchParams(formData).toString()
   }
 
-  setLocalstorageKeys () {
-    if (window.inComponentPreview) {
-      this.storageKeyLocation = 'preview-searchLocation'
-      this.storageKeyDistance = 'preview-searchDistance'
-    } else {
-      this.storageKeyLocation = 'searchLocation'
-      this.storageKeyDistance = 'searchDistance'
-    }
+  // Previews get their own keys, so they don't clobber a real search's saved location
+  get storageKeyPrefix () {
+    return window.inComponentPreview ? 'preview-' : ''
   }
 
   updateForSaleLink () {
@@ -100,17 +94,15 @@ export default class extends Controller {
     if (location && location.length > 0) {
       // Don't save location if location is an ignored string
       if (!this.ignoredLocation(location)) {
-        // console.log(`setting location: '${location}' (storageKeyLocation: ${this.storageKeyLocation})`)
-        localStorage.setItem(this.storageKeyLocation, location)
+        localStorage.setItem(`${this.storageKeyPrefix}searchLocation`, location)
         // save distance if location is being saved
         const distance = this.distanceTarget.value
         if (distance && distance.length > 0) {
-          localStorage.setItem(this.storageKeyDistance, distance)
+          localStorage.setItem(`${this.storageKeyPrefix}searchDistance`, distance)
         }
       }
     } else {
-      location = localStorage.getItem(this.storageKeyLocation)
-      // console.log(`got location: '${location}' (storageKeyLocation: ${this.storageKeyLocation})`)
+      location = localStorage.getItem(`${this.storageKeyPrefix}searchLocation`)
       // Make location 'you' if location is anywhere or blank, so user isn't stuck and unable to use location
       if (this.ignoredLocation(location)) {
         location = 'you'
