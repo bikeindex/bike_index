@@ -30,7 +30,7 @@ RSpec.describe "Register flow", :js, type: :system do
     details_url = page.current_url
     expect(details_url).to match(/register\?b_param_token=.+&step=2/)
 
-    # The browser back button returns to step_1 on the same registration, prefilled
+    # The browser back button returns to step 1 on the same registration, prefilled
     page.go_back
     expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
     expect(page).to have_field("b_param[owner_email]", with: owner_email)

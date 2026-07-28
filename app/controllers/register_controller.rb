@@ -8,7 +8,7 @@ class RegisterController < ApplicationController
     b_param = reusable_b_param || BParam.create(origin: "registration_flow",
       creator_id: current_user&.id, params: {bike: BParam.status_hash_from_params(params)}.as_json)
     session[:register_b_param_token] = b_param.id_token
-    redirect_to step_path(b_param, 1)
+    redirect_to step_path(1, b_param)
   end
 
   # The whole flow after the start: ?step=1, ?step=2 and ?step=complete - or the
@@ -17,7 +17,7 @@ class RegisterController < ApplicationController
     return confirm if params[:confirmation_token].present? && !@b_param.with_bike?
 
     step = permitted_step
-    return redirect_to(step_path(@b_param, step)) if step != params[:step]
+    return redirect_to(step_path(step)) if step != params[:step]
 
     case step
     when "complete"
@@ -41,7 +41,7 @@ class RegisterController < ApplicationController
     elsif @b_param.save
       # Resubmitting step 1 only resends the confirmation email to a new address
       Email::PartialRegistrationJob.perform_async(@b_param.id) if @b_param.owner_email != previous_email
-      redirect_to step_path(@b_param, 2)
+      redirect_to step_path(2)
     else
       @b_param.errors.add(:base, translation(:unable_to_save))
       render Register::Step1::Component.new(b_param: @b_param), status: :unprocessable_entity
@@ -58,13 +58,13 @@ class RegisterController < ApplicationController
     else
       # Everything is saved on the b_param - the bike is created once the
       # confirmation link from the partial registration email is clicked
-      redirect_to step_path(@b_param, :complete)
+      redirect_to step_path(:complete)
     end
   end
 
   private
 
-  def step_path(b_param, step)
+  def step_path(step, b_param = @b_param)
     register_path(b_param_token: b_param.id_token, step:)
   end
 
@@ -75,10 +75,8 @@ class RegisterController < ApplicationController
       "complete"
     elsif @b_param.owner_email.blank?
       "1"
-    elsif %w[1 2].include?(params[:step])
-      params[:step]
     else
-      "2"
+      (params[:step] == "1") ? "1" : "2"
     end
   end
 
@@ -93,7 +91,7 @@ class RegisterController < ApplicationController
       create_bike_and_redirect
     else
       flash[:success] = translation(:email_confirmed_add_details)
-      redirect_to step_path(@b_param, 2)
+      redirect_to step_path(2)
     end
   end
 
@@ -107,7 +105,7 @@ class RegisterController < ApplicationController
 
   # Once the bike exists the token only ever shows the completion page
   def redirect_registered
-    redirect_to step_path(@b_param, :complete) if @b_param.with_bike?
+    redirect_to step_path(:complete) if @b_param.with_bike?
   end
 
   # The session's registration, as long as it hasn't gotten anywhere - step 1
@@ -136,9 +134,9 @@ class RegisterController < ApplicationController
     bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
     if bike.errors.any?
       flash[:error] = @b_param.bike_errors&.to_sentence
-      redirect_to step_path(@b_param, 2)
+      redirect_to step_path(2)
     else
-      redirect_to step_path(@b_param, :complete)
+      redirect_to step_path(:complete)
     end
   end
 
