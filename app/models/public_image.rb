@@ -105,9 +105,8 @@ class PublicImage < ApplicationRecord
     end
 
     if file_needs_processing?
-      # ProcessPublicImageJob analyzes the blob once it has stripped it. Claiming that in memory is
-      # all it takes to stop the attachment's own after_commit from enqueueing AnalyzeJob, which
-      # merges into metadata from a stale read - a concurrent run drops "stripped".
+      # Stops the attachment's after_commit from enqueueing AnalyzeJob, whose metadata merge runs
+      # off a stale read and would drop "stripped". ProcessPublicImageJob analyzes instead.
       file.blob.analyzed = true
       Images::ProcessPublicImageJob.perform_async(id)
     end

@@ -26,7 +26,7 @@ module Images
       stripped = blob.open { |file| ImageProcessing::Vips.source(file).saver(strip: true).call }
       blob.upload(stripped) # Resets checksum/byte_size, which still describe the pre-strip bytes
       blob.update!(metadata: blob.metadata.merge("stripped" => true))
-      blob.analyze # Claimed from AnalyzeJob in PublicImage, so this is the only writer of metadata
+      blob.analyze # PublicImage suppresses AnalyzeJob, so this is metadata's only writer
     ensure
       stripped&.close!
     end
