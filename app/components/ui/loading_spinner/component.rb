@@ -8,7 +8,7 @@ module UI
         md: "tw:h-15 tw:w-15"
       }.freeze
 
-      # color_class: "" leaves the svg inheriting currentColor from its surroundings
+      # A nil color_class leaves the svg inheriting currentColor from its surroundings
       def initialize(text: nil, size: :md, color_class: "tw:text-slate-400 tw:dark:text-blue-800")
         @text = text
         @size = SIZES.key?(size) ? size : :md
