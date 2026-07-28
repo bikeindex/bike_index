@@ -43,7 +43,7 @@ RSpec.describe UI::Forms::TextEditor::Component, type: :component do
 
       expect(component).to have_css("lexxy-editor.lexxy-editor--compact")
       # defaults to SINGLE_LINE_TOOLBAR_BUTTONS -- the omitted buttons get a hide class
-      expect(component).to have_css("lexxy-editor.lexxy-editor--hide-strikethrough.lexxy-editor--hide-table.lexxy-editor--hide-heading")
+      expect(component).to have_css("lexxy-editor.lexxy-editor--hide-strikethrough.lexxy-editor--hide-table.lexxy-editor--hide-format")
       expect(component).to have_no_css("lexxy-editor.lexxy-editor--hide-bold")
       expect(component).to have_no_css("lexxy-editor.lexxy-editor--hide-link")
     end
