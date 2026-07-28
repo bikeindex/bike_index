@@ -59,6 +59,15 @@ RSpec.describe UI::Forms::TextEditor::Component, type: :component do
     end
   end
 
+  # The hide classes only do anything if lexxy_overrides.css carries a matching rule, and a button
+  # added here without one would fail silently -- it just wouldn't hide.
+  it "has a stylesheet rule for every toolbar button" do
+    stylesheet = Rails.root.join("app/assets/tailwind/lexxy_overrides.css").read
+    ruled = stylesheet.scan(/\.lexxy-editor--hide-([a-z-]+)/).flatten.uniq
+
+    expect(ruled).to match_array(described_class::TOOLBAR_BUTTONS.map { it.to_s.tr("_", "-") })
+  end
+
   context "with an unsupported size" do
     it "raises ArgumentError" do
       expect { described_class.new(form_builder: nil, attribute: :description, size: :enormous) }
