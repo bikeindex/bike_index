@@ -8,6 +8,10 @@ module Org
       # the search form, column-toggle settings, or pagination (e.g. a user's other
       # registrations on the show page). Pass render_sortable to enable sort links.
       class Component < ApplicationComponent
+        # UI::Table caches each row without digesting the cells rendered into it, so
+        # bump this whenever this component's or UI::Table's markup changes
+        CACHE_VERSION = "bikes_4"
+
         delegate :additional_registration_fields, :column_renames, to: :settings_component
 
         def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
@@ -16,7 +20,7 @@ module Org
           @bikes = bikes
           @current_user = current_user
           @render_sortable = render_sortable
-          @cache_key = cache_key || "org-#{organization.id}-bikes_4"
+          @cache_key = cache_key || "org-#{organization.id}-#{CACHE_VERSION}"
           @sortable_search_params = sortable_search_params
           @bike_sticker = bike_sticker
           @settings_component = settings_component
