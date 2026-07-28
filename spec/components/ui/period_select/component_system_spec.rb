@@ -14,14 +14,14 @@ RSpec.describe UI::PeriodSelect::Component, :js, type: :system do
 
       click_button("custom")
 
-      # collapse#show removes the hidden class and animates the form open.
+      # ui--collapse#show removes the hidden class and animates the form open.
       expect(page).to have_button("Update")
       expect(page).to have_field("From")
       expect(page).to have_field("To")
 
       click_button("custom")
 
-      # collapse#hide animates it closed and re-adds the hidden class.
+      # ui--collapse#hide animates it closed and re-adds the hidden class.
       expect(page).to have_no_button("Update")
 
       expect_axe_clean

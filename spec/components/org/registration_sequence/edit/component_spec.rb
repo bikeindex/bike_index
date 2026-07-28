@@ -23,7 +23,7 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
   it "puts each page's body in a collapsed disclosure toggled by a chevron" do
     render_inline(described_class.new(registration_sequence:))
 
-    expect(page).to have_css("button[data-action~='collapse#toggle'] [data-collapse-target='chevron']", minimum: 1)
-    expect(page).to have_css("[data-collapse-target='content'][class*='hidden'] li", minimum: 1)
+    expect(page).to have_css("button[data-action~='ui--collapse#toggle'] [data-ui--collapse-target='chevron']", minimum: 1)
+    expect(page).to have_css("[data-ui--collapse-target='content'][class*='hidden'] li", minimum: 1)
   end
 end
