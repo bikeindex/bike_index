@@ -1,0 +1,660 @@
+<%# require inline CSS setting because of caching %>
+<% unless helpers.display_dev_info? %>
+  <style>.only-dev-visible {display: none !important;} </style>
+<% end %>
+
+<div class="admin-bike-tabs">
+  <% if @bike.blank? %>
+    <h1 class="text-danger">
+      No Bike present
+    </h1>
+  <% else %>
+    <% if @bike.deleted? || @bike.likely_spam? || @bike.example? || @bike.user_hidden %>
+      <div class="row mb-4">
+        <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3">
+          <% if @bike.deleted? %>
+            <div class="alert alert-danger mb-4">
+              <h4 class="text-danger"><%= @bike.type_titleize %> Deleted</h4>
+              Deleted:
+              <%= render(UI::Time::Component.new(time: @bike.deleted_at, format: :localize_time_precise)) %>
+            </div>
+          <% end %>
+
+          <% if @bike.likely_spam? %>
+            <div class="alert alert-danger mb-4">
+              <h4 class="text-danger">
+                This <%= @bike.type_titleize %> is likely spam
+              </h4>
+              No need to remove, this doesn't show up in searches and will be
+              deleted, automatically
+            </div>
+          <% end %>
+
+          <% if @bike.example? %>
+            <div class="alert alert-danger mb-4">
+              <h4 class="text-danger">
+                <%= @bike.type_titleize %> is a test registration
+              </h4>
+              No need to remove, this doesn't show up in searches and will be
+              deleted, automatically
+              <small class="d-block mt-1">This is also known as an <em>example bike</em></small>
+            </div>
+          <% end %>
+
+          <% if @bike.user_hidden %>
+            <div class="alert alert-warning mb-4">
+              <h4 class="text-warning">
+                Marked HIDDEN
+              </h4>
+
+              <% if @bike.unregistered_parking_notification? %>
+                <span class="d-block mb-2">
+                  <strong>Hidden because it was created by parking notification.</strong>
+                  Only members of the organization (and Bike Index superadmins)
+                  can see it.
+                </span>
+                Creation notification:
+                <%= link_to unregistered_parking_notification.kind_humanized.downcase, organization_parking_notification_path(unregistered_parking_notification, organization_id: unregistered_parking_notification.organization.to_param), class: "text-underline" %>
+                <small class="d-block mt-2">
+                  This is also known as an
+                  <span class="text-warning">unregistered</span> bike
+                </small>
+              <% else %>
+                <strong class="d-block mb-1">Hidden by the user</strong>
+                No one but the user (and Bike Index superadmins) can see it
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <div class="row">
+      <% cache(["admin_bike_main", @bike, @stolen_record]) do %>
+        <div class="col-lg-2 col-3 mt-auto mb-2 admin-image-thumb">
+          <a href="<%= edit_admin_bike_path(@bike.to_param) %>">
+            <% if @bike.thumb_path.present? %>
+              <%= image_tag @bike.thumb_path, alt: @bike.title_string %>
+            <% else %>
+              <h3 class="less-strong">
+                No Image
+              </h3>
+            <% end %>
+          </a>
+        </div>
+
+        <div class="col-lg-5 col-9 mt-auto mb-2 pr-lg-0">
+          <p class="strong mb-0">
+            <%= link_to edit_admin_bike_path(@bike.to_param) do %>
+              <%= helpers.bike_status_span(@bike) %>
+              <%= @bike.title_string %>
+            <% end %>
+
+            <%= link_to "non-admin view", bike_path(@bike.to_param, organization_id: @bike.creation_organization.to_param), class: "text-muted float-right" %>
+          </p>
+
+          <table class="table-list mb-0">
+            <tbody>
+              <tr class="small only-dev-visible">
+                <td>ID</td>
+
+                <td>
+                  <code><%= @bike.id %></code>
+
+                  <span class="ml-2">
+                    status:
+                    <code><%= @bike.status&.gsub("status_", "") %></code>
+                  </span>
+
+                  <% if @bike.user_hidden %>
+                    <small class="text-warning ml-2">user hidden</small>
+                  <% end %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Serial number
+                </td>
+
+                <td>
+                  <%= render(Atom::Serial::Component.new(bike: @bike, user: helpers.current_user, skip_explanation: true)) %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Colors
+                </td>
+
+                <td>
+                  <%= @bike.frame_colors.to_sentence %>
+
+                  <% if @bike.paint_id.present? %>
+                    <%= link_to @bike.paint_description, edit_admin_paint_url(@bike.paint), class: "small gray-link" %>
+                  <% end %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Created
+                </td>
+
+                <td>
+                  <%= render(UI::Time::Component.new(time: @bike.created_at)) %>
+                  <small class="localizeTimezone"></small>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Creation
+                </td>
+
+                <td>
+                  <% if @bike.creation_organization.present? %>
+                    <%= link_to @bike.creation_organization.name, admin_organization_path(@bike.creation_organization) %>
+                  <% elsif @bike.creator != @bike.user %>
+                    <% if @bike.creator.blank? %>
+                      <small class="text-danger">Creator missing</small>
+                    <% else %>
+                      <%= render Admin::UserCell::Component.new(user: @bike.creator, search_url: admin_bikes_path(user_id: @bike.creator_id)) %>
+                    <% end %>
+                  <% else %>
+                    <small class="less-strong">self reg</small>
+                  <% end %>
+
+                  <% if @bike.creation_description.present? %>
+                    -
+                    <em>
+                      Via
+                      <%= render(Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) %>
+                    </em>
+                    <% if @bike.current_ownership&.doorkeeper_app_id.present? %>
+                      <small class="less-strong">
+                        oauth app
+                        <em><%= @bike.current_ownership.doorkeeper_app&.name || @bike.current_ownership.doorkeeper_app_id %></em>
+                      </small>
+                      <%= link_to search_emoji, admin_bikes_path(search_doorkeeper_app_id: @bike.current_ownership.doorkeeper_app_id), class: "ml-1 mr-1" %>
+                    <% end %>
+                  <% end %>
+
+                  <% if @bike.current_ownership&.bulk_import.present? %>
+                    <br>
+                    Import
+                    <%= link_to admin_bulk_import_path(@bike.current_ownership.bulk_import.to_param) do %>
+                      #<%= @bike.current_ownership.bulk_import_id %>
+                      <% if @bike.current_ownership.bulk_import.ascend? %>
+                        <small> Ascend </small>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Updated
+                </td>
+
+                <td>
+                  <%= render(UI::Time::Component.new(time: @bike.updated_by_user_fallback)) %>
+
+                  <% if @bike.updator_id.present? %>
+                    <em class="small">
+                      by
+                      <% if @bike.updator.present? %>
+                        <%= link_to @bike.updator.display_name, admin_user_path(@bike.updator) %>
+                      <% else %>
+                        <span class="text-danger">
+                          User #<%= @bike.updator_id %> <em>missing</em>
+                        </span>
+                      <% end %>
+                    </em>
+                  <% end %>
+
+                  <% if @bike.not_updated_by_user? %>
+                    <em class="small less-strong">
+                      not updated after creation
+                    </em>
+                  <% end %>
+
+                  <small class="only-dev-visible">
+                    <%= render(UI::Time::Component.new(time: @bike.updated_at)) %>
+                  </small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-lg-5">
+          <table class="table-list">
+            <tr>
+              <td>
+                Owner Email
+              </td>
+
+              <td>
+                <%= @bike.owner_email %>
+                <%= link_to search_emoji, bike_search_url, class: "ml-1 mr-1" %>
+
+                <% if @bike.claimed? %>
+                  <small class="text-info">claimed</small>
+                <% end %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Owner
+              </td>
+
+              <td>
+                <% if @bike.user.present? %>
+                  <%= render Admin::UserCell::Component.new(user: @bike.user) %>
+                <% else %>
+                  Unclaimed
+                <% end %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Cached Data
+              </td>
+
+              <td>
+                <em class="less-strong"><%= @bike.cached_data %></em>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Address
+              </td>
+
+              <td>
+                <small>
+                  <%= address_display(address_hash) if address_hash.present? %>
+                </small>
+              </td>
+            </tr>
+
+            <% if registration_address.present? && registration_address != address_hash %>
+              <tr>
+                <td>
+                  Reg Address
+                </td>
+
+                <td>
+                  <small>
+                    <%= address_display(registration_address.compact) %>
+
+                    <small class="only-dev-visible ml-2">
+                      <em>source:</em>
+                      <%= BikeServices::CalculateLocation.registration_address_source(@bike) %>
+                    </small>
+                  </small>
+                </td>
+              </tr>
+            <% end %>
+
+            <%# Only show phone if no stolen record %>
+            <% if @stolen_record.blank? && @bike.phone.present? %>
+              <tr>
+                <td>
+                  Phone
+                </td>
+
+                <td>
+                  <%= phone_display(@bike.phone) %>
+                </td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @stolen_record.present? %>
+    <h4 class="mt-2">
+      <span class="text-danger"> Theft information </span>
+    </h4>
+    <div class="row">
+      <div class="col-md-6 pr-md-0">
+        <table class="table-list">
+          <tbody>
+            <tr class="small only-dev-visible">
+              <td>ID</td>
+
+              <td>
+                <code><%= @stolen_record.id %></code>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Theft description
+              </td>
+
+              <td>
+                <%= @stolen_record.theft_description %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Stolen record created
+              </td>
+
+              <td>
+                <%= render(UI::Time::Component.new(time: @stolen_record.created_at)) %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Stolen at
+              </td>
+
+              <td>
+                <%= render(UI::Time::Component.new(time: @stolen_record.date_stolen)) %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Callable by
+              </td>
+
+              <td>
+                <% if @stolen_record.phone_for_everyone %>
+                  <strong> Everyone </strong>
+                <% else %>
+                  <%= "Users" if @stolen_record.phone_for_users %>
+                  <%= "Shops" if @stolen_record.phone_for_shops %>
+                  <%= "Police" if @stolen_record.phone_for_police %>
+                <% end %>
+              </td>
+            </tr>
+
+            <% unless @stolen_record.recovered? %>
+              <tr>
+                <td>
+                  Link to recover
+                </td>
+
+                <td>
+                  <input
+                    class="form-control"
+                    type="text"
+                    value="<%= edit_bike_recovery_url(bike_id: @bike.id, token: @stolen_record.find_or_create_recovery_link_token) %>"
+                  >
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-md-6">
+        <table class="table-list">
+          <tbody>
+            <tr>
+              <td>
+                Approved?
+              </td>
+
+              <td>
+                <% if @stolen_record.approved %>
+                  <%= check_mark %>
+                <% else %>
+                  <small class="less-strong">nope</small>
+                <% end %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Estimated $
+              </td>
+
+              <td>
+                <%= @stolen_record.estimated_value %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Location
+              </td>
+
+              <td>
+                <%= @stolen_record.formatted_address_string(visible_attribute: :street) %>
+
+                <% if @stolen_record.without_street? %>
+                  <em class="small text-warning">
+                    missing address (user alerted)
+                  </em>
+                <% end %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Phone
+              </td>
+
+              <td>
+                <%= phone_display(@stolen_record.phone) %>
+
+                <% if @stolen_record.secondary_phone.present? %>
+                  <br>
+                  <small>
+                    <span class="less-strong">secondary:</span>
+                    <%= phone_display(@stolen_record.secondary_phone) %>
+                  </small>
+                <% end %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Police Department
+              </td>
+
+              <td>
+                <%= @stolen_record.police_report_department %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Police Report
+              </td>
+
+              <td>
+                <%= @stolen_record.police_report_number %>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @display_recovery && @stolen_record&.recovered? %>
+    <h4 class="mt-2 text-success">
+      Recovery Information
+      <%= link_to "view", admin_recovery_path(@stolen_record.to_param), class: "small" %>
+    </h4>
+    <div class="row">
+      <div class="col-sm-12 col-lg-6">
+        <table class="table-list">
+          <tbody>
+            <tr>
+              <td>
+                Recovered at
+              </td>
+
+              <td>
+                <%= render(UI::Time::Component.new(time: @stolen_record.recovered_at)) %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Recovered by
+              </td>
+
+              <td>
+                <% if @stolen_record.recovering_user.present? %>
+                  <%= link_to @stolen_record.recovering_user.display_name, admin_user_path(@stolen_record.recovering_user.to_param) %>
+                  <% unless @stolen_record.recovering_user_owner? %>
+                    <em class="text-warning less-strong"> not owner! </em>
+                  <% end %>
+                <% elsif @stolen_record.pre_recovering_user? %>
+                  <small class="less-strong">
+                    pre-recording of recovering user
+                  </small>
+                <% else %>
+                  <small>
+                    No user present
+                    <span class="less-strong"> most likely recovered by owner </span>
+                  </small>
+                <% end %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                We Helped
+              </td>
+
+              <td>
+                <%= check_mark if @stolen_record.index_helped_recovery %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Can Share
+              </td>
+
+              <td>
+                <%= check_mark if @stolen_record.can_share_recovery %>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-sm-12 col-lg-6">
+        <table class="table-list">
+          <tbody>
+            <tr>
+              <td class="text-left" colspan="2">
+                Description
+              </td>
+            </tr>
+
+            <tr>
+              <td class="full-width-data" colspan="2">
+                <%= @stolen_record.recovered_description %>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @bike.present? %>
+    <div class="tw:-mx-[15px] tw:mt-2 tw:overflow-x-scroll tw:pt-2">
+      <%# w-max so the tabs scroll horizontally rather than wrapping %>
+      <div class="nav nav-tabs tw:w-max tw:flex-nowrap">
+        <div class="nav-item">
+          <%= link_to "Edit", edit_admin_bike_path(@bike), class: nav_link_class("bikes-edit") %>
+        </div>
+
+        <div class="nav-item">
+          <%= link_to admin_bike_path(@bike, active_tab: "duplicates"), class: nav_link_class("bikes-duplicates") do %>
+            D<span class="d-none d-md-inline">uplicates</span>
+            <small>(<%= number_display(tab_counts[:duplicates]) %>)</small>
+          <% end %>
+        </div>
+
+        <div class="nav-item">
+          <%= link_to admin_bike_path(@bike, active_tab: "messages"), class: nav_link_class("bikes-messages") do %>
+            M<span class="d-none d-md-inline">essages</span>
+            <small>(<%= number_display(tab_counts[:messages]) %>)</small>
+          <% end %>
+        </div>
+
+        <div class="nav-item">
+          <%= link_to admin_marketplace_listings_path(search_bike_id: @bike.id), class: nav_link_class("marketplace_listings-index") do %>
+            L<span class="d-none d-md-inline">istings</span>
+            <small>(<%= number_display(tab_counts[:marketplace_listings]) %>)</small>
+          <% end %>
+        </div>
+
+        <div class="nav-item">
+          <%= link_to admin_bike_path(@bike.id, active_tab: "ownerships"), class: nav_link_class("bikes-ownerships") do %>
+            O<span class="d-none d-md-inline">wnerships</span>
+            <small>(<%= number_display(tab_counts[:ownerships]) %>)</small>
+          <% end %>
+        </div>
+
+        <div class="nav-item">
+          <%= link_to admin_bike_path(@bike, active_tab: "stickers"), class: nav_link_class("bikes-stickers") do %>
+            S<span class="d-none d-md-inline">tickers</span>
+            <small>(<%= number_display(tab_counts[:bike_stickers]) %>)</small>
+          <% end %>
+        </div>
+
+        <% if @stolen_record.present? %>
+          <div class="nav-item">
+            <%= link_to edit_admin_stolen_bike_url(@stolen_record.id, stolen_record_id: true), class: nav_link_class("stolen_bikes-edit") do %>
+              Stolen
+              <span class="<%= @stolen_record.approved? ? "text-success" : "text-danger" %>"><%= @stolen_record.approved? ? "✅" : "❌" %></span>
+            <% end %>
+          </div>
+        <% end %>
+
+        <div class="nav-item">
+          <%= link_to admin_theft_alerts_path(search_bike_id: @bike.id), class: nav_link_class("theft_alerts") do %>
+            P<span class="d-none d-md-inline">romoted alerts</span>
+            <small>(<%= number_display(tab_counts[:theft_alerts]) %>)</small>
+          <% end %>
+        </div>
+
+        <div class="nav-item">
+          <%= link_to admin_bike_path(@bike, active_tab: "recoveries"), class: nav_link_class("bikes-recoveries") do %>
+            R<span class="d-none d-md-inline">ecoveries</span>
+            <small>(<%= number_display(tab_counts[:recoveries]) %>)</small>
+          <% end %>
+        </div>
+
+        <% if tab_counts[:impound] > 0 %>
+          <div class="nav-item">
+            <%= link_to admin_bike_path(@bike, active_tab: "impound"), class: nav_link_class("bikes-impound") do %>
+              I<span class="d-none d-md-inline">mpoundings</span>
+              <small>(<%= number_display(tab_counts[:impound]) %>)</small>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# Only renders when looking at recoveries %>
+        <% if @display_recovery %>
+          <div class="nav-item">
+            <%= link_to admin_recovery_displays_path(search_bike_id: @bike.id), class: nav_link_class("recovery_displays") do %>
+              Recovery displays
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

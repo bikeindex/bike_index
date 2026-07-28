@@ -1,5 +1,5 @@
-<%= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "bikes-edit"} %>
+<%= render(Admin::Bikes::Tabs::Component.new(bike: @bike, active_tab: "bikes-edit")) %>
 
-<%= render(Admin::BikeEdit::Component.new(bike: @bike, organizations: @organizations)) %>
+<%= render(Admin::Bikes::Edit::Component.new(bike: @bike, organizations: @organizations)) %>
 
-<%= render(Admin::BikeCreationData::Component.new(bike: @bike)) %>
+<%= render(Admin::Bikes::CreationData::Component.new(bike: @bike)) %>

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Admin::BikeCreationData::Component, type: :component do
+RSpec.describe Admin::Bikes::CreationData::Component, type: :component do
   let(:component) { render_inline(described_class.new(bike:)) }
   let(:bike) { FactoryBot.create(:bike, :with_ownership) }
 

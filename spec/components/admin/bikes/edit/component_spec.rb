@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Admin::BikeEdit::Component, type: :component do
+RSpec.describe Admin::Bikes::Edit::Component, type: :component do
   let(:component) { render_inline(described_class.new(bike:, organizations:)) }
   let(:bike) { FactoryBot.create(:bike, :with_ownership, serial_number: "og serial") }
   let(:organizations) { Organization.all }

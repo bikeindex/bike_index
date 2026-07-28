@@ -168,20 +168,6 @@ module AdminHelper
     end
   end
 
-  # Cache the counts, not the rendered tabs, so the key doesn't depend on the active tab
-  def admin_bike_tab_counts(bike)
-    Rails.cache.fetch(["admin_bike_tab_counts-1", bike]) do
-      {duplicates: bike.duplicate_bike_groups.count,
-       messages: bike.messages_count,
-       marketplace_listings: bike.marketplace_listings.count,
-       ownerships: bike.ownerships.count,
-       bike_stickers: bike.bike_stickers.count,
-       theft_alerts: bike.theft_alerts.count,
-       recoveries: bike.recovered_records.count,
-       impound: bike.impound_records.count + ImpoundClaim.involving_bike_id(bike.id).count}
-    end
-  end
-
   def theft_alert_status_class(theft_alert)
     text_class = if theft_alert.active?
       "text-info"

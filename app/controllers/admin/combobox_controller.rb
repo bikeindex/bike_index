@@ -2,7 +2,7 @@
 
 module Admin
   # Backs the selection chips for the multiselect organizations combobox on the bike edit
-  # form (Admin::BikeEdit::Component)
+  # form (Admin::Bikes::Edit::Component)
   class ComboboxController < Admin::BaseController
     # Only ever renders turbo_stream
     before_action { request.format = :turbo_stream }
