@@ -19,10 +19,6 @@ module UI
       # content is a primary line with a muted line below it, rather than one
       # line of two-tone text -- the input grows to fit both.
       #
-      # value_is_default: the `value:` is a suggestion rather than something the
-      # record holds, so a saved form-persist draft outranks it (form_persist
-      # otherwise treats any server-rendered value as the fresher one).
-      #
       # Any other keyword (id:, value:, open:, free_text:, autocomplete:,
       # placeholder:, etc.) is forwarded to `hw_combobox_tag`.
       class Component < ApplicationComponent
@@ -31,11 +27,10 @@ module UI
         STACKED_OVERLAY_CLASSES = "tw:flex tw:flex-col tw:justify-center tw:overflow-hidden"
         STACKED_INPUT_CLASSES = "tw:min-h-13"
 
-        def initialize(name:, options: [], src: nil, rich_display: false, value_is_default: false, **combobox_options)
+        def initialize(name:, options: [], src: nil, rich_display: false, **combobox_options)
           @name = name
           @options_or_src = src || options
           @rich_display = rich_display
-          @value_is_default = value_is_default
           @combobox_options = combobox_options
         end
 
@@ -43,13 +38,12 @@ module UI
           # customize_ (rather than the input: kwarg) appends to the gem's own classes
           combobox = helpers.hw_combobox_tag(@name, @options_or_src, **defaults, **@combobox_options) do |component|
             component.customize_input(class: STACKED_INPUT_CLASSES) if stacked?
-            component.customize_hidden_field(data: {persist_default: ""}) if @value_is_default
           end
           return combobox unless @rich_display
 
           tag.div(class: ["tw:relative", (@rich_display if @rich_display.is_a?(String))],
             data: {controller: "ui--forms--combobox-display"}) do
-            combobox + tag.div("", class: overlay_classes, data: {"ui--forms--combobox-display-target": "overlay"})
+            combobox + tag.div(class: overlay_classes, data: {"ui--forms--combobox-display-target": "overlay"})
           end
         end
 

@@ -316,14 +316,8 @@
 
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :status,
         label_text: translation(".registration_type"), required: true)) do %>
-      <%#
-        BParam#status falls back to status_with_owner, so an untouched registration
-        renders a suggestion - which a saved draft should be able to replace
-      %>
-
       <%= render UI::Forms::Combobox::Component.new(name: :status, form: f, required: true,
-          value: @b_param.status, value_is_default: bike["status"].blank?,
-          options: status_options, rich_display: :stacked) %>
+          value: @b_param.status, options: status_options, rich_display: :stacked) %>
     <% end %>
 
     <%= render Register::SectionLabel::Component.new(text: contact_section_text, divider: true) %>

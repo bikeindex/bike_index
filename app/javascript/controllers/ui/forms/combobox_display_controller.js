@@ -13,6 +13,7 @@ export default class extends Controller {
 
   connect () {
     this.input = this.element.querySelector('.hw-combobox__input')
+    this.hiddenField = this.element.querySelector('input[data-hw-combobox-target="hiddenField"]')
     // Read before the overlay ever paints the input transparent
     this.caretColor = window.getComputedStyle(this.input).color
     this.events().forEach(([target, event]) => target.addEventListener(event, this.sync))
@@ -34,18 +35,14 @@ export default class extends Controller {
     ]
   }
 
-  // input and keyup both fire per keystroke, so bail before repainting (and before
-  // reposition's forced layout) unless what's shown would actually change
   sync = () => {
     const selectedOption = this.selectedOption()
-    // Anything else in the input is a query being typed - let it show through
-    const shown = (this.input.value === selectedOption?.dataset.autocompletableAs) ? selectedOption : null
-    if (shown === this.shown) return
+    if (!selectedOption || this.typingQuery(selectedOption)) {
+      this.hide()
+      return
+    }
 
-    this.shown = shown
-    if (!shown) { this.hide(); return }
-
-    this.overlayTarget.innerHTML = shown.innerHTML
+    this.overlayTarget.innerHTML = selectedOption.innerHTML
     this.reposition()
     Object.assign(this.input.style, { color: 'transparent', caretColor: this.caretColor })
     // combobox.css hides the autocomplete's selection highlight while covered
@@ -53,8 +50,15 @@ export default class extends Controller {
     this.overlayTarget.classList.remove('tw:hidden')
   }
 
+  // Anything but the selection in the input is a query - let it show through.
+  // Only while the input has focus: the small-viewport dialog selects without
+  // ever focusing it, and fills its value after the selection event.
+  typingQuery (selectedOption) {
+    return document.activeElement === this.input &&
+      this.input.value !== selectedOption.dataset.autocompletableAs
+  }
+
   hide = () => {
-    this.shown = null
     Object.assign(this.input.style, { color: '', caretColor: '' })
     delete this.input.dataset.richDisplayShown
     this.overlayTarget.classList.add('tw:hidden')
@@ -66,11 +70,14 @@ export default class extends Controller {
     this.reposition()
   }
 
+  // Matched on the attribute rather than a `[data-value="…"]` selector, which a
+  // value containing a quote would make invalid (see utils/hw_combobox_patch.js)
   selectedOption () {
-    const value = this.element.querySelector('input[type="hidden"]')?.value
+    const value = this.hiddenField?.value
     if (!value) return null
 
-    return this.element.querySelector(`[role="option"][data-value="${value}"]`)
+    return [...this.element.querySelectorAll('[role="option"]')]
+      .find((option) => option.dataset.value === value)
   }
 
   reposition () {

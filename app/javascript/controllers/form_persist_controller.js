@@ -50,8 +50,9 @@ export default class extends Controller {
   }
 
   // Stored values only fill fields the server rendered empty — a field the
-  // server filled is at least as fresh as the draft. Checkboxes and selects
-  // have no empty state to detect, so the draft wins for them.
+  // server filled is at least as fresh as the draft. Checkboxes, selects and
+  // comboboxes have no empty state to detect (they render with a default
+  // selection), so the draft wins for them.
   restore () {
     const stored = this.read()
     this.fields.forEach((field) => {
@@ -67,9 +68,6 @@ export default class extends Controller {
     })
     this.comboboxes.forEach(({ hidden, display }) => {
       if (stored[hidden.name] == null) return
-      // data-persist-default marks a value the server suggested rather than holds,
-      // so unlike a real one it doesn't outrank the draft (UI::Forms::Combobox)
-      if ((hidden.value || display.value) && hidden.dataset.persistDefault == null) return
       hidden.value = stored[hidden.name]
       display.value = stored[`${hidden.name}::display`] || stored[hidden.name]
     })
