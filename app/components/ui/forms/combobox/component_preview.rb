@@ -31,6 +31,11 @@ module UI
           {template: "ui/forms/combobox/component_preview/rich_display"}
         end
 
+        # rich_display: :stacked -- a muted second line, on a taller input
+        def stacked
+          {template: "ui/forms/combobox/component_preview/stacked"}
+        end
+
         # Allows submitting a value that is not in the options list
         def free_text
           {template: "ui/forms/combobox/component_preview/free_text"}

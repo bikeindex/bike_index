@@ -50,7 +50,8 @@ export default class extends Controller {
   }
 
   // Stored values only fill fields the server rendered empty — a field the
-  // server filled is at least as fresh as the draft.
+  // server filled is at least as fresh as the draft. Checkboxes and selects
+  // have no empty state to detect, so the draft wins for them.
   restore () {
     const stored = this.read()
     this.fields.forEach((field) => {
@@ -60,7 +61,7 @@ export default class extends Controller {
         if (!this.radioGroupChecked(field.name)) field.checked = field.value === value
       } else if (field.type === 'checkbox') {
         field.checked = value === true
-      } else if (!field.value) {
+      } else if (!field.value || field.tagName === 'SELECT') {
         field.value = value
       }
     })

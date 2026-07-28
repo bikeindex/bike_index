@@ -79,10 +79,30 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       expect(page).to have_css(overlay, text: "Cargo Bike (front storage)")
       expect(page).to have_css("#{overlay} span", text: "(front storage)")
 
-      # Clicking in to filter again hands the plain input back to the user
+      # Clicking in doesn't blank the display -- only typing a query does
       find_field("Cycle type").click
 
+      expect(page).to have_css(overlay, text: "Cargo Bike (front storage)")
+
+      fill_in "Cycle type", with: "uni"
+
       expect(page).to have_no_css(overlay)
+    end
+  end
+
+  context "with rich_display: :stacked" do
+    let(:overlay) { "[data-ui--forms--combobox-display-target='overlay']" }
+
+    it "mirrors both lines onto the taller input" do
+      visit "/rails/view_components/ui/forms/combobox/component/stacked"
+
+      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+
+      find_field("Registration type").click
+      find('[role="option"]', text: "It was stolen").click
+
+      expect(page).to have_css("#{overlay} span", text: "It was stolen")
+      expect(page).to have_css("#{overlay} span", text: "Report a bike stolen so others can help find it")
     end
   end
 end

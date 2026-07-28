@@ -3,44 +3,57 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='ui--forms--combobox-display'
 // (rendered by UI::Forms::Combobox rich_display:)
 //
-// Renders the selected combobox option with its parenthetical in muted text.
-// An <input> can't render two-tone text, so a mirror overlay covers the input
-// whenever it isn't focused for filtering. The overlay clones the selected
-// option's listbox content, so the two-tone formatting has a single source.
+// Renders the selected combobox option's rich content - a muted parenthetical,
+// or a muted second line. An <input> can't render either, so a mirror overlay
+// covers it, cloning the option's listbox content so the formatting has a
+// single source. Focus alone doesn't drop the overlay (that would blank the
+// display on a click); it steps aside once the input holds a filter query.
 export default class extends Controller {
   static targets = ['overlay']
 
   connect () {
     this.input = this.element.querySelector('.hw-combobox__input')
     this.hiddenField = this.element.querySelector('input[data-hw-combobox-target="hiddenField"]')
-    this.input.addEventListener('focus', this.hide)
-    this.input.addEventListener('blur', this.show)
-    this.element.addEventListener('hw-combobox:selection', this.show)
+    // Read before the overlay ever paints the input transparent
+    this.caretColor = window.getComputedStyle(this.input).color
+    this.events().forEach(([target, event]) => target.addEventListener(event, this.sync))
     window.addEventListener('resize', this.onResize)
-    this.show()
+    this.sync()
   }
 
   disconnect () {
-    this.input.removeEventListener('focus', this.hide)
-    this.input.removeEventListener('blur', this.show)
-    this.element.removeEventListener('hw-combobox:selection', this.show)
+    this.events().forEach(([target, event]) => target.removeEventListener(event, this.sync))
     window.removeEventListener('resize', this.onResize)
   }
 
-  show = () => {
-    if (document.activeElement === this.input) return
+  // keyup catches arrow-key navigation, which sets the value without an input
+  // event; form-persist assigns a restored selection with no event of its own
+  events () {
+    return [
+      [this.input, 'input'], [this.input, 'keyup'], [this.input, 'blur'],
+      [this.element, 'hw-combobox:selection'], [window, 'form-persist:restored']
+    ]
+  }
 
+  sync = () => {
     const selectedOption = this.selectedOption()
-    if (!selectedOption) { this.hide(); return }
+    // Anything else in the input is a query being typed - let it show through
+    if (!selectedOption || this.input.value !== selectedOption.dataset.autocompletableAs) {
+      this.hide()
+      return
+    }
 
     this.overlayTarget.innerHTML = selectedOption.innerHTML
     this.reposition()
-    this.input.style.color = 'transparent'
+    Object.assign(this.input.style, { color: 'transparent', caretColor: this.caretColor })
+    // combobox.css hides the autocomplete's selection highlight while covered
+    this.input.dataset.richDisplayShown = ''
     this.overlayTarget.classList.remove('tw:hidden')
   }
 
   hide = () => {
-    this.input.style.color = ''
+    Object.assign(this.input.style, { color: '', caretColor: '' })
+    delete this.input.dataset.richDisplayShown
     this.overlayTarget.classList.add('tw:hidden')
   }
 
