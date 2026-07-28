@@ -1,5 +1,5 @@
 # Builds the ruby-saml Settings for an organization's SAML configuration.
-# Used both to generate SP metadata (PR2) and to drive SP-initiated login (PR3).
+# Used both to generate SP metadata and to drive SP-initiated login.
 # The SP keypair is shared app-wide via ENV; only the IdP details are per-organization.
 module Saml
   module SettingsBuilder

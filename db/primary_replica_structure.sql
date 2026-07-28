@@ -7077,6 +7077,13 @@ CREATE UNIQUE INDEX index_organizations_on_slug ON public.organizations USING bt
 
 
 --
+-- Name: index_organizations_on_user_email_domain; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organizations_on_user_email_domain ON public.organizations USING btree (user_email_domain);
+
+
+--
 -- Name: index_ownerships_on_address_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7277,13 +7284,6 @@ CREATE INDEX index_social_posts_on_social_account_id ON public.social_posts USIN
 --
 
 CREATE INDEX index_social_posts_on_stolen_record_id ON public.social_posts USING btree (stolen_record_id);
-
-
---
--- Name: index_sso_identities_on_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_sso_identities_on_organization_id ON public.sso_identities USING btree (organization_id);
 
 
 --
@@ -7611,6 +7611,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260728220000'),
 ('20260725192133'),
 ('20260725155657'),
 ('20260725155259'),

@@ -25,7 +25,6 @@
 #  manual_pos_kind                 :integer
 #  name                            :string(255)
 #  opted_into_theft_survey_2023    :boolean          default(FALSE)
-#  user_email_domain               :string
 #  pos_kind                        :integer          default("no_pos")
 #  previous_slug                   :string
 #  regional_ids                    :jsonb
@@ -35,6 +34,7 @@
 #  show_on_map                     :boolean
 #  slug                            :string(255)      not null
 #  spam_registrations              :boolean          default(FALSE)
+#  user_email_domain               :string
 #  website                         :string(255)
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
@@ -48,6 +48,7 @@
 #  index_organizations_on_manufacturer_id                           (manufacturer_id)
 #  index_organizations_on_parent_organization_id                    (parent_organization_id)
 #  index_organizations_on_slug                                      (slug) UNIQUE
+#  index_organizations_on_user_email_domain                         (user_email_domain)
 #
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
@@ -252,7 +253,7 @@ class Organization < ApplicationRecord
       domain = email_domain(str)
       return nil if domain.blank?
 
-      permitted_domain_passwordless_signin.detect { |o| o.user_email_domain == domain }
+      permitted_domain_signin("passwordless_users").find_by(user_email_domain: domain)
     end
 
     # The org that forces SSO for an email's domain: feature enabled + a live IdP config.
@@ -262,7 +263,7 @@ class Organization < ApplicationRecord
       domain = email_domain(str)
       return nil if domain.blank?
 
-      permitted_domain_saml_signin.where(user_email_domain: domain)
+      permitted_domain_signin("saml_sso").where(user_email_domain: domain)
         .includes(:organization_saml_configuration)
         .detect { |org| org.organization_saml_configuration&.configured? }
     end
@@ -275,13 +276,8 @@ class Organization < ApplicationRecord
 
     private
 
-    # Internal helpers for the *_email_matching entrypoints — not part of the public API.
-    def permitted_domain_passwordless_signin
-      where.not(user_email_domain: nil).with_enabled_feature_slugs("passwordless_users")
-    end
-
-    def permitted_domain_saml_signin
-      where.not(user_email_domain: nil).with_enabled_feature_slugs("saml_sso")
+    def permitted_domain_signin(feature_slug)
+      where.not(user_email_domain: nil).with_enabled_feature_slugs(feature_slug)
     end
 
     def email_domain(str)

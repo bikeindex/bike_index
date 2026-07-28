@@ -251,7 +251,7 @@
                         miles
                   = number_field_tag :organization_stolen_message_search_radius_miles, organization_stolen_message.search_radius_miles, {class: "form-control"}
 
-          - if @organization.enabled?("saml_sso")
+          - if saml_sso_enabled
             - saml_configuration = @organization.organization_saml_configuration || @organization.build_organization_saml_configuration
             .form-group.mt-4
               %h4 SAML SSO

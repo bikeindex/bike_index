@@ -70,7 +70,7 @@ feature_name_and_slugs.each do |attrs|
   end
 end
 
-# --- Brakebills: all features except official_manufacturer, avery_export, with is_endless invoice - and skip_ownership_email ---
+# --- Brakebills: every feature except brakebills_skipped_feature_names, on an is_endless invoice ---
 brakebills = Organization.find_by_name("Brakebills") || Organization.create!(name: "Brakebills")
 brakebills_invoice = Invoice.create(organization: brakebills, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
 brakebills_invoice.update(organization_feature_ids: brakebills_feature_ids)

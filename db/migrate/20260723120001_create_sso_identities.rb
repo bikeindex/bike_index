@@ -2,7 +2,8 @@ class CreateSsoIdentities < ActiveRecord::Migration[8.1]
   def change
     create_table :sso_identities do |t|
       t.references :user, null: false, index: true
-      t.references :organization, null: false, index: true
+      # No standalone index - the composite unique index below starts with organization_id
+      t.references :organization, null: false, index: false
       # provider/uid are the unique index below - NULLs don't collide in Postgres,
       # so a nullable column would silently stop enforcing uniqueness
       t.string :provider, null: false

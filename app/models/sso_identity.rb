@@ -16,7 +16,6 @@
 #
 # Indexes
 #
-#  index_sso_identities_on_organization_id                       (organization_id)
 #  index_sso_identities_on_organization_id_and_provider_and_uid  (organization_id,provider,uid) UNIQUE
 #  index_sso_identities_on_user_id                               (user_id)
 #
