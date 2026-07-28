@@ -36,10 +36,8 @@
 
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cycle_type,
           label_text: translation(".vehicle_type"), required: true, wrapper_class: "tw:mb-0")) do %>
-        <%= render Register::ComboboxDisplay::Component.new do %>
-          <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, required: true,
-              value: @b_param.cycle_type, options: cycle_type_options) %>
-        <% end %>
+        <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, required: true,
+            value: @b_param.cycle_type, options: cycle_type_options, rich_display: true) %>
       <% end %>
 
       <%= render UI::Forms::Checkbox::Component.new(name: :propulsion_type_motorized, value: true,

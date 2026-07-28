@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='register--combobox-display'
+// Connects to data-controller='ui--forms--combobox-display'
+// (rendered by UI::Forms::Combobox rich_display:)
 //
 // Renders the selected combobox option with its parenthetical in muted text.
 // An <input> can't render two-tone text, so a mirror overlay covers the input
