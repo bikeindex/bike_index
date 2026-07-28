@@ -170,9 +170,12 @@ Rails.application.routes.draw do
     get :step_2
   end
 
-  # Shadows ActiveStorage's own route (drawn last, so this wins) to put the registration and
-  # file checks in DirectUploadsController. Deliberately unnamed - rails_direct_uploads_path
-  # still resolves here.
+  # Registration photos upload before there's a session, so they get their own endpoint
+  post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
+
+  # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which
+  # checks nothing, isn't reachable. Deliberately unnamed - rails_direct_uploads_path still
+  # resolves here, now to the signed-in-only controller.
   post "/rails/active_storage/direct_uploads" => "direct_uploads#create"
 
   namespace :search do

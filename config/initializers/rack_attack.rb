@@ -10,8 +10,9 @@ class Rack::Attack
   SIGN_IN_PATHS = ["/session", "/session/identify"].freeze
   CSP_REPORTS_PATH = "/csp_reports"
   DIRECT_UPLOADS_PATH = "/rails/active_storage/direct_uploads"
-  DIRECT_UPLOAD_USER_MAX = ENV.fetch("RACK_ATTACK_DIRECT_UPLOAD_USER_LIMIT", 20).to_i
-  DIRECT_UPLOAD_IP_MAX = ENV.fetch("RACK_ATTACK_DIRECT_UPLOAD_IP_LIMIT", 10).to_i
+  REGISTER_DIRECT_UPLOADS_PATH = "/register/direct_uploads"
+  DIRECT_UPLOAD_MAX = ENV.fetch("RACK_ATTACK_DIRECT_UPLOAD_LIMIT", 20).to_i
+  REGISTER_DIRECT_UPLOAD_MAX = ENV.fetch("RACK_ATTACK_REGISTER_DIRECT_UPLOAD_LIMIT", 10).to_i
 
   SENSITIVE_AUTH_PATHS = %w[
     /session/create_magic_link
@@ -81,26 +82,16 @@ class Rack::Attack
     request.ip if request.patch? && request.path == "/my_account"
   end
 
-  # Each direct upload hands out a presigned URL to write into our bucket. A registration
-  # needs exactly one, so anonymous callers get an hourly IP budget; signed-in users are
-  # attributable and may be working through a pile of bikes, so they get a per-minute one.
-  throttle("direct_uploads/user", limit: DIRECT_UPLOAD_USER_MAX, period: 1.minute) do |request|
-    direct_upload_user_id(request) if direct_upload?(request)
+  # Each direct upload hands out a presigned URL to write into our bucket. Both endpoints
+  # verify who's asking in the app - signed in for one, a registration token for the other -
+  # so these only cap how fast one address can ask. A registration needs a single upload,
+  # hence the far tighter hourly budget on the anonymous one.
+  throttle("direct_uploads/ip", limit: DIRECT_UPLOAD_MAX, period: 1.minute) do |request|
+    request.ip if request.post? && request.path == DIRECT_UPLOADS_PATH
   end
 
-  throttle("direct_uploads/ip", limit: DIRECT_UPLOAD_IP_MAX, period: 1.hour) do |request|
-    request.ip if direct_upload?(request) && direct_upload_user_id(request).blank?
-  end
-
-  def self.direct_upload?(request)
-    request.post? && request.path == DIRECT_UPLOADS_PATH
-  end
-
-  # Resolved through AuthRestriction so the signed cookie is actually verified - trusting the
-  # cookie's presence would hand anyone the larger budget. Rack::Attack::Request is a bare
-  # Rack::Request, hence rebuilding the ActionDispatch one it needs for the cookie jar.
-  def self.direct_upload_user_id(request)
-    AuthRestriction.user_from(ActionDispatch::Request.new(request.env))&.id
+  throttle("register_direct_uploads/ip", limit: REGISTER_DIRECT_UPLOAD_MAX, period: 1.hour) do |request|
+    request.ip if request.post? && request.path == REGISTER_DIRECT_UPLOADS_PATH
   end
 
   self.throttled_responder = lambda do |request|
