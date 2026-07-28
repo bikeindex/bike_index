@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller="ui--buttons--submit-spinner" (on a submit button - rendered
+// Connects to data-controller="ui--button--submit-spinner" (on a submit button - rendered
 // by UI::Button spinner: true). Once the button's form actually submits
 // (native validation has passed), disables the button and reveals its spinner.
 export default class extends Controller {

@@ -82,7 +82,7 @@ module UI
         data = @data.merge(active: @active || nil)
         return data unless @spinner
 
-        data.merge(controller: [data[:controller], "ui--buttons--submit-spinner"].compact.join(" "))
+        data.merge(controller: [data[:controller], "ui--button--submit-spinner"].compact.join(" "))
       end
 
       # Hidden until the submit-spinner controller reveals it on form submit;
@@ -91,7 +91,7 @@ module UI
         return unless @spinner
 
         content_tag(:span, render(UI::LoadingSpinner::Component.new(size: :sm, color_class: nil)),
-          class: "tw:hidden", data: {"ui--buttons--submit-spinner-target": "spinner"})
+          class: "tw:hidden", data: {"ui--button--submit-spinner-target": "spinner"})
       end
     end
   end
