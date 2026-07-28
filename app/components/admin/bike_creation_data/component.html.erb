@@ -1,0 +1,153 @@
+<div data-controller="collapse">
+  <%# If display_dev_info, the creation data always shows up %>
+  <% unless helpers.display_dev_info? %>
+    <div class="mt-4">
+      <%= render(UI::Button::Component.new(text: "Creation data & developer information", color: :link,
+            data: {action: "collapse#toggle", "collapse-target": "trigger"})) %>
+    </div>
+  <% end %>
+
+  <%# BParamsView styles the CodeRay output (admin_unvendored.scss) %>
+  <div
+    id="BParamsView"
+    class="mt-5 <%= "tw:hidden" unless helpers.display_dev_info? %>"
+    data-collapse-target="content"
+  >
+    <div class="row">
+      <% ownerships.each do |ownership| %>
+        <div class="col-md-6 mt-2">
+          <table class="table-list">
+            <tbody>
+              <tr>
+                <td>Kind</td>
+
+                <td>
+                  Ownership
+                  <% if @bike.current_ownership_id == ownership.id %>
+                    <span class="text-success">Current</span>
+                  <% elsif ownership.current? %>
+                    <small class="less-strong">
+                      Current but not set on Bike
+                    </small>
+                  <% else %>
+                    <span class="text-info">transferred</span>
+                  <% end %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Created
+                </td>
+
+                <td>
+                  <%= render(UI::Time::Component.new(time: ownership.created_at)) %>
+
+                  <% if helpers.display_dev_info? %>
+                    <code class="only-dev-visible small ml-2">
+                      ID: <%= ownership.id %>
+                    </code>
+                  <% end %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Updated
+                </td>
+
+                <td>
+                  <%= render(UI::Time::Component.new(time: ownership.updated_at)) %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Organization
+                </td>
+
+                <td>
+                  <%= render(Admin::OrganizationCell::Component.new(organization_id: ownership.organization_id)) %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Creator
+                </td>
+
+                <td>
+                  <% if ownership.creator_id.present? %>
+                    <%= link_to ownership.creator&.display_name || ownership.creator_id, admin_user_path(ownership.creator_id) %>
+                  <% end %>
+                </td>
+              </tr>
+
+              <% ownership.registration_info&.each do |key, value| %>
+                <tr>
+                  <td><%= key %></td>
+                  <td><%= value %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-md-6 mt-2">
+          <%= helpers.pretty_print_json(ownership.attributes.except(*OWNERSHIP_SKIPPED_ATTRIBUTES), true) %>
+        </div>
+      <% end %>
+    </div>
+
+    <% if b_params.any? %>
+      <div class="row mt-2">
+        <% b_params.each do |b_param| %>
+          <div class="col-md-6 mt-2">
+            <table class="table-list">
+              <tbody>
+                <tr>
+                  <td>Kind</td>
+                  <td>BParam</td>
+                </tr>
+
+                <tr>
+                  <td>
+                    Created
+                  </td>
+
+                  <td>
+                    <%= render(UI::Time::Component.new(time: b_param.created_at)) %>
+
+                    <% if helpers.display_dev_info? %>
+                      <code class="only-dev-visible small ml-2">
+                        ID: <%= b_param.id %>
+                      </code>
+                    <% end %>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    Updated
+                  </td>
+
+                  <td>
+                    <%= render(UI::Time::Component.new(time: b_param.updated_at)) %>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="col-md-6 mt-2">
+            <%= helpers.pretty_print_json(b_param.params, true) %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p>
+        No <code>BParams</code> exist
+      </p>
+    <% end %>
+  </div>
+</div>

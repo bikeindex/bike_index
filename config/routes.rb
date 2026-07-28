@@ -234,6 +234,8 @@ Rails.application.routes.draw do
       end
       member { get :get_destroy }
     end
+    # Selection chips for the bike edit form's organizations combobox
+    post "combobox/organization_chips", to: "combobox#organization_chips", as: :combobox_organization_chips
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
     get "scheduled_jobs", to: "dashboard#scheduled_jobs"

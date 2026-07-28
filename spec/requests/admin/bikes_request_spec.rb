@@ -64,6 +64,8 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(flash).to_not be_present
         expect(assigns(:page_id)).to eq "admin_bikes_edit"
         expect(manufacturer_warning.key?("hidden")).to be_truthy
+        # The active tab comes from active_tab, rather than JS matching data-activetab
+        expect(Nokogiri::HTML(response.body).css(".nav-tabs .nav-link.active").text.strip).to eq "Edit"
       end
     end
     context "with an unknown manufacturer" do
@@ -250,6 +252,18 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(stolen_record.city).to eq "Chicago"
         expect(stolen_record.postal_code).to eq "60622"
         expect(bike.bike_organization_ids).to eq([organization.id])
+      end
+
+      context "with comma joined bike_organization_ids" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership) }
+        let!(:other_organization) { FactoryBot.create(:organization) }
+
+        # What the multiselect combobox submits
+        it "assigns the organizations" do
+          put "#{base_url}/#{bike.id}", params: {bike: {bike_organization_ids: [organization.id, other_organization.id].join(",")}}
+          expect(flash[:success]).to be_present
+          expect(bike.reload.bike_organization_ids).to match_array([organization.id, other_organization.id])
+        end
       end
 
       context "removing organization with note" do

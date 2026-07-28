@@ -1,0 +1,28 @@
+import { Controller } from '@hotwired/stimulus'
+import { collapse } from 'utils/collapse_utils'
+
+// Connects to data-controller='admin--bike-edit-form'
+//
+// Replaces the legacy BinxAdminBikesEdit from the vendored admin bundle. Two behaviors:
+//   1. The "no serial" checkboxes are mutually exclusive, and each overwrites the serial
+//      field with the sentinel Bike#serial_number expects (data-serial), restoring the
+//      original value when both are unchecked.
+//   2. Unchecking "Bike is stolen" reveals the recovery fields and requires a reason --
+//      filling them in is what recovers the bike.
+export default class extends Controller {
+  static targets = ['serial', 'noSerial', 'stolen', 'recoveryFields', 'recoveryReason']
+  static values = { originalSerial: String }
+
+  serialChanged ({ target }) {
+    this.noSerialTargets.filter((checkbox) => checkbox !== target).forEach((checkbox) => { checkbox.checked = false })
+
+    this.serialTarget.value = target.checked ? target.dataset.serial : this.originalSerialValue
+    this.serialTarget.classList.toggle('fake-disabled', target.checked)
+  }
+
+  stolenChanged () {
+    const recovering = !this.stolenTarget.checked
+    collapse(recovering ? 'show' : 'hide', this.recoveryFieldsTarget)
+    this.recoveryReasonTarget.required = recovering
+  }
+}
