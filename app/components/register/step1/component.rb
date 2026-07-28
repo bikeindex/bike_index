@@ -16,9 +16,7 @@ module Register
       end
 
       def organization
-        return @organization if defined?(@organization)
-
-        @organization = @b_param.creation_organization
+        @organization ||= @b_param.creation_organization
       end
 
       # Every rendering of the cycle type is its own span, so register--heading
@@ -35,8 +33,9 @@ module Register
       end
 
       # slug => the word the heading uses, for register--heading to swap in
+      # (the same map bikes/new hands its JS as window.cycleTypeTranslations)
       def cycle_type_names
-        CycleType.slugs.index_with { |slug| CycleType.new(slug).short_name_translation&.downcase }
+        CycleType.slug_translation_hash_lowercase_short
       end
 
       # Only anonymous registrants have anything to wait on, and the email goes

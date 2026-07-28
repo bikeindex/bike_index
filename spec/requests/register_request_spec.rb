@@ -360,7 +360,8 @@ RSpec.describe RegisterController, type: :request do
       it "renders only the additional registration fields the organization enables" do
         get register_path(b_param_token: b_param.id_token, step: 2)
         reg_fields.each { |field| expect(response.body).to_not include field }
-        expect(status_field("address_record_attributes")["class"]).to include "tw:hidden"
+        # Not rendered at all - no status could reveal it, and it's ~300 option tags
+        expect(status_field("address_record_attributes")).to be_nil
         # The Bike Index sticker isn't org-gated here, unlike bikes/new
         expect(response.body).to include "bike[bike_sticker]"
         # Nothing extra was asked for, so the section is just the registrant's own info

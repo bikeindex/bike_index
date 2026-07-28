@@ -22,31 +22,36 @@ module Register
       end
 
       def organization
-        return @organization if defined?(@organization)
-
-        @organization = @b_param.creation_organization
+        @organization ||= @b_param.creation_organization
       end
 
-      # The additional registration fields, gated exactly as bikes/new gates them
+      # The additional fields the organization asks for, gated exactly as bikes/new
+      # gates them. Resolved once - the gates query, and the section heading below
+      # re-checks every one of them
+      def reg_fields
+        @reg_fields ||= %i[phone extra_registration_number organization_affiliation student_id]
+          .select { |field| helpers.send(:"include_field_reg_#{field}?", organization, @current_user) }
+      end
+
       def show_extra_registration_number?
-        helpers.include_field_reg_extra_registration_number?(organization, @current_user)
+        reg_fields.include?(:extra_registration_number)
       end
 
       def show_organization_affiliation?
-        helpers.include_field_reg_organization_affiliation?(organization, @current_user)
+        reg_fields.include?(:organization_affiliation)
       end
 
       def show_student_id?
-        helpers.include_field_reg_student_id?(organization, @current_user)
+        reg_fields.include?(:student_id)
+      end
+
+      def show_reg_phone?
+        reg_fields.include?(:phone)
       end
 
       # Organizations can rename the fields they require
       def reg_label(field, default)
         helpers.registration_field_label(organization, field) || default
-      end
-
-      def show_reg_phone?
-        helpers.include_field_reg_phone?(organization, @current_user)
       end
 
       # Mirrors bikes/new: stolen needs a contact number, impounded needs one
@@ -74,22 +79,17 @@ module Register
         address_statuses.include?(@b_param.status)
       end
 
-      # form_with has no model here, so fields_for needs the record to render from
+      # form_with has no model here, so fields_for needs the record to render from -
+      # read through the same whitelist that turns these into the created bike's address
       def address_record
-        @address_record ||= AddressRecord.new(@b_param.bike["address_record_attributes"]
-          &.slice(*AddressRecord.permitted_params.map(&:to_s)) || {})
+        @address_record ||= AddressRecord.new(BParam.address_record_attributes(@b_param.bike))
       end
 
       # An organization asking for more than a standard registration owns the section
       def contact_section_text
-        return translation(".contact_info") unless organization_reg_fields?
+        return translation(".contact_info") if reg_fields.none? && address_statuses.none?
 
         translation(".information_for_org", org_name: organization.short_name)
-      end
-
-      def organization_reg_fields?
-        show_reg_phone? || show_extra_registration_number? ||
-          show_organization_affiliation? || show_student_id? || address_statuses.any?
       end
 
       # bikes/new knows the status before rendering - here it's picked in this

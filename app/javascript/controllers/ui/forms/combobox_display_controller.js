@@ -34,15 +34,18 @@ export default class extends Controller {
     ]
   }
 
+  // input and keyup both fire per keystroke, so bail before repainting (and before
+  // reposition's forced layout) unless what's shown would actually change
   sync = () => {
     const selectedOption = this.selectedOption()
     // Anything else in the input is a query being typed - let it show through
-    if (!selectedOption || this.input.value !== selectedOption.dataset.autocompletableAs) {
-      this.hide()
-      return
-    }
+    const shown = (this.input.value === selectedOption?.dataset.autocompletableAs) ? selectedOption : null
+    if (shown === this.shown) return
 
-    this.overlayTarget.innerHTML = selectedOption.innerHTML
+    this.shown = shown
+    if (!shown) { this.hide(); return }
+
+    this.overlayTarget.innerHTML = shown.innerHTML
     this.reposition()
     Object.assign(this.input.style, { color: 'transparent', caretColor: this.caretColor })
     // combobox.css hides the autocomplete's selection highlight while covered
@@ -51,6 +54,7 @@ export default class extends Controller {
   }
 
   hide = () => {
+    this.shown = null
     Object.assign(this.input.style, { color: '', caretColor: '' })
     delete this.input.dataset.richDisplayShown
     this.overlayTarget.classList.add('tw:hidden')

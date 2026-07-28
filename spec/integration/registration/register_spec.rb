@@ -111,6 +111,13 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_no_field("bike[phone]")
     type_into("#bike_status", "Stolen")
     click_combobox_option("Stolen")
+
+    # The status the server renders is only a default, so the draft outlives a
+    # reload - and the fields it gates reopen with it
+    visit details_url
+
+    expect(page).to have_field("bike_status", with: "Stolen")
+    expect(find("input[name='bike[status]']", visible: :all).value).to eq "status_stolen"
     fill_in "bike[phone]", with: "(555) 000-0000"
 
     click_button "Complete Bike Registration"

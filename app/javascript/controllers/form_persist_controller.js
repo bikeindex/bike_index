@@ -66,7 +66,10 @@ export default class extends Controller {
       }
     })
     this.comboboxes.forEach(({ hidden, display }) => {
-      if (hidden.value || display.value || stored[hidden.name] == null) return
+      if (stored[hidden.name] == null) return
+      // data-persist-default marks a value the server suggested rather than holds,
+      // so unlike a real one it doesn't outrank the draft (UI::Forms::Combobox)
+      if ((hidden.value || display.value) && hidden.dataset.persistDefault == null) return
       hidden.value = stored[hidden.name]
       display.value = stored[`${hidden.name}::display`] || stored[hidden.name]
     })
