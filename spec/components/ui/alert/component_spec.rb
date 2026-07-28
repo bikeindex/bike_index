@@ -9,6 +9,7 @@ RSpec.describe UI::Alert::Component, type: :component do
   it "renders" do
     expect(component).to be_present
     expect(component).to have_css('[role="alert"].tw:text-blue-800')
+    expect(component.to_html).to include "M10 9.25v4.5" # the default info icon
     # It doesn't have dismissable button
     expect(component).to_not have_selector("button")
   end
@@ -19,7 +20,7 @@ RSpec.describe UI::Alert::Component, type: :component do
     it "renders the passed icon instead of the default" do
       html = component.to_html
       expect(html).to include "M8.47 1.318" # the envelope path
-      expect(html).to_not include "M10 .5a9.5" # the default info path
+      expect(html).to_not include "M10 9.25v4.5" # the default info path
     end
   end
 
@@ -50,7 +51,7 @@ RSpec.describe UI::Alert::Component, type: :component do
       html = component.to_html
       expect(html).to include('<svg class="custom-icon">')
       # The default info icon is not rendered
-      expect(html).to_not include("M10 .5a9.5")
+      expect(html).to_not include("M10 9.25v4.5")
     end
   end
 
