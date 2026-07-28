@@ -49,6 +49,10 @@ module Images
       end
       stolen_record.bike&.update(updated_at: Time.current)
       stolen_record
+    ensure
+      # open_file and the stock-photo fallback both hand back tempfiles, which otherwise sit in
+      # /tmp until GC runs their finalizer - a batch regenerate holds one original apiece.
+      image.respond_to?(:close!) ? image.close! : image&.close
     end
 
     #

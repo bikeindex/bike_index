@@ -28,8 +28,21 @@ class PublicImage < ApplicationRecord
     photo_of_receipt: 6
   }.freeze
 
-  mount_uploader :image, PublicImageUploader
+  # Sized for display rather than for the source: `large` covers the show page hero at 2x, `small`
+  # the search result cards. `small` stays jpeg because `thumb_path` feeds emails, and Outlook
+  # desktop (still the Word rendering engine) won't render webp.
+  VARIANTS = {
+    small: {resize_to_fill: [300, 300], format: :jpeg},
+    medium: {resize_to_fit: [1000, 750], format: :webp},
+    large: {resize_to_fit: [2000, 1600], format: :webp}
+  }.freeze
+
+  mount_uploader :image, PublicImageUploader # Legacy, migrating to :file
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
+
+  has_one_attached :file do |attachable|
+    VARIANTS.each { |name, transformations| attachable.variant(name, **transformations) }
+  end
 
   enum :kind, KIND_ENUM
 
@@ -64,6 +77,19 @@ class PublicImage < ApplicationRecord
     imageable_type == "Bike"
   end
 
+  # Serves whichever backend this record was uploaded through. CarrierWave versions and
+  # ActiveStorage variants share names, so callers pass the same size either way - the
+  # ActiveStorage dimensions are just larger.
+  def image_url(size = nil)
+    return image.url(*size) unless file.attached?
+
+    BlobUrl.for_variant(file, (size if VARIANTS.key?(size&.to_sym)))
+  end
+
+  def file_needs_processing?
+    file.attached? && !file.blob.metadata["stripped"]
+  end
+
   # Method to make create_revised.js easier to handle
   def bike_type
     return false unless %w[Bike BikeVersion].include?(imageable_type)
@@ -77,6 +103,8 @@ class PublicImage < ApplicationRecord
     if external_image_url.present? && image.blank?
       return Images::ExternalUrlStoreJob.perform_async(id)
     end
+
+    Images::ProcessPublicImageJob.perform_async(id) if file_needs_processing?
 
     imageable&.update(updated_at: Time.current)
     return true unless bike?
@@ -97,13 +125,17 @@ class PublicImage < ApplicationRecord
   # Because the way we load the file is different if it's remote or local
   # This is hacky, but whatever
   def local_file?
+    return file.blob.service.is_a?(ActiveStorage::Service::DiskService) if file.attached?
+
     image&._storage&.to_s == "CarrierWave::Storage::File"
   end
 
   # Always a file on disk - URI.open returns a StringIO for remote files under 10kb,
   # which image processors can't read.
-  # Returns nil when a local file is missing on disk (e.g. sandbox without synced uploads)
+  # Returns nil when the file is missing (e.g. sandbox without synced uploads)
   def open_file
+    return attached_tempfile if file.attached?
+
     if local_file?
       File.open(image.path, "r") if File.exist?(image.path)
     else
@@ -112,6 +144,17 @@ class PublicImage < ApplicationRecord
   end
 
   private
+
+  # Not blob.open, which unlinks its tempfile when the block exits - the caller needs the file to
+  # outlive this method. Plain download is one GET; the chunked form adds two HEADs on S3.
+  def attached_tempfile
+    tempfile = Tempfile.new(["public_image", File.extname(file.filename.to_s)], binmode: true)
+    tempfile.write(file.blob.download)
+    tempfile.tap(&:rewind)
+  rescue ActiveStorage::FileNotFoundError
+    tempfile&.close!
+    nil
+  end
 
   def remote_storage?
     PublicImageUploader.storage == CarrierWave::Storage::Fog

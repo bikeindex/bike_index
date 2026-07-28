@@ -19,6 +19,20 @@ module BlobUrl
     end
   end
 
+  # `size` is a named variant on the attachment. Never calls `processed` - that would issue a
+  # storage existence check per image per render; the post-attach job guarantees they exist.
+  def for_variant(attached = nil, size = nil)
+    return if attached.blank?
+    return self.for(attached.blob) if size.blank?
+
+    variant = attached.variant(size)
+    if local_storage?(attached.blob)
+      Rails.application.routes.url_helpers.rails_representation_url(variant)
+    else
+      File.join(storage_host_for(attached.blob), variant.key) # Deterministic, no query
+    end
+  end
+
   #
   # private below here
   #
