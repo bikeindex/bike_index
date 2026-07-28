@@ -24,7 +24,7 @@ module UI
           @html_options = {
             class: "tw:peer tw:sr-only",
             accept: accept_list.join(",").presence,
-            data: {"form--file-upload-target": "input", action: "form--file-upload#display"}
+            data: {"ui--forms--file-upload-target": "input", action: "ui--forms--file-upload#display"}
           }.merge(html_options)
 
           # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.

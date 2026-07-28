@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='form--file-upload'
+// Connects to data-controller='ui--forms--file-upload'
 // Shows the selected filename (or a count for multiple files) in the field, and
 // frames the controls as a drop target while a file is dragged over the page.
 export default class extends Controller {

@@ -31,12 +31,9 @@ module PageBlock
         @review_app.present?
       end
 
-      # Plain-text title, also shown in the Lookbook navbar (config/initializers/lookbook.rb)
-      def topbar_title
-        return nil unless render?
-        return banner_label if @pr_number.blank?
-
-        "#{banner_label} · #{pr_link_text}"
+      # Only a PR is worth the navbar space; dev and sandbox deploys get nothing.
+      def lookbook_navbar_title
+        pr_link_text if render? && @pr_number.present?
       end
 
       private

@@ -76,9 +76,9 @@
           <% bike_ids = @export.exported_bike_ids %>
 
           <% if bike_ids.present? %>
-            <details data-controller="details">
+            <details data-controller="ui--details">
               <summary
-                data-action="click->details#toggle"
+                data-action="click->ui--details#toggle"
                 class="
                   small less-strong tw:cursor-pointer tw:list-none
                   tw:[&::-webkit-details-marker]:hidden
@@ -94,7 +94,7 @@
               </summary>
 
               <ul
-                data-details-target="content"
+                data-ui--details-target="content"
                 class="exported-link-list tw:hidden!"
               >
                 <% bike_ids.each_with_index do |id, i| %>
