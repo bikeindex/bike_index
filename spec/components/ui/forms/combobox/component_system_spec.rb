@@ -90,6 +90,25 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
     end
   end
 
+  context "inside a form-persist form" do
+    # The combobox always renders with a selection, so there is no empty state
+    # for form-persist to fill -- the draft has to win over the rendered value
+    it "restores the draft selection" do
+      visit "/rails/view_components/ui/forms/combobox/component/persisted"
+
+      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+      expect(find_field("Cycle type").value).to eq "Bike"
+
+      find_field("Cycle type").click
+      find('[role="option"]', text: "Unicycle", exact_text: true).click
+
+      visit "/rails/view_components/ui/forms/combobox/component/persisted"
+
+      expect(find_field("Cycle type").value).to eq "Unicycle"
+      expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "unicycle"
+    end
+  end
+
   context "with rich_display: :stacked" do
     let(:overlay) { "[data-ui--forms--combobox-display-target='overlay']" }
 

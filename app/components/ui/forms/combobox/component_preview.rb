@@ -31,6 +31,11 @@ module UI
           {template: "ui/forms/combobox/component_preview/rich_display"}
         end
 
+        # form-persist restores a draft selection over the rendered value
+        def persisted
+          {template: "ui/forms/combobox/component_preview/persisted"}
+        end
+
         # rich_display: :stacked -- a muted second line, on a taller input
         def stacked
           {template: "ui/forms/combobox/component_preview/stacked"}
