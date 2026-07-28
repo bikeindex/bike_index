@@ -30,6 +30,12 @@ ENV BUNDLE_PATH=/usr/local/bundle
 # libpq-dev/libyaml-dev/libffi-dev/pkg-config (native gem compilation, e.g.
 # pg, fiddle), git (required by actions/checkout inside a container job),
 # ca-certificates and xz-utils (fetching/unpacking Node below).
+#
+# libheif-plugin-x265 is the HEVC *encoder*. Debian ships libheif's encoders as
+# separate plugins, and libvips pulls in only the decoder - so an iPhone HEIC
+# loads but re-saving one fails with "heifsave: Unsupported compression".
+# Images::ProcessPublicImageJob strips EXIF in place, keeping the source format,
+# so stripping a HEIC needs it (spec/jobs/images/process_public_image_job_spec.rb).
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
       build-essential \
@@ -41,6 +47,7 @@ RUN apt-get update -qq && \
       libcurl4-gnutls-dev \
       libexpat1-dev \
       libffi-dev \
+      libheif-plugin-x265 \
       libpq-dev \
       libssl-dev \
       libvips \
