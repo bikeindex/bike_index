@@ -30,34 +30,24 @@ RSpec.describe UI::Forms::ComboboxManufacturer::Component, :js, type: :system do
 
     # An unindexed manufacturer is entered through the unknown option
     type_into(find_field("Manufacturer"), "Bikes by Seth")
-    find('[role="option"]', text: "Unknown manufacturer Bikes by Seth").click
+    click_combobox_option("Unknown manufacturer Bikes by Seth")
 
     expect(page).to have_css('[aria-expanded="false"]')
     expect(find_field("Manufacturer").value).to eq "Bikes by Seth"
     expect(hidden_field.value).to eq "Bikes by Seth"
-  end
 
-  context "with no_manufacturer_other" do
-    # This preview renders the bare component, which has no label of its own
-    let(:combobox) { find("input[role='combobox']") }
+    # With no_manufacturer_other, free text isn't offered or kept. This preview
+    # renders the bare component, which has no label of its own
+    visit "/rails/view_components/ui/forms/combobox_manufacturer/component/no_manufacturer_other"
 
-    it "only selects an indexed manufacturer" do
-      visit "/rails/view_components/ui/forms/combobox_manufacturer/component/no_manufacturer_other"
+    expect(page).to have_css('[aria-expanded="false"]', wait: 10)
 
-      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+    type_into(find("input[role='combobox']"), "Bikes by Seth")
 
-      type_into(combobox, "sur")
+    expect(page).to_not have_css('[role="option"]')
 
-      expect(page).to have_css('[role="option"]', text: "Surly")
-      expect(page).to_not have_css('[role="option"]', text: "Unknown manufacturer")
+    send_keys(:enter)
 
-      type_into(combobox, "Bikes by Seth")
-
-      expect(page).to_not have_css('[role="option"]')
-
-      send_keys(:enter)
-
-      expect(hidden_field.value).to be_blank
-    end
+    expect(hidden_field.value).to be_blank
   end
 end

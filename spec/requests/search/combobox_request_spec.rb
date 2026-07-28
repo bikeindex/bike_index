@@ -90,6 +90,9 @@ RSpec.describe Search::ComboboxController, type: :request do
       expect(response.body).to_not include("data-value=\"#{Manufacturer.other.id}\"")
       expect(response.body).to include("Unknown manufacturer")
       expect(response.body).to include("hw_unknown_manufacturer_option")
+      # Matches of equal priority are alphabetical
+      expect(response.body.index("data-value=\"#{trek.id}\""))
+        .to be < response.body.index("data-value=\"#{trek_components.id}\"")
     end
 
     context "with matches of differing priority" do
@@ -102,7 +105,7 @@ RSpec.describe Search::ComboboxController, type: :request do
         Autocomplete::Loader.load_all(%w[Manufacturer])
       end
 
-      it "orders by priority, then alphabetically" do
+      it "orders by priority" do
         expect(Manufacturer.find(trek_components.id).priority).to be > trek.reload.priority
 
         get "/search/combobox/manufacturers", params: {q: "tre", for_id: "test"}, as: :turbo_stream

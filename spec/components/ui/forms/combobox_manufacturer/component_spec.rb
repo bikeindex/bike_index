@@ -40,7 +40,7 @@ RSpec.describe UI::Forms::ComboboxManufacturer::Component, type: :component do
     let(:bike) { Bike.new(manufacturer:, manufacturer_other:) }
     let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
     let(:manufacturer_other) { nil }
-    let(:form) { ActionView::Helpers::FormBuilder.new("bike", bike, vc_test_controller.view_context, {}) }
+    let(:form) { BikeIndexFormBuilder.new("bike", bike, vc_test_controller.view_context, {}) }
     let(:options) { {form:} }
 
     it "renders the manufacturer's name and id" do

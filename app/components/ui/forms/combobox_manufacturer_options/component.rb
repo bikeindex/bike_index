@@ -8,8 +8,6 @@ module UI
       # synthetic "Unknown manufacturer" option that free text is entered through.
       # Sibling to the form control; this is the turbo-stream response backing it.
       class Component < ApplicationComponent
-        UNKNOWN_OPTION_ID = "hw_unknown_manufacturer_option"
-
         def initialize(matches:, next_page:, q: nil, no_manufacturer_other: false)
           @matches = matches
           @next_page = next_page
@@ -33,7 +31,10 @@ module UI
 
         # Manufacturer.other is never selectable - it's what free text resolves to
         def manufacturer_matches
-          @manufacturer_matches ||= @matches.reject { |match| match["id"] == Manufacturer.other.id }
+          @manufacturer_matches ||= begin
+            other_id = Manufacturer.other.id
+            @matches.reject { |match| match["id"] == other_id }
+          end
         end
 
         def unknown_manufacturer?
@@ -48,7 +49,7 @@ module UI
             tag.span(@q)
           ])
 
-          {id: UNKNOWN_OPTION_ID, value: @q, display: @q, content:}
+          {id: "hw_unknown_manufacturer_option", value: @q, display: @q, content:}
         end
       end
     end

@@ -6,20 +6,18 @@ module Search
   # and the manufacturer picker (UI::Forms::ComboboxManufacturer::Component).
   class ComboboxController < ApplicationController
     PER_PAGE = 15
-    MANUFACTURER_CATEGORIES = %w[cmp_mnfg frame_mnfg].freeze
 
     # Every action only ever renders turbo_stream
     before_action { request.format = :turbo_stream }
 
     def options
       matches = Autocomplete::Matcher.search(autocomplete_params)
-      next_page = (matches.length >= PER_PAGE) ? current_page + 1 : nil
 
       render turbo_stream: view_context.render(
         Search::EverythingComboboxOptions::Component.new(
           matches:,
           search_obj_name: params[:search_obj_name].presence || "Registrations",
-          next_page:,
+          next_page: next_page_for(matches),
           q: params[:q]
         )
       )
@@ -27,12 +25,11 @@ module Search
 
     def manufacturers
       matches = Autocomplete::Matcher.search(manufacturer_params)
-      next_page = (matches.length >= PER_PAGE) ? current_page + 1 : nil
 
       render turbo_stream: view_context.render(
         UI::Forms::ComboboxManufacturerOptions::Component.new(
           matches:,
-          next_page:,
+          next_page: next_page_for(matches),
           q: params[:q],
           no_manufacturer_other: Binxtils::InputNormalizer.boolean(params[:no_manufacturer_other])
         )
@@ -60,9 +57,13 @@ module Search
 
     # frame_maker limits the categories to manufacturers that make frames
     def manufacturer_params
-      categories = Binxtils::InputNormalizer.boolean(params[:frame_maker]) ? %w[frame_mnfg] : MANUFACTURER_CATEGORIES
+      categories = Binxtils::InputNormalizer.boolean(params[:frame_maker]) ? %w[frame_mnfg] : %w[cmp_mnfg frame_mnfg]
 
-      params.permit(:q, :page, :cache).merge(per_page: PER_PAGE, categories:)
+      autocomplete_params.merge(categories:)
+    end
+
+    def next_page_for(matches)
+      (matches.length >= PER_PAGE) ? current_page + 1 : nil
     end
 
     def current_page

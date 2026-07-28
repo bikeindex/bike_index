@@ -46,7 +46,7 @@ module UI
         # The variants render together on the group page, so each needs its own ids -
         # which the combobox derives from the field name, or the form's object name
         def bike_form(object_name, bike)
-          ActionView::Helpers::FormBuilder.new(object_name, bike, template, {})
+          BikeIndexFormBuilder.new(object_name, bike, template, {})
         end
       end
     end

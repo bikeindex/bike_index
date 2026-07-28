@@ -8,7 +8,8 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static targets = ['warning']
 
+  // Digits are an id, matching how Manufacturer.friendly_find reads the submitted value
   toggleWarning ({ detail: { value } }) {
-    this.warningTarget.hidden = value === '' || /^\d+$/.test(value)
+    this.warningTarget.hidden = /^\d*$/.test(value)
   }
 }
