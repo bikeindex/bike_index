@@ -38,6 +38,14 @@ RSpec.describe Admin::Bikes::Edit::Component, type: :component do
     expect(component.css(".fancy-select")).to be_blank
   end
 
+  it "renders every field through UI::Forms::Group, and no bootstrap form classes" do
+    expect(component.css("form .form-control")).to be_blank
+    expect(component.css("form .form-group")).to be_blank
+    # skip_email is its own label, so the required marker stays with "Owner email"
+    expect(component.css("label[for=bike_owner_email]").text.strip).to eq "Owner email *"
+    expect(component.css("input#bike_owner_email").first["class"]).to eq "twinput"
+  end
+
   it "renders primary_activity as a combobox rather than a select" do
     expect(component.css("select#bike_primary_activity_id")).to be_blank
     expect(component.css("input[name='bike[primary_activity_id]']")).to be_present
@@ -53,6 +61,30 @@ RSpec.describe Admin::Bikes::Edit::Component, type: :component do
       expect(component.css("[data-hw-combobox-selection-chip-src-value]").first["data-hw-combobox-selection-chip-src-value"])
         .to eq "/admin/combobox/organization_chips"
     end
+
+    it "lists the bike_organizations in a UI::Table" do
+      table = component.css("table.ui-table").first
+      expect(table.css("th").map { it.text.strip }).to eq(["Organizations", "Created", "Edit claimed?", "Deleted"])
+      expect(table.css("tbody tr").length).to eq 1
+      expect(table.css("tbody tr").text).to include("Cool Bike Shop")
+      expect(component.text).to_not include("No organizations")
+    end
+
+    context "with the organization deleted" do
+      before { organization.destroy }
+
+      # Admin::OrganizationCell resolves it unscoped, where the association reads nil
+      it "still names the organization, and flags it deleted" do
+        row = component.css("table.ui-table tbody tr").text
+        expect(row).to include("Cool Bike Shop")
+        expect(row).to match(/deleted!/)
+      end
+    end
+  end
+
+  it "renders the empty state rather than an empty table" do
+    expect(component.css("table.ui-table")).to be_blank
+    expect(component.text).to include("No organizations")
   end
 
   context "with a stolen bike" do

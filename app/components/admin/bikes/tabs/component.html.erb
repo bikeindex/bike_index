@@ -390,6 +390,7 @@
                   <input
                     class="form-control"
                     type="text"
+                    autocomplete="off"
                     value="<%= edit_bike_recovery_url(bike_id: @bike.id, token: @stolen_record.find_or_create_recovery_link_token) %>"
                   >
                 </td>
