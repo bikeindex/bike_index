@@ -163,12 +163,9 @@ Rails.application.routes.draw do
   end
 
   # Redesigned registration flow: quick start, then complete on-site or via email.
-  # new makes an empty registration and redirects to its step_1, so the whole
-  # flow carries a b_param_token; show renders complete (or confirms the email)
-  resource :register, only: %i[new create show update], controller: :register do
-    get :step_1
-    get :step_2
-  end
+  # new makes an empty registration and redirects into show, which renders
+  # ?step=1|2|complete (and handles the emailed confirmation link)
+  resource :register, only: %i[new create show update], controller: :register
 
   namespace :search do
     get "/", to: redirect("/search/registrations")
