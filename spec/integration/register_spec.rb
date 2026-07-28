@@ -9,6 +9,12 @@ RSpec.describe "Register flow", :js, type: :system do
   let!(:blue) { FactoryBot.create(:color, name: "Blue") }
   let!(:green) { FactoryBot.create(:color, name: "Green") }
 
+  before do
+    # The manufacturer combobox autocompletes against the redis index
+    Autocomplete::Loader.clear_redis
+    Autocomplete::Loader.load_all(%w[Manufacturer])
+  end
+
   it "starts a registration, keeps a full details draft across a reload, and completes" do
     visit "/register/new"
 
