@@ -55,7 +55,14 @@ SCREENSHOT_COMMENT_ID=$(gh api "repos/{owner}/{repo}/issues/$PR_NUMBER/comments"
 
 **Headers are always `| Desktop | Mobile |`** — that stays the same regardless of whether there's a base-branch comparison. The base-branch shots and branch shots stack as additional rows, with a small indicator row between them when both are present.
 
-Default (with base-branch comparison — put the actual base name from `$BASE`, e.g. `main`, in the indicator row):
+Default (with base-branch comparison). The indicator row labels the base by its PR when it has one — `#3918 👆` for a stacked base, plain `main 👆` otherwise:
+
+```bash
+BASE_PR=$(gh pr list --head "$BASE" --state all --json number --jq '.[0].number // empty')
+BASE_LABEL=${BASE_PR:+#$BASE_PR}; BASE_LABEL=${BASE_LABEL:-$BASE}
+```
+
+`// empty` is load-bearing — without it a base with no PR yields the literal `#null`.
 
 ```markdown
 ## Screenshots
@@ -65,7 +72,7 @@ Default (with base-branch comparison — put the actual base name from `$BASE`, 
 | Desktop | Mobile |
 | --- | --- |
 | <img src="<base-desktop-url>" width="500"> | <img src="<base-mobile-url>" width="250"> |
-| $BASE 👆 | this branch 👇 |
+| $BASE_LABEL 👆 | this branch 👇 |
 | <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
 ```
 
