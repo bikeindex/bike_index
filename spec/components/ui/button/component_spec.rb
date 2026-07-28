@@ -34,6 +34,17 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with spinner" do
+    let(:options) { {text:, kind: :submit, spinner: true} }
+
+    it "renders a self-wired hidden spinner that inherits the button's text color" do
+      expect(component).to have_css("button[data-controller='ui--buttons--submit-spinner']")
+      expect(component).to have_css("span.tw\\:hidden[data-ui--buttons--submit-spinner-target='spinner'] svg", visible: :all)
+      expect(component.css("svg").first["class"]).to_not include("tw:text-slate-400")
+      expect(component).to have_text("Click me")
+    end
+  end
+
   context "with link color" do
     let(:color) { :link }
 
