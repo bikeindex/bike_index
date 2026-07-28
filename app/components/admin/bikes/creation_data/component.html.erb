@@ -1,9 +1,9 @@
-<div data-controller="collapse">
+<div data-controller="ui--collapse">
   <%# If display_dev_info, the creation data always shows up %>
   <% unless helpers.display_dev_info? %>
     <div class="mt-4">
       <%= render(UI::Button::Component.new(text: "Creation data & developer information", color: :link,
-            data: {action: "collapse#toggle", "collapse-target": "trigger"})) %>
+            data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"})) %>
     </div>
   <% end %>
 
@@ -11,7 +11,7 @@
   <div
     id="BParamsView"
     class="mt-5 <%= "tw:hidden" unless helpers.display_dev_info? %>"
-    data-collapse-target="content"
+    data-ui--collapse-target="content"
   >
     <div class="row">
       <% ownerships.each do |ownership| %>

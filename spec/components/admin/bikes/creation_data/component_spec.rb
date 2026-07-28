@@ -8,10 +8,10 @@ RSpec.describe Admin::Bikes::CreationData::Component, type: :component do
 
   # display_dev_info? is always false in test, so this is the collapsed rendering
   it "renders the ownership collapsed behind a stimulus trigger" do
-    expect(component.css("[data-controller=collapse]")).to be_present
-    expect(component.css("[data-action='collapse#toggle']").text).to eq "Creation data & developer information"
+    expect(component.css("[data-controller=ui--collapse]")).to be_present
+    expect(component.css("[data-action='ui--collapse#toggle']").text).to eq "Creation data & developer information"
 
-    content = component.css("[data-collapse-target=content]").first
+    content = component.css("[data-ui--collapse-target=content]").first
     expect(content["class"]).to include("tw:hidden")
     expect(content.text).to match(/Ownership/)
     expect(content.text).to match(/No BParams exist/)
