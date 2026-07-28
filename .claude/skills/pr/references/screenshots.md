@@ -15,15 +15,15 @@ From the changed files, infer the affected routes. Heuristics:
 - A view at `app/views/bikes/show.html.erb` → `/bikes/:id` (pick a representative id from the dev db, e.g. `Bike.last.id`)
 - A component touched by a specific page → screenshot that page
 - A shared component (header, footer, UI::Badge, etc.) → screenshot 1–2 representative pages that exercise it
-- A component with a Lookbook preview → its preview URL `/lookbook/preview/<component>/<scenario>` — a real responsive page, captured like any other URL
+- A component with a ViewComponent/Lookbook preview → its preview URL (`frontend-screenshots` covers the path format) — a real responsive page, captured like any other URL
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
 ## 2. Capture branch screenshots
 
-Invoke the `frontend-screenshots` skill with the `(url-path, page-slug)` pairs from step 1. It handles dev-server check, sign-in, the seeded-user identity gate, viewport sizing, and per-PNG sanity checks. It returns local paths under `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`.
+Invoke the `frontend-screenshots` skill with the `(url-path, page-slug)` pairs from step 1. It handles dev-server check, sign-in, the seeded-user identity gate, viewport sizing, and per-PNG sanity checks, and returns the local PNG paths.
 
-If `frontend-screenshots` returns failures it couldn't diagnose, surface them and stop — don't post partial screenshots.
+If it returns failures it couldn't diagnose, report them and leave the PR without screenshots — don't post partial results.
 
 ## 3. Upload branch screenshots and get inline URLs
 
@@ -37,7 +37,7 @@ Capture the **base-branch** (`$BASE` from SKILL.md step 0.5) version of every sc
 
 Skip per-page only when the URL didn't exist on `$BASE` (a brand-new route or page added in this PR) — there's nothing to compare to.
 
-Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs and tell it to capture against the base — pass `$BASE` (from SKILL.md step 0.5) as its `BASE_REF` so it checks out `origin/$BASE`, whether or not that's `main` (its "Cross-branch comparison" section checks out the base ref, captures into `...-base-...` filenames, returns to the original branch). Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
+Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing `origin/$BASE` (`$BASE` from SKILL.md step 0.5) as its `BASE_REF` — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
 
 ## 5. Post the Screenshots section as a PR comment
 
@@ -55,7 +55,14 @@ SCREENSHOT_COMMENT_ID=$(gh api "repos/{owner}/{repo}/issues/$PR_NUMBER/comments"
 
 **Headers are always `| Desktop | Mobile |`** — that stays the same regardless of whether there's a base-branch comparison. The base-branch shots and branch shots stack as additional rows, with a small indicator row between them when both are present.
 
-Default (with base-branch comparison — put the actual base name from `$BASE`, e.g. `main`, in the indicator row):
+Default (with base-branch comparison). The indicator row labels the base by its PR when it has one — `#3918 👆` for a stacked base, plain `main 👆` otherwise:
+
+```bash
+BASE_PR=$(gh pr list --head "$BASE" --state all --json number --jq '.[0].number // empty')
+BASE_LABEL=${BASE_PR:+#$BASE_PR}; BASE_LABEL=${BASE_LABEL:-$BASE}
+```
+
+`// empty` is load-bearing — without it a base with no PR yields the literal `#null`.
 
 ```markdown
 ## Screenshots
@@ -65,7 +72,7 @@ Default (with base-branch comparison — put the actual base name from `$BASE`, 
 | Desktop | Mobile |
 | --- | --- |
 | <img src="<base-desktop-url>" width="500"> | <img src="<base-mobile-url>" width="250"> |
-| $BASE 👆 | this branch 👇 |
+| $BASE_LABEL 👆 | this branch 👇 |
 | <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
 ```
 
@@ -81,14 +88,10 @@ Brand-new page (URL didn't exist on `$BASE` — see step 4), no comparison row:
 
 Rules:
 - Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own table.
-- **Every** entry uses this table, with **no exceptions** — including `/lookbook/preview/...` component previews. A preview is a responsive page with a real URL, so it gets the same desktop+mobile before/after cells as any page. A width-invariant component (small icon, fixed-size control) just yields matching desktop and mobile shots — that's expected; keep both columns, never collapse to one image or special-case previews.
+- **Every** entry uses this table, with **no exceptions** — including component previews. A preview is a responsive page with a real URL, so it gets the same desktop+mobile before/after cells as any page. A width-invariant component (small icon, fixed-size control) just yields matching desktop and mobile shots — that's expected; keep both columns, never collapse to one image or special-case previews.
 - **Headers are always `| Desktop | Mobile |`** — never `| main | this branch |` or any per-PR variation. Reviewers should see the same column meaning across every PR.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 
 When updating an existing screenshots comment, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
 
 Return the PR URL.
-
-## If the tooling fails
-
-If `frontend-screenshots` or `github-upload-image-to-pr` fails, report the failure clearly and leave the PR without screenshots — don't block PR creation on screenshot tooling.

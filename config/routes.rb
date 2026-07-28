@@ -167,6 +167,8 @@ Rails.application.routes.draw do
     # Autocomplete + selection chips for the search query items combobox
     get "combobox/options", to: "combobox#options", as: :combobox_options
     post "combobox/chips", to: "combobox#chips", as: :combobox_chips
+    # Autocomplete for the manufacturer combobox (UI::Forms::ComboboxManufacturer)
+    get "combobox/manufacturers", to: "combobox#manufacturers", as: :combobox_manufacturers
     resources :registrations, only: %i[index] do
       collection do
         get :similar_serials
