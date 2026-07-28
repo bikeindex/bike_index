@@ -34,13 +34,18 @@ module BikeServices
     # The step to show: finished once the bike exists (or it's awaiting the
     # email), step 1 until it's submitted - then 1 and 2 both stay browsable
     def permitted_step(b_param, requested_step)
-      if b_param.with_bike? || (b_param.details_completed? && !creator_available?(b_param))
+      if finished?(b_param)
         "finished"
       elsif b_param.manufacturer_id.blank?
         "1"
       else
         (requested_step == "1") ? "1" : "2"
       end
+    end
+
+    # The bike exists, or everything's entered and awaiting the email
+    def finished?(b_param)
+      b_param.with_bike? || (b_param.details_completed? && !creator_available?(b_param))
     end
 
     # Whether a bike can be created now - Ownership requires a creator, so
@@ -73,13 +78,15 @@ module BikeServices
       create_bike(b_param, ip_address:)
     end
 
-    # Sends the partial-registration email once per address, so resubmitting
-    # step 1 only re-sends to a new one
-    def send_confirmation_email(b_param)
-      return if b_param.params["partial_email_sent_to"] == b_param.owner_email
+    # Saves, sending the partial-registration email when this address hasn't
+    # gotten one - so resubmitting step 1 only re-sends to a new address
+    def save_step_1(b_param)
+      send_email = b_param.partial_email_sent_to != b_param.owner_email
+      b_param.params = b_param.params.merge("partial_email_sent_to" => b_param.owner_email) if send_email
+      return false unless b_param.save
 
-      b_param.update(params: b_param.params.merge("partial_email_sent_to" => b_param.owner_email))
-      Email::PartialRegistrationJob.perform_async(b_param.id)
+      Email::PartialRegistrationJob.perform_async(b_param.id) if send_email
+      true
     end
 
     def create_bike(b_param, ip_address:)

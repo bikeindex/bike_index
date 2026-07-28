@@ -44,8 +44,7 @@ class RegisterController < ApplicationController
     @b_param.errors.add(:base, translation(:manufacturer_required)) if @b_param.manufacturer_id.blank?
     if @b_param.errors.any?
       render Register::Step1::Component.new(b_param: @b_param), status: :unprocessable_entity
-    elsif @b_param.save
-      BikeServices::Register.send_confirmation_email(@b_param)
+    elsif BikeServices::Register.save_step_1(@b_param)
       redirect_to step_path(2)
     else
       @b_param.errors.add(:base, translation(:unable_to_save))
@@ -99,7 +98,7 @@ class RegisterController < ApplicationController
   # A finished registration (bike created, or awaiting the email) only shows
   # the completion page - submissions redirect there too, saving nothing
   def redirect_finished
-    redirect_to step_path(:finished) if BikeServices::Register.permitted_step(@b_param, nil) == "finished"
+    redirect_to step_path(:finished) if BikeServices::Register.finished?(@b_param)
   end
 
   def redirect_after_bike_creation(bike)

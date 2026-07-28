@@ -16,7 +16,7 @@ module Register
 
       # Stale once step 1 was submitted - the confirmation email went out then
       def confirmation_email_pending?
-        @b_param.params["partial_email_sent_to"].blank?
+        @b_param.partial_email_sent_to.blank?
       end
     end
   end

@@ -372,11 +372,16 @@ class BParam < ApplicationRecord
 
   # Mirrors Bike#type - the cycle_type for display
   def type
-    type_titleize&.downcase
+    @type ||= type_titleize&.downcase
   end
 
   def type_titleize
-    CycleType.new(cycle_type).short_name_translation
+    @type_titleize ||= CycleType.new(cycle_type).short_name_translation
+  end
+
+  # The address the partial-registration email last went to (register flow)
+  def partial_email_sent_to
+    params["partial_email_sent_to"]
   end
 
   def is_pos
@@ -446,6 +451,12 @@ class BParam < ApplicationRecord
   # Once the email is confirmed, the email's own account (or the AUTO_ORG_MEMBER
   # system user) can stand in as the creator the Ownership requires
   def confirmed_email_creator_id
+    return @confirmed_email_creator_id if defined?(@confirmed_email_creator_id)
+
+    @confirmed_email_creator_id = calculated_confirmed_email_creator_id
+  end
+
+  def calculated_confirmed_email_creator_id
     return nil unless email_confirmed?
 
     (User.fuzzy_email_find(owner_email) || User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"]))&.id
