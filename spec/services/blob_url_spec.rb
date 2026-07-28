@@ -45,4 +45,34 @@ RSpec.describe BlobUrl do
       end
     end
   end
+
+  describe "for_variant" do
+    let(:attached) { FactoryBot.create(:public_image, :with_attached_file).reload.file }
+
+    it "returns the blob url without a size" do
+      expect(described_class.for_variant(attached)).to eq described_class.for(attached.blob)
+    end
+
+    context "cloudflare storage" do
+      before do
+        stub_const("BlobUrl::LOCAL_STORAGE", false)
+        allow(attached.blob.service).to receive(:name).and_return(:cloudflare_production)
+      end
+
+      it "builds the deterministic variant key without querying or processing" do
+        variant = attached.variant(:large)
+        expect(variant).to be_a ActiveStorage::Variant # Not VariantWithRecord, i.e. track_variants is off
+
+        expect(described_class.for_variant(attached, :large))
+          .to eq "https://uploads.bikeindex.org/#{variant.key}"
+        expect(variant.key).to start_with "variants/#{attached.blob.key}/"
+      end
+
+      it "differs per size" do
+        urls = PublicImage::VARIANTS.keys.map { described_class.for_variant(attached, it) }
+
+        expect(urls.uniq.count).to eq PublicImage::VARIANTS.count
+      end
+    end
+  end
 end

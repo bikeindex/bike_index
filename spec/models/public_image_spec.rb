@@ -54,6 +54,38 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  describe "image_url" do
+    let(:bike) { FactoryBot.create(:bike) }
+
+    context "carrierwave image" do
+      let(:public_image) { FactoryBot.create(:public_image, :with_image_file) }
+
+      it "returns the carrierwave version url" do
+        expect(public_image.file.attached?).to be_falsey
+        expect(public_image.image_url).to eq public_image.image.url
+        expect(public_image.image_url(:large)).to eq public_image.image.url(:large)
+      end
+    end
+
+    context "attached file" do
+      let(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike) }
+
+      it "returns the blob url for a blank or unknown size" do
+        expect(public_image.reload.file.attached?).to be_truthy
+
+        expect(public_image.image_url).to eq BlobUrl.for(public_image.file.blob)
+        expect(public_image.image_url(:unknown)).to eq public_image.image_url
+      end
+
+      it "is what bike#image_url returns" do
+        bike.reload.update(thumb_path: public_image.image_url(:small))
+
+        expect(bike.image_url(:large)).to eq public_image.image_url(:large)
+        expect(bike.image_url(:large)).to_not eq public_image.image_url
+      end
+    end
+  end
+
   describe "open_file" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec", "fixtures", "bike.jpg"))) }
@@ -69,6 +101,24 @@ RSpec.describe PublicImage, type: :model do
       it "returns nil" do
         expect(public_image.local_file?).to be_truthy
         FileUtils.rm(public_image.image.path)
+        expect(public_image.open_file).to be_nil
+      end
+    end
+
+    context "attached file" do
+      let(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike) }
+
+      it "returns a readable file on disk that outlives the method" do
+        file = public_image.reload.open_file
+        # blob.open would have unlinked by now - image processors need a path, not a StringIO
+        expect(File.exist?(file.path)).to be_truthy
+        expect(Vips::Image.new_from_file(file.path).width).to be > 0
+        file.close!
+      end
+
+      it "returns nil when the blob is missing from the service" do
+        public_image.file.blob.service.delete(public_image.file.blob.key)
+
         expect(public_image.open_file).to be_nil
       end
     end

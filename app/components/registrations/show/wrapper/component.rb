@@ -6,6 +6,10 @@ module Registrations
       # Renders the registration show page as the resolved [kind, organization]
       # perspective (e.g. [:public, nil] or [:staff, org]) and fragment-caches it.
       class Component < ApplicationComponent
+        # Nothing digests the nested components' templates, so bump this whenever
+        # their markup changes
+        CACHE_VERSION = "registrations/show-v3"
+
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil)
           @bike = bike
           @current_user = current_user
@@ -41,10 +45,9 @@ module Registrations
         # folds their versions in via #cache_version. This key can't keep cached
         # forms' CSRF tokens valid (they're session-scoped, and a user's session
         # varies across devices/logins) — the csrf-refresh controller reissues them
-        # client-side from the meta tag. Nothing digests the nested components'
-        # templates, so bump the -v3 suffix whenever their markup changes.
+        # client-side from the meta tag.
         def cache_key
-          ["registrations/show-v3", @current_user&.id,
+          [CACHE_VERSION, @current_user&.id,
             @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
