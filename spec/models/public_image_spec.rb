@@ -96,6 +96,17 @@ RSpec.describe PublicImage, type: :model do
       expect(public_image).to be_valid
     end
 
+    # What an iPhone uploads by default. Permitted here but absent from carrierwave's whitelist,
+    # so deriving this list from the uploader alone would reject them
+    context "heic" do
+      let(:filename) { "bike.heic" }
+      let(:content_type) { "image/heic" }
+
+      it "is valid" do
+        expect(public_image).to be_valid
+      end
+    end
+
     context "a pdf" do
       let(:filename) { "invoice.pdf" }
       let(:content_type) { "application/pdf" }

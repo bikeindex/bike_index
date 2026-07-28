@@ -37,9 +37,12 @@ class PublicImage < ApplicationRecord
     large: {resize_to_fit: [2000, 1600], format: :webp}
   }.freeze
 
-  # Direct uploads bypass the uploader, so nothing else holds an attached file to the
-  # extension whitelist the file picker offers, or to the size PublicImagesController caps
-  FILE_CONTENT_TYPES = ApplicationUploader.extensions.map { Marcel::MimeType.for(name: "f.#{it}") }.uniq.freeze
+  # Direct uploads bypass the uploader, so nothing else holds an attached file to a format we
+  # can serve, or to the size PublicImagesController caps. Wider than carrierwave's whitelist
+  # by HEIC: iPhones shoot it by default and vips converts it to every variant, but carrierwave
+  # can't take it, and that list also feeds the file picker's accept attribute.
+  FILE_CONTENT_TYPES = (ApplicationUploader.extensions.map { Marcel::MimeType.for(name: "f.#{it}") } +
+    %w[image/heic image/heif]).uniq.freeze
 
   mount_uploader :image, PublicImageUploader # Legacy, migrating to :file
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
