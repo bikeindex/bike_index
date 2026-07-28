@@ -6,7 +6,7 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   it "doesn't render when review_app is blank" do
     expect(described_class.new(review_app: nil).render?).to be_falsey
     expect(described_class.new(review_app: "").render?).to be_falsey
-    expect(described_class.new(review_app: nil).topbar_title).to be_nil
+    expect(described_class.new(review_app: nil).lookbook_navbar_title).to be_nil
   end
 
   describe ".from_env" do
@@ -23,13 +23,13 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       before { stub_const("ENV", ENV.to_hash.merge(review_app_env)) }
 
       it "reads the deploy's PR from the env" do
-        expect(described_class.from_env.topbar_title).to eq "Review app · Add Promoted section"
+        expect(described_class.from_env.lookbook_navbar_title).to eq "Add Promoted section"
       end
 
       it "doesn't render with NO_REVIEW_TOPBAR" do
         stub_const("ENV", ENV.to_hash.merge(review_app_env, "NO_REVIEW_TOPBAR" => "true"))
         expect(described_class.from_env.render?).to be_falsey
-        expect(described_class.from_env.topbar_title).to be_nil
+        expect(described_class.from_env.lookbook_navbar_title).to be_nil
       end
     end
   end
@@ -37,7 +37,7 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
   it "renders a purple development banner for the local dev server" do
     banner = described_class.new(review_app: "development")
     component = render_inline(banner)
-    expect(banner.topbar_title).to eq "Development"
+    expect(banner.lookbook_navbar_title).to eq "Development"
     expect(component.text).to include("Development")
     expect(component.text).not_to include("Sandbox")
     expect(component.css("a[href='/letter_opener']")).to be_present
@@ -65,7 +65,7 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
 
     it "renders the sandbox label and disclaimer" do
       # No pr_number is the persistent sandbox deploy, not a per-PR review app
-      expect(banner.topbar_title).to eq "Sandbox"
+      expect(banner.lookbook_navbar_title).to eq "Sandbox"
       expect(component.text).to include("Sandbox")
       expect(component.text).not_to include("Review app")
       expect(component.text).to include("data is ephemeral")
@@ -178,7 +178,8 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
       end
 
       it "shows the review app label instead of the sandbox label, hidden on small screens" do
-        expect(banner.topbar_title).to eq "Review app · PR #1234"
+        # The banner keeps the label; the Lookbook navbar drops it for the PR alone
+        expect(banner.lookbook_navbar_title).to eq "PR #1234"
         expect(component.text).to include("Review app")
         expect(component.text).not_to include("Sandbox")
         # The PR title carries the context on small screens, so the label hides
@@ -190,7 +191,7 @@ RSpec.describe PageBlock::ReviewAppBanner::Component, type: :component do
         let(:pr_title) { "Add Promoted section" }
 
         it "uses the title as the PR link text" do
-          expect(banner.topbar_title).to eq "Review app · Add Promoted section"
+          expect(banner.lookbook_navbar_title).to eq "Add Promoted section"
           link = component.css("a[href^='https://github.com']").first
           expect(link[:href]).to eq("https://github.com/bikeindex/bike_index/pull/1234")
           expect(link.text.strip).to eq("Add Promoted section")

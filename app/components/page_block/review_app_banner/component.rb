@@ -31,12 +31,11 @@ module PageBlock
         @review_app.present?
       end
 
-      # Plain-text title, also shown in the Lookbook navbar (config/initializers/lookbook.rb)
-      def topbar_title
+      # A PR identifies the deploy on its own, so the label is only a fallback.
+      def lookbook_navbar_title
         return nil unless render?
-        return banner_label if @pr_number.blank?
 
-        "#{banner_label} · #{pr_link_text}"
+        @pr_number.blank? ? banner_label : pr_link_text
       end
 
       private
