@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "collapse controller", :js, type: :system do
+RSpec.describe "ui--collapse controller", :js, type: :system do
   let(:preview_path) { "/rails/view_components/ui/collapse/component/with_url_param" }
 
   it "toggles, persists open state to the URL, and restores it on load" do
@@ -13,7 +13,7 @@ RSpec.describe "collapse controller", :js, type: :system do
 
     click_button("Toggle details")
 
-    # collapse#show reveals the body, writes ?details=1 via history.replaceState,
+    # ui--collapse#show reveals the body, writes ?details=1 via history.replaceState,
     # and flips the trigger's aria-expanded and data-active.
     expect(page).to have_content("Persisted panel body")
     expect(page).to have_current_path(/details=1/, url: true)
