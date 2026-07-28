@@ -86,11 +86,7 @@
         <% end %>
       </div>
 
-      <%#
-        shrink-0: the fields column's min-content exceeds narrow phone widths, which
-        otherwise squeezes the button (and the icon inside it) down to a sliver
-      %>
-
+      <%# shrink-0: the fields column would otherwise squeeze this to a sliver on phones %>
       <div class="tw:w-20 tw:shrink-0">
         <%= render UI::Button::Component.new(color: :primary, kind: :submit, html_class: "tw:w-full tw:h-full tw:disabled:cursor-wait") do %>
           <%= helpers.inline_svg_tag "icons/searcher.svg",
