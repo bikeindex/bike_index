@@ -12,9 +12,6 @@ WORKDIR /rails
 # Base runtime packages.
 # - libpq5 / postgresql-client: pg gem + bin/docker-entrypoint psql calls
 # - libvips: ruby-vips
-# - libheif-plugin-x265: the HEVC encoder. libvips brings libheif's decoder only, so an
-#   iPhone HEIC loads but re-saving one fails ("heifsave: Unsupported compression") -
-#   Images::ProcessPublicImageJob strips EXIF in place, keeping the source format
 # - imagemagick: mini_magick
 # - libjemalloc2: memory savings under load
 # - curl: health checks
@@ -28,7 +25,6 @@ RUN apt-get update -qq && \
       cron \
       curl \
       imagemagick \
-      libheif-plugin-x265 \
       libjemalloc2 \
       libvips \
       libyaml-0-2 \
