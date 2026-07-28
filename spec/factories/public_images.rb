@@ -27,7 +27,10 @@ FactoryBot.define do
 
     # ActiveStorage rather than CarrierWave - the backend new direct uploads use
     trait :with_attached_file do
-      file { Rack::Test::UploadedFile.new(Rails.root.join(image_path), "image/jpeg") }
+      file do
+        path = Rails.root.join(image_path)
+        Rack::Test::UploadedFile.new(path, Marcel::MimeType.for(path))
+      end
     end
   end
 end

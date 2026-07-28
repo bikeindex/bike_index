@@ -96,8 +96,10 @@ class PublicImage < ApplicationRecord
     BlobUrl.for_variant(file, size&.to_sym&.presence_in(VARIANTS.keys))
   end
 
+  # "processed" is only set once ProcessPublicImageJob has stripped the original and generated
+  # every variant, so a job that died partway through gets picked up again
   def file_needs_processing?
-    file.attached? && !file.blob.metadata["stripped"]
+    file.attached? && !file.blob.metadata["processed"]
   end
 
   # Method to make create_revised.js easier to handle
@@ -116,7 +118,7 @@ class PublicImage < ApplicationRecord
 
     if file_needs_processing?
       # Stops the attachment's after_commit from enqueueing AnalyzeJob, whose metadata merge runs
-      # off a stale read and would drop "stripped". ProcessPublicImageJob analyzes instead.
+      # off a stale read and would drop the job's flags. ProcessPublicImageJob analyzes instead.
       file.blob.analyzed = true
       Images::ProcessPublicImageJob.perform_async(id)
     end
