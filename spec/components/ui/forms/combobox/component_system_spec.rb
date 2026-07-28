@@ -104,5 +104,23 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       expect(page).to have_css("#{overlay} span", text: "It was stolen")
       expect(page).to have_css("#{overlay} span", text: "Report a bike stolen so others can help find it")
     end
+
+    # The gem swaps to a full screen dialog below its mobile breakpoint, and
+    # selecting there fills the input after the selection event, never focusing it
+    it "mirrors a selection made in the small viewport dialog" do
+      page.current_window.resize_to(390, 844)
+      visit "/rails/view_components/ui/forms/combobox/component/stacked"
+
+      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+
+      find_field("Registration type").click
+
+      expect(page).to have_css("dialog[open]")
+
+      find('[role="option"]', text: "It was stolen").click
+
+      expect(page).to have_no_css("dialog[open]")
+      expect(page).to have_css("#{overlay} span", text: "It was stolen")
+    end
   end
 end

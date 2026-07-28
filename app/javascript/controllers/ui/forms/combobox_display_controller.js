@@ -37,8 +37,7 @@ export default class extends Controller {
 
   sync = () => {
     const selectedOption = this.selectedOption()
-    // Anything else in the input is a query being typed - let it show through
-    if (!selectedOption || this.input.value !== selectedOption.dataset.autocompletableAs) {
+    if (!selectedOption || this.typingQuery(selectedOption)) {
       this.hide()
       return
     }
@@ -49,6 +48,14 @@ export default class extends Controller {
     // combobox.css hides the autocomplete's selection highlight while covered
     this.input.dataset.richDisplayShown = ''
     this.overlayTarget.classList.remove('tw:hidden')
+  }
+
+  // Anything but the selection in the input is a query - let it show through.
+  // Only while the input has focus: the small-viewport dialog selects without
+  // ever focusing it, and fills its value after the selection event.
+  typingQuery (selectedOption) {
+    return document.activeElement === this.input &&
+      this.input.value !== selectedOption.dataset.autocompletableAs
   }
 
   hide = () => {
