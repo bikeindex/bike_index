@@ -2,7 +2,7 @@
 en:
   components:
     register:
-      start_form:
+      step1:
         bike_info: Bike info
         electric_helper: Check electric so we flag e-bikes and verify certification.
         electric_motorized: "⚡️ Electric (motorized)"

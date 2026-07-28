@@ -2,7 +2,7 @@
 en:
   components:
     register:
-      details_form:
+      step2:
         add_another_color: Add another color
         add_your_bikes_details: Add your bike's details
         additional_contact_info: Additional contact info

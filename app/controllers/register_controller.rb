@@ -24,10 +24,10 @@ class RegisterController < ApplicationController
       render Register::Complete::Component.new(b_param: @b_param)
     when "2"
       @page_title = I18n.t("meta_titles.register_step_2")
-      render Register::DetailsForm::Component.new(b_param: @b_param)
+      render Register::Step2::Component.new(b_param: @b_param)
     else
       @page_title = I18n.t("meta_titles.register_step_1")
-      render Register::StartForm::Component.new(b_param: @b_param)
+      render Register::Step1::Component.new(b_param: @b_param)
     end
   end
 
@@ -37,14 +37,14 @@ class RegisterController < ApplicationController
     @b_param.errors.add(:base, translation(:email_required)) if @b_param.owner_email.blank?
     @b_param.errors.add(:base, translation(:manufacturer_required)) if @b_param.manufacturer_id.blank?
     if @b_param.errors.any?
-      render Register::StartForm::Component.new(b_param: @b_param), status: :unprocessable_entity
+      render Register::Step1::Component.new(b_param: @b_param), status: :unprocessable_entity
     elsif @b_param.save
       # Resubmitting step 1 only resends the confirmation email to a new address
       Email::PartialRegistrationJob.perform_async(@b_param.id) if @b_param.owner_email != previous_email
       redirect_to step_path(@b_param, 2)
     else
       @b_param.errors.add(:base, translation(:unable_to_save))
-      render Register::StartForm::Component.new(b_param: @b_param), status: :unprocessable_entity
+      render Register::Step1::Component.new(b_param: @b_param), status: :unprocessable_entity
     end
   end
 
