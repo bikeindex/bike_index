@@ -38,11 +38,8 @@ module Bikeindex
     config.active_job.queue_adapter = :sidekiq
     config.active_job.default_queue_name = :low_priority
 
-    # Overrides load_defaults. Untracked variant keys are a pure digest of the blob key plus the
-    # transformation, so BlobUrl builds them without touching the database - tracking would add
-    # active_storage_variant_records plus a nested attachment and blob to every image URL.
-    # Purging still cleans them up (Blob#delete delete_prefixed's "variants/#{key}/"); what's lost
-    # is enumerating them from the database - counting variants means listing the bucket.
+    # Overrides load_defaults. Untracked variant keys are a digest of the blob key, so BlobUrl
+    # builds them without a query - at the cost of only being able to count them from the bucket.
     config.active_storage.track_variants = false
 
     # Use our custom error pages
