@@ -10,8 +10,9 @@ description: >-
   stack traces, per-endpoint hit counts, suspicious traffic, failing
   background jobs). Also triggers when chasing a specific incident from logs
   (e.g. "what happened at 04:42 UTC?", "why did `/search/registrations` 500?").
-  Honeybadger MCP is the right tool for *aggregated* exception triage
-  across time; this skill is for ad-hoc analysis of log files already on disk.
+  For one named exception use honeybadger-debugging, and for *aggregated*
+  exception triage across time the Honeybadger MCP; this skill is for ad-hoc
+  analysis of log files already on disk.
 ---
 
 # Inspecting production logs
