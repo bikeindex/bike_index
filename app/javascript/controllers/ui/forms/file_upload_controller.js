@@ -1,11 +1,25 @@
 import { Controller } from '@hotwired/stimulus'
+import { DirectUpload } from '@rails/activestorage'
 
 // Connects to data-controller='ui--forms--file-upload'
 // Shows the selected filename (or a count for multiple files) in the field, and
 // frames the controls as a drop target while a file is dragged over the page.
 export default class extends Controller {
-  static targets = ['input', 'filename', 'dropZone']
-  static values = { placeholder: String }
+  static targets = ['input', 'filename', 'dropZone', 'signedId']
+  static values = { placeholder: String, url: String, uploading: String, failed: String }
+
+  connect () {
+    this.boundHold = this.hold.bind(this)
+    this.form?.addEventListener('submit', this.boundHold)
+  }
+
+  disconnect () {
+    this.form?.removeEventListener('submit', this.boundHold)
+  }
+
+  get form () {
+    return this.element.closest('form')
+  }
 
   // Both buttons open the one input; `capture` is what sends it to the camera.
   takePicture () {
@@ -69,6 +83,43 @@ export default class extends Controller {
       files.length === 0
         ? this.placeholderValue
         : files.length === 1 ? files[0].name : `${files.length} files`
+    if (this.urlValue) this.upload(files[0])
+  }
+
+  // Only when the field is nameless (direct_upload) - the form then carries the blob's
+  // signed id rather than the bytes.
+  upload (file) {
+    if (!file) return
+
+    this.xhr?.abort() // Picking again shouldn't leave the discarded file uploading
+    this.signedIdTarget.value = ''
+    this.filenameTarget.textContent = `${file.name} — ${this.uploadingValue}`
+
+    const upload = new DirectUpload(file, this.urlValue, this)
+    this.currentUpload = upload
+    this.pending = new Promise((resolve) => upload.create((error, blob) => {
+      resolve()
+      if (this.currentUpload !== upload) return // A newer pick owns the field now
+
+      this.pending = null
+      if (!error) this.signedIdTarget.value = blob.signed_id
+      this.filenameTarget.textContent = error ? `${file.name} — ${this.failedValue}` : file.name
+    }))
+  }
+
+  // DirectUpload delegate hook - the handle that makes a discarded upload cancellable
+  directUploadWillStoreFileWithXHR (xhr) {
+    this.xhr = xhr
+  }
+
+  // Submitting mid-upload would drop the file, so hold the form until the blob lands.
+  // A failed upload submits anyway - the rest of the form matters more.
+  async hold (event) {
+    if (!this.pending) return
+
+    event.preventDefault()
+    await this.pending
+    this.form.requestSubmit()
   }
 }
 

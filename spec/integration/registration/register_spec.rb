@@ -170,7 +170,7 @@ RSpec.describe "Register flow", :js, type: :system do
     it "PUTs the photo to the bucket and serves it from the storage domain" do
       start_registration
 
-      attach_file("register_photo", image_path, make_visible: true)
+      attach_file("bike_image", image_path, make_visible: true)
       expect(page).to have_content("bike_photo-landscape.jpeg")
       expect(page).to have_no_content("uploading", wait: 20) # A real cross-origin PUT
 
