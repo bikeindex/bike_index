@@ -36,8 +36,9 @@ const NAMES = [
   'earthlink', 'shaw', 'sympatico', 'telus', 'btinternet'
 ]
 
-// Endings worth knowing, which is the ones a typo of another ending could land on --
-// without "ch" here, every Swiss address would be offered "ca".
+// Endings worth knowing, which is the ones a typo of another ending could land on. The
+// two-letter ones are only ever recognized, never corrected to -- which is what keeps
+// ".co" from being read as ".com" with a letter dropped.
 const ENDINGS = [
   'com', 'net', 'org', 'edu', 'gov', 'mil', 'co', 'io', 'me', 'info', 'biz', 'app', 'dev',
   'bike', 'cc', 'tv', 'us', 'ca', 'mx', 'br', 'ar', 'cl', 'eu', 'uk', 'co.uk', 'org.uk',
@@ -50,21 +51,30 @@ const ENDINGS = [
 // corrected on a domain nobody here has heard of, and a name we don't know keeps its own.
 function suggest (email) {
   const at = email.lastIndexOf('@')
-  const dot = email.indexOf('.', at)
-  if (at < 1 || dot < at + 2) return null
+  if (at < 1) return null
 
-  const [name, ending] = [email.slice(at + 1, dot).toLowerCase(), email.slice(dot + 1).toLowerCase()]
-  const domain = `${closest(name, NAMES)}.${closest(ending, ENDINGS)}`
+  // A dot with nothing on one side of it is a typo of its own, so it goes before matching
+  // -- leaving each part a whole typo to spend on itself, which ".gmail..come" needs.
+  const typed = email.slice(at + 1).toLowerCase()
+  const [name, ...rest] = typed.split('.').filter(Boolean)
+  if (!name || !rest.length) return null
 
-  return (domain === `${name}.${ending}`) ? null : `${email.slice(0, at)}@${domain}`
+  const domain = `${closest(name, NAMES, 4)}.${closest(rest.join('.'), ENDINGS, 3)}`
+
+  return (domain === typed) ? null : `${email.slice(0, at)}@${domain}`
 }
 
 // The entry a single typo away, or the part itself -- which is every domain we have no
-// opinion about, as well as the ones already spelled the way we know them.
-function closest (part, candidates) {
+// opinion about, as well as the ones already spelled the way we know them. A dropped
+// letter is worth correcting however short it leaves the part (".om" is ".com" with the
+// dot a key early); the other typos need minLength behind them, or they land on a real
+// domain as often as on the intended one -- ".ro" is no more a typo of ".co" than of itself.
+function closest (part, candidates, minLength) {
   if (candidates.includes(part)) return part
 
-  return candidates.find((candidate) => oneTypoApart(part, candidate)) ?? part
+  return candidates.find((candidate) => candidate.length > 2 &&
+    (part.length >= minLength || candidate.length === part.length + 1) &&
+    oneTypoApart(part, candidate)) ?? part
 }
 
 // Strip the ends the two share and a single typo is all that can be left: a letter

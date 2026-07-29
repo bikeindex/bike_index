@@ -37,6 +37,22 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
 
     expect(page).to have_button("Did you mean you@bikeshop.com?")
 
+    # a dropped letter is corrected however short it leaves the part
+    fill_in_email_and_leave("you@macc.om")
+
+    expect(page).to have_button("Did you mean you@mac.com?")
+
+    # a dot with nothing on one side is its own typo, so the ending still has one to spend
+    fill_in_email_and_leave("you@.gmail..come")
+
+    expect(page).to have_button(suggestion)
+
+    # the other typos aren't, on a part this short -- "uol" is no more a mistyped "aol"
+    # than every two-letter ending is a mistyped one of the two-letter endings we know
+    fill_in_email_and_leave("you@uol.ro")
+
+    expect(page).to have_no_css(suggestion_button)
+
     # nothing close to a domain we know of
     fill_in_email_and_leave("you@bikeshop.example")
 
