@@ -10,7 +10,7 @@ Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$RE
 
 Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't use other formatters.
 
-**Pass it the files or directories you changed** — `bin/lint app/components/ui/table app/models/bike.rb`. A bare `bin/lint` walks all ~1,850 files, which is slow and reformats files you aren't working on. Save it for a final check before pushing.
+**Pass it the files or directories you changed** — `bin/lint app/components/ui/table app/models/bike.rb`. A bare `bin/lint` walks the whole repo, which is slow and reformats files you aren't working on. Save it for a final check before pushing.
 
 ### Code guidelines:
 

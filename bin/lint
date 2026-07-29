@@ -15,29 +15,37 @@ require "fileutils"
 # path to your application root.
 APP_ROOT = File.expand_path("..", __dir__)
 
-RUBY_EXTENSIONS = %w[rb rake].freeze
-JS_EXTENSIONS = %w[js ts jsx tsx].freeze
-ERB_EXTENSIONS = %w[erb html].freeze
+EXTENSIONS_BY_KIND = {ruby: %w[rb rake], js: %w[js ts jsx tsx], erb: %w[erb html]}.freeze
+# Vendored or generated - every underlying linter excludes these in its own config
+SKIPPED_DIRECTORIES = %w[node_modules public tmp vendor].freeze
 
 def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
-# Directories expand to every lintable file below them
+# Directories expand by extension, matching what the linters discover on their own -
+# name an extensionless script (a bin/ one, say) explicitly to lint it
 def lintable_files(path)
   return [path] unless File.directory?(path)
 
-  extensions = RUBY_EXTENSIONS + JS_EXTENSIONS + ERB_EXTENSIONS
-  Dir.glob(File.join(path, "**", "*.{#{extensions.join(",")}}"))
+  files = Dir.glob(File.join(path, "**", "*.{#{EXTENSIONS_BY_KIND.values.flatten.join(",")}}"))
+    .reject { |file| file.split(File::SEPARATOR).intersect?(SKIPPED_DIRECTORIES) }
+  warn "No lintable files in: #{path}" if files.none?
+
+  files
+end
+
+def ruby_shebang?(file)
+  File.open(file, &:gets).to_s.match?(/\A#!.*ruby/)
+rescue ArgumentError, SystemCallError
+  false
 end
 
 def lint_kind(file)
   extension = File.extname(file).delete_prefix(".")
-  # Assume bin/ files are ruby, since they mostly are
-  return :ruby if RUBY_EXTENSIONS.include?(extension) || file.start_with?("bin/")
-  return :js if JS_EXTENSIONS.include?(extension)
-
-  :erb if ERB_EXTENSIONS.include?(extension)
+  kind = EXTENSIONS_BY_KIND.find { |_kind, extensions| extensions.include?(extension) }&.first
+  # bin/ scripts have no extension to go by, and a handful of them are bash
+  kind || (:ruby if extension.empty? && ruby_shebang?(file))
 end
 
 FileUtils.chdir APP_ROOT do
@@ -51,16 +59,14 @@ FileUtils.chdir APP_ROOT do
   end
 
   if file_args.any?
-    # Paths are dropped rather than raised on, so `bin/lint $(git diff --name-only ...)`
-    # works - a branch's files include .haml, .scss and friends, which have no linter here
-    missing = file_args.reject { |arg| File.exist?(arg) }
+    present, missing = file_args.partition { |arg| File.exist?(arg) }
     warn "Not found: #{missing.join(", ")}" if missing.any?
 
-    files_by_kind = (file_args - missing).flat_map { |arg| lintable_files(arg) }
-      .group_by { |file| lint_kind(file) }
-    skipped = files_by_kind.delete(nil)
-    warn "Skipping (no linter): #{skipped.join(", ")}" if skipped&.any?
-    abort "Nothing to lint" if files_by_kind.empty?
+    # Unlintable paths are skipped rather than raised on, so that passing a branch's
+    # changed files works - they'll include .haml, .scss and friends
+    files_by_kind = present.flat_map { |arg| lintable_files(arg) }.group_by { |file| lint_kind(file) }
+    skipped = files_by_kind[nil]
+    warn "Skipping (no linter): #{skipped.join(", ")}" if skipped
 
     if (ruby_files = files_by_kind[:ruby])
       system!("bundle exec standardrb --fix #{ruby_files.join(" ")}")
@@ -71,9 +77,10 @@ FileUtils.chdir APP_ROOT do
       system!("npm run js:lint -- #{js_files.join(" ")}")
     end
 
-    # herb-lint is what CI checks, herb-format is what rewrites the file
+    # herb-lint is what CI checks, herb-format is what rewrites the file.
+    # Only the lint script can be delegated to - html:format hardcodes "."
     if (erb_files = files_by_kind[:erb])
-      system!("npx herb-lint --fix --format=simple #{erb_files.join(" ")}")
+      system!("npm run html:lint -- #{erb_files.join(" ")}")
       system!("npx herb-format #{erb_files.join(" ")}")
     end
   else
