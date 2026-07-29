@@ -75,7 +75,7 @@ class PublicImage < ApplicationRecord
     return if skip_update
 
     if external_image_url.present? && image.blank?
-      return Images::ExternalUrlStoreJob.perform_async(id)
+      return ImageJobs::ExternalUrlStoreJob.perform_async(id)
     end
 
     imageable&.update(updated_at: Time.current)

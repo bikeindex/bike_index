@@ -2,7 +2,7 @@
 
 require "image_processing/vips"
 
-module Images
+module ImageJobs
   class ProcessRecoveryDisplayPhotoJob < ApplicationJob
     DIMENSIONS = [800, 800].freeze
 

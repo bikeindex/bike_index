@@ -47,7 +47,7 @@ class ScheduledJobRunner < ScheduledJob
       Email::ScheduledSurveyJob,
       FetchProject529BikesJob,
       FileCacheMaintenanceJob,
-      Images::CleanUnattachedBlobsJob,
+      ImageJobs::CleanUnattachedBlobsJob,
       ImpoundExpirationJob,
       ProcessGraduatedNotificationJob,
       ProcessHotSheetJob,

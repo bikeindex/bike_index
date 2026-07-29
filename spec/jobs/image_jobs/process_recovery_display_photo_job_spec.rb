@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Images::ProcessRecoveryDisplayPhotoJob, type: :job do
+RSpec.describe ImageJobs::ProcessRecoveryDisplayPhotoJob, type: :job do
   let(:recovery_display) { FactoryBot.create(:recovery_display) }
 
   describe "#perform" do

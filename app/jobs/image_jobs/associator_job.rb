@@ -1,4 +1,4 @@
-module Images
+module ImageJobs
   class AssociatorJob < ApplicationJob
     sidekiq_options queue: "high_priority"
 

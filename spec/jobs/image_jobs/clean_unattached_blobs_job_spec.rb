@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Images::CleanUnattachedBlobsJob, type: :job do
+RSpec.describe ImageJobs::CleanUnattachedBlobsJob, type: :job do
   include_context :scheduled_job
   include_examples :scheduled_job_tests
 

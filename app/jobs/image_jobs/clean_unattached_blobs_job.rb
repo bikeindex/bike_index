@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Images
+module ImageJobs
   # A blob is uploaded before the record that references it is saved, so a form the user
   # abandons after picking a file leaves a blob nothing will ever attach.
   class CleanUnattachedBlobsJob < ScheduledJob
