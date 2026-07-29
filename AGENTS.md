@@ -26,12 +26,13 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 
 ## Subagents
 
-When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-hoc fan-out — split them by what the task actually needs:
+When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-hoc fan-out — pick the model by how much of the *search* the agent has to invent, not by how simple the task sounds:
 
-- **Enumeration on `model: "sonnet"`** — "find every call site of X", "which files reference this constant", "list the specs that touch Y". The answer is mechanical and checkable, so a cheaper model is enough.
-- **Judgement on the session model** — omit `model:` so the agent inherits it. These are the passes that catch things like an unvalidated param landing in a fragment cache key, or a shared partial's N+1; a cheaper model reads straight past them.
+- **`model: "haiku"`** when the command is already specified: "run this grep and summarise it", "read these four files and pull out X". There's nothing to devise.
+- **`model: "sonnet"`** when the agent has to work out *how* to look ("every call site of X", "which specs touch Y"). A weaker model compensates by flailing — on a real enumeration here it reached the same answer as sonnet, but took 3x the tool calls, 1.6x the wall clock and more total tokens, so the per-token discount didn't survive.
+- **Omit `model:`** (inherit the session model) for judgement — the passes that catch an unvalidated param landing in a fragment cache key, or a shared partial's N+1.
 
-A good shape for a large review is both: sonnet fans out to *find* candidates, the session model *judges* the shortlist.
+Worth delegating enumeration at all rather than eyeballing a grep: in that same test both subagents found two call sites the hand-written grep missed, because it anchored on the wrong method name.
 
 ## Testing
 
