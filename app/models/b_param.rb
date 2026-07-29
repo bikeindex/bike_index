@@ -85,7 +85,6 @@ class BParam < ApplicationRecord
   serialize :bike_errors, coder: YAML
 
   before_create :generate_id_token
-  before_create :generate_confirmation_token, if: :register_flow?
   before_save :clean_params
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
@@ -429,16 +428,6 @@ class BParam < ApplicationRecord
     PARTIAL_REGISTRATION_ORIGINS.include?(origin)
   end
 
-  def register_flow?
-    origin == "register_flow"
-  end
-
-  # Only sent in the partial registration email - unlike id_token, the anonymous
-  # registrant never sees it, so presenting it proves control of the email
-  def confirmation_token
-    params["confirmation_token"]
-  end
-
   def email_confirmed?
     params["email_confirmed_at"].present?
   end
@@ -630,10 +619,6 @@ class BParam < ApplicationRecord
 
   def generate_id_token
     self.id_token ||= SecurityTokenizer.new_token
-  end
-
-  def generate_confirmation_token
-    self.params = params.merge("confirmation_token" => SecurityTokenizer.new_token)
   end
 
   def parking_notification_params

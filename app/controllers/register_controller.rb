@@ -21,11 +21,9 @@ class RegisterController < ApplicationController
     redirect_to step_path(1)
   end
 
-  # The whole flow after the start: ?step=1, ?step=2 and ?step=finished - or the
-  # emailed confirmation link. A step the registration isn't at redirects to one it is.
+  # The whole flow after the start: ?step=1, ?step=2 and ?step=finished. A step the
+  # registration isn't at redirects to one it is.
   def show
-    return confirm if params[:confirmation_token].present? && !@b_param.with_bike?
-
     step = BikeServices::Register.permitted_step(@b_param, params[:step])
     return redirect_to(step_path(step)) if step != params[:step]
 
@@ -83,22 +81,6 @@ class RegisterController < ApplicationController
 
   def assign_organization
     BikeServices::Register.assign_organization(@b_param, current_organization)
-  end
-
-  # The tokenized link from the partial registration email
-  def confirm
-    outcome = BikeServices::Register.confirm_email(@b_param,
-      confirmation_token: params[:confirmation_token], ip_address: forwarded_ip_address)
-    case outcome
-    when :invalid
-      flash[:error] = translation(:invalid_confirmation_link)
-      redirect_to new_register_path
-    when :details_pending
-      flash[:success] = translation(:email_confirmed_add_details, cycle_type: @b_param.type)
-      redirect_to step_path(2)
-    else
-      redirect_after_bike_creation(outcome)
-    end
   end
 
   # build: only step 1's submission, which carries everything a registration needs

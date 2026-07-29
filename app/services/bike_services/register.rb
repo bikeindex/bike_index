@@ -73,20 +73,6 @@ module BikeServices
       b_param.save
     end
 
-    # The emailed token proves control of the address. Returns the created bike,
-    # :details_pending after confirming an unfinished registration, or :invalid
-    def confirm_email(b_param, confirmation_token:, ip_address:)
-      expected = b_param.confirmation_token
-      unless expected.present? && ActiveSupport::SecurityUtils.secure_compare(confirmation_token.to_s, expected)
-        return :invalid
-      end
-
-      b_param.confirm_email!
-      return :details_pending unless details_completed?(b_param)
-
-      create_bike(b_param, ip_address:)
-    end
-
     def create_bike(b_param, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
       BikeServices::Creator.new(ip_address:).create_bike(b_param)

@@ -15,7 +15,6 @@ RSpec.describe RegisterController, type: :request do
       expect { get "/register/new" }.to change(BParam, :count).by 1
       new_b_param = BParam.last
       expect(new_b_param.origin).to eq "register_flow"
-      expect(new_b_param.confirmation_token).to be_present
       expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
 
       # Revisiting reuses the session's still-blank registration
@@ -619,67 +618,6 @@ RSpec.describe RegisterController, type: :request do
         expect(Bike.count).to eq 0
         expect(response).to redirect_to new_register_path
         expect(flash[:info]).to be_present
-      end
-    end
-  end
-
-  describe "confirm" do
-    let(:bike_details) do
-      {primary_frame_color_id: color.id, serial_number: "XYZ 123", status: "status_with_owner"}
-    end
-    let(:confirm_path) do
-      register_path(b_param_token: b_param.id_token,
-        confirmation_token: b_param.confirmation_token)
-    end
-
-    context "details completed, a user exists for the email" do
-      let!(:user) { FactoryBot.create(:user_confirmed, email: owner_email) }
-
-      it "creates the bike with that user as creator" do
-        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-        expect {
-          get confirm_path
-        }.to change(Bike, :count).by 1
-        bike = Bike.last
-        expect(bike).to have_attributes(owner_email:, creator_id: user.id,
-          manufacturer_id: manufacturer.id)
-        expect(b_param.reload.email_confirmed?).to be_truthy
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
-        follow_redirect!
-        expect(response.body).to include "Registration complete"
-
-        # Clicking the link again just redirects to finished
-        expect { get confirm_path }.to_not change(Bike, :count)
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
-      end
-    end
-
-    context "details completed, no user for the email" do
-      let!(:auto_org_user) { FactoryBot.create(:user_confirmed, email: "auto_user@bikeindex.org") }
-
-      it "creates the bike with the AUTO_ORG_MEMBER user as creator" do
-        stub_const("ENV", ENV.to_hash.merge("AUTO_ORG_MEMBER" => auto_org_user.email))
-        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-        expect { get confirm_path }.to change(Bike, :count).by 1
-        expect(Bike.last).to have_attributes(owner_email:, creator_id: auto_org_user.id)
-      end
-    end
-
-    context "details not completed" do
-      it "confirms the email and sends them to step 2" do
-        expect { get confirm_path }.to_not change(Bike, :count)
-        expect(b_param.reload.email_confirmed?).to be_truthy
-        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 2)
-        expect(flash[:success]).to be_present
-      end
-    end
-
-    context "invalid confirmation token" do
-      it "redirects to the start without confirming" do
-        get register_path(b_param_token: b_param.id_token, confirmation_token: "wrong")
-        expect(response).to redirect_to new_register_path
-        expect(flash[:error]).to be_present
-        expect(b_param.reload.email_confirmed?).to be_falsey
       end
     end
   end

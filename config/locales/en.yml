@@ -1917,11 +1917,6 @@ en:
       update:
         image_updated: Image was successfully updated.
     register:
-      confirm:
-        email_confirmed_add_details: Email confirmed! Add your %{cycle_type}'s details
-          to finish your registration
-        invalid_confirmation_link: That confirmation link isn't valid — start a new
-          registration below
       create:
         email_required: Email is required to register
         manufacturer_required: Manufacturer is required to register
