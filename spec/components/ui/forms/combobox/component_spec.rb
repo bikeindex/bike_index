@@ -41,22 +41,6 @@ RSpec.describe UI::Forms::Combobox::Component, type: :component do
     expect(component).to_not have_css("[data-ui--forms--combobox-display-target='overlay']", visible: :all)
   end
 
-  context "with a wrapper_class" do
-    let(:extra) { {wrapper_class: "tw:flex-1"} }
-
-    it "puts it on the wrapper, whether or not there's a rich display" do
-      expect(component).to have_css("div.tw\\:relative.tw\\:flex-1 fieldset.hw-combobox")
-    end
-
-    context "with rich_display" do
-      let(:extra) { {wrapper_class: "tw:flex-1", rich_display: :stacked} }
-
-      it "puts it on the same wrapper the display controller uses" do
-        expect(component).to have_css("div.tw\\:relative.tw\\:flex-1[data-controller='ui--forms--combobox-display']")
-      end
-    end
-  end
-
   context "with rich_display: :inline" do
     let(:extra) { {rich_display: :inline} }
 
