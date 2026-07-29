@@ -1,148 +1,188 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ruby
+
 # binx_hb — Honeybadger v2 REST reads (read-only). Run from the repo root.
 #
-# Exists so fetching a fault is a single literal command: an inline curl carrying
+# Exists so fetching a fault is one literal command: an inline curl carrying
 # $HONEYBADGER_PERSONAL_AUTH_TOKEN is shell expansion, which the Claude Code
-# permission matcher always rejects. It also keeps payloads small - the
-# Honeybadger MCP returns whole notice objects, roughly half of which is waste
-# (`backtrace` and `application_trace` are byte-identical). This lands the raw
-# JSON in tmp/ and prints a projection, so follow-ups are a local jq.
+# permission matcher always rejects. It also keeps payloads small — the
+# Honeybadger MCP returns whole notice objects, roughly half of them waste
+# (`backtrace` and `application_trace` come back byte-identical). This lands the
+# raw JSON in tmp/ and prints a projection, so follow-ups are a local jq.
 #
 # Needs HONEYBADGER_PERSONAL_AUTH_TOKEN in .env.development (see .env).
-set -euo pipefail
 
-usage() {
-  cat >&2 <<'USAGE'
-Usage: binx_hb MODE TARGET [OPTIONS]
+require "json"
+require "net/http"
+require "optparse"
 
-  MODE    fault | notice | faults
-  TARGET  a fault URL, PROJECT/FAULT_ID, or - for `faults` - a project alias
-  PROJECT backend | frontend | csp, or a numeric project id
+PROJECTS = {"backend" => 35931, "frontend" => 61305, "csp" => 138070}.freeze
+LOOKBACK_UNITS = {"H" => 3600, "h" => 3600, "M" => 60, "d" => 86400}.freeze
+ENV_FILE = ".env.development"
+PARAMS_LIMIT = 500
 
-Options:
-  --all-frames   notice: include gem/framework frames, not just app frames
-  --limit N      notice: fetch N notices instead of 1
-  <window>       faults: lookback like 24H (default), 7d, 1H
+options = {all_frames: false, limit: 1}
 
-Examples:
-  binx_hb fault https://app.honeybadger.io/projects/35931/faults/133010748
-  binx_hb notice backend/133010748
-  binx_hb faults frontend 7d
-USAGE
-  exit 2
-}
+parser = OptionParser.new do |opts|
+  opts.banner = <<~BANNER
+    Usage: binx_hb MODE TARGET [WINDOW] [options]
 
-MODE="${1:-}"; TARGET="${2:-}"
-[ -n "$MODE" ] && [ -n "$TARGET" ] || usage
-shift 2
+    Read one Honeybadger fault without pulling the whole notice into context.
 
-ALL_FRAMES=false; LIMIT=1; WINDOW=24H
-while [ $# -gt 0 ]; do
-  case "$1" in
-    --all-frames) ALL_FRAMES=true ;;
-    --limit) shift; LIMIT="${1:-1}" ;;
-    *) WINDOW="$1" ;;
-  esac
-  shift
-done
+      MODE    fault | notice | faults
+      TARGET  a fault URL, PROJECT/FAULT_ID, or - for `faults` - a project alias
+      PROJECT backend | frontend | csp, or a numeric project id
+      WINDOW  faults only: lookback like 24H (default), 30M, 7d
 
-ENV_FILE=".env.development"
-[ -f "$ENV_FILE" ] || { echo "binx_hb: $ENV_FILE not found - run from the repo root" >&2; exit 2; }
+    Examples:
+      binx_hb fault https://app.honeybadger.io/projects/35931/faults/133010748
+      binx_hb notice backend/133010748
+      binx_hb notice backend/133010748 --all-frames
+      binx_hb faults frontend 7d
 
-# `|| true` because a no-match grep exits 1, which under `set -e` would kill the
-# script before the -n check below can say what's actually wrong.
-TOKEN=$(grep -E '^HONEYBADGER_PERSONAL_AUTH_TOKEN=' "$ENV_FILE" | head -1 | cut -d= -f2- | sed -e 's/^["'\'']//' -e 's/["'\'']$//' || true)
-[ -n "$TOKEN" ] || { echo "binx_hb: HONEYBADGER_PERSONAL_AUTH_TOKEN missing in $ENV_FILE" >&2; exit 2; }
+  BANNER
+
+  opts.on("--all-frames", "notice: include gem frames, not just app frames") { options[:all_frames] = true }
+  opts.on("--limit N", Integer, "notice: fetch N notices (default 1)") { |count| options[:limit] = count }
+  opts.on("-h", "--help") {
+    puts opts
+    exit
+  }
+end
+
+begin
+  parser.parse!
+rescue OptionParser::ParseError => e
+  abort "Error: #{e.message}\n\n#{parser}"
+end
+
+abort "Error: expected MODE and TARGET\n\n#{parser}" unless (2..3).cover?(ARGV.length)
+mode, target, window = ARGV
+
+def read_token
+  abort "Error: #{ENV_FILE} not found - run from the repo root" unless File.exist?(ENV_FILE)
+  line = File.foreach(ENV_FILE).find { |text| text.start_with?("HONEYBADGER_PERSONAL_AUTH_TOKEN=") }
+  abort "Error: HONEYBADGER_PERSONAL_AUTH_TOKEN missing in #{ENV_FILE}" if line.nil?
+  line.split("=", 2).last.strip.gsub(/\A["']|["']\z/, "")
+end
 
 # Accepts a fault URL, PROJECT/FAULT_ID, or a bare project alias. Pulling both
 # ids out of a pasted URL is the common case when fixing a reported bug.
-PROJECT=""; FAULT=""
-case "$TARGET" in
-  http*)
-    PROJECT=$(echo "$TARGET" | sed -nE 's#.*/projects/([0-9]+).*#\1#p')
-    FAULT=$(echo "$TARGET" | sed -nE 's#.*/faults/([0-9]+).*#\1#p') ;;
-  */*) PROJECT="${TARGET%%/*}"; FAULT="${TARGET##*/}" ;;
-  *)   PROJECT="$TARGET" ;;
-esac
+def parse_target(target)
+  case target
+  when %r{\Ahttps?://} then [target[%r{/projects/(\d+)}, 1], target[%r{/faults/(\d+)}, 1]]
+  when %r{/} then target.split("/", 2)
+  else [target, nil]
+  end
+end
 
-# Echo the alias back, so a pasted numeric URL still says which project it hit.
-case "$PROJECT" in
-  backend|35931)  PROJECT=35931;  NAME=backend ;;
-  frontend|61305) PROJECT=61305;  NAME=frontend ;;
-  csp|138070)     PROJECT=138070; NAME=csp ;;
-  *)              NAME=unknown ;;
-esac
-[ -n "$PROJECT" ] || { echo "binx_hb: could not resolve a project from '$TARGET'" >&2; exit 2; }
+# Named back as well as resolved, so a pasted numeric URL still says which
+# project it hit.
+def resolve_project(raw)
+  id = PROJECTS[raw] || raw.to_i
+  abort "Error: could not resolve a project from '#{raw}'" unless id.positive?
+  [id, PROJECTS.key(id) || "unknown"]
+end
 
-mkdir -p tmp
-API="https://app.honeybadger.io/v2/projects/$PROJECT"
+def lookback_seconds(window)
+  match = window.match(/\A(\d+)([HhMd])\z/)
+  abort "Error: bad window '#{window}' - use forms like 24H, 30M, 7d" if match.nil?
+  match[1].to_i * LOOKBACK_UNITS.fetch(match[2])
+end
 
-# $1 = url, $2 = destination. The v2 API authenticates with the personal auth
-# token as the HTTP Basic username and an empty password.
-fetch() {
-  local code
-  code=$(curl -s -u "$TOKEN:" -w '%{http_code}' -o "$2" "$1")
-  case "$code" in
-    200) : ;;
-    401) echo "binx_hb: 401 - HONEYBADGER_PERSONAL_AUTH_TOKEN rejected" >&2; exit 1 ;;
-    404) echo "binx_hb: 404 - no such project/fault ($1)" >&2; exit 1 ;;
-    *)   echo "binx_hb: HTTP $code from $1" >&2; exit 1 ;;
-  esac
-}
+def get(path, token)
+  uri = URI("https://app.honeybadger.io/v2#{path}")
+  request = Net::HTTP::Get.new(uri)
+  request.basic_auth(token, "")
+  response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(request) }
 
-case "$MODE" in
-faults)
+  case response
+  when Net::HTTPOK then response.body
+  when Net::HTTPUnauthorized then abort "Error: 401 - HONEYBADGER_PERSONAL_AUTH_TOKEN rejected"
+  when Net::HTTPNotFound then abort "Error: 404 - no such project/fault (#{uri})"
+  else abort "Error: HTTP #{response.code} from #{uri}"
+  end
+end
+
+# Landing the body keeps a follow-up question a local jq rather than a refetch.
+def save(body, filename)
+  Dir.mkdir("tmp") unless Dir.exist?("tmp")
+  File.join("tmp", filename).tap { |path| File.write(path, body) }
+end
+
+def labelled(label, value, width) = format("%-#{width}s%s", "#{label}:", value)
+
+# A Sidekiq notice puts the whole job hash in request.params, including an
+# error_backtrace of every gem frame - thousands of tokens the app-frame listing
+# already covers. Drop it, then cap whatever is left.
+def params_summary(notice)
+  params = notice.dig("request", "params") || {}
+  job = params["job"]
+  compact = job.is_a?(Hash) ? params.merge("job" => job.except("error_backtrace")) : params
+  json = JSON.generate(compact)
+  (json.length > PARAMS_LIMIT) ? "#{json[0, PARAMS_LIMIT]} …truncated, full JSON in the raw file" : json
+end
+
+def print_notice(notice, all_frames)
+  puts labelled("message", notice["message"] || "-", 12)
+  puts labelled("created", notice["created_at"], 12)
+  puts labelled("url", notice.dig("request", "url") || "-", 12)
+  puts labelled("referer", notice.dig("web_environment", "HTTP_REFERER") || "-", 12)
+  puts labelled("user_agent", notice.dig("web_environment", "HTTP_USER_AGENT") || "-", 12)
+  puts labelled("params", params_summary(notice), 12)
+  puts labelled("deploy", "#{notice.dig("deploy", "revision") || "-"} at #{notice.dig("deploy", "created_at") || "-"}", 12)
+
+  puts(all_frames ? "--- backtrace (all frames)" : "--- backtrace (app frames; --all-frames for the rest)")
+  frames = notice["backtrace"].select { |frame| all_frames || frame["context"] == "app" }
+  frames.each { |frame| puts "  #{frame["file"]}:#{frame["number"]}  #{frame["method"]}" }
+  puts
+end
+
+def print_fault(fault)
+  puts labelled("class", fault["klass"], 13)
+  puts labelled("message", fault["message"], 13)
+  puts labelled("component", "#{fault["component"] || "-"}##{fault["action"] || "-"}", 13)
+  puts labelled("created", fault["created_at"], 13)
+  puts labelled("last_notice", fault["last_notice_at"], 13)
+  puts labelled("counts", "#{fault["notices_count_in_range"] || "-"} in range, #{fault["notices_count"]} lifetime", 13)
+  puts labelled("state", "#{fault["resolved"] ? "resolved" : "open"}, #{fault["ignored"] ? "ignored" : "not ignored"}", 13)
+  puts labelled("url", fault["url"], 13)
+end
+
+token = read_token
+raw_project, fault_id = parse_target(target)
+project_id, project_name = resolve_project(raw_project)
+
+case mode
+when "faults"
   # occurred_after is Unix epoch seconds; an ISO8601 value is silently ignored,
   # which returns faults last seen years ago with a null notices_count_in_range.
-  SINCE=$(date -u -v-"$WINDOW" +%s 2>/dev/null || date -u -d "$WINDOW ago" +%s)
-  SINCE_HUMAN=$(date -u -v-"$WINDOW" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d "$WINDOW ago" +%Y-%m-%dT%H:%M:%SZ)
-  OUT="tmp/hb-faults-$PROJECT.json"
-  fetch "$API/faults?limit=25&order=frequent&occurred_after=$SINCE" "$OUT"
-  echo "PROJECT $NAME ($PROJECT)   since $SINCE_HUMAN"
-  echo "in_window	lifetime	class	component	state	last_notice	url"
-  jq -r '.results[]
-    | [.notices_count_in_range, .notices_count, .klass, (.component // "-"),
-       (if .resolved then "resolved" else "open" end), .last_notice_at, .url]
-    | @tsv' "$OUT"
-  echo "raw: $OUT"
-  ;;
-fault)
-  [ -n "$FAULT" ] || usage
-  OUT="tmp/hb-fault-$FAULT.json"
-  fetch "$API/faults/$FAULT" "$OUT"
-  echo "PROJECT $NAME ($PROJECT)"
-  jq -r '"class:       \(.klass)",
-         "message:     \(.message)",
-         "component:   \(.component // "-")#\(.action // "-")",
-         "created:     \(.created_at)",
-         "last_notice: \(.last_notice_at)",
-         "counts:      \(.notices_count_in_range // "-") in range, \(.notices_count) lifetime",
-         "state:       \(if .resolved then "resolved" else "open" end), \(if .ignored then "ignored" else "not ignored" end)",
-         "url:         \(.url)"' "$OUT"
-  echo "raw: $OUT"
-  ;;
-notice)
-  [ -n "$FAULT" ] || usage
-  OUT="tmp/hb-notice-$FAULT.json"
-  fetch "$API/faults/$FAULT/notices?limit=$LIMIT" "$OUT"
-  echo "PROJECT $NAME ($PROJECT)"
-  # A Sidekiq notice puts the whole job hash in request.params, including an
-  # error_backtrace of every gem frame - thousands of tokens the app-frame
-  # listing already covers. Drop it, then cap whatever is left.
-  jq -r --argjson all "$ALL_FRAMES" '.results[]
-    | ((.request.params // {}) | del(.job.error_backtrace) | tojson) as $p
-    | "message:    \(.message // "-")",
-      "created:    \(.created_at)",
-      "url:        \(.request.url // "-")",
-      "referer:    \(.web_environment.HTTP_REFERER // "-")",
-      "user_agent: \(.web_environment.HTTP_USER_AGENT // "-")",
-      "params:     \(if ($p | length) > 500 then $p[0:500] + " …truncated, full JSON in the raw file" else $p end)",
-      "deploy:     \(.deploy.revision // "-") at \(.deploy.created_at // "-")",
-      (if $all then "--- backtrace (all frames)" else "--- backtrace (app frames; --all-frames for the rest)" end),
-      (.backtrace[] | select($all or .context == "app") | "  \(.file):\(.number)  \(.method)"),
-      ""' "$OUT"
-  echo "raw: $OUT"
-  ;;
-*)
-  usage ;;
-esac
+  since = Time.now.utc - lookback_seconds(window || "24H")
+  body = get("/projects/#{project_id}/faults?limit=25&order=frequent&occurred_after=#{since.to_i}", token)
+  path = save(body, "hb-faults-#{project_id}.json")
+
+  puts "PROJECT #{project_name} (#{project_id})   since #{since.strftime("%Y-%m-%dT%H:%M:%SZ")}"
+  puts %w[in_window lifetime class component state last_notice url].join("\t")
+  JSON.parse(body)["results"].each do |fault|
+    puts [fault["notices_count_in_range"], fault["notices_count"], fault["klass"], fault["component"] || "-",
+      fault["resolved"] ? "resolved" : "open", fault["last_notice_at"], fault["url"]].join("\t")
+  end
+  puts "raw: #{path}"
+when "fault"
+  abort "Error: #{mode} needs a fault id or URL\n\n#{parser}" if fault_id.nil?
+  body = get("/projects/#{project_id}/faults/#{fault_id}", token)
+  path = save(body, "hb-fault-#{fault_id}.json")
+
+  puts "PROJECT #{project_name} (#{project_id})"
+  print_fault(JSON.parse(body))
+  puts "raw: #{path}"
+when "notice"
+  abort "Error: #{mode} needs a fault id or URL\n\n#{parser}" if fault_id.nil?
+  body = get("/projects/#{project_id}/faults/#{fault_id}/notices?limit=#{options[:limit]}", token)
+  path = save(body, "hb-notice-#{fault_id}.json")
+
+  puts "PROJECT #{project_name} (#{project_id})"
+  JSON.parse(body)["results"].each { |notice| print_notice(notice, options[:all_frames]) }
+  puts "raw: #{path}"
+else
+  abort "Error: unknown mode '#{mode}'\n\n#{parser}"
+end
