@@ -129,7 +129,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       let!(:image1) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
       let!(:image2) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
       it "updates the alert image", :flaky do
-        Images::StolenProcessor.update_alert_images(stolen_record)
+        ImageServices::StolenProcessor.update_alert_images(stolen_record)
         expect(stolen_record.reload.images_attached_id).to eq image1.id
 
         expect(Payment.count).to eq 0

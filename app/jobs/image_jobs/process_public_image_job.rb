@@ -2,7 +2,7 @@
 
 require "image_processing/vips"
 
-module Images
+module ImageJobs
   class ProcessPublicImageJob < ApplicationJob
     sidekiq_options queue: "med_priority"
 
@@ -14,12 +14,12 @@ module Images
       return unless public_image&.file_needs_processing?
 
       blob = public_image.file.blob
-      prepare_image(blob) unless blob.metadata["stripped"] # A second pass would re-encode
+      prepare_image(blob) unless blob.binx_data.to_h["stripped"] # A second pass would re-encode
       # Not `preprocessed` - those generate off the un-stripped original, racing the strip
       PublicImage::VARIANTS.each_key { |size| public_image.file.variant(size).processed }
 
       # Written last, once the variants exist - "stripped" only means the original was rewritten
-      blob.update!(metadata: blob.metadata.merge("processed" => true))
+      stamp!(blob, "processed" => true)
     end
 
     private
@@ -40,10 +40,15 @@ module Images
       # Ahead of the upload, which re-identifies content_type with the filename as a hint
       blob.filename = "#{blob.filename.base}.webp" if to_webp
       blob.upload(prepared) # Resets checksum/byte_size, which still describe the pre-strip bytes
-      blob.update!(metadata: blob.metadata.merge("stripped" => true))
-      blob.analyze # PublicImage suppresses AnalyzeJob, so this is metadata's only writer
+      stamp!(blob, "stripped" => true)
     ensure
       prepared&.close!
+    end
+
+    # Not metadata: a direct upload posts that (Rails only protects its own keys), so a client
+    # could hand us "processed" and skip the strip entirely. Saves the checksum too.
+    def stamp!(blob, values)
+      blob.update!(binx_data: blob.binx_data.to_h.merge(values))
     end
   end
 end

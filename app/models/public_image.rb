@@ -106,7 +106,7 @@ class PublicImage < ApplicationRecord
   # "processed" is only set once ProcessPublicImageJob has stripped the original and generated
   # every variant, so a job that died partway through gets picked up again
   def file_needs_processing?
-    file.attached? && !file.blob.metadata["processed"]
+    file.attached? && !file.blob.binx_data.to_h["processed"]
   end
 
   # Method to make create_revised.js easier to handle
@@ -120,15 +120,10 @@ class PublicImage < ApplicationRecord
     return if skip_update
 
     if external_image_url.present? && image.blank?
-      return Images::ExternalUrlStoreJob.perform_async(id)
+      return ImageJobs::ExternalUrlStoreJob.perform_async(id)
     end
 
-    if file_needs_processing?
-      # Stops the attachment's after_commit from enqueueing AnalyzeJob, whose metadata merge runs
-      # off a stale read and would drop the job's flags. ProcessPublicImageJob analyzes instead.
-      file.blob.analyzed = true
-      Images::ProcessPublicImageJob.perform_async(id)
-    end
+    ImageJobs::ProcessPublicImageJob.perform_async(id) if file_needs_processing?
 
     imageable&.update(updated_at: Time.current)
     return true unless bike?

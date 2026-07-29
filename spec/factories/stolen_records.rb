@@ -18,9 +18,19 @@ FactoryBot.define do
       # NOTE: Only attaches 2 photos, because those are the only ones used currently
       after(:build) do |stolen_record, evaluator|
         stolen_record.image_four_by_five.attach(io: File.open(evaluator.filename),
-          filename: "stolen-#{stolen_record.id}-four_by_five.jpeg")
+          filename: "four_by_five.jpeg")
         stolen_record.image_opengraph.attach(io: File.open(evaluator.filename),
-          filename: "stolen-#{stolen_record.id}-opengraph.jpeg")
+          filename: "opengraph.jpeg")
+      end
+
+      # What ImageServices::StolenProcessor sets, and the stamp is what identifies an alert image.
+      # Not in after(:build) - the record has no id to name or stamp them with yet
+      after(:create) do |stolen_record, _evaluator|
+        {four_by_five: stolen_record.image_four_by_five, opengraph: stolen_record.image_opengraph}
+          .each do |template, attachment|
+            attachment.blob.update!(filename: "stolen-#{stolen_record.id}-#{template}.jpeg",
+              binx_data: {"stolen_record_id" => stolen_record.id})
+          end
       end
     end
 

@@ -8,7 +8,7 @@ local:
   root: <%= Rails.root.join("storage") %>
   public: true
 
-# Only for the specs that upload for real (spec/integration/register_spec.rb); the rest of the
+# Only for the specs that upload for real (image_jobs/process_public_image_job_spec); the rest of the
 # suite stays on :test. Its own bucket so CI churn doesn't land where review apps serve from.
 cloudflare_test:
   service: S3

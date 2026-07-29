@@ -1,4 +1,4 @@
-module Images
+module ImageJobs
   class ExternalUrlStoreJob < ApplicationJob
     sidekiq_options queue: "med_priority"
 

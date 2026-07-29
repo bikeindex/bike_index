@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Images::ProcessPublicImageJob, type: :job do
+RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
   let(:instance) { described_class.new }
   let(:bike) { FactoryBot.create(:bike) }
   # Carries GPS EXIF and an orientation tag, which is the whole reason the job exists
@@ -12,13 +12,16 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
   let(:identifying) { /gps|make|model|serial|lens|software|datetime|makernote/i }
   # Autorotated - the orientation tag claimed 1173x1071
   let(:dimensions) { [1071, 1173] }
-  let(:target_metadata) do
-    {"identified" => true, "stripped" => true, "width" => dimensions.first,
-     "height" => dimensions.last, "analyzed" => true, "processed" => true}
-  end
+  # Ours, not blob.metadata - a direct upload posts that, so it can't gate the strip
+  let(:target_binx_data) { {"stripped" => true, "processed" => true} }
 
   def exif_fields(data)
     Vips::Image.new_from_buffer(data, "").get_fields.grep(/exif|gps/i)
+  end
+
+  def dimensions_of(data)
+    image = Vips::Image.new_from_buffer(data, "")
+    [image.width, image.height]
   end
 
   # n-pages counts what the file holds, not what was loaded; formats that can't animate
@@ -35,8 +38,9 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
 
     instance.perform(public_image.id)
 
-    expect(blob.reload.metadata).to eq target_metadata
+    expect(blob.reload.binx_data).to eq target_binx_data
     stripped_data = blob.download
+    expect(dimensions_of(stripped_data)).to eq dimensions
     expect(exif_fields(stripped_data)).to be_empty
     # Only heic is converted - jpeg is served as-is
     expect(blob.content_type).to eq "image/jpeg"
@@ -49,6 +53,24 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
     PublicImage::VARIANTS.each_key do |size|
       expect(blob.service.exist?(public_image.file.variant(size).key)).to be_truthy
     end
+  end
+
+  # Rails only protects analyzed/identified/composed, so everything else in the direct upload's
+  # metadata is the client's to set. Gating on it would let an upload opt out of the strip.
+  it "still processes an upload that claims to be processed" do
+    data = File.binread(Rails.root.join(image_path))
+    blob = ActiveStorage::Blob.create_before_direct_upload!(filename: "gps.jpg",
+      content_type: "image/jpeg", byte_size: data.bytesize,
+      checksum: Digest::MD5.base64digest(data), metadata: {"processed" => true, "stripped" => true})
+    blob.service.upload(blob.key, StringIO.new(data), checksum: blob.checksum)
+    public_image = PublicImage.create!(imageable: bike, file: blob.signed_id)
+
+    expect(public_image.file.blob.metadata["processed"]).to be_truthy # the client's claim stuck
+    expect(public_image.file_needs_processing?).to be_truthy
+
+    instance.perform(public_image.id)
+
+    expect(exif_fields(public_image.reload.file.blob.download)).to be_empty
   end
 
   it "does not rewrite an already stripped blob, or a record without a file" do
@@ -67,7 +89,7 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
 
       instance.perform(public_image.id)
 
-      expect(blob.reload.metadata).to eq target_metadata
+      expect(blob.reload.binx_data).to eq target_binx_data
       expect(blob.content_type).to eq "image/gif"
       expect(frame_count(blob.download)).to eq 4
       # Variants are stills - the page height is what the dimensions describe
@@ -84,7 +106,8 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
 
       instance.perform(public_image.id)
 
-      expect(blob.reload.metadata).to eq target_metadata
+      expect(blob.reload.binx_data).to eq target_binx_data
+      expect(dimensions_of(blob.download)).to eq dimensions
       expect(blob.content_type).to eq "image/webp"
       expect(blob.filename.to_s).to eq "bike_photo.webp"
       expect(Vips::Image.new_from_buffer(blob.download, "").get("vips-loader")).to start_with "webpload"
@@ -96,13 +119,13 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
     variant_key = public_image.file.variant(:small).key
     # Stand in for dying between the strip and the variants
     blob.service.delete(variant_key)
-    blob.update!(metadata: blob.metadata.except("processed"))
+    blob.update!(binx_data: blob.binx_data.except("processed"))
     expect(public_image.reload.file_needs_processing?).to be_truthy
 
     expect { instance.perform(public_image.id) }.to_not change { blob.reload.checksum }
 
     expect(blob.service.exist?(variant_key)).to be_truthy
-    expect(blob.metadata).to eq target_metadata
+    expect(blob.binx_data).to eq target_binx_data
     expect(public_image.reload.file_needs_processing?).to be_falsey
   end
 
@@ -126,7 +149,7 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
 
       instance.perform(public_image.id)
 
-      expect(blob.reload.metadata).to eq target_metadata
+      expect(blob.reload.binx_data).to eq target_binx_data
       # Rewritten as webp - only Safari renders heic, and the original is served directly
       expect(blob.content_type).to eq "image/webp"
       expect(blob.filename.to_s).to eq "bike_photo-gps.webp"
@@ -148,8 +171,8 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
     expect {
       FactoryBot.create(:public_image, :with_attached_file, imageable: bike)
     }.to change(described_class.jobs, :size).by(1)
-    # AnalyzeJob would merge into the same metadata column from a stale read, dropping the flags
-    expect(Sidekiq::ActiveJob::Wrapper.jobs).to be_empty
+    # ActiveStorage owns metadata now, so its AnalyzeJob runs as normal
+    expect(Sidekiq::ActiveJob::Wrapper.jobs.map { it["wrapped"] }).to eq ["ActiveStorage::AnalyzeJob"]
 
     expect {
       FactoryBot.create(:public_image, :with_image_file, imageable: bike)
