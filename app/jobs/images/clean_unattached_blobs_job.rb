@@ -21,12 +21,11 @@ module Images
       blobs.each { it.purge_later }
     end
 
-    # Alert images are unattached on purpose - StolenRecord attaches them with dependent: false
-    # so links to a superseded one keep resolving. BikeJobs::RemoveOrphanedImagesJob owns those
-    # and knows when they're safe to drop
+    # Superseded alert images are unattached on purpose (dependent: false, so links to one keep
+    # resolving) and BikeJobs::RemoveOrphanedImagesJob collects them within a week. This sweeps
+    # what it misses - exempting them instead would turn a missed collection into a leak
     def blobs
-      ActiveStorage::Blob.unattached.where(created_at: ...self.class.clean_before)
-        .where("binx_data->>'stolen_record_id' IS NULL").limit(BATCH_SIZE)
+      ActiveStorage::Blob.unattached.where(created_at: ...self.class.clean_before).limit(BATCH_SIZE)
     end
   end
 end

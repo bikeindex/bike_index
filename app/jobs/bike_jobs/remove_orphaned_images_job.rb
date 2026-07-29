@@ -19,8 +19,8 @@ module BikeJobs
         1.week.ago..1.day.ago
       end
 
-      # The stamp is what exempts a blob from Images::CleanUnattachedBlobsJob, so it has to be what
-      # collects it here too - anything it skips that this misses leaks forever
+      # The stamp rather than the filename - this purges what it matches, and a user can name
+      # an upload "stolen-42-whatever.jpg"
       def blobs_for(stolen_record_id)
         ActiveStorage::Blob.where("binx_data->>'stolen_record_id' = ?", stolen_record_id.to_s)
           .where("created_at < ?", check_period.last)

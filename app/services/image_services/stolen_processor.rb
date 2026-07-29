@@ -83,9 +83,8 @@ module ImageServices
       stolen_record.image_four_by_five.blob.created_at > images_updated
     end
 
-    # stolen_record_id is what marks these as ours to keep - a superseded alert stays
-    # unattached on purpose (dependent: false), and Images::CleanUnattachedBlobsJob reads the
-    # stamp rather than reaping it
+    # stolen_record_id is how BikeJobs::RemoveOrphanedImagesJob finds these - a superseded alert
+    # stays unattached (dependent: false) until it collects them
     def attach_images(stolen_record, image, location_text)
       four_by_five = create_alert_blob(stolen_record, :four_by_five, image, location_text)
       square = create_alert_blob(stolen_record, :square, image, location_text)

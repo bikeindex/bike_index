@@ -20,18 +20,17 @@ RSpec.describe Images::CleanUnattachedBlobsJob, type: :job do
     let!(:attached) { create_blob(created_at: stale).tap { stolen_record.image_square.attach(it) } }
     let!(:orphan) { create_blob(created_at: stale) }
     let!(:recent_orphan) { create_blob(created_at: Time.current - 29.days) }
-    # BikeJobs::RemoveOrphanedImagesJob owns these - a superseded one stays unattached on purpose
+    # An alert BikeJobs::RemoveOrphanedImagesJob didn't collect - this is the backstop
     let!(:alert_image) do
       create_blob(created_at: stale, filename: "stolen-42-opengraph.jpeg",
         binx_data: {"stolen_record_id" => 42})
     end
 
     it "purges only the aged blobs nothing references anymore" do
-      expect(described_class.new.blobs.map(&:id)).to eq([orphan.id])
+      expect(described_class.new.blobs.map(&:id)).to match_array([orphan.id, alert_image.id])
 
       Sidekiq::Testing.inline! { described_class.new.perform }
-      expect(ActiveStorage::Blob.pluck(:id))
-        .to match_array([attached.id, recent_orphan.id, alert_image.id])
+      expect(ActiveStorage::Blob.pluck(:id)).to match_array([attached.id, recent_orphan.id])
     end
   end
 end
