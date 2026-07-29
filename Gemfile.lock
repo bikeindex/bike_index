@@ -279,8 +279,8 @@ GEM
     faraday_middleware (1.2.1)
       faraday (~> 1.0)
     fast_blank (1.0.1)
-    ffi (1.17.3-arm64-darwin)
-    ffi (1.17.3-x86_64-linux-gnu)
+    ffi (1.17.4-arm64-darwin)
+    ffi (1.17.4-x86_64-linux-gnu)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -347,7 +347,7 @@ GEM
       rack
     groupdate (6.8.0)
       activesupport (>= 7.2)
-    guard (2.20.1)
+    guard (2.20.2)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
       logger (~> 1.6)
