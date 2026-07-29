@@ -47,8 +47,7 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
 
     expect(page).to have_button(suggestion)
 
-    # the other typos aren't, on a part this short -- "uol" is no more a mistyped "aol"
-    # than every two-letter ending is a mistyped one of the two-letter endings we know
+    # the other typos need more of the part behind them -- "uol" isn't a mistyped "aol"
     fill_in_email_and_leave("you@uol.ro")
 
     expect(page).to have_no_css(suggestion_button)
