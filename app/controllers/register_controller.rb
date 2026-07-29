@@ -12,13 +12,13 @@ class RegisterController < ApplicationController
   # Redirects into step 1 with a token (reusing the session's registration when
   # it's still blank), so going back from step 2 lands on the same registration
   def new
-    b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
+    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
       status: params[:status], email: params[:email])
-    # Through the same path every other action uses, so reusing the session's
+    # The same filter every other action runs, so reusing the session's
     # registration can't quietly drop the organization the URL named
-    BikeServices::Register.assign_organization(b_param, current_organization)
-    session[:register_b_param_token] = b_param.id_token
-    redirect_to step_path(1, b_param)
+    assign_organization
+    session[:register_b_param_token] = @b_param.id_token
+    redirect_to step_path(1)
   end
 
   # The whole flow after the start: ?step=1, ?step=2 and ?step=finished - or the
@@ -72,8 +72,8 @@ class RegisterController < ApplicationController
 
   private
 
-  def step_path(step, b_param = @b_param)
-    register_path(b_param_token: b_param.id_token, step:)
+  def step_path(step)
+    register_path(b_param_token: @b_param.id_token, step:)
   end
 
   # b_param_token=false abandons the session's registration - the start over link

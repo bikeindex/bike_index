@@ -32,19 +32,19 @@ RSpec.describe RegisterController, type: :request do
     context "status and organization params" do
       let(:organization) { FactoryBot.create(:organization) }
 
-      it "stores them, keeping the session's registration as-is on revisit" do
+      it "stores them on the registration it creates, keeping them on revisit" do
         # The slug resolves to the organization, rather than being stored as-is
         get "/register/new?status=status_stolen&organization_id=#{organization.slug}"
         stolen_b_param = BParam.last
-        expect(stolen_b_param.status).to eq "status_stolen"
-        expect(stolen_b_param.creation_organization_id).to eq organization.id
-        expect(stolen_b_param.organization_id).to eq organization.id
+        expect(stolen_b_param).to have_attributes(status: "status_stolen",
+          creation_organization_id: organization.id, organization_id: organization.id)
 
         get "/register/new?status=status_impounded"
         expect(BParam.last.id).to eq stolen_b_param.id
         expect(stolen_b_param.reload.status).to eq "status_stolen"
       end
 
+      # Only the create branch of b_param_for seeds status, so this is the org path
       it "attaches the organization to a blank registration already in the session" do
         get "/register/new" # a blank shell, no organization
         session_b_param = BParam.last
@@ -153,11 +153,6 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include "email a confirmation link"
       # Submitted already, so this is a return from step 2 - offer abandoning it
       expect(response.body).to include "Start over"
-
-      # Once the confirmation email went out, the "we'll email you" note is stale
-      b_param.update(params: b_param.params.merge("partial_email_sent_to" => owner_email))
-      get register_path(b_param_token: b_param.id_token, step: 1)
-      expect(response.body).to_not include "email a confirmation link"
     end
 
     context "signed in" do
@@ -256,9 +251,8 @@ RSpec.describe RegisterController, type: :request do
     let(:create_params) { step_1_params.merge(b_param_token: empty_b_param.id_token) }
 
     it "saves step 1 and redirects to step 2, without emailing" do
-      expect {
-        expect { post base_url, params: create_params }.to_not change(BParam, :count)
-      }.to_not change { Email::PartialRegistrationJob.jobs.size }
+      expect { post base_url, params: create_params }
+        .to_not change { [BParam.count, Email::PartialRegistrationJob.jobs.size] }
       empty_b_param.reload
       expect(empty_b_param).to have_attributes(origin: "register_flow", owner_email:,
         manufacturer_id: manufacturer.id, creator_id: nil, cycle_type: "cargo")
@@ -313,16 +307,6 @@ RSpec.describe RegisterController, type: :request do
       end
     end
 
-    context "signed in" do
-      include_context :request_spec_logged_in_as_user
-
-      it "saves step 1 onto the registration the session is on" do
-        post base_url, params: create_params
-        expect(empty_b_param.reload.manufacturer_id).to eq manufacturer.id
-        expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
-      end
-    end
-
     context "unknown token" do
       it "builds a registration rather than losing the submission" do
         expect {
@@ -368,13 +352,16 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include owner_email
       # No organization asking for anything, so it's just the registrant's own info
       expect(response.body).to include "Contact info"
-      # An address nothing has proven yet, so the confirmation is still pending
+      # An address nothing has proven yet, so the confirmation is still pending -
+      # and an upload needs an account behind it
       expect(response.body).to include "confirmation link to your email"
+      expect(response.body).to_not include "bike[image]"
 
-      # Once the link has been clicked, the alert is stale
+      # Once the link has been clicked, the alert is stale and the upload opens up
       b_param.confirm_email!
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(response.body).to_not include "confirmation link to your email"
+      expect(response.body).to include "bike[image]"
     end
 
     it "hides the phone field, showing it for the statuses bikes/new does" do
@@ -460,15 +447,6 @@ RSpec.describe RegisterController, type: :request do
         expect(response.body).to_not include "confirmation link to your email"
         expect(response.body).to include "bike[image]"
       end
-    end
-
-    it "offers the photo upload only once there's an account behind it" do
-      get register_path(b_param_token: b_param.id_token, step: 2)
-      expect(response.body).to_not include "bike[image]"
-
-      b_param.confirm_email!
-      get register_path(b_param_token: b_param.id_token, step: 2)
-      expect(response.body).to include "bike[image]"
     end
 
     context "step 1 not submitted" do

@@ -379,11 +379,6 @@ class BParam < ApplicationRecord
     @type_titleize ||= CycleType.new(cycle_type).short_name_translation
   end
 
-  # The address the partial-registration email last went to (register flow)
-  def partial_email_sent_to
-    params["partial_email_sent_to"]
-  end
-
   def is_pos
     bike["is_pos"] || false
   end

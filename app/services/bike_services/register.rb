@@ -116,14 +116,14 @@ module BikeServices
     end
 
     # A reused registration keeps the address it has unless email asked otherwise -
-    # assigned through params, since owner_email= ignores a blank value
+    # through clean_params, since owner_email= ignores a blank value
     def assign_owner_email(b_param, user, email)
       return b_param if email.blank? && b_param.owner_email.present?
 
       owner_email = owner_email_for(user, email)
       return b_param if owner_email == b_param.owner_email
 
-      b_param.params = b_param.params.deep_merge("bike" => {"owner_email" => owner_email})
+      b_param.clean_params({bike: {owner_email:}}.as_json)
       b_param.save
       b_param
     end

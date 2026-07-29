@@ -33,7 +33,8 @@ module Register
       end
 
       # Discarding the registration shouldn't discard how they arrived - the
-      # organization it's attributed to, or the status they came to report
+      # organization it's attributed to, or the status they came to report. The
+      # raw status, since BParam#status answers status_with_owner for an unset one
       def start_over_path
         new_register_path({b_param_token: false, organization_id: organization&.slug,
                            status: @b_param.bike["status"]}.compact)
@@ -45,10 +46,9 @@ module Register
         CycleType.slug_translation_hash_lowercase_short
       end
 
-      # Only anonymous registrants have anything to wait on, and the email goes
-      # out when step 1 is submitted
+      # Only anonymous registrants have anything to wait on
       def confirmation_email_pending?
-        @current_user.blank? && @b_param.partial_email_sent_to.blank?
+        @current_user.blank?
       end
 
       # Step 1 is only revisitable once submitted, so this is a return from step 2
