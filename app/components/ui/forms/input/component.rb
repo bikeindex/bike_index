@@ -10,9 +10,12 @@ module UI
         KINDS = %i[text_field text_area number_field telephone_field datetime_local_field].freeze
 
         def initialize(form_builder:, attribute:, kind: :text_field, required: false, html_options: {})
+          raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}" \
+            unless KINDS.include?(kind&.to_sym)
+
           @form_builder = form_builder
           @attribute = attribute
-          @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : :text_field
+          @kind = kind.to_sym
           @html_options = html_options.merge(
             {class: ["twinput", html_options[:class]].compact.join(" ")},
             (required ? {required: true} : {})
