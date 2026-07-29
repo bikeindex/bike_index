@@ -60,10 +60,7 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
 
   context "animated gif" do
     let(:image_path) { "spec/fixtures/animated.gif" }
-    let(:target_metadata) do
-      {"identified" => true, "stripped" => true, "width" => 120, "height" => 80,
-       "analyzed" => true, "processed" => true}
-    end
+    let(:dimensions) { [120, 80] }
 
     it "keeps every frame through the strip" do
       expect(frame_count(File.binread(Rails.root.join(image_path)))).to eq 4
