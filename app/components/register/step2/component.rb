@@ -15,11 +15,6 @@ module Register
         @b_param.type
       end
 
-      # An upload needs an account behind it - it goes to a signed-in-only endpoint
-      def show_photo?
-        @current_user.present?
-      end
-
       # A signed-in registration creates the bike straight from this step, so only
       # an anonymous one is ever waiting on the address being confirmed
       def awaiting_confirmation?

@@ -8,7 +8,7 @@ module UI
         # otherwise center along with the button next to it.
         LABEL_CLASSES = "tw:mb-0 tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-blue-500/40"
 
-        def initialize(form_builder:, attribute:, accept: nil, camera: nil, direct_upload: false, html_options: {})
+        def initialize(form_builder:, attribute:, accept: nil, camera: nil, direct_upload_url: nil, html_options: {})
           @form_builder = form_builder
           @attribute = attribute
           @placeholder = translation(".no_file_chosen")
@@ -23,13 +23,13 @@ module UI
 
           # The browser uploads to storage itself and the form carries the blob's signed id,
           # so the field is nameless - it must not also post the bytes
-          @direct_upload = direct_upload
+          @direct_upload_url = direct_upload_url
           @html_options = {
             class: "tw:peer tw:sr-only",
             accept: accept_list.join(",").presence,
             data: {"ui--forms--file-upload-target": "input", action: "ui--forms--file-upload#display"}
           }.merge(html_options)
-          @html_options[:name] = nil if direct_upload
+          @html_options[:name] = nil if direct_upload_url.present?
 
           # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.
           @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: LABEL_CLASSES)

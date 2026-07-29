@@ -10,7 +10,9 @@ class Rack::Attack
   SIGN_IN_PATHS = ["/session", "/session/identify"].freeze
   CSP_REPORTS_PATH = "/csp_reports"
   DIRECT_UPLOADS_PATH = "/rails/active_storage/direct_uploads"
+  REGISTER_DIRECT_UPLOADS_PATH = "/register/direct_uploads"
   DIRECT_UPLOAD_MAX = ENV.fetch("RACK_ATTACK_DIRECT_UPLOAD_LIMIT", 20).to_i
+  REGISTER_DIRECT_UPLOAD_MAX = ENV.fetch("RACK_ATTACK_REGISTER_DIRECT_UPLOAD_LIMIT", 10).to_i
 
   SENSITIVE_AUTH_PATHS = %w[
     /session/create_magic_link
@@ -80,10 +82,16 @@ class Rack::Attack
     request.ip if request.patch? && request.path == "/my_account"
   end
 
-  # Each direct upload hands out a presigned URL to write into our bucket. The endpoint
-  # verifies the caller is signed in, so this only caps how fast one address can ask.
+  # Each direct upload hands out a presigned URL to write into our bucket. Both endpoints
+  # verify who's asking in the app - signed in for one, a registration token for the other -
+  # so these only cap how fast one address can ask. A registration needs a single upload,
+  # hence the far tighter hourly budget on the anonymous one.
   throttle("direct_uploads/ip", limit: DIRECT_UPLOAD_MAX, period: 1.minute) do |request|
     request.ip if request.post? && request.path == DIRECT_UPLOADS_PATH
+  end
+
+  throttle("register_direct_uploads/ip", limit: REGISTER_DIRECT_UPLOAD_MAX, period: 1.hour) do |request|
+    request.ip if request.post? && request.path == REGISTER_DIRECT_UPLOADS_PATH
   end
 
   self.throttled_responder = lambda do |request|
