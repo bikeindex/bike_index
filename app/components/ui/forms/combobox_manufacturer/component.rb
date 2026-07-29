@@ -18,8 +18,8 @@ module UI
       # manufacturer is acceptable.
       class Component < ApplicationComponent
         # One is sampled for the placeholder, to show what the field autocompletes
-        PLACEHOLDER_NAMES = ["Trek", "Specialized", "Giant Bikes", "Rad Power Bikes", "Cannondale",
-          "Lectric eBikes", "Aventón", "Canyon", "Orbea"].freeze
+        PLACEHOLDER_NAMES = ["Trek", "Surly", "Giant Bikes", "Rad Power Bikes", "Cannondale",
+          "Lectric eBikes", "Aventón", "Canyon", "Orbea", "Juliana"].freeze
 
         def initialize(name: :manufacturer_id, frame_maker: false, no_manufacturer_other: false, **combobox_options)
           @name = name
