@@ -91,6 +91,7 @@ class BikesController < Bikes::BaseController
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= BikeServices::Builder.build(@b_param, new_bike_attrs)
+    @bike.owner_email = new_owner_email
     @organization = @bike.creation_organization
     @page_errors = @b_param.bike_errors
   end
@@ -227,6 +228,15 @@ class BikesController < Bikes::BaseController
     return false unless marketplace_listing.visible_by?(current_user)
 
     @marketplace_preview = true
+  end
+
+  # ?email= registers for someone other than the signed in user: a string
+  # prefills the field, false leaves it empty
+  def new_owner_email
+    email = Binxtils::InputNormalizer.string(params[:email])
+    return @bike.owner_email || current_user&.email if email.blank?
+
+    email unless ActiveRecord::Type::Boolean::FALSE_VALUES.include?(email)
   end
 
   def new_bike_attrs

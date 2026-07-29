@@ -291,7 +291,7 @@
 
           <%# With impounded and found bikes, including owner_email is confusing %>
           <% if @bike.status_impounded? %>
-            <%= f.hidden_field :owner_email, value: @bike.owner_email || current_user&.email %>
+            <%= f.hidden_field :owner_email, value: @bike.owner_email %>
           <% else %>
             <div class="form-group row unnested-field no-divider-row">
               <%= f.label :owner_email,
@@ -300,7 +300,7 @@
 
               <div class="form-well-input">
                 <%= f.email_field :owner_email,
-                  value: @bike.owner_email || current_user&.email,
+                  value: @bike.owner_email,
                   required: true,
                   placeholder: 'required',
                   class: 'form-control' %>
