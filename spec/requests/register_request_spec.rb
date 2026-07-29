@@ -504,17 +504,19 @@ RSpec.describe RegisterController, type: :request do
         end
 
         it "stores the direct upload's signed id on the b_param" do
-          patch base_url, params: {b_param_token: b_param.id_token, image_signed_id: blob.signed_id,
-                                   bike: bike_details}
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(image_signed_id: blob.signed_id)}
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
           expect(b_param.reload.image_signed_id).to eq blob.signed_id
+          # It isn't a bike attribute, so it stays out of the bike params
+          expect(b_param.bike.keys).to_not include "image_signed_id"
         end
 
         it "keeps a stored signed id when a later submit posts none" do
-          patch base_url, params: {b_param_token: b_param.id_token, image_signed_id: blob.signed_id,
-                                   bike: bike_details}
-          patch base_url, params: {b_param_token: b_param.id_token, image_signed_id: "",
-                                   bike: bike_details}
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(image_signed_id: blob.signed_id)}
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(image_signed_id: "")}
           expect(b_param.reload.image_signed_id).to eq blob.signed_id
         end
       end

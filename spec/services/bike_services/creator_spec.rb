@@ -625,6 +625,7 @@ RSpec.describe BikeServices::Creator do
           filename: "bike.jpg", content_type: "image/jpeg")
       end
       let(:b_param) { FactoryBot.create(:b_param, params: {"image_signed_id" => blob.signed_id}) }
+      before { blob.update!(metadata: blob.metadata.merge("b_param_id" => b_param.id)) }
 
       it "creates a public image holding the already-uploaded blob" do
         instance.attach_photo(b_param, bike)
@@ -633,6 +634,16 @@ RSpec.describe BikeServices::Creator do
         expect(public_image.file.attached?).to be_truthy
         expect(public_image.file.blob).to eq blob
         expect(public_image.image).to_not be_present
+      end
+
+      # A signed id is a bearer token, so the mint stamps which registration asked for it
+      context "blob minted by a different registration" do
+        before { blob.update!(metadata: blob.metadata.merge("b_param_id" => b_param.id + 1)) }
+
+        it "refuses it" do
+          instance.attach_photo(b_param, bike)
+          expect(bike.public_images.count).to eq 0
+        end
       end
 
       # CleanUnattachedBlobsJob can beat a long-delayed confirmation to the blob

@@ -4,7 +4,7 @@
 # controller isn't reachable. Signed-in surfaces upload here; the registration flow has its
 # own endpoint because it runs before there's an account to check.
 class DirectUploadsController < DirectUploads::BaseController
-  before_action :require_current_user
+  prepend_before_action :require_current_user
 
   private
 

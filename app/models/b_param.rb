@@ -448,9 +448,12 @@ class BParam < ApplicationRecord
     params["image_signed_id"]
   end
 
-  # nil once CleanUnattachedBlobsJob has reaped it, which a late registration has to survive
+  # nil once CleanUnattachedBlobsJob has reaped it, which a late registration has to survive.
+  # Only a blob this registration minted - a signed id is a bearer token, so without the stamp
+  # any registration could claim any other's photo.
   def image_blob
-    ActiveStorage::Blob.find_signed(image_signed_id)
+    blob = ActiveStorage::Blob.find_signed(image_signed_id)
+    blob if blob&.metadata&.dig("b_param_id") == id
   end
 
   def primary_frame_color

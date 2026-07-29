@@ -5,6 +5,8 @@
 # adds who it will accept them from.
 module DirectUploads
   class BaseController < ActiveStorage::DirectUploadsController
+    # Subclasses prepend their authorization, so it runs before this - blob_metadata can rely
+    # on whoever is asking having been resolved
     before_action :require_permitted_file
 
     private
@@ -16,6 +18,17 @@ module DirectUploads
       return if PublicImage.file_permitted?(**blob_args.slice(:content_type, :byte_size))
 
       head :unprocessable_entity
+    end
+
+    # Replaces whatever metadata was posted rather than merging it. ActiveStorage permits the
+    # client's, and the keys mean something here - "processed" would skip the job that strips
+    # EXIF, leaving the GPS coordinates of wherever the bike was photographed in the original.
+    def blob_args
+      super.merge(metadata: blob_metadata)
+    end
+
+    def blob_metadata
+      {}
     end
 
     def current_user

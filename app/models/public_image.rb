@@ -72,6 +72,7 @@ class PublicImage < ApplicationRecord
     FILE_CONTENT_TYPES.include?(content_type) &&
       byte_size.to_i.between?(1, PublicImageUploader::MAX_FILE_SIZE)
   end
+
   def default_name
     if bike?
       self.name = "#{imageable&.title_string} #{imageable&.frame_colors&.to_sentence}"
@@ -91,7 +92,6 @@ class PublicImage < ApplicationRecord
   def bike?
     imageable_type == "Bike"
   end
-
 
   # Serves whichever backend this record was uploaded through. CarrierWave versions and
   # ActiveStorage variants share names, so callers pass the same size either way - the

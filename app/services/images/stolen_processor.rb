@@ -88,22 +88,28 @@ module Images
       stolen_record.image_four_by_five.blob.created_at > images_updated
     end
 
+    # stolen_record_id is what marks these as ours to keep - a superseded alert stays
+    # unattached on purpose (dependent: false), and CleanUnattachedBlobsJob reads the stamp
+    # rather than reaping it
     def attach_images(stolen_record, image, location_text)
       four_by_five = ActiveStorage::Blob.create_and_upload!(
         io: generate_alert(template: :four_by_five, image:, location_text:),
-        filename: "stolen-#{stolen_record.id}-four_by_five.jpeg"
+        filename: "stolen-#{stolen_record.id}-four_by_five.jpeg",
+        metadata: {"stolen_record_id" => stolen_record.id}
       )
       four_by_five.analyze
 
       square = ActiveStorage::Blob.create_and_upload!(
         io: generate_alert(template: :square, image:, location_text:),
-        filename: "stolen-#{stolen_record.id}-square.jpeg"
+        filename: "stolen-#{stolen_record.id}-square.jpeg",
+        metadata: {"stolen_record_id" => stolen_record.id}
       )
       square.analyze
 
       opengraph = ActiveStorage::Blob.create_and_upload!(
         io: generate_alert(template: :opengraph, image:, location_text:),
-        filename: "stolen-#{stolen_record.id}-opengraph.jpeg"
+        filename: "stolen-#{stolen_record.id}-opengraph.jpeg",
+        metadata: {"stolen_record_id" => stolen_record.id}
       )
       opengraph.analyze
 

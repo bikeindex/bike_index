@@ -26,7 +26,9 @@ module UI
           @direct_upload_url = direct_upload_url
           # The browser uploads to storage itself and this carries the blob, so the file field
           # is nameless below - it must not also post the bytes
-          @signed_id_field = "#{attribute}_signed_id" if direct_upload_url.present?
+          # Scoped to the form builder like every other field here, so two of these on one
+          # page don't collide on the same param
+          @signed_id_field = "#{form_builder.object_name}[#{attribute}_signed_id]" if direct_upload_url.present?
           @html_options = {
             class: "tw:peer tw:sr-only",
             accept: accept_list.join(",").presence,

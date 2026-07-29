@@ -22,9 +22,17 @@ class CleanUnattachedBlobsJob < ScheduledJob
   end
 
   # Alert images are unattached on purpose - StolenRecord attaches them with dependent: false
-  # so links to a superseded one keep resolving. BikeJobs::RemoveOrphanedImagesJob owns those,
+  # so links to a superseded one keep resolving. BikeJobs::RemoveOrphanedImagesJob owns those
   # and knows when they're safe to drop.
+  #
+  # metadata is a text column, so the stamp can't be a where clause - the batch is bounded, so
+  # reject in ruby. The filename match covers the alerts stamped before StolenProcessor set it,
+  # and can go once none are left.
   def blobs
+    candidates.reject { it.metadata["stolen_record_id"].present? }
+  end
+
+  def candidates
     ActiveStorage::Blob.unattached.where(created_at: ...self.class.clean_before)
       .where.not("filename ILIKE ?", "stolen-%").limit(BATCH_SIZE)
   end

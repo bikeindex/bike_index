@@ -58,7 +58,7 @@ class RegisterController < ApplicationController
 
   def update
     BikeServices::Register.save_step_2(@b_param, user: current_user,
-      image_signed_id: params[:image_signed_id], bike_params: update_params)
+      image_signed_id: params.dig(:bike, :image_signed_id), bike_params: update_params)
     if BikeServices::Register.creator_available?(@b_param)
       redirect_after_bike_creation(BikeServices::Register.create_bike(@b_param, ip_address: forwarded_ip_address))
     else
