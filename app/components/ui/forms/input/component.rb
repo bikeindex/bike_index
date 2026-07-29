@@ -9,13 +9,17 @@ module UI
         # which asks for the type itself so that every one of them checks for a typo.
         KINDS = %i[text_field text_area number_field telephone_field datetime_local_field].freeze
 
-        def initialize(form_builder:, attribute:, kind: :text_field, required: false, html_options: {})
-          raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}" \
-            unless KINDS.include?(kind&.to_sym)
+        # UI::Forms::Group forwards a kind here, so it validates through this too
+        def self.validate_kind!(kind)
+          return kind.to_sym if KINDS.include?(kind&.to_sym)
 
+          raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}"
+        end
+
+        def initialize(form_builder:, attribute:, kind: :text_field, required: false, html_options: {})
           @form_builder = form_builder
           @attribute = attribute
-          @kind = kind.to_sym
+          @kind = self.class.validate_kind!(kind)
           @html_options = html_options.merge(
             {class: ["twinput", html_options[:class]].compact.join(" ")},
             (required ? {required: true} : {})

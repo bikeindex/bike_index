@@ -56,6 +56,17 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
+  # Raising even with a block, where the kind goes unused, keeps a dead one from
+  # sitting there until the block is removed and it silently becomes a text field
+  context "when the kind isn't one UI::Forms::Input renders" do
+    it "raises" do
+      [:email_field, :select, nil].each do |unknown_kind|
+        expect { described_class.new(form_builder:, attribute:, kind: unknown_kind) }
+          .to raise_error(ArgumentError, /unknown kind/)
+      end
+    end
+  end
+
   it "appends an optional badge for a non-required field" do
     expect(component).to have_css("label", text: "optional")
     expect(component).to_not have_css("label span", text: "*")
