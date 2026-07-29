@@ -41,7 +41,8 @@ en:
         model_placeholder: e.g. Marlin 7
         model_year: Model year
         model_year_placeholder: e.g. 2023
-        more_useful_registration: The more you add, the more useful the registration is.
+        more_useful_registration: The more you add, the more useful the registration
+          is.
         nevermind: Nevermind
         optional: optional
         or: or

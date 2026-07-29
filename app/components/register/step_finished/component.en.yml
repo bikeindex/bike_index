@@ -5,7 +5,7 @@ en:
       step_finished:
         add_impound_details: Add impound details if you've found it
         add_photos: Add photos of your %{cycle_type}
-        confirming_lets_you: "Confirming your email lets you:"
+        confirming_lets_you: 'Confirming your email lets you:'
         register_another: Register another %{cycle_type}
         registration_complete: Registration complete!
         report_it_stolen: Report your %{cycle_type} stolen
