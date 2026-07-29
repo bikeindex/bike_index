@@ -10,11 +10,23 @@ RSpec.describe BikeServices::Register do
     let(:user) { nil }
 
     it "creates a registration, keeping only a valid Bike status" do
-      b_param = described_class.b_param_for(user:, status: "status_stolen", organization_id: 12)
+      b_param = described_class.b_param_for(user:, status: "status_stolen")
       expect(b_param).to have_attributes(origin: "register_flow", creator_id: nil,
-        status: "status_stolen", creation_organization_id: 12)
+        status: "status_stolen")
 
       expect(described_class.b_param_for(user:, status: "stolen").bike["status"]).to be_nil
+    end
+
+    context "reusing a blank registration" do
+      let!(:organization) { FactoryBot.create(:organization) }
+      let!(:blank_b_param) { BParam.create(origin: "register_flow") }
+
+      it "attaches an organization to it - assign_organization is the only org path" do
+        reused = described_class.b_param_for(user:, token_id: blank_b_param.id_token)
+        expect(reused).to eq blank_b_param
+        described_class.assign_organization(reused, organization)
+        expect(blank_b_param.reload.creation_organization_id).to eq organization.id
+      end
     end
 
     context "with a blank registration's token" do

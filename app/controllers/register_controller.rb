@@ -13,7 +13,10 @@ class RegisterController < ApplicationController
   # it's still blank), so going back from step 2 lands on the same registration
   def new
     b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
-      organization_id: current_organization&.id, status: params[:status])
+      status: params[:status], email: params[:email])
+    # Through the same path every other action uses, so reusing the session's
+    # registration can't quietly drop the organization the URL named
+    BikeServices::Register.assign_organization(b_param, current_organization)
     session[:register_b_param_token] = b_param.id_token
     redirect_to step_path(1, b_param)
   end

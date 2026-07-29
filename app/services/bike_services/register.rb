@@ -8,14 +8,13 @@ module BikeServices
     # The token's registration when step 1 was never submitted (redirecting into
     # it can't surprise anyone), otherwise a new one. A signed-in user's email
     # prefills owner_email - manufacturer_id is the submitted-step-1 marker.
-    def b_param_for(user:, token_id: nil, organization_id: nil, status: nil)
+    def b_param_for(user:, token_id: nil, status: nil, email: nil)
       existing = find_token(session_token: token_id, user:)
-      return prefill_owner_email(existing, user) if reusable?(existing)
+      return assign_owner_email(existing, user, email) if reusable?(existing)
 
       bike_params = {
-        owner_email: user&.email,
-        status: (status if Bike.statuses.include?(status)),
-        creation_organization_id: organization_id
+        owner_email: owner_email_for(user, email),
+        status: (status if Bike.statuses.include?(status))
       }.compact
       BParam.create(origin: "register_flow", creator_id: user&.id, params: {bike: bike_params}.as_json)
     end
@@ -120,10 +119,23 @@ module BikeServices
       (User.fuzzy_email_find(b_param.owner_email) || User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"]))&.id
     end
 
-    def prefill_owner_email(b_param, user)
-      return b_param if user.nil? || b_param.owner_email.present?
+    # "false" leaves the address blank even for a signed-in user, any other value
+    # stands in for theirs, and blank falls back to it
+    def owner_email_for(user, email)
+      return nil if email.to_s == "false"
 
-      b_param.owner_email = user.email
+      email.presence || user&.email
+    end
+
+    # A reused registration keeps the address it has unless email asked otherwise -
+    # assigned through params, since owner_email= ignores a blank value
+    def assign_owner_email(b_param, user, email)
+      return b_param if email.blank? && b_param.owner_email.present?
+
+      owner_email = owner_email_for(user, email)
+      return b_param if owner_email == b_param.owner_email
+
+      b_param.params = b_param.params.deep_merge("bike" => {"owner_email" => owner_email})
       b_param.save
       b_param
     end
@@ -142,7 +154,7 @@ module BikeServices
       {details_completed: true, bike: bike_params}
     end
 
-    conceal :reusable?, :confirmed_email_creator_id, :prefill_owner_email,
-      :details_completed?, :step_2_params
+    conceal :reusable?, :confirmed_email_creator_id, :owner_email_for,
+      :assign_owner_email, :details_completed?, :step_2_params
   end
 end

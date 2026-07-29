@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-/* global localStorage, setTimeout, clearTimeout, Date, window, CustomEvent, CSS */
+/* global localStorage, setTimeout, clearTimeout, Date, window, CustomEvent, Event, CSS */
 
 // Connects to data-controller="form-persist"
 // Mirrors form fields to localStorage so a draft survives page reloads —
@@ -62,7 +62,12 @@ export default class extends Controller {
         if (!this.radioGroupChecked(field.name)) field.checked = field.value === value
       } else if (field.type === 'checkbox') {
         field.checked = value === true
-      } else if (!field.value || field.tagName === 'SELECT') {
+      } else if (field.tagName === 'SELECT') {
+        field.value = value
+        // A select drives sibling fields (org--impound-update, address-group),
+        // and assigning the value fires nothing - so say what a user pick says
+        field.dispatchEvent(new Event('change', { bubbles: true }))
+      } else if (!field.value) {
         field.value = value
       }
     })

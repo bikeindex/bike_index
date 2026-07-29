@@ -44,6 +44,16 @@ RSpec.describe RegisterController, type: :request do
         expect(BParam.last.id).to eq stolen_b_param.id
         expect(stolen_b_param.reload.status).to eq "status_stolen"
       end
+
+      it "attaches the organization to a blank registration already in the session" do
+        get "/register/new" # a blank shell, no organization
+        session_b_param = BParam.last
+        expect(session_b_param.creation_organization_id).to be_blank
+
+        # Arriving on the organization's link shouldn't quietly go unattributed
+        expect { get "/register/new?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
+        expect(session_b_param.reload.creation_organization_id).to eq organization.id
+      end
     end
 
     it "creates a registration that CleanBParamsJob deletes once stale, if never submitted" do
@@ -71,6 +81,37 @@ RSpec.describe RegisterController, type: :request do
         new_b_param = BParam.last
         expect(new_b_param.owner_email).to eq current_user.email
         expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
+      end
+    end
+
+    context "email param" do
+      it "uses the passed address, and blanks it for false" do
+        get "/register/new?email=someone@example.com"
+        passed = BParam.last
+        expect(passed.owner_email).to eq "someone@example.com"
+
+        # A blank param leaves the reused registration's address alone
+        get "/register/new"
+        expect(passed.reload.owner_email).to eq "someone@example.com"
+
+        # false blanks it, even though it's already set
+        get "/register/new?email=false"
+        expect(passed.reload.owner_email).to be_nil
+      end
+
+      context "signed in" do
+        include_context :request_spec_logged_in_as_user
+
+        it "prefers the passed address over the user's, and false over both" do
+          get "/register/new?email=false"
+          expect(BParam.last.owner_email).to be_nil
+
+          get "/register/new?email=someone@example.com"
+          expect(BParam.last.owner_email).to eq "someone@example.com"
+
+          get "/register/new?b_param_token=false"
+          expect(BParam.last.owner_email).to eq current_user.email
+        end
       end
     end
 
@@ -142,6 +183,20 @@ RSpec.describe RegisterController, type: :request do
         # Posted back, so a submission that has to build a registration keeps the org
         expect(Nokogiri::HTML(response.body).at_css("input[name='organization_id']")["value"])
           .to eq organization.id.to_s
+      end
+
+      context "started as stolen" do
+        let(:b_param) do
+          BParam.create(origin: "register_flow", params: {bike: {owner_email:, manufacturer_id: "Trek",
+                                                                 creation_organization_id: organization.id, status: "status_stolen"}}.as_json)
+        end
+
+        it "carries the organization and status onto the start over link" do
+          get register_path(b_param_token: b_param.id_token, step: 1)
+          start_over = Nokogiri::HTML(response.body).at_css("#start-over-modal a")["href"]
+          expect(start_over).to eq new_register_path(b_param_token: false,
+            organization_id: organization.slug, status: "status_stolen")
+        end
       end
 
       context "organization_id in the url" do
@@ -501,6 +556,21 @@ RSpec.describe RegisterController, type: :request do
           }.to change(Bike, :count).by 1
           expect(Bike.last).to have_attributes(owner_email:, creator_id: user.id)
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+        end
+      end
+
+      context "organization with an auto user" do
+        let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
+        let(:b_param) do
+          BParam.create(origin: "register_flow",
+            params: {bike: {owner_email:, manufacturer_id: "Trek", creation_organization_id: organization.id}}.as_json)
+        end
+
+        it "creates the bike, BikeServices::Builder standing the auto user in as creator" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to change(Bike, :count).by 1
+          expect(Bike.last.creator_id).to eq organization.auto_user_id
         end
       end
 

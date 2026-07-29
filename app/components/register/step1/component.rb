@@ -32,6 +32,13 @@ module Register
           org_name: ERB::Util.html_escape(organization.short_name))
       end
 
+      # Discarding the registration shouldn't discard how they arrived - the
+      # organization it's attributed to, or the status they came to report
+      def start_over_path
+        new_register_path({b_param_token: false, organization_id: organization&.slug,
+                           status: @b_param.bike["status"]}.compact)
+      end
+
       # slug => the word the heading uses, for register--heading to swap in
       # (the same map bikes/new hands its JS as window.cycleTypeTranslations)
       def cycle_type_names
