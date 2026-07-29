@@ -18,8 +18,8 @@ RSpec.describe Register::DirectUploadsController, type: :request do
     expect(ActiveStorage::Blob.last.binx_data).to eq({"b_param_id" => b_param.id})
   end
 
-  # ActiveStorage permits the client's metadata, and "processed" would skip the job that
-  # strips EXIF - leaving the GPS coordinates in the stored original
+  # ActiveStorage permits the client's metadata; the stamps it might try to forge live in
+  # binx_data, which it has no way to post to
   it "ignores metadata the client posts" do
     post base_url, params: {b_param_token: b_param.id_token,
                             blob: blob.merge(metadata: {processed: true, b_param_id: b_param.id + 1})}
