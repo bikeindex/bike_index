@@ -7,10 +7,12 @@ module BlobUrl
   SERVICE = Bikeindex::Application.config.active_storage.service
   LOCAL_STORAGE = %i[local test].include?(SERVICE)
   STORAGE_HOST = ENV.fetch("ACTIVE_STORAGE_HOST", "https://uploads.bikeindex.org")
-  # Non-production buckets each have their own domain; a service that isn't listed (or whose
-  # domain isn't configured) serves from the production one
-  STORAGE_HOSTS = {cloudflare_dev: ENV["ACTIVE_STORAGE_HOST_DEV"],
-                   cloudflare_test: ENV["ACTIVE_STORAGE_HOST_TEST"]}.compact_blank.freeze
+  # Non-production buckets each have their own domain; a service that isn't listed serves
+  # from the production one
+  STORAGE_HOSTS = {
+    cloudflare_dev: ENV.fetch("ACTIVE_STORAGE_HOST_DEV", "https://dev-uploads.bikeindex.org"),
+    cloudflare_test: ENV.fetch("ACTIVE_STORAGE_HOST_TEST", "https://test-uploads.bikeindex.org")
+  }.freeze
 
   def for(blob = nil)
     return if blob.blank?
