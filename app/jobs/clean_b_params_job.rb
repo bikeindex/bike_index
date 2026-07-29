@@ -13,9 +13,10 @@ class CleanBParamsJob < ScheduledJob
     b_params.delete_all
   end
 
-  # Registrations that made their bike, plus never-submitted blank shells
+  # Registrations that made their bike, plus never-submitted blank shells - minus
+  # any holding an e-vehicle attestation, the only record that it was agreed to
   def b_params
-    stale = BParam.where("updated_at < ?", self.class.clean_before)
+    stale = BParam.where("updated_at < ?", self.class.clean_before).without_attestation
     stale.with_bike.or(stale.without_bike_values)
   end
 end

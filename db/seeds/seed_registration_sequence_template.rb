@@ -81,6 +81,7 @@ default_pages = [
 ]
 
 template = RegistrationSequence.template
+template.update!(attestation_text: RegistrationSequence::DEFAULT_ATTESTATION_TEXT) if template.attestation_text.blank?
 
 default_pages.each_with_index do |attributes, index|
   template.registration_sequence_pages.find_or_create_by!(listing_order: index) do |new_page|

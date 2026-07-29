@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    register:
+      step_review:
+        a_quick_review: >-
+          A quick review of everything you acknowledged. Review a page to revisit
+          its rules.
+        complete_registration: Complete %{cycle_type} registration
+        i_name_html: I, %{name},
+        review: Review
+        safety_check_complete: Safety check complete
+        youre_almost_done: You're almost done.

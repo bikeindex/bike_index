@@ -5,6 +5,9 @@ module BikeServices
   module Register
     extend Functionable
 
+    # Step "3" is the first of the e-vehicle acknowledgment pages
+    ACKNOWLEDGMENT_OFFSET = 3
+
     # The token's registration when step 1 was never submitted (redirecting into
     # it can't surprise anyone), otherwise a new one. A signed-in user's email
     # prefills owner_email - manufacturer_id is the submitted-step-1 marker.
@@ -40,21 +43,75 @@ module BikeServices
       b_param.save
     end
 
-    # The step to show: finished once the bike exists (or it's awaiting the
-    # email), step 1 until it's submitted - then 1 and 2 both stay browsable
-    def permitted_step(b_param, requested_step)
-      if finished?(b_param)
-        "finished"
-      elsif b_param.manufacturer_id.blank?
-        "1"
-      else
-        (requested_step == "1") ? "1" : "2"
-      end
+    # The safety rules a registration acknowledges before its bike is created - the
+    # organization's active sequence, and only for an e-vehicle
+    def registration_sequence(b_param)
+      organization = b_param.creation_organization
+      RegistrationSequence.active_for(organization) if b_param.motorized? && organization.present?
+    end
+
+    # The step to show: finished once the bike exists (or it's awaiting the email),
+    # otherwise the furthest step reached, since every earlier one stays browsable
+    def permitted_step(b_param, requested_step, sequence:)
+      return "finished" if finished?(b_param, sequence:)
+
+      steps = permitted_steps(b_param, sequence)
+      steps.include?(requested_step) ? requested_step : steps.last
+    end
+
+    # The sequence page a step renders, or nil for any other step
+    def page_for_step(step, sequence:)
+      index = page_index_for_step(step)
+      sequence_pages(sequence)[index] if index >= 0
+    end
+
+    def page_index_for_step(step) = step.to_i - ACKNOWLEDGMENT_OFFSET
+
+    def step_for_page_index(index) = (index + ACKNOWLEDGMENT_OFFSET).to_s
+
+    # to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
+    # for each of them
+    def sequence_pages(sequence)
+      sequence&.registration_sequence_pages&.to_a || []
+    end
+
+    # The progress bar's segments - one per step the flow can reach
+    def total_steps(sequence) = all_steps(sequence_pages(sequence)).count
+
+    # Nothing to agree to without a sequence, otherwise the final attestation
+    def attested?(b_param, sequence:)
+      sequence_pages(sequence).none? || acknowledgment(b_param)["attested_at"].present?
+    end
+
+    def acknowledged_page_ids(b_param)
+      acknowledgment(b_param)["acknowledged_page_ids"] || []
+    end
+
+    # All or nothing: a page is only acknowledged with every one of its rules checked
+    # (an unchecked box submits nothing, so the lengths only match when they all did)
+    def acknowledge_page(b_param, page, checked:)
+      bullets = page&.bullets || []
+      agreed = Array(checked)
+      return false if bullets.none? || agreed.length != bullets.length ||
+        !agreed.all? { Binxtils::InputNormalizer.boolean(it) }
+
+      # id alongside the pages, so the acknowledged ids are unambiguously scoped
+      save_acknowledgment(b_param, id: page.registration_sequence_id,
+        acknowledged_page_ids: (acknowledged_page_ids(b_param) + [page.id]).uniq)
+    end
+
+    # The final agreement over everything acknowledged
+    def save_attestation(b_param, sequence, attested:)
+      return false unless Binxtils::InputNormalizer.boolean(attested) && sequence.present?
+
+      save_acknowledgment(b_param, id: sequence.id, attested_at: Time.current.to_i)
     end
 
     # The bike exists, or everything's entered and awaiting the email
-    def finished?(b_param)
-      b_param.with_bike? || (details_completed?(b_param) && !creator_available?(b_param))
+    def finished?(b_param, sequence:)
+      return true if b_param.with_bike?
+
+      details_completed?(b_param) && attested?(b_param, sequence:) && !creator_available?(b_param)
     end
 
     # Whether a bike can be created now - Ownership requires a creator, so
@@ -73,6 +130,14 @@ module BikeServices
       b_param.save
     end
 
+    # Ownership requires a creator, and signing in can happen anywhere in the flow -
+    # e.g. partway through the acknowledgment pages
+    def claim_creator(b_param, user)
+      return if user.blank? || b_param.creator_id.present?
+
+      b_param.update(creator_id: user.id)
+    end
+
     def create_bike(b_param, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
       BikeServices::Creator.new(ip_address:).create_bike(b_param)
@@ -84,6 +149,35 @@ module BikeServices
 
     def reusable?(b_param)
       b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank?
+    end
+
+    # Every step the flow reaches with these pages, in order
+    def all_steps(pages)
+      return %w[1 2] if pages.none?
+
+      %w[1 2] + pages.each_index.map { step_for_page_index(it) } + %w[review]
+    end
+
+    def acknowledgment(b_param)
+      b_param.params["registration_sequence"] || {}
+    end
+
+    def save_acknowledgment(b_param, **attributes)
+      b_param.clean_params({registration_sequence: attributes}.as_json)
+      b_param.save
+    end
+
+    # Every step the registration has reached, in order - the acknowledgment pages
+    # open one at a time, and the review once they're all acknowledged
+    def permitted_steps(b_param, sequence)
+      return %w[1] if b_param.manufacturer_id.blank?
+
+      pages = sequence_pages(sequence)
+      return %w[1 2] unless details_completed?(b_param) && pages.any?
+
+      acknowledged = acknowledged_page_ids(b_param)
+      reached = pages.take_while { acknowledged.include?(it.id) }.count
+      all_steps(pages).first(ACKNOWLEDGMENT_OFFSET + reached)
     end
 
     # The confirmed email's own account, or the AUTO_ORG_MEMBER system user standing in
@@ -128,7 +222,8 @@ module BikeServices
       {details_completed: true, bike: bike_params}
     end
 
-    conceal :reusable?, :confirmed_email_creator_id, :owner_email_for,
-      :assign_owner_email, :details_completed?, :step_2_params
+    conceal :reusable?, :all_steps, :acknowledgment, :save_acknowledgment, :permitted_steps,
+      :confirmed_email_creator_id, :owner_email_for, :assign_owner_email, :details_completed?,
+      :step_2_params
   end
 end

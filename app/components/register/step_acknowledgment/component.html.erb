@@ -1,0 +1,74 @@
+<%= render Register::Page::Component.new do %>
+  <%= render Register::Progress::Component.new(step: @step.to_i, total: BikeServices::Register.total_steps(@sequence)) %>
+
+  <p
+    class="
+      tw:mb-4 tw:flex tw:items-center tw:gap-1.5 tw:text-xs tw:font-bold
+      tw:text-gray-500 tw:dark:text-gray-400
+    "
+  >
+    <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:h-3.5 tw:w-3.5 tw:shrink-0 tw:text-green-600", aria_hidden: true) %>
+    <%= translation(".progress_saved") %> ·
+    <%= translation(".step_of", number: position + 1, total: pages.count) %>
+  </p>
+
+  <div class="tw:mb-3">
+    <% if first? %>
+      <%= render UI::Badge::Component.new(text: translation(".electric_detected"), color: :warning) %>
+    <% elsif page.organization_specific && organization_name.present? %>
+      <%= render UI::Badge::Component.new(text: organization_name, color: :notice) %>
+    <% end %>
+  </div>
+
+  <%= render UI::Header::Component.new(text: page.title, subtitle: page.subtitle) %>
+
+  <% if page.image_url.present? %>
+    <%= image_tag page.image_url, alt: "", class: "tw:mb-5 tw:w-full tw:rounded-lg tw:object-cover" %>
+  <% end %>
+
+  <%= form_with(url: acknowledge_register_path, method: :patch,
+      data: {controller: "register--acknowledgment"}) do %>
+    <%= hidden_field_tag :b_param_token, @b_param.id_token %>
+    <%= hidden_field_tag :step, @step %>
+
+    <%= render Register::SectionLabel::Component.new(text: translation(".i_agree_to")) do %>
+      <% if @sequence.faq_url.present? %>
+        <%= render UI::Tooltip::Component.new(text: translation(".questions_about_these_policies")) do |tooltip| %>
+          <% tooltip.with_body do %>
+            <%= translation(".questions_about_these_policies") %>
+            <%= link_to translation(".read_the_faq"), @sequence.faq_url, target: "_blank", rel: "noopener", class: "twlink" %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <div
+      class="
+        tw:divide-y tw:divide-gray-200 tw:rounded-xl tw:border
+        tw:border-gray-200 tw:bg-white tw:dark:divide-gray-700
+        tw:dark:border-gray-700 tw:dark:bg-gray-800
+      "
+    >
+      <% page.bullets.each_with_index do |bullet, index| %>
+        <label
+          class="
+            tw:mb-0 tw:flex tw:cursor-pointer tw:items-start tw:gap-3
+            tw:px-4 tw:py-3.5 tw:text-sm tw:font-normal
+          "
+        >
+          <%= check_box_tag "acknowledged[#{index}]", "1", acknowledged?,
+              class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer",
+              data: {"register--acknowledgment-target": "checkbox", action: "change->register--acknowledgment#update"} %>
+
+          <span><%= sanitize bullet %></span>
+        </label>
+      <% end %>
+    </div>
+
+    <%= render UI::Button::Component.new(text: translation(".continue"), color: :primary, size: :lg,
+        kind: :submit, spinner: true, disabled: true, html_class: "tw:mt-5 tw:w-full",
+        data: {"register--acknowledgment-target": "submit"}) %>
+
+    <%= render Register::BackLink::Component.new(href: previous_path) %>
+  <% end %>
+<% end %>

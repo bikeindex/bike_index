@@ -40,6 +40,24 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         expect(response.status).to eq(404)
       end
     end
+
+    describe "update" do
+      let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
+
+      it "saves the settings shared by every page" do
+        patch "#{base_url}/#{draft.id}", params: {registration_sequence: {faq_url: "https://example.com/faq",
+                                                                          attestation_text: "agree to all of it"}}
+        expect(response).to redirect_to(edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id))
+        expect(draft.reload).to have_attributes(faq_url: "https://example.com/faq",
+          attestation: "agree to all of it")
+      end
+
+      it "404s for another organization's draft" do
+        other = FactoryBot.create(:registration_sequence)
+        patch "#{base_url}/#{other.id}", params: {registration_sequence: {faq_url: "https://example.com"}}
+        expect(response.status).to eq(404)
+      end
+    end
   end
 
   context "logged_in_as_organization_user" do

@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    register:
+      back_link:
+        back: Back

@@ -3,12 +3,14 @@
 # Table name: registration_sequences
 # Database name: primary
 #
-#  id              :bigint           not null, primary key
-#  end_at          :datetime
-#  start_at        :datetime
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  organization_id :bigint
+#  id               :bigint           not null, primary key
+#  attestation_text :text
+#  end_at           :datetime
+#  faq_url          :string
+#  start_at         :datetime
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  organization_id  :bigint
 #
 # Indexes
 #
@@ -20,10 +22,17 @@
 class RegistrationSequence < ApplicationRecord
   STATUS_SCOPES = {"draft" => :draft, "active" => :active, "archived" => :archived, "template" => :templates}.freeze
   STATUSES = STATUS_SCOPES.keys.freeze
+  COPIED_PAGE_ATTRS = %w[title subtitle body listing_order organization_specific].freeze
+  # Follows "I, <registrant's name>," on the flow's final attestation. Seeded onto the
+  # template, so an organization edits its own copy
+  DEFAULT_ATTESTATION_TEXT = "have read, understood, and agree to comply with all of the " \
+    "e-vehicle safety rules above as a condition of registering my vehicle. I understand that " \
+    "failure to comply may result in revocation of my registration."
 
   belongs_to :organization, optional: true
 
-  has_many :registration_sequence_pages, -> { order(:listing_order) },
+  # with_attached_image: every reader of the pages renders or copies their images
+  has_many :registration_sequence_pages, -> { order(:listing_order).with_attached_image },
     dependent: :destroy, inverse_of: :registration_sequence
 
   scope :templates, -> { where(organization_id: nil) }
@@ -59,9 +68,10 @@ class RegistrationSequence < ApplicationRecord
 
     def build_draft_for(organization)
       transaction do
-        draft = create!(organization:)
-        template.registration_sequence_pages.each do |template_page|
-          page = draft.registration_sequence_pages.create!(title: template_page.title, subtitle: template_page.subtitle, body: template_page.body, listing_order: template_page.listing_order)
+        source = template
+        draft = create!(organization:, faq_url: source.faq_url, attestation_text: source.attestation_text)
+        source.registration_sequence_pages.each do |template_page|
+          page = draft.registration_sequence_pages.create!(template_page.slice(*COPIED_PAGE_ATTRS))
           copy_image(template_page.image, page.image) if template_page.image.attached?
         end
         draft
@@ -75,6 +85,8 @@ class RegistrationSequence < ApplicationRecord
       target.attach(io: StringIO.new(blob.download), filename: blob.filename, content_type: blob.content_type)
     end
   end
+
+  def attestation = attestation_text.presence || DEFAULT_ATTESTATION_TEXT
 
   def template? = organization_id.blank?
 

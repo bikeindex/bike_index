@@ -54,7 +54,7 @@ RSpec.describe BikeServices::Register do
           expect(described_class.b_param_for(user:, token_id: blank_b_param.id_token)).to eq blank_b_param
           expect(blank_b_param.reload.owner_email).to eq user.email
           # A prefilled email doesn't mark step 1 submitted
-          expect(described_class.permitted_step(blank_b_param, "2")).to eq "1"
+          expect(described_class.permitted_step(blank_b_param, "2", sequence: nil)).to eq "1"
         end
       end
     end
@@ -89,16 +89,16 @@ RSpec.describe BikeServices::Register do
 
   describe "permitted_step" do
     it "allows steps 1 and 2 once step 1 is submitted" do
-      expect(described_class.permitted_step(b_param, nil)).to eq "2"
-      expect(described_class.permitted_step(b_param, "1")).to eq "1"
-      expect(described_class.permitted_step(b_param, "finished")).to eq "2"
+      expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "2"
+      expect(described_class.permitted_step(b_param, "1", sequence: nil)).to eq "1"
+      expect(described_class.permitted_step(b_param, "finished", sequence: nil)).to eq "2"
     end
 
     context "step 1 not submitted" do
       let(:bike_params) { {owner_email: "prefilled@example.com"} }
 
       it "clamps to step 1 - a prefilled email isn't a submission" do
-        expect(described_class.permitted_step(b_param, "2")).to eq "1"
+        expect(described_class.permitted_step(b_param, "2", sequence: nil)).to eq "1"
       end
     end
 
@@ -108,7 +108,7 @@ RSpec.describe BikeServices::Register do
       end
 
       it "clamps to finished" do
-        expect(described_class.permitted_step(b_param, "1")).to eq "finished"
+        expect(described_class.permitted_step(b_param, "1", sequence: nil)).to eq "finished"
       end
     end
 
@@ -120,7 +120,7 @@ RSpec.describe BikeServices::Register do
 
       it "clamps to finished - awaiting the email confirmation" do
         expect(described_class.creator_available?(b_param)).to be_falsey
-        expect(described_class.permitted_step(b_param, "2")).to eq "finished"
+        expect(described_class.permitted_step(b_param, "2", sequence: nil)).to eq "finished"
       end
 
       context "with a creator" do
@@ -131,8 +131,98 @@ RSpec.describe BikeServices::Register do
 
         it "stays browsable - update creates the bike instead" do
           expect(described_class.creator_available?(b_param)).to be_truthy
-          expect(described_class.permitted_step(b_param, "2")).to eq "2"
+          expect(described_class.permitted_step(b_param, "2", sequence: nil)).to eq "2"
         end
+      end
+    end
+  end
+
+  describe "e-vehicle acknowledgment" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+    let(:pages) { sequence.registration_sequence_pages.to_a }
+    let(:bike_params) do
+      {owner_email: "owner@example.com", manufacturer_id: 12, cycle_type: "e-scooter",
+       creation_organization_id: organization.id}
+    end
+    let(:b_param) do
+      BParam.create(origin: "register_flow",
+        params: {details_completed: true, bike: bike_params}.as_json)
+    end
+
+    describe "registration_sequence" do
+      it "is the organization's active sequence" do
+        expect(described_class.registration_sequence(b_param)).to eq sequence
+        # Two detail steps, a page each and the review
+        expect(described_class.total_steps(sequence)).to eq 5
+      end
+
+      context "not an e-vehicle" do
+        let(:bike_params) { super().merge(cycle_type: "bike") }
+
+        it "is nil - only e-vehicles acknowledge safety rules" do
+          expect(b_param.motorized?).to be_falsey
+          expect(described_class.registration_sequence(b_param)).to be_nil
+          expect(described_class.total_steps(nil)).to eq 2
+        end
+      end
+
+      context "the organization's sequence is still a draft" do
+        let!(:sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
+
+        it "is nil - a draft isn't shown to registrants" do
+          expect(sequence).to be_draft
+          expect(described_class.registration_sequence(b_param)).to be_nil
+        end
+      end
+    end
+
+    it "opens one page at a time, then the review" do
+      expect(pages.count).to eq 2
+      # The details are in, so the first safety page is where the flow now stands
+      expect(described_class.attested?(b_param, sequence:)).to be_falsey
+      expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "3"
+      expect(described_class.permitted_step(b_param, "4", sequence:)).to eq "3"
+      expect(described_class.page_for_step("3", sequence:)).to eq pages.first
+      expect(described_class.page_for_step("review", sequence:)).to be_nil
+
+      expect(described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])).to be_truthy
+      expect(described_class.acknowledged_page_ids(b_param)).to eq([pages.first.id])
+      expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "4"
+      # Every earlier step stays browsable
+      expect(described_class.permitted_step(b_param, "3", sequence:)).to eq "3"
+      expect(described_class.permitted_step(b_param, "1", sequence:)).to eq "1"
+
+      described_class.acknowledge_page(b_param, pages.last, checked: %w[1 1])
+      expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "review"
+      expect(described_class.attested?(b_param, sequence:)).to be_falsey
+
+      expect(described_class.save_attestation(b_param, sequence, attested: "1")).to be_truthy
+      expect(described_class.attested?(b_param, sequence:)).to be_truthy
+      # Which sequence was agreed to is kept alongside the acknowledgment
+      expect(b_param.params.dig("registration_sequence", "id")).to eq sequence.id
+      # Without a creator the registration now waits on the confirmation email
+      expect(described_class.finished?(b_param, sequence:)).to be_truthy
+    end
+
+    it "refuses a page with any rule unchecked" do
+      expect(described_class.acknowledge_page(b_param, pages.first, checked: %w[1])).to be_falsey
+      expect(described_class.acknowledge_page(b_param, pages.first, checked: nil)).to be_falsey
+      expect(described_class.acknowledge_page(b_param, nil, checked: %w[1 1])).to be_falsey
+      expect(described_class.acknowledged_page_ids(b_param)).to eq([])
+      expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "3"
+    end
+
+    it "refuses an unchecked attestation" do
+      pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
+      expect(described_class.save_attestation(b_param, sequence, attested: "0")).to be_falsey
+      expect(described_class.attested?(b_param, sequence:)).to be_falsey
+    end
+
+    context "without a sequence" do
+      it "has nothing to acknowledge" do
+        expect(described_class.attested?(b_param, sequence: nil)).to be_truthy
+        expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "finished"
       end
     end
   end

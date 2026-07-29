@@ -3309,7 +3309,8 @@ CREATE TABLE public.registration_sequence_pages (
     body text,
     listing_order integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    organization_specific boolean DEFAULT false NOT NULL
 );
 
 
@@ -3342,7 +3343,9 @@ CREATE TABLE public.registration_sequences (
     start_at timestamp(6) without time zone,
     end_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    faq_url character varying,
+    attestation_text text
 );
 
 
@@ -7476,6 +7479,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260728120000'),
 ('20260725192133'),
 ('20260725155657'),
 ('20260725155259'),

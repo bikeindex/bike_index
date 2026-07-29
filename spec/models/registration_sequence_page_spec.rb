@@ -19,4 +19,29 @@ RSpec.describe RegistrationSequencePage, type: :model do
       end
     end
   end
+
+  describe "#bullets" do
+    let(:page) { FactoryBot.build(:registration_sequence_page, body:) }
+    let(:body) { "<ul><li>one</li><li>and <em>two</em></li></ul>" }
+
+    it "splits the body list into a rule each, keeping their markup" do
+      expect(page.bullets).to eq ["one", "and <em>two</em>"]
+    end
+
+    context "body without a list" do
+      let(:body) { "<p>just the one</p>" }
+
+      it "is the whole body" do
+        expect(page.bullets).to eq ["<p>just the one</p>"]
+      end
+    end
+
+    context "blank body" do
+      let(:body) { nil }
+
+      it "is empty" do
+        expect(page.bullets).to eq []
+      end
+    end
+  end
 end

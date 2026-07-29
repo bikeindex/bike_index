@@ -132,4 +132,74 @@ RSpec.describe "Register flow", :js, type: :system do
       "status" => "status_stolen")
     expect(BikeServices::Register.send(:details_completed?, b_param)).to be_truthy
   end
+
+  context "e-vehicle with an organization's safety rules" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+    let!(:sequence) do
+      FactoryBot.create(:registration_sequence_active, organization:,
+        attestation_text: "agree to comply with all of the rules above.")
+    end
+    let!(:battery_page) do
+      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 0,
+        title: "Battery & charging", subtitle: "Unsafe charging is the biggest cause of e-bike fires.",
+        body: "<ul><li>Charge with the manufacturer's charger</li><li>Report a swollen battery</li></ul>")
+    end
+    let!(:campus_page) do
+      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 1,
+        title: "Campus rules", body: "<ul><li>Dismount in posted zones</li></ul>",
+        organization_specific: true)
+    end
+
+    it "gates each page of rules, then the attestation, before completing" do
+      visit "/register/new?organization_id=#{organization.slug}"
+
+      type_into("#b_param_manufacturer_id", "Surly")
+      click_combobox_option("Surly")
+      check "Electric (motorized)"
+      fill_in "b_param[owner_email]", with: owner_email
+      click_button "Next"
+
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      fill_in "bike[serial_number]", with: "XYZ 123"
+      # The safety pages come next, so step 2 no longer finishes the registration
+      click_button "Next"
+
+      expect(page).to have_content("Battery & charging")
+      expect(page).to have_content("Electric (motorized) detected")
+      expect(page).to have_content("Safety check 1 of 2")
+      expect(page).to have_button("Continue", disabled: true)
+
+      check "Charge with the manufacturer's charger"
+      expect(page).to have_button("Continue", disabled: true)
+      check "Report a swollen battery"
+      click_button "Continue"
+
+      expect(page).to have_content("Campus rules")
+      # The organization owns this page's rules, so they carry its name
+      expect(page).to have_content("Brakebills")
+      check "Dismount in posted zones"
+      click_button "Continue"
+
+      expect(page).to have_content("You're almost done")
+      expect(page).to have_content("agree to comply with all of the rules above")
+      expect(page).to have_button("Complete Bike registration", disabled: true)
+
+      # A page stays revisitable from the review, showing what was agreed to
+      click_link "Review", match: :first
+      expect(page).to have_content("Battery & charging")
+      expect(page).to have_checked_field("Report a swollen battery")
+      click_button "Continue"
+
+      expect(page).to have_content("You're almost done")
+      check "I, #{owner_email}, agree to comply with all of the rules above."
+      click_button "Complete Bike registration"
+
+      expect(page).to have_content("Registration saved")
+      b_param = BParam.last
+      expect(BikeServices::Register.acknowledged_page_ids(b_param))
+        .to match_array([battery_page.id, campus_page.id])
+      expect(b_param.params.dig("registration_sequence", "id")).to eq sequence.id
+    end
+  end
 end

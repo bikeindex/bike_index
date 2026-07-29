@@ -6,6 +6,7 @@
 #  id                       :bigint           not null, primary key
 #  body                     :text
 #  listing_order            :integer
+#  organization_specific    :boolean          default(FALSE), not null
 #  subtitle                 :text
 #  title                    :string
 #  created_at               :datetime         not null
@@ -27,6 +28,15 @@ class RegistrationSequencePage < ApplicationRecord
 
   def image_url
     BlobUrl.for(image.blob) if image.attached?
+  end
+
+  # body is a single <ul>; the registration flow renders one checkbox per <li>, and the
+  # page editor one rich-text row per <li>
+  def bullets
+    return [] if body.blank?
+
+    items = Nokogiri::HTML.fragment(body).css("li")
+    items.any? ? items.map { it.inner_html.strip } : [body.strip]
   end
 
   private

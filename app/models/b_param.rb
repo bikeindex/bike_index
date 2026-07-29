@@ -95,6 +95,9 @@ class BParam < ApplicationRecord
   # register/new shells whose step 1 was never submitted (manufacturer is required
   # at submit) - only seeds and a prefilled email, nothing worth keeping
   scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
+  # The e-vehicle safety rules a registrant agreed to are only recorded here, so
+  # unlike every other registration these outlive their bike
+  scope :without_attestation, -> { where("(params -> 'registration_sequence' ->> 'attested_at') IS NULL") }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }

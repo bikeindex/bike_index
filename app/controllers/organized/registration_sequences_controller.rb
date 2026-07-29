@@ -7,9 +7,21 @@ module Organized
       @active = RegistrationSequence.active_for(current_organization)
     end
 
-    # Manage the draft's pages (add / reorder / edit)
+    # Manage the draft's pages (add / reorder / edit) and its sequence-wide settings
     def edit
-      @registration_sequence = current_organization.registration_sequences.draft.find(params[:id])
+      @registration_sequence = find_draft
+    end
+
+    # The settings shared by every page: the FAQ link and the final attestation
+    def update
+      @registration_sequence = find_draft
+      if @registration_sequence.update(permitted_params)
+        flash[:success] = "Registration sequence updated"
+        redirect_to edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: @registration_sequence.id)
+      else
+        flash.now[:error] = @registration_sequence.errors.full_messages.to_sentence
+        render :edit, status: :unprocessable_entity
+      end
     end
 
     # Builds the draft (cloned from the template) the org manages
@@ -19,6 +31,14 @@ module Organized
     end
 
     private
+
+    def find_draft
+      current_organization.registration_sequences.draft.find(params[:id])
+    end
+
+    def permitted_params
+      params.require(:registration_sequence).permit(:faq_url, :attestation_text)
+    end
 
     # Superusers can view regardless; org admins/members need the feature flag
     def ensure_access_to_registration_sequences!

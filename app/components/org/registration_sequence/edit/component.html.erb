@@ -48,6 +48,10 @@
               <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
                 <%= page.title %>
               </h3>
+
+              <% if page.organization_specific %>
+                <%= render UI::Badge::Component.new(text: @organization.short_name, color: :notice, size: :xs) %>
+              <% end %>
             </div>
 
             <% if page.subtitle.present? %>
@@ -78,4 +82,38 @@
       </div>
     <% end %>
   </div>
+<% end %>
+
+<h2 class="uncap tw:mt-8 tw:mb-3 tw:text-xl">Settings</h2>
+
+<%= render UI::Card::Component.new do %>
+  <%= form_with model: @registration_sequence, url: organization_registration_sequence_path(organization_id: @organization.to_param, id: @registration_sequence.id), method: :patch do |f| %>
+    <div class="tw:flex tw:flex-col tw:gap-4">
+      <div>
+        <%= f.label :faq_url, "FAQ link", class: "twlabel" %>
+        <%= f.url_field :faq_url, class: "twinput tw:w-full", placeholder: "https://" %>
+
+        <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
+          Linked from every page, for registrants with questions about these
+          policies.
+        </p>
+      </div>
+
+      <div>
+        <%= f.label :attestation_text, "Final attestation", class: "twlabel" %>
+
+        <%= f.text_area :attestation_text, rows: 3, class: "twinput tw:w-full",
+            placeholder: RegistrationSequence::DEFAULT_ATTESTATION_TEXT %>
+
+        <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
+          Follows "I, <em>registrant's name</em>," on the last page, where the
+          registrant agrees to everything they've acknowledged.
+        </p>
+      </div>
+
+      <div>
+        <%= render UI::Button::Component.new(text: "Save settings", color: :primary, kind: :submit) %>
+      </div>
+    </div>
+  <% end %>
 <% end %>

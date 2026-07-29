@@ -4,8 +4,9 @@ module Register
   module Step2
     # Step 2 of the registration flow: the bike details form
     class Component < ApplicationComponent
-      def initialize(b_param:, current_user: nil)
+      def initialize(b_param:, sequence: nil, current_user: nil)
         @b_param = b_param
+        @sequence = sequence
         @current_user = current_user
       end
 
@@ -13,6 +14,13 @@ module Register
 
       def cycle_type
         @b_param.type
+      end
+
+      # An e-vehicle's safety pages come next, so this form doesn't finish the registration
+      def submit_text
+        return translation(".next") if @sequence&.registration_sequence_pages&.any?
+
+        translation(".complete_registration", cycle_type: @b_param.type_titleize)
       end
 
       # An upload needs an account behind it, so an anonymous registrant gets the

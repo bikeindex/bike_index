@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    register:
+      step_acknowledgment:
+        continue: Continue
+        electric_detected: "⚡️ Electric (motorized) detected"
+        i_agree_to: 'I agree to:'
+        progress_saved: Progress saved
+        questions_about_these_policies: Questions about these policies?
+        read_the_faq: Read the FAQ
+        step_of: Safety check %{number} of %{total}
