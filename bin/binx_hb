@@ -1,0 +1,148 @@
+#!/usr/bin/env bash
+# binx_hb — Honeybadger v2 REST reads (read-only). Run from the repo root.
+#
+# Exists so fetching a fault is a single literal command: an inline curl carrying
+# $HONEYBADGER_PERSONAL_AUTH_TOKEN is shell expansion, which the Claude Code
+# permission matcher always rejects. It also keeps payloads small - the
+# Honeybadger MCP returns whole notice objects, roughly half of which is waste
+# (`backtrace` and `application_trace` are byte-identical). This lands the raw
+# JSON in tmp/ and prints a projection, so follow-ups are a local jq.
+#
+# Needs HONEYBADGER_PERSONAL_AUTH_TOKEN in .env.development (see .env).
+set -euo pipefail
+
+usage() {
+  cat >&2 <<'USAGE'
+Usage: binx_hb MODE TARGET [OPTIONS]
+
+  MODE    fault | notice | faults
+  TARGET  a fault URL, PROJECT/FAULT_ID, or - for `faults` - a project alias
+  PROJECT backend | frontend | csp, or a numeric project id
+
+Options:
+  --all-frames   notice: include gem/framework frames, not just app frames
+  --limit N      notice: fetch N notices instead of 1
+  <window>       faults: lookback like 24H (default), 7d, 1H
+
+Examples:
+  binx_hb fault https://app.honeybadger.io/projects/35931/faults/133010748
+  binx_hb notice backend/133010748
+  binx_hb faults frontend 7d
+USAGE
+  exit 2
+}
+
+MODE="${1:-}"; TARGET="${2:-}"
+[ -n "$MODE" ] && [ -n "$TARGET" ] || usage
+shift 2
+
+ALL_FRAMES=false; LIMIT=1; WINDOW=24H
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --all-frames) ALL_FRAMES=true ;;
+    --limit) shift; LIMIT="${1:-1}" ;;
+    *) WINDOW="$1" ;;
+  esac
+  shift
+done
+
+ENV_FILE=".env.development"
+[ -f "$ENV_FILE" ] || { echo "binx_hb: $ENV_FILE not found - run from the repo root" >&2; exit 2; }
+
+# `|| true` because a no-match grep exits 1, which under `set -e` would kill the
+# script before the -n check below can say what's actually wrong.
+TOKEN=$(grep -E '^HONEYBADGER_PERSONAL_AUTH_TOKEN=' "$ENV_FILE" | head -1 | cut -d= -f2- | sed -e 's/^["'\'']//' -e 's/["'\'']$//' || true)
+[ -n "$TOKEN" ] || { echo "binx_hb: HONEYBADGER_PERSONAL_AUTH_TOKEN missing in $ENV_FILE" >&2; exit 2; }
+
+# Accepts a fault URL, PROJECT/FAULT_ID, or a bare project alias. Pulling both
+# ids out of a pasted URL is the common case when fixing a reported bug.
+PROJECT=""; FAULT=""
+case "$TARGET" in
+  http*)
+    PROJECT=$(echo "$TARGET" | sed -nE 's#.*/projects/([0-9]+).*#\1#p')
+    FAULT=$(echo "$TARGET" | sed -nE 's#.*/faults/([0-9]+).*#\1#p') ;;
+  */*) PROJECT="${TARGET%%/*}"; FAULT="${TARGET##*/}" ;;
+  *)   PROJECT="$TARGET" ;;
+esac
+
+# Echo the alias back, so a pasted numeric URL still says which project it hit.
+case "$PROJECT" in
+  backend|35931)  PROJECT=35931;  NAME=backend ;;
+  frontend|61305) PROJECT=61305;  NAME=frontend ;;
+  csp|138070)     PROJECT=138070; NAME=csp ;;
+  *)              NAME=unknown ;;
+esac
+[ -n "$PROJECT" ] || { echo "binx_hb: could not resolve a project from '$TARGET'" >&2; exit 2; }
+
+mkdir -p tmp
+API="https://app.honeybadger.io/v2/projects/$PROJECT"
+
+# $1 = url, $2 = destination. The v2 API authenticates with the personal auth
+# token as the HTTP Basic username and an empty password.
+fetch() {
+  local code
+  code=$(curl -s -u "$TOKEN:" -w '%{http_code}' -o "$2" "$1")
+  case "$code" in
+    200) : ;;
+    401) echo "binx_hb: 401 - HONEYBADGER_PERSONAL_AUTH_TOKEN rejected" >&2; exit 1 ;;
+    404) echo "binx_hb: 404 - no such project/fault ($1)" >&2; exit 1 ;;
+    *)   echo "binx_hb: HTTP $code from $1" >&2; exit 1 ;;
+  esac
+}
+
+case "$MODE" in
+faults)
+  # occurred_after is Unix epoch seconds; an ISO8601 value is silently ignored,
+  # which returns faults last seen years ago with a null notices_count_in_range.
+  SINCE=$(date -u -v-"$WINDOW" +%s 2>/dev/null || date -u -d "$WINDOW ago" +%s)
+  SINCE_HUMAN=$(date -u -v-"$WINDOW" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d "$WINDOW ago" +%Y-%m-%dT%H:%M:%SZ)
+  OUT="tmp/hb-faults-$PROJECT.json"
+  fetch "$API/faults?limit=25&order=frequent&occurred_after=$SINCE" "$OUT"
+  echo "PROJECT $NAME ($PROJECT)   since $SINCE_HUMAN"
+  echo "in_window	lifetime	class	component	state	last_notice	url"
+  jq -r '.results[]
+    | [.notices_count_in_range, .notices_count, .klass, (.component // "-"),
+       (if .resolved then "resolved" else "open" end), .last_notice_at, .url]
+    | @tsv' "$OUT"
+  echo "raw: $OUT"
+  ;;
+fault)
+  [ -n "$FAULT" ] || usage
+  OUT="tmp/hb-fault-$FAULT.json"
+  fetch "$API/faults/$FAULT" "$OUT"
+  echo "PROJECT $NAME ($PROJECT)"
+  jq -r '"class:       \(.klass)",
+         "message:     \(.message)",
+         "component:   \(.component // "-")#\(.action // "-")",
+         "created:     \(.created_at)",
+         "last_notice: \(.last_notice_at)",
+         "counts:      \(.notices_count_in_range // "-") in range, \(.notices_count) lifetime",
+         "state:       \(if .resolved then "resolved" else "open" end), \(if .ignored then "ignored" else "not ignored" end)",
+         "url:         \(.url)"' "$OUT"
+  echo "raw: $OUT"
+  ;;
+notice)
+  [ -n "$FAULT" ] || usage
+  OUT="tmp/hb-notice-$FAULT.json"
+  fetch "$API/faults/$FAULT/notices?limit=$LIMIT" "$OUT"
+  echo "PROJECT $NAME ($PROJECT)"
+  # A Sidekiq notice puts the whole job hash in request.params, including an
+  # error_backtrace of every gem frame - thousands of tokens the app-frame
+  # listing already covers. Drop it, then cap whatever is left.
+  jq -r --argjson all "$ALL_FRAMES" '.results[]
+    | ((.request.params // {}) | del(.job.error_backtrace) | tojson) as $p
+    | "message:    \(.message // "-")",
+      "created:    \(.created_at)",
+      "url:        \(.request.url // "-")",
+      "referer:    \(.web_environment.HTTP_REFERER // "-")",
+      "user_agent: \(.web_environment.HTTP_USER_AGENT // "-")",
+      "params:     \(if ($p | length) > 500 then $p[0:500] + " …truncated, full JSON in the raw file" else $p end)",
+      "deploy:     \(.deploy.revision // "-") at \(.deploy.created_at // "-")",
+      (if $all then "--- backtrace (all frames)" else "--- backtrace (app frames; --all-frames for the rest)" end),
+      (.backtrace[] | select($all or .context == "app") | "  \(.file):\(.number)  \(.method)"),
+      ""' "$OUT"
+  echo "raw: $OUT"
+  ;;
+*)
+  usage ;;
+esac
