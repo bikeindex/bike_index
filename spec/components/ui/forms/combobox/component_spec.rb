@@ -36,25 +36,11 @@ RSpec.describe UI::Forms::Combobox::Component, type: :component do
   end
 
   it "wraps the combobox without paying for the display controller" do
-    expect(component).to have_css("div.tw\\:relative fieldset.hw-combobox")
+    expect(component).to have_css("div > fieldset.hw-combobox")
+    # No overlay to position against, so no positioning context either
+    expect(component).to_not have_css("div.tw\\:relative")
     expect(component).to_not have_css("[data-controller='ui--forms--combobox-display']")
     expect(component).to_not have_css("[data-ui--forms--combobox-display-target='overlay']", visible: :all)
-  end
-
-  context "with a wrapper_class" do
-    let(:extra) { {wrapper_class: "tw:flex-1"} }
-
-    it "puts it on the wrapper, whether or not there's a rich display" do
-      expect(component).to have_css("div.tw\\:relative.tw\\:flex-1 fieldset.hw-combobox")
-    end
-
-    context "with rich_display" do
-      let(:extra) { {wrapper_class: "tw:flex-1", rich_display: :stacked} }
-
-      it "puts it on the same wrapper the display controller uses" do
-        expect(component).to have_css("div.tw\\:relative.tw\\:flex-1[data-controller='ui--forms--combobox-display']")
-      end
-    end
   end
 
   context "with rich_display: :inline" do
