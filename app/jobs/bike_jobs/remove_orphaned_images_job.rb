@@ -20,11 +20,9 @@ module BikeJobs
       end
 
       # The stamp is what exempts a blob from CleanUnattachedBlobsJob, so it has to be what
-      # collects it here too - a stamp without a matching filename would leak forever. The
-      # filename covers whatever Backfills::StolenAlertBlobBinxDataJob hasn't stamped
+      # collects it here too - anything it skips that this misses leaks forever
       def blobs_for(stolen_record_id)
-        ActiveStorage::Blob.where("binx_data->>'stolen_record_id' = ? OR filename ILIKE ?",
-          stolen_record_id.to_s, "stolen-#{stolen_record_id}-%")
+        ActiveStorage::Blob.where("binx_data->>'stolen_record_id' = ?", stolen_record_id.to_s)
           .where("created_at < ?", check_period.last)
       end
     end

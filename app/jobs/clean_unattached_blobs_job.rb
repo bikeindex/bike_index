@@ -22,11 +22,9 @@ class CleanUnattachedBlobsJob < ScheduledJob
 
   # Alert images are unattached on purpose - StolenRecord attaches them with dependent: false
   # so links to a superseded one keep resolving. BikeJobs::RemoveOrphanedImagesJob owns those
-  # and knows when they're safe to drop. The filename match covers whatever
-  # Backfills::StolenAlertBlobBinxDataJob hasn't stamped, and can go once it has run.
+  # and knows when they're safe to drop
   def blobs
     ActiveStorage::Blob.unattached.where(created_at: ...self.class.clean_before)
-      .where("binx_data->>'stolen_record_id' IS NULL")
-      .where.not("filename ILIKE ?", "stolen-%").limit(BATCH_SIZE)
+      .where("binx_data->>'stolen_record_id' IS NULL").limit(BATCH_SIZE)
   end
 end
