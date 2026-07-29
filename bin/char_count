@@ -35,7 +35,7 @@ Dir.chdir(File.expand_path("..", __dir__))
 # Get all tracked files in the specified paths
 file_extensions = %w[.rb .erb .haml .html .js .css .scss .yml .yaml .json .md]
 files = `git ls-files #{paths.shelljoin}`.split("\n")
-                                         .select { |file| file_extensions.include?(File.extname(file)) }
+  .select { |file| file_extensions.include?(File.extname(file)) }
 
 # Process all files and count non-whitespace characters
 total_chars = files.sum do |file|
