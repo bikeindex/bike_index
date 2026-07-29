@@ -34,6 +34,7 @@ module Saml
       # The IdP vouched for this email, so confirm the account (as the magic-link path
       # does) — otherwise sign-in bounces an unconfirmed user to the confirm-email page.
       user.confirm(user.confirmation_token) unless user.confirmed?
+      ensure_organization_role(user, organization)
 
       identity.update(user:, email:, name_id_format: response.name_id_format, last_sign_in_at: Time.current)
       Result.new(user:)
@@ -68,10 +69,21 @@ module Saml
         organization_id: organization.id, created_by_magic_link: true).user
     end
 
+    # The IdP is configured by Bike Index staff, so it is authoritative for its own org:
+    # every successful assertion grants membership. provision_user only covers people who
+    # had no Bike Index account, which would leave everyone else signed in but unaffiliated.
+    # created_by_magic_link suppresses the invitation email - they just authenticated.
+    def ensure_organization_role(user, organization)
+      return if user.organization_roles.where(organization_id: organization.id).any?
+
+      OrganizationRole.create!(organization:, user:, role: "member", created_by_magic_link: true)
+    end
+
     def failure(message)
       Result.new(error: message)
     end
 
-    conceal :provider, :parse_response, :asserted_email, :provision_user, :failure
+    conceal :provider, :parse_response, :asserted_email, :provision_user,
+      :ensure_organization_role, :failure
   end
 end

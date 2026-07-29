@@ -64,15 +64,52 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         user = User.find_by(email:)
         expect(identity.user).to eq user
         expect(user.last_login_at).to be_within(5.seconds).of Time.current
+        expect(user.organizations).to eq([organization])
         expect(signed_in?).to be true
       end
 
       context "existing Bike Index user with the asserted email" do
         let!(:existing) { FactoryBot.create(:user_confirmed, email:) }
-        it "links the existing user without creating one" do
+        it "links the existing user without creating one, and grants membership" do
           expect { post_callback }.not_to change(User, :count)
           expect(SsoIdentity.last.user).to eq existing
+          expect(existing.reload.organizations).to eq([organization])
+          expect(existing.organization_roles.first).to have_attributes(role: "member", claimed?: true)
           expect(signed_in?).to be true
+        end
+
+        context "already a member of the org" do
+          let!(:organization_role) do
+            FactoryBot.create(:organization_role_claimed, organization:, user: existing, role: "admin")
+          end
+          it "leaves the existing role alone" do
+            expect { post_callback }.not_to change(OrganizationRole, :count)
+            expect(existing.reload.organizations).to eq([organization])
+            # An org admin signing in via SSO must not be demoted to member
+            expect(organization_role.reload.role).to eq "admin"
+          end
+        end
+
+        context "membership was removed from the org" do
+          let!(:organization_role) do
+            FactoryBot.create(:organization_role_claimed, organization:, user: existing)
+          end
+          before { organization_role.destroy } # acts_as_paranoid, so this soft deletes
+          it "re-grants membership, since deprovisioning belongs at the IdP" do
+            post_callback
+            expect(existing.reload.organizations).to eq([organization])
+          end
+        end
+
+        context "member of a different organization" do
+          let(:other_organization) { FactoryBot.create(:organization) }
+          let!(:organization_role) do
+            FactoryBot.create(:organization_role_claimed, organization: other_organization, user: existing)
+          end
+          it "adds the SSO org without disturbing the other membership" do
+            expect { post_callback }.to change(OrganizationRole, :count).by(1)
+            expect(existing.reload.organizations).to match_array([other_organization, organization])
+          end
         end
       end
 
@@ -82,6 +119,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
           expect { post_callback }.not_to change(User, :count)
           expect(SsoIdentity.last.user).to eq existing
           expect(existing.reload.confirmed?).to be true
+          expect(existing.organizations).to eq([organization])
           expect(signed_in?).to be true
         end
       end
@@ -96,6 +134,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
           expect { post_callback(name_id:) }.not_to change(User, :count)
           expect(signed_in?).to be true
           expect(identity.reload.last_sign_in_at).to be_present
+          expect(identity.user.organizations).to eq([organization])
         end
       end
 
