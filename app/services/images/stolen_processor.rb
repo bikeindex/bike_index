@@ -84,29 +84,26 @@ module Images
       stolen_record.image_four_by_five.blob.created_at > images_updated
     end
 
+    # stolen_record_id is what marks these as ours to keep - a superseded alert stays
+    # unattached on purpose (dependent: false), and CleanUnattachedBlobsJob reads the stamp
+    # rather than reaping it
     def attach_images(stolen_record, image, location_text)
-      four_by_five = ActiveStorage::Blob.create_and_upload!(
-        io: generate_alert(template: :four_by_five, image:, location_text:),
-        filename: "stolen-#{stolen_record.id}-four_by_five.jpeg"
-      )
-      four_by_five.analyze
-
-      square = ActiveStorage::Blob.create_and_upload!(
-        io: generate_alert(template: :square, image:, location_text:),
-        filename: "stolen-#{stolen_record.id}-square.jpeg"
-      )
-      square.analyze
-
-      opengraph = ActiveStorage::Blob.create_and_upload!(
-        io: generate_alert(template: :opengraph, image:, location_text:),
-        filename: "stolen-#{stolen_record.id}-opengraph.jpeg"
-      )
-      opengraph.analyze
+      four_by_five = create_alert_blob(stolen_record, :four_by_five, image, location_text)
+      square = create_alert_blob(stolen_record, :square, image, location_text)
+      opengraph = create_alert_blob(stolen_record, :opengraph, image, location_text)
 
       stolen_record.image_square.attach(square)
       stolen_record.image_opengraph.attach(opengraph)
       # Attach 4 by five last, it's what sets images_attached?
       stolen_record.image_four_by_five.attach(four_by_five)
+    end
+
+    # create_and_upload! takes explicit keywords, so the stamp is a second write
+    def create_alert_blob(stolen_record, template, image, location_text)
+      ActiveStorage::Blob.create_and_upload!(
+        io: generate_alert(template:, image:, location_text:),
+        filename: "stolen-#{stolen_record.id}-#{template}.jpeg"
+      ).tap { it.update!(binx_data: {"stolen_record_id" => stolen_record.id}) }.tap(&:analyze)
     end
 
     def generate_alert(template:, image:, location_text:, convert: "jpeg")
@@ -223,8 +220,8 @@ module Images
         .gsub("'", "\\'")
     end
 
-    conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :generate_alert,
-      :template_path, :topbar_path, :bike_image_dimensions_for, :bike_image_offset,
+    conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :create_alert_blob,
+      :generate_alert, :template_path, :topbar_path, :bike_image_dimensions_for, :bike_image_offset,
       :caption_overlay, :font, :fc_list_output, :fc_list_has?, :stolen_record_location
   end
 end
