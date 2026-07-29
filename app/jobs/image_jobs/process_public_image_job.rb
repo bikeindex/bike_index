@@ -19,7 +19,7 @@ module ImageJobs
       PublicImage::VARIANTS.each_key { |size| public_image.file.variant(size).processed }
 
       # Written last, once the variants exist - "stripped" only means the original was rewritten
-      stamp(blob, "processed" => true)
+      stamp!(blob, "processed" => true)
     end
 
     private
@@ -40,14 +40,14 @@ module ImageJobs
       # Ahead of the upload, which re-identifies content_type with the filename as a hint
       blob.filename = "#{blob.filename.base}.webp" if to_webp
       blob.upload(prepared) # Resets checksum/byte_size, which still describe the pre-strip bytes
-      stamp(blob, "stripped" => true)
+      stamp!(blob, "stripped" => true)
     ensure
       prepared&.close!
     end
 
     # Not metadata: a direct upload posts that (Rails only protects its own keys), so a client
     # could hand us "processed" and skip the strip entirely. Saves the checksum too.
-    def stamp(blob, values)
+    def stamp!(blob, values)
       blob.update!(binx_data: blob.binx_data.to_h.merge(values))
     end
   end

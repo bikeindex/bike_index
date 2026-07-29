@@ -19,13 +19,13 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
     Vips::Image.new_from_buffer(data, "").get_fields.grep(/exif|gps/i)
   end
 
-  # n-pages counts what the file holds, not what was loaded; formats that can't animate
-  # (jpeg, webp variants) don't carry the field at all
   def dimensions_of(data)
     image = Vips::Image.new_from_buffer(data, "")
     [image.width, image.height]
   end
 
+  # n-pages counts what the file holds, not what was loaded; formats that can't animate
+  # (jpeg, webp variants) don't carry the field at all
   def frame_count(data)
     image = Vips::Image.new_from_buffer(data, "")
     image.get_typeof("n-pages").zero? ? 1 : image.get("n-pages")
