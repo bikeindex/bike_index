@@ -10,6 +10,11 @@
 # raw JSON in tmp/ and prints a projection, so follow-ups are a local jq.
 #
 # Needs HONEYBADGER_PERSONAL_AUTH_TOKEN in .env.development (see .env).
+#
+# Stdlib only, and kept parseable by system ruby 2.6 like the rest of bin/ that
+# doesn't boot Rails: Claude Code's shell doesn't always have the mise shim on
+# PATH, and a syntax error there reads as a broken script rather than the PATH
+# problem it is. So no endless defs and no 3.x-only methods.
 
 require "json"
 require "net/http"
@@ -109,7 +114,9 @@ def save(body, filename)
   File.join("tmp", filename).tap { |path| File.write(path, body) }
 end
 
-def labelled(label, value, width) = format("%-#{width}s%s", "#{label}:", value)
+def labelled(label, value, width)
+  format("%-#{width}s%s", "#{label}:", value)
+end
 
 # A Sidekiq notice puts the whole job hash in request.params, including an
 # error_backtrace of every gem frame - thousands of tokens the app-frame listing
@@ -117,7 +124,10 @@ def labelled(label, value, width) = format("%-#{width}s%s", "#{label}:", value)
 def params_summary(notice)
   params = notice.dig("request", "params") || {}
   job = params["job"]
-  compact = job.is_a?(Hash) ? params.merge("job" => job.except("error_backtrace")) : params
+  # Hash#except is ruby 3.0+, which the 2.6 note at the top rules out.
+  # standard:disable Style/HashExcept
+  compact = job.is_a?(Hash) ? params.merge("job" => job.reject { |key, _| key == "error_backtrace" }) : params
+  # standard:enable Style/HashExcept
   json = JSON.generate(compact)
   (json.length > PARAMS_LIMIT) ? "#{json[0, PARAMS_LIMIT]} …truncated, full JSON in the raw file" : json
 end
