@@ -27,7 +27,7 @@
       translation(".verify_your_email_html", email: content_tag(:strong, @b_param.owner_email))
     end %>
 
-    <%= render UI::Header::Component.new(text: translation(".registration_complete"), subtitle:) %>
+    <%= render UI::Header::Component.new(text: heading_text, subtitle:) %>
 
     <%# What's still locked behind the confirmation, so the link is worth clicking %>
     <% if @bike.blank? %>

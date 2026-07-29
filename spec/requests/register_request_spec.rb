@@ -492,11 +492,11 @@ RSpec.describe RegisterController, type: :request do
         expect(b_param.bike).to match_hash_indifferently(bike_details.merge(owner_email:,
           manufacturer_id: manufacturer.id, primary_frame_color_id: color.id.to_s))
         follow_redirect!
-        expect(response.body).to include "Registration complete"
+        expect(response.body).to include "Registration saved"
         expect(response.body).to include "verify your email"
         # Why the confirmation link is worth clicking
         expect(response.body).to include "Confirming your email lets you"
-        expect(response.body).to include "Report your bike stolen"
+        expect(response.body).to include "Finish reporting your stolen bike"
       end
 
       context "with a photo" do

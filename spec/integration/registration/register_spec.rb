@@ -122,7 +122,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     click_button "Complete Bike Registration"
 
-    expect(page).to have_content("Registration complete")
+    expect(page).to have_content("Registration saved")
     expect(page).to have_content("verify your email")
     b_param = BParam.last
     expect(b_param.bike).to include("frame_model" => "Marlin 7", "year" => "2023",

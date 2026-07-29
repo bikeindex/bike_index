@@ -1,8 +1,8 @@
 class RegisterController < ApplicationController
   before_action :find_b_param, except: %i[new create]
-  # Step 1 carries everything it needs, so an expired token starts a registration
-  # rather than bouncing and losing the submission
-  before_action :find_or_build_b_param, only: %i[create]
+  # An expired token starts a registration rather than bouncing and losing the
+  # submission. assign_organization runs next, so the form's organization_id lands on it
+  before_action -> { find_b_param(build: true) }, only: %i[create]
   before_action :assign_organization, except: %i[new]
   before_action :redirect_finished, only: %i[create update]
   # The step shown depends on server state - a cached page could show a step
@@ -101,23 +101,19 @@ class RegisterController < ApplicationController
     end
   end
 
-  def find_b_param
-    @b_param = token_b_param
-    return if @b_param.present?
-
-    flash[:info] = translation(:registration_not_found) if params[:b_param_token].present?
-    redirect_to new_register_path
-  end
-
-  # assign_organization runs next, so the form's organization_id still lands on it
-  def find_or_build_b_param
-    @b_param = token_b_param || BikeServices::Register.b_param_for(user: current_user)
-    session[:register_b_param_token] = @b_param.id_token
-  end
-
-  def token_b_param
-    BikeServices::Register.find_token(params_token: params[:b_param_token],
+  # build: only step 1's submission, which carries everything a registration needs
+  def find_b_param(build: false)
+    @b_param = BikeServices::Register.find_token(params_token: params[:b_param_token],
       session_token: session[:register_b_param_token], user: current_user)
+    @b_param ||= BikeServices::Register.b_param_for(user: current_user) if build
+    if @b_param.blank?
+      flash[:info] = translation(:registration_not_found) if params[:b_param_token].present?
+      return redirect_to(new_register_path)
+    end
+
+    # The session follows whichever registration the token named, so the next
+    # tokenless request stays on it
+    session[:register_b_param_token] = @b_param.id_token
   end
 
   # A finished registration (bike created, or awaiting the email) only shows

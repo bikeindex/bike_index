@@ -15,6 +15,11 @@ module Register
       def cycle_type
         @b_param.type
       end
+
+      # Without the bike the registration is only held, waiting on the email
+      def heading_text
+        translation(@bike.present? ? ".registration_complete" : ".registration_saved")
+      end
     end
   end
 end
