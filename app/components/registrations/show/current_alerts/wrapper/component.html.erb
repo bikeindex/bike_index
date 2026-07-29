@@ -1,8 +1,6 @@
-<%= render(Registrations::Show::CurrentAlerts::RecoveryPrompt::Component.new(bike: @bike, stolen_record: @alerts.recovered_stolen_record)) %>
-
-<%= render(Registrations::Show::CurrentAlerts::NotificationToken::Component.new(bike: @bike, token: @alerts.token, token_type: @alerts.token_type, matching_notification: @alerts.matching_notification)) %>
-
-<%= render(Registrations::Show::CurrentAlerts::ClaimInvitation::Component.new(bike: @bike, current_user: @current_user, claim_message: @alerts.claim_message)) %>
+<% if token_prompt %>
+  <%= render(token_prompt) %>
+<% end %>
 
 <%= render(Registrations::Show::CurrentAlerts::ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)) %>
 

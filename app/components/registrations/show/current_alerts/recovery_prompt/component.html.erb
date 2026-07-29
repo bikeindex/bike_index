@@ -1,38 +1,42 @@
-<%= render(UI::Alert::Component.new(kind: :success, margin_classes: "", header: translation(".mark_your_bike_recovered", bike_type: @bike.type))) do %>
-  <p>
-    <%= translation(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type) %>
-  </p>
+<%= render(UI::Modal::Component.new(id: "recovery-prompt-modal", title: translation(".mark_your_bike_recovered", bike_type: @bike.type), open: true)) do |modal| %>
+  <% modal.with_body do %>
+    <p>
+      <%= translation(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type) %>
+    </p>
 
-  <p class="tw:mt-1 tw:font-bold">
-    <%= translation(".its_also_how_we_get_better_at_recovering") %>
-  </p>
+    <p class="tw:mt-1 tw:font-bold">
+      <%= translation(".its_also_how_we_get_better_at_recovering") %>
+    </p>
 
-  <%= form_with(model: @stolen_record, url: bike_recovery_path(bike_id: @bike.id), class: "tw:mt-3 tw:max-w-lg", data: {controller: "csrf-refresh"}) do |form| %>
-    <%= form.hidden_field :token, value: @stolen_record.recovery_link_token, name: "token" %>
+    <%= form_with(model: @stolen_record, url: bike_recovery_path(bike_id: @bike.id), class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |form| %>
+      <%= form.hidden_field :token, value: @stolen_record.recovery_link_token, name: "token" %>
 
-    <div>
-      <%= form.label :recovered_description, translation(".how_did_you_get_it_back"), class: "twlabel" %>
-      <%= form.text_area :recovered_description, rows: 3, class: "twinput tw:w-full" %>
-    </div>
+      <div>
+        <%= form.label :recovered_description, translation(".how_did_you_get_it_back"), class: "twlabel" %>
+        <%= form.text_area :recovered_description, rows: 3, class: "twinput tw:w-full" %>
+      </div>
 
-    <div class="tw:mt-3">
-      <%= form.label :recovered_at, translation(".when_did_you_recover_it"), class: "twlabel" %>
-      <%= form.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
-      <%= form.datetime_local_field :recovered_at, value: recovered_at, max: Time.current.end_of_day, step: 3600, required: true, class: "twinput tw:w-full" %>
-    </div>
+      <div class="tw:mt-3">
+        <%= form.label :recovered_at, translation(".when_did_you_recover_it"), class: "twlabel" %>
+        <%= form.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
+        <%= form.datetime_local_field :recovered_at, value: recovered_at, max: Time.current.end_of_day, step: 3600, required: true, class: "twinput tw:w-full" %>
+      </div>
 
-    <label class="tw:mt-3 tw:flex tw:items-center tw:gap-2">
-      <%= form.check_box :index_helped_recovery %>
-      <%= translation(".did_we_help") %>
-    </label>
+      <label class="tw:mt-3 tw:flex tw:items-center tw:gap-2">
+        <%= form.check_box :index_helped_recovery %>
+        <%= translation(".did_we_help") %>
+      </label>
 
-    <label class="tw:mt-1 tw:flex tw:items-center tw:gap-2">
-      <%= form.check_box :can_share_recovery %>
-      <%= translation(".can_we_share_your_story") %>
-    </label>
+      <label class="tw:mt-1 tw:flex tw:items-center tw:gap-2">
+        <%= form.check_box :can_share_recovery %>
+        <%= translation(".can_we_share_your_story") %>
+      </label>
 
-    <div class="tw:mt-3">
-      <%= render(UI::Button::Component.new(text: translation(".mark_recovered"), color: :purple, kind: :submit)) %>
-    </div>
+      <div class="tw:mt-4 tw:flex tw:items-center tw:gap-2">
+        <%= render(UI::Button::Component.new(text: translation(".mark_recovered"), color: :purple, kind: :submit)) %>
+
+        <%= render(UI::Button::Component.new(text: translation(".nevermind"), color: :secondary, data: {action: "click->ui--modal#close"})) %>
+      </div>
+    <% end %>
   <% end %>
 <% end %>

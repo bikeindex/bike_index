@@ -34,6 +34,8 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
       expect(body).to match("Mark your bike recovered!")
       expect(response.body).to match("/bikes/#{bike.id}/recovery")
       expect(response.body).to match(recovery_link_token)
+      # Opened without a click, like the legacy overlay
+      expect(response.body).to match("data-ui--modal-open-on-connect-value=\"true\"")
 
       # Reading it consumes the token, so a reload doesn't re-prompt
       expect(session[:recovery_link_token]).to be_blank

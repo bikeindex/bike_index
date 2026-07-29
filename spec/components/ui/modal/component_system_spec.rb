@@ -17,4 +17,17 @@ RSpec.describe UI::Modal::Component, :js, type: :system do
 
     expect(page).not_to have_css("dialog[open]")
   end
+
+  it "opens a server-opened modal on load, without adding the param" do
+    visit("/rails/view_components/ui/modal/component/open_on_connect")
+
+    expect(page).to have_css("dialog[open]")
+    expect(page).to have_text("Server-opened modal body")
+    # Not persisted — whether it comes back on reload is the server's call
+    expect(page).not_to have_current_path(/modal_open-on-connect-modal/, url: true)
+    expect_axe_clean
+
+    find('button[aria-label="Close"]').click
+    expect(page).not_to have_css("dialog[open]")
+  end
 end

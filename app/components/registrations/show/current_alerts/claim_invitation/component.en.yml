@@ -23,3 +23,4 @@ en:
               registration email.
             were_honored_to_have_your_bike: We're honored to have your %{bike_type}
               on the Index.
+            your_bike: Your %{bike_type}
