@@ -15,10 +15,16 @@ module Register
         @b_param.type
       end
 
-      # A link is only outstanding for an anonymous registrant who hasn't clicked
-      # it - a signed-in registration creates the bike straight from this step
+      # An upload needs an account behind it, so an anonymous registrant gets the
+      # option once the confirmation link proves the address is theirs
+      def show_photo?
+        @current_user.present? || @b_param.email_confirmed?
+      end
+
+      # A signed-in registration creates the bike straight from this step, so only
+      # an anonymous one is ever waiting on the address being confirmed
       def awaiting_confirmation?
-        @current_user.blank? && @b_param.partial_email_sent_to.present? && !@b_param.email_confirmed?
+        @current_user.blank? && @b_param.email_unconfirmed?
       end
 
       def organization

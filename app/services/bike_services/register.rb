@@ -87,18 +87,6 @@ module BikeServices
       create_bike(b_param, ip_address:)
     end
 
-    # Saves, sending the partial-registration email when this address hasn't
-    # gotten one - so resubmitting step 1 only re-sends to a new address. A
-    # signed-in registration creates the bike at step 2, with nothing to confirm
-    def save_step_1(b_param, user:)
-      send_email = user.blank? && b_param.partial_email_sent_to != b_param.owner_email
-      b_param.params = b_param.params.merge("partial_email_sent_to" => b_param.owner_email) if send_email
-      return false unless b_param.save
-
-      Email::PartialRegistrationJob.perform_async(b_param.id) if send_email
-      true
-    end
-
     def create_bike(b_param, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
       BikeServices::Creator.new(ip_address:).create_bike(b_param)

@@ -255,25 +255,16 @@ RSpec.describe RegisterController, type: :request do
     let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:}} }
     let(:create_params) { step_1_params.merge(b_param_token: empty_b_param.id_token) }
 
-    it "saves step 1, sends the email and redirects to step 2" do
-      expect { post base_url, params: create_params }.to_not change(BParam, :count)
+    it "saves step 1 and redirects to step 2, without emailing" do
+      expect {
+        expect { post base_url, params: create_params }.to_not change(BParam, :count)
+      }.to_not change { Email::PartialRegistrationJob.jobs.size }
       empty_b_param.reload
       expect(empty_b_param).to have_attributes(origin: "register_flow", owner_email:,
         manufacturer_id: manufacturer.id, creator_id: nil, cycle_type: "cargo")
       expect(empty_b_param.partial_registration?).to be_truthy
       expect(empty_b_param.motorized?).to be_falsey
-      expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(empty_b_param.id)
       expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
-
-      # Resubmitting with the same email doesn't resend the confirmation
-      expect {
-        post base_url, params: create_params
-      }.to_not change { Email::PartialRegistrationJob.jobs.size }
-
-      # Changing the email does - the old link only proved control of the old address
-      expect {
-        post base_url, params: create_params.deep_merge(b_param: {owner_email: "new@example.com"})
-      }.to change { Email::PartialRegistrationJob.jobs.size }.by 1
     end
 
     context "motorized, stolen, manufacturer not in the list" do
@@ -325,12 +316,9 @@ RSpec.describe RegisterController, type: :request do
     context "signed in" do
       include_context :request_spec_logged_in_as_user
 
-      it "saves without the confirmation email - the bike is created at step 2" do
-        expect {
-          post base_url, params: create_params
-        }.to_not change { Email::PartialRegistrationJob.jobs.size }
+      it "saves step 1 onto the registration the session is on" do
+        post base_url, params: create_params
         expect(empty_b_param.reload.manufacturer_id).to eq manufacturer.id
-        expect(empty_b_param.partial_email_sent_to).to be_blank
         expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
       end
     end
@@ -380,11 +368,7 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include owner_email
       # No organization asking for anything, so it's just the registrant's own info
       expect(response.body).to include "Contact info"
-      # Nothing went out, so there's no link to wait on
-      expect(response.body).to_not include "confirmation link to your email"
-
-      b_param.update(params: b_param.params.merge("partial_email_sent_to" => owner_email))
-      get register_path(b_param_token: b_param.id_token, step: 2)
+      # An address nothing has proven yet, so the confirmation is still pending
       expect(response.body).to include "confirmation link to your email"
 
       # Once the link has been clicked, the alert is stale
@@ -471,11 +455,20 @@ RSpec.describe RegisterController, type: :request do
       include_context :request_spec_logged_in_as_user
 
       it "skips the confirmation alert - they never wait on it" do
-        b_param.update(params: b_param.params.merge("partial_email_sent_to" => owner_email))
         get register_path(b_param_token: b_param.id_token, step: 2)
         expect(response.status).to eq 200
         expect(response.body).to_not include "confirmation link to your email"
+        expect(response.body).to include "bike[image]"
       end
+    end
+
+    it "offers the photo upload only once there's an account behind it" do
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      expect(response.body).to_not include "bike[image]"
+
+      b_param.confirm_email!
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      expect(response.body).to include "bike[image]"
     end
 
     context "step 1 not submitted" do
@@ -523,6 +516,9 @@ RSpec.describe RegisterController, type: :request do
         follow_redirect!
         expect(response.body).to include "Registration complete"
         expect(response.body).to include "verify your email"
+        # Why the confirmation link is worth clicking
+        expect(response.body).to include "Confirming your email lets you"
+        expect(response.body).to include "Report your bike stolen"
       end
 
       context "with a photo" do

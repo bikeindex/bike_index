@@ -448,6 +448,12 @@ class BParam < ApplicationRecord
     params["email_confirmed_at"].present?
   end
 
+  # Waiting on the confirmation link - there's an address, and nothing has proven
+  # it belongs to whoever is registering
+  def email_unconfirmed?
+    owner_email.present? && !email_confirmed?
+  end
+
   def confirm_email!
     email_confirmed? || update(params: params.merge("email_confirmed_at" => Time.current))
   end

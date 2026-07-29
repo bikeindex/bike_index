@@ -50,7 +50,7 @@ class RegisterController < ApplicationController
     @b_param.errors.add(:base, translation(:manufacturer_required)) if @b_param.manufacturer_id.blank?
     if @b_param.errors.any?
       render Register::Step1::Component.new(b_param: @b_param, current_user:), status: :unprocessable_entity
-    elsif BikeServices::Register.save_step_1(@b_param, user: current_user)
+    elsif @b_param.save
       redirect_to step_path(2)
     else
       @b_param.errors.add(:base, translation(:unable_to_save))
