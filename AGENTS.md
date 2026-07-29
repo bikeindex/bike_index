@@ -24,6 +24,15 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - Keep comments pithy — often they aren't necessary. Explain *why* for a future reader; don't narrate the change that introduced the code
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Reach for a `class` only when the object genuinely holds instance state across methods (e.g. a multi-step builder/updater). Don't write a stateless service as a `class` with `def self.` methods.
 
+## Subagents
+
+When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-hoc fan-out — split them by what the task actually needs:
+
+- **Enumeration on `model: "sonnet"`** — "find every call site of X", "which files reference this constant", "list the specs that touch Y". The answer is mechanical and checkable, so a cheaper model is enough.
+- **Judgement on the session model** — omit `model:` so the agent inherits it. These are the passes that catch things like an unvalidated param landing in a fragment cache key, or a shared partial's N+1; a cheaper model reads straight past them.
+
+A good shape for a large review is both: sonnet fans out to *find* candidates, the session model *judges* the shortlist.
+
 ## Testing
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks).
