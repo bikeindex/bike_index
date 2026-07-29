@@ -2,7 +2,7 @@
 
 module Registrations
   module Show
-    module OrgAdmin
+    module WrapperOrgAdmin
       class Component < ApplicationComponent
         include BikeHelper
 

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Registrations::Show::OrgAdmin::Component, type: :component do
+RSpec.describe Registrations::Show::WrapperOrgAdmin::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["registration_notes"]) }
   let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }

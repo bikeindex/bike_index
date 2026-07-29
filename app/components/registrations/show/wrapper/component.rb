@@ -8,7 +8,7 @@ module Registrations
       class Component < ApplicationComponent
         # Nothing digests the nested components' templates, so bump this whenever
         # their markup changes
-        CACHE_VERSION = "registrations/show-v7"
+        CACHE_VERSION = "registrations/show-v8"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil)
           @bike = bike
@@ -30,10 +30,10 @@ module Registrations
           @inner_component ||= begin
             kind, organization = @view
             if organization
-              OrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
+              WrapperOrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
                 org_role: kind, available_views: @available_views, bike_sticker: @bike_sticker)
             else
-              Consumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
+              WrapperConsumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
                 show_for_sale: @bike.is_for_sale?, available_views: @available_views, bike_sticker: @bike_sticker)
             end
           end

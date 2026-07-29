@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Registrations::Show::ScannedSticker::Component, type: :component do
+RSpec.describe Registrations::Show::CurrentAlerts::ScannedSticker::Component, type: :component do
   let(:component) { described_class.new(bike:, bike_sticker:, current_user:) }
   let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
   let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike:, user: bike.owner) }

@@ -2,7 +2,7 @@
 
 module Registrations
   module Show
-    module Consumer
+    module WrapperConsumer
       class Component < ApplicationComponent
         include BikeHelper
 
@@ -15,6 +15,12 @@ module Registrations
           @available_views = available_views
           @bike_sticker = bike_sticker
           @owner = owner.nil? ? (@current_user.present? && @bike.owner == @current_user) : owner
+        end
+
+        # The wrapper folds this into its cache key. Claiming an ownership doesn't
+        # touch the bike, so the sent-to-new-owner alert would outlive the claim
+        def cache_version
+          [@bike.current_ownership&.updated_at]
         end
 
         private
