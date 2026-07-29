@@ -12,11 +12,13 @@
     The drop target frames the preview and controls; its border is transparent until a drag
     starts, so revealing it shifts nothing. data-over rather than is-active, which also
     matches :active and would flash the frame whenever the button inside it is pressed.
+    The -ml cancels that reserved space on the left, so the control still lines up with
+    the field's label rather than sitting indented under it.
   %>
 
   <div
     class="
-      tw:inline-block tw:rounded-lg tw:border-2 tw:border-dashed
+      tw:-ml-2.5 tw:inline-block tw:rounded-lg tw:border-2 tw:border-dashed
       tw:border-transparent tw:p-2 tw:transition-colors
       tw:data-[dragging=true]:border-gray-300
       tw:data-[over=true]:border-blue-500 tw:data-[over=true]:bg-blue-50
