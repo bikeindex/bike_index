@@ -10,6 +10,8 @@ Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$RE
 
 Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't use other formatters.
 
+**Pass it the files or directories you changed** — `bin/lint app/components/ui/table app/models/bike.rb`. A bare `bin/lint` walks the whole repo, which is slow and reformats files you aren't working on. Save it for a final check before pushing.
+
 ### Code guidelines:
 
 - Code in a functional way. Avoid mutation (side effects) when you can.
@@ -21,6 +23,16 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - prefer un-abbreviated variable names
 - Keep comments pithy — often they aren't necessary. Explain *why* for a future reader; don't narrate the change that introduced the code
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Reach for a `class` only when the object genuinely holds instance state across methods (e.g. a multi-step builder/updater). Don't write a stateless service as a `class` with `def self.` methods.
+
+## Subagents
+
+When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-hoc fan-out — pick the model by how much of the *search* the agent has to invent, not by how simple the task sounds:
+
+- **`model: "haiku"`** when the command is already specified: "run this grep and summarise it", "read these four files and pull out X". There's nothing to devise.
+- **`model: "sonnet"`** when the agent has to work out *how* to look ("every call site of X", "which specs touch Y"). A weaker model compensates by flailing — on a real enumeration here it reached the same answer as sonnet, but took 3x the tool calls, 1.6x the wall clock and more total tokens, so the per-token discount didn't survive.
+- **Omit `model:`** (inherit the session model) for judgement — the passes that catch an unvalidated param landing in a fragment cache key, or a shared partial's N+1.
+
+Worth delegating enumeration at all rather than eyeballing a grep: in that same test both subagents found two call sites the hand-written grep missed, because it anchored on the wrong method name.
 
 ## Testing
 

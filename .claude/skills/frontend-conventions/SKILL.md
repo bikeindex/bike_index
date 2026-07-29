@@ -24,7 +24,9 @@ This project uses **Stimulus.js** for JavaScript interactivity and **Tailwind CS
 
 The `bin/dev` command handles building and updating Tailwind and JS.
 
-**Format ERB before committing.** After editing any `.html.erb`, run `bin/lint <file>` — it runs `herb-format`, which sorts `tw:` classes and reflows long `class` attributes onto multiple lines. CI's `lint_and_scan` job runs `herb-format --check` as a step separate from `standardrb`/`rubocop`, so hand-edited ERB that skips formatting fails CI even when the Ruby is clean.
+**Format ERB before committing.** After editing any `.html.erb`, run `bin/lint` on the files or directories you changed — `bin/lint app/components/ui/table`. It runs `herb-lint` and `herb-format`, which sort `tw:` classes, reflow long `class` attributes onto multiple lines, and flag things like an `<input>` missing `autocomplete`. CI's `lint_and_scan` job runs both as steps separate from `standardrb`/`rubocop`, so hand-edited ERB that skips formatting fails CI even when the Ruby is clean.
+
+Scope it rather than running bare `bin/lint`: a whole-repo run reformats files outside your change, and every file it rewrites that you've already read gets re-injected into context in full.
 
 ## Tailwind classes and helpers
 
