@@ -255,7 +255,6 @@ RSpec.describe RegisterController, type: :request do
       empty_b_param.reload
       expect(empty_b_param).to have_attributes(origin: "register_flow", owner_email:,
         manufacturer_id: manufacturer.id, creator_id: nil, cycle_type: "cargo")
-      expect(empty_b_param.partial_registration?).to be_truthy
       expect(empty_b_param.motorized?).to be_falsey
       expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
     end

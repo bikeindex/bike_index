@@ -31,7 +31,6 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
-  PARTIAL_REGISTRATION_ORIGINS = %w[embed_partial register_flow].freeze
   # TODO: #3952 - stolen record legacy attrs, to support accepting the old names
   LEGACY_STOLEN_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
   REGISTRATION_INFO_ATTRS = %w[
@@ -90,7 +89,7 @@ class BParam < ApplicationRecord
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
-  scope :partial_registrations, -> { where(origin: PARTIAL_REGISTRATION_ORIGINS) }
+  scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   # register/new shells whose step 1 was never submitted (manufacturer is required
@@ -425,7 +424,7 @@ class BParam < ApplicationRecord
   end
 
   def partial_registration?
-    PARTIAL_REGISTRATION_ORIGINS.include?(origin)
+    origin == "embed_partial"
   end
 
   def email_confirmed?
