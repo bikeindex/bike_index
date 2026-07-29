@@ -26,7 +26,7 @@ The workflow below (steps 0–3) always runs and creates or updates the PR. When
 
 Invoke the `/simplify` command to review the changed code for reuse, simplification, and efficiency cleanups and apply them. Do this first, before writing the PR up, so the body describes the diff's final shape rather than a first draft. It's quality-only — it won't touch correctness — so it's safe to run unattended here; if it reports nothing to clean up, move on.
 
-Then run `bin/lint` to auto-format the code (it also picks up whatever `/simplify` just changed). Always use `bin/lint`, never another formatter or `standardrb` directly.
+Then run `bin/lint` to auto-format the code (it also picks up whatever `/simplify` just changed). Always use `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo — `bin/lint $(git diff --name-only --diff-filter=d "origin/$BASE"...HEAD)` (`--diff-filter=d` drops deleted paths, which would otherwise raise). It takes directories too, so `bin/lint app/components/foo` works while you're still iterating.
 
 Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix anything that doesn't conform — code-style guidelines (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names, pithy comments), testing conventions, and frontend rules. Only touch lines this branch already changed; don't reformat unrelated code.
 

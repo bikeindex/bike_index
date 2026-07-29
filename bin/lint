@@ -6,7 +6,8 @@
 cli_args = ARGV
 lint_test = ENV["LINT_TEST"] == "true" || cli_args.include?("--no-fix")
 
-# You can pass a file name to lint just that file
+# You can pass file names or directories to lint just those. Prefer it to a whole-repo
+# run: it's much faster, and it won't reformat files you aren't working on.
 file_args = cli_args.reject { |arg| arg.start_with?("-") }
 
 require "fileutils"
@@ -14,8 +15,29 @@ require "fileutils"
 # path to your application root.
 APP_ROOT = File.expand_path("..", __dir__)
 
+RUBY_EXTENSIONS = %w[rb rake].freeze
+JS_EXTENSIONS = %w[js ts jsx tsx].freeze
+ERB_EXTENSIONS = %w[erb html].freeze
+
 def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+# Directories expand to every lintable file below them
+def lintable_files(path)
+  return [path] unless File.directory?(path)
+
+  extensions = RUBY_EXTENSIONS + JS_EXTENSIONS + ERB_EXTENSIONS
+  Dir.glob(File.join(path, "**", "*.{#{extensions.join(",")}}"))
+end
+
+def lint_kind(file)
+  extension = File.extname(file).delete_prefix(".")
+  # Assume bin/ files are ruby, since they mostly are
+  return :ruby if RUBY_EXTENSIONS.include?(extension) || file.start_with?("bin/")
+  return :js if JS_EXTENSIONS.include?(extension)
+
+  :erb if ERB_EXTENSIONS.include?(extension)
 end
 
 FileUtils.chdir APP_ROOT do
@@ -29,22 +51,34 @@ FileUtils.chdir APP_ROOT do
   end
 
   if file_args.any?
-    file_args.each do |file|
-      # Assume bin/ files are ruby, since they mostly are
-      if file.end_with?(".rb") || file.end_with?(".rake") || file.start_with?("bin/")
-        system!("bundle exec standardrb --fix #{file}")
-        system!("bundle exec rubocop -c .rubocop_custom.yml -A #{file}")
-      elsif file.end_with?(".js", ".ts", ".jsx", ".tsx")
-        system!("npm run js:lint -- #{file}")
-      elsif file.end_with?(".erb", ".html")
-        system!("npx herb-format #{file}")
-      else
-        raise "Unknown file type: #{file}"
-      end
+    # Paths are dropped rather than raised on, so `bin/lint $(git diff --name-only ...)`
+    # works - a branch's files include .haml, .scss and friends, which have no linter here
+    missing = file_args.reject { |arg| File.exist?(arg) }
+    warn "Not found: #{missing.join(", ")}" if missing.any?
+
+    files_by_kind = (file_args - missing).flat_map { |arg| lintable_files(arg) }
+      .group_by { |file| lint_kind(file) }
+    skipped = files_by_kind.delete(nil)
+    warn "Skipping (no linter): #{skipped.join(", ")}" if skipped&.any?
+    abort "Nothing to lint" if files_by_kind.empty?
+
+    if (ruby_files = files_by_kind[:ruby])
+      system!("bundle exec standardrb --fix #{ruby_files.join(" ")}")
+      system!("bundle exec rubocop -c .rubocop_custom.yml -A --format quiet #{ruby_files.join(" ")}")
+    end
+
+    if (js_files = files_by_kind[:js])
+      system!("npm run js:lint -- #{js_files.join(" ")}")
+    end
+
+    # herb-lint is what CI checks, herb-format is what rewrites the file
+    if (erb_files = files_by_kind[:erb])
+      system!("npx herb-lint --fix --format=simple #{erb_files.join(" ")}")
+      system!("npx herb-format #{erb_files.join(" ")}")
     end
   else
     system!("bundle exec standardrb --fix")
-    system!("bundle exec rubocop -c .rubocop_custom.yml -A")
+    system!("bundle exec rubocop -c .rubocop_custom.yml -A --format quiet")
     system!("npm run lint")
   end
 end
