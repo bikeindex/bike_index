@@ -78,9 +78,9 @@ FactoryBot.define do
         enabled_feature_slugs { ["regional_bike_counts"] }
       end
 
-      factory :organization_hogwarts do
-        name { "Hogwarts" }
-        short_name { "Hogwarts" }
+      factory :organization_brakebills do
+        name { "Brakebills" }
+        short_name { "Brakebills" }
         enabled_feature_slugs { OrganizationFeature::EXPECTED_SLUGS }
       end
     end

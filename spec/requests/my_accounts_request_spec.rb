@@ -105,7 +105,7 @@ RSpec.describe MyAccountsController, type: :request do
               expect(response).to be_ok
               expect(assigns(:show_general_alert)).to be_falsey
               expect(response).to render_template("show")
-            }.to change(CallbackJob::AfterUserChangeJob.jobs, :count).by 0
+            }.to change(CallbackJobs::AfterUserChangeJob.jobs, :count).by 0
           end
           context "with phone_verification enabled" do
             before { Flipper.enable(:phone_verification) }
@@ -116,8 +116,8 @@ RSpec.describe MyAccountsController, type: :request do
                 expect(response).to be_ok
                 expect(assigns(:show_general_alert)).to be_truthy
                 expect(response).to render_template("show")
-              }.to change(CallbackJob::AfterUserChangeJob.jobs, :count).by 1
-              CallbackJob::AfterUserChangeJob.drain
+              }.to change(CallbackJobs::AfterUserChangeJob.jobs, :count).by 1
+              CallbackJobs::AfterUserChangeJob.drain
               expect(current_user.reload.alert_slugs).to eq([])
             end
           end
@@ -206,7 +206,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(current_user.username).to eq "something"
         expect {
           patch base_url, params: {id: current_user.username, user: {username: " ", name: "tim"}, edit_template: "sharing"}
-        }.to change(CallbackJob::AfterUserChangeJob.jobs, :size).by(1)
+        }.to change(CallbackJobs::AfterUserChangeJob.jobs, :size).by(1)
         expect(assigns(:edit_template)).to eq("sharing")
         current_user.reload
         expect(current_user.username).to eq("something")
@@ -217,7 +217,7 @@ RSpec.describe MyAccountsController, type: :request do
       expect(current_user.notification_unstolen).to be_truthy # Because it's set to true by default
       expect {
         patch base_url, params: {id: current_user.username, user: {notification_newsletters: "1", notification_unstolen: "0"}}
-      }.to change(CallbackJob::AfterUserChangeJob.jobs, :size).by(1)
+      }.to change(CallbackJobs::AfterUserChangeJob.jobs, :size).by(1)
       expect(response).to redirect_to edit_my_account_url(edit_template: "root")
       current_user.reload
       expect(current_user.notification_newsletters).to be_truthy
@@ -304,7 +304,7 @@ RSpec.describe MyAccountsController, type: :request do
         put base_url, params: user_address_params
         expect(response).to redirect_to "/my_account/edit/root"
         expect(flash[:error]).to_not be_present
-        CallbackJob::AddressRecordUpdateAssociationsJob.drain
+        CallbackJobs::AddressRecordUpdateAssociationsJob.drain
 
         expect_updated_user_and_address(current_user, AddressRecord.last)
 
@@ -556,7 +556,7 @@ RSpec.describe MyAccountsController, type: :request do
 
         Sidekiq::Job.clear_all
         put base_url, params: update_params
-        expect(CallbackJob::AfterUserChangeJob.jobs.count).to eq 1
+        expect(CallbackJobs::AfterUserChangeJob.jobs.count).to eq 1
         expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
         expect(flash[:success]).to be_present
         expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
@@ -565,7 +565,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user_registration_organization1.registration_info).to eq target_info
 
         Sidekiq::Testing.inline! {
-          CallbackJob::AfterUserChangeJob.drain
+          CallbackJobs::AfterUserChangeJob.drain
         }
         expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
         expect(bike1.registration_info).to eq target_info
@@ -589,7 +589,7 @@ RSpec.describe MyAccountsController, type: :request do
             "reg_field-organization_affiliation_#{organization1.id}" => "student",
             "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
           }
-          expect(CallbackJob::AfterUserChangeJob.jobs.count).to eq 1
+          expect(CallbackJobs::AfterUserChangeJob.jobs.count).to eq 1
           expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
           expect(flash[:success]).to be_present
           expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
@@ -598,7 +598,7 @@ RSpec.describe MyAccountsController, type: :request do
           expect(user_registration_organization1.registration_info).to eq target_info
 
           Sidekiq::Testing.inline! {
-            CallbackJob::AfterUserChangeJob.drain
+            CallbackJobs::AfterUserChangeJob.drain
           }
           expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
           expect(bike1.registration_info).to eq target_info
@@ -647,7 +647,7 @@ RSpec.describe MyAccountsController, type: :request do
               "reg_field-student_id_#{organization1.id}" => "XXX777YYY",
               "reg_field-organization_affiliation_#{organization2.id}" => "employee"
             }
-            expect(CallbackJob::AfterUserChangeJob.jobs.count).to eq 1
+            expect(CallbackJobs::AfterUserChangeJob.jobs.count).to eq 1
             expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
             expect(flash[:success]).to be_present
             expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
@@ -660,7 +660,7 @@ RSpec.describe MyAccountsController, type: :request do
             expect(user_registration_organization2.registration_info).to eq target_extra_info
 
             Sidekiq::Testing.inline! {
-              CallbackJob::AfterUserChangeJob.drain
+              CallbackJobs::AfterUserChangeJob.drain
             }
             deleted_bike_organization = BikeOrganization.unscoped.where(id: bike1_organization2.id).first
             expect(deleted_bike_organization.deleted?).to be_truthy
@@ -722,7 +722,7 @@ RSpec.describe MyAccountsController, type: :request do
     before { current_user.skip_update = false }
     include_context :request_spec_logged_in_as_user
 
-    it "deletes and enqueues BikeDeleterJob" do
+    it "deletes and enqueues BikeJobs::BikeDeleterJob" do
       expect(current_user.reload.deletable?).to be_truthy
       Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
@@ -744,6 +744,45 @@ RSpec.describe MyAccountsController, type: :request do
         end.to change(User, :count).by(0)
         expect(Bike.count).to eq 1
         expect(flash[:error]).to eq "Organization admins cannot delete their accounts. Email support@bikeindex.org for help"
+      end
+    end
+  end
+
+  describe "toggle_show_redesign" do
+    let(:bike) { FactoryBot.create(:bike) }
+    context "user not logged in" do
+      it "redirects to sign in without toggling" do
+        post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
+        expect(response).to redirect_to(/session\/new/)
+      end
+    end
+    context "user logged in" do
+      include_context :request_spec_logged_in_as_user
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+      it "opts into the legacy view and redirects to the legacy page" do
+        post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
+        expect(response).to redirect_to(bike_path(bike))
+        expect(current_user.reload.feature_registration_show_legacy).to be_truthy
+      end
+
+      context "user opted into the legacy view" do
+        let(:current_user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
+        it "opts back out and redirects to the redesign" do
+          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
+          expect(response).to redirect_to(registration_path(bike))
+          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
+        end
+      end
+
+      context "user invalid for an unrelated reason" do
+        before { current_user.update_column(:preferred_language, "xx") }
+        it "flashes an error and returns to the view they came from" do
+          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
+          expect(response).to redirect_to(registration_path(bike))
+          expect(flash[:error]).to match(/unable to update/i)
+          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
+        end
       end
     end
   end

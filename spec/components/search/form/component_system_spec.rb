@@ -35,9 +35,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
     # Type a query into the combobox, then click the matching autocomplete option
     def combobox_select(query, option_text)
-      find(".hw-combobox__input").set(query)
+      type_into(".hw-combobox__input", query)
       expect(page).to have_css(".hw-combobox__option", text: option_text, wait: 30)
-      find(".hw-combobox__option", text: option_text, match: :first).click
+      click_combobox_option(option_text)
     end
 
     def expect_count(kind_scope, value = :greater_than_zero)
@@ -56,20 +56,31 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       end
     end
 
-    def expect_localstorage_location(location:, distance:)
-      local_storage = page.execute_script(<<~JS)
-        let storage = {};
-        for (let i = 0; i < localStorage.length; i++) {
-          let key = localStorage.key(i);
-          storage[key] = localStorage.getItem(key);
-        }
-        return storage;
+    def local_storage
+      page.evaluate_script(<<~JS)
+        (() => {
+          let storage = {};
+          for (let i = 0; i < localStorage.length; i++) {
+            let key = localStorage.key(i);
+            storage[key] = localStorage.getItem(key);
+          }
+          return storage;
+        })()
       JS
+    end
 
-      location_key = local_storage.find { |k, _| k.match?(/location/i) }&.first
-      distance_key = local_storage.find { |k, _| k.match?(/distance/i) }&.first
-      # pp local_storage
-      expect(local_storage).to match_hash_indifferently({location_key => location, distance_key => distance})
+    # kind_select_fields_controller writes these on turbo:submit-end, which fires
+    # after the URL changes; it namespaces the keys inside a component preview.
+    # Raise Capybara's error, not RSpec's: synchronize rescues StandardError, and
+    # an RSpec expectation failure descends from Exception, so it would never retry.
+    def expect_localstorage_location(location:, distance:)
+      expected = {"preview-searchLocation" => location, "preview-searchDistance" => distance}
+      stored = page.document.synchronize(5) do
+        local_storage.tap do |storage|
+          raise Capybara::ExpectationNotMet unless expected.keys.all? { |key| storage[key] }
+        end
+      end
+      expect(stored).to match_hash_indifferently(expected)
     end
 
     it "submits after selecting a color" do
@@ -89,8 +100,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       find("#location").set(location)
       expect(page_text(page.text)).to match("miles of")
 
-      # Enter on the empty combobox input submits the search
-      find(".hw-combobox__input").send_keys(:return)
+      # Submit via the button — Enter on the combobox is flaky under Playwright
+      # (refocusing it reopens the dropdown, which swallows the keypress).
+      find("#search-button").click
       expect(page).to have_current_path(/\?/, wait: 5)
 
       expect_localstorage_location(location:, distance:)
@@ -109,7 +121,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     end
 
     it "adds the matching option when enter is pressed" do
-      find(".hw-combobox__input").set("Burg")
+      type_into(".hw-combobox__input", "Burg")
       # Wait for filtering to settle to the single match before pressing enter
       expect(page).to have_css(".hw-combobox__option", text: "Burgundy", count: 1, wait: 30)
       expect(page).to have_no_css(".hw-combobox__option", text: "Black")
@@ -125,7 +137,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       Autocomplete::Loader.load_all(%w[Color])
       visit(preview_path)
 
-      find(".hw-combobox__input").set("Reddish")
+      type_into(".hw-combobox__input", "Reddish")
       expect(page).to have_css(".hw-combobox__option", wait: 10)
 
       expect(page.evaluate_script("document.body.dataset.xss")).to be_nil

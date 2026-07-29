@@ -47,7 +47,7 @@ RSpec.describe Images::StolenProcessor do
       expect(stolen_record.reload.image_four_by_five.blob.metadata["image_id"]).to eq public_image.id
       expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
       # No new jobs are enqueued
-      expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
+      expect(BikeJobs::AfterStolenRecordSaveJob.jobs.count).to eq 0
 
       stolen_record.bike.update_column :updated_at, Time.current - 1.hour
       # It doesn't create again
@@ -59,7 +59,7 @@ RSpec.describe Images::StolenProcessor do
       # It doesn't update the updated_at
       expect(stolen_record.reload.bike.updated_at).to be_within(1).of(Time.current - 1.hour)
       # No new jobs are enqueued
-      expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
+      expect(BikeJobs::AfterStolenRecordSaveJob.jobs.count).to eq 0
     end
 
     context "public_image deleted" do
@@ -159,6 +159,17 @@ RSpec.describe Images::StolenProcessor do
       end
     end
 
+    context "public_image file missing on disk" do
+      it "does not raise and skips attaching images" do
+        expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
+        FileUtils.rm(public_image.image.path)
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 0
+        expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
+      end
+    end
+
     context "with stock photo" do
       let(:bike) { FactoryBot.create(:bike, stock_photo_url:) }
       let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/13095/csm_INFINITO_CV_SUPER_RECORD_EPS_Compact_2a2c680c1b.jpg" }
@@ -175,12 +186,26 @@ RSpec.describe Images::StolenProcessor do
           expect(stolen_record.images_attached_id).to eq "b#{bike.id}"
         end
       end
+
+      # URI.open returns a StringIO (rather than a file) for photos under 10kb
+      context "under 10kb" do
+        let(:stock_photo_url) { "https://bikeindex.org/apple-touch-icon.png" }
+        it "creates" do
+          VCR.use_cassette("Images-StolenProcessor-small_stock_photo") do
+            expect do
+              described_class.update_alert_images(stolen_record)
+            end.to change(ActiveStorage::Blob, :count).by 3
+            expect(stolen_record.reload.images_attached?).to be_truthy
+            expect(stolen_record.images_attached_id).to eq "b#{bike.id}"
+          end
+        end
+      end
     end
   end
 
   describe "#stolen_record_location" do
     let(:state) { FactoryBot.create(:state_california) }
-    let(:location_attrs) { {state: state, country: Country.united_states, street: "100 W 1st St", city: "Los Angeles", zipcode: "90021", latitude: 34.05223, longitude: -118.24368} }
+    let(:location_attrs) { {region_record: state, country: Country.united_states, street: "100 W 1st St", city: "Los Angeles", postal_code: "90021", latitude: 34.05223, longitude: -118.24368} }
     context "stolen record with a location" do
       let(:stolen_record) { StolenRecord.new(location_attrs) }
       it "returns the stolen record location" do
@@ -188,20 +213,20 @@ RSpec.describe Images::StolenProcessor do
         expect(described_class.send(:stolen_record_location, stolen_record)).to eq("Los Angeles, CA")
       end
     end
-    context "stolen_record without street, zipcode or city" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record, location_attrs.slice(:country, :state, :latitude, :longitude).merge(skip_geocoding: false)) }
+    context "stolen_record without street, postal_code or city" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record, location_attrs.slice(:country, :region_record, :latitude, :longitude).merge(skip_geocoding: false)) }
       it "returns without" do
         expect(stolen_record.to_coordinates).to eq([nil, nil])
         expect(described_class.send(:stolen_record_location, stolen_record)).to be_blank
       end
     end
     context "Edmonton" do
-      let(:location_attrs) { {street: "7935 Gateway Blvd", city: "Edmonton", zipcode: "T6E 3X8", latitude: 53.515072, longitude: -113.494412, state: nil, country: Country.canada} }
+      let(:location_attrs) { {street: "7935 Gateway Blvd", city: "Edmonton", postal_code: "T6E 3X8", latitude: 53.515072, longitude: -113.494412, region_record: nil, region_string: "AB", country: Country.canada} }
       let(:stolen_record) { FactoryBot.create(:stolen_record, location_attrs.merge(skip_geocoding: true)) }
       it "returns edmonton" do
         stolen_record.reload
         expect(stolen_record.to_coordinates).to eq([location_attrs[:latitude], location_attrs[:longitude]])
-        expect(described_class.send(:stolen_record_location, stolen_record)).to eq("Edmonton, Canada")
+        expect(described_class.send(:stolen_record_location, stolen_record)).to eq("Edmonton, AB, Canada")
       end
     end
   end
@@ -221,14 +246,6 @@ RSpec.describe Images::StolenProcessor do
 
       it "creates an image matching target" do
         expect_images_to_match(generated_image, target_image)
-      end
-
-      context "when image is a StringIO" do
-        let(:image) { StringIO.new(File.binread(Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg"))) }
-
-        it "creates an image matching target" do
-          expect_images_to_match(generated_image, target_image)
-        end
       end
     end
 

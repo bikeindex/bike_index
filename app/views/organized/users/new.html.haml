@@ -11,16 +11,16 @@
   - if current_organization.enabled?("passwordless_users")
     %p= t(".automatic_passwordless")
 
-    - if current_organization.passwordless_user_domain.present?
+    - if current_organization.user_email_domain.present?
       .alert.alert-info.mt-4.col-md-8.offset-md-1
         %strong
           = t(".you_have_a_permitted_domain")
         %br
-        = t(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
+        = t(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.user_email_domain}", org_name: current_organization.short_name)
 
 = form_for @organization_role, { as: :organization_role, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
 
-  = render(Alerts::ObjectErrors::Component.new(object: @organization_role, name: t(".organization_role")))
+  = render(UI::Alerts::ObjectError::Component.new(object: @organization_role, name: t(".organization_role")))
 
   - display_multi_invite = params[:multiple_emails_invited].present?
   .form-group.row#singleEmailInvite{ class: display_multi_invite ? "currently-hidden" : "" }

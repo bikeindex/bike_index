@@ -9,7 +9,7 @@ module Spreadsheets
     EXPORT_COLUMNS = %i[flavor families].freeze
 
     def to_csv(primary_activities = nil)
-      primary_activities ||= PrimaryActivity.by_priority
+      primary_activities ||= PrimaryActivity.by_priority.includes(:primary_activity_family)
 
       CSV.generate do |csv|
         csv << EXPORT_COLUMNS
@@ -29,8 +29,15 @@ module Spreadsheets
 
     def names_and_families(primary_activities)
       flavors_families = {}
+      # A family exports as a flavor-less row; import upserts the family and creates no flavor
+      family_rows = []
 
-      primary_activities.flavor.each do |primary_activity|
+      primary_activities.each do |primary_activity|
+        if primary_activity.family?
+          family_rows << [nil, primary_activity.name]
+          next
+        end
+
         family_name = primary_activity.top_level? ? nil : primary_activity.family_name
         flavors_families[primary_activity.name] ||= family_name
         next if flavors_families[primary_activity.name] == family_name
@@ -39,7 +46,7 @@ module Spreadsheets
         flavors_families[primary_activity.name] += " & #{family_name}"
       end
 
-      flavors_families.to_a
+      family_rows + flavors_families.to_a
     end
 
     def update_or_create_for!(row)

@@ -111,6 +111,72 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
     end
+
+    describe "short_id" do
+      # The short_id "/" is a real path separator here (e.g. /api/v3/bikes/r/35); the "_" and
+      # "-" separators (see ShortId.decode) are accepted equivalents.
+      # Pin the id: ShortId.encode only stays decimal below 1296 (see its spec)
+      let(:bike) { FactoryBot.create(:bike, id: 35) }
+
+      it "finds the bike from its short_id (r/ and r_)" do
+        expect(bike.short_id).to eq "r/35"
+        [bike.short_id, bike.short_id.tr("/", "_")].each do |short_id|
+          get "/api/v3/bikes/#{short_id}", params: {format: :json}
+          expect(response.code).to eq("200")
+          expect(json_result["bike"]["id"]).to eq bike.id
+        end
+      end
+
+      context "bike_sticker short_id" do
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "A044", bike: bike) }
+
+        it "finds the sticker's bike (s/, lowercase, and s-)" do
+          expect(bike_sticker.short_id).to eq "s/A44" # code normalizes, stripping the leading zero
+          ["s/A44", "s/a044", "s-A44"].each do |short_id|
+            get "/api/v3/bikes/#{short_id}", params: {format: :json}
+            expect(response.code).to eq("200")
+            expect(json_result["bike"]["id"]).to eq bike.id
+          end
+        end
+
+        it "responds with 404 for an unknown sticker" do
+          get "/api/v3/bikes/s/nope999", params: {format: :json}
+          expect(response.code).to eq("404")
+          expect(json_result["error"]).to eq "Unable to find bike sticker: nope999"
+        end
+
+        it "responds with 404 for an unassigned sticker" do
+          unassigned = FactoryBot.create(:bike_sticker, code: "B22")
+          expect(unassigned.bike_id).to be_nil
+          get "/api/v3/bikes/#{unassigned.short_id}", params: {format: :json}
+          expect(response.code).to eq("404")
+          expect(json_result["error"]).to eq "Bike sticker B22 is not assigned to a bike"
+        end
+      end
+
+      context "soft-deleted bike with an assigned sticker" do
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "C55", bike: bike) }
+        before { bike.destroy }
+
+        it "404s identically by id and short_id, and reads the sticker as unassigned" do
+          expect(bike.deleted_at).to be_present
+
+          # the bike id and its r/ short_id are no longer visible - identical 404
+          get "/api/v3/bikes/#{bike.id}", params: {format: :json}
+          expect(response.code).to eq("404")
+          by_id_error = json_result["error"]
+
+          get "/api/v3/bikes/#{bike.short_id}", params: {format: :json}
+          expect(response.code).to eq("404")
+          expect(json_result["error"]).to eq by_id_error
+
+          # the sticker still points at the now-invisible bike, so it reads as unassigned
+          get "/api/v3/bikes/s/C55", params: {format: :json}
+          expect(response.code).to eq("404")
+          expect(json_result["error"]).to eq "Bike sticker C55 is not assigned to a bike"
+        end
+      end
+    end
   end
 
   describe "check_if_registered" do
@@ -894,7 +960,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.status_stolen?).to be_truthy
       stolen_record = bike.current_stolen_record
       expect(stolen_record.country_id).to eq Country.canada.id
-      expect(stolen_record.state_id).to be_nil
+      expect(stolen_record.region_record_id).to be_nil
       expect(stolen_record.city).to eq "Edmonton"
     end
 
@@ -1283,7 +1349,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.reload.status_stolen?).to be_truthy
       stolen_record = bike.current_stolen_record
       expect(stolen_record.country_id).to eq Country.canada.id
-      expect(stolen_record.state_id).to be_nil
+      expect(stolen_record.region_record_id).to be_nil
       expect(stolen_record.city).to eq "Edmonton"
     end
 

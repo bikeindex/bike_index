@@ -13,6 +13,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     load Rails.root.join("db/seeds/seed_registration_sequence_template.rb").to_s
     visit new_session_path
     fill_in "Email", with: user.email
+    click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
   end
@@ -47,8 +48,8 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
 
     attach_file "registration_sequence_page[image]",
       Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true
-    # the Form::FileUpload Stimulus controller reflects the chosen file
-    expect(page).to have_css("[data-form--file-upload-target='filename']", text: "bike.jpg")
+    # the UI::Forms::FileUpload Stimulus controller reflects the chosen file
+    expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "bike.jpg")
 
     click_button "Save page"
 

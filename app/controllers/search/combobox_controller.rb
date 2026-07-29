@@ -1,24 +1,37 @@
 # frozen_string_literal: true
 
 module Search
-  # Backs the search query items combobox (Search::EverythingCombobox::Component):
-  # autocomplete options and the selection chips, both rendered for hotwire_combobox.
+  # Backs the comboboxes that autocomplete from the Autocomplete index: the search
+  # query items (Search::EverythingCombobox::Component) - options and selection chips -
+  # and the manufacturer picker (UI::Forms::ComboboxManufacturer::Component).
   class ComboboxController < ApplicationController
     PER_PAGE = 15
 
-    # Both actions only ever render turbo_stream
+    # Every action only ever renders turbo_stream
     before_action { request.format = :turbo_stream }
 
     def options
       matches = Autocomplete::Matcher.search(autocomplete_params)
-      next_page = (matches.length >= PER_PAGE) ? current_page + 1 : nil
 
       render turbo_stream: view_context.render(
         Search::EverythingComboboxOptions::Component.new(
           matches:,
           search_obj_name: params[:search_obj_name].presence || "Registrations",
-          next_page:,
+          next_page: next_page_for(matches),
           q: params[:q]
+        )
+      )
+    end
+
+    def manufacturers
+      matches = Autocomplete::Matcher.search(manufacturer_params)
+
+      render turbo_stream: view_context.render(
+        UI::Forms::ComboboxManufacturerOptions::Component.new(
+          matches:,
+          next_page: next_page_for(matches),
+          q: params[:q],
+          no_manufacturer_other: Binxtils::InputNormalizer.boolean(params[:no_manufacturer_other])
         )
       )
     end
@@ -40,6 +53,17 @@ module Search
 
     def autocomplete_params
       params.permit(:q, :page, :categories, :cache).merge(per_page: PER_PAGE)
+    end
+
+    # frame_maker limits the categories to manufacturers that make frames
+    def manufacturer_params
+      categories = Binxtils::InputNormalizer.boolean(params[:frame_maker]) ? %w[frame_mnfg] : %w[cmp_mnfg frame_mnfg]
+
+      autocomplete_params.merge(categories:)
+    end
+
+    def next_page_for(matches)
+      (matches.length >= PER_PAGE) ? current_page + 1 : nil
     end
 
     def current_page

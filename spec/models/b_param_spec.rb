@@ -37,6 +37,27 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "stolen_attrs" do
+    context "legacy attribute names" do
+      let(:b_param) { BParam.new(params: {stolen_record: {address: "100 Main St", zipcode: "60622", state_id: 12}}) }
+      it "renames to the current attributes" do
+        expect(b_param.stolen_attrs).to eq({"street" => "100 Main St", "postal_code" => "60622", "region_record_id" => 12})
+      end
+      context "nested in stolen_records_attributes" do
+        let(:b_param) { BParam.new(params: {bike: {stolen_records_attributes: {"0" => {zipcode: "60622", street: "100 Main St"}}}}) }
+        it "renames to the current attributes" do
+          expect(b_param.stolen_attrs).to eq({"street" => "100 Main St", "postal_code" => "60622"})
+        end
+      end
+      context "with both legacy and current names" do
+        let(:b_param) { BParam.new(params: {stolen_record: {zipcode: "60622", postal_code: "10007"}}) }
+        it "prefers the current name" do
+          expect(b_param.stolen_attrs).to eq({"postal_code" => "10007"})
+        end
+      end
+    end
+  end
+
   describe "clean_params" do
     context "passed params" do
       it "calls the things we want it to call" do
@@ -259,6 +280,26 @@ RSpec.describe BParam, type: :model do
           expect(b_param.bike["manufacturer_id"]).to eq(manufacturer.id)
         end
       end
+    end
+  end
+
+  describe "image processing" do
+    let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }
+    let(:b_param) { FactoryBot.build(:b_param) }
+
+    # Regression: process_in_background with a non-Delay uploader resized inline in the
+    # request, hitting the 30s Rack::Timeout on bikes#create (Honeybadger 132565677)
+    it "defers version generation to the background job instead of resizing inline" do
+      ImageUploaderBackgrounded.enable_processing = true
+      b_param.image = image_file
+      expect { b_param.save! }.to change(CarrierWaveProcessJob.jobs, :size).by(1)
+      expect(b_param.process_image_upload).to be_nil
+      expect(b_param.image.file).to be_present # original stored synchronously
+      expect(b_param.image.large.file).to be_blank # resized versions deferred to the job
+    ensure
+      ImageUploaderBackgrounded.enable_processing = false
+      b_param.image&.remove!
+      image_file.close
     end
   end
 
@@ -511,6 +552,23 @@ RSpec.describe BParam, type: :model do
         expect(result.id).to be_nil
         expect(result.creator_id).to eq user.id
       end
+      context "with no creator" do
+        it "does not return that BParam" do
+          b_param_nil.update_columns(id_token: nil, creator_id: nil)
+          result = BParam.find_or_new_from_token(nil, user_id: user.id)
+          expect(result.is_a?(BParam)).to be_truthy
+          expect(result.id).to be_nil
+          expect(result.creator_id).to eq user.id
+        end
+      end
+    end
+  end
+
+  describe "with_organization_or_no_creator" do
+    it "returns nil for a blank token" do
+      FactoryBot.create(:b_param) # a creator-less b_param that a blank token must not match
+      expect(BParam.with_organization_or_no_creator(nil)).to be_nil
+      expect(BParam.with_organization_or_no_creator("")).to be_nil
     end
   end
 

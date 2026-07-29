@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe StolenRecord, type: :model do
-  it_behaves_like "geocodeable_legacy"
+  it_behaves_like "geocodeable"
   it_behaves_like "default_currencyable"
 
   describe "factories" do
@@ -44,7 +44,7 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record_instance = StolenRecord.find(stolen_record.id)
         Sidekiq::Job.clear_all
         stolen_record_instance.update(phone: "1112223333")
-        expect(StolenBike::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
+        expect(BikeJobs::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
           .to eq([stolen_record_instance.id, false])
       end
     end
@@ -54,7 +54,7 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record_instance = StolenRecord.find(stolen_record.id)
         Sidekiq::Job.clear_all
         stolen_record_instance.update(city: "New city")
-        expect(StolenBike::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
+        expect(BikeJobs::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
           .to eq([stolen_record_instance.id, true])
       end
     end
@@ -171,25 +171,27 @@ RSpec.describe StolenRecord, type: :model do
     it "creates an address" do
       stolen_record = StolenRecord.new(street: "2200 N Milwaukee Ave",
         city: "Chicago",
-        state_id: state.id,
-        zipcode: "60647",
-        country_id: country.id)
-      expect(stolen_record.address).to eq("Chicago, XXX 60647, NEVVVV")
-      expect(stolen_record.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
-      expect(stolen_record.address).to eq("Chicago, XXX 60647, NEVVVV")
+        region_record_id: state.id,
+        postal_code: "60647",
+        country_id: country.id,
+        skip_geocoding: true)
+      expect(stolen_record.formatted_address_string).to eq("Chicago, XXX 60647, Neverland")
+      expect(stolen_record.formatted_address_string(visible_attribute: :street)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, Neverland")
+      expect(stolen_record.formatted_address_string).to eq("Chicago, XXX 60647, Neverland")
       expect(stolen_record.display_checklist?).to be_truthy
     end
     it "is ok with missing information" do
       stolen_record = StolenRecord.new(street: "2200 N Milwaukee Ave",
-        zipcode: "60647",
-        country_id: country.id)
-      expect(stolen_record.address).to eq("60647, NEVVVV")
-      expect(stolen_record.without_location?).to be_falsey
-      expect(stolen_record.address).to eq("60647, NEVVVV")
+        postal_code: "60647",
+        country_id: country.id,
+        skip_geocoding: true)
+      expect(stolen_record.formatted_address_string).to eq("60647, Neverland")
+      expect(stolen_record.without_street?).to be_falsey
+      expect(stolen_record.formatted_address_string).to eq("60647, Neverland")
     end
-    it "returns nil if there is no country" do
-      stolen_record = StolenRecord.new(street: "302666 Richmond Blvd")
-      expect(stolen_record.address).to be_nil
+    it "returns blank if there is no address" do
+      stolen_record = StolenRecord.new(skip_geocoding: true)
+      expect(stolen_record.formatted_address_string).to be_blank
     end
   end
 
@@ -263,20 +265,6 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record.set_calculated_attributes
         expect(stolen_record.phone).to eq("0000000000")
         expect(stolen_record.secondary_phone).to eq("+22 0000000000 x000")
-      end
-    end
-
-    describe "titleize_city" do
-      it "it should titleize_city" do
-        stolen_record = StolenRecord.new(city: "INDIANAPOLIS, IN USA")
-        stolen_record.set_calculated_attributes
-        expect(stolen_record.city).to eq("Indianapolis")
-      end
-
-      it "it shouldn't remove other things" do
-        stolen_record = StolenRecord.new(city: "Georgian la")
-        stolen_record.set_calculated_attributes
-        expect(stolen_record.city).to eq("Georgian La")
       end
     end
 
@@ -505,26 +493,26 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  describe "#address" do
-    context "given include_all" do
+  describe "#formatted_address_string" do
+    context "with full address" do
       it "returns all available location components" do
-        stolen_record = FactoryBot.create(:stolen_record, :in_nyc_legacy)
-        expect(stolen_record.address).to eq("New York, NY 10007, US")
-        expect(stolen_record.address(country: [:skip_default])).to eq("New York, NY 10007")
+        stolen_record = FactoryBot.create(:stolen_record, :in_nyc)
+        expect(stolen_record.formatted_address_string).to eq("New York, NY 10007")
+        expect(stolen_record.formatted_address_string(render_country: true)).to eq("New York, NY 10007, United States")
         stolen_record.street = ""
-        expect(stolen_record.without_location?).to be_truthy
+        expect(stolen_record.without_street?).to be_truthy
 
         ca = FactoryBot.create(:state_california)
-        stolen_record = FactoryBot.create(:stolen_record, city: nil, state: ca, country: Country.united_states)
-        expect(stolen_record.address).to eq("CA, US")
-        expect(stolen_record.address(country: [:skip_default])).to eq("CA")
+        stolen_record = FactoryBot.create(:stolen_record, city: nil, region_record: ca, country: Country.united_states)
+        expect(stolen_record.formatted_address_string).to eq("CA")
+        expect(stolen_record.formatted_address_string(render_country: true)).to eq("CA, United States")
       end
     end
 
     context "given only a city" do
-      it "returns nil" do
-        stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: nil)
-        expect(stolen_record.address).to eq("New Paltz")
+      it "returns the city" do
+        stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", region_record_id: nil)
+        expect(stolen_record.formatted_address_string).to eq("New Paltz")
       end
     end
   end
@@ -561,9 +549,9 @@ RSpec.describe StolenRecord, type: :model do
       {
         street: "Special Broadway location",
         city: "New York",
-        zipcode: "10007",
+        postal_code: "10007",
         neighborhood: "Tribeca",
-        state_id: state.id,
+        region_record_id: state.id,
         latitude: latitude,
         longitude: longitude
       }
@@ -576,15 +564,15 @@ RSpec.describe StolenRecord, type: :model do
       expect(stolen_record.reload).to have_attributes target_attributes
     end
     context "with location attributes set" do
-      let(:location_attributes) { {country_id: country.id, state_id: FactoryBot.create(:state).id, zipcode: "99999", city: "A City"} }
+      let(:location_attributes) { {country_id: country.id, region_record_id: FactoryBot.create(:state).id, postal_code: "99999", city: "A City"} }
       before { stolen_record.attributes = location_attributes }
       it "does not call geocoder" do
         expect(Geocoder).to_not receive(:search)
         stolen_record.save!
         expect(stolen_record.reload).to have_attributes location_attributes
       end
-      context "with canada (no state_id)" do
-        let(:location_attributes) { {country_id: Country.canada.id, state_id: nil, zipcode: "99999", city: "A City"} }
+      context "with canada (no region_record_id)" do
+        let(:location_attributes) { {country_id: Country.canada.id, region_record_id: nil, postal_code: "99999", city: "A City"} }
         it "does not call geocoder" do
           expect(Geocoder).to_not receive(:search)
           stolen_record.save!
@@ -597,7 +585,7 @@ RSpec.describe StolenRecord, type: :model do
   describe "promoted alert recovery notification" do
     context "if marked as recovered while a promoted alert is active" do
       it "sends an admin notification" do
-        stolen_record = FactoryBot.create(:stolen_record, :in_chicago_legacy)
+        stolen_record = FactoryBot.create(:stolen_record, :in_chicago)
         theft_alert = FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
         stolen_record.reload
         expect(stolen_record.theft_alert_missing_photo?).to be_truthy

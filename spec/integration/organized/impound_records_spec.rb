@@ -29,6 +29,8 @@ RSpec.describe "Organized impound records index", :js, type: :system do
       display_id_integer: 9002,
       impounded_from_address_record: FactoryBot.create(:address_record, :los_angeles, kind: :impounded_from))
   end
+  # A separate bike to impound through the registration show page
+  let(:impound_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
   include_context :geocoder_default_location
   include_context :geocoder_stubbed_bounding_box
 
@@ -54,6 +56,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     page.current_window.resize_to(1280, 900)
     visit new_session_path
     fill_in "Email", with: user.email
+    click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     find(".alert-success .close").click
@@ -155,14 +158,14 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(checkbox_for(unregistered)).to be_disabled
 
     # Submitting with nothing checked shows an error and doesn't submit
-    within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
+    within("#impoundRecordUpdateForm") { find("button[type=submit]").click }
     expect(page).to have_css("[role=alert]", text: /select at least one record/i)
     expect(unregistered.impound_record_updates).to be_empty
 
     # Checking a row hides the error again
     check_for_update(registered)
     expect(page).to have_no_css("[role=alert]", text: /select at least one record/i)
-    within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
+    within("#impoundRecordUpdateForm") { find("button[type=submit]").click }
 
     expect(page).to have_content("Updated 1 impound record", wait: 10)
     expect(registered.impound_record_updates.pluck(:kind)).to eq ["retrieved_by_owner"]
@@ -199,7 +202,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(checkbox_for(impounded_nyc)).to be_checked
     expect(checkbox_for(impounded_la)).to be_checked
     fill_in "impound_record_update[notes]", with: "multi-update note"
-    within("#impoundRecordUpdateForm") { find("input[type=submit]").click }
+    within("#impoundRecordUpdateForm") { find("button[type=submit]").click }
 
     expect(page).to have_content("Updated 3 impound record", wait: 10)
     [unregistered, impounded_nyc, impounded_la].each do |record|
@@ -207,5 +210,33 @@ RSpec.describe "Organized impound records index", :js, type: :system do
       expect(last_update.kind).to eq "note"
       expect(last_update.notes).to eq "multi-update note"
     end
+  end
+
+  it "impounds a bike via the org-admin impound action on the registration show page" do
+    visit registration_path(impound_bike)
+
+    # The impound action opens the shared parking panel in impound mode
+    click_button "Impound"
+    expect(page).to have_content(/impound this bike/i)
+
+    # Enter the address by hand to skip the geolocation prompt and enable submit
+    choose "Enter address manually", allow_label_click: true
+    fill_in "parking_notification_street", with: "100 Main St"
+    fill_in "parking_notification_city", with: "New York"
+
+    Sidekiq::Job.clear_all
+    expect {
+      click_button "Create parking notification"
+      expect(page).to have_content("Parking Notification for #{impound_bike.type} created", wait: 10)
+    }.to change(impound_bike.parking_notifications, :count).by(1)
+      .and change(ProcessParkingNotificationJob.jobs, :count).by(1)
+
+    expect(impound_bike.reload.parking_notifications.last.kind).to eq "impound_notification"
+
+    # The impound record is created when the notification is processed
+    expect { ProcessParkingNotificationJob.drain }.to change(ImpoundRecord, :count).by(1)
+    impound_record = impound_bike.reload.current_impound_record
+    expect(impound_record.organization).to eq organization
+    expect(impound_record.user).to eq user
   end
 end

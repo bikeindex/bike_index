@@ -54,7 +54,7 @@ RSpec.describe BikeServices::StolenRecordUpdator do
         theft_description: "blah blah blah",
         street: "some address",
         city: "Big town",
-        zipcode: "60666"
+        postal_code: "60666"
       }
       b_param = BParam.new(params: {stolen_record: sr}.as_json)
       stolen_record = StolenRecord.new
@@ -65,7 +65,7 @@ RSpec.describe BikeServices::StolenRecordUpdator do
       expect(stolen_record.theft_description).to eq(sr[:theft_description])
       expect(stolen_record.street).to eq(sr[:street])
       expect(stolen_record.city).to eq(sr[:city])
-      expect(stolen_record.zipcode).to eq("60666")
+      expect(stolen_record.postal_code).to eq("60666")
       expect(stolen_record.date_stolen.to_i).to be_within(1).of target_time
     end
 
@@ -81,7 +81,7 @@ RSpec.describe BikeServices::StolenRecordUpdator do
       updator = BikeServices::StolenRecordUpdator.new(b_param: b_param)
       stolen_record = updator.send(:update_with_params, stolen_record)
       expect(stolen_record.country).to eq(country)
-      expect(stolen_record.state).to eq(state)
+      expect(stolen_record.region_record).to eq(state)
     end
   end
 end

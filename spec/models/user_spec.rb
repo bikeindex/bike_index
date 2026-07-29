@@ -224,6 +224,33 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "registration_show_redesign?" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "is falsey when not in the rollout" do
+      expect(user.registration_show_toggleable?).to be_falsey
+      expect(user.registration_show_redesign?).to be_falsey
+    end
+
+    context "in the rollout" do
+      before { Flipper.enable_actor(:bike_show_redesign_toggle, user) }
+
+      it "is truthy" do
+        expect(user.registration_show_toggleable?).to be_truthy
+        expect(user.registration_show_redesign?).to be_truthy
+      end
+
+      context "switched to the legacy view" do
+        let(:user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
+
+        it "is toggleable, but not the redesign" do
+          expect(user.registration_show_toggleable?).to be_truthy
+          expect(user.registration_show_redesign?).to be_falsey
+        end
+      end
+    end
+  end
+
   describe "superuser?" do
     let(:user) { User.new }
     it "is true for superuser attribute" do
@@ -619,6 +646,18 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "refreshed_magic_link_token" do
+    let(:user) { FactoryBot.create(:user) }
+
+    it "generates a token, reuses it while unexpired, replaces it once expired" do
+      token = user.refreshed_magic_link_token
+      expect(token).to be_present
+      expect(user.refreshed_magic_link_token).to eq token
+      user.update_auth_token("magic_link_token", (Time.current - 3.hours).to_i)
+      expect(user.refreshed_magic_link_token).to_not eq token
+    end
+  end
+
   describe "update_last_login" do
     let(:user) { FactoryBot.create(:user) }
     let(:update_time) { Time.current - 3.hours }
@@ -874,6 +913,19 @@ RSpec.describe User, type: :model do
     it "returns false if the user has no ambassadorships" do
       user = FactoryBot.create(:organization_user)
       expect(user).to_not be_ambassador
+    end
+  end
+
+  describe "looks_like_spam?" do
+    let(:user) { User.new }
+    it "is false without the honeypot" do
+      expect(user.looks_like_spam?).to be_falsey
+    end
+    context "with the additional honeypot filled" do
+      let(:user) { User.new(additional: "http://spam.example.com") }
+      it "is true" do
+        expect(user.looks_like_spam?).to be_truthy
+      end
     end
   end
 

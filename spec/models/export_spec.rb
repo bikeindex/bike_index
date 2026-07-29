@@ -213,6 +213,64 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  describe "undo_bike_stickers_and_record!" do
+    let(:export) { FactoryBot.create(:export_organization) }
+    let(:organization) { export.organization }
+    let(:user) { FactoryBot.create(:user) }
+    let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:, code: "A11") }
+    let(:exported_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let(:later_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    before do
+      export.update(options: export.options.merge(assign_bike_codes: true, bike_codes_assigned: ["A11"]))
+    end
+
+    def export_claim(bike)
+      bike_sticker.claim(user:, bike:, organization:, export_id: export.id, creator_kind: "creator_export")
+    end
+
+    it "enqueues a revert for the export's sticker update" do
+      export_claim(exported_bike)
+      bike_sticker_update = bike_sticker.bike_sticker_updates.last
+      expect {
+        export.undo_bike_stickers_and_record!
+      }.to change(RevertBikeStickerUpdateJob.jobs, :count).by 1
+      expect(RevertBikeStickerUpdateJob.jobs.last["args"]).to eq([bike_sticker_update.id])
+      expect(export.reload.bike_codes_undone?).to be_truthy
+      expect(export.bike_stickers_not_undone).to eq([])
+    end
+
+    it "reverts the sticker when the job runs" do
+      export_claim(exported_bike)
+      expect(bike_sticker.reload.bike).to eq exported_bike
+      Sidekiq::Testing.inline! { export.undo_bike_stickers_and_record! }
+      expect(bike_sticker.reload.bike).to be_nil
+      expect(bike_sticker.bike_sticker_updates.count).to eq 0
+    end
+
+    context "sticker was claimed again after the export" do
+      it "skips it and records the code" do
+        export_claim(exported_bike)
+        bike_sticker.claim(user:, bike: later_bike, organization:)
+        expect {
+          export.undo_bike_stickers_and_record!
+        }.to_not change(RevertBikeStickerUpdateJob.jobs, :count)
+        expect(export.reload.bike_codes_undone?).to be_truthy
+        expect(export.bike_stickers_not_undone).to eq(["A11"])
+        expect(bike_sticker.reload.bike).to eq later_bike
+      end
+    end
+
+    context "already undone" do
+      it "does not re-run" do
+        export_claim(exported_bike)
+        export.undo_bike_stickers_and_record!
+        expect {
+          export.undo_bike_stickers_and_record!
+        }.to_not change(RevertBikeStickerUpdateJob.jobs, :count)
+      end
+    end
+  end
+
   describe "bikes_scoped" do
     # Pending - we're getting the organization scopes up and running before migrating existing Spreadsheets::TsvCreator tasks
     # But we eventually want to add stolen tsv's into here

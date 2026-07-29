@@ -207,7 +207,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(location1.email).to eq "stuff@goooo.com"
             expect(location1.publicly_visible).to be_truthy
             expect(location1.impound_location).to be_falsey
-            expect(location1.address_record).to have_attributes(street: "some street 2", city: "First city",
+            expect(location1.address_record).to have_attributes(street: "some street 2", city: "First City",
               postal_code: "2222222", region_record_id: state.id, country_id: country.id)
 
             # second location
@@ -216,7 +216,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(location2.publicly_visible).to be_falsey
             expect(location2.impound_location).to be_truthy
             expect(location2.default_impound_location).to be_falsey
-            expect(location2.address_record).to have_attributes(street: "some street 2", city: "cool city",
+            expect(location2.address_record).to have_attributes(street: "some street 2", city: "Cool City",
               postal_code: "12243444", region_record_id: state.id, country_id: country.id)
           end
         end
@@ -344,7 +344,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.locations.count).to eq 1
             location = current_organization.locations.first
             expect(location.name).to eq "Second shop"
-            expect(location.address_record).to have_attributes(street: "some street 2", city: "cool city")
+            expect(location.address_record).to have_attributes(street: "some street 2", city: "Cool City")
           end
           context "location is default impound location" do
             let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }

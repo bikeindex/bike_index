@@ -299,7 +299,7 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
         let!(:public_image) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
         before do
           bike.reload.save
-          # bike.reload
+          public_image.reload # version URLs reconstruct from the stored identifier (generation is backgrounded)
         end
         it "returns expected thing" do
           expect_matching_tags(title:, description:, image: public_image.image_url(:large), updated_at: bike.updated_at)
@@ -310,10 +310,10 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
         let(:title) { "Stolen #{mnfg_name}" }
         let(:description) do
           "#{bike.primary_frame_color.name} #{mnfg_name}, serial: #{bike.serial_number.upcase}. " \
-          "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, US"
+          "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, United States"
         end
         it "returns expected things" do
-          expect(bike.reload.current_stolen_record.address).to eq "Chicago, IL 60608, US"
+          expect(bike.reload.current_stolen_record.formatted_address_string).to eq "Chicago, IL 60608"
 
           expect_matching_tags(title:, description:, updated_at: bike.updated_at)
         end

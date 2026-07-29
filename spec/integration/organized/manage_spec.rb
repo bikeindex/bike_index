@@ -11,6 +11,7 @@ RSpec.describe "Organized manage", :js, type: :system do
   before do
     visit new_session_path
     fill_in "Email", with: user.email
+    click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
   end
@@ -22,10 +23,10 @@ RSpec.describe "Organized manage", :js, type: :system do
     fill_in "Website", with: "https://example.com"
     check "Send emails directly to unclaimed bike owners."
 
-    expect(page).to have_css("[data-form--file-upload-target='filename']", text: "No file chosen")
+    expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "No file chosen")
     attach_file("organization[avatar]", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
-    # the Form::FileUpload Stimulus controller reflects the chosen file in the field
-    expect(page).to have_css("[data-form--file-upload-target='filename']", text: "bike.jpg")
+    # the UI::Forms::FileUpload Stimulus controller reflects the chosen file in the field
+    expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "bike.jpg")
 
     within("form.organized-form") { click_button "Update" }
 

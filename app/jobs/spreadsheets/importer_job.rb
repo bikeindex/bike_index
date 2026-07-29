@@ -3,6 +3,10 @@ module Spreadsheets
     RESOURCES_URL = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data".freeze
     # Maps each importer module (e.g. Spreadsheets::Manufacturers) to its CSV filename in the resources repo
     IMPORTERS = {"manufacturers" => "manufacturers", "primary_activities" => "primary_activities", "components" => "component_types"}.freeze
+    # db/seeds.rb runs this inline, so a transient blip reaching GitHub would abort the
+    # whole seed (e.g. CI). Retry a few times before giving up.
+    DOWNLOAD_ATTEMPTS = 3
+    RETRY_DELAY_SECONDS = 2
 
     def perform(name = nil)
       return IMPORTERS.each_key { |n| perform(n) } if name.blank?
@@ -22,16 +26,27 @@ module Spreadsheets
     private
 
     def download(url)
-      conn = Faraday.new do |faraday|
+      attempt = 0
+      begin
+        attempt += 1
+        response = connection.get(url)
+        raise "Failed to fetch #{url}: #{response.status}" unless response.success?
+
+        response.body
+      rescue Faraday::ConnectionFailed, Faraday::TimeoutError
+        raise if attempt >= DOWNLOAD_ATTEMPTS
+        sleep RETRY_DELAY_SECONDS
+        retry
+      end
+    end
+
+    def connection
+      Faraday.new do |faraday|
         faraday.use FaradayMiddleware::FollowRedirects, limit: 15
         faraday.adapter Faraday.default_adapter
         faraday.options.timeout = 30
-        faraday.options.open_timeout = 5
+        faraday.options.open_timeout = 10
       end
-      response = conn.get(url)
-      raise "Failed to fetch #{url}: #{response.status}" unless response.success?
-
-      response.body
     end
   end
 end

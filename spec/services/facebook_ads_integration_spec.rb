@@ -43,7 +43,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 999) }
       let(:bike) { Bike.new(id: 430872, mnfg_name: "Trek") } # Manually stubbing so test has a valid URL
       let(:canada) { Country.canada }
-      let(:stolen_record) { StolenRecord.new(bike: bike, city: "Edmonton", street: "10000 138 st", zipcode: "T5N 2H7", country: canada) }
+      let(:stolen_record) { StolenRecord.new(bike: bike, city: "Edmonton", street: "10000 138 st", postal_code: "T5N 2H7", country: canada) }
       let(:theft_alert) do
         TheftAlert.new(id: 12, theft_alert_plan: theft_alert_plan,
           stolen_record: stolen_record,
@@ -59,7 +59,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       describe "create_campaign" do
         let(:theft_alert) { TheftAlert.new(id: 12) }
         it "creates a campaign" do
-          expect(theft_alert.address_string).to eq "10000 138 st, Edmonton, T5N 2H7, CA"
+          expect(theft_alert.address_string).to eq "10000 138 st, Edmonton, T5N 2H7, Canada"
           VCR.use_cassette("facebook/ads_integration-create_campaign", match_requests_on: [:method]) do
             campaign = instance.create_campaign(theft_alert)
             expect(campaign).to be_present
@@ -199,6 +199,21 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
               expect(theft_alert.facebook_data["spend_cents"]).to eq 3793.0
               expect(theft_alert.reach).to eq 16_092
               expect(theft_alert.engagement).to be_present
+            end
+          end
+        end
+        context "insights missing unique_clicks" do
+          let(:amount_cents_facebook) { 3800 }
+          let(:facebook_data) { {ad_id: "6720937606414", adset_id: "6720937162214", campaign_id: "6720937063014", activating_at: Time.current.to_i, effective_object_story_id: "500198263370025_1118473403646138"} }
+          # Regression: reading a requested-but-unreturned field via the SDK reader raised
+          # "load! is not supported for this object"
+          it "sets engagement with a nil unique_clicks" do
+            VCR.use_cassette("facebook/ads_integration-update_facebook_data-no_unique_clicks", match_requests_on: [:method]) do
+              expect { instance.update_facebook_data(theft_alert) }.not_to raise_error
+              theft_alert.reload
+              expect(theft_alert.reach).to eq 16_092
+              expect(theft_alert.engagement["unique_clicks"]).to be_nil
+              expect(theft_alert.engagement["link_click"]).to eq "17"
             end
           end
         end

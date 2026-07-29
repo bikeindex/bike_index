@@ -1,0 +1,43 @@
+require "rails_helper"
+
+RSpec.describe BikeJobs::ApproveStolenListingJob, type: :job, vcr: true do
+  it "enqueues another awesome job" do
+    bike = FactoryBot.create(:bike)
+    BikeJobs::ApproveStolenListingJob.perform_async(bike.id)
+    expect(BikeJobs::ApproveStolenListingJob).to have_enqueued_sidekiq_job(bike.id)
+  end
+
+  context "given a bike with no current stolen record" do
+    it "raises ArgumentError" do
+      bike = FactoryBot.create(:bike)
+      job = -> { BikeJobs::ApproveStolenListingJob.new.perform(bike.id) }
+      expect { job.call }.to raise_error(ArgumentError)
+    end
+  end
+
+  context "given no social account" do
+    it "raises ArgumentError" do
+      bike = FactoryBot.create(:stolen_bike)
+      job = -> { BikeJobs::ApproveStolenListingJob.new.perform(bike.id) }
+      expect { job.call }.to raise_error(ArgumentError)
+    end
+  end
+
+  # Commented out in #2618 - twitter is disabled
+  #
+  # context "given a bike with a current stolen record and a nearby social account" do
+  #   let!(:social_account) { FactoryBot.create(:social_account_1, :active, :in_nyc_legacy) }
+  #   let!(:bike) { FactoryBot.create(:stolen_bike) }
+  #   it "creates social stolen bike alert" do
+  #     expect {
+  #       BikeJobs::ApproveStolenListingJob.new.perform(bike.id)
+  #     }.to change(SocialPost, :count).by 1
+  #   end
+  #   it "skips if posting disabled" do
+  #     stub_const("BikeJobs::ApproveStolenListingJob::TWEETING_DISABLED", true)
+  #     expect {
+  #       BikeJobs::ApproveStolenListingJob.new.perform(bike.id)
+  #     }.to change(SocialPost, :count).by 0
+  #   end
+  # end
+end

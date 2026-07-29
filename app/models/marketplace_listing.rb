@@ -59,7 +59,7 @@ class MarketplaceListing < ApplicationRecord
   validates_presence_of :seller_id
   validates_presence_of :status
 
-  # skip_update doesn't do anything yet, added so it can be passed in CallbackJob::AddressRecordUpdateAssociationsJob
+  # skip_update doesn't do anything yet, added so it can be passed in CallbackJobs::AddressRecordUpdateAssociationsJob
   attr_accessor :skip_update
 
   # validate that there isn't another current listing for an item

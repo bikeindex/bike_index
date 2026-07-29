@@ -18,7 +18,7 @@ module Admin
           stolen_record_ids.each do |id|
             stolen_record = StolenRecord.unscoped.find(id)
             stolen_record.update_attribute :approved, true
-            StolenBike::ApproveStolenListingJob.perform_async(stolen_record.bike_id)
+            BikeJobs::ApproveStolenListingJob.perform_async(stolen_record.bike_id)
           end
           # Lazy pluralize hack
           flash[:success] = "#{stolen_record_ids.count} stolen #{(stolen_record_ids.count == 1) ? "bike" : "bikes"} approved!"
@@ -29,7 +29,7 @@ module Admin
       else
         find_bike
         @bike.current_stolen_record.update_attribute :approved, true
-        StolenBike::ApproveStolenListingJob.perform_async(@bike.id)
+        BikeJobs::ApproveStolenListingJob.perform_async(@bike.id)
         flash[:success] = "Stolen Bike was approved"
         redirect_to edit_admin_stolen_bike_url(@bike)
       end
@@ -91,7 +91,7 @@ module Admin
       end
 
       # Running this inline causes the server to break. So background it
-      StolenBike::AfterStolenRecordSaveJob.perform_async(@bike.current_stolen_record_id, true,
+      BikeJobs::AfterStolenRecordSaveJob.perform_async(@bike.current_stolen_record_id, true,
         selected_image&.id)
       # Lazy hack to wait for it to process
       sleep 1
@@ -106,7 +106,7 @@ module Admin
       if @unapproved_only
         available_stolen_records = StolenRecord.current.unapproved
         unless @only_without_location
-          @unapproved_without_location_count = available_stolen_records.without_location.count
+          @unapproved_without_location_count = available_stolen_records.without_street.count
           available_stolen_records = available_stolen_records.with_location
         end
       else

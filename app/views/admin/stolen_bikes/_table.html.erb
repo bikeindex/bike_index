@@ -3,7 +3,7 @@
 <div class="full-screen-table">
   <table class="table table-striped table-bordered table-sm">
     <thead class="thead-light sortable">
-      <th class="table-checkbox-select">
+      <th class="table-cell-check">
         <button
           type="button"
           class="twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0"
@@ -34,7 +34,7 @@
         <% bike = stolen_record.bike || Bike.unscoped.find_id(stolen_record.bike_id) %>
 
         <tr>
-          <td class="display-multi-check table-checkbox-select">
+          <td class="display-multi-check table-cell-check">
             <%= check_box_tag "sr_selected[#{stolen_record.id}]", stolen_record.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
           </td>
 
@@ -92,7 +92,7 @@
             </td>
             <td>
               <span class="<%= stolen_record.city.blank? ? "less-strong" : "" %>">
-                <%= [stolen_record.city, stolen_record.state&.abbreviation, stolen_record.zipcode].reject(&:blank?).first %>
+                <%= [stolen_record.city, stolen_record.region, stolen_record.postal_code].reject(&:blank?).first %>
               </span>
             </td>
             <td class="table-cell-check">

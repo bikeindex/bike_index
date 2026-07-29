@@ -1,0 +1,140 @@
+module Admin
+  class BugReportsController < Admin::BaseController
+    include Binxtils::SortableTable
+
+    # Keyed by the BugReport scope each filter applies
+    MEMBERSHIP_FILTERS = {"member" => "Only members", "paid_organization" => "Only paid org",
+                          "paid_organization_staff" => "Only paid org staff"}.freeze
+    STATUS_FILTER_ALL = "all"
+    STATUS_FILTER_INVESTIGATE = "investigate"
+
+    before_action :find_bug_report, only: %i[show update]
+
+    def index
+      @per_page = permitted_per_page(default: 50)
+      @pagy, @collection = pagy(:countish,
+        matching_bug_reports.includes(:user)
+          .reorder("bug_reports.#{sort_column} #{sort_direction}"),
+        limit: @per_page,
+        page: permitted_page)
+
+      respond_to do |format|
+        format.html
+        format.json do
+          render json: {bug_reports: @collection.map { bug_report_json(it) }}
+                     .merge(page: @pagy.page, per_page: @per_page, total_count: @pagy.count)
+        end
+      end
+    end
+
+    def show
+    end
+
+    def update
+      if @bug_report.update(permitted_params)
+        respond_to do |format|
+          format.html { redirect_to admin_bug_report_path(@bug_report), flash: {success: "Bug report updated"} }
+          format.json { render json: {bug_report: bug_report_json(@bug_report)} }
+        end
+      else
+        errors = @bug_report.errors.full_messages
+        respond_to do |format|
+          format.html do
+            flash.now[:error] = errors.to_sentence
+            render :show, status: :unprocessable_entity
+          end
+          format.json { render json: {errors:}, status: :unprocessable_entity }
+        end
+      end
+    end
+
+    def assign_tags
+      new_tags = BugReport.normalized_tags(params[:tags])
+      if new_tags.any? && params[:bug_reports_selected].present?
+        bug_reports = BugReport.where(id: params[:bug_reports_selected].keys)
+        bug_reports.each { it.update(tags: it.tags + new_tags) }
+        flash[:success] = "Added tags to #{bug_reports.count} bug #{"report".pluralize(bug_reports.count)}"
+      else
+        flash[:error] = "Select a tag and at least one bug report"
+      end
+      redirect_back(fallback_location: admin_bug_reports_path)
+    end
+
+    helper_method :matching_bug_reports, :searchable_tags, :membership_filters,
+      :status_filters, :status_only_filters
+
+    def searchable_tags
+      @searchable_tags ||= BugReport.all_tags
+    end
+
+    def membership_filters
+      MEMBERSHIP_FILTERS
+    end
+
+    # Ordered value => label. "Status: investigate" and "All" sit above the per-status options
+    def status_filters
+      {STATUS_FILTER_INVESTIGATE => "Status: investigate", STATUS_FILTER_ALL => "All"}
+        .merge(status_only_filters)
+    end
+
+    def status_only_filters
+      BugReport.statuses.keys.index_with { |status| "Only #{status.humanize.downcase}" }
+    end
+
+    protected
+
+    def sortable_columns
+      %w[created_at received_at updated_at email user_id github_pull_request status].freeze
+    end
+
+    def earliest_period_date
+      Time.at(1783296000) # 2026-07-06 - bug reports introduced
+    end
+
+    def matching_bug_reports
+      bug_reports = BugReport.all
+      @searched_tag = params[:search_tag] if searchable_tags.include?(params[:search_tag])
+      bug_reports = bug_reports.with_tag(@searched_tag) if @searched_tag.present?
+      bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
+      @searched_membership = params[:search_membership] if MEMBERSHIP_FILTERS.key?(params[:search_membership])
+      bug_reports = filter_by_membership(bug_reports)
+      bug_reports = filter_by_status(bug_reports)
+      bug_reports = bug_reports.text_search(params[:query]) if params[:query].present?
+      bug_reports.where(created_at: @time_range)
+    end
+
+    # Explicit scopes rather than a dynamic key, so no user input reaches the query
+    def filter_by_membership(bug_reports)
+      case @searched_membership
+      when "member" then bug_reports.member
+      when "paid_organization" then bug_reports.paid_organization
+      when "paid_organization_staff" then bug_reports.paid_organization_staff
+      else bug_reports
+      end
+    end
+
+    def filter_by_status(bug_reports)
+      @searched_status = status_filters.key?(params[:search_status]) ? params[:search_status] : STATUS_FILTER_INVESTIGATE
+      case @searched_status
+      when STATUS_FILTER_ALL then bug_reports
+      when STATUS_FILTER_INVESTIGATE then bug_reports.investigate
+      else bug_reports.where(status: @searched_status)
+      end
+    end
+
+    private
+
+    def find_bug_report
+      @bug_report = BugReport.find(params[:id])
+    end
+
+    def permitted_params
+      params.require(:bug_report).permit(:github_pull_request, :tags, tags: [])
+    end
+
+    def bug_report_json(bug_report)
+      bug_report.as_json(only: %w[id user_id email from_name subject body tags github_pull_request
+        is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
+    end
+  end
+end

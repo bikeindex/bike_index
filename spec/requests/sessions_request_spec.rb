@@ -1,6 +1,98 @@
 require "rails_helper"
 
 RSpec.describe SessionsController, type: :request do
+  # The `auth` Set-Cookie line for the last response. A permanent (remember-me)
+  # cookie carries an `expires=`; a session cookie doesn't.
+  def auth_set_cookie
+    Array(response.headers["Set-Cookie"]).join("\n").lines.find { |line| line.start_with?("auth=") }.to_s
+  end
+
+  describe "new" do
+    it "renders the email-only first step, without a password field" do
+      get "/session/new"
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('autocomplete="username"')
+      expect(response.body).to_not include('autocomplete="current-password"')
+      # the field offers a correction for a mistyped domain, and is still the autofocused one
+      expect(Capybara.string(response.body))
+        .to have_css("[data-controller='ui--forms--email'] input#session_email[autofocus][required]")
+    end
+  end
+
+  describe "identify" do
+    def identify(email)
+      post "/session/identify", params: {session: {email:}}
+    end
+
+    context "existing account" do
+      let!(:user) { FactoryBot.create(:user_confirmed, email: "person@example.com") }
+      it "renders the password step with the email preserved" do
+        identify("person@example.com")
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(:identify)
+        expect(response.body).to include('autocomplete="current-password"')
+        expect(response.body).to include("person@example.com")
+      end
+    end
+
+    context "no account" do
+      it "redirects to sign up with the email pre-filled" do
+        identify("newperson@example.com")
+        expect(response).to redirect_to(new_user_path(email: "newperson@example.com"))
+      end
+    end
+
+    context "blank email" do
+      it "re-renders the email step" do
+        identify("")
+        expect(response).to render_template(:new)
+      end
+    end
+
+    context "GET (reload / bookmark / back)" do
+      it "re-renders the email step instead of 404ing or attempting a login" do
+        get "/session/identify"
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(:new)
+        expect(response.cookies["auth"]).to be_blank
+      end
+    end
+
+    context "passwordless organization domain" do
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["passwordless_users"], user_email_domain: "party.edu")
+      end
+      it "renders the magic-link step for the org domain (even with no account yet)" do
+        identify("newperson@party.edu")
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(:identify)
+        expect(response.body).to_not include('autocomplete="current-password"')
+      end
+    end
+
+    context "with rack_attack" do
+      include_context :rack_attack
+
+      it "returns 429 after exceeding the per-IP sign-in limit" do
+        # Fresh email per request keeps each under the per-email throttle, so only per-IP trips
+        throttled = rack_attack_throttled_response(limit: 10) do
+          identify("person-#{SecureRandom.hex(4)}@example.com")
+          response
+        end
+        expect(throttled.headers["retry-after"]).to eq "60"
+      end
+
+      it "returns 429 after exceeding the per-email sign-in limit" do
+        throttled = rack_attack_throttled_response(limit: 5) do
+          identify("person@example.com")
+          response
+        end
+        expect(throttled.headers["retry-after"]).to eq "20"
+      end
+    end
+  end
+
   describe "create_magic_link" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
     it "sends the magic link" do
@@ -29,12 +121,12 @@ RSpec.describe SessionsController, type: :request do
       end
     end
     context "passwordless email" do
-      let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "party.edu", available_invitation_count: 1) }
+      let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "party.edu", available_invitation_count: 1) }
       it "autogenerates" do
         ActionMailer::Base.deliveries = []
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
-          # Just throw this in here because we don't have anywhere else that tests signup with passwordless_user_domain present...
+          # Just throw this in here because we don't have anywhere else that tests signup with user_email_domain present...
           expect { post "/session/create_magic_link", params: {email: "somethingcool@ party.edu"} }.to_not change(User, :count)
           expect(current_organization.organization_roles.count).to eq 0
           expect {
@@ -71,6 +163,40 @@ RSpec.describe SessionsController, type: :request do
         expect(response.code).to eq "200"
         expect(response).to render_template(:new)
       end
+    end
+  end
+
+  describe "sign_in_with_magic_link" do
+    let!(:superadmin) { FactoryBot.create(:superuser) }
+
+    it "signs in the superadmin with a refreshed token" do
+      post "/session/sign_in_with_magic_link", params: {token: superadmin.refreshed_magic_link_token}
+      expect(response).to redirect_to admin_root_url
+      expect(superadmin.reload.magic_link_token).to be_nil
+      expect(superadmin.last_login_at).to be_within(1.second).of Time.current
+    end
+
+    it "redirects back to return_to when passed (review-app banner)" do
+      post "/session/sign_in_with_magic_link",
+        params: {token: superadmin.refreshed_magic_link_token, return_to: "/bikes/12"}
+      expect(response).to redirect_to "/bikes/12"
+      expect(superadmin.reload.magic_link_token).to be_nil
+    end
+  end
+
+  describe "remember_me across the magic-link round-trip" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+    it "sets a permanent auth cookie when remember_me was chosen at request time" do
+      post "/session/create_magic_link", params: {email: user.email, remember_me: "1"}
+      token = user.reload.magic_link_token
+      expect(token).to be_present
+      post "/session/sign_in_with_magic_link", params: {token:}
+      expect(auth_set_cookie).to include("expires=")
+    end
+    it "sets a session auth cookie without remember_me" do
+      post "/session/create_magic_link", params: {email: user.email}
+      post "/session/sign_in_with_magic_link", params: {token: user.reload.magic_link_token}
+      expect(auth_set_cookie).to_not include("expires=")
     end
   end
 
@@ -121,6 +247,25 @@ RSpec.describe SessionsController, type: :request do
         expect(response).to redirect_to new_session_path
         user.reload
         expect(user.last_login_at).to be_blank
+      end
+    end
+
+    context "remember_me" do
+      it "sets a permanent auth cookie when checked" do
+        post "/session", params: {session: {email: user.email, password:, remember_me: "1"}}
+        expect(response).to redirect_to my_account_url
+        expect(auth_set_cookie).to include("expires=")
+      end
+      it "sets a session auth cookie when unchecked" do
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(response).to redirect_to my_account_url
+        expect(auth_set_cookie).to_not include("expires=")
+      end
+      it "preserves the choice on the credential step after a wrong password" do
+        post "/session", params: {session: {email: user.email, password: "wrong", remember_me: "1"}}
+        expect(response).to render_template(:identify)
+        expect(response.body).to include('name="session[remember_me]"')
+        expect(response.body).to include('value="1"')
       end
     end
 

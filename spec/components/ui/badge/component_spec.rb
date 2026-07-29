@@ -16,7 +16,7 @@ RSpec.describe UI::Badge::Component, type: :component do
     expect(component).not_to have_css("[role='tooltip']")
 
     html = component.to_html
-    expect(html).to include("tw:bg-gray-300")
+    expect(html).to include("tw:bg-[#f0f0f2]")
     expect(html).to include("tw:inline-flex")
     expect(html).to include("tw:rounded-full")
     expect(html).to include("tw:cursor-default")
@@ -41,15 +41,15 @@ RSpec.describe UI::Badge::Component, type: :component do
 
   describe "colors" do
     {
-      success: "tw:bg-emerald-500",
-      notice: "tw:bg-blue-300",
-      purple: "tw:bg-purple-300",
-      warning: "tw:bg-amber-300",
-      cyan: "tw:bg-cyan-400",
-      error: "tw:bg-red-300",
-      gray: "tw:bg-gray-300",
-      rose: "tw:bg-rose-400",
-      orange: "tw:bg-orange-400",
+      success: "tw:bg-green-50",
+      notice: "tw:bg-blue-50",
+      purple: "tw:bg-purple-50",
+      warning: "tw:bg-amber-50",
+      cyan: "tw:bg-cyan-50",
+      error: "tw:bg-red-50",
+      gray: "tw:bg-[#f0f0f2]",
+      rose: "tw:bg-rose-50",
+      orange: "tw:bg-orange-50",
       empty: "tw:bg-white"
     }.each do |color_name, css_class|
       context "with #{color_name}" do
@@ -64,7 +64,7 @@ RSpec.describe UI::Badge::Component, type: :component do
   context "with invalid color" do
     let(:color) { :invalid_color }
     it "falls back to gray" do
-      expect(component.to_html).to include("tw:bg-gray-300")
+      expect(component.to_html).to include("tw:bg-[#f0f0f2]")
     end
   end
 

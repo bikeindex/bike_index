@@ -1,5 +1,5 @@
 /*
- * Bike Index theme overrides for the Form::Combobox (hotwire_combobox gem).
+ * Bike Index theme overrides for the UI::Forms::Combobox (hotwire_combobox gem).
  *
  * The gem's base stylesheet is loaded separately via `hw_combobox_style_tag`
  * in the layout <head> — this file ONLY re-themes it. The theme is applied by
@@ -55,6 +55,13 @@ body.dark .hw-combobox {
 .hw-combobox .hw-combobox__option {
   white-space: normal;
   overflow-wrap: anywhere;
+}
+
+/* While the rich-display overlay covers the input (UI::Forms::Combobox
+   rich_display:), the input's own text is transparent — so the autocomplete's
+   selected range would otherwise show as a stray highlight over the overlay. */
+.hw-combobox__input[data-rich-display-shown]::selection {
+  background-color: transparent;
 }
 
 /* The gem leaves the small-viewport <dialog> at the browser default (white);

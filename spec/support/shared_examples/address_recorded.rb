@@ -5,8 +5,8 @@ RSpec.shared_examples "address_recorded" do
   let(:instance) { FactoryBot.create(model_sym, address_record:, latitude: nil, longitude: nil) }
   let(:address_record) { FactoryBot.create(:address_record) }
 
-  describe "CallbackJob::AddressRecordUpdateAssociationsJob updates" do
-    let(:job) { CallbackJob::AddressRecordUpdateAssociationsJob }
+  describe "CallbackJobs::AddressRecordUpdateAssociationsJob updates" do
+    let(:job) { CallbackJobs::AddressRecordUpdateAssociationsJob }
 
     it "is updated from the job" do
       # bikes handling is via BikeServices::CalculateLocation

@@ -76,6 +76,9 @@
                     - FrontGearType.standard.each do |gt|
                       %option{ value: gt.count }
                         = gt.name
+                    - FrontGearType.pinion.each do |gt|
+                      %option{ value: gt.count }
+                        = gt.name
                 .right-input-help
                   - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
                   %label.cursor-pointer

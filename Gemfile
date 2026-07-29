@@ -29,7 +29,7 @@ gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 gem "responders" # Rails responders modules
 gem "rack-attack" # Rate limiting
-gem "secure_headers", "~> 7.2"
+gem "secure_headers", "~> 7.3"
 
 # Speed, performance, etc
 gem "fast_blank"
@@ -63,7 +63,7 @@ gem "carrierwave", "~> 3.1" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
-gem "lexxy", "~> 0.1.26.beta" # Rich text editor (Action Text) for registration sequences
+gem "lexxy", "~> 0.9.27" # Rich text editor (Action Text) for registration sequences
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "rqrcode", "3.2.0" # QR Code image generator
@@ -76,7 +76,7 @@ gem "flipper-active_record" # Feature flagging
 gem "flipper-ui" # Feature flagging
 gem "geocoder" # Geolocation using external APIs
 gem "money-rails", "~> 1.11" # Money formatting
-gem "sitemap_generator", "~> 6" # Make sitemaps
+gem "sitemap_generator", "~> 7" # Make sitemaps
 
 # API wrappers, external requests
 gem "twitter" # Twitter. For rendering tweets
@@ -122,24 +122,24 @@ group :production do
   gem "skylight" # Performance monitoring
 end
 
-group :staging, :production do
+group :sandbox, :production do
   gem "honeybadger" # Error monitoring
 end
 
-group :staging do
+group :sandbox do
   gem "thruster", require: false # HTTP/2, asset caching, X-Sendfile for Puma (used by review-app Dockerfile)
 end
 
-group :staging, :development do
+group :sandbox, :development do
   # Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
-  # Loaded in development (local dev) and staging (review apps — see config/deploy.review.yml).
+  # Loaded in development (local dev) and sandbox (review apps — see config/deploy.review.yml).
   gem "letter_opener_web", "~> 3.0"
 end
 
-# dotenv-rails is also loaded in :staging so review apps pick up the committed
-# .env dev/sandbox values at boot (see config/environments/staging.rb). dotenv
+# dotenv-rails is also loaded in :sandbox so review apps pick up the committed
+# .env dev/sandbox values at boot (see config/environments/sandbox.rb). dotenv
 # never overrides a var kamal already sets, so per-app/managed secrets win.
-group :development, :test, :staging do
+group :development, :test, :sandbox do
   gem "dotenv-rails"
 end
 
@@ -188,8 +188,8 @@ group :test do
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry flaky test failures on CI
   gem "capybara" # For view components
-  gem "capybara-lockstep" # Sync Capybara with in-flight JS/AJAX to reduce flaky :js specs
-  gem "selenium-webdriver" # For capybara
+  gem "capybara-playwright-driver" # Drives :js specs through Playwright (the playwright npm package)
   gem "chunky_png" # used to test that generated images match their targets
-  gem "axe-core-rspec" # Accessibility testing
+  # Accessibility testing runs axe-core (the npm package) via Playwright directly;
+  # see spec/support/axe.rb (the axe rubygems assume a Selenium driver).
 end

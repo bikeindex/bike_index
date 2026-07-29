@@ -25,11 +25,14 @@
 #  index_b_params_on_bike_owner_email_trgm  ((((params -> 'bike'::text) ->> 'owner_email'::text)) gin_trgm_ops) USING gin
 #  index_b_params_on_created_bike_id        (created_bike_id)
 #  index_b_params_on_email_trgm             (email) WHERE (created_bike_id IS NULL) USING gin
+#  index_b_params_on_id_token               (id_token)
 #  index_b_params_on_organization_id        (organization_id)
 #
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
+  # TODO: #3952 - stolen record legacy attrs, to support accepting the old names
+  LEGACY_STOLEN_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
   REGISTRATION_INFO_ATTRS = %w[
     accuracy
     bike_code
@@ -69,8 +72,8 @@ class BParam < ApplicationRecord
     stolen
     street
   ].freeze
-  mount_uploader :image, ImageUploader
-  process_in_background :image, CarrierWaveStoreJob
+  mount_uploader :image, ImageUploaderBackgrounded
+  process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"
@@ -89,6 +92,11 @@ class BParam < ApplicationRecord
   scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
+  # register/new shells whose step 1 was never submitted (manufacturer is required
+  # at submit) - only seeds and a prefilled email, nothing worth keeping
+  scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
+  # Tokenized lookups resume registrations for up to a month
+  scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -125,9 +133,16 @@ class BParam < ApplicationRecord
       stolen_attrs = h["bike"].delete "stolen_record"
       if stolen_attrs.present? && stolen_attrs.delete_if { |k, v| v.blank? } && stolen_attrs.keys.any?
         h["stolen_record"] = stolen_attrs
-        h["stolen_record"]["street"] = h["stolen_record"].delete("address") if h["stolen_record"]["address"].present?
       end
       h
+    end
+
+    # TODO: #3952 - stolen record legacy attrs
+    def rename_legacy_stolen_attrs(s_attrs)
+      LEGACY_STOLEN_ATTRS.each_with_object(s_attrs) do |(legacy, renamed), attrs|
+        value = attrs.delete(legacy)
+        attrs[renamed] = value if value.present? && attrs[renamed].blank?
+      end
     end
 
     def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil, bike_sticker: nil)
@@ -156,7 +171,9 @@ class BParam < ApplicationRecord
 
     # Because organization embed bikes might not match the creator
     def with_organization_or_no_creator(toke)
-      without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
+      return if toke.blank?
+
+      without_bike.recent_with_token(toke)
         .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
     end
 
@@ -284,7 +301,7 @@ class BParam < ApplicationRecord
     # Set the date_stolen if it was passed, if something else didn't already set date_stolen
     date_stolen = params.dig("bike", "date_stolen")
     s_attrs["date_stolen"] ||= date_stolen if date_stolen.present?
-    s_attrs.except("phone_no_show", "show_address")
+    self.class.rename_legacy_stolen_attrs(s_attrs.except("phone_no_show", "show_address"))
   end
 
   def impound_attrs
@@ -347,6 +364,19 @@ class BParam < ApplicationRecord
     bike["manufacturer_id"]
   end
 
+  def manufacturer_other
+    bike["manufacturer_other"]
+  end
+
+  # Mirrors Bike#type - the cycle_type for display
+  def type
+    @type ||= type_titleize&.downcase
+  end
+
+  def type_titleize
+    @type_titleize ||= CycleType.new(cycle_type).short_name_translation
+  end
+
   def is_pos
     bike["is_pos"] || false
   end
@@ -395,6 +425,20 @@ class BParam < ApplicationRecord
 
   def partial_registration?
     origin == "embed_partial"
+  end
+
+  def email_confirmed?
+    params["email_confirmed_at"].present?
+  end
+
+  # Waiting on the confirmation link - there's an address, and nothing has proven
+  # it belongs to whoever is registering
+  def email_unconfirmed?
+    owner_email.present? && !email_confirmed?
+  end
+
+  def confirm_email!
+    email_confirmed? || update(params: params.merge("email_confirmed_at" => Time.current))
   end
 
   def primary_frame_color

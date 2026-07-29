@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe PageBlock::Footer::Component, type: :component do
+  it_behaves_like "cache_version_checkpoint"
+
   let(:instance) { described_class.new(current_user: nil, skip_facebook:, page_id: "welcome_index") }
   let(:component) { with_request_url("/") { render_inline(instance) } }
   let(:skip_facebook) { false }
@@ -11,6 +13,10 @@ RSpec.describe PageBlock::Footer::Component, type: :component do
   it "renders the footer and the facebook pixel" do
     expect(component).to have_css "footer.primary-footer"
     expect(component.to_html).to include(pixel_id)
+    # The pixel id must be emitted as raw JS; HTML-escaping the quotes to &quot;
+    # produces a SyntaxError inside the inline <script> (entities aren't decoded there).
+    expect(component.to_html).to include(%(fbq('init', "#{pixel_id}")))
+    expect(component.to_html).to_not include("&quot;")
   end
 
   context "with skip_facebook" do

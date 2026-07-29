@@ -46,14 +46,15 @@
 = form_tag update_manufacturers_admin_bikes_path, data: {controller: "table-multi-checkbox"} do
   .row
     .col-md-4
-      = render Form::Combobox::Component.new(name: :manufacturer_id, label: Manufacturer.model_name.human, placeholder: "Choose manufacturer", include_blank: true, options: Manufacturer.frame_makers.pluck(:name, :id))
+      = render(UI::Forms::Group::Component.new(attribute: :manufacturer_id, label_text: Manufacturer.model_name.human)) do
+        = render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true)
     .col-md-2
       = submit_tag 'Update selected', class: 'btn btn-primary'
 
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
-        %th.table-checkbox-select
+        %th.table-cell-check
           %button{ type: "button", class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", title: "Toggle all checked", aria: { label: "Toggle all checked" }, data: { action: "click->table-multi-checkbox#toggleAll" } }
             = check_mark
         %th
@@ -68,7 +69,7 @@
       %tbody
         - @bikes.each do |bike|
           %tr
-            %td.table-checkbox-select
+            %td.table-cell-check
               = check_box_tag "bikes_selected[#{bike.id}]", bike.id, false, data: { "table-multi-checkbox-target" => "checkbox" }
             %td
               .less-strong-hold

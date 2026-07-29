@@ -119,6 +119,39 @@ found_locations.each_with_index do |loc, i|
   end
 end
 
+# --- 1 found bike reported by the primary test user (user@bikeindex.org) ---
+puts "Creating found bike reported by user@bikeindex.org..."
+found_bike_location = {latitude: 37.7691, longitude: -122.4449, street: "1000 Stanyan St", city: "San Francisco", zipcode: "94117"}
+specialized_manufacturer = Manufacturer.friendly_find("Specialized")
+
+user_found_bike = seed_bike(
+  creator:, user:, label: "Found bike",
+  params: {
+    bike: bike_params(owner_email: user.email, manufacturer_id: specialized_manufacturer&.id).merge(
+      frame_model: "Sirrus",
+      description: "Found unlocked near the Golden Gate Park tennis courts",
+      status: "status_impounded"
+    ),
+    impound_record: {
+      address_record_attributes: {
+        street: found_bike_location[:street],
+        city: found_bike_location[:city],
+        zipcode: found_bike_location[:zipcode],
+        state_id: ca_state&.id.to_s,
+        country_id: us&.id.to_s,
+        skip_geocoding: true
+      }
+    }
+  }
+)
+unless user_found_bike.errors.any?
+  impound_record = user_found_bike.current_impound_record
+  ProcessImpoundUpdatesJob.new.perform(impound_record.id)
+  impound_record.reload
+  impound_record.address_record&.update_columns(latitude: found_bike_location[:latitude], longitude: found_bike_location[:longitude])
+  puts "  Created found bike at #{found_bike_location[:street]}, #{found_bike_location[:city]}"
+end
+
 # --- 3 Cannondale bikes registered to Cannondale org ---
 cannondale_org = Organization.friendly_find("Cannondale")
 cannondale_manufacturer = Manufacturer.friendly_find("Cannondale")
@@ -243,5 +276,97 @@ trek_components.each do |component|
   )
 end
 puts "  Created stolen Trek at #{trek_location[:street]}, #{trek_location[:city]} with #{trek_bike.components.count} components"
+
+# --- Specific real bike: Riese & Müller Load4 75 rohloff cargo e-bike (child carrying) ---
+puts "Creating Riese & Müller Load4 75 rohloff cargo bike..."
+rm_manufacturer = Manufacturer.friendly_find("Riese & Müller")
+brakebills_org = Organization.friendly_find("Brakebills")
+grey = Color.friendly_find("Silver, gray or bare metal")
+child_carrying_activity = PrimaryActivity.friendly_find("Child Carrying")
+twenty_inch_id = WheelSize.id_for_bsd(406) # front "20 inch"
+twenty_six_inch_id = WheelSize.id_for_bsd(559) # rear "26 inch"
+
+# Stock build spec from Riese & Müller's Load4 75 rohloff (2023, universal size)
+rm_components = [
+  {ctype: "Bashguard/Chain Guide", description: "Riemenschutzring"},
+  {ctype: "Bell/Noisemaker", description: "Billy"},
+  {ctype: "Brake", manufacturer: "Tektro", front: true, rear: true, description: "Tektro TRP C 2.3 disc brake"},
+  {ctype: "Chainrings", description: "55T, for Gates drive belt CDX"},
+  {ctype: "Cog/Cassette/Freewheel", rear: true, description: "19T, for Gates drive belt CDX"},
+  {ctype: "Crankset", description: "FSA/Riese & Müller, 170 mm"},
+  {ctype: "Drive Belt", description: "Gates drive belt CDX"},
+  {ctype: "E-vehicle Battery", description: "Akku Bosch PowerPack Frame 725"},
+  {ctype: "E-vehicle Display/Remote", manufacturer: "Bosch", description: "Bosch Purion 200"},
+  {ctype: "E-vehicle Motor", manufacturer: "Bosch", description: "Bosch Cargo Line (smart system)"},
+  {ctype: "Fender", manufacturer: "SKS", description: "SKS A65R"},
+  {ctype: "Fork", description: "Suntour Mobie 34 CGO Boost, 20\", 80mm"},
+  {ctype: "Grips/Tape", manufacturer: "Ergon", description: "Ergon ergonomic"},
+  {ctype: "Handlebar", manufacturer: "Satori", description: "Satori Horizon, 31,8 mm, 9°, B=620 mm"},
+  {ctype: "Headset", manufacturer: "Acros", description: "Acros AZX-221, block lock"},
+  {ctype: "Hub", front: true, description: "Novatec Boost Cargo Disc 32H"},
+  {ctype: "Hub", manufacturer: "Rohloff", rear: true, description: "Rohloff Speedhub E14, 14-speed, 36H"},
+  {ctype: "Kickstand", description: "Kickstand Riese & Müller"},
+  {ctype: "Lights", manufacturer: "Supernova Bikes", front: true, description: "Supernova M99 Mini Pro-25"},
+  {ctype: "Lights", manufacturer: "Supernova Bikes", rear: true, description: "Supernova M99, integrated brake light"},
+  {ctype: "Pedals", description: "VP R&M Custom"},
+  {ctype: "Rack", manufacturer: "Riese & Müller", description: "Riese & Müller luggage rack"},
+  {ctype: "Rear Suspension", manufacturer: "X-Fusion", rear: true, description: "X-Fusion Glyde"},
+  {ctype: "Rim", front: true, description: "Mach1 Trucky30 20\""},
+  {ctype: "Rim", rear: true, description: "Mach1 Trucky30 26\""},
+  {ctype: "Saddle", manufacturer: "Selle Royal", description: "Selle Royal Essenza Moderate"},
+  {ctype: "Seatpost", description: "JD/Riese & Müller, Alu, 34,9 x 430mm"},
+  {ctype: "Seatpost Clamp", description: "JD, 40,0 mm, QR"},
+  {ctype: "Shifter", manufacturer: "Rohloff", description: "Rohloff E14 electronic shifter"},
+  {ctype: "Spokes", description: "Sapim Leader 2,0 mm, Inox, black"},
+  {ctype: "Stem", manufacturer: "Riese & Müller", description: "Riese & Müller, adjustable height and angle"},
+  {ctype: "Tire", manufacturer: "Schwalbe", front: true, description: "Schwalbe Big Ben Plus 55-406 Reflex"},
+  {ctype: "Tire", manufacturer: "Schwalbe", rear: true, description: "Schwalbe Big Ben Plus 55-559 Reflex"},
+  {ctype: "Tube", manufacturer: "Schwalbe", description: "Schwalbe AV7"},
+  {ctype: "unknown", description: "Bibia rubber"},
+  {ctype: "unknown", manufacturer: "Abus", description: "ABUS Shield X+ lock"},
+  {ctype: "unknown", description: "RX Chip (für RX Services)"}
+]
+
+rm_bike = seed_bike(
+  creator:, user:, origin: "organization_form", label: "Riese & Müller bike",
+  params: {bike: bike_params(owner_email: "user_3@gmail.com", manufacturer_id: rm_manufacturer.id).merge(
+    creation_organization_id: brakebills_org.id.to_s,
+    cycle_type: "cargo",
+    propulsion_type: "pedal-assist",
+    primary_frame_color_id: grey&.id,
+    year: 2023,
+    frame_model: "Load4 75 rohloff",
+    frame_material_slug: "aluminum",
+    handlebar_type: "flat",
+    primary_activity_id: child_carrying_activity&.id,
+    rear_tire_narrow: "false",
+    front_tire_narrow: "false",
+    front_gear_type_slug: "1",
+    rear_gear_type_slug: "14-internal",
+    front_wheel_size_id: twenty_inch_id,
+    rear_wheel_size_id: twenty_six_inch_id,
+    description: "Bosch Cargo Line mid-drive (Class 1) with 725Wh PowerPack, Rohloff Speedhub E14 14-speed internal hub and Gates CDX belt drive. Aluminum frame with front box cargo area, 200kg max total weight, SKS fenders, Supernova lights."
+  )}
+)
+
+["riese_muller_load4_with_passenger.jpg", "riese_muller_load4.jpg"].each_with_index do |filename, i|
+  public_image = PublicImage.new(imageable: rm_bike, listing_order: i + 1)
+  File.open(Rails.root.join("db/seeds/images", filename)) { |file| public_image.image = file }
+  public_image.save!
+end
+rm_components.each do |component|
+  manufacturer = Manufacturer.friendly_find(component[:manufacturer])
+  rm_bike.components.create!(
+    ctype: Ctype.friendly_find(component[:ctype]),
+    manufacturer: manufacturer || Manufacturer.other,
+    manufacturer_other: manufacturer ? nil : component[:manufacturer],
+    description: component[:description],
+    front: component[:front],
+    rear: component[:rear],
+    is_stock: true,
+    setting_is_stock: true
+  )
+end
+puts "  Created Riese & Müller Load4 with #{rm_bike.components.count} components"
 
 puts "Bikes seeded successfully!"

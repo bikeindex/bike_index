@@ -8,19 +8,6 @@ RSpec.describe Integrations::Strava::ProxyRequester do
   let(:strava_integration) { FactoryBot.create(:strava_integration) }
   let(:user) { strava_integration.user }
 
-  describe ".authorize_user_and_strava_integration" do
-    let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
-    let(:access_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
-    before { stub_const("Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
-
-    it "returns user and strava_integration when valid" do
-      result = described_class.authorize_user_and_strava_integration(access_token)
-      expect(result[:error]).to be_nil
-      expect(result[:user]).to eq user
-      expect(result[:strava_integration]).to eq strava_integration
-    end
-  end
-
   describe ".sync_status" do
     it "returns sync_status hash for the integration" do
       expect(strava_integration.synced?).to be_falsey

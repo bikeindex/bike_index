@@ -6,6 +6,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
   def log_in_via_browser(user)
     visit new_session_path
     fill_in "Email", with: user.email
+    click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     expect(page).to have_current_path("/my_account", wait: 5)
@@ -26,13 +27,29 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
        contact_name: "Jane Doe", phone_number: "5551234567", title: "New School lead: Test University"}
     end
 
-    it "submits a school lead via hero button" do
+    it "submits a school lead via hero button, persisting entry across a reload" do
       visit "/for_schools"
       expect(page).to have_content("campus bike management")
       first("button[data-open-modal]").click
 
+      expect(page).to have_content("Contact us for a free trial", wait: 5)
+      fill_in "Name", with: "Jane Doe"
+      fill_in "School", with: "Test University"
+      fill_in "Phone number", with: "5551234567"
+      fill_in "Email", with: "admin@testuni.edu"
+
+      page.refresh
+
+      # have_content/have_field only match visible text, so these assert the modal
+      # reopened (URL param) with entered data restored (form-persist localStorage)
+      expect(page).to have_content("Contact us for a free trial", wait: 5)
+      expect(page).to have_field("Name", with: "Jane Doe")
+      expect(page).to have_field("School", with: "Test University")
+      expect(page).to have_field("Phone number", with: "5551234567")
+      expect(page).to have_field("Email", with: "admin@testuni.edu")
+
       expect {
-        fill_in_and_submit_demo_form(name_label: "School", name_value: "Test University", email: "admin@testuni.edu")
+        click_button "Let's chat"
         expect(page).to have_content("Thank", wait: 5)
       }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
 

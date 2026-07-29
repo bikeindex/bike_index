@@ -6,10 +6,10 @@ Rails.application.routes.draw do
   # Liveness endpoint (200 if the app boots). Used by the review-app kamal-proxy health check
   get "up", to: "rails/health#show", as: :rails_health_check
 
-  mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
-  mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
-  # letter_opener_web inbox — the gem's Bundler group (:development, :staging)
-  # decides where it's mounted. Unrestricted — staging runs seeded data with no PII.
+  mount Sidekiq::Web => "/sidekiq", :constraints => AuthRestriction::Developer
+  mount PgHero::Engine, at: "/pghero", constraints: AuthRestriction::Developer
+  # letter_opener_web inbox — the gem's Bundler group (:development, :sandbox)
+  # decides where it's mounted. Unrestricted — sandbox runs seeded data with no PII.
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if defined?(LetterOpenerWeb)
 
   use_doorkeeper do
@@ -61,6 +61,7 @@ Rails.application.routes.draw do
       get :magic_link
       post :sign_in_with_magic_link
       post :create_magic_link
+      match :identify, via: %i[get post]
     end
   end
   get "logout", to: "sessions#destroy"
@@ -121,6 +122,7 @@ Rails.application.routes.draw do
     end
   end
   resource :my_account, only: %i[show update destroy] do
+    post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
   end
@@ -156,15 +158,22 @@ Rails.application.routes.draw do
     member { post :is_private }
   end
 
-  resources :registrations, only: %i[new create] do
+  resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
   end
+
+  # Redesigned registration flow: quick start, then complete on-site or via email.
+  # new makes an empty registration and redirects into show, which renders
+  # ?step=1|2|finished (and handles the emailed confirmation link)
+  resource :register, only: %i[new create show update], controller: :register
 
   namespace :search do
     get "/", to: redirect("/search/registrations")
     # Autocomplete + selection chips for the search query items combobox
     get "combobox/options", to: "combobox#options", as: :combobox_options
     post "combobox/chips", to: "combobox#chips", as: :combobox_chips
+    # Autocomplete for the manufacturer combobox (UI::Forms::ComboboxManufacturer)
+    get "combobox/manufacturers", to: "combobox#manufacturers", as: :combobox_manufacturers
     resources :registrations, only: %i[index] do
       collection do
         get :similar_serials
@@ -194,6 +203,10 @@ Rails.application.routes.draw do
   get "bikes/:id/edit(/:edit_template)", to: "bikes/edits#show", as: :edit_bike
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
   get "stickers/:scanned_id", to: "bikes#scanned"
+  # Short sticker URL (BikeSticker short_id): /s/<code> redirects to the canonical scanned path
+  get "s/:scanned_id", to: redirect { |params, request|
+    ["/bikes/scanned/#{params[:scanned_id]}", request.query_string.presence].compact.join("?")
+  }
 
   resources :bike_versions, except: [:edit]
   get "bike_versions/:id/edit(/:edit_template)", to: "bike_versions/edits#show", as: :edit_bike_version
@@ -273,6 +286,10 @@ Rails.application.routes.draw do
 
     resources :registration_sequences, only: %i[index]
 
+    resources :bug_reports, only: %i[index show update] do
+      collection { post :assign_tags }
+    end
+
     resources :organizations do
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
@@ -313,7 +330,7 @@ Rails.application.routes.draw do
     resources :users, only: %i[index show edit update destroy]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
-      :constraints => DeveloperRestriction,
+      :constraints => AuthRestriction::Superuser,
       :as => :feature_flags
   end
 
@@ -349,6 +366,12 @@ Rails.application.routes.draw do
     end
     resources :autocomplete, only: %i[index]
     resources :strava_proxy, only: %i[create]
+    resources :admin_data, only: [] do
+      collection do
+        get :sidekiq
+        get :pghero
+      end
+    end
   end
   mount API::Base => "/api"
 
@@ -386,6 +409,8 @@ Rails.application.routes.draw do
 
   get "strava_search", to: "strava_search#index"
   post "strava_search/token", to: "strava_search#create_token", as: :strava_search_token
+
+  get "reverse_geocode", to: "reverse_geocode#index", defaults: {format: "json"}
 
   mount Lookbook::Engine, at: "/lookbook"
 
@@ -465,5 +490,5 @@ Rails.application.routes.draw do
   # Short marketplace_listing URLs: /m/<short_id> (and /M/...)
   get "*id", to: "marketplace_listings#show", constraints: {id: %r{[mM]/.*}}, format: false
 
-  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
+  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.sandbox? # Handle 404s with lograge
 end

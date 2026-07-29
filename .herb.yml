@@ -26,6 +26,13 @@ files:
     - 'tmp/**/*'
     - 'vendor/**/*'
     - 'node_modules/**/*'
+    # ERB that renders something other than HTML. The formatter indents it as though it
+    # were markup, which loses whitespace that matters: a mail template's line breaks (and
+    # the space before an <%= %>), CoffeeScript's indentation. .turbo_stream.erb is HTML,
+    # so it stays in.
+    - '**/*.text.erb'
+    - '**/*.js.erb'
+    - '**/*.coffee.erb'
 
 linter:
   enabled: true

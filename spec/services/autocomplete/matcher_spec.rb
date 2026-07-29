@@ -31,12 +31,12 @@ RSpec.describe Autocomplete::Matcher do
       expect(subject.send(:not_in_cache?, opts[:cache_key])).to be_falsey
 
       # Query result
-      opts_query = subject.params_to_opts(q: "b", per_page: 11)
+      opts_query = subject.params_to_opts(q: "b", per_page: 12)
       # Isn't in cache
       expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_truthy
       result_query = subject.search(nil, opts_query)
-      expect(result_query.count).to eq 11
-      target_search_ids = [color_sid, "v_0", "v_11", "v_6", "v_8", "v_12", "v_21", "v_22", "v_9", "v_14", "m_#{manufacturer2.id}"]
+      expect(result_query.count).to eq 12
+      target_search_ids = [color_sid, "v_0", "v_11", "v_23", "v_6", "v_8", "v_12", "v_21", "v_22", "v_9", "v_14", "m_#{manufacturer2.id}"]
       # pp result_query.map { "#{it["search_id"]} - #{it["text"]}" }
       expect(result_query.map { it["search_id"] }).to eq target_search_ids
       # But it is in cache after the search

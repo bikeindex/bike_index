@@ -3,9 +3,16 @@
 module UI
   module Button
     class ComponentPreview < ApplicationComponentPreview
-      # @label legacy (using twbtn classes)
-      def legacy
-        {template: "ui/button/component_preview/default"}
+      # Submit reveals the spinner and disables the button -- but only once native
+      # validation has passed, so an empty email leaves the button alone
+      def in_form
+        {template: "ui/button/component_preview/in_form"}
+      end
+
+      # The same state without the submit, for reviewing it alongside the colors
+      def submitting
+        render(UI::Button::Component.new(text: "Next", color: :primary, kind: :submit,
+          spinner: true, disabled: true, html_class: "tw:[&_span]:inline-flex!"))
       end
 
       # @!group Colors
@@ -35,6 +42,15 @@ module UI
         render(UI::Button::Component.new(text: "Error Active", color: :error, active: true))
       end
 
+      # White button with a soft danger outline
+      def danger_outline
+        render(UI::Button::Component.new(text: "Mark stolen", color: :danger_outline))
+      end
+
+      def danger_outline_active
+        render(UI::Button::Component.new(text: "Danger Outline Active", color: :danger_outline, active: true))
+      end
+
       def link
         render(UI::Button::Component.new(text: "Link style", color: :link))
       end
@@ -42,6 +58,29 @@ module UI
       def link_active
         render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
       end
+
+      def link_bold
+        render(UI::Button::Component.new(text: "Where's my serial number?", color: :link, html_class: "tw:text-xs tw:font-bold"))
+      end
+
+      # Filled purple primary
+      def purple
+        render(UI::Button::Component.new(text: "Purple", color: :purple))
+      end
+
+      def purple_active
+        render(UI::Button::Component.new(text: "Purple Active", color: :purple, active: true))
+      end
+
+      # White button with a purple outline (toggles to a purple tint when active)
+      def purple_outline
+        render(UI::Button::Component.new(text: "Purple outline", color: :purple_outline))
+      end
+
+      def purple_outline_active
+        render(UI::Button::Component.new(text: "Purple Outline Active", color: :purple_outline, active: true))
+      end
+
       # @!endgroup
 
       # @!group Sizes
