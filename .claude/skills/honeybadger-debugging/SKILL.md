@@ -57,13 +57,34 @@ One notice is almost always enough; repeat notices of a fault are near-identical
 Pass `--limit N` only when you suspect the occurrences genuinely differ — a
 browser-specific frontend error, or params that vary between failures.
 
-## Then fix it like any other bug
+## Then fix it
+
+Decide which kind of fault it is first — the two need different work.
+
+### Deterministic — a bug reachable from the input
 
 - Reproduce from `args`/`params` before changing code — `bundle exec rails
   runner` against the dev database is usually enough.
 - Cover the fix with a spec; the `rspec-testing` skill has the house style.
 - Check whether the same pattern exists elsewhere. `Errno::ENOENT` in one image
   job usually means every image job shares the bug.
+
+### Transient — a 5xx or timeout from S3/R2, the image CDN, another service
+
+Don't try to reproduce it. The tell is a burst of notices inside a few seconds
+and then nothing, with a `message` naming the provider rather than your code.
+
+- Check the job's retry setting first. `config/honeybadger.yml` sets
+  `sidekiq.attempt_threshold`, which only drops the first failure of a
+  *retryable* job — `retry: false` reports every blip, and `ScheduledJob`
+  defaults to it.
+- A retry only silences a blip shorter than Sidekiq's first backoff,
+  `15 + rand(30)` seconds. Check the notice timestamps against that.
+- Check what a mid-operation failure leaves behind — retrying doesn't help work
+  that isn't idempotent. `ActiveStorage::Blob#purge` destroys the row before
+  deleting the file, so a failed delete orphans the file for good.
+- Find prior occurrences by error class, not job name. Honeybadger's `q` doesn't
+  match the component field, and a renamed component splits the history.
 
 Don't resolve, ignore, or comment on the fault in Honeybadger — marking it fixed
 is the user's call once the fix ships.
