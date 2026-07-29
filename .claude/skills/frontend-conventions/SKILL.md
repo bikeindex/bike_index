@@ -93,6 +93,7 @@ When deleting an `id`/`class`, grep the repo for the name before deciding what t
 This project uses the ViewComponent gem to render components.
 
 - Prefer view components to partials.
+- **If a view file only renders a single component, consider rendering it from the controller instead** (`render Foo::Component.new(...)`) and deleting the view file — the layout still wraps it.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
 - View components must initialize with keyword arguments. Everything the component needs must be passed in explicitly by the caller — never reach into controller state from inside a component (e.g. `controller.instance_variable_get(:@bike)`). If the component needs `@bike`, the caller renders `Component.new(bike: @bike)`.
 - In view components, use instance variables directly — don't add `attr_reader`/`attr_accessor`. Reference `@foo` everywhere, including in the template (`@current_user`, not `current_user`).

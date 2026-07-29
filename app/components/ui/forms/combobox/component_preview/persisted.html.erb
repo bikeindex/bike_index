@@ -1,0 +1,8 @@
+<%= form_with(url: "/rails/view_components/ui/forms/combobox/component/persisted", method: :get,
+  data: {controller: "form-persist", "form-persist-key-value": "combobox-preview",
+    action: "hw-combobox:selection->form-persist#save submit->form-persist#clear"}) do %>
+  <%= render(UI::Forms::Group::Component.new(attribute: :cycle_type)) do %>
+    <%= render(UI::Forms::Combobox::Component.new(name: :cycle_type, value: "bike",
+      options: CycleType.select_options)) %>
+  <% end %>
+<% end %>
