@@ -10,8 +10,8 @@ en:
         registration_complete: Registration complete!
         registration_saved: Registration saved
         report_it_stolen: >-
-          Finish reporting your stolen %{cycle_type} and take advantage of our
-          community network
+          Finish reporting your stolen %{cycle_type} and take advantage of our community
+          network
         verify_your_email_html: >-
           One more step — verify your email. We sent a confirmation link to %{email};
           click it to finish your registration. Everything you've entered is saved.
