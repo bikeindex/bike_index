@@ -25,15 +25,14 @@ RSpec.describe CleanBParamsJob, type: :job do
     end
 
     context "with an e-vehicle attestation" do
-      let!(:b_param_attested) do
-        FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: stale,
-          params: {registration_sequence: {id: 1, attested_at: Time.current.to_i}}.as_json)
+      let!(:attestation) do
+        FactoryBot.create(:registration_sequence_attestation, b_param: b_param_with_bike, bike:)
       end
 
-      it "keeps it - the safety rules agreed to are only recorded here" do
-        expect(BParam.without_attestation.pluck(:id)).to_not include(b_param_attested.id)
+      it "sweeps the registration, leaving the attestation record standing" do
         expect { described_class.new.perform }.to change(BParam, :count).by(-2)
-        expect(BParam.pluck(:id)).to include(b_param_attested.id)
+        expect(attestation.reload.bike_id).to eq bike.id
+        expect(attestation.attestation_text).to be_present
       end
     end
   end

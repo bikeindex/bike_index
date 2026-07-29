@@ -197,12 +197,30 @@ RSpec.describe BikeServices::Register do
       expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "review"
       expect(described_class.attested?(b_param, sequence:)).to be_falsey
 
-      expect(described_class.save_attestation(b_param, sequence, attested: "1")).to be_truthy
+      expect {
+        expect(described_class.save_attestation(b_param, sequence, attested: "1")).to be_truthy
+      }.to change(RegistrationSequenceAttestation, :count).by 1
       expect(described_class.attested?(b_param, sequence:)).to be_truthy
-      # Which sequence was agreed to is kept alongside the acknowledgment
-      expect(b_param.params.dig("registration_sequence", "id")).to eq sequence.id
+
+      # The agreement is its own record, holding what was agreed to and to which sequence
+      attestation = RegistrationSequenceAttestation.last
+      expect(attestation).to have_attributes(registration_sequence_id: sequence.id,
+        b_param_id: b_param.id, owner_email: b_param.owner_email, bike_id: nil,
+        attestation_text: sequence.attestation)
+      expect(attestation.acknowledged_page_ids).to match_array(pages.map(&:id))
+      expect(attestation.attested_at).to be_within(5).of(Time.current)
+
       # Without a creator the registration now waits on the confirmation email
       expect(described_class.finished?(b_param, sequence:)).to be_truthy
+    end
+
+    it "attests once, even if the review is submitted twice" do
+      pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
+      described_class.save_attestation(b_param, sequence, attested: "1")
+
+      expect {
+        expect(described_class.save_attestation(b_param, sequence, attested: "1")).to be_truthy
+      }.to_not change(RegistrationSequenceAttestation, :count)
     end
 
     it "refuses a page with any rule unchecked" do
@@ -215,7 +233,9 @@ RSpec.describe BikeServices::Register do
 
     it "refuses an unchecked attestation" do
       pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
-      expect(described_class.save_attestation(b_param, sequence, attested: "0")).to be_falsey
+      expect {
+        expect(described_class.save_attestation(b_param, sequence, attested: "0")).to be_falsey
+      }.to_not change(RegistrationSequenceAttestation, :count)
       expect(described_class.attested?(b_param, sequence:)).to be_falsey
     end
 

@@ -196,10 +196,11 @@ RSpec.describe "Register flow", :js, type: :system do
       click_button "Complete Bike registration"
 
       expect(page).to have_content("Registration saved")
-      b_param = BParam.last
-      expect(BikeServices::Register.acknowledged_page_ids(b_param))
-        .to match_array([battery_page.id, campus_page.id])
-      expect(b_param.params.dig("registration_sequence", "id")).to eq sequence.id
+      attestation = RegistrationSequenceAttestation.last
+      expect(attestation).to have_attributes(registration_sequence_id: sequence.id,
+        b_param_id: BParam.last.id, owner_email:,
+        attestation_text: "agree to comply with all of the rules above.")
+      expect(attestation.acknowledged_page_ids).to match_array([battery_page.id, campus_page.id])
     end
   end
 end

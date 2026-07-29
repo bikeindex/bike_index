@@ -34,6 +34,9 @@ class RegistrationSequence < ApplicationRecord
   # with_attached_image: every reader of the pages renders or copies their images
   has_many :registration_sequence_pages, -> { order(:listing_order).with_attached_image },
     dependent: :destroy, inverse_of: :registration_sequence
+  # nullify, not destroy - an attestation is a record of what someone agreed to, and
+  # it snapshots the text it needs to outlive this
+  has_many :registration_sequence_attestations, dependent: :nullify
 
   scope :templates, -> { where(organization_id: nil) }
   scope :draft, -> { where(start_at: nil).where.not(organization_id: nil) }

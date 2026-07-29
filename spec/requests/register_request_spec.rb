@@ -691,10 +691,16 @@ RSpec.describe RegisterController, type: :request do
       # The attestation is what creates the bike
       expect {
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", attested: "1"}
-      }.to change(Bike, :count).by 1
+      }.to change(Bike, :count).by(1).and change(RegistrationSequenceAttestation, :count).by(1)
       expect(response).to redirect_to step_path.call("finished")
       expect(b_param.reload.created_bike_id).to eq Bike.last.id
-      expect(b_param.params.dig("registration_sequence", "id")).to eq sequence.id
+
+      # The record hangs off the bike, so it survives the b_param being swept
+      attestation = RegistrationSequenceAttestation.last
+      expect(attestation).to have_attributes(registration_sequence_id: sequence.id,
+        bike_id: Bike.last.id, user_id: current_user.id, owner_email:,
+        attestation_text: "agree to all of it")
+      expect(attestation.acknowledged_page_ids).to match_array([battery_page.id, campus_page.id])
     end
 
     it "claims a registrant who signed in partway through the safety pages" do

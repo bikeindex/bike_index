@@ -77,7 +77,8 @@ class RegisterController < ApplicationController
   def acknowledge
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence)
     saved = if step == "review"
-      BikeServices::Register.save_attestation(@b_param, @registration_sequence, attested: params[:attested])
+      BikeServices::Register.save_attestation(@b_param, @registration_sequence,
+        attested: params[:attested], user: current_user)
     else
       BikeServices::Register.acknowledge_page(@b_param,
         BikeServices::Register.page_for_step(step, sequence: @registration_sequence),

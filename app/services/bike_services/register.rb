@@ -78,13 +78,19 @@ module BikeServices
     # The progress bar's segments - one per step the flow can reach
     def total_steps(sequence) = all_steps(sequence_pages(sequence)).count
 
-    # Nothing to agree to without a sequence, otherwise the final attestation
+    # Nothing to agree to without a sequence, otherwise the attestation record
     def attested?(b_param, sequence:)
-      sequence_pages(sequence).none? || acknowledgment(b_param)["attested_at"].present?
+      sequence_pages(sequence).none? || attestation(b_param).present?
     end
 
+    def attestation(b_param)
+      RegistrationSequenceAttestation.find_by(b_param_id: b_param.id)
+    end
+
+    # Which pages have been acknowledged so far. In-flight progress, so it lives on
+    # the b_param alongside the rest of the wizard's state
     def acknowledged_page_ids(b_param)
-      acknowledgment(b_param)["acknowledged_page_ids"] || []
+      b_param.params.dig("registration_sequence", "acknowledged_page_ids") || []
     end
 
     # All or nothing: a page is only acknowledged with every one of its rules checked
@@ -96,15 +102,19 @@ module BikeServices
         !agreed.all? { Binxtils::InputNormalizer.boolean(it) }
 
       # id alongside the pages, so the acknowledged ids are unambiguously scoped
-      save_acknowledgment(b_param, id: page.registration_sequence_id,
-        acknowledged_page_ids: (acknowledged_page_ids(b_param) + [page.id]).uniq)
+      b_param.clean_params({registration_sequence: {id: page.registration_sequence_id,
+                                                    acknowledged_page_ids: (acknowledged_page_ids(b_param) + [page.id]).uniq}}.as_json)
+      b_param.save
     end
 
-    # The final agreement over everything acknowledged
-    def save_attestation(b_param, sequence, attested:)
+    # The moment the pages become an agreement - promoted off the b_param onto a
+    # record of its own, which outlives the registration
+    def save_attestation(b_param, sequence, attested:, user: nil)
       return false unless Binxtils::InputNormalizer.boolean(attested) && sequence.present?
+      return true if attestation(b_param).present?
 
-      save_acknowledgment(b_param, id: sequence.id, attested_at: Time.current.to_i)
+      RegistrationSequenceAttestation.create_for(b_param, sequence:, user:,
+        page_ids: acknowledged_page_ids(b_param)).persisted?
     end
 
     # The bike exists, or everything's entered and awaiting the email
@@ -140,7 +150,10 @@ module BikeServices
 
     def create_bike(b_param, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      BikeServices::Creator.new(ip_address:).create_bike(b_param)
+      bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
+      # The bike is what the attestation hangs off once the b_param is swept
+      attestation(b_param)&.update(bike_id: bike.id, user_id: b_param.creator_id) if bike.id.present?
+      bike
     end
 
     #
@@ -156,15 +169,6 @@ module BikeServices
       return %w[1 2] if pages.none?
 
       %w[1 2] + pages.each_index.map { step_for_page_index(it) } + %w[review]
-    end
-
-    def acknowledgment(b_param)
-      b_param.params["registration_sequence"] || {}
-    end
-
-    def save_acknowledgment(b_param, **attributes)
-      b_param.clean_params({registration_sequence: attributes}.as_json)
-      b_param.save
     end
 
     # Every step the registration has reached, in order - the acknowledgment pages
@@ -222,8 +226,7 @@ module BikeServices
       {details_completed: true, bike: bike_params}
     end
 
-    conceal :reusable?, :all_steps, :acknowledgment, :save_acknowledgment, :permitted_steps,
-      :confirmed_email_creator_id, :owner_email_for, :assign_owner_email, :details_completed?,
-      :step_2_params
+    conceal :reusable?, :all_steps, :permitted_steps, :confirmed_email_creator_id,
+      :owner_email_for, :assign_owner_email, :details_completed?, :step_2_params
   end
 end

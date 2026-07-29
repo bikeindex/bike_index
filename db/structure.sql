@@ -3298,6 +3298,44 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 
 
 --
+-- Name: registration_sequence_attestations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.registration_sequence_attestations (
+    id bigint NOT NULL,
+    registration_sequence_id bigint,
+    b_param_id bigint,
+    bike_id bigint,
+    user_id bigint,
+    owner_email character varying,
+    acknowledged_page_ids bigint[] DEFAULT '{}'::bigint[],
+    attestation_text text,
+    attested_at timestamp(6) without time zone NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: registration_sequence_attestations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.registration_sequence_attestations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: registration_sequence_attestations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.registration_sequence_attestations_id_seq OWNED BY public.registration_sequence_attestations.id;
+
+
+--
 -- Name: registration_sequence_pages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4933,6 +4971,13 @@ ALTER TABLE ONLY public.recovery_displays ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
+-- Name: registration_sequence_attestations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registration_sequence_attestations ALTER COLUMN id SET DEFAULT nextval('public.registration_sequence_attestations_id_seq'::regclass);
+
+
+--
 -- Name: registration_sequence_pages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5772,6 +5817,14 @@ ALTER TABLE ONLY public.recovery_displays
 
 
 --
+-- Name: registration_sequence_attestations registration_sequence_attestations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registration_sequence_attestations
+    ADD CONSTRAINT registration_sequence_attestations_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: registration_sequence_pages registration_sequence_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5969,6 +6022,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_on_registration_sequence_id_fa88640992; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_on_registration_sequence_id_fa88640992 ON public.registration_sequence_attestations USING btree (registration_sequence_id);
 
 
 --
@@ -7106,6 +7166,34 @@ CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_disp
 
 
 --
+-- Name: index_registration_sequence_attestations_on_b_param_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequence_attestations_on_b_param_id ON public.registration_sequence_attestations USING btree (b_param_id);
+
+
+--
+-- Name: index_registration_sequence_attestations_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequence_attestations_on_bike_id ON public.registration_sequence_attestations USING btree (bike_id);
+
+
+--
+-- Name: index_registration_sequence_attestations_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequence_attestations_on_user_id ON public.registration_sequence_attestations USING btree (user_id);
+
+
+--
+-- Name: index_registration_sequence_attestations_one_per_b_param; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_registration_sequence_attestations_one_per_b_param ON public.registration_sequence_attestations USING btree (b_param_id) WHERE (b_param_id IS NOT NULL);
+
+
+--
 -- Name: index_registration_sequence_pages_on_registration_sequence_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7479,6 +7567,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260729070204'),
 ('20260728120000'),
 ('20260725192133'),
 ('20260725155657'),
