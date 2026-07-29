@@ -36,8 +36,8 @@
       <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
       <%= @form_builder.file_field(@attribute, @html_options) %>
 
-      <% if @direct_upload_url.present? %>
-        <%= hidden_field_tag "#{@attribute}_signed_id", nil, data: {"ui--forms--file-upload-target": "signedId"} %>
+      <% if @signed_id_field %>
+        <%= hidden_field_tag @signed_id_field, nil, data: {"ui--forms--file-upload-target": "signedId"} %>
       <% end %>
 
       <%# Stimulus has no default event for a label, so name click explicitly. %>

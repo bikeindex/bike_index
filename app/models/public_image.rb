@@ -67,6 +67,11 @@ class PublicImage < ApplicationRecord
   default_scope { where(is_private: false).order(:listing_order) }
   scope :bike, -> { where(imageable_type: "Bike") }
 
+  # Direct uploads are checked before the blob exists, the validation after - same rule
+  def self.file_permitted?(content_type:, byte_size:)
+    FILE_CONTENT_TYPES.include?(content_type) &&
+      byte_size.to_i.between?(1, PublicImageUploader::MAX_FILE_SIZE)
+  end
   def default_name
     if bike?
       self.name = "#{imageable&.title_string} #{imageable&.frame_colors&.to_sentence}"
@@ -86,6 +91,7 @@ class PublicImage < ApplicationRecord
   def bike?
     imageable_type == "Bike"
   end
+
 
   # Serves whichever backend this record was uploaded through. CarrierWave versions and
   # ActiveStorage variants share names, so callers pass the same size either way - the
@@ -163,8 +169,7 @@ class PublicImage < ApplicationRecord
 
   def file_permitted
     blob = attachment_changes["file"].blob
-    return if FILE_CONTENT_TYPES.include?(blob.content_type) &&
-      blob.byte_size <= PublicImageUploader::MAX_FILE_SIZE
+    return if self.class.file_permitted?(content_type: blob.content_type, byte_size: blob.byte_size)
 
     errors.add(:file, :invalid)
   end

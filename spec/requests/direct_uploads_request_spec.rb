@@ -9,8 +9,12 @@ RSpec.describe DirectUploadsController, type: :request do
     post base_url, params: {blob: blob.merge(overrides)}
   end
 
-  it "is the route rails_direct_uploads_path points at" do
+  # The shadow depends on route order, so assert the dispatch - if ActiveStorage's own route
+  # ever wins again, its controller accepts anything from anyone and nothing else would fail
+  it "shadows ActiveStorage's route, which would otherwise check nothing" do
     expect(Rails.application.routes.url_helpers.rails_direct_uploads_path).to eq base_url
+    expect(Rails.application.routes.recognize_path(base_url, method: :post))
+      .to eq(controller: "direct_uploads", action: "create")
   end
 
   context "signed out" do

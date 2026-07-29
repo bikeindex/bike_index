@@ -5,7 +5,7 @@ module Register
   # token stands in for a session. Anyone can start a registration, so this is scoping and
   # attribution rather than a gate - the hourly per-IP throttle in rack_attack.rb is the teeth.
   class DirectUploadsController < DirectUploads::BaseController
-    before_action :require_registration, :require_permitted_file
+    before_action :require_registration
 
     private
 

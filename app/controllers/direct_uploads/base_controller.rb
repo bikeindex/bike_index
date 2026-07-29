@@ -5,14 +5,15 @@
 # adds who it will accept them from.
 module DirectUploads
   class BaseController < ActiveStorage::DirectUploadsController
+    before_action :require_permitted_file
+
     private
 
-    # The browser declares both, and the presigned URL is signed against what it declared -
-    # so refusing here is what makes an oversized or non-image upload impossible rather than
-    # merely unused.
+    # Both values are the browser's claim, and the presigned URL is signed against them - so
+    # this caps how much can be written and keeps obvious junk out, but it can't verify the
+    # bytes. Nothing does yet; the model validation reads the same declared values.
     def require_permitted_file
-      return if PublicImage::FILE_CONTENT_TYPES.include?(blob_args[:content_type]) &&
-        blob_args[:byte_size].to_i.between?(1, PublicImageUploader::MAX_FILE_SIZE)
+      return if PublicImage.file_permitted?(**blob_args.slice(:content_type, :byte_size))
 
       head :unprocessable_entity
     end

@@ -68,7 +68,7 @@ module BikeServices
     # signed id and the fields into the params json
     def save_step_2(b_param, user:, image_signed_id:, bike_params:)
       b_param.creator_id ||= user&.id
-      b_param.clean_params(step_2_params(bike_params.to_h, image_signed_id).as_json)
+      b_param.clean_params(step_2_params(bike_params.to_h, image_signed_id:).as_json)
       b_param.save
     end
 
@@ -120,7 +120,7 @@ module BikeServices
 
     # Blank values keep what step 1 saved - except the additional colors, where
     # blank is the "remove color" button clearing one
-    def step_2_params(bike_params, image_signed_id)
+    def step_2_params(bike_params, image_signed_id:)
       bike_params = bike_params.reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
       # The unit only means something alongside a numeric size
       bike_params = bike_params.except("frame_size_unit") if bike_params["frame_size_number"].blank?

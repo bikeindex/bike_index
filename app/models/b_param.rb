@@ -448,9 +448,9 @@ class BParam < ApplicationRecord
     params["image_signed_id"]
   end
 
-  # nil once CleanUnattachedBlobsJob has reaped it, which a late confirmation has to survive
+  # nil once CleanUnattachedBlobsJob has reaped it, which a late registration has to survive
   def image_blob
-    ActiveStorage::Blob.find_signed(image_signed_id) if image_signed_id.present?
+    ActiveStorage::Blob.find_signed(image_signed_id)
   end
 
   def primary_frame_color

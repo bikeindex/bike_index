@@ -83,17 +83,15 @@ export default class extends Controller {
       files.length === 0
         ? this.placeholderValue
         : files.length === 1 ? files[0].name : `${files.length} files`
-    if (this.urlValue) this.upload(files[0])
+    if (this.urlValue && files[0]) this.upload(files[0])
   }
 
-  // Only when the field is nameless (direct_upload) - the form then carries the blob's
-  // signed id rather than the bytes.
+  // Only reached with a direct_upload_url, where the field is nameless and the form carries
+  // the blob's signed id rather than the bytes.
   upload (file) {
-    if (!file) return
-
     this.xhr?.abort() // Picking again shouldn't leave the discarded file uploading
     this.signedIdTarget.value = ''
-    this.filenameTarget.textContent = `${file.name} — ${this.uploadingValue}`
+    this.status(file, this.uploadingValue)
 
     const upload = new DirectUpload(file, this.urlValue, this)
     this.currentUpload = upload
@@ -103,8 +101,12 @@ export default class extends Controller {
 
       this.pending = null
       if (!error) this.signedIdTarget.value = blob.signed_id
-      this.filenameTarget.textContent = error ? `${file.name} — ${this.failedValue}` : file.name
+      this.status(file, error && this.failedValue)
     }))
+  }
+
+  status (file, suffix) {
+    this.filenameTarget.textContent = suffix ? `${file.name} — ${suffix}` : file.name
   }
 
   // DirectUpload delegate hook - the handle that makes a discarded upload cancellable
