@@ -78,7 +78,6 @@ class BikeIndex.Init extends BikeIndex
       # the 🔎 path won't rebind them; make the page script idempotent instead.
       organized_graduated_notifications_index: BikeIndex.BikesIndex
       my_accounts_edit: BikeIndex.UsersEdit
-      users_new: BikeIndex.UsersNew
       my_account_show: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
       stolen_index: BikeIndex.LegacyStolenIndex
