@@ -18,8 +18,8 @@ module UI
       #   - :inline  one line, the muted part following the display text
       #   - :stacked a muted line below the display text, on a taller input
       #
-      # It always renders inside a wrapper div, so the markup doesn't shift when
-      # rich_display is toggled -- wrap it yourself for the parent's layout.
+      # It always renders inside a wrapper div, so the combobox sits at the same
+      # depth either way -- add your own wrapper for the parent's layout.
       #
       # Any other keyword (id:, value:, open:, free_text:, autocomplete:,
       # placeholder:, etc.) is forwarded to `hw_combobox_tag`.
@@ -39,7 +39,7 @@ module UI
         end
 
         def call
-          tag.div(class: "tw:relative", data: wrapper_data) do
+          tag.div(**wrapper_attrs) do
             safe_join([combobox, overlay].compact)
           end
         end
@@ -53,10 +53,12 @@ module UI
           end
         end
 
-        # The wrapper always renders, so toggling rich_display doesn't move the
-        # combobox in its parent's layout -- but only it pays for the controller
-        def wrapper_data
-          {controller: ("ui--forms--combobox-display" if @rich_display)}.compact
+        # Only a rich display needs the controller, or the positioning context
+        # the overlay is placed against
+        def wrapper_attrs
+          return {} unless @rich_display
+
+          {class: "tw:relative", data: {controller: "ui--forms--combobox-display"}}
         end
 
         def overlay

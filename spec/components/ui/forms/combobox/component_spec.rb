@@ -36,7 +36,9 @@ RSpec.describe UI::Forms::Combobox::Component, type: :component do
   end
 
   it "wraps the combobox without paying for the display controller" do
-    expect(component).to have_css("div.tw\\:relative fieldset.hw-combobox")
+    expect(component).to have_css("div > fieldset.hw-combobox")
+    # No overlay to position against, so no positioning context either
+    expect(component).to_not have_css("div.tw\\:relative")
     expect(component).to_not have_css("[data-controller='ui--forms--combobox-display']")
     expect(component).to_not have_css("[data-ui--forms--combobox-display-target='overlay']", visible: :all)
   end
