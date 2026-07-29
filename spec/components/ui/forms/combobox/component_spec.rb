@@ -35,35 +35,54 @@ RSpec.describe UI::Forms::Combobox::Component, type: :component do
     end
   end
 
-  context "with rich_display" do
-    let(:extra) { {rich_display: true} }
+  it "wraps the combobox without paying for the display controller" do
+    expect(component).to have_css("div.tw\\:relative fieldset.hw-combobox")
+    expect(component).to_not have_css("[data-controller='ui--forms--combobox-display']")
+    expect(component).to_not have_css("[data-ui--forms--combobox-display-target='overlay']", visible: :all)
+  end
 
-    it "wraps the combobox with the overlay the display controller paints on" do
-      expect(component).to have_css("div.tw\\:relative[data-controller='ui--forms--combobox-display'] fieldset.hw-combobox")
-      expect(component).to have_css("[data-ui--forms--combobox-display-target='overlay'].tw\\:hidden", visible: :all)
+  context "with a wrapper_class" do
+    let(:extra) { {wrapper_class: "tw:flex-1"} }
+
+    it "puts it on the wrapper, whether or not there's a rich display" do
+      expect(component).to have_css("div.tw\\:relative.tw\\:flex-1 fieldset.hw-combobox")
     end
 
-    it "truncates the overlay to the input's single line" do
-      expect(component).to have_css("[data-ui--forms--combobox-display-target='overlay'].tw\\:truncate", visible: :all)
-      expect(component).to_not have_css("input[role='combobox'].tw\\:min-h-13")
-    end
+    context "with rich_display" do
+      let(:extra) { {wrapper_class: "tw:flex-1", rich_display: :stacked} }
 
-    context "with a class string" do
-      let(:extra) { {rich_display: "tw:flex-1"} }
-
-      it "puts it on the wrapper" do
+      it "puts it on the same wrapper the display controller uses" do
         expect(component).to have_css("div.tw\\:relative.tw\\:flex-1[data-controller='ui--forms--combobox-display']")
       end
     end
+  end
 
-    context "stacked" do
-      let(:extra) { {rich_display: :stacked} }
+  context "with rich_display: :inline" do
+    let(:extra) { {rich_display: :inline} }
 
-      it "grows the input for the muted second line, stacking the overlay over it" do
-        expect(component).to have_css("input[role='combobox'].hw-combobox__input.tw\\:min-h-13")
-        expect(component).to have_css("[data-ui--forms--combobox-display-target='overlay'].tw\\:flex-col", visible: :all)
-        expect(component).to_not have_css("[data-ui--forms--combobox-display-target='overlay'].tw\\:truncate", visible: :all)
-      end
+    it "adds the overlay the display controller paints on, truncated to one line" do
+      expect(component).to have_css("div.tw\\:relative[data-controller='ui--forms--combobox-display'] fieldset.hw-combobox")
+      expect(component).to have_css("[data-ui--forms--combobox-display-target='overlay'].tw\\:hidden.tw\\:truncate", visible: :all)
+      expect(component).to_not have_css("input[role='combobox'].tw\\:min-h-13")
+    end
+  end
+
+  context "with rich_display: :stacked" do
+    let(:extra) { {rich_display: :stacked} }
+
+    it "grows the input for the muted second line, stacking the overlay over it" do
+      expect(component).to have_css("input[role='combobox'].hw-combobox__input.tw\\:min-h-13")
+      expect(component).to have_css("[data-ui--forms--combobox-display-target='overlay'].tw\\:flex-col", visible: :all)
+      expect(component).to_not have_css("[data-ui--forms--combobox-display-target='overlay'].tw\\:truncate", visible: :all)
+    end
+  end
+
+  context "with an unrecognized rich_display" do
+    let(:extra) { {rich_display: true} }
+
+    it "renders no rich display rather than guessing" do
+      expect(component).to_not have_css("[data-controller='ui--forms--combobox-display']")
+      expect(component).to_not have_css("[data-ui--forms--combobox-display-target='overlay']", visible: :all)
     end
   end
 
