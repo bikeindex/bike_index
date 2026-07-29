@@ -25,12 +25,13 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
     end
   end
 
+  # An email field is UI::Forms::Email, so that every one of them checks for a typo
   context "when email_field" do
     let(:kind) { :email_field }
     let(:attribute) { :email }
 
-    it "renders an email input" do
-      expect(component).to have_css("input[type='email'][name='user[email]']")
+    it "is not a kind, and falls back to text" do
+      expect(component).to have_css("input[type='text'][name='user[email]']")
     end
   end
 

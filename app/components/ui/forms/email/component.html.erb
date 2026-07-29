@@ -5,7 +5,7 @@
   data-ui--forms--email-message-value="<%= translation(".did_you_mean") %>"
 >
   <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: @attribute,
-    kind: :email_field, required: @required, html_options: @html_options)) %>
+    required: @required, html_options: @html_options)) %>
 
   <%# The region outlives the suggestion inside it -- one added along with its text has nothing to announce. %>
   <div aria-live="polite">

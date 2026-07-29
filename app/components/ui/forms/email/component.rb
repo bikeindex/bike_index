@@ -12,7 +12,8 @@ module UI
           @form_builder = form_builder
           @attribute = attribute
           @required = required
-          @html_options = {data: {"ui--forms--email-target": "input"}}.deep_merge(html_options)
+          # UI::Forms::Input has no email kind, so the type comes from here
+          @html_options = {type: "email", data: {"ui--forms--email-target": "input"}}.deep_merge(html_options)
         end
       end
     end
