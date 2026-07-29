@@ -168,6 +168,9 @@ class PublicImage < ApplicationRecord
 
   private
 
+  # content_type is trustworthy here even though a direct upload declares its own: attaching runs
+  # Attached::Changes::CreateOne#initialize, which re-identifies it from the stored bytes with
+  # Marcel. byte_size is signed into the presigned PUT, so S3 rejects a body of any other length.
   def file_permitted
     blob = attachment_changes["file"].blob
     return if self.class.file_permitted?(content_type: blob.content_type, byte_size: blob.byte_size)
