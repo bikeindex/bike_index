@@ -6,9 +6,9 @@ RSpec.describe CleanUnattachedBlobsJob, type: :job do
 
   let(:stale) { Time.current - 31.days }
 
-  def create_blob(created_at:, filename: "bike.jpg", metadata: {})
-    ActiveStorage::Blob.create_and_upload!(io: StringIO.new("photo"), filename:, metadata:,
-      content_type: "image/jpeg").tap { it.update_column(:created_at, created_at) }
+  def create_blob(created_at:, filename: "bike.jpg", binx_data: nil)
+    ActiveStorage::Blob.create_and_upload!(io: StringIO.new("photo"), filename:,
+      content_type: "image/jpeg").tap { it.update_columns(created_at:, binx_data:) }
   end
 
   it "runs about daily" do
@@ -21,7 +21,7 @@ RSpec.describe CleanUnattachedBlobsJob, type: :job do
     let!(:recent_orphan) { create_blob(created_at: Time.current - 29.days) }
     # BikeJobs::RemoveOrphanedImagesJob owns these - a superseded one stays unattached on purpose.
     # StolenProcessor stamps them; the filename covers the ones minted before it did.
-    let!(:alert_image) { create_blob(created_at: stale, metadata: {"stolen_record_id" => 42}) }
+    let!(:alert_image) { create_blob(created_at: stale, binx_data: {"stolen_record_id" => 42}) }
     let!(:legacy_alert_image) { create_blob(created_at: stale, filename: "stolen-42-opengraph.jpeg") }
 
     it "purges only the aged blobs nothing references anymore" do

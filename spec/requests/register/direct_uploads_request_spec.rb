@@ -15,7 +15,7 @@ RSpec.describe Register::DirectUploadsController, type: :request do
     expect(json_result["signed_id"]).to be_present
     expect(json_result.dig("direct_upload", "url")).to be_present
     # Stamped so only this registration can claim it
-    expect(ActiveStorage::Blob.last.metadata).to eq({"b_param_id" => b_param.id})
+    expect(ActiveStorage::Blob.last.binx_data).to eq({"b_param_id" => b_param.id})
   end
 
   # ActiveStorage permits the client's metadata, and "processed" would skip the job that
@@ -24,7 +24,8 @@ RSpec.describe Register::DirectUploadsController, type: :request do
     post base_url, params: {b_param_token: b_param.id_token,
                             blob: blob.merge(metadata: {processed: true, b_param_id: b_param.id + 1})}
     expect(response.status).to eq 200
-    expect(ActiveStorage::Blob.last.metadata).to eq({"b_param_id" => b_param.id})
+    expect(ActiveStorage::Blob.last).to have_attributes(metadata: {},
+      binx_data: {"b_param_id" => b_param.id})
   end
 
   context "no registration token" do

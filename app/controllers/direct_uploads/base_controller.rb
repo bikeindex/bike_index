@@ -5,9 +5,17 @@
 # adds who it will accept them from.
 module DirectUploads
   class BaseController < ActiveStorage::DirectUploadsController
-    # Subclasses prepend their authorization, so it runs before this - blob_metadata can rely
+    # Subclasses prepend their authorization, so it runs before this - binx_data can rely
     # on whoever is asking having been resolved
     before_action :require_permitted_file
+
+    # create_before_direct_upload! takes explicit keywords, so binx_data can't ride along in
+    # blob_args. Otherwise the same as ActiveStorage's.
+    def create
+      blob = ActiveStorage::Blob.create_before_direct_upload!(**blob_args)
+      blob.update!(binx_data:) if binx_data.present?
+      render json: direct_upload_json(blob)
+    end
 
     private
 
@@ -20,14 +28,14 @@ module DirectUploads
       head :unprocessable_entity
     end
 
-    # Replaces whatever metadata was posted rather than merging it. ActiveStorage permits the
+    # Drops whatever metadata was posted rather than merging it. ActiveStorage permits the
     # client's, and the keys mean something here - "processed" would skip the job that strips
     # EXIF, leaving the GPS coordinates of wherever the bike was photographed in the original.
     def blob_args
-      super.merge(metadata: blob_metadata)
+      super.merge(metadata: {})
     end
 
-    def blob_metadata
+    def binx_data
       {}
     end
 

@@ -21,7 +21,7 @@ module Register
 
     # A signed id is a bearer token, so without this any registration could claim any blob.
     # BParam#image_blob only hands back one stamped with its own id.
-    def blob_metadata
+    def binx_data
       {"b_param_id" => b_param.id}
     end
   end

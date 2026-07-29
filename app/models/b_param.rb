@@ -453,7 +453,7 @@ class BParam < ApplicationRecord
   # any registration could claim any other's photo.
   def image_blob
     blob = ActiveStorage::Blob.find_signed(image_signed_id)
-    blob if blob&.metadata&.dig("b_param_id") == id
+    blob if blob&.binx_data&.dig("b_param_id") == id
   end
 
   def primary_frame_color
