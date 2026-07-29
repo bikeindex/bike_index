@@ -118,10 +118,12 @@ export default class extends Controller {
     return this.element.querySelector(`input[type=radio][name="${CSS.escape(name)}"]:checked`)
   }
 
+  // Nameless fields would all share one key — hotwire_combobox renders two of
+  // them per combobox (the display input and its small-viewport twin).
   get fields () {
-    return this.element.querySelectorAll(
-      'textarea, select, input:not([type=hidden]):not([type=file]):not([type=submit]):not([type=button]):not(.hw-combobox__input)'
-    )
+    return [...this.element.querySelectorAll(
+      'textarea, select, input:not([type=hidden]):not([type=file]):not([type=submit]):not([type=button])'
+    )].filter((field) => field.name)
   }
 
   // hotwire_combobox splits each field into a nameless display input and a
