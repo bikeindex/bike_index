@@ -23,6 +23,8 @@ RSpec.describe Registrations::Show::CurrentAlerts::ScannedSticker::Component, ty
     it "includes the form to re-link the sticker" do
       render_inline(component)
       expect(page).to have_button("Change the bike it links to")
+      # The chevron target is what ui--collapse rotates when the form opens
+      expect(page).to have_css("button[data-ui--collapse-target='trigger'] [data-ui--collapse-target='chevron'] svg")
       expect(page).to have_css("form[action='/bike_stickers/#{bike_sticker.code}'] input[name='bike_id']", visible: :all)
       expect(page).to have_button("Update")
     end
