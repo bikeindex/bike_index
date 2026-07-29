@@ -3,8 +3,9 @@ name: merge-conflicts
 description: >-
   How to bring a branch up to date and resolve git merge conflicts the way this
   repo expects — merge (never rebase or force-push), understand each side's
-  intent before choosing, ask when a resolution isn't clear-cut, and keep the
-  merge commit to just the merge. Trigger whenever you're about to run
+  intent before choosing, ask when a resolution isn't clear-cut, keep the merge
+  commit to just the merge, and audit what merged *cleanly* before committing.
+  Trigger whenever you're about to run
   `git merge`/`git pull`, sync a branch with `main`, "update from main", or
   resolve conflict markers left by a merge, cherry-pick, or interrupted pull —
   including bare phrasings like "fix the conflicts", "merge main in", or "this
@@ -26,6 +27,8 @@ When a branch needs to catch up with its base, or a merge/cherry-pick/pull leave
 3. **The upstream tracking ref**, if it names a branch other than this one's own remote mirror (`git rev-parse --abbrev-ref @{u}`).
 4. **The Conductor workspace target branch** (from the workspace/system instructions) — a default hint, *not* the last word.
 
+**Re-resolve the base every time — it moves.** When a base branch's PR merges, GitHub retargets the child PR (usually to `main`), so what you merged from last time may no longer be the base. Check `gh pr view <branch> --json baseRefName`, and `gh pr list` for whether the old base still has an open PR. A base whose PR has merged often keeps accumulating commits behind no PR at all; those aren't yours to integrate.
+
 If 1–3 turn up nothing and the branch clearly builds on another feature branch — it was created by merging one in, was cut from `main` but layers work that lives on an unmerged branch, or the user talks about it as part of a stack — **ask which branch to update from (offer the likely candidate) rather than merging `main`.** Confirm before running the merge; a wrong base is expensive to unwind. Note that being 0-behind `main` proves nothing here — a stacked branch is normally 0-behind `main` and still far behind its real base.
 
 ## Bring a branch up to date
@@ -46,7 +49,33 @@ When git leaves `<<<<<<<` / `=======` / `>>>>>>>` markers:
 - **Understand each side before choosing.** The version on `main` and the version on the branch each exist for a reason. Read enough of both to know what each is trying to do — don't mechanically keep "ours" or "theirs." The correct resolution is often a combination, not one side wholesale.
 - **Consider the branch's purpose.** What is this branch trying to accomplish? A conflict resolution that quietly drops the branch's intent (or reverts something `main` deliberately changed) is a bug, even if it compiles.
 - **Ask when it isn't clear-cut.** If you can't confidently tell which side should win, or the two changes are semantically entangled, stop and ask the user rather than guessing. A wrong silent resolution is worse than a question.
+- **Both sides added at the same spot? Order matters.** Keeping both isn't enough when either block has side effects. If the incoming block ends by reloading the page, anything of yours that depends on unsaved state has to come *after* it — concatenated the other way it still passes while testing nothing.
+- **Don't blanket-replace a renamed string.** Two call sites that shared a string can have legitimately diverged; `sed`-ing the whole file changes the one that shouldn't move.
 - After resolving, verify the result actually makes sense — the merged code should reflect both intents, not just parse. Run the relevant tests if the conflict touched logic.
+
+## The dangerous part is what merged *cleanly*
+
+Conflict markers are the easy case — git is asking for help. The silent breakages come from hunks it merged without asking, because a three-way merge keeps *your* side of any line it can't attribute to a common ancestor. A base that arrived as a **squash-merge** has history unrelated to yours, so git will cheerfully resurrect code that base deliberately deleted, in files it reports as auto-merged.
+
+After every merge, before committing:
+
+```bash
+git diff origin/<base> -- app/ lib/ config/   # then account for every file listed
+```
+
+Every differing file must be explainable as *this branch's work* (or a sibling branch you're intentionally stacked on). Anything else is a resurrection or a stray. For a file that's mostly wrong, don't hand-patch hunks — `git checkout origin/<base> -- <file>` and re-apply your change on top.
+
+This is what it catches, all of which has actually happened here:
+
+- **Deleted code coming back.** A constant, predicate, or callback the base removed reappears, along with the call sites that reference it — reintroducing behavior the base decided against.
+- **Another branch's change riding along.** A retention window, a flag, a tweak that came in when you merged a sibling branch and the base never took. Not yours to carry; reset it.
+- **Committed churn in generated files.** `git checkout --` reverts to HEAD, not to the base — so once churn is committed it survives every later revert. Check VCR cassettes and lockfiles specifically; a diff that's only timestamps/nonces should be reset to the base.
+
+## Run the linter, not just the specs
+
+`bin/lint` after every merge. A bad auto-merge that duplicates a method or strands a constant parses fine and passes its specs — `Lint/DuplicateMethods` is what catches it.
+
+Then run specs for the merged area, **including the browser ones**. The base renaming or moving something your branch calls produces no conflict marker at all: a method that moved to a service, a route reshaped into a query param, copy your specs assert on. Those only surface at runtime.
 
 ## Never force-push
 
