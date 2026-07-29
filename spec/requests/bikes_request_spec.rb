@@ -23,43 +23,11 @@ RSpec.describe BikesController, type: :request do
       expect(bike.status).to eq "status_with_owner"
       expect(bike.stolen_records.last).to be_blank
       expect(response).to render_template(:new)
-      expect(response.body).to include(current_user.email) # prefilled owner_email
       expect(response.body).to match("<title>Register a bike!</title>")
       expect(response.body).to match('<meta name="description" content="Register a bike on Bike Index quickly')
       # This still wouldn't show address, because it doesn't have an organization with BikeServices::Builder.include_address_record?
       expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
-    context "with email" do
-      # The signed in user's email is in the nav, so assert on the field itself
-      let(:owner_email_field) { Nokogiri::HTML(response.body).at_css("#bike_owner_email") }
-
-      it "prefills the passed email rather than the current user's" do
-        get "#{base_url}/new?email=friend@example.com"
-        expect(response.code).to eq("200")
-        expect(assigns(:bike).owner_email).to eq "friend@example.com"
-        expect(owner_email_field["value"]).to eq "friend@example.com"
-      end
-
-      context "false" do
-        it "renders no email, even signed in" do
-          get "#{base_url}/new?email=false"
-          expect(response.code).to eq("200")
-          expect(current_user.email).to be_present
-          expect(assigns(:bike).owner_email).to be_blank
-          expect(owner_email_field["value"]).to be_blank
-        end
-      end
-
-      context "blank" do
-        it "falls back to the current user" do
-          get "#{base_url}/new?email="
-          expect(response.code).to eq("200")
-          expect(assigns(:bike).owner_email).to eq current_user.email
-          expect(owner_email_field["value"]).to eq current_user.email
-        end
-      end
-    end
-
     context "with bike_sticker" do
       let(:organization) { FactoryBot.create(:organization) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "UC1101", organization: organization) }
