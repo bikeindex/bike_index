@@ -52,9 +52,11 @@
           class="tw:mt-2 tw:flex tw:items-center tw:gap-3 <%= "tw:hidden" if value.blank? %>"
           data-register--additional-colors-target="row"
         >
-          <%= render UI::Forms::Combobox::Component.new(name: field, form: f,
-              value:, options: color_combobox_options, placeholder: blank_label,
-              rich_display: :inline, wrapper_class: "tw:flex-1") %>
+          <div class="tw:flex-1">
+            <%= render UI::Forms::Combobox::Component.new(name: field, form: f,
+                value:, options: color_combobox_options, placeholder: blank_label,
+                rich_display: :inline) %>
+          </div>
 
           <%= render UI::Button::Component.new(text: "×", color: :link,
               html_class: "tw:shrink-0 tw:text-xl tw:leading-none tw:font-bold",
