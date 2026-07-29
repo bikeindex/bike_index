@@ -90,6 +90,7 @@ gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketi
 gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
 gem "down" # used to generate a local tempfile
 gem "faraday_middleware" # Manage faraday request flow
+gem "ruby-saml" # Organization SSO
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
