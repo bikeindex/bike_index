@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 require "fileutils"
 load File.expand_path("env", __dir__)
-include FileUtils
 
 # path to your application root.
 APP_ROOT = File.expand_path("..", __dir__)
@@ -12,7 +11,7 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
-chdir APP_ROOT do
+FileUtils.chdir APP_ROOT do
   # Conductor workspace setup
   if ENV["CONDUCTOR_ROOT_PATH"]
     root = ENV["CONDUCTOR_ROOT_PATH"]
@@ -22,47 +21,46 @@ chdir APP_ROOT do
     env_test = File.join(root, ".env.test")
     if File.exist?(env_test)
       puts "Copying .env.test from #{root}..."
-      cp env_test, ".env.test"
+      FileUtils.cp env_test, ".env.test"
     end
 
     # Copy .env.conductor_dev from root repo
     env_dev = File.join(root, ".env.conductor_dev")
     if File.exist?(env_dev)
       puts "Copying .env.conductor_dev from #{root}..."
-      cp env_dev, ".env.development"
+      FileUtils.cp env_dev, ".env.development"
     end
 
     # Symlink storage directory for Active Storage
     root_storage = File.join(root, "storage")
     if Dir.exist?(root_storage)
       puts "Symlinking storage from #{root_storage}..."
-      rm_rf "storage"
-      ln_sf root_storage, "storage"
+      FileUtils.rm_rf "storage"
     else
       puts "Creating storage directory at #{root_storage}..."
-      mkdir_p root_storage
-      ln_sf root_storage, "storage"
+      FileUtils.mkdir_p root_storage
     end
+    FileUtils.ln_sf root_storage, "storage"
 
     # Symlink node_modules so every workspace shares one install
     root_node_modules = File.join(root, "node_modules")
-    mkdir_p root_node_modules unless Dir.exist?(root_node_modules)
+    FileUtils.mkdir_p root_node_modules unless Dir.exist?(root_node_modules)
     puts "Symlinking node_modules from #{root_node_modules}..."
-    rm_rf "node_modules"
-    ln_sf root_node_modules, "node_modules"
+    FileUtils.rm_rf "node_modules"
+    FileUtils.ln_sf root_node_modules, "node_modules"
 
     # Copy Facebook VCR cassettes
     fb_cassettes = File.join(root, "spec/vcr_cassettes/facebook")
     if Dir.exist?(fb_cassettes)
       puts "Copying spec/vcr_cassettes/facebook from #{root}..."
-      mkdir_p "spec/vcr_cassettes/facebook"
-      Dir.glob(File.join(fb_cassettes, "*")).each { |f| cp f, "spec/vcr_cassettes/facebook/" }
+      FileUtils.mkdir_p "spec/vcr_cassettes/facebook"
+      Dir.glob(File.join(fb_cassettes, "*")).each { |f| FileUtils.cp f, "spec/vcr_cassettes/facebook/" }
     end
   end
 
   puts "== Checking Ruby version =="
   required_ruby = File.read(".tool-versions")[/ruby (\S+)/, 1]
-  if required_ruby && RUBY_VERSION != required_ruby
+  if required_ruby && required_ruby != RUBY_VERSION
     if ENV["SETUP_RUBY_INSTALLED"]
       abort "Failed to activate Ruby #{required_ruby} via mise after installing"
     end
