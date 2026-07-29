@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        email:
+          did_you_mean: Did you mean %{email}?

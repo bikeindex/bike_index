@@ -29,13 +29,21 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
-  context "when email_field" do
-    let(:attribute) { :email }
-    let(:kind) { :email_field }
+  # There's no email kind -- UI::Forms::Email renders one, so it arrives in a block
+  context "when a content block wraps an email field" do
+    let(:component) do
+      render_in_view_context do
+        form_for User.new, url: "#", method: :patch, builder: BikeIndexFormBuilder do |f|
+          render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do
+            render(UI::Forms::Email::Component.new(form_builder: f, required: true))
+          end
+        end
+      end
+    end
 
-    it "renders email input with label" do
-      expect(component).to have_css("label", text: "Email")
-      expect(component).to have_css("input[type='email']")
+    it "labels the email field rendered in the block" do
+      expect(component).to have_css("label[for='user_email']", text: "Email")
+      expect(component).to have_css("[data-controller='ui--forms--email'] input.twinput[type='email'][name='user[email]'][required]")
     end
   end
 
