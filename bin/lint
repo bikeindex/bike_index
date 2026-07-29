@@ -23,13 +23,16 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
-# Directories expand by extension, matching what the linters discover on their own -
-# name an extensionless script (a bin/ one, say) explicitly to lint it
+# Directories expand to every file below them that lint_kind can place - by extension,
+# or by shebang for the extensionless scripts in bin/
 def lintable_files(path)
   return [path] unless File.directory?(path)
 
-  files = Dir.glob(File.join(path, "**", "*.{#{EXTENSIONS_BY_KIND.values.flatten.join(",")}}"))
+  extensions = EXTENSIONS_BY_KIND.values.flatten.join(",")
+  globs = [File.join(path, "**", "*.{#{extensions}}"), File.join(path, "**", "*[^.]")]
+  files = Dir.glob(globs).uniq
     .reject { |file| file.split(File::SEPARATOR).intersect?(SKIPPED_DIRECTORIES) }
+    .select { |file| File.file?(file) && lint_kind(file) }
   warn "No lintable files in: #{path}" if files.none?
 
   files
