@@ -1,5 +1,9 @@
 class RegisterController < ApplicationController
-  before_action :find_b_param, except: %i[new]
+  before_action :find_b_param, except: %i[new create]
+  # Step 1 carries everything it needs, so an expired token starts a registration
+  # rather than bouncing and losing the submission
+  before_action :find_or_build_b_param, only: %i[create]
+  before_action :assign_organization, except: %i[new]
   before_action :redirect_finished, only: %i[create update]
   # The step shown depends on server state - a cached page could show a step
   # the registration is past (register--revalidate covers Safari's bfcache)
@@ -8,11 +12,13 @@ class RegisterController < ApplicationController
   # Redirects into step 1 with a token (reusing the session's registration when
   # it's still blank), so going back from step 2 lands on the same registration
   def new
-    b_param = BikeServices::Register.b_param_for(user: current_user,
-      token_id: session[:register_b_param_token],
-      organization_id: params[:organization_id], status: params[:status])
-    session[:register_b_param_token] = b_param.id_token
-    redirect_to step_path(1, b_param)
+    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
+      status: params[:status], email: params[:email])
+    # The same filter every other action runs, so reusing the session's
+    # registration can't quietly drop the organization the URL named
+    assign_organization
+    session[:register_b_param_token] = @b_param.id_token
+    redirect_to step_path(1)
   end
 
   # The whole flow after the start: ?step=1, ?step=2 and ?step=finished - or the
@@ -26,13 +32,13 @@ class RegisterController < ApplicationController
     case step
     when "finished"
       @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type_titleize)
-      render Register::StepFinished::Component.new(b_param: @b_param)
+      render Register::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "2"
       @page_title = I18n.t("meta_titles.register_step_2", cycle_type: @b_param.type)
-      render Register::Step2::Component.new(b_param: @b_param)
+      render Register::Step2::Component.new(b_param: @b_param, current_user:)
     else
       @page_title = I18n.t("meta_titles.register_step_1", cycle_type: @b_param.type)
-      render Register::Step1::Component.new(b_param: @b_param)
+      render Register::Step1::Component.new(b_param: @b_param, current_user:)
     end
   end
 
@@ -43,12 +49,12 @@ class RegisterController < ApplicationController
     @b_param.errors.add(:base, translation(:email_required)) if @b_param.owner_email.blank?
     @b_param.errors.add(:base, translation(:manufacturer_required)) if @b_param.manufacturer_id.blank?
     if @b_param.errors.any?
-      render Register::Step1::Component.new(b_param: @b_param), status: :unprocessable_entity
-    elsif BikeServices::Register.save_step_1(@b_param)
+      render Register::Step1::Component.new(b_param: @b_param, current_user:), status: :unprocessable_entity
+    elsif @b_param.save
       redirect_to step_path(2)
     else
       @b_param.errors.add(:base, translation(:unable_to_save))
-      render Register::Step1::Component.new(b_param: @b_param), status: :unprocessable_entity
+      render Register::Step1::Component.new(b_param: @b_param, current_user:), status: :unprocessable_entity
     end
   end
 
@@ -66,8 +72,17 @@ class RegisterController < ApplicationController
 
   private
 
-  def step_path(step, b_param = @b_param)
-    register_path(b_param_token: b_param.id_token, step:)
+  def step_path(step)
+    register_path(b_param_token: @b_param.id_token, step:)
+  end
+
+  # b_param_token=false abandons the session's registration - the start over link
+  def reusable_token
+    session[:register_b_param_token] unless params[:b_param_token] == "false"
+  end
+
+  def assign_organization
+    BikeServices::Register.assign_organization(@b_param, current_organization)
   end
 
   # The tokenized link from the partial registration email
@@ -87,12 +102,22 @@ class RegisterController < ApplicationController
   end
 
   def find_b_param
-    @b_param = BikeServices::Register.find_token(params_token: params[:b_param_token],
-      session_token: session[:register_b_param_token], user: current_user)
+    @b_param = token_b_param
     return if @b_param.present?
 
     flash[:info] = translation(:registration_not_found) if params[:b_param_token].present?
     redirect_to new_register_path
+  end
+
+  # assign_organization runs next, so the form's organization_id still lands on it
+  def find_or_build_b_param
+    @b_param = token_b_param || BikeServices::Register.b_param_for(user: current_user)
+    session[:register_b_param_token] = @b_param.id_token
+  end
+
+  def token_b_param
+    BikeServices::Register.find_token(params_token: params[:b_param_token],
+      session_token: session[:register_b_param_token], user: current_user)
   end
 
   # A finished registration (bike created, or awaiting the email) only shows
@@ -113,13 +138,14 @@ class RegisterController < ApplicationController
   def create_params
     bike_params = params.require(:b_param).permit(:manufacturer_id, :cycle_type, :owner_email)
       .to_h.merge(BParam.status_hash_from_params(params))
-    bike_params[:creation_organization_id] = current_organization.id if current_organization.present?
     {bike: bike_params, propulsion_type_motorized: params[:propulsion_type_motorized]}
   end
 
   def update_params
     params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
       :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
-      :bike_sticker, :phone, :status, :frame_model, :year)
+      :bike_sticker, :phone, :status, :frame_model, :year,
+      :extra_registration_number, :organization_affiliation, :student_id,
+      address_record_attributes: AddressRecord.permitted_params)
   end
 end

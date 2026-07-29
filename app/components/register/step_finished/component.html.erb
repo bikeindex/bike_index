@@ -29,6 +29,31 @@
 
     <%= render UI::Header::Component.new(text: translation(".registration_complete"), subtitle:) %>
 
+    <%# What's still locked behind the confirmation, so the link is worth clicking %>
+    <% if @bike.blank? %>
+      <div
+        class="
+          tw:mb-6 tw:rounded-lg tw:bg-white tw:px-4 tw:py-3 tw:text-left
+          tw:dark:bg-gray-800
+        "
+      >
+        <p class="tw:mb-1.5 tw:text-sm tw:font-semibold">
+          <%= translation(".confirming_lets_you") %>
+        </p>
+
+        <ul
+          class="
+            tw:mb-0 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm
+            tw:text-gray-600 tw:dark:text-gray-300
+          "
+        >
+          <li><%= translation(".report_it_stolen", cycle_type:) %></li>
+          <li><%= translation(".add_impound_details") %></li>
+          <li><%= translation(".add_photos", cycle_type:) %></li>
+        </ul>
+      </div>
+    <% end %>
+
     <div class="tw:flex tw:flex-col tw:gap-2.5">
       <% if @bike.present? %>
         <%= render UI::ButtonLink::Component.new(text: translation(".view_your_registration"), href: bike_path(@bike),

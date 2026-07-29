@@ -6,7 +6,7 @@ RSpec.describe RegisterController, type: :request do
   let(:color) { FactoryBot.create(:color, name: "Red") }
   let(:owner_email) { "owner@example.com" }
   let(:b_param) do
-    BParam.create(origin: "registration_flow",
+    BParam.create(origin: "register_flow",
       params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
   end
 
@@ -14,7 +14,7 @@ RSpec.describe RegisterController, type: :request do
     it "creates an empty registration and redirects to its step 1" do
       expect { get "/register/new" }.to change(BParam, :count).by 1
       new_b_param = BParam.last
-      expect(new_b_param.origin).to eq "registration_flow"
+      expect(new_b_param.origin).to eq "register_flow"
       expect(new_b_param.confirmation_token).to be_present
       expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
 
@@ -32,15 +32,27 @@ RSpec.describe RegisterController, type: :request do
     context "status and organization params" do
       let(:organization) { FactoryBot.create(:organization) }
 
-      it "stores them, keeping the session's registration as-is on revisit" do
-        get "/register/new?status=status_stolen&organization_id=#{organization.id}"
+      it "stores them on the registration it creates, keeping them on revisit" do
+        # The slug resolves to the organization, rather than being stored as-is
+        get "/register/new?status=status_stolen&organization_id=#{organization.slug}"
         stolen_b_param = BParam.last
-        expect(stolen_b_param.status).to eq "status_stolen"
-        expect(stolen_b_param.creation_organization_id.to_s).to eq organization.id.to_s
+        expect(stolen_b_param).to have_attributes(status: "status_stolen",
+          creation_organization_id: organization.id, organization_id: organization.id)
 
         get "/register/new?status=status_impounded"
         expect(BParam.last.id).to eq stolen_b_param.id
         expect(stolen_b_param.reload.status).to eq "status_stolen"
+      end
+
+      # Only the create branch of b_param_for seeds status, so this is the org path
+      it "attaches the organization to a blank registration already in the session" do
+        get "/register/new" # a blank shell, no organization
+        session_b_param = BParam.last
+        expect(session_b_param.creation_organization_id).to be_blank
+
+        # Arriving on the organization's link shouldn't quietly go unattributed
+        expect { get "/register/new?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
+        expect(session_b_param.reload.creation_organization_id).to eq organization.id
       end
     end
 
@@ -72,6 +84,48 @@ RSpec.describe RegisterController, type: :request do
       end
     end
 
+    context "email param" do
+      it "uses the passed address, and blanks it for false" do
+        get "/register/new?email=someone@example.com"
+        passed = BParam.last
+        expect(passed.owner_email).to eq "someone@example.com"
+
+        # A blank param leaves the reused registration's address alone
+        get "/register/new"
+        expect(passed.reload.owner_email).to eq "someone@example.com"
+
+        # false blanks it, even though it's already set
+        get "/register/new?email=false"
+        expect(passed.reload.owner_email).to be_nil
+      end
+
+      context "signed in" do
+        include_context :request_spec_logged_in_as_user
+
+        it "prefers the passed address over the user's, and false over both" do
+          get "/register/new?email=false"
+          expect(BParam.last.owner_email).to be_nil
+
+          get "/register/new?email=someone@example.com"
+          expect(BParam.last.owner_email).to eq "someone@example.com"
+
+          get "/register/new?b_param_token=false"
+          expect(BParam.last.owner_email).to eq current_user.email
+        end
+      end
+    end
+
+    it "starts a fresh registration with b_param_token=false, ignoring the session's" do
+      get "/register/new"
+      session_b_param = BParam.last
+      expect { get "/register/new?b_param_token=false" }.to change(BParam, :count).by 1
+      expect(BParam.last.id).to_not eq session_b_param.id
+      expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
+
+      # The new registration is now the session's, so /register/new reuses it again
+      expect { get "/register/new" }.to_not change(BParam, :count)
+    end
+
     it "redirects the bare /register" do
       get base_url
       expect(response).to redirect_to new_register_path
@@ -96,17 +150,82 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include owner_email
       # Never cached - the step shown depends on server state
       expect(response.headers["Cache-Control"]).to eq "no-store"
-      expect(response.body).to include "confirmation link too"
+      expect(response.body).to include "email a confirmation link"
+      # Submitted already, so this is a return from step 2 - offer abandoning it
+      expect(response.body).to include "Start over"
+    end
 
-      # Once the confirmation email went out, the "we'll email you" note is stale
-      b_param.update(params: b_param.params.merge("partial_email_sent_to" => owner_email))
-      get register_path(b_param_token: b_param.id_token, step: 1)
-      expect(response.body).to_not include "confirmation link too"
+    context "signed in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "skips the confirmation email note - they never wait on it" do
+        get register_path(b_param_token: b_param.id_token, step: 1)
+        expect(response.status).to eq 200
+        expect(response.body).to_not include "email a confirmation link"
+      end
+    end
+
+    context "with an organization" do
+      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+      let(:b_param) do
+        BParam.create(origin: "register_flow",
+          params: {bike: {owner_email:, cycle_type: "cargo", creation_organization_id: organization.id}}.as_json)
+      end
+
+      it "names the organization in the heading, with the cycle type js can swap" do
+        get register_path(b_param_token: b_param.id_token, step: 1)
+        expect(response.body).to include "Register your <span data-register--heading-target=\"cycleType\">cargo bike</span> with Brakebills!"
+        # Posted back, so a submission that has to build a registration keeps the org
+        expect(Nokogiri::HTML(response.body).at_css("input[name='organization_id']")["value"])
+          .to eq organization.id.to_s
+      end
+
+      context "started as stolen" do
+        let(:b_param) do
+          BParam.create(origin: "register_flow", params: {bike: {owner_email:, manufacturer_id: "Trek",
+                                                                 creation_organization_id: organization.id, status: "status_stolen"}}.as_json)
+        end
+
+        it "carries the organization and status onto the start over link" do
+          get register_path(b_param_token: b_param.id_token, step: 1)
+          start_over = Nokogiri::HTML(response.body).at_css("#start-over-modal a")["href"]
+          expect(start_over).to eq new_register_path(b_param_token: false,
+            organization_id: organization.slug, status: "status_stolen")
+        end
+      end
+
+      context "organization_id in the url" do
+        let(:b_param) do
+          BParam.create(origin: "register_flow", params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
+        end
+
+        it "adds the organization to a registration already underway, by slug" do
+          get register_path(b_param_token: b_param.id_token, step: 1, organization_id: organization.slug)
+          expect(b_param.reload.creation_organization_id).to eq organization.id
+          expect(b_param.organization_id).to eq organization.id
+          expect(response.body).to include "with Brakebills!"
+
+          # Once the bike exists there's nothing left to attribute
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+          get register_path(b_param_token: b_param.id_token, organization_id: FactoryBot.create(:organization).slug)
+          expect(b_param.reload.creation_organization_id).to eq organization.id
+        end
+      end
+    end
+
+    context "step 1 not submitted" do
+      let(:b_param) { BParam.create(origin: "register_flow") }
+
+      it "renders without the start over link - there's nothing to abandon" do
+        get register_path(b_param_token: b_param.id_token, step: 1)
+        expect(response.status).to eq 200
+        expect(response.body).to_not include "Start over"
+      end
     end
 
     context "self-reported manufacturer" do
       let(:b_param) do
-        BParam.create(origin: "registration_flow",
+        BParam.create(origin: "register_flow",
           params: {bike: {owner_email:, manufacturer_id: Manufacturer.other.id, manufacturer_other: "Fancy Cycles"}}.as_json)
       end
 
@@ -127,29 +246,19 @@ RSpec.describe RegisterController, type: :request do
   end
 
   describe "create" do
-    let!(:empty_b_param) { BParam.create(origin: "registration_flow") }
+    let!(:empty_b_param) { BParam.create(origin: "register_flow") }
     let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:}} }
     let(:create_params) { step_1_params.merge(b_param_token: empty_b_param.id_token) }
 
-    it "saves step 1, sends the email and redirects to step 2" do
-      expect { post base_url, params: create_params }.to_not change(BParam, :count)
+    it "saves step 1 and redirects to step 2, without emailing" do
+      expect { post base_url, params: create_params }
+        .to_not change { [BParam.count, Email::PartialRegistrationJob.jobs.size] }
       empty_b_param.reload
-      expect(empty_b_param).to have_attributes(origin: "registration_flow", owner_email:,
+      expect(empty_b_param).to have_attributes(origin: "register_flow", owner_email:,
         manufacturer_id: manufacturer.id, creator_id: nil, cycle_type: "cargo")
       expect(empty_b_param.partial_registration?).to be_truthy
       expect(empty_b_param.motorized?).to be_falsey
-      expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(empty_b_param.id)
       expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
-
-      # Resubmitting with the same email doesn't resend the confirmation
-      expect {
-        post base_url, params: create_params
-      }.to_not change { Email::PartialRegistrationJob.jobs.size }
-
-      # Changing the email does - the old link only proved control of the old address
-      expect {
-        post base_url, params: create_params.deep_merge(b_param: {owner_email: "new@example.com"})
-      }.to change { Email::PartialRegistrationJob.jobs.size }.by 1
     end
 
     context "motorized, stolen, manufacturer not in the list" do
@@ -199,23 +308,149 @@ RSpec.describe RegisterController, type: :request do
     end
 
     context "unknown token" do
-      it "redirects to the start" do
-        post base_url, params: step_1_params.merge(b_param_token: "unknown-token")
-        expect(response).to redirect_to new_register_path
+      it "builds a registration rather than losing the submission" do
+        expect {
+          post base_url, params: step_1_params.merge(b_param_token: "unknown-token")
+        }.to change(BParam, :count).by 1
+        built_b_param = BParam.last
+        expect(built_b_param).to have_attributes(origin: "register_flow", owner_email:,
+          manufacturer_id: manufacturer.id, cycle_type: "cargo")
+        expect(response).to redirect_to register_path(b_param_token: built_b_param.id_token, step: 2)
+      end
+
+      context "with the organization_id from step 1's hidden field" do
+        let(:organization) { FactoryBot.create(:organization) }
+
+        it "keeps the organization on the built registration" do
+          post base_url, params: step_1_params.merge(b_param_token: "unknown-token",
+            organization_id: organization.slug)
+          expect(BParam.last.creation_organization_id).to eq organization.id
+        end
       end
     end
   end
 
   describe "show step: 2" do
+    # Methods rather than let, since the examples re-request and re-check
+    def status_field(field_name)
+      Nokogiri::HTML(response.body).css("[data-register--status-fields-target='field']")
+        .find { |el| el.at_css("[name^='bike[#{field_name}']") }
+    end
+
+    def phone_field_classes
+      status_field("phone")["class"]
+    end
+
+    def phone_statuses_watched
+      JSON.parse(status_field("phone")["data-statuses"])
+    end
+
     it "renders the details form, showing the email from step 1" do
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(response.status).to eq 200
       expect(response.body).to include "Add your bike"
       expect(response.body).to include owner_email
+      # No organization asking for anything, so it's just the registrant's own info
+      expect(response.body).to include "Contact info"
+      # An address nothing has proven yet, so the confirmation is still pending -
+      # and an upload needs an account behind it
+      expect(response.body).to include "confirmation link to your email"
+      expect(response.body).to_not include "bike[image]"
+
+      # Once the link has been clicked, the alert is stale and the upload opens up
+      b_param.confirm_email!
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      expect(response.body).to_not include "confirmation link to your email"
+      expect(response.body).to include "bike[image]"
+    end
+
+    it "hides the phone field, showing it for the statuses bikes/new does" do
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      expect(phone_field_classes).to include "tw:hidden" # rendered, just collapsed
+      # Only stolen and impounded reveal it, so those are what the controller watches
+      expect(phone_statuses_watched).to eq %w[status_stolen status_impounded]
+
+      b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      expect(phone_field_classes).to_not include "tw:hidden"
+    end
+
+    context "with an organization" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:b_param) do
+        BParam.create(origin: "register_flow",
+          params: {bike: {owner_email:, manufacturer_id: "Trek", creation_organization_id: organization.id}}.as_json)
+      end
+      let(:reg_fields) { %w[bike[extra_registration_number] bike[organization_affiliation] bike[student_id]] }
+
+      it "renders only the additional registration fields the organization enables" do
+        get register_path(b_param_token: b_param.id_token, step: 2)
+        reg_fields.each { |field| expect(response.body).to_not include field }
+        # Not rendered at all - no status could reveal it, and it's ~300 option tags
+        expect(status_field("address_record_attributes")).to be_nil
+        # The Bike Index sticker isn't org-gated here, unlike bikes/new
+        expect(response.body).to include "bike[bike_sticker]"
+        # Nothing extra was asked for, so the section is just the registrant's own info
+        expect(response.body).to include "Contact info"
+        expect(response.body).to_not include "Information for"
+
+        organization.update_column :enabled_feature_slugs,
+          %w[reg_phone reg_extra_registration_number reg_organization_affiliation reg_student_id]
+        get register_path(b_param_token: b_param.id_token, step: 2)
+        reg_fields.each { |field| expect(response.body).to include field }
+        expect(response.body).to include "Information for #{organization.short_name}"
+        expect(response.body).to_not include "Contact info"
+        # reg_phone shows it regardless of the status, so nothing to toggle
+        expect(phone_field_classes).to_not include "tw:hidden"
+        expect(phone_statuses_watched).to eq Bike.statuses
+        expect(response.body).to include "#{organization.short_name} affiliation"
+      end
+
+      it "saves the additional registration fields" do
+        organization.update_column :enabled_feature_slugs, %w[reg_extra_registration_number reg_student_id]
+        patch base_url, params: {b_param_token: b_param.id_token,
+                                 bike: {primary_frame_color_id: color.id, status: "status_with_owner",
+                                        extra_registration_number: "XX99", organization_affiliation: "student",
+                                        student_id: "S-1234",
+                                        address_record_attributes: {street: "1 Main St", city: "Chicago",
+                                                                    postal_code: "60608", country_id: Country.united_states_id}}}
+        expect(b_param.reload.bike).to include("extra_registration_number" => "XX99",
+          "organization_affiliation" => "student", "student_id" => "S-1234")
+        # Passed through as the nested attributes BikeServices::Creator assigns on the bike
+        expect(b_param.bike["address_record_attributes"]).to include("street" => "1 Main St", "city" => "Chicago")
+      end
+
+      context "reg_address" do
+        it "shows the address fields, except for statuses with their own address record" do
+          organization.update_column :enabled_feature_slugs, ["reg_address"]
+          get register_path(b_param_token: b_param.id_token, step: 2)
+          expect(status_field("address_record_attributes")["class"]).to_not include "tw:hidden"
+          watched = JSON.parse(status_field("address_record_attributes")["data-statuses"])
+          expect(watched).to include "status_with_owner"
+          expect(watched).to_not include "status_stolen"
+          expect(watched).to_not include "status_impounded"
+          expect(response.body).to include "Information for #{organization.short_name}"
+
+          b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
+          get register_path(b_param_token: b_param.id_token, step: 2)
+          expect(status_field("address_record_attributes")["class"]).to include "tw:hidden"
+        end
+      end
+    end
+
+    context "signed in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "skips the confirmation alert - they never wait on it" do
+        get register_path(b_param_token: b_param.id_token, step: 2)
+        expect(response.status).to eq 200
+        expect(response.body).to_not include "confirmation link to your email"
+        expect(response.body).to include "bike[image]"
+      end
     end
 
     context "step 1 not submitted" do
-      let(:b_param) { BParam.create(origin: "registration_flow") }
+      let(:b_param) { BParam.create(origin: "register_flow") }
 
       it "redirects to step 1" do
         get register_path(b_param_token: b_param.id_token, step: 2)
@@ -252,13 +487,16 @@ RSpec.describe RegisterController, type: :request do
         }.to_not change(Bike, :count)
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         b_param.reload
-        expect(b_param.details_completed?).to be_truthy
+        expect(BikeServices::Register.send(:details_completed?, b_param)).to be_truthy
         # IDs pass through as posted strings; they're cast when the bike is created
         expect(b_param.bike).to match_hash_indifferently(bike_details.merge(owner_email:,
           manufacturer_id: manufacturer.id, primary_frame_color_id: color.id.to_s))
         follow_redirect!
         expect(response.body).to include "Registration complete"
         expect(response.body).to include "verify your email"
+        # Why the confirmation link is worth clicking
+        expect(response.body).to include "Confirming your email lets you"
+        expect(response.body).to include "Report your bike stolen"
       end
 
       context "with a photo" do
@@ -306,9 +544,24 @@ RSpec.describe RegisterController, type: :request do
         end
       end
 
+      context "organization with an auto user" do
+        let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
+        let(:b_param) do
+          BParam.create(origin: "register_flow",
+            params: {bike: {owner_email:, manufacturer_id: "Trek", creation_organization_id: organization.id}}.as_json)
+        end
+
+        it "creates the bike, BikeServices::Builder standing the auto user in as creator" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to change(Bike, :count).by 1
+          expect(Bike.last.creator_id).to eq organization.auto_user_id
+        end
+      end
+
       context "motorized" do
         let(:b_param) do
-          BParam.create(origin: "registration_flow",
+          BParam.create(origin: "register_flow",
             params: {bike: {owner_email:, manufacturer_id: "Trek"}, propulsion_type_motorized: "1"}.as_json)
         end
 
@@ -331,7 +584,7 @@ RSpec.describe RegisterController, type: :request do
         expect(bike).to have_attributes(manufacturer_id: manufacturer.id,
           primary_frame_color_id: color.id, serial_number: "XYZ 123",
           owner_email:, creator_id: current_user.id)
-        expect(bike.current_ownership.origin).to eq "registration_flow"
+        expect(bike.current_ownership.origin).to eq "register_flow"
         expect(b_param.reload.created_bike_id).to eq bike.id
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         follow_redirect!
@@ -357,7 +610,7 @@ RSpec.describe RegisterController, type: :request do
 
       context "b_param created by a different user" do
         let(:b_param) do
-          BParam.create(origin: "registration_flow", creator_id: FactoryBot.create(:user_confirmed).id,
+          BParam.create(origin: "register_flow", creator_id: FactoryBot.create(:user_confirmed).id,
             params: {bike: {owner_email:}}.as_json)
         end
 
@@ -366,6 +619,17 @@ RSpec.describe RegisterController, type: :request do
           expect(response).to redirect_to new_register_path
           expect(flash[:info]).to be_present
         end
+      end
+    end
+
+    context "unknown token" do
+      it "errors - step 2 alone has nothing to build a registration from" do
+        expect {
+          patch base_url, params: {b_param_token: "unknown-token", bike: bike_details}
+        }.to_not change(BParam, :count)
+        expect(Bike.count).to eq 0
+        expect(response).to redirect_to new_register_path
+        expect(flash[:info]).to be_present
       end
     end
   end

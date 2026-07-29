@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-/* global localStorage, setTimeout, clearTimeout, Date, window, CustomEvent, CSS */
+/* global localStorage, setTimeout, clearTimeout, Date, window, CustomEvent, Event, CSS */
 
 // Connects to data-controller="form-persist"
 // Mirrors form fields to localStorage so a draft survives page reloads —
@@ -50,7 +50,9 @@ export default class extends Controller {
   }
 
   // Stored values only fill fields the server rendered empty — a field the
-  // server filled is at least as fresh as the draft.
+  // server filled is at least as fresh as the draft. Checkboxes, selects and
+  // comboboxes have no empty state to detect (they render with a default
+  // selection), so the draft wins for them.
   restore () {
     const stored = this.read()
     this.fields.forEach((field) => {
@@ -60,12 +62,17 @@ export default class extends Controller {
         if (!this.radioGroupChecked(field.name)) field.checked = field.value === value
       } else if (field.type === 'checkbox') {
         field.checked = value === true
+      } else if (field.tagName === 'SELECT') {
+        field.value = value
+        // A select drives sibling fields (org--impound-update, address-group),
+        // and assigning the value fires nothing - so say what a user pick says
+        field.dispatchEvent(new Event('change', { bubbles: true }))
       } else if (!field.value) {
         field.value = value
       }
     })
     this.comboboxes.forEach(({ hidden, display }) => {
-      if (hidden.value || display.value || stored[hidden.name] == null) return
+      if (stored[hidden.name] == null) return
       hidden.value = stored[hidden.name]
       display.value = stored[`${hidden.name}::display`] || stored[hidden.name]
     })

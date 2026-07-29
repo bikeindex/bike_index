@@ -3,22 +3,22 @@
 require "rails_helper"
 
 RSpec.describe BikeServices::Register do
-  let(:b_param) { BParam.new(origin: "registration_flow", params: {bike: bike_params}.as_json) }
+  let(:b_param) { BParam.new(origin: "register_flow", params: {bike: bike_params}.as_json) }
   let(:bike_params) { {owner_email: "owner@example.com", manufacturer_id: 12} }
 
   describe "b_param_for" do
     let(:user) { nil }
 
     it "creates a registration, keeping only a valid Bike status" do
-      b_param = described_class.b_param_for(user:, status: "status_stolen", organization_id: 12)
-      expect(b_param).to have_attributes(origin: "registration_flow", creator_id: nil,
-        status: "status_stolen", creation_organization_id: 12)
+      b_param = described_class.b_param_for(user:, status: "status_stolen")
+      expect(b_param).to have_attributes(origin: "register_flow", creator_id: nil,
+        status: "status_stolen")
 
       expect(described_class.b_param_for(user:, status: "stolen").bike["status"]).to be_nil
     end
 
     context "with a blank registration's token" do
-      let!(:blank_b_param) { BParam.create(origin: "registration_flow") }
+      let!(:blank_b_param) { BParam.create(origin: "register_flow") }
 
       it "reuses it" do
         expect {
@@ -28,7 +28,7 @@ RSpec.describe BikeServices::Register do
 
       context "once step 1 is submitted" do
         let!(:blank_b_param) do
-          BParam.create(origin: "registration_flow", params: {bike: {manufacturer_id: 12}}.as_json)
+          BParam.create(origin: "register_flow", params: {bike: {manufacturer_id: 12}}.as_json)
         end
 
         it "creates a fresh registration" do
@@ -48,7 +48,7 @@ RSpec.describe BikeServices::Register do
       end
 
       context "reusing a blank registration" do
-        let!(:blank_b_param) { BParam.create(origin: "registration_flow") }
+        let!(:blank_b_param) { BParam.create(origin: "register_flow") }
 
         it "prefills owner_email onto it" do
           expect(described_class.b_param_for(user:, token_id: blank_b_param.id_token)).to eq blank_b_param
@@ -61,7 +61,7 @@ RSpec.describe BikeServices::Register do
   end
 
   describe "save_step_2" do
-    let(:b_param) { BParam.create(origin: "registration_flow", params: {bike: bike_params}.as_json) }
+    let(:b_param) { BParam.create(origin: "register_flow", params: {bike: bike_params}.as_json) }
     let(:save) do
       ->(fields, signed_id = nil) do
         described_class.save_step_2(b_param, user: nil, image_signed_id: signed_id, bike_params: fields)
@@ -71,7 +71,7 @@ RSpec.describe BikeServices::Register do
     it "stores absent serials and marks the details completed" do
       save.call("serial_number" => "unknown", "status" => "status_with_owner")
       expect(b_param.reload.bike["serial_number"]).to eq "unknown"
-      expect(b_param.details_completed?).to be_truthy
+      expect(described_class.send(:details_completed?, b_param)).to be_truthy
 
       save.call("serial_number" => "made_without_serial", "status" => "status_with_owner")
       expect(b_param.reload.bike["serial_number"]).to eq "made_without_serial"
@@ -108,7 +108,7 @@ RSpec.describe BikeServices::Register do
 
     context "bike created" do
       let(:b_param) do
-        BParam.new(origin: "registration_flow", created_bike_id: 42, params: {bike: bike_params}.as_json)
+        BParam.new(origin: "register_flow", created_bike_id: 42, params: {bike: bike_params}.as_json)
       end
 
       it "clamps to finished" do
@@ -118,7 +118,7 @@ RSpec.describe BikeServices::Register do
 
     context "details completed without a creator" do
       let(:b_param) do
-        BParam.new(origin: "registration_flow",
+        BParam.new(origin: "register_flow",
           params: {details_completed: true, bike: bike_params}.as_json)
       end
 
@@ -129,7 +129,7 @@ RSpec.describe BikeServices::Register do
 
       context "with a creator" do
         let(:b_param) do
-          BParam.new(origin: "registration_flow", creator_id: 42,
+          BParam.new(origin: "register_flow", creator_id: 42,
             params: {details_completed: true, bike: bike_params}.as_json)
         end
 
