@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Images are linked by external sources - so don't purge them in Images::StolenProcessor
+# Images are linked by external sources - so don't purge them in ImageServices::StolenProcessor
 # Do it after a delay (and after we've verified the new images are correct)
 module BikeJobs
   class RemoveOrphanedImagesJob < ScheduledJob

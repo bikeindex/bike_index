@@ -23,7 +23,7 @@ RSpec.describe StolenRecord, type: :model do
     let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images) }
     let(:blob) { stolen_record.image_four_by_five.blob }
 
-    it "reads the stamp Images::StolenProcessor sets, not ActiveStorage's metadata" do
+    it "reads the stamp ImageServices::StolenProcessor sets, not ActiveStorage's metadata" do
       blob.update!(metadata: blob.metadata.merge("image_id" => 12, "removed" => true))
       expect(stolen_record.reload.images_attached_id).to be_blank
       expect(stolen_record.images_attached?).to be_truthy

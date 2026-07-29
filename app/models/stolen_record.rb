@@ -203,7 +203,7 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  # Images::StolenProcessor marks the blob removed when the image it rendered from is gone
+  # ImageServices::StolenProcessor marks the blob removed when the image it rendered from is gone
   def images_attached?
     image_four_by_five&.attached? && alert_blob_data("removed") != true
   end

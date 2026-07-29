@@ -23,7 +23,7 @@ FactoryBot.define do
           filename: "opengraph.jpeg")
       end
 
-      # What Images::StolenProcessor sets, and the stamp is what identifies an alert image.
+      # What ImageServices::StolenProcessor sets, and the stamp is what identifies an alert image.
       # Not in after(:build) - the record has no id to name or stamp them with yet
       after(:create) do |stolen_record, _evaluator|
         {four_by_five: stolen_record.image_four_by_five, opengraph: stolen_record.image_opengraph}

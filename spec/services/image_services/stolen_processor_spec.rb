@@ -1,7 +1,7 @@
 require "rails_helper"
 require "chunky_png" # For image comparison
 
-RSpec.describe Images::StolenProcessor do
+RSpec.describe ImageServices::StolenProcessor do
   let(:location_text) { "San Francisco, CA" }
 
   def expect_images_to_match(generated, target, tolerance: 0.1)

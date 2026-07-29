@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Backfills
-  # Stamp the alert images minted before Images::StolenProcessor set binx_data. The jobs that
+  # Stamp the alert images minted before ImageServices::StolenProcessor set binx_data. The jobs that
   # identify them by the stamp - and StolenRecord - depend on this having run.
   class StolenAlertBlobBinxDataJob < ApplicationJob
     include Sidekiq::IterableJob

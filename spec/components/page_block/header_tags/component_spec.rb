@@ -321,7 +321,7 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
           let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image_path)) }
           let(:stolen_record) { bike.current_stolen_record }
           let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
-          before { Images::StolenProcessor.update_alert_images(stolen_record) }
+          before { ImageServices::StolenProcessor.update_alert_images(stolen_record) }
           let(:target_images) do
             {
               page_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_opengraph),

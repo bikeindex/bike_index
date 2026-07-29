@@ -3,7 +3,7 @@
 require "image_processing/vips"
 require "vips"
 
-module Images
+module ImageServices
   module StolenProcessor
     extend Functionable
 
@@ -84,8 +84,8 @@ module Images
     end
 
     # stolen_record_id is what marks these as ours to keep - a superseded alert stays
-    # unattached on purpose (dependent: false), and CleanUnattachedBlobsJob reads the stamp
-    # rather than reaping it
+    # unattached on purpose (dependent: false), and Images::CleanUnattachedBlobsJob reads the
+    # stamp rather than reaping it
     def attach_images(stolen_record, image, location_text)
       four_by_five = create_alert_blob(stolen_record, :four_by_five, image, location_text)
       square = create_alert_blob(stolen_record, :square, image, location_text)
