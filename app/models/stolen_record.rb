@@ -203,7 +203,7 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  # Images::StolenProcessor marks the blob removed when the image it rendered from is gone
+  # ImageServices::StolenProcessor marks the blob removed when the image it rendered from is gone
   def images_attached?
     image_four_by_five&.attached? && alert_blob_data("removed") != true
   end
@@ -394,12 +394,7 @@ class StolenRecord < ApplicationRecord
 
   private
 
-  # metadata is where these lived before binx_data, and where they stay until
-  # Backfills::StolenAlertBlobBinxDataJob has run - so binx_data wins key by key
-  def alert_blob_data(key)
-    blob = image_four_by_five&.blob
-    blob&.metadata.to_h.merge(blob&.binx_data.to_h)[key]
-  end
+  def alert_blob_data(key) = image_four_by_five&.blob&.binx_data&.dig(key)
 
   # The read replica can't make database changes, but can enqueue the worker - which will make the changes
   def enqueue_worker(location_changed = false)

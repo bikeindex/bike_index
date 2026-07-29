@@ -63,7 +63,7 @@ RSpec.describe BikeJobs::RemoveOrphanedImagesJob, type: :lib do
       let!(:alert_image) { FactoryBot.create(:alert_image, stolen_record:) }
       let!(:public_image) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
       before do
-        Images::StolenProcessor.update_alert_images(stolen_record)
+        ImageServices::StolenProcessor.update_alert_images(stolen_record)
         stolen_record.reload.image_four_by_five.blob.update(created_at: time)
         stolen_record.image_opengraph.blob.update(created_at: time)
         # Don't update square - just to test that things that are created more recently aren't destroyed
@@ -71,7 +71,7 @@ RSpec.describe BikeJobs::RemoveOrphanedImagesJob, type: :lib do
 
       it "does not delete current image, deletes orphaned attachments and alert_image" do
         expect(ActiveStorage::Blob.count).to eq 3
-        Images::StolenProcessor.update_alert_images(stolen_record, force_regenerate: true)
+        ImageServices::StolenProcessor.update_alert_images(stolen_record, force_regenerate: true)
         expect(ActiveStorage::Blob.count).to eq 6
         # I'd really prefer if this didn't actually delete the records, but...
         expect(ActiveStorage::Attachment.count).to eq 3
@@ -94,7 +94,7 @@ RSpec.describe BikeJobs::RemoveOrphanedImagesJob, type: :lib do
         end
 
         it "keeps the blob, so the file isn't orphaned and the next run retries" do
-          Images::StolenProcessor.update_alert_images(stolen_record, force_regenerate: true)
+          ImageServices::StolenProcessor.update_alert_images(stolen_record, force_regenerate: true)
           expect(ActiveStorage::Blob.count).to eq 6
 
           expect { instance.perform(stolen_record.id) }.to raise_error(/internal error/)
@@ -126,11 +126,11 @@ RSpec.describe BikeJobs::RemoveOrphanedImagesJob, type: :lib do
       let(:stolen_record) { FactoryBot.create(:stolen_record) }
       let!(:public_image) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
       before do
-        Images::StolenProcessor.update_alert_images(stolen_record)
+        ImageServices::StolenProcessor.update_alert_images(stolen_record)
         ActiveStorage::Blob.update_all(created_at: time)
         public_image.destroy
         # Marks the images removed, leaving the attachments in place
-        Images::StolenProcessor.update_alert_images(stolen_record.reload)
+        ImageServices::StolenProcessor.update_alert_images(stolen_record.reload)
       end
 
       it "purges the blobs instead of stranding them behind the deleted attachments" do

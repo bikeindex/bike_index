@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Images are linked by external sources - so don't purge them in Images::StolenProcessor
+# Images are linked by external sources - so don't purge them in ImageServices::StolenProcessor
 # Do it after a delay (and after we've verified the new images are correct)
 module BikeJobs
   class RemoveOrphanedImagesJob < ScheduledJob
@@ -19,12 +19,10 @@ module BikeJobs
         1.week.ago..1.day.ago
       end
 
-      # The stamp is what exempts a blob from CleanUnattachedBlobsJob, so it has to be what
-      # collects it here too - a stamp without a matching filename would leak forever. The
-      # filename covers whatever Backfills::StolenAlertBlobBinxDataJob hasn't stamped
+      # The stamp rather than the filename - this purges what it matches, and a user can name
+      # an upload "stolen-42-whatever.jpg"
       def blobs_for(stolen_record_id)
-        ActiveStorage::Blob.where("binx_data->>'stolen_record_id' = ? OR filename ILIKE ?",
-          stolen_record_id.to_s, "stolen-#{stolen_record_id}-%")
+        ActiveStorage::Blob.where("binx_data->>'stolen_record_id' = ?", stolen_record_id.to_s)
           .where("created_at < ?", check_period.last)
       end
     end
