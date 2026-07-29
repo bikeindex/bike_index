@@ -9,7 +9,7 @@ module UI
         SIZE = %i[default single_line].freeze
 
         # toolbar_buttons: shows only a subset -- the rest are hidden via lexxy_overrides.css.
-        TOOLBAR_BUTTONS = %i[bold italic strikethrough highlight link quote heading code
+        TOOLBAR_BUTTONS = %i[bold italic strikethrough underline format highlight link quote code
           unordered_list ordered_list table divider undo redo].freeze
 
         # The compact single-line editor gets a trimmed toolbar unless the caller overrides it.

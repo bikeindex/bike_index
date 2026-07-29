@@ -456,7 +456,7 @@ GEM
       letter_opener (~> 1.9)
       railties (>= 6.1)
       rexml
-    lexxy (0.1.26.beta)
+    lexxy (0.9.27)
       rails (>= 8.0.2)
     lint_roller (1.1.0)
     listen (3.10.0)
@@ -529,7 +529,7 @@ GEM
       mustermann (>= 1.0.0)
     naught (1.1.0)
     nenv (0.3.0)
-    net-imap (0.6.4.1)
+    net-imap (0.6.6)
       date
       net-protocol
     net-pop (0.1.2)
@@ -674,7 +674,7 @@ GEM
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
-    rbs (4.0.3)
+    rbs (4.1.0)
       logger
       prism (>= 1.6.0)
       tsort
@@ -964,7 +964,7 @@ DEPENDENCIES
   knapsack_pro
   kramdown
   letter_opener_web (~> 3.0)
-  lexxy (~> 0.1.26.beta)
+  lexxy (~> 0.9.27)
   lograge
   logstash-event
   lookbook
