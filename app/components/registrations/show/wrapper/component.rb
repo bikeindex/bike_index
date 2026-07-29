@@ -8,14 +8,15 @@ module Registrations
       class Component < ApplicationComponent
         # Nothing digests the nested components' templates, so bump this whenever
         # their markup changes
-        CACHE_VERSION = "registrations/show-v9"
+        CACHE_VERSION = "registrations/show-v10"
 
-        def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil)
+        def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, alerts: nil)
           @bike = bike
           @current_user = current_user
           @view = view
           @available_views = available_views
           @bike_sticker = bike_sticker
+          @alerts = alerts
         end
 
         def call
@@ -31,10 +32,10 @@ module Registrations
             kind, organization = @view
             if organization
               WrapperOrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
-                org_role: kind, available_views: @available_views, bike_sticker: @bike_sticker)
+                org_role: kind, available_views: @available_views, bike_sticker: @bike_sticker, alerts: @alerts)
             else
               WrapperConsumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
-                show_for_sale: @bike.is_for_sale?, available_views: @available_views, bike_sticker: @bike_sticker)
+                show_for_sale: @bike.is_for_sale?, available_views: @available_views, bike_sticker: @bike_sticker, alerts: @alerts)
             end
           end
         end
@@ -46,10 +47,14 @@ module Registrations
         # forms' CSRF tokens valid (they're session-scoped, and a user's session
         # varies across devices/logins) — the csrf-refresh controller reissues them
         # client-side from the meta tag.
+        #
+        # The alerts' tokens must be in here too: they're per-request, so without them
+        # a token-holder's prompt would be cached and served to every later viewer.
         def cache_key
           [CACHE_VERSION, @current_user&.id,
             @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
+            *@alerts&.cache_key,
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
         end
       end
