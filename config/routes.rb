@@ -167,12 +167,8 @@ Rails.application.routes.draw do
   # ?step=1|2|finished (and handles the emailed confirmation link)
   resource :register, only: %i[new create show update], controller: :register
 
-  # Registration photos upload before there's a session, so they get their own endpoint
-  post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
-
   # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which
-  # checks nothing, isn't reachable. Deliberately unnamed - rails_direct_uploads_path still
-  # resolves here, now to the signed-in-only controller.
+  # checks nothing, isn't reachable. Deliberately unnamed - rails_direct_uploads_path resolves here.
   post "/rails/active_storage/direct_uploads" => "direct_uploads#create"
 
   namespace :search do

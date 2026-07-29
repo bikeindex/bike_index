@@ -350,16 +350,16 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include owner_email
       # No organization asking for anything, so it's just the registrant's own info
       expect(response.body).to include "Contact info"
-      # An address nothing has proven yet, so the confirmation is still pending -
-      # and an upload needs an account behind it
+      # An address nothing has proven yet, so the confirmation is still pending - and the
+      # upload goes to a signed-in-only endpoint, so it isn't offered either
       expect(response.body).to include "confirmation link to your email"
       expect(response.body).to_not include "register_photo"
 
-      # Once the link has been clicked, the alert is stale and the upload opens up
+      # Confirming clears the alert, but the upload still needs an account
       b_param.confirm_email!
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(response.body).to_not include "confirmation link to your email"
-      expect(response.body).to include "register_photo"
+      expect(response.body).to_not include "register_photo"
     end
 
     it "hides the phone field, showing it for the statuses bikes/new does" do
