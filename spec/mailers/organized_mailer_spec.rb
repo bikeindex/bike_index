@@ -42,6 +42,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect_render_donation(true, mail)
         expect_render_supporters(true, mail)
         expect(mail.deliver_now.text_part.body.to_s).to include("Almost Done").and include("Finish it")
+        expect(mail.html_part.decoded).to include "bikes/new?b_param_token=#{b_param.id_token}"
       end
     end
     context "with organization" do

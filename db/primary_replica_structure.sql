@@ -185,7 +185,8 @@ CREATE TABLE public.active_storage_blobs (
     service_name character varying NOT NULL,
     byte_size bigint NOT NULL,
     checksum character varying,
-    created_at timestamp(6) without time zone NOT NULL
+    created_at timestamp(6) without time zone NOT NULL,
+    binx_data jsonb
 );
 
 
@@ -7611,6 +7612,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260729085100'),
 ('20260728220000'),
 ('20260725192133'),
 ('20260725155657'),

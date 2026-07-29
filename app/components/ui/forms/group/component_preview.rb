@@ -9,10 +9,6 @@ module UI
           {template: "ui/forms/group/component_preview/text_field"}
         end
 
-        def email_field
-          {template: "ui/forms/group/component_preview/email_field"}
-        end
-
         def text_area
           {template: "ui/forms/group/component_preview/text_area"}
         end

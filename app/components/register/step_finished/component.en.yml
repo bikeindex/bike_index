@@ -1,0 +1,21 @@
+---
+en:
+  components:
+    register:
+      step_finished:
+        add_impound_details: Add impound details if you've found it
+        add_photos: Add photos of your %{cycle_type}
+        confirming_lets_you: 'Confirming your email lets you:'
+        register_another: Register another %{cycle_type}
+        registration_complete: Registration complete!
+        registration_saved: Registration saved
+        report_it_stolen: >-
+          Finish reporting your stolen %{cycle_type} and take advantage of our community
+          network
+        verify_your_email_html: >-
+          One more step — verify your email. We sent a confirmation link to %{email};
+          click it to finish your registration. Everything you've entered is saved.
+        view_your_registration: View your registration
+        we_will_keep_watch: >-
+          Your %{bike_display} is registered with Bike Index. We'll keep watch — if
+          it's ever reported stolen, the whole community is looking.
