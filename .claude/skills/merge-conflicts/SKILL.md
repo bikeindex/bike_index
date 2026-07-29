@@ -38,6 +38,23 @@ If 1–3 turn up nothing and the branch clearly builds on another feature branch
 - If uncommitted work blocks the merge, commit that work first (it belongs to the branch anyway), then merge.
 - Already up to date → nothing to do.
 
+### Base already merged? Merge its final commit *before* `main`
+
+This repo squash-merges, so a merged base lands on `main` as one commit sharing no ancestry with the base's real commits. Merge `main` straight into the stacked branch and every file the base *added* comes back as an **add/add** conflict — git has no common ancestor to three-way merge against, so it hands you files you never touched.
+
+Merge the base's tip first, then `main`:
+
+```bash
+gh pr view <base-pr> --json headRefOid --jq .headRefOid  # tip survives branch deletion
+git fetch origin <sha>                                   # or refs/pull/<base-pr>/head
+git merge --no-edit <sha>
+git merge --no-edit origin/main
+```
+
+That makes your side byte-identical to what the squash put on `main`, so the add/add conflicts collapse and you're left only with files this branch actually changed. Measured on one base sitting a single commit ahead: 3 conflicts (`.env`, `bin/binx_hb`, a skill file) became 1 — the one real edit.
+
+The branch is usually deleted locally *and* on the remote by then, so don't look for `origin/<base>`; `headRefOid` and `refs/pull/<n>/head` are how you reach the commit.
+
 ## Keep the merge commit to *just* the merge
 
 A merge commit should contain **only** the reconciliation of the two histories — nothing else. Don't fold in lint fixes, refactors, renames, or "while I'm here" cleanups. Those are real changes a reviewer needs to see on their own; buried inside a merge they're invisible in most diff views and impossible to revert independently. Land them as separate commits *after* the merge.

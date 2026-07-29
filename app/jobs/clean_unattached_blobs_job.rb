@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Direct uploads reach the bucket the moment a file is picked, so a registration the user
-# then abandons leaves a blob nothing will ever reference.
+# A blob is uploaded before the record that references it is saved, so a form the user
+# abandons after picking a file leaves a blob nothing will ever attach.
 class CleanUnattachedBlobsJob < ScheduledJob
   prepend ScheduledJobRecorder
 
@@ -11,8 +11,7 @@ class CleanUnattachedBlobsJob < ScheduledJob
     25.hours
   end
 
-  # A registration's blob stays unattached until its bike is created, which for a partial
-  # registration waits on an email confirmation that may sit for weeks
+  # Nothing here is urgent, and a blob can legitimately wait on a confirmation email
   def self.clean_before
     Time.current - 30.days
   end
@@ -23,8 +22,8 @@ class CleanUnattachedBlobsJob < ScheduledJob
 
   # Alert images are unattached on purpose - StolenRecord attaches them with dependent: false
   # so links to a superseded one keep resolving. BikeJobs::RemoveOrphanedImagesJob owns those
-  # and knows when they're safe to drop. The filename match covers the alerts created before
-  # StolenProcessor stamped them, and can go once none are left.
+  # and knows when they're safe to drop. The filename match covers whatever
+  # Backfills::StolenAlertBlobBinxDataJob hasn't stamped, and can go once it has run.
   def blobs
     ActiveStorage::Blob.unattached.where(created_at: ...self.class.clean_before)
       .where("binx_data->>'stolen_record_id' IS NULL")

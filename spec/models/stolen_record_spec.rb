@@ -19,6 +19,22 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "images_attached_id" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images) }
+    let(:blob) { stolen_record.image_four_by_five.blob }
+
+    # The window before Backfills::StolenAlertBlobBinxDataJob migrates them
+    it "falls back to the metadata the alert images used before binx_data" do
+      blob.update!(metadata: blob.metadata.merge("image_id" => 12, "removed" => true))
+      expect(stolen_record.reload.images_attached_id).to eq 12
+      expect(stolen_record.images_attached?).to be_falsey
+
+      blob.update!(binx_data: {"image_id" => 13, "removed" => false})
+      expect(stolen_record.reload.images_attached_id).to eq 13
+      expect(stolen_record.images_attached?).to be_truthy
+    end
+  end
+
   describe "after_save hooks" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }

@@ -4,9 +4,10 @@ RSpec.describe BikeJobs::RemoveOrphanedImagesJob, type: :lib do
   include_context :scheduled_job
   include_examples :scheduled_job_tests
 
-  it "is the correct queue and frequency" do
+  it "is the correct queue, frequency and retry" do
     expect(described_class.sidekiq_options["queue"]).to eq "low_priority" # overrides default
     expect(described_class.frequency).to be > 20.hours
+    expect(described_class.sidekiq_options["retry"]).to eq 1 # ScheduledJob defaults to false
   end
 
   describe "perform" do
@@ -83,6 +84,64 @@ RSpec.describe BikeJobs::RemoveOrphanedImagesJob, type: :lib do
         expect(ActiveStorage::Attachment.count).to eq 3
         expect(AlertImage.count).to eq 0
         expect(stolen_record.reload.images_attached?).to be_truthy
+      end
+
+      context "storage fails while deleting the file" do
+        # Stubbed because the real trigger is a transient S3 5xx, which can't be provoked
+        before do
+          allow_any_instance_of(ActiveStorage::Service::DiskService).to receive(:delete)
+            .and_raise(StandardError, "We encountered an internal error. Please try again.")
+        end
+
+        it "keeps the blob, so the file isn't orphaned and the next run retries" do
+          Images::StolenProcessor.update_alert_images(stolen_record, force_regenerate: true)
+          expect(ActiveStorage::Blob.count).to eq 6
+
+          expect { instance.perform(stolen_record.id) }.to raise_error(/internal error/)
+
+          expect(ActiveStorage::Blob.count).to eq 6
+          expect(stolen_record.reload.images_attached?).to be_truthy
+        end
+      end
+    end
+
+    context "blob stamped for the stolen_record, but not named for it" do
+      let!(:stamped_blob) do
+        ActiveStorage::Blob.create_and_upload!(io: StringIO.new("photo"), filename: "alert.jpeg",
+          content_type: "image/jpeg")
+          .tap { it.update_columns(created_at: time, binx_data: {"stolen_record_id" => stolen_record.id}) }
+      end
+
+      it "purges it, rather than leaving it for a reaper that skips the stamp" do
+        expect(stolen_record.reload.images_attached?).to be_truthy
+
+        instance.perform(stolen_record.id)
+
+        expect(ActiveStorage::Blob.where(id: stamped_blob.id)).to be_empty
+        expect(stolen_record.reload.images_attached?).to be_truthy
+      end
+    end
+
+    context "images removed, with the attachments still present" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record) }
+      let!(:public_image) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
+      before do
+        Images::StolenProcessor.update_alert_images(stolen_record)
+        ActiveStorage::Blob.update_all(created_at: time)
+        public_image.destroy
+        # Marks the images removed, leaving the attachments in place
+        Images::StolenProcessor.update_alert_images(stolen_record.reload)
+      end
+
+      it "purges the blobs instead of stranding them behind the deleted attachments" do
+        expect(stolen_record.reload.images_attached?).to be_falsey
+        expect(ActiveStorage::Blob.count).to eq 3
+        expect(ActiveStorage::Attachment.count).to eq 3
+
+        instance.perform(stolen_record.id)
+
+        expect(ActiveStorage::Attachment.count).to eq 0
+        expect(ActiveStorage::Blob.count).to eq 0
       end
     end
   end

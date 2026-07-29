@@ -37,11 +37,10 @@ module Images
         # Prevent touching the stolen record, which kicks off a job
         ActiveRecord::Base.no_touching do
           attach_images(stolen_record, image, stolen_record_location(stolen_record))
-          stolen_record.image_four_by_five.blob.metadata["image_id"] = image_id
-          stolen_record.image_four_by_five.blob.save
+          stamp(stolen_record.image_four_by_five.blob, "image_id" => image_id).save
         end
       elsif (existing_blob = stolen_record.image_four_by_five&.blob)
-        existing_blob.metadata["removed"] = true
+        stamp(existing_blob, "removed" => true)
         # We don't want to update the bike.updated_at unless this is a change
         return unless existing_blob.changed?
 
@@ -83,7 +82,7 @@ module Images
     def use_stolen_images_override_id?(stolen_record)
       images_updated = PublicImage.unscoped.where(imageable_type: "Bike", imageable_id: stolen_record.bike_id).maximum(:updated_at)
       return false if images_updated.blank? || stolen_record.image_four_by_five&.blob&.created_at.blank? ||
-        stolen_record.images_attached_id.blank? # handle if metadata is overwritten
+        stolen_record.images_attached_id.blank? # nothing recorded the image it came from
 
       stolen_record.image_four_by_five.blob.created_at > images_updated
     end
@@ -107,7 +106,13 @@ module Images
       ActiveStorage::Blob.create_and_upload!(
         io: generate_alert(template:, image:, location_text:),
         filename: "stolen-#{stolen_record.id}-#{template}.jpeg"
-      ).tap { it.update!(binx_data: {"stolen_record_id" => stolen_record.id}) }.tap(&:analyze)
+      ).tap { stamp(it, "stolen_record_id" => stolen_record.id).save! }.tap(&:analyze)
+    end
+
+    # Our references to the records an alert came from. Not metadata - that's ActiveStorage's,
+    # and analyze merges the whole hash back off its own read
+    def stamp(blob, values)
+      blob.tap { it.binx_data = it.binx_data.to_h.merge(values) }
     end
 
     def generate_alert(template:, image:, location_text:, convert: "jpeg")
@@ -225,7 +230,8 @@ module Images
     end
 
     conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :create_alert_blob,
-      :generate_alert, :template_path, :topbar_path, :bike_image_dimensions_for, :bike_image_offset,
-      :caption_overlay, :font, :fc_list_output, :fc_list_has?, :stolen_record_location
+      :stamp, :generate_alert, :template_path, :topbar_path, :bike_image_dimensions_for,
+      :bike_image_offset, :caption_overlay, :font, :fc_list_output, :fc_list_has?,
+      :stolen_record_location
   end
 end
