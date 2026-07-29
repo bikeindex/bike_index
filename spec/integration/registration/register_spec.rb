@@ -135,10 +135,8 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(find("input[name='bike[status]']", visible: :all).value).to eq "status_stolen"
     fill_in "bike[phone]", with: "(555) 000-0000"
 
-    # Picking a photo uploads it straight to storage; the form carries only the signed id
-    attach_file("register_photo", Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg"), make_visible: true)
-    expect(page).to have_content("bike_photo-landscape.jpeg")
-    expect(page).to have_no_content("uploading")
+    # An upload needs an account behind it, so this registration never offers one
+    expect(page).to have_no_field("register_photo", visible: :all)
 
     click_button "Complete Bike Registration"
 
@@ -151,8 +149,6 @@ RSpec.describe "Register flow", :js, type: :system do
       "serial_number" => "made_without_serial", "phone" => "(555) 000-0000",
       "status" => "status_stolen")
     expect(BikeServices::Register.send(:details_completed?, b_param)).to be_truthy
-    expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
-      .to eq "bike_photo-landscape.jpeg"
   end
 
   # The example above uploads to the Disk service, same-origin, which never exercises a presigned
