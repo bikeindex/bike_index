@@ -87,6 +87,15 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       fill_in "Cycle type", with: "uni"
 
       expect(page).to have_no_css(overlay)
+
+      # The handle clears the selection without any event of its own
+      find('[role="option"]', text: "Unicycle", exact_text: true).click
+
+      expect(page).to have_css(overlay, text: "Unicycle")
+
+      find(".hw-combobox__handle").click
+
+      expect(page).to have_no_css(overlay)
     end
   end
 

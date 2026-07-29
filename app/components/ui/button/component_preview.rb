@@ -3,8 +3,13 @@
 module UI
   module Button
     class ComponentPreview < ApplicationComponentPreview
-      # The mid-submit state: disabled, with the spinner span force-shown (the
-      # controller reveals it on a real submit)
+      # Submit reveals the spinner and disables the button -- but only once native
+      # validation has passed, so an empty email leaves the button alone
+      def in_form
+        {template: "ui/button/component_preview/in_form"}
+      end
+
+      # The same state without the submit, for reviewing it alongside the colors
       def submitting
         render(UI::Button::Component.new(text: "Next", color: :primary, kind: :submit,
           spinner: true, disabled: true, html_class: "tw:[&_span]:inline-flex!"))
