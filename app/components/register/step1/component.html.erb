@@ -43,7 +43,7 @@
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cycle_type,
           label_text: translation(".vehicle_type"), required: true, wrapper_class: "tw:mb-0")) do %>
         <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, required: true,
-            value: @b_param.cycle_type, options: cycle_type_options, rich_display: true) %>
+            value: @b_param.cycle_type, options: cycle_type_options, rich_display: :inline) %>
       <% end %>
 
       <%= render UI::Forms::Checkbox::Component.new(name: :propulsion_type_motorized, value: true,
@@ -58,9 +58,11 @@
 
     <%= render Register::SectionLabel::Component.new(text: translation(".your_info"), divider: true) %>
 
-    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email, kind: :email_field,
-        label_text: translation(".email"), required: true, wrapper_class: "tw:mb-6",
-        html_options: {value: @b_param.owner_email, placeholder: translation(".email_placeholder")}) %>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email,
+        label_text: translation(".email"), required: true, wrapper_class: "tw:mb-6")) do %>
+      <%= render UI::Forms::Email::Component.new(form_builder: f, attribute: :owner_email, required: true,
+          html_options: {value: @b_param.owner_email, placeholder: translation(".email_placeholder")}) %>
+    <% end %>
 
     <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
         kind: :submit, spinner: true, html_class: "tw:w-full") %>

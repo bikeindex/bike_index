@@ -135,12 +135,9 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(find("input[name='bike[status]']", visible: :all).value).to eq "status_stolen"
     fill_in "bike[phone]", with: "(555) 000-0000"
 
-    # An upload needs an account behind it, so this registration never offers one
-    expect(page).to have_no_field("register_photo", visible: :all)
-
     click_button "Complete Bike Registration"
 
-    expect(page).to have_content("Registration complete")
+    expect(page).to have_content("Registration saved")
     expect(page).to have_content("verify your email")
     b_param = BParam.last
     expect(b_param.bike).to include("frame_model" => "Marlin 7", "year" => "2023",

@@ -25,15 +25,6 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
     end
   end
 
-  context "when email_field" do
-    let(:kind) { :email_field }
-    let(:attribute) { :email }
-
-    it "renders an email input" do
-      expect(component).to have_css("input[type='email'][name='user[email]']")
-    end
-  end
-
   context "when number_field" do
     let(:kind) { :number_field }
 
@@ -50,21 +41,14 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
     end
   end
 
-  # select goes through UI::Forms::Select — its arity doesn't fit KINDS
-  context "when select" do
-    let(:kind) { :select }
-
-    it "falls back to text_field" do
-      expect(component).to have_css("input[type='text']")
-      expect(component).to_not have_css("select")
-    end
-  end
-
-  context "when invalid kind" do
-    let(:kind) { :password_field }
-
-    it "falls back to text_field" do
-      expect(component).to have_css("input[type='text']")
+  # An email field is UI::Forms::Email, so every one of them checks for a typo, and a
+  # select is UI::Forms::Select — neither may quietly render as a text field instead
+  context "when the kind isn't one of KINDS" do
+    it "raises" do
+      [:email_field, :select, :password_field, nil].each do |unknown_kind|
+        expect { described_class.new(form_builder:, attribute:, kind: unknown_kind) }
+          .to raise_error(ArgumentError, /unknown kind/)
+      end
     end
   end
 

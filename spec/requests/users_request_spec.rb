@@ -3,6 +3,15 @@ require "rails_helper"
 RSpec.describe UsersController, type: :request do
   base_url = "/users"
 
+  describe "new" do
+    it "renders an email field that offers a correction for a mistyped domain" do
+      get "#{base_url}/new"
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:new)
+      expect(Capybara.string(response.body)).to have_css("[data-controller='ui--forms--email'] input#user_email")
+    end
+  end
+
   describe "create with a null origin" do
     include_context :test_csrf_token
     let(:email) { "ruther99@msu.edu" }

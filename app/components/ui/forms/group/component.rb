@@ -12,7 +12,7 @@ module UI
           wrapper_class: "tw:mb-4", html_options: {})
           @form_builder = form_builder
           @attribute = attribute
-          @kind = kind.to_sym
+          @kind = Input::Component.validate_kind!(kind)
           @label_text = label_text || attribute.to_s.humanize
           @required = required
           @wrapper_class = wrapper_class

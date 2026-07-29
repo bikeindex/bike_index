@@ -14,40 +14,58 @@ module UI
       #
       # rich_display: shows the selected option's rich `content` on the closed
       # input via an overlay (an <input> can't render two-tone text) -- see
-      # ui/forms/combobox_display_controller.js. Pass a class string to also
-      # put it on the wrapper (e.g. "tw:flex-1"). Pass :stacked when the option
-      # content is a primary line with a muted line below it, rather than one
-      # line of two-tone text -- the input grows to fit both.
+      # ui/forms/combobox_display_controller.js.
+      #   - :inline  one line, the muted part following the display text
+      #   - :stacked a muted line below the display text, on a taller input
+      #
+      # It always renders inside a wrapper div, so the combobox sits at the same
+      # depth either way -- add your own wrapper for the parent's layout.
       #
       # Any other keyword (id:, value:, open:, free_text:, autocomplete:,
       # placeholder:, etc.) is forwarded to `hw_combobox_tag`.
       class Component < ApplicationComponent
+        RICH_DISPLAYS = %i[inline stacked].freeze
+
         OVERLAY_CLASSES = "tw:pointer-events-none tw:absolute tw:hidden tw:text-gray-900 tw:dark:text-gray-200"
         # Centered as a block, so blurring lines up with the input's own centered text
         STACKED_OVERLAY_CLASSES = "tw:flex tw:flex-col tw:justify-center tw:overflow-hidden"
         STACKED_INPUT_CLASSES = "tw:min-h-13"
 
-        def initialize(name:, options: [], src: nil, rich_display: false, **combobox_options)
+        def initialize(name:, options: [], src: nil, rich_display: nil, **combobox_options)
           @name = name
           @options_or_src = src || options
-          @rich_display = rich_display
+          @rich_display = RICH_DISPLAYS.detect { |display| display.to_s == rich_display.to_s }
           @combobox_options = combobox_options
         end
 
         def call
-          # customize_ (rather than the input: kwarg) appends to the gem's own classes
-          combobox = helpers.hw_combobox_tag(@name, @options_or_src, **defaults, **@combobox_options) do |component|
-            component.customize_input(class: STACKED_INPUT_CLASSES) if stacked?
-          end
-          return combobox unless @rich_display
-
-          tag.div(class: ["tw:relative", (@rich_display if @rich_display.is_a?(String))],
-            data: {controller: "ui--forms--combobox-display"}) do
-            combobox + tag.div(class: overlay_classes, data: {"ui--forms--combobox-display-target": "overlay"})
+          tag.div(**wrapper_attrs) do
+            safe_join([combobox, overlay].compact)
           end
         end
 
         private
+
+        def combobox
+          # customize_ (rather than the input: kwarg) appends to the gem's own classes
+          helpers.hw_combobox_tag(@name, @options_or_src, **defaults, **@combobox_options) do |component|
+            component.customize_input(class: STACKED_INPUT_CLASSES) if stacked?
+          end
+        end
+
+        # Only a rich display needs the controller, or the positioning context
+        # the overlay is placed against
+        def wrapper_attrs
+          return {} unless @rich_display
+
+          {class: "tw:relative", data: {controller: "ui--forms--combobox-display"}}
+        end
+
+        def overlay
+          return unless @rich_display
+
+          tag.div(class: overlay_classes, data: {"ui--forms--combobox-display-target": "overlay"})
+        end
 
         def stacked?
           @rich_display == :stacked

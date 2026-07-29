@@ -24,7 +24,9 @@ This project uses **Stimulus.js** for JavaScript interactivity and **Tailwind CS
 
 The `bin/dev` command handles building and updating Tailwind and JS.
 
-**Format ERB before committing.** After editing any `.html.erb`, run `bin/lint <file>` — it runs `herb-format`, which sorts `tw:` classes and reflows long `class` attributes onto multiple lines. CI's `lint_and_scan` job runs `herb-format --check` as a step separate from `standardrb`/`rubocop`, so hand-edited ERB that skips formatting fails CI even when the Ruby is clean.
+**Format ERB before committing.** After editing any `.html.erb`, run `bin/lint` on the files or directories you changed — `bin/lint app/components/ui/table`. It runs `herb-lint` and `herb-format`, which sort `tw:` classes, reflow long `class` attributes onto multiple lines, and flag things like an `<input>` missing `autocomplete`. CI's `lint_and_scan` job runs both as steps separate from `standardrb`/`rubocop`, so hand-edited ERB that skips formatting fails CI even when the Ruby is clean.
+
+Scope it rather than running bare `bin/lint`: a whole-repo run reformats files outside your change, and every file it rewrites that you've already read gets re-injected into context in full.
 
 ## Tailwind classes and helpers
 
@@ -77,7 +79,7 @@ Any time you show, hide, or toggle an element in response to interaction, go thr
   collapse('show', this.formTarget)   // 'show' | 'hide' | 'toggle'; optional duration (default 200)
   ```
 
-The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
+The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Use **`tw:hidden!`** when the element also carries a display utility that sorts after `hidden` — any `inline-*`, which every `UI::Button` has. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
 
 ## No dead hooks in markup
 

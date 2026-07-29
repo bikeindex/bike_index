@@ -14,7 +14,7 @@ RSpec.describe CleanBParamsJob, type: :job do
     let!(:b_param_with_values) { FactoryBot.create(:b_param, updated_at: stale) }
     let(:bike) { FactoryBot.create(:bike) }
     let!(:b_param_with_bike) { FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: stale) }
-    let!(:b_param_with_recent_bike) { FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: Time.current - 2.days) }
+    let!(:b_param_with_recent_bike) { FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: Time.current - 2.hours) }
     let!(:b_param_blank) { BParam.create(origin: "register_flow", params: {bike: {}}.as_json, updated_at: stale) }
     let!(:b_param_blank_recent) { BParam.create(origin: "register_flow", params: {bike: {}}.as_json) }
 

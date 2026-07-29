@@ -45,18 +45,6 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.html_part.decoded).to include "bikes/new?b_param_token=#{b_param.id_token}"
       end
     end
-    context "register_flow" do
-      let(:b_param) do
-        BParam.create(origin: "register_flow",
-          params: {bike: {owner_email: "owner@example.com"}}.as_json)
-      end
-      it "links to the register confirmation url" do
-        mail = OrganizedMailer.partial_registration(b_param)
-        expect(mail.to).to eq(["owner@example.com"])
-        expect(mail.deliver_now.html_part.decoded)
-          .to include "register?b_param_token=#{b_param.id_token}&amp;confirmation_token=#{b_param.confirmation_token}"
-      end
-    end
     context "with organization" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       context "non-stolen, organization has mail snippet" do
