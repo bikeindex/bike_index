@@ -66,8 +66,11 @@ mode, target, window = ARGV
 def read_token
   abort "Error: #{ENV_FILE} not found - run from the repo root" unless File.exist?(ENV_FILE)
   line = File.foreach(ENV_FILE).find { |text| text.start_with?("HONEYBADGER_PERSONAL_AUTH_TOKEN=") }
-  abort "Error: HONEYBADGER_PERSONAL_AUTH_TOKEN missing in #{ENV_FILE}" if line.nil?
-  line.split("=", 2).last.strip.gsub(/\A["']|["']\z/, "")
+  # Blank as well as absent: .env ships the key with no value, so a copied
+  # template reads as unset here rather than coming back 401 from the API.
+  token = line.to_s.split("=", 2)[1].to_s.strip.gsub(/\A["']|["']\z/, "")
+  abort "Error: set HONEYBADGER_PERSONAL_AUTH_TOKEN in #{ENV_FILE} - get one at honeybadger.io/users/edit" if token.empty?
+  token
 end
 
 # Accepts a fault URL, PROJECT/FAULT_ID, or a bare project alias. Pulling both
