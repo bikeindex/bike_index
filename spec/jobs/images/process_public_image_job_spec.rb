@@ -20,6 +20,13 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
     Vips::Image.new_from_buffer(data, "").get_fields.grep(/exif|gps/i)
   end
 
+  # n-pages counts what the file holds, not what was loaded; formats that can't animate
+  # (jpeg, webp variants) don't carry the field at all
+  def frame_count(data)
+    image = Vips::Image.new_from_buffer(data, "")
+    image.get_typeof("n-pages").zero? ? 1 : image.get("n-pages")
+  end
+
   it "strips exif, generates the variants and marks the blob" do
     expect(exif_fields(File.binread(Rails.root.join(image_path)))).to be_present
     expect(public_image.file_needs_processing?).to be_truthy
@@ -48,6 +55,26 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
 
     expect { instance.perform(public_image.id) }.to_not change { blob.reload.checksum }
     expect { instance.perform(FactoryBot.create(:public_image, imageable: bike).id) }.to_not raise_error
+  end
+
+  context "animated gif" do
+    let(:image_path) { "spec/fixtures/animated.gif" }
+    let(:target_metadata) do
+      {"identified" => true, "stripped" => true, "width" => 120, "height" => 80,
+       "analyzed" => true, "processed" => true}
+    end
+
+    it "keeps every frame through the strip" do
+      expect(frame_count(File.binread(Rails.root.join(image_path)))).to eq 4
+
+      instance.perform(public_image.id)
+
+      expect(blob.reload.metadata).to eq target_metadata
+      expect(blob.content_type).to eq "image/gif"
+      expect(frame_count(blob.download)).to eq 4
+      # Variants are stills - the page height is what the dimensions describe
+      expect(frame_count(public_image.file.variant(:small).download)).to eq 1
+    end
   end
 
   context "tiff" do

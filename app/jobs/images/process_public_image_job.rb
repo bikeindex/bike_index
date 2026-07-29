@@ -36,7 +36,10 @@ module Images
       to_webp = WEBP_SOURCE_TYPES.include?(blob.content_type)
       prepared = blob.open do |file|
         source = ImageProcessing::Vips.source(file).saver(strip: true)
-        (to_webp ? source.convert("webp") : source).call
+        # n: -1 keeps every frame of an animated gif or apng - the default reads page one, so
+        # re-encoding silently flattens them. Not for the webp conversions: pages there are a
+        # tiff's scans or a heic burst, which shouldn't become an animation.
+        to_webp ? source.convert("webp").call : source.loader(n: -1).call
       end
       # Ahead of the upload, which re-identifies content_type with the filename as a hint
       blob.filename = "#{blob.filename.base}.webp" if to_webp
