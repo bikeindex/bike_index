@@ -8,8 +8,14 @@ Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
     policy.font_src :self, "https://fonts.gstatic.com", "http://fonts.gstatic.com", "https://themes.googleusercontent.com", :data
+    # ActiveStorage serves blobs from the bucket's own domain, and each non-production bucket
+    # has a different one - so a review app's images are blocked unless its host is listed too.
+    # Duplicates BlobUrl's defaults because this block is evaluated before autoloading is
+    # available; blob_url_spec fails if the two drift.
     policy.img_src :self, "https://files.bikeindex.org",
-      "https://uploads.bikeindex.org",
+      ENV.fetch("ACTIVE_STORAGE_HOST", "https://uploads.bikeindex.org"),
+      ENV.fetch("ACTIVE_STORAGE_HOST_DEV", "https://dev-uploads.bikeindex.org"),
+      ENV.fetch("ACTIVE_STORAGE_HOST_TEST", "https://test-uploads.bikeindex.org"),
       "https://maps.bikeindex.org",
       "https://bikebook.s3.amazonaws.com",
       "https://www.googletagmanager.com",

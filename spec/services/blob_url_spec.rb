@@ -1,6 +1,13 @@
 require "rails_helper"
 
 RSpec.describe BlobUrl do
+  # content_security_policy.rb repeats these hosts because it's evaluated before autoloading.
+  # A host img-src doesn't list renders nothing at all - the browser blocks it silently.
+  it "has every storage host in the CSP img-src" do
+    img_src = Rails.application.config.content_security_policy.directives.fetch("img-src")
+    expect(img_src).to include(described_class::STORAGE_HOST, *described_class::STORAGE_HOSTS.values)
+  end
+
   describe "for" do
     let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images) }
     it "returns the url" do
