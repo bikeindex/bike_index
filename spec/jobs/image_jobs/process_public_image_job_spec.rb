@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Images::ProcessPublicImageJob, type: :job do
+RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
   let(:instance) { described_class.new }
   let(:bike) { FactoryBot.create(:bike) }
   # Carries GPS EXIF and an orientation tag, which is the whole reason the job exists

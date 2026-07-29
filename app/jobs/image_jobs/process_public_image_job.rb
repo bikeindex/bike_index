@@ -2,7 +2,7 @@
 
 require "image_processing/vips"
 
-module Images
+module ImageJobs
   class ProcessPublicImageJob < ApplicationJob
     sidekiq_options queue: "med_priority"
 

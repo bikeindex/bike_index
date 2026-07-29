@@ -120,10 +120,10 @@ class PublicImage < ApplicationRecord
     return if skip_update
 
     if external_image_url.present? && image.blank?
-      return Images::ExternalUrlStoreJob.perform_async(id)
+      return ImageJobs::ExternalUrlStoreJob.perform_async(id)
     end
 
-    Images::ProcessPublicImageJob.perform_async(id) if file_needs_processing?
+    ImageJobs::ProcessPublicImageJob.perform_async(id) if file_needs_processing?
 
     imageable&.update(updated_at: Time.current)
     return true unless bike?
