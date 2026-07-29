@@ -133,6 +133,31 @@ RSpec.describe PublicImage, type: :model do
         expect(public_image).to be_valid
       end
     end
+
+    # The blob is created from the client's JSON, then the browser PUTs straight to the bucket -
+    # so content_type is whatever the client typed until we look at the bytes
+    context "a direct upload" do
+      let(:data) { File.binread(Rails.root.join("spec/fixtures/bike.jpg")) }
+      let(:blob) do
+        ActiveStorage::Blob.create_before_direct_upload!(filename:, content_type:,
+          byte_size: data.bytesize, checksum: Digest::MD5.base64digest(data))
+          .tap { it.service.upload(it.key, StringIO.new(data), checksum: it.checksum) }
+      end
+
+      it "is valid" do
+        expect(public_image).to be_valid
+      end
+
+      context "claiming a permitted type for bytes that aren't one" do
+        let(:data) { "%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n%%EOF\n" }
+
+        it "is invalid" do
+          expect(blob.content_type).to eq "image/jpeg" # what the client claimed
+          expect(public_image).to_not be_valid
+          expect(public_image.file.blob.content_type).to eq "application/pdf" # what it really is
+        end
+      end
+    end
   end
 
   describe "open_file" do

@@ -10,10 +10,11 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
 
   # Tags that identify the photographer, their camera or where they stood
   let(:identifying) { /gps|make|model|serial|lens|software|datetime|makernote/i }
-  # Dimensions are autorotated - the orientation tag claimed 1173x1071
+  # Autorotated - the orientation tag claimed 1173x1071
+  let(:dimensions) { [1071, 1173] }
   let(:target_metadata) do
-    {"identified" => true, "stripped" => true, "width" => 1071, "height" => 1173,
-     "analyzed" => true, "processed" => true}
+    {"identified" => true, "stripped" => true, "width" => dimensions.first,
+     "height" => dimensions.last, "analyzed" => true, "processed" => true}
   end
 
   def exif_fields(data)
@@ -79,10 +80,7 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
 
   context "tiff" do
     let(:image_path) { "spec/fixtures/bike_photo.tif" }
-    let(:target_metadata) do
-      {"identified" => true, "stripped" => true, "width" => 800, "height" => 600,
-       "analyzed" => true, "processed" => true}
-    end
+    let(:dimensions) { [800, 600] }
 
     it "rewrites it as webp" do
       expect(blob.content_type).to eq "image/tiff"
@@ -115,10 +113,7 @@ RSpec.describe Images::ProcessPublicImageJob, type: :job do
   context "iphone heic on R2", vcr: {cassette_name: "process_public_image_job-heic_r2", preserve_exact_body_bytes: true} do
     let(:image_path) { "spec/fixtures/bike_photo-gps.heic" }
     let(:public_image) { FactoryBot.create(:public_image, imageable: bike, file: r2_blob) }
-    let(:target_metadata) do
-      {"identified" => true, "stripped" => true, "width" => 2400, "height" => 1800,
-       "analyzed" => true, "processed" => true}
-    end
+    let(:dimensions) { [2400, 1800] }
     # Fixed key - blob keys are random, and the cassette matches on path (the variant keys hang
     # off it too), so a generated one would never replay
     let(:r2_blob) do

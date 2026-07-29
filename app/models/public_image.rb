@@ -41,7 +41,7 @@ class PublicImage < ApplicationRecord
   # can serve, or to the size PublicImagesController caps. Wider than carrierwave's whitelist
   # by HEIC: iPhones shoot it by default and vips converts it to every variant, but carrierwave
   # can't take it, and that list also feeds the file picker's accept attribute.
-  FILE_CONTENT_TYPES = (ApplicationUploader.extensions.map { Marcel::MimeType.for(name: "f.#{it}") } +
+  FILE_CONTENT_TYPES = (ApplicationUploader.extensions.map { Marcel::MimeType.for(extension: it) } +
     %w[image/heic image/heif]).uniq.freeze
 
   mount_uploader :image, PublicImageUploader # Legacy, migrating to :file
@@ -97,7 +97,8 @@ class PublicImage < ApplicationRecord
   # ActiveStorage variants share names, so callers pass the same size either way - the
   # ActiveStorage dimensions are just larger.
   def image_url(size = nil)
-    return image.url(*size) unless file.attached?
+    # Checked before the attachment so legacy rows never pay for an active_storage_attachments query
+    return image.url(*size) if image.path.present? || !file.attached?
 
     BlobUrl.for_variant(file, size&.to_sym&.presence_in(VARIANTS.keys))
   end
@@ -167,6 +168,9 @@ class PublicImage < ApplicationRecord
 
   private
 
+  # content_type is trustworthy here even though a direct upload declares its own: attaching runs
+  # Attached::Changes::CreateOne#initialize, which re-identifies it from the stored bytes with
+  # Marcel. byte_size is signed into the presigned PUT, so S3 rejects a body of any other length.
   def file_permitted
     blob = attachment_changes["file"].blob
     return if self.class.file_permitted?(content_type: blob.content_type, byte_size: blob.byte_size)
