@@ -36,6 +36,13 @@ const NAMES = [
   'earthlink', 'shaw', 'sympatico', 'telus', 'btinternet'
 ]
 
+// The names above that exist as a ".com" and nothing else, so a near-miss of it is wrong
+// however real the ending is elsewhere -- ".co" is Colombia to everyone but Gmail.
+const COM_ONLY = [
+  'gmail', 'googlemail', 'yahoo', 'ymail', 'hotmail', 'outlook', 'icloud', 'protonmail',
+  'aol', 'msn', 'live', 'me', 'mac', 'hey', 'fastmail'
+]
+
 // Endings worth knowing. The two-letter ones are never corrected to, only recognized --
 // which is what keeps ".co" from being read as ".com" with a letter dropped.
 const ENDINGS = [
@@ -58,9 +65,18 @@ function suggest (email) {
   const [name, ...rest] = typed.split('.').filter(Boolean)
   if (!rest.length) return null
 
-  const domain = `${closest(name, NAMES, 4)}.${closest(rest.join('.'), ENDINGS, 3)}`
+  const corrected = closest(name, NAMES, 4)
+  const domain = `${corrected}.${ending(corrected, rest.join('.'))}`
 
   return (domain === typed) ? null : `${email.slice(0, at)}@${domain}`
+}
+
+// A name we recognize vouches for its own ending, which is the only way to read ".co" as
+// a typo -- on its own it's a country's, and left alone.
+function ending (name, typed) {
+  if (COM_ONLY.includes(name) && typed !== 'com' && oneTypoApart(typed, 'com')) return 'com'
+
+  return closest(typed, ENDINGS, 3)
 }
 
 // The entry a single typo away, or the part itself -- which is every domain we have no

@@ -42,8 +42,43 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
 
     expect(page).to have_button("Did you mean you@mac.com?")
 
+    # a name that short is never corrected itself, though -- "max" isn't a mistyped "mac"
+    fill_in_email_and_leave("you@max.com")
+
+    expect(page).to have_no_css(suggestion_button)
+
+    # unless the ending is what's wrong: "mac" has a ".com" and nothing else
+    fill_in_email_and_leave("you@mac.co")
+
+    expect(page).to have_button("Did you mean you@mac.com?")
+
+    # which is only the names that have one -- gmx is a ".de", so its ending stands
+    fill_in_email_and_leave("you@gmx.de")
+
+    expect(page).to have_no_css(suggestion_button)
+
+    # a multi-label ending is matched whole, so a typo in the name doesn't cost it
+    fill_in_email_and_leave("you@yahho.co.jp")
+
+    expect(page).to have_button("Did you mean you@yahoo.co.jp?")
+
+    # and yahoo keeps its own ".co.jp", vouching for ".com" or not
+    fill_in_email_and_leave("you@yahoo.co.jp")
+
+    expect(page).to have_no_css(suggestion_button)
+
     # a dot with nothing on one side is its own typo, so the ending still has one to spend
     fill_in_email_and_leave("you@.gmail..come")
+
+    expect(page).to have_button(suggestion)
+
+    # ".co" on a domain we don't know is a country's own
+    fill_in_email_and_leave("you@bikeshop.co")
+
+    expect(page).to have_no_css(suggestion_button)
+
+    # but a name with one ending vouches for it, so here it's a "com" rather than Colombia
+    fill_in_email_and_leave("you@gmail.co")
 
     expect(page).to have_button(suggestion)
 
