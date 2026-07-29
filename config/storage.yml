@@ -8,6 +8,17 @@ local:
   root: <%= Rails.root.join("storage") %>
   public: true
 
+# Only for the specs that upload for real (spec/integration/register_spec.rb); the rest of the
+# suite stays on :test. Its own bucket so CI churn doesn't land where review apps serve from.
+cloudflare_test:
+  service: S3
+  endpoint: <%= ENV["R2_TEST_ENDPOINT"] %>
+  access_key_id: <%= ENV["R2_TEST_ACCESS_KEY"] %>
+  secret_access_key: <%= ENV["R2_TEST_ACCESS_KEY_SECRET"] %>
+  bucket: bikeindex-test
+  region: auto
+  public: true
+
 cloudflare_dev:
   service: S3
   endpoint: <%= ENV["R2_DEV_ENDPOINT"] %>

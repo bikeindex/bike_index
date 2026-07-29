@@ -37,6 +37,13 @@ class PublicImage < ApplicationRecord
     large: {resize_to_fit: [2000, 1600], format: :webp}
   }.freeze
 
+  # Direct uploads bypass the uploader, so nothing else holds an attached file to a format we
+  # can serve, or to the size PublicImagesController caps. Wider than carrierwave's whitelist
+  # by HEIC: iPhones shoot it by default and vips converts it to every variant, but carrierwave
+  # can't take it, and that list also feeds the file picker's accept attribute.
+  FILE_CONTENT_TYPES = (ApplicationUploader.extensions.map { Marcel::MimeType.for(name: "f.#{it}") } +
+    %w[image/heic image/heif]).uniq.freeze
+
   mount_uploader :image, PublicImageUploader # Legacy, migrating to :file
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
@@ -48,6 +55,9 @@ class PublicImage < ApplicationRecord
 
   belongs_to :imageable, polymorphic: true
 
+  # Only when a file is being assigned - otherwise every legacy carrierwave save pays a
+  # query to load an attachment it doesn't have
+  validate :file_permitted, if: -> { attachment_changes["file"].present? }
   attr_writer :image_cache
   attr_accessor :skip_update
 
@@ -56,6 +66,12 @@ class PublicImage < ApplicationRecord
 
   default_scope { where(is_private: false).order(:listing_order) }
   scope :bike, -> { where(imageable_type: "Bike") }
+
+  # Direct uploads are checked before the blob exists, the validation after - same rule
+  def self.file_permitted?(content_type:, byte_size:)
+    FILE_CONTENT_TYPES.include?(content_type) &&
+      byte_size.to_i.between?(1, PublicImageUploader::MAX_FILE_SIZE)
+  end
 
   def default_name
     if bike?
@@ -150,6 +166,13 @@ class PublicImage < ApplicationRecord
   end
 
   private
+
+  def file_permitted
+    blob = attachment_changes["file"].blob
+    return if self.class.file_permitted?(content_type: blob.content_type, byte_size: blob.byte_size)
+
+    errors.add(:file, :invalid)
+  end
 
   # Not blob.open, which unlinks its tempfile when the block exits - the caller needs the file to
   # outlive this method. Plain download is one GET; the chunked form adds two HEADs on S3.
