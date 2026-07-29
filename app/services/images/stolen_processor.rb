@@ -37,11 +37,10 @@ module Images
         # Prevent touching the stolen record, which kicks off a job
         ActiveRecord::Base.no_touching do
           attach_images(stolen_record, image, stolen_record_location(stolen_record))
-          stolen_record.image_four_by_five.blob.metadata["image_id"] = image_id
-          stolen_record.image_four_by_five.blob.save
+          stamp(stolen_record.image_four_by_five.blob, "image_id" => image_id).save
         end
       elsif (existing_blob = stolen_record.image_four_by_five&.blob)
-        existing_blob.metadata["removed"] = true
+        stamp(existing_blob, "removed" => true)
         # We don't want to update the bike.updated_at unless this is a change
         return unless existing_blob.changed?
 
@@ -79,34 +78,37 @@ module Images
     def use_stolen_images_override_id?(stolen_record)
       images_updated = PublicImage.unscoped.where(imageable_type: "Bike", imageable_id: stolen_record.bike_id).maximum(:updated_at)
       return false if images_updated.blank? || stolen_record.image_four_by_five&.blob&.created_at.blank? ||
-        stolen_record.images_attached_id.blank? # handle if metadata is overwritten
+        stolen_record.images_attached_id.blank? # nothing recorded the image it came from
 
       stolen_record.image_four_by_five.blob.created_at > images_updated
     end
 
+    # stolen_record_id is what marks these as ours to keep - a superseded alert stays
+    # unattached on purpose (dependent: false), and CleanUnattachedBlobsJob reads the stamp
+    # rather than reaping it
     def attach_images(stolen_record, image, location_text)
-      four_by_five = ActiveStorage::Blob.create_and_upload!(
-        io: generate_alert(template: :four_by_five, image:, location_text:),
-        filename: "stolen-#{stolen_record.id}-four_by_five.jpeg"
-      )
-      four_by_five.analyze
-
-      square = ActiveStorage::Blob.create_and_upload!(
-        io: generate_alert(template: :square, image:, location_text:),
-        filename: "stolen-#{stolen_record.id}-square.jpeg"
-      )
-      square.analyze
-
-      opengraph = ActiveStorage::Blob.create_and_upload!(
-        io: generate_alert(template: :opengraph, image:, location_text:),
-        filename: "stolen-#{stolen_record.id}-opengraph.jpeg"
-      )
-      opengraph.analyze
+      four_by_five = create_alert_blob(stolen_record, :four_by_five, image, location_text)
+      square = create_alert_blob(stolen_record, :square, image, location_text)
+      opengraph = create_alert_blob(stolen_record, :opengraph, image, location_text)
 
       stolen_record.image_square.attach(square)
       stolen_record.image_opengraph.attach(opengraph)
       # Attach 4 by five last, it's what sets images_attached?
       stolen_record.image_four_by_five.attach(four_by_five)
+    end
+
+    # create_and_upload! takes explicit keywords, so the stamp is a second write
+    def create_alert_blob(stolen_record, template, image, location_text)
+      ActiveStorage::Blob.create_and_upload!(
+        io: generate_alert(template:, image:, location_text:),
+        filename: "stolen-#{stolen_record.id}-#{template}.jpeg"
+      ).tap { stamp(it, "stolen_record_id" => stolen_record.id).save! }.tap(&:analyze)
+    end
+
+    # Our references to the records an alert came from. Not metadata - that's ActiveStorage's,
+    # and analyze merges the whole hash back off its own read
+    def stamp(blob, values)
+      blob.tap { it.binx_data = it.binx_data.to_h.merge(values) }
     end
 
     def generate_alert(template:, image:, location_text:, convert: "jpeg")
@@ -223,8 +225,9 @@ module Images
         .gsub("'", "\\'")
     end
 
-    conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :generate_alert,
-      :template_path, :topbar_path, :bike_image_dimensions_for, :bike_image_offset,
-      :caption_overlay, :font, :fc_list_output, :fc_list_has?, :stolen_record_location
+    conceal :image_and_id, :use_stolen_images_override_id?, :attach_images, :create_alert_blob,
+      :stamp, :generate_alert, :template_path, :topbar_path, :bike_image_dimensions_for,
+      :bike_image_offset, :caption_overlay, :font, :fc_list_output, :fc_list_has?,
+      :stolen_record_location
   end
 end

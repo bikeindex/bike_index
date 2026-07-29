@@ -105,6 +105,23 @@ RSpec.describe BikeJobs::RemoveOrphanedImagesJob, type: :lib do
       end
     end
 
+    context "blob stamped for the stolen_record, but not named for it" do
+      let!(:stamped_blob) do
+        ActiveStorage::Blob.create_and_upload!(io: StringIO.new("photo"), filename: "alert.jpeg",
+          content_type: "image/jpeg")
+          .tap { it.update_columns(created_at: time, binx_data: {"stolen_record_id" => stolen_record.id}) }
+      end
+
+      it "purges it, rather than leaving it for a reaper that skips the stamp" do
+        expect(stolen_record.reload.images_attached?).to be_truthy
+
+        instance.perform(stolen_record.id)
+
+        expect(ActiveStorage::Blob.where(id: stamped_blob.id)).to be_empty
+        expect(stolen_record.reload.images_attached?).to be_truthy
+      end
+    end
+
     context "images removed, with the attachments still present" do
       let(:stolen_record) { FactoryBot.create(:stolen_record) }
       let!(:public_image) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
