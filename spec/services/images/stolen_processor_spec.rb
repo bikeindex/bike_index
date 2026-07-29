@@ -44,8 +44,8 @@ RSpec.describe Images::StolenProcessor do
       expect(stolen_record.image_square.attached?).to be_truthy
       expect(stolen_record.image_opengraph.attached?).to be_truthy
       expect(stolen_record.images_attached_id).to eq public_image.id
-      expect(stolen_record.reload.image_four_by_five.blob.metadata["image_id"]).to eq public_image.id
-      expect(stolen_record.image_four_by_five.blob.binx_data).to eq({"stolen_record_id" => stolen_record.id})
+      expect(stolen_record.reload.image_four_by_five.blob.binx_data)
+        .to eq({"stolen_record_id" => stolen_record.id, "image_id" => public_image.id})
       expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
       # No new jobs are enqueued
       expect(BikeJobs::AfterStolenRecordSaveJob.jobs.count).to eq 0
