@@ -74,7 +74,7 @@ RSpec.describe Images::StolenProcessor do
           described_class.update_alert_images(stolen_record)
         end.to change(ActiveStorage::Blob, :count).by 3
 
-        expect(stolen_record.reload.image_four_by_five.blob.metadata["image_id"]).to eq public_image.id
+        expect(stolen_record.reload.image_four_by_five.blob.binx_data["image_id"]).to eq public_image.id
       end
     end
 
