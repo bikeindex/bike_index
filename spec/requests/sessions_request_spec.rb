@@ -13,6 +13,9 @@ RSpec.describe SessionsController, type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('autocomplete="username"')
       expect(response.body).to_not include('autocomplete="current-password"')
+      # the field offers a correction for a mistyped domain, and is still the autofocused one
+      expect(Capybara.string(response.body))
+        .to have_css("[data-controller='ui--forms--email'] input#session_email[autofocus][required]")
     end
   end
 
