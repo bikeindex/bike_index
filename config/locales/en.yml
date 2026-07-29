@@ -1916,6 +1916,14 @@ en:
         no_permission_to_edit: Sorry! You don't have permission to edit that image.
       update:
         image_updated: Image was successfully updated.
+    register:
+      create:
+        email_required: Email is required to register
+        manufacturer_required: Manufacturer is required to register
+        unable_to_save: We're unable to save that registration, please try again
+      find_b_param:
+        registration_not_found: We couldn't find that registration — start a new one
+          below
     search:
       marketplace:
         set_interpreted_params:
@@ -3864,6 +3872,10 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
+    register_create: Register your %{cycle_type}!
+    register_show: "%{cycle_type} registration"
+    register_step_1: Register your %{cycle_type}!
+    register_step_2: Add your %{cycle_type}'s details
     registrations_embed: Register a bike with %{organization}
     search_registrations_index: Search results
     sessions_create: Log in

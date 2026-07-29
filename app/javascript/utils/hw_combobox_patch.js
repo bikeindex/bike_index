@@ -9,3 +9,13 @@ HwComboboxController.prototype._optionElementWithValue = function (value) {
     this._actingListbox.querySelectorAll(`[${this.filterableAttributeValue}]`)
   ).find(option => option.getAttribute('data-value') === value) || null
 }
+
+// It also swallows Enter whether or not the listbox is open, so a combobox with
+// nothing to pick breaks the form's implicit submission -- unlike every other
+// input. Only handle the key while there's an option to choose.
+const navigate = HwComboboxController.prototype.navigate
+HwComboboxController.prototype.navigate = function (event) {
+  if (event.key === 'Enter' && this._isClosed) return
+
+  navigate.call(this, event)
+}

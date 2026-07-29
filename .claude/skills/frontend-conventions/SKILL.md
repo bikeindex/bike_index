@@ -24,7 +24,9 @@ This project uses **Stimulus.js** for JavaScript interactivity and **Tailwind CS
 
 The `bin/dev` command handles building and updating Tailwind and JS.
 
-**Format ERB before committing.** After editing any `.html.erb`, run `bin/lint <file>` — it runs `herb-format`, which sorts `tw:` classes and reflows long `class` attributes onto multiple lines. CI's `lint_and_scan` job runs `herb-format --check` as a step separate from `standardrb`/`rubocop`, so hand-edited ERB that skips formatting fails CI even when the Ruby is clean.
+**Format ERB before committing.** After editing any `.html.erb`, run `bin/lint` on the files or directories you changed — `bin/lint app/components/ui/table`. It runs `herb-lint` and `herb-format`, which sort `tw:` classes, reflow long `class` attributes onto multiple lines, and flag things like an `<input>` missing `autocomplete`. CI's `lint_and_scan` job runs both as steps separate from `standardrb`/`rubocop`, so hand-edited ERB that skips formatting fails CI even when the Ruby is clean.
+
+Scope it rather than running bare `bin/lint`: a whole-repo run reformats files outside your change, and every file it rewrites that you've already read gets re-injected into context in full.
 
 ## Tailwind classes and helpers
 
@@ -68,7 +70,7 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 
 Any time you show, hide, or toggle an element in response to interaction, go through the shared collapse helpers. **Never** hand-roll it with the `hidden` attribute, `element.style.display`, `element.hidden = true`, or ad-hoc `classList.add('tw:hidden')` — those skip the shared show/hide animation and the `tw:hidden!`/`tw:hidden` class contract the rest of the app depends on.
 
-- **Markup-only toggle** (a trigger reveals/collapses a panel, no other logic): add `data-controller="collapse"`, mark the collapsible element `data-collapse-target="content"`, and wire the trigger's `data-action` to `collapse#toggle` / `collapse#show` / `collapse#hide` (`app/javascript/controllers/collapse_controller.js`; optional `data-collapse-duration-value`).
+- **Markup-only toggle** (a trigger reveals/collapses a panel, no other logic): add `data-controller="ui--collapse"`, mark the collapsible element `data-ui--collapse-target="content"`, and wire the trigger's `data-action` to `ui--collapse#toggle` / `ui--collapse#show` / `ui--collapse#hide` (`app/javascript/controllers/ui/collapse_controller.js`; optional `data-ui--collapse-duration-value`).
 - **Inside your own Stimulus controller** (you have extra logic — a redirect branch, a query-param check, etc.): import `collapse_utils` and call it directly:
 
   ```js
@@ -77,7 +79,7 @@ Any time you show, hide, or toggle an element in response to interaction, go thr
   collapse('show', this.formTarget)   // 'show' | 'hide' | 'toggle'; optional duration (default 200)
   ```
 
-The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
+The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Use **`tw:hidden!`** when the element also carries a display utility that sorts after `hidden` — any `inline-*`, which every `UI::Button` has. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
 
 ## No dead hooks in markup
 
@@ -93,6 +95,7 @@ When deleting an `id`/`class`, grep the repo for the name before deciding what t
 This project uses the ViewComponent gem to render components.
 
 - Prefer view components to partials.
+- **If a view file only renders a single component, consider rendering it from the controller instead** (`render Foo::Component.new(...)`) and deleting the view file — the layout still wraps it.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
 - View components must initialize with keyword arguments. Everything the component needs must be passed in explicitly by the caller — never reach into controller state from inside a component (e.g. `controller.instance_variable_get(:@bike)`). If the component needs `@bike`, the caller renders `Component.new(bike: @bike)`.
 - In view components, use instance variables directly — don't add `attr_reader`/`attr_accessor`. Reference `@foo` everywhere, including in the template (`@current_user`, not `current_user`).

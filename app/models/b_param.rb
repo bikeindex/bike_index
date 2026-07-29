@@ -92,6 +92,11 @@ class BParam < ApplicationRecord
   scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
+  # register/new shells whose step 1 was never submitted (manufacturer is required
+  # at submit) - only seeds and a prefilled email, nothing worth keeping
+  scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
+  # Tokenized lookups resume registrations for up to a month
+  scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -168,7 +173,7 @@ class BParam < ApplicationRecord
     def with_organization_or_no_creator(toke)
       return if toke.blank?
 
-      without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
+      without_bike.recent_with_token(toke)
         .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
     end
 
@@ -359,6 +364,19 @@ class BParam < ApplicationRecord
     bike["manufacturer_id"]
   end
 
+  def manufacturer_other
+    bike["manufacturer_other"]
+  end
+
+  # Mirrors Bike#type - the cycle_type for display
+  def type
+    @type ||= type_titleize&.downcase
+  end
+
+  def type_titleize
+    @type_titleize ||= CycleType.new(cycle_type).short_name_translation
+  end
+
   def is_pos
     bike["is_pos"] || false
   end
@@ -407,6 +425,20 @@ class BParam < ApplicationRecord
 
   def partial_registration?
     origin == "embed_partial"
+  end
+
+  def email_confirmed?
+    params["email_confirmed_at"].present?
+  end
+
+  # Waiting on the confirmation link - there's an address, and nothing has proven
+  # it belongs to whoever is registering
+  def email_unconfirmed?
+    owner_email.present? && !email_confirmed?
+  end
+
+  def confirm_email!
+    email_confirmed? || update(params: params.merge("email_confirmed_at" => Time.current))
   end
 
   def primary_frame_color

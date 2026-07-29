@@ -43,7 +43,7 @@ RSpec.describe UI::Forms::TextEditor::Component, type: :component do
 
       expect(component).to have_css("lexxy-editor.lexxy-editor--compact")
       # defaults to SINGLE_LINE_TOOLBAR_BUTTONS -- the omitted buttons get a hide class
-      expect(component).to have_css("lexxy-editor.lexxy-editor--hide-strikethrough.lexxy-editor--hide-table.lexxy-editor--hide-heading")
+      expect(component).to have_css("lexxy-editor.lexxy-editor--hide-strikethrough.lexxy-editor--hide-table.lexxy-editor--hide-format")
       expect(component).to have_no_css("lexxy-editor.lexxy-editor--hide-bold")
       expect(component).to have_no_css("lexxy-editor.lexxy-editor--hide-link")
     end
@@ -57,6 +57,15 @@ RSpec.describe UI::Forms::TextEditor::Component, type: :component do
       expect(component).to have_no_css("lexxy-editor.lexxy-editor--hide-bold")
       expect(component).to have_no_css("lexxy-editor.lexxy-editor--hide-italic")
     end
+  end
+
+  # The hide classes only do anything if lexxy_overrides.css carries a matching rule, and a button
+  # added here without one would fail silently -- it just wouldn't hide.
+  it "has a stylesheet rule for every toolbar button" do
+    stylesheet = Rails.root.join("app/assets/tailwind/lexxy_overrides.css").read
+    ruled = stylesheet.scan(/\.lexxy-editor--hide-([a-z-]+)/).flatten.uniq
+
+    expect(ruled).to match_array(described_class::TOOLBAR_BUTTONS.map { it.to_s.tr("_", "-") })
   end
 
   context "with an unsupported size" do
