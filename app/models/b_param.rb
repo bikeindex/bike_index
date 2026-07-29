@@ -31,7 +31,6 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
-  PARTIAL_REGISTRATION_ORIGINS = %w[embed_partial register_flow].freeze
   # TODO: #3952 - stolen record legacy attrs, to support accepting the old names
   LEGACY_STOLEN_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
   REGISTRATION_INFO_ATTRS = %w[
@@ -85,13 +84,12 @@ class BParam < ApplicationRecord
   serialize :bike_errors, coder: YAML
 
   before_create :generate_id_token
-  before_create :generate_confirmation_token, if: :register_flow?
   before_save :clean_params
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
-  scope :partial_registrations, -> { where(origin: PARTIAL_REGISTRATION_ORIGINS) }
+  scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   # register/new shells whose step 1 was never submitted (manufacturer is required
@@ -426,17 +424,7 @@ class BParam < ApplicationRecord
   end
 
   def partial_registration?
-    PARTIAL_REGISTRATION_ORIGINS.include?(origin)
-  end
-
-  def register_flow?
-    origin == "register_flow"
-  end
-
-  # Only sent in the partial registration email - unlike id_token, the anonymous
-  # registrant never sees it, so presenting it proves control of the email
-  def confirmation_token
-    params["confirmation_token"]
+    origin == "embed_partial"
   end
 
   def email_confirmed?
@@ -642,10 +630,6 @@ class BParam < ApplicationRecord
 
   def generate_id_token
     self.id_token ||= SecurityTokenizer.new_token
-  end
-
-  def generate_confirmation_token
-    self.params = params.merge("confirmation_token" => SecurityTokenizer.new_token)
   end
 
   def parking_notification_params
