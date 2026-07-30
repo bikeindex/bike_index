@@ -98,12 +98,18 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
     expect(page).to have_no_css(suggestion_button)
   end
 
-  it "checks a value the field is rendered with, and accepts it from the keyboard" do
+  it "checks a value the field is rendered with, and spends enter on the suggestion before the form" do
     visit("#{base_path}mistyped")
 
     find_field("Email").send_keys(:tab)
 
     expect(page).to have_button(suggestion)
+
+    find_field("Email").send_keys(:enter)
+
+    # submitting would have taken us off the preview, which still has the field and the suggestion
+    expect(page).to have_button(suggestion)
+    expect(page).to have_field("Email", with: "you@gmial.con")
 
     find_button(suggestion).send_keys(:enter)
 
@@ -111,5 +117,10 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
     expect(page).to have_no_css(suggestion_button)
     # the suggestion is gone, so focus goes back where it came from
     expect(page).to have_css("input[type='email']:focus")
+
+    # and with nothing left to ask about, enter reaches the form
+    find_field("Email").send_keys(:enter)
+
+    expect(page).to have_no_field("Email")
   end
 end

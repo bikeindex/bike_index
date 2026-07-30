@@ -17,6 +17,16 @@ export default class extends Controller {
     collapse('show', this.suggestionTarget)
   }
 
+  // Enter never leaves the field, so the value is checked here too -- and a suggestion
+  // takes the keystroke, since submitting past one is what it's there to ask about.
+  // Enter on the suggestion itself is the button's, which is what accepts it.
+  checkOnEnter (event) {
+    if (event.target !== this.inputTarget) return
+
+    this.check()
+    if (this.suggested) event.preventDefault()
+  }
+
   accept () {
     this.inputTarget.value = this.suggested
     collapse('hide', this.suggestionTarget)

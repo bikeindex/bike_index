@@ -1,7 +1,7 @@
 <%# focusout rather than blur, which doesn't bubble up to the controller. %>
 <div
   data-controller="ui--forms--email"
-  data-action="focusout->ui--forms--email#check"
+  data-action="focusout->ui--forms--email#check keydown.enter->ui--forms--email#checkOnEnter"
   data-ui--forms--email-message-value="<%= translation(".did_you_mean") %>"
 >
   <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: @attribute,
