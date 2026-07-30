@@ -73,6 +73,13 @@ RSpec.describe Admin::PublicImagesController, type: :request do
         expect(response.body).to include(ActiveSupport::NumberHelper.number_to_human_size(sized.image_size))
       end
 
+      # Sizing a carrierwave image costs a fog request, so the hidden column mustn't resolve it
+      it "doesn't ask for sizes when the column is hidden" do
+        expect_any_instance_of(PublicImage).to_not receive(:image_size)
+        get base_url
+        expect(response.status).to eq(200)
+      end
+
       it "renders the chart" do
         get base_url, params: {render_chart: true}
         expect(response.status).to eq(200)
