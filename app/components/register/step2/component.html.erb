@@ -116,12 +116,8 @@
       own token, so an anonymous registrant can attach a photo before confirming.
     %>
 
-    <div class="tw:mb-4">
-      <span class="twlabel">
-        <%= translation(".attach_photo", cycle_type:) %>
-        <%= optional_badge %>
-      </span>
-
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :image,
+        label_text: translation(".attach_photo", cycle_type:)) do %>
       <%# The token rides the query string - DirectUpload posts to this url verbatim %>
       <%= render UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image,
             accept: ImageUploader.permitted_extensions,
@@ -136,7 +132,7 @@
         <%= helpers.inline_svg_tag("icons/info.svg", class: "tw:mt-px tw:h-3.5 tw:w-3.5 tw:shrink-0", aria_hidden: true) %>
         <%= translation(".database_public_note") %>
       </p>
-    </div>
+    <% end %>
 
     <div class="tw:mb-4" data-controller="ui--collapse register--serial">
       <div class="tw:flex tw:items-center tw:justify-between tw:gap-2">
