@@ -78,6 +78,56 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
     end
   end
 
+  # Graduated rides a different param than parking, and ShowCurrentAlerts branches on
+  # which one is present — so the redirect has to be walked for this one too
+  describe "graduated notification link" do
+    let(:organization) do
+      FactoryBot.create(:organization_with_organization_features, name: "Brakebills",
+        enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 1.year)
+    end
+    let!(:notification) do
+      FactoryBot.create(:graduated_notification_bike_graduated, :with_user, user: current_user, organization:)
+    end
+    let(:bike) { notification.bike }
+    let(:token) { notification.marked_remaining_link_token }
+
+    it "keeps the token through the redirect and offers to mark it remaining" do
+      get "/bikes/#{bike.id}?graduated_notification_remaining=#{token}"
+      expect(response).to redirect_to(registration_path(bike, graduated_notification_remaining: token))
+
+      follow_redirect!
+      expect(response.status).to eq(200)
+      body = whitespace_normalized_body_text
+      expect(body).to match("Renew your bike registration with Brakebills")
+      expect(body).to match("Mark bike remaining")
+      expect(response.body).to match("/bikes/#{bike.id}/resolve_token")
+      # resolve_token branches on token_type, so the graduated one has to make the round trip
+      expect(response.body).to match("value=\"graduated_notification\"")
+    end
+
+    it "ignores a token that doesn't match" do
+      get "/registrations/#{bike.id}?graduated_notification_remaining=nottherightone"
+      expect(response.status).to eq(200)
+      expect(whitespace_normalized_body_text).to_not match("Mark bike remaining")
+    end
+
+    context "already marked remaining" do
+      # Marking remaining keeps the token, so the link in the email still resolves here
+      let!(:notification) do
+        FactoryBot.create(:graduated_notification, :marked_remaining, :with_user, user: current_user, organization:)
+      end
+
+      it "confirms it's resolved instead of offering the form" do
+        get "/registrations/#{bike.id}?graduated_notification_remaining=#{token}"
+        expect(response.status).to eq(200)
+        body = whitespace_normalized_body_text
+        expect(body).to match("You have already marked this bike remaining")
+        expect(body).to match("no further action necessary")
+        expect(body).to_not match("Mark bike remaining")
+      end
+    end
+  end
+
   describe "claim link" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "new-owner@example.com") }
     let(:ownership) { bike.current_ownership }
@@ -109,6 +159,17 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
         body = whitespace_normalized_body_text
         expect(body).to match("We're honored to have your bike on the Index")
         expect(response.body).to match("/ownerships/#{ownership.id}")
+      end
+
+      # The only claim-link case that redirects — a signed-out recipient stays on the
+      # legacy page, since the redesign is gated on the signed-in user's flag
+      it "keeps the token through the redirect" do
+        get "/bikes/#{bike.id}?t=#{ownership.token}"
+        expect(response).to redirect_to(registration_path(bike, t: ownership.token))
+
+        follow_redirect!
+        expect(response.status).to eq(200)
+        expect(whitespace_normalized_body_text).to match("We're honored to have your bike on the Index")
       end
     end
   end
