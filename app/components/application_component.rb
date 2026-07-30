@@ -3,24 +3,32 @@
 class ApplicationComponent < ViewComponent::Base
   include ApplicationComponentHelper
 
-  # A digest of the component files rendered inside a fragment cache, for folding into
-  # that cache's key. Fragment caches don't digest their own templates, so without this
-  # editing markup serves stale HTML until someone remembers to bump a version constant.
-  #
-  # Memoized only where code doesn't reload, so it costs one glob per set per boot when
-  # deployed — keyed by globs because a shared component (UI::Table) digests a different
-  # set for each caller. Keying on perform_caching instead would go stale under dev:cache:
-  # the reloader ignores template-only edits, so nothing would clear the memo.
-  def self.markup_digest(globs)
-    return compute_markup_digest(globs) if Rails.env.local?
+  COMPONENT_MARKUP = "app/components/**/*"
 
-    @markup_digests ||= {}
-    @markup_digests[globs] ||= compute_markup_digest(globs)
+  # A digest of every component's markup, for folding into a fragment cache key.
+  # Fragment caches don't digest their own templates, so without this editing markup
+  # serves stale HTML until someone remembers to bump a version constant. Pass
+  # extra_markup for cached markup living outside app/components (an admin table
+  # partial). Digesting the whole tree is what keeps this honest: cells render
+  # components that render components, so a per-caller list of directories quietly
+  # stops covering the ones it doesn't reach.
+  #
+  # Memoized only where code doesn't reload — the dev reloader ignores template-only
+  # edits, so a memo there would go stale under dev:cache.
+  def self.markup_digest(extra_markup = nil)
+    return "nocache" unless ActionController::Base.perform_caching
+    return compute_markup_digest(extra_markup) if Rails.env.local?
+
+    (@markup_digests ||= {})[extra_markup] ||= compute_markup_digest(extra_markup)
   end
 
-  def self.compute_markup_digest(globs)
-    files = Array(globs).flat_map { |glob| glob_markup(glob) }.sort
-    Digest::MD5.hexdigest(files.map { |file| "#{file.relative_path_from(Rails.root)}\n#{file.read}" }.join("\n"))[0, 12]
+  def self.markup_files(extra_markup = nil)
+    [COMPONENT_MARKUP, *extra_markup].flat_map { |glob| glob_markup(glob) }.sort
+  end
+
+  def self.compute_markup_digest(extra_markup)
+    contents = markup_files(extra_markup).map { |file| "#{file.relative_path_from(Rails.root)}\n#{file.read}" }
+    Digest::MD5.hexdigest(contents.join("\n"))[0, 12]
   end
   private_class_method :compute_markup_digest
 

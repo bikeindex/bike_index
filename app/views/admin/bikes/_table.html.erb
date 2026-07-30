@@ -9,11 +9,6 @@
 
 <% skip_manufacturer_link = params[:search_manufacturer].present? %>
 
-<%# Rows are cached, so the key digests everything rendered into one — this partial included %>
-<% cached_markup = ["app/views/admin/bikes/_table.html.erb", "app/components/admin/user_cell/**/*",
-  "app/components/admin/badges/**/*", "app/components/org/origin_display/**/*",
-  "app/components/ui/time/**/*", "app/components/ui/alert/**/*"] %>
-
 <% if skip_manufacturer_link %>
   <style>.display-mnfg-link {display: none !important;}</style>
 <% end %>
@@ -43,7 +38,8 @@
     data-controller="update-cached-sortable-links"
     data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
   >
-    <%= render(UI::Table::Component.new(records: bikes, cache_key: "admin-bikes", cached_markup:, render_sortable:, classes: show_serial ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
+    <%# Rows are cached, so the key digests the cells' markup — this partial included %>
+    <%= render(UI::Table::Component.new(records: bikes, cache_key: "admin-bikes", cached_markup: "app/views/admin/bikes/_table.html.erb", render_sortable:, classes: show_serial ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
       <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bike| %>
         <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
       <% end %>

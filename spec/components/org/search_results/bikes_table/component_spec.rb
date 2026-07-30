@@ -3,9 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Org::SearchResults::BikesTable::Component, type: :component do
-  # UI::Table caches each row, so every component rendered into one counts too
-  it_behaves_like "cached_markup_digest", "app/components/org/origin_display/component.rb"
-
   let(:instance) { described_class.new(**options) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do

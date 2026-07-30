@@ -4,9 +4,6 @@ require "rails_helper"
 require "ostruct"
 
 RSpec.describe UI::Table::Component, type: :component do
-  it_behaves_like "cached_markup_digest", "app/components/ui/table_column/component.rb",
-    "app/components/ui/table/component_preview.rb"
-
   let(:records) do
     [
       OpenStruct.new(name: "Alice", email: "alice@example.com"),

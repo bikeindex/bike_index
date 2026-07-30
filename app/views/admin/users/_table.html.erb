@@ -16,11 +16,8 @@
   tbody td.only-dev-visible {border-top: 0px;}
 </style>
 
-<%# Rows are cached, so the key digests everything rendered into one — this partial included %>
-<% cached_markup = ["app/views/admin/users/_table.html.erb", "app/components/admin/user_cell/**/*",
-  "app/components/admin/badges/**/*", "app/components/ui/time/**/*", "app/components/ui/alert/**/*"] %>
-
-<%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users", cached_markup:, render_sortable:)) do |table| %>
+<%# Rows are cached, so the key digests the cells' markup — this partial included %>
+<%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users", cached_markup: "app/views/admin/users/_table.html.erb", render_sortable:)) do |table| %>
   <% table.column(sortable: "created_at") do |user| %>
     <%= render UI::Time::Component.new(time: user.created_at) %>
   <% end %>

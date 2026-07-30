@@ -8,11 +8,6 @@ module Org
       # the search form, column-toggle settings, or pagination (e.g. a user's other
       # registrations on the show page). Pass render_sortable to enable sort links.
       class Component < ApplicationComponent
-        # UI::Table caches each row without digesting the cells rendered into it, so the
-        # digest has to span every component rendered into a row (UI::Table adds its own)
-        CACHED_MARKUP = ["app/components/org/search_results/bikes_table/**/*",
-          "app/components/org/origin_display/**/*", "app/components/ui/address_display/**/*"].freeze
-
         delegate :additional_registration_fields, :column_renames, to: :settings_component
 
         def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
