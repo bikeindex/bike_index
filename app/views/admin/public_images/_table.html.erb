@@ -7,6 +7,12 @@
       <th class="small"><%= sortable "updated_at", render_sortable: %></th>
       <th>Image</th>
       <th>Size</th>
+
+      <th>
+        AS
+        <%= render UI::Tooltip::Component.new(text: "ActiveStorage (instead of legacy carrierwave)") %>
+      </th>
+
       <th>Private</th>
       <th><%= sortable "kind", render_sortable: %></th>
       <th><%= sortable "imageable_type", render_sortable: %></th>
@@ -52,6 +58,8 @@
                 <%= number_to_human_size(image_size) if image_size %>
               </small>
             </td>
+
+            <td><%= check_mark if public_image.activestorage? %></td>
 
             <td><%= check_mark if public_image.is_private? %></td>
 
