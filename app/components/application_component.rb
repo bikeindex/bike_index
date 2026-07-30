@@ -10,17 +10,16 @@ class ApplicationComponent < ViewComponent::Base
   # Memoized only where code doesn't reload, so it costs one glob per boot when deployed.
   # Keying on perform_caching instead would go stale under dev:cache: the reloader
   # ignores template-only edits, so nothing would clear the memo.
-  def self.markup_digest(*globs)
+  def self.markup_digest(globs)
     return compute_markup_digest(globs) if Rails.env.local?
 
-    @markup_digest ||= {}
-    @markup_digest[globs] ||= compute_markup_digest(globs)
+    @markup_digest ||= compute_markup_digest(globs)
   end
 
-  # Previews render outside the cache block, so their markup can't go stale
   def self.compute_markup_digest(globs)
-    files = globs.flat_map { |glob| Rails.root.glob(glob) }
-      .select(&:file?).reject { |file| file.to_s.match?(%r{/(component_preview\.rb|preview/)}) }.sort
+    files = Array(globs).flat_map { |glob| Rails.root.glob(glob) }.select(&:file?)
+      # Previews render outside the cache block, so their markup can't go stale
+      .reject { |file| file.to_s.match?(%r{/(component_preview\.rb|preview/)}) }.sort
     Digest::MD5.hexdigest(files.map { |file| "#{file.relative_path_from(Rails.root)}\n#{file.read}" }.join("\n"))[0, 12]
   end
   private_class_method :compute_markup_digest

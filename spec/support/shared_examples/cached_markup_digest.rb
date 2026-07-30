@@ -11,7 +11,7 @@ RSpec.shared_examples "cached_markup_digest" do |sample_template, sample_preview
 
   # A method, not a let — the point is to recompute it either side of the edit
   def markup_digest
-    described_class.markup_digest(*cached_markup)
+    described_class.markup_digest(described_class::CACHED_MARKUP)
   end
 
   it "covers the cached markup" do

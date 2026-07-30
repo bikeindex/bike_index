@@ -47,7 +47,7 @@ module Registrations
           def organization_snippet
             return @organization_snippet if defined?(@organization_snippet)
 
-            @organization_snippet = organization&.mail_snippets&.enabled&.where(kind: @token_type)&.first&.body
+            @organization_snippet = organization&.mail_snippets&.enabled&.find_by(kind: @token_type)&.body
           end
 
           def organization_email

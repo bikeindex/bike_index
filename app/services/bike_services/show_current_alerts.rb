@@ -15,8 +15,7 @@ module BikeServices
     # so the prompt shows once); the token params arrive on the query string and
     # survive the bikes#show redirect to the redesign.
     def find(bike:, params:, recovery_link_token: nil)
-      token = params[:parking_notification_retrieved].presence || params[:graduated_notification_remaining].presence
-      notification, token_type = notification_for(bike:, params:, token:)
+      token, token_type, notification = notification_for(bike:, params:)
 
       Resolved.new(claim_message: claim_message_for(bike:, claim_token: params[:t]),
         token:, token_type:, matching_notification: notification,
@@ -34,15 +33,17 @@ module BikeServices
       ownership.claim_message
     end
 
-    def notification_for(bike:, params:, token:)
-      return [nil, nil] if token.blank?
-
-      if params[:parking_notification_retrieved].present?
-        notification = bike.parking_notifications.where(retrieval_link_token: token).first
-        [notification, notification&.kind || "parked_incorrectly_notification"]
+    # [token, token_type, notification] — each branch owns the param it reads, so the
+    # token and the type it implies can't drift apart
+    def notification_for(bike:, params:)
+      if (token = params[:parking_notification_retrieved].presence)
+        notification = bike.parking_notifications.find_by(retrieval_link_token: token)
+        [token, notification&.kind || "parked_incorrectly_notification", notification]
+      elsif (token = params[:graduated_notification_remaining].presence)
+        [token, "graduated_notification",
+          GraduatedNotification.find_by(bike_id: bike.id, marked_remaining_link_token: token)]
       else
-        [GraduatedNotification.where(bike_id: bike.id, marked_remaining_link_token: token).first,
-          "graduated_notification"]
+        [nil, nil, nil]
       end
     end
 
