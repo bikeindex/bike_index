@@ -17,6 +17,8 @@ RSpec.describe UI::Forms::Email::Component, type: :component do
     expect(component).to have_css("[aria-live='polite'] button[class~='tw:hidden!'][data-ui--forms--email-target='suggestion']")
     expect(component).to have_css("[aria-live='polite'] p[class~='tw:hidden'][data-ui--forms--email-target='warning']",
       text: "That doesn't look like your real email address. Please enter an email address where you receive email")
+    expect(component).to have_css("[aria-live='polite'] div button[class~='tw:hidden!'][data-ui--forms--email-target='override']",
+      text: "Submit form anyway")
   end
 
   # EmailDomain::RESERVED_REGEX is what the server checks, so this pins the syntax the

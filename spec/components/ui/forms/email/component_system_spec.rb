@@ -5,8 +5,10 @@ require "rails_helper"
 RSpec.describe UI::Forms::Email::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/email/component/" }
   let(:suggestion) { "Did you mean you@gmail.com?" }
-  let(:suggestion_button) { "[aria-live='polite'] button" }
+  # the suggestion's text varies, so it's found by target rather than by name
+  let(:suggestion_button) { "[data-ui--forms--email-target='suggestion']" }
   let(:warning) { "That doesn't look like your real email address." }
+  let(:override) { "Submit form anyway" }
 
   # Leaving the field is what checks it
   def fill_in_email_and_leave(email)
@@ -17,21 +19,28 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
   it "checks the field on leaving it -- suggesting a correction, warning where there's none to offer, swapping it in when clicked" do
     visit("#{base_path}default")
 
-    # the button ships hidden -- an empty one in the tab order is both a stop to
-    # nowhere and a control with no name
+    # the buttons ship hidden -- an empty one in the tab order is both a stop to
+    # nowhere and a control with no name, and there's nothing yet to submit past
     expect(page).to have_no_css(suggestion_button)
+    expect(page).to have_no_button(override)
+    expect(page).to have_button("Register", disabled: false)
     expect_axe_clean
 
     fill_in_email_and_leave("you@gmial.con")
 
     # announced as it appears, so the region carries it rather than the button alone
     expect(page).to have_css("[aria-live='polite']", text: suggestion)
+    # the form's own submit is held while it stands, with the way past it alongside
+    expect(page).to have_button("Register", disabled: true)
+    expect(page).to have_button(override)
     expect_axe_clean
 
     click_on suggestion
 
     expect(page).to have_field("Email", with: "you@gmail.com")
     expect(page).to have_no_css(suggestion_button)
+    # answered, so the form is the user's again
+    expect(page).to have_button("Register", disabled: false)
 
     # a domain nobody knows keeps its name, but its ending is still checked
     fill_in_email_and_leave("you@bikeshop.con")
@@ -119,6 +128,7 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
     fill_in_email_and_leave("you@example.co")
 
     expect(page).to have_no_text(warning)
+    expect(page).to have_button("Register", disabled: false)
 
     # and enter is spent on the warning too, there being no correction to offer instead
     fill_in "Email", with: "you@example.com"
@@ -127,6 +137,11 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
     expect(page).to have_text(warning)
     # submitting would have taken us off the preview
     expect(page).to have_field("Email", with: "you@example.com")
+
+    # which is what the way past is for -- the address stands as typed
+    click_on override
+
+    expect(page).to have_no_field("Email")
   end
 
   it "checks a value the field is rendered with, and spends enter on the suggestion before the form" do
@@ -146,6 +161,9 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
 
     expect(page).to have_field("Email", with: "you@gmail.com")
     expect(page).to have_no_css(suggestion_button)
+    expect(page).to have_button("Register", disabled: false)
+    # releasing puts back only what the hold took, so a submit held elsewhere stays held
+    expect(page).to have_button("Held elsewhere", disabled: true)
     # the suggestion is gone, so focus goes back where it came from
     expect(page).to have_css("input[type='email']:focus")
 
