@@ -111,11 +111,6 @@
       </div>
     </div>
 
-    <%#
-      Not gated on a confirmed address any more - the upload is scoped by the registration's
-      own token, so an anonymous registrant can attach a photo before confirming.
-    %>
-
     <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :image,
         label_text: translation(".attach_photo", cycle_type:)) do %>
       <%# The token rides the query string - DirectUpload posts to this url verbatim %>
