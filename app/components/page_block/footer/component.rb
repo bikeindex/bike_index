@@ -4,6 +4,8 @@ module PageBlock
   module Footer
     class Component < ApplicationComponent
       FACEBOOK_PIXEL_ID = "199066297131941"
+      # Nothing digests the cached template, so bump this whenever its markup changes
+      CACHE_VERSION = "footer_3"
 
       def initialize(current_user:, skip_facebook:, page_id:, passive_organization: nil)
         @current_user = current_user
@@ -15,7 +17,7 @@ module PageBlock
       private
 
       def cache_key
-        [ApplicationComponent.markup_digest, @page_id, @current_user, @passive_organization, @skip_facebook]
+        [CACHE_VERSION, @page_id, @current_user, @passive_organization, @skip_facebook]
       end
     end
   end
