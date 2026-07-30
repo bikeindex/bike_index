@@ -4,7 +4,6 @@ en:
     ui:
       forms:
         file_upload:
-          choose_file: Choose file
-          choose_or_drop_file: Click or drop to choose file
           no_file_chosen: No file chosen
           take_picture: Take picture
+          upload: Upload

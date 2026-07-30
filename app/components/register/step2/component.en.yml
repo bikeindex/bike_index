@@ -70,10 +70,8 @@ en:
         stolen: Stolen
         stolen_description: This %{cycle_type} has been stolen
         student_id: Student ID
-        take_photo: Take Photo
         third_color_blank: Third color
         up_to_3: up to 3
-        upload: Upload
         very_very_few_bikes_html: >-
           Very <em>very</em> few %{cycle_types} are made without serials. Unless this
           %{cycle_type}:

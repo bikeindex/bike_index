@@ -360,6 +360,8 @@ RSpec.describe RegisterController, type: :request do
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(response.body).to_not include "confirmation link to your email"
       expect(response.body).to include "bike[image]"
+      # the shared upload component, rather than this page's own pair of buttons
+      expect(response.body).to include "ui--forms--file-upload"
     end
 
     it "hides the phone field, showing it for the statuses bikes/new does" do

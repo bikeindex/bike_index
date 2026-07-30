@@ -11,20 +11,23 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
   let(:attribute) { :avatar }
   let(:options) { {} }
 
-  it "renders the input, both labels and the drop frame -- but no camera or thumbnail" do
+  it "renders the input, the upload label and the drop frame -- but no camera, and an empty preview" do
     expect(component).to have_css("input#user_avatar[type='file'][name='user[avatar]']")
     expect(component).to have_css("[data-controller='ui--forms--file-upload']")
     expect(component).to have_css("[data-ui--forms--file-upload-target='input']")
     expect(component).to have_css("[data-ui--forms--file-upload-target='filename']", text: "No file chosen")
-    expect(component).to have_css("label[data-action='click->ui--forms--file-upload#chooseFile']")
-    # both wordings ship, and the pointer media query picks one (see the system spec)
-    expect(component).to have_css("label span", text: "Click or drop to choose file")
-    expect(component).to have_css("label span", text: "Choose file")
-    # the frame is always rendered -- only its border reacts to a drag
-    expect(component).to have_css("[data-ui--forms--file-upload-target='dropZone'].tw\\:border-transparent")
-    # nothing accepted, so nothing to photograph; nothing attached, so nothing to preview
+    expect(component).to have_css("label[data-action='click->ui--forms--file-upload#chooseFile']", text: "Upload")
+    # decorative -- the label text is what names it
+    expect(component).to have_css("label svg[aria-hidden='true']")
+    # the frame is always rendered -- only its outline reacts to a drag
+    expect(component).to have_css("[data-ui--forms--file-upload-target='dropZone'].tw\\:outline-transparent")
+    # nothing accepted, so nothing to photograph
     expect(component).to have_no_css("button[data-action='ui--forms--file-upload#takePicture']")
-    expect(component).to have_no_css("img")
+    # nothing attached, so the preview ships hidden and srcless, waiting for a pick
+    # hidden! because collapse() hides with the important variant, and tw:block is on the same element
+    expect(component).to have_css("a[data-ui--forms--file-upload-target='preview'].tw\\:hidden\\! img")
+    expect(component).to have_no_css("[data-ui--forms--file-upload-target='preview'][href]")
+    expect(component).to have_no_css("img[src]")
   end
 
   context "with html_options" do
