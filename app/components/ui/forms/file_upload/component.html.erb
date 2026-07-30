@@ -28,9 +28,16 @@
     data-ui--forms--file-upload-target="dropZone"
     data-action="dragenter->ui--forms--file-upload#highlightDropZone dragleave->ui--forms--file-upload#unhighlightDropZone"
   >
-    <% if @attachment_url %>
-      <%# block so the controls start a new line, w-fit so the link doesn't stretch past the image %>
-      <%= link_to image_tag(@thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded"), @attachment_url, class: "tw:mb-2 tw:block tw:w-fit" %>
+    <%#
+      A pick previews here from a local object url, before the upload finishes - so the img
+      ships on every render, srcless and hidden, rather than only when something is attached.
+      block so the controls start a new line, w-fit so the link doesn't stretch past the image.
+    %>
+
+    <%= tag.a(href: @attachment_url,
+          class: ["tw:mb-2 tw:block tw:w-fit", ("tw:hidden" if @attachment_url.blank?)],
+          data: {"ui--forms--file-upload-target": "preview"}) do %>
+      <%= tag.img(src: @thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded") %>
     <% end %>
 
     <%# flex-wrap: the long label and the camera button coincide on a `pointer: none` device %>

@@ -1,11 +1,12 @@
 import { Controller } from '@hotwired/stimulus'
 import { DirectUpload } from '@rails/activestorage'
+import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='ui--forms--file-upload'
 // Shows the selected filename (or a count for multiple files) in the field, and
 // frames the controls as a drop target while a file is dragged over the page.
 export default class extends Controller {
-  static targets = ['input', 'filename', 'dropZone', 'signedId']
+  static targets = ['input', 'filename', 'dropZone', 'signedId', 'preview']
   static values = { placeholder: String, url: String, uploading: String, failed: String }
 
   connect () {
@@ -15,6 +16,7 @@ export default class extends Controller {
 
   disconnect () {
     this.form?.removeEventListener('submit', this.boundHold)
+    this.releaseObjectUrl()
   }
 
   get form () {
@@ -83,7 +85,35 @@ export default class extends Controller {
       files.length === 0
         ? this.placeholderValue
         : files.length === 1 ? files[0].name : `${files.length} files`
+    this.showPreview(files[0])
     if (this.urlValue && files[0]) this.upload(files[0])
+  }
+
+  // Reads the file the browser already holds, so the preview lands immediately rather than
+  // waiting on the upload - and on the stored original rather than a variant of it.
+  showPreview (file) {
+    this.releaseObjectUrl()
+    // An empty pick leaves whatever is attached on screen, since that's still what will submit
+    if (!file) return
+    if (!file.type.startsWith('image/')) return collapse('hide', this.previewTarget)
+
+    this.objectUrl = URL.createObjectURL(file)
+    const image = this.previewTarget.querySelector('img')
+    // Assigned rather than added, so a re-pick replaces these instead of stacking them.
+    // collapse animates to the natural height, which isn't known until the image decodes -
+    // and a file that won't decode shouldn't leave the previous preview on screen.
+    image.onload = () => collapse('show', this.previewTarget)
+    image.onerror = () => collapse('hide', this.previewTarget)
+    image.src = this.objectUrl
+    this.previewTarget.href = this.objectUrl
+  }
+
+  // Each object url pins the file in memory until it's revoked
+  releaseObjectUrl () {
+    if (!this.objectUrl) return
+
+    URL.revokeObjectURL(this.objectUrl)
+    this.objectUrl = null
   }
 
   // Only reached with a direct_upload_url, where the field is nameless and the form carries

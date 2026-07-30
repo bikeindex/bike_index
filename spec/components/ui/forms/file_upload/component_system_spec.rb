@@ -5,6 +5,7 @@ require "rails_helper"
 RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/file_upload/component/" }
   let(:drop_frame) { "[data-ui--forms--file-upload-target='dropZone']" }
+  let(:preview) { "[data-ui--forms--file-upload-target='preview']" }
   # Dragging a file has no Capybara equivalent -- the drag source is the OS, not the
   # page -- so the events carry a hand-built DataTransfer, per Playwright's docs.
   let(:start_drag) do
@@ -22,10 +23,14 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
     # a fine pointer can click and drop, and the frame is idle until something is dragged
     expect(page).to have_css("label", text: "Click or drop to choose file")
     expect(page).to have_no_css("#{drop_frame}[data-dragging]")
+    # nothing attached, so nothing to preview yet
+    expect(page).to have_no_css(preview)
 
     attach_file("file", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
 
     expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "bike.jpg")
+    # the pick previews straight from the browser's copy, rather than waiting on an upload
+    expect(page).to have_css("#{preview}[href^='blob:'] img[src^='blob:']")
 
     # dragging text rather than a file leaves the frame alone
     page.execute_script(<<~JS)
@@ -68,6 +73,9 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
 
     expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "dropped.jpg")
     expect(page).to have_no_css("#{drop_frame}[data-dragging]")
+    # those bytes aren't a jpeg whatever the name says - the previous preview goes rather
+    # than staying up as a broken image
+    expect(page).to have_no_css(preview)
     # rendered, but the media query keeps it from a mouse
     expect(page).to have_button("Take picture", visible: :hidden)
     expect(page).to have_no_button("Take picture")
