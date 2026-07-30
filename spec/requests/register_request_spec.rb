@@ -350,18 +350,20 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include owner_email
       # No organization asking for anything, so it's just the registrant's own info
       expect(response.body).to include "Contact info"
-      # An address nothing has proven yet, so the confirmation is still pending -
-      # and an upload needs an account behind it
+      # An address nothing has proven yet, so the confirmation is still pending - the photo
+      # is offered regardless, uploading against the registration's token
       expect(response.body).to include "confirmation link to your email"
-      expect(response.body).to_not include "bike[image]"
+      expect(response.body).to include "bike_image"
 
-      # Once the link has been clicked, the alert is stale and the upload opens up
+      # Confirming only clears the alert
       b_param.confirm_email!
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(response.body).to_not include "confirmation link to your email"
-      expect(response.body).to include "bike[image]"
-      # the shared upload component, rather than this page's own pair of buttons
+      # the shared upload component, rather than this page's own pair of buttons. The field
+      # posts its own bytes as rendered; JS swaps that for the signed id it uploads to
       expect(response.body).to include "ui--forms--file-upload"
+      expect(response.body).to include "bike[image]"
+      expect(response.body).to include "bike[image_signed_id]"
     end
 
     it "hides the phone field, showing it for the statuses bikes/new does" do
@@ -445,7 +447,7 @@ RSpec.describe RegisterController, type: :request do
         get register_path(b_param_token: b_param.id_token, step: 2)
         expect(response.status).to eq 200
         expect(response.body).to_not include "confirmation link to your email"
-        expect(response.body).to include "bike[image]"
+        expect(response.body).to include "bike_image"
       end
     end
 
@@ -500,13 +502,38 @@ RSpec.describe RegisterController, type: :request do
       end
 
       context "with a photo" do
-        it "attaches the image to the b_param" do
+        let(:blob) do
+          ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),
+            filename: "bike.jpg", content_type: "image/jpeg")
+        end
+
+        it "stores the direct upload's signed id, and keeps it when a later submit posts none" do
           patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: bike_details.merge(image: Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg"))}
+                                   bike: bike_details.merge(image_signed_id: blob.signed_id)}
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
-          expect(b_param.reload.image).to be_present
-          # The uploaded file doesn't leak into the JSON params
-          expect(b_param.params.to_json).to_not include "bike.jpg"
+          expect(b_param.reload.image_signed_id).to eq blob.signed_id
+          # It isn't a bike attribute, so it stays out of the bike params
+          expect(b_param.bike.keys).to_not include "image_signed_id"
+
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(image_signed_id: "")}
+          expect(b_param.reload.image_signed_id).to eq blob.signed_id
+        end
+
+        # Without JS nothing strips the field's name, so it posts the bytes and there's no
+        # signed id to go with them
+        context "posting the bytes rather than a signed id" do
+          let(:image) { Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg") }
+
+          it "stores the upload on the b_param" do
+            patch base_url, params: {b_param_token: b_param.id_token,
+                                     bike: bike_details.merge(image_signed_id: "", image:)}
+            expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+            expect(b_param.reload.image).to be_present
+            expect(b_param.image_signed_id).to be_blank
+            # The upload isn't a bike attribute, so it stays out of the params json
+            expect(b_param.params.to_json).to_not include "bike.jpg"
+          end
         end
       end
 

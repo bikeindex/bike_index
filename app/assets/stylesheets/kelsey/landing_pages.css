@@ -102,6 +102,15 @@
   color: var(--redesign-blue-800);
 }
 
+/* After :hover, which still matches a disabled input in some browsers */
+.kelsey_styles .le-btn-primary:disabled {
+  background: #ffd660;
+  border-color: #ffd660;
+  transform: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .kelsey_styles .le-btn-secondary {
   background-color: transparent;
   color: white;

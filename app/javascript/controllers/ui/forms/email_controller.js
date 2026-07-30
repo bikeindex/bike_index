@@ -3,28 +3,80 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='ui--forms--email'
 // Offers a correction whenever the field is left holding a near-miss of a well known
-// email domain, and swaps it in if the suggestion is clicked.
+// email domain, and swaps it in if the suggestion is clicked. A domain no message can
+// arrive at gets the warning instead, which there's nothing to correct it to. Either
+// one holds the form until it's answered, or the way past it is taken.
 export default class extends Controller {
-  static targets = ['input', 'suggestion']
-  static values = { message: String }
+  static targets = ['input', 'suggestion', 'correction', 'warning', 'override']
+  static values = { reserved: String }
 
+  // Whether the field has something to say, which is what holds the form back.
   check () {
-    this.suggested = suggest(this.inputTarget.value)
-    if (!this.suggested) return collapse('hide', this.suggestionTarget)
+    const email = this.inputTarget.value
+    // The domain's, the way the server's is -- SpamEstimator::Bike#reserved_email_domain?
+    const reserved = new RegExp(this.reservedValue, 'i').test(email.split('@').at(-1).trim())
+    this.suggested = reserved ? null : suggest(email)
 
-    // Before showing: collapse animates to the height the text gives it.
-    this.suggestionTarget.textContent = this.messageValue.replace('%{email}', this.suggested)
-    collapse('show', this.suggestionTarget)
+    // Set before showing: collapse animates to the height the text gives it.
+    if (this.suggested) this.correctionTarget.textContent = this.suggested
+    collapse(this.suggested ? 'show' : 'hide', this.suggestionTarget)
+    collapse(reserved ? 'show' : 'hide', this.warningTarget)
+
+    const held = reserved || Boolean(this.suggested)
+    this.hold(held)
+
+    return held
+  }
+
+  // Typing answers whatever was asked, so the field goes quiet and hands the form back
+  // until the value settles and focusout checks it again.
+  clear () {
+    collapse('hide', [this.suggestionTarget, this.warningTarget])
+    this.hold(false)
+  }
+
+  // Enter never leaves the field, so the value is checked here too -- and a message
+  // takes the keystroke, since submitting past one is what it's there to ask about.
+  // Enter on a button of ours is that button's, which is what answers it.
+  checkOnEnter (event) {
+    if (event.target !== this.inputTarget) return
+
+    if (this.check()) event.preventDefault()
   }
 
   accept () {
     this.inputTarget.value = this.suggested
-    collapse('hide', this.suggestionTarget)
     // Assigning a value fires neither event, and anything watching the field expects both.
+    // The input is one of those watchers, so this runs clear() -- check() has to follow it.
     this.inputTarget.dispatchEvent(new Event('input', { bubbles: true }))
     this.inputTarget.dispatchEvent(new Event('change', { bubbles: true }))
+    // The correction can be a domain the warning is about, so it's checked like any other.
+    this.check()
     // The suggestion is on its way out, so focus can't stay on it.
     this.inputTarget.focus()
+  }
+
+  submitAnyway () {
+    this.clear()
+    this.form?.requestSubmit()
+  }
+
+  // The submit belongs to the form rather than to us, so releasing it puts back only
+  // what we took -- ui--button--submit-spinner disables the same button to see off a
+  // second submit, and a clean focusout has no business undoing that.
+  hold (held) {
+    collapse(held ? 'show' : 'hide', this.overrideTarget)
+    this.holding?.forEach((submit) => { submit.disabled = false })
+    this.holding = held ? [...this.submits].filter((submit) => !submit.disabled) : []
+    this.holding.forEach((submit) => { submit.disabled = true })
+  }
+
+  get form () {
+    return this.element.closest('form')
+  }
+
+  get submits () {
+    return this.form?.querySelectorAll('[type="submit"]') ?? []
   }
 }
 

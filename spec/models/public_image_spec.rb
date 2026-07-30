@@ -20,6 +20,48 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  describe "imageable_name" do
+    it "is nil without an imageable" do
+      expect(PublicImage.new.imageable_name).to be_nil
+    end
+
+    it "is the bike display_name" do
+      bike = FactoryBot.create(:bike)
+      expect(PublicImage.new(imageable: bike).imageable_name).to eq bike.display_name
+    end
+
+    it "is the blog title" do
+      blog = FactoryBot.create(:blog, title: "Some blog post")
+      expect(PublicImage.new(imageable: blog).imageable_name).to eq "Some blog post"
+    end
+
+    it "is the organization name" do
+      organization = FactoryBot.create(:organization, name: "Cool Bike Shop")
+      expect(PublicImage.new(imageable: organization).imageable_name).to eq "Cool Bike Shop"
+    end
+
+    it "is nil for imageables that don't name themselves" do
+      expect(PublicImage.new(imageable: FactoryBot.create(:social_post)).imageable_name).to be_nil
+    end
+  end
+
+  describe "image_size" do
+    it "is nil without an image" do
+      expect(PublicImage.new.image_size).to be_nil
+    end
+
+    it "is the carrierwave file size" do
+      public_image = FactoryBot.create(:public_image, :with_image_file)
+      expect(public_image.image_size).to eq public_image.image.size
+      expect(public_image.image_size).to be > 0
+    end
+
+    it "is the blob byte_size when attached" do
+      public_image = FactoryBot.create(:public_image, :with_attached_file)
+      expect(public_image.reload.image_size).to eq public_image.file.blob.byte_size
+    end
+  end
+
   describe "process_image_upload" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }

@@ -64,12 +64,13 @@ module BikeServices
         confirmed_email_creator_id(b_param).present?
     end
 
-    # Step 2 merges over step 1 - creator claimed for signed-in users, the
-    # photo onto b_param.image, the fields into the params json
-    def save_step_2(b_param, user:, image:, bike_params:)
+    # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
+    # fields into the params json. The photo arrives one of two ways: as bytes from a plain
+    # file field, or as the signed id of a blob the browser already uploaded.
+    def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
-      b_param.clean_params(step_2_params(bike_params.to_h).as_json)
+      b_param.clean_params(step_2_params(bike_params.to_h, image_signed_id:).as_json)
       b_param.save
     end
 
@@ -121,11 +122,13 @@ module BikeServices
 
     # Blank values keep what step 1 saved - except the additional colors, where
     # blank is the "remove color" button clearing one
-    def step_2_params(bike_params)
+    def step_2_params(bike_params, image_signed_id:)
       bike_params = bike_params.reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
       # The unit only means something alongside a numeric size
       bike_params = bike_params.except("frame_size_unit") if bike_params["frame_size_number"].blank?
-      {details_completed: true, bike: bike_params}
+      # The photo went browser -> bucket before submit, so only its signed id rides along.
+      # Dropped when blank rather than merged, which would clobber an id already stored.
+      {details_completed: true, bike: bike_params, image_signed_id: image_signed_id.presence}.compact
     end
 
     conceal :reusable?, :confirmed_email_creator_id, :owner_email_for,
