@@ -5,7 +5,7 @@ module Admin
     include Binxtils::SortableTable
 
     def index
-      @per_page = permitted_per_page(default: 50)
+      @per_page = permitted_per_page(default: 25)
       @pagy, @collection = pagy(:countish,
         matching_public_images.includes(:imageable)
           .reorder("public_images.#{sort_column} #{sort_direction}"),
@@ -22,7 +22,7 @@ module Admin
     end
 
     def earliest_period_date
-      Time.at(1357027200) # 2013-01-01, before any public images
+      Time.at(1373500800) # 2013-07-11 - first public image
     end
 
     # unscoped so admins see private images too
@@ -33,6 +33,9 @@ module Admin
 
       @kind = params[:search_kind] if PublicImage.kinds.include?(params[:search_kind])
       public_images = public_images.where(kind: @kind) if @kind.present?
+
+      @private = Binxtils::InputNormalizer.boolean(params[:search_private])
+      public_images = public_images.where(is_private: true) if @private
 
       @time_range_column = (sort_column == "updated_at") ? sort_column : "created_at"
       public_images.where(@time_range_column => @time_range)

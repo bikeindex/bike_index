@@ -50,6 +50,11 @@ class PublicImage < ApplicationRecord
 
   def self.kinds = KIND_ENUM.keys.map(&:to_s)
 
+  # Fog reads this with a request per image - only call from a cached fragment
+  def image_size
+    (image.size if image?)&.nonzero?
+  end
+
   # Imageables label themselves differently, and some (ImpoundClaim, MailSnippet, SocialPost) not at all
   def imageable_name
     imageable.try(:display_name) || imageable.try(:name) || imageable.try(:title)

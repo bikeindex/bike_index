@@ -54,6 +54,14 @@ RSpec.describe Admin::PublicImagesController, type: :request do
           expect(assigns(:collection).pluck(:id)).to eq([bike_image.id])
         end
       end
+
+      context "with search_private" do
+        it "filters to only private images" do
+          get base_url, params: {search_private: true}
+          expect(response.status).to eq(200)
+          expect(assigns(:collection).pluck(:id)).to eq([private_image.id])
+        end
+      end
     end
   end
 
