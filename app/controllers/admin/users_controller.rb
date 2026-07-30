@@ -2,6 +2,11 @@ module Admin
   class UsersController < Admin::BaseController
     include Binxtils::SortableTable
 
+    # The table partial's rows are fragment-cached and nothing digests their markup, so
+    # the key carries this. The cached_markup_digest spec keeps it current.
+    CACHED_MARKUP = "app/views/admin/users/_table.html.erb"
+    MARKUP_DIGEST = "6cda964a324e"
+
     before_action :find_user, only: %i[show edit update destroy]
     helper_method :invalid_user_options
 
