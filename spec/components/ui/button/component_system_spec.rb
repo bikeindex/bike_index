@@ -18,7 +18,8 @@ RSpec.describe UI::Button::Component, :js, type: :system do
     expect(page).to have_button("Next")
     expect(page).to have_no_css(spinner)
 
-    fill_in "Email", with: "user@example.com"
+    # Not an RFC 2606 domain: the field holds the form on one, and this submit has to land
+    fill_in "Email", with: "user@bikeindex.org"
     click_button "Next"
 
     expect(page).to have_css(spinner)
