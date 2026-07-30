@@ -7211,6 +7211,13 @@ CREATE INDEX index_primary_activities_on_primary_activity_family_id ON public.pr
 
 
 --
+-- Name: index_public_images_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_public_images_on_created_at ON public.public_images USING btree (created_at);
+
+
+--
 -- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7612,6 +7619,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260729180400'),
 ('20260729085100'),
 ('20260728220000'),
 ('20260725192133'),

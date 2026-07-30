@@ -17,6 +17,7 @@
 #
 # Indexes
 #
+#  index_public_images_on_created_at                       (created_at)
 #  index_public_images_on_imageable_id_and_imageable_type  (imageable_id,imageable_type)
 #
 class PublicImage < ApplicationRecord
