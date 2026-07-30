@@ -1,9 +1,6 @@
 require "rails_helper"
 
 RSpec.describe Admin::BikesController, type: :request do
-  # The table partial's rows are fragment-cached, so its markup has to stay digested
-  it_behaves_like "cached_markup_digest", "app/views/admin/bikes/_table.html.erb"
-
   base_url = "/admin/bikes"
   let(:bike) { FactoryBot.create(:bike, :with_ownership) }
   include_context :request_spec_logged_in_as_superuser

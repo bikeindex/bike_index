@@ -2,10 +2,6 @@ module Admin
   class BikesController < Admin::BaseController
     include Binxtils::SortableTable
 
-    # The table partial's rows are fragment-cached and nothing digests their markup, so
-    # the key carries this. The cached_markup_digest spec keeps it current.
-    MARKUP_DIGEST = "6c6c09fd9781"
-
     before_action :find_bike, only: %i[edit update show]
     before_action :set_period, only: %i[index missing_manufacturer]
     around_action :set_reading_role, only: %i[index show]

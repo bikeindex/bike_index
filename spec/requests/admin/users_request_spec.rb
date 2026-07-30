@@ -1,9 +1,6 @@
 require "rails_helper"
 
 RSpec.describe Admin::UsersController, type: :request do
-  # The table partial's rows are fragment-cached, so its markup has to stay digested
-  it_behaves_like "cached_markup_digest", "app/views/admin/users/_table.html.erb"
-
   base_url = "/admin/users/"
   include_context :request_spec_logged_in_as_superuser
   let(:user_subject) { FactoryBot.create(:user) }

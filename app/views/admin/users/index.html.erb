@@ -126,7 +126,7 @@
     unconfirmed users
   <% end %>
 
-  <%= render partial: "/admin/users/table", locals: {collection: @collection, render_sortable: true, render_deleted: @deleted} %>
+  <%= render Admin::UsersTable::Component.new(users: @collection, render_sortable: true, render_deleted: @deleted) %>
 
   <% unless @collection.present? %>
     <h1 class="mt-4">No users found!</h1>

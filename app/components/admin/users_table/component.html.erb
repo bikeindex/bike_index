@@ -1,11 +1,12 @@
-<%# locals: (collection: nil, render_sortable: false, render_deleted: false) %>
-<% collection ||= @users %>
+<%# Locals, not @ivars: UI::Table instance_execs cell blocks against itself, %>
+<%# so instance variables resolve to nil inside them — closures capture these. %>
+<% check_mark = helpers.check_mark %>
 
-<% unless render_deleted %>
+<% unless @render_deleted %>
   <style>.deleted-cell {display: none !important;}</style>
 <% end %>
 
-<% unless display_dev_info? %>
+<% unless helpers.display_dev_info? %>
   <style>
     .only-dev-visible {display: none !important;}
   </style>
@@ -16,7 +17,7 @@
   tbody td.only-dev-visible {border-top: 0px;}
 </style>
 
-<%= render(UI::Table::Component.new(records: collection, cache_key: "admin-users-#{Admin::UsersController::MARKUP_DIGEST}", render_sortable:)) do |table| %>
+<%= render(UI::Table::Component.new(records: @users, cache_key:, render_sortable: @render_sortable)) do |table| %>
   <% table.column(sortable: "created_at") do |user| %>
     <%= render UI::Time::Component.new(time: user.created_at) %>
   <% end %>
@@ -46,7 +47,7 @@
   <% end %>
 
   <% table.column(label: "Bikes", header_classes: "tw:font-normal") do |user| %>
-    <%= number_display(user.ownerships.count) %>
+    <%= helpers.number_display(user.ownerships.count) %>
   <% end %>
 
   <% table.column(label: "OrganizationRoles", header_classes: "tw:font-normal") do |user| %>
@@ -64,7 +65,7 @@
 
   <% table.column(label: "Ambassador tasks", classes: "tw:text-xs", header_classes: "tw:font-normal") do |user| %>
     <% if user.ambassador? %>
-      <%= number_display(Ambassador.find(user.id).progress_count) %>
+      <%= helpers.number_display(Ambassador.find(user.id).progress_count) %>
     <% end %>
   <% end %>
 
