@@ -7,8 +7,8 @@ import { collapse } from 'utils/collapse_utils'
 // arrive at gets the warning instead, which there's nothing to correct it to. Either
 // one holds the form until it's answered, or the way past it is taken.
 export default class extends Controller {
-  static targets = ['input', 'suggestion', 'warning', 'override']
-  static values = { message: String, reserved: String }
+  static targets = ['input', 'suggestion', 'correction', 'warning', 'override']
+  static values = { reserved: String }
 
   // Whether the field has something to say, which is what holds the form back.
   check () {
@@ -18,9 +18,7 @@ export default class extends Controller {
     this.suggested = reserved ? null : suggest(email)
 
     // Set before showing: collapse animates to the height the text gives it.
-    if (this.suggested) {
-      this.suggestionTarget.textContent = this.messageValue.replace('%{email}', this.suggested)
-    }
+    if (this.suggested) this.correctionTarget.textContent = this.suggested
     collapse(this.suggested ? 'show' : 'hide', this.suggestionTarget)
     collapse(reserved ? 'show' : 'hide', this.warningTarget)
 
@@ -28,6 +26,13 @@ export default class extends Controller {
     this.hold(held)
 
     return held
+  }
+
+  // Typing answers whatever was asked, so the field goes quiet and hands the form back
+  // until the value settles and focusout checks it again.
+  clear () {
+    collapse('hide', [this.suggestionTarget, this.warningTarget])
+    this.hold(false)
   }
 
   // Enter never leaves the field, so the value is checked here too -- and a message
@@ -42,6 +47,7 @@ export default class extends Controller {
   accept () {
     this.inputTarget.value = this.suggested
     // Assigning a value fires neither event, and anything watching the field expects both.
+    // The input is one of those watchers, so this runs clear() -- check() has to follow it.
     this.inputTarget.dispatchEvent(new Event('input', { bubbles: true }))
     this.inputTarget.dispatchEvent(new Event('change', { bubbles: true }))
     // The correction can be a domain the warning is about, so it's checked like any other.
@@ -51,8 +57,7 @@ export default class extends Controller {
   }
 
   submitAnyway () {
-    collapse('hide', [this.suggestionTarget, this.warningTarget])
-    this.hold(false)
+    this.clear()
     this.form?.requestSubmit()
   }
 

@@ -23,6 +23,13 @@ module UI
         def reserved_pattern
           EmailDomain::RESERVED_REGEX.source.gsub(/\s/, "").gsub("\\A", "^").gsub("\\z", "$")
         end
+
+        # Only the address is the button. It renders empty -- the controller fills it in,
+        # the address not being known until the field is checked.
+        def did_you_mean_markup
+          translation(".did_you_mean_html", email: render(UI::Button::Component.new(color: :link,
+            data: {"ui--forms--email-target": "correction", action: "ui--forms--email#accept"})))
+        end
       end
     end
   end

@@ -13,12 +13,19 @@ RSpec.describe UI::Forms::Email::Component, type: :component do
   it "renders an email field with both messages hidden" do
     expect(component).to have_css("input.twinput[type='email'][name='user[email]'][data-ui--forms--email-target='input']")
     expect(component).to_not have_css("input[required]")
-    expect(component).to have_css("[data-ui--forms--email-message-value='Did you mean %{email}?']")
-    expect(component).to have_css("[aria-live='polite'] button[class~='tw:hidden!'][data-ui--forms--email-target='suggestion']")
     expect(component).to have_css("[aria-live='polite'] p[class~='tw:hidden'][data-ui--forms--email-target='warning']",
       text: "That doesn't look like your real email address. Please enter an email address where you receive email")
     expect(component).to have_css("[aria-live='polite'] div button[class~='tw:hidden!'][data-ui--forms--email-target='override']",
       text: "Submit form anyway")
+  end
+
+  # Only the address is a button, and the controller is what fills it in
+  it "wraps an empty correction button in the message that carries it" do
+    expect(component).to have_css("p[data-ui--forms--email-target='suggestion']", text: "Did you mean ?")
+    expect(component).to have_css("p[data-ui--forms--email-target='suggestion'] " \
+      "button[data-ui--forms--email-target='correction']", text: "")
+    # the "?" sits against the button, with no space formatting could have left behind
+    expect(component.to_html).to include("</button>?")
   end
 
   # EmailDomain::RESERVED_REGEX is what the server checks, so this pins the syntax the
