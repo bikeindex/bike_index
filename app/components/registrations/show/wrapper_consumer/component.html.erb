@@ -41,7 +41,7 @@
         <%= render(Registrations::Show::Status::Component.new(bike: @bike)) %>
       </div>
 
-      <%= render(Registrations::Show::CurrentAlerts::Wrapper::Component.new(bike: @bike, current_user: @current_user, bike_sticker: @bike_sticker, owner: @owner, alerts: @alerts)) %>
+      <%= render(Registrations::Show::CurrentAlerts::Wrapper::Component.new(bike: @bike, current_user: @current_user, bike_sticker: @bike_sticker, owner: @owner)) %>
 
       <%= render(Registrations::Show::BikeIndexCard::Component.new(bike: @bike, term: :right_align)) %>
 

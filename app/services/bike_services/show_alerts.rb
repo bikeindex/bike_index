@@ -9,11 +9,7 @@ module BikeServices
   module ShowAlerts
     extend Functionable
 
-    Resolved = Data.define(:claim_message, :token, :token_type, :matching_notification, :recovered_stolen_record) do
-      def cache_key
-        [claim_message, token, token_type, recovered_stolen_record&.id]
-      end
-    end
+    Resolved = Data.define(:claim_message, :token, :token_type, :matching_notification, :recovered_stolen_record)
 
     # recovery_link_token is read from the session by the caller (which deletes it,
     # so the prompt shows once); the token params arrive on the query string and

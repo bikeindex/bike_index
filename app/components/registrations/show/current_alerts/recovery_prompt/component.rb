@@ -9,6 +9,8 @@ module Registrations
         # session[:recovery_link_token], deleting the token so this shows once.
         # A similar form lives in edit_report_stolen / edit_report_recovered
         class Component < ApplicationComponent
+          include LegacyCopy
+
           def initialize(bike:, stolen_record: nil)
             @bike = bike
             @stolen_record = stolen_record

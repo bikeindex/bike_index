@@ -8,6 +8,8 @@ module Registrations
         # in as someone it's claimable by, or because they followed the claim link from
         # their registration email (claim_message, so they may still be signed out)
         class Component < ApplicationComponent
+          include LegacyCopy
+
           def initialize(bike:, current_user: nil, claim_message: nil)
             @bike = bike
             @current_user = current_user
@@ -23,8 +25,12 @@ module Registrations
 
           private
 
+          # Memoized: this hits UserEmail, and render? plus the template and claim_path
+          # all ask
           def claimable?
-            @bike.claimable_by?(@current_user)
+            return @claimable if defined?(@claimable)
+
+            @claimable = @bike.claimable_by?(@current_user)
           end
 
           def ownership

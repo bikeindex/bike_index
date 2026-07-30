@@ -121,21 +121,4 @@ RSpec.describe BikeServices::ShowAlerts do
       end
     end
   end
-
-  describe "#cache_key" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership) }
-
-    it "is blank without tokens, so untokened requests share a fragment" do
-      expect(resolved.cache_key.compact).to eq([])
-    end
-
-    context "with a token" do
-      let!(:notification) { FactoryBot.create(:parking_notification, bike:) }
-      let(:params) { ActionController::Parameters.new(parking_notification_retrieved: notification.retrieval_link_token) }
-
-      it "includes the token, so a prompt isn't cached for later viewers" do
-        expect(resolved.cache_key).to include(notification.retrieval_link_token)
-      end
-    end
-  end
 end

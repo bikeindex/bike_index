@@ -8,7 +8,7 @@ module Registrations
       class Component < ApplicationComponent
         # Nothing digests the nested components' templates, so bump this whenever
         # their markup changes
-        CACHE_VERSION = "registrations/show-v11"
+        CACHE_VERSION = "registrations/show-v12"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, alerts: nil)
           @bike = bike
@@ -19,25 +19,13 @@ module Registrations
           @alerts = alerts
         end
 
+        # The token prompt renders outside the cache block — it's per-request, so
+        # caching it would serve one token-holder's modal to every later viewer
         def call
-          capture do
-            cache(cache_key) { concat(render(inner_component)) }
-          end
-        end
-
-        private
-
-        def inner_component
-          @inner_component ||= begin
-            kind, organization = @view
-            if organization
-              WrapperOrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
-                org_role: kind, available_views: @available_views, bike_sticker: @bike_sticker, alerts: @alerts)
-            else
-              WrapperConsumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
-                show_for_sale: @bike.is_for_sale?, available_views: @available_views, bike_sticker: @bike_sticker, alerts: @alerts)
-            end
-          end
+          safe_join([
+            render(CurrentAlerts::TokenPrompt::Component.new(bike: @bike, current_user: @current_user, alerts: @alerts)),
+            capture { cache(cache_key) { concat(render(inner_component)) } }
+          ])
         end
 
         # Keyed on the viewer for the admin view's per-user content. The bike's
@@ -48,14 +36,29 @@ module Registrations
         # varies across devices/logins) — the csrf-refresh controller reissues them
         # client-side from the meta tag.
         #
-        # The alerts' tokens must be in here too: they're per-request, so without them
-        # a token-holder's prompt would be cached and served to every later viewer.
+        # The ownership's timestamp is in here because claiming doesn't touch the bike,
+        # and both views show claim state.
         def cache_key
           [CACHE_VERSION, @current_user&.id,
             @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
-            *@alerts&.cache_key,
+            @bike.current_ownership&.updated_at,
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
+        end
+
+        private
+
+        def inner_component
+          @inner_component ||= begin
+            kind, organization = @view
+            if organization
+              WrapperOrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
+                org_role: kind, available_views: @available_views, bike_sticker: @bike_sticker)
+            else
+              WrapperConsumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
+                show_for_sale: @bike.is_for_sale?, available_views: @available_views, bike_sticker: @bike_sticker)
+            end
+          end
         end
       end
     end
