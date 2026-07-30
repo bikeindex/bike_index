@@ -20,7 +20,7 @@ class RegistrationsController < ApplicationController
       organization_id: params[:organization_id], user: current_user)
 
     render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view:,
-      available_views:, bike_sticker:, alerts: current_alerts), layout: "application")
+      available_views:, bike_sticker:, current_alerts:), layout: "application")
   end
 
   # The redesign has no edit view of its own; edit still lives on the bike
@@ -70,7 +70,7 @@ class RegistrationsController < ApplicationController
   # bikes#show: the recovery token is deleted as it's read so the form shows once, and
   # a matching claim token records the email so signing up can claim the bike.
   def current_alerts
-    alerts = BikeServices::ShowAlerts.find(bike: @bike, params:,
+    alerts = BikeServices::ShowCurrentAlerts.find(bike: @bike, params:,
       recovery_link_token: session.delete(:recovery_link_token))
     if alerts.claim_message.present?
       session[:claim_token_email] = @bike.current_ownership.owner_email

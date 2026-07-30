@@ -8,22 +8,22 @@ module Registrations
       class Component < ApplicationComponent
         # Nothing digests the nested components' templates, so bump this whenever
         # their markup changes
-        CACHE_VERSION = "registrations/show-v13"
+        CACHE_VERSION = "registrations/show-v14"
 
-        def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, alerts: nil)
+        def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: nil)
           @bike = bike
           @current_user = current_user
           @view = view
           @available_views = available_views
           @bike_sticker = bike_sticker
-          @alerts = alerts
+          @current_alerts = current_alerts
         end
 
         # The token prompt renders outside the cache block — it's per-request, so
         # caching it would serve one token-holder's modal to every later viewer
         def call
           safe_join([
-            render(CurrentAlerts::TokenPrompt::Component.new(bike: @bike, current_user: @current_user, alerts: @alerts)),
+            render(CurrentAlerts::TokenPrompt::Component.new(bike: @bike, current_user: @current_user, current_alerts: @current_alerts)),
             capture { cache(cache_key) { concat(render(inner_component)) } }
           ])
         end

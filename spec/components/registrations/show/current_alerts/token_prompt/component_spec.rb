@@ -3,16 +3,16 @@
 require "rails_helper"
 
 RSpec.describe Registrations::Show::CurrentAlerts::TokenPrompt::Component, type: :component do
-  let(:component) { described_class.new(bike:, current_user:, alerts:) }
+  let(:component) { described_class.new(bike:, current_user:, current_alerts:) }
   let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
   let(:current_user) { nil }
-  let(:alerts) do
-    BikeServices::ShowAlerts::Resolved.new(claim_message: nil, token: nil, token_type: nil,
+  let(:current_alerts) do
+    BikeServices::ShowCurrentAlerts::Resolved.new(claim_message: nil, token: nil, token_type: nil,
       matching_notification: nil, recovered_stolen_record: nil)
   end
 
   context "a recovery token" do
-    let(:alerts) { super().with(recovered_stolen_record: bike.current_stolen_record) }
+    let(:current_alerts) { super().with(recovered_stolen_record: bike.current_stolen_record) }
 
     it "renders the recovery prompt, opened" do
       render_inline(component)
@@ -29,7 +29,7 @@ RSpec.describe Registrations::Show::CurrentAlerts::TokenPrompt::Component, type:
   end
 
   context "no alerts resolved at all" do
-    let(:alerts) { nil }
+    let(:current_alerts) { nil }
 
     it "does not render" do
       render_inline(component)
@@ -39,7 +39,7 @@ RSpec.describe Registrations::Show::CurrentAlerts::TokenPrompt::Component, type:
 
   context "when more than one prompt applies" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, owner_email: "new-owner@example.com") }
-    let(:alerts) do
+    let(:current_alerts) do
       super().with(claim_message: "new_registration", recovered_stolen_record: bike.current_stolen_record)
     end
 

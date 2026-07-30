@@ -8,10 +8,10 @@ module Registrations
         # page's fragment cache — these are per-request, and a recovery token is spent
         # as it's read, so a cached copy could never be served again anyway.
         class Component < ApplicationComponent
-          def initialize(bike:, current_user: nil, alerts: nil)
+          def initialize(bike:, current_user: nil, current_alerts: nil)
             @bike = bike
             @current_user = current_user
-            @alerts = alerts
+            @current_alerts = current_alerts
           end
 
           def render?
@@ -31,12 +31,12 @@ module Registrations
           def prompt
             return @prompt if defined?(@prompt)
 
-            @prompt = @alerts && [
-              RecoveryPrompt::Component.new(bike: @bike, stolen_record: @alerts.recovered_stolen_record),
-              NotificationToken::Component.new(bike: @bike, token: @alerts.token,
-                token_type: @alerts.token_type, matching_notification: @alerts.matching_notification),
+            @prompt = @current_alerts && [
+              RecoveryPrompt::Component.new(bike: @bike, stolen_record: @current_alerts.recovered_stolen_record),
+              NotificationToken::Component.new(bike: @bike, token: @current_alerts.token,
+                token_type: @current_alerts.token_type, matching_notification: @current_alerts.matching_notification),
               ClaimInvitation::Component.new(bike: @bike, current_user: @current_user,
-                claim_message: @alerts.claim_message)
+                claim_message: @current_alerts.claim_message)
             ].find(&:render?)
           end
         end

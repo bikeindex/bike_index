@@ -6,7 +6,7 @@ module BikeServices
   # per-request rather than per-bike, so Registrations::Show::Wrapper folds
   # Resolved#cache_key into its fragment key — otherwise one viewer's prompt would
   # be cached and served to everyone.
-  module ShowAlerts
+  module ShowCurrentAlerts
     extend Functionable
 
     Resolved = Data.define(:claim_message, :token, :token_type, :matching_notification, :recovered_stolen_record)

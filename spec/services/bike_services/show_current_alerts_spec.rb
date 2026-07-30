@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe BikeServices::ShowAlerts do
+RSpec.describe BikeServices::ShowCurrentAlerts do
   let(:resolved) { described_class.find(bike:, params:, recovery_link_token:) }
   let(:params) { ActionController::Parameters.new }
   let(:recovery_link_token) { nil }
