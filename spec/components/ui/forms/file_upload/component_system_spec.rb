@@ -5,6 +5,7 @@ require "rails_helper"
 RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/file_upload/component/" }
   let(:drop_frame) { "[data-ui--forms--file-upload-target='dropZone']" }
+  let(:preview) { "[data-ui--forms--file-upload-target='preview']" }
   # Dragging a file has no Capybara equivalent -- the drag source is the OS, not the
   # page -- so the events carry a hand-built DataTransfer, per Playwright's docs.
   let(:start_drag) do
@@ -15,17 +16,21 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
     JS
   end
 
-  it "takes a file from the picker or a drag, and adapts its labels to the pointer" do
+  it "takes a file from the picker or a drag, and offers the camera only to a coarse pointer" do
     visit("#{base_path}default")
 
     expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "No file chosen")
-    # a fine pointer can click and drop, and the frame is idle until something is dragged
-    expect(page).to have_css("label", text: "Click or drop to choose file")
+    expect(page).to have_css("label", text: "Upload")
+    # the frame is idle until something is dragged
     expect(page).to have_no_css("#{drop_frame}[data-dragging]")
+    # nothing attached, so nothing to preview yet
+    expect(page).to have_no_css(preview)
 
     attach_file("file", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
 
     expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "bike.jpg")
+    # the pick previews straight from the browser's copy, rather than waiting on an upload
+    expect(page).to have_css("#{preview}[href^='blob:'] img[src^='blob:']")
 
     # dragging text rather than a file leaves the frame alone
     page.execute_script(<<~JS)
@@ -68,6 +73,9 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
 
     expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "dropped.jpg")
     expect(page).to have_no_css("#{drop_frame}[data-dragging]")
+    # those bytes aren't a jpeg whatever the name says -- the previous preview goes rather
+    # than staying up as a broken image
+    expect(page).to have_no_css(preview)
     # rendered, but the media query keeps it from a mouse
     expect(page).to have_button("Take picture", visible: :hidden)
     expect(page).to have_no_button("Take picture")
@@ -75,9 +83,6 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
     # everything below runs touch-emulated -- fine-pointer assertions must come first
     emulate_touch_device
 
-    # a touch device can neither click nor drop, so the wording drops back
-    expect(page).to have_css("label", text: "Choose file")
-    expect(page).to have_no_css("label", text: "Click or drop to choose file")
     # the camera button is only visible here, so this is the audit that covers it
     expect_axe_clean
 
@@ -85,7 +90,7 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
 
     expect(page).to have_css("input[type='file'][capture='environment']", visible: :all)
 
-    find(:label, "Choose file").click
+    find(:label, "Upload").click
 
     expect(page).to have_no_css("input[type='file'][capture]", visible: :all)
   end

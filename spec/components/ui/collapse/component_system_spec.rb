@@ -18,6 +18,8 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     expect(page).to have_content("Persisted panel body")
     expect(page).to have_current_path(/details=1/, url: true)
     expect(page).to have_css("button[aria-expanded='true'][data-active='true']", text: "Toggle details")
+    # Rotated, which is what spins a trigger's icon while its panel is open
+    expect(page).to have_css("[data-ui--collapse-target='chevron'].tw\\:rotate-90")
 
     expect_axe_clean
 

@@ -33,12 +33,11 @@ module UI
 
         private
 
-        # Both wordings ship and the pointer media query picks one -- a coarse pointer
-        # can neither click nor drop, so it gets the short one.
+        # The button's gap-1.5 spaces these; the icon is decorative, the text names it.
         def label_content
           safe_join([
-            tag.span(translation(".choose_or_drop_file"), class: "tw:pointer-coarse:hidden"),
-            tag.span(translation(".choose_file"), class: "tw:hidden tw:pointer-coarse:inline")
+            helpers.inline_svg_tag("icons/upload.svg", class: "tw:h-4 tw:w-4", aria_hidden: true),
+            translation(".upload")
           ])
         end
 

@@ -5,26 +5,36 @@
   data-action="drop->ui--forms--file-upload#drop dragover@document->ui--forms--file-upload#dragOver dragleave@document->ui--forms--file-upload#endDrag drop@document->ui--forms--file-upload#endDrag"
 >
   <%#
-    The drop target frames the preview and controls; its border is transparent until a drag
-    starts, so revealing it shifts nothing. data-over rather than is-active, which also
-    matches :active and would flash the frame whenever the button inside it is pressed.
+    The drop target spans the field, framing the preview and controls. An outline rather than a
+    border -- drawn outside the box, so the controls line up with the field's own label instead
+    of being indented by padding held in reserve; my-2 is what keeps it off that label.
+    data-over rather than is-active, which also matches :active and would flash the frame
+    whenever the button inside it is pressed.
   %>
 
   <div
     class="
-      tw:inline-block tw:rounded-lg tw:border-2 tw:border-dashed
-      tw:border-transparent tw:p-2 tw:transition-colors
-      tw:data-[dragging=true]:border-gray-300
-      tw:data-[over=true]:border-blue-500 tw:data-[over=true]:bg-blue-50
-      tw:dark:data-[dragging=true]:border-gray-600
+      tw:my-2 tw:rounded-lg tw:outline-2 tw:outline-offset-2
+      tw:outline-transparent tw:transition-colors tw:outline-dashed
+      tw:data-[dragging=true]:outline-gray-300
+      tw:data-[over=true]:bg-blue-50 tw:data-[over=true]:outline-blue-500
+      tw:dark:data-[dragging=true]:outline-gray-600
       tw:dark:data-[over=true]:bg-blue-950
     "
     data-ui--forms--file-upload-target="dropZone"
     data-action="dragenter->ui--forms--file-upload#highlightDropZone dragleave->ui--forms--file-upload#unhighlightDropZone"
   >
-    <% if @attachment_url %>
-      <%# block so the controls start a new line, w-fit so the link doesn't stretch past the image %>
-      <%= link_to image_tag(@thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded"), @attachment_url, class: "tw:mb-2 tw:block tw:w-fit" %>
+    <%#
+      A pick previews here from a local object url, without waiting on a round trip - so the
+      img ships on every render, srcless and hidden, rather than only when something is attached.
+      block so the controls start a new line, w-fit so the link doesn't stretch past the image.
+    %>
+
+    <%= tag.a(href: @attachment_url,
+          class: ["tw:mb-2 tw:block tw:w-fit", ("tw:hidden!" if @attachment_url.blank?)],
+          data: {"ui--forms--file-upload-target": "preview"}) do %>
+      <%= tag.img(src: @thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded",
+            data: {"ui--forms--file-upload-target": "previewImage"}) %>
     <% end %>
 
     <%# flex-wrap: the long label and the camera button coincide on a `pointer: none` device %>
