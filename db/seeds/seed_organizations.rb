@@ -45,30 +45,34 @@ feature_name_and_slugs = [
   {name: "Registration field: Student ID", feature_slugs: ["reg_student_id"]},
   {name: "Registration field: Student ID - REQUIRED", feature_slugs: ["reg_student_id", "require_reg_student_id"]},
   {name: "Registration field: True/False question", feature_slugs: []},
+  {name: "Single Sign On (SSO)", feature_slugs: ["saml_sso"]},
   {name: "Skip ownership email", feature_slugs: ["skip_ownership_email"]},
   {name: "Social media ad campaign", feature_slugs: []}
 ]
 
-feature_ids = []
+brakebills_feature_ids = []
 official_manufacturer_feature_id = nil
-skip_ownership_email_feature_id = nil
-avery_export_feature_id = nil
 law_enforcement_feature_id = nil
+
+brakebills_skipped_feature_names = ["Avery Export", "Skip ownership email", "Single Sign On (SSO)"]
 
 feature_name_and_slugs.each do |attrs|
   org_feature = OrganizationFeature.find_by_name(attrs[:name]) ||
     OrganizationFeature.create(attrs.merge(amount_cents: 500_00))
-  feature_ids << org_feature.id
-  official_manufacturer_feature_id = org_feature.id if attrs[:name] == "Official manufacturer organization"
-  skip_ownership_email_feature_id = org_feature.id if attrs[:name] == "Skip ownership email"
-  avery_export_feature_id = org_feature.id if attrs[:name] == "Avery Export"
-  law_enforcement_feature_id = org_feature.id if attrs[:name] == "Law Enforcement functionality"
+
+  next if brakebills_skipped_feature_names.include?(attrs[:name])
+
+  if attrs[:name] == "Official manufacturer organization"
+    official_manufacturer_feature_id = org_feature.id
+  else
+    law_enforcement_feature_id = org_feature.id if attrs[:name] == "Law Enforcement functionality"
+    brakebills_feature_ids << org_feature.id
+  end
 end
 
-# --- Brakebills: all features except official_manufacturer, avery_export, with is_endless invoice - and skip_ownership_email ---
+# --- Brakebills: every feature except brakebills_skipped_feature_names, on an is_endless invoice ---
 brakebills = Organization.find_by_name("Brakebills") || Organization.create!(name: "Brakebills")
 brakebills_invoice = Invoice.create(organization: brakebills, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
-brakebills_feature_ids = feature_ids - [official_manufacturer_feature_id, skip_ownership_email_feature_id, avery_export_feature_id]
 brakebills_invoice.update(organization_feature_ids: brakebills_feature_ids)
 OrganizationRole.create(organization_id: brakebills.id, user_id: User.find_by_email("member@brakebills.edu").id, role: "member")
 

@@ -179,13 +179,19 @@
                   %code.d-inline nearby_organizations
                   will search within this radius for other organizations in the same area
 
-          - if @organization.enabled?("passwordless_users")
+          - passwordless_enabled = @organization.enabled?("passwordless_users")
+          - saml_sso_enabled = @organization.enabled?("saml_sso")
+          - sign_in_kinds = [("passwordless sign in" if passwordless_enabled), ("SAML SSO" if saml_sso_enabled)].compact
+          - if sign_in_kinds.any?
             .form-group
               = f.label :user_email_domain do
                 %span
-                permitted domain for passwordless sign in
+                permitted domain for #{sign_in_kinds.to_sentence}
                 %small
-                  <span class="text-success">passwordless user feature</span>
+                  - if passwordless_enabled
+                    <span class="text-success">passwordless user feature</span>
+                  - if saml_sso_enabled
+                    <span class="text-success">SAML SSO feature</span>
               .input-group
                 .input-group-prepend
                   .input-group-text @
@@ -244,3 +250,42 @@
                         = OrganizationStolenMessage::MAX_SEARCH_RADIUS
                         miles
                   = number_field_tag :organization_stolen_message_search_radius_miles, organization_stolen_message.search_radius_miles, {class: "form-control"}
+
+          - if saml_sso_enabled
+            - saml_configuration = @organization.organization_saml_configuration || @organization.build_organization_saml_configuration
+            .form-group.mt-4
+              %h4 SAML SSO
+              %p.text-success
+                Service Provider details for the organization's IdP admin — or just share the metadata URL, which contains all of them.
+              %ul
+                %li
+                  Metadata URL:
+                  = link_to saml_metadata_url(org_slug: @organization.to_param), saml_metadata_url(org_slug: @organization.to_param)
+                %li
+                  SP entityID:
+                  %code= Saml::SettingsBuilder.sp_entity_id(saml_configuration)
+                %li
+                  ACS (callback) URL:
+                  %code= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration)
+              = f.fields_for :organization_saml_configuration, saml_configuration do |saml_f|
+                .form-check.mt-2
+                  = saml_f.check_box :enabled, class: "form-check-input"
+                  = saml_f.label :enabled, "Enable live SAML login for this organization", class: "form-check-label"
+                .form-group.mt-2
+                  = saml_f.label :idp_entity_id, "IdP entityID"
+                  = saml_f.text_field :idp_entity_id, class: "form-control"
+                .form-group.mt-2
+                  = saml_f.label :idp_sso_target_url, "IdP SSO target URL"
+                  = saml_f.text_field :idp_sso_target_url, class: "form-control"
+                .form-group.mt-2
+                  = saml_f.label :idp_slo_target_url, "IdP SLO target URL (optional)"
+                  = saml_f.text_field :idp_slo_target_url, class: "form-control"
+                .form-group.mt-2
+                  = saml_f.label :idp_cert, "IdP certificate (PEM or base64)"
+                  = saml_f.text_area :idp_cert, class: "form-control", rows: 4
+                .form-group.mt-2
+                  = saml_f.label :idp_cert_fingerprint, "IdP certificate fingerprint (optional)"
+                  = saml_f.text_field :idp_cert_fingerprint, class: "form-control"
+                .form-group.mt-2
+                  = saml_f.label :email_attribute_name, "Email attribute name (optional)"
+                  = saml_f.text_field :email_attribute_name, class: "form-control", placeholder: OrganizationSamlConfiguration::DEFAULT_EMAIL_ATTRIBUTE
