@@ -25,11 +25,15 @@ RSpec.describe Admin::PublicImagesController, type: :request do
       context "with an attached file" do
         let!(:attached_image) { FactoryBot.create(:public_image, :with_attached_file) }
 
-        it "marks it as activestorage and sizes it off the blob" do
+        it "marks it as activestorage, sizes it off the blob, and renders its thumbnail" do
           get base_url
           expect(assigns(:collection).pluck(:id)).to include(attached_image.id)
           expect(attached_image.reload.image_size).to eq attached_image.file.blob.byte_size
           expect(response.body).to include("ActiveStorage (instead of legacy carrierwave)")
+          # image? is carrierwave-only, so the cell has to key off image_url
+          expect(attached_image.image?).to be_falsey
+          expect(response.body).to include(attached_image.image_url)
+          expect(response.body).to include(attached_image.image_url(:small))
         end
       end
 

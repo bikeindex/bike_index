@@ -43,10 +43,12 @@
             </td>
 
             <td>
-              <% if public_image.image? %>
-                <%= link_to public_image.image_url do %>
+              <% image_url = public_image.image_url %>
+
+              <% if image_url.present? %>
+                <%= link_to image_url do %>
                   <%= image_tag(public_image.image_url(:small), class: "tw:max-h-12", loading: "lazy",
-                    data: {controller: "image-fallback", action: "error->image-fallback#useOriginal", "image-fallback-url-value": public_image.image_url}) %>
+                    data: {controller: "image-fallback", action: "error->image-fallback#useOriginal", "image-fallback-url-value": image_url}) %>
                 <% end %>
               <% end %>
             </td>
