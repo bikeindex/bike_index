@@ -46,6 +46,22 @@ RSpec.describe Registrations::Show::CurrentAlerts::NotificationToken::Component,
       render_inline(component)
       expect(page).to have_button("Mark bike remaining")
     end
+
+    context "already marked remaining" do
+      # Graduated says "remaining", not the parking wording — the other arm of resolved_text.
+      # Reload because mark_remaining! updates a separate instance loaded inside the job
+      before do
+        notification.mark_remaining!
+        notification.reload
+      end
+
+      it "confirms it's resolved instead of offering the form" do
+        render_inline(component)
+        expect(page).to have_text("You have already marked this bike remaining")
+        expect(page).to have_text("no further action necessary")
+        expect(page).to_not have_button("Mark bike remaining")
+      end
+    end
   end
 
   context "no matching notification" do
