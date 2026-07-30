@@ -15,6 +15,14 @@ module UI
           # UI::Forms::Input has no email kind, so the type comes from here
           @html_options = {type: "email", data: {"ui--forms--email-target": "input"}}.deep_merge(html_options)
         end
+
+        private
+
+        # The one definition of a domain no message reaches, spent client side too.
+        # JS has no \A or \z, where ^ and $ mean the same thing without /m.
+        def reserved_pattern
+          EmailDomain::RESERVED_REGEX.source.gsub(/\s/, "").gsub("\\A", "^").gsub("\\z", "$")
+        end
       end
     end
   end

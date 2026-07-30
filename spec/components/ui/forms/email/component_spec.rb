@@ -10,11 +10,20 @@ RSpec.describe UI::Forms::Email::Component, type: :component do
   let(:component) { render_inline(described_class.new(form_builder:, **options)) }
   let(:options) { {} }
 
-  it "renders an email field with the suggestion hidden" do
+  it "renders an email field with both messages hidden" do
     expect(component).to have_css("input.twinput[type='email'][name='user[email]'][data-ui--forms--email-target='input']")
     expect(component).to_not have_css("input[required]")
     expect(component).to have_css("[data-ui--forms--email-message-value='Did you mean %{email}?']")
     expect(component).to have_css("[aria-live='polite'] button[class~='tw:hidden!'][data-ui--forms--email-target='suggestion']")
+    expect(component).to have_css("[aria-live='polite'] p[class~='tw:hidden'][data-ui--forms--email-target='warning']",
+      text: "That doesn't look like your real email address. Please enter an email address where you receive email")
+  end
+
+  # EmailDomain::RESERVED_REGEX is what the server checks, so this pins the syntax the
+  # two share -- \A and \z would leave the controller with an unusable pattern.
+  it "hands the controller the reserved-domain pattern as javascript reads it" do
+    expect(component.css("[data-controller]").first["data-ui--forms--email-reserved-value"])
+      .to eq '^(?:.+\.)?example\.(?:com|net|org)$|(?:^|\.)(?:test|example|invalid|localhost)$'
   end
 
   context "with required and html_options" do

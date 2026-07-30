@@ -4,12 +4,6 @@ module SpamEstimator
 
     MARK_SPAM_PERCENT = 90 # May modify in the future!
 
-    # RFC 2606 / 6761 reserved domains, which can never be a real registrant
-    RESERVED_EMAIL_DOMAIN_REGEX = /
-      \A(?:.+\.)?example\.(?:com|net|org)\z |
-      (?:\A|\.)(?:test|example|invalid|localhost)\z
-    /xi
-
     def estimate(bike, stolen_record = nil)
       estimate = 0
       return estimate if bike.blank?
@@ -43,7 +37,7 @@ module SpamEstimator
       domain = email&.split("@")&.last&.strip
       return false if domain.blank?
 
-      domain.match?(RESERVED_EMAIL_DOMAIN_REGEX)
+      domain.match?(EmailDomain::RESERVED_REGEX)
     end
 
     def domain_estimate(email)

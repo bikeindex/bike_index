@@ -6,6 +6,7 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/email/component/" }
   let(:suggestion) { "Did you mean you@gmail.com?" }
   let(:suggestion_button) { "[aria-live='polite'] button" }
+  let(:warning) { "That doesn't look like your real email address." }
 
   # Leaving the field is what checks it
   def fill_in_email_and_leave(email)
@@ -13,7 +14,7 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
     find_field("Email").send_keys(:tab)
   end
 
-  it "suggests a correction on leaving the field, holds its peace where it has none, and swaps it in when clicked" do
+  it "checks the field on leaving it -- suggesting a correction, warning where there's none to offer, swapping it in when clicked" do
     visit("#{base_path}default")
 
     # the button ships hidden -- an empty one in the tab order is both a stop to
@@ -96,6 +97,36 @@ RSpec.describe UI::Forms::Email::Component, :js, type: :system do
     fill_in_email_and_leave("you@gmail.com")
 
     expect(page).to have_no_css(suggestion_button)
+
+    # a domain RFC 2606 holds back has nothing to correct it to, so it's told rather than asked
+    fill_in_email_and_leave("you@example.com")
+
+    expect(page).to have_css("[aria-live='polite']", text: warning)
+    expect(page).to have_no_css(suggestion_button)
+    expect_axe_clean
+
+    # subdomains of one included, matching what the server scores as spam
+    fill_in_email_and_leave("you@mail.example.org")
+
+    expect(page).to have_text(warning)
+
+    # as are its endings, however deliverable the name in front of one reads
+    fill_in_email_and_leave("you@bikeshop.invalid")
+
+    expect(page).to have_text(warning)
+
+    # ".co" is a country's rather than one of them, so the field keeps its peace
+    fill_in_email_and_leave("you@example.co")
+
+    expect(page).to have_no_text(warning)
+
+    # and enter is spent on the warning too, there being no correction to offer instead
+    fill_in "Email", with: "you@example.com"
+    find_field("Email").send_keys(:enter)
+
+    expect(page).to have_text(warning)
+    # submitting would have taken us off the preview
+    expect(page).to have_field("Email", with: "you@example.com")
   end
 
   it "checks a value the field is rendered with, and spends enter on the suggestion before the form" do

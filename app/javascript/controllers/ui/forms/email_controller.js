@@ -3,28 +3,36 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='ui--forms--email'
 // Offers a correction whenever the field is left holding a near-miss of a well known
-// email domain, and swaps it in if the suggestion is clicked.
+// email domain, and swaps it in if the suggestion is clicked. A domain no message can
+// arrive at gets the warning instead, which there's nothing to correct it to.
 export default class extends Controller {
-  static targets = ['input', 'suggestion']
-  static values = { message: String }
+  static targets = ['input', 'suggestion', 'warning']
+  static values = { message: String, reserved: String }
 
+  // Whether the field has something to say, which is what holds enter back.
   check () {
-    this.suggested = suggest(this.inputTarget.value)
-    if (!this.suggested) return collapse('hide', this.suggestionTarget)
+    const email = this.inputTarget.value
+    // The domain's, the way the server's is -- SpamEstimator::Bike#reserved_email_domain?
+    const reserved = new RegExp(this.reservedValue, 'i').test(email.split('@').at(-1).trim())
+    this.suggested = reserved ? null : suggest(email)
 
-    // Before showing: collapse animates to the height the text gives it.
-    this.suggestionTarget.textContent = this.messageValue.replace('%{email}', this.suggested)
-    collapse('show', this.suggestionTarget)
+    // Set before showing: collapse animates to the height the text gives it.
+    if (this.suggested) {
+      this.suggestionTarget.textContent = this.messageValue.replace('%{email}', this.suggested)
+    }
+    collapse(this.suggested ? 'show' : 'hide', this.suggestionTarget)
+    collapse(reserved ? 'show' : 'hide', this.warningTarget)
+
+    return reserved || Boolean(this.suggested)
   }
 
-  // Enter never leaves the field, so the value is checked here too -- and a suggestion
+  // Enter never leaves the field, so the value is checked here too -- and either message
   // takes the keystroke, since submitting past one is what it's there to ask about.
   // Enter on the suggestion itself is the button's, which is what accepts it.
   checkOnEnter (event) {
     if (event.target !== this.inputTarget) return
 
-    this.check()
-    if (this.suggested) event.preventDefault()
+    if (this.check()) event.preventDefault()
   }
 
   accept () {

@@ -3,14 +3,23 @@
   data-controller="ui--forms--email"
   data-action="focusout->ui--forms--email#check keydown.enter->ui--forms--email#checkOnEnter"
   data-ui--forms--email-message-value="<%= translation(".did_you_mean") %>"
+  data-ui--forms--email-reserved-value="<%= reserved_pattern %>"
 >
   <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: @attribute,
     required: @required, html_options: @html_options)) %>
 
-  <%# The region outlives the suggestion inside it -- one added along with its text has nothing to announce. %>
+  <%# The region outlives the messages inside it -- one added along with its text has nothing to announce. %>
   <div aria-live="polite">
     <%# hidden!, since the button's own tw:inline-flex sorts after tw:hidden. %>
     <%= render(UI::Button::Component.new(color: :link, html_class: "tw:mt-1 tw:hidden! tw:text-sm",
       data: {"ui--forms--email-target": "suggestion", action: "ui--forms--email#accept"})) %>
+
+    <%# Text rather than a button, there being no correction to accept. %>
+    <p
+      class="tw:mt-1 tw:hidden tw:text-sm tw:text-red-800 tw:dark:text-red-400"
+      data-ui--forms--email-target="warning"
+    >
+      <%= translation(".not_real") %>
+    </p>
   </div>
 </div>

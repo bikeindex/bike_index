@@ -25,6 +25,12 @@ class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
   INVALID_REGEX = /[\/\\()\[\]=\s!"']/
+  # RFC 2606 / 6761 reserved domains, which no message ever arrives at. Also checked
+  # client side, so keep it to syntax JS shares -- see UI::Forms::Email::Component.
+  RESERVED_REGEX = /
+    \A(?:.+\.)?example\.(?:com|net|org)\z |
+    (?:\A|\.)(?:test|example|invalid|localhost)\z
+  /xi
   INVALID_DOMAIN = "(invalid).domain"
   EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 3).to_i
   STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2, ignored: 3}.freeze
