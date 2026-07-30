@@ -54,6 +54,38 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  describe "activestorage" do
+    let!(:carrierwave) { FactoryBot.create(:public_image, :with_image_file) }
+    let!(:attached) { FactoryBot.create(:public_image, :with_attached_file) }
+
+    it "is the rows image_url dispatches to the new backend" do
+      expect(carrierwave.activestorage?).to be_falsey
+      expect(carrierwave.carrierwave?).to be_truthy
+      expect(attached.reload.activestorage?).to be_truthy
+      expect(attached.carrierwave?).to be_falsey
+
+      expect(PublicImage.activestorage.pluck(:id)).to eq([attached.id])
+      expect(PublicImage.carrierwave.pluck(:id)).to eq([carrierwave.id])
+      # Complements, so the pair tracks the migration without double-counting
+      expect(PublicImage.activestorage.count + PublicImage.carrierwave.count).to eq PublicImage.count
+    end
+
+    context "a row holding both" do
+      let!(:attached) do
+        FactoryBot.create(:public_image, :with_attached_file)
+          .tap { it.update!(image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
+      end
+
+      it "is activestorage - the attachment supersedes the carrierwave version" do
+        expect(attached.reload.image).to be_present
+        expect(attached.activestorage?).to be_truthy
+        expect(attached.image_url).to_not eq attached.image.url
+        expect(attached.image_url).to eq BlobUrl.for(attached.file.blob)
+        expect(PublicImage.activestorage.pluck(:id)).to include attached.id
+      end
+    end
+  end
+
   describe "image_url" do
     context "carrierwave image" do
       let(:public_image) { FactoryBot.create(:public_image, :with_image_file) }

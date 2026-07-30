@@ -66,6 +66,10 @@ class PublicImage < ApplicationRecord
 
   default_scope { where(is_private: false).order(:listing_order) }
   scope :bike, -> { where(imageable_type: "Bike") }
+  # Exact complements, so the two counts add up to the migration's progress. A row holding both
+  # is activestorage - the attachment is what image_url serves once it exists
+  scope :activestorage, -> { where.associated(:file_attachment) }
+  scope :carrierwave, -> { where.missing(:file_attachment) }
 
   # Direct uploads are checked before the blob exists, the validation after - same rule
   def self.file_permitted?(content_type:, byte_size:)
@@ -93,12 +97,19 @@ class PublicImage < ApplicationRecord
     imageable_type == "Bike"
   end
 
+  # Which backend image_url and open_file read. A row holding both is activestorage: the
+  # attachment supersedes the carrierwave version rather than waiting on it being removed
+  def activestorage?
+    file.attached?
+  end
+
+  def carrierwave? = !activestorage?
+
   # Serves whichever backend this record was uploaded through. CarrierWave versions and
   # ActiveStorage variants share names, so callers pass the same size either way - the
   # ActiveStorage dimensions are just larger.
   def image_url(size = nil)
-    # Checked before the attachment so legacy rows never pay for an active_storage_attachments query
-    return image.url(*size) if image.path.present? || !file.attached?
+    return image.url(*size) unless activestorage?
 
     BlobUrl.for_variant(file, size&.to_sym&.presence_in(VARIANTS.keys))
   end
@@ -152,7 +163,7 @@ class PublicImage < ApplicationRecord
   # which image processors can't read.
   # Returns nil when the file is missing (e.g. sandbox without synced uploads)
   def open_file
-    return attached_tempfile if file.attached?
+    return attached_tempfile if activestorage?
 
     if local_file?
       File.open(image.path, "r") if File.exist?(image.path)
