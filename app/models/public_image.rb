@@ -37,12 +37,16 @@ class PublicImage < ApplicationRecord
     large: {resize_to_fit: [2000, 1600], format: :webp}
   }.freeze
 
+  # No browser renders TIFF and only Safari renders HEIC, so ProcessPublicImageJob rewrites these
+  # as webp - the original is served directly
+  WEBP_SOURCE_TYPES = %w[image/heic image/heif image/tiff].freeze
+
   # Direct uploads bypass the uploader, so nothing else holds an attached file to a format we
   # can serve, or to the size PublicImagesController caps. Wider than carrierwave's whitelist
-  # by HEIC: iPhones shoot it by default and vips converts it to every variant, but carrierwave
-  # can't take it, and that list also feeds the file picker's accept attribute.
+  # by HEIC, which iPhones shoot by default - anything we convert has to be permitted. Also
+  # feeds the file picker's accept attribute.
   FILE_CONTENT_TYPES = (ApplicationUploader.extensions.map { Marcel::MimeType.for(extension: it) } +
-    %w[image/heic image/heif]).uniq.freeze
+    WEBP_SOURCE_TYPES).uniq.freeze
 
   mount_uploader :image, PublicImageUploader # Legacy, migrating to :file
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
@@ -117,7 +121,7 @@ class PublicImage < ApplicationRecord
   # "processed" is only set once ProcessPublicImageJob has stripped the original and generated
   # every variant, so a job that died partway through gets picked up again
   def file_needs_processing?
-    file.attached? && !file.blob.binx_data.to_h["processed"]
+    activestorage? && !file.blob.binx_data.to_h["processed"]
   end
 
   # Method to make create_revised.js easier to handle

@@ -6,9 +6,6 @@ module ImageJobs
   class ProcessPublicImageJob < ApplicationJob
     sidekiq_options queue: "med_priority"
 
-    # No browser renders TIFF and only Safari renders HEIC, and the original is served directly
-    WEBP_SOURCE_TYPES = %w[image/heic image/heif image/tiff].freeze
-
     def perform(public_image_id)
       public_image = PublicImage.unscoped.find_by(id: public_image_id)
       return unless public_image&.file_needs_processing?
@@ -29,7 +26,7 @@ module ImageJobs
     # Rewrites in place: variant keys derive from blob.key, so reusing it keeps every URL stable.
     # Vips autorotates on load, so orientation survives stripping the tag that encoded it.
     def prepare_image(blob)
-      to_webp = WEBP_SOURCE_TYPES.include?(blob.content_type)
+      to_webp = PublicImage::WEBP_SOURCE_TYPES.include?(blob.content_type)
       prepared = blob.open do |file|
         source = ImageProcessing::Vips.source(file).saver(strip: true)
         # n: -1 keeps every frame of an animated gif or apng - the default reads page one, so
