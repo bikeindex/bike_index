@@ -9,8 +9,7 @@ module Registrations
         # Nothing digests the nested components' templates, so the key carries a digest
         # of them. The cached_markup_digest spec keeps MARKUP_DIGEST current, following
         # what this tree renders out into UI:: and elsewhere.
-        CACHED_MARKUP = "app/components/registrations/show/**/*"
-        MARKUP_DIGEST = "f634ca00fca2"
+        MARKUP_DIGEST = "1d049701f0e1"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil)
           @bike = bike

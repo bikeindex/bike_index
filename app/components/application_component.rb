@@ -10,15 +10,16 @@ class ApplicationComponent < ViewComponent::Base
   DIGEST_ASSIGNMENT = /^\s*MARKUP_DIGEST = .*$/
 
   class << self
-    # A digest of the markup rendered inside a fragment cache, for folding into that
-    # cache's key. Fragment caches don't digest their own templates, so without this
-    # editing markup serves stale HTML.
+    # A digest of the markup rendered inside this component's fragment cache, for folding
+    # into that cache's key — fragment caches don't digest their own templates, so without
+    # this editing markup serves stale HTML. Defaults to the component's own directory;
+    # pass globs for markup that isn't a component (an admin table's view partial).
     #
     # Callers commit the result as MARKUP_DIGEST rather than calling this per render:
     # reading every file takes milliseconds, and every process would pay it. The
     # cached_markup_digest shared example recomputes it and fails when the markup has
-    # moved on.
-    def markup_digest(globs)
+    # moved on. Nothing here is fast, and nothing needs to be — it only runs in specs.
+    def calculated_markup_digest(globs = own_markup)
       contents = markup_files(globs)
         .map { |file| "#{file.relative_path_from(Rails.root)}\n#{file.read.sub(DIGEST_ASSIGNMENT, "")}" }
       Digest::MD5.hexdigest(contents.join("\n"))[0, 12]
@@ -27,8 +28,8 @@ class ApplicationComponent < ViewComponent::Base
     # The files matching globs, plus the markup of every component they render, followed
     # transitively — an admin cell renders Admin::UserCell, which renders
     # Admin::Badges::User, which renders UI::Badge, and any of the three going stale is
-    # the same bug. So globs need name only the markup rendered directly.
-    def markup_files(globs)
+    # the same bug.
+    def markup_files(globs = own_markup)
       files = glob_markup(globs)
       unscanned = files
       until unscanned.empty?
@@ -39,6 +40,10 @@ class ApplicationComponent < ViewComponent::Base
     end
 
     private
+
+    def own_markup
+      "app/components/#{name.underscore.delete_suffix("/component")}/**/*"
+    end
 
     # Raises rather than digesting nothing, so a typo in a glob can't quietly stop
     # covering a directory
@@ -56,9 +61,20 @@ class ApplicationComponent < ViewComponent::Base
     end
 
     def rendered_component_dirs(files)
-      files.flat_map { |file| file.read.scan(RENDERED_COMPONENT) }.uniq
-        .map { |name| name.underscore.delete_suffix("/component") }
-        .select { |dir| Rails.root.join("app/components", dir).directory? }
+      files.flat_map { |file| rendered_in(file) }.uniq
+    end
+
+    # Component references resolve the way Ruby resolves them — Registrations::Show::Wrapper
+    # renders a bare OrgAdmin::Component, which is registrations/show/org_admin — so walk
+    # out from the referencing file's own namespace before falling back to the full path.
+    def rendered_in(file)
+      namespace = file.dirname.relative_path_from(Rails.root.join("app/components")).to_s.split("/")
+      namespace = [] if namespace.first == ".."
+      file.read.scan(RENDERED_COMPONENT).filter_map do |reference|
+        dir = reference.underscore.delete_suffix("/component")
+        namespace.length.downto(0).map { |i| [*namespace[0, i], dir].join("/") }
+          .find { |candidate| Rails.root.join("app/components", candidate).directory? }
+      end
     end
   end
 

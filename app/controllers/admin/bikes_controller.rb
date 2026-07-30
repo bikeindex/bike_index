@@ -4,7 +4,6 @@ module Admin
 
     # The table partial's rows are fragment-cached and nothing digests their markup, so
     # the key carries this. The cached_markup_digest spec keeps it current.
-    CACHED_MARKUP = "app/views/admin/bikes/_table.html.erb"
     MARKUP_DIGEST = "6c6c09fd9781"
 
     before_action :find_bike, only: %i[edit update show]

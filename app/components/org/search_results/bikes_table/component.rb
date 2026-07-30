@@ -11,8 +11,7 @@ module Org
         # UI::Table caches each row without digesting the cells rendered into it, so the
         # key carries a digest of them. The cached_markup_digest spec keeps MARKUP_DIGEST
         # current, following the components the cells render.
-        CACHED_MARKUP = "app/components/org/search_results/bikes_table/**/*"
-        MARKUP_DIGEST = "168e9e8b5828"
+        MARKUP_DIGEST = "4ae949e500c0"
 
         delegate :additional_registration_fields, :column_renames, to: :settings_component
 
