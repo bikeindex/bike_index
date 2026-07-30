@@ -76,6 +76,38 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
       expect(response.status).to eq(200)
       expect(whitespace_normalized_body_text).to_not match("Mark bike retrieved")
     end
+
+    context "already retrieved" do
+      # Retrieving keeps the token, so the link in the email still resolves here
+      before { notification.mark_retrieved!(retrieved_kind: "organization_recovery", retrieved_by_id: notification.user_id) }
+
+      it "confirms it's resolved instead of offering the form" do
+        get "/registrations/#{bike.id}?parking_notification_retrieved=#{notification.retrieval_link_token}"
+        expect(response.status).to eq(200)
+        body = whitespace_normalized_body_text
+        expect(body).to match("You have marked this notification resolved")
+        expect(body).to match("no further action necessary")
+        expect(body).to_not match("Mark bike retrieved")
+      end
+    end
+
+    context "superseded by a repeat notification" do
+      let!(:abandoned) { notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: notification.user) }
+
+      # The sent email links to the original, so that's what has to keep resolving —
+      # and its kind is what comes back as token_type for resolve_token to branch on
+      it "still resolves the notification the link was sent for" do
+        ProcessParkingNotificationJob.new.perform(abandoned.id)
+        expect(notification.reload.status).to eq "replaced"
+
+        get "/registrations/#{bike.id}?parking_notification_retrieved=#{notification.retrieval_link_token}"
+        expect(response.status).to eq(200)
+        body = whitespace_normalized_body_text
+        expect(body).to match("Please move it")
+        expect(body).to match("Mark bike retrieved")
+        expect(response.body).to match("value=\"parked_incorrectly_notification\"")
+      end
+    end
   end
 
   # Graduated rides a different param than parking, and ShowCurrentAlerts branches on
@@ -170,6 +202,22 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
         follow_redirect!
         expect(response.status).to eq(200)
         expect(whitespace_normalized_body_text).to match("We're honored to have your bike on the Index")
+      end
+
+      # Claiming nils the ownership token, so the emailed link goes dead — unlike the
+      # notification links, which keep resolving after they've been acted on
+      it "stops inviting them once they've claimed it" do
+        token = ownership.token
+        expect(token).to be_present
+        ownership.mark_claimed
+        expect(ownership.reload.token).to be_blank
+
+        get "/registrations/#{bike.id}?t=#{token}"
+        expect(response.status).to eq(200)
+        body = whitespace_normalized_body_text
+        expect(body).to_not match("We're honored to have your bike on the Index")
+        expect(body).to_not match("registered your bike on Bike Index")
+        expect(session[:claim_token_email]).to be_blank
       end
     end
   end
