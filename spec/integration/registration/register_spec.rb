@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Register flow", :js, type: :system do
-  let(:owner_email) { "owner@example.com" }
+  let(:owner_email) { "owner@bikeindex.org" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   let!(:red) { FactoryBot.create(:color, name: "Red") }
   let!(:blue) { FactoryBot.create(:color, name: "Blue") }

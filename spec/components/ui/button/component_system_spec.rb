@@ -18,7 +18,7 @@ RSpec.describe UI::Button::Component, :js, type: :system do
     expect(page).to have_button("Next")
     expect(page).to have_no_css(spinner)
 
-    fill_in "Email", with: "user@example.com"
+    fill_in "Email", with: "user@bikeindex.org"
     click_button "Next"
 
     expect(page).to have_css(spinner)
