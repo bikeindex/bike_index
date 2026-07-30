@@ -1,0 +1,65 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item tw:text-sm">
+    <%= render(UI::Dropdown::Component.new(
+      name: @imageable_type.present? ? "#{@imageable_type} only" : "All types",
+      button_size: :sm,
+      active: @imageable_type.present?
+    )) do |dropdown|
+      dropdown.with_entry_item(active: @imageable_type.blank?) { link_to "All types", url_for(sortable_search_params.merge(search_imageable_type: nil)) }
+      dropdown.with_entry_divider
+      PublicImage::IMAGEABLE_TYPES.each do |imageable_type|
+        dropdown.with_entry_item(active: @imageable_type == imageable_type) { link_to "#{imageable_type} only", url_for(sortable_search_params.merge(search_imageable_type: imageable_type)) }
+      end
+    end %>
+  </li>
+
+  <li class="nav-item tw:text-sm">
+    <%= render(UI::Dropdown::Component.new(
+      name: @kind.present? ? "#{@kind.titleize} only" : "All kinds",
+      button_size: :sm,
+      active: @kind.present?
+    )) do |dropdown|
+      dropdown.with_entry_item(active: @kind.blank?) { link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)) }
+      dropdown.with_entry_divider
+      PublicImage.kinds.each do |kind|
+        dropdown.with_entry_item(active: @kind == kind) { link_to "#{kind.titleize} only", url_for(sortable_search_params.merge(search_kind: kind)) }
+      end
+    end %>
+  </li>
+
+  <li class="nav-item tw:text-sm">
+    <%= render(UI::Dropdown::Component.new(
+      name: @storage.present? ? "Only #{storage_filters[@storage]}" : "All storage",
+      button_size: :sm,
+      active: @storage.present?
+    )) do |dropdown|
+      dropdown.with_entry_item(active: @storage.blank?) { link_to "All storage", url_for(sortable_search_params.merge(search_storage: nil)) }
+      dropdown.with_entry_divider
+      storage_filters.each do |value, label|
+        dropdown.with_entry_item(active: @storage == value) { link_to "Only #{label}", url_for(sortable_search_params.merge(search_storage: value)) }
+      end
+    end %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Private", url_for(sortable_search_params.merge(search_private: !@private)), class: "nav-link #{@private ? "active" : ""}" %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Show size", url_for(sortable_search_params.merge(search_size: !@render_size)), class: "nav-link #{@render_size ? "active" : ""}" %>
+  </li>
+<% end %>
+
+<% rendered_chart = capture do %>
+  <% if @render_chart %>
+    <% chart_types = @imageable_type.present? ? [@imageable_type] : PublicImage::IMAGEABLE_TYPES %>
+    <% series = chart_types.map { {name: it, data: UI::Chart::Component.time_range_counts(collection: matching_public_images.where(imageable_type: it), time_range: @time_range, column: @time_range_column)} } %>
+    <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true)) %>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "table", locals: {collection: @collection, render_sortable: true, render_size: @render_size} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, rendered_chart:, table_view:)) %>
