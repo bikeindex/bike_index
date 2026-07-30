@@ -49,8 +49,8 @@ module ImageServices
       stolen_record.bike&.update(updated_at: Time.current)
       stolen_record
     ensure
-      # Tempfiles (stock-photo fallback, activestorage) need close! or they sit in /tmp until GC
-      # runs their finalizer; a local carrierwave File is the stored image itself, so only close it.
+      # Tempfiles need close! or they sit in /tmp until GC; a local carrierwave File is the
+      # stored image itself, so only close it
       image.respond_to?(:close!) ? image.close! : image&.close
     end
 

@@ -8,7 +8,7 @@ module UI
           {template: "ui/forms/file_upload/component_preview/default"}
         end
 
-        # Renders nothing above the buttons unless the org actually has an avatar
+        # The preview above the button stays empty and hidden unless the org has an avatar
         def with_existing_image
           {template: "ui/forms/file_upload/component_preview/with_existing_image",
            locals: {organization: lookbook_organization}}

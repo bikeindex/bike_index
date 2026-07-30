@@ -3,10 +3,11 @@ import { DirectUpload } from '@rails/activestorage'
 import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='ui--forms--file-upload'
-// Shows the selected filename (or a count for multiple files) in the field, and
-// frames the controls as a drop target while a file is dragged over the page.
+// Shows the selected filename (or a count for multiple files) in the field, previews an
+// image pick, and frames the controls as a drop target while a file is dragged over the page.
+// With a url value, uploads the pick straight to storage and posts its signed blob id.
 export default class extends Controller {
-  static targets = ['input', 'filename', 'dropZone', 'signedId', 'preview']
+  static targets = ['input', 'filename', 'dropZone', 'preview', 'previewImage', 'signedId']
   static values = { placeholder: String, url: String, uploading: String, failed: String }
 
   connect () {
@@ -89,23 +90,25 @@ export default class extends Controller {
     if (this.urlValue && files[0]) this.upload(files[0])
   }
 
-  // Reads the file the browser already holds, so the preview lands immediately rather than
-  // waiting on the upload - and on the stored original rather than a variant of it.
+  // Reads the file the browser already holds, so the preview lands on the pick rather than
+  // on a round trip -- and shows the original rather than a processed copy of it.
   showPreview (file) {
     this.releaseObjectUrl()
     // An empty pick leaves whatever is attached on screen, since that's still what will submit
     if (!file) return
-    if (!file.type.startsWith('image/')) return collapse('hide', this.previewTarget)
 
+    const preview = this.previewTarget
+    if (!file.type.startsWith('image/')) return collapse('hide', preview)
+
+    const image = this.previewImageTarget
     this.objectUrl = URL.createObjectURL(file)
-    const image = this.previewTarget.querySelector('img')
     // Assigned rather than added, so a re-pick replaces these instead of stacking them.
-    // collapse animates to the natural height, which isn't known until the image decodes -
+    // collapse animates to the natural height, which isn't known until the image decodes --
     // and a file that won't decode shouldn't leave the previous preview on screen.
-    image.onload = () => collapse('show', this.previewTarget)
-    image.onerror = () => collapse('hide', this.previewTarget)
+    image.onload = () => collapse('show', preview)
+    image.onerror = () => collapse('hide', preview)
     image.src = this.objectUrl
-    this.previewTarget.href = this.objectUrl
+    preview.href = this.objectUrl
   }
 
   // Each object url pins the file in memory until it's revoked

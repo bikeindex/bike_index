@@ -205,13 +205,12 @@ module BikeAttributable
     end
 
     public_image = public_images.limit(1).first
+    # PublicImage owns which backend a row is on
+    return public_image.image_url(size) if public_image&.activestorage?
+
     image_col = public_image&.image
     # NOTE: avoid image_col.blank? — on Fog storage it issues an S3 HEAD per call (timed out the API search).
-    # Checked before the attachment so legacy rows never pay for an active_storage_attachments query.
-    if image_col&.path.blank?
-      return public_image.image_url(size) if public_image&.file&.attached?
-      return nil unless REMOTE_IMAGE_FALLBACK_URLS
-    end
+    return nil if image_col&.path.blank? && !REMOTE_IMAGE_FALLBACK_URLS
 
     image_url = image_col&.send(:url, size)
     # image_col.blank? and image_url.present? indicates it's a remote file in local development

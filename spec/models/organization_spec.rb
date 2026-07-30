@@ -459,7 +459,7 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "restrict_invitations?, permitted_domain_passwordless_signin, matching_domain" do
+  describe "restrict_invitations?, passwordless_email_matching" do
     it "is truthy" do
       expect(Organization.new.restrict_invitations?).to be_truthy
     end
@@ -467,13 +467,57 @@ RSpec.describe Organization, type: :model do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "example.gov") }
       it "is falsey" do
         expect(organization.restrict_invitations?).to be_falsey
-        expect(Organization.permitted_domain_passwordless_signin.pluck(:id)).to eq([organization.id])
         expect(Organization.passwordless_email_matching("fakeexample.gov")).to be_blank
         expect(Organization.passwordless_email_matching("f@example.gov@party.gov")).to be_blank
         expect(Organization.passwordless_email_matching("f@éxample.gov")).to be_blank # accent
         expect(Organization.passwordless_email_matching("party@@example.gov")).to be_blank
         expect(Organization.passwordless_email_matching("seth@EXample.gov")).to eq organization
         expect(Organization.passwordless_email_matching("seth@EXample.gov ")).to eq organization
+      end
+    end
+  end
+
+  describe "passwordless_user_creation?" do
+    it "is falsey" do
+      expect(Organization.new.passwordless_user_creation?).to be_falsey
+    end
+    context "saml_sso" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      it "is truthy without granting the passwordless feature" do
+        expect(organization.passwordless_user_creation?).to be_truthy
+        expect(organization.enabled_feature_slugs).to eq(["saml_sso"])
+      end
+    end
+    context "passwordless_users" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "passwordless_users") }
+      it "is truthy" do
+        expect(organization.passwordless_user_creation?).to be_truthy
+      end
+    end
+  end
+
+  describe "user_email_domain uniqueness" do
+    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled) }
+    let!(:sso_organization) { saml_configuration.organization }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+    before { sso_organization.update!(user_email_domain: "example.edu") }
+
+    it "blocks a second SSO organization from claiming the domain" do
+      organization.user_email_domain = "example.edu"
+      expect(organization).to_not be_valid
+      expect(organization.errors.attribute_names).to include(:user_email_domain)
+      expect(Organization.saml_email_matching("someone@example.edu")).to eq sso_organization
+    end
+
+    it "permits the claiming organization to keep its own domain" do
+      expect(sso_organization.update(name: "Renamed")).to be_truthy
+    end
+
+    context "organization without saml_sso" do
+      let(:organization) { FactoryBot.create(:organization) }
+      it "permits the shared domain, since it doesn't affect SSO routing" do
+        expect(organization.update(user_email_domain: "example.edu")).to be_truthy
+        expect(Organization.saml_email_matching("someone@example.edu")).to eq sso_organization
       end
     end
   end

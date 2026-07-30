@@ -54,6 +54,38 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  describe "activestorage" do
+    let!(:carrierwave) { FactoryBot.create(:public_image, :with_image_file) }
+    let!(:attached) { FactoryBot.create(:public_image, :with_attached_file) }
+
+    it "is the rows image_url dispatches to the new backend" do
+      expect(carrierwave.activestorage?).to be_falsey
+      expect(carrierwave.carrierwave?).to be_truthy
+      expect(attached.reload.activestorage?).to be_truthy
+      expect(attached.carrierwave?).to be_falsey
+
+      expect(PublicImage.activestorage.pluck(:id)).to eq([attached.id])
+      expect(PublicImage.carrierwave.pluck(:id)).to eq([carrierwave.id])
+      # Complements, so the pair tracks the migration without double-counting
+      expect(PublicImage.activestorage.count + PublicImage.carrierwave.count).to eq PublicImage.count
+    end
+
+    context "a row holding both" do
+      let!(:attached) do
+        FactoryBot.create(:public_image, :with_attached_file)
+          .tap { it.update!(image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
+      end
+
+      it "is activestorage - the attachment supersedes the carrierwave version" do
+        expect(attached.reload.image).to be_present
+        expect(attached.activestorage?).to be_truthy
+        expect(attached.image_url).to_not eq attached.image.url
+        expect(attached.image_url).to eq BlobUrl.for(attached.file.blob)
+        expect(PublicImage.activestorage.pluck(:id)).to include attached.id
+      end
+    end
+  end
+
   describe "image_url" do
     context "carrierwave image" do
       let(:public_image) { FactoryBot.create(:public_image, :with_image_file) }
@@ -80,8 +112,8 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
-  # Direct uploads land in the bucket before the server sees them, so this is the only
-  # thing keeping a registration from publishing a non-image or an enormous one
+  # Direct uploads land in the bucket before the server sees them, so this is all that keeps
+  # a registration from publishing a non-image or an enormous one
   describe "file_permitted" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:public_image) { PublicImage.new(imageable: bike, file: blob.signed_id) }
@@ -96,8 +128,7 @@ RSpec.describe PublicImage, type: :model do
       expect(public_image).to be_valid
     end
 
-    # What an iPhone uploads by default. Permitted here but absent from carrierwave's whitelist,
-    # so deriving this list from the uploader alone would reject them
+    # Permitted here but absent from carrierwave's whitelist, which alone would reject it
     context "heic" do
       let(:filename) { "bike.heic" }
       let(:content_type) { "image/heic" }
@@ -134,8 +165,8 @@ RSpec.describe PublicImage, type: :model do
       end
     end
 
-    # The blob is created from the client's JSON, then the browser PUTs straight to the bucket -
-    # so content_type is whatever the client typed until we look at the bytes
+    # Created from the client's JSON, then PUT straight to the bucket - so content_type is
+    # whatever the client typed until we look at the bytes
     context "a direct upload" do
       let(:data) { File.binread(Rails.root.join("spec/fixtures/bike.jpg")) }
       let(:blob) do

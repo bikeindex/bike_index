@@ -48,6 +48,7 @@
 #  index_organizations_on_manufacturer_id                           (manufacturer_id)
 #  index_organizations_on_parent_organization_id                    (parent_organization_id)
 #  index_organizations_on_slug                                      (slug) UNIQUE
+#  index_organizations_on_user_email_domain                         (user_email_domain)
 #
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
@@ -124,10 +125,12 @@ class Organization < ApplicationRecord
   has_one :hot_sheet_configuration
   has_one :organization_stolen_message
   has_one :impound_configuration
+  has_one :organization_saml_configuration
   has_many :hot_sheets
   has_many :organization_model_audits
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :organization_stolen_message
+  accepts_nested_attributes_for :organization_saml_configuration
   accepts_nested_attributes_for :locations, allow_destroy: true
 
   validates_presence_of :name
@@ -136,6 +139,12 @@ class Organization < ApplicationRecord
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
   validate :user_email_domain_format
+  # Two SSO orgs on one domain would make saml_email_matching's pick arbitrary (name order),
+  # silently sending logins to the wrong org's IdP. Non-SSO orgs may still share a domain.
+  validates_uniqueness_of :user_email_domain, allow_blank: true,
+    conditions: -> { with_enabled_feature_slugs("saml_sso") },
+    if: -> { enabled?("saml_sso") },
+    message: "is already used for SSO by another organization"
 
   attr_accessor :embedable_user_email, :skip_update
 
@@ -240,22 +249,42 @@ class Organization < ApplicationRecord
       where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
     end
 
-    def permitted_domain_passwordless_signin
-      where.not(user_email_domain: nil).with_enabled_feature_slugs("passwordless_users")
+    def passwordless_email_matching(str)
+      domain = email_domain(str)
+      return nil if domain.blank?
+
+      permitted_domain_signin("passwordless_users").find_by(user_email_domain: domain)
     end
 
-    def passwordless_email_matching(str)
-      str = EmailNormalizer.normalize(str)
-      return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
+    # The org that forces SSO for an email's domain: feature enabled + a live IdP config.
+    # SSO shares the passwordless domain field for routing (no separate saml domain column).
+    # Filter the domain in SQL and eager-load the config so a login never scans every SSO org.
+    def saml_email_matching(str)
+      domain = email_domain(str)
+      return nil if domain.blank?
 
-      domain = str.split("@").last
-      permitted_domain_passwordless_signin.detect { |o| o.user_email_domain == domain }
+      permitted_domain_signin("saml_sso").where(user_email_domain: domain)
+        .includes(:organization_saml_configuration)
+        .detect { |org| org.organization_saml_configuration&.configured? }
     end
 
     def example
       # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
       found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
       found || Organization.create(name: "Example Bike Shop")
+    end
+
+    private
+
+    def permitted_domain_signin(feature_slug)
+      where.not(user_email_domain: nil).with_enabled_feature_slugs(feature_slug)
+    end
+
+    def email_domain(str)
+      normalized = EmailNormalizer.normalize(str)
+      return nil unless normalized.present? && normalized.count("@") == 1 && normalized.match?(/.@.*\../)
+
+      normalized.split("@").last
     end
   end
   # never geocode, use default_location lat/long
@@ -273,6 +302,13 @@ class Organization < ApplicationRecord
 
   def restrict_invitations?
     !enabled?("passwordless_users") && !user_email_domain.present?
+  end
+
+  # Members of these organizations authenticate somewhere other than a Bike Index password
+  # prompt - a magic link, or the organization's IdP - so an invitation mints the account
+  # outright rather than emailing a request to pick a password.
+  def passwordless_user_creation?
+    any_enabled?(%w[passwordless_users saml_sso])
   end
 
   def sent_invitation_count

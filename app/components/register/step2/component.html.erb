@@ -111,6 +111,11 @@
       </div>
     </div>
 
+    <%#
+      Not gated on a confirmed address any more - the upload is scoped by the registration's
+      own token, so an anonymous registrant can attach a photo before confirming.
+    %>
+
     <div class="tw:mb-4">
       <span class="twlabel">
         <%= translation(".attach_photo", cycle_type:) %>
