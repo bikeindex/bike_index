@@ -3348,7 +3348,8 @@ CREATE TABLE public.registration_sequence_pages (
     listing_order integer,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    organization_specific boolean DEFAULT false NOT NULL
+    organization_specific boolean DEFAULT false NOT NULL,
+    heading character varying
 );
 
 
@@ -7567,6 +7568,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260729111713'),
 ('20260729070204'),
 ('20260728120000'),
 ('20260725192133'),

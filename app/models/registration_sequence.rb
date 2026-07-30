@@ -22,12 +22,12 @@
 class RegistrationSequence < ApplicationRecord
   STATUS_SCOPES = {"draft" => :draft, "active" => :active, "archived" => :archived, "template" => :templates}.freeze
   STATUSES = STATUS_SCOPES.keys.freeze
-  COPIED_PAGE_ATTRS = %w[title subtitle body listing_order organization_specific].freeze
+  COPIED_PAGE_ATTRS = %w[title heading subtitle body listing_order organization_specific].freeze
   # Follows "I, <registrant's name>," on the flow's final attestation. Seeded onto the
   # template, so an organization edits its own copy
   DEFAULT_ATTESTATION_TEXT = "have read, understood, and agree to comply with all of the " \
     "e-vehicle safety rules above as a condition of registering my vehicle. I understand that " \
-    "failure to comply may result in revocation of my registration."
+    "failure to comply may result in revocation of my registration and/or disciplinary action."
 
   belongs_to :organization, optional: true
 

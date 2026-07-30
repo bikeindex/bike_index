@@ -27,6 +27,7 @@ feature_name_and_slugs = [
   {name: "Organization Dashboard: Claimed ownerships", feature_slugs: ["claimed_ownerships"]},
   {name: "Organization Dashboard: Regional bike counts", feature_slugs: ["regional_bike_counts"]},
   {name: "Organization Registration Notes", feature_slugs: ["registration_notes"]},
+  {name: "Organization Registration Sequences", feature_slugs: ["registration_sequences"]},
   {name: "Organization Views: Bike recoveries", feature_slugs: ["show_recoveries"]},
   {name: "Organization Views: Bulk Import - standard", feature_slugs: ["show_bulk_import"]},
   {name: "Organization Views: Bulk Import impounded", feature_slugs: ["show_bulk_import_impound"]},

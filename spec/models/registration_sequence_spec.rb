@@ -31,7 +31,8 @@ RSpec.describe RegistrationSequence, type: :model do
       template = RegistrationSequence.template
       template.update!(faq_url: "https://example.com/faq", attestation_text: "agree to everything")
       template.registration_sequence_pages.create!(title: "Battery", subtitle: "Charge safely",
-        body: "<p>Hello</p>", listing_order: 0, organization_specific: true)
+        heading: "Looks like you have an e-vehicle!", body: "<p>Hello</p>", listing_order: 0,
+        organization_specific: true)
 
       draft = RegistrationSequence.draft_for(organization)
 
@@ -40,7 +41,8 @@ RSpec.describe RegistrationSequence, type: :model do
         attestation: "agree to everything")
       page = draft.registration_sequence_pages.first
       expect(page).to have_attributes(title: "Battery", subtitle: "Charge safely",
-        body: "<p>Hello</p>", organization_specific: true)
+        heading: "Looks like you have an e-vehicle!", body: "<p>Hello</p>",
+        organization_specific: true)
     end
 
     it "falls back to the default attestation when the template has none" do

@@ -630,6 +630,7 @@ RSpec.describe RegisterController, type: :request do
     let!(:battery_page) do
       FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 0,
         title: "Battery & charging", subtitle: "Charge safely",
+        heading: "Looks like you have an e-vehicle!",
         body: "<ul><li>Charge with the manufacturer's charger</li><li>Report a swollen battery</li></ul>")
     end
     let!(:campus_page) do
@@ -657,10 +658,12 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to step_path.call("3")
 
       follow_redirect!
+      # The heading is the page's own; the title labels its rules and names it on the review
+      expect(response.body).to include "Looks like you have an e-vehicle!"
       expect(response.body).to include "Battery &amp; charging"
       expect(response.body).to include "Charge with the manufacturer's charger"
       expect(response.body).to include "Electric (motorized) detected"
-      expect(response.body).to include "Safety check 1 of 2"
+      expect(response.body).to include "E-Vehicle Acknowledgment · Step 1 of 2"
       expect(response.body).to include "https://example.com/faq"
 
       # Ahead of where the registration stands clamps back to it

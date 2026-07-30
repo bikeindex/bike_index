@@ -167,7 +167,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
       expect(page).to have_content("Battery & charging")
       expect(page).to have_content("Electric (motorized) detected")
-      expect(page).to have_content("Safety check 1 of 2")
+      expect(page).to have_content("E-Vehicle Acknowledgment · Step 1 of 2")
       expect(page).to have_button("Continue", disabled: true)
 
       check "Charge with the manufacturer's charger"
@@ -183,7 +183,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
       expect(page).to have_content("You're almost done")
       expect(page).to have_content("agree to comply with all of the rules above")
-      expect(page).to have_button("Complete Bike registration", disabled: true)
+      expect(page).to have_button("Complete Bike Registration", disabled: true)
 
       # A page stays revisitable from the review, showing what was agreed to
       click_link "Review", match: :first
@@ -193,7 +193,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
       expect(page).to have_content("You're almost done")
       check "I, #{owner_email}, agree to comply with all of the rules above."
-      click_button "Complete Bike registration"
+      click_button "Complete Bike Registration"
 
       expect(page).to have_content("Registration saved")
       attestation = RegistrationSequenceAttestation.last

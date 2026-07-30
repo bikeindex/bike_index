@@ -5,6 +5,7 @@
 #
 #  id                       :bigint           not null, primary key
 #  body                     :text
+#  heading                  :string
 #  listing_order            :integer
 #  organization_specific    :boolean          default(FALSE), not null
 #  subtitle                 :text
@@ -29,6 +30,10 @@ class RegistrationSequencePage < ApplicationRecord
   def image_url
     BlobUrl.for(image.blob) if image.attached?
   end
+
+  # The big text at the top of the page. title is the page's name - shown as the
+  # label above its rules and in the review - so it stands in when there's no heading
+  def heading_text = heading.presence || title
 
   # body is a single <ul>; the registration flow renders one checkbox per <li>, and the
   # page editor one rich-text row per <li>
