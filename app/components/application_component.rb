@@ -32,33 +32,32 @@ class ApplicationComponent < ViewComponent::Base
     # Admin::Badges::User, which renders UI::Badge, and any of the three going stale is
     # the same bug.
     def markup_files
-      files = component_files(name.underscore.delete_suffix("/component"))
+      files = component_files(self)
       unscanned = files
       until unscanned.empty?
         unscanned = unscanned.flat_map { |file| rendered_in(file) }.uniq
-          .flat_map { |dir| component_files(dir) }.uniq - files
+          .flat_map { |component| component_files(component) }.uniq - files
         files += unscanned
       end
       files.sort
     end
 
-    # Previews render outside the cache block, so their markup can't go stale — and the
-    # components only they render aren't cached markup either. Both the preview file and
-    # its sidecar template directory, which is where most of them keep their markup.
-    def component_files(dir)
-      Rails.root.glob("app/components/#{dir}/**/*").select(&:file?)
+    # A component's markup is its sidecar files, which ViewComponent locates from the same
+    # identifier. Previews render outside the cache block, so their markup can't go stale —
+    # and the components only they render aren't cached markup either.
+    def component_files(component)
+      Pathname.new(component.identifier).dirname.glob("**/*").select(&:file?)
         .reject { |file| file.to_s.match?(%r{/(component_)?preview(\.rb|/)}) }
     end
 
     # Component references resolve the way Ruby resolves them — Registrations::Show::Wrapper
-    # renders a bare OrgAdmin::Component, which is registrations/show/org_admin — so walk
-    # out from the referencing file's own namespace before falling back to the full path.
+    # renders a bare OrgAdmin::Component — so walk out from the referencing file's own
+    # namespace and let the autoloader answer.
     def rendered_in(file)
-      namespace = file.dirname.relative_path_from(Rails.root.join("app/components")).to_s.split("/")
+      namespace = file.dirname.relative_path_from(Rails.root.join("app/components")).to_s.split("/").map(&:camelize)
       file.read.scan(RENDERED_COMPONENT).filter_map do |reference|
-        dir = reference.underscore.delete_suffix("/component")
-        namespace.length.downto(0).map { |i| [*namespace[0, i], dir].join("/") }
-          .find { |candidate| Rails.root.join("app/components", candidate).directory? }
+        namespace.length.downto(0).filter_map { |i| [*namespace[0, i], reference].join("::").safe_constantize }
+          .find { |component| component.is_a?(Class) && component < ViewComponent::Base }
       end
     end
   end
