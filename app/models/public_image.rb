@@ -28,6 +28,9 @@ class PublicImage < ApplicationRecord
     photo_of_receipt: 6
   }.freeze
 
+  # Every model with `has_many :public_images, as: :imageable`
+  IMAGEABLE_TYPES = %w[Bike BikeVersion Blog ImpoundClaim MailSnippet Organization SocialPost].freeze
+
   mount_uploader :image, PublicImageUploader
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
@@ -43,6 +46,13 @@ class PublicImage < ApplicationRecord
 
   default_scope { where(is_private: false).order(:listing_order) }
   scope :bike, -> { where(imageable_type: "Bike") }
+
+  def self.kinds = KIND_ENUM.keys.map(&:to_s)
+
+  # Imageables label themselves differently, and some (ImpoundClaim, MailSnippet, SocialPost) not at all
+  def imageable_name
+    imageable.try(:display_name) || imageable.try(:name) || imageable.try(:title)
+  end
 
   def default_name
     if bike?

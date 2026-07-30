@@ -20,6 +20,31 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  describe "imageable_name" do
+    it "is nil without an imageable" do
+      expect(PublicImage.new.imageable_name).to be_nil
+    end
+
+    it "is the bike display_name" do
+      bike = FactoryBot.create(:bike)
+      expect(PublicImage.new(imageable: bike).imageable_name).to eq bike.display_name
+    end
+
+    it "is the blog title" do
+      blog = FactoryBot.create(:blog, title: "Some blog post")
+      expect(PublicImage.new(imageable: blog).imageable_name).to eq "Some blog post"
+    end
+
+    it "is the organization name" do
+      organization = FactoryBot.create(:organization, name: "Cool Bike Shop")
+      expect(PublicImage.new(imageable: organization).imageable_name).to eq "Cool Bike Shop"
+    end
+
+    it "is nil for imageables that don't name themselves" do
+      expect(PublicImage.new(imageable: FactoryBot.create(:social_post)).imageable_name).to be_nil
+    end
+  end
+
   describe "process_image_upload" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }
