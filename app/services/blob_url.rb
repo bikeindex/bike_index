@@ -7,8 +7,7 @@ module BlobUrl
   SERVICE = Bikeindex::Application.config.active_storage.service
   LOCAL_STORAGE = %i[local test].include?(SERVICE)
   STORAGE_HOST = ENV.fetch("ACTIVE_STORAGE_HOST", "https://uploads.bikeindex.org")
-  # Non-production buckets each have their own domain; a service that isn't listed serves
-  # from the production one
+  # Each non-production bucket has its own domain; an unlisted service serves from production's
   STORAGE_HOSTS = {
     cloudflare_dev: ENV.fetch("ACTIVE_STORAGE_HOST_DEV", "https://dev-uploads.bikeindex.org"),
     cloudflare_test: ENV.fetch("ACTIVE_STORAGE_HOST_TEST", "https://test-uploads.bikeindex.org")
@@ -24,8 +23,8 @@ module BlobUrl
     end
   end
 
-  # `size` is a named variant on the attachment. Never calls `processed` - that would issue a
-  # storage existence check per image per render; the post-attach job guarantees they exist.
+  # `size` is a named variant. Never calls `processed` - that would be a storage existence
+  # check per image per render, and the post-attach job guarantees they exist
   def for_variant(attached = nil, size = nil)
     return if attached.blank?
     return self.for(attached.blob) if size.blank?

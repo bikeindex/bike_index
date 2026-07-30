@@ -205,7 +205,7 @@ module BikeAttributable
     end
 
     public_image = public_images.limit(1).first
-    # PublicImage owns which backend a row is on, so the rule isn't spelled twice
+    # PublicImage owns which backend a row is on
     return public_image.image_url(size) if public_image&.activestorage?
 
     image_col = public_image&.image

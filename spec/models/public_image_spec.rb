@@ -112,8 +112,8 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
-  # Direct uploads land in the bucket before the server sees them, so this is the only
-  # thing keeping a registration from publishing a non-image or an enormous one
+  # Direct uploads land in the bucket before the server sees them, so this is all that keeps
+  # a registration from publishing a non-image or an enormous one
   describe "file_permitted" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:public_image) { PublicImage.new(imageable: bike, file: blob.signed_id) }
@@ -128,8 +128,7 @@ RSpec.describe PublicImage, type: :model do
       expect(public_image).to be_valid
     end
 
-    # What an iPhone uploads by default. Permitted here but absent from carrierwave's whitelist,
-    # so deriving this list from the uploader alone would reject them
+    # Permitted here but absent from carrierwave's whitelist, which alone would reject it
     context "heic" do
       let(:filename) { "bike.heic" }
       let(:content_type) { "image/heic" }
@@ -166,8 +165,8 @@ RSpec.describe PublicImage, type: :model do
       end
     end
 
-    # The blob is created from the client's JSON, then the browser PUTs straight to the bucket -
-    # so content_type is whatever the client typed until we look at the bytes
+    # Created from the client's JSON, then PUT straight to the bucket - so content_type is
+    # whatever the client typed until we look at the bytes
     context "a direct upload" do
       let(:data) { File.binread(Rails.root.join("spec/fixtures/bike.jpg")) }
       let(:blob) do

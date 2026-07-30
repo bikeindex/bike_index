@@ -25,7 +25,7 @@ FactoryBot.define do
       image { File.open(Rails.root.join(image_path)) }
     end
 
-    # ActiveStorage rather than CarrierWave - the backend new direct uploads use
+    # ActiveStorage rather than CarrierWave
     trait :with_attached_file do
       file { {io: File.open(Rails.root.join(image_path)), filename: File.basename(image_path)} }
     end

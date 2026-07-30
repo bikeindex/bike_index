@@ -37,14 +37,11 @@ class PublicImage < ApplicationRecord
     large: {resize_to_fit: [2000, 1600], format: :webp}
   }.freeze
 
-  # No browser renders TIFF and only Safari renders HEIC, so ProcessPublicImageJob rewrites these
-  # as webp - the original is served directly
+  # No browser renders TIFF and only Safari HEIC, so the job rewrites these as webp
   WEBP_SOURCE_TYPES = %w[image/heic image/heif image/tiff].freeze
 
-  # Direct uploads bypass the uploader, so nothing else holds an attached file to a format we
-  # can serve, or to the size PublicImagesController caps. Wider than carrierwave's whitelist
-  # by HEIC, which iPhones shoot by default - anything we convert has to be permitted. Also
-  # feeds the file picker's accept attribute.
+  # Direct uploads bypass the uploader, so nothing else holds them to a format we can serve.
+  # Wider than carrierwave's whitelist by HEIC - anything we convert has to be permitted
   FILE_CONTENT_TYPES = (ApplicationUploader.extensions.map { Marcel::MimeType.for(extension: it) } +
     WEBP_SOURCE_TYPES).uniq.freeze
 
@@ -59,8 +56,7 @@ class PublicImage < ApplicationRecord
 
   belongs_to :imageable, polymorphic: true
 
-  # Only when a file is being assigned - otherwise every legacy carrierwave save pays a
-  # query to load an attachment it doesn't have
+  # Only when a file is assigned, so a legacy carrierwave save pays no attachment query
   validate :file_permitted, if: -> { attachment_changes["file"].present? }
   attr_writer :image_cache
   attr_accessor :skip_update
@@ -70,12 +66,11 @@ class PublicImage < ApplicationRecord
 
   default_scope { where(is_private: false).order(:listing_order) }
   scope :bike, -> { where(imageable_type: "Bike") }
-  # Exact complements, so the two counts add up to the migration's progress. A row holding both
-  # is activestorage - the attachment is what image_url serves once it exists
+  # Complements, so the counts add up to the migration's progress
   scope :activestorage, -> { where.associated(:file_attachment) }
   scope :carrierwave, -> { where.missing(:file_attachment) }
 
-  # Direct uploads are checked before the blob exists, the validation after - same rule
+  # Checked before the blob exists on direct upload, and again by the validation after
   def self.file_permitted?(content_type:, byte_size:)
     FILE_CONTENT_TYPES.include?(content_type) &&
       byte_size.to_i.between?(1, PublicImageUploader::MAX_FILE_SIZE)
@@ -101,25 +96,22 @@ class PublicImage < ApplicationRecord
     imageable_type == "Bike"
   end
 
-  # Which backend image_url and open_file read. A row holding both is activestorage: the
-  # attachment supersedes the carrierwave version rather than waiting on it being removed
+  # A row holding both is activestorage: the attachment supersedes the carrierwave version
   def activestorage?
     file.attached?
   end
 
   def carrierwave? = !activestorage?
 
-  # Serves whichever backend this record was uploaded through. CarrierWave versions and
-  # ActiveStorage variants share names, so callers pass the same size either way - the
-  # ActiveStorage dimensions are just larger.
+  # Both backends name their sizes the same, so callers pass one either way - the
+  # activestorage dimensions are just larger
   def image_url(size = nil)
     return image.url(*size) unless activestorage?
 
     BlobUrl.for_variant(file, size&.to_sym&.presence_in(VARIANTS.keys))
   end
 
-  # "processed" is only set once ProcessPublicImageJob has stripped the original and generated
-  # every variant, so a job that died partway through gets picked up again
+  # "processed" lands only once the variants exist, so a job that died partway is picked up again
   def file_needs_processing?
     activestorage? && !file.blob.binx_data.to_h["processed"]
   end
@@ -178,9 +170,8 @@ class PublicImage < ApplicationRecord
 
   private
 
-  # content_type is trustworthy here even though a direct upload declares its own: attaching runs
-  # Attached::Changes::CreateOne#initialize, which re-identifies it from the stored bytes with
-  # Marcel. byte_size is signed into the presigned PUT, so S3 rejects a body of any other length.
+  # A direct upload declares both, but attaching re-identifies content_type from the stored bytes
+  # and byte_size is signed into the presigned PUT - so S3 rejects a body of any other length
   def file_permitted
     blob = attachment_changes["file"].blob
     return if self.class.file_permitted?(content_type: blob.content_type, byte_size: blob.byte_size)
@@ -188,8 +179,8 @@ class PublicImage < ApplicationRecord
     errors.add(:file, :invalid)
   end
 
-  # Not blob.open, which unlinks its tempfile when the block exits - the caller needs the file to
-  # outlive this method. Plain download is one GET; the chunked form adds two HEADs on S3.
+  # Not blob.open: it unlinks on block exit, and the caller needs the file to outlive this.
+  # Plain download is one GET; the chunked form adds two HEADs on S3
   def attached_tempfile
     tempfile = Tempfile.new(["public_image", File.extname(file.filename.to_s)], binmode: true)
     tempfile.write(file.blob.download)

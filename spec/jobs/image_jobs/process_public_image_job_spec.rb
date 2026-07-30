@@ -3,15 +3,14 @@ require "rails_helper"
 RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
   let(:instance) { described_class.new }
   let(:bike) { FactoryBot.create(:bike) }
-  # Carries GPS EXIF and an orientation tag, which is the whole reason the job exists
+  # Carries GPS EXIF and an orientation tag, the whole reason the job exists
   let(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike, image_path:) }
   let(:image_path) { "spec/fixtures/exif_orientation.jpg" }
   let(:blob) { public_image.reload.file.blob }
 
   # Tags that identify the photographer, their camera or where they stood
   let(:identifying) { /gps|make|model|serial|lens|software|datetime|makernote/i }
-  # Autorotated - the orientation tag claimed 1173x1071
-  let(:dimensions) { [1071, 1173] }
+  let(:dimensions) { [1071, 1173] } # Autorotated; the tag claimed 1173x1071
   # Ours, not blob.metadata - a direct upload posts that, so it can't gate the strip
   let(:target_binx_data) { {"stripped" => true, "processed" => true} }
 
@@ -24,8 +23,7 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
     [image.width, image.height]
   end
 
-  # n-pages counts what the file holds, not what was loaded; formats that can't animate
-  # (jpeg, webp variants) don't carry the field at all
+  # n-pages counts what the file holds, not what loaded; formats that can't animate omit it
   def frame_count(data)
     image = Vips::Image.new_from_buffer(data, "")
     image.get_typeof("n-pages").zero? ? 1 : image.get("n-pages")
@@ -55,8 +53,7 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
     end
   end
 
-  # Rails only protects analyzed/identified/composed, so everything else in the direct upload's
-  # metadata is the client's to set. Gating on it would let an upload opt out of the strip.
+  # Rails protects only analyzed/identified/composed, so the rest is the client's to set
   it "still processes an upload that claims to be processed" do
     data = File.binread(Rails.root.join(image_path))
     blob = ActiveStorage::Blob.create_before_direct_upload!(filename: "gps.jpg",
@@ -92,7 +89,7 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
       expect(blob.reload.binx_data).to eq target_binx_data
       expect(blob.content_type).to eq "image/gif"
       expect(frame_count(blob.download)).to eq 4
-      # Variants are stills - the page height is what the dimensions describe
+      # Variants are stills
       expect(frame_count(public_image.file.variant(:small).download)).to eq 1
     end
   end
@@ -129,13 +126,12 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
     expect(public_image.reload.file_needs_processing?).to be_falsey
   end
 
-  # Recorded against the real bikeindex-test R2 bucket; re-record with R2_TEST_* from .env.test
+  # Recorded against the real bikeindex-test bucket; re-record with R2_TEST_* from .env.test
   context "iphone heic on R2", vcr: {cassette_name: "process_public_image_job-heic_r2", preserve_exact_body_bytes: true} do
     let(:image_path) { "spec/fixtures/bike_photo-gps.heic" }
     let(:public_image) { FactoryBot.create(:public_image, imageable: bike, file: r2_blob) }
     let(:dimensions) { [2400, 1800] }
-    # Fixed key - blob keys are random, and the cassette matches on path (the variant keys hang
-    # off it too), so a generated one would never replay
+    # Fixed key - the cassette matches on path, so a generated one would never replay
     let(:r2_blob) do
       ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join(image_path)),
         filename: "bike_photo-gps.heic", key: "spec-process-public-image-heic", service_name: :cloudflare_test)
@@ -150,15 +146,14 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
       instance.perform(public_image.id)
 
       expect(blob.reload.binx_data).to eq target_binx_data
-      # Rewritten as webp - only Safari renders heic, and the original is served directly
       expect(blob.content_type).to eq "image/webp"
       expect(blob.filename.to_s).to eq "bike_photo-gps.webp"
       original_data = blob.download
       expect(Vips::Image.new_from_buffer(original_data, "").get("vips-loader")).to start_with "webpload"
       expect(exif_fields(original_data)).to be_empty
 
-      # vips copies exif through a transform - a variant is only clean because the original was
-      # rewritten first. It re-synthesizes orientation/resolution/colorspace, so expect those.
+      # vips copies exif through a transform, so a variant is only clean because the original
+      # was rewritten first - and it re-synthesizes orientation/resolution/colorspace
       PublicImage::VARIANTS.each_key do |size|
         variant_fields = exif_fields(public_image.file.variant(size).download)
         expect(variant_fields.grep(identifying)).to be_empty

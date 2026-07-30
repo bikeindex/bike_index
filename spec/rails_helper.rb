@@ -101,9 +101,8 @@ VCR.configure do |config|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
   end
 
-  # aws-sdk addresses R2 virtual-host style (bucket.<account>.r2...), so R2_TEST_ENDPOINT never
-  # appears verbatim - filter the host itself to keep the account id out of cassettes. VCR swaps
-  # it back on playback, so a cassette recorded against real R2 replays against the .env placeholder.
+  # aws-sdk addresses R2 virtual-host style (bucket.<account>.r2...), so the endpoint never appears
+  # verbatim - filtering the host keeps the account id out, and VCR swaps it back on playback
   config.filter_sensitive_data("<R2_TEST_HOST>") { URI.parse(ENV["R2_TEST_ENDPOINT"]).host if ENV["R2_TEST_ENDPOINT"].present? }
 
   config.before_record do |i|
