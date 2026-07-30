@@ -45,6 +45,23 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  describe "image_size" do
+    it "is nil without an image" do
+      expect(PublicImage.new.image_size).to be_nil
+    end
+
+    it "is the carrierwave file size" do
+      public_image = FactoryBot.create(:public_image, :with_image_file)
+      expect(public_image.image_size).to eq public_image.image.size
+      expect(public_image.image_size).to be > 0
+    end
+
+    it "is the blob byte_size when attached" do
+      public_image = FactoryBot.create(:public_image, :with_attached_file)
+      expect(public_image.reload.image_size).to eq public_image.file.blob.byte_size
+    end
+  end
+
   describe "process_image_upload" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }

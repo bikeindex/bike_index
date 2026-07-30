@@ -82,11 +82,6 @@ class PublicImage < ApplicationRecord
 
   def self.kinds = KIND_ENUM.keys.map(&:to_s)
 
-  # Fog reads this with a request per image - only call from a cached fragment
-  def image_size
-    (image.size if image?)&.nonzero?
-  end
-
   # Imageables label themselves differently, and some (ImpoundClaim, MailSnippet, SocialPost) not at all
   def imageable_name
     imageable.try(:display_name) || imageable.try(:name) || imageable.try(:title)
@@ -125,6 +120,14 @@ class PublicImage < ApplicationRecord
     return image.url(*size) unless activestorage?
 
     BlobUrl.for_variant(file, size&.to_sym&.presence_in(VARIANTS.keys))
+  end
+
+  # The blob stores it, but fog resolves it with a request per image - so carrierwave
+  # rows are only worth asking from a cached fragment
+  def image_size
+    return file.blob.byte_size if activestorage?
+
+    (image.size if image?)&.nonzero?
   end
 
   # "processed" lands only once the variants exist, so a job that died partway is picked up again
