@@ -7,10 +7,11 @@ class ApplicationComponent < ViewComponent::Base
   # that cache's key. Fragment caches don't digest their own templates, so without this
   # editing markup serves stale HTML until someone remembers to bump a version constant.
   #
-  # Only memoized where the cache is live, so it costs one glob per boot in production
-  # while dev and test pick up edits without a reload.
+  # Memoized only where code doesn't reload, so it costs one glob per boot when deployed.
+  # Keying on perform_caching instead would go stale under dev:cache: the reloader
+  # ignores template-only edits, so nothing would clear the memo.
   def self.markup_digest(*globs)
-    return compute_markup_digest(globs) unless Rails.application.config.action_controller.perform_caching
+    return compute_markup_digest(globs) if Rails.env.local?
 
     @markup_digest ||= {}
     @markup_digest[globs] ||= compute_markup_digest(globs)
