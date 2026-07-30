@@ -62,28 +62,45 @@ RSpec.describe BikeServices::Register do
 
   describe "save_step_2" do
     let(:b_param) { BParam.create(origin: "register_flow", params: {bike: bike_params}.as_json) }
-    let(:save) { ->(fields) { described_class.save_step_2(b_param, user: nil, image: nil, bike_params: fields) } }
+    let(:save) do
+      ->(fields, signed_id = nil, image = nil) do
+        described_class.save_step_2(b_param, user: nil, image:, image_signed_id: signed_id, bike_params: fields)
+      end
+    end
 
-    it "stores absent serials and marks the details completed" do
+    it "stores absent serials, marks the details completed, and keeps saved values over blanks" do
       save.call("serial_number" => "unknown", "status" => "status_with_owner")
       expect(b_param.reload.bike["serial_number"]).to eq "unknown"
       expect(described_class.send(:details_completed?, b_param)).to be_truthy
 
       save.call("serial_number" => "made_without_serial", "status" => "status_with_owner")
       expect(b_param.reload.bike["serial_number"]).to eq "made_without_serial"
-    end
 
-    it "keeps saved values over blanks - except colors, where blank removes" do
       color = FactoryBot.create(:color)
       save.call("frame_size_number" => "56", "frame_size_unit" => "cm",
         "secondary_frame_color_id" => color.id.to_s, "status" => "status_with_owner")
       expect(b_param.reload.bike["frame_size_unit"]).to eq "cm"
       expect(b_param.bike["secondary_frame_color_id"]).to eq color.id.to_s
 
+      # blank removes a color, but leaves everything else as saved
       save.call("frame_size" => "m", "frame_size_unit" => "in", "secondary_frame_color_id" => "")
       expect(b_param.reload.bike["frame_size"]).to eq "m"
       expect(b_param.bike["frame_size_unit"]).to eq "cm" # unit without a number isn't overwritten
       expect(b_param.bike["secondary_frame_color_id"]).to be_blank
+    end
+
+    # What a submit without JS posts - the field keeps its name until the uploader takes over
+    context "with a file rather than a signed id" do
+      let(:image) { Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg") }
+
+      it "stores the upload on the b_param" do
+        save.call({"status" => "status_with_owner"}, nil, image)
+
+        expect(b_param.reload.image).to be_present
+        expect(b_param.image_signed_id).to be_blank
+        # It's a file, so it can't ride along in the params json
+        expect(b_param.params.to_json).to_not include "bike.jpg"
+      end
     end
   end
 
