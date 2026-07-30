@@ -7,22 +7,32 @@ class ApplicationComponent < ViewComponent::Base
   # that cache's key. Fragment caches don't digest their own templates, so without this
   # editing markup serves stale HTML until someone remembers to bump a version constant.
   #
-  # Memoized only where code doesn't reload, so it costs one glob per boot when deployed.
-  # Keying on perform_caching instead would go stale under dev:cache: the reloader
-  # ignores template-only edits, so nothing would clear the memo.
+  # Memoized only where code doesn't reload, so it costs one glob per set per boot when
+  # deployed — keyed by globs because a shared component (UI::Table) digests a different
+  # set for each caller. Keying on perform_caching instead would go stale under dev:cache:
+  # the reloader ignores template-only edits, so nothing would clear the memo.
   def self.markup_digest(globs)
     return compute_markup_digest(globs) if Rails.env.local?
 
-    @markup_digest ||= compute_markup_digest(globs)
+    @markup_digests ||= {}
+    @markup_digests[globs] ||= compute_markup_digest(globs)
   end
 
   def self.compute_markup_digest(globs)
-    files = Array(globs).flat_map { |glob| Rails.root.glob(glob) }.select(&:file?)
-      # Previews render outside the cache block, so their markup can't go stale
-      .reject { |file| file.to_s.match?(%r{/(component_preview\.rb|preview/)}) }.sort
+    files = Array(globs).flat_map { |glob| glob_markup(glob) }.sort
     Digest::MD5.hexdigest(files.map { |file| "#{file.relative_path_from(Rails.root)}\n#{file.read}" }.join("\n"))[0, 12]
   end
   private_class_method :compute_markup_digest
+
+  # Raises rather than digesting nothing, so a typo in a glob can't quietly stop
+  # covering a directory
+  def self.glob_markup(glob)
+    Rails.root.glob(glob).select(&:file?)
+      # Previews render outside the cache block, so their markup can't go stale
+      .reject { |file| file.to_s.match?(%r{/(component_preview\.rb|preview/)}) }
+      .presence || raise(ArgumentError, "No cached markup matched #{glob}")
+  end
+  private_class_method :glob_markup
 
   def raise_if_invalid_value!(attribute, value, options = {})
     return if options.include?(value)

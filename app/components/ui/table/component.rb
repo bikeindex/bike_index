@@ -5,10 +5,14 @@ module UI
     class Component < ApplicationComponent
       include Binxtils::SortableHelper
 
-      # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
-      def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil, render_sortable: false, sticky: false)
+      CACHED_MARKUP = ["app/components/ui/table/**/*", "app/components/ui/table_column/**/*"].freeze
+
+      # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users"),
+      # with cached_markup globbing whatever the caller renders into the cells — rows are
+      # cached without digesting their own markup, so the key folds in that digest.
+      def initialize(records:, cache_key: nil, cached_markup: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil, render_sortable: false, sticky: false)
         @records = records
-        @cache_key = cache_key
+        @cache_key = cache_key && [cache_key, self.class.markup_digest(CACHED_MARKUP + Array(cached_markup))].join("-")
         @classes = classes
         @bordered = !unbordered
         @sort = sort

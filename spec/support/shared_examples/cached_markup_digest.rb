@@ -5,9 +5,9 @@
 # their CACHED_MARKUP globs into the cache key, which invalidates on its own — this just
 # checks that wiring is live, so a mistyped glob can't silently stop covering a directory.
 # Pass sample_preview to also check that previews stay out of the digest.
-RSpec.shared_examples "cached_markup_digest" do |sample_template, sample_preview = nil|
+RSpec.shared_examples "cached_markup_digest" do |sample_file, sample_preview = nil|
   let(:cached_markup) { Array(described_class::CACHED_MARKUP) }
-  let(:template) { Rails.root.join(sample_template) }
+  let(:file) { Rails.root.join(sample_file) }
 
   # A method, not a let — the point is to recompute it either side of the edit
   def markup_digest
@@ -16,13 +16,13 @@ RSpec.shared_examples "cached_markup_digest" do |sample_template, sample_preview
 
   it "covers the cached markup" do
     expect(cached_markup).to be_present
-    expect(template).to exist # a moved template shouldn't silently stop being covered
+    expect(file).to exist # a moved file shouldn't silently stop being covered
     expect(markup_digest).to be_present
 
-    original = template.read
-    expect { template.write("#{original}\n<!-- edited -->\n") }.to change { markup_digest }
+    original = file.read
+    expect { file.write("#{original}\n") }.to change { markup_digest }
   ensure
-    template.write(original) if original
+    file.write(original) if original
   end
 
   if sample_preview
