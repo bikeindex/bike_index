@@ -7,10 +7,8 @@ module Admin
     # render_sortable to enable sort links, render_multi_check for the delete
     # checkboxes, and skip_user to drop the owner column.
     class Component < ApplicationComponent
-      # UI::Table caches each row without digesting the cells rendered into it, so the
-      # key carries a digest of them. The cached_markup_digest spec keeps MARKUP_DIGEST
-      # current, following the components the cells render.
-      MARKUP_DIGEST = "dc6e41152f42"
+      # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
+      MARKUP_DIGEST = "733c5c375e31"
 
       def initialize(bikes:, no_show_header: false, show_serial: false, render_sortable: false,
         skip_user: false, render_multi_check: false)

@@ -3,7 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Org::SearchResults::BikesTable::Component, type: :component do
-  # UI::Table caches each row, so every component rendered into one counts too
   it_behaves_like "cached_markup_digest"
 
   let(:instance) { described_class.new(**options) }

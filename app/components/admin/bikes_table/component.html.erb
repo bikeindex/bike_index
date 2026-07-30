@@ -1,8 +1,3 @@
-<%# Locals, not @ivars: UI::Table instance_execs cell blocks against itself, %>
-<%# so instance variables resolve to nil inside them — closures capture these. %>
-<% check_mark = helpers.check_mark %>
-<% search_emoji = helpers.search_emoji %>
-
 <%# require inline CSS setting because of caching %>
 <% unless helpers.display_dev_info? %>
   <style>.only-dev-visible {display: none !important;} </style>

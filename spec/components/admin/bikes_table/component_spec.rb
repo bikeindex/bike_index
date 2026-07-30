@@ -3,7 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Admin::BikesTable::Component, type: :component do
-  # UI::Table caches each row, so every component rendered into one counts too
   it_behaves_like "cached_markup_digest"
 
   let(:bike) { FactoryBot.create(:bike, :with_ownership, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes") }

@@ -6,10 +6,9 @@ module Registrations
       # Renders the registration show page as the resolved [kind, organization]
       # perspective (e.g. [:public, nil] or [:staff, org]) and fragment-caches it.
       class Component < ApplicationComponent
-        # Nothing digests the nested components' templates, so the key carries a digest
-        # of them. The cached_markup_digest spec keeps MARKUP_DIGEST current, following
-        # what this tree renders out into UI:: and elsewhere.
-        MARKUP_DIGEST = "1d049701f0e1"
+        # Digest of the markup inside the cache block — the cached_markup_digest spec
+        # keeps it current, following what this tree renders out into UI:: and elsewhere
+        MARKUP_DIGEST = "0b9c0ce42900"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil)
           @bike = bike

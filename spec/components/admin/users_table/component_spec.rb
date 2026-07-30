@@ -3,7 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Admin::UsersTable::Component, type: :component do
-  # UI::Table caches each row, so every component rendered into one counts too
   it_behaves_like "cached_markup_digest"
 
   let(:user) { FactoryBot.create(:user_confirmed, name: "Sally Rider") }

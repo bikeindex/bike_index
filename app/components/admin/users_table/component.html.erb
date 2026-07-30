@@ -1,7 +1,3 @@
-<%# Locals, not @ivars: UI::Table instance_execs cell blocks against itself, %>
-<%# so instance variables resolve to nil inside them — closures capture these. %>
-<% check_mark = helpers.check_mark %>
-
 <% unless @render_deleted %>
   <style>.deleted-cell {display: none !important;}</style>
 <% end %>
@@ -47,7 +43,7 @@
   <% end %>
 
   <% table.column(label: "Bikes", header_classes: "tw:font-normal") do |user| %>
-    <%= helpers.number_display(user.ownerships.count) %>
+    <%= number_display(user.ownerships.count) %>
   <% end %>
 
   <% table.column(label: "OrganizationRoles", header_classes: "tw:font-normal") do |user| %>
@@ -65,7 +61,7 @@
 
   <% table.column(label: "Ambassador tasks", classes: "tw:text-xs", header_classes: "tw:font-normal") do |user| %>
     <% if user.ambassador? %>
-      <%= helpers.number_display(Ambassador.find(user.id).progress_count) %>
+      <%= number_display(Ambassador.find(user.id).progress_count) %>
     <% end %>
   <% end %>
 

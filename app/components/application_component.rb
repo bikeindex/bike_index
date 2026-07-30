@@ -5,63 +5,49 @@ class ApplicationComponent < ViewComponent::Base
 
   # e.g. UI::Badge::Component, in a render call or a constant reference
   RENDERED_COMPONENT = /\b(?:[A-Z][A-Za-z0-9]*::)+Component\b/
-  # A component's digest usually sits in the markup it covers, so it can't count toward
-  # it — committing a new value would otherwise change the value again
+  # A component's digest sits in the markup it covers, so it can't count toward it —
+  # committing a new value would otherwise change the value again
   DIGEST_ASSIGNMENT = /^\s*MARKUP_DIGEST = .*$/
+  private_constant :RENDERED_COMPONENT, :DIGEST_ASSIGNMENT
 
   class << self
-    # A digest of the markup rendered inside this component's fragment cache, for folding
-    # into that cache's key — fragment caches don't digest their own templates, so without
-    # this editing markup serves stale HTML. Defaults to the component's own directory;
-    # pass globs for markup that isn't a component (an admin table's view partial).
+    # A digest of this component's markup, for folding into the key of a fragment cache
+    # it renders inside — fragment caches don't digest their own templates, so without
+    # this editing markup serves stale HTML.
     #
     # Callers commit the result as MARKUP_DIGEST rather than calling this per render:
     # reading every file takes milliseconds, and every process would pay it. The
     # cached_markup_digest shared example recomputes it and fails when the markup has
-    # moved on. Nothing here is fast, and nothing needs to be — it only runs in specs.
-    def calculated_markup_digest(globs = own_markup)
-      contents = markup_files(globs)
+    # moved on, so this only ever runs in specs.
+    def calculated_markup_digest
+      contents = markup_files
         .map { |file| "#{file.relative_path_from(Rails.root)}\n#{file.read.sub(DIGEST_ASSIGNMENT, "")}" }
       Digest::MD5.hexdigest(contents.join("\n"))[0, 12]
     end
 
-    # The files matching globs, plus the markup of every component they render, followed
+    private
+
+    # This component's own files, plus the markup of every component they render, followed
     # transitively — an admin cell renders Admin::UserCell, which renders
     # Admin::Badges::User, which renders UI::Badge, and any of the three going stale is
     # the same bug.
-    def markup_files(globs = own_markup)
-      files = glob_markup(globs)
+    def markup_files
+      files = component_files(name.underscore.delete_suffix("/component"))
       unscanned = files
       until unscanned.empty?
-        unscanned = rendered_component_dirs(unscanned).flat_map { |dir| cached_files("app/components/#{dir}/**/*") } - files
+        unscanned = unscanned.flat_map { |file| rendered_in(file) }.uniq
+          .flat_map { |dir| component_files(dir) }.uniq - files
         files += unscanned
       end
       files.sort
     end
 
-    private
-
-    def own_markup
-      "app/components/#{name.underscore.delete_suffix("/component")}/**/*"
-    end
-
-    # Raises rather than digesting nothing, so a typo in a glob can't quietly stop
-    # covering a directory
-    def glob_markup(globs)
-      Array(globs).flat_map do |glob|
-        cached_files(glob).presence || raise(ArgumentError, "No cached markup matched #{glob}")
-      end
-    end
-
     # Previews render outside the cache block, so their markup can't go stale — and the
-    # components only they render aren't cached markup either
-    def cached_files(glob)
-      Rails.root.glob(glob).select(&:file?)
-        .reject { |file| file.to_s.match?(%r{/(component_preview\.rb|preview/)}) }
-    end
-
-    def rendered_component_dirs(files)
-      files.flat_map { |file| rendered_in(file) }.uniq
+    # components only they render aren't cached markup either. Both the preview file and
+    # its sidecar template directory, which is where most of them keep their markup.
+    def component_files(dir)
+      Rails.root.glob("app/components/#{dir}/**/*").select(&:file?)
+        .reject { |file| file.to_s.match?(%r{/(component_)?preview(\.rb|/)}) }
     end
 
     # Component references resolve the way Ruby resolves them — Registrations::Show::Wrapper
@@ -69,7 +55,6 @@ class ApplicationComponent < ViewComponent::Base
     # out from the referencing file's own namespace before falling back to the full path.
     def rendered_in(file)
       namespace = file.dirname.relative_path_from(Rails.root.join("app/components")).to_s.split("/")
-      namespace = [] if namespace.first == ".."
       file.read.scan(RENDERED_COMPONENT).filter_map do |reference|
         dir = reference.underscore.delete_suffix("/component")
         namespace.length.downto(0).map { |i| [*namespace[0, i], dir].join("/") }

@@ -8,10 +8,8 @@ module Org
       # the search form, column-toggle settings, or pagination (e.g. a user's other
       # registrations on the show page). Pass render_sortable to enable sort links.
       class Component < ApplicationComponent
-        # UI::Table caches each row without digesting the cells rendered into it, so the
-        # key carries a digest of them. The cached_markup_digest spec keeps MARKUP_DIGEST
-        # current, following the components the cells render.
-        MARKUP_DIGEST = "4ae949e500c0"
+        # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
+        MARKUP_DIGEST = "1d6fe7e5f29d"
 
         delegate :additional_registration_fields, :column_renames, to: :settings_component
 
