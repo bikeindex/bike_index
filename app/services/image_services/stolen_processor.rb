@@ -48,6 +48,10 @@ module ImageServices
       end
       stolen_record.bike&.update(updated_at: Time.current)
       stolen_record
+    ensure
+      # Tempfiles need close! or they sit in /tmp until GC; a local carrierwave File is the
+      # stored image itself, so only close it
+      image.respond_to?(:close!) ? image.close! : image&.close
     end
 
     #
